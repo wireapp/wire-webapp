@@ -1,0 +1,8 @@
+ls:
+  libraries/config/src:
+    .dir: camelCase
+    .ts: camelCase
+    .spec.ts: camelCase
+    .config.ts: camelCase
+    .config.spec.ts: camelCase
+    .types.ts: camelCase

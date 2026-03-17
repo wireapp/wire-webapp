@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2021 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,13 +17,18 @@
  *
  */
 
-import {initClient} from './initClient';
+import {$convertToMarkdownString} from '@lexical/markdown';
+import {$getRoot} from 'lexical';
 
-(async () => {
-  const apiClient = await initClient();
-  apiClient['accessTokenStore'].accessTokenData!.access_token = 'invalid';
-  await apiClient.api.conversation.getConversationList();
-})().catch(error => {
-  console.error(error);
-  process.exit(1);
-});
+import {markdownTransformers} from './markdownTransformers';
+
+export const serializeMessage = (showMarkdownPreview: boolean): string => {
+  if (!showMarkdownPreview) {
+    return $getRoot()
+      .getChildren()
+      .map(node => node.getTextContent())
+      .join('\n');
+  }
+
+  return $convertToMarkdownString(markdownTransformers, undefined, true);
+};

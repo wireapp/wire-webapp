@@ -68,7 +68,7 @@ export const useRestoreParentNode = ({
             path: RECYCLE_BIN_PATH,
           });
         });
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(error);
         onError();
       }

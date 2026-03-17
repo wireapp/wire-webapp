@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
@@ -26,12 +27,42 @@ import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
 
 import {isObject} from '../guards/common';
 
-export function isAxiosError<T>(errorCandidate: any): errorCandidate is AxiosError<T> {
-  return errorCandidate && errorCandidate.isAxiosError === true;
+type ErrorWithCode = Error & {readonly code: number};
+type ErrorWithType = Error & {readonly type: string};
+
+export function isAxiosError<T>(errorCandidate: unknown): errorCandidate is AxiosError<T> {
+  return (
+    isObject(errorCandidate) &&
+    (('isAxiosError' in errorCandidate && errorCandidate.isAxiosError === true) || 'response' in errorCandidate)
+  );
 }
 
-export function isBackendError(errorCandidate: any): errorCandidate is BackendError {
-  return errorCandidate && typeof errorCandidate.label === 'string' && typeof errorCandidate.message === 'string';
+export function isBackendError(errorCandidate: unknown): errorCandidate is BackendError {
+  return isObject(errorCandidate) && 'label' in errorCandidate && typeof errorCandidate.label === 'string';
+}
+
+export function isErrorWithCode(errorCandidate: unknown): errorCandidate is ErrorWithCode {
+  return isObject(errorCandidate) && 'code' in errorCandidate && typeof errorCandidate.code === 'number';
+}
+
+export function isErrorWithType(errorCandidate: unknown): errorCandidate is ErrorWithType {
+  return isObject(errorCandidate) && 'type' in errorCandidate && typeof errorCandidate.type === 'string';
+}
+
+export function toError(errorCandidate: unknown): Error {
+  if (is.error(errorCandidate)) {
+    return errorCandidate;
+  }
+
+  if (isObject(errorCandidate)) {
+    return errorCandidate as Error;
+  }
+
+  if (typeof errorCandidate === 'string') {
+    return new Error(errorCandidate);
+  }
+
+  return new Error('Unknown error', {cause: errorCandidate});
 }
 
 export function isConversationEntity(conversation: any): conversation is Conversation {

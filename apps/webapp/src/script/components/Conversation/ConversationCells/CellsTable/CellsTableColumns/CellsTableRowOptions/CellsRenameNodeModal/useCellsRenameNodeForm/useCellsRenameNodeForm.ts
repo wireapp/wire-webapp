@@ -51,7 +51,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     try {
       await cellsRepository.renameNode({currentPath: node.path, newName: buildNewName(name)});
       onSuccess();
-    } catch (error) {
+    } catch (error: unknown) {
       setError(t('cells.renameNodeModal.error'));
     }
   };

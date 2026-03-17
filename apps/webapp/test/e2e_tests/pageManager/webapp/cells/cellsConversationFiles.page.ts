@@ -20,12 +20,10 @@
 import {Locator, Page} from '@playwright/test';
 
 export class CellsConversationFilesPage {
-  readonly page: Page;
   filesList: Locator;
   readonly searchInput: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.filesList = page.locator('table td[data-cell="Name"]');
     this.searchInput = page.getByRole('textbox', {name: 'Search files and folders'});
   }

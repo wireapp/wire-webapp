@@ -23,6 +23,7 @@ import {renderHook} from '@testing-library/react';
 
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {createDeterministicWallClock} from '../clock/deterministicWallClock';
+import {reliableWebsocketConnectionFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {
   RootContext,
@@ -51,7 +52,7 @@ function createRootProviderWrapper(
     initialCurrentTimestampInMilliseconds: wallClockTimestampInMilliseconds,
   });
   function isFeatureToggleEnabledForTest(featureName: StartupFeatureToggleName): boolean {
-    return featureName === 'reliable-websocket-connection';
+    return featureName === reliableWebsocketConnectionFeatureToggleName;
   }
 
   const isFeatureToggleEnabled = jest.fn(isFeatureToggleEnabledForTest);
@@ -126,7 +127,7 @@ describe('RootProvider', () => {
 
     const {result} = renderHook(useApplicationContext, {wrapper});
 
-    expect(result.current.isFeatureToggleEnabled('reliable-websocket-connection')).toBe(true);
-    expect(isFeatureToggleEnabled).toHaveBeenCalledWith('reliable-websocket-connection');
+    expect(result.current.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
+    expect(isFeatureToggleEnabled).toHaveBeenCalledWith(reliableWebsocketConnectionFeatureToggleName);
   });
 });

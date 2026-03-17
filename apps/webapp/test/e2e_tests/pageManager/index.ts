@@ -73,13 +73,15 @@ import {StartUIPage} from './webapp/pages/startUI.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
 import {GuestLinkPasswordModal} from './webapp/modals/guestLinkPassword.modal';
 import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
+import {CreateConversationModal} from './webapp/modals/createConversation';
+import {InviteModal} from './webapp/modals/invite.modal';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
 export class PageManager {
   private readonly cache = new Map<string, any>();
 
-  constructor(readonly page: Page) {}
+  constructor(public readonly page: Page) {}
 
   static from(page: Page): PageManager;
   static from(page: Promise<Page>): Promise<PageManager>;
@@ -106,6 +108,14 @@ export class PageManager {
 
   openLoginPage = async () => {
     await this.page.goto(`${webAppPath}auth/#/login`);
+  };
+
+  openRegistrationPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/createaccount`);
+  };
+
+  openSSOPage = async () => {
+    await this.page.goto(`${webAppPath}auth/#/sso`);
   };
 
   openUrl = (url: string) => {
@@ -210,6 +220,9 @@ export class PageManager {
       optionModal: () => this.getOrCreate('webapp.modals.optionModal', () => new OptionModal(this.page)),
       guestLinkPassword: () =>
         this.getOrCreate('webapp.modals.guestLinkPassword', () => new GuestLinkPasswordModal(this.page)),
+      createConversation: () =>
+        this.getOrCreate('webapp.modals.createConversation', () => CreateConversationModal(this.page)),
+      invite: () => this.getOrCreate('webapp.modals.invite', () => InviteModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

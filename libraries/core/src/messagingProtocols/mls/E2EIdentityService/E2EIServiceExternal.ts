@@ -185,12 +185,22 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       clientIds,
     );
 
-    return deviceIdentities.map(identity => ({
-      ...identity,
-      deviceId: parseFullQualifiedClientId(identity.clientId).client,
-      credentialType: identity.credentialType,
-      qualifiedUserId: userClientsMap[identity.clientId],
-    }));
+    return deviceIdentities.flatMap(identity => {
+      const qualifiedUserId = userClientsMap[identity.clientId];
+
+      if (qualifiedUserId === undefined) {
+        return [];
+      }
+
+      return [
+        {
+          ...identity,
+          deviceId: parseFullQualifiedClientId(identity.clientId).client,
+          credentialType: identity.credentialType,
+          qualifiedUserId,
+        },
+      ];
+    });
   }
 
   public async isFreshMLSSelfClient(): Promise<boolean> {

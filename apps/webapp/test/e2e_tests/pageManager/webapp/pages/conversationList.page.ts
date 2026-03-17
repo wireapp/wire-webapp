@@ -22,7 +22,7 @@ import {Locator, Page} from '@playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 
 export class ConversationListPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly list: Locator;
   readonly blockConversationMenuButton: Locator;
@@ -40,6 +40,8 @@ export class ConversationListPage {
   readonly conversationListHeaderTitle: Locator;
   readonly joinCallButton: Locator;
   readonly clearContentButton: Locator;
+  readonly notificationsButton: Locator;
+  readonly addToFavoritesButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -62,6 +64,8 @@ export class ConversationListPage {
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
     this.joinCallButton = page.getByRole('button', {name: 'Join'});
     this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
+    this.notificationsButton = page.getByRole('menuitem', {name: 'Notifications'});
+    this.addToFavoritesButton = page.getByRole('menuitem', {name: 'Add to favorites'});
   }
 
   async isConversationBlocked(conversationName: string) {
@@ -95,7 +99,7 @@ export class ConversationListPage {
   }
 
   async setNotifications(level: 'Everything' | 'Mentions and replies' | 'Nothing') {
-    await this.page.getByRole('menuitem', {name: 'Notifications'}).click(); // Click the "Notifications" menu item
+    await this.notificationsButton.click(); // Click the "Notifications" menu item
     await this.page.getByRole('radiogroup').locator('label', {hasText: level}).click(); // Click the specified radio button
   }
 

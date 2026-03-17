@@ -44,6 +44,7 @@ import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
+import {toError} from 'Util/TypePredicateUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {
@@ -107,7 +108,7 @@ const OAuthPermissionsComponent = ({
     try {
       const url = await postOauthCode({...oauthParams, scope: cleanedScopes});
       window.location.replace(url);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
     }
   };
@@ -135,12 +136,12 @@ const OAuthPermissionsComponent = ({
         throw Error('OAuth client not found');
       }
     };
-    getUserData().catch(error => {
+    getUserData().catch((error: unknown) => {
       console.error(error);
-      if (error.message === 'OAuth client not found') {
+      if (toError(error).message === 'OAuth client not found') {
         window.location.replace('/');
       } else {
-        doLogout().catch(error => {
+        doLogout().catch((error: unknown) => {
           console.error(error);
         });
       }

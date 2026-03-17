@@ -61,7 +61,7 @@ export class OAuthAPI {
     };
     try {
       await this.client.sendJSON(config);
-    } catch (error) {
+    } catch (error: unknown) {
       throw error;
     }
   }
@@ -78,7 +78,7 @@ export class OAuthAPI {
     try {
       const response = await this.client.sendJSON(config);
       return response.headers.location;
-    } catch (error) {
+    } catch (error: unknown) {
       throw error;
     }
   }

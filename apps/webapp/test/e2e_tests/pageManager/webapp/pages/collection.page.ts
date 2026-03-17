@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 
 /** POM for the "collection". This page is accessible by searching for a message within a conversation. */
 export class CollectionPage {
-  readonly page: Page;
+  private readonly page: Page;
   readonly component: Locator;
   readonly searchResults: Locator;
 
@@ -57,5 +57,4 @@ export class CollectionPage {
   get noResultsMessage() {
     return this.component.getByText('No results.', {exact: true});
   }
-
 }

@@ -266,7 +266,7 @@ export class MediaDevicesHandler {
       this.onMediaDevicesRefresh?.();
 
       return mediaDevices;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update MediaDevice list: ${error instanceof Error ? error.message : ''}`, error);
       throw error;
     }

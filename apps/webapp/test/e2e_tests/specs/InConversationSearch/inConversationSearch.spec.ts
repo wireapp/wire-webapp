@@ -55,6 +55,8 @@ test.describe('In Conversation Search', () => {
       await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await expect(userAPages.conversation().getMessage({sender: userB})).toHaveCount(3);
+
       await userAPages.conversation().searchButton.click();
       const collection = userAPages.collection();
       await expect(collection.getSection('Images')).toBeVisible();
@@ -76,14 +78,15 @@ test.describe('In Conversation Search', () => {
       await createGroup(userAPages, conversationName, [userB]);
 
       await userBPages.conversationList().openConversation(conversationName);
+      await userAPages.conversationList().openConversation(conversationName);
       const {page: pageB} = userBPages.conversation();
+      const {page: pageA} = userAPages.conversation();
 
       for (let imageCount = 0; imageCount < 10; imageCount++) {
         await shareAssetHelper(getImageFilePath(), pageB, pageB.getByRole('button', {name: 'Add picture'}));
       }
+      await expect(userAPages.conversation().getMessage({sender: userB})).toHaveCount(10);
 
-      await userAPages.conversationList().openConversation(conversationName);
-      const {page: pageA} = userAPages.conversation();
       for (let imageCount = 0; imageCount < 10; imageCount++) {
         await shareAssetHelper(getImageFilePath(), pageA, pageA.getByRole('button', {name: 'Add picture'}));
       }
@@ -177,6 +180,7 @@ test.describe('In Conversation Search', () => {
 
       const messageB = userBPages.conversation().getMessage({sender: userB});
       await userBPages.conversation().deleteMessage(messageB, 'Everyone');
+      await expect(messageWithImage).not.toBeVisible();
 
       await userAPages.conversation().searchButton.click();
       await expect(userAPages.collection().getSection('Images').showAllButton).not.toBeVisible();
@@ -269,6 +273,7 @@ test.describe('In Conversation Search', () => {
 
     const messageUserB = userBPages.conversation().getMessage({sender: userB});
     await userBPages.conversation().deleteMessage(messageUserB, 'Everyone');
+    await expect(userAPages.conversation().getMessage({content: 'Papaya'})).not.toBeAttached();
 
     await userAPages.conversation().searchButton.click();
     await userAPages.collection().searchBar.fill('Papaya');
@@ -313,11 +318,12 @@ test.describe('In Conversation Search', () => {
     const specialWord = 'Crème brûlée';
 
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userBPages.conversation().sendMessage(`Message with diacritical letter: ${specialWord}`);
-
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userAPages.conversation().searchButton.click();
 
+    await userBPages.conversation().sendMessage(`Message with diacritical letter: ${specialWord}`);
+    await expect(userAPages.conversation().getMessage({content: specialWord})).toBeAttached();
+
+    await userAPages.conversation().searchButton.click();
     const collection = userAPages.collection();
     await collection.searchBar.fill(specialWord);
     await expect(collection.searchResults).toHaveCount(1);
@@ -331,11 +337,12 @@ test.describe('In Conversation Search', () => {
     ]);
 
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userBPages.conversation().sendMessage('User B message');
-
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userAPages.conversation().searchButton.click();
 
+    await userBPages.conversation().sendMessage('User B message');
+    await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
+
+    await userAPages.conversation().searchButton.click();
     const collection = userAPages.collection();
     await collection.searchBar.fill('  message');
     await expect(collection.searchResults).toHaveCount(1);

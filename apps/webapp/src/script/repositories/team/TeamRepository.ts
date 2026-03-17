@@ -218,7 +218,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         updateRemoteConfigLogger.info('Updating team-settings');
         await this.getTeam();
         await this.updateFeatureConfig();
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(error);
       }
     };
@@ -423,7 +423,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
           if (imageBlob) {
             imageDataUrl = await loadDataUrl(imageBlob);
           }
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.warn(`Account image could not be loaded`, error);
         }
       }

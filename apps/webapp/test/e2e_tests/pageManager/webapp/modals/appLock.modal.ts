@@ -20,8 +20,6 @@
 import {Locator, Page} from '@playwright/test';
 
 export class AppLockModal {
-  readonly page: Page;
-
   readonly lockPasscodeInput: Locator;
   readonly unlockPasscodeInput: Locator;
   readonly appLockWipeInput: Locator;
@@ -35,8 +33,6 @@ export class AppLockModal {
   readonly wipeDatabaseButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.appLockModal = page.locator("[data-uie-name='applock-modal']");
     this.lockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-set-a']");
     this.unlockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-unlock']");

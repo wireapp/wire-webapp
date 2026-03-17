@@ -584,7 +584,7 @@ export class NotificationRepository {
     if (canShowUserImage) {
       try {
         return await this.assetRepository.getObjectUrl(userEntity.previewPictureResource());
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof ValidationUtilError) {
           this.logger.error(`Failed to validate an asset URL: ${error.message}`);
         }

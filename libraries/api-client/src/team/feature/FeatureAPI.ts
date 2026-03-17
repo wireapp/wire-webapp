@@ -138,7 +138,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureConversationGuestLink>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -169,7 +169,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureConferenceCalling>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -206,7 +206,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureVideoCalling>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -237,7 +237,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureSelfDeletingMessages>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -268,7 +268,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureFileSharing>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error) && error.label === BackendErrorLabel.FEATURE_LOCKED) {
         throw new FeatureLockedError(error.message);
       }
@@ -409,7 +409,7 @@ export class FeatureAPI {
     try {
       const response = await this.client.sendJSON<FeatureAppLock>(config);
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       switch ((error as BackendError).label) {
         case BackendErrorLabel.APP_LOCK_INVALID_TIMEOUT: {
           throw new InvalidAppLockTimeoutError((error as BackendError).message);

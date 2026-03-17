@@ -21,7 +21,7 @@ import {Page, Locator} from '@playwright/test';
 
 export class ConversationSidebar {
   readonly pageLoadingTimeout = 60_000;
-  readonly page: Page;
+  private readonly page: Page;
   readonly navigation: Locator;
   readonly personalStatusLabel: Locator;
   readonly personalStatusIcon: Locator;
@@ -33,6 +33,7 @@ export class ConversationSidebar {
   readonly archiveButton: Locator;
   readonly manageTeamButton: Locator;
   readonly sidebar: Locator;
+  readonly supportButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -48,6 +49,7 @@ export class ConversationSidebar {
     this.archiveButton = page.getByTestId('go-archive');
     this.manageTeamButton = page.getByTestId('go-team-management');
     this.sidebar = page.locator(`.conversations-sidebar-items`);
+    this.supportButton = page.getByRole('link', {name: 'Support'});
   }
 
   async clickPreferencesButton() {

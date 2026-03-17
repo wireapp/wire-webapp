@@ -20,14 +20,10 @@
 import {Page, Locator} from '@playwright/test';
 
 export class OptionsPage {
-  readonly page: Page;
-
   readonly soundAlertsRadioGroup: Locator;
   readonly notificationsRadioGroup: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.soundAlertsRadioGroup = page.getByRole('group', {name: 'Sound alerts'}).getByRole('radiogroup');
     this.notificationsRadioGroup = page.getByRole('group', {name: 'Notifications'}).getByRole('radiogroup');
   }

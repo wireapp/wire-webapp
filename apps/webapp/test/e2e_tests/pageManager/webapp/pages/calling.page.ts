@@ -22,7 +22,7 @@ import {Page, Locator} from '@playwright/test';
 import {FullScreenCallPage} from './fullScreenCall.page';
 
 export class CallingPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   // Core call UI elements
   readonly callCell: Locator;

@@ -30,6 +30,7 @@ import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {getLogger, Logger} from 'Util/Logger';
 import {compareTransliteration, sortByPriority} from 'Util/StringUtil';
+import {toError} from 'Util/TypePredicateUtil';
 
 import {IntegrationMapper} from './IntegrationMapper';
 import type {IntegrationService} from './IntegrationService';
@@ -215,8 +216,8 @@ export class IntegrationRepository {
         this.services(serviceEntities);
         return serviceEntities;
       }
-    } catch (error) {
-      this.logger.error(`Error searching for services: ${error.message}`, error);
+    } catch (error: unknown) {
+      this.logger.error(`Error searching for services: ${toError(error).message}`, error);
     }
     return undefined;
   }

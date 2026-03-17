@@ -8,6 +8,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -25,6 +27,8 @@ updates:
       interval: daily
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -41,6 +45,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -63,16 +69,6 @@ updates:
           - '0.10.16'
       - dependency-name: '@types/node'
       - dependency-name: 'typescript'
-      - dependency-name: '@lexical/code'
-      - dependency-name: '@lexical/history'
-      - dependency-name: '@lexical/list'
-      - dependency-name: '@lexical/markdown'
-      - dependency-name: '@lexical/react'
-      - dependency-name: '@lexical/rich-text'
-      # Wait until libsodium-wrappers:0.7.17 because: https://github.com/jedisct1/libsodium.js/issues/357
-      - dependency-name: 'libsodium-wrappers'
-        versions:
-          - '0.7.16'
 
   # Server dependencies
   - package-ecosystem: npm
@@ -82,6 +78,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -103,6 +101,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -121,6 +121,8 @@ updates:
       day: sunday
       time: '16:00'
       timezone: 'Europe/Berlin'
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 99
     labels:
       - 'type: chore 🧹'
@@ -137,6 +139,10 @@ updates:
     open-pull-requests-limit: 99
     schedule:
       interval: 'daily'
+      time: '16:00'
+      timezone: 'Europe/Berlin'
+    labels:
+      - 'type: chore 🧹'
   # Docker
   - package-ecosystem: 'docker'
     directory: '/'

@@ -94,6 +94,17 @@ describe('APIClient', () => {
       expect(client.transport.http['client'].defaults.baseURL).toBe(APIClient.BACKEND.PRODUCTION.rest);
       expect(client.transport.ws['baseUrl']).toBe(APIClient.BACKEND.PRODUCTION.ws);
     });
+
+    it('passes the incremental retry backoff constructor configuration to the http client', () => {
+      const client = new APIClient({
+        ...testConfig,
+        shouldUseIncrementalRetryBackoff: true,
+      });
+
+      apiClients.push(client);
+
+      expect(client.transport.http['shouldUseIncrementalRetryBackoff']).toBe(true);
+    });
   });
 
   describe('useVersion', () => {
@@ -106,7 +117,7 @@ describe('APIClient', () => {
       let errorMessage;
       try {
         await client.useVersion(MINIMUM_API_VERSION + 2, MINIMUM_API_VERSION + 3);
-      } catch (error) {
+      } catch (error: unknown) {
         errorMessage = error.message;
       } finally {
         expect(errorMessage).toContain('No compatible API version in range');
@@ -120,7 +131,7 @@ describe('APIClient', () => {
       let errorMessage;
       try {
         await client.useVersion(0, 3);
-      } catch (error) {
+      } catch (error: unknown) {
         errorMessage = error.message;
       } finally {
         expect(errorMessage).toContain(`Minimum supported API version is ${MINIMUM_API_VERSION}. Received: 0`);

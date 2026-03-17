@@ -66,7 +66,7 @@ export class BackUpHeader {
       UNSIGNED_INT_LENGTH,
     } = this;
 
-    const salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES);
+    const salt = sodium.randombytes_buf(sodium.crypto_pwhash_SALTBYTES, 'uint8array') as Uint8Array;
     const hashedUserId = this.hashUserId(
       this.userId,
       salt,
@@ -166,7 +166,8 @@ export class BackUpHeader {
       opslimit,
       memlimit,
       sodium.crypto_pwhash_ALG_DEFAULT,
-    );
+      'uint8array',
+    ) as Uint8Array;
   }
 
   readBackupHeader(data: Uint8Array): {decodedHeader: DecodedHeader; headerSize: number} {

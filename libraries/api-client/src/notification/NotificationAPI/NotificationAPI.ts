@@ -112,7 +112,7 @@ export class NotificationAPI {
           currentNotificationId,
           abortController,
         );
-      } catch (error) {
+      } catch (error: unknown) {
         const isAxiosError = axios.isAxiosError(error);
 
         //error with response body (before v3 API)

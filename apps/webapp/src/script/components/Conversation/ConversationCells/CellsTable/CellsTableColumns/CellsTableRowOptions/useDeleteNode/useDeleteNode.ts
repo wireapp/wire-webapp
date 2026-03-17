@@ -41,7 +41,7 @@ export const useDeleteNode = ({conversationQualifiedId, cellsRepository}: UseDel
       try {
         removeNode({conversationId: conversationQualifiedId.id, nodeId: uuid});
         await cellsRepository.deleteNode({uuid, permanently});
-      } catch (error) {
+      } catch (error: unknown) {
         deleteFileFailedNotification.show();
         console.error(error);
       }

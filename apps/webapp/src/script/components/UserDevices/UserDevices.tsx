@@ -89,7 +89,7 @@ export const UserDevices = ({
             setDeviceMode(deviceMode);
           }
         }
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error(`Unable to retrieve clients for user '${user.id}': ${(error as Error).message || error}`);
       }
     })();

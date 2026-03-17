@@ -69,7 +69,7 @@ export function captureModalFocusContext(context: ModalFocusContext = {}): Modal
       if (additionalCallback) {
         try {
           additionalCallback();
-        } catch (error) {
+        } catch (error: unknown) {
           console.error('Error in modal close callback:', error);
         }
       }
@@ -84,7 +84,7 @@ export function captureModalFocusContext(context: ModalFocusContext = {}): Modal
           ) {
             previouslyFocusedElement.focus();
           }
-        } catch (error) {
+        } catch (error: unknown) {
           // Silently handle focus errors (e.g., element no longer in DOM)
           console.error('Failed to restore focus to element:', error);
         }

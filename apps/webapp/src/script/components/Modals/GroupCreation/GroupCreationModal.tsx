@@ -245,7 +245,7 @@ const GroupCreationModal = ({
         } else {
           createNavigate(generateConversationUrl(conversation.qualifiedId))(event);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         if (isNonFederatingBackendsError(error)) {
           const tempName = groupName;
           setIsShown(false);

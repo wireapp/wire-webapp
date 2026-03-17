@@ -76,7 +76,7 @@ export const joinUnestablishedMixedConversation = async (
       qualifiedUsers: otherUsersToAdd,
       selfUserId: selfUserId,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     mlsMigrationLogger.error(
       `Failed to establish MLS group for mixed conversation with id ${mixedConversation.id}, error: `,
       error,

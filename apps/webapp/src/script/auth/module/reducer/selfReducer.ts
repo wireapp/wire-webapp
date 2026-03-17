@@ -23,12 +23,26 @@ import {AUTH_ACTION, AppActions, SELF_ACTION} from '../action/creator/';
 
 export interface SelfState {
   consents: {[key: number]: number};
-  error: Error;
+  error: Error | null;
   fetched: boolean;
   fetching: boolean;
   hasPassword: boolean;
   self: Self;
 }
+
+const unsetSelf: Self = {
+  accent_id: undefined,
+  assets: [],
+  email: undefined,
+  expires_at: undefined,
+  handle: undefined,
+  id: '',
+  locale: '',
+  name: '',
+  qualified_id: {id: '', domain: ''},
+  sso_id: undefined,
+  team: undefined,
+};
 
 export const initialSelfState: SelfState = {
   consents: {},
@@ -36,7 +50,7 @@ export const initialSelfState: SelfState = {
   fetched: false,
   fetching: false,
   hasPassword: false,
-  self: {assets: [], id: null, qualified_id: {id: '', domain: ''}, locale: null, name: null, team: null},
+  self: unsetSelf,
 };
 
 export function selfReducer(state: SelfState = initialSelfState, action: AppActions): SelfState {

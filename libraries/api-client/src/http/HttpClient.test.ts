@@ -17,7 +17,9 @@
  *
  */
 
+import assert from 'assert';
 import nock from 'nock';
+import {AxiosHeaders, AxiosResponse} from 'axios';
 
 import {BackendErrorLabel} from './BackendErrorLabel';
 import {HttpClient} from './HttpClient';
@@ -25,6 +27,43 @@ import {HttpClient} from './HttpClient';
 import {AccessTokenStore, AuthAPI} from '../auth';
 
 import {BackendError, StatusCode} from '.';
+
+type HttpClientDependenciesForTest = {
+  readonly clearTimeout: jest.Mock<void, [ReturnType<typeof globalThis.setTimeout>]>;
+  readonly observedDelayInMilliseconds: number[];
+  readonly setTimeout: jest.Mock<ReturnType<typeof globalThis.setTimeout>, [() => void, number]>;
+};
+
+function createHttpClientDependenciesForTest(): HttpClientDependenciesForTest {
+  const observedDelayInMilliseconds: number[] = [];
+  const setTimeout = jest.fn((handler: () => void, delayInMilliseconds: number) => {
+    observedDelayInMilliseconds.push(delayInMilliseconds);
+    handler();
+
+    return 1 as ReturnType<typeof globalThis.setTimeout>;
+  });
+  const clearTimeout = jest.fn();
+
+  return {
+    clearTimeout,
+    observedDelayInMilliseconds,
+    setTimeout,
+  };
+}
+
+function createRetryableBackendError(statusCode: number): BackendError {
+  return new BackendError('Retryable backend error', undefined, statusCode);
+}
+
+function createAxiosResponseForTest<ResponseValue>(data: ResponseValue): AxiosResponse<ResponseValue> {
+  return {
+    config: {headers: new AxiosHeaders()},
+    data,
+    headers: {},
+    status: StatusCode.OK,
+    statusText: 'OK',
+  };
+}
 
 describe('HttpClient', () => {
   const testConfig = {urls: {rest: 'https://test.zinfra.io', ws: '', name: 'test'}};
@@ -75,7 +114,7 @@ describe('HttpClient', () => {
       try {
         await client._sendRequest({config: {method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS}});
         throw new Error('Should not resolve');
-      } catch (error) {
+      } catch (error: unknown) {
         backendError = error;
       } finally {
         expect((backendError as BackendError).message).toBe('Authentication failed because the token is invalid.');
@@ -99,7 +138,7 @@ describe('HttpClient', () => {
     try {
       await client._sendRequest({config: {method: 'GET', baseURL: testConfig.urls.rest, url: AuthAPI.URL.ACCESS}});
       throw new Error('Should not resolve');
-    } catch (error) {
+    } catch (error: unknown) {
       backendError = error;
     } finally {
       expect((backendError as BackendError).message).toBe('Authentication failed because the cookie is missing.');
@@ -119,6 +158,231 @@ describe('HttpClient', () => {
         mockedAccessTokenStore.tokenExpirationDate = expirationDate;
         expect(client.hasValidAccessToken()).toBe(expected);
       });
+    });
+  });
+
+  describe('sendRequest with incremental retry backoff', () => {
+    it.each(
+      [
+        {
+          expectedDescription: '420',
+          retryableStatusCode: 420,
+        },
+        {
+          expectedDescription: '429',
+          retryableStatusCode: StatusCode.TOO_MANY_REQUESTS,
+        },
+      ] as const,
+    )(
+      'retries $expectedDescription backend errors when incremental retry backoff is enabled',
+      async ({retryableStatusCode}) => {
+        const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
+        const client = new HttpClient(
+          testConfig,
+          mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: httpClientDependenciesForTest,
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+        const response = createAxiosResponseForTest({ok: true});
+
+        client._sendRequest = jest
+          .fn()
+          .mockRejectedValueOnce(createRetryableBackendError(retryableStatusCode))
+          .mockResolvedValueOnce(response);
+
+        const result = await client.sendRequest({method: 'GET', url: '/conversations'});
+
+        expect(result).toBe(response);
+        expect(client._sendRequest).toHaveBeenCalledTimes(2);
+        expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([100]);
+      },
+    );
+
+    it('retries retryable backend errors when incremental retry backoff is enabled', async () => {
+      const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
+      const client = new HttpClient(
+        testConfig,
+        mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: httpClientDependenciesForTest,
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+      const response = createAxiosResponseForTest({ok: true});
+
+      client._sendRequest = jest
+        .fn()
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockResolvedValueOnce(response);
+
+      const result = await client.sendRequest({method: 'GET', url: '/conversations'});
+
+      expect(result).toBe(response);
+      expect(client._sendRequest).toHaveBeenCalledTimes(2);
+      expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([100]);
+    });
+
+    it('does not retry non-retryable backend errors when incremental retry backoff is enabled', async () => {
+      const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
+      const client = new HttpClient(
+        testConfig,
+        mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: httpClientDependenciesForTest,
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+      const nonRetryableBackendError = new BackendError('Bad request', undefined, StatusCode.BAD_REQUEST);
+
+      client._sendRequest = jest.fn().mockRejectedValueOnce(nonRetryableBackendError);
+
+      await expect(client.sendRequest({method: 'GET', url: '/conversations'})).rejects.toBe(nonRetryableBackendError);
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([]);
+    });
+
+    it('preserves the existing behavior when incremental retry backoff is disabled', async () => {
+      const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
+      const client = new HttpClient(
+        testConfig,
+        mockedAccessTokenStore as AccessTokenStore,
+        {dependencies: httpClientDependenciesForTest},
+      );
+      const tooManyRequestsBackendError = new BackendError('Too many requests', undefined, StatusCode.TOO_MANY_REQUESTS);
+
+      client._sendRequest = jest.fn().mockRejectedValueOnce(tooManyRequestsBackendError);
+
+      await expect(client.sendRequest({method: 'GET', url: '/conversations'})).rejects.toBe(tooManyRequestsBackendError);
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([]);
+    });
+
+    it('restarts with the initial retry delay after the retry backoff is reset', async () => {
+      const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
+      const client = new HttpClient(
+        testConfig,
+        mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: httpClientDependenciesForTest,
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+      const response = createAxiosResponseForTest({ok: true});
+
+      client._sendRequest = jest
+        .fn()
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockResolvedValueOnce(response)
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockResolvedValueOnce(response)
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockResolvedValueOnce(response);
+
+      await client.sendRequest({method: 'GET', url: '/conversations'});
+      await client.sendRequest({method: 'GET', url: '/conversations'});
+
+      client.resetRetryBackoff();
+
+      await client.sendRequest({method: 'GET', url: '/conversations'});
+
+      expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([100, 200, 100]);
+    });
+
+    it('retries immediately when the retry backoff is reset during an active wait', async () => {
+      let scheduledTimeoutHandler: (() => void) | undefined;
+      const observedDelayInMilliseconds: number[] = [];
+      let resolveWaitWasScheduled: (() => void) | undefined;
+      const waitWasScheduled = new Promise<void>((resolve) => {
+        resolveWaitWasScheduled = resolve;
+      });
+      const clearTimeout = jest.fn();
+      const setTimeout = jest.fn((handler: () => void, delayInMilliseconds: number) => {
+        scheduledTimeoutHandler = handler;
+        observedDelayInMilliseconds.push(delayInMilliseconds);
+        assert(resolveWaitWasScheduled !== undefined);
+        resolveWaitWasScheduled();
+
+        return 1 as ReturnType<typeof globalThis.setTimeout>;
+      });
+      const client = new HttpClient(
+        testConfig,
+        mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: {
+            clearTimeout,
+            setTimeout,
+          },
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+      const response = createAxiosResponseForTest({ok: true});
+
+      client._sendRequest = jest
+        .fn()
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockResolvedValueOnce(response);
+
+      const responsePromise = client.sendRequest({method: 'GET', url: '/conversations'});
+      await waitWasScheduled;
+
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      assert(scheduledTimeoutHandler !== undefined);
+
+      client.resetRetryBackoff();
+
+      await expect(responsePromise).resolves.toBe(response);
+      expect(clearTimeout).toHaveBeenCalledWith(1);
+      expect(client._sendRequest).toHaveBeenCalledTimes(2);
+      expect(observedDelayInMilliseconds).toEqual([100]);
+    });
+
+    it('stops retrying when the request is aborted during an active wait', async () => {
+      let scheduledTimeoutHandler: (() => void) | undefined;
+      const observedDelayInMilliseconds: number[] = [];
+      let resolveWaitWasScheduled: (() => void) | undefined;
+      const waitWasScheduled = new Promise<void>((resolve) => {
+        resolveWaitWasScheduled = resolve;
+      });
+      const abortController = new AbortController();
+      const clearTimeout = jest.fn();
+      const setTimeout = jest.fn((handler: () => void, delayInMilliseconds: number) => {
+        scheduledTimeoutHandler = handler;
+        observedDelayInMilliseconds.push(delayInMilliseconds);
+        assert(resolveWaitWasScheduled !== undefined);
+        resolveWaitWasScheduled();
+
+        return 1 as ReturnType<typeof globalThis.setTimeout>;
+      });
+      const client = new HttpClient(
+        testConfig,
+        mockedAccessTokenStore as AccessTokenStore,
+        {
+          dependencies: {
+            clearTimeout,
+            setTimeout,
+          },
+          shouldUseIncrementalRetryBackoff: true,
+        },
+      );
+
+      client._sendRequest = jest.fn().mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE));
+
+      const responsePromise = client.sendRequest({method: 'GET', url: '/conversations'}, false, abortController);
+      await waitWasScheduled;
+
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(setTimeout).toHaveBeenCalledTimes(1);
+      assert(scheduledTimeoutHandler !== undefined);
+
+      abortController.abort();
+
+      await expect(responsePromise).rejects.toThrow('The wait was aborted.');
+      expect(clearTimeout).toHaveBeenCalledWith(1);
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(observedDelayInMilliseconds).toEqual([100]);
     });
   });
 });

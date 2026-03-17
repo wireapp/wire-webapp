@@ -156,7 +156,7 @@ async function appendCiDescription(runId: number): Promise<void> {
         doc.c.push(linkParagraph("Build URL:", url));
         await testinyRequest("PUT", `/testrun/${runId}?force=true`, { description: JSON.stringify(doc) });
         console.log("  ✓ Description updated");
-    } catch (err) {
+    } catch (err: unknown) {
         console.warn(`  ⚠️  Could not update description: ${err instanceof Error ? err.message : JSON.stringify(err)}`);
     }
 }
@@ -194,7 +194,7 @@ async function resolveTestCases(allTests: FlatTest[], runId: number) {
                 if (testCaseId === null) { console.log("NOT FOUND in Testiny"); skippedNotFound++; continue; }
                 pending.push({ runId, testCaseId, status });
                 console.log("queued");
-            } catch (err) {
+            } catch (err: unknown) {
                 console.log(`ERROR: ${err instanceof Error ? err.message : String(err)}`);
                 resolveErrors++;
             }
@@ -238,7 +238,7 @@ async function main(): Promise<void> {
             await bulkAddResults(dedupedResults);
             sent = dedupedResults.length;
             console.log("  ✓ Bulk upload successful");
-        } catch (err) {
+        } catch (err: unknown) {
             console.error(`  ❌ Bulk upload failed: ${err instanceof Error ? err.message : String(err)}`);
             sendError = 1;
         }
@@ -257,7 +257,7 @@ async function main(): Promise<void> {
     if (resolveErrors > 0 || sendError > 0) process.exitCode = 1;
 
     // Phase 4 (optional) - append CI link to run description
-    appendCiDescription(runId).catch(err =>
+    appendCiDescription(runId).catch((err: unknown) =>
         console.warn(`  ⚠️  Could not update run description: ${err instanceof Error ? err.message : String(err)}`)
     );
 }

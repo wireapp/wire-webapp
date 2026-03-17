@@ -21,11 +21,16 @@ import axios, {AxiosError, AxiosHeaders, AxiosInstance, AxiosRequestConfig, Axio
 import axiosRetry, {isNetworkOrIdempotentRequestError, exponentialDelay} from 'axios-retry';
 import logdown from 'logdown';
 import {gzip} from 'pako';
+import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
 import {LogFactory, TimeUtil} from '@wireapp/commons';
 import {PriorityQueue} from '@wireapp/priority-queue';
+
+import {createAbortableWait} from './AbortableWait';
+import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './IncrementalRetryBackoff';
+import {createIncrementalRetryBackoffRunner} from './IncrementalRetryBackoffRunner';
 
 import {
   AccessTokenData,
@@ -52,6 +57,16 @@ type SendRequest = {
   abortController?: AbortController;
 };
 
+export type HttpClientDependencies = {
+  readonly clearTimeout?: (timeoutIdentifier: ReturnType<typeof globalThis.setTimeout>) => void;
+  readonly setTimeout?: (handler: () => void, delayInMilliseconds: number) => ReturnType<typeof globalThis.setTimeout>;
+};
+
+export type HttpClientConfiguration = {
+  readonly dependencies?: HttpClientDependencies;
+  readonly shouldUseIncrementalRetryBackoff?: boolean;
+};
+
 export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
 
@@ -66,6 +81,12 @@ export class HttpClient extends EventEmitter {
   private connectionState: ConnectionState;
   private readonly requestQueue: PriorityQueue;
   private readonly backOffQueue: PriorityQueue;
+  private readonly incrementalRetryBackoffPolicy = createIncrementalRetryBackoffPolicy();
+  private readonly incrementalRetryBackoffRunner;
+  private incrementalRetryBackoffResetAbortController = new AbortController();
+  private incrementalRetryBackoffResetCount = 0;
+  private incrementalRetryBackoffState: IncrementalRetryBackoffState;
+  private shouldUseIncrementalRetryBackoff = false;
   public static readonly TOPIC = TOPIC;
   private versionPrefix = '';
 
@@ -74,8 +95,12 @@ export class HttpClient extends EventEmitter {
   constructor(
     private readonly config: Config,
     public accessTokenStore: AccessTokenStore,
+    httpClientConfiguration: HttpClientConfiguration = {},
   ) {
     super();
+    const {dependencies = {}, shouldUseIncrementalRetryBackoff = false} = httpClientConfiguration;
+    const setTimeout = dependencies.setTimeout ?? globalThis.setTimeout.bind(globalThis);
+    const clearTimeout = dependencies.clearTimeout ?? globalThis.clearTimeout.bind(globalThis);
 
     this.client = axios.create({
       baseURL: this.config.urls.rest,
@@ -103,6 +128,23 @@ export class HttpClient extends EventEmitter {
     });
 
     this.connectionState = ConnectionState.UNDEFINED;
+    this.shouldUseIncrementalRetryBackoff = shouldUseIncrementalRetryBackoff;
+    this.incrementalRetryBackoffState = this.incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
+    this.incrementalRetryBackoffRunner = createIncrementalRetryBackoffRunner({
+      abortableWait: createAbortableWait({clearTimeout, setTimeout}),
+      getStatusCode(error: unknown): Maybe<number> {
+        if (axios.isAxiosError(error)) {
+          return Maybe.of(error.response?.status);
+        }
+
+        if (error instanceof BackendError) {
+          return Maybe.of(error.code);
+        }
+
+        return Maybe.nothing();
+      },
+      incrementalRetryBackoffPolicy: this.incrementalRetryBackoffPolicy,
+    });
 
     this.logger = LogFactory.getLogger('@wireapp/api-client/http/HttpClient');
 
@@ -142,6 +184,23 @@ export class HttpClient extends EventEmitter {
     this.versionPrefix = version > 0 ? `/v${version}` : '';
   }
 
+  public resetRetryBackoff(): void {
+    this.incrementalRetryBackoffResetCount += 1;
+    this.incrementalRetryBackoffState = this.incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
+    this.incrementalRetryBackoffResetAbortController.abort();
+    this.incrementalRetryBackoffResetAbortController = new AbortController();
+  }
+
+  private getIncrementalRetryBackoffAbortSignal(abortController?: AbortController): Maybe<AbortSignal> {
+    if (abortController !== undefined) {
+      return Maybe.just(
+        AbortSignal.any([abortController.signal, this.incrementalRetryBackoffResetAbortController.signal]),
+      );
+    }
+
+    return Maybe.just(this.incrementalRetryBackoffResetAbortController.signal);
+  }
+
   private updateConnectionState(state: ConnectionState): void {
     if (this.connectionState !== state) {
       this.connectionState = state;
@@ -174,7 +233,7 @@ export class HttpClient extends EventEmitter {
       this.updateConnectionState(ConnectionState.CONNECTED);
 
       return response;
-    } catch (error) {
+    } catch (error: unknown) {
       const retryWithTokenRefresh = async () => {
         this.logger.warn(`Access token refresh triggered for "${config.method}" request to "${config.url}".`);
         await this.refreshAccessToken();
@@ -299,19 +358,50 @@ export class HttpClient extends EventEmitter {
     isSynchronousRequest: boolean = false,
     abortController?: AbortController,
   ): Promise<AxiosResponse<T>> {
-    const promise = isSynchronousRequest
-      ? this.requestQueue.add(() => this._sendRequest<T>({config, abortController}))
-      : this._sendRequest<T>({config, abortController});
+    const runRequestAttempt = async (): Promise<AxiosResponse<T>> => {
+      if (isSynchronousRequest) {
+        return await this.requestQueue.add(() => {
+          return this._sendRequest<T>({config, abortController});
+        });
+      }
+
+      return this._sendRequest<T>({config, abortController});
+    };
+
+    if (this.shouldUseIncrementalRetryBackoff) {
+      return this.incrementalRetryBackoffRunner.runWithIncrementalRetryBackoff({
+        abortSignal: this.getIncrementalRetryBackoffAbortSignal(abortController),
+        getIncrementalRetryBackoffState: () => {
+          return this.incrementalRetryBackoffState;
+        },
+        getRetryBackoffResetCount: () => {
+          return this.incrementalRetryBackoffResetCount;
+        },
+        isRequestAborted: () => {
+          return abortController?.signal.aborted === true;
+        },
+        runRequestAttempt,
+        setIncrementalRetryBackoffState: nextIncrementalRetryBackoffState => {
+          this.incrementalRetryBackoffState = nextIncrementalRetryBackoffState;
+
+          return this.incrementalRetryBackoffState;
+        },
+      });
+    }
+
+    const promise = runRequestAttempt();
 
     try {
       return await promise;
-    } catch (error) {
+    } catch (error: unknown) {
       // If the request failed due to too many requests, we want put it into the backoff queue
       // It will be retried after a (growing) delay
       const isTooManyRequestsError = axios.isAxiosError(error) && error.response?.status === 420;
 
       if (isTooManyRequestsError) {
-        return this.backOffQueue.add(() => this._sendRequest<T>({config, abortController}));
+        return await this.backOffQueue.add(() => {
+          return this._sendRequest<T>({config, abortController});
+        });
       }
 
       throw error;

@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 import {GuestOptionsPage} from './guestOptions.page';
 
 export class ConversationDetailsPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly groupAdmins: Locator;
   readonly groupMembers: Locator;

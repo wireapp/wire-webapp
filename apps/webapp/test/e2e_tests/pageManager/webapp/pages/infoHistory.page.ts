@@ -20,7 +20,7 @@
 import {Locator, Page} from '@playwright/test';
 
 export class HistoryInfoPage {
-  readonly page: Page;
+  private readonly page: Page;
   readonly continueButton: Locator;
 
   constructor(page: Page) {
@@ -31,7 +31,7 @@ export class HistoryInfoPage {
     try {
       await this.continueButton.waitFor({state: 'visible'});
       return true;
-    } catch (err) {
+    } catch (err: unknown) {
       return false;
     }
   }

@@ -17,21 +17,14 @@
  *
  */
 
-import {Maybe, Result, toolbelt} from 'true-myth';
+export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
+export const incrementalHttpRetryBackoffFeatureToggleName = 'incremental-http-retry-backoff';
+export const collaboraClipboardAccessFeatureToggleName = 'collabora-clipboard-access';
 
-export type ParseMinimumRequiredClientBuildDateDependencies = {
-  readonly parseClientVersion: (clientVersionHeaderValue: string) => Result<Date, Error>;
-  readonly clientVersion?: string | undefined;
-};
+export const startupFeatureToggleNames = [
+  reliableWebsocketConnectionFeatureToggleName,
+  incrementalHttpRetryBackoffFeatureToggleName,
+  collaboraClipboardAccessFeatureToggleName,
+] as const;
 
-export function parseMinimumRequiredClientBuildDate(
-  dependencies: ParseMinimumRequiredClientBuildDateDependencies,
-): Maybe<Date> {
-  const {parseClientVersion, clientVersion} = dependencies;
-
-  if (clientVersion === undefined || clientVersion.length === 0) {
-    return Maybe.nothing();
-  }
-
-  return toolbelt.fromResult(parseClientVersion(clientVersion));
-}
+export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

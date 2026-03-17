@@ -94,7 +94,13 @@ const initSession = async (
     apiClient,
     cryptoClient,
   });
-  return sessions[0];
+  const sessionId = sessions[0];
+
+  if (sessionId === undefined) {
+    throw new Error('Expected a session to be initialized.');
+  }
+
+  return sessionId;
 };
 
 /**
@@ -148,14 +154,23 @@ const initSessions = async ({
       }
       if (!Array.isArray(data)) {
         const domainMissingWithPrekey = missingClientsWithPrekeys[userId.domain] ?? {};
-        domainMissingWithPrekey[userId.id] = domainMissingWithPrekey[userId.id] ?? {};
-        domainMissingWithPrekey[userId.id][clientId] = data[clientId];
+        const userPrekeys = domainMissingWithPrekey[userId.id] ?? {};
+        const prekey = data[clientId];
+
+        if (prekey === undefined) {
+          continue;
+        }
+
+        userPrekeys[clientId] = prekey;
+        domainMissingWithPrekey[userId.id] = userPrekeys;
         missingClientsWithPrekeys[userId.domain] = domainMissingWithPrekey;
         continue;
       }
       const domainMissing = missingClients[userId.domain] ?? {};
-      domainMissing[userId.id] = domainMissing[userId.id] || [];
-      domainMissing[userId.id].push(clientId);
+      const missingClientIds = domainMissing[userId.id] ?? [];
+
+      missingClientIds.push(clientId);
+      domainMissing[userId.id] = missingClientIds;
       missingClients[userId.domain] = domainMissing;
     }
   }
@@ -181,7 +196,7 @@ const initSessions = async ({
       })
     : {sessions: [], failed: undefined, unknowns: undefined};
 
-  const allUnknowns = {...prekeyUnknows, ...unknowns};
+  const allUnknowns = {...prekeyUnknows, ...(unknowns ?? {})};
   return {
     sessions: [...existingSessions, ...prekeyCreated, ...created],
     failed,

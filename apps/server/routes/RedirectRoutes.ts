@@ -17,15 +17,25 @@
  *
  */
 
-import express from 'express';
+import express, {type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import type {ClientConfig, ServerConfig} from '@wireapp/config';
+import type {ServerConfig} from '@wireapp/config';
+
 import * as BrowserUtil from '../util/BrowserUtil';
 
 const router = express.Router();
 
-export const RedirectRoutes = (config: ServerConfig, clientConfig: ClientConfig) => [
+export function setNonCacheHeaders(response: Response): Response {
+  response.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  response.set('Pragma', 'no-cache');
+  response.set('Expires', '0');
+  response.set('Surrogate-Control', 'no-store');
+
+  return response;
+}
+
+export const RedirectRoutes = (config: ServerConfig) => [
   router.get('/robots.txt', async (req, res) => {
     const robotsContent = (config.ROBOTS.ALLOWED_HOSTS as ReadonlyArray<string>).includes(req.hostname)
       ? config.ROBOTS.ALLOW
@@ -51,10 +61,14 @@ export const RedirectRoutes = (config: ServerConfig, clientConfig: ClientConfig)
     return res.json(parseResult);
   }),
   router.get('/commit/?', (_req, res) => {
-    return res.send(config.COMMIT);
+    const response = setNonCacheHeaders(res);
+
+    return response.send(config.COMMIT);
   }),
   router.get('/version/?', (_req, res) => {
-    return res.json({version: config.VERSION});
+    const response = setNonCacheHeaders(res);
+
+    return response.json({version: config.VERSION});
   }),
   /**
    * This route is used by the OIDC Provider to redirect the user back to the client.

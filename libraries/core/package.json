@@ -25,7 +25,7 @@
     "./lib/cryptography/AssetCryptography/crypto.node": "./lib/cryptography/AssetCryptography/crypto.browser.js"
   },
   "dependencies": {
-    "@wireapp/api-client": "27.95.6",
+    "@wireapp/api-client": "27.96.0",
     "@wireapp/core-crypto": "9.3.0",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/priority-queue": "2.1.19",
@@ -49,11 +49,7 @@
     "build": "nx run core-lib:build",
     "clean": "nx run core-lib:clean",
     "dist": "nx run core-lib:dist",
-    "demo:composite": "nx run core-lib:demo:composite",
-    "demo:sendCounter": "nx run core-lib:demo:sendCounter",
     "start": "nx run core-lib:start",
-    "start:echo": "nx run core-lib:start:echo",
-    "start:sender": "nx run core-lib:start:sender",
     "test": "nx run core-lib:test",
     "test:coverage": "nx run core-lib:test:coverage",
     "watch": "nx run core-lib:watch"

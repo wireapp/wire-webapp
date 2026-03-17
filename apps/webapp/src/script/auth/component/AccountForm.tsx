@@ -146,7 +146,7 @@ const AccountFormComponent = ({
       }
 
       return onSubmit();
-    } catch (error) {
+    } catch (error: unknown) {
       const label = (error as BackendError)?.label;
       if (label) {
         switch (label) {

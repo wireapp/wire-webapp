@@ -59,7 +59,7 @@ export const useCellsNewItemForm = ({
         await cellsRepository.createFile({path, name});
       }
       onSuccess();
-    } catch (error) {
+    } catch (error: unknown) {
       if (isAxiosError(error) && error.response?.status === ITEM_ALREADY_EXISTS_ERROR) {
         setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
       } else {
