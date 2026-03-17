@@ -66,7 +66,6 @@ import {
 } from './VideoControls.styles';
 import {VideoControlsMenu} from './VideoControlsMenu/VideoControlsMenu';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
-import {ImageIcon} from "Components/Icon";
 
 /**
  * Maps video input devices to select options.

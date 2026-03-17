@@ -29,7 +29,6 @@ import {BackgroundEffectsPicker} from './BackgroundEffectsPicker';
 
 import {
   videoOptionsBackButtonStyles,
-  videoOptionsRowButtonStyles,
   videoOptionsRowIconStyles,
   videoOptionsSelectGroupHeadingStyles,
   videoOptionsSelectMenuStyles,
