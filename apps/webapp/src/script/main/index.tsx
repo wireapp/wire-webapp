@@ -44,6 +44,7 @@ import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/s
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
+import {createAPIClient} from '../service/createAPIClient';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -77,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {wallClock} = applicationServices;
-  const apiClient = new APIClient({isFeatureToggleEnabled});
+  const apiClient = createAPIClient(isFeatureToggleEnabled);
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,
