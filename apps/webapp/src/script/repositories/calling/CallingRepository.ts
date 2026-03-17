@@ -1439,7 +1439,13 @@ export class CallingRepository {
       if (!!conversation && this.isMLSConference(conversation)) {
         // Enable the epoch cache to save all epoch infos while init avs!
         call.epochCache.enable();
-        await this.joinMlsConferenceSubconversation(conversation);
+        try {
+          await this.joinMlsConferenceSubconversation(conversation);
+        } catch (error: unknown) {
+          this.logger.error('Failed to join MLS SubConversation', error);
+          await this.leaveMLSConferenceBecauseError(conversation);
+          return;
+        }
       }
 
       this.wCall?.answer(
@@ -1461,9 +1467,6 @@ export class CallingRepository {
         this.logger.error('Failed answering call', error);
       }
       this.rejectCall(conversation.qualifiedId);
-      if (!!conversation && this.isMLSConference(conversation)) {
-        await this.leaveMLSConferenceBecauseError(conversation);
-      }
     }
   }
 
