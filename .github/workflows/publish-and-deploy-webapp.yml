@@ -1,4 +1,4 @@
-name: Publish
+name: Publish and deploy webapp
 
 on:
   push:
