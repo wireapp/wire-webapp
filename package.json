@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "9.9.0",
+    "@ls-lint/ls-lint": "2.3.1",
     "@nx/jest": "22.5.4",
     "@nx/node": "22.5.4",
     "@nx/workspace": "22.5.4",
@@ -100,6 +101,7 @@
     "docker": "nx run workspace-tools:docker",
     "fix": "nx format:write && nx run-many -t lint --all --fix",
     "lint": "nx run-many -t lint --all",
+    "lint:fileNames": "ls-lint",
     "lint:fix": "nx run-many -t lint --all --fix",
     "lint:other": "nx format:check --base=dev --head=HEAD && nx run webapp:stylelint",
     "postinstall": "nx run webapp:configure",
