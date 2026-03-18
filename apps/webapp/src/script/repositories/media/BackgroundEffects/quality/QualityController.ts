@@ -470,8 +470,8 @@ export class QualityController {
     if (this.tier === 'medium') {
       return this.canUpgradeTo('high') ? 'high' : 'medium';
     }
-    // Tier can only go to A (maximum quality)
-    return this.tier === 'high' && this.canUpgradeTo('high') ? 'superhigh' : 'high';
+    // Tier can only go to superhigh (maximum quality)
+    return this.tier === 'high' && this.canUpgradeTo('superhigh') ? 'superhigh' : 'high';
   }
 
   /**
@@ -534,7 +534,7 @@ export class QualityController {
       low: 1,
       medium: 2,
       high: 3,
-      superhigh: 3,
+      superhigh: 4,
     };
     return rank[tier];
   }
