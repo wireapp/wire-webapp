@@ -17,8 +17,7 @@
  *
  */
 
-import ko from 'knockout';
-
+import {User} from 'Repositories/entity/User/User';
 import {createUuid} from 'Util/uuid';
 
 import {AppLockCrypto, AppLockRepository} from './AppLockRepository';
@@ -39,7 +38,7 @@ const createAppLockRepository = (): AppLockRepository => {
     cryptoPwhashStrVerify: (hashedCode: string, code: string) => mockCryptoPwhashStrVerify(hashedCode, code),
   };
 
-  jest.spyOn(userState, 'self').mockImplementation(ko.observable({id: createUuid()}));
+  userState.self(new User(createUuid(), ''));
 
   return new AppLockRepository(userState, appLockState, appLockCrypto);
 };
