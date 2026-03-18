@@ -422,9 +422,9 @@ async function runBrowserDemo() {
     stream = await navigator.mediaDevices.getUserMedia({
       video: {width: {ideal: 1280}, height: {ideal: 720}},
     });
-  } catch (error) {
+  } catch (error: unknown) {
     logGetUserMediaError(error, 'getUserMedia (ideal 1280x720)');
-    stream = await navigator.mediaDevices.getUserMedia({video: true}).catch(err => {
+    stream = await navigator.mediaDevices.getUserMedia({video: true}).catch((err: unknown) => {
       logGetUserMediaError(err, 'getUserMedia (fallback)');
       throw err;
     });
@@ -449,7 +449,7 @@ async function runBrowserDemo() {
   );
   console.log('Video track state:', inputTrack.readyState);
   rawVideo.srcObject = new MediaStream([inputTrack]);
-  rawVideo.play().catch(error => console.warn('Raw video play failed', error));
+  rawVideo.play().catch((error: unknown) => console.warn('Raw video play failed', error));
 
   const backgroundImage = await createBackgroundImage(backgroundKind, settings);
   const controller = new BackgroundEffectsController();
@@ -546,7 +546,7 @@ async function createBackgroundImage(kind: string, settings: MediaTrackSettings)
 // Run browser demo when in browser environment
 if (isBrowser) {
   const startDemo = () => {
-    runBrowserDemo().catch(error => {
+    runBrowserDemo().catch((error: unknown) => {
       window.__bgfxDemo = {status: 'failed', error: (error as Error)?.message ?? String(error)};
       console.error('Browser demo failed:', error);
     });

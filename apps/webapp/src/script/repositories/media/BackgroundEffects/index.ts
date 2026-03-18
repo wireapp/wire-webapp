@@ -37,23 +37,6 @@
  */
 
 /**
- * Main controller for background effects processing.
- *
- * @example
- * ```typescript
- * import {BackgroundEffectsController} from 'Repositories/media/BackgroundEffects';
- *
- * const controller = new BackgroundEffectsController();
- * const {outputTrack, stop} = await controller.start(inputTrack, {
- *   mode: 'blur',
- *   quality: 'auto',
- *   targetFps: 30,
- * });
- * ```
- */
-export {BackgroundEffectsController} from './effects/BackgroundEffectsController';
-
-/**
  * Detects browser capabilities required for background effects.
  *
  * @returns Capability information with boolean flags for each required API.

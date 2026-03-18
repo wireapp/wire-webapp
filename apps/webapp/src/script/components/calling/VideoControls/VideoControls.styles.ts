@@ -130,21 +130,21 @@ export const videoOptionsSelectGroupHeadingStyles: CSSObject = {
 };
 
 export const videoOptionsRowButtonStyles = css`
-  display: flex;
   align-items: center;
-  justify-content: space-between;
-
-  width: 100%;
-  padding: 8px 12px 8px 32px; /* gleiche Einrückung wie Select Option */
-
   background: none;
   border: none;
 
-  font: inherit;
   color: inherit;
+  cursor: pointer; /* gleiche Einrückung wie Select Option */
 
-  cursor: pointer;
+  display: flex;
+  font: inherit;
+
+  justify-content: space-between;
+  padding: 8px 12px 8px 32px;
+
   text-align: left;
+  width: 100%;
 
   &:hover {
     background-color: var(--gray-10);

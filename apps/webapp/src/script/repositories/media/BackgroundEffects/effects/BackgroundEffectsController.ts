@@ -352,7 +352,7 @@ export class BackgroundEffectsController {
           }
           this.pipelineImpl.setBackgroundImage(bitmap, source.naturalWidth, source.naturalHeight);
         })
-        .catch(error => this.logger.warn('Failed to set background image', error));
+        .catch((error: unknown) => this.logger.warn('Failed to set background image', error));
       return;
     }
 
@@ -387,7 +387,7 @@ export class BackgroundEffectsController {
         }
         this.pipelineImpl.setBackgroundImage(bitmap, 1, 1);
       })
-      .catch(error => this.logger.warn('Failed to set solid background color', error));
+      .catch((error: unknown) => this.logger.warn('Failed to set solid background color', error));
   }
 
   /**

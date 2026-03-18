@@ -110,7 +110,7 @@ export class VideoSource {
    */
   public async start(onFrame: FrameCallback): Promise<void> {
     // Start video playback (required for frame extraction)
-    await this.videoEl.play().catch(error => this.logger.warn('VideoSource play failed', error));
+    await this.videoEl.play().catch((error: unknown) => this.logger.warn('VideoSource play failed', error));
 
     // Helper functions to get current video dimensions
     const width = () => this.videoEl.videoWidth || 0;

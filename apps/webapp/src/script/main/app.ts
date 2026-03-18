@@ -69,6 +69,8 @@ import {GiphyService} from 'Repositories/extension/GiphyService';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {IntegrationService} from 'Repositories/integration/IntegrationService';
 import {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
+import {BackgroundEffectsController} from 'Repositories/media/BackgroundEffects/effects/BackgroundEffectsController';
+import {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
@@ -119,8 +121,6 @@ import {serverTimeHandler} from '../time/serverTimeHandler';
 import {WindowHandler} from '../ui/WindowHandler';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 import {Warnings} from '../view_model/WarningsContainer';
-import {BackgroundEffectsController} from "Repositories/media/BackgroundEffects";
-import {BackgroundEffectsHandler} from "Repositories/media/BackgroundEffectsHandler";
 
 // Initialize PDF.js worker for react-pdf package
 pdfjs.GlobalWorkerOptions.workerSrc = '/min/pdf.worker.mjs';

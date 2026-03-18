@@ -19,7 +19,6 @@
 
 import {observable} from 'knockout';
 
-import {BackgroundEffectsController} from 'Repositories/media/BackgroundEffects';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -30,6 +29,8 @@ import {
 } from 'Repositories/media/VideoBackgroundEffects';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
+
+import {BackgroundEffectsController} from './BackgroundEffects/effects/BackgroundEffectsController';
 
 export const TARGET_FPS = 15;
 
