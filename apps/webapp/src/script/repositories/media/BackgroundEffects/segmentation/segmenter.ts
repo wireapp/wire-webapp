@@ -600,4 +600,8 @@ export class Segmenter {
       // Swallow probe errors to avoid blocking initialization.
     }
   }
+
+  getSegmenter(): ImageSegmenter | null {
+    return this.segmenter;
+  }
 }
