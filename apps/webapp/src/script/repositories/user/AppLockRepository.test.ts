@@ -28,7 +28,7 @@ import {UserState} from './UserState';
 const mockCryptoPwhashStr = jest.fn();
 const mockCryptoPwhashStrVerify = jest.fn();
 
-const createAppLockRepository = () => {
+const createAppLockRepository = (): AppLockRepository => {
   const userState = new UserState();
   const appLockState = new AppLockState();
   const appLockCrypto: AppLockCrypto = {
