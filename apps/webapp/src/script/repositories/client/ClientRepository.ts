@@ -38,7 +38,8 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
-import {isAxiosError, isErrorWithCode, isErrorWithType, toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/TypePredicateUtil';
 
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';

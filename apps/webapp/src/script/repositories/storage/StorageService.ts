@@ -25,7 +25,7 @@ import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
 import {loadValue, storeValue} from 'Util/StorageUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
 
 import {DexieDatabase} from './DexieDatabase';
 import {StorageSchemata} from './StorageSchemata';

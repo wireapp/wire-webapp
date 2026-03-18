@@ -37,7 +37,8 @@ import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
-import {isErrorWithCode, toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isErrorWithCode} from 'Util/TypePredicateUtil';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
