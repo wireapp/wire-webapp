@@ -17,7 +17,6 @@
  *
  */
 
-import is from '@sindresorhus/is';
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
@@ -47,22 +46,6 @@ export function isErrorWithCode(errorCandidate: unknown): errorCandidate is Erro
 
 export function isErrorWithType(errorCandidate: unknown): errorCandidate is ErrorWithType {
   return isObject(errorCandidate) && 'type' in errorCandidate && typeof errorCandidate.type === 'string';
-}
-
-export function toError(errorCandidate: unknown): Error {
-  if (is.error(errorCandidate)) {
-    return errorCandidate;
-  }
-
-  if (isObject(errorCandidate)) {
-    return errorCandidate as Error;
-  }
-
-  if (typeof errorCandidate === 'string') {
-    return new Error(errorCandidate);
-  }
-
-  return new Error('Unknown error', {cause: errorCandidate});
 }
 
 export function isConversationEntity(conversation: any): conversation is Conversation {

@@ -19,7 +19,7 @@
 
 import {Cookie as ToughCookie} from 'tough-cookie';
 
-import {ObfuscationUtil} from './ObfuscationUtil';
+import {ObfuscationUtil} from './obfuscationUtil';
 
 import {AccessTokenData} from '../auth';
 

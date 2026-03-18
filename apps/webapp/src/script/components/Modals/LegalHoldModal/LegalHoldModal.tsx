@@ -38,7 +38,8 @@ import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/LocalizerUtil';
-import {isErrorWithCode, toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isErrorWithCode} from 'Util/TypePredicateUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 

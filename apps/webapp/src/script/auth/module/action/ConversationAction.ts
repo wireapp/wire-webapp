@@ -21,7 +21,8 @@ import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/da
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {isBackendError, toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {ConversationActionCreator} from './creator/';
 

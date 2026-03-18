@@ -62,7 +62,7 @@ import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
 import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';

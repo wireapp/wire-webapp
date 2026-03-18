@@ -40,7 +40,8 @@ import {UserState} from 'Repositories/user/UserState';
 import {replaceLink, t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {isBackendError, toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {ConnectionEntity} from './ConnectionEntity';
 import {ConnectionMapper} from './ConnectionMapper';

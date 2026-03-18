@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,14 @@
  *
  */
 
-export * from './obfuscationUtil';
+import {APIClient} from './APIClientSingleton';
+
+import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
+
+export function createAPIClient(
+  isFeatureToggleEnabled: (featureToggleName: StartupFeatureToggleName) => boolean,
+): APIClient {
+  return new APIClient({
+    isFeatureToggleEnabled,
+  });
+}

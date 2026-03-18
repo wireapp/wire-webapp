@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ValidationError';
+export * from './validationError';

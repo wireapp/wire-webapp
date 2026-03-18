@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,24 @@
  *
  */
 
-export * from './obfuscationUtil';
+import is from '@sindresorhus/is';
+
+export function toError(errorCandidate: unknown): Error {
+  if (is.error(errorCandidate)) {
+    return errorCandidate;
+  }
+
+  if (is.object(errorCandidate)) {
+    if ('message' in errorCandidate && is.string(errorCandidate.message)) {
+      return new Error(errorCandidate.message, {cause: errorCandidate});
+    }
+
+    return new Error('Unknown error', {cause: errorCandidate});
+  }
+
+  if (is.string(errorCandidate)) {
+    return new Error(errorCandidate);
+  }
+
+  return new Error('Unknown error', {cause: errorCandidate});
+}

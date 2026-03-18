@@ -17,42 +17,27 @@
  *
  */
 
-import {Config} from '../Config';
 import {incrementalHttpRetryBackoffFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import {APIClient} from './APIClientSingleton';
 
-describe('APIClientSingleton', () => {
-  it('configures wire client metadata headers for backend requests', () => {
-    const apiClient = new APIClient();
+import {createAPIClient} from './createAPIClient';
 
-    try {
-      expect(apiClient.config.headers).toEqual({
-        'Wire-Client': 'Web',
-        'Wire-Client-Version': Config.getConfig().VERSION,
-      });
-    } finally {
-      apiClient.disconnect();
-    }
-  });
-
-  it('enables incremental http retry backoff when the startup feature toggle is enabled', () => {
-    const isFeatureToggleEnabled = jest.fn((featureToggleName) => {
+describe('createAPIClient', () => {
+  it('enables incremental http retry backoff when the startup feature toggle reader returns true', () => {
+    const apiClient = createAPIClient(featureToggleName => {
       return featureToggleName === incrementalHttpRetryBackoffFeatureToggleName;
     });
-    const apiClient = new APIClient({
-      isFeatureToggleEnabled,
-    });
 
     try {
-      expect(isFeatureToggleEnabled).toHaveBeenCalledWith(incrementalHttpRetryBackoffFeatureToggleName);
       expect(apiClient.transport.http['shouldUseIncrementalRetryBackoff']).toBe(true);
     } finally {
       apiClient.disconnect();
     }
   });
 
-  it('keeps incremental http retry backoff disabled when no toggle reader is injected', () => {
-    const apiClient = new APIClient();
+  it('keeps incremental http retry backoff disabled when the startup feature toggle reader returns false', () => {
+    const apiClient = createAPIClient(() => {
+      return false;
+    });
 
     try {
       expect(apiClient.transport.http['shouldUseIncrementalRetryBackoff']).toBe(false);

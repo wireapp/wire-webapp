@@ -40,16 +40,20 @@ import {actionRoot} from './module/action';
 import {Root} from './page/Root';
 
 import {Config} from '../Config';
+import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
+import {createAPIClient} from '../service/createAPIClient';
 
 exposeWrapperGlobals();
 
 const mainId = 'main';
 
-const apiClient = container.resolve(APIClient);
+const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
+const apiClient = createAPIClient(startupFeatureToggles.isFeatureToggleEnabled);
+container.registerInstance(APIClient, apiClient);
 const core = container.resolve(Core);
 
 let localStorage;

@@ -1,5 +1,5 @@
 import {type Response} from 'express';
-import {setNonCacheHeaders} from './RedirectRoutes';
+import {setNonCacheHeaders} from './redirectRoutes';
 
 type HeaderValueMap = Record<string, string>;
 
