@@ -19,22 +19,20 @@
 
 import is from '@sindresorhus/is';
 
-import {isObject} from '../guards/common';
-
 export function toError(errorCandidate: unknown): Error {
   if (is.error(errorCandidate)) {
     return errorCandidate;
   }
 
-  if (isObject(errorCandidate)) {
-    if ('message' in errorCandidate && typeof errorCandidate.message === 'string') {
+  if (is.object(errorCandidate)) {
+    if ('message' in errorCandidate && is.string(errorCandidate.message)) {
       return new Error(errorCandidate.message, {cause: errorCandidate});
     }
 
     return new Error('Unknown error', {cause: errorCandidate});
   }
 
-  if (typeof errorCandidate === 'string') {
+  if (is.string(errorCandidate)) {
     return new Error(errorCandidate);
   }
 
