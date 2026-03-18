@@ -25,7 +25,7 @@ import {LogFactory} from '@wireapp/commons';
 import {Cookie} from '../../auth/';
 import {CookieStore} from '../../auth/CookieStore';
 import {HttpClient} from '../../http/';
-import {ObfuscationUtil} from '../../obfuscation/';
+import {ObfuscationUtil} from '../../obfuscation';
 
 const logger = LogFactory.getLogger('@wireapp/api-client/shims/node/cookie');
 

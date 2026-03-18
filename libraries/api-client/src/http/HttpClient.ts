@@ -43,7 +43,7 @@ import {
 } from '../auth/';
 import {Config} from '../Config';
 import {BackendError, ConnectionState, ContentType, StatusCode, mapBackendError} from '../http/';
-import {ObfuscationUtil} from '../obfuscation/';
+import {ObfuscationUtil} from '../obfuscation';
 import {sendRequestWithCookie} from '../shims/node/cookie';
 
 enum TOPIC {
