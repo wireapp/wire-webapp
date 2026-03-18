@@ -99,6 +99,7 @@ test.describe('Authentication', () => {
       await test.step('Log out of public computer', async () => {
         await pages.settings().accountButton.click();
         await pages.account().clickLogoutButton();
+        await expect(pages.login().signInButton).toBeVisible({timeout: LOGIN_TIMEOUT});
       });
 
       await test.step('Log in again on non public computer', async () => {
@@ -221,6 +222,7 @@ test.describe('Authentication', () => {
         await components.conversationSidebar().clickPreferencesButton();
         await pages.settings().accountButton.click();
         await pages.account().clickLogoutButton();
+        await expect(pages.login().signInButton).toBeVisible({timeout: LOGIN_TIMEOUT});
       });
 
       await test.step('Log in again', async () => {
