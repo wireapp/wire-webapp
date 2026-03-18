@@ -66,7 +66,8 @@ import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
-import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType, toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/TypePredicateUtil';
 
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';
