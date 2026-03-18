@@ -22,7 +22,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {MessageSendingStatus} from '../conversation/';
 import {HttpClient} from '../http/';
-import {ValidationError} from '../validation/';
+import {ValidationError} from '../validation';
 
 export class BroadcastAPI {
   constructor(private readonly client: HttpClient) {}
