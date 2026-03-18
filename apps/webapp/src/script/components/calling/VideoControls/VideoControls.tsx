@@ -355,12 +355,14 @@ export const VideoControls = ({
       ? {
           label: t('videoCallBackgroundBlurLow'),
           value: 'blur-low',
-          icon: <Icon.BlurLowIcon />,
+          icon: <Icon.FileIcon />,
+          //icon: <Icon.BlurLowIcon />,
         }
       : {
           label: t('videoCallBackgroundBlurHigh'),
           value: 'blur-high',
-          icon: <Icon.BlurHighIcon />,
+          icon: <Icon.FileIcon />,
+          //icon: <Icon.BlurHighIcon />,
         };
 
   const backgroundOptions: {label: string; options: BackgroundOption[]}[] = useMemo(
@@ -368,9 +370,13 @@ export const VideoControls = ({
       {
         label: t('videoCallBackgroundEffectsLabel'),
         options: [
-          {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.CircleIcon />},
+          {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.FileIcon /> /*icon: <Icon.CircleIcon />*/},
           currentBlurOption,
-          {label: t('videoCallVirtualBackground'), value: 'virtual', icon: <Icon.ImageIcon />},
+          {
+            label: t('videoCallBackgroundVirtual'),
+            value: 'virtual',
+            icon: <Icon.FileIcon /> /*icon: <Icon.ImageIcon />*/,
+          },
           {
             label: t('videoCallBackgroundSettings'),
             value: 'settings',
