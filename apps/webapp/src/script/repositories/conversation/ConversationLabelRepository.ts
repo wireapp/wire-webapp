@@ -234,7 +234,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         ...event.value,
         labels: (event.value?.labels ?? []).map((label: ConversationLabelJson) => ({
           ...label,
-          name: label.name ? fixWebsocketString(label.name) : label.name,
+          name: label.name ? fixWebsocketString(label.name) : undefined,
         })),
       };
       this.unmarshal(value);
