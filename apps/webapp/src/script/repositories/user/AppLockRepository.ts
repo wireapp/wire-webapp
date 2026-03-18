@@ -43,7 +43,8 @@ const defaultAppLockCrypto: AppLockCrypto = {
   ready,
   cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number): Uint8Array | string =>
     sodium.crypto_pwhash_str(code, opsLimit, memLimit),
-  cryptoPwhashStrVerify: (hashedCode: string, code: string): boolean => sodium.crypto_pwhash_str_verify(hashedCode, code),
+  cryptoPwhashStrVerify: (hashedCode: string, code: string): boolean =>
+    sodium.crypto_pwhash_str_verify(hashedCode, code),
 };
 
 // libsodium-wrappers-sumo currently returns a string here despite the published typings.
