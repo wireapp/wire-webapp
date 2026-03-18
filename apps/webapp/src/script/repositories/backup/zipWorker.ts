@@ -22,11 +22,25 @@ import sodium, {ready} from 'libsodium-wrappers-sumo';
 
 import {ImportError} from './Error';
 
-import {toError} from '../../util/TypePredicateUtil';
-
 type Payload =
   | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
   | {type: 'unzip'; bytes: ArrayBuffer; encrytionKey?: Uint8Array; headerLength?: number};
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  if (typeof error === 'string') {
+    return error;
+  }
+
+  if (typeof error === 'object' && error !== null && 'message' in error && typeof error.message === 'string') {
+    return error.message;
+  }
+
+  return 'Unknown error';
+}
 
 export async function handleZipEvent(payload: Payload) {
   const zip = new JSZip();
@@ -57,7 +71,7 @@ export async function handleZipEvent(payload: Payload) {
           decryptedBytes = await decryptFile(payloadBytes, encrytionKey, headerLength);
         } catch (error: unknown) {
           // Handle decryption failure
-          throw new ImportError(toError(error).message);
+          throw new ImportError(getErrorMessage(error));
         }
       } else {
         decryptedBytes = payload.bytes;
@@ -127,6 +141,6 @@ self.addEventListener('message', async (event: MessageEvent<Payload>) => {
     const result = await handleZipEvent(event.data);
     self.postMessage(result);
   } catch (error: unknown) {
-    self.postMessage({error: toError(error).message});
+    self.postMessage({error: getErrorMessage(error)});
   }
 });
