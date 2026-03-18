@@ -48,7 +48,7 @@ describe('AppLockRepository', () => {
   beforeEach(() => {
     mockCryptoPwhashStr.mockReset();
     mockCryptoPwhashStrVerify.mockReset();
-    window.localStorage.clear();
+    globalThis.localStorage.clear();
   });
 
   it('stores the pwhash output directly when libsodium returns a string', async () => {
