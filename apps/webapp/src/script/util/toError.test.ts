@@ -52,4 +52,22 @@ describe('toError', () => {
     expect(actual.message).toBe('Unknown error');
     expect(actual.cause).toBe(source);
   });
+
+  it('wraps objects with a non-string message into unknown errors', () => {
+    const source = {message: 500};
+
+    const actual = toError(source);
+
+    expect(actual.message).toBe('Unknown error');
+    expect(actual.cause).toBe(source);
+  });
+
+  it('wraps non-string primitive values into unknown errors', () => {
+    const source = 500;
+
+    const actual = toError(source);
+
+    expect(actual.message).toBe('Unknown error');
+    expect(actual.cause).toBe(source);
+  });
 });
