@@ -230,12 +230,15 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly onUserEvent = (event: any) => {
     if (event.type === USER_EVENT.PROPERTIES_SET && event.key === propertiesKey) {
-      const value: LabelProperty = {
-        ...event.value,
-        labels: (event.value?.labels ?? []).map((label: ConversationLabelJson) => ({
+      const normalizedLabels = event.value?.labels?.map((label: ConversationLabelJson) => {
+        return {
           ...label,
           name: label.name ? fixWebsocketString(label.name) : undefined,
-        })),
+        };
+      });
+      const value: LabelProperty = {
+        ...event.value,
+        labels: normalizedLabels ?? [],
       };
       this.unmarshal(value);
     }
