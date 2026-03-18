@@ -19,7 +19,6 @@
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
-import {selectByDataAttribute} from 'test/e2e_tests/utils/selector.util';
 
 test.describe('Conversation tabs feature flag', () => {
   test(
@@ -38,7 +37,7 @@ test.describe('Conversation tabs feature flag', () => {
 
       await components.conversationSidebar().isPageLoaded();
 
-      await expect(page.locator(selectByDataAttribute('tabs-filter-button'))).toHaveCount(0);
+      await expect(page.getByTestId('tabs-filter-button')).toHaveCount(0);
 
       const defaultTabs = [
         'go-recent-view',
@@ -55,15 +54,15 @@ test.describe('Conversation tabs feature flag', () => {
       ];
 
       for (const tab of defaultTabs) {
-        await expect(page.locator(selectByDataAttribute(tab))).toBeVisible();
+        await expect(page.getByTestId(tab)).toBeVisible();
       }
 
       if (process.env.FEATURE_ENABLE_CHANNELS === 'true') {
-        await expect(page.locator(selectByDataAttribute('go-channels-view'))).toBeVisible();
+        await expect(page.getByTestId('go-channels-view')).toBeVisible();
       }
 
       if (process.env.FEATURE_ENABLE_CELLS === 'true') {
-        await expect(page.locator(selectByDataAttribute('go-cells'))).toBeVisible();
+        await expect(page.getByTestId('go-cells')).toBeVisible();
       }
     },
   );

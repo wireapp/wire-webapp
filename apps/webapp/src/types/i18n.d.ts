@@ -717,8 +717,6 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
-    'tabsFilterHeader': `Show filters`;
-    'tabsFilterTooltip': `Customize visible tabs`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -1798,11 +1796,6 @@ declare module 'I18n/en-US.json' {
     'searchConversations': `Search conversations`;
     'searchConversationsNoResult': `No results found`;
     'searchConversationsNoResultConnectSuggestion': `Connect with new users or start a new conversation`;
-    'searchDraftsConversations': `Search in drafts`;
-    'searchMentionsConversations': `Search in mentions`;
-    'searchPingsConversations': `Search in pings`;
-    'searchRepliesConversations': `Search in replies`;
-    'searchUnreadConversations': `Search in unread`;
     'searchCreateGroup': `Create group`;
     'searchCreateGuestRoom': `Create guest room`;
     'searchDirectConversations': `Search 1:1 conversations`;
