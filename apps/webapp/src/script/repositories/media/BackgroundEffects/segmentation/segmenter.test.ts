@@ -46,7 +46,6 @@ describe('Segmenter', () => {
   let createImageBitmapSpy: jest.SpyInstance;
   let performanceNowSpy: jest.SpyInstance;
   let fetchSpy: jest.SpyInstance;
-  let consoleInfoSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;
 
   beforeEach(() => {
@@ -61,7 +60,9 @@ describe('Segmenter', () => {
         constructor(
           public width: number,
           public height: number,
-        ) {}
+        ) {
+        }
+
         getContext(): any {
           return null;
         }
@@ -131,8 +132,6 @@ describe('Segmenter', () => {
       status: 200,
     } as Response);
 
-    // Mock console methods
-    consoleInfoSpy = jest.spyOn(console, 'info').mockImplementation();
     consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
   });
 
@@ -178,7 +177,7 @@ describe('Segmenter', () => {
             delegate: 'CPU',
           },
           runningMode: 'VIDEO',
-          outputCategoryMask: false,
+          outputCategoryMask: true,
           outputConfidenceMasks: true,
         }),
       );
@@ -215,22 +214,22 @@ describe('Segmenter', () => {
       expect(fetchSpy).toHaveBeenCalledWith(MODEL_PATH, {method: 'HEAD'});
     });
 
-    it('logs info when assets are available', async () => {
+    it('segmenter exists when assets are available', async () => {
       fetchSpy.mockResolvedValue({ok: true, status: 200} as Response);
       const segmenter = new Segmenter(MODEL_PATH);
 
       await segmenter.init();
 
-      expect(consoleInfoSpy).toHaveBeenCalled();
+      expect(segmenter.getSegmenter()).not.toBeNull();
     });
 
-    it('logs warning when asset check fails', async () => {
+    it('probeAsset has no effect', async () => {
       fetchSpy.mockResolvedValue({ok: false, status: 404} as Response);
       const segmenter = new Segmenter(MODEL_PATH);
 
       await segmenter.init();
 
-      expect(consoleWarnSpy).toHaveBeenCalled();
+      expect(segmenter.getSegmenter()).not.toBeNull();
     });
 
     it('handles fetch errors gracefully', async () => {
@@ -238,7 +237,6 @@ describe('Segmenter', () => {
       const segmenter = new Segmenter(MODEL_PATH);
 
       await expect(segmenter.init()).resolves.not.toThrow();
-      expect(consoleWarnSpy).toHaveBeenCalled();
     });
 
     it('skips probe when fetch is unavailable', async () => {
@@ -523,7 +521,7 @@ describe('Segmenter', () => {
       expect(putImageDataCall.data[0]).toBe(128); // R channel
       expect(putImageDataCall.data[1]).toBe(128); // G channel
       expect(putImageDataCall.data[2]).toBe(128); // B channel
-      expect(putImageDataCall.data[3]).toBe(255); // A channel
+      expect(putImageDataCall.data[3]).toBe(128); // A channel (Soft-Edge Rendering if Alpha mask not 100% viewable)
 
       restoreOffscreenCanvas(segmenter);
     });
@@ -657,7 +655,7 @@ describe('Segmenter', () => {
       restoreOffscreenCanvas(segmenter);
     });
 
-    it('closes mask resources after segmentation', async () => {
+    it('closes mask resources after released result segmentation', async () => {
       const segmenter = await setupSegmenter();
 
       const mockMask = {
@@ -668,7 +666,9 @@ describe('Segmenter', () => {
         confidenceMasks: [mockMask],
       });
 
-      await segmenter.segment(mockFrame, 1000);
+      const result = await segmenter.segment(mockFrame, 1000);
+
+      result.release();
 
       expect(mockMask.close).toHaveBeenCalled();
 
