@@ -89,7 +89,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
