@@ -64,7 +64,8 @@ import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
-import {isErrorWithType, toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isErrorWithType} from 'Util/TypePredicateUtil';
 import {base64ToArray} from 'Util/util';
 
 import {
