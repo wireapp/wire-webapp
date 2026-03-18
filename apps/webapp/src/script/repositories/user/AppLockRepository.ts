@@ -38,8 +38,12 @@ export interface AppLockCrypto {
 }
 
 const defaultAppLockCrypto: AppLockCrypto = {
-  cryptoPwhashMemLimitInteractive: sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
-  cryptoPwhashOpsLimitInteractive: sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
+  get cryptoPwhashMemLimitInteractive(): number {
+    return sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE;
+  },
+  get cryptoPwhashOpsLimitInteractive(): number {
+    return sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
+  },
   ready,
   cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number): Uint8Array | string =>
     sodium.crypto_pwhash_str(code, opsLimit, memLimit),
