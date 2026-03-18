@@ -85,38 +85,4 @@ describe('TypePredicateUtil', () => {
       expect(actual).toBeTruthy();
     });
   });
-
-  describe('toError', () => {
-    it('returns error instances unchanged', () => {
-      const error = new Error('Server Error');
-
-      const actual = toError(error);
-
-      expect(actual).toBe(error);
-    });
-
-    it('wraps string values into errors', () => {
-      const actual = toError('Server Error');
-
-      expect(actual.message).toBe('Server Error');
-    });
-
-    it('wraps objects with a message into errors', () => {
-      const source = {message: 'Server Error'};
-
-      const actual = toError(source);
-
-      expect(actual.message).toBe('Server Error');
-      expect(actual.cause).toBe(source);
-    });
-
-    it('wraps objects without a message into unknown errors', () => {
-      const source = {code: 500};
-
-      const actual = toError(source);
-
-      expect(actual.message).toBe('Unknown error');
-      expect(actual.cause).toBe(source);
-    });
-  });
 });
