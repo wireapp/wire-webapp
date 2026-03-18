@@ -181,8 +181,8 @@ export class FrameSource {
             frame.close();
           }
         }
-      } catch (error) {
-        if (abortController.signal.aborted || error?.name === 'AbortError') {
+      } catch (error: unknown) {
+        if (abortController.signal.aborted || (error instanceof DOMException && error?.name === 'AbortError')) {
           return;
         }
         this.logger.warn('FrameSource processor pipe failed', error);

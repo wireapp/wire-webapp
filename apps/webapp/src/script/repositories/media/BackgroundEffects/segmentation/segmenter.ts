@@ -79,8 +79,6 @@ export class Segmenter {
   private height = 0;
   /** Base path for MediaPipe WASM files. */
   private readonly wasmBasePath = '/min/mediapipe/wasm';
-
-  private wasInit = false;
   /**
    * Creates a new segmenter instance.
    *
@@ -116,15 +114,6 @@ export class Segmenter {
    * @throws May throw if model files are missing or initialization fails.
    */
   public async init(): Promise<void> {
-    console.log('### Segmentation model:', this.modelPath);
-    // Prevent memory overflow by initializing multiple times. If the model cannot be loaded, a memory overflow occurs
-    // because the MediaPipe is loaded multiple times.
-    // if (this.wasInit) {
-    //   return Promise.resolve();
-    // }
-    //
-    // this.wasInit = true;
-
     // Probe for required assets (non-blocking)
     await this.probeAsset(`${this.wasmBasePath}/vision_wasm_internal.wasm`);
     await this.probeAsset(this.modelPath);
