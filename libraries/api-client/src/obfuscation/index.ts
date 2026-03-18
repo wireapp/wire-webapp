@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ObfuscationUtil';
+export * from './obfuscationUtil';

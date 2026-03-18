@@ -50,7 +50,7 @@ import {GiphyAPI} from './giphy/';
 import {BackendError, HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/OAuthAPI';
-import {ObfuscationUtil} from './obfuscation/';
+import {ObfuscationUtil} from './obfuscation';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';
 import {ServicesAPI} from './services';
