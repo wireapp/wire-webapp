@@ -18,7 +18,6 @@
  */
 
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const path = require('path');
 
@@ -62,6 +61,7 @@ module.exports = {
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
   },
   mode: 'development',
+  plugins: [...commonConfig.plugins, new webpack.HotModuleReplacementPlugin(), updateTranslationTypesPlugin],
   snapshot: {
     // Watch @wireapp packages in node_modules and local monorepo dependencies
     managedPaths: [
