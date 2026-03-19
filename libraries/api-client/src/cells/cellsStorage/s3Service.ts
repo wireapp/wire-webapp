@@ -20,7 +20,7 @@
 import {S3Client, S3ServiceException} from '@aws-sdk/client-s3';
 import {Upload} from '@aws-sdk/lib-storage';
 
-import {CellsStorage, CellsStorageError} from './CellsStorage';
+import {CellsStorage, CellsStorageError} from './cellsStorage';
 
 import {AccessTokenStore} from '../../auth';
 

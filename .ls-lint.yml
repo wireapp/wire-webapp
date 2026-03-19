@@ -62,3 +62,8 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .schema.ts: camelCase
+  libraries/api-client/src/cells:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .schema.ts: camelCase

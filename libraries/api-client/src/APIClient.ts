@@ -39,7 +39,7 @@ import {
 import {CookieStore} from './auth/CookieStore';
 import {parseAccessToken} from './auth/parseAccessToken';
 import {BroadcastAPI} from './broadcast/broadcastApi';
-import {CellsAPI} from './cells/CellsAPI';
+import {CellsAPI} from './cells/cellsApi';
 import {ClientAPI, ClientType} from './client/';
 import {Config, MINIMUM_API_VERSION} from './Config';
 import {ConnectionAPI} from './connection/';
