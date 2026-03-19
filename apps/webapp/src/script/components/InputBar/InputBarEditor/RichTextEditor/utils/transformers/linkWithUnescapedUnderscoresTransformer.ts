@@ -31,8 +31,6 @@ export const LINK_WITH_UNESCAPED_UNDERSCORES: TextMatchTransformer = {
     const textContent = exportChildren(node);
     const normalizedUrl = node.getURL().replace(/\\_/g, '_');
 
-    return title
-      ? `[${textContent}](${normalizedUrl} "${title}")`
-      : `[${textContent}](${normalizedUrl})`;
+    return title ? `[${textContent}](${normalizedUrl} "${title}")` : `[${textContent}](${normalizedUrl})`;
   },
 };

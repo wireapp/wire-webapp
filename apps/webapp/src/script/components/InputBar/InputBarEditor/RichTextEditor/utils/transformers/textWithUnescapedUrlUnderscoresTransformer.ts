@@ -17,8 +17,8 @@
  *
  */
 
-import {$isTextNode, TextNode} from 'lexical';
 import {TextMatchTransformer} from '@lexical/markdown';
+import {$isTextNode, TextNode} from 'lexical';
 
 const URL_TOKEN_PATTERN = /(https?:\/\/[^\s)]+)/g;
 
