@@ -19,10 +19,10 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {LoginServiceProviderData} from './LoginServiceProviderData';
-import {NewServiceProvider} from './NewServiceProvider';
-import {RegisteredServiceProvider} from './RegisteredServiceProvider';
-import {UpdateServiceProviderData} from './UpdateServiceProviderData';
+import {LoginServiceProviderData} from './loginServiceProviderData';
+import {NewServiceProvider} from './newServiceProvider';
+import {RegisteredServiceProvider} from './registeredServiceProvider';
+import {UpdateServiceProviderData} from './updateServiceProviderData';
 
 import {HttpClient} from '../http';
 import {CompletePasswordReset} from '../user';

@@ -24,8 +24,8 @@ import {EventEmitter} from 'events';
 
 import {LogFactory} from '@wireapp/commons';
 
-import {AcknowledgeType} from './AcknowledgeEvent.types';
-import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
+import {AcknowledgeType} from './acknowledgeEvent.types';
+import {ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../Config';
@@ -36,7 +36,7 @@ import {
   ConsumableNotificationEvent,
   ConsumableNotificationSchema,
   ConsumableNotificationSynchronization,
-} from '../notification/ConsumableNotification';
+} from '../notification/consumableNotification';
 
 enum TOPIC {
   ON_ERROR = 'WebSocketClient.TOPIC.ON_ERROR',

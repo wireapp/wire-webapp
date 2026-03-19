@@ -39,7 +39,7 @@ import {
 import {CookieStore} from './auth/CookieStore';
 import {parseAccessToken} from './auth/parseAccessToken';
 import {BroadcastAPI} from './broadcast/broadcastApi';
-import {CellsAPI} from './cells/CellsAPI';
+import {CellsAPI} from './cells/cellsApi';
 import {ClientAPI, ClientType} from './client/';
 import {Config, MINIMUM_API_VERSION} from './Config';
 import {ConnectionAPI} from './connection/';
@@ -49,7 +49,7 @@ import {GenericAPI} from './generic/genericApi';
 import {GiphyAPI} from './giphy/giphyApi';
 import {BackendError, HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
-import {OAuthAPI} from './oauth/OAuthAPI';
+import {OAuthAPI} from './oauth/oAuthApi';
 import {ObfuscationUtil} from './obfuscation';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';

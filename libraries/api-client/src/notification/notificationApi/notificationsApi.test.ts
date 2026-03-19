@@ -25,7 +25,7 @@ import {
   mockedNotificationId,
   mockedResultData,
   notificationAPI,
-} from './NotificationsAPI.mocks';
+} from './notificationsApi.mocks';
 
 import {BackendError, BackendErrorLabel} from '../../http';
 
