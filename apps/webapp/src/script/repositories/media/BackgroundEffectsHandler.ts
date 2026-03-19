@@ -98,7 +98,7 @@ export class BackgroundEffectsHandler {
         }),
       );
     } catch (error) {
-      this.controller.stop();
+      await this.controller.stop();
       this.logger.warn('BackgroundEffectsController failed with error:', error);
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }

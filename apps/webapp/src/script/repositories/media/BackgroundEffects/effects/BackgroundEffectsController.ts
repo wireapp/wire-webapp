@@ -281,7 +281,7 @@ export class BackgroundEffectsController {
     this.outputTrack = captureStream.getVideoTracks()[0];
 
     // Stop pipeline when input track ends
-    inputTrack.addEventListener('ended', () => this.stop());
+    inputTrack.addEventListener('ended', async () => await this.stop());
 
     // Set background sources if provided
     if (opts.backgroundImage) {
@@ -296,7 +296,7 @@ export class BackgroundEffectsController {
 
     return {
       outputTrack: this.outputTrack,
-      stop: () => this.stop(),
+      stop: async () => await this.stop(),
     };
   }
 
@@ -434,7 +434,7 @@ export class BackgroundEffectsController {
    * Should be called when the pipeline is no longer needed to free all resources
    * and prevent memory leaks.
    */
-  public stop(): void {
+  public async stop(): Promise<void> {
     this.isStopping = true;
     this.backgroundPumpCancel?.();
     this.backgroundPumpCancel = null;

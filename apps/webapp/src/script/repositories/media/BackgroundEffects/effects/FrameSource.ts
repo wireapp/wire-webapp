@@ -97,7 +97,7 @@ export class FrameSource {
    *
    * @returns Nothing.
    */
-  public stop(): void {
+  public async stop(): Promise<void> {
     this.running = false;
     if (this.processorAbort) {
       this.processorAbort.abort();
@@ -105,7 +105,7 @@ export class FrameSource {
     }
     if (this.processorReader) {
       try {
-        this.processorReader.cancel();
+        await this.processorReader.cancel();
       } catch (error) {
         this.logger.warn('FrameSource cancel failed', error);
       }

@@ -60,20 +60,8 @@ module.exports = {
     ...commonConfig.entry,
     app: ['webpack-hot-middleware/client?reload=true', path.resolve(__dirname, srcScript, 'main/index.tsx')],
     auth: ['webpack-hot-middleware/client', path.resolve(__dirname, srcScript, 'auth/main.tsx')],
-    'test-background-effects': path.resolve(__dirname, srcScript, 'repositories/media/BackgroundEffects/test-basic.ts'),
   },
   mode: 'development',
-  plugins: [
-    ...commonConfig.plugins,
-    new webpack.HotModuleReplacementPlugin(),
-    updateTranslationTypesPlugin,
-    new HtmlWebpackPlugin({
-      inject: false,
-      filename: 'testBackgroundEffects.html',
-      template: path.resolve(__dirname, 'src/page/testBackgroundEffects.html'),
-      templateParameters: {},
-    }),
-  ],
   snapshot: {
     // Watch @wireapp packages in node_modules and local monorepo dependencies
     managedPaths: [
