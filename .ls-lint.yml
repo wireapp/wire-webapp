@@ -57,3 +57,8 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
+  libraries/api-client/src/asset:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .schema.ts: camelCase
