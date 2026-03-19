@@ -114,6 +114,13 @@ describe('renderMessage', () => {
     expect(renderMessage(`Just click ${link} and download it`)).toBe(expected);
   });
 
+  it('renders URLs with underscores in hostname', () => {
+    const link = 'https://wire-webapp_dev.zinfra.io/';
+    const expected = `<a href="${link}" target="_blank" rel="nofollow noopener noreferrer">${link}</a>`;
+
+    expect(renderMessage(link)).toBe(expected);
+  });
+
   it('escapes links when they are posted as plain HTML', () => {
     const expected = "&lt;a href=&quot;javascript:alert('ohoh!')&quot;&gt;what?&lt;/a&gt;";
 
