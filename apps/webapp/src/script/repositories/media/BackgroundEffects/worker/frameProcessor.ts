@@ -170,7 +170,7 @@ function ensureSegmenterForTier(tier: QualityTier): void {
   if (tier === 'bypass') {
     return;
   }
-  if (state.segmenterInitPromise) {
+  if (state.segmenterInitPromise !== null) {
     return;
   }
   const desiredPath = resolveSegmentationModelPath(
