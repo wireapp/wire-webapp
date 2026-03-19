@@ -17,7 +17,7 @@
  *
  */
 
-import * as TimeUtil from './TimeUtil';
+import * as TimeUtil from './timeUtil';
 
 describe('TimeUtil', () => {
   beforeAll(() => {

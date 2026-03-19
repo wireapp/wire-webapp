@@ -17,7 +17,7 @@
  *
  */
 
-import * as BrowserUtil from './BrowserUtil';
+import * as BrowserUtil from './browserUtil';
 
 type UserAgentExpectation = readonly [
   description: string,

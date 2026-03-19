@@ -27,7 +27,7 @@ import {
   UserSeenByService,
   ClientSeenByService,
   ServiceMessage,
-} from './Service';
+} from './service';
 
 import {AssetOptions, AssetAPI} from '../asset';
 import {PreKey} from '../auth';
