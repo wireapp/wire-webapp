@@ -49,7 +49,7 @@ import {GenericAPI} from './generic/genericApi';
 import {GiphyAPI} from './giphy/giphyApi';
 import {BackendError, HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
-import {OAuthAPI} from './oauth/OAuthAPI';
+import {OAuthAPI} from './oauth/oAuthApi';
 import {ObfuscationUtil} from './obfuscation';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';
