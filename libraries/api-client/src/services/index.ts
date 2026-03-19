@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ServicesAPI';
+export * from './servicesApi';
