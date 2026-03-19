@@ -91,7 +91,7 @@ export const TIER_DEFINITIONS: Record<QualityTier, TierDefinition> = {
     bilateralSpatialSigma: 3.5,
     bilateralRangeSigma: 0.1,
     bypass: false,
-    modelPath: '/assets/mediapipe-models/selfie_segmenter_landscape.tflite',
+    modelPath: '/assets/mediapipe-models/selfie_multiclass_256x256.tflite',
   },
   high: {
     tier: 'high',
