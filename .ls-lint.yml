@@ -29,6 +29,13 @@ ls:
   libraries/api-client/src/federation/data:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/giphy:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/utils/backFromSleepHandler:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
   libraries/api-client/src/validation:
     .dir: camelCase
     .ts: camelCase

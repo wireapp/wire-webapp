@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {GiphySearchOptions, GiphyRandomOptions, GiphyTrendingOptions, GiphyIdOptions} from './GiphyOptions';
-import {GiphyResult, GiphyMultipleResult} from './GiphyResult';
+import {GiphySearchOptions, GiphyRandomOptions, GiphyTrendingOptions, GiphyIdOptions} from './giphyOptions';
+import {GiphyResult, GiphyMultipleResult} from './giphyResult';
 
 import {HttpClient} from '../http/';
 

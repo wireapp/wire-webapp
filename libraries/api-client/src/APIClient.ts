@@ -46,7 +46,7 @@ import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
 import {Backend} from './env/backend';
 import {GenericAPI} from './generic/genericApi';
-import {GiphyAPI} from './giphy/';
+import {GiphyAPI} from './giphy/giphyApi';
 import {BackendError, HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
 import {OAuthAPI} from './oauth/OAuthAPI';

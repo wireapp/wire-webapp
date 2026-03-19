@@ -24,7 +24,7 @@ import {LogFactory, TimeUtil} from '@wireapp/commons';
 
 import * as buffer from '../shims/node/buffer';
 import {WebSocketNode} from '../shims/node/websocket';
-import {onBackFromSleep} from '../utils/BackFromSleepHandler';
+import {onBackFromSleep} from '../utils/backFromSleepHandler/backFromSleepHandler';
 
 export enum CloseEventCode {
   NORMAL_CLOSURE = 1000,
