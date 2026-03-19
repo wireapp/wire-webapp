@@ -92,6 +92,30 @@ const isValidUrl = (url: string): boolean => {
   // only allow urls to wire://, https://, http:// and mailto:
   return !!url.match(/^(wire:\/\/|https?:\/\/|mailto:)/i);
 };
+
+const registerHttpSchemaWithUnderscoreHostSupport = (schema: 'http:' | 'https:') => {
+  markdownit.linkify.add(schema, {
+    validate: (text, pos) => {
+      const tail = text.slice(pos);
+      const match = /^[^\s<>()]+/.exec(tail);
+
+      if (!match) {
+        return 0;
+      }
+
+      const normalizedMatch = match[0].replace(/[.,!?;:]+$/, '');
+      const urlCandidate = `${schema}//${normalizedMatch}`;
+      if (!isValidUrl(urlCandidate)) {
+        return 0;
+      }
+
+      return normalizedMatch.length;
+    },
+  });
+};
+
+registerHttpSchemaWithUnderscoreHostSupport('http:');
+registerHttpSchemaWithUnderscoreHostSupport('https:');
 markdownit.validateLink = isValidUrl;
 markdownit.normalizeLink = (url: string): string => {
   url = originalNormalizeLink(url);
@@ -133,6 +157,8 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
   return '<br>'.repeat(Math.max(count, 0));
 };
 markdownit.renderer.rules.paragraph_close = () => '';
+
+const NEXT_TOKEN_OFFSET = 2;
 
 const renderMention = (mentionData: MentionText) => {
   const elementClasses = mentionData.isSelfMentioned ? ' self-mention' : '';
@@ -233,7 +259,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
     const text = nextToken?.type === 'text' ? nextToken.content : '';
     const closeToken = tokens.slice(idx).find(token => token.type === 'link_close');
 
-    if (href == '' || closeToken == nextToken || (!text.trim() && closeToken == tokens[idx + 2])) {
+    if (href == '' || closeToken == nextToken || (!text.trim() && closeToken == tokens[idx + NEXT_TOKEN_OFFSET])) {
       if (closeToken) {
         closeToken.type = 'text';
         closeToken.content = `](${cleanString(href)})`;
