@@ -23,7 +23,7 @@ import {Server as WebSocketServer} from 'ws';
 
 import {AddressInfo} from 'net';
 
-import {PingMessage, ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
+import {PingMessage, ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
 
 const reservedPorts: number[] = [];
 

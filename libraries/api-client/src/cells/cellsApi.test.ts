@@ -29,9 +29,9 @@ import {
 } from 'cells-sdk-ts';
 import {v4 as uuidv4} from 'uuid';
 
-import {CellsAPI} from './CellsAPI';
-import {CellsStorage} from './CellsStorage/CellsStorage';
-import {S3Service} from './CellsStorage/S3Service';
+import {CellsAPI} from './cellsApi';
+import {CellsStorage} from './cellsStorage/cellsStorage';
+import {S3Service} from './cellsStorage/s3Service';
 
 import {AccessTokenStore} from '../auth/AccessTokenStore';
 import {HttpClient} from '../http';
@@ -39,7 +39,7 @@ import {cellsConfigMock} from '../mocks/cells';
 
 jest.mock('cells-sdk-ts');
 jest.mock('uuid');
-jest.mock('./CellsStorage/S3Service');
+jest.mock('./cellsStorage/s3Service');
 
 describe('CellsAPI', () => {
   let cellsAPI: CellsAPI;

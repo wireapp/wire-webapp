@@ -17,4 +17,4 @@
  *
  */
 
-export * from './BroadcastAPI';
+export * from './broadcastApi';

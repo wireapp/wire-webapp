@@ -39,9 +39,9 @@ import logdown from 'logdown';
 
 import {LogFactory} from '@wireapp/commons';
 
-import {Node, NodeVersions, RestNodeSchema, RestNodeVersionsSchema} from './CellsAPI.schema';
-import {CellsStorage} from './CellsStorage/CellsStorage';
-import {S3Service} from './CellsStorage/S3Service';
+import {Node, NodeVersions, RestNodeSchema, RestNodeVersionsSchema} from './cellsApi.schema';
+import {CellsStorage} from './cellsStorage/cellsStorage';
+import {S3Service} from './cellsStorage/s3Service';
 
 import {AccessTokenStore} from '../auth';
 import {HttpClient} from '../http';

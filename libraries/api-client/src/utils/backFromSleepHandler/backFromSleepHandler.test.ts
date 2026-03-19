@@ -17,7 +17,7 @@
  *
  */
 
-import {onBackFromSleep} from './BackFromSleepHandler';
+import {onBackFromSleep} from './backFromSleepHandler';
 
 const CHECK_INTERVAL = 2000;
 const TOLERANCE = CHECK_INTERVAL * 2;

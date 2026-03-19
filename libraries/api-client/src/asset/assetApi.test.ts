@@ -17,9 +17,9 @@
  *
  */
 
-import {AssetAPI} from './AssetAPI';
-import {AssetUploadData} from './AssetAPI.schema';
-import {AssetRetentionPolicy} from './AssetRetentionPolicy';
+import {AssetAPI} from './assetApi';
+import {AssetUploadData} from './assetApi.schema';
+import {AssetRetentionPolicy} from './assetRetentionPolicy';
 
 import {HttpClient, StatusCode, SyntheticErrorLabel} from '../http';
 import {RequestCancellationError} from '../user';

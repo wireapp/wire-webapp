@@ -20,8 +20,8 @@
 import {S3Client, S3ServiceException} from '@aws-sdk/client-s3';
 import {Upload} from '@aws-sdk/lib-storage';
 
-import {CellsStorageError} from './CellsStorage';
-import {MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './S3Service';
+import {CellsStorageError} from './cellsStorage';
+import {MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './s3Service';
 
 import {AccessTokenStore} from '../../auth/AccessTokenStore';
 

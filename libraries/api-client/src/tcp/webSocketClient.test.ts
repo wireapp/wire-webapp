@@ -19,12 +19,12 @@
 
 /* eslint-disable dot-notation */
 
-import {WebSocketClient} from './WebSocketClient';
+import {WebSocketClient} from './webSocketClient';
 
 import {InvalidTokenError} from '../auth/AuthenticationError';
 import {MINIMUM_API_VERSION} from '../Config';
 import {TEAM_EVENT} from '../event/';
-import {ConsumableEvent, ConsumableNotification} from '../notification/ConsumableNotification';
+import {ConsumableEvent, ConsumableNotification} from '../notification/consumableNotification';
 
 const accessTokenPayload = {
   access_token:

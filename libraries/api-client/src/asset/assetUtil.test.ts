@@ -17,7 +17,7 @@
  *
  */
 
-import {isValidToken, isValidUUID} from './AssetUtil';
+import {isValidToken, isValidUUID} from './assetUtil';
 
 describe('"isValidToken"', () => {
   it('should return true if token is valid', () => {

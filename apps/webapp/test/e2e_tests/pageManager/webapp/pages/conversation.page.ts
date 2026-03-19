@@ -152,6 +152,12 @@ export class ConversationPage {
     await this.messageInput.pressSequentially(message, {delay: 100});
   }
 
+  async sendTypedMessage(message: string) {
+    await this.messageInput.clear();
+    await this.typeMessage(message);
+    await this.sendMessageButton.click();
+  }
+
   async mentionUser(userFullName: string, searchQuery?: string) {
     const textToType = searchQuery ? `@${searchQuery}` : `@${userFullName.slice(0, 3)}`;
     await this.messageInput.pressSequentially(textToType);

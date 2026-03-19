@@ -17,7 +17,7 @@
  *
  */
 
-import {NotificationAPI} from './NotificationAPI';
+import {NotificationAPI} from './notificationApi';
 
 import {AccessTokenStore} from '../../auth';
 import {HttpClient} from '../../http';

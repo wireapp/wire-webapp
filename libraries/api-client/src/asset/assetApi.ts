@@ -22,9 +22,9 @@ import logdown from 'logdown';
 
 import {LogFactory} from '@wireapp/commons';
 
-import {AssetUploadData, PostAssetsResponseSchema} from './AssetAPI.schema';
-import {AssetRetentionPolicy} from './AssetRetentionPolicy';
-import {isValidToken, isValidUUID} from './AssetUtil';
+import {AssetUploadData, PostAssetsResponseSchema} from './assetApi.schema';
+import {AssetRetentionPolicy} from './assetRetentionPolicy';
+import {isValidToken, isValidUUID} from './assetUtil';
 
 import {
   BackendError,

@@ -19,9 +19,9 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {OAuthApplication} from './OAuthApplication';
-import {OAuthBody} from './OAuthBody';
-import {OAuthClient} from './OAuthClient';
+import {OAuthApplication} from './oAuthApplication';
+import {OAuthBody} from './oAuthBody';
+import {OAuthClient} from './oAuthClient';
 
 import {HttpClient} from '../http';
 
