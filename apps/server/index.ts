@@ -20,7 +20,7 @@
 import {clientConfig, serverConfig} from './config';
 import {Server} from './Server';
 import {logServerStartup} from './serverStartupLog';
-import {formatDate} from './util/TimeUtil';
+import {formatDate} from './util/timeUtil';
 
 const server = new Server(serverConfig, clientConfig);
 

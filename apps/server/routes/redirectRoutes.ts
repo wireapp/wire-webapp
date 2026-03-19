@@ -22,7 +22,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import type {ServerConfig} from '@wireapp/config';
 
-import * as BrowserUtil from '../util/BrowserUtil';
+import * as BrowserUtil from '../util/browserUtil';
 
 const router = express.Router();
 

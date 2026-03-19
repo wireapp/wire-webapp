@@ -21,7 +21,7 @@ import express from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import logdown from 'logdown';
 
-import {formatDate} from '../../util/TimeUtil';
+import {formatDate} from '../../util/timeUtil';
 
 const router = express.Router();
 

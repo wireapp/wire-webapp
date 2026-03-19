@@ -10,6 +10,10 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  apps/server/util:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
   libraries/api-client/src/validation:
     .dir: camelCase
     .ts: camelCase
