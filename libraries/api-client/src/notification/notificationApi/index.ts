@@ -17,4 +17,4 @@
  *
  */
 
-export * from './NotificationAPI';
+export * from './notificationApi';

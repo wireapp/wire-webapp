@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 
-import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {container} from 'tsyringe';

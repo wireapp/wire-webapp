@@ -19,7 +19,7 @@
 
 import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
 import type {RegisterData} from '@wireapp/api-client/lib/auth/';
-import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import {TeamData} from '@wireapp/api-client/lib/team';
 
 import type {LoginDataState, RegistrationDataState} from '../../reducer/authReducer';

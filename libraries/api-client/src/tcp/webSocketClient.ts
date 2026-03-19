@@ -36,7 +36,7 @@ import {
   ConsumableNotificationEvent,
   ConsumableNotificationSchema,
   ConsumableNotificationSynchronization,
-} from '../notification/ConsumableNotification';
+} from '../notification/consumableNotification';
 
 enum TOPIC {
   ON_ERROR = 'WebSocketClient.TOPIC.ON_ERROR',

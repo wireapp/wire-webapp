@@ -37,9 +37,9 @@ import {
   ConsumableNotification,
   ConsumableNotificationEvent,
   ConsumableNotificationSynchronization,
-} from '@wireapp/api-client/lib/notification/ConsumableNotification';
+} from '@wireapp/api-client/lib/notification/consumableNotification';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
-import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';

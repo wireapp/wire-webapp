@@ -67,3 +67,8 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .schema.ts: camelCase
+  libraries/api-client/src/notification:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .mocks.ts: camelCase
