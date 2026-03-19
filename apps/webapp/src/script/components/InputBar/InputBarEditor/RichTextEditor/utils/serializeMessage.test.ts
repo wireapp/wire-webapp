@@ -73,4 +73,12 @@ describe('serializeMessage', () => {
 
     expect(message).toBe('\\*\\*bold\\*\\* \\_italic\\_');
   });
+
+  it('does not escape underscores in URL paths when preview is enabled', () => {
+    const editor = createEditorWithParagraphs(['https://example.com/path_with_underscores']);
+
+    const message = editor.getEditorState().read(() => serializeMessage(true));
+
+    expect(message).toBe('https://example.com/path_with_underscores');
+  });
 });
