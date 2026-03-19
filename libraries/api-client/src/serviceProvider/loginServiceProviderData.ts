@@ -17,6 +17,6 @@
  *
  */
 
-import {NewServiceProvider} from './NewServiceProvider';
+import {NewServiceProvider} from './newServiceProvider';
 
-export type UpdateServiceProviderData = Partial<Omit<NewServiceProvider, 'email' | 'password'>>;
+export type LoginServiceProviderData = Required<Pick<NewServiceProvider, 'email' | 'password'>>;
