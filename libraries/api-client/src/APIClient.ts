@@ -38,14 +38,14 @@ import {
 } from './auth/';
 import {CookieStore} from './auth/CookieStore';
 import {parseAccessToken} from './auth/parseAccessToken';
-import {BroadcastAPI} from './broadcast/';
+import {BroadcastAPI} from './broadcast/broadcastApi';
 import {CellsAPI} from './cells/CellsAPI';
 import {ClientAPI, ClientType} from './client/';
 import {Config, MINIMUM_API_VERSION} from './Config';
 import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
-import {Backend} from './env/';
-import {GenericAPI} from './generic';
+import {Backend} from './env/backend';
+import {GenericAPI} from './generic/genericApi';
 import {GiphyAPI} from './giphy/';
 import {BackendError, HttpClient} from './http/';
 import {NotificationAPI} from './notification/';
