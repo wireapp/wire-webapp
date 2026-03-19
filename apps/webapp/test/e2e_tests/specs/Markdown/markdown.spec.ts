@@ -39,7 +39,7 @@ test.describe('Markdown', () => {
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversation().sendMessage('**Bold Message from User A**');
+    await userAPages.conversation().sendTypedMessage('**Bold Message from User A**');
 
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
@@ -56,7 +56,7 @@ test.describe('Markdown', () => {
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversation().sendMessage('*Emphasized message from User A*');
+    await userAPages.conversation().sendTypedMessage('*Emphasized message from User A*');
 
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
@@ -73,7 +73,7 @@ test.describe('Markdown', () => {
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversation().sendMessage('`Code message from User A`');
+    await userAPages.conversation().sendTypedMessage('`Code message from User A`');
 
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
@@ -90,8 +90,25 @@ test.describe('Markdown', () => {
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
-    const longCodeMessage = '```\nconst a = 5;\nconst b = 10;\nconsole.log(a + b);\n```';
-    await userAPages.conversation().sendMessage(longCodeMessage);
+    const longCodeMessage = 'const a = 5;\nconst b = 10;\nconsole.log(a + b);';
+    const conversationPage = userAPages.conversation();
+
+    await conversationPage.typeMessage('```');
+    await conversationPage.messageInput.press('Enter');
+
+    const codeLines = longCodeMessage.split('\n');
+
+    for (const [index, line] of codeLines.entries()) {
+      if (line.length > 0) {
+        await conversationPage.messageInput.pressSequentially(line, {delay: 100});
+      }
+
+      if (index < codeLines.length - 1) {
+        await conversationPage.messageInput.press('Shift+Enter');
+      }
+    }
+
+    await conversationPage.sendMessageButton.click();
 
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
@@ -108,7 +125,7 @@ test.describe('Markdown', () => {
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversation().sendMessage('**Bold**, *Italic* and `Code`');
+    await userAPages.conversation().sendTypedMessage('**Bold**, *Italic* and `Code`');
 
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
@@ -127,7 +144,7 @@ test.describe('Markdown', () => {
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversation().sendMessage('Start **Bold** Message');
+    await userAPages.conversation().sendTypedMessage('Start **Bold** Message');
 
     const sentMessageA = userAPages.conversation().getMessage({sender: userA});
     const sentMessageB = userBPages.conversation().getMessage({sender: userA});
@@ -138,7 +155,7 @@ test.describe('Markdown', () => {
     await userAPages.conversation().editMessage(sentMessageA);
     await expect(userAPages.conversation().messageInput).toContainText('Start Bold Message');
 
-    await userAPages.conversation().sendMessage('Edited to *Italic* Message');
+    await userAPages.conversation().sendTypedMessage('Edited to *Italic* Message');
 
     for (const message of [sentMessageA, sentMessageB]) {
       await expect(message).toContainText('Edited to Italic Message');
@@ -161,7 +178,7 @@ test.describe('Markdown', () => {
 
       const linkText = 'Wire Website';
       const url = 'https://wire.com';
-      await userAPages.conversation().sendMessage(`Visit [${linkText}](${url}) for book a demo`);
+      await userAPages.conversation().sendTypedMessage(`Visit [${linkText}](${url}) for book a demo`);
 
       for (const pages of [userAPages, userBPages]) {
         const message = pages.conversation().getMessage({sender: userA});
