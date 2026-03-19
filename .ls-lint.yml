@@ -52,3 +52,8 @@ ls:
   libraries/api-client/src/serviceProvider:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/tcp:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase

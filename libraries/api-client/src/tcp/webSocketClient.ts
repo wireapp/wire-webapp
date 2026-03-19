@@ -24,8 +24,8 @@ import {EventEmitter} from 'events';
 
 import {LogFactory} from '@wireapp/commons';
 
-import {AcknowledgeType} from './AcknowledgeEvent.types';
-import {ReconnectingWebsocket, WEBSOCKET_STATE} from './ReconnectingWebsocket';
+import {AcknowledgeType} from './acknowledgeEvent.types';
+import {ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../Config';

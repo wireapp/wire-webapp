@@ -19,7 +19,7 @@
 
 /* eslint-disable dot-notation */
 
-import {WebSocketClient} from './WebSocketClient';
+import {WebSocketClient} from './webSocketClient';
 
 import {InvalidTokenError} from '../auth/AuthenticationError';
 import {MINIMUM_API_VERSION} from '../Config';
