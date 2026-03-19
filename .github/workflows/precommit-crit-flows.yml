@@ -8,7 +8,7 @@ on:
 
 # One at a time lane for the shared precommit environment
 concurrency:
-  group: precommit-deploy
+  group: precommit-deploy-${{ github.base_ref || github.ref_name }}
   cancel-in-progress: false # queue newer runs
 
 jobs:
