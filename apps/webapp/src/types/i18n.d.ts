@@ -400,7 +400,7 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.tags.placeholder': `Select a tag`;
     'cells.filtersModal.title': `Filters`;
     'cells.folderBreadcrumbCombained': `Show more`;
-    'cells.heading': `All files`;
+    'cells.heading': `Files`;
     'cells.imageFullScreenModal.closeButton': `Close`;
     'cells.imageFullScreenModal.downloadButton': `Download`;
     'cells.modal.closeButton': `Close`;
@@ -1167,8 +1167,8 @@ declare module 'I18n/en-US.json' {
     'inviteHeadline': `Invite people to {brandName}`;
     'inviteHintSelected': `Press {metaKey} + C to copy`;
     'inviteHintUnselected': `Select and Press {metaKey} + C`;
-    'inviteMessage': `I’m on {brandName}, search for {username} or visit get.wire.com.`;
-    'inviteMessageNoEmail': `I’m on {brandName}. Visit get.wire.com to connect with me.`;
+    'inviteMessage': `I’m on {brandName}, search for {username} or visit wire.com/app-download.`;
+    'inviteMessageNoEmail': `I’m on {brandName}. Visit wire.com/app-download to connect with me.`;
     'inviteMetaKeyMac': `Cmd`;
     'inviteMetaKeyPc': `Ctrl`;
     'jumpToLastMessage': `Scroll to the end of this conversation`;
