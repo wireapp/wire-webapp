@@ -18,8 +18,8 @@
  */
 
 import {QualifiedId} from '../../user';
-import {DefaultConversationRoleName} from '../ConversationRole';
-import {MutedStatus} from '../MutedStatus';
+import {DefaultConversationRoleName} from '../conversationRole';
+import {MutedStatus} from '../mutedStatus';
 
 export interface ConversationMemberUpdateData extends Partial<ConversationOtherMemberUpdateData> {
   /** The userId concerned by this update */

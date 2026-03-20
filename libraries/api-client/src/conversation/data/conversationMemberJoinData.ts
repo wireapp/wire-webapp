@@ -17,7 +17,7 @@
  *
  */
 
-import {OtherMember} from '../OtherMember';
+import {OtherMember} from '../otherMember';
 
 export interface ConversationMemberJoinData {
   users?: OtherMember[];

@@ -21,7 +21,7 @@ import {AxiosResponse} from 'axios';
 
 import {randomUUID} from 'crypto';
 
-import {ConversationAPI} from './ConversationAPI';
+import {ConversationAPI} from './conversationApi';
 
 import {AccessTokenStore} from '../../auth';
 import {HttpClient} from '../../http';

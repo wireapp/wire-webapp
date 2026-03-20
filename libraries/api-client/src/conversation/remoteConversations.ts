@@ -17,8 +17,12 @@
  *
  */
 
-import {UserClients} from './UserClients';
+import {Conversation} from './conversation';
 
-export interface QualifiedUserClients {
-  [domain: string]: UserClients;
+import {QualifiedId} from '../user/qualifiedId';
+
+export interface RemoteConversations {
+  failed?: QualifiedId[];
+  found?: Conversation[];
+  not_found?: QualifiedId[];
 }

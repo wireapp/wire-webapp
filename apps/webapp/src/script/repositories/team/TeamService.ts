@@ -17,7 +17,7 @@
  *
  */
 
-import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/ConversationRole';
+import type {ConversationRolesList} from '@wireapp/api-client/lib/conversation/conversationRole';
 import type {FeatureList} from '@wireapp/api-client/lib/team/feature/';
 import {FEATURE_STATUS, FEATURE_KEY} from '@wireapp/api-client/lib/team/feature/';
 import {TeamMigrationPayload} from '@wireapp/api-client/lib/team/invitation/TeamMigrationPayload';

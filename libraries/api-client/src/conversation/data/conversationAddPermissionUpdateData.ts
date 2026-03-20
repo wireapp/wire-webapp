@@ -17,7 +17,7 @@
  *
  */
 
-import {ADD_PERMISSION} from '../Conversation';
+import {ADD_PERMISSION} from '../conversation';
 
 export interface ConversationAddPermissionUpdateData {
   add_permission: ADD_PERMISSION;

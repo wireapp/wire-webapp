@@ -21,7 +21,7 @@ import {AxiosRequestConfig} from 'axios';
 
 import {TeamConversationList, TeamConversation} from './TeamConversation';
 
-import {ConversationRolesList} from '../../conversation/ConversationRole';
+import {ConversationRolesList} from '../../conversation/conversationRole';
 import {HttpClient} from '../../http';
 
 export class TeamConversationAPI {

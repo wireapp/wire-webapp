@@ -17,12 +17,13 @@
  *
  */
 
-import {Conversation} from './Conversation';
+import {QualifiedUserClients} from './qualifiedUserClients';
 
-import {QualifiedId} from '../user/qualifiedId';
-
-export interface RemoteConversations {
-  failed?: QualifiedId[];
-  found?: Conversation[];
-  not_found?: QualifiedId[];
+export interface MessageSendingStatus {
+  deleted: QualifiedUserClients;
+  failed_to_confirm_clients?: QualifiedUserClients;
+  failed_to_send?: QualifiedUserClients;
+  missing: QualifiedUserClients;
+  redundant: QualifiedUserClients;
+  time: string;
 }

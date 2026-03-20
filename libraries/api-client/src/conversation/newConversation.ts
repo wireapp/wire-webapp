@@ -17,8 +17,8 @@
  *
  */
 
-import {Conversation} from './Conversation';
-import {DefaultConversationRoleName} from './ConversationRole';
+import {Conversation} from './conversation';
+import {DefaultConversationRoleName} from './conversationRole';
 import {RECEIPT_MODE} from './data/conversationReceiptModeUpdateData';
 
 import {CONVERSATION_PROTOCOL, TeamInfo} from '../team/';

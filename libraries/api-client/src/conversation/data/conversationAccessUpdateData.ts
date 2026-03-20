@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_ACCESS, CONVERSATION_LEGACY_ACCESS_ROLE, CONVERSATION_ACCESS_ROLE} from '../Conversation';
+import {CONVERSATION_ACCESS, CONVERSATION_LEGACY_ACCESS_ROLE, CONVERSATION_ACCESS_ROLE} from '../conversation';
 
 /**@deprecated */
 export interface ConversationAccessV2UpdateData {

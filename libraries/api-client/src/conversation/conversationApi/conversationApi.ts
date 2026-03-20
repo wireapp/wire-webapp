@@ -58,7 +58,7 @@ import {
   ConversationFullError,
   ConversationCodeNotFoundError,
   ConversationLegalholdMissingConsentError,
-} from '../ConversationError';
+} from '../conversationError';
 import {
   ConversationAccessUpdateData,
   ConversationJoinData,
@@ -69,8 +69,8 @@ import {
   ConversationReceiptModeUpdateData,
   ConversationTypingData,
 } from '../data';
-import {handleFederationErrors} from '../FederatedBackendsError';
-import {Subconversation, SUBCONVERSATION_ID} from '../Subconversation';
+import {handleFederationErrors} from '../federatedBackendsError';
+import {Subconversation, SUBCONVERSATION_ID} from '../subconversation';
 
 export type PostMlsMessageResponse = {
   failed_to_send?: QualifiedId[];
