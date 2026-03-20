@@ -23,7 +23,7 @@ export {MemberAPI, MemberData, Members, Permissions, PermissionsData, Role} from
 export {NewTeamData, TeamAPI, TeamChunkData, TeamData, TeamInfo, UpdateTeamData} from './team/';
 export {PaymentAPI, PaymentData} from './payment/';
 export {ServiceAPI, Service, ServiceWhitelistData} from './service/';
-export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError, ServiceNotFoundError} from './TeamError';
+export {TeamError, InviteEmailInUseError, InvalidInvitationCodeError, ServiceNotFoundError} from './teamError';
 
 export * from './billing/';
 export * from './identityprovider/';

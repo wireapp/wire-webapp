@@ -155,3 +155,6 @@ ls:
   libraries/api-client/src/team/billing:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/team:
+    .dir: camelCase
+    .ts: camelCase
