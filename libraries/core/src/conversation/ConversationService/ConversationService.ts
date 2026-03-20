@@ -487,6 +487,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     groupId,
     conversationId,
   }: Required<AddUsersParams> & {shouldRetry?: boolean}): Promise<BaseCreateConversationResponse> {
+    console.log(
+      `addUsersToMLSConversation(qualifiedUsers=${JSON.stringify(qualifiedUsers)}, groupId=${groupId}, conversationId=${conversationId})`,
+    );
     return this.MLSRecoveryOrchestrator.execute({
       context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
       callBack: () => this.performAddUsersToMLSConversationAPI({qualifiedUsers, groupId, conversationId}),

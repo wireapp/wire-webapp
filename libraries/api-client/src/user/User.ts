@@ -26,6 +26,12 @@ import {Picture} from '../self/';
 import {CONVERSATION_PROTOCOL} from '../team';
 import {UserAsset} from '../user/';
 
+export enum UserType {
+  REGULAR = 'regular',
+  APP = 'app',
+  BOT = 'bot',
+}
+
 export interface User {
   accent_id?: AccentColor.AccentColorID;
   assets?: UserAsset[];
@@ -42,4 +48,5 @@ export interface User {
   team?: string;
   searchable?: boolean;
   supported_protocols?: CONVERSATION_PROTOCOL[];
+  type: UserType;
 }
