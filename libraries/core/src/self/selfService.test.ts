@@ -21,7 +21,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {SelfService} from './SelfService';
+import {SelfService} from './selfService';
 
 const BASE_URL = 'mock-backend.wire.com';
 const MOCK_BACKEND = {
