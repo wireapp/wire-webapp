@@ -162,3 +162,6 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/account:
+    .dir: camelCase
+    .ts: camelCase
