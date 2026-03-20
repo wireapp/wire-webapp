@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientCapabilityData} from './ClientCapabilityData';
+import {ClientCapabilityData} from './clientCapabilityData';
 
 import {PreKey} from '../auth/';
 

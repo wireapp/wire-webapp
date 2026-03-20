@@ -20,8 +20,8 @@
 import {AxiosRequestConfig} from 'axios';
 import {z} from 'zod';
 
-import {ClientCapabilityData} from './ClientCapabilityData';
-import {ClientCapabilityRemovedError} from './ClientError';
+import {ClientCapabilityData} from './clientCapabilityData';
+import {ClientCapabilityRemovedError} from './clientError';
 
 import {PreKeyBundle} from '../auth/';
 import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '../client/';

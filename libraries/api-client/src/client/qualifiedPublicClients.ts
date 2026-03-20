@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,14 @@
  *
  */
 
-import {ClientClassification} from './ClientClassification';
+import {PublicClient} from './publicClient';
 
-export interface PublicClient {
-  class: ClientClassification;
-  id: string;
+export interface QualifiedUserClientMap {
+  [domain: string]: {
+    [userId: string]: PublicClient[];
+  };
+}
+
+export interface QualifiedPublicClients {
+  qualified_user_map: QualifiedUserClientMap;
 }

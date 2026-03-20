@@ -19,7 +19,7 @@
 
 import {PreKey} from '../auth/PreKey';
 import {ClientType} from '../client';
-import {PublicClient} from '../client/PublicClient';
+import {PublicClient} from '../client/publicClient';
 import {OtherMember, NewOTRMessage} from '../conversation';
 import {UserAsset, User} from '../user';
 

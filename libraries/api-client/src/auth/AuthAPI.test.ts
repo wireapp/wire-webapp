@@ -18,7 +18,7 @@
  */
 
 import {APIClient} from '../APIClient';
-import {ClientType} from '../client/ClientType';
+import {ClientType} from '../client/clientType';
 import {StatusCode} from '../http';
 
 describe('AuthAPI', () => {

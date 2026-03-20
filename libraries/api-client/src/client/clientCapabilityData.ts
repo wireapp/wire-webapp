@@ -17,14 +17,8 @@
  *
  */
 
-import {PublicClient} from './PublicClient';
+import {ClientCapability} from './clientCapability';
 
-export interface QualifiedUserClientMap {
-  [domain: string]: {
-    [userId: string]: PublicClient[];
-  };
-}
-
-export interface QualifiedPublicClients {
-  qualified_user_map: QualifiedUserClientMap;
-}
+export type ClientCapabilityData = {
+  capabilities?: ClientCapability[];
+};

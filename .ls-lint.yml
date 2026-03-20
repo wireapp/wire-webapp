@@ -87,3 +87,6 @@ ls:
   libraries/api-client/src/self:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/client:
+    .dir: camelCase
+    .ts: camelCase
