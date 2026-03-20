@@ -81,3 +81,6 @@ ls:
   libraries/api-client/src/event:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/userGroups:
+    .dir: camelCase
+    .ts: camelCase

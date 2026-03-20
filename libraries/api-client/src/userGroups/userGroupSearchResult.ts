@@ -17,7 +17,7 @@
  *
  */
 
-import {UserGroup} from './UserGroup';
+import {UserGroup} from './userGroup';
 
 export interface UserGroupSearchResult {
   page: UserGroup[];

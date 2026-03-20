@@ -17,7 +17,7 @@
  *
  */
 
-import {UserGroupManagedBy} from './UserGroupManagedBy';
+import {UserGroupManagedBy} from './userGroupManagedBy';
 
 import {QualifiedId} from '../user/QualifiedId';
 

@@ -19,10 +19,10 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {UserGroup} from './UserGroup';
-import {UserGroupCreateRequest} from './UserGroupCreateRequest';
-import {UserGroupSearchOptions} from './UserGroupSearchOptions';
-import {UserGroupSearchResult} from './UserGroupSearchResult';
+import {UserGroup} from './userGroup';
+import {UserGroupCreateRequest} from './userGroupCreateRequest';
+import {UserGroupSearchOptions} from './userGroupSearchOptions';
+import {UserGroupSearchResult} from './userGroupSearchResult';
 
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http';
 import {RequestCancellationError} from '../user/UserError';
