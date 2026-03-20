@@ -17,26 +17,19 @@
  *
  */
 
-import {SupportedCurrency} from './SupportedCurrency';
+import {SupportedCurrency} from './supportedCurrency';
 
-export interface Coupon {
-  amountOff: number;
-  name: string;
-  percentOff: number;
+export enum PlanInterval {
+  MONTH = 'month',
+  YEAR = 'year',
 }
 
-export interface InvoiceUpcomingData {
-  number: string;
-  status: string;
+export interface PlanData {
   amount: number;
-  balance: number;
-  endingBalance: number;
-  coupon: Coupon;
+  custom: boolean;
+  id: string;
+  interval: PlanInterval;
   currency: SupportedCurrency;
-  date: number;
-  discount: number;
-  subtotal: number;
-  tax: number;
-  taxPercent: number;
-  total: number;
+  calculatedPriceEstimate: number;
+  name: string;
 }

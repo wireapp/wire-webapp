@@ -17,16 +17,26 @@
  *
  */
 
-import {SupportedCurrency} from './SupportedCurrency';
+import {SupportedCurrency} from './supportedCurrency';
 
-// https://stripe.com/docs/api#invoice_object
-export interface InvoiceData {
-  closed: boolean;
+export interface Coupon {
+  amountOff: number;
+  name: string;
+  percentOff: number;
+}
+
+export interface InvoiceUpcomingData {
+  number: string;
+  status: string;
+  amount: number;
+  balance: number;
+  endingBalance: number;
+  coupon: Coupon;
   currency: SupportedCurrency;
   date: number;
-  id: string;
-  number: string;
-  paid: boolean;
+  discount: number;
+  subtotal: number;
+  tax: number;
+  taxPercent: number;
   total: number;
-  url: string;
 }

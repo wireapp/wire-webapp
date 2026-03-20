@@ -17,19 +17,16 @@
  *
  */
 
-import {SupportedCurrency} from './SupportedCurrency';
+import {SupportedCurrency} from './supportedCurrency';
 
-export enum PlanInterval {
-  MONTH = 'month',
-  YEAR = 'year',
-}
-
-export interface PlanData {
-  amount: number;
-  custom: boolean;
-  id: string;
-  interval: PlanInterval;
+// https://stripe.com/docs/api#invoice_object
+export interface InvoiceData {
+  closed: boolean;
   currency: SupportedCurrency;
-  calculatedPriceEstimate: number;
-  name: string;
+  date: number;
+  id: string;
+  number: string;
+  paid: boolean;
+  total: number;
+  url: string;
 }

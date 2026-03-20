@@ -19,13 +19,13 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {BillingData} from './BillingInfo';
-import {BillingTeamData} from './BillingTeamData';
-import {CardData} from './CardData';
-import {InvoiceListData} from './InvoiceListData';
-import {Coupon, InvoiceUpcomingData} from './InvoiceUpcomingData';
-import {PlanData, PlanInterval} from './PlanData';
-import {SupportedCurrency} from './SupportedCurrency';
+import {BillingData} from './billingInfo';
+import {BillingTeamData} from './billingTeamData';
+import {CardData} from './cardData';
+import {InvoiceListData} from './invoiceListData';
+import {Coupon, InvoiceUpcomingData} from './invoiceUpcomingData';
+import {PlanData, PlanInterval} from './planData';
+import {SupportedCurrency} from './supportedCurrency';
 
 import {HttpClient} from '../../http';
 import {Subscription} from '../payment';
