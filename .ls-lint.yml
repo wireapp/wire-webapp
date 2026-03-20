@@ -136,3 +136,6 @@ ls:
     .schema.ts: camelCase
     .types.ts: camelCase
     .helper.ts: camelCase
+  libraries/api-client/src/team/legalhold:
+    .dir: camelCase
+    .ts: camelCase

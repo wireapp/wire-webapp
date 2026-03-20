@@ -17,7 +17,7 @@
  *
  */
 
-export * from './LegalHoldAPI';
-export * from './LegalHoldData';
-export * from './LegalHoldMemberStatus';
-export * from './NewLegalHoldData';
+export * from './legalHoldApi';
+export * from './legalHoldData';
+export * from './legalHoldMemberStatus';
+export * from './newLegalHoldData';

@@ -19,9 +19,9 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {LegalHoldData} from './LegalHoldData';
-import {LegalHoldMemberData} from './LegalHoldMemberStatus';
-import {NewLegalHoldData} from './NewLegalHoldData';
+import {LegalHoldData} from './legalHoldData';
+import {LegalHoldMemberData} from './legalHoldMemberStatus';
+import {NewLegalHoldData} from './newLegalHoldData';
 
 import {HttpClient} from '../../http';
 import {TeamAPI} from '../team/TeamAPI';
