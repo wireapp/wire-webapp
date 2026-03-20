@@ -17,11 +17,11 @@
  *
  */
 
-import {CONVERSATION_EVENT} from './ConversationEvent';
-import {FEDERATION_EVENT} from './FederationEvent';
-import {TEAM_EVENT} from './TeamEvent';
-import {USER_EVENT} from './UserEvent';
-import {USER_GROUP_EVENT, UserGroupEvent} from './UserGroupEvent';
+import {CONVERSATION_EVENT} from './conversationEvent';
+import {FEDERATION_EVENT} from './federationEvent';
+import {TEAM_EVENT} from './teamEvent';
+import {USER_EVENT} from './userEvent';
+import {USER_GROUP_EVENT, UserGroupEvent} from './userGroupEvent';
 
 import {ConversationEvent, TeamEvent, UserEvent, FederationEvent} from '.';
 

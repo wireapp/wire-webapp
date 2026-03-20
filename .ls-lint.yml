@@ -78,3 +78,6 @@ ls:
   libraries/api-client/src/account:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/event:
+    .dir: camelCase
+    .ts: camelCase
