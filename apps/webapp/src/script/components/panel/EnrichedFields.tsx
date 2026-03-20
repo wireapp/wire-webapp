@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import type {RichInfoField} from '@wireapp/api-client/lib/user/RichInfo';
+import type {RichInfoField} from '@wireapp/api-client/lib/user/richInfo';
 import {container} from 'tsyringe';
 
 import {Availability} from '@wireapp/protocol-messaging';

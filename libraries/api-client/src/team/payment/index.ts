@@ -17,15 +17,15 @@
  *
  */
 
-export * from './InvoiceData';
-export * from './PaymentAPI';
-export * from './PaymentBillingData';
-export * from './PaymentData';
-export * from './PaymentDataUpdate';
-export * from './PaymentInterval';
-export * from './PaymentPlan';
-export * from './PaymentStripeCharge';
-export * from './PaymentStripeInvoice';
-export * from './PaymentStripeInvoices';
-export * from './PaymentStripePlan';
-export * from './SupportedCurrency';
+export * from './invoiceData';
+export * from './paymentApi';
+export * from './paymentBillingData';
+export * from './paymentData';
+export * from './paymentDataUpdate';
+export * from './paymentInterval';
+export * from './paymentPlan';
+export * from './paymentStripeCharge';
+export * from './paymentStripeInvoice';
+export * from './paymentStripeInvoices';
+export * from './paymentStripePlan';
+export * from './supportedCurrency';

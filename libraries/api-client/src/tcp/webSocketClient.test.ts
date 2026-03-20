@@ -21,8 +21,8 @@
 
 import {WebSocketClient} from './webSocketClient';
 
-import {InvalidTokenError} from '../auth/AuthenticationError';
-import {MINIMUM_API_VERSION} from '../Config';
+import {InvalidTokenError} from '../auth/authenticationError';
+import {MINIMUM_API_VERSION} from '../config';
 import {TEAM_EVENT} from '../event/';
 import {ConsumableEvent, ConsumableNotification} from '../notification/consumableNotification';
 

@@ -32,7 +32,7 @@ import {
   MemberLeaveReason,
   RECEIPT_MODE,
 } from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/conversationTypingData';
 import {
   CONVERSATION_EVENT,
   ConversationAddPermissionUpdateEvent,

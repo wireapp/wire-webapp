@@ -17,9 +17,9 @@
  *
  */
 
-import {PreKey} from '../auth/PreKey';
+import {PreKey} from '../auth/preKey';
 import {ClientType} from '../client';
-import {PublicClient} from '../client/PublicClient';
+import {PublicClient} from '../client/publicClient';
 import {OtherMember, NewOTRMessage} from '../conversation';
 import {UserAsset, User} from '../user';
 
