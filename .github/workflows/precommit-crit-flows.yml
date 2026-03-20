@@ -3,6 +3,7 @@ name: precommit-crit-flows
 on:
   pull_request:
     branches: [master, dev, release/*]
+    types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
     branches: [master, dev, release/*]
 
