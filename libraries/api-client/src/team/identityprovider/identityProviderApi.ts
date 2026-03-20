@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {IdentityProvider} from './IdentityProvider';
-import {IdentityProviders} from './IdentityProviders';
+import {IdentityProvider} from './identityProvider';
+import {IdentityProviders} from './identityProviders';
 
 import {HttpClient} from '../../http';
 
