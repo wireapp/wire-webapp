@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,12 +45,14 @@ type ConversationSidebarProps = {
   isTeam: boolean;
   changeTab: (nextTab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
+  conversations: Conversation[];
   groupConversations: Conversation[];
   channelConversations: Conversation[];
   directConversations: Conversation[];
   unreadConversations: Conversation[];
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
+  draftConversations: Conversation[];
   conversationRepository: ConversationRepository;
   onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge: boolean;
@@ -65,11 +67,13 @@ export const ConversationSidebar = ({
   isTeam,
   changeTab,
   currentTab,
+  conversations,
   groupConversations,
   directConversations,
   unreadConversations,
   favoriteConversations,
   archivedConversations,
+  draftConversations,
   conversationRepository,
   onClickPreferences,
   showNotificationsBadge,
@@ -88,11 +92,13 @@ export const ConversationSidebar = ({
         <ConversationTabs
           onChangeTab={changeTab}
           currentTab={currentTab}
+          conversations={conversations}
           groupConversations={groupConversations}
           directConversations={directConversations}
           unreadConversations={unreadConversations}
           favoriteConversations={favoriteConversations}
           archivedConversations={archivedConversations}
+          draftConversations={draftConversations}
           conversationRepository={conversationRepository}
           onClickPreferences={onClickPreferences}
           showNotificationsBadge={showNotificationsBadge}

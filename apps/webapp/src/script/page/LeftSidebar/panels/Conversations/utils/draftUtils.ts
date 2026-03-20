@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,8 +51,17 @@ export const conversationHasDraft = (conversation: Conversation): boolean => {
     const amplifyData: AmplifyWrapper | DraftData = JSON.parse(draftData);
     // Amplify wraps the data in an object with 'data' and 'expires' properties
     const draft = (amplifyData as AmplifyWrapper).data || (amplifyData as DraftData);
-    // Check if draft has content (editorState or plainMessage)
-    return Boolean(draft && (draft.editorState || draft.plainMessage));
+
+    if (!draft) {
+      return false;
+    }
+
+    // Check plainMessage for actual content (not just whitespace)
+    const plainMessage = draft.plainMessage || '';
+    const hasTextContent = plainMessage.trim().length > 0;
+    const hasEditorStateContent = Boolean(draft.editorState);
+
+    return hasTextContent || hasEditorStateContent;
   } catch (error: unknown) {
     // Only log error type, not the actual error to avoid exposing draft content
     logger.warn(
