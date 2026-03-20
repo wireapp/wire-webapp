@@ -17,7 +17,7 @@
  *
  */
 
-import type {SSOSettings} from '@wireapp/api-client/lib/account/SSOSettings';
+import type {SSOSettings} from '@wireapp/api-client/lib/account/ssoSettings';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';

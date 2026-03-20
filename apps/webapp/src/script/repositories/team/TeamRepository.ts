@@ -25,7 +25,7 @@ import type {
   TeamFeatureConfigurationUpdateEvent,
   TeamMemberLeaveEvent,
 } from '@wireapp/api-client/lib/event';
-import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
+import {TEAM_EVENT} from '@wireapp/api-client/lib/event/teamEvent';
 import {FEATURE_KEY, FeatureList, CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import type {PermissionsData} from '@wireapp/api-client/lib/team/member/permissionsData';
 import type {TeamData} from '@wireapp/api-client/lib/team/team/teamData';

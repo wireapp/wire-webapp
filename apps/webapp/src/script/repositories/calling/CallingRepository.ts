@@ -17,7 +17,7 @@
  *
  */
 
-import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
+import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
