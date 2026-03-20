@@ -28,8 +28,10 @@ import {
   STRIKETHROUGH,
   UNORDERED_LIST,
   QUOTE,
-  LINK,
 } from '@lexical/markdown';
+
+import {LINK_WITH_UNESCAPED_UNDERSCORES} from './transformers/linkWithUnescapedUnderscoresTransformer';
+import {TEXT_WITH_UNESCAPED_URL_UNDERSCORES} from './transformers/textWithUnescapedUrlUnderscoresTransformer';
 
 export const markdownTransformers = [
   UNORDERED_LIST,
@@ -42,5 +44,6 @@ export const markdownTransformers = [
   ITALIC_STAR,
   STRIKETHROUGH,
   QUOTE,
-  LINK,
+  TEXT_WITH_UNESCAPED_URL_UNDERSCORES,
+  LINK_WITH_UNESCAPED_UNDERSCORES,
 ];
