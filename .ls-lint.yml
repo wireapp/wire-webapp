@@ -127,3 +127,6 @@ ls:
   libraries/api-client/src/team/search:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/team/invitation:
+    .dir: camelCase
+    .ts: camelCase

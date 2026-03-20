@@ -25,8 +25,8 @@ import {
   InvitationEmailExistsError,
   InvitationNotFoundError,
   InvitationMultipleError,
-} from './InvitationError';
-import {TeamMigrationPayload} from './TeamMigrationPayload';
+} from './invitationError';
+import {TeamMigrationPayload} from './teamMigrationPayload';
 
 import {HttpClient, BackendErrorLabel, BackendError} from '../../http/';
 import {NewTeamInvitation, TeamInvitation, TeamInvitationChunk} from '../invitation/';
