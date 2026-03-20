@@ -26,7 +26,7 @@ import {
   VerifyChallenge,
   VerifyChallengeRequest,
   VerifyDomainRedirectConfig,
-} from './SSOAPI.types';
+} from './ssoApi.types';
 
 import {HttpClient} from '../../http';
 import {TeamAPI} from '../team';
