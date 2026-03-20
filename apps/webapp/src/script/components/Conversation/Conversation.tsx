@@ -326,6 +326,8 @@ export const Conversation = ({
     }
 
     if (parsed?.type === 'conversation-join') {
+      event.preventDefault();
+
       window.dispatchEvent(
         new CustomEvent(WebAppEvents.CONVERSATION.JOIN, {
           detail: {

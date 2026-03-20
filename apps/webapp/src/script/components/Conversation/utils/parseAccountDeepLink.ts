@@ -27,7 +27,7 @@ type ParsedQualifiedId = {
   domain?: string;
 };
 
-const parsedQualifiedUserId = (value: string): ParsedQualifiedId => {
+const parseQualifiedUserId = (value: string): ParsedQualifiedId => {
   const atIndex = value.lastIndexOf('@');
   if (atIndex <= 0) {
     return {id: value};
@@ -71,7 +71,7 @@ export const parseAccountDeepLink = (href: string, accountBase?: string): ParseA
       return null;
     }
 
-    const qualified = parsedQualifiedUserId(rawId);
+    const qualified = parseQualifiedUserId(rawId);
 
     return {type: 'user-profile', id: qualified.id, domain: explicitDomain ?? qualified.domain};
   }
