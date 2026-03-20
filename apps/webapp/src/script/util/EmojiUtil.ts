@@ -58,14 +58,16 @@ Object.keys(emojiesList).forEach(key => {
     return;
   }
 
-  const emojiObject = emojiValue[0];
-  const emojiNames = emojiObject.n;
+  if (emojiValue[0] !== undefined) {
+    const emojiObject = emojiValue[0];
+    const emojiNames = emojiObject.n;
 
-  // Replace hyphens with spaces, but only if not followed by a number
-  // example- thumbs down emoji name is -1
-  const formattedEmojiName = emojiNames[0].replace(/-(?![0-9])/g, ' ');
+    // Replace hyphens with spaces, but only if not followed by a number
+    // example- thumbs down emoji name is -1
+    const formattedEmojiName = emojiNames[0].replace(/-(?![0-9])/g, ' ');
 
-  emojiDictionary.set(key, formattedEmojiName);
+    emojiDictionary.set(key, formattedEmojiName);
+  }
 });
 
 // Function to get the emoji without skintone modifiers

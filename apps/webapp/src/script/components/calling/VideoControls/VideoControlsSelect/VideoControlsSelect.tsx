@@ -32,6 +32,7 @@ type VideoControlsSelectProps = Pick<
   | 'onChange'
   | 'onMenuClose'
   | 'menuIsOpen'
+  | 'menuPlacement'
   | 'onKeyDown'
   | 'wrapperCSS'
   | 'menuCSS'
@@ -46,6 +47,7 @@ export const VideoControlsSelect = ({
   onKeyDown,
   onMenuClose,
   menuIsOpen,
+  menuPlacement,
   wrapperCSS,
   menuCSS,
 }: VideoControlsSelectProps) => {
@@ -64,7 +66,7 @@ export const VideoControlsSelect = ({
       onChange={onChange}
       onKeyDown={onKeyDown}
       onMenuClose={onMenuClose}
-      menuPlacement="top"
+      menuPlacement={menuPlacement ?? 'top'}
       menuIsOpen={menuIsOpen}
       wrapperCSS={wrapperCSS}
       menuCSS={menuCSS}

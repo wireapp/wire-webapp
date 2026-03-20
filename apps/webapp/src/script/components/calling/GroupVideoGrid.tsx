@@ -144,7 +144,7 @@ const GroupVideoGrid = ({
     'hasActiveVideo',
     'sharesScreen',
     'videoStream',
-    'blurredVideoStream',
+    'processedVideoStream',
   ]);
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
@@ -287,7 +287,7 @@ const GroupVideoGrid = ({
             css={{
               transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
             }}
-            srcObject={thumbnail.blurredVideoStream?.stream ?? thumbnail.videoStream}
+            srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
           />
           {selfIsMuted && !minimized && (
             <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">
