@@ -19,12 +19,12 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {CustomBackendNotFoundError} from './AccountError';
-import {BackendConfigData} from './BackendConfigData';
-import {CallConfigData} from './CallConfigData';
-import {DomainData} from './DomainData';
-import {DomainRedirect, DomainRedirectPayload} from './DomainRedirect';
-import {SSOSettings} from './SSOSettings';
+import {CustomBackendNotFoundError} from './accountError';
+import {BackendConfigData} from './backendConfigData';
+import {CallConfigData} from './callConfigData';
+import {DomainData} from './domainData';
+import {DomainRedirect, DomainRedirectPayload} from './domainRedirect';
+import {SSOSettings} from './ssoSettings';
 
 import {HttpClient, BackendErrorLabel, BackendError, StatusCode} from '../http';
 

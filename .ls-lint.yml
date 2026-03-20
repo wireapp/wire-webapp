@@ -75,3 +75,6 @@ ls:
   libraries/api-client/src/connection:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/account:
+    .dir: camelCase
+    .ts: camelCase

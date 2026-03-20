@@ -23,7 +23,7 @@ import {EventEmitter} from 'events';
 
 import {LogFactory} from '@wireapp/commons';
 
-import {AccountAPI} from './account/AccountAPI';
+import {AccountAPI} from './account/accountApi';
 import {AssetAPI} from './asset/';
 import {
   AccessTokenData,
