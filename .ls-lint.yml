@@ -130,3 +130,9 @@ ls:
   libraries/api-client/src/team/invitation:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/team/feature:
+    .dir: camelCase
+    .ts: camelCase
+    .schema.ts: camelCase
+    .types.ts: camelCase
+    .helper.ts: camelCase

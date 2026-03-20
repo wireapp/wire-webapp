@@ -25,7 +25,7 @@ import {
   FEATURE_KEY,
   FEATURE_LOCK_STATUS,
   FEATURE_STATUS,
-} from './FeatureList.types';
+} from './featureList.types';
 
 /**
  * Runtime validation schemas for the Wire backend feature flags API according to

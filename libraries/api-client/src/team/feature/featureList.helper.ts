@@ -17,7 +17,7 @@
  *
  */
 
-import {CONVERSATION_PROTOCOL} from './FeatureList.types';
+import {CONVERSATION_PROTOCOL} from './featureList.types';
 
 export const mapToConversationProtocol = (protocol: unknown): CONVERSATION_PROTOCOL | undefined => {
   if (typeof protocol !== 'string') {

@@ -49,7 +49,7 @@ import type {
   FeatureStealthUsers,
   FeatureValidateSAMLEmails,
   FeatureVideoCalling,
-} from './FeatureList.schema';
+} from './featureList.schema';
 
 /**
  * FEATURE_KEY enum defines the canonical keys for all Wire feature flags.

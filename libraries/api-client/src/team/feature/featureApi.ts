@@ -22,7 +22,7 @@ import logdown from 'logdown';
 
 import {LogFactory} from '@wireapp/commons';
 
-import {InvalidAppLockTimeoutError} from './FeatureError';
+import {InvalidAppLockTimeoutError} from './featureError';
 import {
   allFeaturesResponseSchema,
   FeatureAllowedGlobalOperations,
@@ -45,8 +45,8 @@ import {
   FeatureSndFactorPassword,
   FeatureSSO,
   FeatureVideoCalling,
-} from './FeatureList.schema';
-import {FeatureList} from './FeatureList.types';
+} from './featureList.schema';
+import {FeatureList} from './featureList.types';
 
 import {BackendError, BackendErrorLabel, HttpClient} from '../../http';
 
