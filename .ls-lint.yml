@@ -165,3 +165,6 @@ ls:
   libraries/core/src/account:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/connection:
+    .dir: camelCase
+    .ts: camelCase
