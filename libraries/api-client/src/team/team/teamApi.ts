@@ -19,11 +19,11 @@
 
 import Axios, {AxiosRequestConfig} from 'axios';
 
-import {NewAppRequest} from './app/NewAppRequest';
-import {NewAppResponse} from './app/NewAppResponse';
-import {LeadData} from './LeadData';
-import {TeamSizeData} from './TeamSizeData';
-import {UpdateTeamData} from './UpdateTeamData';
+import {NewAppRequest} from './app/newAppRequest';
+import {NewAppResponse} from './app/newAppResponse';
+import {LeadData} from './leadData';
+import {TeamSizeData} from './teamSizeData';
+import {UpdateTeamData} from './updateTeamData';
 
 import {NewTeamData, TeamChunkData, TeamData} from '../';
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http/';

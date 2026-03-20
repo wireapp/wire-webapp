@@ -142,3 +142,6 @@ ls:
   libraries/api-client/src/team/service:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/team/team:
+    .dir: camelCase
+    .ts: camelCase

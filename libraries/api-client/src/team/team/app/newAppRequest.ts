@@ -17,7 +17,7 @@
  *
  */
 
-import {NewApp} from './NewApp';
+import {NewApp} from './newApp';
 
 export interface NewAppRequest {
   app: NewApp;

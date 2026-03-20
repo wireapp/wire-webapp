@@ -34,7 +34,7 @@ import {
 } from '../../http/';
 import {RequestCancellationError} from '../../user';
 import {MemberData, Members} from '../member/';
-import {TeamAPI} from '../team/TeamAPI';
+import {TeamAPI} from '../team/teamApi';
 
 export class MemberAPI {
   // Maximum 1600 due to "413 Request Entity Too Large" response

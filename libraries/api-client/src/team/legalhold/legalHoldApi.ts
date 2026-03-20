@@ -24,7 +24,7 @@ import {LegalHoldMemberData} from './legalHoldMemberStatus';
 import {NewLegalHoldData} from './newLegalHoldData';
 
 import {HttpClient} from '../../http';
-import {TeamAPI} from '../team/TeamAPI';
+import {TeamAPI} from '../team/teamApi';
 
 export class LegalHoldAPI {
   constructor(private readonly client: HttpClient) {}

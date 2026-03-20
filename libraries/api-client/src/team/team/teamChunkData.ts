@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamData} from './TeamData';
+import {TeamData} from './teamData';
 
 export interface TeamChunkData {
   has_more: boolean;

@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamData} from '../team/team/TeamData';
+import {TeamData} from '../team/team/teamData';
 import {User} from '../user/';
 
 export type RegisterData = Pick<User, 'accent_id' | 'assets' | 'email' | 'name'> & {
