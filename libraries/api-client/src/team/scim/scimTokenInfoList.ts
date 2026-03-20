@@ -17,7 +17,7 @@
  *
  */
 
-import {ScimTokenInfo} from './ScimTokenInfo';
+import {ScimTokenInfo} from './scimTokenInfo';
 
 export interface ScimTokenInfoList {
   tokens: ScimTokenInfo[];

@@ -114,3 +114,6 @@ ls:
   libraries/api-client/src/team/data:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/team/scim:
+    .dir: camelCase
+    .ts: camelCase

@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {NewScimToken} from './NewScimToken';
-import {ScimTokenInfoList} from './ScimTokenInfoList';
+import {NewScimToken} from './newScimToken';
+import {ScimTokenInfoList} from './scimTokenInfoList';
 
 import {HttpClient} from '../../http';
 

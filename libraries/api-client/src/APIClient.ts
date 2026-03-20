@@ -67,7 +67,7 @@ import {
   TeamConversationAPI,
   TeamInvitationAPI,
 } from './team/';
-import {ScimAPI} from './team/scim/ScimAPI';
+import {ScimAPI} from './team/scim/scimApi';
 import {TeamSearchAPI} from './team/search';
 import {SSOAPI} from './team/sso';
 import {UserAPI} from './user/';
