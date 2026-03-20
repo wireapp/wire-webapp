@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamContact} from './TeamContact';
+import {TeamContact} from './teamContact';
 
 import {Role} from '..';
 

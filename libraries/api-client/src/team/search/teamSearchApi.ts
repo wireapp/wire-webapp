@@ -19,10 +19,10 @@
 
 import Axios, {AxiosRequestConfig} from 'axios';
 
-import {ChannelSearchOptions} from './ChannelSearchOptions';
-import {ChannelSearchResult} from './ChannelSearchResult';
-import {TeamSearchOptions} from './TeamSearchOptions';
-import {TeamSearchResult} from './TeamSearchResult';
+import {ChannelSearchOptions} from './channelSearchOptions';
+import {ChannelSearchResult} from './channelSearchResult';
+import {TeamSearchOptions} from './teamSearchOptions';
+import {TeamSearchResult} from './teamSearchResult';
 
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../../http';
 import {RequestCancellationError} from '../../user';

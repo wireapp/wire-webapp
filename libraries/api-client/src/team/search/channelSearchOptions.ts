@@ -17,7 +17,7 @@
  *
  */
 
-import {SortOrder} from './TeamSearchOptions';
+import {SortOrder} from './teamSearchOptions';
 
 export interface ChannelSearchOptions {
   /** The query string, to be used to match with the name of the channel. When not provided, the search would return the first page of the list. */
