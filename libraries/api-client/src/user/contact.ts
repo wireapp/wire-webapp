@@ -17,9 +17,6 @@
  *
  */
 
-import {QualifiedId} from './QualifiedId';
+import {User} from './user';
 
-export interface HandleInfo {
-  qualified_id?: QualifiedId;
-  user: string;
-}
+export type Contact = Pick<User, 'accent_id' | 'handle' | 'id' | 'name' | 'qualified_id' | 'team'>;

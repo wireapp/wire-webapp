@@ -98,3 +98,6 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/api-client/src/user:
+    .dir: camelCase
+    .ts: camelCase

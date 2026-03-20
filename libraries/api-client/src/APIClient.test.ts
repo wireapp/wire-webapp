@@ -29,7 +29,7 @@ import {Config, MINIMUM_API_VERSION} from './Config';
 import {BackendErrorLabel, StatusCode} from './http';
 import {cellsConfigMock} from './mocks/cells';
 import {Self, SelfAPI} from './self';
-import {UserAPI} from './user/UserAPI';
+import {UserAPI} from './user/userApi';
 
 const testConfig = {
   cells: cellsConfigMock,

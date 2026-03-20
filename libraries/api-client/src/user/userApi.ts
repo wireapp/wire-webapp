@@ -21,9 +21,10 @@ import Axios, {AxiosRequestConfig} from 'axios';
 
 import {ArrayUtil} from '@wireapp/commons';
 
-import {RichInfo} from './RichInfo';
-import {RequestCancellationError} from './UserError';
-import {QualifiedUserPreKeyBundleMap} from './UserPreKeyBundleMap';
+import {RichInfo} from './richInfo';
+import {RTCConfiguration} from './rtcConfiguration';
+import {RequestCancellationError} from './userError';
+import {QualifiedUserPreKeyBundleMap} from './userPreKeyBundleMap';
 
 import {BackendFeatures} from '../APIClient';
 import {ClientPreKey, PreKeyBundle} from '../auth/';

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2021 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
  *
  */
 
-import {User} from './User';
+import {QualifiedId} from './qualifiedId';
 
-export type Contact = Pick<User, 'accent_id' | 'handle' | 'id' | 'name' | 'qualified_id' | 'team'>;
+export interface LimitedQualifiedUserIdList {
+  qualified_users: QualifiedId[];
+}

@@ -17,13 +17,10 @@
  *
  */
 
-import {UserPushTokenProvider} from './UserPushTokenProvider';
+import {User} from '../user';
 
-export interface UserPushRemoveData {
-  token: {
-    app: string;
-    client: string;
-    token: string;
-    transport: UserPushTokenProvider;
+export interface UserUpdateData {
+  user: Partial<User> & {
+    id: string;
   };
 }

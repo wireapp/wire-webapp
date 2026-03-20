@@ -19,7 +19,7 @@
 
 import {ConversationOtherMemberUpdateData} from './data';
 
-import {QualifiedId} from '../user/QualifiedId';
+import {QualifiedId} from '../user/qualifiedId';
 
 import {ServiceRef} from './';
 

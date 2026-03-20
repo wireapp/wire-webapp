@@ -17,7 +17,7 @@
  *
  */
 
-import {QualifiedId} from '../user/QualifiedId';
+import {QualifiedId} from '../user/qualifiedId';
 
 export interface QualifiedConversationIds {
   qualified_conversations: QualifiedId[];

@@ -25,7 +25,7 @@ import {UserGroupSearchOptions} from './userGroupSearchOptions';
 import {UserGroupSearchResult} from './userGroupSearchResult';
 
 import {BackendError, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http';
-import {RequestCancellationError} from '../user/UserError';
+import {RequestCancellationError} from '../user/userError';
 
 export class UserGroupAPI {
   constructor(private readonly client: HttpClient) {}

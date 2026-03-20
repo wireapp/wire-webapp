@@ -17,29 +17,9 @@
  *
  */
 
-import {AccentColor} from '@wireapp/commons';
+import {QualifiedId} from './qualifiedId';
 
-import {QualifiedId} from './QualifiedId';
-
-import {ServiceRef} from '../conversation/';
-import {Picture} from '../self/';
-import {CONVERSATION_PROTOCOL} from '../team';
-import {UserAsset} from '../user/';
-
-export interface User {
-  accent_id?: AccentColor.AccentColorID;
-  assets?: UserAsset[];
-  deleted?: boolean;
-  email?: string;
-  expires_at?: string;
-  handle?: string;
-  id: string;
-  name: string;
-  picture?: Picture[];
-  user_groups?: string[];
-  qualified_id: QualifiedId;
-  service?: ServiceRef;
-  team?: string;
-  searchable?: boolean;
-  supported_protocols?: CONVERSATION_PROTOCOL[];
+export interface HandleInfo {
+  qualified_id?: QualifiedId;
+  user: string;
 }

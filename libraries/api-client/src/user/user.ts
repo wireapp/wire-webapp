@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2019 Wire Swiss GmbH
+ * Copyright (C) 2018 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,29 @@
  *
  */
 
-import {QualifiedId} from '../QualifiedId';
+import {AccentColor} from '@wireapp/commons';
 
-export interface UserDeleteData {
+import {QualifiedId} from './qualifiedId';
+
+import {ServiceRef} from '../conversation/';
+import {Picture} from '../self/';
+import {CONVERSATION_PROTOCOL} from '../team';
+import {UserAsset} from '../user/';
+
+export interface User {
+  accent_id?: AccentColor.AccentColorID;
+  assets?: UserAsset[];
+  deleted?: boolean;
+  email?: string;
+  expires_at?: string;
+  handle?: string;
   id: string;
+  name: string;
+  picture?: Picture[];
+  user_groups?: string[];
   qualified_id: QualifiedId;
+  service?: ServiceRef;
+  team?: string;
+  searchable?: boolean;
+  supported_protocols?: CONVERSATION_PROTOCOL[];
 }
