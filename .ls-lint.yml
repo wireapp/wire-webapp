@@ -108,3 +108,6 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/api-client/src/team/conversation:
+    .dir: camelCase
+    .ts: camelCase

@@ -19,7 +19,7 @@
 
 import {AxiosRequestConfig} from 'axios';
 
-import {TeamConversationList, TeamConversation} from './TeamConversation';
+import {TeamConversationList, TeamConversation} from './teamConversation';
 
 import {ConversationRolesList} from '../../conversation/conversationRole';
 import {HttpClient} from '../../http';
