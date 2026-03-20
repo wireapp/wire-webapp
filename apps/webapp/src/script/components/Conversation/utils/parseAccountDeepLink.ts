@@ -22,6 +22,23 @@ export type ParseAccountDeepLink =
   | {type: 'conversation-join'; key: string; code: string; domain?: string}
   | null;
 
+type ParsedQualifiedId = {
+  id: string;
+  domain?: string;
+};
+
+const parsedQualifiedUserId = (value: string): ParsedQualifiedId => {
+  const atIndex = value.lastIndexOf('@');
+  if (atIndex <= 0) {
+    return {id: value};
+  }
+
+  return {
+    id: value.slice(0, atIndex),
+    domain: value.slice(atIndex + 1) || undefined,
+  };
+};
+
 const normalizePath = (pathname: string): string => pathname.replace(/\/+$/, '');
 
 const normalizeOrigin = (url: URL): string => url.origin.toLowerCase();
@@ -47,15 +64,18 @@ export const parseAccountDeepLink = (href: string, accountBase?: string): ParseA
   const pathname = normalizePath(linkUrl.pathname);
 
   if (pathname === '/user-profile') {
-    const id = linkUrl.searchParams.get('id');
-    const domain = linkUrl.searchParams.get('domain') || undefined;
+    const rawId = linkUrl.searchParams.get('id');
+    const explicitDomain = linkUrl.searchParams.get('domain') || undefined;
 
-    if (!id) {
+    if (!rawId) {
       return null;
     }
 
-    return {type: 'user-profile', id, domain};
+    const qualified = parsedQualifiedUserId(rawId);
+
+    return {type: 'user-profile', id: qualified.id, domain: explicitDomain ?? qualified.domain};
   }
+
   if (pathname === '/conversation-join') {
     const key = linkUrl.searchParams.get('key');
     const code = linkUrl.searchParams.get('code');

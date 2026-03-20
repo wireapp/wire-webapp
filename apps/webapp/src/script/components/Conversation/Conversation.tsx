@@ -360,7 +360,7 @@ export const Conversation = ({
       (async () => {
         try {
           const userEntity = await repositories.user.getUserById({domain: domain || '', id: userId});
-          showUserDetails(userEntity);
+          await showUserDetails(userEntity);
         } catch (error) {
           if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
             throw error;
