@@ -22,6 +22,7 @@ import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
+import {Runtime} from '@wireapp/commons';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -29,6 +30,8 @@ import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsH
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {t} from 'Util/LocalizerUtil';
+
+import {HardwareAccelerationRestartModal} from './HardwareAccelerationRestartModal';
 
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/PreferencesSection';
@@ -53,6 +56,21 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
   const [pressSpaceToUnmuteEnabled, setPressSpaceToUnmuteEnabled] = useState(
     !!propertiesRepository.properties.settings.call.enable_press_space_to_unmute,
   );
+
+  const desktopSettings = Config.getDesktopSettings();
+
+  const isHardwareAccelerationChangeable = Runtime.isDesktopApp() && !!desktopSettings;
+
+  const [showHwRestartModal, setShowHwRestartModal] = useState(false);
+  const [pendingHwValue, setPendingHwValue] = useState<boolean | null>(null);
+
+  const [hardwareAccelerationEnabled, setHardwareAccelerationEnabled] = useState<boolean>(() => {
+    if (!isHardwareAccelerationChangeable) {
+      return true; // default in browser (but not changeable)
+    }
+
+    return desktopSettings.isHardwareAccelerationEnabled();
+  });
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties) => {
@@ -101,6 +119,32 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     },
     [propertiesRepository],
   );
+
+  const handleHardwareAccelerationChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+
+    setPendingHwValue(isChecked);
+    setShowHwRestartModal(true);
+  }, []);
+
+  const confirmHardwareAccelerationChange = () => {
+    if (!desktopSettings || pendingHwValue === null) {
+      setShowHwRestartModal(false);
+      return;
+    }
+
+    desktopSettings.setHardwareAccelerationEnabled(pendingHwValue);
+    setHardwareAccelerationEnabled(pendingHwValue);
+
+    setShowHwRestartModal(false);
+
+    amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+  };
+
+  const cancelHardwareAccelerationChange = () => {
+    setShowHwRestartModal(false);
+    setPendingHwValue(null);
+  };
 
   return (
     <PreferencesSection title={t('preferencesOptionsCall')}>
@@ -153,6 +197,29 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
           </p>
         </div>
       )}
+
+      {isHardwareAccelerationChangeable && (
+        <div className="checkbox-margin">
+          <Checkbox
+            onChange={handleHardwareAccelerationChange}
+            checked={hardwareAccelerationEnabled}
+            data-uie-name="status-preference-hardware-acceleration"
+          >
+            <CheckboxLabel htmlFor="status-preference-hardware-acceleration">
+              {t('preferencesOptionsEnableHardwareAcceleration')}
+            </CheckboxLabel>
+          </Checkbox>
+          <p className="preferences-detail preferences-detail-intended">
+            {t('preferencesOptionsEnableHardwareAccelerationDetails')}
+          </p>
+        </div>
+      )}
+
+      <HardwareAccelerationRestartModal
+        isShown={showHwRestartModal}
+        onCancel={cancelHardwareAccelerationChange}
+        onConfirm={confirmHardwareAccelerationChange}
+      />
     </PreferencesSection>
   );
 };
