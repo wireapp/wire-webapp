@@ -17,7 +17,7 @@
  *
  */
 
-import {SupportedCurrency} from './SupportedCurrency';
+import {SupportedCurrency} from './supportedCurrency';
 
 export interface PaymentBillingData {
   city: string;

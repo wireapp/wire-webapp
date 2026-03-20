@@ -17,7 +17,7 @@
  *
  */
 
-import {PaymentStripeInvoice} from './PaymentStripeInvoice';
+import {PaymentStripeInvoice} from './paymentStripeInvoice';
 
 // https://stripe.com/docs/api#invoice_object
 export interface PaymentStripeInvoices {

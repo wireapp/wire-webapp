@@ -17,7 +17,7 @@
  *
  */
 
-import {PaymentPlanID} from './PaymentPlan';
+import {PaymentPlanID} from './paymentPlan';
 
 import {InvoiceData, PaymentPlan} from './';
 
