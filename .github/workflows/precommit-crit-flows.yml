@@ -2,7 +2,9 @@ name: precommit-crit-flows
 
 on:
   pull_request:
-    branches: [dev]
+    branches: [master, dev, release/*]
+  merge_group:
+    branches: [master, dev, release/*]
 
 # One at a time lane for the shared precommit environment
 concurrency:
