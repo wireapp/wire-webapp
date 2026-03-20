@@ -17,7 +17,7 @@
  *
  */
 
-import {Service} from './Service';
+import {Service} from './service';
 
 export interface Services {
   has_more: boolean;
