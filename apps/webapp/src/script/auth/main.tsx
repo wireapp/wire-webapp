@@ -44,12 +44,14 @@ import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
+import {createAPIClient} from '../service/createAPIClient';
 
 exposeWrapperGlobals();
 
 const mainId = 'main';
 
-const apiClient = container.resolve(APIClient);
+const apiClient = createAPIClient();
+container.registerInstance(APIClient, apiClient);
 const core = container.resolve(Core);
 
 let localStorage;

@@ -24,14 +24,12 @@ import {
 } from './startupFeatureToggles';
 import {
   collaboraClipboardAccessFeatureToggleName,
-  incrementalHttpRetryBackoffFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
   startupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
-  incrementalHttpRetryBackoffFeatureToggleName,
   collaboraClipboardAccessFeatureToggleName,
 ] as const;
 
@@ -66,14 +64,6 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
-  });
-
-  it('enables the incremental http retry backoff feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${incrementalHttpRetryBackoffFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(incrementalHttpRetryBackoffFeatureToggleName)).toBe(true);
   });
 
   it('enables the collabora clipboard access feature toggle when present in the query parameter', () => {
@@ -134,7 +124,6 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
-      incrementalHttpRetryBackoffFeatureToggleName,
       collaboraClipboardAccessFeatureToggleName,
     ]);
   });

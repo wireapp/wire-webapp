@@ -17,12 +17,8 @@
  *
  */
 
-export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
-export const collaboraClipboardAccessFeatureToggleName = 'collabora-clipboard-access';
+import {APIClient} from './APIClientSingleton';
 
-export const startupFeatureToggleNames = [
-  reliableWebsocketConnectionFeatureToggleName,
-  collaboraClipboardAccessFeatureToggleName,
-] as const;
-
-export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];
+export function createAPIClient(): APIClient {
+  return new APIClient();
+}

@@ -95,7 +95,6 @@ export interface APIClient {
 }
 
 export type APIClientConfiguration = {
-  readonly shouldUseIncrementalRetryBackoff?: boolean;
 };
 
 export type APIClientConstructorConfiguration = Config & APIClientConfiguration;
@@ -182,7 +181,6 @@ export class APIClient extends EventEmitter {
 
   constructor(config?: APIClientConstructorConfiguration) {
     super();
-    const {shouldUseIncrementalRetryBackoff = false} = config ?? {};
     this.config = {...defaultConfig, ...config};
     this.accessTokenStore = new AccessTokenStore();
     this.accessTokenStore.on(AccessTokenStore.TOPIC.ACCESS_TOKEN_REFRESH, (accessToken: AccessTokenData) =>
@@ -194,7 +192,7 @@ export class APIClient extends EventEmitter {
 
     this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
 
-    const httpClient = new HttpClient(this.config, this.accessTokenStore, {shouldUseIncrementalRetryBackoff});
+    const httpClient = new HttpClient(this.config, this.accessTokenStore);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
 
     const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {

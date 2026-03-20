@@ -16,13 +16,16 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
+import {createAPIClient} from './createAPIClient';
 
-export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
-export const collaboraClipboardAccessFeatureToggleName = 'collabora-clipboard-access';
+describe('createAPIClient', () => {
+  it('creates an api client with incremental http retry backoff support', () => {
+    const apiClient = createAPIClient();
 
-export const startupFeatureToggleNames = [
-  reliableWebsocketConnectionFeatureToggleName,
-  collaboraClipboardAccessFeatureToggleName,
-] as const;
-
-export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];
+    try {
+      expect(apiClient.transport.http['incrementalRetryBackoffRunner']).toBeDefined();
+    } finally {
+      apiClient.disconnect();
+    }
+  });
+});
