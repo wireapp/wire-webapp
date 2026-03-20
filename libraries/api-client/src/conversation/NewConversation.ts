@@ -19,7 +19,7 @@
 
 import {Conversation} from './Conversation';
 import {DefaultConversationRoleName} from './ConversationRole';
-import {RECEIPT_MODE} from './data/ConversationReceiptModeUpdateData';
+import {RECEIPT_MODE} from './data/conversationReceiptModeUpdateData';
 
 import {CONVERSATION_PROTOCOL, TeamInfo} from '../team/';
 import {QualifiedId} from '../user/';

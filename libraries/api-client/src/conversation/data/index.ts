@@ -17,19 +17,19 @@
  *
  */
 
-export * from './ConversationAccessUpdateData';
-export * from './ConversationCodeUpdateData';
-export * from './ConversationConnectRequestData';
-export * from './ConversationCreateData';
-export * from './ConversationJoinData';
-export * from './ConversationMemberJoinData';
-export * from './ConversationMemberLeaveData';
-export * from './ConversationMemberUpdateData';
-export * from './ConversationMessageTimerUpdateData';
-export * from './ConversationNameUpdateData';
-export * from './ConversationOtrMessageAddData';
-export * from './ConversationMLSWelcomeData';
-export * from './ConversationMLSMessageAddData';
-export * from './ConversationReceiptModeUpdateData';
-export * from './ConversationRenameData';
-export * from './ConversationTypingData';
+export * from './conversationAccessUpdateData';
+export * from './conversationCodeUpdateData';
+export * from './conversationConnectRequestData';
+export * from './conversationCreateData';
+export * from './conversationJoinData';
+export * from './conversationMemberJoinData';
+export * from './conversationMemberLeaveData';
+export * from './conversationMemberUpdateData';
+export * from './conversationMessageTimerUpdateData';
+export * from './conversationNameUpdateData';
+export * from './conversationOtrMessageAddData';
+export * from './conversationMlsWelcomeData';
+export * from './conversationMlsMessageAddData';
+export * from './conversationReceiptModeUpdateData';
+export * from './conversationRenameData';
+export * from './conversationTypingData';

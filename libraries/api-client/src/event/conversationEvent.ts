@@ -34,9 +34,9 @@ import {
   ConversationMLSWelcomeData,
   ConversationMLSMessageAddData,
 } from '../conversation/data/';
-import {ConversationAddPermissionUpdateData} from '../conversation/data/ConversationAddPermissionUpdateData';
-import {ConversationMLSResetData} from '../conversation/data/ConversationMLSResetData';
-import {ConversationProtocolUpdateData} from '../conversation/data/ConversationProtocolUpdateData';
+import {ConversationAddPermissionUpdateData} from '../conversation/data/conversationAddPermissionUpdateData';
+import {ConversationMLSResetData} from '../conversation/data/conversationMlsResetData';
+import {ConversationProtocolUpdateData} from '../conversation/data/conversationProtocolUpdateData';
 import {QualifiedId} from '../user';
 
 export enum CONVERSATION_EVENT {
