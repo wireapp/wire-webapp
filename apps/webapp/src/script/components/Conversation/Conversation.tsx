@@ -307,7 +307,7 @@ export const Conversation = ({
     if (parsed?.type === 'user-profile') {
       event.preventDefault();
 
-      (async () => {
+      void (async () => {
         try {
           const userEntity = await repositories.user.getUserById({
             id: parsed.id,
