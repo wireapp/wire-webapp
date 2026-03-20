@@ -17,7 +17,7 @@
  *
  */
 
-import {Permissions} from './Permissions';
+import {Permissions} from './permissions';
 
 export interface PermissionsData {
   /** The permissions bitmask which this user can assign to others */

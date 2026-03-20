@@ -17,6 +17,6 @@
  *
  */
 
-import {MemberData} from './MemberData';
+import {MemberData} from './memberData';
 
 export type UpdatedMemberData = Omit<MemberData, 'legalhold_status'>;

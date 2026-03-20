@@ -17,7 +17,7 @@
  *
  */
 
-import {PermissionsData} from './PermissionsData';
+import {PermissionsData} from './permissionsData';
 
 import {LegalHoldMemberStatus} from '../legalhold';
 

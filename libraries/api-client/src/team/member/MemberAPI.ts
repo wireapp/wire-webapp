@@ -21,8 +21,8 @@ import axios, {AxiosRequestConfig} from 'axios';
 
 import {ArrayUtil} from '@wireapp/commons';
 
-import {MemberCSVResponse} from './MemberCSVResponse';
-import {UpdatedMemberData} from './UpdatedMemberData';
+import {MemberCSVResponse} from './memberCsvResponse';
+import {UpdatedMemberData} from './updatedMemberData';
 
 import {
   BackendError,

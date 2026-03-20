@@ -17,7 +17,7 @@
  *
  */
 
-import {Permissions, hasPermissions} from './Permissions';
+import {Permissions, hasPermissions} from './permissions';
 
 describe('Permission', () => {
   describe('hasPermission true for', () => {

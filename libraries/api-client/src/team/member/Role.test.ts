@@ -17,8 +17,8 @@
  *
  */
 
-import {Permissions, combinePermissions} from './Permissions';
-import {PermissionsData} from './PermissionsData';
+import {Permissions, combinePermissions} from './permissions';
+import {PermissionsData} from './permissionsData';
 import {
   Role,
   isAdmin,
@@ -29,7 +29,7 @@ import {
   isOwner,
   isPartner,
   roleToPermissions,
-} from './Role';
+} from './role';
 
 describe('Role', () => {
   describe('hasPermissions', () => {

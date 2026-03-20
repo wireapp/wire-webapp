@@ -17,7 +17,7 @@
  *
  */
 
-import {PermissionsData} from '../member/PermissionsData';
+import {PermissionsData} from '../member/permissionsData';
 
 export interface TeamMemberUpdateData {
   permissions: PermissionsData;
