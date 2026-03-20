@@ -23,7 +23,7 @@ import {Upload} from '@aws-sdk/lib-storage';
 import {CellsStorageError} from './cellsStorage';
 import {MAX_QUEUE_SIZE, PART_SIZE, S3Service} from './s3Service';
 
-import {AccessTokenStore} from '../../auth/AccessTokenStore';
+import {AccessTokenStore} from '../../auth/accessTokenStore';
 
 jest.mock('@aws-sdk/client-s3', () => {
   const actualS3Module = jest.requireActual('@aws-sdk/client-s3');

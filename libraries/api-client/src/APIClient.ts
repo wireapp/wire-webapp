@@ -36,7 +36,7 @@ import {
   MissingCookieError,
   RegisterData,
 } from './auth/';
-import {CookieStore} from './auth/CookieStore';
+import {CookieStore} from './auth/cookieStore';
 import {parseAccessToken} from './auth/parseAccessToken';
 import {BroadcastAPI} from './broadcast/broadcastApi';
 import {CellsAPI} from './cells/cellsApi';

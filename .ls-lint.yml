@@ -90,3 +90,7 @@ ls:
   libraries/api-client/src/client:
     .dir: camelCase
     .ts: camelCase
+  libraries/api-client/src/auth:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase

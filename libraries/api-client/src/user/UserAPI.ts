@@ -27,7 +27,7 @@ import {QualifiedUserPreKeyBundleMap} from './UserPreKeyBundleMap';
 
 import {BackendFeatures} from '../APIClient';
 import {ClientPreKey, PreKeyBundle} from '../auth/';
-import {VerificationActionType} from '../auth/VerificationActionType';
+import {VerificationActionType} from '../auth/verificationActionType';
 import {PublicClient, QualifiedPublicClients} from '../client/';
 import {QualifiedUserClients} from '../conversation/';
 import {BackendError, BackendErrorLabel, HttpClient, RequestCancelable, SyntheticErrorLabel} from '../http/';

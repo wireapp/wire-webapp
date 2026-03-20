@@ -33,7 +33,7 @@ import {CellsAPI} from './cellsApi';
 import {CellsStorage} from './cellsStorage/cellsStorage';
 import {S3Service} from './cellsStorage/s3Service';
 
-import {AccessTokenStore} from '../auth/AccessTokenStore';
+import {AccessTokenStore} from '../auth/accessTokenStore';
 import {HttpClient} from '../http';
 import {cellsConfigMock} from '../mocks/cells';
 

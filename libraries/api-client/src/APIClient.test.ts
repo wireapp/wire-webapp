@@ -23,7 +23,7 @@ import {AccentColor} from '@wireapp/commons/lib';
 import nock from 'nock';
 
 import {APIClient} from './APIClient';
-import {AuthAPI} from './auth/AuthAPI';
+import {AuthAPI} from './auth/authApi';
 import {ClientType} from './client';
 import {Config, MINIMUM_API_VERSION} from './Config';
 import {BackendErrorLabel, StatusCode} from './http';

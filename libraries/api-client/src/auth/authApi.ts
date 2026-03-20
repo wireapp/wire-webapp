@@ -19,8 +19,8 @@
 
 import {AxiosRequestConfig, AxiosResponse} from 'axios';
 
-import {CookieList} from './CookieList';
-import {RegisterData} from './RegisterData';
+import {CookieList} from './cookieList';
+import {RegisterData} from './registerData';
 
 import {AccessTokenData, LoginData} from '../auth/';
 import {ClientType} from '../client/';
