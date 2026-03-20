@@ -17,7 +17,7 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client/lib/APIClient';
+import {APIClient} from '@wireapp/api-client/lib/apiClient';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 interface Params {

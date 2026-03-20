@@ -19,7 +19,7 @@
 
 import {useState, useContext} from 'react';
 
-import {ADD_PERMISSION, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/Conversation';
+import {ADD_PERMISSION, GROUP_CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';

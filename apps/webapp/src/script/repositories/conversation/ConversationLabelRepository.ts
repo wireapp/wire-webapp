@@ -29,6 +29,7 @@ import type {PropertiesService} from 'Repositories/properties/PropertiesService'
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/LocalizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
+import {fixWebsocketString} from 'Util/StringUtil';
 import {TypedEventTarget} from 'Util/TypedEventTarget';
 import {createUuid} from 'Util/uuid';
 
@@ -229,7 +230,17 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly onUserEvent = (event: any) => {
     if (event.type === USER_EVENT.PROPERTIES_SET && event.key === propertiesKey) {
-      this.unmarshal(event.value);
+      const normalizedLabels = event.value?.labels?.map((label: ConversationLabelJson) => {
+        return {
+          ...label,
+          name: label.name ? fixWebsocketString(label.name) : undefined,
+        };
+      });
+      const value: LabelProperty = {
+        ...event.value,
+        labels: normalizedLabels ?? [],
+      };
+      this.unmarshal(value);
     }
   };
 

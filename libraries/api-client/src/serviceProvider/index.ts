@@ -17,8 +17,8 @@
  *
  */
 
-export * from './LoginServiceProviderData';
-export * from './ServiceProviderAPI';
-export * from './RegisteredServiceProvider';
-export * from './NewServiceProvider';
-export * from './UpdateServiceProviderData';
+export * from './loginServiceProviderData';
+export * from './serviceProviderApi';
+export * from './registeredServiceProvider';
+export * from './newServiceProvider';
+export * from './updateServiceProviderData';

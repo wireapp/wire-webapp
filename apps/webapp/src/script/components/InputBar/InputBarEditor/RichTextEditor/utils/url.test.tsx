@@ -64,6 +64,8 @@ describe('validateUrl', () => {
     expect(URL_REGEX.test('http://valid.com')).toBe(true);
     expect(URL_REGEX.test('https://sub.domain/path?query=1')).toBe(true);
     expect(URL_REGEX.test('https://example.com,')).toBe(true);
+    expect(URL_REGEX.test('https://example.com/path;param=value')).toBe(true);
+    expect(URL_REGEX.test('https://example.com/app;jsessionid=abc123?foo=bar')).toBe(true);
   });
 
   test('should reject invalid URLs with URL_REGEX', () => {

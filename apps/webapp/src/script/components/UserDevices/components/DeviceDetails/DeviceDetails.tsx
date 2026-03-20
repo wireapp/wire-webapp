@@ -36,7 +36,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/LocalizerUtil';
 import type {Logger} from 'Util/Logger';
 import {splitFingerprint} from 'Util/StringUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
 
 import {Config} from '../../../../Config';
 import {MotionDuration} from '../../../../motion/MotionDuration';

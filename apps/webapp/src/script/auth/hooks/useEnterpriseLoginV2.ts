@@ -19,7 +19,7 @@
 
 import {useCallback} from 'react';
 
-import {DomainRedirect} from '@wireapp/api-client/lib/account/DomainRedirect';
+import {DomainRedirect} from '@wireapp/api-client/lib/account/domainRedirect';
 import {useDispatch} from 'react-redux';
 import {useNavigate} from 'react-router';
 import {UnknownAction} from 'redux';

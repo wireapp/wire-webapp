@@ -17,7 +17,7 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {expect, Locator, Page} from '@playwright/test';
 
 export class AppLockModal {
   readonly lockPasscodeInput: Locator;
@@ -49,6 +49,7 @@ export class AppLockModal {
   async setPasscode(passcode: string) {
     await this.lockPasscodeInput.fill(passcode);
     await this.appLockActionButton.click();
+    await expect(this.appLockModal).toBeHidden();
   }
 
   async unlockAppWithPasscode(passcode: string) {

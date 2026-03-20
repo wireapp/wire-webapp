@@ -10,8 +10,8 @@
   "files": [
     "lib"
   ],
-  "main": "lib/APIClient",
-  "types": "lib/APIClient.d.ts",
+  "main": "lib/apiClient",
+  "types": "lib/apiClient.d.ts",
   "browser": {
     "./lib/shims/node/buffer": "./lib/shims/browser/buffer.js",
     "./lib/shims/node/cookie": "./lib/shims/browser/cookie.js",

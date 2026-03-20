@@ -17,7 +17,7 @@
  *
  */
 
-import {APIClient} from '@wireapp/api-client/lib/APIClient';
+import {APIClient} from '@wireapp/api-client/lib/apiClient';
 import {QualifiedUserClientMap} from '@wireapp/api-client/lib/client';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';

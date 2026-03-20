@@ -8911,6 +8911,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@stylistic/eslint-plugin@npm:5.10.0":
+  version: 5.10.0
+  resolution: "@stylistic/eslint-plugin@npm:5.10.0"
+  dependencies:
+    "@eslint-community/eslint-utils": "npm:^4.9.1"
+    "@typescript-eslint/types": "npm:^8.56.0"
+    eslint-visitor-keys: "npm:^4.2.1"
+    espree: "npm:^10.4.0"
+    estraverse: "npm:^5.3.0"
+    picomatch: "npm:^4.0.3"
+  peerDependencies:
+    eslint: ^9.0.0 || ^10.0.0
+  checksum: 10/d55706b09a55defbc5afbfc251c4ecc0acfcbc3e741c34bec461365b399d2c9d89a6cafac069356ea03e231f3b12d5cc9550e66603ac343c29e07f2b2cd30464
+  languageName: node
+  linkType: hard
+
 "@surma/rollup-plugin-off-main-thread@npm:^2.2.3":
   version: 2.2.3
   resolution: "@surma/rollup-plugin-off-main-thread@npm:2.2.3"
@@ -10387,7 +10403,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/types@npm:8.57.0, @typescript-eslint/types@npm:^8.57.0":
+"@typescript-eslint/types@npm:8.57.0, @typescript-eslint/types@npm:^8.56.0, @typescript-eslint/types@npm:^8.57.0":
   version: 8.57.0
   resolution: "@typescript-eslint/types@npm:8.57.0"
   checksum: 10/ba23a4deeb5a89b9b99fee35f58d662901f236000d0f6bcada5143a2ef5ec831c7909e9192def8a48d18f8c3327b78bf3e9c02d770b4a4d721a0422b97ca1e29
@@ -11040,10 +11056,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:9.3.0":
-  version: 9.3.0
-  resolution: "@wireapp/core-crypto@npm:9.3.0"
-  checksum: 10/2c599c91e6adcc6792b859d05808cc8ff00f0edcc8928e23a7b0e5326009ab2cc92d09d1ff99e67652624437cc8a972e358bc9c16a1ccac6577c7300e3745075
+"@wireapp/core-crypto@npm:9.3.2":
+  version: 9.3.2
+  resolution: "@wireapp/core-crypto@npm:9.3.2"
+  checksum: 10/608470af7c114b48bb25ce5bb4699378474866b845461da067985ad027000d6895c6291f9e67c7b3e577c5714fd033f1921a9cd076dd9eb09bfb95519872883c
   languageName: node
   linkType: hard
 
@@ -11056,7 +11072,7 @@ __metadata:
     "@types/lodash": "npm:4.17.24"
     "@types/long": "npm:5.0.0"
     "@wireapp/api-client": "npm:27.96.0"
-    "@wireapp/core-crypto": "npm:9.3.0"
+    "@wireapp/core-crypto": "npm:9.3.2"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:2.1.19"
     "@wireapp/promise-queue": "npm:2.4.13"
@@ -26249,12 +26265,12 @@ __metadata:
   linkType: hard
 
 "socket.io-parser@npm:~4.2.4":
-  version: 4.2.5
-  resolution: "socket.io-parser@npm:4.2.5"
+  version: 4.2.6
+  resolution: "socket.io-parser@npm:4.2.6"
   dependencies:
     "@socket.io/component-emitter": "npm:~3.1.0"
     debug: "npm:~4.4.1"
-  checksum: 10/612b3ba068327cbdca043d07f8d96da587a18e0b3e00f002b6476c22410c891abafc44a3f009abd014f2de42b348032f465a7b19771151728f6361ed116423d2
+  checksum: 10/cf8f3e9feee42b2405065bccef732894a0b07b7cb734c4954eb8876d7a0038e7df6e6d06fab3a25f816f5d996917391833d5f06136e8c8c6fbecf5da962c1c9e
   languageName: node
   linkType: hard
 
@@ -29042,6 +29058,7 @@ __metadata:
     "@nx/jest": "npm:22.5.4"
     "@nx/node": "npm:22.5.4"
     "@nx/workspace": "npm:22.5.4"
+    "@stylistic/eslint-plugin": "npm:5.10.0"
     "@tony.ganchev/eslint-plugin-header": "npm:3.3.0"
     "@types/eslint": "npm:9.6.1"
     "@types/eslint-plugin-jsx-a11y": "npm:6.10.1"

@@ -20,7 +20,8 @@
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {AxiosError} from 'axios';
 
-import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType, toError} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
 
 describe('TypePredicateUtil', () => {
   describe('isAxiosError', () => {
@@ -82,22 +83,6 @@ describe('TypePredicateUtil', () => {
       const actual = isErrorWithType(error);
 
       expect(actual).toBeTruthy();
-    });
-  });
-
-  describe('toError', () => {
-    it('returns error instances unchanged', () => {
-      const error = new Error('Server Error');
-
-      const actual = toError(error);
-
-      expect(actual).toBe(error);
-    });
-
-    it('wraps string values into errors', () => {
-      const actual = toError('Server Error');
-
-      expect(actual.message).toBe('Server Error');
     });
   });
 });

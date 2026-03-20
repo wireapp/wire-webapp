@@ -17,7 +17,7 @@
  *
  */
 
-import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
+import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
@@ -91,7 +91,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';

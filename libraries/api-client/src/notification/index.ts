@@ -17,6 +17,6 @@
  *
  */
 
-export * from './Notification';
-export * from './NotificationAPI';
-export * from './NotificationList';
+export * from './notification';
+export * from './notificationApi';
+export * from './notificationList';
