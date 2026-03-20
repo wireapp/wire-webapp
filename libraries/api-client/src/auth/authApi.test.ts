@@ -17,7 +17,7 @@
  *
  */
 
-import {APIClient} from '../APIClient';
+import {APIClient} from '../apiClient';
 import {ClientType} from '../client/clientType';
 import {StatusCode} from '../http';
 

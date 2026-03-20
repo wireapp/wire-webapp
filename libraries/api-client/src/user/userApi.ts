@@ -26,7 +26,7 @@ import {RTCConfiguration} from './rtcConfiguration';
 import {RequestCancellationError} from './userError';
 import {QualifiedUserPreKeyBundleMap} from './userPreKeyBundleMap';
 
-import {BackendFeatures} from '../APIClient';
+import {BackendFeatures} from '../apiClient';
 import {ClientPreKey, PreKeyBundle} from '../auth/';
 import {VerificationActionType} from '../auth/verificationActionType';
 import {PublicClient, QualifiedPublicClients} from '../client/';

@@ -25,7 +25,7 @@ import {
   ClientType,
   RegisteredClient,
 } from '@wireapp/api-client/lib/client';
-import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/config';
 import {ConversationAPI} from '@wireapp/api-client/lib/conversation';
 import {BackendEvent} from '@wireapp/api-client/lib/event';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';

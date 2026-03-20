@@ -37,7 +37,7 @@ import {
   QualifiedConversationIds,
   RemoteConversations,
 } from '..';
-import {BackendFeatures} from '../../APIClient';
+import {BackendFeatures} from '../../apiClient';
 import {
   ConversationAccessUpdateEvent,
   ConversationAddPermissionUpdateEvent,

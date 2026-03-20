@@ -41,7 +41,7 @@ import {parseAccessToken} from './auth/parseAccessToken';
 import {BroadcastAPI} from './broadcast/broadcastApi';
 import {CellsAPI} from './cells/cellsApi';
 import {ClientAPI, ClientType} from './client/';
-import {Config, MINIMUM_API_VERSION} from './Config';
+import {Config, MINIMUM_API_VERSION} from './config';
 import {ConnectionAPI} from './connection/';
 import {ConversationAPI} from './conversation/';
 import {Backend} from './env/backend';

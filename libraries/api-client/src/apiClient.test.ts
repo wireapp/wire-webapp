@@ -22,10 +22,10 @@
 import {AccentColor} from '@wireapp/commons/lib';
 import nock from 'nock';
 
-import {APIClient} from './APIClient';
+import {APIClient} from './apiClient';
 import {AuthAPI} from './auth/authApi';
 import {ClientType} from './client';
-import {Config, MINIMUM_API_VERSION} from './Config';
+import {Config, MINIMUM_API_VERSION} from './config';
 import {BackendErrorLabel, StatusCode} from './http';
 import {cellsConfigMock} from './mocks/cells';
 import {Self, SelfAPI} from './self';

@@ -41,7 +41,7 @@ import {
   MissingCookieError,
   TokenExpiredError,
 } from '../auth/';
-import {Config} from '../Config';
+import {Config} from '../config';
 import {BackendError, ConnectionState, ContentType, StatusCode, mapBackendError} from '../http/';
 import {ObfuscationUtil} from '../obfuscation';
 import {sendRequestWithCookie} from '../shims/node/cookie';
