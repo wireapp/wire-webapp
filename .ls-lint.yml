@@ -172,3 +172,6 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/giphy:
+    .dir: camelCase
+    .ts: camelCase
