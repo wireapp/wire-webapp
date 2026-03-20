@@ -21,7 +21,7 @@ import {Maybe} from 'true-myth';
 
 import {
   createIncrementalRetryBackoffPolicy,
-} from './IncrementalRetryBackoff';
+} from './incrementalRetryBackoff';
 
 const badRequestStatusCode = 400;
 const unauthorizedStatusCode = 401;

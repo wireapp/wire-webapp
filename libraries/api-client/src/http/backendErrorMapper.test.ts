@@ -17,7 +17,7 @@
  *
  */
 
-import {mapBackendError} from './BackendErrorMapper';
+import {mapBackendError} from './backendErrorMapper';
 
 import {
   InvalidCredentialsError,

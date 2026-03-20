@@ -19,7 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {AbortableWaitDependencies, createAbortableWait} from './AbortableWait';
+import {AbortableWaitDependencies, createAbortableWait} from './abortableWait';
 
 type AbortableWaitDependenciesForTest = {
   readonly abortableWaitDependencies: AbortableWaitDependencies;

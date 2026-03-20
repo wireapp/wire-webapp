@@ -19,9 +19,9 @@
 
 import {Maybe} from 'true-myth';
 
-import {AbortableWait} from './AbortableWait';
-import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './IncrementalRetryBackoff';
-import {createIncrementalRetryBackoffRunner} from './IncrementalRetryBackoffRunner';
+import {AbortableWait} from './abortableWait';
+import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './incrementalRetryBackoff';
+import {createIncrementalRetryBackoffRunner} from './incrementalRetryBackoffRunner';
 
 type RetryableError = {
   readonly statusCode: number;

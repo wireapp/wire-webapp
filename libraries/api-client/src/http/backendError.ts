@@ -19,7 +19,7 @@
 
 import {StatusCodes as StatusCode} from 'http-status-codes';
 
-import {SyntheticErrorLabel} from './BackendErrorLabel';
+import {SyntheticErrorLabel} from './backendErrorLabel';
 
 import {BackendErrorLabel} from '../http/';
 

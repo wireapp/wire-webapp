@@ -28,9 +28,9 @@ import {EventEmitter} from 'events';
 import {LogFactory, TimeUtil} from '@wireapp/commons';
 import {PriorityQueue} from '@wireapp/priority-queue';
 
-import {createAbortableWait} from './AbortableWait';
-import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './IncrementalRetryBackoff';
-import {createIncrementalRetryBackoffRunner} from './IncrementalRetryBackoffRunner';
+import {createAbortableWait} from './abortableWait';
+import {createIncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './incrementalRetryBackoff';
+import {createIncrementalRetryBackoffRunner} from './incrementalRetryBackoffRunner';
 
 import {
   AccessTokenData,

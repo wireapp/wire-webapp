@@ -19,8 +19,8 @@
 
 import {Maybe} from 'true-myth';
 
-import {AbortableWait} from './AbortableWait';
-import {IncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './IncrementalRetryBackoff';
+import {AbortableWait} from './abortableWait';
+import {IncrementalRetryBackoffPolicy, IncrementalRetryBackoffState} from './incrementalRetryBackoff';
 
 export type IncrementalRetryBackoffRunnerDependencies = {
   readonly abortableWait: AbortableWait;

@@ -21,8 +21,8 @@ import assert from 'assert';
 import nock from 'nock';
 import {AxiosHeaders, AxiosResponse} from 'axios';
 
-import {BackendErrorLabel} from './BackendErrorLabel';
-import {HttpClient} from './HttpClient';
+import {BackendErrorLabel} from './backendErrorLabel';
+import {HttpClient} from './httpClient';
 
 import {AccessTokenStore, AuthAPI} from '../auth';
 
