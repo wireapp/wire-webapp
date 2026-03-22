@@ -3542,9 +3542,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:6.13.1":
-  version: 6.13.1
-  resolution: "@formatjs/cli@npm:6.13.1"
+"@formatjs/cli@npm:6.13.4":
+  version: 6.13.4
+  resolution: "@formatjs/cli@npm:6.13.4"
   peerDependencies:
     "@glimmer/syntax": ^0.84.3 || ^0.95.0
     "@vue/compiler-core": ^3.5.0
@@ -3567,7 +3567,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 10/741c5bc03820dab5d81fcd9b29249a71117d8e3c34fe8715f4f4107ef53670173c5a68c52a2b02f012e652b213fc2c47166c31bed3daca4c6aa79289079b304f
+  checksum: 10/ec59ba2bd5ea3aca913c3f6d52efaa60b6ed3f7b121b9c6512925393a773e2783f56856ea2cb0f48e65eb2d8e8727b4afbb32ba6389b544cb0c7fd44c51890bb
   languageName: node
   linkType: hard
 
@@ -11332,7 +11332,7 @@ __metadata:
     "@datadog/browser-rum": "npm:5.35.1"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@emotion/react": "npm:11.14.0"
-    "@formatjs/cli": "npm:6.13.1"
+    "@formatjs/cli": "npm:6.13.4"
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.41.0"
     "@lexical/history": "npm:0.41.0"
