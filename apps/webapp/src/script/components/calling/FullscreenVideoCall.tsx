@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
@@ -300,8 +300,8 @@ const FullscreenVideoCall = ({
     void switchVideoBackgroundEffect(effect);
   };
 
-  const handleAddBackground = () => {
-    addBackgroundNotification.show();
+  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
+    callingRepository.allowSuperhighQualityTier(event.target.checked);
   };
 
   return (
@@ -427,8 +427,9 @@ const FullscreenVideoCall = ({
               selectedEffect={selectedBackgroundEffect}
               backgrounds={BUILTIN_BACKGROUNDS}
               onSelectEffect={handleBackgroundSidebarSelect}
-              onAddBackground={handleAddBackground}
+              onEnableHighQualityBlur={handleEnableHighQualityBlur}
               onClose={() => setIsBackgroundSidebarOpen(false)}
+              highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
             />
           )}
         </div>
@@ -509,8 +510,9 @@ const FullscreenVideoCall = ({
           selectedEffect={selectedBackgroundEffect}
           backgrounds={BUILTIN_BACKGROUNDS}
           onSelectEffect={handleBackgroundSidebarSelect}
-          onAddBackground={handleAddBackground}
+          onEnableHighQualityBlur={handleEnableHighQualityBlur}
           onClose={() => setIsBackgroundSidebarOpen(false)}
+          highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
         />
       )}
       <ModalComponent
@@ -537,7 +539,7 @@ const FullscreenVideoCall = ({
                 wrapperCSS={{marginTop: 16}}
                 data-uie-name="do-not-ask-again-checkbox"
                 id="do-not-ask-again-checkbox"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   localStorage.setItem(
                     LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL,
                     event.target.checked.toString(),

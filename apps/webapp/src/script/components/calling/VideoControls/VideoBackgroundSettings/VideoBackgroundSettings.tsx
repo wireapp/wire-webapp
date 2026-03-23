@@ -17,9 +17,9 @@
  *
  */
 
-import {CSSProperties, ReactNode} from 'react';
+import {ChangeEvent, CSSProperties, ReactNode} from 'react';
 
-import {BlurHighIcon, BlurLowIcon, CircleIcon} from '@wireapp/react-ui-kit';
+import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
@@ -45,8 +45,9 @@ interface VideoBackgroundSettingsProps {
   selectedEffect: BackgroundEffectSelection;
   backgrounds: BuiltinBackground[];
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
-  onAddBackground: () => void;
+  onEnableHighQualityBlur: (event: ChangeEvent<HTMLInputElement>) => void;
   onClose: () => void;
+  highQualityBlurAllowed: boolean;
 }
 
 const isEffectSelected = (selected: BackgroundEffectSelection, candidate: BackgroundEffectSelection): boolean => {
@@ -105,16 +106,21 @@ export const VideoBackgroundSettings = ({
   selectedEffect,
   backgrounds,
   onSelectEffect,
-  onAddBackground,
+  highQualityBlurAllowed,
+  onEnableHighQualityBlur,
   onClose,
 }: VideoBackgroundSettingsProps) => {
   const isNoneSelected = selectedEffect.type === 'none';
+
+  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
+    onEnableHighQualityBlur(event);
+  };
 
   return (
     <div css={backgroundSettingsWrapperStyles} data-uie-name="video-background-settings">
       <div css={backgroundSettingsHeaderStyles}>
         <span css={backgroundSettingsTitleStyles}>{t('videoCallBackgroundEffectsLabel')}</span>
-        <button type="button" className="icon-button" onClick={onClose} title={t('cells.filtersModal.closeButton')}>
+        <button type="button" className="icon-button" onClick={onClose} title={t('modalCloseButton')}>
           <Icon.CloseIcon width={12} height={12} />
         </button>
       </div>
@@ -150,6 +156,18 @@ export const VideoBackgroundSettings = ({
               previewContent={<BlurHighIcon />}
             />
           </div>
+        </div>
+
+        <div>
+          <Checkbox
+            id="enable-high-quality-blur"
+            disabled={!highQualityBlurAllowed}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => handleEnableHighQualityBlur(event)}
+          >
+            <CheckboxLabel htmlFor="enable-high-quality-blur">
+              {t('videoCallBackgroundEnableHighQualityBlur')}
+            </CheckboxLabel>
+          </Checkbox>
         </div>
 
         {/* Virtual backgrounds section */}

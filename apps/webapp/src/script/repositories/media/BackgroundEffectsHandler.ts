@@ -239,8 +239,8 @@ export class BackgroundEffectsHandler {
     return this.controller.getQuality();
   }
 
-  public allowSuperhighQualityTier(allow: boolean) {
-    if (allow) {
+  public enableSuperhighQualityTier(enable: boolean) {
+    if (enable) {
       this.controller.setMaxQualityTier('superhigh');
     } else {
       this.controller.setMaxQualityTier('high');

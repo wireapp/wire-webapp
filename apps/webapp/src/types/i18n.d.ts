@@ -2034,6 +2034,7 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundNone': `None`;
     'videoCallBackgroundUpload': `Upload background`;
     'videoCallBackgroundVirtualSectionLabel': `Virtual Backgrounds`;
+    'videoCallBackgroundEnableHighQualityBlur': `Enable high quality blur`;
     'videoCallBackgroundOffice1': `Office 1`;
     'videoCallBackgroundOffice2': `Office 2`;
     'videoCallBackgroundOffice3': `Office 3`;
