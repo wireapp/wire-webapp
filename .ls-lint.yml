@@ -175,3 +175,6 @@ ls:
   libraries/core/src/giphy:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/team:
+    .dir: camelCase
+    .ts: camelCase
