@@ -201,3 +201,6 @@ ls:
   libraries/core/src/client:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/errors:
+    .dir: camelCase
+    .ts: camelCase

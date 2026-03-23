@@ -31,7 +31,7 @@ import {NotificationSource} from './notificationSource.types';
 
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../CoreError';
-import {DecryptionError} from '../errors/DecryptionError';
+import {DecryptionError} from '../errors/decryptionError';
 
 export type HandledEventPayload = {
   /** the raw event received from backend */
