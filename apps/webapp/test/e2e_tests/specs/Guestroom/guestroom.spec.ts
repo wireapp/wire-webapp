@@ -1,19 +1,19 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withConnectedUser, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-test.describe('Conversations', () => {
+test.describe('Guestroom', () => {
   let team: Team;
   let userA: User;
   let userB: User;
   let userC: User;
-  const groupName = 'Test Group';
+  const groupName = 'Guestroom';
 
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
     userC = await createUser();
-    team = await createTeam('Test Team', {users: [userB, userC]});
+    team = await createTeam('Test Team', {users: [userC]});
     userA = team.owner;
   });
 
@@ -21,6 +21,8 @@ test.describe('Conversations', () => {
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
     async ({createPage}) => {
+      test.setTimeout(150_000);
+      let createdLink: string;
       const [userAPage, userBPage] = await Promise.all([
         createPage(withLogin(userA), withConnectedUser(userC)),
         createPage(),
@@ -31,33 +33,47 @@ test.describe('Conversations', () => {
       const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
       const {pages} = userAPageManager;
 
-      await createGroup(pages, groupName, [userC]);
-      await pages.conversationList().openConversation(groupName);
-      await pages.conversation().toggleGroupInformation();
-      await pages.conversationDetails().guestOptionsButton.click();
+      await test.step('User A creates invite link', async () => {
+        await createGroup(pages, groupName, [userC]);
+        await pages.conversationList().openConversation(groupName);
+        await pages.conversation().toggleGroupInformation();
+        await pages.conversationDetails().guestOptionsButton.click();
+        createdLink = await pages.guestOptions().createLink();
+      });
 
-      const createdLink = await pages.guestOptions().createLink();
+      await test.step('User B joins the group using the invitation link', async () => {
+        await userBPage.goto(createdLink.toString());
+        await userBPages.joinConversation().joinBrowserButton.click();
+        await expect(userBPages.joinConversation().joinAsGuest).toBeVisible();
 
-      const linkWithExpires = new URL(createdLink);
-      linkWithExpires.searchParams.set('expires_in', '60');
+        // Add expires_in query parameter to simulate account expiration
+        const joinLink = new URL(userBPage.url());
+        joinLink.searchParams.set('expires_in', '60');
 
-      await userBPageManager.openUrl(linkWithExpires.toString());
-      await userBPages.joinConversation().joinBrowserButton.click();
-      await expect(userBPages.joinConversation().joinAsGuest).toBeVisible();
+        await userBPage.goto(joinLink.toString());
+        await userBPages.joinConversation().nameInput.fill(userB.firstName);
+        await userBPages.joinConversation().acceptTermsCheckBox.check({force: true});
+        await userBPages.joinConversation().joinAsGuest.click();
+      });
 
-      const joinLink = new URL(userBPage.url());
-      joinLink.searchParams.set('expires_in', '60');
-      joinLink.hostname = 'wire-webapp-dev.zinfra.io';
+      await test.step('User B sends a message in the conversation', async () => {
+        await userBPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+        await userBModals.confirm().actionButton.click();
+        await userBPages.conversation().sendMessage('Hello from Guest');
+      });
 
-      await userBPageManager.openUrl(joinLink.toString());
-      await userBPages.joinConversation().nameInput.fill(userB.firstName);
-      await userBPages.joinConversation().acceptCheckBox.check({force: true});
-      await userBPages.joinConversation().joinAsGuest.click();
+      await test.step('User A sees guest details (to trigger access validation) after 1 minute', async () => {
+        await pages.conversation().toggleGroupInformation();
+        await userAPage.waitForTimeout(60_000);
+        await pages.conversationDetails().openParticipantDetails(userB.firstName);
+        await expect(pages.participantDetails().userStatus).toBeVisible();
+      });
 
-      await userBPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: 40_000});
-      await userBModals.confirm().actionButton.click();
-      await userBPageManager.waitForTimeout(1000);
-      await userBPages.conversation().conversationTitle.waitFor({state: 'hidden', timeout: 90_000});
+      await test.step('User B confirms that he was logged out due to expiration', async () => {
+        await expect(userBPage.getByTestId('status-logout-reason')).toContainText(
+          'You were signed out because your account was deleted.',
+        );
+      });
     },
   );
 });

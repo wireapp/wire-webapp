@@ -25,7 +25,7 @@ export class JoinConversationPage {
   readonly joinBrowserButton: Locator;
   readonly joinAsGuest: Locator;
   readonly nameInput: Locator;
-  readonly acceptCheckBox: Locator;
+  readonly acceptTermsCheckBox: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -33,6 +33,6 @@ export class JoinConversationPage {
     this.joinBrowserButton = this.page.getByTestId('do-conversation-join-webapp');
     this.joinAsGuest = this.page.getByTestId('do-join-as-guest');
     this.nameInput = this.page.getByRole('textbox', {name: 'Your name'});
-    this.acceptCheckBox = this.page.getByRole('checkbox', {name: 'I accept Wire’s Terms of Use.'});
+    this.acceptTermsCheckBox = this.page.getByRole('checkbox', {name: 'I accept Wire’s Terms of Use.'});
   }
 }
