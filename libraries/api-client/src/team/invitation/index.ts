@@ -17,9 +17,9 @@
  *
  */
 
-export * from './NewTeamInvitation';
-export * from './TeamInvitationAPI';
-export * from './InvitationError';
-export * from './TeamInvitationChunk';
-export * from './TeamInvitation';
-export * from './TeamMigrationPayload';
+export * from './newTeamInvitation';
+export * from './teamInvitationApi';
+export * from './invitationError';
+export * from './teamInvitationChunk';
+export * from './teamInvitation';
+export * from './teamMigrationPayload';

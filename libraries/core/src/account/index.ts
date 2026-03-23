@@ -17,4 +17,4 @@
  *
  */
 
-export * from './AccountService';
+export * from './accountService';

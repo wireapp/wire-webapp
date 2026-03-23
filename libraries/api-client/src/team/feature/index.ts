@@ -17,8 +17,8 @@
  *
  */
 
-export * from './FeatureAPI';
-export * from './FeatureList.types';
-export * from './FeatureList.schema';
-export * from './FeatureError';
-export * from './FeatureList.helper';
+export * from './featureApi';
+export * from './featureList.types';
+export * from './featureList.schema';
+export * from './featureError';
+export * from './featureList.helper';

@@ -18,7 +18,7 @@
  */
 
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
+import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
 import {SigninResponse} from 'oidc-client-ts';
 import {container} from 'tsyringe';

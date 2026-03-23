@@ -17,5 +17,5 @@
  *
  */
 
-export * from './AvailabilityType';
-export * from './BroadcastService';
+export * from './availabilityType';
+export * from './broadcastService';

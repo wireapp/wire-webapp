@@ -18,7 +18,6 @@
  */
 
 import {Config} from '../Config';
-import {incrementalHttpRetryBackoffFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {APIClient} from './APIClientSingleton';
 
 describe('APIClientSingleton', () => {
@@ -35,27 +34,11 @@ describe('APIClientSingleton', () => {
     }
   });
 
-  it('enables incremental http retry backoff when the startup feature toggle is enabled', () => {
-    const isFeatureToggleEnabled = jest.fn((featureToggleName) => {
-      return featureToggleName === incrementalHttpRetryBackoffFeatureToggleName;
-    });
-    const apiClient = new APIClient({
-      isFeatureToggleEnabled,
-    });
-
-    try {
-      expect(isFeatureToggleEnabled).toHaveBeenCalledWith(incrementalHttpRetryBackoffFeatureToggleName);
-      expect(apiClient.transport.http['shouldUseIncrementalRetryBackoff']).toBe(true);
-    } finally {
-      apiClient.disconnect();
-    }
-  });
-
-  it('keeps incremental http retry backoff disabled when no toggle reader is injected', () => {
+  it('uses the incremental http retry backoff http client by default', () => {
     const apiClient = new APIClient();
 
     try {
-      expect(apiClient.transport.http['shouldUseIncrementalRetryBackoff']).toBe(false);
+      expect(apiClient.transport.http['incrementalRetryBackoffRunner']).toBeDefined();
     } finally {
       apiClient.disconnect();
     }

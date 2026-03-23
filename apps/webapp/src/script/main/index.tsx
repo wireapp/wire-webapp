@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {wallClock} = applicationServices;
-  const apiClient = createAPIClient(isFeatureToggleEnabled);
+  const apiClient = createAPIClient();
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,
@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     isElectron: () => {
       return Runtime.isElectron();
     },
-    isFeatureToggleEnabled,
     subscribeToApplicationSignal: (signalName, listener) => {
       document.addEventListener(signalName, listener);
     },

@@ -23,7 +23,7 @@ import {Cookie as ToughCookie} from 'tough-cookie';
 import {LogFactory} from '@wireapp/commons';
 
 import {Cookie} from '../../auth/';
-import {CookieStore} from '../../auth/CookieStore';
+import {CookieStore} from '../../auth/cookieStore';
 import {HttpClient} from '../../http/';
 import {ObfuscationUtil} from '../../obfuscation';
 

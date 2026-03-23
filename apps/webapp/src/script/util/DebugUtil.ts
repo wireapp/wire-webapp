@@ -30,7 +30,7 @@ import type {Notification, NotificationList} from '@wireapp/api-client/lib/notif
 import {CONVERSATION_PROTOCOL, FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {NotificationSource} from '@wireapp/core/lib/notification';
-import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
+import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
 import Dexie from 'dexie';
 import keyboardjs from 'keyboardjs';
 import {$createTextNode, $getRoot, LexicalEditor} from 'lexical';

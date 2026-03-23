@@ -17,13 +17,12 @@
  *
  */
 
+import {Page} from 'playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-
-type Pages = PageManager['webapp']['pages'];
 
 test.describe('Reactions', () => {
   let userA: User;
@@ -39,47 +38,45 @@ test.describe('Reactions', () => {
     {
       tc: '@TC-1527',
       title: 'link preview in 1:1',
-      sendFromUserB: async (userBPages: Pages) => {
+      sendFromUserB: async (page: Page) => {
         const link = 'https://www.kaufland.de/';
+        const userBPages = PageManager.from(page).webapp.pages;
         await userBPages.conversation().sendMessage(link);
       },
     },
     {
       tc: '@TC-1528',
       title: 'picture',
-      sendFromUserB: async (userBPages: Pages) => {
-        const {page} = userBPages.conversation();
+      sendFromUserB: async (page: Page) => {
         await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
       },
     },
     {
       tc: '@TC-1529',
       title: 'audio message',
-      sendFromUserB: async (userBPages: Pages) => {
-        const {page} = userBPages.conversation();
+      sendFromUserB: async (page: Page) => {
         await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
       },
     },
     {
       tc: '@TC-1530',
       title: 'video message',
-      sendFromUserB: async (userBPages: Pages) => {
-        const {page} = userBPages.conversation();
+      sendFromUserB: async (page: Page) => {
         await shareAssetHelper(getVideoFilePath(), page, page.getByRole('button', {name: 'Add file'}));
       },
     },
     {
       tc: '@TC-1532',
       title: 'shared file',
-      sendFromUserB: async (userBPages: Pages) => {
-        const {page} = userBPages.conversation();
+      sendFromUserB: async (page: Page) => {
         await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
       },
     },
     {
       tc: '@TC-1536',
       title: 'message in 1:1',
-      sendFromUserB: async (userBPages: Pages) => {
+      sendFromUserB: async (page: Page) => {
+        const userBPages = PageManager.from(page).webapp.pages;
         await userBPages.conversation().sendMessage('Message from User B');
       },
     },
@@ -87,13 +84,16 @@ test.describe('Reactions', () => {
 
   for (const c of likeCases) {
     test(`Verify liking someone's ${c.title}`, {tag: [c.tc, '@regression']}, async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
       ]);
 
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      await c.sendFromUserB(userBPages);
+      await c.sendFromUserB(userBPage);
 
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       const messageFromUserB = userAPages.conversation().getMessage({sender: userB});
@@ -135,7 +135,7 @@ test.describe('Reactions', () => {
   });
 
   test('Verify liking an own text message', {tag: ['@TC-1534', '@regression']}, async ({createPage}) => {
-    const userAPages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
 
     await userAPages.conversation().sendMessage('Message from User A');
     const messageUserA = userAPages.conversation().getMessage({sender: userA});
@@ -145,7 +145,7 @@ test.describe('Reactions', () => {
   });
 
   test('Verify you cannot like a system message', {tag: ['@TC-1535', '@regression']}, async ({createPage}) => {
-    const userAPages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
 
     const systemMessage = userAPages.conversation().systemMessages;
     await systemMessage.hover();
@@ -182,10 +182,13 @@ test.describe('Reactions', () => {
     'Verify I can open like list by hovering the link in the tooltip of a reaction pill',
     {tag: ['@TC-1540', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
       ]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
@@ -200,10 +203,7 @@ test.describe('Reactions', () => {
       const reaction = userAPages.conversation().getReactionOnMessage(messageUserB, 'heart');
       await reaction.hover();
 
-      const tooltip = userAPages
-        .conversation()
-        .page.getByRole('tooltip')
-        .filter({hasText: `${userA.fullName} reacted with`});
+      const tooltip = userAPage.getByRole('tooltip').filter({hasText: `${userA.fullName} reacted with`});
       await expect(tooltip).toBeVisible();
     },
   );

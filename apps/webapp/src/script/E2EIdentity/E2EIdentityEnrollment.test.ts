@@ -19,7 +19,7 @@
 
 import {waitFor} from '@testing-library/react';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
+import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';

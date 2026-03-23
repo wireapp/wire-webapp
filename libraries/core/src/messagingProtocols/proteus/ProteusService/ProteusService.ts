@@ -17,7 +17,7 @@
  *
  */
 
-import type {APIClient} from '@wireapp/api-client/lib/APIClient';
+import type {APIClient} from '@wireapp/api-client/lib/apiClient';
 import type {PreKey, Context} from '@wireapp/api-client/lib/auth';
 import {
   isFederatedBackendsError,

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './SelfService';
+export * from './selfService';

@@ -17,7 +17,7 @@
  *
  */
 
-import {TaskParams} from '@wireapp/core/lib/util/RecurringTaskScheduler';
+import {TaskParams} from '@wireapp/core/lib/util/recurringTaskScheduler';
 import {container} from 'tsyringe';
 
 import {getLogger} from 'Util/Logger';

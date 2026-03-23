@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ConnectionService';
+export * from './connectionService';

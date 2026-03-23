@@ -37,9 +37,9 @@ import {
   ConsumableNotification,
   ConsumableNotificationEvent,
   ConsumableNotificationSynchronization,
-} from '@wireapp/api-client/lib/notification/ConsumableNotification';
+} from '@wireapp/api-client/lib/notification/consumableNotification';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
-import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
@@ -88,11 +88,11 @@ import {HandledEventPayload, NotificationService, NotificationSource} from './no
 import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
-import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
+import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
 import {TeamService} from './team/';
 import {UserService} from './user/';
-import {LocalStorageStore} from './util/LocalStorageStore';
-import {RecurringTaskScheduler} from './util/RecurringTaskScheduler';
+import {LocalStorageStore} from './util/localStorageStore';
+import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
 
 export type ProcessedEventPayload = HandledEventPayload;
 
