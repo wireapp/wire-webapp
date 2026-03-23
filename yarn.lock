@@ -11861,7 +11861,7 @@ __metadata:
     markdown-it: "npm:14.1.1"
     murmurhash: "npm:2.0.1"
     noop-esm: "npm:1.1.0"
-    oidc-client-ts: "npm:3.4.1"
+    oidc-client-ts: "npm:3.5.0"
     os-browserify: "npm:0.3.0"
     p-wait-for: "npm:6.0.0"
     path-browserify: "npm:1.0.1"
@@ -22625,12 +22625,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oidc-client-ts@npm:3.4.1":
-  version: 3.4.1
-  resolution: "oidc-client-ts@npm:3.4.1"
+"oidc-client-ts@npm:3.5.0":
+  version: 3.5.0
+  resolution: "oidc-client-ts@npm:3.5.0"
   dependencies:
     jwt-decode: "npm:^4.0.0"
-  checksum: 10/9b02efa7eee9160741d38a7f31a7640a9b9843519abe2e1ee74f44cd7a6ac76c745428af73e32838b52c4780901ffd6223abdea9f130b38472ec310f91a82d0b
+  checksum: 10/8ffe30c5b73bbde33b7a2f6a4c97a9fb26e33aec0e6643be79bfda8e6e2b39a256d8ef4434f06c3a8687cdbac8895e3b6f09ae443f48d10d80145555effcdcaf
   languageName: node
   linkType: hard
 
