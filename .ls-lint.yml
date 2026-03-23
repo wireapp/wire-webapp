@@ -195,3 +195,6 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/broadcast:
+    .dir: camelCase
+    .ts: camelCase
