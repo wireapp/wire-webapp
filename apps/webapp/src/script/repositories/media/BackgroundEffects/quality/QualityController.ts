@@ -115,7 +115,7 @@ export class QualityController {
    * @param targetFps - Target frames per second. Used to calculate frame budget
    *                    and performance thresholds (budget = 1000ms / targetFps).
    */
-  constructor(targetFps: number) {
+  constructor(targetFps: number, maxTier: QualityTier | null = null) {
     const resolvedTargetFps = Number.isFinite(targetFps) && targetFps > 0 ? targetFps : DEFAULT_TARGET_FPS;
     if (process.env.NODE_ENV !== 'production') {
       if (resolvedTargetFps !== targetFps) {
@@ -126,6 +126,7 @@ export class QualityController {
       }
       console.info('[QualityController] init', {targetFps: resolvedTargetFps});
     }
+    this.maxTier = maxTier;
     // Calculate frame budget: time available per frame to maintain target FPS
     const budget = 1000 / resolvedTargetFps;
     this.budgetMs = budget;

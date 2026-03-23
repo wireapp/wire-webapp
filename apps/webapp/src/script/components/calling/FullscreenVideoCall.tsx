@@ -76,6 +76,7 @@ import {VideoControls} from './VideoControls/VideoControls';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
+import {PerformancePanel} from "Components/calling/PerformancePanel/PerformancePanel";
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;
@@ -538,6 +539,7 @@ const FullscreenVideoCall = ({
           </>
         )}
       </ModalComponent>
+      <PerformancePanel backgroundEffectsHandler={backgroundEffectsHandler} />
     </div>
   );
 };
