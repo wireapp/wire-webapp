@@ -97,13 +97,23 @@ const registerHttpSchemaWithUnderscoreHostSupport = (schema: 'http:' | 'https:')
   markdownit.linkify.add(schema, {
     validate: (text, pos) => {
       const tail = text.slice(pos);
-      const match = /^[^\s<>()]+/.exec(tail);
+      // Match characters until space or angle bracket, but allow underscores and parentheses in URL
+      const match = /^[^\s<>]+/.exec(tail);
 
       if (!match) {
         return 0;
       }
 
+      // Strip trailing punctuation that typically ends a sentence
       const normalizedMatch = match[0].replace(/[.,!?;:]+$/, '');
+
+      // Ensure at least one valid hostname character (not just slashes or empty)
+      // Valid hostname chars: alphanumeric, dots, underscores, hyphens
+      if (!normalizedMatch || !/[a-zA-Z0-9._\-]/.test(normalizedMatch)) {
+        return 0;
+      }
+
+      // Validate the URL candidate before accepting it
       const urlCandidate = `${schema}//${normalizedMatch}`;
       if (!isValidUrl(urlCandidate)) {
         return 0;
