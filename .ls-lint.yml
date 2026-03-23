@@ -191,3 +191,7 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/linkPreview:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
