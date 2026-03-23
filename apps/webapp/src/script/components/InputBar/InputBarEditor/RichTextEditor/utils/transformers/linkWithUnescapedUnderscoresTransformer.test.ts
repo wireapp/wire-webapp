@@ -22,7 +22,7 @@ import {createEditor} from 'lexical';
 
 import {LINK_WITH_UNESCAPED_UNDERSCORES} from './linkWithUnescapedUnderscoresTransformer';
 
-describe('LINK_WITH_UNESCAPED_UNDERSCORES', () => {
+describe('unescaping URL with underscores in links transformer', () => {
   const runInEditor = (assertion: () => void) => {
     const editor = createEditor();
 
