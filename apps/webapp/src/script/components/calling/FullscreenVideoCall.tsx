@@ -24,7 +24,6 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {
-  TabIndex,
   Checkbox,
   CheckboxLabel,
   CloseDetachedWindowIcon,
@@ -32,6 +31,7 @@ import {
   IconButtonVariant,
   OpenDetachedWindowIcon,
   QUERY,
+  TabIndex,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -48,6 +48,7 @@ import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
+import {BUILTIN_BACKGROUNDS, DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
@@ -64,14 +65,15 @@ import {Duration} from './Duration';
 import {
   classifiedBarStyles,
   headerActionsWrapperStyles,
-  paginationWrapperStyles,
-  videoTopBarStyles,
   minimizeButtonStyles,
   openDetachedWindowButtonStyles,
   paginationStyles,
+  paginationWrapperStyles,
+  videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
+import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
@@ -190,8 +192,13 @@ const FullscreenVideoCall = ({
   const openPopup = () => callingRepository.setViewModeDetached();
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
+  const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
 
   const callNotification = useAppNotification({
+    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
+  });
+  const addBackgroundNotification = useAppNotification({
+    message: t('videoCallBackgroundAddToast'),
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
   });
 
@@ -278,6 +285,23 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
+
+  const {preferredBackgroundEffect} = useKoSubscribableChildren(backgroundEffectsHandler, [
+    'preferredBackgroundEffect',
+  ]);
+  const selectedBackgroundEffect = preferredBackgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
+
+  const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
+    if (effect.type === 'custom') {
+      addBackgroundNotification.show();
+      return;
+    }
+    void switchVideoBackgroundEffect(effect);
+  };
+
+  const handleAddBackground = () => {
+    addBackgroundNotification.show();
+  };
 
   return (
     <div
@@ -397,6 +421,15 @@ const FullscreenVideoCall = ({
               onClose={toggleParticipantsList}
             />
           )}
+          {isMobile && isBackgroundSidebarOpen && (
+            <VideoBackgroundSettings
+              selectedEffect={selectedBackgroundEffect}
+              backgrounds={BUILTIN_BACKGROUNDS}
+              onSelectEffect={handleBackgroundSidebarSelect}
+              onAddBackground={handleAddBackground}
+              onClose={() => setIsBackgroundSidebarOpen(false)}
+            />
+          )}
         </div>
 
         {isMobile && isPaginationVisible && (
@@ -453,6 +486,7 @@ const FullscreenVideoCall = ({
               setActiveCallViewTab={setActiveCallViewTab}
               setMaximizedParticipant={setMaximizedParticipant}
               sendEmoji={sendEmoji}
+              onOpenBackgroundSettings={() => setIsBackgroundSidebarOpen(true)}
             />
           </>
         )}
@@ -467,6 +501,15 @@ const FullscreenVideoCall = ({
           isSelfVerified={selfUser?.is_verified()}
           showParticipants={true}
           onClose={toggleParticipantsList}
+        />
+      )}
+      {!isMobile && isBackgroundSidebarOpen && (
+        <VideoBackgroundSettings
+          selectedEffect={selectedBackgroundEffect}
+          backgrounds={BUILTIN_BACKGROUNDS}
+          onSelectEffect={handleBackgroundSidebarSelect}
+          onAddBackground={handleAddBackground}
+          onClose={() => setIsBackgroundSidebarOpen(false)}
         />
       )}
       <ModalComponent
