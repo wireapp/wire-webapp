@@ -17,9 +17,9 @@
  *
  */
 
-import React from 'react';
+import {CSSProperties, ReactNode} from 'react';
 
-import {HelpIcon} from '@wireapp/react-ui-kit';
+import {BlurHighIcon, BlurLowIcon, CircleIcon} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
@@ -32,7 +32,6 @@ import {
   backgroundSettingsTitleStyles,
   backgroundSettingsWrapperStyles,
   noEffectButtonStyles,
-  noEffectIconStyles,
   sectionLabelStyles,
   tileButtonStyles,
   tileCheckIconStyles,
@@ -40,7 +39,6 @@ import {
   tileGridStyles,
   tileLabelStyles,
   tilePreviewStyles,
-  uploadButtonStyles,
 } from './VideoBackgroundSettings.styles';
 
 interface VideoBackgroundSettingsProps {
@@ -69,8 +67,8 @@ interface BackgroundTileProps {
   effect: BackgroundEffectSelection;
   selectedEffect: BackgroundEffectSelection;
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
-  previewContent?: React.ReactNode;
-  previewStyle?: React.CSSProperties;
+  previewContent?: ReactNode;
+  previewStyle?: CSSProperties;
 }
 
 const BackgroundTile = ({
@@ -129,7 +127,7 @@ export const VideoBackgroundSettings = ({
           aria-pressed={isNoneSelected}
           onClick={() => onSelectEffect({type: 'none'})}
         >
-          <div css={noEffectIconStyles} />
+          <CircleIcon />
           {t('videoCallBackgroundNoEffect')}
         </button>
 
@@ -142,14 +140,14 @@ export const VideoBackgroundSettings = ({
               effect={{type: 'blur', level: 'low'}}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
-              previewContent={<HelpIcon />}
+              previewContent={<BlurLowIcon />}
             />
             <BackgroundTile
               label={t('videoCallBackgroundBlurHigh')}
               effect={{type: 'blur', level: 'high'}}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
-              previewContent={<HelpIcon />}
+              previewContent={<BlurHighIcon />}
             />
           </div>
         </div>
@@ -171,11 +169,6 @@ export const VideoBackgroundSettings = ({
             ))}
           </div>
         </div>
-
-        {/* Upload background */}
-        <button type="button" css={uploadButtonStyles} onClick={onAddBackground}>
-          {t('videoCallBackgroundUpload')}
-        </button>
       </FadingScrollbar>
     </div>
   );

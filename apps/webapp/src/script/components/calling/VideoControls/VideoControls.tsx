@@ -23,7 +23,18 @@ import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon, TabIndex} from '@wireapp/react-ui-kit';
+import {
+  BlurHighIcon,
+  BlurLowIcon,
+  CircleIcon,
+  EmojiIcon,
+  GridIcon,
+  ImageIcon,
+  MoreIcon,
+  QUERY,
+  RaiseHandIcon,
+  TabIndex,
+} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification';
@@ -376,11 +387,11 @@ export const VideoControls = ({
   const currentBlurOption = useMemo(
     () =>
       selectedBackgroundEffect.type === 'blur' && selectedBackgroundEffect.level === 'low'
-        ? {label: t('videoCallBackgroundBlurLow'), value: 'blur-low', icon: <Icon.FileIcon />}
+        ? {label: t('videoCallBackgroundBlurLow'), value: 'blur-low', icon: <BlurLowIcon />}
         : {
             label: t('videoCallBackgroundBlurHigh'),
             value: 'blur-high',
-            icon: <Icon.FileIcon />,
+            icon: <BlurHighIcon />,
           },
     [selectedBackgroundEffect],
   );
@@ -390,9 +401,9 @@ export const VideoControls = ({
       {
         label: t('videoCallBackgroundEffectsLabel'),
         options: [
-          {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.FileIcon />},
+          {label: t('videoCallBackgroundNone'), value: 'none', icon: <CircleIcon />},
           currentBlurOption,
-          {label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <Icon.FileIcon />},
+          {label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <ImageIcon />},
           {
             label: t('videoCallBackgroundSettings'),
             value: 'settings',
