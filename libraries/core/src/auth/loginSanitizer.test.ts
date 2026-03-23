@@ -20,7 +20,7 @@
 import {LoginData} from '@wireapp/api-client/lib/auth/';
 import {ClientType} from '@wireapp/api-client/lib/client';
 
-import {LoginSanitizer} from './LoginSanitizer';
+import {LoginSanitizer} from './loginSanitizer';
 
 describe('LoginSanitizer', () => {
   describe('"removeNonPrintableCharacters"', () => {

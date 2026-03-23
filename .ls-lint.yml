@@ -187,3 +187,7 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
+  libraries/core/src/auth:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase

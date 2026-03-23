@@ -17,4 +17,4 @@
  *
  */
 
-export * from './LoginSanitizer';
+export * from './loginSanitizer';
