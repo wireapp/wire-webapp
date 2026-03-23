@@ -21,7 +21,7 @@ import {$createTextNode, createEditor} from 'lexical';
 
 import {TEXT_WITH_UNESCAPED_URL_UNDERSCORES} from './textWithUnescapedUrlUnderscoresTransformer';
 
-describe('TEXT_WITH_UNESCAPED_URL_UNDERSCORES', () => {
+describe('unescaping URL underscores transformer', () => {
   const runInEditor = (assertion: () => void) => {
     const editor = createEditor();
 
