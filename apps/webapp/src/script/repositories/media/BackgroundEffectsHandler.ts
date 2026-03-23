@@ -19,6 +19,8 @@
 
 import {observable} from 'knockout';
 
+import {Metrics, QualityMode, QualityTier} from 'Repositories/media/BackgroundEffects';
+import {CapabilityInfo} from 'Repositories/media/BackgroundEffects/types';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -31,8 +33,6 @@ import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {BackgroundEffectsController} from './BackgroundEffects/effects/BackgroundEffectsController';
-import {Metrics, QualityMode, QualityTier} from "Repositories/media/BackgroundEffects";
-import {CapabilityInfo} from "Repositories/media/BackgroundEffects/types";
 
 export const TARGET_FPS = 15;
 
@@ -59,7 +59,7 @@ export class BackgroundEffectsHandler {
 
   public async applyBackgroundEffect(
     originalVideoStream: MediaStream,
-  ): Promise<{ applied: boolean; media: ReleasableMediaStream }> {
+  ): Promise<{applied: boolean; media: ReleasableMediaStream}> {
     if (this.preferredBackgroundEffect().type === 'none') {
       // No background changes wanted nothing to do
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
@@ -252,7 +252,7 @@ export class BackgroundEffectsHandler {
   }
 
   public getModel(): string {
-    return "Model--xxxx";
+    return 'Model--xxxx';
   }
 
   getCapabilityInfo(): CapabilityInfo {
@@ -276,15 +276,14 @@ export class ReleasableMediaStream {
   constructor(
     public stream: MediaStream,
     public release: () => void = () => null,
-  ) {
-  }
+  ) {}
 }
 
 export interface RenderMetrics extends Metrics {
-  budget: number,
-  utilShare: number,
-  mlShare: number,
-  webglShare: number,
-  ml: 'ML(CPU)' | 'ML(GPU)' | 'ML',
-  tier: QualityTier
+  budget: number;
+  utilShare: number;
+  mlShare: number;
+  webglShare: number;
+  ml: 'ML(CPU)' | 'ML(GPU)' | 'ML';
+  tier: QualityTier;
 }

@@ -24,7 +24,6 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {
-  TabIndex,
   Checkbox,
   CheckboxLabel,
   CloseDetachedWindowIcon,
@@ -32,10 +31,12 @@ import {
   IconButtonVariant,
   OpenDetachedWindowIcon,
   QUERY,
+  TabIndex,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
+import {PerformancePanel} from 'Components/calling/PerformancePanel/PerformancePanel';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
@@ -64,11 +65,11 @@ import {Duration} from './Duration';
 import {
   classifiedBarStyles,
   headerActionsWrapperStyles,
-  paginationWrapperStyles,
-  videoTopBarStyles,
   minimizeButtonStyles,
   openDetachedWindowButtonStyles,
   paginationStyles,
+  paginationWrapperStyles,
+  videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
@@ -76,7 +77,6 @@ import {VideoControls} from './VideoControls/VideoControls';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
-import {PerformancePanel} from "Components/calling/PerformancePanel/PerformancePanel";
 
 export interface FullscreenVideoCallProps {
   activeCallViewTab: string;

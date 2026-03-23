@@ -126,7 +126,12 @@ export class BackgroundEffectsController {
   private onMetrics: ((metrics: Metrics) => void) | null = null;
   /** Tracks shutdown to avoid logging expected stop errors. */
   private isStopping = false;
-  private capabilityInfo: CapabilityInfo = { offscreenCanvas: false, worker: false, webgl2: false, requestVideoFrameCallback: false};
+  private capabilityInfo: CapabilityInfo = {
+    offscreenCanvas: false,
+    worker: false,
+    webgl2: false,
+    requestVideoFrameCallback: false,
+  };
   private maxQualityTier: QualityTier = 'superhigh';
 
   /**
