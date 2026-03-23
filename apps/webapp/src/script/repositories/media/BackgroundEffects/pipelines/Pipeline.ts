@@ -82,6 +82,7 @@ export interface PipelineInit {
   onWorkerSegmenterError?: (error: string) => void;
   /** Optional callback invoked when worker WebGL context is lost. */
   onWorkerContextLoss?: () => void;
+  maxTier: QualityTier | null;
 }
 
 /**

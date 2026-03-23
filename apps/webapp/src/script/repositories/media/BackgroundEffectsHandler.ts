@@ -19,6 +19,8 @@
 
 import {observable} from 'knockout';
 
+import {Metrics, QualityMode, QualityTier} from 'Repositories/media/BackgroundEffects';
+import {CapabilityInfo} from 'Repositories/media/BackgroundEffects/types';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -42,6 +44,7 @@ export class BackgroundEffectsHandler {
   public readonly isVideoBackgroundEffectsFeatureEnabled = observable<boolean>(false);
   public readonly backgroundEffectedVideoStream = observable<ReleasableMediaStream | undefined>();
   public readonly preferredBackgroundEffect = observable<BackgroundEffectSelection>(DEFAULT_BACKGROUND_EFFECT);
+  public readonly metrics = observable<RenderMetrics | undefined>(undefined);
   private readonly storage: Storage | undefined;
   private customBackground: BackgroundSource | undefined = undefined;
 
@@ -89,6 +92,7 @@ export class BackgroundEffectsHandler {
         targetFps: TARGET_FPS,
         debugMode: 'off',
         ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
+        onMetrics: (metrics: Metrics) => this.onMetrics(metrics),
       });
       const processedStream = new MediaStream([outputTrack]);
       this.backgroundEffectedVideoStream(
@@ -226,6 +230,46 @@ export class BackgroundEffectsHandler {
       this.logger.error('Failed to persis preferred video background effect', error);
     }
   }
+
+  public applyQuality(quality: QualityMode) {
+    this.controller.setQuality(quality);
+  }
+
+  public getQuality(): QualityMode {
+    return this.controller.getQuality();
+  }
+
+  public allowSuperhighQualityTier(allow: boolean) {
+    if (allow) {
+      this.controller.setMaxQualityTier('superhigh');
+    } else {
+      this.controller.setMaxQualityTier('high');
+    }
+  }
+
+  public isSuperhighQualityTierAllowed(): boolean {
+    return this.controller.getMaxQualityTier() !== 'superhigh';
+  }
+
+  public getModel(): string {
+    return 'Model--xxxx';
+  }
+
+  getCapabilityInfo(): CapabilityInfo {
+    return this.controller.getCapabilityInfo();
+  }
+
+  private onMetrics(metrics: Metrics): void {
+    const budget = 1000 / TARGET_FPS;
+    const total = metrics.avgTotalMs || 0;
+    const utilShare = budget > 0 ? Math.min(999, (total / budget) * 100) : 0;
+    const mlShare = total > 0 ? (metrics.avgSegmentationMs / total) * 100 : 0;
+    const webglShare = total > 0 ? (metrics.avgGpuMs / total) * 100 : 0;
+    // Label ML phase based on an actual delegate type
+    const ml = metrics.segmentationDelegate ? `ML(${metrics.segmentationDelegate})` : 'ML';
+    const renderMetrics = {...metrics, webglShare, utilShare, mlShare, budget, ml} as RenderMetrics;
+    this.metrics(renderMetrics);
+  }
 }
 
 export class ReleasableMediaStream {
@@ -233,4 +277,13 @@ export class ReleasableMediaStream {
     public stream: MediaStream,
     public release: () => void = () => null,
   ) {}
+}
+
+export interface RenderMetrics extends Metrics {
+  budget: number;
+  utilShare: number;
+  mlShare: number;
+  webglShare: number;
+  ml: 'ML(CPU)' | 'ML(GPU)' | 'ML';
+  tier: QualityTier;
 }

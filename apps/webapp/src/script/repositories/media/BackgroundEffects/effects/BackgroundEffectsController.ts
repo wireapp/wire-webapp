@@ -44,6 +44,7 @@ import type {Pipeline, PipelineConfig} from '../pipelines/Pipeline';
 import {WorkerWebGLPipeline} from '../pipelines/WorkerWebGLPipeline';
 import {resolveQualityPolicy, resolveSegmentationModelPath, TIER_DEFINITIONS} from '../quality';
 import type {
+  CapabilityInfo,
   DebugMode,
   EffectMode,
   Metrics,
@@ -125,6 +126,13 @@ export class BackgroundEffectsController {
   private onMetrics: ((metrics: Metrics) => void) | null = null;
   /** Tracks shutdown to avoid logging expected stop errors. */
   private isStopping = false;
+  private capabilityInfo: CapabilityInfo = {
+    offscreenCanvas: false,
+    worker: false,
+    webgl2: false,
+    requestVideoFrameCallback: false,
+  };
+  private maxQualityTier: QualityTier = 'superhigh';
 
   /**
    * Creates a new background effects controller.
@@ -168,6 +176,7 @@ export class BackgroundEffectsController {
     this.targetFps = opts.targetFps ?? this.targetFps;
     // Detect capabilities and select optimal pipeline
     const cap = detectCapabilities();
+    this.capabilityInfo = cap;
     const policy = resolveQualityPolicy(cap, opts.qualityPolicy ?? 'auto');
 
     if (opts.segmentationModelPath) {
@@ -420,6 +429,10 @@ export class BackgroundEffectsController {
     this.updatePipelineConfig();
   }
 
+  public getQuality(): QualityMode {
+    return this.quality;
+  }
+
   /**
    * Stops the background effects pipeline and cleans up all resources.
    *
@@ -483,6 +496,7 @@ export class BackgroundEffectsController {
         segmentationModelPath,
         segmentationModelByTier: this.segmentationModelByTier,
         initialTier,
+        maxTier: this.maxQualityTier,
         config,
         onMetrics: this.onMetrics,
         onTierChange: tier => this.handleTierChange(tier),
@@ -506,6 +520,7 @@ export class BackgroundEffectsController {
         segmentationModelPath,
         segmentationModelByTier: this.segmentationModelByTier,
         initialTier,
+        maxTier: this.maxQualityTier,
         config,
         onMetrics: this.onMetrics,
         onTierChange: tier => this.handleTierChange(tier),
@@ -769,5 +784,17 @@ export class BackgroundEffectsController {
 
   isProcessing() {
     return this.pipelineImpl !== null;
+  }
+
+  public getCapabilityInfo() {
+    return this.capabilityInfo;
+  }
+
+  public setMaxQualityTier(quality: QualityTier) {
+    this.maxQualityTier = quality;
+  }
+
+  public getMaxQualityTier(): QualityTier {
+    return this.maxQualityTier;
   }
 }
