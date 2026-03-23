@@ -2025,7 +2025,6 @@ declare module 'I18n/en-US.json' {
     'verify.resendCode': `Resend code`;
     'verify.subhead': `Enter the six-digit verification code we sent to{newline}{email}`;
     'videoCallBackgroundAdd': `Add background...`;
-    'videoCallBackgroundAddToast': `Custom backgrounds are coming soon.`;
     'videoCallBackgroundBlurHigh': `High`;
     'videoCallBackgroundBlurLow': `Low`;
     'videoCallBackgroundBlurSectionLabel': `Blur`;

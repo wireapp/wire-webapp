@@ -198,10 +198,6 @@ const FullscreenVideoCall = ({
   const callNotification = useAppNotification({
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
   });
-  const addBackgroundNotification = useAppNotification({
-    message: t('videoCallBackgroundAddToast'),
-    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
-  });
 
   useEffect(() => {
     const handRaisedHandler = (event: Event) => {
@@ -293,10 +289,6 @@ const FullscreenVideoCall = ({
   const selectedBackgroundEffect = preferredBackgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
-    if (effect.type === 'custom') {
-      addBackgroundNotification.show();
-      return;
-    }
     void switchVideoBackgroundEffect(effect);
   };
 

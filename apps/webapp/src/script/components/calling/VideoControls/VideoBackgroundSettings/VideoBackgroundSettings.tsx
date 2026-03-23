@@ -33,8 +33,6 @@ import {
   backgroundSettingsWrapperStyles,
   sectionLabelStyles,
   tileButtonStyles,
-  tileCheckIconStyles,
-  tileCheckStyles,
   tileGridStyles,
   tilePreviewContentStyles,
   tilePreviewStyles,
@@ -88,11 +86,6 @@ const BackgroundTile = ({
     >
       <div css={tilePreviewStyles} style={previewStyle} className="bg-tile__preview">
         {previewContent}
-        {selected && (
-          <div css={tileCheckStyles}>
-            <Icon.CheckIcon css={tileCheckIconStyles} />
-          </div>
-        )}
       </div>
     </button>
   );

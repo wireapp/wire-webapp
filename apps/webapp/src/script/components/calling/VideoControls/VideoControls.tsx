@@ -37,7 +37,6 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/AppNotification';
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
@@ -228,10 +227,6 @@ export const VideoControls = ({
 
   const {viewMode, detachedWindow} = useKoSubscribableChildren(callState, ['viewMode', 'detachedWindow']);
   const activeWindow = viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow : window;
-  const addBackgroundNotification = useAppNotification({
-    message: t('videoCallBackgroundAddToast'),
-    activeWindow,
-  });
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
@@ -423,19 +418,12 @@ export const VideoControls = ({
 
   const handleBackgroundSelect = useCallback(
     (effect: BackgroundEffectSelection) => {
-      if (effect.type === 'custom') {
-        addBackgroundNotification.show();
-        if (isMobile) {
-          setVideoOptionsOpen(false);
-        }
-        return;
-      }
       void switchVideoBackgroundEffect(effect);
       if (isMobile) {
         setVideoOptionsOpen(false);
       }
     },
-    [addBackgroundNotification, isMobile, switchVideoBackgroundEffect],
+    [isMobile, switchVideoBackgroundEffect],
   );
 
   const handleVideoSelectChange = useCallback(

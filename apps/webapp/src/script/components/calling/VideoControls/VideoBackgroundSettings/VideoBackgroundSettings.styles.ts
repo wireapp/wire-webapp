@@ -133,31 +133,11 @@ export const tilePreviewStyles: CSSObject = {
   justifyContent: 'center',
 };
 
-export const tileCheckStyles: CSSObject = {
-  position: 'absolute',
-  top: 4,
-  right: 4,
-  width: 16,
-  height: 16,
-  borderRadius: '50%',
-  backgroundColor: 'var(--accent-color)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-};
-
-export const tileCheckIconStyles: CSSObject = {
-  width: 10,
-  height: 10,
-  fill: 'var(--app-bg-secondary)',
-};
-
 export const tilePreviewContentStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   gap: 4,
   fontSize: 10,
-  color: 'var(--gray-70)',
+  color: 'black', // no design for dark mode, so keeping it black.
 };
