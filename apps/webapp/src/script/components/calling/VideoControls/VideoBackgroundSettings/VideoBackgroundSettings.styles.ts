@@ -70,46 +70,6 @@ export const backgroundSettingsScrollableContentStyles: CSSObject = {
   gap: 20,
 };
 
-/** Full-width "No background effect" card button. */
-export const noEffectButtonStyles: CSSObject = {
-  alignItems: 'center',
-  background: 'none',
-  border: '1px solid var(--inactive-call-button-border)',
-  borderRadius: 8,
-  color: 'var(--main-color)',
-  cursor: 'pointer',
-  display: 'flex',
-  font: 'inherit',
-  fontSize: 13,
-  gap: 10,
-  padding: '10px 12px',
-  textAlign: 'left',
-  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-  width: '100%',
-
-  '&[aria-pressed="true"]': {
-    borderColor: 'var(--accent-color)',
-    boxShadow: '0 0 0 2px var(--accent-color)',
-  },
-
-  '&:hover:not([aria-pressed="true"])': {
-    borderColor: 'var(--gray-60)',
-  },
-
-  '&:focus-visible': {
-    outline: '2px solid var(--accent-color-focus)',
-    outlineOffset: 2,
-  },
-};
-
-export const noEffectIconStyles: CSSObject = {
-  width: 18,
-  height: 18,
-  borderRadius: '50%',
-  border: '2px solid currentColor',
-  flexShrink: 0,
-};
-
 export const sectionLabelStyles: CSSObject = {
   fontSize: 11,
   fontWeight: 600,
@@ -160,7 +120,7 @@ export const tileButtonStyles: CSSObject = {
 export const tilePreviewStyles: CSSObject = {
   position: 'relative',
   width: '100%',
-  aspectRatio: '16 / 9',
+  height: 70,
   borderRadius: 8,
   border: '1px solid var(--inactive-call-button-border)',
   backgroundColor: 'var(--gray-20)',
@@ -171,12 +131,6 @@ export const tilePreviewStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-};
-
-export const tileLabelStyles: CSSObject = {
-  fontSize: 11,
-  fontWeight: 500,
-  color: 'var(--main-color)',
 };
 
 export const tileCheckStyles: CSSObject = {
@@ -197,4 +151,13 @@ export const tileCheckIconStyles: CSSObject = {
   width: 10,
   height: 10,
   fill: 'var(--app-bg-secondary)',
+};
+
+export const tilePreviewContentStyles: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 4,
+  fontSize: 10,
+  color: 'var(--gray-70)',
 };

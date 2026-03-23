@@ -31,13 +31,12 @@ import {
   backgroundSettingsScrollableContentStyles,
   backgroundSettingsTitleStyles,
   backgroundSettingsWrapperStyles,
-  noEffectButtonStyles,
   sectionLabelStyles,
   tileButtonStyles,
   tileCheckIconStyles,
   tileCheckStyles,
   tileGridStyles,
-  tileLabelStyles,
+  tilePreviewContentStyles,
   tilePreviewStyles,
 } from './VideoBackgroundSettings.styles';
 
@@ -64,7 +63,6 @@ const isEffectSelected = (selected: BackgroundEffectSelection, candidate: Backgr
 };
 
 interface BackgroundTileProps {
-  label?: string;
   effect: BackgroundEffectSelection;
   selectedEffect: BackgroundEffectSelection;
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
@@ -73,7 +71,6 @@ interface BackgroundTileProps {
 }
 
 const BackgroundTile = ({
-  label,
   effect,
   selectedEffect,
   onSelectEffect,
@@ -97,7 +94,6 @@ const BackgroundTile = ({
           </div>
         )}
       </div>
-      <div css={tileLabelStyles}>{label}</div>
     </button>
   );
 };
@@ -110,8 +106,6 @@ export const VideoBackgroundSettings = ({
   onEnableHighQualityBlur,
   onClose,
 }: VideoBackgroundSettingsProps) => {
-  const isNoneSelected = selectedEffect.type === 'none';
-
   const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
     onEnableHighQualityBlur(event);
   };
@@ -126,34 +120,44 @@ export const VideoBackgroundSettings = ({
       </div>
 
       <FadingScrollbar css={backgroundSettingsScrollableContentStyles}>
-        {/* No background effect */}
-        <button
-          type="button"
-          css={noEffectButtonStyles}
-          aria-pressed={isNoneSelected}
-          onClick={() => onSelectEffect({type: 'none'})}
-        >
-          <CircleIcon />
-          {t('videoCallBackgroundNoEffect')}
-        </button>
+        {/* No background effect — full-width tile */}
+        <BackgroundTile
+          effect={{type: 'none'}}
+          selectedEffect={selectedEffect}
+          onSelectEffect={onSelectEffect}
+          previewContent={
+            <div css={tilePreviewContentStyles}>
+              <CircleIcon />
+              {t('videoCallBackgroundNoEffect')}
+            </div>
+          }
+        />
 
         {/* Blur section */}
         <div>
           <div css={sectionLabelStyles}>{t('videoCallBackgroundBlurSectionLabel')}</div>
           <div css={tileGridStyles}>
             <BackgroundTile
-              label={t('videoCallBackgroundBlurLow')}
               effect={{type: 'blur', level: 'low'}}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
-              previewContent={<BlurLowIcon />}
+              previewContent={
+                <div css={tilePreviewContentStyles}>
+                  <BlurLowIcon />
+                  {t('videoCallBackgroundBlurLow')}
+                </div>
+              }
             />
             <BackgroundTile
-              label={t('videoCallBackgroundBlurHigh')}
               effect={{type: 'blur', level: 'high'}}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
-              previewContent={<BlurHighIcon />}
+              previewContent={
+                <div css={tilePreviewContentStyles}>
+                  <BlurHighIcon />
+                  {t('videoCallBackgroundBlurHigh')}
+                </div>
+              }
             />
           </div>
         </div>
