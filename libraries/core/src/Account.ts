@@ -88,7 +88,7 @@ import {HandledEventPayload, NotificationService, NotificationSource} from './no
 import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
-import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
+import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
 import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/LocalStorageStore';

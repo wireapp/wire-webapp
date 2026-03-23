@@ -50,7 +50,7 @@ import {
 import {MLSServiceEvents} from '../../messagingProtocols/mls/MLSService/MLSService';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
-import {openDB} from '../../storage/CoreDB';
+import {openDB} from '../../storage/coreDb';
 import * as PayloadHelper from '../../test/PayloadHelper';
 import * as MessageBuilder from '../message/MessageBuilder';
 import {SubconversationService} from '../SubconversationService/SubconversationService';

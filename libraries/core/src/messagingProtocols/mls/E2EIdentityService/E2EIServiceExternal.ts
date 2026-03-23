@@ -37,7 +37,7 @@ import {getE2EIClientId} from './Helper';
 import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 
 import {ClientService} from '../../../client';
-import {CoreDatabase} from '../../../storage/CoreDB';
+import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
 import {LowPrecisionTaskScheduler} from '../../../util/LowPrecisionTaskScheduler';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';

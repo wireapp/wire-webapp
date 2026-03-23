@@ -24,7 +24,7 @@ import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} f
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
 import {ClientService} from '../../../client';
-import {openDB} from '../../../storage/CoreDB';
+import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/PayloadHelper';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';

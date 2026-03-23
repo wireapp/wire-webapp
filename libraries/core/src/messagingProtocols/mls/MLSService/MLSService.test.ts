@@ -43,7 +43,7 @@ import {CORE_CRYPTO_ERROR_NAMES} from './CoreCryptoMLSError';
 import {InitClientOptions, MLSService} from './MLSService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
-import {openDB} from '../../../storage/CoreDB';
+import {openDB} from '../../../storage/coreDb';
 import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
 import {TaskScheduler} from '../../../util/TaskScheduler';
 import * as Helper from '../E2EIdentityService/Helper';
