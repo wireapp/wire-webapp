@@ -21,7 +21,7 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {USER_EVENT, UserConnectionEvent} from '@wireapp/api-client/lib/event';
 import {UserConnectionData} from '@wireapp/api-client/lib/user/data';
 
-import {UserMapper} from './UserMapper';
+import {UserMapper} from './userMapper';
 
 import {MessageSendingState} from '../conversation';
 import {PayloadBundleType} from '../conversation/message/PayloadBundle';

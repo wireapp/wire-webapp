@@ -178,3 +178,7 @@ ls:
   libraries/core/src/team:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/user:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
