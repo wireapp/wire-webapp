@@ -39,9 +39,9 @@ import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 import {ClientService} from '../../../client';
 import {CoreDatabase} from '../../../storage/coreDb';
 import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUtils';
-import {LowPrecisionTaskScheduler} from '../../../util/LowPrecisionTaskScheduler';
+import {LowPrecisionTaskScheduler} from '../../../util/lowPrecisionTaskScheduler';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
-import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
+import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService, MLSServiceEvents} from '../MLSService';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status' | typeof Symbol.dispose> & {

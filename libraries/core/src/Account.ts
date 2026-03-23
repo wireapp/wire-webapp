@@ -91,8 +91,8 @@ import {SelfService} from './self/';
 import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
 import {TeamService} from './team/';
 import {UserService} from './user/';
-import {LocalStorageStore} from './util/LocalStorageStore';
-import {RecurringTaskScheduler} from './util/RecurringTaskScheduler';
+import {LocalStorageStore} from './util/localStorageStore';
+import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
 
 export type ProcessedEventPayload = HandledEventPayload;
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {isQualifiedUserClients} from './TypePredicateUtil';
+import {isQualifiedUserClients} from './typePredicateUtil';
 
 describe('TypePredicatUtil', () => {
   describe('isQualifiedUserClients', () => {

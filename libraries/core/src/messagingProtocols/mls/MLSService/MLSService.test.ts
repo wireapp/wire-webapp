@@ -44,8 +44,8 @@ import {InitClientOptions, MLSService} from './MLSService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB} from '../../../storage/coreDb';
-import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
-import {TaskScheduler} from '../../../util/TaskScheduler';
+import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
+import {TaskScheduler} from '../../../util/taskScheduler';
 import * as Helper from '../E2EIdentityService/Helper';
 
 jest.mock('../E2EIdentityService/Helper', () => ({

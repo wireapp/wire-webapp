@@ -21,7 +21,7 @@ import {advanceJestTimersWithPromise} from '@wireapp/commons/lib/util/testUtils'
 
 import {TimeUtil} from '@wireapp/commons';
 
-import {RecurringTaskScheduler} from './RecurringTaskScheduler';
+import {RecurringTaskScheduler} from './recurringTaskScheduler';
 
 const mockedStore = {
   storage: new Map<string, number>(),

@@ -27,7 +27,7 @@ import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/PayloadHelper';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
-import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
+import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService} from '../MLSService';
 
 async function buildE2EIService(dbName = 'core-test-db') {
