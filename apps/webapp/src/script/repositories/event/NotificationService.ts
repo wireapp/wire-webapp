@@ -18,7 +18,7 @@
  */
 
 import type {NotificationList} from '@wireapp/api-client/lib/notification/';
-import {DatabaseKeys} from '@wireapp/core/lib/notification/NotificationDatabaseRepository';
+import {DatabaseKeys} from '@wireapp/core/lib/notification/notificationDatabaseRepository';
 import {container} from 'tsyringe';
 
 import {StorageSchemata, StorageService} from 'Repositories/storage/';

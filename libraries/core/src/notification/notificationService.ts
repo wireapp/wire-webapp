@@ -25,9 +25,9 @@ import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 
-import {NotificationBackendRepository} from './NotificationBackendRepository';
-import {NotificationDatabaseRepository} from './NotificationDatabaseRepository';
-import {NotificationSource} from './Notifications.types';
+import {NotificationBackendRepository} from './notificationBackendRepository';
+import {NotificationDatabaseRepository} from './notificationDatabaseRepository';
+import {NotificationSource} from './notificationSource.types';
 
 import {ConversationService} from '../conversation';
 import {CoreError, NotificationError} from '../CoreError';
