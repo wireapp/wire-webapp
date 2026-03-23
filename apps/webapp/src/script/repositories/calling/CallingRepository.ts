@@ -380,7 +380,7 @@ export class CallingRepository {
     }
 
     // Whatever will happen from now, we stop the current background effect!
-    // selfParticipant.releaseProcessedVideoStream();
+    selfParticipant.releaseProcessedVideoStream();
 
     // let's check if background should be disabled, then let's do it and go back to the original video
     if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled() && hasActiveVideo) {
