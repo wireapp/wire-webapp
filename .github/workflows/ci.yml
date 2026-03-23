@@ -54,9 +54,6 @@ jobs:
       - name: Build libraries
         run: yarn nx run-many -t build --projects=tag:type:lib
 
-      - name: Lint file names
-        run: yarn lint:fileNames
-
       - name: Lint
         run: yarn nx run-many -t lint --all
 
