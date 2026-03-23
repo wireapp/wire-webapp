@@ -198,3 +198,6 @@ ls:
   libraries/core/src/broadcast:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/client:
+    .dir: camelCase
+    .ts: camelCase
