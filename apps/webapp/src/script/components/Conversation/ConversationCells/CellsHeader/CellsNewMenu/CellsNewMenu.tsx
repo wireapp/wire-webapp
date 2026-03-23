@@ -38,12 +38,16 @@ interface CellsNewMenuProps {
   onRefresh: () => void;
 }
 
+export type CellsNewFileType = 'document' | 'spreadsheet' | 'presentation';
+
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<CellNodeType>(CellNodeType.FILE);
+  const [fileType, setFileType] = useState<CellsNewFileType>('document');
 
-  const openModal = (type: CellNodeType) => {
+  const openModal = (type: CellNodeType, selectedFileType: CellsNewFileType = 'document') => {
     setModalType(type);
+    setFileType(selectedFileType);
     setIsModalOpen(true);
   };
 
@@ -60,6 +64,20 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
           <DropdownMenu.Item onClick={() => openModal(CellNodeType.FOLDER)}>
             {t('cells.newItemMenu.folder')}
           </DropdownMenu.Item>
+          <DropdownMenu.Sub>
+            <DropdownMenu.SubTrigger>{t('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>
+            <DropdownMenu.SubContent>
+              <DropdownMenu.Item onClick={() => openModal(CellNodeType.FILE, 'document')}>
+                {t('cells.newItemMenu.document')}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => openModal(CellNodeType.FILE, 'spreadsheet')}>
+                {t('cells.newItemMenu.spreadsheet')}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => openModal(CellNodeType.FILE, 'presentation')}>
+                {t('cells.newItemMenu.presentation')}
+              </DropdownMenu.Item>
+            </DropdownMenu.SubContent>
+          </DropdownMenu.Sub>
         </DropdownMenu.Content>
       </DropdownMenu>
       {isModalOpen && (
@@ -70,6 +88,7 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
           onClose={() => setIsModalOpen(false)}
           cellsRepository={cellsRepository}
           conversationQualifiedId={conversationQualifiedId}
+          fileType={fileType}
           onSuccess={() => {
             onRefresh();
             setIsModalOpen(false);

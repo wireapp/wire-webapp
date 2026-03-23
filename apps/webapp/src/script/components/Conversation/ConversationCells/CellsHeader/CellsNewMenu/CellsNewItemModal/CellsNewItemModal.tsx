@@ -28,6 +28,7 @@ import {t} from 'Util/localizerUtil';
 import {descriptionStyles} from './CellsNewItemModal.styles';
 
 import {CellsModal} from '../../../common/CellsModal/CellsModal';
+import {CellsNewFileType} from '../CellsNewMenu';
 
 interface CellsNewItemModalProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ interface CellsNewItemModalProps {
   type: CellNode['type'];
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
+  fileType: CellsNewFileType;
   onSuccess: () => void;
   currentPath: string;
 }
@@ -45,6 +47,7 @@ export const CellsNewItemModal = ({
   type,
   cellsRepository,
   conversationQualifiedId,
+  fileType: _fileType,
   onSuccess,
   currentPath,
 }: CellsNewItemModalProps) => {
