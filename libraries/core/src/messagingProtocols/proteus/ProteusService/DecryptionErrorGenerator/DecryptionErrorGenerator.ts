@@ -27,7 +27,7 @@ import {
   ProteusErrorType,
 } from '@wireapp/core-crypto';
 
-import {DecryptionError} from '../../../../errors/DecryptionError';
+import {DecryptionError} from '../../../../errors/decryptionError';
 
 export const ProteusErrors = {
   SessionNotFound: 102,

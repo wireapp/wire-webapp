@@ -19,8 +19,8 @@
 
 import {TimeUtil} from '@wireapp/commons';
 
-import {LowPrecisionTaskScheduler} from '../LowPrecisionTaskScheduler';
-import {TaskScheduler} from '../TaskScheduler';
+import {LowPrecisionTaskScheduler} from '../lowPrecisionTaskScheduler';
+import {TaskScheduler} from '../taskScheduler';
 
 interface RecurringTaskSchedulerStorage {
   set: (key: string, timestamp: number) => Promise<void>;

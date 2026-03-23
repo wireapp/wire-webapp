@@ -17,4 +17,4 @@
  *
  */
 
-export * from './RecurringTaskScheduler';
+export * from './recurringTaskScheduler';
