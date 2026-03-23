@@ -216,3 +216,26 @@ export const videoOptionsBackdropStyles: CSSObject = {
   backgroundColor: 'rgba(0, 0, 0, 0.35)',
   zIndex: 1000,
 };
+
+export const videoOptionInlineMenuStyles: CSSObject = {
+  width: '100%',
+  minWidth: '0',
+  boxSizing: 'border-box',
+};
+
+export const videoOptionLabelStyles = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+};
+
+export const videoOptionLabelTextStyles = {};
+
+export const videoOptionLabelIconStyles = {
+  color: 'inherit',
+};
+
+export const videoOptionsInlineWrapperStyles = {
+  marginBottom: 0,
+};

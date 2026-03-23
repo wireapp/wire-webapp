@@ -2026,10 +2026,14 @@ declare module 'I18n/en-US.json' {
     'verify.subhead': `Enter the six-digit verification code we sent to{newline}{email}`;
     'videoCallBackgroundAdd': `Add background...`;
     'videoCallBackgroundAddToast': `Custom backgrounds are coming soon.`;
-    'videoCallBackgroundBlurHigh': `Blur (High)`;
-    'videoCallBackgroundBlurLow': `Blur (Low)`;
-    'videoCallBackgroundEffectsLabel': `Background`;
+    'videoCallBackgroundBlurHigh': `High`;
+    'videoCallBackgroundBlurLow': `Low`;
+    'videoCallBackgroundBlurSectionLabel': `Blur`;
+    'videoCallBackgroundEffectsLabel': `Background Settings`;
+    'videoCallBackgroundNoEffect': `No background effect`;
     'videoCallBackgroundNone': `None`;
+    'videoCallBackgroundUpload': `Upload background`;
+    'videoCallBackgroundVirtualSectionLabel': `Virtual Backgrounds`;
     'videoCallBackgroundOffice1': `Office 1`;
     'videoCallBackgroundOffice2': `Office 2`;
     'videoCallBackgroundOffice3': `Office 3`;

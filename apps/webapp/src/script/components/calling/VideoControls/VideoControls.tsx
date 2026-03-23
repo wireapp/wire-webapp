@@ -38,7 +38,7 @@ import {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHand
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {BUILTIN_BACKGROUNDS, DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
+import {DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -58,14 +58,44 @@ import {
   videoControlActiveStyles,
   videoControlDisabledStyles,
   videoControlInActiveStyles,
+  videoControlsWrapperStyles,
   videoOptionsBackdropStyles,
   videoOptionsMenuStyles,
-  videoOptionsSheetStyles,
-  videoControlsWrapperStyles,
   videoOptionsRowIconStyles,
+  videoOptionsSheetStyles,
 } from './VideoControls.styles';
-import {VideoControlsMenu} from './VideoControlsMenu/VideoControlsMenu';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
+
+type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
+
+const BACKGROUND_OPTION_VALUES = new Set<string>(['none', 'blur-high', 'blur-low', 'virtual', 'settings']);
+
+const mapValueToEffect = (value: BackgroundOptionValue): BackgroundEffectSelection => {
+  switch (value) {
+    case 'none':
+      return {type: 'none'};
+    case 'blur-high':
+      return {type: 'blur', level: 'high'};
+    case 'blur-low':
+      return {type: 'blur', level: 'low'};
+    case 'virtual':
+      return {type: 'virtual', backgroundId: 'default'};
+    default:
+      return {type: 'none'};
+  }
+};
+
+const mapEffectToValue = (effect: BackgroundEffectSelection): BackgroundOptionValue => {
+  switch (effect.type) {
+    case 'blur':
+      return effect.level === 'high' ? 'blur-high' : 'blur-low';
+    case 'virtual':
+    case 'custom':
+      return 'virtual';
+    default:
+      return 'none';
+  }
+};
 
 /**
  * Maps video input devices to select options.
@@ -128,6 +158,7 @@ interface VideoControlsProps {
   setActiveCallViewTab: (tab: CallViewTab) => void;
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   sendEmoji: (emoji: string, call: Call) => void;
+  onOpenBackgroundSettings?: () => void;
 }
 
 export const VideoControls = ({
@@ -153,6 +184,7 @@ export const VideoControls = ({
   setActiveCallViewTab,
   setMaximizedParticipant,
   sendEmoji,
+  onOpenBackgroundSettings,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: VideoControlsProps) => {
@@ -341,42 +373,26 @@ export const VideoControls = ({
     switchCameraInput(camera.id);
   };
 
-  // ###########################################
-  type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
+  const currentBlurOption = useMemo(
+    () =>
+      selectedBackgroundEffect.type === 'blur' && selectedBackgroundEffect.level === 'low'
+        ? {label: t('videoCallBackgroundBlurLow'), value: 'blur-low', icon: <Icon.FileIcon />}
+        : {
+            label: t('videoCallBackgroundBlurHigh'),
+            value: 'blur-high',
+            icon: <Icon.FileIcon />,
+          },
+    [selectedBackgroundEffect],
+  );
 
-  type BackgroundOption = {
-    label: string;
-    value: BackgroundOptionValue;
-    icon: React.ReactNode;
-  };
-
-  const currentBlurOption: BackgroundOption =
-    selectedBackgroundEffect.type === 'blur' && selectedBackgroundEffect.level === 'low'
-      ? {
-          label: t('videoCallBackgroundBlurLow'),
-          value: 'blur-low',
-          icon: <Icon.FileIcon />,
-          //icon: <Icon.BlurLowIcon />,
-        }
-      : {
-          label: t('videoCallBackgroundBlurHigh'),
-          value: 'blur-high',
-          icon: <Icon.FileIcon />,
-          //icon: <Icon.BlurHighIcon />,
-        };
-
-  const backgroundOptions: {label: string; options: BackgroundOption[]}[] = useMemo(
+  const backgroundOptions = useMemo(
     () => [
       {
         label: t('videoCallBackgroundEffectsLabel'),
         options: [
-          {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.FileIcon /> /*icon: <Icon.CircleIcon />*/},
+          {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.FileIcon />},
           currentBlurOption,
-          {
-            label: t('videoCallBackgroundVirtual'),
-            value: 'virtual',
-            icon: <Icon.FileIcon /> /*icon: <Icon.ImageIcon />*/,
-          },
+          {label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <Icon.FileIcon />},
           {
             label: t('videoCallBackgroundSettings'),
             value: 'settings',
@@ -388,61 +404,11 @@ export const VideoControls = ({
     [currentBlurOption],
   );
 
-  const mapValueToEffect = (value: BackgroundOptionValue): BackgroundEffectSelection => {
-    switch (value) {
-      case 'none':
-        return {type: 'none'};
-
-      case 'blur-high':
-        return {type: 'blur', level: 'high'};
-
-      case 'blur-low':
-        return {type: 'blur', level: 'low'};
-
-      case 'virtual':
-        return {
-          type: 'virtual',
-          backgroundId: 'default',
-        };
-
-      default:
-        return {type: 'none'};
-    }
-  };
-
-  const mapEffectToValue = (effect: BackgroundEffectSelection): BackgroundOptionValue => {
-    switch (effect.type) {
-      case 'none':
-        return 'none';
-
-      case 'blur':
-        return effect.level === 'high' ? 'blur-high' : 'blur-low';
-
-      case 'virtual':
-        return 'virtual';
-
-      case 'custom':
-        return 'virtual'; // oder eigener Wert falls nötig
-    }
-  };
-
-  const selectedBackgroundOption =
-    backgroundOptions[0].options.find(({value}) => value === mapEffectToValue(selectedBackgroundEffect)) ??
-    backgroundOptions[0].options[0];
-
-  const handleBackgroundChange = (selectedOption: BackgroundOption | null) => {
-    const value = selectedOption?.value;
-
-    setVideoOptionsOpen(false);
-
-    if (!value || value === 'settings') {
-      return;
-    }
-
-    const effect = mapValueToEffect(value);
-
-    handleBackgroundSelect(effect);
-  };
+  /** Merged options: camera group + (if enabled) background group. */
+  const options = useMemo(
+    () => (isVideoBackgroundEffectsFeatureEnabled ? [...cameraOptions, ...backgroundOptions] : cameraOptions),
+    [cameraOptions, backgroundOptions, isVideoBackgroundEffectsFeatureEnabled],
+  );
 
   const handleBackgroundSelect = useCallback(
     (effect: BackgroundEffectSelection) => {
@@ -461,18 +427,34 @@ export const VideoControls = ({
     [addBackgroundNotification, isMobile, switchVideoBackgroundEffect],
   );
 
-  /**
-   * Handles the "Add Background" action from the picker.
-   *
-   * Shows a notification that custom backgrounds are not yet implemented
-   * and closes the video options menu on mobile devices.
-   */
-  const handleAddBackground = useCallback(() => {
-    addBackgroundNotification.show();
-    if (isMobile) {
-      setVideoOptionsOpen(false);
-    }
-  }, [addBackgroundNotification, isMobile]);
+  const handleVideoSelectChange = useCallback(
+    (selectedOption: any) => {
+      const value = selectedOption?.value as string | undefined;
+      if (value === 'settings') {
+        setVideoOptionsOpen(false);
+        onOpenBackgroundSettings?.();
+        return;
+      }
+      if (value && BACKGROUND_OPTION_VALUES.has(value)) {
+        setVideoOptionsOpen(false);
+        const effect = mapValueToEffect(value as BackgroundOptionValue);
+        handleBackgroundSelect(effect);
+        return;
+      }
+      if (value) {
+        updateCameraOptions(value);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [onOpenBackgroundSettings, handleBackgroundSelect],
+  );
+
+  const selectedBackgroundValue = mapEffectToValue(selectedBackgroundEffect);
+
+  const isVideoOptionSelected = useCallback(
+    (option: any) => option.value === selectedCameraOption.value || option.value === selectedBackgroundValue,
+    [selectedCameraOption, selectedBackgroundValue],
+  );
 
   useEffect(() => {
     if (!videoOptionsOpen) {
@@ -611,28 +593,24 @@ export const VideoControls = ({
               tabIndex={0}
             />
             <div css={videoOptionsSheetStyles} ref={videoOptionsSheetRef}>
-              <VideoControlsMenu
-                isOpen={videoOptionsOpen}
-                showHeader
-                onClose={() => setVideoOptionsOpen(false)}
-                cameraOptions={cameraOptions}
-                selectedCameraOptions={selectedCameraOptions}
-                onCameraChange={selectedOption => updateCameraOptions(String(selectedOption?.value))}
-                onCameraKeyDown={event =>
+              <VideoControlsSelect
+                value={selectedCameraOptions}
+                id="select-camera"
+                dataUieName="select-camera"
+                options={options}
+                menuIsOpen={videoOptionsOpen}
+                onChange={handleVideoSelectChange}
+                onKeyDown={event =>
                   handleKeyDown({
                     event,
                     callback: () => toggleCamera(call),
                     keys: [KEY.ENTER, KEY.SPACE],
                   })
                 }
-                isBackgroundEffectsEnabled={isVideoBackgroundEffectsFeatureEnabled}
-                backgroundOptions={backgroundOptions}
-                selectedBackgroundOption={selectedBackgroundOption}
-                onBackgroundChange={handleBackgroundChange}
-                selectedEffect={selectedBackgroundEffect}
-                backgrounds={BUILTIN_BACKGROUNDS}
-                onSelectEffect={handleBackgroundSelect}
-                onAddBackground={handleAddBackground}
+                overlayMenu={false}
+                showHeader
+                onClose={() => setVideoOptionsOpen(false)}
+                isOptionSelected={isVideoOptionSelected}
               />
             </div>
           </>
@@ -800,20 +778,16 @@ export const VideoControls = ({
                 </button>
                 {videoOptionsOpen && (
                   <div css={videoOptionsMenuStyles}>
-                    <VideoControlsMenu
-                      isOpen={videoOptionsOpen}
-                      cameraOptions={cameraOptions}
-                      selectedCameraOptions={selectedCameraOptions}
-                      onCameraChange={selectedOption => updateCameraOptions(String(selectedOption?.value))}
-                      onCameraKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
-                      isBackgroundEffectsEnabled={isVideoBackgroundEffectsFeatureEnabled}
-                      backgroundOptions={backgroundOptions}
-                      selectedBackgroundOption={selectedBackgroundOption}
-                      onBackgroundChange={handleBackgroundChange}
-                      selectedEffect={selectedBackgroundEffect}
-                      backgrounds={BUILTIN_BACKGROUNDS}
-                      onSelectEffect={handleBackgroundSelect}
-                      onAddBackground={handleAddBackground}
+                    <VideoControlsSelect
+                      value={selectedCameraOptions}
+                      id="select-camera"
+                      dataUieName="select-camera"
+                      options={options}
+                      menuIsOpen={videoOptionsOpen}
+                      onChange={handleVideoSelectChange}
+                      onKeyDown={event => isEscapeKey(event) && setVideoOptionsOpen(false)}
+                      overlayMenu={false}
+                      isOptionSelected={isVideoOptionSelected}
                     />
                   </div>
                 )}
