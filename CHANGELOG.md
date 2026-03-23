@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.75.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.74.0...@wireapp/react-ui-kit@9.75.0) (2026-03-23)
+
+### Features
+
+* **react-ui-kit:** add icons for BlurLowIcon, BlurHighIcon, CircleIcon ([#8024](https://github.com/wireapp/wire-web-packages/issues/8024)) ([222a98b](https://github.com/wireapp/wire-web-packages/commit/222a98b36b8675a2c8e9fa710621d1277a8bf99d))
+
 # [9.74.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.73.9...@wireapp/react-ui-kit@9.74.0) (2026-01-29)
 
 ### Features
