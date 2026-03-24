@@ -109,39 +109,21 @@ const BUILTIN_BACKGROUND_DEFINITIONS: BuiltinBackgroundDefinition[] = [
   {
     id: DEFAULT_BUILTIN_BACKGROUND_ID,
     labelKey: 'videoCallBackgroundWire1',
-    imageUrl: '/apps/webapp/assets/images/backgrounds/wire-1.png',
+    imageUrl: '/assets/images/backgrounds/wire-1.png',
     previewColors: ['#1a1a1a', '#2d2d2d', '#4a4a4a'],
   },
   {
     id: 'office-1',
     labelKey: 'videoCallBackgroundOffice1',
-    imageUrl: '/apps/webapp/assets/images/backgrounds/background-1.png',
+    imageUrl: '/assets/images/backgrounds/office-1.png',
     previewColors: ['#4a5568', '#718096', '#cbd5e0'],
   },
   {
     id: 'office-2',
     labelKey: 'videoCallBackgroundOffice2',
-    imageUrl: '/apps/webapp/assets/images/backgrounds/background-2.png',
+    imageUrl: '/assets/images/backgrounds/office-2.png',
     previewColors: ['#2d3748', '#4a5568', '#718096'],
   },
-  // {
-  //   id: 'office-3',
-  //   labelKey: 'videoCallBackgroundOffice3',
-  //   imageUrl: '/image/backgrounds/office-3.jpg',
-  //   previewColors: ['#1a202c', '#2d3748', '#4a5568'],
-  // },
-  // {
-  //   id: 'office-4',
-  //   labelKey: 'videoCallBackgroundOffice4',
-  //   imageUrl: '/image/backgrounds/office-4.jpg',
-  //   previewColors: ['#2c3e50', '#34495e', '#7f8c8d'],
-  // },
-  // {
-  //   id: 'office-5',
-  //   labelKey: 'videoCallBackgroundOffice5',
-  //   imageUrl: '/image/backgrounds/office-5.jpg',
-  //   previewColors: ['#34495e', '#5d6d7e', '#aab7b8'],
-  // },
 ];
 
 export const BUILTIN_BACKGROUNDS: BuiltinBackground[] = BUILTIN_BACKGROUND_DEFINITIONS.map(definition => ({
