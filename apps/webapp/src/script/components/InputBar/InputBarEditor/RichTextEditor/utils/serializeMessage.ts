@@ -24,10 +24,7 @@ import {markdownTransformers} from './markdownTransformers';
 
 export const serializeMessage = (showMarkdownPreview: boolean): string => {
   if (!showMarkdownPreview) {
-    return $getRoot()
-      .getChildren()
-      .map(node => node.getTextContent())
-      .join('\n');
+    return $getRoot().getTextContent();
   }
 
   return $convertToMarkdownString(markdownTransformers, undefined, true);
