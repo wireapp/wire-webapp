@@ -47,7 +47,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
+import {BackgroundEffectSelection, DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
 import {DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
@@ -89,7 +89,7 @@ const mapValueToEffect = (value: BackgroundOptionValue): BackgroundEffectSelecti
     case 'blur-low':
       return {type: 'blur', level: 'low'};
     case 'virtual':
-      return {type: 'virtual', backgroundId: 'default'};
+      return {type: 'virtual', backgroundId: DEFAULT_BUILTIN_BACKGROUND_ID};
     default:
       return {type: 'none'};
   }
