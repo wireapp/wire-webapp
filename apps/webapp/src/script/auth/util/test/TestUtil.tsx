@@ -193,7 +193,10 @@ export const buildMediaDevicesHandler = () => {
 };
 
 export const buildCallingRepository = () => {
-  const controller: BackgroundEffectsController = {} as unknown as BackgroundEffectsController;
+  const controller: BackgroundEffectsController = {
+    getQuality: jest.fn(),
+    getCapabilityInfo: jest.fn(),
+  } as unknown as BackgroundEffectsController;
   const backgroundEffectsHandler = new BackgroundEffectsHandler(controller);
 
   return {
