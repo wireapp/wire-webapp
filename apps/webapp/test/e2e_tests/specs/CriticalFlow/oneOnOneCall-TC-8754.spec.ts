@@ -21,7 +21,8 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 
 import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
 
-test(
+// Flaky behavior because of the flaky calling service.
+test.skip(
   '1:1 Video call with device switch and screenshare',
   {tag: ['@TC-8754', '@crit-flow-web']},
   async ({createTeam, createPage, api}) => {
