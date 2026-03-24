@@ -98,6 +98,7 @@ export class BackgroundEffectsHandler {
         debugMode: 'off',
         ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
         onMetrics: (metrics: Metrics) => this.onMetrics(metrics),
+        onModelChange: (model: string) => this.onModelChange(model),
       });
       const processedStream = new MediaStream([outputTrack]);
       releasableStream = new ReleasableMediaStream(processedStream, () => {
@@ -250,11 +251,11 @@ export class BackgroundEffectsHandler {
   }
 
   public isSuperhighQualityTierAllowed(): boolean {
-    return this.controller.getMaxQualityTier() !== 'superhigh';
+    return this.controller.getMaxQualityTier() === 'superhigh';
   }
 
   public getModel(): string {
-    return 'Model--xxxx';
+    return this.controller.getModel();
   }
 
   getCapabilityInfo(): CapabilityInfo {
@@ -270,6 +271,10 @@ export class BackgroundEffectsHandler {
     const ml = metrics.segmentationDelegate ? `ML(${metrics.segmentationDelegate})` : 'ML';
     const renderMetrics = {...metrics, webglShare, utilShare, mlShare, budget, ml} as RenderMetrics;
     backgroundEffectsStore.getState().setMetrics(renderMetrics);
+  }
+  private onModelChange(modelPath: string): void {
+    const model = modelPath.split('/').pop();
+    backgroundEffectsStore.getState().setModel(model);
   }
 }
 
