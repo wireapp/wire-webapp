@@ -33,8 +33,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {BackgroundEffectsController} from './BackgroundEffects/effects/BackgroundEffectsController';
 import {backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
 
-export {RenderMetrics} from './useBackgroundEffectsStore';
-
 export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
 
@@ -250,7 +248,7 @@ export class BackgroundEffectsHandler {
   }
 
   public isSuperhighQualityTierAllowed(): boolean {
-    return this.controller.getMaxQualityTier() !== 'superhigh';
+    return this.controller.getMaxQualityTier() === 'superhigh';
   }
 
   public getModel(): string {
