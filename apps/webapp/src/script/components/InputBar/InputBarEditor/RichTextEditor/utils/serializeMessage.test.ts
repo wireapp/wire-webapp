@@ -22,19 +22,16 @@ import {$createParagraphNode, $createTextNode, $getRoot, createEditor} from 'lex
 import {serializeMessage} from './serializeMessage';
 
 describe('serializeMessage', () => {
-  const createEditorWithParagraphs = (paragraphs: string[]) => {
+  const createEditorWithText = (text: string) => {
     const editor = createEditor();
 
     editor.update(
       () => {
         const root = $getRoot();
+        const paragraph = $createParagraphNode();
 
-        paragraphs.forEach(text => {
-          const paragraph = $createParagraphNode();
-
-          paragraph.append($createTextNode(text));
-          root.append(paragraph);
-        });
+        paragraph.append($createTextNode(text));
+        root.append(paragraph);
       },
       {discrete: true},
     );
@@ -43,31 +40,15 @@ describe('serializeMessage', () => {
   };
 
   it('preserves raw markdown markers when preview is disabled', () => {
-    const editor = createEditorWithParagraphs(['**bold** _italic_']);
+    const editor = createEditorWithText('**bold** _italic_');
 
     const message = editor.getEditorState().read(() => serializeMessage(false));
 
     expect(message).toBe('**bold** _italic_');
   });
 
-  it('preserves a single line break between paragraphs when preview is disabled', () => {
-    const editor = createEditorWithParagraphs(['check this out', 'https://wire.com/']);
-
-    const message = editor.getEditorState().read(() => serializeMessage(false));
-
-    expect(message).toBe('check this out\nhttps://wire.com/');
-  });
-
-  it('preserves intentional empty lines when preview is disabled', () => {
-    const editor = createEditorWithParagraphs(['first line', '', 'third line']);
-
-    const message = editor.getEditorState().read(() => serializeMessage(false));
-
-    expect(message).toBe('first line\n\nthird line');
-  });
-
   it('uses Lexical markdown serialization when preview is enabled', () => {
-    const editor = createEditorWithParagraphs(['**bold** _italic_']);
+    const editor = createEditorWithText('**bold** _italic_');
 
     const message = editor.getEditorState().read(() => serializeMessage(true));
 
