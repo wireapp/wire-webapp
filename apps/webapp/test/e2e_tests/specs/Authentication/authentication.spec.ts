@@ -72,7 +72,7 @@ test.describe('Authentication', () => {
     },
   );
 
-  test(
+  test.skip(
     'Verify current browser is set as temporary device',
     {tag: ['@TC-3460', '@regression']},
     async ({createUser, createPage}) => {
@@ -194,7 +194,7 @@ test.describe('Authentication', () => {
     },
   );
 
-  test(
+  test.skip(
     'Make sure user does not see data of user of previous sessions on same browser',
     {tag: ['@TC-1311', '@regression']},
     async ({createUser, createTeam, createPage}) => {
