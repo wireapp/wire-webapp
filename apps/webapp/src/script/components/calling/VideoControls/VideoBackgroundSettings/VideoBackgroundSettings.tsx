@@ -17,9 +17,9 @@
  *
  */
 
-import React from 'react';
+import {ChangeEvent, CSSProperties, ReactNode} from 'react';
 
-import {HelpIcon} from '@wireapp/react-ui-kit';
+import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
@@ -31,24 +31,20 @@ import {
   backgroundSettingsScrollableContentStyles,
   backgroundSettingsTitleStyles,
   backgroundSettingsWrapperStyles,
-  noEffectButtonStyles,
-  noEffectIconStyles,
   sectionLabelStyles,
   tileButtonStyles,
-  tileCheckIconStyles,
-  tileCheckStyles,
   tileGridStyles,
-  tileLabelStyles,
+  tilePreviewContentStyles,
   tilePreviewStyles,
-  uploadButtonStyles,
 } from './VideoBackgroundSettings.styles';
 
 interface VideoBackgroundSettingsProps {
   selectedEffect: BackgroundEffectSelection;
   backgrounds: BuiltinBackground[];
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
-  onAddBackground: () => void;
+  onEnableHighQualityBlur: (event: ChangeEvent<HTMLInputElement>) => void;
   onClose: () => void;
+  highQualityBlurAllowed: boolean;
 }
 
 const isEffectSelected = (selected: BackgroundEffectSelection, candidate: BackgroundEffectSelection): boolean => {
@@ -65,16 +61,14 @@ const isEffectSelected = (selected: BackgroundEffectSelection, candidate: Backgr
 };
 
 interface BackgroundTileProps {
-  label?: string;
   effect: BackgroundEffectSelection;
   selectedEffect: BackgroundEffectSelection;
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
-  previewContent?: React.ReactNode;
-  previewStyle?: React.CSSProperties;
+  previewContent?: ReactNode;
+  previewStyle?: CSSProperties;
 }
 
 const BackgroundTile = ({
-  label,
   effect,
   selectedEffect,
   onSelectEffect,
@@ -92,13 +86,7 @@ const BackgroundTile = ({
     >
       <div css={tilePreviewStyles} style={previewStyle} className="bg-tile__preview">
         {previewContent}
-        {selected && (
-          <div css={tileCheckStyles}>
-            <Icon.CheckIcon css={tileCheckIconStyles} />
-          </div>
-        )}
       </div>
-      <div css={tileLabelStyles}>{label}</div>
     </button>
   );
 };
@@ -107,51 +95,76 @@ export const VideoBackgroundSettings = ({
   selectedEffect,
   backgrounds,
   onSelectEffect,
-  onAddBackground,
+  highQualityBlurAllowed,
+  onEnableHighQualityBlur,
   onClose,
 }: VideoBackgroundSettingsProps) => {
-  const isNoneSelected = selectedEffect.type === 'none';
+  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
+    onEnableHighQualityBlur(event);
+  };
 
   return (
     <div css={backgroundSettingsWrapperStyles} data-uie-name="video-background-settings">
       <div css={backgroundSettingsHeaderStyles}>
         <span css={backgroundSettingsTitleStyles}>{t('videoCallBackgroundEffectsLabel')}</span>
-        <button type="button" className="icon-button" onClick={onClose} title={t('cells.filtersModal.closeButton')}>
+        <button type="button" className="icon-button" onClick={onClose} title={t('modalCloseButton')}>
           <Icon.CloseIcon width={12} height={12} />
         </button>
       </div>
 
       <FadingScrollbar css={backgroundSettingsScrollableContentStyles}>
-        {/* No background effect */}
-        <button
-          type="button"
-          css={noEffectButtonStyles}
-          aria-pressed={isNoneSelected}
-          onClick={() => onSelectEffect({type: 'none'})}
-        >
-          <div css={noEffectIconStyles} />
-          {t('videoCallBackgroundNoEffect')}
-        </button>
+        {/* No background effect — full-width tile */}
+        <BackgroundTile
+          effect={{type: 'none'}}
+          selectedEffect={selectedEffect}
+          onSelectEffect={onSelectEffect}
+          previewContent={
+            <div css={tilePreviewContentStyles}>
+              <CircleIcon />
+              {t('videoCallBackgroundNoEffect')}
+            </div>
+          }
+        />
 
         {/* Blur section */}
         <div>
           <div css={sectionLabelStyles}>{t('videoCallBackgroundBlurSectionLabel')}</div>
           <div css={tileGridStyles}>
             <BackgroundTile
-              label={t('videoCallBackgroundBlurLow')}
               effect={{type: 'blur', level: 'low'}}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
-              previewContent={<HelpIcon />}
+              previewContent={
+                <div css={tilePreviewContentStyles}>
+                  <BlurLowIcon />
+                  {t('videoCallBackgroundBlurLow')}
+                </div>
+              }
             />
             <BackgroundTile
-              label={t('videoCallBackgroundBlurHigh')}
               effect={{type: 'blur', level: 'high'}}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
-              previewContent={<HelpIcon />}
+              previewContent={
+                <div css={tilePreviewContentStyles}>
+                  <BlurHighIcon />
+                  {t('videoCallBackgroundBlurHigh')}
+                </div>
+              }
             />
           </div>
+        </div>
+
+        <div>
+          <Checkbox
+            id="enable-high-quality-blur"
+            disabled={!highQualityBlurAllowed}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => handleEnableHighQualityBlur(event)}
+          >
+            <CheckboxLabel htmlFor="enable-high-quality-blur">
+              {t('videoCallBackgroundEnableHighQualityBlur')}
+            </CheckboxLabel>
+          </Checkbox>
         </div>
 
         {/* Virtual backgrounds section */}
@@ -171,11 +184,6 @@ export const VideoBackgroundSettings = ({
             ))}
           </div>
         </div>
-
-        {/* Upload background */}
-        <button type="button" css={uploadButtonStyles} onClick={onAddBackground}>
-          {t('videoCallBackgroundUpload')}
-        </button>
       </FadingScrollbar>
     </div>
   );

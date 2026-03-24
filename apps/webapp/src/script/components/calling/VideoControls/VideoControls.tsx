@@ -23,10 +23,20 @@ import classNames from 'classnames';
 import {container} from 'tsyringe';
 
 import {CALL_TYPE} from '@wireapp/avs';
-import {EmojiIcon, GridIcon, MoreIcon, QUERY, RaiseHandIcon, TabIndex} from '@wireapp/react-ui-kit';
+import {
+  BlurHighIcon,
+  BlurLowIcon,
+  CircleIcon,
+  EmojiIcon,
+  GridIcon,
+  ImageIcon,
+  MoreIcon,
+  QUERY,
+  RaiseHandIcon,
+  TabIndex,
+} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/AppNotification';
 import * as Icon from 'Components/Icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
@@ -34,10 +44,10 @@ import {Call} from 'Repositories/calling/Call';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
+import {BackgroundEffectSelection, DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
 import {DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
@@ -79,7 +89,7 @@ const mapValueToEffect = (value: BackgroundOptionValue): BackgroundEffectSelecti
     case 'blur-low':
       return {type: 'blur', level: 'low'};
     case 'virtual':
-      return {type: 'virtual', backgroundId: 'default'};
+      return {type: 'virtual', backgroundId: DEFAULT_BUILTIN_BACKGROUND_ID};
     default:
       return {type: 'none'};
   }
@@ -142,7 +152,6 @@ interface VideoControlsProps {
   canShareScreen: boolean;
   conversation: Conversation;
   mediaDevicesHandler: MediaDevicesHandler;
-  backgroundEffectsHandler: BackgroundEffectsHandler;
   callState?: CallState;
   teamState?: TeamState;
   minimize: () => void;
@@ -170,7 +179,6 @@ export const VideoControls = ({
   toggleParticipantsList,
   canShareScreen,
   conversation,
-  backgroundEffectsHandler,
   minimize,
   leave,
   toggleMute,
@@ -204,12 +212,9 @@ export const VideoControls = ({
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
 
-  const {preferredBackgroundEffect, isVideoBackgroundEffectsFeatureEnabled} = useKoSubscribableChildren(
-    backgroundEffectsHandler,
-    ['preferredBackgroundEffect', 'isVideoBackgroundEffectsFeatureEnabled'],
-  );
-
-  const selectedBackgroundEffect = preferredBackgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
+  const selectedBackgroundEffect =
+    useBackgroundEffectsStore(state => state.preferredEffect) ?? DEFAULT_BACKGROUND_EFFECT;
+  const isVideoBackgroundEffectsFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
 
   const {participants} = useKoSubscribableChildren(call, ['participants']);
 
@@ -217,10 +222,6 @@ export const VideoControls = ({
 
   const {viewMode, detachedWindow} = useKoSubscribableChildren(callState, ['viewMode', 'detachedWindow']);
   const activeWindow = viewMode === CallingViewMode.DETACHED_WINDOW && detachedWindow ? detachedWindow : window;
-  const addBackgroundNotification = useAppNotification({
-    message: t('videoCallBackgroundAddToast'),
-    activeWindow,
-  });
 
   const {isVideoCallingEnabled} = useKoSubscribableChildren(teamState, ['isVideoCallingEnabled']);
 
@@ -376,11 +377,11 @@ export const VideoControls = ({
   const currentBlurOption = useMemo(
     () =>
       selectedBackgroundEffect.type === 'blur' && selectedBackgroundEffect.level === 'low'
-        ? {label: t('videoCallBackgroundBlurLow'), value: 'blur-low', icon: <Icon.FileIcon />}
+        ? {label: t('videoCallBackgroundBlurLow'), value: 'blur-low', icon: <BlurLowIcon />}
         : {
             label: t('videoCallBackgroundBlurHigh'),
             value: 'blur-high',
-            icon: <Icon.FileIcon />,
+            icon: <BlurHighIcon />,
           },
     [selectedBackgroundEffect],
   );
@@ -390,9 +391,9 @@ export const VideoControls = ({
       {
         label: t('videoCallBackgroundEffectsLabel'),
         options: [
-          {label: t('videoCallBackgroundNone'), value: 'none', icon: <Icon.FileIcon />},
+          {label: t('videoCallBackgroundNone'), value: 'none', icon: <CircleIcon />},
           currentBlurOption,
-          {label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <Icon.FileIcon />},
+          {label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <ImageIcon />},
           {
             label: t('videoCallBackgroundSettings'),
             value: 'settings',
@@ -412,19 +413,12 @@ export const VideoControls = ({
 
   const handleBackgroundSelect = useCallback(
     (effect: BackgroundEffectSelection) => {
-      if (effect.type === 'custom') {
-        addBackgroundNotification.show();
-        if (isMobile) {
-          setVideoOptionsOpen(false);
-        }
-        return;
-      }
       void switchVideoBackgroundEffect(effect);
       if (isMobile) {
         setVideoOptionsOpen(false);
       }
     },
-    [addBackgroundNotification, isMobile, switchVideoBackgroundEffect],
+    [isMobile, switchVideoBackgroundEffect],
   );
 
   const handleVideoSelectChange = useCallback(

@@ -70,46 +70,6 @@ export const backgroundSettingsScrollableContentStyles: CSSObject = {
   gap: 20,
 };
 
-/** Full-width "No background effect" card button. */
-export const noEffectButtonStyles: CSSObject = {
-  alignItems: 'center',
-  background: 'none',
-  border: '1px solid var(--inactive-call-button-border)',
-  borderRadius: 8,
-  color: 'var(--main-color)',
-  cursor: 'pointer',
-  display: 'flex',
-  font: 'inherit',
-  fontSize: 13,
-  gap: 10,
-  padding: '10px 12px',
-  textAlign: 'left',
-  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
-  width: '100%',
-
-  '&[aria-pressed="true"]': {
-    borderColor: 'var(--accent-color)',
-    boxShadow: '0 0 0 2px var(--accent-color)',
-  },
-
-  '&:hover:not([aria-pressed="true"])': {
-    borderColor: 'var(--gray-60)',
-  },
-
-  '&:focus-visible': {
-    outline: '2px solid var(--accent-color-focus)',
-    outlineOffset: 2,
-  },
-};
-
-export const noEffectIconStyles: CSSObject = {
-  width: 18,
-  height: 18,
-  borderRadius: '50%',
-  border: '2px solid currentColor',
-  flexShrink: 0,
-};
-
 export const sectionLabelStyles: CSSObject = {
   fontSize: 11,
   fontWeight: 600,
@@ -160,7 +120,7 @@ export const tileButtonStyles: CSSObject = {
 export const tilePreviewStyles: CSSObject = {
   position: 'relative',
   width: '100%',
-  aspectRatio: '16 / 9',
+  height: 70,
   borderRadius: 8,
   border: '1px solid var(--inactive-call-button-border)',
   backgroundColor: 'var(--gray-20)',
@@ -173,74 +133,11 @@ export const tilePreviewStyles: CSSObject = {
   justifyContent: 'center',
 };
 
-export const tileLabelStyles: CSSObject = {
-  fontSize: 11,
-  fontWeight: 500,
-  color: 'var(--main-color)',
-};
-
-export const tileCheckStyles: CSSObject = {
-  position: 'absolute',
-  top: 4,
-  right: 4,
-  width: 16,
-  height: 16,
-  borderRadius: '50%',
-  backgroundColor: 'var(--accent-color)',
+export const tilePreviewContentStyles: CSSObject = {
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'center',
-  justifyContent: 'center',
-  boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
-};
-
-export const tileCheckIconStyles: CSSObject = {
-  width: 10,
-  height: 10,
-  fill: 'var(--app-bg-secondary)',
-};
-
-export const blurPatternStyles: CSSObject = {
-  position: 'absolute',
-  inset: 0,
-  backgroundImage: 'repeating-linear-gradient(135deg, rgba(0,0,0,0.14) 0 6px, rgba(255,255,255,0.8) 6px 12px)',
-};
-
-export const humanOutlineStyles: CSSObject = {
-  position: 'relative',
-  width: '70%',
-  height: '70%',
-  color: 'var(--gray-70)',
-  zIndex: 1,
-};
-
-export const humanStrokeStyles: CSSObject = {
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 2.2,
-  strokeLinecap: 'round',
-  strokeLinejoin: 'round',
-};
-
-/** Full-width "Upload background" button. */
-export const uploadButtonStyles: CSSObject = {
-  background: 'none',
-  border: '1px solid var(--inactive-call-button-border)',
-  borderRadius: 8,
-  color: 'var(--main-color)',
-  cursor: 'pointer',
-  font: 'inherit',
-  fontSize: 13,
-  fontWeight: 'var(--font-weight-semibold)',
-  padding: 10,
-  transition: 'background-color 0.15s ease',
-  width: '100%',
-
-  '&:hover': {
-    backgroundColor: 'var(--gray-10)',
-  },
-
-  '&:focus-visible': {
-    outline: '2px solid var(--accent-color-focus)',
-    outlineOffset: 2,
-  },
+  gap: 4,
+  fontSize: 10,
+  color: 'black', // no design for dark mode, so keeping it black.
 };
