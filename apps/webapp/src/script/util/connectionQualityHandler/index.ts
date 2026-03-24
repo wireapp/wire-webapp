@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ConnectionQualityHandler';
+export * from './connectionQualityHandler';
