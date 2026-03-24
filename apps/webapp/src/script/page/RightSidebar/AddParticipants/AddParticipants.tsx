@@ -41,7 +41,7 @@ import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 

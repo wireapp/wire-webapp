@@ -18,7 +18,7 @@
  */
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {CellsFilters} from './CellsFilters/CellsFilters';
 import {contentStyles, headingStyles, searchWrapperStyles, wrapperStyles} from './CellsHeader.styles';

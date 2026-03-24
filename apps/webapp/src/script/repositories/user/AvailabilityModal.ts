@@ -20,7 +20,7 @@
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/StorageUtil';
 
 const initialKey = 'hide_initial_modal';

@@ -28,7 +28,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit';
 
 import {handleEnterDown} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Page} from './Page';
 

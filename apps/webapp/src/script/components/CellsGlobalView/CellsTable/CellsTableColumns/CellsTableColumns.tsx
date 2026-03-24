@@ -21,7 +21,7 @@ import {createColumnHelper} from '@tanstack/react-table';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {CellsConversationColumn} from './CellsConversationColumn/CellsConversationColumn';
 import {CellsTableOwnerColumn} from './CellsOwnerColumn/CellsOwnerColumn';

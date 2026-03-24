@@ -31,7 +31,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './Access.styles';

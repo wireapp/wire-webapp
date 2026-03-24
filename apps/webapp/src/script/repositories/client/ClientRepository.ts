@@ -34,7 +34,7 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/StorageKey';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';

@@ -28,7 +28,7 @@ import {useKeyPressAndHold} from 'Hooks/useKeyPressAndHold/useKeyPressAndHold';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {EventName} from 'Repositories/tracking/EventName';
 import {KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface UsePressSpaceToUnmuteParams {
   callState: CallState;

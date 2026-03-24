@@ -27,7 +27,7 @@ import * as Icon from 'Components/Icon';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/SanitizationUtil';
 
 import {getManageServicesUrl} from '../../../../externalRoute';

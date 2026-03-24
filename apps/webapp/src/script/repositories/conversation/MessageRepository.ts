@@ -85,7 +85,7 @@ import {
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
 } from 'Util/LinkPreviewSender';
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
+import {Declension, joinNames, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isMarkdownText} from 'Util/MarkdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';

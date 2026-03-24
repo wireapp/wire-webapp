@@ -34,7 +34,7 @@ import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 import {isErrorWithType} from 'Util/TypePredicateUtil';
 

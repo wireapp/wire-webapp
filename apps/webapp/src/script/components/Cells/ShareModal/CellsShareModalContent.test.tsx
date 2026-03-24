@@ -26,7 +26,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {CellsShareModalContent} from './CellsShareModalContent';
 
 // Mock dependencies
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
 }));
 

@@ -18,7 +18,7 @@
  */
 
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {trimFileExtension} from 'Util/util';
 
 interface RestrictedFileProps {

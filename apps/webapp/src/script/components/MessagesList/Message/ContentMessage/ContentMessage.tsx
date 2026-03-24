@@ -35,7 +35,7 @@ import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';

@@ -47,7 +47,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
 import {formatBytes} from 'Util/util';

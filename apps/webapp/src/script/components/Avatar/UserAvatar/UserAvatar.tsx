@@ -29,7 +29,7 @@ import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import {AvatarBackground} from '../AvatarBackground';

@@ -17,5 +17,5 @@
  *
  */
 
-export * from './LocalizerUtil';
-export * from './LocalizerUtil.types';
+export * from './localizerUtil';
+export * from './localizerUtil.types';

@@ -35,7 +35,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from 'Util/util';
 

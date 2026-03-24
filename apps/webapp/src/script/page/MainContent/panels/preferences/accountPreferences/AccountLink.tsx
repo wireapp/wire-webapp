@@ -21,7 +21,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {copyText} from 'Util/ClipboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface AccountLinkProps {
   'data-uie-name'?: string;

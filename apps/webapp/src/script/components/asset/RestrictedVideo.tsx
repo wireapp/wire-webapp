@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface RestrictedVideoProps {
   isSmall?: boolean;

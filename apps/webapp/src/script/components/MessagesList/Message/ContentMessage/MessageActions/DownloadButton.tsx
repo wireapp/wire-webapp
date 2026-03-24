@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface DownloadButtonProps {
   actionId: string;

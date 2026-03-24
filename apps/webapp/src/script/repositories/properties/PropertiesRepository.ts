@@ -36,7 +36,7 @@ import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndica
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/Environment';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';
 

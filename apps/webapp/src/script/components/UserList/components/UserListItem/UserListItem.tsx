@@ -29,7 +29,7 @@ import {UserlistMode} from 'Components/UserList';
 import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 interface UserListItemProps {

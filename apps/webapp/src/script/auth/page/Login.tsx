@@ -54,7 +54,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 import {isBackendError} from 'Util/TypePredicateUtil';
 

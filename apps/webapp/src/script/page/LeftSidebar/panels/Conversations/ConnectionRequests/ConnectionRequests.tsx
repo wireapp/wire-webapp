@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
 import {User} from 'Repositories/entity/User';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {ContentState, useAppState} from '../../../../useAppState';
 

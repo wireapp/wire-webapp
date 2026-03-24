@@ -26,7 +26,7 @@ import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Config} from 'src/script/Config';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {isValidPassword} from 'Util/StringUtil';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';

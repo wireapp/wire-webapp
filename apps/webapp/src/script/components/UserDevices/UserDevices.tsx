@@ -27,7 +27,7 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
 import {partition} from 'Util/ArrayUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 

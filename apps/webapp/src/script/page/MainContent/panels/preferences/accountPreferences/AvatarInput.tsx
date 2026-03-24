@@ -28,7 +28,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 import {isErrorWithType} from 'Util/TypePredicateUtil';
 import {validateProfileImageResolution} from 'Util/util';

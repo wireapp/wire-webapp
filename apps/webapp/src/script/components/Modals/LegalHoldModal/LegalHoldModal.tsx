@@ -37,7 +37,7 @@ import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {handleEnterDown} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithCode} from 'Util/TypePredicateUtil';
 

@@ -27,7 +27,7 @@ import {ClientEntity} from 'Repositories/client';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {FormattedId} from '../FormattedId';

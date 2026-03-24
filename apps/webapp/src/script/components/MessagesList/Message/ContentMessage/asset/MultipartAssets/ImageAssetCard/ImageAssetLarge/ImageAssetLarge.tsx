@@ -25,7 +25,7 @@ import {ICellAsset} from '@wireapp/protocol-messaging';
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
 import {getBestPreviewSource} from 'Util/ImageUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   containerStyles,

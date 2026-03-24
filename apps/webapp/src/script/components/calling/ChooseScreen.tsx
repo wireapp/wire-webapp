@@ -25,7 +25,7 @@ import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {captureModalFocusContext} from 'Util/ModalFocusUtil';
 
 interface ChooseScreenProps {

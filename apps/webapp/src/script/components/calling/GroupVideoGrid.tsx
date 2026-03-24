@@ -31,7 +31,7 @@ import {Call} from 'Repositories/calling/Call';
 import type {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {Video} from './Video';

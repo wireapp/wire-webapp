@@ -31,7 +31,7 @@ import {User} from 'Repositories/entity/User';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {

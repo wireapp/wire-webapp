@@ -33,7 +33,7 @@ import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import type {Logger} from 'Util/Logger';
 import {splitFingerprint} from 'Util/StringUtil';
 import {toError} from 'Util/toError';

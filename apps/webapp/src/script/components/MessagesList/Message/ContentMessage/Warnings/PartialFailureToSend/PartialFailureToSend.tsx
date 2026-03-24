@@ -27,7 +27,7 @@ import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';

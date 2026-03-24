@@ -31,7 +31,7 @@ import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {PanelHeader} from '../PanelHeader';

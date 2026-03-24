@@ -18,7 +18,7 @@
  */
 
 import {User} from 'Repositories/entity/User';
-import {Declension, LocalizerUtil, t, getSelfName, getUserName} from 'Util/LocalizerUtil';
+import {Declension, LocalizerUtil, t, getSelfName, getUserName} from 'Util/localizerUtil';
 
 import {escapeRegex, safeWindowOpen} from './SanitizationUtil';
 

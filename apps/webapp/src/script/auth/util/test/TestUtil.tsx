@@ -61,7 +61,7 @@ import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {setStrings} from 'Util/LocalizerUtil';
+import {setStrings} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {mapLanguage} from '../../localeConfig';

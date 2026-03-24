@@ -26,7 +26,7 @@ import {RadioGroup} from 'Components/Radio';
 import {NOTIFICATION_STATE, getNotificationText} from 'Repositories/conversation/NotificationSetting';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 import {PanelHeader} from '../PanelHeader';

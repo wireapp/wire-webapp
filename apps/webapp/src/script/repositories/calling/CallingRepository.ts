@@ -82,7 +82,7 @@ import type {UserRepository} from 'Repositories/user/UserRepository';
 import {flatten} from 'Util/ArrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {captureModalFocusContext} from 'Util/ModalFocusUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';

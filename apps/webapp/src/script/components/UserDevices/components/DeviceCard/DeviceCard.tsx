@@ -26,7 +26,7 @@ import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {type ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';

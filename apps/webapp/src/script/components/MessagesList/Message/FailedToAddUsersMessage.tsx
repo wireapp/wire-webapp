@@ -31,7 +31,7 @@ import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styles';

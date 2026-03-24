@@ -22,7 +22,7 @@ import React, {useState} from 'react';
 import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 
 import {handleEnterDown} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {EntropyData} from '../../util/Entropy';
 import {EntropyCanvas} from '../component/EntropyCanvas';

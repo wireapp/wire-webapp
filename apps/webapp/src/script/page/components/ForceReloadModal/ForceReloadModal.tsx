@@ -22,7 +22,7 @@ import {FunctionComponent, useEffect} from 'react';
 import {Maybe} from 'true-myth';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {useApplicationContext} from '../../RootProvider';

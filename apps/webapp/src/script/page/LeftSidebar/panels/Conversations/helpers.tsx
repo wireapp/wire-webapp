@@ -18,7 +18,7 @@
  */
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {replaceAccents} from 'Util/StringUtil';
 
 import {ConversationFilter, SidebarTabs} from './useSidebarStore';

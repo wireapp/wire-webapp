@@ -28,7 +28,7 @@ import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {isServiceEntity} from '../../../guards/Service';
