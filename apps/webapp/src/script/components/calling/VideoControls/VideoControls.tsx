@@ -44,8 +44,8 @@ import {Call} from 'Repositories/calling/Call';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
@@ -152,7 +152,6 @@ interface VideoControlsProps {
   canShareScreen: boolean;
   conversation: Conversation;
   mediaDevicesHandler: MediaDevicesHandler;
-  backgroundEffectsHandler: BackgroundEffectsHandler;
   callState?: CallState;
   teamState?: TeamState;
   minimize: () => void;
@@ -180,7 +179,6 @@ export const VideoControls = ({
   toggleParticipantsList,
   canShareScreen,
   conversation,
-  backgroundEffectsHandler,
   minimize,
   leave,
   toggleMute,
@@ -214,12 +212,9 @@ export const VideoControls = ({
 
   const {is1to1: is1to1Conversation} = useKoSubscribableChildren(conversation, ['is1to1']);
 
-  const {preferredBackgroundEffect, isVideoBackgroundEffectsFeatureEnabled} = useKoSubscribableChildren(
-    backgroundEffectsHandler,
-    ['preferredBackgroundEffect', 'isVideoBackgroundEffectsFeatureEnabled'],
-  );
-
-  const selectedBackgroundEffect = preferredBackgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
+  const selectedBackgroundEffect =
+    useBackgroundEffectsStore(state => state.preferredEffect) ?? DEFAULT_BACKGROUND_EFFECT;
+  const isVideoBackgroundEffectsFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
 
   const {participants} = useKoSubscribableChildren(call, ['participants']);
 

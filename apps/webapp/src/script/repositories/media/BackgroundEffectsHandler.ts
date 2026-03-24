@@ -17,9 +17,7 @@
  *
  */
 
-import {observable} from 'knockout';
-
-import {Metrics, QualityMode, QualityTier} from 'Repositories/media/BackgroundEffects';
+import {Metrics, QualityMode} from 'Repositories/media/BackgroundEffects';
 import {CapabilityInfo} from 'Repositories/media/BackgroundEffects/types';
 import {
   BackgroundEffectSelection,
@@ -33,56 +31,63 @@ import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {BackgroundEffectsController} from './BackgroundEffects/effects/BackgroundEffectsController';
+import {backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
+
+export {RenderMetrics} from './useBackgroundEffectsStore';
 
 export const TARGET_FPS = 15;
+export const DEBOUNCE_TIMER = 500;
 
 const VIDEO_BACKGROUND_EFFECT_STORAGE_KEY = 'video-background-effects';
 const VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY = 'video-background-effects-feature-enabled';
 
 export class BackgroundEffectsHandler {
   private readonly logger: Logger = getLogger('BackgroundEffectsHandler');
-  public readonly isVideoBackgroundEffectsFeatureEnabled = observable<boolean>(false);
-  public readonly backgroundEffectedVideoStream = observable<ReleasableMediaStream | undefined>();
-  public readonly preferredBackgroundEffect = observable<BackgroundEffectSelection>(DEFAULT_BACKGROUND_EFFECT);
-  public readonly metrics = observable<RenderMetrics | undefined>(undefined);
   private readonly storage: Storage | undefined;
   private customBackground: BackgroundSource | undefined = undefined;
+  private saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private readonly controller: BackgroundEffectsController) {
     this.storage = getStorage();
-    this.isVideoBackgroundEffectsFeatureEnabled(this.readFeatureEnabledStateFromStore());
-    this.preferredBackgroundEffect(this.readPreferredBackgroundEffectFromStore());
-    this.preferredBackgroundEffect
-      .extend({rateLimit: 500})
-      .subscribe(effect => this.savePreferredBackgroundEffectInStore(effect));
+    backgroundEffectsStore.getState().setIsFeatureEnabled(this.readFeatureEnabledStateFromStore());
+    backgroundEffectsStore.getState().setPreferredEffect(this.readPreferredBackgroundEffectFromStore());
+
+    backgroundEffectsStore.subscribe((state, prevState) => {
+      if (state.preferredEffect !== prevState.preferredEffect) {
+        if (this.saveDebounceTimer) {
+          clearTimeout(this.saveDebounceTimer);
+        }
+        this.saveDebounceTimer = setTimeout(
+          () => this.savePreferredBackgroundEffectInStore(state.preferredEffect),
+          DEBOUNCE_TIMER,
+        );
+      }
+    });
   }
 
   public async applyBackgroundEffect(
     originalVideoStream: MediaStream,
   ): Promise<{applied: boolean; media: ReleasableMediaStream}> {
-    if (this.preferredBackgroundEffect().type === 'none') {
-      // No background changes wanted nothing to do
+    const {preferredEffect} = backgroundEffectsStore.getState();
+
+    if (preferredEffect.type === 'none') {
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
     const videoTrack = originalVideoStream.getVideoTracks()[0];
 
     if (!videoTrack) {
-      // No input video track, nothing to do
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
-    const effect = this.preferredBackgroundEffect();
-    const isVirtual = effect.type === 'virtual' || effect.type === 'custom';
-    const blurStrength = effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
-
-    if (this.controller.isProcessing()) {
-      // this.controller.stop();
-    }
+    const isVirtual = preferredEffect.type === 'virtual' || preferredEffect.type === 'custom';
+    const blurStrength = preferredEffect.type === 'blur' ? BLUR_STRENGTHS[preferredEffect.level] : BLUR_STRENGTHS.high;
 
     const backgroundSource: BackgroundSource | undefined = isVirtual
-      ? await this.loadBackgroundSource(effect)
+      ? await this.loadBackgroundSource(preferredEffect)
       : undefined;
+
+    let releasableStream: ReleasableMediaStream;
 
     try {
       const {outputTrack, stop} = await this.controller.start(videoTrack, {
@@ -95,19 +100,13 @@ export class BackgroundEffectsHandler {
         onMetrics: (metrics: Metrics) => this.onMetrics(metrics),
       });
       const processedStream = new MediaStream([outputTrack]);
-      this.backgroundEffectedVideoStream(
-        new ReleasableMediaStream(processedStream, () => {
-          stop();
-          outputTrack.stop();
-        }),
-      );
+      releasableStream = new ReleasableMediaStream(processedStream, () => {
+        stop();
+        outputTrack.stop();
+      });
     } catch (error) {
       await this.controller.stop();
       this.logger.warn('BackgroundEffectsController failed with error:', error);
-      return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
-    }
-
-    if (this.backgroundEffectedVideoStream()?.stream === undefined) {
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
@@ -121,15 +120,17 @@ export class BackgroundEffectsHandler {
       this.controller.setBlurStrength(blurStrength);
     }
 
-    return {applied: true, media: this.backgroundEffectedVideoStream()};
+    return {applied: true, media: releasableStream};
   }
 
   public setPreferredBackgroundEffect(effect: BackgroundEffectSelection, customBackground?: BackgroundSource) {
-    this.preferredBackgroundEffect(effect);
+    backgroundEffectsStore.getState().setPreferredEffect(effect);
     if (effect.type === 'custom') {
       if (!customBackground) {
-        this.preferredBackgroundEffect({type: 'virtual', backgroundId: DEFAULT_BUILTIN_BACKGROUND_ID});
-        this.logger.warn('No cusstom backgound image was set, switch to default virtuell Back ground');
+        backgroundEffectsStore
+          .getState()
+          .setPreferredEffect({type: 'virtual', backgroundId: DEFAULT_BUILTIN_BACKGROUND_ID});
+        this.logger.warn('No custom background image was set, switch to default virtual background');
       }
       this.customBackground = customBackground;
     }
@@ -160,7 +161,8 @@ export class BackgroundEffectsHandler {
   }
 
   public isBackgroundEffectEnabled(): boolean {
-    return this.isVideoBackgroundEffectsFeatureEnabled() && this.preferredBackgroundEffect().type !== 'none';
+    const {isFeatureEnabled, preferredEffect} = backgroundEffectsStore.getState();
+    return isFeatureEnabled && preferredEffect.type !== 'none';
   }
 
   public readFeatureEnabledStateFromStore(): boolean {
@@ -179,7 +181,7 @@ export class BackgroundEffectsHandler {
 
   public saveFeatureEnabledStateInStore(flag: boolean): boolean {
     if (this.storage === undefined) {
-      this.isVideoBackgroundEffectsFeatureEnabled(flag);
+      backgroundEffectsStore.getState().setIsFeatureEnabled(flag);
       return false;
     }
 
@@ -187,10 +189,10 @@ export class BackgroundEffectsHandler {
       this.storage.setItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY, `${flag}`);
     } catch (error) {
       console.error('Failed to persisted video background effect feature state', error);
-      this.isVideoBackgroundEffectsFeatureEnabled(flag);
+      backgroundEffectsStore.getState().setIsFeatureEnabled(flag);
       return false;
     }
-    this.isVideoBackgroundEffectsFeatureEnabled(flag);
+    backgroundEffectsStore.getState().setIsFeatureEnabled(flag);
     return flag;
   }
 
@@ -227,7 +229,7 @@ export class BackgroundEffectsHandler {
       const serialized = JSON.stringify(effect);
       this.storage.setItem(VIDEO_BACKGROUND_EFFECT_STORAGE_KEY, serialized);
     } catch (error) {
-      this.logger.error('Failed to persis preferred video background effect', error);
+      this.logger.error('Failed to persist preferred video background effect', error);
     }
   }
 
@@ -265,10 +267,9 @@ export class BackgroundEffectsHandler {
     const utilShare = budget > 0 ? Math.min(999, (total / budget) * 100) : 0;
     const mlShare = total > 0 ? (metrics.avgSegmentationMs / total) * 100 : 0;
     const webglShare = total > 0 ? (metrics.avgGpuMs / total) * 100 : 0;
-    // Label ML phase based on an actual delegate type
     const ml = metrics.segmentationDelegate ? `ML(${metrics.segmentationDelegate})` : 'ML';
     const renderMetrics = {...metrics, webglShare, utilShare, mlShare, budget, ml} as RenderMetrics;
-    this.metrics(renderMetrics);
+    backgroundEffectsStore.getState().setMetrics(renderMetrics);
   }
 }
 
@@ -277,13 +278,4 @@ export class ReleasableMediaStream {
     public stream: MediaStream,
     public release: () => void = () => null,
   ) {}
-}
-
-export interface RenderMetrics extends Metrics {
-  budget: number;
-  utilShare: number;
-  mlShare: number;
-  webglShare: number;
-  ml: 'ML(CPU)' | 'ML(GPU)' | 'ML';
-  tier: QualityTier;
 }

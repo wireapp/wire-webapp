@@ -48,8 +48,9 @@ import {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {BUILTIN_BACKGROUNDS, DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
+import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
@@ -283,10 +284,7 @@ const FullscreenVideoCall = ({
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
 
-  const {preferredBackgroundEffect} = useKoSubscribableChildren(backgroundEffectsHandler, [
-    'preferredBackgroundEffect',
-  ]);
-  const selectedBackgroundEffect = preferredBackgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
+  const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
     void switchVideoBackgroundEffect(effect);
@@ -466,7 +464,6 @@ const FullscreenVideoCall = ({
               canShareScreen={canShareScreen}
               conversation={conversation}
               mediaDevicesHandler={mediaDevicesHandler}
-              backgroundEffectsHandler={backgroundEffectsHandler}
               minimize={minimize}
               leave={leave}
               toggleMute={toggleMute}
