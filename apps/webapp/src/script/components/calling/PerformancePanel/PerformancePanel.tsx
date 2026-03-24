@@ -33,7 +33,8 @@ import {
 } from 'Components/calling/PerformancePanel/PerformancePannel.styles';
 import {QualityMode} from 'Repositories/media/BackgroundEffects';
 import {CapabilityInfo} from 'Repositories/media/BackgroundEffects/types';
-import type {BackgroundEffectsHandler, RenderMetrics} from 'Repositories/media/BackgroundEffectsHandler';
+import type {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
+import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 
 type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;
@@ -65,68 +66,33 @@ const MetricRow = ({label, value}: MetricRowProps) => (
   </div>
 );
 
+const POLLING_INTERVAL = 500;
+
 export const PerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
-  const [isFeatureEnabled, setIsFeatureEnabled] = useState<boolean>(() =>
-    backgroundEffectsHandler.isVideoBackgroundEffectsFeatureEnabled(),
-  );
+  const isFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
+  const renderMetrics = useBackgroundEffectsStore(state => state.metrics);
+
   const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => backgroundEffectsHandler.getQuality());
   const [isPanelOpen, setIsPanelOpen] = useState(false);
-  const [renderMetrics, setRenderMetrics] = useState<RenderMetrics | null>(null);
   const [capabilityInfo, setCapabilityInfo] = useState<CapabilityInfo | null>(null);
   const [modelName, setModelName] = useState<string>('');
 
   useEffect(() => {
-    setIsFeatureEnabled(backgroundEffectsHandler.isVideoBackgroundEffectsFeatureEnabled());
     setModelName(backgroundEffectsHandler.getModel());
     setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
-
-    const initialMetrics = backgroundEffectsHandler.metrics();
-    setRenderMetrics(initialMetrics ? {...initialMetrics} : null);
   }, [backgroundEffectsHandler]);
 
-  // -------------------------
-  // Feature enabled subscribe
-  // -------------------------
-  useEffect(() => {
-    const featureEnabledSubscription = backgroundEffectsHandler.isVideoBackgroundEffectsFeatureEnabled.subscribe(
-      (nextIsEnabled: boolean) => {
-        setIsFeatureEnabled(nextIsEnabled);
-      },
-    );
-
-    return () => {
-      featureEnabledSubscription.dispose();
-    };
-  }, [backgroundEffectsHandler]);
-
-  // -------------------------
-  // Metrics subscription (FIXED)
-  // -------------------------
-  useEffect(() => {
-    const metricsSubscription = backgroundEffectsHandler.metrics.subscribe((nextMetrics: RenderMetrics | null) => {
-      setRenderMetrics(nextMetrics ? {...nextMetrics} : null);
-    });
-
-    return () => {
-      metricsSubscription.dispose();
-    };
-  }, [backgroundEffectsHandler]);
-
-  // -------------------------
-  // Quality polling (fallback)
-  // -------------------------
+  // Quality polling (fallback for non-reactive quality)
   useEffect(() => {
     const interval = setInterval(() => {
       const current = backgroundEffectsHandler.getQuality();
       setSelectedQuality(prev => (prev !== current ? current : prev));
-    }, 500);
+    }, POLLING_INTERVAL);
 
     return () => clearInterval(interval);
   }, [backgroundEffectsHandler]);
 
-  // -------------------------
   // Auto close if disabled
-  // -------------------------
   useEffect(() => {
     if (!isFeatureEnabled && isPanelOpen) {
       setIsPanelOpen(false);

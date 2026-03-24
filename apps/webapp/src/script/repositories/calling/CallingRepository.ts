@@ -345,6 +345,16 @@ export class CallingRepository {
     await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
   }
 
+  public allowSuperhighQualityTier(event: boolean) {
+    if (this.isSuperhighQualityTierAllowed()) {
+      this.backgroundEffectsHandler.enableSuperhighQualityTier(event);
+    }
+  }
+
+  public isSuperhighQualityTierAllowed() {
+    return this.backgroundEffectsHandler.isSuperhighQualityTierAllowed();
+  }
+
   public getBackgroundEffectsHandler(): BackgroundEffectsHandler {
     return this.backgroundEffectsHandler;
   }
@@ -370,7 +380,7 @@ export class CallingRepository {
     }
 
     // Whatever will happen from now, we stop the current background effect!
-    // selfParticipant.releaseProcessedVideoStream();
+    selfParticipant.releaseProcessedVideoStream();
 
     // let's check if background should be disabled, then let's do it and go back to the original video
     if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled() && hasActiveVideo) {

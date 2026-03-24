@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
@@ -48,8 +48,9 @@ import {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
-import {BUILTIN_BACKGROUNDS, DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
+import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
@@ -198,10 +199,6 @@ const FullscreenVideoCall = ({
   const callNotification = useAppNotification({
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
   });
-  const addBackgroundNotification = useAppNotification({
-    message: t('videoCallBackgroundAddToast'),
-    activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
-  });
 
   useEffect(() => {
     const handRaisedHandler = (event: Event) => {
@@ -287,21 +284,14 @@ const FullscreenVideoCall = ({
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
 
-  const {preferredBackgroundEffect} = useKoSubscribableChildren(backgroundEffectsHandler, [
-    'preferredBackgroundEffect',
-  ]);
-  const selectedBackgroundEffect = preferredBackgroundEffect ?? DEFAULT_BACKGROUND_EFFECT;
+  const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
-    if (effect.type === 'custom') {
-      addBackgroundNotification.show();
-      return;
-    }
     void switchVideoBackgroundEffect(effect);
   };
 
-  const handleAddBackground = () => {
-    addBackgroundNotification.show();
+  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
+    callingRepository.allowSuperhighQualityTier(event.target.checked);
   };
 
   return (
@@ -427,8 +417,9 @@ const FullscreenVideoCall = ({
               selectedEffect={selectedBackgroundEffect}
               backgrounds={BUILTIN_BACKGROUNDS}
               onSelectEffect={handleBackgroundSidebarSelect}
-              onAddBackground={handleAddBackground}
+              onEnableHighQualityBlur={handleEnableHighQualityBlur}
               onClose={() => setIsBackgroundSidebarOpen(false)}
+              highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
             />
           )}
         </div>
@@ -473,7 +464,6 @@ const FullscreenVideoCall = ({
               canShareScreen={canShareScreen}
               conversation={conversation}
               mediaDevicesHandler={mediaDevicesHandler}
-              backgroundEffectsHandler={backgroundEffectsHandler}
               minimize={minimize}
               leave={leave}
               toggleMute={toggleMute}
@@ -509,8 +499,9 @@ const FullscreenVideoCall = ({
           selectedEffect={selectedBackgroundEffect}
           backgrounds={BUILTIN_BACKGROUNDS}
           onSelectEffect={handleBackgroundSidebarSelect}
-          onAddBackground={handleAddBackground}
+          onEnableHighQualityBlur={handleEnableHighQualityBlur}
           onClose={() => setIsBackgroundSidebarOpen(false)}
+          highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
         />
       )}
       <ModalComponent
@@ -537,7 +528,7 @@ const FullscreenVideoCall = ({
                 wrapperCSS={{marginTop: 16}}
                 data-uie-name="do-not-ask-again-checkbox"
                 id="do-not-ask-again-checkbox"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   localStorage.setItem(
                     LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL,
                     event.target.checked.toString(),

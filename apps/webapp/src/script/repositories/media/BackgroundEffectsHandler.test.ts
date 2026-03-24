@@ -18,6 +18,7 @@
  */
 
 import {BackgroundEffectsHandler, ReleasableMediaStream} from './BackgroundEffectsHandler';
+import {backgroundEffectsStore} from './useBackgroundEffectsStore';
 
 // Mocks
 jest.mock('Util/localStorage', () => ({
@@ -41,6 +42,12 @@ jest.mock('Util/Logger', () => ({
 describe('BackgroundEffectsHandler', () => {
   let mockController: any;
   let mockStorage: any;
+
+  afterEach(() => {
+    backgroundEffectsStore.getState().setIsFeatureEnabled(false);
+    backgroundEffectsStore.getState().setPreferredEffect({type: 'none'});
+    backgroundEffectsStore.getState().setMetrics(undefined);
+  });
 
   beforeEach(() => {
     mockController = {
@@ -165,7 +172,7 @@ describe('BackgroundEffectsHandler', () => {
 
     handler.setPreferredBackgroundEffect({type: 'custom'} as any);
 
-    expect(handler.preferredBackgroundEffect().type).toBe('virtual');
+    expect(backgroundEffectsStore.getState().preferredEffect.type).toBe('virtual');
   });
 
   it('saves feature flag to storage', () => {
@@ -177,14 +184,14 @@ describe('BackgroundEffectsHandler', () => {
       'video-background-effects-feature-enabled',
       'true',
     );
-    expect(handler.isVideoBackgroundEffectsFeatureEnabled()).toBe(true);
+    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
   });
 
   it('reads feature flag from storage', () => {
     mockStorage.getItem.mockReturnValue('true');
 
-    const handler = new BackgroundEffectsHandler(mockController);
+    new BackgroundEffectsHandler(mockController);
 
-    expect(handler.isVideoBackgroundEffectsFeatureEnabled()).toBe(true);
+    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
   });
 });
