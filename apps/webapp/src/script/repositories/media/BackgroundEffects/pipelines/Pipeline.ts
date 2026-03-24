@@ -184,4 +184,6 @@ export interface Pipeline {
    * longer needed to prevent memory leaks.
    */
   stop(): void;
+
+  getCurrentModelPath(): string | null;
 }

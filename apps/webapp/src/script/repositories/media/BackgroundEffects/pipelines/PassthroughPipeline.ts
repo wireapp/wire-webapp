@@ -155,4 +155,8 @@ export class PassthroughPipeline implements Pipeline {
   public stop(): void {
     this.outputCanvas = null;
   }
+
+  public getCurrentModelPath(): string | null {
+    return '';
+  }
 }

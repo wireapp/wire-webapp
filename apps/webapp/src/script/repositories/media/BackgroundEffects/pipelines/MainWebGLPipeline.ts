@@ -445,4 +445,8 @@ export class MainWebGLPipeline implements Pipeline {
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'GPU';
     this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));
   }
+
+  public getCurrentModelPath(): string | null {
+    return '';
+  }
 }

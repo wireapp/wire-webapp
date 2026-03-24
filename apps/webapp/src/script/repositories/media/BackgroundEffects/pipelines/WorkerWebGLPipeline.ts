@@ -331,4 +331,8 @@ export class WorkerWebGLPipeline implements Pipeline {
     this.onWorkerContextLoss = null;
     this.lastTier = null;
   }
+
+  getCurrentModelPath(): string | null {
+    return '';
+  }
 }
