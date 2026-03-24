@@ -818,4 +818,8 @@ export class Canvas2DPipeline implements Pipeline {
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'CPU';
     this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));
   }
+
+  public getCurrentModelPath(): string | null {
+    return '';
+  }
 }

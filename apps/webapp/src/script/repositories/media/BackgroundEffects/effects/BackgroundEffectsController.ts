@@ -663,6 +663,22 @@ export class BackgroundEffectsController {
   }
 
   private handleTierChange(tier: QualityTier): void {
+    this.logger.info('Quality tier changed', tier);
+
+    const newModel = resolveSegmentationModelPath(tier, this.segmentationModelByTier, undefined);
+    const currentModel = this.pipelineImpl?.getCurrentModelPath?.();
+
+    if (newModel !== currentModel) {
+      this.logger.info('Model change required due to tier switch', {
+        tier,
+        newModel,
+        currentModel,
+      });
+
+      void this.initPipeline(this.pipeline);
+      return;
+    }
+
     if (this.pipeline === 'worker-webgl2') {
       this.maybeLogWorkerTierChange(tier);
       return;
@@ -691,9 +707,6 @@ export class BackgroundEffectsController {
    * @param tier - New quality tier.
    */
   private maybeLogWorkerTierChange(tier: QualityTier): void {
-    if (!this.isDev) {
-      return;
-    }
     if (this.lastWorkerTier !== tier) {
       this.logger.info('Worker pipeline quality tier change', {from: this.lastWorkerTier, to: tier});
       this.lastWorkerTier = tier;
