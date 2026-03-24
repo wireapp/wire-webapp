@@ -69,6 +69,7 @@ export const parseAccountDeepLink = (href: string, accountBase?: string): ParseA
     return null;
   }
 
+  // use regex https:\/\/[\w.-]+\/(?:user-profile\/\?id=([\w-]+)@|conversation-join\/\?key=([\w-]+)&code=([\w-]+)&domain=)([\w.-]+\.[a-zA-Z]{2,})
   const pathname = normalizePath(linkUrl.pathname);
 
   if (pathname === '/user-profile') {
