@@ -124,6 +124,8 @@ export class BackgroundEffectsController {
   private lastWorkerTier: QualityTier | null = null;
   /** Optional metrics callback for demo/telemetry use. */
   private onMetrics: ((metrics: Metrics) => void) | null = null;
+
+  private onModelChange: ((model: string) => void) | null = null;
   /** Tracks shutdown to avoid logging expected stop errors. */
   private isStopping = false;
   private capabilityInfo: CapabilityInfo = {
@@ -207,6 +209,7 @@ export class BackgroundEffectsController {
       };
     }
     this.onMetrics = opts.onMetrics ?? null;
+    this.onModelChange = opts.onModelChange ?? null;
     this.droppedFrames = 0;
     this.pipelineImpl = null;
 
@@ -663,21 +666,24 @@ export class BackgroundEffectsController {
   }
 
   private handleTierChange(tier: QualityTier): void {
-    this.logger.info('Quality tier changed', tier);
-
     const newModel = resolveSegmentationModelPath(tier, this.segmentationModelByTier, undefined);
-    const currentModel = this.pipelineImpl?.getCurrentModelPath?.();
-
-    if (newModel !== currentModel) {
-      this.logger.info('Model change required due to tier switch', {
-        tier,
-        newModel,
-        currentModel,
-      });
-
-      void this.initPipeline(this.pipeline);
-      return;
+    if (this.onModelChange !== null) {
+      this.onModelChange(newModel);
     }
+    this.logger.info('Quality tier changed', tier, newModel);
+
+    //const currentModel = this.pipelineImpl?.getCurrentModelPath?.();
+
+    // if (newModel !== currentModel) {
+    //   this.logger.info('Model change required due to tier switch', {
+    //     tier,
+    //     newModel,
+    //     currentModel,
+    //   });
+    //
+    //   void this.initPipeline(this.pipeline);
+    //   return;
+    // }
 
     if (this.pipeline === 'worker-webgl2') {
       this.maybeLogWorkerTierChange(tier);
@@ -799,7 +805,7 @@ export class BackgroundEffectsController {
     return this.pipelineImpl !== null;
   }
 
-  public getCapabilityInfo() {
+  public getCapabilityInfo(): CapabilityInfo {
     return this.capabilityInfo;
   }
 

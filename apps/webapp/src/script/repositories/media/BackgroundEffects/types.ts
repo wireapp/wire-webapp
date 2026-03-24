@@ -235,6 +235,8 @@ export interface StartOptions {
   pipelineOverride?: PipelineType;
   /** Optional callback to receive performance metrics updates. */
   onMetrics?: (metrics: Metrics) => void;
+  /** Optional callback to receive model name updates. */
+  onModelChange?: (model: string) => void;
 }
 
 /**

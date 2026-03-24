@@ -37,10 +37,12 @@ export type BackgroundEffectsState = {
   isFeatureEnabled: boolean;
   preferredEffect: BackgroundEffectSelection;
   metrics: RenderMetrics | undefined;
+  model: string;
 
   setIsFeatureEnabled(value: boolean): void;
   setPreferredEffect(effect: BackgroundEffectSelection): void;
   setMetrics(metrics: RenderMetrics | undefined): void;
+  setModel(model: string | undefined): void;
 };
 
 export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
@@ -48,6 +50,7 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     isFeatureEnabled: false,
     preferredEffect: DEFAULT_BACKGROUND_EFFECT,
     metrics: undefined,
+    model: 'unknown',
 
     setIsFeatureEnabled: value =>
       set(state => {
@@ -62,6 +65,11 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     setMetrics: metrics =>
       set(state => {
         state.metrics = metrics;
+      }),
+
+    setModel: model =>
+      set(state => {
+        state.model = model;
       }),
   })),
 );
