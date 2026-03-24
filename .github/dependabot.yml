@@ -69,6 +69,12 @@ updates:
           - '0.10.16'
       - dependency-name: '@types/node'
       - dependency-name: 'typescript'
+      - dependency-name: '@lexical/code'
+      - dependency-name: '@lexical/history'
+      - dependency-name: '@lexical/list'
+      - dependency-name: '@lexical/markdown'
+      - dependency-name: '@lexical/react'
+      - dependency-name: '@lexical/rich-text'
 
   # Server dependencies
   - package-ecosystem: npm
