@@ -34,9 +34,9 @@ import {
 } from 'Repositories/backup/Error';
 import {User} from 'Repositories/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
-import {checkBackupEncryption} from 'Util/BackupUtil';
+import {checkBackupEncryption} from 'Util/backupUtil';
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 import {loadFileBuffer} from 'Util/util';
 
 import {BackupFileUpload} from './BackupFileUpload';

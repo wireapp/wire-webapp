@@ -26,6 +26,7 @@ Object.defineProperty(window, 'Response', {
       this.responseString = responseString;
     }
     json = jest.fn().mockImplementation(() => (this.responseString ? JSON.parse(this.responseString) : {}));
+    text = jest.fn().mockImplementation(() => this.responseString ?? '');
   },
   writable: true,
 });

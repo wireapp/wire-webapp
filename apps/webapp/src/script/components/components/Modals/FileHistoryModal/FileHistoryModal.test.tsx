@@ -25,6 +25,18 @@ import {FileHistoryModal} from './FileHistoryModal';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {useFileVersions} from './hooks/useFileVersions';
 
+jest.mock('@wireapp/react-ui-kit', () => {
+  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
+
+  return {
+    ...actualModule,
+    Button: ({children, showLoading, ...properties}: any) => (
+      <button {...properties}>{showLoading ? null : children}</button>
+    ),
+    Loading: () => null,
+  };
+});
+
 jest.mock('./hooks/useFileHistoryModal');
 jest.mock('./hooks/useFileVersions');
 jest.mock('./FileHistoryHeader', () => ({

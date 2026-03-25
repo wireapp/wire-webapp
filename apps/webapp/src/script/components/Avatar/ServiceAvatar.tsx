@@ -23,7 +23,7 @@ import ko from 'knockout';
 
 import * as Icon from 'Components/Icon';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
+import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
 import {AvatarBackground} from './AvatarBackground';
 import {AvatarBorder} from './AvatarBorder';

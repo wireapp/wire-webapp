@@ -19,7 +19,7 @@
 
 import {TextInput} from 'Components/TextInput';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {handleEnterDown} from 'Util/KeyboardUtil';
+import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';

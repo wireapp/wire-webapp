@@ -40,7 +40,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {entities} from 'test/api/payloads';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {ConsentValue} from './ConsentValue';
 import {UserRepository} from './UserRepository';

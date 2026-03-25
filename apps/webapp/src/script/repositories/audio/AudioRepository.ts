@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {AudioPlayingType} from './AudioPlayingType';
 import {AudioType} from './AudioType';

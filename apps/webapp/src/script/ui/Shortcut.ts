@@ -23,7 +23,7 @@ import keyboardJS from 'keyboardjs';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {capitalizeFirstChar, includesString} from 'Util/StringUtil';
+import {capitalizeFirstChar, includesString} from 'Util/stringUtil';
 
 import {ShortcutType} from './ShortcutType';
 

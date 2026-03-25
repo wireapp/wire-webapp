@@ -24,7 +24,7 @@ import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/ent
 import {Config} from 'src/script/Config';
 import {MotionDuration} from 'src/script/motion/MotionDuration';
 import {t} from 'Util/localizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
+import {splitFingerprint} from 'Util/stringUtil';
 
 import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
 

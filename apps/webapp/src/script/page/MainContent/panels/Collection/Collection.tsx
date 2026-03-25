@@ -36,7 +36,7 @@ import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {CollectionDetails} from './CollectionDetails';

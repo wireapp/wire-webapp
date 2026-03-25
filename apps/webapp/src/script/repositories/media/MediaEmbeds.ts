@@ -19,7 +19,7 @@
 
 import {Runtime} from '@wireapp/commons';
 
-import {formatString} from 'Util/StringUtil';
+import {formatString} from 'Util/stringUtil';
 
 interface IFrameOptions {
   allowfullscreen: string;

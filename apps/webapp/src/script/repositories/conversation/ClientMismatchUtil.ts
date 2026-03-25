@@ -24,7 +24,7 @@ import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
 
 import {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 type UserClient = {clients: string[]; userId: QualifiedId};
 

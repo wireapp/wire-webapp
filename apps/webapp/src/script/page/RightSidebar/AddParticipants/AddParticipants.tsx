@@ -39,11 +39,11 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {UserState} from 'Repositories/user/UserState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {getManageServicesUrl} from '../../../externalRoute';
 import {PanelHeader} from '../PanelHeader';

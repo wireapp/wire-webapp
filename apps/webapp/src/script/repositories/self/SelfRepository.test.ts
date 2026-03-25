@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {ClientEntity} from 'Repositories/client';
 import {TestFactory} from 'test/helper/TestFactory';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {SelfRepository} from './SelfRepository';
 import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';

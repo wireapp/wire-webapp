@@ -28,7 +28,7 @@ import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 import {noop} from 'Util/util';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';

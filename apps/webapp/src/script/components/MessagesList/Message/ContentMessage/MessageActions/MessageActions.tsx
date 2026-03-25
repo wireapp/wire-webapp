@@ -27,8 +27,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {useClickOutside} from 'Hooks/useClickOutside';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isSpaceOrEnterKey, isTabKey} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 

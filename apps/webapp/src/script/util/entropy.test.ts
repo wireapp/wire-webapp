@@ -17,7 +17,7 @@
  *
  */
 
-import {EntropyData, shannonEntropy, calculateDeltaValues} from './Entropy';
+import {EntropyData, shannonEntropy, calculateDeltaValues} from './entropy';
 
 const seedrandom = require('seedrandom');
 

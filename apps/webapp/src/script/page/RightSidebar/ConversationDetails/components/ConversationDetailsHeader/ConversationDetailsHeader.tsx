@@ -25,10 +25,10 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {removeLineBreaks} from 'Util/StringUtil';
+import {removeLineBreaks} from 'Util/stringUtil';
 
 import {GroupDetails} from '../GroupDetails/GroupDetails';
 

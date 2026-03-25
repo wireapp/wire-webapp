@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 interface FileInputProps extends React.HTMLProps<HTMLInputElement> {
   fileTypes?: string[];

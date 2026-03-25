@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
-import {isAxiosError} from 'Util/TypePredicateUtil';
+import {isAxiosError} from 'Util/typePredicateUtil';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 

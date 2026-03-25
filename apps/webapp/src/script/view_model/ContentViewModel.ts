@@ -35,8 +35,8 @@ import type {Message} from 'Repositories/entity/message/Message';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {isConversationEntity} from 'Util/TypePredicateUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 

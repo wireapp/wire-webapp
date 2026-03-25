@@ -20,7 +20,7 @@
 import {renderHook, act} from '@testing-library/react';
 import ko from 'knockout';
 
-import {useKoSubscribableChildren} from './ComponentUtil';
+import {useKoSubscribableChildren} from './componentUtil';
 
 describe('ComponentUtil', () => {
   describe('useKoSubscribableChildren', () => {

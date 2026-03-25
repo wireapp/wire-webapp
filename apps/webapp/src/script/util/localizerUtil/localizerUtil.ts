@@ -24,7 +24,7 @@ import type {User} from 'Repositories/entity/User';
 
 import {Declension} from './localizerUtil.types';
 
-import {sortUsersByPriority} from '../StringUtil';
+import {sortUsersByPriority} from '../stringUtil';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 type ExtractSubstitutionKeys<Value extends string> = Value extends `${infer Start}{${infer Key}}${infer Rest}`

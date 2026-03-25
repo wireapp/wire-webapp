@@ -84,16 +84,16 @@ import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
-} from 'Util/LinkPreviewSender';
+} from 'Util/linkPreviewSender';
 import {Declension, joinNames, t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 import {isMarkdownText} from 'Util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {roundLogarithmic} from 'Util/NumberUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {capitalizeFirstChar} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {isBackendError, isErrorWithCode} from 'Util/TypePredicateUtil';
+import {roundLogarithmic} from 'Util/numberUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {capitalizeFirstChar} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
 import {loadUrlBlob, supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 

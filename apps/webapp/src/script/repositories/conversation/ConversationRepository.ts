@@ -92,11 +92,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserFilter} from 'Repositories/user/UserFilter';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {getNextItem} from 'Util/ArrayUtil';
+import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
 import {
   compareTransliteration,
@@ -104,10 +104,10 @@ import {
   sortByPriority,
   sortUsersByPriority,
   startsWith,
-} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
-import {isBackendError, isErrorWithType} from 'Util/TypePredicateUtil';
+import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';

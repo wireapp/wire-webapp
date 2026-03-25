@@ -30,9 +30,9 @@ import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
-import {getLogger} from 'Util/Logger';
-import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {removeUrlParameters} from 'Util/UrlUtil';
+import {getLogger} from 'Util/logger';
+import {formatDelayTime, TIME_IN_MILLIS} from 'Util/timeUtil';
+import {removeUrlParameters} from 'Util/urlUtil';
 
 import {
   hasActiveCertificate,

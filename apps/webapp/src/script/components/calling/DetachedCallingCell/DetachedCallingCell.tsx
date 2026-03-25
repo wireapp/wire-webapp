@@ -24,7 +24,7 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {DetachedWindow} from './components/DetachedWindow';
 

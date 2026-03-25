@@ -27,9 +27,9 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {isServiceEntity} from '../../../guards/Service';
 import {PanelHeader} from '../PanelHeader';

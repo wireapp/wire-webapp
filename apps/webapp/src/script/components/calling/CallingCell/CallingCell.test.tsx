@@ -18,7 +18,7 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {act} from 'react-dom/test-utils';
+import {act} from 'react';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 

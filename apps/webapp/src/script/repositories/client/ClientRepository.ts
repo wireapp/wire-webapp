@@ -35,11 +35,11 @@ import type {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import {t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {loadValue} from 'Util/StorageUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {loadValue} from 'Util/storageUtil';
 import {toError} from 'Util/toError';
-import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/TypePredicateUtil';
+import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';

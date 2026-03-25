@@ -59,9 +59,9 @@ import {disableForcedErrorReporting} from 'Repositories/tracking/Telemetry.helpe
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {getStorage} from 'Util/localStorage';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
-import {TIME_IN_MILLIS} from './TimeUtil';
+import {TIME_IN_MILLIS} from './timeUtil';
 import {createUuid} from './uuid';
 
 import {E2EIHandler} from '../E2EIdentity';

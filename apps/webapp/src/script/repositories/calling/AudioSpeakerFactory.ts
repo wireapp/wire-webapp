@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 export class AudioSpeakerFactory {
   private static readonly logger: Logger = getLogger('AudioSpeakerFactory');

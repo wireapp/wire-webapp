@@ -23,8 +23,8 @@ import {create} from 'zustand';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
 import {replaceLink, t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
-import {formatLocale} from 'Util/TimeUtil';
+import {getLogger} from 'Util/logger';
+import {formatLocale} from 'Util/timeUtil';
 import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 

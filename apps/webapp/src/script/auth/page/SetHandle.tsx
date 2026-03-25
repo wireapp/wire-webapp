@@ -30,8 +30,8 @@ import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} fr
 import {StorageKey} from 'Repositories/storage';
 import {navigate} from 'src/script/router/Router';
 import {t} from 'Util/localizerUtil';
-import {storeValue} from 'Util/StorageUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {storeValue} from 'Util/storageUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {Page} from './Page';
 

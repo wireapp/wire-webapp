@@ -77,7 +77,7 @@ import {
   generateAPIConversation,
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent} from 'test/helper/EventGenerator';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {escapeRegex} from 'Util/sanitizationUtil';
 import {createUuid} from 'Util/uuid';
 

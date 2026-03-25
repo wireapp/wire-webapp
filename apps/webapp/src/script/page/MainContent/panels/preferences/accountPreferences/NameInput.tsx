@@ -19,7 +19,7 @@
 
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {AccountInput, useInputDone} from './AccountInput';
 

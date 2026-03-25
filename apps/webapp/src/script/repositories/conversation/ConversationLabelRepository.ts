@@ -28,9 +28,9 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {fixWebsocketString} from 'Util/StringUtil';
-import {TypedEventTarget} from 'Util/TypedEventTarget';
+import {getLogger, Logger} from 'Util/logger';
+import {fixWebsocketString} from 'Util/stringUtil';
+import {TypedEventTarget} from 'Util/typedEventTarget';
 import {createUuid} from 'Util/uuid';
 
 export enum LabelType {

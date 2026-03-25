@@ -30,8 +30,8 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {initializeDataDog} from 'Util/DataDog';
-import {enableLogging} from 'Util/LoggerUtil';
+import {initializeDataDog} from 'Util/dataDog';
+import {enableLogging} from 'Util/loggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import './configureEnvironment';

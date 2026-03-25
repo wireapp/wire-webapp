@@ -25,6 +25,11 @@ import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './UserDetails';
 
+jest.mock('Components/Avatar', () => ({
+  Avatar: () => <div data-testid="mock-avatar" />,
+  AVATAR_SIZE: {X_LARGE: 'x-large'},
+}));
+
 describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {
     const name = 'test-name';

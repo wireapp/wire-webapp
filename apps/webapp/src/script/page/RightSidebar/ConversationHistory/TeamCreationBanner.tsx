@@ -20,7 +20,7 @@
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 

@@ -21,8 +21,8 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {User} from 'Repositories/entity/User';
-import {getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
-import {isTabKey} from 'Util/KeyboardUtil';
+import {getEmojiTitleFromEmojiUnicode} from 'Util/emojiUtil';
+import {isTabKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 

@@ -25,6 +25,17 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {CellsShareModalContent} from './CellsShareModalContent';
 
+jest.mock('@wireapp/react-ui-kit', () => {
+  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
+
+  return {
+    ...actualModule,
+    Input: ({wrapperCSS, showTogglePasswordLabel, hideTogglePasswordLabel, ...properties}: any) => (
+      <input {...properties} />
+    ),
+  };
+});
+
 // Mock dependencies
 jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,

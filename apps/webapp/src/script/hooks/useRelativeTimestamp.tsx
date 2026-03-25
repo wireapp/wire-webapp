@@ -33,7 +33,7 @@ import {
   formatDayMonth,
   isThisYear,
   isYoungerThanMinute,
-} from 'Util/TimeUtil';
+} from 'Util/timeUtil';
 
 const calculateTimestamp = (ts: number, isDay: boolean) => {
   const date = fromUnixTime(ts / TIME_IN_MILLIS.SECOND);

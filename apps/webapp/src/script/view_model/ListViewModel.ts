@@ -35,8 +35,8 @@ import {SearchRepository} from 'Repositories/search/SearchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
-import {iterateItem} from 'Util/ArrayUtil';
-import {isEscapeKey} from 'Util/KeyboardUtil';
+import {iterateItem} from 'Util/arrayUtil';
+import {isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import type {ActionsViewModel} from './ActionsViewModel';

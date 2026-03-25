@@ -41,8 +41,8 @@ import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/C
 import {RootContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isKeyboardEvent} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isKeyboardEvent} from 'Util/keyboardUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 
 import {PrimaryModal} from '../../PrimaryModal';

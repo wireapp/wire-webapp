@@ -19,7 +19,7 @@
 
 import {User} from 'Repositories/entity/User';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {ProgressCallback, FileData, Filename, FileDescriptor, Metadata} from './Backup.types';
 import {BackupService} from './BackupService';

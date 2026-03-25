@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {validateHandle} from 'Repositories/user/UserHandleGenerator';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/localizerUtil';
-import {isErrorWithType} from 'Util/TypePredicateUtil';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
 

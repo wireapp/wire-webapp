@@ -17,7 +17,7 @@
  *
  */
 
-import {matchQualifiedIds} from './QualifiedId';
+import {matchQualifiedIds} from './qualifiedId';
 
 describe('QualifiedId util', () => {
   describe('matchQualifiedIds', () => {

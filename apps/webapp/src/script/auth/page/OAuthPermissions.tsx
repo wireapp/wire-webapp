@@ -42,7 +42,7 @@ import {
 import * as Icon from 'Components/Icon';
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
 import {loadDataUrl} from 'Util/util';

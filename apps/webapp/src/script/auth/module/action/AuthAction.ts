@@ -29,7 +29,7 @@ import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
 import {toError} from 'Util/toError';
-import {isAxiosError, isBackendError} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError} from 'Util/typePredicateUtil';
 
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';

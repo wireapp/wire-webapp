@@ -33,6 +33,13 @@ import {setStrings} from 'Util/localizerUtil';
 import {MemberMessage} from './MemberMessage';
 import {CONFIG} from './MemberMessage/MessageContent';
 
+jest.mock('Components/Avatar', () => ({
+  AVATAR_SIZE: {
+    X_LARGE: 'avatar-xl',
+  },
+  Avatar: () => <div data-uie-name="mock-avatar" />,
+}));
+
 setStrings({en});
 
 function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {

@@ -17,7 +17,7 @@
  *
  */
 
-import {renderHook, waitFor} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
@@ -100,12 +100,16 @@ describe('useAssetTransfer', () => {
 
       expect(result.current.uploadProgress).toBe(0);
 
-      progressObservable(50);
+      act(() => {
+        progressObservable(50);
+      });
       await waitFor(() => {
         expect(result.current.uploadProgress).toBe(50);
       });
 
-      progressObservable(100);
+      act(() => {
+        progressObservable(100);
+      });
       await waitFor(() => {
         expect(result.current.uploadProgress).toBe(100);
       });
