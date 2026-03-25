@@ -24,7 +24,7 @@ import {Accept, FileRejection, useDropzone} from 'react-dropzone';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';

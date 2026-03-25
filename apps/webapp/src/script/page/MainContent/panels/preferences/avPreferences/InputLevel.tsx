@@ -21,7 +21,7 @@ import {HTMLProps, useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 
 export interface InputLevelProps extends HTMLProps<HTMLDivElement> {

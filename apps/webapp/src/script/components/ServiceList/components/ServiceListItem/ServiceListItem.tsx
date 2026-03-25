@@ -25,7 +25,7 @@ import {listItem, listWrapper} from 'Components/ParticipantItemContent/Participa
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface ServiceListItemProps {
   service: ServiceEntity;

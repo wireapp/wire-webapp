@@ -45,7 +45,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';

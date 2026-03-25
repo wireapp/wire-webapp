@@ -24,7 +24,7 @@ import {generateCellState} from 'Repositories/conversation/ConversationCellState
 import {ConversationStatusIcon} from 'Repositories/conversation/ConversationStatusIcon';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface Props {
   conversation: Conversation;

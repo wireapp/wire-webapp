@@ -19,7 +19,7 @@
 
 import {isKnownSignature, MLSPublicKeys} from 'Repositories/client';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 
 import {styles} from './MLSDeviceDetails.styles';

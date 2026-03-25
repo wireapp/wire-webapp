@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2026 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,18 +17,4 @@
  *
  */
 
-import {$convertToMarkdownString} from '@lexical/markdown';
-import {$getRoot} from 'lexical';
-
-import {markdownTransformers} from './markdownTransformers';
-
-export const serializeMessage = (showMarkdownPreview: boolean): string => {
-  if (!showMarkdownPreview) {
-    return $getRoot()
-      .getChildren()
-      .map(node => node.getTextContent())
-      .join('\n');
-  }
-
-  return $convertToMarkdownString(markdownTransformers, undefined, true);
-};
+export * from './taskScheduler';

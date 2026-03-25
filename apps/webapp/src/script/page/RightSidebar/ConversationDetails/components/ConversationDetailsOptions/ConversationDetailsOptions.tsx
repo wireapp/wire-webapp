@@ -34,8 +34,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
+import {t} from 'Util/localizerUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './ConversationDetailsOption';

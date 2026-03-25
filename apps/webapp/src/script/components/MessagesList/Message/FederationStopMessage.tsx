@@ -23,7 +23,7 @@ import * as Icon from 'Components/Icon';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/FederationStopMessage';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {MessageTime} from './MessageTime';
 import {useMessageFocusedTabIndex} from './util';

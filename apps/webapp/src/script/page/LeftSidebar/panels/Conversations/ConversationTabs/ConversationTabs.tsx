@@ -44,7 +44,7 @@ import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDataDogEnabled} from 'Util/DataDog';
 import {getWebEnvironment} from 'Util/Environment';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {

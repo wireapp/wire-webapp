@@ -17,7 +17,7 @@
  *
  */
 
-import {LocalStorageStore} from '../LocalStorageStore';
+import {LocalStorageStore} from '../localStorageStore';
 
 const prependKey = `TaskScheduler`;
 

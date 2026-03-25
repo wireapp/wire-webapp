@@ -33,7 +33,7 @@ import {createNewOrder, finalizeOrder} from './Steps/Order';
 import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/E2EIStorage.schema';
 
-import {CoreDatabase} from '../../../storage/CoreDB';
+import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;

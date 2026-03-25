@@ -55,7 +55,7 @@ import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';

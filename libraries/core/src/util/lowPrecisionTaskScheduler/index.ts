@@ -17,4 +17,4 @@
  *
  */
 
-export * from './LowPrecisionTaskScheduler';
+export * from './lowPrecisionTaskScheduler';

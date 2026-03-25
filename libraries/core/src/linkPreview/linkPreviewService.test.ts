@@ -23,7 +23,7 @@ import {AssetService} from '../conversation';
 import {LinkPreviewContent} from '../conversation/content';
 import {EncryptedAssetUploaded} from '../cryptography';
 
-import {LinkPreviewService} from './LinkPreviewService';
+import {LinkPreviewService} from './linkPreviewService';
 
 const conversationIdentifier: QualifiedId = {
   domain: 'wire.com',

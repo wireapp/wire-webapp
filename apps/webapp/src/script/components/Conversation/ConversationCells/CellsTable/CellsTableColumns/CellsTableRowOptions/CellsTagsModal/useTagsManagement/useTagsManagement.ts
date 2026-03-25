@@ -22,7 +22,7 @@ import {useCallback, useState} from 'react';
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';

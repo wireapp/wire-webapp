@@ -27,7 +27,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {AssetLoader} from '../common/AssetLoader/AssetLoader';
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';

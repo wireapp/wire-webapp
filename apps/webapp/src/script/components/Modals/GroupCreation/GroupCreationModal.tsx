@@ -52,7 +52,7 @@ import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/KeyboardUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 
 import {Config} from '../../../Config';

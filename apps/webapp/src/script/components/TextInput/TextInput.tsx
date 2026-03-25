@@ -23,7 +23,7 @@ import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {isTabKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {cancelButtonCSS, containerCSS, errorMessageCSS, getIconCSS, getInputCSS, getLabelCSS} from './TextInput.styles';
 

@@ -34,7 +34,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isConversationEntity} from 'Util/TypePredicateUtil';
 

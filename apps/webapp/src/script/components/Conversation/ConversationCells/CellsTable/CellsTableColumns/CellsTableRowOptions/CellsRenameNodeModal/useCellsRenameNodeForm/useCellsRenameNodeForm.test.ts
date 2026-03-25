@@ -25,7 +25,7 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellsRenameForm} from './useCellsRenameNodeForm';
 
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
 }));
 

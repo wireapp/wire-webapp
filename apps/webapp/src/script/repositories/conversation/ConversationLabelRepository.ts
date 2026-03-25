@@ -27,7 +27,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {TypedEventTarget} from 'Util/TypedEventTarget';

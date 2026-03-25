@@ -25,7 +25,7 @@ import * as Icon from 'Components/Icon';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {DeviceSelect} from './DeviceSelect';

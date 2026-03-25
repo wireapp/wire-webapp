@@ -39,7 +39,7 @@ jest.mock('tsyringe', () => ({
   injectable: () => () => {},
 }));
 
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
 }));
 

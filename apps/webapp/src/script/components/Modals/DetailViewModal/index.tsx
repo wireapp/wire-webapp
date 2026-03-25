@@ -33,7 +33,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {User} from 'Repositories/entity/User';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';

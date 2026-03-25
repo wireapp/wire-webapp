@@ -24,7 +24,7 @@ import {IntegrationRepository} from 'Repositories/integration/IntegrationReposit
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';

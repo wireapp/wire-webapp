@@ -36,7 +36,7 @@ import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import type {MenuItem} from './PanelActions';

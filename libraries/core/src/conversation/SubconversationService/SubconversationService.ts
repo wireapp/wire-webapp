@@ -27,7 +27,7 @@ import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
 import {generateSubconversationStoreKey} from './subconversationUtil';
 
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
-import {CoreDatabase} from '../../storage/CoreDB';
+import {CoreDatabase} from '../../storage/coreDb';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 
 type Events = {

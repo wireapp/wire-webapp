@@ -36,7 +36,7 @@ import {AppLockState} from 'Repositories/user/AppLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithCode} from 'Util/TypePredicateUtil';
 

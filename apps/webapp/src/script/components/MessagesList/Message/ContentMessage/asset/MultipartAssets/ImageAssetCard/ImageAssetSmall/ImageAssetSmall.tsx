@@ -19,7 +19,7 @@
 
 import {useState} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {containerStyles, imageStyles} from './ImageAssetSmall.styles';
 

@@ -25,7 +25,7 @@ import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {AssetType} from 'Repositories/assets/AssetType';
 import type {ReadReceipt} from 'Repositories/storage/record/EventRecord';
-import {t, getUserName} from 'Util/LocalizerUtil';
+import {t, getUserName} from 'Util/localizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';

@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, Input} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {StepProps} from './StepProps';
 import {modalButtonsCss} from './TeamCreationSteps.styles';

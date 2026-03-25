@@ -45,11 +45,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
-import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
 import {formatBytes} from 'Util/util';
 
 import {ConversationCells} from './ConversationCells/ConversationCells';

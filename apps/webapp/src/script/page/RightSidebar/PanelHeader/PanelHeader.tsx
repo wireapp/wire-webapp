@@ -25,7 +25,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DraggableClickWrapper} from 'Components/DraggableClickWrapper';
 import * as Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {noop} from 'Util/util';
 
 interface PanelHeaderProps {

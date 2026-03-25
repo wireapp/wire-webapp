@@ -29,7 +29,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {stripImageExifData} from 'Util/ImageUtil';
+import {stripImageExifData} from 'Util/imageUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
 import {WebWorker} from 'Util/worker';

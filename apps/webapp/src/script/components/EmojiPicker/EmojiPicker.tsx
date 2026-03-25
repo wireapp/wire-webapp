@@ -24,7 +24,7 @@ import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface EmojiPickerProps {
   posX: number;

@@ -24,7 +24,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getCurrentDate} from 'Util/TimeUtil';
 import {downloadBlob} from 'Util/util';
 

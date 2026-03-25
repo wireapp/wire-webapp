@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {Runtime} from '@wireapp/commons';
 
 import * as Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {afterRender} from 'Util/util';
 
 import {closeWarning, useWarningsState} from './WarningsState';

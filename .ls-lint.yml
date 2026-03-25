@@ -6,6 +6,34 @@ ls:
     .config.ts: camelCase
     .config.spec.ts: camelCase
     .types.ts: camelCase
+  apps/webapp/src/script/util/localizerUtil:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/util/connectionQualityHandler:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/util:
+    clipboardUtil.ts: camelCase
+    errorUtil.ts: camelCase
+    fileTypeUtil.ts: camelCase
+    fileTypeUtil.test.ts: camelCase
+    imageUtil.ts: camelCase
+    imageUtil.test.ts: camelCase
+    markdownUtil.ts: camelCase
+    markdownUtil.test.ts: camelCase
+    modalFocusUtil.ts: camelCase
+    reactionUtil.ts: camelCase
+    reactionUtil.test.ts: camelCase
+    sanitizationUtil.ts: camelCase
+    sanitizationUtil.test.ts: camelCase
+  apps/webapp/src/script/util/test/mock:
+    localStorageMock.ts: camelCase
+    responseMock.ts: camelCase
+    webRtcMock.ts: camelCase
   apps/server/routes:
     .dir: camelCase
     .ts: camelCase
@@ -175,3 +203,40 @@ ls:
   libraries/core/src/giphy:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/team:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/user:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/notification:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/auth:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/linkPreview:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/broadcast:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/client:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/errors:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/storage:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/util:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .store.ts: camelCase

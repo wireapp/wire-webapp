@@ -23,7 +23,7 @@ import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../Config';
 import {DeviceCard} from '../DeviceCard';

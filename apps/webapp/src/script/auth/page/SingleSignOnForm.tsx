@@ -30,7 +30,7 @@ import {Navigate, useNavigate} from 'react-router-dom';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import {Config} from '../../Config';

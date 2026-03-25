@@ -18,7 +18,7 @@
  */
 
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {AccountInput, useInputDone} from './AccountInput';

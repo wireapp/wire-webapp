@@ -24,7 +24,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {loadMoreWrapperStyles, wrapperStyles} from './CellsGlobalView.styles';
 import {CellsHeader} from './CellsHeader/CellsHeader';

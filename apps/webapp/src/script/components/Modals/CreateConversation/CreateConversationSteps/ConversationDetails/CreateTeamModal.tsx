@@ -22,7 +22,7 @@ import {Button, Text} from '@wireapp/react-ui-kit';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {useTeamCreationModal} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/useTeamCreationModal';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   salesModalBodyButtonCss,

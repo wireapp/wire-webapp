@@ -37,7 +37,7 @@ import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conv
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {AccountInput} from './accountPreferences/AccountInput';

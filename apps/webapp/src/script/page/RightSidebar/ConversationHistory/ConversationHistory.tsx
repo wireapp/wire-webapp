@@ -29,7 +29,7 @@ import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversat
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   conversationHistoryContainerCss,

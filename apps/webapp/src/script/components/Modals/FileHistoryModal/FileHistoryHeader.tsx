@@ -20,7 +20,7 @@
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
 import * as Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   fileHistoryCloseButtonCss,

@@ -40,7 +40,7 @@ import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/StringUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
