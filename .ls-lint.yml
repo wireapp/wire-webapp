@@ -22,9 +22,8 @@ ls:
     .test.ts: camelCase
     .test.tsx: camelCase
   apps/webapp/src/script/util/test/mock:
-    localStorageMock.ts: camelCase
-    responseMock.ts: camelCase
-    webRtcMock.ts: camelCase
+    .ts: camelCase
+    .mock.ts: camelCase
   apps/server/routes:
     .dir: camelCase
     .ts: camelCase

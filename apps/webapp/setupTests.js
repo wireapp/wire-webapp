@@ -35,7 +35,7 @@ import '@testing-library/jest-dom';
  * Wire specific side-effect mocks (mutate global objects when imported)
  * ---------------------------------------------------------------------------
  */
-import 'src/script/util/test/mock/createObjectURLMock';
+import 'src/script/util/test/mock/createObjectUrlMock';
 import 'src/script/util/test/mock/cryptoMock';
 import 'src/script/util/test/mock/matchMediaMock';
 import 'src/script/util/test/mock/mediaDevicesMock';
