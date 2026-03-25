@@ -17,6 +17,8 @@
  *
  */
 
+import {Decoder} from 'bazinga64';
+
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
@@ -35,7 +37,6 @@ import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from '.
 
 import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';
-import {Decoder} from 'bazinga64';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
 
