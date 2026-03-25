@@ -19,7 +19,7 @@
 
 import {MessageAddEvent, ReactionEvent} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage';
-import {addReaction, userReactionMapToReactionMap} from 'Util/ReactionUtil';
+import {addReaction, userReactionMapToReactionMap} from 'Util/reactionUtil';
 
 import {EventValidationError} from './EventValidationError';
 
