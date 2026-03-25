@@ -36,8 +36,8 @@ import {
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
-import {PerformancePanel} from 'Components/calling/PerformancePanel/PerformancePanel';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {VideoBackgroundPerformancePanel} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -573,7 +573,7 @@ const FullscreenVideoCall = ({
           </>
         )}
       </ModalComponent>
-      <PerformancePanel backgroundEffectsHandler={backgroundEffectsHandler} />
+      <VideoBackgroundPerformancePanel backgroundEffectsHandler={backgroundEffectsHandler} />
     </div>
   );
 };

@@ -73,10 +73,10 @@ describe('BackgroundEffectsHandler', () => {
       getVideoTracks: () =>
         withTrack
           ? [
-            {
-              stop: jest.fn(),
-            },
-          ]
+              {
+                stop: jest.fn(),
+              },
+            ]
           : [],
     } as unknown as MediaStream;
   }
@@ -119,9 +119,14 @@ describe('BackgroundEffectsHandler', () => {
     const result = await handler.applyBackgroundEffect(stream);
 
     expect(result.applied).toBe(true);
-    expect(mockController.start).toHaveBeenCalled();
-    expect(mockController.setMode).toHaveBeenCalledWith('blur');
-    expect(mockController.setBlurStrength).toHaveBeenCalled();
+    expect(mockController.start).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        mode: 'blur',
+      }),
+    );
+    expect(mockController.setMode).not.toHaveBeenCalled();
+    expect(mockController.setBlurStrength).not.toHaveBeenCalled();
   });
 
   it('applies virtual background successfully', async () => {
@@ -148,8 +153,15 @@ describe('BackgroundEffectsHandler', () => {
     const result = await handler.applyBackgroundEffect(stream);
 
     expect(result.applied).toBe(true);
-    expect(mockController.setMode).toHaveBeenCalledWith('virtual');
-    expect(mockController.setBackgroundSource).toHaveBeenCalledWith('mock-bg');
+    expect(loadBackgroundSource).toHaveBeenCalledWith('bg1');
+    expect(mockController.start).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        mode: 'virtual',
+      }),
+    );
+    expect(mockController.setMode).not.toHaveBeenCalled();
+    expect(mockController.setBackgroundSource).not.toHaveBeenCalled();
   });
 
   it('handles controller error gracefully', async () => {
@@ -180,10 +192,7 @@ describe('BackgroundEffectsHandler', () => {
 
     handler.saveFeatureEnabledStateInStore(true);
 
-    expect(mockStorage.setItem).toHaveBeenCalledWith(
-      'video-background-effects-feature-enabled',
-      'true',
-    );
+    expect(mockStorage.setItem).toHaveBeenCalledWith('video-background-effects-feature-enabled', 'true');
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
   });
 

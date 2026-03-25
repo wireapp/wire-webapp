@@ -33,8 +33,6 @@ import {getLogger, Logger} from 'Util/Logger';
 import {BackgroundEffectsController} from './BackgroundEffects/effects/BackgroundEffectsController';
 import {backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
 
-export {RenderMetrics} from './useBackgroundEffectsStore';
-
 export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
 
@@ -46,6 +44,7 @@ export class BackgroundEffectsHandler {
   private readonly storage: Storage | undefined;
   private customBackground: BackgroundSource | undefined = undefined;
   private saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private currentReleasableStream: ReleasableMediaStream | undefined = undefined;
 
   constructor(private readonly controller: BackgroundEffectsController) {
     this.storage = getStorage();
@@ -87,7 +86,19 @@ export class BackgroundEffectsHandler {
       ? await this.loadBackgroundSource(preferredEffect)
       : undefined;
 
-    let releasableStream: ReleasableMediaStream;
+    // If the pipeline is already running, update its parameters in-place and return the same stream object.
+    if (this.controller.isProcessing() && this.currentReleasableStream) {
+      if (isVirtual) {
+        this.controller.setMode('virtual');
+        if (backgroundSource) {
+          this.controller.setBackgroundSource(backgroundSource);
+        }
+      } else {
+        this.controller.setMode('blur');
+        this.controller.setBlurStrength(blurStrength);
+      }
+      return {applied: true, media: this.currentReleasableStream};
+    }
 
     try {
       const {outputTrack, stop} = await this.controller.start(videoTrack, {
@@ -101,7 +112,8 @@ export class BackgroundEffectsHandler {
         onModelChange: (model: string) => this.onModelChange(model),
       });
       const processedStream = new MediaStream([outputTrack]);
-      releasableStream = new ReleasableMediaStream(processedStream, () => {
+      this.currentReleasableStream = new ReleasableMediaStream(processedStream, () => {
+        this.currentReleasableStream = undefined;
         stop();
         outputTrack.stop();
       });
@@ -111,17 +123,7 @@ export class BackgroundEffectsHandler {
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
 
-    if (isVirtual) {
-      this.controller.setMode('virtual');
-      if (backgroundSource) {
-        this.controller.setBackgroundSource(backgroundSource);
-      }
-    } else {
-      this.controller.setMode('blur');
-      this.controller.setBlurStrength(blurStrength);
-    }
-
-    return {applied: true, media: releasableStream};
+    return {applied: true, media: this.currentReleasableStream!};
   }
 
   public setPreferredBackgroundEffect(effect: BackgroundEffectSelection, customBackground?: BackgroundSource) {
