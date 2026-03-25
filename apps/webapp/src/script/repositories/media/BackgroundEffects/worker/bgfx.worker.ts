@@ -37,6 +37,33 @@ import {state} from './state';
 
 import type {WorkerMessage, WorkerResponse} from '../types';
 
+self.addEventListener('error', event => {
+  try {
+    postMessage({
+      type: 'workerError',
+      reason: 'error',
+      message: event.message,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    } as WorkerResponse);
+  } catch {
+    // ignore
+  }
+});
+
+self.addEventListener('unhandledrejection', event => {
+  try {
+    postMessage({
+      type: 'workerError',
+      reason: 'unhandledrejection',
+      message: String(event.reason),
+    } as WorkerResponse);
+  } catch {
+    // ignore
+  }
+});
+
 /**
  * Main message handler for worker communication.
  *

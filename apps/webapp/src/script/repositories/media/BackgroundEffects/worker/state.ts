@@ -51,6 +51,8 @@ export interface State {
   canvas: OffscreenCanvas | null;
   /** Whether the WebGL context has been lost. */
   contextLost: boolean;
+  segmenterErrorCount: number;
+  fatalError: string | null;
 }
 
 /**
@@ -95,4 +97,7 @@ export const state: State = {
   lastTimestampMs: 0,
   canvas: null,
   contextLost: false,
+  // Error handling
+  segmenterErrorCount: 0,
+  fatalError: null,
 };
