@@ -25,6 +25,7 @@ module.exports = {
   Input: React.forwardRef(({showTogglePasswordLabel, hideTogglePasswordLabel, ...properties}, ref) =>
     React.createElement(actualUIKit.Input, {...properties, ref}),
   ),
+  Loading: properties => React.createElement('div', properties),
   Transition: ({children}) => children,
   TransitionContainer: ({children}) => children,
 };
