@@ -17,6 +17,8 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
   apps/webapp/src/script/util:
+    availabilityStatus.tsx: camelCase
+    backupUtil.ts: camelCase
     clipboardUtil.ts: camelCase
     errorUtil.ts: camelCase
     fileTypeUtil.ts: camelCase
@@ -24,6 +26,7 @@ ls:
     imageUtil.ts: camelCase
     imageUtil.test.ts: camelCase
     linkPreviewSender.ts: camelCase
+    loggerUtil.ts: camelCase
     locationUtil.ts: camelCase
     markdownUtil.ts: camelCase
     markdownUtil.test.ts: camelCase
