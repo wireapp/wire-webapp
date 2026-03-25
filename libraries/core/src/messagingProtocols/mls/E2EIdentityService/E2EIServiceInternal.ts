@@ -17,6 +17,8 @@
  *
  */
 
+import {Decoder} from 'bazinga64';
+
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
@@ -274,7 +276,7 @@ export class E2EIServiceInternal {
       const newCrlDistributionPoints = await cx.saveX509Credential(identity, certificate);
       for (const conversation of conversations) {
         if (Boolean(conversation.group_id?.length)) {
-          const idAsBytes = new TextEncoder().encode(conversation.group_id);
+          const idAsBytes = Decoder.fromBase64(conversation.group_id).asBytes;
           await cx.e2eiRotate(new ConversationId(idAsBytes));
         } else {
           this.logger.error('No group id found in conversation');
