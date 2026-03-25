@@ -201,5 +201,6 @@ export const buildCallingRepository = () => {
 
   return {
     getBackgroundEffectsHandler: () => backgroundEffectsHandler,
+    isSuperhighQualityTierAllowed: jest.fn(),
   } as unknown as CallingRepository;
 };
