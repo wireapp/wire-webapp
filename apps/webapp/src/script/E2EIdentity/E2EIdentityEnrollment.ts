@@ -27,7 +27,6 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
 import {getLogger} from 'Util/Logger';
@@ -313,12 +312,13 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           return userData.id_token;
         },
         certificateTtl: this.certificateTtl,
-        getAllConversations: () => {
-          const conversationState = container.resolve(ConversationState);
-          const conversations = conversationState.conversations().map(conversation => ({
-            group_id: conversation.groupId ?? '',
-          }));
-          return Promise.resolve(conversations);
+        getAllConversations: async () => {
+          const conversations = await this.core.service.conversation.getConversations();
+          return conversations.found
+            .filter(conversation => !!conversation.group_id)
+            .map(({group_id}) => ({
+              group_id,
+            }));
         },
       });
 

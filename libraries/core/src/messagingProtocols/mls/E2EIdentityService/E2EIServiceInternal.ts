@@ -35,6 +35,7 @@ import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from '.
 
 import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';
+import {Decoder} from 'bazinga64';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
 
@@ -274,7 +275,7 @@ export class E2EIServiceInternal {
       const newCrlDistributionPoints = await cx.saveX509Credential(identity, certificate);
       for (const conversation of conversations) {
         if (Boolean(conversation.group_id?.length)) {
-          const idAsBytes = new TextEncoder().encode(conversation.group_id);
+          const idAsBytes = Decoder.fromBase64(conversation.group_id).asBytes;
           await cx.e2eiRotate(new ConversationId(idAsBytes));
         } else {
           this.logger.error('No group id found in conversation');
