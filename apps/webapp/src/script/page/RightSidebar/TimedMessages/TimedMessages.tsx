@@ -26,7 +26,7 @@ import {RadioGroup} from 'Components/Radio';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {formatDuration} from 'Util/TimeUtil';
 
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';

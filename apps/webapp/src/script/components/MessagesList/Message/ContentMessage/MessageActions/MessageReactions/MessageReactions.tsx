@@ -21,7 +21,7 @@ import {useState, RefObject, FC, useRef} from 'react';
 
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {EmojiChar} from './EmojiChar';
 import {reactionImgSize} from './EmojiChar.styles';

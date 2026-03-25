@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {ReadIcon} from 'Components/Icon';
 import {Message} from 'Repositories/entity/message/Message';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {formatTimeShort} from 'Util/TimeUtil';
 
 interface ReadReceiptStatusProps {

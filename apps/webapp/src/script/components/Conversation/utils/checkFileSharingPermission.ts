@@ -21,7 +21,7 @@ import {container} from 'tsyringe';
 
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 /**
  * higher order function to check if file sharing is enabled.

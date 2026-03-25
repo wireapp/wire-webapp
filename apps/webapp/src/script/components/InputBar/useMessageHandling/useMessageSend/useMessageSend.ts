@@ -40,7 +40,7 @@ import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {isErrorWithType} from 'src/script/util/TypePredicateUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';
 

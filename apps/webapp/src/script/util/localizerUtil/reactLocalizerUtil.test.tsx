@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {replaceReactComponents} from './ReactLocalizerUtil';
+import {replaceReactComponents} from './reactLocalizerUtil';
 
 describe('replaceReactComponents', () => {
   it('return the string untouched if no replacements are given', () => {

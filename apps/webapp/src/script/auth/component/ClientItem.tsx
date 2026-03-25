@@ -37,7 +37,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {isEnterKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 

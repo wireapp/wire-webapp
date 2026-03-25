@@ -27,7 +27,7 @@ import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/CallPart
 import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {CallParticipantItemContent} from './CallParticipantItemContent';

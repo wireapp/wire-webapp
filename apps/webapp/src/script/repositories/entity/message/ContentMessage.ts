@@ -23,8 +23,8 @@ import ko from 'knockout';
 
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ReactionMap, ReadReceipt} from 'Repositories/storage';
-import {copyText} from 'Util/ClipboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {copyText} from 'Util/clipboardUtil';
+import {t} from 'Util/localizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
 
 import type {Asset} from './Asset';

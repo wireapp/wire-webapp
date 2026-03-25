@@ -18,7 +18,7 @@
  */
 
 import type {Location} from 'Repositories/entity/message/Location';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getMapsUrl} from 'Util/LocationUtil';
 
 interface LocationAssetProps {

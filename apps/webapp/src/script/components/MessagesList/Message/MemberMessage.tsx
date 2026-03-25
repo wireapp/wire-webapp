@@ -24,7 +24,7 @@ import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/
 import {User} from 'Repositories/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {E2eEncryptionMessage} from './E2eEncryptionMessage/E2eEncryptionMessage';
 import {ConnectedMessage} from './MemberMessage/ConnectedMessage';

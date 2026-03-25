@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {
   TIME_IN_MILLIS,
   fromUnixTime,

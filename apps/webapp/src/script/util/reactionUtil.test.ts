@@ -20,10 +20,10 @@
 import {ReactionMap} from 'Repositories/storage';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 
-import {addReaction, userReactionMapToReactionMap} from './ReactionUtil';
+import {addReaction, userReactionMapToReactionMap} from './reactionUtil';
 import {createUuid} from './uuid';
 
-describe('ReactionUtil', () => {
+describe('reactionUtil', () => {
   describe('userReactionMapToReactionMap', () => {
     it('converts a user reaction map to a reaction map', () => {
       const userId = {id: createUuid(), domain: ''};

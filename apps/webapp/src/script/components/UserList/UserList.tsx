@@ -32,7 +32,7 @@ import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {UserListItem} from './components/UserListItem';
 

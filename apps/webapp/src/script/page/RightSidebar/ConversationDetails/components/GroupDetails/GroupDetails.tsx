@@ -22,7 +22,7 @@ import {FC} from 'react';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface GroupDetailsProps {
   userParticipants: User[];

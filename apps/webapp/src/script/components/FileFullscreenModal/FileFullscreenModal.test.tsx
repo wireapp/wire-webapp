@@ -63,7 +63,7 @@ jest.mock('./PdfViewer/PdfViewer', () => ({
   PDFViewer: () => <div data-uie-name="pdf-viewer">PDF Viewer</div>,
 }));
 
-jest.mock('Util/FileTypeUtil', () => ({
+jest.mock('Util/fileTypeUtil', () => ({
   isFileEditable: (extension: string) => ['txt', 'md', 'json'].includes(extension),
 }));
 

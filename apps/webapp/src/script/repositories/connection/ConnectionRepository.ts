@@ -37,7 +37,7 @@ import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {toError} from 'Util/toError';

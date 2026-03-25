@@ -27,7 +27,7 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isEnterKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {removeLineBreaks} from 'Util/StringUtil';
 
 import {GroupDetails} from '../GroupDetails/GroupDetails';

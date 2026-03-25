@@ -21,7 +21,7 @@ import {Button, ButtonVariant, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   confirmConversationTypeContainerCss,

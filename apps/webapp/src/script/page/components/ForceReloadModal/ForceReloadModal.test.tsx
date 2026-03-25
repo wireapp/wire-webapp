@@ -25,7 +25,7 @@ import {render} from '@testing-library/react';
 import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {createDeterministicWallClock, DeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 
 import {RootProvider} from '../../RootProvider';

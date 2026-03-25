@@ -39,7 +39,7 @@ import type {IntegrationRepository} from 'Repositories/integration/IntegrationRe
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';

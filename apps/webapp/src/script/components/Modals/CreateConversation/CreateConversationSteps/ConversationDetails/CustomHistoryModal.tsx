@@ -21,7 +21,7 @@ import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/reac
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, HistorySharingUnit} from '../../types';

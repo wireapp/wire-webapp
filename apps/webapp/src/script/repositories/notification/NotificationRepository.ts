@@ -52,7 +52,7 @@ import {getPermissionState, setPermissionState} from 'Repositories/permission/pe
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {UserState} from 'Repositories/user/UserState';
-import {Declension, t, getUserName} from 'Util/LocalizerUtil';
+import {Declension, t, getUserName} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {truncate} from 'Util/StringUtil';

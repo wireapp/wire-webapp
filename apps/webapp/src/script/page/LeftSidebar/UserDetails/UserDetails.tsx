@@ -28,7 +28,7 @@ import {UserVerificationBadges} from 'Components/Badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import * as styles from './UserDetails.styles';
 

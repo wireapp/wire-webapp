@@ -26,7 +26,7 @@ import {MenuItem} from 'Components/panel/PanelActions';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as UserPermission from 'Repositories/user/UserPermission';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../Config';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';

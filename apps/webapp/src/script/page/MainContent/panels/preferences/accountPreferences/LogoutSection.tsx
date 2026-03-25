@@ -20,7 +20,7 @@
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {ClientRepository} from 'Repositories/client';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface LogoutSectionProps {
   clientRepository: ClientRepository;

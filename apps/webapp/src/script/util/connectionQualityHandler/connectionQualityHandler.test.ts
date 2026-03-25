@@ -19,7 +19,7 @@
 
 import {getConnectionQualityHander} from './';
 
-describe('ConnectionQualityListener', () => {
+describe('connectionQualityListener', () => {
   let originalNavigator: any;
   let mockConnection: any;
 

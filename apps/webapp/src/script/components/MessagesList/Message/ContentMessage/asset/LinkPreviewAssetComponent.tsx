@@ -26,8 +26,8 @@ import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Text} from 'Repositories/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {t} from 'Util/localizerUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {cleanURL, prependProtocol} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 

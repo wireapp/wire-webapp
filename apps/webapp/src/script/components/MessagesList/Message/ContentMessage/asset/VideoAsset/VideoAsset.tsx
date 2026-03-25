@@ -32,7 +32,7 @@ import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {formatSeconds} from 'Util/TimeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 

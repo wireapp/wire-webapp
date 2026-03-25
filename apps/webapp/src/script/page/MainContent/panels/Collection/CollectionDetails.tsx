@@ -23,7 +23,7 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {formatLocale, isThisYear, isToday} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
 

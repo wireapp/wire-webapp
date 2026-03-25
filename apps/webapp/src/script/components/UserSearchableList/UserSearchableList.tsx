@@ -30,7 +30,7 @@ import {SearchRepository} from 'Repositories/search/SearchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {partition} from 'Util/ArrayUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortByPriority} from 'Util/StringUtil';
 

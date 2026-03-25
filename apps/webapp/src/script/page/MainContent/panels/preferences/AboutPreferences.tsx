@@ -25,7 +25,7 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';

@@ -35,7 +35,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatDuration} from 'Util/TimeUtil';
 

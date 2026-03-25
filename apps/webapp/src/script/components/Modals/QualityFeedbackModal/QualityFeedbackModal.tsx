@@ -31,7 +31,7 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {trackCallQualityFeedback} from 'Repositories/tracking/Helpers';
 import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 
 import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';

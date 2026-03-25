@@ -28,7 +28,7 @@ import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './MessageHeader.styles';
 

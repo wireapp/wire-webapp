@@ -27,7 +27,7 @@ import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileA
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {useMessageFocusedTabIndex} from '../../../util';

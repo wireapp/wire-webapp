@@ -23,8 +23,8 @@ import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {User} from 'Repositories/entity/User';
 import {getEmojiTitleFromEmojiUnicode} from 'Util/EmojiUtil';
 import {isTabKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
+import {t} from 'Util/localizerUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {EmojiChar} from './EmojiChar';
 import {

@@ -43,7 +43,7 @@ import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 
 import {PrimaryModal} from '../../PrimaryModal';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';

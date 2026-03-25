@@ -23,7 +23,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {UserState} from 'Repositories/user/UserState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';
 import {CreateConversationSubmit} from './CreateConversationSubmit';

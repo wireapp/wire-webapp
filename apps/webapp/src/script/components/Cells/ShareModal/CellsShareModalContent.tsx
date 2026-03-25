@@ -42,7 +42,7 @@ import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClip
 import * as Icon from 'Components/Icon';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 

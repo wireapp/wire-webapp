@@ -62,7 +62,7 @@ import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {chunk, partition} from 'Util/ArrayUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';

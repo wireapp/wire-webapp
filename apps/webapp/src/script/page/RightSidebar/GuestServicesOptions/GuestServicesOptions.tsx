@@ -27,7 +27,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {GuestOptions} from './components/GuestOptions';
 import {ServicesOptions} from './components/ServicesOptions';

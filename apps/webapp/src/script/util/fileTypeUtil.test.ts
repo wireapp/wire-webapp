@@ -17,7 +17,7 @@
  *
  */
 
-import {isFileEditable} from './FileTypeUtil';
+import {isFileEditable} from './fileTypeUtil';
 
 describe('isFileEditable', () => {
   it('returns true for odf extension', () => {

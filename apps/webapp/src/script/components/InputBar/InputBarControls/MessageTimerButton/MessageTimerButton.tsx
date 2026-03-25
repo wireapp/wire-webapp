@@ -29,7 +29,7 @@ import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {DurationUnit, formatDuration} from 'Util/TimeUtil';
 import {setContextMenuPosition} from 'Util/util';
 

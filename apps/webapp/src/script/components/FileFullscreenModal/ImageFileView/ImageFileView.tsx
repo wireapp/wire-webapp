@@ -18,7 +18,7 @@
  */
 
 import {ZoomableImage} from 'Components/ZoomableImage/ZoomableImage';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {imageWrapperStyles, wrapperStyles} from './ImageFileView.styles';
 

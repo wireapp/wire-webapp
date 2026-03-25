@@ -22,7 +22,7 @@ import {escape} from 'underscore';
 import {create} from 'zustand';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 import {formatLocale} from 'Util/TimeUtil';
 import {noop} from 'Util/util';
