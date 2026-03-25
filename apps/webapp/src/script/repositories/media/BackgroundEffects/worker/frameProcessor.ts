@@ -200,6 +200,11 @@ function ensureSegmenterForTier(tier: QualityTier): void {
       nextSegmenter.close();
       if (initId === currentInitId) {
         state.pendingModelPath = null;
+
+        if (!state.segmenter) {
+          state.segmenter = null;
+          state.currentModelPath = null;
+        }
       }
       return;
     }
