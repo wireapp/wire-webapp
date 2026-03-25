@@ -717,6 +717,13 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
+    'conversationFilterDrafts': `Drafts`;
+    'conversationFilterMentions': `Mentions`;
+    'conversationFilterNone': `No filter`;
+    'conversationFilterPings': `Pings`;
+    'conversationFilterReplies': `Replies`;
+    'conversationFilterTooltip': `Filter conversations`;
+    'conversationFilterUnread': `Unread`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -1850,6 +1857,8 @@ declare module 'I18n/en-US.json' {
     'selfNotSupportMLSMsgPart1': `You can\'t communicate with {selfUserName}, as your device doesn\'t support the suitable protocol.`;
     'selfNotSupportMLSMsgPart2': `to call, and send messages and files.`;
     'selfProfileImageAlt': `Your profile picture`;
+    'servicesNotEnabledNoteTitle': `Your team doesn\'t use apps yet`;
+    'servicesNotEnabledBody': `To improve your workflow with apps, your team needs configuration. Please contact your team admin.`;
     'servicesOptionsTitle': `Apps`;
     'servicesRoomToggleInfo': `Open this conversation to apps.`;
     'servicesRoomToggleInfoExtended': `Open this conversation to apps. You can always change it later.`;

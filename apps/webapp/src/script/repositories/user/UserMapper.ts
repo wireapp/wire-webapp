@@ -108,6 +108,7 @@ export class UserMapper {
       service,
       team: teamId,
       supported_protocols: supportedProtocols,
+      type,
     } = userData;
 
     if (accentId) {
@@ -180,6 +181,8 @@ export class UserMapper {
     if (deleted) {
       userEntity.isDeleted = true;
     }
+
+    userEntity.type = type;
 
     return userEntity;
   }

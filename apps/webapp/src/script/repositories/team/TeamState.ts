@@ -18,8 +18,8 @@
  */
 
 import {Backend} from '@wireapp/api-client/lib/env';
-import {Role} from '@wireapp/api-client/lib/team';
-import {FeatureList, FEATURE_STATUS, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
+import {CONVERSATION_PROTOCOL, Role} from '@wireapp/api-client/lib/team';
+import {FEATURE_STATUS, FeatureList, SELF_DELETING_TIMEOUT} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
@@ -64,6 +64,7 @@ export class TeamState {
   readonly isCellsEnabled: ko.PureComputed<boolean>;
   readonly isAuditLogEnabled: ko.PureComputed<boolean>;
   readonly isAppsEnabled: ko.PureComputed<boolean>;
+  readonly isLegacyServicesEnabled: ko.PureComputed<boolean>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
@@ -147,7 +148,17 @@ export class TeamState {
     });
 
     this.isAppsEnabled = ko.pureComputed(() => {
-      return this.teamFeatures()?.apps?.status === FEATURE_STATUS.ENABLED;
+      return (
+        this.teamFeatures()?.apps?.status === FEATURE_STATUS.ENABLED &&
+        this.teamFeatures().mls?.config?.defaultProtocol === CONVERSATION_PROTOCOL.MLS
+      );
+    });
+
+    this.isLegacyServicesEnabled = ko.pureComputed(() => {
+      return (
+        this.hasWhitelistedServices() &&
+        this.teamFeatures().mls?.config?.defaultProtocol === CONVERSATION_PROTOCOL.PROTEUS
+      );
     });
 
     this.isAuditLogEnabled = ko.pureComputed(() => {
