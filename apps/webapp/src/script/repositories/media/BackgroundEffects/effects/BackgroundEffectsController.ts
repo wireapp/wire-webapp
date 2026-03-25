@@ -672,19 +672,6 @@ export class BackgroundEffectsController {
     }
     this.logger.info('Quality tier changed', tier, newModel);
 
-    //const currentModel = this.pipelineImpl?.getCurrentModelPath?.();
-
-    // if (newModel !== currentModel) {
-    //   this.logger.info('Model change required due to tier switch', {
-    //     tier,
-    //     newModel,
-    //     currentModel,
-    //   });
-    //
-    //   void this.initPipeline(this.pipeline);
-    //   return;
-    // }
-
     if (this.pipeline === 'worker-webgl2') {
       this.maybeLogWorkerTierChange(tier);
       return;

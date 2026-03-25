@@ -76,7 +76,6 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
   const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => backgroundEffectsHandler.getQuality());
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [capabilityInfo, setCapabilityInfo] = useState<CapabilityInfo | null>(null);
-  //const [modelName, setModelName] = useState<string>('');
 
   useEffect(() => {
     setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
