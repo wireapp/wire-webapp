@@ -109,6 +109,9 @@ export class WorkerWebGLPipeline implements Pipeline {
       if (event.data.type === 'segmenterError') {
         this.onWorkerSegmenterError?.(event.data.error);
       }
+      if (event.data.type === 'workerError') {
+        this.onWorkerContextLoss?.();
+      }
       if (event.data.type === 'contextLost') {
         this.onWorkerContextLoss?.();
       }

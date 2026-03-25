@@ -52,6 +52,11 @@ import type {QualityTier, QualityTierParams} from '../types';
  * @returns Promise that resolves when frame processing is complete.
  */
 export async function handleFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
+  if (state.fatalError) {
+    frame.close();
+    return;
+  }
+
   const renderer = state.renderer;
   if (!renderer || state.contextLost) {
     frame.close();
@@ -194,9 +199,33 @@ function ensureSegmenterForTier(tier: QualityTier): void {
 
   state.segmenterInitPromise = (async () => {
     try {
+      console.info('[bgfx.worker] loading model', desiredPath);
+
       await nextSegmenter.init();
+
+      console.info('[bgfx.worker] model ready', desiredPath);
+
+      state.segmenterErrorCount = 0;
+      state.fatalError = null;
     } catch (error) {
       console.warn('[bgfx.worker] Segmentation model swap failed, keeping previous model', error);
+
+      state.segmenterErrorCount++;
+      self.postMessage({
+        type: 'segmenterError',
+        model: desiredPath,
+        message: String(error),
+      });
+
+      if (state.segmenterErrorCount >= 3) {
+        state.fatalError = 'segmenter_failed_repeatedly';
+
+        self.postMessage({
+          type: 'workerError',
+          reason: 'segmenter',
+          message: state.fatalError,
+        });
+      }
       nextSegmenter.close();
       if (initId === currentInitId) {
         state.pendingModelPath = null;
