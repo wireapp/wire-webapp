@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ConversationParticipants';
+export * from './groupParticipantService';

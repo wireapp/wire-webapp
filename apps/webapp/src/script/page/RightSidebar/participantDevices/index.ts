@@ -17,4 +17,4 @@
  *
  */
 
-export * from './TimedMessages';
+export * from './participantDevices';

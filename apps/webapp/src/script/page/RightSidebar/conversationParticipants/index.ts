@@ -17,4 +17,4 @@
  *
  */
 
-export * from './GroupParticipantUser';
+export * from './conversationParticipants';

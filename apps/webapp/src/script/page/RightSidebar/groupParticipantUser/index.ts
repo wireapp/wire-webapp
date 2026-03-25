@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ParticipantDevices';
+export * from './groupParticipantUser';

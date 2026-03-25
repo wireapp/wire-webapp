@@ -34,7 +34,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
-import {conversationAccessContainerCss, conversationAccessContentCss} from './Access.styles';
+import {conversationAccessContainerCss, conversationAccessContentCss} from './access.styles';
 
 import {PanelHeader} from '../PanelHeader';
 

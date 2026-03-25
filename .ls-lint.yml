@@ -24,6 +24,28 @@ ls:
   apps/webapp/src/script/util/test/mock:
     .ts: camelCase
     .mock.ts: camelCase
+  apps/webapp/src/script/page/RightSidebar/access:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/page/RightSidebar/addParticipants:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/conversationParticipants:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/groupParticipantService:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/groupParticipantUser:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/participantDevices:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/timedMessages:
+    .ts: camelCase
+    .tsx: camelCase
   apps/server/routes:
     .dir: camelCase
     .ts: camelCase

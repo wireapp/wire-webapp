@@ -34,18 +34,18 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {Access} from './Access/Access';
-import {AddParticipants} from './AddParticipants';
+import {Access} from './access/access';
+import {AddParticipants} from './addParticipants';
 import {ConversationDetails} from './ConversationDetails';
 import {ConversationHistory} from './ConversationHistory/ConversationHistory';
-import {ConversationParticipants} from './ConversationParticipants';
-import {GroupParticipantService} from './GroupParticipantService';
-import {GroupParticipantUser} from './GroupParticipantUser';
+import {ConversationParticipants} from './conversationParticipants';
+import {GroupParticipantService} from './groupParticipantService';
+import {GroupParticipantUser} from './groupParticipantUser';
 import {GuestServicesOptions} from './GuestServicesOptions';
 import {MessageDetails} from './MessageDetails';
 import {Notifications} from './Notifications';
-import {ParticipantDevices} from './ParticipantDevices';
-import {TimedMessages} from './TimedMessages';
+import {ParticipantDevices} from './participantDevices';
+import {TimedMessages} from './timedMessages';
 
 import {isReadableMessage} from '../../guards/Message';
 import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';

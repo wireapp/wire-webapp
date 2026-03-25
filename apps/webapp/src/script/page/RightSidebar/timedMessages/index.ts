@@ -17,4 +17,4 @@
  *
  */
 
-export * from './GroupParticipantService';
+export * from './timedMessages';
