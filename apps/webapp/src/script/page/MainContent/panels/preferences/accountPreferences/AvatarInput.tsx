@@ -30,7 +30,7 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
-import {isErrorWithType} from 'Util/TypePredicateUtil';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 import {validateProfileImageResolution} from 'Util/util';
 
 import {FileInput} from './FileInput';

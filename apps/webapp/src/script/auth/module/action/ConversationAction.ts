@@ -22,7 +22,7 @@ import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {toError} from 'Util/toError';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {ConversationActionCreator} from './creator/';
 

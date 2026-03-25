@@ -67,7 +67,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {fixWebsocketString} from 'Util/StringUtil';
 import {toError} from 'Util/toError';
-import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
 import {showAvailabilityModal} from './AvailabilityModal';
 import {ConsentValue} from './ConsentValue';

@@ -36,7 +36,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {includesOnlyEmojis} from 'Util/EmojiUtil';
 import {t} from 'Util/localizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
-import {isErrorWithType} from 'Util/TypePredicateUtil';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AudioAsset} from './asset/AudioAsset/AudioAsset';
 import {FileAsset} from './asset/FileAsset/FileAsset';

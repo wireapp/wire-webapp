@@ -45,7 +45,7 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isKeyboardEvent} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {isConversationEntity} from 'Util/TypePredicateUtil';
+import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import {ConnectionRequests} from './ConnectionRequests';
 import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './ConversationsList.styles';

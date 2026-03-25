@@ -39,7 +39,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {loadValue} from 'Util/StorageUtil';
 import {toError} from 'Util/toError';
-import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/TypePredicateUtil';
+import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';

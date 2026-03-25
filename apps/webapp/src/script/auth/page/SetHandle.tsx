@@ -31,7 +31,7 @@ import {StorageKey} from 'Repositories/storage';
 import {navigate} from 'src/script/router/Router';
 import {t} from 'Util/localizerUtil';
 import {storeValue} from 'Util/StorageUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {Page} from './Page';
 

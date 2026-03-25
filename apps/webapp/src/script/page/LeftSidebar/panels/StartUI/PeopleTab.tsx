@@ -38,7 +38,7 @@ import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {sortByPriority} from 'Util/StringUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {TopPeople} from './components/TopPeople';
 

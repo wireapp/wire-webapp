@@ -39,7 +39,7 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
-import {isErrorWithCode} from 'Util/TypePredicateUtil';
+import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {useLegalHoldModalState} from './LegalHoldModal.state';
 

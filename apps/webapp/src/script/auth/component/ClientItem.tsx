@@ -39,7 +39,7 @@ import {
 import {isEnterKey} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/StringUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {ValidationError} from '../module/action/ValidationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';

@@ -107,7 +107,7 @@ import {
 } from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {toError} from 'Util/toError';
-import {isBackendError, isErrorWithType} from 'Util/TypePredicateUtil';
+import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';

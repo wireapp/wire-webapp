@@ -93,7 +93,7 @@ import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {isBackendError, isErrorWithCode} from 'Util/TypePredicateUtil';
+import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
 import {loadUrlBlob, supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 

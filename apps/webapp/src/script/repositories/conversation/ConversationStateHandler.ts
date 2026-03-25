@@ -25,7 +25,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/localizerUtil';
-import {isErrorWithCode} from 'Util/TypePredicateUtil';
+import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';

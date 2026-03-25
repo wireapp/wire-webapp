@@ -38,7 +38,7 @@ import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
-import {isErrorWithCode} from 'Util/TypePredicateUtil';
+import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',

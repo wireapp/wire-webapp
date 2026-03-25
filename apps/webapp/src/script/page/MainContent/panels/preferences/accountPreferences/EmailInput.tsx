@@ -23,7 +23,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
-import {isErrorWithCode} from 'Util/TypePredicateUtil';
+import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
 

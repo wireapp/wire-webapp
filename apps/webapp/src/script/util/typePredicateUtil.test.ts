@@ -20,10 +20,10 @@
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http/';
 import type {AxiosError} from 'axios';
 
-import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/TypePredicateUtil';
+import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 import {toError} from 'Util/toError';
 
-describe('TypePredicateUtil', () => {
+describe('typePredicateUtil', () => {
   describe('isAxiosError', () => {
     it('recognizes axios error structures', () => {
       const error: AxiosError = {

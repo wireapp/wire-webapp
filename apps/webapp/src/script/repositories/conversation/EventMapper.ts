@@ -65,7 +65,7 @@ import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {userReactionMapToReactionMap} from 'Util/reactionUtil';
 import {toError} from 'Util/toError';
-import {isErrorWithType} from 'Util/TypePredicateUtil';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 import {base64ToArray} from 'Util/util';
 
 import {
