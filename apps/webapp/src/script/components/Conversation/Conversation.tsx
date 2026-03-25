@@ -45,7 +45,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
-import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/FileTypeUtil';
+import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';

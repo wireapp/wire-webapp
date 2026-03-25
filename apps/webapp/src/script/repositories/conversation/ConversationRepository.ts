@@ -93,7 +93,7 @@ import {UserFilter} from 'Repositories/user/UserFilter';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {getNextItem} from 'Util/ArrayUtil';
-import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';

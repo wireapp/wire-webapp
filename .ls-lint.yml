@@ -17,6 +17,8 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
   apps/webapp/src/script/util:
+    fileTypeUtil.ts: camelCase
+    fileTypeUtil.test.ts: camelCase
     markdownUtil.ts: camelCase
     markdownUtil.test.ts: camelCase
     modalFocusUtil.ts: camelCase
