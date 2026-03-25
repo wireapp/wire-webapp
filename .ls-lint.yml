@@ -23,6 +23,7 @@ ls:
     fileTypeUtil.test.ts: camelCase
     imageUtil.ts: camelCase
     imageUtil.test.ts: camelCase
+    linkPreviewSender.ts: camelCase
     locationUtil.ts: camelCase
     markdownUtil.ts: camelCase
     markdownUtil.test.ts: camelCase

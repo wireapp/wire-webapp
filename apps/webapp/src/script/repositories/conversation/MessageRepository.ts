@@ -84,7 +84,7 @@ import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
-} from 'Util/LinkPreviewSender';
+} from 'Util/linkPreviewSender';
 import {Declension, joinNames, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isMarkdownText} from 'Util/markdownUtil';
