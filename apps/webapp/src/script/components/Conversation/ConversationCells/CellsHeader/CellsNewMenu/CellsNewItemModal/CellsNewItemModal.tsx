@@ -23,7 +23,7 @@ import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common
 import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {descriptionStyles} from './CellsNewItemModal.styles';
 

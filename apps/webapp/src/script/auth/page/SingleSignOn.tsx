@@ -47,8 +47,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LogoFullIcon} from 'Components/Icon';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {Page} from './Page';
 import {SingleSignOnForm} from './SingleSignOnForm';

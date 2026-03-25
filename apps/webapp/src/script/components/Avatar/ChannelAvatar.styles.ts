@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {CSS_SQUARE} from 'Util/CSSMixin';
+import {CSS_SQUARE} from 'Util/cssMixin';
 
 import {ChannelAvatarSize} from './ChannelAvatar';
 

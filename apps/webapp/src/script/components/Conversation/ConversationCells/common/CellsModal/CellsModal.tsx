@@ -20,7 +20,7 @@
 import {ReactNode} from 'react';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {handleEscDown} from 'Util/KeyboardUtil';
+import {handleEscDown} from 'Util/keyboardUtil';
 
 import {largeModalStyles, wrapperStyles} from './CellsModal.styles';
 import {

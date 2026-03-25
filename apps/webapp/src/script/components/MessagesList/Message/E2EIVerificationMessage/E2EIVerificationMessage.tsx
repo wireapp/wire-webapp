@@ -22,10 +22,10 @@ import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/Icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {MessageIcon, IconInfo, Link as LinkStyles} from './E2EIVerificationMessage.styles';
 

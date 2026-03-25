@@ -19,7 +19,7 @@
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {wrapperStyles, iconStyles, textStyles} from './VideoAssetError.styles';
 

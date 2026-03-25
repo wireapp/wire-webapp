@@ -32,7 +32,7 @@ import {
   COMMAND_PRIORITY_EDITOR,
 } from 'lexical';
 
-import {isTabKey} from 'Util/KeyboardUtil';
+import {isTabKey} from 'Util/keyboardUtil';
 
 const ON_SHIFT_TAB: LexicalCommand<KeyboardEvent> = createCommand('ON_SHIFT_TAB');
 interface GlobalEventsPluginProps {

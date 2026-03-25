@@ -30,6 +30,11 @@ import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
 import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
 
+jest.mock('Components/Avatar', () => ({
+  AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},
+  Avatar: () => <div data-testid="mock-avatar" />,
+}));
+
 const createMockParticipant = (
   userId: string,
   clientId: string,

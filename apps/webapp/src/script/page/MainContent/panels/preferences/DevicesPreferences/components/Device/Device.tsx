@@ -25,10 +25,10 @@ import {DeviceVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/Icon';
 import {ClientEntity} from 'Repositories/client';
 import {WireIdentity} from 'src/script/E2EIdentity';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
+import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../FormattedId';
 

@@ -24,7 +24,7 @@ import {LogFactory} from '@wireapp/commons';
 import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {GenericMessageType} from '../../../../../conversation';
-import {DecryptionError} from '../../../../../errors/DecryptionError';
+import {DecryptionError} from '../../../../../errors/decryptionError';
 import {HandledEventPayload} from '../../../../../notification';
 import {ProteusService} from '../../../ProteusService';
 

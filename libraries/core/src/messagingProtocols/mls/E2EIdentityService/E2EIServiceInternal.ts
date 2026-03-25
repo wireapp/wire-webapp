@@ -17,6 +17,8 @@
  *
  */
 
+import {Decoder} from 'bazinga64';
+
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
@@ -33,7 +35,7 @@ import {createNewOrder, finalizeOrder} from './Steps/Order';
 import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
 import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/E2EIStorage.schema';
 
-import {CoreDatabase} from '../../../storage/CoreDB';
+import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
@@ -274,12 +276,14 @@ export class E2EIServiceInternal {
       const newCrlDistributionPoints = await cx.saveX509Credential(identity, certificate);
       for (const conversation of conversations) {
         if (Boolean(conversation.group_id?.length)) {
-          const idAsBytes = new TextEncoder().encode(conversation.group_id);
+          const idAsBytes = Decoder.fromBase64(conversation.group_id).asBytes;
           await cx.e2eiRotate(new ConversationId(idAsBytes));
         } else {
           this.logger.error('No group id found in conversation');
         }
       }
+
+      await cx.deleteStaleKeyPackages(cipherSuite);
 
       const keyPackages = await cx.clientKeypackages(cipherSuite, CredentialType.X509, this.keyPackagesAmount);
 

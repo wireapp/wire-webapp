@@ -34,7 +34,7 @@ import {
 } from 'src/script/E2EIdentity';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
 import {Core} from 'src/script/service/CoreSingleton';
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/logger';
 import {waitFor} from 'Util/waitFor';
 
 import {isMLSConversation, MLSCapableConversation, MLSConversation} from '../../ConversationSelectors';

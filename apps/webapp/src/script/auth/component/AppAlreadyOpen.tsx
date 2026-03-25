@@ -20,7 +20,7 @@
 import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/react-ui-kit';
 
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../Config';
 

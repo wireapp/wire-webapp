@@ -19,13 +19,14 @@
 
 import {Runtime} from '@wireapp/commons';
 
-import {formatString} from 'Util/StringUtil';
+import {formatString} from 'Util/stringUtil';
 
 interface IFrameOptions {
   allowfullscreen: string;
   class: string;
   frameborder: string;
   height: string;
+  referrerpolicy: string;
   src?: string;
   type: string;
   video: boolean;
@@ -43,13 +44,14 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
     class: 'iframe-container iframe-container-video',
     frameborder: '0',
     height: '100%',
+    referrerpolicy: '',
     type: 'default',
     video: true,
     width: '100%',
   };
 
   options = {...defaults, ...options};
-  const iFrameContainer = `<div class="{0}"><iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}></iframe></div>`;
+  const iFrameContainer = `<div class="{0}"><iframe class="${options.type}" width="{1}" height="{2}" src="{3}" frameborder="{4}"{5}{6}></iframe></div>`;
 
   if (!options.video) {
     options.allowfullscreen = '';
@@ -68,6 +70,7 @@ const _createIFrameContainer = (options?: Partial<IFrameOptions>): string => {
     options.src,
     options.frameborder,
     options.allowfullscreen,
+    options.referrerpolicy,
   );
 };
 
@@ -285,6 +288,7 @@ export const MediaEmbeds = {
 
     if (embedUrl) {
       const iFrame = _createIFrameContainer({
+        referrerpolicy: ' referrerpolicy="strict-origin-when-cross-origin"',
         src: embedUrl,
         type: 'youtube',
       });

@@ -22,7 +22,7 @@
 import {useCallback, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
-import {isKey, isTabKey, KEY} from 'Util/KeyboardUtil';
+import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
 
 export function useRoveFocus(elements: string[]) {
   const [focusedId, setFocusedId] = useState<string | undefined>(undefined);

@@ -26,9 +26,9 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import type {User} from 'Repositories/entity/User';
 import {RichProfileRepository} from 'Repositories/user/RichProfileRepository';
-import {availabilityStatus, availabilityTranslationKeys} from 'Util/AvailabilityStatus';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 import {noop} from 'Util/util';
 
 interface EnrichedFieldsProps {

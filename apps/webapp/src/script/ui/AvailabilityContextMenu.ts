@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {ContextMenuEntry, showContextMenu} from './ContextMenu';
 

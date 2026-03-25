@@ -24,8 +24,8 @@ import {useSelector} from 'react-redux';
 
 import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
-import {isValidEmail, isValidUsername} from 'Util/ValidationUtil';
+import {t} from 'Util/localizerUtil';
+import {isValidEmail, isValidUsername} from 'Util/validationUtil';
 
 import {useAutoFocus} from '../hooks/useAutoFocus';
 import {ValidationError} from '../module/action/ValidationError';

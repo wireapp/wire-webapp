@@ -23,8 +23,8 @@ import {container} from 'tsyringe';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 import {ConversationType} from '../types';

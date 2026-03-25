@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {upgradeBadgeCss} from './ConversationDetails.styles';
 

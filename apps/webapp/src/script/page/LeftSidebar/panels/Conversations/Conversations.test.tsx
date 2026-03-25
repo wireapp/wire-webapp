@@ -32,6 +32,24 @@ import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations} from './';
 
+jest.mock('./ConversationSidebar/ConversationSidebar', () => ({
+  ConversationSidebar: ({onClickPreferences}: {onClickPreferences: (contentState: number) => void}) => {
+    const {ContentState} = require('src/script/page/useAppState');
+
+    return (
+      <button
+        title="preferencesHeadline"
+        type="button"
+        onClick={() => onClickPreferences(ContentState.PREFERENCES_ACCOUNT)}
+      />
+    );
+  },
+}));
+
+jest.mock('./ConversationHeader', () => ({
+  ConversationHeader: () => null,
+}));
+
 const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversationRepository' | 'searchRepository'> = {
   listViewModel: {
     switchList: jest.fn(),

@@ -23,7 +23,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {ProgressBar} from 'Components/ProgressBar';
 import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {uploadingProgressText} from './UploadAssetItem.styles';
 

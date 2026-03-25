@@ -17,7 +17,7 @@
  *
  */
 
-import {formatSeconds} from 'Util/TimeUtil';
+import {formatSeconds} from 'Util/timeUtil';
 
 import {wrapperStyles, playButtonWrapperStyles, seekbarStyles, timeStyles} from './VideoControls.styles';
 

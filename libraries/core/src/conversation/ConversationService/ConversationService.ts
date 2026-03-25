@@ -71,7 +71,7 @@ import {
   SendProteusMessageParams,
 } from '../../messagingProtocols/proteus/ProteusService/ProteusService.types';
 import {HandledEventPayload, HandledEventResult} from '../../notification';
-import {CoreDatabase} from '../../storage/CoreDB';
+import {CoreDatabase} from '../../storage/coreDb';
 import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {isSendingMessage, sendMessage} from '../message/messageSender';

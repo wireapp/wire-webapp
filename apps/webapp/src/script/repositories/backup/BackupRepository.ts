@@ -26,9 +26,9 @@ import {User} from 'Repositories/entity/User';
 import {EventRecord, UserRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {chunk} from 'Util/ArrayUtil';
-import {Logger, getLogger} from 'Util/Logger';
-import {constructUserPrimaryKey} from 'Util/StorageUtil';
+import {chunk} from 'Util/arrayUtil';
+import {Logger, getLogger} from 'Util/logger';
+import {constructUserPrimaryKey} from 'Util/storageUtil';
 import {WebWorker} from 'Util/worker';
 
 import {ProgressCallback, Filename, FileDescriptor} from './Backup.types';

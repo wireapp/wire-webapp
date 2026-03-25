@@ -61,11 +61,11 @@ import type {Text as TextAsset} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {userReactionMapToReactionMap} from 'Util/reactionUtil';
 import {toError} from 'Util/toError';
-import {isErrorWithType} from 'Util/TypePredicateUtil';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 import {base64ToArray} from 'Util/util';
 
 import {

@@ -38,7 +38,7 @@ export class CallingServiceClientE2E {
       email,
       password,
       verificationCode: '',
-      backend: 'DEV',
+      backend: 'MASTER',
       instanceType: {
         name: 'chrome',
         version: '103.0.5060.53',

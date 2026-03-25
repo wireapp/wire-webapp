@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {
   TIME_IN_MILLIS,
   fromUnixTime,
@@ -33,7 +33,7 @@ import {
   formatDayMonth,
   isThisYear,
   isYoungerThanMinute,
-} from 'Util/TimeUtil';
+} from 'Util/timeUtil';
 
 const calculateTimestamp = (ts: number, isDay: boolean) => {
   const date = fromUnixTime(ts / TIME_IN_MILLIS.SECOND);

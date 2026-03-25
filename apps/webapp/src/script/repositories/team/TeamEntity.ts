@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {isValidAsset} from 'Util/ValidationUtil';
+import {isValidAsset} from 'Util/validationUtil';
 
 export class TeamEntity {
   creator?: string;

@@ -22,10 +22,11 @@ import ko, {computed, observable, pureComputed} from 'knockout';
 
 import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
+import {Logger} from '@wireapp/commons';
 
 import {User} from 'Repositories/entity/User';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {getLogger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export type UserId = string;
 export type ClientId = string;

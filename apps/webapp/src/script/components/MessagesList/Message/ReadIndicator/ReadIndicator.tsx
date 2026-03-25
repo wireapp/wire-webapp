@@ -19,8 +19,8 @@
 
 import * as Icon from 'Components/Icon';
 import {Message} from 'Repositories/entity/message/Message';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {formatTimeShort} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {formatTimeShort} from 'Util/timeUtil';
 
 import {ReadIndicatorContainer, ReadIndicatorStyles, ReadReceiptText} from './ReadIndicator.styles';
 

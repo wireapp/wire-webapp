@@ -30,7 +30,7 @@ import {
   isPasteAction,
   isSpaceKey,
   isTabKey,
-} from 'Util/KeyboardUtil';
+} from 'Util/keyboardUtil';
 
 const hasInputAlreadyFocused = () => {
   return document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);

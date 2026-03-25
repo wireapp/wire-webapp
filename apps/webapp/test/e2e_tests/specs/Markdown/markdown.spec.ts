@@ -90,25 +90,8 @@ test.describe('Markdown', () => {
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
-    const longCodeMessage = 'const a = 5;\nconst b = 10;\nconsole.log(a + b);';
-    const conversationPage = userAPages.conversation();
-
-    await conversationPage.typeMessage('```');
-    await conversationPage.messageInput.press('Enter');
-
-    const codeLines = longCodeMessage.split('\n');
-
-    for (const [index, line] of codeLines.entries()) {
-      if (line.length > 0) {
-        await conversationPage.messageInput.pressSequentially(line, {delay: 100});
-      }
-
-      if (index < codeLines.length - 1) {
-        await conversationPage.messageInput.press('Shift+Enter');
-      }
-    }
-
-    await conversationPage.sendMessageButton.click();
+    const longCodeMessage = '```\nconst a = 5;\nconst b = 10;\nconsole.log(a + b);\n```';
+    await userAPages.conversation().sendMessage(longCodeMessage);
 
     for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});

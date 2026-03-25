@@ -17,59 +17,46 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-
 import {test, expect, withLogin} from '../../test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-const channelName = 'Test Channel';
-
-// ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
-test.fixme(
+test(
   'Calls in channels with device switch and screenshare',
   {tag: ['@TC-8755', '@crit-flow-web']},
   async ({createUser, createTeam, createPage, api}) => {
     test.setTimeout(150_000);
 
-    let owner: User;
-    let member: User;
-    let ownerPageManager: PageManager;
     let callingServiceInstanceId: string;
+    const channelName = 'Test Channel';
 
-    await test.step('Preconditions: Team owner creates a channels enabled team', async () => {
-      member = await createUser();
-      const team = await createTeam('Channels Call', {users: [member]});
-      owner = team.owner;
-
-      await api.brig.enableMLSFeature(owner.teamId);
-      await api.brig.unlockChannelFeature(owner.teamId);
-      await api.brig.enableChannelsFeature(owner.teamId);
-      await api.enableConferenceCallingFeature(owner.teamId);
-
-      // Create page managers for both owner and member
-      // Member page manager is needed for the channel/calling service to work properly
-      [ownerPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(owner))),
-        // Member logs in but calling service handles call participation
-        createPage(withLogin(member)),
-      ]);
+    const member = await createUser();
+    const team = await createTeam('Channels Call', {
+      users: [member],
+      features: {channels: true, mls: true, conferenceCalling: true},
     });
+    const owner = team.owner;
+
+    // Member page manager is needed for the channel/calling service to work properly
+    const [ownerPageManager] = await Promise.all([
+      PageManager.from(createPage(withLogin(owner))),
+      // Member logs in but calling service handles call participation
+      createPage(withLogin(member)),
+    ]);
+
+    const {pages, components, modals} = ownerPageManager.webapp;
 
     await test.step('Team owner creates a channel with available member', async () => {
-      const {pages} = ownerPageManager.webapp;
-      await createGroup(pages, channelName, [member]);
+      await pages.conversationList().clickCreateGroup();
+      await modals.createConversation().createChannel(channelName, {members: [member]});
       await expect(pages.conversationList().getConversationLocator(channelName)).toBeVisible();
     });
 
     await test.step('Owner starts a call in channel', async () => {
-      const {pages} = ownerPageManager.webapp;
       try {
         const response = await api.callingService.createInstance(member.password, member.email);
         callingServiceInstanceId = response.id;
         await api.callingService.setAcceptNextCall(callingServiceInstanceId);
         await pages.conversationList().openConversation(channelName);
-        await pages.conversation().clickConversationInfoButton();
         await pages.conversation().clickCallButton();
       } catch (error: unknown) {
         console.error('Error during call initiation:', error);
@@ -78,10 +65,7 @@ test.fixme(
     });
 
     await test.step('Member answers call from calling notification', async () => {
-      const {pages} = ownerPageManager.webapp;
-      // answering happens automatically calling service
-      await pages.calling().waitForCell();
-      expect(await pages.calling().isCellVisible()).toBeTruthy();
+      await expect(pages.calling().callCell).toBeVisible();
     });
 
     await test.step('Owner switches audio on and sends audio', async () => {
@@ -93,7 +77,6 @@ test.fixme(
     });
 
     await test.step('Owner turns on camera', async () => {
-      const {pages} = ownerPageManager.webapp;
       await pages.calling().clickToggleVideoButton();
     });
 
@@ -102,7 +85,6 @@ test.fixme(
     });
 
     await test.step('Owner swaps audio and video devices', async () => {
-      const {pages, components} = ownerPageManager.webapp;
       await components.conversationSidebar().clickPreferencesButton();
       await pages.settings().clickAudioVideoSettingsButton();
       await pages.audioVideoSettings().selectMicrophone('Fake Audio Input 2');
@@ -116,7 +98,6 @@ test.fixme(
     });
 
     await test.step('Owner turns on screenshare', async () => {
-      const {pages} = ownerPageManager.webapp;
       await pages.calling().clickToggleScreenShareButton();
     });
 
@@ -125,7 +106,6 @@ test.fixme(
     });
 
     await test.step('Owner ends call', async () => {
-      const {pages} = ownerPageManager.webapp;
       await pages.calling().clickLeaveCallButton();
     });
   },

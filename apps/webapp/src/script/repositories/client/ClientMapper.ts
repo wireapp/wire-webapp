@@ -20,7 +20,7 @@
 import type {PublicClient, RegisteredClient} from '@wireapp/api-client/lib/client';
 
 import {ClientRecord} from 'Repositories/storage';
-import {isClientRecord, isClientWithMLSPublicKeys} from 'Util/TypePredicateUtil';
+import {isClientRecord, isClientWithMLSPublicKeys} from 'Util/typePredicateUtil';
 
 import {ClientEntity} from './ClientEntity';
 import {parseClientId} from './ClientIdUtil';

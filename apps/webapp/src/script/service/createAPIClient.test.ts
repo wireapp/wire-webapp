@@ -16,31 +16,14 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-
-import {incrementalHttpRetryBackoffFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-
 import {createAPIClient} from './createAPIClient';
 
 describe('createAPIClient', () => {
-  it('enables incremental http retry backoff when the startup feature toggle reader returns true', () => {
-    const apiClient = createAPIClient(featureToggleName => {
-      return featureToggleName === incrementalHttpRetryBackoffFeatureToggleName;
-    });
+  it('creates an api client with incremental http retry backoff support', () => {
+    const apiClient = createAPIClient();
 
     try {
-      expect(apiClient.transport.http['shouldUseIncrementalRetryBackoff']).toBe(true);
-    } finally {
-      apiClient.disconnect();
-    }
-  });
-
-  it('keeps incremental http retry backoff disabled when the startup feature toggle reader returns false', () => {
-    const apiClient = createAPIClient(() => {
-      return false;
-    });
-
-    try {
-      expect(apiClient.transport.http['shouldUseIncrementalRetryBackoff']).toBe(false);
+      expect(apiClient.transport.http['incrementalRetryBackoffRunner']).toBeDefined();
     } finally {
       apiClient.disconnect();
     }

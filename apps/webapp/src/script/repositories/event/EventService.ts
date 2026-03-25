@@ -33,7 +33,7 @@ import {
   hasQuoteForMessage,
 } from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 import {toError} from 'Util/toError';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';

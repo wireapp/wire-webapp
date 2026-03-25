@@ -22,7 +22,7 @@ import {create} from 'zustand';
 import {LegalHoldModalType} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {splitFingerprint} from 'Util/StringUtil';
+import {splitFingerprint} from 'Util/stringUtil';
 
 type LegalHoldModalState = {
   type: LegalHoldModalType | null;

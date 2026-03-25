@@ -28,9 +28,9 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {AppLockRepository} from 'Repositories/user/AppLockRepository';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatDurationCaption} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {formatDurationCaption} from 'Util/timeUtil';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 
