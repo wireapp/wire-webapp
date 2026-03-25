@@ -26,6 +26,7 @@ module.exports = {
     React.createElement(actualUIKit.Input, {...properties, ref}),
   ),
   Loading: properties => React.createElement('div', properties),
+  Modal: ({children}) => React.createElement('div', null, children),
   Transition: ({children}) => children,
   TransitionContainer: ({children}) => children,
 };
