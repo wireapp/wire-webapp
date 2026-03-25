@@ -7961,6 +7961,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@sindresorhus/is@npm:4.6.0":
+  version: 4.6.0
+  resolution: "@sindresorhus/is@npm:4.6.0"
+  checksum: 10/e7f36ed72abfcd5e0355f7423a72918b9748bb1ef370a59f3e5ad8d40b728b85d63b272f65f63eec1faf417cda89dcb0aeebe94015647b6054659c1442fe5ce0
+  languageName: node
+  linkType: hard
+
 "@sinonjs/commons@npm:^2.0.0":
   version: 2.0.0
   resolution: "@sinonjs/commons@npm:2.0.0"
@@ -10898,6 +10905,7 @@ __metadata:
     "@nx/webpack": "npm:22.3.3"
     "@playwright/test": "npm:1.57.0"
     "@roamhq/wrtc": "npm:0.9.1"
+    "@sindresorhus/is": "npm:4.6.0"
     "@tanstack/react-table": "npm:8.21.3"
     "@tanstack/react-virtual": "npm:3.13.18"
     "@testing-library/dom": "npm:10.4.1"
