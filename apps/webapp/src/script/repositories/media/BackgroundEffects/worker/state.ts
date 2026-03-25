@@ -40,6 +40,7 @@ export interface State {
   blurStrength: number;
   quality: QualityMode;
   currentModelPath: string | null;
+  pendingModelPath: string | null;
   segmenterInitPromise: Promise<void> | null;
   metrics: Metrics;
   frameCount: number;
@@ -77,6 +78,7 @@ export const state: State = {
   blurStrength: 0.5,
   quality: 'auto',
   currentModelPath: null,
+  pendingModelPath: null,
   segmenterInitPromise: null,
   metrics: {
     avgTotalMs: 0,
