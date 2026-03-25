@@ -20,7 +20,7 @@
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {copyText} from 'Util/ClipboardUtil';
+import {copyText} from 'Util/clipboardUtil';
 import {t} from 'Util/localizerUtil';
 
 interface AccountLinkProps {

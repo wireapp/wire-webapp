@@ -17,6 +17,7 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
   apps/webapp/src/script/util:
+    clipboardUtil.ts: camelCase
     fileTypeUtil.ts: camelCase
     fileTypeUtil.test.ts: camelCase
     markdownUtil.ts: camelCase
