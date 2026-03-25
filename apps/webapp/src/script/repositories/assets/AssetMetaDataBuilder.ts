@@ -17,8 +17,8 @@
  *
  */
 
-import {chunk} from 'Util/ArrayUtil';
-import {capToByte, rootMeanSquare} from 'Util/NumberUtil';
+import {chunk} from 'Util/arrayUtil';
+import {capToByte, rootMeanSquare} from 'Util/numberUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {loadFileBuffer} from 'Util/util';
 

@@ -24,7 +24,7 @@ import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
 import {Logger, getLogger} from 'Util/Logger';
-import {loadValue, storeValue} from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/storageUtil';
 import {toError} from 'Util/toError';
 
 import {DexieDatabase} from './DexieDatabase';

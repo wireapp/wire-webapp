@@ -28,8 +28,8 @@ import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
-import {cleanURL, prependProtocol} from 'Util/UrlUtil';
-import {isTweetUrl} from 'Util/ValidationUtil';
+import {cleanURL, prependProtocol} from 'Util/urlUtil';
+import {isTweetUrl} from 'Util/validationUtil';
 
 import {AssetHeader} from './common/AssetHeader/AssetHeader';
 

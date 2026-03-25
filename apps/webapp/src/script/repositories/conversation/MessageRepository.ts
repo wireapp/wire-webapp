@@ -89,7 +89,7 @@ import {Declension, joinNames, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {isMarkdownText} from 'Util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {roundLogarithmic} from 'Util/NumberUtil';
+import {roundLogarithmic} from 'Util/numberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';

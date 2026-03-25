@@ -86,7 +86,7 @@ import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserService} from 'Repositories/user/UserService';
-import {initializeDataDog} from 'Util/DataDog';
+import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
 import {t} from 'Util/localizerUtil';

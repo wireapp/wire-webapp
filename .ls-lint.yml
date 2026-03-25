@@ -17,10 +17,17 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
   apps/webapp/src/script/util:
+    arrayUtil.ts: camelCase
     availabilityStatus.tsx: camelCase
     backupUtil.ts: camelCase
     clipboardUtil.ts: camelCase
+    countryCodes.ts: camelCase
+    cssMixin.ts: camelCase
+    dataDog.ts: camelCase
     debugUtil.ts: camelCase
+    emojiUtil.ts: camelCase
+    entropy.test.ts: camelCase
+    entropy.ts: camelCase
     environment.ts: camelCase
     errorUtil.ts: camelCase
     fileTypeUtil.ts: camelCase
@@ -33,13 +40,18 @@ ls:
     markdownUtil.ts: camelCase
     markdownUtil.test.ts: camelCase
     modalFocusUtil.ts: camelCase
+    numberUtil.ts: camelCase
+    peerConnectionUtil.ts: camelCase
     reactionUtil.ts: camelCase
     reactionUtil.test.ts: camelCase
     sanitizationUtil.ts: camelCase
     sanitizationUtil.test.ts: camelCase
+    storageUtil.ts: camelCase
     typedEventTarget.ts: camelCase
     typePredicateUtil.ts: camelCase
     typePredicateUtil.test.ts: camelCase
+    urlUtil.ts: camelCase
+    validationUtil.ts: camelCase
   apps/webapp/src/script/util/test/mock:
     localStorageMock.ts: camelCase
     responseMock.ts: camelCase

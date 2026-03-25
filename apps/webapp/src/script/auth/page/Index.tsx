@@ -31,7 +31,7 @@ import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/r
 import {LogoFullIcon} from 'Components/Icon';
 import {useSingleInstance} from 'Hooks/useSingleInstance';
 import {Core} from 'src/script/service/CoreSingleton';
-import {isDataDogEnabled} from 'Util/DataDog';
+import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';
 import {t} from 'Util/localizerUtil';
 

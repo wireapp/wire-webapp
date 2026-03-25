@@ -42,9 +42,9 @@ import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/localizerUtil';
-import {loadValue, storeValue} from 'Util/StorageUtil';
+import {loadValue, storeValue} from 'Util/storageUtil';
 import {setDateLocale, LocaleType} from 'Util/TimeUtil';
-import {getParameter} from 'Util/UrlUtil';
+import {getParameter} from 'Util/urlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 

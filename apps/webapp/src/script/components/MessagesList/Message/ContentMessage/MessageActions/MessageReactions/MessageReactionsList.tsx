@@ -21,7 +21,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {User} from 'Repositories/entity/User';
 import {ReactionMap} from 'Repositories/storage';
-import {getEmojiUnicode} from 'Util/EmojiUtil';
+import {getEmojiUnicode} from 'Util/emojiUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 
 import {EmojiPill} from './EmojiPill';

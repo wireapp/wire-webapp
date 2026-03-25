@@ -57,7 +57,7 @@ import {getLogger, Logger} from 'Util/Logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {truncate} from 'Util/StringUtil';
 import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {ValidationUtilError} from 'Util/ValidationUtil';
+import {ValidationUtilError} from 'Util/validationUtil';
 
 import {AppPermissionState} from './AppPermissionState';
 

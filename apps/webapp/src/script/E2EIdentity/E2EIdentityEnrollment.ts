@@ -32,7 +32,7 @@ import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
 import {getLogger} from 'Util/Logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {removeUrlParameters} from 'Util/UrlUtil';
+import {removeUrlParameters} from 'Util/urlUtil';
 
 import {
   hasActiveCertificate,

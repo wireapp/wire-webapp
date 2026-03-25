@@ -17,8 +17,8 @@
  *
  */
 
-import {prependProtocol} from './UrlUtil';
-import {isValidEmail} from './ValidationUtil';
+import {prependProtocol} from './urlUtil';
+import {isValidEmail} from './validationUtil';
 
 export const escapeRegex = (string: string): string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 

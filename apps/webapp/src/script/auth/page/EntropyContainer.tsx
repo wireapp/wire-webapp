@@ -24,7 +24,7 @@ import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/rea
 import {handleEnterDown} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import {EntropyData} from '../../util/Entropy';
+import {EntropyData} from '../../util/entropy';
 import {EntropyCanvas} from '../component/EntropyCanvas';
 import {ProgressBar} from '../component/ProgressBar';
 

@@ -33,7 +33,7 @@ import {Multipart} from 'Repositories/entity/message/Multipart';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {includesOnlyEmojis} from 'Util/emojiUtil';
 import {t} from 'Util/localizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';

@@ -17,7 +17,7 @@
  *
  */
 
-import {partition} from 'Util/ArrayUtil';
+import {partition} from 'Util/arrayUtil';
 
 import {Config} from '../Config';
 

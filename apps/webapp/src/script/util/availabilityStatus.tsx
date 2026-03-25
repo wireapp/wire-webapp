@@ -22,7 +22,7 @@ import {CSSObject} from '@emotion/serialize';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import * as Icon from 'Components/Icon';
-import {CSS_SQUARE} from 'Util/CSSMixin';
+import {CSS_SQUARE} from 'Util/cssMixin';
 
 const iconStyles: CSSObject = {
   ...CSS_SQUARE(10),

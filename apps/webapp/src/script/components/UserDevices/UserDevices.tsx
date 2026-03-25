@@ -26,7 +26,7 @@ import {ClientRepository, ClientEntity} from 'Repositories/client';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
-import {partition} from 'Util/ArrayUtil';
+import {partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
 import {capitalizeFirstChar} from 'Util/StringUtil';

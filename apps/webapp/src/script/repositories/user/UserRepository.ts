@@ -61,7 +61,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {chunk, partition} from 'Util/ArrayUtil';
+import {chunk, partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';

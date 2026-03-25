@@ -29,7 +29,7 @@ import {
 import {UserList} from 'Components/UserList';
 import {User} from 'Repositories/entity/User';
 import {ReactionMap} from 'Repositories/storage';
-import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/EmojiUtil';
+import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/emojiUtil';
 import {capitalizeFirstChar} from 'Util/StringUtil';
 
 import {panelContentTitleStyles} from './MessageDetails.styles';

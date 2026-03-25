@@ -30,7 +30,7 @@ import {Text} from 'Repositories/entity/message/Text';
 import type {EventService} from 'Repositories/event/EventService';
 import type {EventRecord} from 'Repositories/storage';
 import {getLogger, Logger} from 'Util/Logger';
-import {clamp} from 'Util/NumberUtil';
+import {clamp} from 'Util/numberUtil';
 import {obfuscate} from 'Util/StringUtil';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
 import {arrayToBase64, noop} from 'Util/util';

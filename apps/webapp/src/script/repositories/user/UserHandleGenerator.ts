@@ -19,8 +19,8 @@
 
 import getSlug from 'speakingurl';
 
-import {randomElement} from 'Util/ArrayUtil';
-import {getRandomNumber} from 'Util/NumberUtil';
+import {randomElement} from 'Util/arrayUtil';
+import {getRandomNumber} from 'Util/numberUtil';
 
 const MIN_HANDLE_LENGTH = 2;
 export const MAX_HANDLE_LENGTH = 256;

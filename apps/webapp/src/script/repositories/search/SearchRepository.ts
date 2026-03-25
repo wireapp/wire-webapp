@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import type {User} from 'Repositories/entity/User';
 import {validateHandle} from 'Repositories/user/UserHandleGenerator';
 import type {UserRepository} from 'Repositories/user/UserRepository';
-import {EMOJI_RANGES} from 'Util/EmojiUtil';
+import {EMOJI_RANGES} from 'Util/emojiUtil';
 import {
   computeTransliteration,
   replaceAccents,

@@ -24,7 +24,7 @@ import {CSSObject} from '@emotion/serialize';
 import {User} from 'Repositories/entity/User';
 import {ACCENT_ID} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {CSS_SQUARE} from 'Util/CSSMixin';
+import {CSS_SQUARE} from 'Util/cssMixin';
 import {t} from 'Util/localizerUtil';
 
 export interface AccentColorPickerProps {

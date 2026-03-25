@@ -32,7 +32,7 @@ import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
 import {enableLogging} from 'Util/loggerUtil';
-import {loadValue} from 'Util/StorageUtil';
+import {loadValue} from 'Util/storageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {createApplicationServices} from './createApplicationServices';

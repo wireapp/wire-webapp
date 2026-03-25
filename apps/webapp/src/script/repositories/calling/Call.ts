@@ -27,7 +27,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {CanvasMediaStreamMixer} from 'Repositories/media/CanvasMediaStreamMixer';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {chunk, getDifference, partition} from 'Util/ArrayUtil';
+import {chunk, getDifference, partition} from 'Util/arrayUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {sortUsersByPriority} from 'Util/StringUtil';
