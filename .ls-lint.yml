@@ -18,6 +18,7 @@ ls:
     .test.ts: camelCase
   apps/webapp/src/script/util:
     clipboardUtil.ts: camelCase
+    errorUtil.ts: camelCase
     fileTypeUtil.ts: camelCase
     fileTypeUtil.test.ts: camelCase
     imageUtil.ts: camelCase
