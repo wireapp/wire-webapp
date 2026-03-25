@@ -38,12 +38,12 @@ import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
-import {ConversationDetailsOption} from './ConversationDetailsOption';
+import {ConversationDetailsOption} from './conversationDetailsOption';
 
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {PanelEntity, PanelState} from '../../../RightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';
-import {ConversationDetailsBottomActions} from '../ConversationDetailsBottomActions';
+import {ConversationDetailsBottomActions} from '../conversationDetailsBottomActions';
 
 interface ConversationDetailsOptionsProps {
   actionsViewModel: ActionsViewModel;

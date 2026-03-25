@@ -44,9 +44,9 @@ import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 import {formatDuration} from 'Util/timeUtil';
 
-import {ConversationDetailsHeader} from './components/ConversationDetailsHeader';
-import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';
-import {ConversationDetailsParticipants} from './components/ConversationDetailsParticipants';
+import {ConversationDetailsHeader} from './components/conversationDetailsHeader';
+import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
+import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
 
 import {isServiceEntity} from '../../../guards/Service';
 import {Shortcut} from '../../../ui/Shortcut';

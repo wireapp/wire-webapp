@@ -25,7 +25,7 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {createUuid} from 'Util/uuid';
 
-import {ConversationDetailsHeader} from './ConversationDetailsHeader';
+import {ConversationDetailsHeader} from './conversationDetailsHeader';
 
 const participant = new User('id');
 const service = new ServiceEntity({id: 'id'});

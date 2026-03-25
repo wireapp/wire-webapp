@@ -17,4 +17,4 @@
  *
  */
 
-export * from './GuestServicesOptions';
+export * from './conversationDetailsBottomActions';

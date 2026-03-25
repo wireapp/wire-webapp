@@ -37,7 +37,7 @@ import {UserState} from 'Repositories/user/UserState';
 import 'src/script/util/test/mock/localStorageMock';
 import {createUuid} from 'Util/uuid';
 
-import {ConversationDetails} from './ConversationDetails';
+import {ConversationDetails} from './conversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';

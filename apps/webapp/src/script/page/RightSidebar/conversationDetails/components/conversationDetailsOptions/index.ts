@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ConversationDetailsBottomActions';
+export * from './conversationDetailsOptions';

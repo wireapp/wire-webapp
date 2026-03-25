@@ -29,8 +29,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {GuestOptions} from './components/GuestOptions';
-import {ServicesOptions} from './components/ServicesOptions';
+import {GuestOptions} from './components/guestOptions';
+import {ServicesOptions} from './components/servicesOptions';
 
 import {PanelHeader} from '../panelHeader';
 

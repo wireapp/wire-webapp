@@ -26,7 +26,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 
-import {GuestServicesOptions} from './GuestServicesOptions';
+import {GuestServicesOptions} from './guestServicesOptions';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './GuestOptions';
+export * from './conversationDetailsHeader';

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ServicesOptions';
+export * from './guestOptions';

@@ -30,7 +30,7 @@ import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {removeLineBreaks} from 'Util/stringUtil';
 
-import {GroupDetails} from '../GroupDetails/GroupDetails';
+import {GroupDetails} from '../groupDetails/groupDetails';
 
 interface ConversationDetailsHeaderProps {
   isActiveGroupParticipant: boolean;
