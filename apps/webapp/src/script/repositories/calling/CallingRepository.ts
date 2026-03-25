@@ -84,7 +84,7 @@ import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {captureModalFocusContext} from 'Util/ModalFocusUtil';
+import {captureModalFocusContext} from 'Util/modalFocusUtil';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
 import {copyStyles} from 'Util/renderElement';

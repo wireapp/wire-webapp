@@ -26,7 +26,7 @@ import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHand
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {captureModalFocusContext} from 'Util/ModalFocusUtil';
+import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
 interface ChooseScreenProps {
   choose: (screenId: string) => void;
