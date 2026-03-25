@@ -313,6 +313,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         certificateTtl: this.certificateTtl,
         getAllConversations: async () => {
+          if (!isCertificateRenewal) {
+            return Promise.resolve([]);
+          }
           const conversations = await this.core.service.conversation.getConversations();
           return conversations.found
             .filter(conversation => !!conversation.group_id)
