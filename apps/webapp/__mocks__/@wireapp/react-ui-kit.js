@@ -17,10 +17,12 @@
  *
  */
 
+const React = require('react');
 const actualUIKit = jest.requireActual('@wireapp/react-ui-kit');
 
 module.exports = {
   ...actualUIKit,
+  Input: ({showTogglePasswordLabel, hideTogglePasswordLabel, ...properties}) => React.createElement(actualUIKit.Input, properties),
   Transition: ({children}) => children,
   TransitionContainer: ({children}) => children,
 };
