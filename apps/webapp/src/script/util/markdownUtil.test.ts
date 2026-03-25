@@ -17,9 +17,9 @@
  *
  */
 
-import {isMarkdownText, sanitizeMarkdown} from './MarkdownUtil';
+import {isMarkdownText, sanitizeMarkdown} from './markdownUtil';
 
-describe('MarkdownUtil', () => {
+describe('markdownUtil', () => {
   describe('isMarkdownText', () => {
     it('returns false for empty text', () => {
       expect(isMarkdownText('')).toBe(false);

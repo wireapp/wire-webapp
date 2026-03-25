@@ -87,7 +87,7 @@ import {
 } from 'Util/LinkPreviewSender';
 import {Declension, joinNames, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
-import {isMarkdownText} from 'Util/MarkdownUtil';
+import {isMarkdownText} from 'Util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
 import {roundLogarithmic} from 'Util/NumberUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
