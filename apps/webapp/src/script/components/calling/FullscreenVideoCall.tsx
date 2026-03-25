@@ -194,7 +194,7 @@ const FullscreenVideoCall = ({
   const openPopup = () => callingRepository.setViewModeDetached();
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
-  const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(true);
+  const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
 
   const callNotification = useAppNotification({
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
