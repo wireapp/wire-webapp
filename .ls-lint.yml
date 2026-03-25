@@ -20,6 +20,8 @@ ls:
     clipboardUtil.ts: camelCase
     fileTypeUtil.ts: camelCase
     fileTypeUtil.test.ts: camelCase
+    imageUtil.ts: camelCase
+    imageUtil.test.ts: camelCase
     markdownUtil.ts: camelCase
     markdownUtil.test.ts: camelCase
     modalFocusUtil.ts: camelCase

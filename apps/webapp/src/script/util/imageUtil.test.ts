@@ -19,7 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {getBestPreviewSource, imageHasExifData, isPreviewableImage, stripImageExifData} from './ImageUtil';
+import {getBestPreviewSource, imageHasExifData, isPreviewableImage, stripImageExifData} from './imageUtil';
 
 const jpegWithExif = new Blob([new Uint8Array([0xff, 0xd8, 0xff, 0xe1, 0x00, 0x10, 0x45, 0x78, 0x69, 0x66])], {
   type: 'image/jpeg',
@@ -34,7 +34,7 @@ const nonJpeg = new Blob([new Uint8Array([0x00, 0x00, 0x00, 0x00])], {type: 'app
 URL.createObjectURL = jest.fn(() => 'mocked-url');
 URL.revokeObjectURL = jest.fn();
 
-describe('ImageUtil', () => {
+describe('imageUtil', () => {
   let mockCanvas: HTMLCanvasElement;
   let mockContext: CanvasRenderingContext2D;
 
