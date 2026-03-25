@@ -30,6 +30,7 @@ jest.mock('@wireapp/react-ui-kit', () => {
 
   return {
     ...actualModule,
+    Button: ({children, ...properties}: any) => <button {...properties}>{children}</button>,
     Loading: () => null,
   };
 });
