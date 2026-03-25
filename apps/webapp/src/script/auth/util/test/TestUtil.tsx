@@ -98,7 +98,9 @@ const withStore = (
   store: MockStoreEnhanced<RecursivePartial<RootState>, ThunkDispatch<RootState, Api, AnyAction>>,
 ) => <Provider store={store}>{children}</Provider>;
 
-const withRouter = (component: React.ReactNode) => <Router>{component}</Router>;
+const withRouter = (component: React.ReactNode) => (
+  <Router future={{v7_relativeSplatPath: true, v7_startTransition: true}}>{component}</Router>
+);
 
 const loadLanguage = (language: string) => {
   return require(`I18n/${mapLanguage(language)}.json`);
