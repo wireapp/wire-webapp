@@ -61,7 +61,7 @@ export const CallParticipantItemContent = ({
           {isSelf && <div css={selfIndicator}>{selfString}</div>}
           {isAudioEstablished && showContextMenu && (
             <button
-              data-hoverClass="chevron-icon"
+              data-hover-class="chevron-icon"
               tabIndex={TabIndex.UNFOCUSABLE}
               css={chevronIcon}
               onClick={onDropdownClick}

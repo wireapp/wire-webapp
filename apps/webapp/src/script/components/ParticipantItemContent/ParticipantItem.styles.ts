@@ -32,7 +32,7 @@ export const listWrapper = ({isHighlighted = false, noUnderline = false, noInter
     },
   },
 
-  '&:hover [data-hoverClass="chevron-icon"], &:focus, &:focus-visible [data-hoverClass="chevron-icon"]': {
+  '&:hover [data-hover-class="chevron-icon"], &:focus, &:focus-visible [data-hover-class="chevron-icon"]': {
     opacity: 1,
   },
 

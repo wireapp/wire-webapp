@@ -106,7 +106,7 @@ export const ParticipantItemContent = ({
         )}
       </div>
 
-      {showArrow && <Icon.ChevronRight css={chevronIcon} data-hoverClass="chevron-icon" />}
+      {showArrow && <Icon.ChevronRight css={chevronIcon} data-hover-class="chevron-icon" />}
     </div>
   );
 };
