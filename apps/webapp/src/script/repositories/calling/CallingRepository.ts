@@ -379,11 +379,9 @@ export class CallingRepository {
       return;
     }
 
-    // Whatever will happen from now, we stop the current background effect!
-    selfParticipant.releaseProcessedVideoStream();
-
     // let's check if background should be disabled, then let's do it and go back to the original video
-    if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled() && hasActiveVideo) {
+    if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+      selfParticipant.releaseProcessedVideoStream();
       if (hasActiveVideo && changeAvsSendingMediaSource) {
         // So let's switch back to the original video source
         this.logger.info('Disable background effects.');
@@ -398,17 +396,27 @@ export class CallingRepository {
       return;
     }
 
+    // Hold a reference to the old stream so we can release it AFTER the new one is assigned,
+    const previousStream = selfParticipant.processedVideoStream();
+
     const {applied, media} = await this.backgroundEffectsHandler.applyBackgroundEffect(selfParticipant.videoStream());
 
     // The BackgroundEffectsHandler decide not to change the video stream, so we're going on with the original video.
-    if (!applied && changeAvsSendingMediaSource) {
-      this.logger.info('Background effect could not applied! Switch back to original video stream!');
-      this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+    if (!applied) {
+      previousStream?.release();
+      selfParticipant.processedVideoStream(undefined);
+      if (changeAvsSendingMediaSource) {
+        this.logger.info('Background effect could not applied! Switch back to original video stream!');
+        this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+      }
       return selfParticipant.videoStream();
     }
 
-    // Replace current video stream with new effected video stream
+    // Assign new stream first, then release old.
     selfParticipant.processedVideoStream(media);
+    if (previousStream !== media) {
+      previousStream?.release();
+    }
 
     // in case we also want to instantly change AVS sending source we do it now,
     if (changeAvsSendingMediaSource) {
