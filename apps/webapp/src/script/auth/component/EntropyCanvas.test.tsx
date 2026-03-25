@@ -21,7 +21,7 @@ import React from 'react';
 
 import {fireEvent, render, screen, act} from '@testing-library/react';
 
-import {EntropyCanvas} from './entropyCanvas';
+import {EntropyCanvas} from './EntropyCanvas';
 
 import {EntropyData} from '../../util/entropy';
 import {withIntl, withTheme} from '../util/test/TestUtil';
