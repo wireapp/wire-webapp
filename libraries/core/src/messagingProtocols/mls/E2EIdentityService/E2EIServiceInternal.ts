@@ -283,6 +283,8 @@ export class E2EIServiceInternal {
         }
       }
 
+      await cx.deleteStaleKeyPackages(cipherSuite);
+
       const keyPackages = await cx.clientKeypackages(cipherSuite, CredentialType.X509, this.keyPackagesAmount);
 
       return {
