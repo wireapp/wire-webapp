@@ -49,7 +49,7 @@ import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
-import {safeMailOpen, safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
 import {formatBytes} from 'Util/util';
 
 import {ConversationCells} from './ConversationCells/ConversationCells';

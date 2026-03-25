@@ -23,7 +23,7 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {Config} from 'src/script/Config';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {
   salesModalWrapperCss,

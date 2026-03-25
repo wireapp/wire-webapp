@@ -20,9 +20,9 @@
 import {User} from 'Repositories/entity/User';
 import {Declension, LocalizerUtil, t, getSelfName, getUserName} from 'Util/localizerUtil';
 
-import {escapeRegex, safeWindowOpen} from './SanitizationUtil';
+import {escapeRegex, safeWindowOpen} from './sanitizationUtil';
 
-describe('SanitizationUtil', () => {
+describe('sanitizationUtil', () => {
   describe('escapeRegex', () => {
     it('will return escaped regex strings', () => {
       const escapedRegex = escapeRegex(':)');

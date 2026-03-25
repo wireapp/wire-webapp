@@ -36,7 +36,7 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/Logger';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {sortByPriority} from 'Util/StringUtil';
 import {isBackendError} from 'Util/TypePredicateUtil';
 

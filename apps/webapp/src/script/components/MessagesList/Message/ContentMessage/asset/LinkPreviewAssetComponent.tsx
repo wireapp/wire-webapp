@@ -27,7 +27,7 @@ import type {Text} from 'Repositories/entity/message/Text';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {cleanURL, prependProtocol} from 'Util/UrlUtil';
 import {isTweetUrl} from 'Util/ValidationUtil';
 

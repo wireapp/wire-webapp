@@ -26,7 +26,7 @@ import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/localizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {StepProps} from './StepProps';
 import {listCss, modalButtonsCss, successStepSubHeaderCss} from './TeamCreationSteps.styles';

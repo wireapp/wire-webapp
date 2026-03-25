@@ -50,7 +50,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {ROLE} from 'Repositories/user/UserPermission';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/QualifiedId';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {Config} from '../Config';
 

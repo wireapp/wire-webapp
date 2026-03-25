@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import {t} from 'Util/localizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {TYPE} from './WarningsTypes';
 

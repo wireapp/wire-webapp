@@ -22,7 +22,7 @@ import {Button, Text} from '@wireapp/react-ui-kit';
 import {Config} from 'src/script/Config';
 import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {
   teamCreationBodyCss,
