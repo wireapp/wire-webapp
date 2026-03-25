@@ -43,7 +43,9 @@ export const CellsNewNodeForm = ({type, onSubmit, inputValue, onChange, error, i
   return (
     <form onSubmit={onSubmit}>
       <div css={inputWrapperStyles}>
-        <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
+        <Label htmlFor="cells-new-item-name">
+          {t(type === 'folder' ? 'cells.newItemMenuModal.labelFolder' : 'cells.newItemMenuModal.labelFile')}
+        </Label>
         <Input
           id="cells-new-item-name"
           value={inputValue}

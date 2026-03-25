@@ -47,7 +47,7 @@ export const CellsNewItemModal = ({
   type,
   cellsRepository,
   conversationQualifiedId,
-  fileType: _fileType,
+  fileType,
   onSuccess,
   currentPath,
 }: CellsNewItemModalProps) => {
@@ -64,7 +64,7 @@ export const CellsNewItemModal = ({
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>
-        {t(isFolder ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
+        {isFolder ? t('cells.newItemMenuModal.headlineFolder') : t('cells.newItemMenuModal.headlineFile', {fileType})}
       </CellsModal.Header>
       <p css={descriptionStyles}>
         {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
