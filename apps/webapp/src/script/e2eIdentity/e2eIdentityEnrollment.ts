@@ -318,9 +318,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         certificateTtl: this.certificateTtl,
         getAllConversations: async () => {
-          if (is.undefined(this.core.service)) {
+          if (!isCertificateRenewal || is.undefined(this.core.service)) {
             return [];
           }
+          
           const conversations = await this.core.service.conversation.getConversations();
 
           if (!is.array(conversations.found)) {
