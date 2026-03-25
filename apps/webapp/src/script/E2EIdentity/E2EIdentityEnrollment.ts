@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
@@ -318,7 +319,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           }
           const conversations = await this.core.service.conversation.getConversations();
           return conversations.found
-            .filter(conversation => !!conversation.group_id)
+            .filter(conversation => is.nonEmptyString(conversation.group_id))
             .map(({group_id}) => ({
               group_id,
             }));
