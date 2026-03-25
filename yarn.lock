@@ -5239,6 +5239,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx/jest@npm:22.6.1":
+  version: 22.6.1
+  resolution: "@nx/jest@npm:22.6.1"
+  dependencies:
+    "@jest/reporters": "npm:^30.0.2"
+    "@jest/test-result": "npm:^30.0.2"
+    "@nx/devkit": "npm:22.6.1"
+    "@nx/js": "npm:22.6.1"
+    "@phenomnomnominal/tsquery": "npm:~6.1.4"
+    identity-obj-proxy: "npm:3.0.0"
+    jest-config: "npm:^30.0.2"
+    jest-resolve: "npm:^30.0.2"
+    jest-util: "npm:^30.0.2"
+    minimatch: "npm:10.2.4"
+    picocolors: "npm:^1.1.0"
+    resolve.exports: "npm:2.0.3"
+    semver: "npm:^7.6.3"
+    tslib: "npm:^2.3.0"
+    yargs-parser: "npm:21.1.1"
+  checksum: 10/1f24748898a2dada2a21e7deb835849f181d1afbd9db46937ed3d9e0f048d084e479c34a672b4deb9d9ccaf440fe357208cc6c3481a94d62c9a5569e9d5c176e
+  languageName: node
+  linkType: hard
+
 "@nx/js@npm:22.5.4":
   version: 22.5.4
   resolution: "@nx/js@npm:22.5.4"
@@ -5314,6 +5337,45 @@ __metadata:
     verdaccio:
       optional: true
   checksum: 10/b6affd7a57a019afbfd41ccba74b06f470aa3db8fe767b8c6277103d8c7c710d45084bf519d8a1bdf5b155b2063ad39c4ab9bd40f0c068ae0a06d1636cfe501e
+  languageName: node
+  linkType: hard
+
+"@nx/js@npm:22.6.1":
+  version: 22.6.1
+  resolution: "@nx/js@npm:22.6.1"
+  dependencies:
+    "@babel/core": "npm:^7.23.2"
+    "@babel/plugin-proposal-decorators": "npm:^7.22.7"
+    "@babel/plugin-transform-class-properties": "npm:^7.22.5"
+    "@babel/plugin-transform-runtime": "npm:^7.23.2"
+    "@babel/preset-env": "npm:^7.23.2"
+    "@babel/preset-typescript": "npm:^7.22.5"
+    "@babel/runtime": "npm:^7.22.6"
+    "@nx/devkit": "npm:22.6.1"
+    "@nx/workspace": "npm:22.6.1"
+    "@zkochan/js-yaml": "npm:0.0.7"
+    babel-plugin-const-enum: "npm:^1.0.1"
+    babel-plugin-macros: "npm:^3.1.0"
+    babel-plugin-transform-typescript-metadata: "npm:^0.3.1"
+    chalk: "npm:^4.1.0"
+    columnify: "npm:^1.6.0"
+    detect-port: "npm:^1.5.1"
+    ignore: "npm:^5.0.4"
+    js-tokens: "npm:^4.0.0"
+    jsonc-parser: "npm:3.2.0"
+    npm-run-path: "npm:^4.0.1"
+    picocolors: "npm:^1.1.0"
+    picomatch: "npm:4.0.2"
+    semver: "npm:^7.6.3"
+    source-map-support: "npm:0.5.19"
+    tinyglobby: "npm:^0.2.12"
+    tslib: "npm:^2.3.0"
+  peerDependencies:
+    verdaccio: ^6.0.5
+  peerDependenciesMeta:
+    verdaccio:
+      optional: true
+  checksum: 10/4b3cd44c279c1b0138671153c2185bde566ac96d0c9929a706b6e4e79c0cee86f4532922fc90be7a505415b60b97fad90298cd076ffdfb7e741683e6dca2df1f
   languageName: node
   linkType: hard
 
@@ -29616,7 +29678,7 @@ __metadata:
   dependencies:
     "@faker-js/faker": "npm:9.9.0"
     "@ls-lint/ls-lint": "npm:2.3.1"
-    "@nx/jest": "npm:22.6.0"
+    "@nx/jest": "npm:22.6.1"
     "@nx/node": "npm:22.6.0"
     "@nx/workspace": "npm:22.6.1"
     "@stylistic/eslint-plugin": "npm:5.10.0"
