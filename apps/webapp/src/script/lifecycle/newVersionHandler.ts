@@ -29,7 +29,7 @@ interface VersionListener {
 
 const logger = getLogger('newVersionHandler');
 const VERSION_URL = '/version/';
-const CHECK_INTERVAL = TIME_IN_MILLIS.HOUR * 3;
+const CHECK_INTERVAL = TIME_IN_MILLIS.MINUTE * 15;
 
 let newVersionListeners: VersionListener[] = [];
 let pollInterval: number;
