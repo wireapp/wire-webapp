@@ -4799,6 +4799,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lexical/code-core@npm:0.42.0":
+  version: 0.42.0
+  resolution: "@lexical/code-core@npm:0.42.0"
+  dependencies:
+    lexical: "npm:0.42.0"
+  checksum: 10/6f70db58a2fd5eccf8b8f330ba8ab7852193e37ce0e6963c2c090a3fb8b5d885a45384356a0144c1f9b7e37ee02869a5c464a7b5b6dc420c22cd54b44b2fac78
+  languageName: node
+  linkType: hard
+
+"@lexical/code-prism@npm:0.42.0":
+  version: 0.42.0
+  resolution: "@lexical/code-prism@npm:0.42.0"
+  dependencies:
+    "@lexical/code-core": "npm:0.42.0"
+    lexical: "npm:0.42.0"
+    prismjs: "npm:^1.30.0"
+  checksum: 10/9cacaa7398c8c1726909fe400a46be4bb1743b2ada0c230978b8a6c231670a77b45f6f65f2a6a23f384e60f3a8589f57211b4e7700e90744fc893af96413003a
+  languageName: node
+  linkType: hard
+
 "@lexical/code@npm:0.27.2":
   version: 0.27.2
   resolution: "@lexical/code@npm:0.27.2"
@@ -4807,6 +4827,17 @@ __metadata:
     lexical: "npm:0.27.2"
     prismjs: "npm:^1.30.0"
   checksum: 10/8211545f92eebb7419051e9562f17279d9b9589bea6564c78f15201b363b6cdc50e64db493fd0a7515df30a588a504e36c4fbf395d65a1006543001c61d5646e
+  languageName: node
+  linkType: hard
+
+"@lexical/code@npm:0.42.0":
+  version: 0.42.0
+  resolution: "@lexical/code@npm:0.42.0"
+  dependencies:
+    "@lexical/code-core": "npm:0.42.0"
+    "@lexical/code-prism": "npm:0.42.0"
+    lexical: "npm:0.42.0"
+  checksum: 10/0a3e0968a7525f82a93b73af8c2252005cf41f77e17c9a092127587cfd77c409ed1d7c8599c186578ea08eb14749a3a48622bd5d7d9fb9fd88ec61b1c3a8b842
   languageName: node
   linkType: hard
 
@@ -11429,7 +11460,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@formatjs/cli": "npm:6.14.0"
     "@formkit/auto-animate": "npm:0.9.0"
-    "@lexical/code": "npm:0.27.2"
+    "@lexical/code": "npm:0.42.0"
     "@lexical/history": "npm:0.27.2"
     "@lexical/list": "npm:0.27.2"
     "@lexical/markdown": "npm:0.27.2"
@@ -20691,6 +20722,13 @@ __metadata:
   version: 0.27.2
   resolution: "lexical@npm:0.27.2"
   checksum: 10/d476d71756fae6139374b967afbddf0309d356f19c4bca62997ee4b63624ef0072c61107617bb0b6d917dd1366440ddc46982e0d61b9e3e9cfd2501faf6d70f0
+  languageName: node
+  linkType: hard
+
+"lexical@npm:0.42.0":
+  version: 0.42.0
+  resolution: "lexical@npm:0.42.0"
+  checksum: 10/1e51b6f8181b8942b75a976e7f3f4351616cd673d95eeb33e415ec275ad0684053213b87ead624b5227db8dd89db5436737b90f2259a2e0f73d17fdcccd6963b
   languageName: node
   linkType: hard
 
