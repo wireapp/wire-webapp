@@ -24,8 +24,8 @@ import ko from 'knockout';
 
 import {ClientEvent} from 'Repositories/event/Client';
 import {Declension, getUserName, t} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {capitalizeFirstChar} from 'Util/StringUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {SystemMessage} from './SystemMessage';
 

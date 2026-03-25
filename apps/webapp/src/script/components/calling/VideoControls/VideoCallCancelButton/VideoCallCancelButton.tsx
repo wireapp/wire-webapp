@@ -18,7 +18,7 @@
  */
 
 import * as Icon from 'Components/Icon';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 interface VideoCallCancelButtonProps {

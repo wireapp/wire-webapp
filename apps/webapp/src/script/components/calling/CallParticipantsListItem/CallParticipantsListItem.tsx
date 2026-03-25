@@ -25,8 +25,8 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserStatusBadges} from 'Components/Badge';
 import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
 import {Participant} from 'Repositories/calling/Participant';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 

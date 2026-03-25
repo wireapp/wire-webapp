@@ -28,7 +28,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {Page} from './Page';
 import {styles} from './VerifyEmailCode.styles';

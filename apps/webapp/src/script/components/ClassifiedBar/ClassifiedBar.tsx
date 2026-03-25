@@ -23,7 +23,7 @@ import cx from 'classnames';
 import * as Icon from 'Components/Icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {

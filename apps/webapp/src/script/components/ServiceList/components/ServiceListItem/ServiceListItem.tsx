@@ -23,8 +23,8 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {ParticipantItemContent} from 'Components/ParticipantItemContent';
 import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 interface ServiceListItemProps {

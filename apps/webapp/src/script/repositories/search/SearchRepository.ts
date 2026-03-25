@@ -30,7 +30,7 @@ import {
   sortByPriority,
   startsWith,
   transliterationIndex,
-} from 'Util/StringUtil';
+} from 'Util/stringUtil';
 
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';

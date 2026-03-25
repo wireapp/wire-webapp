@@ -22,7 +22,7 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/Icon';
 import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/FederationStopMessage';
 import {Config} from 'src/script/Config';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {MessageTime} from './MessageTime';

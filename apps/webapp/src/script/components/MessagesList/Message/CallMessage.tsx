@@ -19,7 +19,7 @@
 
 import * as Icon from 'Components/Icon';
 import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/CallMessage';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {MessageTime} from './MessageTime';
 

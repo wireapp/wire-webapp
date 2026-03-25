@@ -25,7 +25,7 @@ import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import type {Text} from 'Repositories/entity/message/Text';
 import {t} from 'Util/localizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 

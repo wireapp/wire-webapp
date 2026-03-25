@@ -27,7 +27,7 @@ import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {Declension, joinNames, replaceLink, t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export const CONFIG = {
   MAX_USERS_VISIBLE: 17,

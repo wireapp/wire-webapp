@@ -39,10 +39,10 @@ import {IntegrationRepository} from 'Repositories/integration/IntegrationReposit
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
-import {formatDuration} from 'Util/TimeUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
+import {formatDuration} from 'Util/timeUtil';
 
 import {ConversationDetailsHeader} from './components/ConversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/ConversationDetailsOptions';

@@ -28,8 +28,8 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {User} from 'Repositories/entity/User';
 import {partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
-import {capitalizeFirstChar} from 'Util/StringUtil';
+import {getLogger} from 'Util/logger';
+import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {DeviceDetails} from './components/DeviceDetails';
 import {DeviceList} from './components/DeviceList';

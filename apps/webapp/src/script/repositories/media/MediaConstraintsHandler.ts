@@ -21,7 +21,7 @@ import {container} from 'tsyringe';
 
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/UserState';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
 

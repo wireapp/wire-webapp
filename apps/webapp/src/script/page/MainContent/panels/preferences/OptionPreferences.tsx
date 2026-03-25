@@ -32,7 +32,7 @@ import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {Config} from 'src/script/Config';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {PreferencesPage} from './components/PreferencesPage';

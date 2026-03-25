@@ -26,7 +26,7 @@ import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {AssetType} from 'Repositories/assets/AssetType';
 import type {ReadReceipt} from 'Repositories/storage/record/EventRecord';
 import {t, getUserName} from 'Util/localizerUtil';
-import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
 import type {CallMessage} from './CallMessage';

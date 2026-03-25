@@ -41,10 +41,10 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isKeyboardEvent} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isKeyboardEvent} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import {ConnectionRequests} from './ConnectionRequests';

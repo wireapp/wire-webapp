@@ -25,9 +25,9 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {RadioGroup} from 'Components/Radio';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
-import {formatDuration} from 'Util/TimeUtil';
+import {formatDuration} from 'Util/timeUtil';
 
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';

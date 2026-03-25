@@ -17,7 +17,7 @@
  *
  */
 
-import {generateRandomPassword, isValidPassword} from './StringUtil';
+import {generateRandomPassword, isValidPassword} from './stringUtil';
 
 describe('generateRandomPassword', () => {
   it('generates a password of default length (8)', () => {

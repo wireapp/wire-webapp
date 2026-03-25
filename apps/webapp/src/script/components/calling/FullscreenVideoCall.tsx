@@ -52,9 +52,9 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {preventFocusOutside} from 'Util/util';
 

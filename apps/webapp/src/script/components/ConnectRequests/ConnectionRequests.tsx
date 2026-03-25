@@ -33,7 +33,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {RootContext} from '../../page/RootProvider';

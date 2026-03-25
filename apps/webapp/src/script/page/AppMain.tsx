@@ -48,7 +48,7 @@ import {showInitialModal} from 'Repositories/user/AvailabilityModal';
 import {UserState} from 'Repositories/user/UserState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {AppLock} from './AppLock';
 import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';

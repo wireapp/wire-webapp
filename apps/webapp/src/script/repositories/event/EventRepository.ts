@@ -37,8 +37,8 @@ import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/E
 import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
 import {EventName} from 'Repositories/tracking/EventName';
 import {UserState} from 'Repositories/user/UserState';
-import {getLogger, Logger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
 import {isAxiosError} from 'Util/typePredicateUtil';
 

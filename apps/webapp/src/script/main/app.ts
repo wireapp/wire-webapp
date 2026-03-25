@@ -90,8 +90,8 @@ import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
 import {t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import '../../style/default.less';

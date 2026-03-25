@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {ConversationError} from '../error/ConversationError';
 

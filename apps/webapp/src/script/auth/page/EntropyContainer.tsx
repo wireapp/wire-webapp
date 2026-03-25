@@ -21,7 +21,7 @@ import React, {useState} from 'react';
 
 import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 
-import {handleEnterDown} from 'Util/KeyboardUtil';
+import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {EntropyData} from '../../util/entropy';

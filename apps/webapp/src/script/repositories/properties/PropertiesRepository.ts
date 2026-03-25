@@ -37,7 +37,7 @@ import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 import {loadValue} from 'Util/storageUtil';
 
 import type {PropertiesService} from './PropertiesService';

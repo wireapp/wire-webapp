@@ -42,7 +42,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/UserState';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {waitFor} from 'Util/waitFor';
 

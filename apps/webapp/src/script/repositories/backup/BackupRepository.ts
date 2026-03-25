@@ -27,7 +27,7 @@ import {EventRecord, UserRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {chunk} from 'Util/arrayUtil';
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/logger';
 import {constructUserPrimaryKey} from 'Util/storageUtil';
 import {WebWorker} from 'Util/worker';
 

@@ -30,7 +30,7 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/localizerUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {
   headerStyles,

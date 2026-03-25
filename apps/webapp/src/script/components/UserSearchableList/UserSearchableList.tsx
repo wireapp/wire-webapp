@@ -31,8 +31,8 @@ import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {sortByPriority} from 'Util/StringUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {sortByPriority} from 'Util/stringUtil';
 
 export type UserListProps = React.ComponentProps<typeof UserList> & {
   conversationState?: ConversationState;

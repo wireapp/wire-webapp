@@ -32,10 +32,10 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Multipart} from 'Repositories/entity/message/Multipart';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
 import {t} from 'Util/localizerUtil';
-import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AudioAsset} from './asset/AudioAsset/AudioAsset';

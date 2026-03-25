@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {BrowserPermissionStatus} from './BrowserPermissionStatus';
 import {permissionsStore} from './Permissions.store';

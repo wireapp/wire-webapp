@@ -43,7 +43,7 @@ import uk from 'I18n/uk-UA.json';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/storageUtil';
-import {setDateLocale, LocaleType} from 'Util/TimeUtil';
+import {setDateLocale, LocaleType} from 'Util/timeUtil';
 import {getParameter} from 'Util/urlUtil';
 
 import {URLParameter} from '../auth/URLParameter';

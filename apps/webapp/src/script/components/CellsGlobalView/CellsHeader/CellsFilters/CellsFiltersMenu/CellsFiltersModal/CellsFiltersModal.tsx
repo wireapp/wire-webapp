@@ -20,7 +20,7 @@
 import {Accordion} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {handleEscDown} from 'Util/KeyboardUtil';
+import {handleEscDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {CellsFilterModalHeader} from './CellsFilterModalHeader/CellsFilterModalHeader';

@@ -19,7 +19,7 @@
 
 import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {handleEscDown} from 'Util/KeyboardUtil';
+import {handleEscDown} from 'Util/keyboardUtil';
 
 import {FileHistoryContent} from './FileHistoryContent';
 import {FileHistoryHeader} from './FileHistoryHeader';

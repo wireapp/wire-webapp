@@ -23,7 +23,7 @@ import {singleton} from 'tsyringe';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/logger';
 import {loadValue, storeValue} from 'Util/storageUtil';
 import {toError} from 'Util/toError';
 

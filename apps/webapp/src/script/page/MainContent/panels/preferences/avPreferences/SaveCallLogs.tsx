@@ -25,7 +25,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/localizerUtil';
-import {getCurrentDate} from 'Util/TimeUtil';
+import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../../../../Config';

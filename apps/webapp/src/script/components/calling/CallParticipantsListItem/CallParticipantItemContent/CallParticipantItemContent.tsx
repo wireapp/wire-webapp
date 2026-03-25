@@ -25,7 +25,7 @@ import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
 import {t} from 'Util/localizerUtil';
-import {capitalizeFirstChar} from 'Util/StringUtil';
+import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {
   selfIndicator,

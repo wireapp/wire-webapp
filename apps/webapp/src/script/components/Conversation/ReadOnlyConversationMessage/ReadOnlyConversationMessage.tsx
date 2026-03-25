@@ -26,7 +26,7 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/Icon';
 import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 

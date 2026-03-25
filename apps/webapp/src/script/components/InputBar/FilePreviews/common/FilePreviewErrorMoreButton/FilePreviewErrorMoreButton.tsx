@@ -22,7 +22,7 @@ import {KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
 import {showContextMenu} from 'src/script/ui/ContextMenu';
-import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
+import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 

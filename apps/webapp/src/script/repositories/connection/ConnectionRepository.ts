@@ -38,8 +38,8 @@ import {TeamService} from 'Repositories/team/TeamService';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {replaceLink, t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {toError} from 'Util/toError';
 import {isBackendError} from 'Util/typePredicateUtil';
 

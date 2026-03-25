@@ -26,7 +26,7 @@ import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './DeviceSelect';
 

@@ -23,7 +23,7 @@ import {FallbackProps} from 'react-error-boundary';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 const logger = getLogger('ErrorFallback');
 

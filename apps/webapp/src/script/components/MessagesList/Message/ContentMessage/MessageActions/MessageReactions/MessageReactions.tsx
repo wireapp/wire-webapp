@@ -20,7 +20,7 @@
 import {useState, RefObject, FC, useRef} from 'react';
 
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
-import {isSpaceOrEnterKey} from 'Util/KeyboardUtil';
+import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {EmojiChar} from './EmojiChar';

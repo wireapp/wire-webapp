@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {noop} from 'Util/util';
 

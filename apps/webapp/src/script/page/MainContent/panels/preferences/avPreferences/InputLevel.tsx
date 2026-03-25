@@ -22,7 +22,7 @@ import {HTMLProps, useEffect, useRef, useState} from 'react';
 import cx from 'classnames';
 
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 export interface InputLevelProps extends HTMLProps<HTMLDivElement> {
   disabled: boolean;

@@ -19,7 +19,7 @@
 
 import {chunk} from 'Util/arrayUtil';
 import {capToByte, rootMeanSquare} from 'Util/numberUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {loadFileBuffer} from 'Util/util';
 
 export type AudioMetadata = {durationInMillis: number; normalizedLoudness: Uint8Array};

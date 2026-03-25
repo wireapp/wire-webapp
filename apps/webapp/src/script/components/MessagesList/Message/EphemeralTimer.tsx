@@ -20,7 +20,7 @@
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import type {Message} from 'Repositories/entity/message/Message';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './EphemeralTimer.styles';

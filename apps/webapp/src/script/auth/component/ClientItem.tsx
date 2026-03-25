@@ -36,9 +36,9 @@ import {
   TrashIcon,
 } from '@wireapp/react-ui-kit';
 
-import {isEnterKey} from 'Util/KeyboardUtil';
+import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
+import {splitFingerprint} from 'Util/stringUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
 import {ValidationError} from '../module/action/ValidationError';

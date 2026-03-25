@@ -55,7 +55,7 @@ import {
 
 import {LogoFullIcon} from 'Components/Icon';
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 import {isBackendError} from 'Util/typePredicateUtil';
 
 import {EntropyContainer} from './EntropyContainer';

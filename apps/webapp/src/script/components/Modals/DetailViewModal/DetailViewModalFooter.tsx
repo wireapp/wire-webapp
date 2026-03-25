@@ -36,8 +36,8 @@ import {ReplyButton} from 'Components/MessagesList/Message/ContentMessage/Messag
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isTabKey} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isTabKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 interface DetailViewModalFooterProps {

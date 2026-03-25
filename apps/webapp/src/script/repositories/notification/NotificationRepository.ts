@@ -53,10 +53,10 @@ import {normalizePermissionState} from 'Repositories/permission/Permissions.type
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {UserState} from 'Repositories/user/UserState';
 import {Declension, t, getUserName} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
-import {truncate} from 'Util/StringUtil';
-import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {truncate} from 'Util/stringUtil';
+import {formatDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {ValidationUtilError} from 'Util/validationUtil';
 
 import {AppPermissionState} from './AppPermissionState';

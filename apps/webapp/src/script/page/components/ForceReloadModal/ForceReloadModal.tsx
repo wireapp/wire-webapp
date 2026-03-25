@@ -23,7 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/localizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {useApplicationContext} from '../../RootProvider';
 

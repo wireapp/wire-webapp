@@ -49,7 +49,7 @@ import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {ROLE} from 'Repositories/user/UserPermission';
 import {replaceLink, t} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {Config} from '../Config';

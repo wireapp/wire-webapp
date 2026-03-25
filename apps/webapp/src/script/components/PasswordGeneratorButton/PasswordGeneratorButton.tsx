@@ -21,7 +21,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {t} from 'Util/localizerUtil';
-import {generateRandomPassword} from 'Util/StringUtil';
+import {generateRandomPassword} from 'Util/stringUtil';
 
 interface PasswordGeneratorButtonProps {
   passwordLength?: number;

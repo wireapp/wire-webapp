@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 import {ReadReceipt} from 'Repositories/storage';
-import {formatTimeShort} from 'Util/TimeUtil';
+import {formatTimeShort} from 'Util/timeUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
 

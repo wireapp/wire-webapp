@@ -23,7 +23,7 @@ import EmojiPickerReact, {EmojiClickData, EmojiStyle, SkinTones} from 'emoji-pic
 import {createPortal} from 'react-dom';
 
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
+import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 interface EmojiPickerProps {

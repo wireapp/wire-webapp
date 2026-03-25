@@ -25,7 +25,7 @@ import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/localizerUtil';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';

@@ -30,7 +30,7 @@ import {RadioGroup} from 'Components/Radio';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 

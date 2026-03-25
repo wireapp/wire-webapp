@@ -36,7 +36,7 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {handleEnterDown} from 'Util/KeyboardUtil';
+import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithCode} from 'Util/typePredicateUtil';

@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
 import {MAX_HANDLE_LENGTH} from 'Repositories/user/UserHandleGenerator';
-import {isEnterKey} from 'Util/KeyboardUtil';
+import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import * as Icon from '../Icon';

@@ -83,12 +83,12 @@ import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 import {roundLogarithmic} from 'Util/numberUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {copyStyles} from 'Util/renderElement';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
 import {createUuid} from 'Util/uuid';
 

@@ -20,7 +20,7 @@
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 interface NoDevicesFoundProps {

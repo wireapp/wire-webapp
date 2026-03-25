@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {SystemMessage} from './SystemMessage';
 

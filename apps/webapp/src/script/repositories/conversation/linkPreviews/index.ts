@@ -20,8 +20,8 @@
 import type {Data as OpenGraphResult} from 'open-graph';
 
 import {deArrayify} from 'Util/arrayUtil';
-import {getLogger} from 'Util/Logger';
-import {truncate} from 'Util/StringUtil';
+import {getLogger} from 'Util/logger';
+import {truncate} from 'Util/stringUtil';
 import {base64ToArray, getContentTypeFromDataUrl} from 'Util/util';
 import {isTweetUrl} from 'Util/validationUtil';
 

@@ -25,7 +25,7 @@ import {AssetRepository} from 'Repositories/assets/AssetRepository';
 import {ReactionMap, ReadReceipt} from 'Repositories/storage';
 import {copyText} from 'Util/clipboardUtil';
 import {t} from 'Util/localizerUtil';
-import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
+import {formatLocale, formatTimeShort} from 'Util/timeUtil';
 
 import type {Asset} from './Asset';
 import type {FileAsset} from './FileAsset';

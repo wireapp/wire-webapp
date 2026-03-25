@@ -25,7 +25,7 @@ import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {getPermissionStates} from 'Repositories/permission/permissionHandlers';
 import {PermissionType} from 'Repositories/permission/PermissionType';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 import {toError} from 'Util/toError';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 

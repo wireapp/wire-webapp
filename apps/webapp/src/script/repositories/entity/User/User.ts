@@ -32,8 +32,8 @@ import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ROLE as TEAM_ROLE} from 'Repositories/user/UserPermission';
 import {t} from 'Util/localizerUtil';
 import {clamp} from 'Util/numberUtil';
-import {getFirstChar} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getFirstChar} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ACCENT_ID} from '../../../Config';
 

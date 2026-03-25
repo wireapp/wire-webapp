@@ -17,7 +17,7 @@
  *
  */
 
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {dotStyles, dotButtonStyles} from './Pagination.styles';

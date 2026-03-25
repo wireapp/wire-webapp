@@ -19,7 +19,7 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 const logger = getLogger('ConnectionQualityListener');
 

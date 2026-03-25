@@ -63,9 +63,9 @@ import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {chunk, partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {fixWebsocketString} from 'Util/StringUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {fixWebsocketString} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
 import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 

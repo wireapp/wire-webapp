@@ -38,8 +38,8 @@ import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
