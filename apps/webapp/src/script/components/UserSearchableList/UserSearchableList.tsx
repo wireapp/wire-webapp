@@ -67,7 +67,7 @@ export const UserSearchableList = ({
   selfUser,
   users,
   teamState = container.resolve(TeamState),
-  userType,
+  userType = UserType.REGULAR,
   ...props
 }: UserListProps) => {
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
