@@ -53,7 +53,7 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   /** will do an extra request to the server when user types in (otherwise will only lookup given local users) */
   allowRemoteSearch?: boolean;
   filterRemoteTeamUsers?: boolean;
-  userType: UserType;
+  userType?: UserType;
 };
 
 export const UserSearchableList = ({
@@ -76,9 +76,7 @@ export const UserSearchableList = ({
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
 
-  const filteredSelectedUsers = selectedUsers
-    ? searchRepository.searchUserInSet(filter, selectedUsers).filter(u => u.type === UserType.REGULAR)
-    : undefined;
+  const filteredSelectedUsers = selectedUsers ? searchRepository.searchUserInSet(filter, selectedUsers) : undefined;
 
   const selfInTeam = teamState.isInTeam(selfUser);
 
