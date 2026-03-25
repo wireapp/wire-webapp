@@ -17,6 +17,8 @@
  *
  */
 
+import {act} from 'react';
+
 import {fireEvent, waitFor} from '@testing-library/react';
 
 import {SetHandle} from './SetHandle';
@@ -40,7 +42,9 @@ describe('SetHandle', () => {
     const setHandleButton = getByTestId(setHandleButtonId) as HTMLButtonElement;
 
     expect(setHandleButton.disabled).toBe(true);
-    fireEvent.change(handleInput, {target: {value: 'e'}});
+    await act(async () => {
+      fireEvent.change(handleInput, {target: {value: 'e'}});
+    });
 
     expect(setHandleButton.disabled).toBe(false);
   });
@@ -57,9 +61,13 @@ describe('SetHandle', () => {
     await waitFor(() => getByTestId(handleInputId));
     const handleInput = getByTestId(handleInputId);
     const setHandleButton = getByTestId(setHandleButtonId) as HTMLButtonElement;
-    fireEvent.change(handleInput, {target: {value: ` ${handle} `}});
+    await act(async () => {
+      fireEvent.change(handleInput, {target: {value: ` ${handle} `}});
+    });
 
-    fireEvent.click(setHandleButton);
+    await act(async () => {
+      fireEvent.click(setHandleButton);
+    });
 
     expect(actionRoot.selfAction.setHandle).toHaveBeenCalledWith(handle);
   });
