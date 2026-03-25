@@ -32,7 +32,7 @@ const setHandleButtonId = 'do-send-handle';
 describe('SetHandle', () => {
   it('has disabled submit button as long as there is no input', async () => {
     spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve(''));
     const {getByTestId} = mountComponent(<SetHandle />, mockStoreFactory()(initialRootState));
 
     await waitFor(() => getByTestId(handleInputId));
@@ -46,7 +46,7 @@ describe('SetHandle', () => {
   });
 
   it('trims the handle', async () => {
-    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve(''));
     spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.selfAction, 'setHandle').and.returnValue(() => Promise.resolve());
 
