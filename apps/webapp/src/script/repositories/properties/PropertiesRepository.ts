@@ -35,7 +35,7 @@ import {ConsentValue} from 'Repositories/user/ConsentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
-import {Environment} from 'Util/Environment';
+import {Environment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {loadValue} from 'Util/StorageUtil';

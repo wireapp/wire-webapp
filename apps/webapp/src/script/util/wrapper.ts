@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ROLE} from 'Repositories/user/UserPermission';
 
-import {Environment} from './Environment';
+import {Environment} from './environment';
 
 export function exposeWrapperGlobals(): void {
   if (Runtime.isDesktopApp()) {

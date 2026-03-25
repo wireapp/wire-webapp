@@ -43,7 +43,7 @@ import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useS
 import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/ComponentUtil';
 import {isDataDogEnabled} from 'Util/DataDog';
-import {getWebEnvironment} from 'Util/Environment';
+import {getWebEnvironment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 

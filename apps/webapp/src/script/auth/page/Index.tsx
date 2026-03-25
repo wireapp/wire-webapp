@@ -32,7 +32,7 @@ import {LogoFullIcon} from 'Components/Icon';
 import {useSingleInstance} from 'Hooks/useSingleInstance';
 import {Core} from 'src/script/service/CoreSingleton';
 import {isDataDogEnabled} from 'Util/DataDog';
-import {getWebEnvironment} from 'Util/Environment';
+import {getWebEnvironment} from 'Util/environment';
 import {t} from 'Util/localizerUtil';
 
 import {Page} from './Page';

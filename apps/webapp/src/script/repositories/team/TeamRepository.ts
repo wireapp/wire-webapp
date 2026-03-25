@@ -48,7 +48,7 @@ import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/use
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {Environment} from 'Util/Environment';
+import {Environment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/Logger';
 import {TIME_IN_MILLIS} from 'Util/TimeUtil';
