@@ -32,7 +32,7 @@ import {t} from 'Util/localizerUtil';
 import {GuestOptions} from './components/GuestOptions';
 import {ServicesOptions} from './components/ServicesOptions';
 
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 
 interface GuestServicesOptionsProps {
   activeConversation: Conversation;

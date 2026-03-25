@@ -32,7 +32,7 @@ import {ReactionMap} from 'Repositories/storage';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/emojiUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
-import {panelContentTitleStyles} from './MessageDetails.styles';
+import {panelContentTitleStyles} from './messageDetails.styles';
 
 interface UsersReactionsProps {
   reactions: ReactionMap;

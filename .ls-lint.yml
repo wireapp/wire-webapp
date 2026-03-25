@@ -46,6 +46,23 @@ ls:
   apps/webapp/src/script/page/RightSidebar/timedMessages:
     .ts: camelCase
     .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/panelHeader:
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/notifications:
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/messageDetails:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/conversationHistory:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
   apps/server/routes:
     .dir: camelCase
     .ts: camelCase

@@ -34,7 +34,7 @@ import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 
 interface GroupParticipantServiceProps {
   activeConversation: Conversation;

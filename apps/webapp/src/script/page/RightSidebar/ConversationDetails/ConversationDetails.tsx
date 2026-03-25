@@ -52,7 +52,7 @@ import {isServiceEntity} from '../../../guards/Service';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 const CONFIG = {

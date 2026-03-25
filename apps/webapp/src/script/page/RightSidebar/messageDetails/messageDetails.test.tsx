@@ -29,7 +29,7 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {createUuid} from 'Util/uuid';
 
-import {MessageDetails} from './MessageDetails';
+import {MessageDetails} from './messageDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 

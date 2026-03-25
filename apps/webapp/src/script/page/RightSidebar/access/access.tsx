@@ -36,7 +36,7 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {conversationAccessContainerCss, conversationAccessContentCss} from './access.styles';
 
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 
 export interface AccessProps {
   onClose: () => void;

@@ -33,10 +33,10 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
 
-import {UsersReactions} from './UserReactions';
+import {UsersReactions} from './userReactions';
 
 import {SuperType} from '../../../message/SuperType';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 const MESSAGE_STATES = {

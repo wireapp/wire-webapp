@@ -43,7 +43,7 @@ import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 import {PanelEntity} from '../RightSidebar';
 
 interface GroupParticipantUserProps {

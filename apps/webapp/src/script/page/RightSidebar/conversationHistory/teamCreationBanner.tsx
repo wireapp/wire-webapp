@@ -29,7 +29,7 @@ import {
   teamCreationButtonCss,
   teamCreationTextCss,
   teamCreationWrapperCss,
-} from './ConversationHistory.styles';
+} from './conversationHistory.styles';
 
 export const TeamCreationBanner = () => {
   const navigateToUpgradePlan = () => {

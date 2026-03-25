@@ -29,7 +29,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 
 interface NotificationsProps {
   activeConversation: Conversation;

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './PanelHeader';
+export * from './notifications';

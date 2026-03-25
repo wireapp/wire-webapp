@@ -37,13 +37,13 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {Access} from './access/access';
 import {AddParticipants} from './addParticipants';
 import {ConversationDetails} from './ConversationDetails';
-import {ConversationHistory} from './ConversationHistory/ConversationHistory';
+import {ConversationHistory} from './conversationHistory/conversationHistory';
 import {ConversationParticipants} from './conversationParticipants';
 import {GroupParticipantService} from './groupParticipantService';
 import {GroupParticipantUser} from './groupParticipantUser';
 import {GuestServicesOptions} from './GuestServicesOptions';
-import {MessageDetails} from './MessageDetails';
-import {Notifications} from './Notifications';
+import {MessageDetails} from './messageDetails';
+import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
 import {TimedMessages} from './timedMessages';
 

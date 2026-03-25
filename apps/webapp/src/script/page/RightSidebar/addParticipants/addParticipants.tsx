@@ -46,7 +46,7 @@ import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {getManageServicesUrl} from '../../../externalRoute';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 const ENABLE_ADD_ACTIONS_LENGTH = 0;

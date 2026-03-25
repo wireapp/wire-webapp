@@ -25,7 +25,7 @@ import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting'
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TestFactory} from 'test/helper/TestFactory';
 
-import {Notifications} from './Notifications';
+import {Notifications} from './notifications';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 

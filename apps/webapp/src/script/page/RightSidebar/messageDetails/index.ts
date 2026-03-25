@@ -17,4 +17,4 @@
  *
  */
 
-export * from './MessageDetails';
+export * from './messageDetails';

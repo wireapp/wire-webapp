@@ -31,7 +31,7 @@ import {formatDuration} from 'Util/timeUtil';
 
 import {EphemeralTimings} from '../../../ephemeral/EphemeralTimings';
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 
 interface TimedMessagesPanelProps {
   activeConversation: Conversation;

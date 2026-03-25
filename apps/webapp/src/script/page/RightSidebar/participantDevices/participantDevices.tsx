@@ -26,7 +26,7 @@ import type {User} from 'Repositories/entity/User';
 import {t} from 'Util/localizerUtil';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 
 interface ParticipantDevicesProps {
   onClose: () => void;

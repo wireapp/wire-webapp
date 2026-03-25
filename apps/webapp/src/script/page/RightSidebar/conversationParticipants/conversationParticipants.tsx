@@ -32,7 +32,7 @@ import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {isServiceEntity} from '../../../guards/Service';
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
 interface ConversationParticipantsProps {

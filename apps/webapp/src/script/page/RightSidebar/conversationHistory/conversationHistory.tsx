@@ -35,10 +35,10 @@ import {
   conversationHistoryContainerCss,
   conversationHistoryCustomCss,
   conversationHistoryParagraphCss,
-} from './ConversationHistory.styles';
-import {TeamCreationBanner} from './TeamCreationBanner';
+} from './conversationHistory.styles';
+import {TeamCreationBanner} from './teamCreationBanner';
 
-import {PanelHeader} from '../PanelHeader';
+import {PanelHeader} from '../panelHeader';
 
 export interface AccessProps {
   onClose: () => void;
