@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {CollectionItem} from './CollectionItem';
 

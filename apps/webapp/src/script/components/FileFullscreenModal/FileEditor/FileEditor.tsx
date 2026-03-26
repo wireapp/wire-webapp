@@ -29,8 +29,8 @@ import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {Config} from 'src/script/Config';
 import {collaboraClipboardAccessFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import * as styles from './FileEditor.styles';
 import {validateCollaboraUrl} from './validateCollaboraUrl';

@@ -40,6 +40,11 @@ import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 
+jest.mock('Components/Avatar', () => ({
+  AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
+  Avatar: () => <div data-uie-name="mock-avatar" />,
+}));
+
 const testFactory = new TestFactory();
 
 let eventRepository: EventRepository;

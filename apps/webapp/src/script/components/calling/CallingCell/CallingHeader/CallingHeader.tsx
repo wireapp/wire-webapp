@@ -24,7 +24,7 @@ import {Duration} from 'Components/calling/Duration';
 import * as Icon from 'Components/Icon';
 import {User} from 'Repositories/entity/User';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   callAvatar,

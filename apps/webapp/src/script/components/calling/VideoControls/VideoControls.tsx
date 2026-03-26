@@ -57,9 +57,9 @@ import {isCallViewOption} from 'src/script/guards/CallView';
 import {isMediaDevice} from 'src/script/guards/MediaDevice';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, isEscapeKey, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, isEscapeKey, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 
 import {EmojisBar} from './EmojisBar/EmojisBar';
 import {VideoCallCancelButton} from './VideoCallCancelButton/VideoCallCancelButton';

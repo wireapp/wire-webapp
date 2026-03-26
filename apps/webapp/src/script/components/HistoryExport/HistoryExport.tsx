@@ -34,9 +34,9 @@ import {User} from 'Repositories/entity/User';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {ContentState} from 'src/script/page/useAppState';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {getCurrentDate} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../Config';

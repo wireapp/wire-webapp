@@ -26,7 +26,7 @@ import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 
 import {useGetAssetUrl} from './useGetAssetUrl';
 
-jest.mock('Util/Logger', () => ({
+jest.mock('Util/logger', () => ({
   getLogger: jest.fn(() => ({
     error: jest.fn(),
   })),

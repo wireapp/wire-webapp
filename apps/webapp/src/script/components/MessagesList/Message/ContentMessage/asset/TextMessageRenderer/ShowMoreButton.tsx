@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import * as Icon from 'Components/Icon';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface ShowMoreButtonProps {
   active: boolean;

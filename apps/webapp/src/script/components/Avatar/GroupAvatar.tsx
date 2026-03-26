@@ -18,7 +18,7 @@
  */
 
 import {getGroupAvatarColors} from 'Util/avatarUtil';
-import {CSS_SQUARE} from 'Util/CSSMixin';
+import {CSS_SQUARE} from 'Util/cssMixin';
 
 interface GroupAvatarProps {
   size?: 'small' | 'large';

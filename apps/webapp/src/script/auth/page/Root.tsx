@@ -27,7 +27,7 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';

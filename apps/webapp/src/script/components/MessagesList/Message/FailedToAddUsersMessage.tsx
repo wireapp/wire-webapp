@@ -30,9 +30,9 @@ import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Reposito
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {backendErrorLink, warning} from './ContentMessage/Warnings/Warnings.styles';
 import {MessageTime} from './MessageTime';

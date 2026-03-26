@@ -24,7 +24,7 @@ import type {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 import type {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
 import {AssetType} from 'Repositories/assets/AssetType';
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/logger';
 
 import {Asset} from './Asset';
 

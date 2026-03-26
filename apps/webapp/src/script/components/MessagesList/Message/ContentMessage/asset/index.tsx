@@ -31,8 +31,8 @@ import type {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Multipart} from 'Repositories/entity/message/Multipart';
 import {Text} from 'Repositories/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {includesOnlyEmojis} from 'Util/emojiUtil';
 
 import {AudioAsset} from './AudioAsset/AudioAsset';
 import {FileAsset} from './FileAsset/FileAsset';

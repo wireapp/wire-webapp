@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 import {UserRecord} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {StorageService} from 'Repositories/storage/StorageService';
-import {constructUserPrimaryKey} from 'Util/StorageUtil';
+import {constructUserPrimaryKey} from 'Util/storageUtil';
 
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';

@@ -21,10 +21,10 @@ import React, {useState} from 'react';
 
 import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 
-import {handleEnterDown} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {handleEnterDown} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 
-import {EntropyData} from '../../util/Entropy';
+import {EntropyData} from '../../util/entropy';
 import {EntropyCanvas} from '../component/EntropyCanvas';
 import {ProgressBar} from '../component/ProgressBar';
 

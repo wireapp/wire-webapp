@@ -22,8 +22,8 @@ import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {VerificationBadges} from 'Components/Badge';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {styles} from './E2EICertificateDetails.styles';
 import {useCertificateDetailsModal} from './useCertificateDetailsModal';

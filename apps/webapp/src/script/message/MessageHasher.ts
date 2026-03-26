@@ -21,7 +21,7 @@ import Long from 'long';
 
 import {ClientEvent} from 'Repositories/event/Client';
 import {LegacyEventRecord} from 'Repositories/storage/record/EventRecord';
-import {stringToUtf16BE, utf8ToUtf16BE} from 'Util/StringUtil';
+import {stringToUtf16BE, utf8ToUtf16BE} from 'Util/stringUtil';
 
 /**
  * @returns Promise with hashed string bytes

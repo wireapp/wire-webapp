@@ -20,7 +20,7 @@
 import {Link, LinkVariant, ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   e2eMessageContainerCss,

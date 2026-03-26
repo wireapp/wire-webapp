@@ -32,8 +32,8 @@ import {
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {isFileEditable} from 'Util/FileTypeUtil';
-import {t} from 'Util/LocalizerUtil';
+import {isFileEditable} from 'Util/fileTypeUtil';
+import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile} from 'Util/util';
 
 import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';

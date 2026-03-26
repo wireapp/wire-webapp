@@ -21,7 +21,7 @@ import {GroupAvatar} from 'Components/Avatar';
 import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
 import {openConversation} from 'Components/CellsGlobalView/common/openConversation/openConversation';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {avatarWrapperStyles, textStyles, wrapperStyles} from './CellsConversationColumn.styles';

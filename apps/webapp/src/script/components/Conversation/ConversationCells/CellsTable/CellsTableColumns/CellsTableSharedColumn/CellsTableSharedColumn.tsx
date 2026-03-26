@@ -18,7 +18,7 @@
  */
 
 import {LinkIcon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   wrapperStyles,

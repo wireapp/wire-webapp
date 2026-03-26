@@ -26,7 +26,7 @@ import {APIClient} from '@wireapp/api-client';
 import {SubconversationService} from './SubconversationService';
 
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
-import {openDB} from '../../storage/CoreDB';
+import {openDB} from '../../storage/coreDb';
 import {constructFullyQualifiedClientId} from '../../util/fullyQualifiedClientIdUtils';
 
 interface SubconversationMember {

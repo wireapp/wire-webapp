@@ -31,7 +31,7 @@ import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';

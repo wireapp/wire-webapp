@@ -37,9 +37,9 @@ import {
 } from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/Icon';
 import type {Participant} from 'Repositories/calling/Participant';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isEnterKey} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Video} from './Video';
 

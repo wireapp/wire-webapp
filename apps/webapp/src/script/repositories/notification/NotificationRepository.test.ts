@@ -61,8 +61,8 @@ import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {entities, payload} from 'test/api/payloads';
-import {t} from 'Util/LocalizerUtil';
-import {truncate} from 'Util/StringUtil';
+import {t} from 'Util/localizerUtil';
+import {truncate} from 'Util/stringUtil';
 import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';

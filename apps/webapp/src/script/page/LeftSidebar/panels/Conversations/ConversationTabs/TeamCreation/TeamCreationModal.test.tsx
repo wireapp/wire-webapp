@@ -17,16 +17,26 @@
  *
  */
 
+import {act} from 'react';
+
 import {render, fireEvent, waitFor} from '@testing-library/react';
 
 import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {setStrings} from 'Util/LocalizerUtil';
+import {setStrings} from 'Util/localizerUtil';
 
 import {TeamCreationModal} from './TeamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
 jest.mock('Repositories/team/TeamService');
+jest.mock('@wireapp/react-ui-kit', () => {
+  const actualModule = jest.requireActual('@wireapp/react-ui-kit');
+
+  return {
+    ...actualModule,
+    Loading: () => null,
+  };
+});
 
 const testIdentifiers = {
   doContinue: 'do-continue',
@@ -64,17 +74,23 @@ describe('TeamCreationModal', () => {
 
   it('navigates to the form step when clicking continue', () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
-    fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
     expect(getByText(getStepString(2))).toBeTruthy();
   });
 
   it('navigates back to the introduction step', () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
 
-    fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
     expect(getByText(getStepString(2))).toBeTruthy();
 
-    fireEvent.click(getByTestId(testIdentifiers.doGoBack));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doGoBack));
+    });
     expect(getByText(getStepString(1))).toBeTruthy();
   });
 
@@ -82,11 +98,17 @@ describe('TeamCreationModal', () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
 
     expect(getByText(getStepString(1))).toBeTruthy();
-    fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
 
     expect(getByText(getStepString(2))).toBeTruthy();
-    fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
-    fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    act(() => {
+      fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
+    });
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
 
     expect(getByText(getStepString(3))).toBeTruthy();
   });
@@ -95,50 +117,74 @@ describe('TeamCreationModal', () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
 
     expect(getByText(getStepString(1))).toBeTruthy();
-    fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
 
     expect(getByText(getStepString(2))).toBeTruthy();
-    fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
-    fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    act(() => {
+      fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
+    });
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
 
     expect(getByText(getStepString(3))).toBeTruthy();
-    fireEvent.click(getByTestId(testIdentifiers.doAcceptTerms));
-    fireEvent.click(getByTestId(testIdentifiers.doAcceptMigration));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doAcceptTerms));
+    });
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doAcceptMigration));
+    });
 
-    fireEvent.click(getByTestId(testIdentifiers.doCreateTeam));
+    await act(async () => {
+      fireEvent.click(getByTestId(testIdentifiers.doCreateTeam));
+    });
 
     await waitFor(() => {
       expect(getByText(getStepString(4))).toBeTruthy();
     });
 
-    fireEvent.click(getByTestId(testIdentifiers.doClose));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doClose));
+    });
     expect(onSuccessMock).toHaveBeenCalled();
   });
 
   it('calls onClose when closing from any other step', () => {
     const {getByTestId} = renderTeamCreationModal();
 
-    fireEvent.click(getByTestId(testIdentifiers.doClose));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doClose));
+    });
     expect(onCloseMock).toHaveBeenCalled();
   });
 
   it('disables Continue button for empty or whitespace-only team names', () => {
     const {getByTestId} = renderTeamCreationModal();
 
-    fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    act(() => {
+      fireEvent.click(getByTestId(testIdentifiers.doContinue));
+    });
 
     const continueButton = getByTestId(testIdentifiers.doContinue);
     const teamNameInput = getByTestId(testIdentifiers.enterTeamName);
 
     expect(continueButton).toBeDisabled();
 
-    fireEvent.change(teamNameInput, {target: {value: '   '}});
+    act(() => {
+      fireEvent.change(teamNameInput, {target: {value: '   '}});
+    });
     expect(continueButton).toBeDisabled();
 
-    fireEvent.change(teamNameInput, {target: {value: ''}});
+    act(() => {
+      fireEvent.change(teamNameInput, {target: {value: ''}});
+    });
     expect(continueButton).toBeDisabled();
 
-    fireEvent.change(teamNameInput, {target: {value: 'Valid Team'}});
+    act(() => {
+      fireEvent.change(teamNameInput, {target: {value: 'Valid Team'}});
+    });
     expect(continueButton).not.toBeDisabled();
   });
 });

@@ -25,7 +25,7 @@ import {AvsDebugger} from '@wireapp/avs-debugger';
 
 import {User} from 'Repositories/entity/User';
 import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export type UserId = string;
 export type ClientId = string;

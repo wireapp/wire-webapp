@@ -27,8 +27,8 @@ import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
 import {StorageKey} from 'Repositories/storage';
-import {loadValue, storeValue} from 'Util/StorageUtil';
-import {sortByPriority} from 'Util/StringUtil';
+import {loadValue, storeValue} from 'Util/storageUtil';
+import {sortByPriority} from 'Util/stringUtil';
 
 import {EmojiItem} from './EmojiItem';
 

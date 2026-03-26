@@ -174,17 +174,12 @@ describe('HttpClient', () => {
         },
       ] as const,
     )(
-      'retries $expectedDescription backend errors when incremental retry backoff is enabled',
+      'retries $expectedDescription backend errors with incremental retry backoff',
       async ({retryableStatusCode}) => {
         const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
-        const client = new HttpClient(
-          testConfig,
-          mockedAccessTokenStore as AccessTokenStore,
-        {
+        const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
           dependencies: httpClientDependenciesForTest,
-          shouldUseIncrementalRetryBackoff: true,
-        },
-      );
+        });
         const response = createAxiosResponseForTest({ok: true});
 
         client._sendRequest = jest
@@ -200,16 +195,11 @@ describe('HttpClient', () => {
       },
     );
 
-    it('retries retryable backend errors when incremental retry backoff is enabled', async () => {
+    it('retries retryable backend errors with incremental retry backoff', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
-      const client = new HttpClient(
-        testConfig,
-        mockedAccessTokenStore as AccessTokenStore,
-        {
-          dependencies: httpClientDependenciesForTest,
-          shouldUseIncrementalRetryBackoff: true,
-        },
-      );
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        dependencies: httpClientDependenciesForTest,
+      });
       const response = createAxiosResponseForTest({ok: true});
 
       client._sendRequest = jest
@@ -224,16 +214,11 @@ describe('HttpClient', () => {
       expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([100]);
     });
 
-    it('does not retry non-retryable backend errors when incremental retry backoff is enabled', async () => {
+    it('does not retry non-retryable backend errors with incremental retry backoff', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
-      const client = new HttpClient(
-        testConfig,
-        mockedAccessTokenStore as AccessTokenStore,
-        {
-          dependencies: httpClientDependenciesForTest,
-          shouldUseIncrementalRetryBackoff: true,
-        },
-      );
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        dependencies: httpClientDependenciesForTest,
+      });
       const nonRetryableBackendError = new BackendError('Bad request', undefined, StatusCode.BAD_REQUEST);
 
       client._sendRequest = jest.fn().mockRejectedValueOnce(nonRetryableBackendError);
@@ -243,32 +228,11 @@ describe('HttpClient', () => {
       expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([]);
     });
 
-    it('preserves the existing behavior when incremental retry backoff is disabled', async () => {
-      const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
-      const client = new HttpClient(
-        testConfig,
-        mockedAccessTokenStore as AccessTokenStore,
-        {dependencies: httpClientDependenciesForTest},
-      );
-      const tooManyRequestsBackendError = new BackendError('Too many requests', undefined, StatusCode.TOO_MANY_REQUESTS);
-
-      client._sendRequest = jest.fn().mockRejectedValueOnce(tooManyRequestsBackendError);
-
-      await expect(client.sendRequest({method: 'GET', url: '/conversations'})).rejects.toBe(tooManyRequestsBackendError);
-      expect(client._sendRequest).toHaveBeenCalledTimes(1);
-      expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([]);
-    });
-
     it('restarts with the initial retry delay after the retry backoff is reset', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
-      const client = new HttpClient(
-        testConfig,
-        mockedAccessTokenStore as AccessTokenStore,
-        {
-          dependencies: httpClientDependenciesForTest,
-          shouldUseIncrementalRetryBackoff: true,
-        },
-      );
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        dependencies: httpClientDependenciesForTest,
+      });
       const response = createAxiosResponseForTest({ok: true});
 
       client._sendRequest = jest
@@ -306,17 +270,12 @@ describe('HttpClient', () => {
 
         return 1 as ReturnType<typeof globalThis.setTimeout>;
       });
-      const client = new HttpClient(
-        testConfig,
-        mockedAccessTokenStore as AccessTokenStore,
-        {
-          dependencies: {
-            clearTimeout,
-            setTimeout,
-          },
-          shouldUseIncrementalRetryBackoff: true,
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        dependencies: {
+          clearTimeout,
+          setTimeout,
         },
-      );
+      });
       const response = createAxiosResponseForTest({ok: true});
 
       client._sendRequest = jest
@@ -364,7 +323,6 @@ describe('HttpClient', () => {
             clearTimeout,
             setTimeout,
           },
-          shouldUseIncrementalRetryBackoff: true,
         },
       );
 

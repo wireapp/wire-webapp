@@ -23,7 +23,7 @@ import Cookies from 'js-cookie';
 
 import {Runtime} from '@wireapp/commons';
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {createUuid} from 'Util/uuid';
 
 const CONFIG = {

@@ -18,7 +18,7 @@
  */
 
 import {CloseIcon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {buttonStyles, iconStyles} from './FilePreviewDeleteButton.styles';
 

@@ -19,7 +19,7 @@
 
 import {Dexie, Table, Transaction} from 'dexie';
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';
 import {ClientRecord} from './record/ClientRecord';

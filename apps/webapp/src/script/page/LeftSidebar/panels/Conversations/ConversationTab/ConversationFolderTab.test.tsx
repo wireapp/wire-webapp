@@ -69,16 +69,16 @@ describe('ConversationFolderTab', () => {
     conversationRepository['conversationLabelRepository'].addConversationToFavorites(favoriteConversation);
 
     const customFolderName = 'customFolder';
-    const customFolder = createLabel(customFolderName, [customFolderConversation], 'id', LabelType.Custom);
+    const customFolder = createLabel(customFolderName, [customFolderConversation], 'custom-folder-id-1', LabelType.Custom);
 
     const customFolderName2 = 'customFolder2';
-    const customFolder2 = createLabel(customFolderName2, [customFolderConversation], 'id', LabelType.Custom);
+    const customFolder2 = createLabel(customFolderName2, [customFolderConversation], 'custom-folder-id-2', LabelType.Custom);
 
     const customFavoriteFolderName = 'customFavoriteFolder';
     const customFavoriteFolder = createLabel(
       customFavoriteFolderName,
       [favoriteConversation],
-      'id',
+      'favorite-folder-id',
       LabelType.Favorite,
     );
 

@@ -17,15 +17,10 @@
  *
  */
 
-import {noop} from 'noop-esm';
-
-import {incrementalHttpRetryBackoffFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {APIClient} from '../service/APIClientSingleton';
 
 type ConfigureIncrementalHttpRetryBackoffResetDependencies = {
   readonly isElectron: () => boolean;
-  readonly isFeatureToggleEnabled: (featureToggleName: StartupFeatureToggleName) => boolean;
   readonly subscribeToApplicationSignal: (signalName: 'visibilitychange', listener: () => void) => void;
   readonly apiClient: APIClient;
   readonly subscribeToRuntimeSignal: (signalName: 'focus' | 'online' | 'unload', listener: () => void) => void;
@@ -55,17 +50,12 @@ export function createIncrementalHttpRetryBackoffReset(
   const {
     apiClient,
     isElectron,
-    isFeatureToggleEnabled,
     subscribeToApplicationSignal,
     subscribeToRuntimeSignal,
     unsubscribeFromApplicationSignal,
     unsubscribeFromRuntimeSignal,
     visibilityState,
   } = dependencies;
-
-  if (!isFeatureToggleEnabled(incrementalHttpRetryBackoffFeatureToggleName)) {
-    return noop;
-  }
 
   function resetRetryBackoff(): void {
     apiClient.resetIncrementalRetryBackoff();

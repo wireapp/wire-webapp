@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {buttonStyles, iconStyles, textStyles, wrapperStyles} from './CellsCreateNewFolderHint.styles';
 
