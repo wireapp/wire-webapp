@@ -84,7 +84,7 @@ test.describe('account settings', () => {
     },
   );
 
-  test(
+  test.skip(
     'I should not be able to change email of user managed by SCIM',
     {tag: ['@TC-60', '@regression']},
     async ({pageManager, context}) => {

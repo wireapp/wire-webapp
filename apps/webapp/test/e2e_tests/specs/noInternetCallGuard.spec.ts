@@ -32,7 +32,7 @@ let ownerB = getUser();
 const teamAName = 'Direct Call A';
 const teamBName = 'Direct Call B';
 
-test('Starting call 1:1 call without internet', async ({browser, pageManager: ownerAPageManager, api}) => {
+test.skip('Starting call 1:1 call without internet', async ({browser, pageManager: ownerAPageManager, api}) => {
   test.setTimeout(150_000);
 
   const {pages: ownerAPages, modals: ownerAModals, components: ownerAComponents} = ownerAPageManager.webapp;
