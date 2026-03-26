@@ -49,10 +49,10 @@ import type {
   StartOptions,
 } from '../backgroundEffectsWorkerTypes';
 import type {BackgroundEffectsRenderingPipeline, PipelineConfig} from '../pipelines/backgroundEffectsRenderingPipeline';
-import {Canvas2DPipeline} from '../pipelines/canvas2DPipeline';
-import {MainWebGLPipeline} from '../pipelines/mainWebGLPipeline';
+import {Canvas2dPipeline} from '../pipelines/canvas2dPipeline';
+import {MainWebGlPipeline} from '../pipelines/mainWebGlPipeline';
 import {PassthroughPipeline} from '../pipelines/passthroughPipeline';
-import {WorkerWebGLPipeline} from '../pipelines/workerWebGLPipeline';
+import {WorkerWebGlPipeline} from '../pipelines/workerWebGlPipeline';
 import {resolveQualityPolicy, resolveSegmentationModelPath, TIER_DEFINITIONS} from '../quality';
 
 /**
@@ -541,11 +541,11 @@ export class BackgroundEffectsController {
   private createPipeline(type: PipelineType): BackgroundEffectsRenderingPipeline {
     switch (type) {
       case 'worker-webgl2':
-        return new WorkerWebGLPipeline();
+        return new WorkerWebGlPipeline();
       case 'main-webgl2':
-        return new MainWebGLPipeline();
+        return new MainWebGlPipeline();
       case 'canvas2d':
-        return new Canvas2DPipeline();
+        return new Canvas2dPipeline();
       default:
         return new PassthroughPipeline();
     }

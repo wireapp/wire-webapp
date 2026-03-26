@@ -146,9 +146,9 @@ interface StartOptions {
     | 'conservative'
     | 'aggressive'
     | ((capabilities) => {
-        initialTier: 'A' | 'B' | 'C' | 'D';
-        segmentationModelByTier?: Partial<Record<'A' | 'B' | 'C' | 'D', string>>;
-      });
+    initialTier: 'A' | 'B' | 'C' | 'D';
+    segmentationModelByTier?: Partial<Record<'A' | 'B' | 'C' | 'D', string>>;
+  });
   debugMode?: DebugMode; // Default: 'off'
   mode?: EffectMode; // Default: 'blur'
   blurStrength?: number; // Default: 0.5 (0-1)
@@ -270,7 +270,7 @@ BackgroundEffects/
 │   └── capability.ts                   # Capability detection
 ├── pipelines/                          # BackgroundEffectsRenderingPipeline implementations
 ├── renderer/
-│   └── webGLRenderer.ts                # WebGL2 rendering pipeline
+│   └── webGlRenderer.ts                # WebGL2 rendering pipeline
 ├── segmentation/
 │   └── segmenter.ts                   # MediaPipe segmentation
 ├── quality/
@@ -281,7 +281,7 @@ BackgroundEffects/
 ├── debug/
 │   └── debugModes.ts                  # Debug mode utilities
 ├── shared/                             # Shared helpers (mask, timestamps)
-├── test-basic.ts                       # Basic pipeline test harness
+├── testBasic.ts                       # Basic pipeline test harness
 ├── backgroundEffectsWorkerTypes.ts                           # Type definitions
 └── index.ts                           # Public API exports
 ```

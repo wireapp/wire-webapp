@@ -36,7 +36,7 @@ import {
   resolveQualityTierForEffectMode,
   resolveSegmentationModelPath,
 } from '../quality';
-import {WebGLRenderer} from '../renderer/webGLRenderer';
+import {WebGlRenderer} from '../renderer/webGlRenderer';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
@@ -62,10 +62,10 @@ import {buildMaskInput, type MaskInput, type MaskSource} from '../shared/mask';
  * - Virtual background: WebGL texture compositing
  * - Mask refinement: Joint bilateral filtering, temporal smoothing
  */
-export class MainWebGLPipeline implements BackgroundEffectsRenderingPipeline {
+export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
   public readonly type = 'main-webgl2' as const;
   private readonly logger: Logger;
-  private renderer: WebGLRenderer | null = null;
+  private renderer: WebGlRenderer | null = null;
   private segmenter: SegmenterLike | null = null;
   private segmenterFactory: SegmenterFactory = MediaPipeSegmenterFactory;
   private segmentationModelByTier: SegmentationModelByTier = {};
@@ -83,7 +83,7 @@ export class MainWebGLPipeline implements BackgroundEffectsRenderingPipeline {
   private mainFrameCount = 0;
 
   constructor() {
-    this.logger = getLogger('MainWebGLPipeline');
+    this.logger = getLogger('MainWebGlPipeline');
   }
 
   /**
@@ -107,7 +107,7 @@ export class MainWebGLPipeline implements BackgroundEffectsRenderingPipeline {
     this.getDroppedFrames = init.getDroppedFrames;
     this.mainFrameCount = 0;
 
-    this.renderer = new WebGLRenderer(this.outputCanvas, this.outputCanvas.width, this.outputCanvas.height);
+    this.renderer = new WebGlRenderer(this.outputCanvas, this.outputCanvas.width, this.outputCanvas.height);
     this.segmenterFactory = init.createSegmenter ?? MediaPipeSegmenterFactory;
     this.segmentationModelByTier = init.segmentationModelByTier;
     const postProcessorFactory = init.createMaskPostProcessor ?? {
@@ -433,7 +433,7 @@ export class MainWebGLPipeline implements BackgroundEffectsRenderingPipeline {
    *
    * Adds a new sample to the metrics window, updates quality tier if in
    * adaptive mode, and invokes the onMetrics callback with aggregated metrics.
-   * Uses 'GPU' as the segmentation delegate since MainWebGLPipeline uses GPU inference.
+   * Uses 'GPU' as the segmentation delegate since MainWebGlPipeline uses GPU inference.
    *
    * @param totalMs - Total frame processing time in milliseconds.
    * @param segmentationMs - Segmentation processing time in milliseconds.
@@ -445,7 +445,7 @@ export class MainWebGLPipeline implements BackgroundEffectsRenderingPipeline {
       return;
     }
     pushMetricsSample(this.metricsWindow, {totalMs, segmentationMs, gpuMs});
-    // MainWebGLPipeline uses GPU delegate
+    // MainWebGlPipeline uses GPU delegate
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'GPU';
     this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));
   }

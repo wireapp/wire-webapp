@@ -17,7 +17,7 @@
  *
  */
 
-import type {Size} from './webGLResources';
+import type {Size} from './webGlResources';
 
 /**
  * Manages background image texture for virtual background rendering.

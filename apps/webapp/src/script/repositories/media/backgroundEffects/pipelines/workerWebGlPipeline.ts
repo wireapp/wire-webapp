@@ -44,7 +44,7 @@ import type {QualityTier, WorkerOptions, WorkerResponse} from '../backgroundEffe
  * - Worker sends metrics and completion notifications back to main thread
  * - All configuration updates are sent via postMessage
  */
-export class WorkerWebGLPipeline implements BackgroundEffectsRenderingPipeline {
+export class WorkerWebGlPipeline implements BackgroundEffectsRenderingPipeline {
   public readonly type = 'worker-webgl2' as const;
   private worker: Worker | null = null;
   private outputCanvasTransferred = false;

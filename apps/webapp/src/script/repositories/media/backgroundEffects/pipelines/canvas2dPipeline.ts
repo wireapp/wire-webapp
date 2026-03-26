@@ -61,7 +61,7 @@ import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTyp
  * - Virtual background: Canvas2D drawImage with compositing
  * - Mask compositing: destination-in blend mode
  */
-export class Canvas2DPipeline implements BackgroundEffectsRenderingPipeline {
+export class Canvas2dPipeline implements BackgroundEffectsRenderingPipeline {
   public readonly type = 'canvas2d' as const;
   private readonly logger: Logger;
   private outputCanvas: HTMLCanvasElement | null = null;
@@ -93,7 +93,7 @@ export class Canvas2DPipeline implements BackgroundEffectsRenderingPipeline {
   private background: {bitmap: ImageBitmap; width: number; height: number} | null = null;
 
   constructor() {
-    this.logger = getLogger('Canvas2DPipeline');
+    this.logger = getLogger('Canvas2dPipeline');
   }
 
   /**
@@ -818,7 +818,7 @@ export class Canvas2DPipeline implements BackgroundEffectsRenderingPipeline {
       return;
     }
     pushMetricsSample(this.metricsWindow, {totalMs, segmentationMs, gpuMs});
-    // Canvas2DPipeline uses CPU delegate
+    // Canvas2dPipeline uses CPU delegate
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'CPU';
     this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));
   }

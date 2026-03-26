@@ -20,7 +20,7 @@
 /* eslint-disable no-console */
 /**
  * Basic test script for backgroundEffects module
- * Run with: ts-node src/script/repositories/media/backgroundEffects/test-basic.ts
+ * Run with: ts-node src/script/repositories/media/backgroundEffects/testBasic.ts
  *
  * Browser demo:
  *   Bundle this file as an ES module in the app build and open it in the browser.

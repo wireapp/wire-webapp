@@ -21,7 +21,7 @@ import {state} from './backgroundEffectsWorkerState';
 
 import type {WorkerResponse} from '../backgroundEffectsWorkerTypes';
 import {resolveSegmentationModelPath} from '../quality';
-import {WebGLRenderer} from '../renderer/webGLRenderer';
+import {WebGlRenderer} from '../renderer/webGlRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 
 let contextHandlersBound = false;
@@ -95,7 +95,7 @@ async function handleContextRestored(): Promise<void> {
     return;
   }
   try {
-    state.renderer = new WebGLRenderer(state.canvas, state.width, state.height);
+    state.renderer = new WebGlRenderer(state.canvas, state.width, state.height);
   } catch (error) {
     console.warn('[bgfx.worker] Renderer restore failed', error);
     state.renderer = null;

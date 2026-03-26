@@ -49,7 +49,7 @@ export interface RendererConfig {
  * based on quality tier parameters, and manages resource swapping for ping-pong
  * operations.
  */
-export class WebGLResources {
+export class WebGlResources {
   private readonly textures: Map<string, WebGLTexture> = new Map();
   private readonly framebuffers: Map<string, WebGLFramebuffer> = new Map();
   private sizes: Record<string, Size> = {};

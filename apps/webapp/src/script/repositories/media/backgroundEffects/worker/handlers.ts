@@ -22,7 +22,7 @@ import {bindContextLossHandlers, resetContextLossHandlers} from './contextLoss';
 
 import type {WorkerOptions, WorkerResponse} from '../backgroundEffectsWorkerTypes';
 import {QualityController, resolveSegmentationModelPath} from '../quality';
-import {WebGLRenderer} from '../renderer/webGLRenderer';
+import {WebGlRenderer} from '../renderer/webGlRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 
 /**
@@ -56,7 +56,7 @@ export async function handleInit(
   state.quality = options.quality;
   state.canvas = canvas;
 
-  const renderer = new WebGLRenderer(canvas, width, height);
+  const renderer = new WebGlRenderer(canvas, width, height);
   state.renderer = renderer;
 
   state.qualityController = new QualityController(options.targetFps ?? 15);

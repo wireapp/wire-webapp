@@ -34,7 +34,7 @@
 import {BackgroundRenderer} from './backgroundRenderer';
 import {RenderPasses} from './renderPasses';
 import {ShaderPrograms} from './shaderPrograms';
-import {WebGLResources, type Size} from './webGLResources';
+import {type Size, WebGlResources} from './webGlResources';
 
 import type {DebugMode, EffectMode, QualityTierParams} from '../backgroundEffectsWorkerTypes';
 import {computeBlurRadius} from '../quality';
@@ -88,7 +88,7 @@ type MaskInput = MaskInputBitmap | MaskInputTexture;
  * The renderer supports both main thread (HTMLCanvasElement) and worker thread
  * (OffscreenCanvas) operation for optimal performance.
  */
-export class WebGLRenderer {
+export class WebGlRenderer {
   /** WebGL2 rendering context. */
   private readonly gl: WebGL2RenderingContext;
   /** Vertex array object for fullscreen quad rendering. */
@@ -96,7 +96,7 @@ export class WebGLRenderer {
   /** Shader program manager. */
   private readonly programs: ShaderPrograms;
   /** WebGL resource manager for textures/framebuffers. */
-  private readonly resources: WebGLResources;
+  private readonly resources: WebGlResources;
   /** Render pass helpers. */
   private readonly passes: RenderPasses;
   /** Current renderer configuration. */
@@ -134,7 +134,7 @@ export class WebGLRenderer {
     // Compile all shader programs
     this.programs = new ShaderPrograms(this.gl);
     // Initialize resources and passes
-    this.resources = new WebGLResources(this.gl);
+    this.resources = new WebGlResources(this.gl);
     this.passes = new RenderPasses(this.gl, this.programs, this.resources);
     this.background = new BackgroundRenderer(this.gl);
     // Initialize default configuration

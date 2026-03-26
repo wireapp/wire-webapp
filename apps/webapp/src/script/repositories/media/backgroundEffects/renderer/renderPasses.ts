@@ -18,7 +18,7 @@
  */
 
 import type {ShaderPrograms} from './shaderPrograms';
-import type {Size, WebGLResources} from './webGLResources';
+import type {Size, WebGlResources} from './webGlResources';
 
 /**
  * Helper class for executing WebGL render passes.
@@ -31,7 +31,7 @@ export class RenderPasses {
   constructor(
     private readonly gl: WebGL2RenderingContext,
     private readonly programs: ShaderPrograms,
-    private readonly resources: WebGLResources,
+    private readonly resources: WebGlResources,
   ) {}
 
   /**

@@ -19,7 +19,7 @@
 
 import type {DebugMode, EffectMode, Metrics, QualityMode, WorkerOptions} from '../backgroundEffectsWorkerTypes';
 import {createMetricsWindow, type MetricsWindow, QualityController} from '../quality';
-import {WebGLRenderer} from '../renderer/webGLRenderer';
+import {WebGlRenderer} from '../renderer/webGlRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 
 /**
@@ -29,7 +29,7 @@ import {Segmenter} from '../segmentation/segmenter';
  * segmenter, quality controller, configuration, and metrics.
  */
 export interface BackgroundEffectsWorkerState {
-  renderer: WebGLRenderer | null;
+  renderer: WebGlRenderer | null;
   segmenter: Segmenter | null;
   qualityController: QualityController | null;
   options: WorkerOptions | null;

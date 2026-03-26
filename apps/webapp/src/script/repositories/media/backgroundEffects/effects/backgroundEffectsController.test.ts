@@ -25,7 +25,7 @@ jest.mock('./capability', () => ({
   choosePipeline: jest.fn(() => 'main-webgl2'),
 }));
 
-jest.mock('../pipelines/mainWebGLPipeline', () => ({
+jest.mock('../pipelines/mainWebGlPipeline', () => ({
   MainWebGLPipeline: jest.fn().mockImplementation(() => ({
     init: jest.fn().mockResolvedValue(undefined),
     processFrame: jest.fn().mockResolvedValue(undefined),
