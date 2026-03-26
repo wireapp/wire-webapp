@@ -38,6 +38,8 @@ describe('IncrementalRetryBackoff', function () {
     const incrementalRetryBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
 
     expect(incrementalRetryBackoffState.delayInMilliseconds).toBe(0);
+    expect(incrementalRetryBackoffState.retryCount).toBe(0);
+    expect(incrementalRetryBackoffState.totalRetryDelayInMilliseconds).toBe(0);
   });
 
   it('starts the retry progression at 100 milliseconds', () => {
@@ -48,6 +50,8 @@ describe('IncrementalRetryBackoff', function () {
       incrementalRetryBackoffPolicy.advanceState(currentIncrementalRetryBackoffState);
 
     expect(nextIncrementalRetryBackoffState.delayInMilliseconds).toBe(100);
+    expect(nextIncrementalRetryBackoffState.retryCount).toBe(1);
+    expect(nextIncrementalRetryBackoffState.totalRetryDelayInMilliseconds).toBe(100);
   });
 
   it('doubles the retry delay on each advancement', () => {
@@ -63,6 +67,12 @@ describe('IncrementalRetryBackoff', function () {
     expect(firstIncrementalRetryBackoffState.delayInMilliseconds).toBe(100);
     expect(secondIncrementalRetryBackoffState.delayInMilliseconds).toBe(200);
     expect(thirdIncrementalRetryBackoffState.delayInMilliseconds).toBe(400);
+    expect(firstIncrementalRetryBackoffState.retryCount).toBe(1);
+    expect(secondIncrementalRetryBackoffState.retryCount).toBe(2);
+    expect(thirdIncrementalRetryBackoffState.retryCount).toBe(3);
+    expect(firstIncrementalRetryBackoffState.totalRetryDelayInMilliseconds).toBe(100);
+    expect(secondIncrementalRetryBackoffState.totalRetryDelayInMilliseconds).toBe(300);
+    expect(thirdIncrementalRetryBackoffState.totalRetryDelayInMilliseconds).toBe(700);
   });
 
   it('caps the retry delay at ten minutes', () => {
@@ -84,7 +94,11 @@ describe('IncrementalRetryBackoff', function () {
     const resetBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
 
     expect(advancedIncrementalRetryBackoffState.delayInMilliseconds).toBe(100);
+    expect(advancedIncrementalRetryBackoffState.retryCount).toBe(1);
+    expect(advancedIncrementalRetryBackoffState.totalRetryDelayInMilliseconds).toBe(100);
     expect(resetBackoffState.delayInMilliseconds).toBe(0);
+    expect(resetBackoffState.retryCount).toBe(0);
+    expect(resetBackoffState.totalRetryDelayInMilliseconds).toBe(0);
   });
 
   it('treats 420, 429, and 5xx statuses as retryable', () => {
