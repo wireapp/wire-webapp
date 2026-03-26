@@ -31,9 +31,9 @@
  * structured cloneable types (ImageBitmap, OffscreenCanvas).
  */
 
+import {backgroundEffectsWorkerState} from './backgroundEffectsWorkerState';
 import {handleFrame} from './frameProcessor';
 import {cleanup, handleBackgroundImage, handleInit} from './handlers';
-import {state} from './state';
 
 import type {WorkerMessage, WorkerResponse} from '../types';
 
@@ -91,31 +91,31 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
         await handleFrame(message.frame, message.timestamp, message.width, message.height);
       } catch {
         // Increment dropped frame counter on processing errors
-        state.metrics.droppedFrames += 1;
+        backgroundEffectsWorkerState.metrics.droppedFrames += 1;
       } finally {
         // Always notify main thread that frame processing completed
         postMessage({type: 'frameProcessed'} as WorkerResponse);
       }
       break;
     case 'setMode':
-      state.mode = message.mode ?? state.mode;
+      backgroundEffectsWorkerState.mode = message.mode ?? backgroundEffectsWorkerState.mode;
       break;
     case 'setBlurStrength':
-      state.blurStrength = message.blurStrength ?? state.blurStrength;
+      backgroundEffectsWorkerState.blurStrength = message.blurStrength ?? backgroundEffectsWorkerState.blurStrength;
       break;
     case 'setDebugMode':
-      state.debugMode = message.debugMode ?? state.debugMode;
+      backgroundEffectsWorkerState.debugMode = message.debugMode ?? backgroundEffectsWorkerState.debugMode;
       break;
     case 'setQuality':
-      state.quality = message.quality ?? state.quality;
+      backgroundEffectsWorkerState.quality = message.quality ?? backgroundEffectsWorkerState.quality;
       // If quality is fixed (not auto), update quality controller tier
-      if (state.quality !== 'auto' && state.qualityController) {
-        state.qualityController.setTier(state.quality);
+      if (backgroundEffectsWorkerState.quality !== 'auto' && backgroundEffectsWorkerState.qualityController) {
+        backgroundEffectsWorkerState.qualityController.setTier(backgroundEffectsWorkerState.quality);
       }
       break;
     case 'setDroppedFrames':
       if (typeof message.droppedFrames === 'number') {
-        state.metrics.droppedFrames = message.droppedFrames;
+        backgroundEffectsWorkerState.metrics.droppedFrames = message.droppedFrames;
       }
       break;
     case 'setBackgroundImage':

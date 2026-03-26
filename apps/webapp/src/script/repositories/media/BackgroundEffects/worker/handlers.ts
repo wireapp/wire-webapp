@@ -17,10 +17,10 @@
  *
  */
 
+import {backgroundEffectsWorkerState} from './backgroundEffectsWorkerState';
 import {bindContextLossHandlers, resetContextLossHandlers} from './contextLoss';
-import {state} from './state';
 
-import {resolveSegmentationModelPath, QualityController} from '../quality';
+import {QualityController, resolveSegmentationModelPath} from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
 import {Segmenter} from '../segmentation/segmenter';
 import type {WorkerOptions, WorkerResponse} from '../types';
@@ -47,23 +47,23 @@ export async function handleInit(
   height: number,
   options: WorkerOptions,
 ): Promise<void> {
-  state.options = options;
-  state.width = width;
-  state.height = height;
-  state.mode = options.mode;
-  state.debugMode = options.debugMode;
-  state.blurStrength = options.blurStrength;
-  state.quality = options.quality;
-  state.canvas = canvas;
+  backgroundEffectsWorkerState.options = options;
+  backgroundEffectsWorkerState.width = width;
+  backgroundEffectsWorkerState.height = height;
+  backgroundEffectsWorkerState.mode = options.mode;
+  backgroundEffectsWorkerState.debugMode = options.debugMode;
+  backgroundEffectsWorkerState.blurStrength = options.blurStrength;
+  backgroundEffectsWorkerState.quality = options.quality;
+  backgroundEffectsWorkerState.canvas = canvas;
 
   const renderer = new WebGLRenderer(canvas, width, height);
-  state.renderer = renderer;
+  backgroundEffectsWorkerState.renderer = renderer;
 
-  state.qualityController = new QualityController(options.targetFps ?? 15);
-  if (state.quality === 'auto') {
-    state.qualityController.setTier(options.initialTier);
+  backgroundEffectsWorkerState.qualityController = new QualityController(options.targetFps ?? 15);
+  if (backgroundEffectsWorkerState.quality === 'auto') {
+    backgroundEffectsWorkerState.qualityController.setTier(options.initialTier);
   } else {
-    state.qualityController.setTier(state.quality);
+    backgroundEffectsWorkerState.qualityController.setTier(backgroundEffectsWorkerState.quality);
   }
 
   const initialTier = options.quality === 'auto' ? options.initialTier : options.quality;
@@ -74,27 +74,27 @@ export async function handleInit(
       options.segmentationModelByTier,
       options.segmentationModelPath,
     );
-    state.segmenterInitPromise = (async () => {
+    backgroundEffectsWorkerState.segmenterInitPromise = (async () => {
       const segmenter = new Segmenter(modelPath, 'GPU', canvas);
       try {
         await segmenter.init();
-        state.segmenter?.close();
-        state.segmenter = segmenter;
-        state.currentModelPath = modelPath;
+        backgroundEffectsWorkerState.segmenter?.close();
+        backgroundEffectsWorkerState.segmenter = segmenter;
+        backgroundEffectsWorkerState.currentModelPath = modelPath;
       } catch (error) {
         console.warn('[bgfx.worker] Segmenter init failed, running in bypass mode.', error);
         postMessage({type: 'segmenterError', error: String(error)} as WorkerResponse);
         segmenter.close();
-        state.segmenter = null;
-        state.currentModelPath = null;
+        backgroundEffectsWorkerState.segmenter = null;
+        backgroundEffectsWorkerState.currentModelPath = null;
       } finally {
-        state.segmenterInitPromise = null;
+        backgroundEffectsWorkerState.segmenterInitPromise = null;
       }
     })();
   } else {
-    state.segmenter = null;
-    state.currentModelPath = null;
-    state.segmenterInitPromise = null;
+    backgroundEffectsWorkerState.segmenter = null;
+    backgroundEffectsWorkerState.currentModelPath = null;
+    backgroundEffectsWorkerState.segmenterInitPromise = null;
   }
 
   bindContextLossHandlers(canvas);
@@ -114,14 +114,14 @@ export async function handleInit(
  */
 export async function handleBackgroundImage(bitmap: ImageBitmap | null, width: number, height: number): Promise<void> {
   if (!bitmap) {
-    state.background?.close();
-    state.background = null;
-    state.backgroundSize = null;
+    backgroundEffectsWorkerState.background?.close();
+    backgroundEffectsWorkerState.background = null;
+    backgroundEffectsWorkerState.backgroundSize = null;
     return;
   }
-  state.background?.close();
-  state.background = bitmap;
-  state.backgroundSize = {width, height};
+  backgroundEffectsWorkerState.background?.close();
+  backgroundEffectsWorkerState.background = bitmap;
+  backgroundEffectsWorkerState.backgroundSize = {width, height};
 }
 
 /**
@@ -134,13 +134,13 @@ export async function handleBackgroundImage(bitmap: ImageBitmap | null, width: n
  * @returns Nothing.
  */
 export function cleanup(): void {
-  state.segmenter?.close();
-  state.segmenter = null;
-  state.renderer?.destroy();
-  state.renderer = null;
-  state.background?.close();
-  state.background = null;
-  state.canvas = null;
-  state.contextLost = false;
+  backgroundEffectsWorkerState.segmenter?.close();
+  backgroundEffectsWorkerState.segmenter = null;
+  backgroundEffectsWorkerState.renderer?.destroy();
+  backgroundEffectsWorkerState.renderer = null;
+  backgroundEffectsWorkerState.background?.close();
+  backgroundEffectsWorkerState.background = null;
+  backgroundEffectsWorkerState.canvas = null;
+  backgroundEffectsWorkerState.contextLost = false;
   resetContextLossHandlers();
 }

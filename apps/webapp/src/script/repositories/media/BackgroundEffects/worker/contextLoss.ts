@@ -17,7 +17,7 @@
  *
  */
 
-import {state} from './state';
+import {backgroundEffectsWorkerState} from './backgroundEffectsWorkerState';
 
 import {resolveSegmentationModelPath} from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
@@ -69,16 +69,16 @@ export function resetContextLossHandlers(): void {
  */
 function handleContextLost(event: Event): void {
   event.preventDefault();
-  state.contextLost = true;
+  backgroundEffectsWorkerState.contextLost = true;
   postMessage({type: 'contextLost'} as WorkerResponse);
   try {
-    state.renderer?.destroy();
+    backgroundEffectsWorkerState.renderer?.destroy();
   } catch (error) {
     console.warn('[bgfx.worker] Failed to destroy renderer after context loss', error);
   }
-  state.renderer = null;
-  state.segmenter?.close();
-  state.segmenter = null;
+  backgroundEffectsWorkerState.renderer = null;
+  backgroundEffectsWorkerState.segmenter?.close();
+  backgroundEffectsWorkerState.segmenter = null;
 }
 
 /**
@@ -91,39 +91,51 @@ function handleContextLost(event: Event): void {
  * @returns Promise that resolves when context restoration is complete.
  */
 async function handleContextRestored(): Promise<void> {
-  if (!state.canvas || !state.options) {
+  if (!backgroundEffectsWorkerState.canvas || !backgroundEffectsWorkerState.options) {
     return;
   }
   try {
-    state.renderer = new WebGLRenderer(state.canvas, state.width, state.height);
+    backgroundEffectsWorkerState.renderer = new WebGLRenderer(
+      backgroundEffectsWorkerState.canvas,
+      backgroundEffectsWorkerState.width,
+      backgroundEffectsWorkerState.height,
+    );
   } catch (error) {
     console.warn('[bgfx.worker] Renderer restore failed', error);
-    state.renderer = null;
-    state.contextLost = true;
+    backgroundEffectsWorkerState.renderer = null;
+    backgroundEffectsWorkerState.contextLost = true;
     return;
   }
 
-  state.contextLost = false;
-  const tier = state.metrics?.tier ?? (state.quality === 'auto' ? state.options.initialTier : state.quality);
-  if (tier === 'bypass' || state.mode === 'passthrough') {
-    state.segmenter?.close();
-    state.segmenter = null;
-    state.currentModelPath = null;
+  backgroundEffectsWorkerState.contextLost = false;
+  const tier =
+    backgroundEffectsWorkerState.metrics?.tier ??
+    (backgroundEffectsWorkerState.quality === 'auto'
+      ? backgroundEffectsWorkerState.options.initialTier
+      : backgroundEffectsWorkerState.quality);
+  if (tier === 'bypass' || backgroundEffectsWorkerState.mode === 'passthrough') {
+    backgroundEffectsWorkerState.segmenter?.close();
+    backgroundEffectsWorkerState.segmenter = null;
+    backgroundEffectsWorkerState.currentModelPath = null;
     return;
   }
   const modelPath = resolveSegmentationModelPath(
     tier,
-    state.options.segmentationModelByTier,
-    state.options.segmentationModelPath,
+    backgroundEffectsWorkerState.options.segmentationModelByTier,
+    backgroundEffectsWorkerState.options.segmentationModelPath,
   );
-  state.segmenter?.close();
-  state.segmenter = new Segmenter(modelPath, 'GPU', state.canvas ?? undefined);
+  backgroundEffectsWorkerState.segmenter?.close();
+  backgroundEffectsWorkerState.segmenter = new Segmenter(
+    modelPath,
+    'GPU',
+    backgroundEffectsWorkerState.canvas ?? undefined,
+  );
   try {
-    await state.segmenter.init();
-    state.currentModelPath = modelPath;
+    await backgroundEffectsWorkerState.segmenter.init();
+    backgroundEffectsWorkerState.currentModelPath = modelPath;
   } catch (error) {
     console.warn('[bgfx.worker] Segmenter restore failed', error);
-    state.segmenter = null;
-    state.currentModelPath = null;
+    backgroundEffectsWorkerState.segmenter = null;
+    backgroundEffectsWorkerState.currentModelPath = null;
   }
 }

@@ -17,7 +17,7 @@
  *
  */
 
-import {state} from './state';
+import {backgroundEffectsWorkerState} from './backgroundEffectsWorkerState';
 
 import {
   buildMetrics,
@@ -52,13 +52,13 @@ import type {QualityTier, QualityTierParams} from '../types';
  * @returns Promise that resolves when frame processing is complete.
  */
 export async function handleFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
-  if (state.fatalError) {
+  if (backgroundEffectsWorkerState.fatalError) {
     frame.close();
     return;
   }
 
-  const renderer = state.renderer;
-  if (!renderer || state.contextLost) {
+  const renderer = backgroundEffectsWorkerState.renderer;
+  if (!renderer || backgroundEffectsWorkerState.contextLost) {
     frame.close();
     return;
   }
@@ -67,30 +67,32 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
   let maskBitmap: ImageBitmap | null = null;
   let releaseMaskResources: (() => void) | null = null;
   try {
-    if (width !== state.width || height !== state.height) {
-      state.width = width;
-      state.height = height;
-      if (state.canvas) {
-        state.canvas.width = width;
-        state.canvas.height = height;
+    if (width !== backgroundEffectsWorkerState.width || height !== backgroundEffectsWorkerState.height) {
+      backgroundEffectsWorkerState.width = width;
+      backgroundEffectsWorkerState.height = height;
+      if (backgroundEffectsWorkerState.canvas) {
+        backgroundEffectsWorkerState.canvas.width = width;
+        backgroundEffectsWorkerState.canvas.height = height;
       }
     }
 
     let qualityTier = resolveQualityTierParams();
     if (!qualityTier.bypass) {
       ensureSegmenterForTier(qualityTier.tier);
-      if (!state.segmenter) {
+      if (!backgroundEffectsWorkerState.segmenter) {
         qualityTier = {...qualityTier, bypass: true};
       }
     }
     let segmentationMs = 0;
 
-    if (!qualityTier.bypass && state.segmenter && qualityTier.segmentationCadence > 0) {
-      if (state.frameCount % qualityTier.segmentationCadence === 0) {
-        state.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
+    if (!qualityTier.bypass && backgroundEffectsWorkerState.segmenter && qualityTier.segmentationCadence > 0) {
+      if (backgroundEffectsWorkerState.frameCount % qualityTier.segmentationCadence === 0) {
+        backgroundEffectsWorkerState.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
         const timestampMs = nextTimestampMs(timestamp);
-        const includeClassMask = state.debugMode === 'classOverlay' || state.debugMode === 'classOnly';
-        const result = await state.segmenter.segment(frame, timestampMs, {includeClassMask});
+        const includeClassMask =
+          backgroundEffectsWorkerState.debugMode === 'classOverlay' ||
+          backgroundEffectsWorkerState.debugMode === 'classOnly';
+        const result = await backgroundEffectsWorkerState.segmenter.segment(frame, timestampMs, {includeClassMask});
         const useClassMask = includeClassMask && result.classMask;
         const maskSource: MaskSource = useClassMask
           ? {
@@ -114,15 +116,30 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
       }
     }
 
-    if (state.canvas && (state.canvas.width !== state.width || state.canvas.height !== state.height)) {
-      state.canvas.width = state.width;
-      state.canvas.height = state.height;
+    if (
+      backgroundEffectsWorkerState.canvas &&
+      (backgroundEffectsWorkerState.canvas.width !== backgroundEffectsWorkerState.width ||
+        backgroundEffectsWorkerState.canvas.height !== backgroundEffectsWorkerState.height)
+    ) {
+      backgroundEffectsWorkerState.canvas.width = backgroundEffectsWorkerState.width;
+      backgroundEffectsWorkerState.canvas.height = backgroundEffectsWorkerState.height;
     }
 
-    renderer.configure(state.width, state.height, qualityTier, state.mode, state.debugMode, state.blurStrength);
+    renderer.configure(
+      backgroundEffectsWorkerState.width,
+      backgroundEffectsWorkerState.height,
+      qualityTier,
+      backgroundEffectsWorkerState.mode,
+      backgroundEffectsWorkerState.debugMode,
+      backgroundEffectsWorkerState.blurStrength,
+    );
 
-    if (state.background && state.backgroundSize) {
-      renderer.setBackground(state.background, state.backgroundSize.width, state.backgroundSize.height);
+    if (backgroundEffectsWorkerState.background && backgroundEffectsWorkerState.backgroundSize) {
+      renderer.setBackground(
+        backgroundEffectsWorkerState.background,
+        backgroundEffectsWorkerState.backgroundSize.width,
+        backgroundEffectsWorkerState.backgroundSize.height,
+      );
     }
 
     const gpuStart = performance.now();
@@ -134,7 +151,7 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
     }
     const gpuMs = performance.now() - gpuStart;
 
-    state.frameCount += 1;
+    backgroundEffectsWorkerState.frameCount += 1;
 
     const totalMs = segmentationMs + gpuMs;
     updateMetrics(totalMs, segmentationMs, gpuMs, qualityTier.tier);
@@ -152,7 +169,11 @@ export async function handleFrame(frame: ImageBitmap, timestamp: number, width: 
  * @returns Quality tier parameters for current configuration.
  */
 function resolveQualityTierParams(): QualityTierParams {
-  return resolveQualityTierForEffectMode(state.qualityController, state.quality, state.mode);
+  return resolveQualityTierForEffectMode(
+    backgroundEffectsWorkerState.qualityController,
+    backgroundEffectsWorkerState.quality,
+    backgroundEffectsWorkerState.mode,
+  );
 }
 
 /**
@@ -171,7 +192,7 @@ function resolveQualityTierParams(): QualityTierParams {
 let currentInitId = 0;
 
 function ensureSegmenterForTier(tier: QualityTier): void {
-  if (!state.options || !state.canvas) {
+  if (!backgroundEffectsWorkerState.options || !backgroundEffectsWorkerState.canvas) {
     return;
   }
   if (tier === 'bypass') {
@@ -180,24 +201,24 @@ function ensureSegmenterForTier(tier: QualityTier): void {
 
   const desiredPath = resolveSegmentationModelPath(
     tier,
-    state.options.segmentationModelByTier,
-    state.options.segmentationModelPath,
+    backgroundEffectsWorkerState.options.segmentationModelByTier,
+    backgroundEffectsWorkerState.options.segmentationModelPath,
   );
 
-  if (state.currentModelPath === desiredPath && state.segmenter) {
+  if (backgroundEffectsWorkerState.currentModelPath === desiredPath && backgroundEffectsWorkerState.segmenter) {
     return;
   }
-  if (state.pendingModelPath === desiredPath) {
+  if (backgroundEffectsWorkerState.pendingModelPath === desiredPath) {
     console.info('[bgfx.worker] Segmentation change for model swap, already in progress');
     return;
   }
 
   const initId = ++currentInitId;
-  state.pendingModelPath = desiredPath;
+  backgroundEffectsWorkerState.pendingModelPath = desiredPath;
 
-  const nextSegmenter = new Segmenter(desiredPath, 'GPU', state.canvas as OffscreenCanvas);
+  const nextSegmenter = new Segmenter(desiredPath, 'GPU', backgroundEffectsWorkerState.canvas as OffscreenCanvas);
 
-  state.segmenterInitPromise = (async () => {
+  backgroundEffectsWorkerState.segmenterInitPromise = (async () => {
     try {
       console.info('[bgfx.worker] loading model', desiredPath);
 
@@ -205,34 +226,34 @@ function ensureSegmenterForTier(tier: QualityTier): void {
 
       console.info('[bgfx.worker] model ready', desiredPath);
 
-      state.segmenterErrorCount = 0;
-      state.fatalError = null;
+      backgroundEffectsWorkerState.segmenterErrorCount = 0;
+      backgroundEffectsWorkerState.fatalError = null;
     } catch (error) {
       console.warn('[bgfx.worker] Segmentation model swap failed, keeping previous model', error);
 
-      state.segmenterErrorCount++;
+      backgroundEffectsWorkerState.segmenterErrorCount++;
       self.postMessage({
         type: 'segmenterError',
         model: desiredPath,
         message: String(error),
       });
 
-      if (state.segmenterErrorCount >= 3) {
-        state.fatalError = 'segmenter_failed_repeatedly';
+      if (backgroundEffectsWorkerState.segmenterErrorCount >= 3) {
+        backgroundEffectsWorkerState.fatalError = 'segmenter_failed_repeatedly';
 
         self.postMessage({
           type: 'workerError',
           reason: 'segmenter',
-          message: state.fatalError,
+          message: backgroundEffectsWorkerState.fatalError,
         });
       }
       nextSegmenter.close();
       if (initId === currentInitId) {
-        state.pendingModelPath = null;
+        backgroundEffectsWorkerState.pendingModelPath = null;
 
-        if (!state.segmenter) {
-          state.segmenter = null;
-          state.currentModelPath = null;
+        if (!backgroundEffectsWorkerState.segmenter) {
+          backgroundEffectsWorkerState.segmenter = null;
+          backgroundEffectsWorkerState.currentModelPath = null;
         }
       }
       return;
@@ -245,15 +266,15 @@ function ensureSegmenterForTier(tier: QualityTier): void {
       return;
     }
 
-    state.segmenter?.close();
-    state.segmenter = nextSegmenter;
-    state.currentModelPath = desiredPath;
-    state.pendingModelPath = null;
+    backgroundEffectsWorkerState.segmenter?.close();
+    backgroundEffectsWorkerState.segmenter = nextSegmenter;
+    backgroundEffectsWorkerState.currentModelPath = desiredPath;
+    backgroundEffectsWorkerState.pendingModelPath = null;
   })();
 
-  void state.segmenterInitPromise.finally(() => {
+  void backgroundEffectsWorkerState.segmenterInitPromise.finally(() => {
     if (initId === currentInitId) {
-      state.segmenterInitPromise = null;
+      backgroundEffectsWorkerState.segmenterInitPromise = null;
     }
   });
 }
@@ -272,28 +293,28 @@ function ensureSegmenterForTier(tier: QualityTier): void {
  * @returns Nothing.
  */
 function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, tier: QualityTier): void {
-  if (!state.qualityController) {
+  if (!backgroundEffectsWorkerState.qualityController) {
     return;
   }
 
-  const processingMode = isProcessingMode(state.mode) ? state.mode : null;
+  const processingMode = isProcessingMode(backgroundEffectsWorkerState.mode) ? backgroundEffectsWorkerState.mode : null;
   const params = processingMode
-    ? state.quality === 'auto'
-      ? state.qualityController.update({totalMs, segmentationMs, gpuMs}, processingMode)
-      : state.qualityController.getTier(processingMode)
+    ? backgroundEffectsWorkerState.quality === 'auto'
+      ? backgroundEffectsWorkerState.qualityController.update({totalMs, segmentationMs, gpuMs}, processingMode)
+      : backgroundEffectsWorkerState.qualityController.getTier(processingMode)
     : null;
 
-  pushMetricsSample(state.metricsWindow, {totalMs, segmentationMs, gpuMs});
+  pushMetricsSample(backgroundEffectsWorkerState.metricsWindow, {totalMs, segmentationMs, gpuMs});
   // Get segmentation delegate type (null if no segmenter)
-  const segmentationDelegate = state.segmenter?.getDelegate() ?? null;
-  state.metrics = buildMetrics(
-    state.metricsWindow,
-    state.metrics.droppedFrames,
-    state.quality === 'auto' && params ? params.tier : tier,
+  const segmentationDelegate = backgroundEffectsWorkerState.segmenter?.getDelegate() ?? null;
+  backgroundEffectsWorkerState.metrics = buildMetrics(
+    backgroundEffectsWorkerState.metricsWindow,
+    backgroundEffectsWorkerState.metrics.droppedFrames,
+    backgroundEffectsWorkerState.quality === 'auto' && params ? params.tier : tier,
     segmentationDelegate,
   );
 
-  postMessage({type: 'metrics', metrics: state.metrics});
+  postMessage({type: 'metrics', metrics: backgroundEffectsWorkerState.metrics});
 }
 
 /**
@@ -307,7 +328,7 @@ function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number, t
  * @returns Monotonic timestamp in milliseconds.
  */
 function nextTimestampMs(sourceTimestampSeconds: number): number {
-  const monotonic = toMonotonicTimestampMs(sourceTimestampSeconds, state.lastTimestampMs);
-  state.lastTimestampMs = monotonic;
+  const monotonic = toMonotonicTimestampMs(sourceTimestampSeconds, backgroundEffectsWorkerState.lastTimestampMs);
+  backgroundEffectsWorkerState.lastTimestampMs = monotonic;
   return monotonic;
 }

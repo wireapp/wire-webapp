@@ -28,7 +28,7 @@ import type {DebugMode, EffectMode, Metrics, QualityMode, WorkerOptions} from '.
  * Maintains all state needed for frame processing, including renderer,
  * segmenter, quality controller, configuration, and metrics.
  */
-export interface State {
+export interface BackgroundEffectsWorkerState {
   renderer: WebGLRenderer | null;
   segmenter: Segmenter | null;
   qualityController: QualityController | null;
@@ -68,7 +68,7 @@ export const METRICS_MAX_SAMPLES = 30;
  * Shared state object used throughout the worker for frame processing,
  * configuration, and resource management.
  */
-export const state: State = {
+export const backgroundEffectsWorkerState: BackgroundEffectsWorkerState = {
   renderer: null,
   segmenter: null,
   qualityController: null,
