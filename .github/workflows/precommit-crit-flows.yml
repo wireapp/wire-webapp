@@ -96,33 +96,26 @@ jobs:
         with:
           name: build-artifact
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
       - name: Deploy to precommit environment
         id: deploy
-        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027 # v22
+        uses: aws-actions/aws-elasticbeanstalk-deploy@v1.0.0
         with:
-          application_name: Webapp
-          aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          deployment_package: ${{ needs.build.outputs.build_artifact }}
-          environment_name: wire-webapp-precommit
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{ needs.build.outputs.committer }} — ${{ needs.build.outputs.commit_url }}
-          version_label: ${{ github.run_id }}
-          wait_for_deployment: true # ✅ wait until EB is green
-
-      - name: Fetch precommit URL
-        id: fetch_url
-        run: |
-          URL=$(aws elasticbeanstalk describe-environments \
-            --region eu-central-1 \
-            --environment-names wire-webapp-precommit \
-            --query "Environments[0].CNAME" --output text)
-          echo "url=https://$URL" >> "$GITHUB_OUTPUT"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
+          aws-region: eu-central-1
+          application-name: Webapp
+          environment-name: wire-webapp-precommit
+          version-label: ${{ github.run_id }}
+          version-description: ${{ needs.build.outputs.committer }} — ${{ needs.build.outputs.commit_url }}
+          deployment-package-path: ${{ needs.build.outputs.build_artifact }}
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          use-existing-application-version-if-available: true
 
       - name: Deployment Status
         if: ${{ always() }}
