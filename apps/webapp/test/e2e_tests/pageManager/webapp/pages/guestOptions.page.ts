@@ -56,5 +56,8 @@ export const GuestOptionsPage = (page: Page) => {
   return {
     backButton,
     createLink,
+    passwordSecuredRadioButton,
+    createLinkButton,
+    guestLink,
   };
 };
