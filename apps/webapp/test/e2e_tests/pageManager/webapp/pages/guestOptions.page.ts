@@ -26,8 +26,8 @@ export const GuestOptionsPage = (page: Page) => {
   const createPasswordModal = new GuestLinkPasswordModal(page);
 
   const backButton = panel.getByRole('button', {name: 'Go back'});
-  const passwordSecuredRadioButton = panel.getByRole('radiogroup').getByText('Password secured');
-  const notPasswordSecuredRadioButton = panel.getByRole('radiogroup').getByText('Not password secured');
+  const passwordSecuredRadioButton = panel.getByRole('radiogroup').getByText('Password secured', {exact: true});
+  const notPasswordSecuredRadioButton = panel.getByRole('radiogroup').getByText('Not password secured', {exact: true});
   const createLinkButton = panel.getByRole('button', {name: 'Create link'});
 
   const guestLink = panel.getByRole('button', {name: /https:\/\/.+\/conversation-join\//});

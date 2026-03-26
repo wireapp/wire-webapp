@@ -18,6 +18,51 @@ test.describe('Guestroom', () => {
   });
 
   test(
+    'I want to join a conversation through password secured invite link as existing user',
+    {tag: ['@TC-8140', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userC)),
+        createPage(),
+      ]);
+
+      const password = 'Test1234?';
+      let createdLink: string;
+
+      const userAPageManager = PageManager.from(userAPage).webapp;
+      const userBPageManager = PageManager.from(userBPage);
+      const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
+      const {pages} = userAPageManager;
+
+      await test.step('User A creates invite link with password for conversation', async () => {
+        await createGroup(pages, groupName, [userC]);
+        await pages.conversationList().openConversation(groupName);
+        await pages.conversation().toggleGroupInformation();
+        await pages.conversationDetails().guestOptionsButton.click();
+        createdLink = await pages.guestOptions().createLink({password});
+      });
+
+      await test.step('User B sees error when entering incorrect password', async () => {
+        await userBPage.goto(createdLink.toString());
+        await userBPages.joinConversation().joinBrowserButton.click();
+        await expect(userBPages.joinConversation().joinAsGuest).toBeVisible();
+
+        await userBPages.login().login(userB);
+        await userBModals.conversationAccess().joinConversation('WrongPassword');
+        await expect(userBModals.conversationAccess().joinForm).toContainText(
+          'Password is incorrect, please try again.',
+        );
+      });
+
+      await test.step('User B can join conversation with correct password', async () => {
+        await userBModals.conversationAccess().joinConversation(password);
+        await userBPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+        await expect(userBPages.conversation().conversationTitle).toContainText(groupName);
+      });
+    },
+  );
+
+  test(
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
     async ({createPage}) => {
