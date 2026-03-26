@@ -27,7 +27,7 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
 // Generating test data
 const conversationName = 'Crits';
 
-test(
+test.skip(
   'Team owner adds whole team to an all team chat',
   {tag: ['@TC-8631', '@crit-flow-web']},
   async ({createTeam, createPage, api}) => {

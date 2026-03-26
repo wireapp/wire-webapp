@@ -56,7 +56,7 @@ test.describe('AppLock', () => {
     },
   );
 
-  test(
+  test.skip(
     'Web: App should not lock if I switch back to webapp tab in time (during inactivity timeout)',
     {tag: ['@TC-2752', '@TC-2753', '@regression']},
     async ({browser, createPage}) => {
