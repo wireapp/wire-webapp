@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
@@ -28,12 +28,12 @@ import {
   isProcessingMode,
   pushMetricsSample,
   QualityController,
+  resetMetricsWindow,
   resolveQualityTierForEffectMode,
   resolveSegmentationModelPath,
-  resetMetricsWindow,
 } from '../quality';
-import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
+import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
 import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
 import type {QualityTier, QualityTierParams, SegmentationModelByTier} from '../types';

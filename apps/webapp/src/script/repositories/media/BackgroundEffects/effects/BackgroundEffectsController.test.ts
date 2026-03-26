@@ -52,7 +52,7 @@ jest.mock('./FrameSource', () => ({
   })),
 }));
 
-jest.mock('Util/Logger', () => ({
+jest.mock('Util/logger', () => ({
   getLogger: () => ({
     info: jest.fn(),
     warn: jest.fn(),

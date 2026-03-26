@@ -28,7 +28,7 @@ import {
   loadBackgroundSource,
 } from 'Repositories/media/VideoBackgroundEffects';
 import {getStorage} from 'Util/localStorage';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {BackgroundEffectsController} from './BackgroundEffects/effects/BackgroundEffectsController';
 import {backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
@@ -254,10 +254,6 @@ export class BackgroundEffectsHandler {
 
   public isSuperhighQualityTierAllowed(): boolean {
     return this.controller.getMaxQualityTier() === 'superhigh';
-  }
-
-  public getModel(): string {
-    return this.controller.getModel();
   }
 
   getCapabilityInfo(): CapabilityInfo {

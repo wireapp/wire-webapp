@@ -32,9 +32,9 @@
  * to produce an output MediaStreamTrack with effects applied.
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
-import {detectCapabilities, choosePipeline} from './capability';
+import {choosePipeline, detectCapabilities} from './capability';
 import {FrameSource} from './FrameSource';
 
 import {Canvas2DPipeline} from '../pipelines/Canvas2DPipeline';
