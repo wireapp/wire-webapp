@@ -10,7 +10,7 @@ updates:
       timezone: 'Europe/Berlin'
     cooldown:
       default-days: 3
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     labels:
       - 'type: chore 🧹'
     ignore:
@@ -29,7 +29,7 @@ updates:
       timezone: 'Europe/Berlin'
     cooldown:
       default-days: 3
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     labels:
       - 'type: chore 🧹'
     ignore:
@@ -47,7 +47,7 @@ updates:
       timezone: 'Europe/Berlin'
     cooldown:
       default-days: 3
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     labels:
       - 'type: chore 🧹'
     groups:
@@ -86,7 +86,7 @@ updates:
       timezone: 'Europe/Berlin'
     cooldown:
       default-days: 3
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     labels:
       - 'type: chore 🧹'
     ignore:
@@ -109,7 +109,7 @@ updates:
       timezone: 'Europe/Berlin'
     cooldown:
       default-days: 3
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     labels:
       - 'type: chore 🧹'
     ignore:
@@ -129,7 +129,7 @@ updates:
       timezone: 'Europe/Berlin'
     cooldown:
       default-days: 3
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     labels:
       - 'type: chore 🧹'
     ignore:
@@ -142,7 +142,7 @@ updates:
   # Github actions
   - package-ecosystem: 'github-actions'
     directory: '/'
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     schedule:
       interval: 'daily'
       time: '16:00'
@@ -152,6 +152,6 @@ updates:
   # Docker
   - package-ecosystem: 'docker'
     directory: '/'
-    open-pull-requests-limit: 99
+    open-pull-requests-limit: 5
     schedule:
       interval: 'daily'
