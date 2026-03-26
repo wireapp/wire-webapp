@@ -21,7 +21,7 @@ import {useStore} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
-import {Metrics, QualityTier} from 'Repositories/media/BackgroundEffects';
+import {Metrics, QualityTier} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectSelection, DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
 
 export interface RenderMetrics extends Metrics {

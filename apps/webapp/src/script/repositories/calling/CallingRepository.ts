@@ -70,7 +70,7 @@ import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
+import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
