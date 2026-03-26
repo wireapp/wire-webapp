@@ -70,6 +70,7 @@ jobs:
 
       - name: Install 1Password CLI
         run: |
+          apt-get update && apt-get install -y unzip
           curl -sSfLo op.zip https://cache.agilebits.com/dist/1P/op2/pkg/v2.30.0/op_linux_amd64_v2.30.0.zip
           unzip -od /usr/local/bin/ op.zip
           rm op.zip
@@ -88,7 +89,7 @@ jobs:
           key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}
 
   test:
-    name: Run E2E Tests (Shard ${{ matrix.shard }})
+    name: Run E2E Tests
     runs-on: ubuntu-latest
     needs: prepare
     
