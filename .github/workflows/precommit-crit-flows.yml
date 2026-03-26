@@ -166,8 +166,8 @@ jobs:
           echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
           echo "Merge queue run detected, executing critical flow tests"
 
-  run_e2e_tests:
-    name: Playwright Critical Flow (precommit)
+  e2e_tests:
+    name: E2E Tests Execution
     if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' }}
     needs: [check_edits_to_e2e_tests, deploy_to_aws]
     uses: ./.github/workflows/e2e-tests.yml
@@ -178,9 +178,18 @@ jobs:
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
+  run_e2e_tests:
+    name: Playwright Critical Flow (precommit)
+    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' }}
+    needs: [e2e_tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report Status
+        run: echo "E2E tests completed with status - ${{ needs.e2e_tests.result }}"
+
   e2e-report:
     name: Generate test report
-    needs: run_e2e_tests
+    needs: e2e_tests
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
@@ -205,7 +214,7 @@ jobs:
       - name: Download report
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          artifact-ids: ${{ needs.run_e2e_tests.outputs.reportArtifactId }}
+          artifact-ids: ${{ needs.e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
 
       - name: Generate PR comment
@@ -238,7 +247,7 @@ jobs:
         with:
           header: playwright-summary
           message: |
-            🔗 [Download Full Report Artifact](${{ needs.run_e2e_tests.outputs.reportUrl }})
+            🔗 [Download Full Report Artifact](${{ needs.e2e_tests.outputs.reportUrl }})
 
             ${{ steps.generate_comment.outputs.comment }}
         env:
