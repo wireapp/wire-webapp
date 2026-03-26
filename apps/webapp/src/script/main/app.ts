@@ -88,12 +88,12 @@ import {TeamService} from 'Repositories/team/TeamService';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserService} from 'Repositories/user/UserService';
-import {initializeDataDog} from 'Util/DataDog';
-import {DebugUtil} from 'Util/DebugUtil';
-import {Environment} from 'Util/Environment';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {initializeDataDog} from 'Util/dataDog';
+import {DebugUtil} from 'Util/debugUtil';
+import {Environment} from 'Util/environment';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import '../../style/default.less';
@@ -184,7 +184,7 @@ export class App {
     this.repository = this._setupRepositories();
 
     if (config.FEATURE.ENABLE_DEBUG) {
-      import('Util/DebugUtil').then(({DebugUtil}) => {
+      import('Util/debugUtil').then(({DebugUtil}) => {
         this.debug = new DebugUtil(this.repository);
         this.util = {debug: this.debug}; // Alias for QA
       });

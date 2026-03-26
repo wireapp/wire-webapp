@@ -22,7 +22,7 @@ import {useCallback, useState} from 'react';
 import {useAppNotification} from 'Components/AppNotification';
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 

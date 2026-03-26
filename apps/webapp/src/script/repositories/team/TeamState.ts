@@ -28,7 +28,7 @@ import {User} from 'Repositories/entity/User';
 import {ROLE, roleMap} from 'Repositories/user/UserPermission';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {TeamEntity} from './TeamEntity';
 

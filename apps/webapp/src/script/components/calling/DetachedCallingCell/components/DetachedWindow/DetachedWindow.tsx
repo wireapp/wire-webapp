@@ -27,7 +27,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {CallState} from 'Repositories/calling/CallState';
 import {useActiveWindow} from 'src/script/hooks/useActiveWindow';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import '../../../../../../style/default.less';
 

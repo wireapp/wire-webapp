@@ -23,7 +23,7 @@ import {EventMapper} from 'Repositories/conversation/EventMapper';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/Message';
 import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
-import {getRandomNumber} from 'Util/NumberUtil';
+import {getRandomNumber} from 'Util/numberUtil';
 import {createUuid} from 'Util/uuid';
 
 import {groupMessagesBySenderAndTime, isMarker} from './messagesGroup';

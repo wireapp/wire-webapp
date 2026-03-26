@@ -17,6 +17,8 @@
  *
  */
 
+import {act} from 'react';
+
 import {fireEvent, waitFor} from '@testing-library/react';
 
 import {SetHandle} from './SetHandle';
@@ -32,7 +34,7 @@ const setHandleButtonId = 'do-send-handle';
 describe('SetHandle', () => {
   it('has disabled submit button as long as there is no input', async () => {
     spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
-    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve(''));
     const {getByTestId} = mountComponent(<SetHandle />, mockStoreFactory()(initialRootState));
 
     await waitFor(() => getByTestId(handleInputId));
@@ -40,13 +42,15 @@ describe('SetHandle', () => {
     const setHandleButton = getByTestId(setHandleButtonId) as HTMLButtonElement;
 
     expect(setHandleButton.disabled).toBe(true);
-    fireEvent.change(handleInput, {target: {value: 'e'}});
+    await act(async () => {
+      fireEvent.change(handleInput, {target: {value: 'e'}});
+    });
 
     expect(setHandleButton.disabled).toBe(false);
   });
 
   it('trims the handle', async () => {
-    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve());
+    spyOn(actionRoot.userAction, 'checkHandles').and.returnValue(() => Promise.resolve(''));
     spyOn(actionRoot.selfAction, 'doGetConsents').and.returnValue(() => Promise.resolve());
     spyOn(actionRoot.selfAction, 'setHandle').and.returnValue(() => Promise.resolve());
 
@@ -57,9 +61,13 @@ describe('SetHandle', () => {
     await waitFor(() => getByTestId(handleInputId));
     const handleInput = getByTestId(handleInputId);
     const setHandleButton = getByTestId(setHandleButtonId) as HTMLButtonElement;
-    fireEvent.change(handleInput, {target: {value: ` ${handle} `}});
+    await act(async () => {
+      fireEvent.change(handleInput, {target: {value: ` ${handle} `}});
+    });
 
-    fireEvent.click(setHandleButton);
+    await act(async () => {
+      fireEvent.click(setHandleButton);
+    });
 
     expect(actionRoot.selfAction.setHandle).toHaveBeenCalledWith(handle);
   });

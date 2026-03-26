@@ -20,7 +20,7 @@
 import {render, screen} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {isFileEditable} from 'Util/FileTypeUtil';
+import {isFileEditable} from 'Util/fileTypeUtil';
 
 import {FileAssetOptions} from './FileAssetOptions';
 
@@ -29,7 +29,7 @@ jest.mock('Util/util', () => ({
   getFileNameWithExtension: jest.fn((name: string, ext: string) => `${name}.${ext}`),
 }));
 
-jest.unmock('Util/FileTypeUtil');
+jest.unmock('Util/fileTypeUtil');
 
 describe('FileAssetOptions', () => {
   const mockOnOpen = jest.fn();

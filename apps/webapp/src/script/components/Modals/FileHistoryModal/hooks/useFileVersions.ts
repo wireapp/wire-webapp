@@ -22,7 +22,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'src/script/repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
 import {FileInfo, FileVersion} from '../types';

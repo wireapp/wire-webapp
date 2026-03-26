@@ -17,5 +17,5 @@
  *
  */
 
-export * from './DecryptionError';
-export * from './FederatedBackendsError';
+export * from './decryptionError';
+export * from './federatedBackendsError';

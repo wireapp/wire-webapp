@@ -31,8 +31,8 @@ import {Runtime} from '@wireapp/commons';
 import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
-import {enableLogging} from 'Util/LoggerUtil';
-import {loadValue} from 'Util/StorageUtil';
+import {enableLogging} from 'Util/loggerUtil';
+import {loadValue} from 'Util/storageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import {createApplicationServices} from './createApplicationServices';
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {wallClock} = applicationServices;
-  const apiClient = createAPIClient(isFeatureToggleEnabled);
+  const apiClient = createAPIClient();
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,
@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     isElectron: () => {
       return Runtime.isElectron();
     },
-    isFeatureToggleEnabled,
     subscribeToApplicationSignal: (signalName, listener) => {
       document.addEventListener(signalName, listener);
     },

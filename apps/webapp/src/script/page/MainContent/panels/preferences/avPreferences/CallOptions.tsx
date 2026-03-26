@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/PreferencesSection';

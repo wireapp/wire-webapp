@@ -27,9 +27,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {UserState} from 'Repositories/user/UserState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {Config} from '../../Config';
 import {ContentState, useAppState} from '../useAppState';

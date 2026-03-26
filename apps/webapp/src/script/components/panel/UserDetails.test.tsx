@@ -20,10 +20,15 @@
 import {render} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './UserDetails';
+
+jest.mock('Components/Avatar', () => ({
+  Avatar: () => <div data-testid="mock-avatar" />,
+  AVATAR_SIZE: {X_LARGE: 'x-large'},
+}));
 
 describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {

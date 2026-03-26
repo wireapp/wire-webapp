@@ -20,8 +20,8 @@
 import {useCallback, useEffect} from 'react';
 
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
-import {t} from 'Util/LocalizerUtil';
-import {formatLocale} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {formatLocale} from 'Util/timeUtil';
 import {getFileExtension, sanitizeFilename} from 'Util/util';
 
 interface UseFilePasteParams {

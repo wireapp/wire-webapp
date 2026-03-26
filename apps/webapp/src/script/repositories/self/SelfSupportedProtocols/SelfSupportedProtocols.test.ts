@@ -22,7 +22,7 @@ import {CONVERSATION_PROTOCOL, FEATURE_STATUS, FeatureList} from '@wireapp/api-c
 
 import {MLSMigrationStatus} from 'src/script/mls/MLSMigration/migrationStatus';
 import {TestFactory} from 'test/helper/TestFactory';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols';
 

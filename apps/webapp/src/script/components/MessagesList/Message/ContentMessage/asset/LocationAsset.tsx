@@ -18,8 +18,8 @@
  */
 
 import type {Location} from 'Repositories/entity/message/Location';
-import {t} from 'Util/LocalizerUtil';
-import {getMapsUrl} from 'Util/LocationUtil';
+import {t} from 'Util/localizerUtil';
+import {getMapsUrl} from 'Util/locationUtil';
 
 interface LocationAssetProps {
   asset: Location;

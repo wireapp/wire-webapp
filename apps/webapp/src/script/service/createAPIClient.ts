@@ -19,12 +19,6 @@
 
 import {APIClient} from './APIClientSingleton';
 
-import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
-
-export function createAPIClient(
-  isFeatureToggleEnabled: (featureToggleName: StartupFeatureToggleName) => boolean,
-): APIClient {
-  return new APIClient({
-    isFeatureToggleEnabled,
-  });
+export function createAPIClient(): APIClient {
+  return new APIClient();
 }

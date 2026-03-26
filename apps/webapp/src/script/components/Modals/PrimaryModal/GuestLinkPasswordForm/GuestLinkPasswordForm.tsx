@@ -24,7 +24,7 @@ import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {errorMessageStyles} from './GuestLinkPasswordForm.styles';
 

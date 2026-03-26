@@ -24,7 +24,7 @@ import {MemoryEngine} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
 import {DexieDatabase} from 'Repositories/storage/DexieDatabase';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 const logger = getLogger('StoreEngineProvider');
 

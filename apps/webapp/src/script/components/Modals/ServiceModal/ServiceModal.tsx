@@ -23,8 +23,8 @@ import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';

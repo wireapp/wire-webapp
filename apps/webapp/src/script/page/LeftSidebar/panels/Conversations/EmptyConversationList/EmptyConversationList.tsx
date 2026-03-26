@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './EmptyConversationList.styles';
 

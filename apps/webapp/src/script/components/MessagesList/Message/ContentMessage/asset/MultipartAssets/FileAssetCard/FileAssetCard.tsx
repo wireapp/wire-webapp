@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {FileAssetSmall} from './FileAssetSmall/FileAssetSmall';
 import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';

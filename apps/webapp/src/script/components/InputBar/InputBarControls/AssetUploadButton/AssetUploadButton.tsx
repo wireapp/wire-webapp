@@ -22,7 +22,7 @@ import {useRef} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface AssetUploadButtonProps {
   onSelectFiles: (files: File[]) => void;

@@ -22,9 +22,9 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Text} from 'Repositories/entity/message/Text';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {formatDateShort} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {formatDateShort} from 'Util/timeUtil';
 
 interface FullSearchItemProps {
   formatText: (text: string) => {matches: number; parts: string[]};

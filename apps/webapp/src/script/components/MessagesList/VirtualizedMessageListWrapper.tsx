@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {VirtualizedMessagesList} from 'Components/MessagesList/VirtualizedMessagesList/VirtualizedMessagesList';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {MessagesListParams} from './MessageList.types';
 

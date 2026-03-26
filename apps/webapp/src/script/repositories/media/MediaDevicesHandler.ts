@@ -19,8 +19,8 @@
 
 import {Runtime} from '@wireapp/commons';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {loadValue, storeValue} from 'Util/StorageUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {loadValue, storeValue} from 'Util/storageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
 import {MediaDevicesState, mediaDevicesStore} from './useMediaDevicesStore';

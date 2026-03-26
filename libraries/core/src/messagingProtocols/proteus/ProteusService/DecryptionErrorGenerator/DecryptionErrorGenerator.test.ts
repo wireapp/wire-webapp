@@ -19,7 +19,7 @@
 
 import {generateDecryptionError} from './DecryptionErrorGenerator';
 
-import {DecryptionError} from '../../../../errors/DecryptionError';
+import {DecryptionError} from '../../../../errors/decryptionError';
 
 const basePayload = {userId: {id: 'user1', domain: 'domain'}, clientId: 'client1'};
 

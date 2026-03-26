@@ -23,7 +23,7 @@ import {RestNode} from 'cells-sdk-ts';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes, getFileExtension, getName} from 'Util/util';
 
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';

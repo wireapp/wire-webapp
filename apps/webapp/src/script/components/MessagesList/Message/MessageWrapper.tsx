@@ -34,8 +34,8 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {TeamState} from 'Repositories/team/TeamState';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {CallMessage} from './CallMessage';
 import {CallTimeoutMessage} from './CallTimeoutMessage';

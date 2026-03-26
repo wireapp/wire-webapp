@@ -24,7 +24,7 @@ import {Runtime} from '@wireapp/commons';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';

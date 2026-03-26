@@ -26,7 +26,7 @@ import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Reposito
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/UserState';
 import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
-import {setStrings} from 'Util/LocalizerUtil';
+import {setStrings} from 'Util/localizerUtil';
 
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 

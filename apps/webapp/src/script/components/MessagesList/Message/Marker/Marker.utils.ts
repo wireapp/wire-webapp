@@ -17,8 +17,8 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
-import {formatLocale, isToday, isYesterday} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {formatLocale, isToday, isYesterday} from 'Util/timeUtil';
 
 /**
  If today: “Today”

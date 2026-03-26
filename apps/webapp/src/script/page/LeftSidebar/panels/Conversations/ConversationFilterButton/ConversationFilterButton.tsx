@@ -22,7 +22,7 @@ import {useState, useRef, useEffect} from 'react';
 import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {ConversationFilter, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   dropdown,
