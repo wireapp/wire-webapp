@@ -54,10 +54,6 @@ jobs:
     name: Prepare Dependencies (One Time Setup)
     runs-on: ubuntu-latest
     
-    # Use Playwright's official container - browsers already installed!
-    container:
-      image: mcr.microsoft.com/playwright:v1.49.1-noble
-    
     steps:
       - uses: actions/checkout@v6
 
@@ -68,11 +64,14 @@ jobs:
       - name: Install dependencies once
         run: yarn --immutable
 
+      - name: Install Playwright browsers
+        run: yarn playwright install --only-shell --with-deps chromium
+
       - name: Install 1Password CLI
         run: |
-          apt-get update && apt-get install -y unzip
           curl -sSfLo op.zip https://cache.agilebits.com/dist/1P/op2/pkg/v2.30.0/op_linux_amd64_v2.30.0.zip
-          unzip -od /usr/local/bin/ op.zip
+          unzip -od /tmp op.zip
+          sudo mv /tmp/op /usr/local/bin/
           rm op.zip
           chmod +x /usr/local/bin/op
 
@@ -85,6 +84,7 @@ jobs:
             apps/server/node_modules
             libraries/*/node_modules
             .yarn/cache
+            ~/.cache/ms-playwright
             /usr/local/bin/op
           key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}
 
@@ -92,10 +92,6 @@ jobs:
     name: Run E2E Tests
     runs-on: ubuntu-latest
     needs: prepare
-    
-    # Use Playwright's official container - browsers already installed!
-    container:
-      image: mcr.microsoft.com/playwright:v1.49.1-noble
 
     strategy:
       fail-fast: false
@@ -128,6 +124,7 @@ jobs:
             apps/server/node_modules
             libraries/*/node_modules
             .yarn/cache
+            ~/.cache/ms-playwright
             /usr/local/bin/op
           key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}
           fail-on-cache-miss: true
@@ -160,10 +157,6 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !cancelled() }}
     needs: [prepare, test]
-    
-    # Use Playwright container
-    container:
-      image: mcr.microsoft.com/playwright:v1.49.1-noble
 
     # It's necessary to define the outputs of the job so the calling workflow can access them
     outputs:
@@ -187,6 +180,7 @@ jobs:
             apps/server/node_modules
             libraries/*/node_modules
             .yarn/cache
+            ~/.cache/ms-playwright
           key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}
           fail-on-cache-miss: true
 
@@ -234,6 +228,8 @@ jobs:
     needs: [prepare, test, e2e-report]
     
     steps:
+      - uses: actions/checkout@v6
+      
       - name: Delete workflow cache
         run: |
           gh cache delete "e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}" \
