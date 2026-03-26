@@ -24,10 +24,10 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
-import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';
+import {CellsNewFileModal} from './CellsNewFileModal/CellsNewFileModal';
+import {CellsNewFolderModal} from './CellsNewFolderModal/CellsNewFolderModal';
 import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
 
 import {getCellsFilesPath} from '../../common/getCellsFilesPath/getCellsFilesPath';
@@ -41,14 +41,21 @@ interface CellsNewMenuProps {
 export type CellsNewFileType = 'document' | 'spreadsheet' | 'presentation';
 
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<CellNodeType>(CellNodeType.FILE);
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [isFileModalOpen, setIsFileModalOpen] = useState(false);
   const [fileType, setFileType] = useState<CellsNewFileType>('document');
 
-  const openModal = (type: CellNodeType, selectedFileType: CellsNewFileType = 'document') => {
-    setModalType(type);
+  const openFolderModal = () => setIsFolderModalOpen(true);
+
+  const openFileModal = (selectedFileType: CellsNewFileType) => {
     setFileType(selectedFileType);
-    setIsModalOpen(true);
+    setIsFileModalOpen(true);
+  };
+
+  const commonProps = {
+    cellsRepository,
+    conversationQualifiedId,
+    currentPath: getCellsFilesPath(),
   };
 
   return (
@@ -61,40 +68,42 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          <DropdownMenu.Item onClick={() => openModal(CellNodeType.FOLDER)}>
-            {t('cells.newItemMenu.folder')}
-          </DropdownMenu.Item>
+          <DropdownMenu.Item onClick={openFolderModal}>{t('cells.newItemMenu.folder')}</DropdownMenu.Item>
           <DropdownMenu.Sub>
             <DropdownMenu.SubTrigger>{t('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>
             <DropdownMenu.SubContent>
-              <DropdownMenu.Item onClick={() => openModal(CellNodeType.FILE, 'document')}>
+              <DropdownMenu.Item onClick={() => openFileModal('document')}>
                 {t('cells.newItemMenu.document')}
               </DropdownMenu.Item>
-              <DropdownMenu.Item onClick={() => openModal(CellNodeType.FILE, 'spreadsheet')}>
+              <DropdownMenu.Item onClick={() => openFileModal('spreadsheet')}>
                 {t('cells.newItemMenu.spreadsheet')}
               </DropdownMenu.Item>
-              <DropdownMenu.Item onClick={() => openModal(CellNodeType.FILE, 'presentation')}>
+              <DropdownMenu.Item onClick={() => openFileModal('presentation')}>
                 {t('cells.newItemMenu.presentation')}
               </DropdownMenu.Item>
             </DropdownMenu.SubContent>
           </DropdownMenu.Sub>
         </DropdownMenu.Content>
       </DropdownMenu>
-      {isModalOpen && (
-        <CellsNewItemModal
-          type={modalType}
-          currentPath={getCellsFilesPath()}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          cellsRepository={cellsRepository}
-          conversationQualifiedId={conversationQualifiedId}
-          fileType={fileType}
-          onSuccess={() => {
-            onRefresh();
-            setIsModalOpen(false);
-          }}
-        />
-      )}
+      <CellsNewFolderModal
+        {...commonProps}
+        isOpen={isFolderModalOpen}
+        onClose={() => setIsFolderModalOpen(false)}
+        onSuccess={() => {
+          onRefresh();
+          setIsFolderModalOpen(false);
+        }}
+      />
+      <CellsNewFileModal
+        {...commonProps}
+        isOpen={isFileModalOpen}
+        fileType={fileType}
+        onClose={() => setIsFileModalOpen(false)}
+        onSuccess={() => {
+          onRefresh();
+          setIsFileModalOpen(false);
+        }}
+      />
     </>
   );
 };

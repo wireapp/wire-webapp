@@ -20,41 +20,38 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
-import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
+import {
+  CellsFileType,
+  useCellsNewFileForm,
+} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFileForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
-import {descriptionStyles} from './CellsNewItemModal.styles';
+import {descriptionStyles} from './CellsNewFileModal.styles';
 
 import {CellsModal} from '../../../common/CellsModal/CellsModal';
-import {CellsNewFileType} from '../CellsNewMenu';
 
-interface CellsNewItemModalProps {
+interface CellsNewFileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: CellNode['type'];
+  fileType: CellsFileType;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
-  fileType: CellsNewFileType;
   onSuccess: () => void;
   currentPath: string;
 }
 
-export const CellsNewItemModal = ({
+export const CellsNewFileModal = ({
   isOpen,
   onClose,
-  type,
+  fileType,
   cellsRepository,
   conversationQualifiedId,
-  fileType,
   onSuccess,
   currentPath,
-}: CellsNewItemModalProps) => {
-  const isFolder = type === 'folder';
-
-  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
-    type,
+}: CellsNewFileModalProps) => {
+  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewFileForm({
+    fileType,
     cellsRepository,
     conversationQualifiedId,
     onSuccess,
@@ -63,14 +60,11 @@ export const CellsNewItemModal = ({
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>
-        {isFolder ? t('cells.newItemMenuModal.headlineFolder') : t('cells.newItemMenuModal.headlineFile', {fileType})}
-      </CellsModal.Header>
-      <p css={descriptionStyles}>
-        {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
-      </p>
+      <CellsModal.Header>{t('cells.newItemMenuModal.headlineFile', {fileType})}</CellsModal.Header>
+      <p css={descriptionStyles}>{t('cells.newItemMenuModal.descriptionFile')}</p>
       <CellsNewNodeForm
-        type={type}
+        label={t('cells.newItemMenuModal.labelFile')}
+        placeholder={t('cells.newItemMenuModal.placeholderFile')}
         onSubmit={handleSubmit}
         inputValue={name}
         onChange={handleChange}

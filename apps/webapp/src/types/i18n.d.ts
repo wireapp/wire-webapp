@@ -420,11 +420,12 @@ declare module 'I18n/en-US.json' {
     'cells.newItemMenu.spreadsheet': `Spreadsheet`;
     'cells.newItemMenu.presentation': `Presentation`;
     'cells.newItemMenu.folder': `Create Folder`;
-    'cells.newItemMenuModal.descriptionFile': `All participants in this conversation can see this file.`;
+    'cells.newItemMenuModal.descriptionFile': `All participants in this conversation can see this file and its content.`;
     'cells.newItemMenuModal.descriptionFolder': `All participants in this conversation can see this folder and its content.`;
-    'cells.newItemMenuModal.headlineFile': `Create file`;
+    'cells.newItemMenuModal.headlineFile': `Create {fileType} file`;
     'cells.newItemMenuModal.headlineFolder': `Create folder`;
-    'cells.newItemMenuModal.label': `Name`;
+    'cells.newItemMenuModal.labelFile': `File name`;
+    'cells.newItemMenuModal.labelFolder': `Folder name`;
     'cells.newItemMenuModal.placeholderFile': `Enter file name`;
     'cells.newItemMenuModal.placeholderFolder': `Enter folder name`;
     'cells.newItemMenuModal.primaryAction': `Create`;
