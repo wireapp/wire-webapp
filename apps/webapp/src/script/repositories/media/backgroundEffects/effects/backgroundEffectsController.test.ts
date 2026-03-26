@@ -26,7 +26,7 @@ jest.mock('./capability', () => ({
 }));
 
 jest.mock('../pipelines/mainWebGlPipeline', () => ({
-  MainWebGLPipeline: jest.fn().mockImplementation(() => ({
+  MainWebGlPipeline: jest.fn().mockImplementation(() => ({
     init: jest.fn().mockResolvedValue(undefined),
     processFrame: jest.fn().mockResolvedValue(undefined),
     updateConfig: jest.fn(),
