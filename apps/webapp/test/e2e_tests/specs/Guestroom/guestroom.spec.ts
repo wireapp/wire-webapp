@@ -62,6 +62,39 @@ test.describe('Guestroom', () => {
     },
   );
 
+  test('I want to create a password secured guest link', {tag: ['@TC-8141', '@regression']}, async ({createPage}) => {
+    const userAPage = await createPage(withLogin(userA), withConnectedUser(userC));
+    const {pages, modals} = PageManager.from(userAPage).webapp;
+
+    const password = 'Test1234?';
+    await createGroup(pages, groupName, [userC]);
+    await pages.conversationList().openConversation(groupName);
+
+    // UserA sees an error message when trying to create a password secured link with a weak password
+    await pages.conversation().toggleGroupInformation();
+    await pages.conversationDetails().guestOptionsButton.click();
+    await pages.guestOptions().createLinkButton.click();
+
+    await modals.guestLinkPassword().setPasswordInput.fill('wrongPassword');
+    await modals.guestLinkPassword().confirmPasswordInput.fill('wrongPassword');
+    await modals.guestLinkPassword().actionButton.click();
+    await expect(modals.guestLinkPassword().errorMessage).toContainText(
+      'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
+    );
+
+    // UserA cancels the creation of the password secured link
+    await modals.guestLinkPassword().setPasswordInput.fill(password);
+    await modals.guestLinkPassword().confirmPasswordInput.fill(password);
+    await modals.guestLinkPassword().actionButton.click();
+    await modals.confirm().cancelButton.click();
+    await expect(pages.guestOptions().guestLink).not.toBeVisible();
+
+    // UserA creates a password secured link with a valid password
+    await pages.guestOptions().createLink({password});
+    await expect(pages.guestOptions().guestLink).toBeVisible();
+    await expect(userAPage.getByText('Link is password secured')).toBeVisible();
+  });
+
   test(
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
