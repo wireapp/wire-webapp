@@ -71,14 +71,13 @@ const POLLING_INTERVAL = 500;
 export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
   const isFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
   const renderMetrics = useBackgroundEffectsStore(state => state.metrics);
+  const model = useBackgroundEffectsStore(state => state.model);
 
   const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => backgroundEffectsHandler.getQuality());
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [capabilityInfo, setCapabilityInfo] = useState<CapabilityInfo | null>(null);
-  const [modelName, setModelName] = useState<string>('');
 
   useEffect(() => {
-    setModelName(backgroundEffectsHandler.getModel());
     setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
   }, [backgroundEffectsHandler]);
 
@@ -216,7 +215,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
           </div>
 
           <div css={metricsListStyles}>
-            <MetricRow label="Model" value={formatValue(modelName)} />
+            <MetricRow label="Model" value={formatValue(model)} />
 
             {metricRows.map(row => (
               <MetricRow key={row.label} label={row.label} value={row.value} />

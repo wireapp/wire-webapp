@@ -235,6 +235,8 @@ export interface StartOptions {
   pipelineOverride?: PipelineType;
   /** Optional callback to receive performance metrics updates. */
   onMetrics?: (metrics: Metrics) => void;
+  /** Optional callback to receive model name updates. */
+  onModelChange?: (model: string) => void;
 }
 
 /**
@@ -363,7 +365,7 @@ export interface WorkerFrameProcessedMessage {
  * Sent when segmenter initialization fails. The worker continues in
  * bypass mode (no segmentation) but notifies the main thread.
  */
-export interface WorkerErrorMessage {
+export interface WorkerSegmentErrorMessage {
   /** Message type discriminator. */
   type: 'segmenterError';
   /** Error message describing the failure. */
@@ -381,6 +383,16 @@ export interface WorkerContextLostMessage {
   type: 'contextLost';
 }
 
+export interface WorkerErrorMessage {
+  /** Message type system error. */
+  type: 'workerError';
+  message: string;
+  reason: string;
+  filename?: string;
+  lineno?: number;
+  colno?: number;
+}
+
 /**
  * Union type of all messages sent from worker to main thread.
  *
@@ -390,6 +402,7 @@ export type WorkerResponse =
   | WorkerMetricsMessage
   | WorkerReadyMessage
   | WorkerFrameProcessedMessage
+  | WorkerSegmentErrorMessage
   | WorkerErrorMessage
   | WorkerContextLostMessage;
 

@@ -26,7 +26,7 @@
  * callbacks when unavailable.
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {VideoSource} from './VideoSource';
 

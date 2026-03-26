@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
@@ -27,13 +27,13 @@ import {
   isProcessingMode,
   pushMetricsSample,
   QualityController,
+  resetMetricsWindow,
   resolveQualityTierForEffectMode,
   resolveSegmentationModelPath,
-  resetMetricsWindow,
 } from '../quality';
 import {WebGLRenderer} from '../renderer/WebGLRenderer';
-import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
+import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
 import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
 import {buildMaskInput, type MaskInput, type MaskSource} from '../shared/mask';
@@ -444,5 +444,9 @@ export class MainWebGLPipeline implements Pipeline {
     // MainWebGLPipeline uses GPU delegate
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'GPU';
     this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));
+  }
+
+  public getCurrentModelPath(): string | null {
+    return '';
   }
 }

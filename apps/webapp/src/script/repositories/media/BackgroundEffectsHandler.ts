@@ -28,7 +28,7 @@ import {
   loadBackgroundSource,
 } from 'Repositories/media/VideoBackgroundEffects';
 import {getStorage} from 'Util/localStorage';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {BackgroundEffectsController} from './BackgroundEffects/effects/BackgroundEffectsController';
 import {backgroundEffectsStore, RenderMetrics} from './useBackgroundEffectsStore';
@@ -109,6 +109,7 @@ export class BackgroundEffectsHandler {
         debugMode: 'off',
         ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
         onMetrics: (metrics: Metrics) => this.onMetrics(metrics),
+        onModelChange: (model: string) => this.onModelChange(model),
       });
       const processedStream = new MediaStream([outputTrack]);
       this.currentReleasableStream = new ReleasableMediaStream(processedStream, () => {
@@ -255,10 +256,6 @@ export class BackgroundEffectsHandler {
     return this.controller.getMaxQualityTier() === 'superhigh';
   }
 
-  public getModel(): string {
-    return 'Model--xxxx';
-  }
-
   getCapabilityInfo(): CapabilityInfo {
     return this.controller.getCapabilityInfo();
   }
@@ -272,6 +269,10 @@ export class BackgroundEffectsHandler {
     const ml = metrics.segmentationDelegate ? `ML(${metrics.segmentationDelegate})` : 'ML';
     const renderMetrics = {...metrics, webglShare, utilShare, mlShare, budget, ml} as RenderMetrics;
     backgroundEffectsStore.getState().setMetrics(renderMetrics);
+  }
+  private onModelChange(modelPath: string): void {
+    const model = modelPath.split('/').pop();
+    backgroundEffectsStore.getState().setModel(model);
   }
 }
 

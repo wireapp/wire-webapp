@@ -28,7 +28,7 @@
  * - Handles video element lifecycle (play, pause, cleanup)
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 /**
  * Callback function invoked for each video frame.

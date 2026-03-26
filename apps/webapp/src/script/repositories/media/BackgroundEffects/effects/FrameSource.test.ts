@@ -20,7 +20,7 @@
 import {FrameSource} from './FrameSource';
 
 // Logger mock
-jest.mock('Util/Logger', () => ({
+jest.mock('Util/logger', () => ({
   getLogger: () => ({
     warn: jest.fn(),
     info: jest.fn(),
@@ -60,7 +60,8 @@ describe('FrameSource', () => {
   });
 
   it('should use MediaStreamTrackProcessor if available', async () => {
-    const readMock = jest.fn()
+    const readMock = jest
+      .fn()
       .mockResolvedValueOnce({
         done: false,
         value: {
@@ -114,7 +115,7 @@ describe('FrameSource', () => {
 
     VideoSource.mockImplementation(() => ({
       element: {},
-      start: jest.fn((cb) => {
+      start: jest.fn(cb => {
         callback = cb;
         return Promise.resolve();
       }),
@@ -145,7 +146,7 @@ describe('FrameSource', () => {
 
     VideoSource.mockImplementation(() => ({
       element: {},
-      start: jest.fn((cb) => {
+      start: jest.fn(cb => {
         callback = cb;
         return Promise.resolve();
       }),

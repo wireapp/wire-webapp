@@ -109,6 +109,9 @@ export class WorkerWebGLPipeline implements Pipeline {
       if (event.data.type === 'segmenterError') {
         this.onWorkerSegmenterError?.(event.data.error);
       }
+      if (event.data.type === 'workerError') {
+        this.onWorkerContextLoss?.();
+      }
       if (event.data.type === 'contextLost') {
         this.onWorkerContextLoss?.();
       }
@@ -330,5 +333,9 @@ export class WorkerWebGLPipeline implements Pipeline {
     this.onWorkerSegmenterError = null;
     this.onWorkerContextLoss = null;
     this.lastTier = null;
+  }
+
+  getCurrentModelPath(): string | null {
+    return '';
   }
 }

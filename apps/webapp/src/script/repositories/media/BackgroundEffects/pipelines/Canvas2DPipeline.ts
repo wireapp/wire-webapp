@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import type {Pipeline, PipelineConfig, PipelineInit} from './Pipeline';
 
@@ -28,12 +28,12 @@ import {
   isProcessingMode,
   pushMetricsSample,
   QualityController,
+  resetMetricsWindow,
   resolveQualityTierForEffectMode,
   resolveSegmentationModelPath,
-  resetMetricsWindow,
 } from '../quality';
-import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import type {MaskPostProcessor} from '../segmentation/maskPostProcessor';
+import {NoopMaskPostProcessor} from '../segmentation/maskPostProcessor';
 import {MediaPipeSegmenterFactory} from '../segmentation/mediaPipeSegmenter';
 import type {SegmenterFactory, SegmenterLike} from '../segmentation/segmenterTypes';
 import type {QualityTier, QualityTierParams, SegmentationModelByTier} from '../types';
@@ -817,5 +817,9 @@ export class Canvas2DPipeline implements Pipeline {
     // Canvas2DPipeline uses CPU delegate
     const segmentationDelegate = this.segmenter?.getDelegate?.() ?? 'CPU';
     this.onMetrics(buildMetrics(this.metricsWindow, this.getDroppedFrames(), tier, segmentationDelegate));
+  }
+
+  public getCurrentModelPath(): string | null {
+    return '';
   }
 }

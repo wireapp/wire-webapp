@@ -40,6 +40,7 @@ export interface State {
   blurStrength: number;
   quality: QualityMode;
   currentModelPath: string | null;
+  pendingModelPath: string | null;
   segmenterInitPromise: Promise<void> | null;
   metrics: Metrics;
   frameCount: number;
@@ -50,6 +51,8 @@ export interface State {
   canvas: OffscreenCanvas | null;
   /** Whether the WebGL context has been lost. */
   contextLost: boolean;
+  segmenterErrorCount: number;
+  fatalError: string | null;
 }
 
 /**
@@ -77,6 +80,7 @@ export const state: State = {
   blurStrength: 0.5,
   quality: 'auto',
   currentModelPath: null,
+  pendingModelPath: null,
   segmenterInitPromise: null,
   metrics: {
     avgTotalMs: 0,
@@ -93,4 +97,7 @@ export const state: State = {
   lastTimestampMs: 0,
   canvas: null,
   contextLost: false,
+  // Error handling
+  segmenterErrorCount: 0,
+  fatalError: null,
 };

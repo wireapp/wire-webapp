@@ -32,9 +32,9 @@
  * to produce an output MediaStreamTrack with effects applied.
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
-import {detectCapabilities, choosePipeline} from './capability';
+import {choosePipeline, detectCapabilities} from './capability';
 import {FrameSource} from './FrameSource';
 
 import {Canvas2DPipeline} from '../pipelines/Canvas2DPipeline';
@@ -124,6 +124,8 @@ export class BackgroundEffectsController {
   private lastWorkerTier: QualityTier | null = null;
   /** Optional metrics callback for demo/telemetry use. */
   private onMetrics: ((metrics: Metrics) => void) | null = null;
+
+  private onModelChange: ((model: string) => void) | null = null;
   /** Tracks shutdown to avoid logging expected stop errors. */
   private isStopping = false;
   private capabilityInfo: CapabilityInfo = {
@@ -207,6 +209,7 @@ export class BackgroundEffectsController {
       };
     }
     this.onMetrics = opts.onMetrics ?? null;
+    this.onModelChange = opts.onModelChange ?? null;
     this.droppedFrames = 0;
     this.pipelineImpl = null;
 
@@ -663,6 +666,12 @@ export class BackgroundEffectsController {
   }
 
   private handleTierChange(tier: QualityTier): void {
+    const newModel = resolveSegmentationModelPath(tier, this.segmentationModelByTier, undefined);
+    if (this.onModelChange !== null) {
+      this.onModelChange(newModel);
+    }
+    this.logger.info('Quality tier changed', tier, newModel);
+
     if (this.pipeline === 'worker-webgl2') {
       this.maybeLogWorkerTierChange(tier);
       return;
@@ -691,9 +700,6 @@ export class BackgroundEffectsController {
    * @param tier - New quality tier.
    */
   private maybeLogWorkerTierChange(tier: QualityTier): void {
-    if (!this.isDev) {
-      return;
-    }
     if (this.lastWorkerTier !== tier) {
       this.logger.info('Worker pipeline quality tier change', {from: this.lastWorkerTier, to: tier});
       this.lastWorkerTier = tier;
@@ -786,7 +792,7 @@ export class BackgroundEffectsController {
     return this.pipelineImpl !== null;
   }
 
-  public getCapabilityInfo() {
+  public getCapabilityInfo(): CapabilityInfo {
     return this.capabilityInfo;
   }
 

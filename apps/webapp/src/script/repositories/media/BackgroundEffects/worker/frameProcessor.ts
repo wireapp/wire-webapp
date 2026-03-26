@@ -52,6 +52,11 @@ import type {QualityTier, QualityTierParams} from '../types';
  * @returns Promise that resolves when frame processing is complete.
  */
 export async function handleFrame(frame: ImageBitmap, timestamp: number, width: number, height: number): Promise<void> {
+  if (state.fatalError) {
+    frame.close();
+    return;
+  }
+
   const renderer = state.renderer;
   if (!renderer || state.contextLost) {
     frame.close();
@@ -160,9 +165,11 @@ function resolveQualityTierParams(): QualityTierParams {
  * Uses GPU delegate for worker pipeline. The swap happens asynchronously
  * to avoid blocking frame processing.
  *
- * @param tier - Quality tier ('A', 'B', 'C', or 'D').
+ * @param tier - Quality tier ('superhigh', 'high', 'medium', or 'low', or ''bypass).
  * @returns Nothing.
  */
+let currentInitId = 0;
+
 function ensureSegmenterForTier(tier: QualityTier): void {
   if (!state.options || !state.canvas) {
     return;
@@ -170,32 +177,84 @@ function ensureSegmenterForTier(tier: QualityTier): void {
   if (tier === 'bypass') {
     return;
   }
-  if (state.segmenterInitPromise !== null) {
-    return;
-  }
+
   const desiredPath = resolveSegmentationModelPath(
     tier,
     state.options.segmentationModelByTier,
     state.options.segmentationModelPath,
   );
+
   if (state.currentModelPath === desiredPath && state.segmenter) {
     return;
   }
+  if (state.pendingModelPath === desiredPath) {
+    console.info('[bgfx.worker] Segmentation change for model swap, already in progress');
+    return;
+  }
+
+  const initId = ++currentInitId;
+  state.pendingModelPath = desiredPath;
+
+  const nextSegmenter = new Segmenter(desiredPath, 'GPU', state.canvas as OffscreenCanvas);
+
   state.segmenterInitPromise = (async () => {
-    const nextSegmenter = new Segmenter(desiredPath, 'GPU', state.canvas as OffscreenCanvas);
     try {
+      console.info('[bgfx.worker] loading model', desiredPath);
+
       await nextSegmenter.init();
+
+      console.info('[bgfx.worker] model ready', desiredPath);
+
+      state.segmenterErrorCount = 0;
+      state.fatalError = null;
     } catch (error) {
       console.warn('[bgfx.worker] Segmentation model swap failed, keeping previous model', error);
+
+      state.segmenterErrorCount++;
+      self.postMessage({
+        type: 'segmenterError',
+        model: desiredPath,
+        message: String(error),
+      });
+
+      if (state.segmenterErrorCount >= 3) {
+        state.fatalError = 'segmenter_failed_repeatedly';
+
+        self.postMessage({
+          type: 'workerError',
+          reason: 'segmenter',
+          message: state.fatalError,
+        });
+      }
+      nextSegmenter.close();
+      if (initId === currentInitId) {
+        state.pendingModelPath = null;
+
+        if (!state.segmenter) {
+          state.segmenter = null;
+          state.currentModelPath = null;
+        }
+      }
+      return;
+    }
+
+    // In case meanwhile a new init process stated again we discard this segmenter
+    if (initId !== currentInitId) {
+      console.warn('[bgfx.worker] Segmentation model swap again, we use next segmenter and discard previous one');
       nextSegmenter.close();
       return;
     }
+
     state.segmenter?.close();
     state.segmenter = nextSegmenter;
     state.currentModelPath = desiredPath;
+    state.pendingModelPath = null;
   })();
+
   void state.segmenterInitPromise.finally(() => {
-    state.segmenterInitPromise = null;
+    if (initId === currentInitId) {
+      state.segmenterInitPromise = null;
+    }
   });
 }
 

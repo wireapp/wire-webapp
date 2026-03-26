@@ -32,7 +32,7 @@ jest.mock('Repositories/media/VideoBackgroundEffects', () => ({
   loadBackgroundSource: jest.fn(),
 }));
 
-jest.mock('Util/Logger', () => ({
+jest.mock('Util/logger', () => ({
   getLogger: () => ({
     warn: jest.fn(),
     error: jest.fn(),
