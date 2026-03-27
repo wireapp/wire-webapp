@@ -23,7 +23,6 @@ import {
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
 import {
-  collaboraClipboardAccessFeatureToggleName,
   collaboraNewDocumentCreationMenuFeatureToggleName,
   countlyIncrementalBackoffRetryReportingFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
@@ -32,7 +31,6 @@ import {
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
-  collaboraClipboardAccessFeatureToggleName,
   collaboraNewDocumentCreationMenuFeatureToggleName,
   countlyIncrementalBackoffRetryReportingFeatureToggleName,
 ] as const;
@@ -68,14 +66,6 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
-  });
-
-  it('enables the collabora clipboard access feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${collaboraClipboardAccessFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(collaboraClipboardAccessFeatureToggleName)).toBe(true);
   });
 
   it('enables the collabora new document creation feature toggle when present in the query parameter', () => {
@@ -146,7 +136,6 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
-      collaboraClipboardAccessFeatureToggleName,
       collaboraNewDocumentCreationMenuFeatureToggleName,
       countlyIncrementalBackoffRetryReportingFeatureToggleName,
     ]);
