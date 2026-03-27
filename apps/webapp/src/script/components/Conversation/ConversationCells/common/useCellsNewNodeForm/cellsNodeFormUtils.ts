@@ -17,7 +17,10 @@
  *
  */
 
-import {t} from 'Util/LocalizerUtil';
+import {Maybe} from 'true-myth';
+
+import {t} from 'Util/localizerUtil';
+import {isAxiosError} from 'Util/typePredicateUtil';
 
 export const ITEM_ALREADY_EXISTS_ERROR = 409;
 
@@ -27,4 +30,10 @@ export const getNameValidationError = (name: string): string | null => {
   }
 
   return null;
+};
+
+export const getErrorStatus = (error: unknown): number | undefined => {
+  return Maybe.of(error)
+    .map(caughtError => (isAxiosError(caughtError) ? caughtError.response?.status : undefined))
+    .unwrapOr(undefined);
 };

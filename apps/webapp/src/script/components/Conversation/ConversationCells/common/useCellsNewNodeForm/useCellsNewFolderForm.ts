@@ -23,9 +23,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
-import {isAxiosError} from 'Util/typePredicateUtil';
 
-import {ITEM_ALREADY_EXISTS_ERROR, getNameValidationError} from './cellsNodeFormUtils';
+import {ITEM_ALREADY_EXISTS_ERROR, getErrorStatus, getNameValidationError} from './cellsNodeFormUtils';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
@@ -53,7 +52,8 @@ export const useCellsNewFolderForm = ({
       await cellsRepository.createFolder({path, name: folderName});
       onSuccess();
     } catch (err: unknown) {
-      if (isAxiosError(err) && err.response?.status === ITEM_ALREADY_EXISTS_ERROR) {
+      const status = getErrorStatus(err);
+      if (status === ITEM_ALREADY_EXISTS_ERROR) {
         setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
       } else {
         setError(t('cells.newItemMenuModalForm.genericError'));

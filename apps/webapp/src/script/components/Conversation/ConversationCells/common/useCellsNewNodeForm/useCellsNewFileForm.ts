@@ -22,10 +22,9 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
-import {isAxiosError} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
 
-import {ITEM_ALREADY_EXISTS_ERROR, getNameValidationError} from './cellsNodeFormUtils';
+import {ITEM_ALREADY_EXISTS_ERROR, getErrorStatus, getNameValidationError} from './cellsNodeFormUtils';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
@@ -68,7 +67,8 @@ export const useCellsNewFileForm = ({
       await cellsRepository.createFile({path, name: fileName});
       onSuccess();
     } catch (err: unknown) {
-      if (isAxiosError(err) && err.response?.status === ITEM_ALREADY_EXISTS_ERROR) {
+      const status = getErrorStatus(err);
+      if (status === ITEM_ALREADY_EXISTS_ERROR) {
         setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
       } else {
         setError(t('cells.newItemMenuModalForm.genericError'));
