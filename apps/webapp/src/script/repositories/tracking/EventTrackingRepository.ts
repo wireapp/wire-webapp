@@ -17,6 +17,7 @@
  *
  */
 
+import {HttpClient, LongRunningRetryDetails} from '@wireapp/api-client/lib/http';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -45,8 +46,21 @@ import {UserData} from './UserData';
 
 import {URLParameter} from '../../auth/URLParameter';
 import {Config} from '../../Config';
+import {APIClient} from '../../service/APIClientSingleton';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;
+
+type HttpRetryReportingClient = {
+  readonly on: (
+    event: typeof HttpClient.TOPIC.ON_LONG_RUNNING_RETRY,
+    listener: (retryDetails: LongRunningRetryDetails) => void,
+  ) => unknown;
+  readonly removeListener: (
+    event: typeof HttpClient.TOPIC.ON_LONG_RUNNING_RETRY,
+    listener: (retryDetails: LongRunningRetryDetails) => void,
+  ) => unknown;
+};
+
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean = false;
   private sendAppOpenEvent: boolean = true;
@@ -72,6 +86,8 @@ export class EventTrackingRepository {
 
   constructor(
     private readonly messageRepository: MessageRepository,
+    private readonly apiClient: APIClient,
+    private readonly isCountlyIncrementalBackoffRetryReportingEnabled: boolean,
     private readonly teamState = container.resolve(TeamState),
     private readonly userState = container.resolve(UserState),
   ) {
@@ -309,8 +325,22 @@ export class EventTrackingRepository {
       },
     );
 
+    if (this.isCountlyIncrementalBackoffRetryReportingEnabled) {
+      const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
+
+      httpRetryReportingClient.on(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
+    }
+
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
   }
+
+  private readonly onLongRunningRetry = (retryDetails: LongRunningRetryDetails): void => {
+    this.trackProductReportingEvent(EventName.CONNECTIVITY.RETRYING_FOR_ONE_MINUTE, {
+      [Segmentation.CONNECTIVITY.RETRY_COUNT]: retryDetails.retryCount,
+      [Segmentation.CONNECTIVITY.RETRY_DURATION_IN_MILLISECONDS]: retryDetails.retryDurationInMilliseconds,
+      [Segmentation.CONNECTIVITY.TRANSPORT]: 'api',
+    });
+  };
 
   private startProductReportingSession(): void {
     if (!telemetry.isLoaded()) {
@@ -384,6 +414,13 @@ export class EventTrackingRepository {
 
   private unsubscribeFromProductTrackingEvents(): void {
     this.logger.debug('Unsubscribing from product tracking events');
+
+    if (this.isCountlyIncrementalBackoffRetryReportingEnabled) {
+      const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
+
+      httpRetryReportingClient.removeListener(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
+    }
+
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
 }
