@@ -8,6 +8,7 @@ test.describe('Guestroom', () => {
   let userA: User;
   let userB: User;
   let userC: User;
+  let createdLink: string;
   const groupName = 'Guestroom';
   const password = 'Test1234?';
 
@@ -26,8 +27,6 @@ test.describe('Guestroom', () => {
         createPage(withLogin(userA), withConnectedUser(userC)),
         createPage(),
       ]);
-
-      let createdLink: string;
 
       const userAPageManager = PageManager.from(userAPage).webapp;
       const userBPageManager = PageManager.from(userBPage);
@@ -110,6 +109,72 @@ test.describe('Guestroom', () => {
 
     await pages.guestOptions().revokeLink();
     await expect(pages.guestOptions().guestLink).not.toBeVisible();
+  });
+
+  [
+    {
+      description: 'I want to see guest indicator on participant details',
+      tag: '@TC-3307',
+      verify: async (pages: PageManager['webapp']['pages']) => {
+        await expect(pages.participantDetails().userStatus).toContainText('Guest');
+      },
+    },
+    {
+      description: 'I should not see a username for wireless guest on participant details',
+      tag: '@TC-3311',
+      verify: async (pages: PageManager['webapp']['pages']) => {
+        await expect(pages.participantDetails().userHandle).not.toBeVisible();
+      },
+    },
+    {
+      description: 'I should not be able to connect to a wireless guest on participant details',
+      tag: '@TC-3312',
+      verify: async (pages: PageManager['webapp']['pages']) => {
+        await expect(pages.participantDetails().connectButton).not.toBeVisible();
+      },
+    },
+    {
+      description: 'I should not see button to open 1:1 with wireless guest on participant details',
+      tag: '@TC-3313',
+      verify: async (pages: PageManager['webapp']['pages']) => {
+        await expect(pages.participantDetails().openConversationButton).not.toBeVisible();
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPage, questPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userC)),
+        createPage(),
+      ]);
+
+      const userAPageManager = PageManager.from(userAPage).webapp;
+      const questPageManager = PageManager.from(questPage);
+      const {pages: questPages, modals: guestModals} = questPageManager.webapp;
+      const {pages} = userAPageManager;
+
+      await createGroup(pages, groupName, [userC]);
+
+      await pages.conversationList().openConversation(groupName);
+      await pages.conversation().toggleGroupInformation();
+      await pages.conversationDetails().openQuestOptions();
+      createdLink = await pages.guestOptions().createLink();
+
+      await questPage.goto(createdLink.toString());
+      await questPages.joinConversation().joinBrowserButton.click();
+      await expect(questPages.joinConversation().joinAsGuest).toBeVisible();
+
+      await questPages.joinConversation().nameInput.fill(userB.firstName);
+      await questPages.joinConversation().acceptTermsCheckBox.check({force: true});
+      await questPages.joinConversation().joinAsGuest.click();
+      
+      await questPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+      await guestModals.confirm().actionButton.click();
+      await expect(questPages.conversation().conversationTitle).toContainText(groupName);
+
+      await pages.conversation().toggleGroupInformation();
+      await pages.conversationDetails().openParticipantDetails(userB.firstName);
+      await verify(pages);
+    });
   });
 
   test(
