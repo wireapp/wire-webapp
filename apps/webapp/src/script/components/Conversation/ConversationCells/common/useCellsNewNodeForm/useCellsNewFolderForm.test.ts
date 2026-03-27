@@ -24,7 +24,7 @@ import {CellsRepository} from 'Repositories/cells/CellsRepository';
 
 import {useCellsNewFolderForm} from './useCellsNewFolderForm';
 
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
 }));
 
