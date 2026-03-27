@@ -33,6 +33,7 @@
     "sharedGlobals": [] // hook for root-level shared files if needed
   },
   "defaultProject": "webapp",
+  "neverConnectToCloud": true,
   "release": {
     "projects": ["tag:npm:public"],
     "projectsRelationship": "independent",
