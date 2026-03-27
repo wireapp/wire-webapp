@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [9.76.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.75.0...@wireapp/react-ui-kit@9.76.0) (2026-03-27)
+
+### Features
+
+* add styled DropdownMenu submenu trigger/content with default indicator(WPB-22465) ([#8023](https://github.com/wireapp/wire-web-packages/issues/8023)) ([7289ba2](https://github.com/wireapp/wire-web-packages/commit/7289ba2bff57bdffd1be36b4f7212a588a8b6cd9))
+
 # [9.75.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/react-ui-kit@9.74.0...@wireapp/react-ui-kit@9.75.0) (2026-03-23)
 
 ### Features
