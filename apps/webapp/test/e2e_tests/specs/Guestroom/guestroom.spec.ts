@@ -9,6 +9,7 @@ test.describe('Guestroom', () => {
   let userB: User;
   let userC: User;
   const groupName = 'Guestroom';
+  const password = 'Test1234?';
 
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
@@ -26,7 +27,6 @@ test.describe('Guestroom', () => {
         createPage(),
       ]);
 
-      const password = 'Test1234?';
       let createdLink: string;
 
       const userAPageManager = PageManager.from(userAPage).webapp;
@@ -38,7 +38,7 @@ test.describe('Guestroom', () => {
         await createGroup(pages, groupName, [userC]);
         await pages.conversationList().openConversation(groupName);
         await pages.conversation().toggleGroupInformation();
-        await pages.conversationDetails().guestOptionsButton.click();
+        await pages.conversationDetails().openQuestOptions();
         createdLink = await pages.guestOptions().createLink({password});
       });
 
@@ -66,13 +66,12 @@ test.describe('Guestroom', () => {
     const userAPage = await createPage(withLogin(userA), withConnectedUser(userC));
     const {pages, modals} = PageManager.from(userAPage).webapp;
 
-    const password = 'Test1234?';
     await createGroup(pages, groupName, [userC]);
     await pages.conversationList().openConversation(groupName);
 
     // UserA sees an error message when trying to create a password secured link with a weak password
     await pages.conversation().toggleGroupInformation();
-    await pages.conversationDetails().guestOptionsButton.click();
+    await pages.conversationDetails().openQuestOptions();
     await pages.guestOptions().createLinkButton.click();
 
     await modals.guestLinkPassword().setPasswordInput.fill('wrongPassword');
@@ -93,6 +92,24 @@ test.describe('Guestroom', () => {
     await pages.guestOptions().createLink({password});
     await expect(pages.guestOptions().guestLink).toBeVisible();
     await expect(userAPage.getByText('Link is password secured')).toBeVisible();
+  });
+
+  test('I want to revoke a password secured guest link', {tag: ['@TC-8142', '@regression']}, async ({createPage}) => {
+    const userAPage = await createPage(withLogin(userA), withConnectedUser(userC));
+    const {pages} = PageManager.from(userAPage).webapp;
+
+    await createGroup(pages, groupName, [userC]);
+    await pages.conversationList().openConversation(groupName);
+
+    await pages.conversation().toggleGroupInformation();
+    await pages.conversationDetails().openQuestOptions();
+    await pages.guestOptions().createLink({password});
+
+    await expect(pages.guestOptions().guestLink).toBeVisible();
+    await expect(userAPage.getByText('Link is password secured')).toBeVisible();
+
+    await pages.guestOptions().revokeLink();
+    await expect(pages.guestOptions().guestLink).not.toBeVisible();
   });
 
   test(
