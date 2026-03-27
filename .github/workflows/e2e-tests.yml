@@ -153,7 +153,7 @@ jobs:
             ~/.local/bin/op
           key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
           fail-on-cache-miss: true
-      
+
       - name: Verify cache was restored
         run: |
           echo "Cache restored: ${{ steps.cache-restore.outputs.cache-hit }}"

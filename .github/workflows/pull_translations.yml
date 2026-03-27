@@ -31,7 +31,7 @@ jobs:
         run: yarn --immutable
 
       - name: Sync translations
-        uses: crowdin/github-action@ce33ce793a5cbc401d9cd748716e03fc90c001f1
+        uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
         env:
           GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
           GITHUB_ACTOR: otto-the-bot
