@@ -17,7 +17,6 @@
  *
  */
 
-import {expect} from 'playwright/test';
 import {parseAccountDeepLink} from 'Components/Conversation/utils/parseAccountDeepLink';
 
 describe('parseAccountDeepLink', () => {
