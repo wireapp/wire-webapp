@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

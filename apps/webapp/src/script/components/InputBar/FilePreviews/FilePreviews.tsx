@@ -22,7 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {isAudio, isVideo, isImage} from 'Repositories/assets/AssetMetaDataBuilder';
+import {isAudio, isVideo, isImage} from 'Repositories/assets/assetMetaDataBuilder';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
 import {isPreviewableImage} from 'Util/imageUtil';
 

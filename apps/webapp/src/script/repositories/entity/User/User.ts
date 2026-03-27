@@ -26,7 +26,7 @@ import ko from 'knockout';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
 import {ROLE as TEAM_ROLE} from 'Repositories/user/UserPermission';

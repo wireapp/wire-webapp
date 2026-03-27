@@ -28,8 +28,8 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/'
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientRepository} from 'Repositories/client/ClientRepository';

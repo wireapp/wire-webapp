@@ -36,8 +36,8 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {BackupRepository} from 'Repositories/backup/BackupRepository';
 import {BackupService} from 'Repositories/backup/BackupService';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';

@@ -65,7 +65,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';

@@ -45,7 +45,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientMapper} from 'Repositories/client/ClientMapper';

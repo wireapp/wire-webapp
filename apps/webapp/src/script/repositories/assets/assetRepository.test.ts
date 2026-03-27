@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
 
-import {AssetRepository, AssetUploadOptions} from './AssetRepository';
+import {AssetRepository, AssetUploadOptions} from './assetRepository';
 
 import {Core} from '../../service/CoreSingleton';
 

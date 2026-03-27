@@ -24,8 +24,8 @@ import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/InViewport';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
 import {AVATAR_SIZE} from '.';

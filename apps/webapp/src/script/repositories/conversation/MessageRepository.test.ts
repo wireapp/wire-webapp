@@ -25,8 +25,8 @@ import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';

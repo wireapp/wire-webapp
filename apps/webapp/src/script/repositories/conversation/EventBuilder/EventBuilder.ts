@@ -32,7 +32,7 @@ import {DecryptionError} from '@wireapp/core/lib/errors/decryptionError';
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';

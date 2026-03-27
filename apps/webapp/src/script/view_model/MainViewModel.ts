@@ -19,8 +19,8 @@
 
 import {container} from 'tsyringe';
 
-import type {AssetRepository} from 'Repositories/assets/AssetRepository';
-import type {AudioRepository} from 'Repositories/audio/AudioRepository';
+import type {AssetRepository} from 'Repositories/assets/assetRepository';
+import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import type {BackupRepository} from 'Repositories/backup/BackupRepository';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';

@@ -38,7 +38,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';

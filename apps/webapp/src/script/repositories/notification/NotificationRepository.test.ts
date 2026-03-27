@@ -28,7 +28,7 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
