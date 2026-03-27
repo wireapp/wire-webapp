@@ -98,12 +98,12 @@ jobs:
             .yarn/cache
             ~/.cache/ms-playwright
             ~/.local/bin/op
-          key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}
+          key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
       
       - name: Verify cache was saved
         run: |
           echo "Cache save step completed"
-          echo "Cache key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}"
+          echo "Cache key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}"
 
   test:
     name: Run E2E Tests
@@ -133,9 +133,9 @@ jobs:
 
       - name: Debug cache key
         run: |
-          echo "Looking for cache key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}"
+          echo "Looking for cache key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}"
           echo "Runner OS: ${{ runner.os }}"
-          echo "Yarn lock hash: ${{ hashFiles('**/yarn.lock') }}"
+          echo "Yarn lock hash: ${{ hashFiles('yarn.lock') }}"
           echo "Run ID: ${{ github.run_id }}"
 
       # Restore dependencies installed in prepare job (NOT reinstalling!)
@@ -151,7 +151,7 @@ jobs:
             .yarn/cache
             ~/.cache/ms-playwright
             ~/.local/bin/op
-          key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}
+          key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
           fail-on-cache-miss: true
       
       - name: Verify cache was restored
@@ -215,7 +215,7 @@ jobs:
             libraries/*/node_modules
             .yarn/cache
             ~/.cache/ms-playwright
-          key: e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}
+          key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
           fail-on-cache-miss: true
 
       - name: Download blob reports
@@ -266,7 +266,7 @@ jobs:
       
       - name: Delete workflow cache
         run: |
-          gh cache delete "e2e-deps-${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}-${{ github.run_id }}" \
+          gh cache delete "e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}" \
             --repo ${{ github.repository }} || echo "Cache already deleted or not found"
         env:
           GH_TOKEN: ${{ github.token }}
