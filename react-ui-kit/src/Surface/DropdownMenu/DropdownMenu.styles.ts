@@ -131,3 +131,11 @@ export const triggerStyles: CSSObject = {
   background: 'none',
   cursor: 'pointer',
 };
+
+export const subTriggerStyle: CSSObject = {
+  justifyContent: 'space-between',
+};
+
+export const subContentStyle: CSSObject = {
+  minWidth: '160px',
+};
