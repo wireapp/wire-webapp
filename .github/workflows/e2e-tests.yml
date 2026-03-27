@@ -204,19 +204,8 @@ jobs:
         with:
           node-version-file: '.nvmrc'
 
-      # Restore dependencies from cache (NOT reinstalling!)
-      - name: Restore cached dependencies
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            node_modules
-            apps/webapp/node_modules
-            apps/server/node_modules
-            libraries/*/node_modules
-            .yarn/cache
-            ~/.cache/ms-playwright
-          key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
-          fail-on-cache-miss: true
+      - name: Install dependencies
+        run: yarn --immutable
 
       - name: Download blob reports
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
