@@ -22,7 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {useCellsNewFolderForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {descriptionStyles} from './CellsNewFolderModal.styles';
 
