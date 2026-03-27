@@ -119,7 +119,7 @@ jobs:
           name: build-artifact-${{ needs.validate_request.outputs.tag }}
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
         with:
           aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
@@ -127,7 +127,7 @@ jobs:
 
       - name: Deploy to wire-webapp-prod
         id: deploy
-        uses: aws-actions/aws-elasticbeanstalk-deploy@v1.0.0
+        uses: aws-actions/aws-elasticbeanstalk-deploy@e90ca3136d2cf14ddb5c7a30538d6f214d9a3c0e
         with:
           aws-region: ${{ env.AWS_REGION }}
           application-name: Webapp
