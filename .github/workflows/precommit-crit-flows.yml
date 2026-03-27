@@ -171,7 +171,7 @@ jobs:
 
   e2e_tests:
     name: E2E Tests Execution
-    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
     needs: [check_edits_to_e2e_tests, deploy_to_aws]
     uses: ./.github/workflows/e2e-tests.yml
     with:
@@ -183,7 +183,7 @@ jobs:
 
   run_e2e_tests:
     name: Playwright Critical Flow (precommit)
-    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
     needs: [e2e_tests]
     runs-on: ubuntu-latest
     steps:
