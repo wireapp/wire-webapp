@@ -49,7 +49,7 @@ import {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientMapper} from 'Repositories/client/ClientMapper';
-import type {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import type {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {flattenUserClientsQualifiedIds} from 'Repositories/conversation/userClientsUtils';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';

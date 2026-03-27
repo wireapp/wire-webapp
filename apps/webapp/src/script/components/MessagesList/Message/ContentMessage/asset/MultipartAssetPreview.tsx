@@ -26,7 +26,7 @@ import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {isPreviewableImage} from 'Util/imageUtil';
 import {getFileExtension, getName} from 'Util/util';
 

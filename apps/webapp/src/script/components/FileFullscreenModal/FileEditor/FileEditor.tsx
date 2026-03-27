@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';

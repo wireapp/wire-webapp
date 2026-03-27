@@ -43,10 +43,10 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {toError} from 'Util/toError';
 import {isBackendError} from 'Util/typePredicateUtil';
 
-import type {ConnectionEntity} from './ConnectionEntity';
-import {ConnectionMapper} from './ConnectionMapper';
-import type {ConnectionService} from './ConnectionService';
-import {ConnectionState} from './ConnectionState';
+import type {ConnectionEntity} from './connectionEntity';
+import {ConnectionMapper} from './connectionMapper';
+import type {ConnectionService} from './connectionService';
+import {ConnectionState} from './connectionState';
 
 import {Config} from '../../Config';
 import {SystemMessageType} from '../../message/SystemMessageType';

@@ -17,7 +17,7 @@
  *
  */
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useCellPublicLink} from 'src/script/components/Cells/common/useCellPublicLink/useCellPublicLink';
 
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';

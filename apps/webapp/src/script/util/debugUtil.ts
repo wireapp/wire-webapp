@@ -43,7 +43,7 @@ import {CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {ClientRepository} from 'Repositories/client';
 import {ClientState} from 'Repositories/client/ClientState';
-import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

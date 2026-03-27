@@ -19,7 +19,7 @@
 
 import type {Connection as ConnectionData} from '@wireapp/api-client/lib/connection/';
 
-import {ConnectionEntity} from './ConnectionEntity';
+import {ConnectionEntity} from './connectionEntity';
 
 /**
  * Connection mapper to convert all server side JSON connections into core connection entities.

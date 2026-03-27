@@ -32,12 +32,12 @@ import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 import {WebWorker} from 'Util/worker';
 
-import {Filename} from './Backup.types';
-import {BackUpHeader, DecodedHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './BackUpHeader';
-import {BackupRepository} from './BackupRepository';
-import {BackupService} from './BackupService';
-import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './Error';
-import {createMetaData} from './LegacyBackup.helper';
+import {Filename} from './backup.types';
+import {BackUpHeader, DecodedHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './backUpHeader';
+import {BackupRepository} from './backupRepository';
+import {BackupService} from './backupService';
+import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './error';
+import {createMetaData} from './legacyBackup.helper';
 import {handleZipEvent} from './zipWorker';
 
 import {DatabaseTypes, createStorageEngine} from '../../service/StoreEngineProvider';

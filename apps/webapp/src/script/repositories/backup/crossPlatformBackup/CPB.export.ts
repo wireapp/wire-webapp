@@ -19,7 +19,7 @@
 
 import {ConversationRecord, UserRecord, EventRecord} from 'Repositories/storage';
 
-import {buildMetaData} from './AssetMetadata';
+import {buildMetaData} from './assetMetadata';
 import {
   CPBackupExporter,
   BackupQualifiedId,
@@ -39,7 +39,7 @@ import {
   UserTableEntrySchema,
 } from './data.schema';
 
-import {CancelError, ExportError} from '../Error';
+import {CancelError, ExportError} from '../error';
 import {preprocessConversations, preprocessUsers, preprocessEvents} from '../recordPreprocessors';
 
 import {CPBLogger, exportTable, isAssetAddEvent, isLocationAddEvent, isMessageAddEvent, isSupportedEventType} from '.';

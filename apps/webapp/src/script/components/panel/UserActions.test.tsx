@@ -26,7 +26,7 @@ import ko from 'knockout';
 import {container} from 'tsyringe';
 
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
