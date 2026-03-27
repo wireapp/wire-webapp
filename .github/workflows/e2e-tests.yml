@@ -189,7 +189,7 @@ jobs:
 
   e2e-report:
     runs-on: ubuntu-latest
-    if: ${{ !cancelled() }}
+    if: ${{ needs.prepare.result == 'success' && needs.test.result == 'success' }}
     needs: [prepare, test]
 
     # It's necessary to define the outputs of the job so the calling workflow can access them
