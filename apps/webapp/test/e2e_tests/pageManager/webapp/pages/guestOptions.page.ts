@@ -29,6 +29,7 @@ export const GuestOptionsPage = (page: Page) => {
   const passwordSecuredRadioButton = panel.getByRole('radiogroup').getByText('Password secured', {exact: true});
   const notPasswordSecuredRadioButton = panel.getByRole('radiogroup').getByText('Not password secured', {exact: true});
   const createLinkButton = panel.getByRole('button', {name: 'Create link'});
+  const revokeLinkButton = panel.getByRole('button', {name: 'Revoke link'});
 
   const guestLink = panel.getByRole('button', {name: /https:\/\/.+\/conversation-join\//});
 
@@ -53,9 +54,15 @@ export const GuestOptionsPage = (page: Page) => {
     return await guestLink.textContent();
   };
 
+  const revokeLink = async () => {
+    await revokeLinkButton.click();
+    await new ConfirmModal(page).actionButton.click();
+  };
+
   return {
     backButton,
     createLink,
+    revokeLink,
     passwordSecuredRadioButton,
     createLinkButton,
     guestLink,
