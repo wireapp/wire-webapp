@@ -21,8 +21,6 @@ jobs:
   validate_request:
     name: Validate redeploy request
     runs-on: ubuntu-latest
-    env:
-      AWS_REGION: eu-central-1
     outputs:
       tag: ${{ steps.validate.outputs.tag }}
 
@@ -109,6 +107,8 @@ jobs:
   deploy_to_production:
     name: Deploy to production
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-central-1
     needs: [validate_request, build_artifact]
     environment: wire-webapp-prod
 
