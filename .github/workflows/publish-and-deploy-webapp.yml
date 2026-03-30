@@ -32,7 +32,6 @@ jobs:
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
       CHANGELOG_FILE: './changelog.md'
-      AWS_REGION: eu-central-1
 
     steps:
       - name: Checkout
@@ -287,6 +286,8 @@ jobs:
   deploy_to_aws:
     name: 'Deploy to live environments'
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-central-1
     environment: ${{ matrix.target }}
     needs: [build, set_deployment_targets]
     if: ${{needs.set_deployment_targets.outputs.deployment_targets}}
