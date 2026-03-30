@@ -299,6 +299,23 @@ export const Conversation = ({
     return false;
   };
 
+  const openUserProfile = async (id: string, domain?: string) => {
+    try {
+      const userEntity = await repositories.user.getUserById({
+        id,
+        domain: domain ?? '',
+      });
+
+      showUserModal(userEntity);
+    } catch (error: unknown) {
+      if (error instanceof UserError && error.type === UserError.TYPE.USER_NOT_FOUND) {
+        messageListLogger.warn('Could not resolve user profile deep link', {id, domain});
+        return;
+      }
+      throw error;
+    }
+  };
+
   const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails) => {
     const href = messageDetails.href!;
 
@@ -306,22 +323,7 @@ export const Conversation = ({
 
     if (parsed?.type === 'user-profile') {
       event.preventDefault();
-
-      void (async () => {
-        try {
-          const userEntity = await repositories.user.getUserById({
-            id: parsed.id,
-            domain: parsed.domain ?? '',
-          });
-
-          showUserModal(userEntity);
-        } catch (error: unknown) {
-          if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
-            throw error;
-          }
-        }
-      })();
-
+      void openUserProfile(parsed.id, parsed.domain);
       return false;
     }
 
