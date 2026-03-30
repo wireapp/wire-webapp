@@ -27,6 +27,7 @@ export class GroupCreationPage {
   readonly createGroupButton: Locator;
   readonly addMembersButton: Locator;
   readonly filesCheckbox: Locator;
+  readonly questsToggle: Locator;
 
   readonly searchPeopleInput: Locator;
   readonly searchPeopleResults: Locator;
@@ -38,6 +39,7 @@ export class GroupCreationPage {
     this.createGroupButton = page.locator('[data-uie-name="do-create-group"]');
     this.addMembersButton = page.locator('[data-uie-name="do-create"]');
     this.filesCheckbox = page.locator('[data-uie-name="do-toggle-cells"]');
+    this.questsToggle = page.getByRole('button', {name: 'Guests', exact: true});
 
     this.searchPeopleInput = page.getByRole('dialog').getByLabel('Search by name');
     this.searchPeopleList = page.getByRole('dialog').getByRole('list');
