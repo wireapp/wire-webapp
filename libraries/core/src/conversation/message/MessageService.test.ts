@@ -35,7 +35,7 @@ import {
   buildProteusService,
   cleanupProteusServiceMocks,
 } from '../../messagingProtocols/proteus/ProteusService/ProteusService.mocks';
-import {getUUID} from '../../test/PayloadHelper';
+import {getUUID} from '../../test/payloadHelper';
 
 const baseMessageSendingStatus: MessageSendingStatus = {
   deleted: {},

@@ -25,8 +25,8 @@ import {CryptoClient} from './CryptoClient';
 import {CoreCryptoWrapper} from './CryptoClient/CoreCryptoWrapper/CoreCryptoWrapper';
 import {ProteusService} from './ProteusService';
 
-import {getUUID} from '../../../test/PayloadHelper';
-import {createMemoryEngine} from '../../../test/StoreHelper';
+import {getUUID} from '../../../test/payloadHelper';
+import {createMemoryEngine} from '../../../test/storeHelper';
 
 const createdApiClients: APIClient[] = [];
 

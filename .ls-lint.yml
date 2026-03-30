@@ -310,3 +310,6 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .test.node.ts: camelCase
+  libraries/core/src/test:
+    .dir: camelCase
+    .ts: camelCase
