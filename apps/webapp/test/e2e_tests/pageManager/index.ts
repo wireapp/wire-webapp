@@ -74,7 +74,6 @@ import {WelcomePage} from './webapp/pages/welcome.page';
 import {GuestLinkPasswordModal} from './webapp/modals/guestLinkPassword.modal';
 import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
 import {CreateConversationModal} from './webapp/modals/createConversation';
-import {JoinConversationPage} from './webapp/pages/joinConversation.page';
 import {InviteModal} from './webapp/modals/invite.modal';
 import {ConversationAccessModal} from './webapp/modals/conversationAccess.modal';
 
@@ -164,8 +163,6 @@ export class PageManager {
       conversationDetails: () =>
         this.getOrCreate('webapp.pages.conversationDetails', () => new ConversationDetailsPage(this.page)),
       conversation: () => this.getOrCreate('webapp.pages.conversation', () => new ConversationPage(this.page)),
-      joinConversation: () =>
-        this.getOrCreate('webapp.pages.joinConversation', () => new JoinConversationPage(this.page)),
       collection: () => this.getOrCreate('webapp.pages.collection', () => new CollectionPage(this.page)),
       cellsConversation: () =>
         this.getOrCreate('webapp.pages.cellsConversation', () => new CellsConversationPage(this.page)),

@@ -60,7 +60,7 @@ export const GuestOptionsPage = (page: Page) => {
     await new ConfirmModal(page).actionButton.click();
   };
 
-  const toggleQuests = async () => {
+  const toggleGuests = async () => {
     await guestsToggle.click();
     await new ConfirmModal(page).actionButton.click();
   };
@@ -69,7 +69,7 @@ export const GuestOptionsPage = (page: Page) => {
     backButton,
     createLink,
     revokeLink,
-    toggleQuests,
+    toggleGuests,
     guestsToggle,
     passwordSecuredRadioButton,
     createLinkButton,
