@@ -56,7 +56,7 @@ jobs:
 
       - name: Deploy to Elastic Beanstalk
         id: deploy
-        uses: aws-actions/aws-elasticbeanstalk-deploy@e90ca3136d2cf14ddb5c7a30538d6f214d9a3c0e
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
         with:
           aws-region: ${{ env.AWS_REGION }}
           application-name: ${{ env.AWS_APPLICATION_NAME }}
