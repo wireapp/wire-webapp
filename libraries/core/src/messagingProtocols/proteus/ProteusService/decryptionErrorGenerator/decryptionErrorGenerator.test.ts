@@ -17,7 +17,7 @@
  *
  */
 
-import {generateDecryptionError} from './DecryptionErrorGenerator';
+import {generateDecryptionError} from './decryptionErrorGenerator';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 

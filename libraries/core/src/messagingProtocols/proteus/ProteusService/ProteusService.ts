@@ -34,7 +34,7 @@ import {CRUDEngine} from '@wireapp/store-engine';
 
 import {CryptoClient} from './CryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
-import {generateDecryptionError} from './DecryptionErrorGenerator';
+import {generateDecryptionError} from './decryptionErrorGenerator';
 import {deleteIdentity} from './identityClearer';
 import type {
   AddUsersToProteusConversationParams,

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './DecryptionErrorGenerator';
+export * from './decryptionErrorGenerator';
