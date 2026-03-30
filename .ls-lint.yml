@@ -305,3 +305,8 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/secretStore:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .test.node.ts: camelCase
