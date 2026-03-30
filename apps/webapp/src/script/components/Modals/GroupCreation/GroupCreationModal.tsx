@@ -355,7 +355,6 @@ const GroupCreationModal = ({
     <ModalComponent
       id="group-creation-modal"
       className="group-creation__modal"
-      wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
       isShown={isShown}
       onClosed={onClose}
       data-uie-name="group-creation-label"
