@@ -21,20 +21,31 @@ import {Crypto} from './interfaces';
 
 import {toBufferSource} from '../../util/bufferUtils';
 
-const cryptoLib = window.crypto;
+function getBrowserCrypto(): globalThis.Crypto {
+  const browserCrypto = globalThis.crypto;
+
+  if (!browserCrypto?.subtle) {
+    throw new Error('Web Crypto API is unavailable');
+  }
+
+  return browserCrypto;
+}
 
 export const crypto: Crypto = {
   async digest(cipherText: Uint8Array): Promise<Uint8Array> {
-    const checksum = await cryptoLib.subtle.digest('SHA-256', toBufferSource(cipherText));
+    const browserCrypto = getBrowserCrypto();
+    const checksum = await browserCrypto.subtle.digest('SHA-256', toBufferSource(cipherText));
+
     return new Uint8Array(checksum);
   },
 
   async decrypt(cipherText: Uint8Array, keyBytes: Uint8Array): Promise<Uint8Array> {
-    const key = await cryptoLib.subtle.importKey('raw', toBufferSource(keyBytes), 'AES-CBC', false, ['decrypt']);
+    const browserCrypto = getBrowserCrypto();
+    const key = await browserCrypto.subtle.importKey('raw', toBufferSource(keyBytes), 'AES-CBC', false, ['decrypt']);
 
     const initializationVector = cipherText.slice(0, 16);
     const assetCipherText = cipherText.slice(16);
-    const decipher = await cryptoLib.subtle.decrypt(
+    const decipher = await browserCrypto.subtle.decrypt(
       {iv: toBufferSource(initializationVector), name: 'AES-CBC'},
       key,
       toBufferSource(assetCipherText),
@@ -44,7 +55,9 @@ export const crypto: Crypto = {
   },
 
   getRandomValues(size: number): Uint8Array {
-    return cryptoLib.getRandomValues(new Uint8Array(size));
+    const browserCrypto = getBrowserCrypto();
+
+    return browserCrypto.getRandomValues(new Uint8Array(size));
   },
 
   async encrypt(
@@ -52,10 +65,12 @@ export const crypto: Crypto = {
     keyBytes: Uint8Array,
     initializationVector: Uint8Array,
   ): Promise<{key: Uint8Array; cipher: Uint8Array | ArrayBuffer}> {
-    const key = await cryptoLib.subtle.importKey('raw', toBufferSource(keyBytes), 'AES-CBC', true, ['encrypt']);
+    const browserCrypto = getBrowserCrypto();
+    const key = await browserCrypto.subtle.importKey('raw', toBufferSource(keyBytes), 'AES-CBC', true, ['encrypt']);
+
     return {
-      key: new Uint8Array(await cryptoLib.subtle.exportKey('raw', key)),
-      cipher: await cryptoLib.subtle.encrypt(
+      key: new Uint8Array(await browserCrypto.subtle.exportKey('raw', key)),
+      cipher: await browserCrypto.subtle.encrypt(
         {iv: toBufferSource(initializationVector), name: 'AES-CBC'},
         key,
         toBufferSource(plainText),

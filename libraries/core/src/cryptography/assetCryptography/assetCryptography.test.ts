@@ -18,6 +18,7 @@
  */
 
 import {decryptAsset, encryptAsset} from './assetCryptography';
+import {crypto as browserCrypto} from './crypto.browser';
 
 describe('AssetCrypto', () => {
   it('should encrypt and decrypt ArrayBuffer', async () => {
@@ -46,5 +47,22 @@ describe('AssetCrypto', () => {
 
     const {cipherText, keyBytes} = await encryptAsset({plainText: bytes});
     await expect(decryptAsset({cipherText, keyBytes, sha256: new Uint8Array([])})).rejects.toThrow();
+  });
+
+  it('should expose the lower-case browser mapping for asset cryptography', () => {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const packageJson = require('../../../package.json');
+
+    expect(packageJson.browser['./lib/cryptography/assetCryptography/crypto.node']).toBe(
+      './lib/cryptography/assetCryptography/crypto.browser.js',
+    );
+    expect(packageJson.browser['./lib/cryptography/AssetCryptography/crypto.node']).toBeUndefined();
+  });
+
+  it('should use the browser crypto implementation through globalThis', async () => {
+    const digest = await browserCrypto.digest(new Uint8Array([1, 2, 3]));
+
+    expect(digest).toBeInstanceOf(Uint8Array);
+    expect(digest.byteLength).toBe(32);
   });
 });
