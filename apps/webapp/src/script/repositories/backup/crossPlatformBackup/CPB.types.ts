@@ -19,8 +19,8 @@
 
 import {User} from 'Repositories/entity/User';
 
-import {ProgressCallback} from '../Backup.types';
-import {BackupService} from '../BackupService';
+import {ProgressCallback} from '../backup.types';
+import {BackupService} from '../backupService';
 
 export interface ExportHistoryFromDatabaseParams {
   backupService: BackupService;

@@ -19,7 +19,7 @@
 
 import {UserAsset as APIClientUserAsset, UserAssetType} from '@wireapp/api-client/lib/user/';
 
-import * as AssetMapper from './AssetMapper';
+import * as AssetMapper from './assetMapper';
 
 describe('AssetMapper', () => {
   describe('mapProfileAssets', () => {

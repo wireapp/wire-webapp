@@ -23,7 +23,7 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionMapper} from 'Repositories/connection/ConnectionMapper';
+import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import 'src/script/localization/Localizer';

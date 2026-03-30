@@ -51,11 +51,11 @@ import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protoc
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/AssetMetaDataBuilder';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
-import {AudioType} from 'Repositories/audio/AudioType';
+import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
+import {AudioType} from 'Repositories/audio/audioType';
 import {ClientState} from 'Repositories/client/ClientState';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';

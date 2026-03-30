@@ -34,10 +34,10 @@ import {getLogger, Logger} from 'Util/logger';
 import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 
-import {AssetError} from './AssetError';
-import {AssetRemoteData} from './AssetRemoteData';
-import {AssetTransferState} from './AssetTransferState';
-import {getAssetUrl, setAssetUrl} from './AssetURLCache';
+import {AssetError} from './assetError';
+import {AssetRemoteData} from './assetRemoteData';
+import {AssetTransferState} from './assetTransferState';
+import {getAssetUrl, setAssetUrl} from './assetUrlCache';
 
 import {Core} from '../../service/CoreSingleton';
 

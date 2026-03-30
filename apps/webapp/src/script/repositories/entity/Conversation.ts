@@ -40,7 +40,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import {ConversationRepository, CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
 import {isProteusTeam1to1Conversation, isSelfConversation} from 'Repositories/conversation/ConversationSelectors';

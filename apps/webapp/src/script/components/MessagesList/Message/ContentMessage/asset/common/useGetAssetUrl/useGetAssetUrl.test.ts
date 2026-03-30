@@ -19,9 +19,9 @@
 
 import {act, renderHook} from '@testing-library/react';
 
-import {AssetError} from 'Repositories/assets/AssetError';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetError} from 'Repositories/assets/assetError';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 
 import {useGetAssetUrl} from './useGetAssetUrl';

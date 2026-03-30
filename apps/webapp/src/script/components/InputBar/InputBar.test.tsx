@@ -21,8 +21,8 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

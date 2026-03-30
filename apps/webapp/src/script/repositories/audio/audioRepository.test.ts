@@ -22,9 +22,9 @@ import {difference} from 'underscore';
 
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 
-import {AudioPlayingType} from './AudioPlayingType';
-import {AudioRepository} from './AudioRepository';
-import {AudioType} from './AudioType';
+import {AudioPlayingType} from './audioPlayingType';
+import {AudioRepository} from './audioRepository';
+import {AudioType} from './audioType';
 
 describe('AudioRepository', () => {
   const audioRepository = new AudioRepository();

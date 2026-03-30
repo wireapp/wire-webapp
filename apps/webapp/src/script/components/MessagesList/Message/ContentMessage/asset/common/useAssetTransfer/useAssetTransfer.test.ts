@@ -20,9 +20,9 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {createUuid} from 'Util/uuid';

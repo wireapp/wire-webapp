@@ -24,8 +24,8 @@ import {getLogger} from 'Util/logger';
 
 import {CPBackupImporter, BackupPeekResult, isCreatedBySameUser, BackupQualifiedId} from './CPB.library';
 
-import {BackupService} from '../BackupService';
-import {IncompatibleBackupError} from '../Error';
+import {BackupService} from '../backupService';
+import {IncompatibleBackupError} from '../error';
 
 export const CPBLogger = getLogger('wire:backup:CPB');
 
