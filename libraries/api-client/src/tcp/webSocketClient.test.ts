@@ -223,5 +223,47 @@ describe('WebSocketClient', () => {
         websocketClient.unlock();
       });
     });
+
+    it('emits a long-running retry event once reconnect retries reach one minute', async () => {
+      const websocketClient = new WebSocketClient('ws://url', fakeHttpClient);
+      webSocketClients.push(websocketClient);
+      const retryDetailsListener = jest.fn();
+      const socket = websocketClient['socket'];
+
+      websocketClient.useVersion(MINIMUM_API_VERSION);
+      websocketClient.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryDetailsListener);
+      jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
+      jest.spyOn(Date, 'now').mockReturnValueOnce(0).mockReturnValueOnce(1000).mockReturnValueOnce(61000);
+
+      websocketClient.connect();
+      await socket['internalOnReconnect']();
+      await socket['internalOnReconnect']();
+      await socket['internalOnReconnect']();
+
+      expect(retryDetailsListener).toHaveBeenCalledTimes(1);
+      expect(retryDetailsListener).toHaveBeenCalledWith({
+        retryCount: 2,
+        retryDurationInMilliseconds: 60000,
+      });
+    });
+
+    it('does not emit a long-running retry event before reconnect retries reach one minute', async () => {
+      const websocketClient = new WebSocketClient('ws://url', fakeHttpClient);
+      webSocketClients.push(websocketClient);
+      const retryDetailsListener = jest.fn();
+      const socket = websocketClient['socket'];
+
+      websocketClient.useVersion(MINIMUM_API_VERSION);
+      websocketClient.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryDetailsListener);
+      jest.spyOn(socket as any, 'getReconnectingWebsocket').mockReturnValue(fakeSocket);
+      jest.spyOn(Date, 'now').mockReturnValueOnce(0).mockReturnValueOnce(1000).mockReturnValueOnce(60000);
+
+      websocketClient.connect();
+      await socket['internalOnReconnect']();
+      await socket['internalOnReconnect']();
+      await socket['internalOnReconnect']();
+
+      expect(retryDetailsListener).not.toHaveBeenCalled();
+    });
   });
 });
