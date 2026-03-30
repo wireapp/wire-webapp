@@ -5071,10 +5071,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mediapipe/tasks-vision@npm:0.10.32":
-  version: 0.10.32
-  resolution: "@mediapipe/tasks-vision@npm:0.10.32"
-  checksum: 10/438d9b27951419b6edcd855a7b8494de29db5175dd1ab651e32c5b4ab3b7abcd744ba854e68609a3fc48e838f5ae2da46f0d5f1870fa043c7a14f35d1b887bbe
+"@mediapipe/tasks-vision@npm:0.10.34":
+  version: 0.10.34
+  resolution: "@mediapipe/tasks-vision@npm:0.10.34"
+  checksum: 10/d085377a4d60ecf30c9f27dc1ba8d21ffafdd320d20a4ce0fc82e79a57c69a8c600d3478c8348b089a7393bf5c095d02745931c37663a61939a0985065c06261
   languageName: node
   linkType: hard
 
@@ -11269,7 +11269,7 @@ __metadata:
     "@lexical/markdown": "npm:0.27.2"
     "@lexical/react": "npm:0.27.2"
     "@lexical/rich-text": "npm:0.27.2"
-    "@mediapipe/tasks-vision": "npm:0.10.32"
+    "@mediapipe/tasks-vision": "npm:0.10.34"
     "@nx/webpack": "npm:22.6.1"
     "@playwright/test": "npm:1.58.2"
     "@roamhq/wrtc": "npm:0.10.0"
