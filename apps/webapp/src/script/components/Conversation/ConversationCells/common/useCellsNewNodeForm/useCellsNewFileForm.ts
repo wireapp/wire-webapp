@@ -21,7 +21,7 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
 import {ITEM_ALREADY_EXISTS_ERROR, getErrorStatus, getNameValidationError} from './cellsNodeFormUtils';
