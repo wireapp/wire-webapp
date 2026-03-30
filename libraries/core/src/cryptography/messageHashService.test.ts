@@ -17,7 +17,7 @@
  *
  */
 
-import {AvailableMessageContent, MessageHashService} from './MessageHashService';
+import {AvailableMessageContent, MessageHashService} from './messageHashService';
 
 describe('MessageHashService', () => {
   describe('"getHash"', () => {

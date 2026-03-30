@@ -301,3 +301,7 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .store.ts: camelCase
+  libraries/core/src/cryptography:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase

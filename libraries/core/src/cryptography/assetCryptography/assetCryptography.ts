@@ -20,7 +20,7 @@
 import {CipherOptions} from '@wireapp/api-client/lib/asset';
 
 import {crypto} from './crypto.node';
-import {EncryptedAsset} from './EncryptedAsset';
+import {EncryptedAsset} from './encryptedAsset';
 
 const isEqual = (a: Uint8Array, b: Uint8Array): boolean => {
   const arrayA = new Uint32Array(a);

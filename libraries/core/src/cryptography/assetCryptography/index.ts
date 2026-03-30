@@ -17,4 +17,4 @@
  *
  */
 
-export * from './AssetCryptography';
+export * from './assetCryptography';

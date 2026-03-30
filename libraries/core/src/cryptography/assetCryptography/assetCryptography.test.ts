@@ -17,7 +17,7 @@
  *
  */
 
-import {decryptAsset, encryptAsset} from './AssetCryptography';
+import {decryptAsset, encryptAsset} from './assetCryptography';
 
 describe('AssetCrypto', () => {
   it('should encrypt and decrypt ArrayBuffer', async () => {

@@ -23,7 +23,7 @@ import {ProgressCallback, RequestCancelable} from '@wireapp/api-client/lib/http'
 import {APIClient} from '@wireapp/api-client';
 
 import {EncryptedAsset, EncryptedAssetUploaded} from '../../cryptography';
-import {decryptAsset, encryptAsset} from '../../cryptography/AssetCryptography/AssetCryptography';
+import {decryptAsset, encryptAsset} from '../../cryptography/assetCryptography/assetCryptography';
 import {toBufferSource} from '../../util/bufferUtils';
 
 export {ProgressCallback};
