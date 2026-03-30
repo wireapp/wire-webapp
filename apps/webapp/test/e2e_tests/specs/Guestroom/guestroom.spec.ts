@@ -216,6 +216,53 @@ test.describe('Guestroom', () => {
   );
 
   test(
+    'I want to see Wire and Wireless guest(s) are removed when I change the Allow guests from on to off',
+    {tag: ['@TC-3322', '@regression']},
+    async ({createPage}) => {
+      const [ownerPages, guestPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))).then(({webapp}) => webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(({webapp}) => webapp.pages),
+      ]);
+
+      await guestPages.conversationList().openPendingConnectionRequest();
+      await guestPages.connectRequest().clickConnectButton();
+
+      await createGroup(ownerPages, groupName, [userB, userC]);
+      await ownerPages.conversationList().openConversation(groupName);
+
+      await ownerPages.conversation().toggleGroupInformation();
+      await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+
+      await ownerPages.conversationDetails().openQuestOptions();
+      await ownerPages.guestOptions().toggleQuests();
+
+      await expect(
+        ownerPages.conversation().systemMessages.filter({hasText: `You removed ${userB.fullName}`}),
+      ).toBeVisible();
+    },
+  );
+
+  test(
+    'I want to see a description of what does Allow guests mean',
+    {tag: ['@TC-3323', '@regression']},
+    async ({createPage}) => {
+      const ownerPage = await createPage(withLogin(userA));
+      const ownerPages = PageManager.from(ownerPage).webapp.pages;
+
+      await createGroup(ownerPages, groupName, [userC]);
+      await ownerPages.conversationList().openConversation(groupName);
+      await ownerPages.conversation().toggleGroupInformation();
+
+      await ownerPages.conversationDetails().openQuestOptions();
+      await ownerPages.guestOptions().guestsToggle.click();
+
+      await expect(ownerPage.getByTestId('status-guest-options-info')).toContainText(
+        'Open this conversation to people outside your team.',
+      );
+    },
+  );
+
+  test(
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
     async ({createPage}) => {
