@@ -1,6 +1,14 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
+import {
+  test,
+  expect,
+  withConnectedUser,
+  withLogin,
+  Team,
+  LOGIN_TIMEOUT,
+  withConnectionRequest,
+} from 'test/e2e_tests/test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Guestroom', () => {
@@ -166,7 +174,7 @@ test.describe('Guestroom', () => {
       await questPages.joinConversation().nameInput.fill(userB.firstName);
       await questPages.joinConversation().acceptTermsCheckBox.check({force: true});
       await questPages.joinConversation().joinAsGuest.click();
-      
+
       await questPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       await guestModals.confirm().actionButton.click();
       await expect(questPages.conversation().conversationTitle).toContainText(groupName);
@@ -176,6 +184,36 @@ test.describe('Guestroom', () => {
       await verify(pages);
     });
   });
+
+  test(
+    'I should not see guests when adding people to existing conversation when guest toggle is OFF',
+    {tag: ['@TC-3318', '@regression']},
+    async ({createPage}) => {
+      const [ownerPages, guestPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))).then(({webapp}) => webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(({webapp}) => webapp.pages),
+      ]);
+
+      await guestPages.conversationList().openPendingConnectionRequest();
+      await guestPages.connectRequest().clickConnectButton();
+
+      await createGroup(ownerPages, groupName, [userB, userC]);
+      await ownerPages.conversationList().openConversation(groupName);
+      await ownerPages.conversation().toggleGroupInformation();
+      await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+
+      await ownerPages.conversationDetails().openQuestOptions();
+      await ownerPages.guestOptions().toggleQuests();
+      await ownerPages.conversation().toggleGroupInformation();
+      await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).not.toBeVisible();
+
+      await ownerPages.conversationDetails().clickAddPeopleButton();
+      await ownerPages.conversationDetails().searchPeopleInput.fill(userB.fullName);
+      await expect(ownerPages.conversationDetails().searchList).toContainText(
+        'No matching results. Try entering a different name.',
+      );
+    },
+  );
 
   test(
     'I want to get logged out with a reason when my account expires',
