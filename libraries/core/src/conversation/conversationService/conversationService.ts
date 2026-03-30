@@ -54,7 +54,7 @@ import {
   KeyPackageClaimUser,
   SendMlsMessageParams,
   SendResult,
-} from './ConversationService.types';
+} from './conversationService.types';
 
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';

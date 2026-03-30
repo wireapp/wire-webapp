@@ -17,4 +17,4 @@
  *
  */
 
-export * from '../../../conversation/ConversationService/Utility/getConversationQualifiedMembers';
+export * from '../../../conversation/conversationService/utility/getConversationQualifiedMembers';

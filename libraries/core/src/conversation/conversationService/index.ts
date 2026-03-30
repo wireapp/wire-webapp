@@ -17,5 +17,5 @@
  *
  */
 
-export * from './ConversationService.types';
-export * from './ConversationService';
+export * from './conversationService.types';
+export * from './conversationService';

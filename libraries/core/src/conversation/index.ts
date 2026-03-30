@@ -21,7 +21,7 @@ export * from './abortReason';
 export * from './assetService';
 export * from './assetTransferState';
 export * from './clientActionType';
-export * from './ConversationService';
+export * from './conversationService';
 export * from './genericMessageType';
 export * from './messageTimer';
 export * from './message/payloadBundle';
