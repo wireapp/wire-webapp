@@ -32,9 +32,9 @@ import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-clien
 import {LogFactory} from '@wireapp/commons';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptoClient} from './CryptoClient';
+import {CryptoClient} from './cryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
-import {generateDecryptionError} from './DecryptionErrorGenerator';
+import {generateDecryptionError} from './decryptionErrorGenerator';
 import {deleteIdentity} from './identityClearer';
 import type {
   AddUsersToProteusConversationParams,
@@ -51,19 +51,19 @@ import {
   SendResult,
   ProteusAddUsersResponse,
 } from '../../../conversation';
-import {MessageService} from '../../../conversation/message/MessageService';
+import {MessageService} from '../../../conversation/message/messageService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {HandledEventPayload} from '../../../notification';
 import {handleOtrMessageAdd} from '../EventHandler/events';
-import {getGenericMessageParams} from '../Utility/getGenericMessageParams';
-import {isClearFromMismatch} from '../Utility/isClearFromMismatch';
+import {getGenericMessageParams} from '../utility/getGenericMessageParams';
+import {isClearFromMismatch} from '../utility/isClearFromMismatch';
 import {
   buildEncryptedPayloads,
   constructSessionId,
   deleteSession,
   initSession,
   initSessions,
-} from '../Utility/SessionHandler';
+} from '../utility/sessionHandler';
 
 export type EncryptionResult = {
   /** the encrypted payloads for the clients that have a valid sessions */

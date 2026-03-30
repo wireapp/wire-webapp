@@ -36,7 +36,7 @@ import {ConversationMapper} from './conversationMapper';
 
 import {NotificationSource} from '../../notification';
 import {MessageSendingState} from '../message';
-import {PayloadBundle, PayloadBundleType} from '../message/PayloadBundle';
+import {PayloadBundle, PayloadBundleType} from '../message/payloadBundle';
 
 describe('ConversationMapper', () => {
   describe('"mapConversationEvent"', () => {

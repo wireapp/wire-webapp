@@ -21,8 +21,8 @@ import {ClientType} from '@wireapp/api-client/lib/client';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {CryptoClient} from './CryptoClient';
-import {CoreCryptoWrapper} from './CryptoClient/CoreCryptoWrapper/CoreCryptoWrapper';
+import {CryptoClient} from './cryptoClient';
+import {CoreCryptoWrapper} from './cryptoClient/coreCryptoWrapper/coreCryptoWrapper';
 import {ProteusService} from './ProteusService';
 
 import {getUUID} from '../../../test/payloadHelper';

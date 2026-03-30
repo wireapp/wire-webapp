@@ -332,3 +332,28 @@ ls:
   libraries/core/src/conversation/content:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/conversation/message:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/conversation/conversationService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/utility:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService/cryptoClient:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+    .store.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService/decryptionErrorGenerator:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
