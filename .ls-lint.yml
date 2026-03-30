@@ -347,6 +347,12 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService/cryptoClient:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+    .store.ts: camelCase
   libraries/core/src/messagingProtocols/proteus/ProteusService/decryptionErrorGenerator:
     .dir: camelCase
     .ts: camelCase

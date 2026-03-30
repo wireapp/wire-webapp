@@ -42,7 +42,7 @@ import {NonFederatingBackendsError} from '../../../errors';
 import {generateQualifiedId, generateQualifiedIds} from '../../../testUtils';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('./CryptoClient/CoreCryptoWrapper/PrekeysTracker', () => {
+jest.mock('./cryptoClient/coreCryptoWrapper/prekeysTracker', () => {
   return {
     PrekeyTracker: jest.fn().mockImplementation(() => {
       return {

@@ -34,11 +34,11 @@ import {
 } from '@wireapp/core-crypto';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
-import {PrekeyTracker} from './PrekeysTracker';
+import {PrekeyTracker} from './prekeysTracker';
 
 import {CorruptedKeyError, GeneratedKey} from '../../../../../secretStore/secretKeyGenerator';
 import {CoreCryptoConfig} from '../../../../common.types';
-import {CryptoClient} from '../CryptoClient.types';
+import {CryptoClient} from '../cryptoClient.types';
 
 type Config = {
   generateSecretKey: (keyId: string, keySize: 16 | 32) => Promise<GeneratedKey>;

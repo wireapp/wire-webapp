@@ -17,7 +17,7 @@
  *
  */
 
-import {PrekeyTracker} from './PrekeysTracker';
+import {PrekeyTracker} from './prekeysTracker';
 
 describe('PrekeysGenerator', () => {
   const baseConfig = {

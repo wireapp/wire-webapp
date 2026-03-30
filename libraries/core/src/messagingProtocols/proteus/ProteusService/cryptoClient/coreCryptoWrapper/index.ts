@@ -17,4 +17,4 @@
  *
  */
 
-export * from './CoreCryptoWrapper';
+export * from './coreCryptoWrapper';

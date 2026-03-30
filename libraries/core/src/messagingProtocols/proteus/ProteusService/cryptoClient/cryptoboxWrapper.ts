@@ -23,7 +23,7 @@ import {Cryptobox} from '@wireapp/cryptobox';
 import {keys as ProteusKeys} from '@wireapp/proteus';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptoClient} from './CryptoClient.types';
+import {CryptoClient} from './cryptoClient.types';
 
 import {toArrayBuffer} from '../../../../util/bufferUtils';
 

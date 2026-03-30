@@ -32,7 +32,7 @@ import type {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-clien
 import {LogFactory} from '@wireapp/commons';
 import {CRUDEngine} from '@wireapp/store-engine';
 
-import {CryptoClient} from './CryptoClient';
+import {CryptoClient} from './cryptoClient';
 import {cryptoMigrationStore} from './cryptoMigrationStateStore';
 import {generateDecryptionError} from './decryptionErrorGenerator';
 import {deleteIdentity} from './identityClearer';

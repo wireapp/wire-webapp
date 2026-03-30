@@ -19,7 +19,7 @@
 
 import {PreKey} from '@wireapp/api-client/lib/auth';
 
-import {PrekeysTrackerStore} from './PrekeysTracker.store';
+import {PrekeysTrackerStore} from './prekeysTracker.store';
 
 import {CryptoClient} from '../..';
 
