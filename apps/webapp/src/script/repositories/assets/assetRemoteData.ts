@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetUrlData} from '@wireapp/core/lib/conversation/AssetService/AssetService';
+import {AssetUrlData} from '@wireapp/core/lib/conversation/assetService/assetService';
 
 /**
  * Callback function that receives download progress updates.

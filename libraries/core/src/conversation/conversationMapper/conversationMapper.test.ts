@@ -32,7 +32,7 @@ import {
   ConversationTypingEvent,
 } from '@wireapp/api-client/lib/event';
 
-import {ConversationMapper} from './ConversationMapper';
+import {ConversationMapper} from './conversationMapper';
 
 import {NotificationSource} from '../../notification';
 import {MessageSendingState} from '../message';

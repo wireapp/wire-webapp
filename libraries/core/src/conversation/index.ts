@@ -18,12 +18,12 @@
  */
 
 export * from './AbortReason';
-export * from './AssetService';
+export * from './assetService';
 export * from './AssetTransferState';
 export * from './ClientActionType';
 export * from './ConversationService';
 export * from './GenericMessageType';
-export * from './MessageTimer';
+export * from './messageTimer';
 export * from './message/PayloadBundle';
 export * from './message/Message.types';
 export * from './ReactionType';

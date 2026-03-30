@@ -53,7 +53,7 @@ import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import {openDB} from '../../storage/coreDb';
 import * as PayloadHelper from '../../test/payloadHelper';
 import * as MessageBuilder from '../message/MessageBuilder';
-import {SubconversationService} from '../SubconversationService/SubconversationService';
+import {SubconversationService} from '../subconversationService/subconversationService';
 
 const createMLSMessageAddEventMock = (
   conversationId: QualifiedId,

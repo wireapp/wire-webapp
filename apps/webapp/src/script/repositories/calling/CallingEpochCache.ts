@@ -17,7 +17,7 @@
  *
  */
 
-import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
 
 export type CallingEpochData = {
   serializedConversationId: string;

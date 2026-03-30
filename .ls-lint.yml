@@ -313,3 +313,19 @@ ls:
   libraries/core/src/test:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/conversation/assetService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/conversationMapper:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/messageTimer:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/subconversationService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase

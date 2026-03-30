@@ -17,4 +17,4 @@
  *
  */
 
-export * from './AssetService';
+export * from './messageTimer';

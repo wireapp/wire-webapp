@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageTimer} from './MessageTimer';
+import {MessageTimer} from './messageTimer';
 
 describe('TimerService', () => {
   describe('"getMessageTimer"', () => {
