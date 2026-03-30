@@ -262,6 +262,39 @@ test.describe('Guestroom', () => {
     },
   );
 
+  [
+    {
+      description: 'I want to see the Allow Guests toggle in Linear Group Creation flow',
+      tag: '@TC-3326',
+    },
+    {
+      description: 'I want to see guest toggle being ON by default in linear group creation',
+      tag: '@TC-3327',
+    },
+  ].forEach(({description, tag}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const ownerPage = await createPage(withLogin(userA));
+      const ownerPages = PageManager.from(ownerPage).webapp.pages;
+
+      // UserA sees allow guests toggle is ON on group creation page
+      await ownerPages.conversationList().clickCreateGroup();
+      await expect(ownerPages.groupCreation().questsToggle).toHaveAttribute('data-uie-value', 'checked');
+
+      await ownerPages.groupCreation().setGroupName(groupName);
+      await ownerPages.groupCreation().selectGroupMembers(userC.username);
+      await ownerPages.groupCreation().clickCreateGroupButton();
+
+      await ownerPages.conversationList().openConversation(groupName);
+      await ownerPages.conversation().toggleGroupInformation();
+
+      // UserA sees guest options label shows ON in conversation details
+      await expect(ownerPages.conversationDetails().guestOptionsButton).toContainText('On');
+      // UserA confirms allow guests toggle is ON in guest options
+      await ownerPages.conversationDetails().openQuestOptions();
+      await expect(ownerPages.guestOptions().guestsToggle).toHaveAttribute('data-uie-value', 'checked');
+    });
+  });
+
   test(
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
