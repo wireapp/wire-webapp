@@ -21,10 +21,10 @@ import {User} from 'Repositories/entity/User';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {getLogger} from 'Util/logger';
 
-import {ProgressCallback, FileData, Filename, FileDescriptor, Metadata} from './Backup.types';
-import {BackupService} from './BackupService';
-import {exportTable} from './CrossPlatformBackup';
-import {CancelError, DifferentAccountError, IncompatiblePlatformError, InvalidMetaDataError} from './Error';
+import {ProgressCallback, FileData, Filename, FileDescriptor, Metadata} from './backup.types';
+import {BackupService} from './backupService';
+import {exportTable} from './crossPlatformBackup';
+import {CancelError, DifferentAccountError, IncompatiblePlatformError, InvalidMetaDataError} from './error';
 import {preprocessConversations, preprocessEvents, preprocessUsers} from './recordPreprocessors';
 
 const logger = getLogger('wire:backup:LegacyBackup');

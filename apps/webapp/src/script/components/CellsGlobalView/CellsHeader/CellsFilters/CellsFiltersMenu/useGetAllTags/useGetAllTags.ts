@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
   const [tags, setTags] = useState<string[]>([]);

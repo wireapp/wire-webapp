@@ -32,10 +32,10 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
-import {ConnectionEntity} from './ConnectionEntity';
-import {ConnectionRepository} from './ConnectionRepository';
-import {ConnectionService} from './ConnectionService';
-import {ConnectionState} from './ConnectionState';
+import {ConnectionEntity} from './connectionEntity';
+import {ConnectionRepository} from './connectionRepository';
+import {ConnectionService} from './connectionService';
+import {ConnectionState} from './connectionState';
 
 function buildConnectionRepository() {
   const connectionState = new ConnectionState();

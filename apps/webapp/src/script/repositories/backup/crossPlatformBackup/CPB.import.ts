@@ -24,8 +24,8 @@ import {ImportHistoryToDatabaseParams} from './CPB.types';
 import {mapConversationRecord, mapUserRecord} from './importMappers';
 import {mapEventRecord} from './importMappers/mapEventRecord';
 
-import {FileDescriptor, Filename} from '../Backup.types';
-import {DifferentAccountError, IncompatibleBackupError, IncompatibleBackupFormatError, InvalidPassword} from '../Error';
+import {FileDescriptor, Filename} from '../backup.types';
+import {DifferentAccountError, IncompatibleBackupError, IncompatibleBackupFormatError, InvalidPassword} from '../error';
 
 import {CPBLogger, peekCrossPlatformData} from '.';
 

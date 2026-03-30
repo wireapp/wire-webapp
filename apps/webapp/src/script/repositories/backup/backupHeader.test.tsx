@@ -19,7 +19,7 @@
 
 import sodium from 'libsodium-wrappers-sumo';
 
-import {BackUpHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './BackUpHeader';
+import {BackUpHeader, ENCRYPTED_BACKUP_FORMAT, ENCRYPTED_BACKUP_VERSION} from './backUpHeader';
 
 describe('BackUpHeader', () => {
   let backUpHeader: BackUpHeader;

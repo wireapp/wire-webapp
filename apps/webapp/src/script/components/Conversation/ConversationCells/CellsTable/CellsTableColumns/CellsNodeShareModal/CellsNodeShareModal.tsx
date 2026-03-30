@@ -24,7 +24,7 @@ import {serializeShareModalInput} from 'Components/Cells/ShareModal/shareModalSe
 import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpirationToggle';
 import {useCellPasswordToggle} from 'Components/Cells/ShareModal/useCellPasswordToggle';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 

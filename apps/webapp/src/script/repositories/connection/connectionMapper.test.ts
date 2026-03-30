@@ -19,7 +19,7 @@
 
 import {Connection, ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 
-import {ConnectionMapper} from './ConnectionMapper';
+import {ConnectionMapper} from './connectionMapper';
 
 describe('ConnectionMapper', () => {
   describe('mapConnectionFromJson', () => {

@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ROLE as TEAM_ROLE} from 'Repositories/user/UserPermission';
 import {t} from 'Util/localizerUtil';
 import {clamp} from 'Util/numberUtil';
