@@ -54,7 +54,7 @@ module.exports = defineConfig({
       mode: 'on-first-retry',
       snapshots: false,
       sources: false,
-      attachments: true,
+      attachments: false,
     },
     screenshot: 'only-on-failure',
     permissions: ['camera', 'microphone'],
