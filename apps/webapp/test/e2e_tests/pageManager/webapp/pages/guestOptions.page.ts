@@ -70,6 +70,7 @@ export const GuestOptionsPage = (page: Page) => {
     createLink,
     revokeLink,
     toggleQuests,
+    guestsToggle,
     passwordSecuredRadioButton,
     createLinkButton,
     guestLink,
