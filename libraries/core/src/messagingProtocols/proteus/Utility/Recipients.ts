@@ -23,7 +23,7 @@ import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {getConversationQualifiedMembers} from '../../../conversation/ConversationService/Utility/getConversationQualifiedMembers';
-import {flattenUserMap, nestUsersList} from '../../../conversation/message/UserClientsUtil';
+import {flattenUserMap, nestUsersList} from '../../../conversation/message/userClientsUtil';
 import {isQualifiedUserClients} from '../../../util';
 
 function toQualifiedUserClients(publicClients: QualifiedUserClientMap): QualifiedUserClients {

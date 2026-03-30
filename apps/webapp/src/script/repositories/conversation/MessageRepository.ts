@@ -38,9 +38,9 @@ import {
   MultiPartContent,
   TextContent,
 } from '@wireapp/core/lib/conversation/content';
-import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
-import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
-import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
+import * as MessageBuilder from '@wireapp/core/lib/conversation/message/messageBuilder';
+import {OtrMessage} from '@wireapp/core/lib/conversation/message/otrMessage';
+import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/textContentBuilder';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';

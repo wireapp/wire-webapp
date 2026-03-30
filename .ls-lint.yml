@@ -332,3 +332,8 @@ ls:
   libraries/core/src/conversation/content:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src/conversation/message:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase

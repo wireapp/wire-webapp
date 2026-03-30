@@ -51,7 +51,7 @@ import {
   SendResult,
   ProteusAddUsersResponse,
 } from '../../../conversation';
-import {MessageService} from '../../../conversation/message/MessageService';
+import {MessageService} from '../../../conversation/message/messageService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {HandledEventPayload} from '../../../notification';
 import {handleOtrMessageAdd} from '../EventHandler/events';

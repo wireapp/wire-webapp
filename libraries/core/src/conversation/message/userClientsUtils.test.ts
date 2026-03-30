@@ -17,7 +17,7 @@
  *
  */
 
-import {flattenUserMap, nestUsersList} from './UserClientsUtil';
+import {flattenUserMap, nestUsersList} from './userClientsUtil';
 
 describe('userClientsUtils', () => {
   it('extracts user and data info from qualified payload', () => {

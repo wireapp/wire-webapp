@@ -20,8 +20,8 @@
 import {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-client/lib/event/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Message} from './Message';
-import {MessageSendingState} from './Message.types';
+import {Message} from './message';
+import {MessageSendingState} from './message.types';
 
 import {NotificationSource} from '../../notification';
 import {ConversationContent} from '../content';

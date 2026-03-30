@@ -29,7 +29,7 @@ import * as Long from 'long';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {flattenUserMap} from './UserClientsUtil';
+import {flattenUserMap} from './userClientsUtil';
 
 import type {EncryptionResult, ProteusService} from '../../messagingProtocols/proteus';
 import {isQualifiedIdArray} from '../../util';

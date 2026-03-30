@@ -25,7 +25,7 @@ import {
   TeamUpdateData,
 } from '@wireapp/api-client/lib/team/data';
 
-import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
+import {BasePayloadBundle, PayloadBundleType} from './payloadBundle';
 
 export interface TeamConversationCreateMessage extends BasePayloadBundle {
   content: TeamConversationCreateData;

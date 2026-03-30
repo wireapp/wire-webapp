@@ -27,7 +27,7 @@ import {APIClient} from '@wireapp/api-client';
 
 import {SessionId} from './SessionHandler.types';
 
-import {flattenUserMap} from '../../../../conversation/message/UserClientsUtil';
+import {flattenUserMap} from '../../../../conversation/message/userClientsUtil';
 import {CryptoClient} from '../../ProteusService/CryptoClient';
 
 interface ConstructSessionIdParams {

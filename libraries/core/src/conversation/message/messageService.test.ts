@@ -29,7 +29,7 @@ import {v4 as uuidv4} from 'uuid';
 import {APIClient} from '@wireapp/api-client';
 import {GenericMessage, Text} from '@wireapp/protocol-messaging';
 
-import {MessageService} from './MessageService';
+import {MessageService} from './messageService';
 
 import {
   buildProteusService,

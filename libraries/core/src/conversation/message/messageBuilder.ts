@@ -45,6 +45,7 @@ import {
   InCallHandRaise,
 } from '@wireapp/protocol-messaging';
 
+import {MessageToProtoMapper} from './messageToProtoMapper';
 import {
   ButtonActionConfirmationMessage,
   ButtonActionMessage,
@@ -62,12 +63,11 @@ import {
   PingMessage,
   ReactionMessage,
   TextMessage,
-} from './OtrMessage';
+} from './otrMessage';
 
 import {AssetTransferState} from '../AssetTransferState';
 import {MultiPartContent, TextContent} from '../content';
 import {GenericMessageType} from '../GenericMessageType';
-import {MessageToProtoMapper} from '../message/MessageToProtoMapper';
 
 export function createId() {
   return uuidv4();

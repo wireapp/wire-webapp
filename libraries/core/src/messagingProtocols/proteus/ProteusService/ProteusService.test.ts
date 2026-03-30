@@ -31,7 +31,7 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 
 import {AddUsersFailureReasons, MessageSendingState, MessageTargetMode} from '../../../conversation';
-import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
+import {buildTextMessage} from '../../../conversation/message/messageBuilder';
 import {SendProteusMessageParams} from './ProteusService.types';
 import {buildProteusService, cleanupProteusServiceMocks} from './ProteusService.mocks';
 import {constructSessionId} from '../Utility/SessionHandler';

@@ -24,8 +24,8 @@ import {UserConnectionData} from '@wireapp/api-client/lib/user/data';
 import {UserMapper} from './userMapper';
 
 import {MessageSendingState} from '../conversation';
-import {PayloadBundleType} from '../conversation/message/PayloadBundle';
-import {UserConnectionMessage} from '../conversation/message/UserMessage';
+import {PayloadBundleType} from '../conversation/message/payloadBundle';
+import {UserConnectionMessage} from '../conversation/message/userMessage';
 import {NotificationSource} from '../notification';
 
 describe('UserMapper', () => {

@@ -17,7 +17,7 @@
  *
  */
 
-import {BasePayloadBundle, PayloadBundleType} from './PayloadBundle';
+import {BasePayloadBundle, PayloadBundleType} from './payloadBundle';
 
 import {
   AssetContent,
