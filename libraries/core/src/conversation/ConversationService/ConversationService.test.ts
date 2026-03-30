@@ -51,9 +51,9 @@ import {MLSServiceEvents} from '../../messagingProtocols/mls/MLSService/MLSServi
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import {openDB} from '../../storage/coreDb';
-import * as PayloadHelper from '../../test/PayloadHelper';
+import * as PayloadHelper from '../../test/payloadHelper';
 import * as MessageBuilder from '../message/MessageBuilder';
-import {SubconversationService} from '../SubconversationService/SubconversationService';
+import {SubconversationService} from '../subconversationService/subconversationService';
 
 const createMLSMessageAddEventMock = (
   conversationId: QualifiedId,

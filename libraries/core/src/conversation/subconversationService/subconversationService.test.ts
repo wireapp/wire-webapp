@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {SubconversationService} from './SubconversationService';
+import {SubconversationService} from './subconversationService';
 
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {openDB} from '../../storage/coreDb';

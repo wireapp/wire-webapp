@@ -58,7 +58,7 @@ import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
 import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
-import {SubconversationService} from './conversation/SubconversationService/SubconversationService';
+import {SubconversationService} from './conversation/subconversationService/subconversationService';
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {CoreCryptoConfig} from './messagingProtocols/common.types';

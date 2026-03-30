@@ -21,7 +21,7 @@ import {v4 as uuidv4} from 'uuid';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {AssetService} from './AssetService';
+import {AssetService} from './assetService';
 
 describe('AssetService', () => {
   describe('"uploadAsset"', () => {

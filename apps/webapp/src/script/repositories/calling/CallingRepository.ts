@@ -24,7 +24,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
 import {TaskScheduler} from '@wireapp/core/lib/util';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {amplify} from 'amplify';

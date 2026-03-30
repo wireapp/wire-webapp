@@ -75,7 +75,7 @@ import {CoreDatabase} from '../../storage/coreDb';
 import {isMLSConversation} from '../../util';
 import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/fullyQualifiedClientIdUtils';
 import {isSendingMessage, sendMessage} from '../message/messageSender';
-import {SubconversationService} from '../SubconversationService/SubconversationService';
+import {SubconversationService} from '../subconversationService/subconversationService';
 
 type Events = {
   MLSConversationRecovered: {conversationId: QualifiedId};
