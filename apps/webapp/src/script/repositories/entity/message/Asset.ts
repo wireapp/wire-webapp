@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetType} from 'Repositories/assets/AssetType';
+import {AssetType} from 'Repositories/assets/assetType';
 
 import type {FileAsset} from './FileAsset';
 import type {Location as LocationAsset} from './Location';

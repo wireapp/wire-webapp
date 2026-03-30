@@ -33,6 +33,7 @@
     "sharedGlobals": []
   },
   "defaultProject": "webapp",
+  "neverConnectToCloud": true,
   "release": {
     "projects": ["tag:npm:public"],
     "projectsRelationship": "independent",

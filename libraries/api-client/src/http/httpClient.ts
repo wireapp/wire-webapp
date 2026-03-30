@@ -49,7 +49,13 @@ import {sendRequestWithCookie} from '../shims/node/cookie';
 enum TOPIC {
   ON_CONNECTION_STATE_CHANGE = 'HttpClient.TOPIC.ON_CONNECTION_STATE_CHANGE',
   ON_INVALID_TOKEN = 'HttpClient.TOPIC.ON_INVALID_TOKEN',
+  ON_LONG_RUNNING_RETRY = 'HttpClient.TOPIC.ON_LONG_RUNNING_RETRY',
 }
+
+export type LongRunningRetryDetails = {
+  readonly retryCount: number;
+  readonly retryDurationInMilliseconds: number;
+};
 
 type SendRequest = {
   config: AxiosRequestConfig;
@@ -70,9 +76,12 @@ export interface HttpClient {
   on(event: TOPIC.ON_CONNECTION_STATE_CHANGE, listener: (state: ConnectionState) => void): this;
 
   on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError | MissingCookieError) => void): this;
+
+  on(event: TOPIC.ON_LONG_RUNNING_RETRY, listener: (retryDetails: LongRunningRetryDetails) => void): this;
 }
 
 const FILE_SIZE_100_MB = 104857600;
+const longRunningRetryThresholdInMilliseconds = TimeUtil.TimeInMillis.MINUTE;
 
 export class HttpClient extends EventEmitter {
   public readonly client: AxiosInstance;
@@ -84,6 +93,7 @@ export class HttpClient extends EventEmitter {
   private incrementalRetryBackoffResetAbortController = new AbortController();
   private incrementalRetryBackoffResetCount = 0;
   private incrementalRetryBackoffState: IncrementalRetryBackoffState;
+  private hasReportedLongRunningRetry = false;
   public static readonly TOPIC = TOPIC;
   private versionPrefix = '';
 
@@ -173,8 +183,25 @@ export class HttpClient extends EventEmitter {
   public resetRetryBackoff(): void {
     this.incrementalRetryBackoffResetCount += 1;
     this.incrementalRetryBackoffState = this.incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
+    this.hasReportedLongRunningRetry = false;
     this.incrementalRetryBackoffResetAbortController.abort();
     this.incrementalRetryBackoffResetAbortController = new AbortController();
+  }
+
+  private reportLongRunningRetryIfNeeded(nextIncrementalRetryBackoffState: IncrementalRetryBackoffState): void {
+    if (this.hasReportedLongRunningRetry) {
+      return;
+    }
+
+    if (nextIncrementalRetryBackoffState.totalRetryDelayInMilliseconds < longRunningRetryThresholdInMilliseconds) {
+      return;
+    }
+
+    this.hasReportedLongRunningRetry = true;
+    this.emit(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, {
+      retryCount: nextIncrementalRetryBackoffState.retryCount,
+      retryDurationInMilliseconds: nextIncrementalRetryBackoffState.totalRetryDelayInMilliseconds,
+    });
   }
 
   private getIncrementalRetryBackoffAbortSignal(abortController?: AbortController): Maybe<AbortSignal> {
@@ -364,6 +391,9 @@ export class HttpClient extends EventEmitter {
       },
       isRequestAborted: () => {
         return abortController?.signal.aborted === true;
+      },
+      onIncrementalRetryBackoffStateChanged: nextIncrementalRetryBackoffState => {
+        this.reportLongRunningRetryIfNeeded(nextIncrementalRetryBackoffState);
       },
       runRequestAttempt,
       setIncrementalRetryBackoffState: nextIncrementalRetryBackoffState => {

@@ -36,16 +36,16 @@ import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
-import {BackupRepository} from 'Repositories/backup/BackupRepository';
-import {BackupService} from 'Repositories/backup/BackupService';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
+import {BackupRepository} from 'Repositories/backup/backupRepository';
+import {BackupService} from 'Repositories/backup/backupService';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ClientRepository, ClientService} from 'Repositories/client';
 import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
-import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
-import {ConnectionService} from 'Repositories/connection/ConnectionService';
+import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
+import {ConnectionService} from 'Repositories/connection/connectionService';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationService} from 'Repositories/conversation/ConversationService';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -171,6 +171,7 @@ export class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
+    private readonly isCountlyIncrementalBackoffRetryReportingEnabled: boolean = false,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -294,7 +295,11 @@ export class App {
       serverTimeHandler,
     );
 
-    repositories.eventTracker = new EventTrackingRepository(repositories.message);
+    repositories.eventTracker = new EventTrackingRepository(
+      repositories.message,
+      this.apiClient,
+      this.isCountlyIncrementalBackoffRetryReportingEnabled,
+    );
 
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
 

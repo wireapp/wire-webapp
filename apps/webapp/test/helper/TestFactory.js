@@ -28,15 +28,15 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/'
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientRepository} from 'Repositories/client/ClientRepository';
 import {ClientService} from 'Repositories/client/ClientService';
 import {ClientState} from 'Repositories/client/ClientState';
-import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
-import {ConnectionService} from 'Repositories/connection/ConnectionService';
+import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
+import {ConnectionService} from 'Repositories/connection/connectionService';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationService} from 'Repositories/conversation/ConversationService';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

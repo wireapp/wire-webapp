@@ -19,7 +19,7 @@
 
 import {amplify} from 'amplify';
 
-import {CacheRepository} from 'Repositories/cache/CacheRepository';
+import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import {createUuid} from 'Util/uuid';
 

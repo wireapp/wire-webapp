@@ -19,13 +19,13 @@
 
 import {container} from 'tsyringe';
 
-import type {AssetRepository} from 'Repositories/assets/AssetRepository';
-import type {AudioRepository} from 'Repositories/audio/AudioRepository';
-import type {BackupRepository} from 'Repositories/backup/BackupRepository';
+import type {AssetRepository} from 'Repositories/assets/assetRepository';
+import type {AudioRepository} from 'Repositories/audio/audioRepository';
+import type {BackupRepository} from 'Repositories/backup/backupRepository';
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {ClientRepository} from 'Repositories/client';
-import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';

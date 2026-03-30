@@ -65,6 +65,9 @@ export const EventName = {
     BACKUP_CREATED: 'history.backup_created',
     BACKUP_CANCELLED: 'history.backup_cancelled',
   },
+  CONNECTIVITY: {
+    RETRYING_FOR_ONE_MINUTE: 'connectivity.retrying_for_one_minute',
+  },
   INPUT: {
     FORMAT_TEXT: {
       ENABLED: 'input.rich_text_editor.enabled',

@@ -26,9 +26,9 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {ClientEntity} from 'Repositories/client';
-import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';

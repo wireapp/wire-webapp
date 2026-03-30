@@ -17,7 +17,7 @@
  *
  */
 
-import {AudioType} from 'Repositories/audio/AudioType';
+import {AudioType} from 'Repositories/audio/audioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withConnectedUser, withLogin, expect} from 'test/e2e_tests/test.fixtures';

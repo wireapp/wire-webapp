@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
-import {ConnectionEntity} from './ConnectionEntity';
+import {ConnectionEntity} from './connectionEntity';
 
 @singleton()
 export class ConnectionState {

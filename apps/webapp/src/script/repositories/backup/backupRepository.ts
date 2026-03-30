@@ -31,10 +31,10 @@ import {Logger, getLogger} from 'Util/logger';
 import {constructUserPrimaryKey} from 'Util/storageUtil';
 import {WebWorker} from 'Util/worker';
 
-import {ProgressCallback, Filename, FileDescriptor} from './Backup.types';
-import {BackUpHeader, ERROR_TYPES} from './BackUpHeader';
-import {BackupService} from './BackupService';
-import {exportCPBHistoryFromDatabase, importCPBHistoryToDatabase, isCPBackup} from './CrossPlatformBackup';
+import {ProgressCallback, Filename, FileDescriptor} from './backup.types';
+import {BackUpHeader, ERROR_TYPES} from './backUpHeader';
+import {BackupService} from './backupService';
+import {exportCPBHistoryFromDatabase, importCPBHistoryToDatabase, isCPBackup} from './crossPlatformBackup';
 import {
   CancelError,
   DifferentAccountError,
@@ -46,8 +46,8 @@ import {
   IncompatibleBackupFormatError,
   InvalidPassword,
   isErrorOfType,
-} from './Error';
-import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './LegacyBackup.helper';
+} from './error';
+import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './legacyBackup.helper';
 
 import {Config} from '../../Config';
 

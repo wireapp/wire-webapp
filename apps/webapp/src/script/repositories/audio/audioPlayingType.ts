@@ -17,7 +17,7 @@
  *
  */
 
-import {AudioType} from './AudioType';
+import {AudioType} from './audioType';
 
 interface AudioPlayingType {
   MUTED: AudioType[];
