@@ -211,7 +211,7 @@ export class ConversationDetailsPage {
     await this.blockConversationButton.click();
   }
 
-  async openQuestOptions() {
+  async openGuestOptions() {
     await this.guestOptionsButton.click();
   }
 
