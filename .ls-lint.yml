@@ -342,3 +342,8 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/utility:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase

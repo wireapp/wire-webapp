@@ -22,7 +22,7 @@ import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib
 
 import {APIClient} from '@wireapp/api-client';
 
-import {constructSessionId, initSession, initSessions} from './SessionHandler';
+import {constructSessionId, initSession, initSessions} from './sessionHandler';
 
 import {CryptoClient} from '../../ProteusService/CryptoClient';
 

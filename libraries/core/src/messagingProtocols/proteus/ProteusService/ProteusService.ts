@@ -55,15 +55,15 @@ import {MessageService} from '../../../conversation/message/messageService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {HandledEventPayload} from '../../../notification';
 import {handleOtrMessageAdd} from '../EventHandler/events';
-import {getGenericMessageParams} from '../Utility/getGenericMessageParams';
-import {isClearFromMismatch} from '../Utility/isClearFromMismatch';
+import {getGenericMessageParams} from '../utility/getGenericMessageParams';
+import {isClearFromMismatch} from '../utility/isClearFromMismatch';
 import {
   buildEncryptedPayloads,
   constructSessionId,
   deleteSession,
   initSession,
   initSessions,
-} from '../Utility/SessionHandler';
+} from '../utility/sessionHandler';
 
 export type EncryptionResult = {
   /** the encrypted payloads for the clients that have a valid sessions */

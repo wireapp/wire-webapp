@@ -17,4 +17,4 @@
  *
  */
 
-export * from './SessionHandler';
+export * from './sessionHandler';

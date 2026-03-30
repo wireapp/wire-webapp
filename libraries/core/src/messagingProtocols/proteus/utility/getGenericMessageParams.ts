@@ -23,8 +23,8 @@ import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {getRecipientsForConversation} from './Recipients';
-import {extractQualifiedUserIds} from './UserIds';
+import {getRecipientsForConversation} from './recipients';
+import {extractQualifiedUserIds} from './userIds';
 
 import {MessageTargetMode, MessageSendingOptions} from '../../../conversation';
 import {isQualifiedUserClients} from '../../../util';
