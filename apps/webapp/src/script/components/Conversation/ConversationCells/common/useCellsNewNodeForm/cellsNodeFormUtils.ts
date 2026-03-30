@@ -34,6 +34,12 @@ export const getNameValidationError = (name: string): string | null => {
 
 export const getErrorStatus = (error: unknown): number | undefined => {
   return Maybe.of(error)
-    .map(caughtError => (isAxiosError(caughtError) ? caughtError.response?.status : undefined))
+    .andThen(caughtError => {
+      if (!isAxiosError(caughtError)) {
+        return Maybe.nothing();
+      }
+
+      return Maybe.of(caughtError.response?.status);
+    })
     .unwrapOr(undefined);
 };
