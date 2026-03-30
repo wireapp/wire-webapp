@@ -20,7 +20,7 @@
 import {Article, Asset, LinkPreview, Mention, Quote, Text, Tweet} from '@wireapp/protocol-messaging';
 
 import {EditedTextContent, LinkPreviewUploadedContent, TextContent} from '../content';
-import {GenericMessageType} from '../GenericMessageType';
+import {GenericMessageType} from '../genericMessageType';
 
 export class MessageToProtoMapper {
   static mapLinkPreviews(linkPreviews: LinkPreviewUploadedContent[]): LinkPreview[] {

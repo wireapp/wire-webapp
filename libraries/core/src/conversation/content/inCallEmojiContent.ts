@@ -17,7 +17,7 @@
  *
  */
 
-import {InCallEmojiType} from '../InCallEmojiType';
+import {InCallEmojiType} from '../inCallEmojiType';
 
 export interface InCallEmojiContent {
   emojis: InCallEmojiType;

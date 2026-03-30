@@ -65,9 +65,9 @@ import {
   TextMessage,
 } from './otrMessage';
 
-import {AssetTransferState} from '../AssetTransferState';
+import {AssetTransferState} from '../assetTransferState';
 import {MultiPartContent, TextContent} from '../content';
-import {GenericMessageType} from '../GenericMessageType';
+import {GenericMessageType} from '../genericMessageType';
 
 export function createId() {
   return uuidv4();
