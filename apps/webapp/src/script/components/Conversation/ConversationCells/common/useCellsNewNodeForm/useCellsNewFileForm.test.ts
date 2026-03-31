@@ -38,6 +38,7 @@ describe('useCellsNewFileForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCellsRepository = {
+      checkFileAlreadyExists: jest.fn().mockResolvedValue(false),
       createFile: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<CellsRepository>;
     onSuccess = jest.fn();
@@ -96,6 +97,24 @@ describe('useCellsNewFileForm', () => {
     });
 
     expect(result.current.error).toBe('cells.newItemMenuModalForm.alreadyExistsError');
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('shows already-exists error when precheck reports a duplicate', async () => {
+    mockCellsRepository.checkFileAlreadyExists.mockResolvedValueOnce(true);
+
+    const {result} = renderUseCellsNewFileForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'New file'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe('cells.newItemMenuModalForm.alreadyExistsError');
+    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
     expect(onSuccess).not.toHaveBeenCalled();
   });
 

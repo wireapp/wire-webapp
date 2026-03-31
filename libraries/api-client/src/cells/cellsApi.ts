@@ -192,6 +192,29 @@ export class CellsAPI {
     return result.data;
   }
 
+  async checkNodeCreation({
+    path,
+    uuid,
+    versionId,
+    type,
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: string;
+    versionId: string;
+    type: RestIncomingNode['Type'];
+  }): Promise<RestCreateCheckResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.createCheck({
+      Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
+      FindAvailablePath: false,
+    });
+
+    return result.data;
+  }
+
   async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestPromoteVersionResponse> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
