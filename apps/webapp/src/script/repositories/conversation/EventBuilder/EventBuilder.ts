@@ -26,7 +26,7 @@ import {
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
-import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
+import {ReactionType} from '@wireapp/core/lib/conversation/reactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/decryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
