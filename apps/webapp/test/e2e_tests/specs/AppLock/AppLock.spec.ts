@@ -127,6 +127,27 @@ test.describe('AppLock', () => {
   );
 
   test(
+    'I want to wipe database when I forgot my app lock passphrase',
+    {tag: ['@TC-2761', '@regression']},
+    async ({createPage}) => {
+      const page = await createPage(withLogin(memberA));
+      const pageManager = PageManager.from(page);
+      const {pages, modals} = PageManager.from(page).webapp;
+      await handleAppLockState(pageManager, appLockPassCode);
+
+      await page.reload();
+      await modals.appLock().clickForgotPassphrase();
+      await modals.appLock().clickWipeDB();
+      await modals.appLock().clickReset();
+      await modals.appLock().inputUserPassword(memberA.password);
+
+      // After redirect to login page verify the whole indexDB was cleared
+      await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
+      await expect.poll(() => page.evaluate(() => indexedDB.databases())).toHaveLength(0);
+    },
+  );
+
+  test(
     'I should not be able to switch off app lock if it is enforced for the team',
     {tag: ['@TC-2770', '@TC-2767', '@regression']},
     async ({createPage}) => {
