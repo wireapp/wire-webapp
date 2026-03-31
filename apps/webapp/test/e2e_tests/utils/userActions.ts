@@ -95,6 +95,18 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
   await modals.userProfile().clickConnectButton();
 }
 
+export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
+  const {modals} = pageManager.webapp;
+  const appLockModal = modals.appLock();
+  if (await appLockModal.isVisible()) {
+    if (await appLockModal.lockPasscodeInput.isVisible()) {
+      await appLockModal.setPasscode(appLockPassCode);
+    } else {
+      await appLockModal.unlockAppWithPasscode(appLockPassCode);
+    }
+  }
+};
+
 /**
  * @param testInfo is needed to create unique backup filename
  */

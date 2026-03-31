@@ -153,12 +153,12 @@ test.describe('AppLock', () => {
     const {components, pages, modals} = pageManager.webapp;
 
     await components.conversationSidebar().clickPreferencesButton();
-    await pages.account().toggleAppLock();
+    await pages.account().appLockCheckboxLabel.click();
     await handleAppLockState(pageManager, appLockPassCode);
 
-    await pages.account().toggleAppLock();
+    await pages.account().appLockCheckboxLabel.click();
 
-    await modals.removeMember().clickConfirm();
+    await modals.confirm().actionButton.click();
     await expect(pages.account().appLockCheckbox).not.toBeChecked();
   });
 

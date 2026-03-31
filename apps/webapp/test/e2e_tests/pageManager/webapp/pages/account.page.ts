@@ -23,6 +23,8 @@ export class AccountPage {
   private readonly page: Page;
 
   readonly sendUsageDataCheckbox: Locator;
+  readonly appLockCheckboxLabel: Locator;
+  readonly appLockCheckbox: Locator;
   readonly deleteAccountButton: Locator;
   readonly backUpButton: Locator;
   readonly backupFileInput: Locator;
@@ -44,6 +46,8 @@ export class AccountPage {
     this.page = page;
 
     this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
+    this.appLockCheckboxLabel = page.locator("[data-uie-name='status-preference-applock']+label");
+    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']");
     this.deleteAccountButton = page.getByTestId('go-delete-account');
     this.backUpButton = page.getByTestId('do-backup-export');
     this.backupFileInput = page.getByTestId('input-import-file');
