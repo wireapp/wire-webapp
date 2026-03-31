@@ -1537,7 +1537,6 @@ export class CallingRepository {
     const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
       conversationId,
       conversation.groupId,
-      true,
     );
 
     if (!subconversationEpochInfo) {
