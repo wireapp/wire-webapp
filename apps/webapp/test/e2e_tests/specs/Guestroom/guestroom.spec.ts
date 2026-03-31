@@ -289,6 +289,39 @@ test.describe('Guestroom', () => {
   });
 
   test(
+    'I want to see a system message when wireless guest has joined or left',
+    {tag: ['@TC-3334', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
+
+      const ownerPages = PageManager.from(userAPage).webapp.pages;
+      const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
+
+      await createGroup(ownerPages, groupName, []);
+      createdLink = await generateGroupGuestsLink(ownerPages, groupName);
+
+      await guestPage.goto(createdLink.toString());
+      await guestPages.conversationJoin().joinBrowserButton.click();
+      await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+      await guestPages.login().login(guestUser);
+      await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+
+      await expect(
+        ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.fullName} joined`}),
+      ).toBeVisible();
+
+      await guestPages.conversation().toggleGroupInformation();
+      await guestPages.conversation().leaveConversation();
+      await guestModals.leaveConversation().clickConfirm();
+
+      await expect(
+        ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.fullName} left`}),
+      ).toBeVisible();
+    },
+  );
+
+  test(
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
     async ({createPage}) => {
