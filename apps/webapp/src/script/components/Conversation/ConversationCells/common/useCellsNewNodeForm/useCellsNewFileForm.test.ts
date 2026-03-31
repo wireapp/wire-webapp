@@ -32,6 +32,8 @@ describe('useCellsNewFileForm', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
+  const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockCellsRepository = {
@@ -40,8 +42,8 @@ describe('useCellsNewFileForm', () => {
     onSuccess = jest.fn();
   });
 
-  const setup = () => {
-    const {result} = renderHook(() =>
+  const renderUseCellsNewFileForm = () =>
+    renderHook(() =>
       useCellsNewFileForm({
         fileType: 'document',
         cellsRepository: mockCellsRepository,
@@ -51,16 +53,89 @@ describe('useCellsNewFileForm', () => {
       }),
     );
 
-    return {
-      result,
-      createNodeMock: mockCellsRepository.createFile,
-      onSuccess,
-    };
-  };
+  it('shows an error when name is empty', async () => {
+    const {result} = renderUseCellsNewFileForm();
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe('cells.newItemMenuModalForm.nameRequired');
+    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
+  });
+
+  it('does not submit when name validation fails', async () => {
+    const {result} = renderUseCellsNewFileForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'file/name'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe('cells.newItemMenuModalForm.invalidCharactersError');
+    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
+  });
+
+  it('maps 409 responses to already-exists error', async () => {
+    mockCellsRepository.createFile.mockRejectedValueOnce({
+      response: {status: 409},
+    });
+
+    const {result} = renderUseCellsNewFileForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'New file'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe('cells.newItemMenuModalForm.alreadyExistsError');
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('maps non-409 failures to generic error', async () => {
+    mockCellsRepository.createFile.mockRejectedValueOnce(new Error('network error'));
+
+    const {result} = renderUseCellsNewFileForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'New file'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe('cells.newItemMenuModalForm.genericError');
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  it('trims the name and appends extension before create call', async () => {
+    const {result} = renderUseCellsNewFileForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: ' New file '}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New file.docx',
+      }),
+    );
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
 
   it('appends selected file type extension when a mismatched extension is provided', async () => {
-    const {result} = setup();
-    const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
+    const {result} = renderUseCellsNewFileForm();
 
     act(() => {
       result.current.handleChange({currentTarget: {value: 'doc124.ppt'}} as ChangeEvent<HTMLInputElement>);
@@ -70,8 +145,11 @@ describe('useCellsNewFileForm', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(mockCellsRepository.createFile).toHaveBeenCalledWith(expect.objectContaining({name: 'doc124.ppt.docx'}));
+    expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'doc124.ppt.docx',
+      }),
+    );
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
-
 });

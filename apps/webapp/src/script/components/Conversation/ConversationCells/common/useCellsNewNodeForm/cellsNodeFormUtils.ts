@@ -26,6 +26,7 @@ export const ITEM_ALREADY_EXISTS_ERROR = 409;
 export const NODE_NAME_MAX_LENGTH = 64;
 
 const INVALID_NODE_NAME_PATTERN = /[\\/"]/u;
+const LEADING_DOT_PATTERN = /^\./u;
 
 export const getNameValidationError = (name: string): Maybe<string> => {
   if (!name) {
@@ -45,7 +46,7 @@ export const getClientSideNodeNameError = (name: string): Maybe<string> => {
     return Maybe.just(t('cells.newItemMenuModalForm.maxLengthError'));
   }
 
-  if (name.startsWith('.') || INVALID_NODE_NAME_PATTERN.test(name)) {
+  if (LEADING_DOT_PATTERN.test(name) || INVALID_NODE_NAME_PATTERN.test(name)) {
     return Maybe.just(t('cells.newItemMenuModalForm.invalidCharactersError'));
   }
 
