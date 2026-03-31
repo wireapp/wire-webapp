@@ -3,15 +3,15 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {
   test,
   expect,
-  withConnectedUser,
   withLogin,
   Team,
   LOGIN_TIMEOUT,
+  withGuestUser,
   withConnectionRequest,
 } from 'test/e2e_tests/test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-const generateGroupGuestLink = async (pages: PageManager['webapp']['pages'], groupName: string, password?: string) => {
+const generateGroupGuestsLink = async (pages: PageManager['webapp']['pages'], groupName: string, password?: string) => {
   await pages.conversationList().openConversation(groupName);
   await pages.conversation().toggleGroupInformation();
   await pages.conversationDetails().openGuestOptions();
@@ -22,16 +22,14 @@ const generateGroupGuestLink = async (pages: PageManager['webapp']['pages'], gro
 test.describe('Guestroom', () => {
   let team: Team;
   let userA: User;
-  let userB: User;
-  let userC: User;
+  let guestUser: User;
   let createdLink: string;
   const groupName = 'Guestroom';
   const password = 'Test1234?';
 
   test.beforeEach(async ({createTeam, createUser}) => {
-    userB = await createUser();
-    userC = await createUser();
-    team = await createTeam('Test Team', {users: [userC]});
+    guestUser = await createUser();
+    team = await createTeam('Test Team');
     userA = team.owner;
   });
 
@@ -39,17 +37,14 @@ test.describe('Guestroom', () => {
     'I want to join a conversation through password secured invite link as existing user',
     {tag: ['@TC-8140', '@regression']},
     async ({createPage}) => {
-      const [userAPage, guestPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userC)),
-        createPage(),
-      ]);
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
 
       const {pages: guestPages, modals: guestBModals} = PageManager.from(guestPage).webapp;
       const {pages} = PageManager.from(userAPage).webapp;
 
       await test.step('User A creates invite link with password for conversation', async () => {
-        await createGroup(pages, groupName, [userC]);
-        createdLink = await generateGroupGuestLink(pages, groupName, password);
+        await createGroup(pages, groupName, []);
+        createdLink = await generateGroupGuestsLink(pages, groupName, password);
       });
 
       await test.step('User B sees error when entering incorrect password', async () => {
@@ -57,7 +52,7 @@ test.describe('Guestroom', () => {
         await guestPages.conversationJoin().joinBrowserButton.click();
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
-        await guestPages.login().login(userB);
+        await guestPages.login().login(guestUser);
         await guestBModals.conversationAccess().joinConversation('WrongPassword');
         await expect(guestBModals.conversationAccess().joinForm).toContainText(
           'Password is incorrect, please try again.',
@@ -73,10 +68,10 @@ test.describe('Guestroom', () => {
   );
 
   test('I want to create a password secured guest link', {tag: ['@TC-8141', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA), withConnectedUser(userC));
+    const userAPage = await createPage(withLogin(userA));
     const {pages, modals} = PageManager.from(userAPage).webapp;
 
-    await createGroup(pages, groupName, [userC]);
+    await createGroup(pages, groupName, []);
     await pages.conversationList().openConversation(groupName);
 
     // UserA sees an error message when trying to create a password secured link with a weak password
@@ -105,11 +100,11 @@ test.describe('Guestroom', () => {
   });
 
   test('I want to revoke a password secured guest link', {tag: ['@TC-8142', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA), withConnectedUser(userC));
+    const userAPage = await createPage(withLogin(userA));
     const {pages} = PageManager.from(userAPage).webapp;
 
-    await createGroup(pages, groupName, [userC]);
-    await generateGroupGuestLink(pages, groupName, password);
+    await createGroup(pages, groupName, []);
+    await generateGroupGuestsLink(pages, groupName, password);
 
     await expect(pages.guestOptions().guestLink).toBeVisible();
     await expect(userAPage.getByText('Link is password secured')).toBeVisible();
@@ -149,31 +144,19 @@ test.describe('Guestroom', () => {
     },
   ].forEach(({description, tag, verify}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const [userAPage, guestPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userC)),
-        createPage(),
-      ]);
+      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
-      const userAPageManager = PageManager.from(userAPage).webapp;
-      const guestPageManager = PageManager.from(guestPage);
-      const {pages: guestPages, modals: guestModals} = guestPageManager.webapp;
-      const {pages} = userAPageManager;
+      await createGroup(pages, groupName, []);
+      createdLink = await generateGroupGuestsLink(pages, groupName);
 
-      await createGroup(pages, groupName, [userC]);
-      createdLink = await generateGroupGuestLink(pages, groupName);
-
-      await guestPage.goto(createdLink.toString());
-      await guestPages.conversationJoin().joinBrowserButton.click();
-      await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
-
-      await guestPages.conversationJoin().joinAsGuest(userB.firstName);
-
-      await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-      await guestModals.confirm().actionButton.click();
-      await expect(guestPages.conversation().conversationTitle).toContainText(groupName);
+      await createPage(withGuestUser(createdLink, guestUser.firstName));
 
       await pages.conversation().toggleGroupInformation();
-      await pages.conversationDetails().openParticipantDetails(userB.firstName);
+      const guestMember = pages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName});
+      // It may take a moment until the login is done and the user joined
+      await expect(guestMember).toBeVisible({timeout: LOGIN_TIMEOUT});
+
+      await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
       await verify(pages);
     });
   });
@@ -183,25 +166,29 @@ test.describe('Guestroom', () => {
     {tag: ['@TC-3318', '@regression']},
     async ({createPage}) => {
       const [ownerPages, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))).then(({webapp}) => webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(({webapp}) => webapp.pages),
+        PageManager.from(createPage(withLogin(userA), withConnectionRequest(guestUser))).then(
+          ({webapp}) => webapp.pages,
+        ),
+        PageManager.from(createPage(withLogin(guestUser))).then(({webapp}) => webapp.pages),
       ]);
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
 
-      await createGroup(ownerPages, groupName, [userB, userC]);
+      await createGroup(ownerPages, groupName, [guestUser]);
       await ownerPages.conversationList().openConversation(groupName);
       await ownerPages.conversation().toggleGroupInformation();
-      await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+      await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.fullName})).toBeVisible();
 
       await ownerPages.conversationDetails().openGuestOptions();
       await ownerPages.guestOptions().toggleGuests();
       await ownerPages.conversation().toggleGroupInformation();
-      await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).not.toBeVisible();
+      await expect(
+        ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.fullName}),
+      ).not.toBeVisible();
 
       await ownerPages.conversationDetails().clickAddPeopleButton();
-      await ownerPages.conversationDetails().searchPeopleInput.fill(userB.fullName);
+      await ownerPages.conversationDetails().searchPeopleInput.fill(guestUser.fullName);
       await expect(ownerPages.conversationDetails().searchList).toContainText(
         'No matching results. Try entering a different name.',
       );
@@ -212,25 +199,28 @@ test.describe('Guestroom', () => {
     'I want to see Wire and Wireless guest(s) are removed when I change the Allow guests from on to off',
     {tag: ['@TC-3322', '@regression']},
     async ({createPage}) => {
-      const [ownerPages, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))).then(({webapp}) => webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(({webapp}) => webapp.pages),
-      ]);
+      const {pages: ownerPages} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
-      await guestPages.conversationList().openPendingConnectionRequest();
-      await guestPages.connectRequest().clickConnectButton();
-
-      await createGroup(ownerPages, groupName, [userB, userC]);
+      await createGroup(ownerPages, groupName, []);
       await ownerPages.conversationList().openConversation(groupName);
 
       await ownerPages.conversation().toggleGroupInformation();
-      await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+      const link = await ownerPages.conversationDetails().createGuestLink();
+      await createPage(withGuestUser(link, guestUser.firstName));
+
+      const guestMember = ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName});
+      // It may take a moment until the login is done and the user joined
+      await expect(guestMember).toBeVisible({timeout: LOGIN_TIMEOUT});
+
+      await expect(
+        ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.firstName} joined`}),
+      ).toBeVisible();
 
       await ownerPages.conversationDetails().openGuestOptions();
       await ownerPages.guestOptions().toggleGuests();
 
       await expect(
-        ownerPages.conversation().systemMessages.filter({hasText: `You removed ${userB.fullName}`}),
+        ownerPages.conversation().systemMessages.filter({hasText: `You removed ${guestUser.firstName}`}),
       ).toBeVisible();
     },
   );
@@ -242,7 +232,7 @@ test.describe('Guestroom', () => {
       const ownerPage = await createPage(withLogin(userA));
       const ownerPages = PageManager.from(ownerPage).webapp.pages;
 
-      await createGroup(ownerPages, groupName, [userC]);
+      await createGroup(ownerPages, groupName, []);
       await ownerPages.conversationList().openConversation(groupName);
       await ownerPages.conversation().toggleGroupInformation();
 
@@ -274,7 +264,6 @@ test.describe('Guestroom', () => {
       await expect(ownerPages.groupCreation().guestsToggle).toHaveAttribute('data-uie-value', 'checked');
 
       await ownerPages.groupCreation().setGroupName(groupName);
-      await ownerPages.groupCreation().selectGroupMembers(userC.username);
       await ownerPages.groupCreation().clickCreateGroupButton();
 
       await ownerPages.conversationList().openConversation(groupName);
@@ -293,50 +282,46 @@ test.describe('Guestroom', () => {
     {tag: ['@TC-3365', '@regression']},
     async ({createPage}) => {
       test.setTimeout(150_000);
-      let createdLink: string;
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userC)),
-        createPage(),
-      ]);
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
-      const userBPageManager = PageManager.from(userBPage);
-      const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
+      const guestPageManager = PageManager.from(guestPage);
+      const {pages: guestPages, modals: guestModals} = guestPageManager.webapp;
       const {pages} = userAPageManager;
 
       await test.step('User A creates invite link', async () => {
-        await createGroup(pages, groupName, [userC]);
-        createdLink = await generateGroupGuestLink(pages, groupName);
+        await createGroup(pages, groupName, []);
+        createdLink = await generateGroupGuestsLink(pages, groupName);
       });
 
       await test.step('User B joins the group using the invitation link', async () => {
-        await userBPage.goto(createdLink.toString());
-        await userBPages.conversationJoin().joinBrowserButton.click();
-        await expect(userBPages.conversationJoin().joinAsGuestButton).toBeVisible();
+        await guestPage.goto(createdLink.toString());
+        await guestPages.conversationJoin().joinBrowserButton.click();
+        await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
         // Add expires_in query parameter to simulate account expiration
-        const joinLink = new URL(userBPage.url());
+        const joinLink = new URL(guestPage.url());
         joinLink.searchParams.set('expires_in', '60');
 
-        await userBPage.goto(joinLink.toString());
-        await userBPages.conversationJoin().joinAsGuest(userB.firstName);
+        await guestPage.goto(joinLink.toString());
+        await guestPages.conversationJoin().joinAsGuest(guestUser.firstName);
       });
 
       await test.step('User B sends a message in the conversation', async () => {
-        await userBPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-        await userBModals.confirm().actionButton.click();
-        await userBPages.conversation().sendMessage('Hello from Guest');
+        await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+        await guestModals.confirm().actionButton.click();
+        await guestPages.conversation().sendMessage('Hello from Guest');
       });
 
       await test.step('User A sees guest details (to trigger access validation) after 1 minute', async () => {
         await pages.conversation().toggleGroupInformation();
         await userAPage.waitForTimeout(60_000);
-        await pages.conversationDetails().openParticipantDetails(userB.firstName);
+        await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
         await expect(pages.participantDetails().userStatus).toBeVisible();
       });
 
       await test.step('User B confirms that he was logged out due to expiration', async () => {
-        await expect(userBPage.getByTestId('status-logout-reason')).toContainText(
+        await expect(guestPage.getByTestId('status-logout-reason')).toContainText(
           'You were signed out because your account was deleted.',
         );
       });
