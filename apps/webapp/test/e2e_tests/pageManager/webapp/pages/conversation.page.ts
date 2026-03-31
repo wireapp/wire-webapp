@@ -60,6 +60,7 @@ export class ConversationPage {
   readonly ignoreButton: Locator;
   readonly cancelRequest: Locator;
   readonly mentionSuggestions: Locator;
+  readonly invitePeopleButton: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -106,6 +107,7 @@ export class ConversationPage {
     this.ignoreButton = page.getByRole('button', {name: 'Ignore'});
     this.cancelRequest = page.getByRole('button', {name: 'Cancel connection request'});
     this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
+    this.invitePeopleButton = page.getByRole('button', {name: 'Invite people'});
   }
 
   getImageLocator(user: User): Locator {

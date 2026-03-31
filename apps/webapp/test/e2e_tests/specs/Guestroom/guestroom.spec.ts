@@ -322,6 +322,30 @@ test.describe('Guestroom', () => {
   );
 
   test(
+    'I want to see Invite People button when Allow Guests is on',
+    {tag: ['@TC-3335', '@regression']},
+    async ({createPage}) => {
+      const ownerPage = await createPage(withLogin(userA));
+      const ownerPages = PageManager.from(ownerPage).webapp.pages;
+
+      await createGroup(ownerPages, groupName, []);
+      await ownerPages.conversationList().openConversation(groupName);
+
+      await expect(
+        ownerPages
+          .conversation()
+          .systemMessages.filter({hasText: `People outside your team can join this conversation.`}),
+      ).toBeVisible();
+      await expect(ownerPages.conversation().invitePeopleButton).toBeVisible();
+
+      await ownerPages.conversation().invitePeopleButton.click();
+      
+      await expect(ownerPages.guestOptions().guestsToggle).toHaveAttribute('data-uie-value', 'checked');
+      await expect(ownerPages.guestOptions().createLinkButton).toBeVisible();
+    },
+  );
+
+  test(
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
     async ({createPage}) => {
