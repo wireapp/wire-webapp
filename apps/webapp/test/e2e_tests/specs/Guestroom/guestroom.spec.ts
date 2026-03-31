@@ -392,6 +392,20 @@ test.describe('Guestroom', () => {
   );
 
   test(
+    'I want to see Guests are present indicator if there are guests in the conversation',
+    {tag: ['@TC-3338', '@regression']},
+    async ({createPage}) => {
+      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+
+      await createGroup(pages, groupName, []);
+      createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      await createPage(withGuestUser(createdLink, guestUser.firstName));
+      await expect(pages.conversation().guestsIndicator).toBeVisible({timeout: LOGIN_TIMEOUT});
+    },
+  );
+
+  test(
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
     async ({createPage}) => {

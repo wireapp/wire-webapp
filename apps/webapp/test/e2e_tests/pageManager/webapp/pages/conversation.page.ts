@@ -61,6 +61,7 @@ export class ConversationPage {
   readonly cancelRequest: Locator;
   readonly mentionSuggestions: Locator;
   readonly invitePeopleButton: Locator;
+  readonly guestsIndicator: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -108,6 +109,7 @@ export class ConversationPage {
     this.cancelRequest = page.getByRole('button', {name: 'Cancel connection request'});
     this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
     this.invitePeopleButton = page.getByRole('button', {name: 'Invite people'});
+    this.guestsIndicator = page.getByTestId('status-indication-badge');
   }
 
   getImageLocator(user: User): Locator {
