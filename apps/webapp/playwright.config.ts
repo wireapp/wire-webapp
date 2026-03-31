@@ -17,11 +17,11 @@
  *
  */
 
-import { defineConfig, devices } from '@playwright/test';
-import { config } from 'dotenv';
-import { resolve } from 'node:path';
+import {defineConfig, devices} from '@playwright/test';
+import {config} from 'dotenv';
+import {resolve} from 'node:path';
 
-config({ path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true });
+config({path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true});
 
 const numberOfRetriesOnCI = 1;
 const numberOfParallelWorkersOnCI = 3;
@@ -43,8 +43,8 @@ module.exports = defineConfig({
   workers: process.env.CI ? numberOfParallelWorkersOnCI : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
-    ['html', { outputFolder: 'playwright-report/html', open: 'never' }],
-    ['json', { outputFile: 'playwright-report/report.json' }],
+    ['html', {outputFolder: 'playwright-report/html', open: 'never'}],
+    ['json', {outputFile: 'playwright-report/report.json'}],
     ['line'],
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
