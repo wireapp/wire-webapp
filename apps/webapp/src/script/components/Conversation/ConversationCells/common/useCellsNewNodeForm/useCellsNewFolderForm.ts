@@ -22,45 +22,38 @@ import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
-import {isAxiosError} from 'Util/typePredicateUtil';
+
+import {ITEM_ALREADY_EXISTS_ERROR, getErrorStatus, getNameValidationError} from './cellsNodeFormUtils';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
-interface UseCellsNewItemFormProps {
-  type: CellNode['type'];
+interface UseCellsNewFolderFormProps {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
   currentPath: string;
 }
 
-const ITEM_ALREADY_EXISTS_ERROR = 409;
-
-export const useCellsNewItemForm = ({
-  type,
+export const useCellsNewFolderForm = ({
   cellsRepository,
   conversationQualifiedId,
   onSuccess,
   currentPath,
-}: UseCellsNewItemFormProps) => {
+}: UseCellsNewFolderFormProps) => {
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const createNode = async (name: string) => {
+  const createFolder = async (folderName: string) => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
 
     try {
-      if (type === 'folder') {
-        await cellsRepository.createFolder({path, name});
-      } else {
-        await cellsRepository.createFile({path, name});
-      }
+      await cellsRepository.createFolder({path, name: folderName});
       onSuccess();
-    } catch (error: unknown) {
-      if (isAxiosError(error) && error.response?.status === ITEM_ALREADY_EXISTS_ERROR) {
+    } catch (err: unknown) {
+      const status = getErrorStatus(err);
+      if (status === ITEM_ALREADY_EXISTS_ERROR) {
         setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
       } else {
         setError(t('cells.newItemMenuModalForm.genericError'));
@@ -75,17 +68,18 @@ export const useCellsNewItemForm = ({
       return;
     }
 
-    setError(null);
-    setIsSubmitting(true);
-
-    if (!name.trim()) {
-      setError(t('cells.newItemMenuModalForm.nameRequired'));
-      setIsSubmitting(false);
+    const normalizedName = name.trim();
+    const validationError = getNameValidationError(normalizedName);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
+    setError(null);
+    setIsSubmitting(true);
+
     try {
-      await createNode(name);
+      await createFolder(normalizedName);
     } finally {
       setIsSubmitting(false);
     }
