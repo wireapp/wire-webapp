@@ -26,6 +26,10 @@ on:
       testinyRunName:
         type: string
         description: Define Testiny Run name to upload results to
+      keep_traces:
+        description: 'Attach traces to HTML report'
+        type: boolean
+        default: false
   # Options for calling the workflow within an other workflow
   workflow_call:
     inputs:
@@ -38,6 +42,10 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+      keep_traces:
+        type: boolean
+        description: 'Keep Playwright traces'
+        default: false
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN:
         required: true
@@ -141,6 +149,17 @@ jobs:
           else
             echo "Trace data directory not found"
           fi  
+
+      - name: Delete trace artifacts
+        if: ${{ !inputs.keep_traces }}
+        working-directory: apps/webapp
+        run: |
+          if [ -d "playwright-report/html/data" ]; then
+            DELETED_COUNT=$(find playwright-report/html/data -name "*.zip" -type f -delete -print)
+            echo "Deleted $DELETED_COUNT trace archive files"
+          else
+            echo "Trace data directory not found, skipping trace cleanup"
+          fi
 
       - name: Delete blob report artifacts
         if: always()
