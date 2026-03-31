@@ -24,7 +24,12 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
-import {ITEM_ALREADY_EXISTS_ERROR, getErrorStatus, getNameValidationError} from './cellsNodeFormUtils';
+import {
+  ITEM_ALREADY_EXISTS_ERROR,
+  getClientSideNodeNameError,
+  getErrorStatus,
+  isClientSideNodeNameError,
+} from './cellsNodeFormUtils';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
@@ -67,8 +72,10 @@ export const useCellsNewFileForm = ({
       await cellsRepository.createFile({path, name: fileName});
       onSuccess();
     } catch (err: unknown) {
-      const status = getErrorStatus(err);
-      if (status === ITEM_ALREADY_EXISTS_ERROR) {
+      const isAlreadyExistsError = getErrorStatus(err)
+        .map(status => status === ITEM_ALREADY_EXISTS_ERROR)
+        .unwrapOr(false);
+      if (isAlreadyExistsError) {
         setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
       } else {
         setError(t('cells.newItemMenuModalForm.genericError'));
@@ -84,7 +91,7 @@ export const useCellsNewFileForm = ({
     }
 
     const trimmedName = name.trim();
-    const validationError = getNameValidationError(trimmedName);
+    const validationError = getClientSideNodeNameError(trimmedName).unwrapOr(null);
     if (validationError) {
       setError(validationError);
       return;
@@ -102,7 +109,7 @@ export const useCellsNewFileForm = ({
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.currentTarget.value);
-    if (error === t('cells.newItemMenuModalForm.nameRequired')) {
+    if (isClientSideNodeNameError(error).unwrapOr(false)) {
       setError(null);
     }
   };

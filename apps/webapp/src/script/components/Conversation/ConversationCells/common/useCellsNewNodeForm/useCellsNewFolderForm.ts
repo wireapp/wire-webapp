@@ -52,8 +52,10 @@ export const useCellsNewFolderForm = ({
       await cellsRepository.createFolder({path, name: folderName});
       onSuccess();
     } catch (err: unknown) {
-      const status = getErrorStatus(err);
-      if (status === ITEM_ALREADY_EXISTS_ERROR) {
+      const isAlreadyExistsError = getErrorStatus(err)
+        .map(status => status === ITEM_ALREADY_EXISTS_ERROR)
+        .unwrapOr(false);
+      if (isAlreadyExistsError) {
         setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
       } else {
         setError(t('cells.newItemMenuModalForm.genericError'));
@@ -69,7 +71,7 @@ export const useCellsNewFolderForm = ({
     }
 
     const normalizedName = name.trim();
-    const validationError = getNameValidationError(normalizedName);
+    const validationError = getNameValidationError(normalizedName).unwrapOr(null);
     if (validationError) {
       setError(validationError);
       return;
