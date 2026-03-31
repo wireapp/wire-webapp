@@ -23,6 +23,7 @@ jobs:
       DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS: 150
       AWS_APPLICATION_NAME: Webapp
       AWS_BUILD_ZIP_PATH: apps/server/dist/s3/ebs.zip
+      AWS_REGION: eu-central-1
 
     steps:
       - name: Print environment variables
@@ -46,17 +47,23 @@ jobs:
       - name: Build and package
         run: yarn nx run server:package
 
-      - name: Deploy to Elastic Beanstalk
-        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
         with:
-          application_name: ${{env.AWS_APPLICATION_NAME}}
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{env.AWS_BUILD_ZIP_PATH}}
-          environment_name: ${{inputs.env}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: ${{github.run_id}}
-          wait_for_deployment: false
-          wait_for_environment_recovery: ${{env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS}}
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to Elastic Beanstalk
+        id: deploy
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: ${{ env.AWS_APPLICATION_NAME }}
+          environment-name: ${{ inputs.env }}
+          version-label: ${{ github.run_id }}
+          deployment-package-path: ${{ env.AWS_BUILD_ZIP_PATH }}
+          wait-for-deployment: false
+          wait-for-environment-recovery: true
+          deployment-timeout: ${{ env.DEPLOYMENT_RECOVERY_TIMEOUT_SECONDS }}
+          use-existing-application-version-if-available: true

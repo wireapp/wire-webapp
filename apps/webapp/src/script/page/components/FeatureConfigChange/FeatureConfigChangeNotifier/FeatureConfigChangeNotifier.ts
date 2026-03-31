@@ -34,10 +34,10 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {formatDuration} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {formatDuration} from 'Util/timeUtil';
 
 import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifier.store';
 

@@ -19,8 +19,8 @@
 
 import {FC} from 'react';
 
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
-import {getFirstChar} from 'Util/StringUtil';
+import {CSS_FILL_PARENT} from 'Util/cssMixin';
+import {getFirstChar} from 'Util/stringUtil';
 
 import {AVATAR_SIZE, INITIALS_SIZE, DIAMETER} from '.';
 

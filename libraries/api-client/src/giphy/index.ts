@@ -17,7 +17,7 @@
  *
  */
 
-export * from './GiphyAPI';
-export * from './GiphyOptions';
-export * from './GiphyResult';
-export * from './GiphyImage';
+export * from './giphyApi';
+export * from './giphyOptions';
+export * from './giphyResult';
+export * from './giphyImage';

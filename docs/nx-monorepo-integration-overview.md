@@ -1737,7 +1737,7 @@ nx show project webapp
 |----------|------------------|
 | [`ci.yml`](.github/workflows/ci.yml) | `nx run-many -t lint --all`, `nx run-many -t test --all` |
 | [`precommit.yml`](.github/workflows/precommit.yml) | `nx run webapp:configure`, `nx run server:package` |
-| [`publish.yml`](.github/workflows/publish.yml) | `nx run webapp:configure`, `nx run-many -t test --all`, `nx run server:package` |
+| [`publish-and-deploy-webapp.yml`](.github/workflows/publish-and-deploy-webapp.yml) | `nx run webapp:configure`, `nx run-many -t test --all`, `nx run server:package` |
 
 ### Codecov Upload in CI
 

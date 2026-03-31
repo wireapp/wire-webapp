@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef} from 'react';
 
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 interface UseDatePassedProps {
   target: Date | null;

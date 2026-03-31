@@ -20,10 +20,10 @@
 import type {ChangePassword, ConsentType, Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import {Environment} from 'Util/Environment';
-import {getLogger} from 'Util/Logger';
+import {Environment} from 'Util/environment';
+import {getLogger} from 'Util/logger';
 import {toError} from 'Util/toError';
-import {isAxiosError} from 'Util/TypePredicateUtil';
+import {isAxiosError} from 'Util/typePredicateUtil';
 
 import {SelfActionCreator} from './creator/';
 

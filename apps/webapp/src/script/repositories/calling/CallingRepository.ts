@@ -17,14 +17,14 @@
  *
  */
 
-import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
+import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
 import {TaskScheduler} from '@wireapp/core/lib/util';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {amplify} from 'amplify';
@@ -79,16 +79,16 @@ import * as trackingHelpers from 'Repositories/tracking/Helpers';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/Telemetry.helpers';
 import type {UserRepository} from 'Repositories/user/UserRepository';
-import {flatten} from 'Util/ArrayUtil';
+import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {captureModalFocusContext} from 'Util/ModalFocusUtil';
-import {roundLogarithmic} from 'Util/NumberUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {captureModalFocusContext} from 'Util/modalFocusUtil';
+import {roundLogarithmic} from 'Util/numberUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {copyStyles} from 'Util/renderElement';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
 import {createUuid} from 'Util/uuid';
 

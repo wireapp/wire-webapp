@@ -28,7 +28,7 @@ import {
   jumpToLastMessageChevronStyles,
 } from 'Components/MessagesList/MessageList.styles';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface JumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;

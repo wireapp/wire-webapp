@@ -17,4 +17,4 @@
  *
  */
 
-export * from './WebSocketClient';
+export * from './webSocketClient';

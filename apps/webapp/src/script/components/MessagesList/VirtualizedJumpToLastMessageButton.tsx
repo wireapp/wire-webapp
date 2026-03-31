@@ -23,7 +23,7 @@ import {
   jumpToLastMessageButtonStyles,
   jumpToLastMessageChevronStyles,
 } from 'Components/MessagesList/MessageList.styles';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface VirtualizedJumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;

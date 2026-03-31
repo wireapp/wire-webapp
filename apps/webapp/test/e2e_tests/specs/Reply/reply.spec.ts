@@ -124,8 +124,8 @@ test.describe('Reply', () => {
   );
 
   test('I want to reply to a picture', {tag: ['@TC-3002', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
-    const {page} = pages.conversation();
+    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const pages = PageManager.from(page).webapp.pages;
     await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
 
     const messageWithImage = pages.conversation().getMessage({sender: userA});
@@ -137,8 +137,9 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to an audio message', {tag: ['@TC-3003', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
-    const {page} = pages.conversation();
+    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const pages = PageManager.from(page).webapp.pages;
+
     await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
     const messageWithAudio = pages.conversation().getMessage({sender: userA});
@@ -150,8 +151,8 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a video message', {tag: ['@TC-3004', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
-    const {page} = pages.conversation();
+    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const pages = PageManager.from(page).webapp.pages;
     await shareAssetHelper(getVideoFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
     const messageWithVideo = pages.conversation().getMessage({sender: userA});
@@ -171,12 +172,12 @@ test.describe('Reply', () => {
     await pages.conversation().sendMessage('Reply');
 
     const reply = pages.conversation().getMessage({content: 'Reply'});
-    await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
+    await expect(reply.getByTestId('quote-item').getByRole('link', {name: /https:\/\/www\.lidl\.de\/?/})).toBeVisible();
   });
 
   test('I want to reply to a file', {tag: ['@TC-3006', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
-    const {page} = pages.conversation();
+    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const pages = PageManager.from(page).webapp.pages;
     await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
     const messageWithFile = pages.conversation().getMessage({sender: userA});
@@ -213,7 +214,7 @@ test.describe('Reply', () => {
 
     const reply = pages.conversation().getMessage({content: 'Reply'});
     await expect(reply.getByTestId('quote-item')).toContainText('Link: https://www.lidl.de');
-    await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
+    await expect(reply.getByTestId('quote-item').getByRole('link', {name: /https:\/\/www\.lidl\.de\/?/})).toBeVisible();
   });
 
   test('I want to reply to a location share', {tag: ['@TC-3009', '@regression']}, async ({createPage, api}) => {

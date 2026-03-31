@@ -21,7 +21,7 @@ import {FunctionComponent} from 'react';
 
 import * as Icon from 'Components/Icon';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {DeviceSelect} from './DeviceSelect';
 

@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {CSS_VISUALLY_HIDDEN} from 'Util/CSSMixin';
+import {CSS_VISUALLY_HIDDEN} from 'Util/cssMixin';
 
 import {styleBreakpoint} from '../../../common/styleBreakpoint/styleBreakpoint';
 

@@ -30,8 +30,8 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {initializeDataDog} from 'Util/DataDog';
-import {enableLogging} from 'Util/LoggerUtil';
+import {initializeDataDog} from 'Util/dataDog';
+import {enableLogging} from 'Util/loggerUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
 import './configureEnvironment';
@@ -44,12 +44,14 @@ import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/APIClientSingleton';
 import {Core} from '../service/CoreSingleton';
+import {createAPIClient} from '../service/createAPIClient';
 
 exposeWrapperGlobals();
 
 const mainId = 'main';
 
-const apiClient = container.resolve(APIClient);
+const apiClient = createAPIClient();
+container.registerInstance(APIClient, apiClient);
 const core = container.resolve(Core);
 
 let localStorage;

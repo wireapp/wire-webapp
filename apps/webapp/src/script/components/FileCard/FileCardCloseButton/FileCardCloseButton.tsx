@@ -19,7 +19,7 @@
 
 import {CloseIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {buttonStyles} from './FileCardCloseButton.styles';
 

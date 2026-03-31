@@ -17,9 +17,9 @@
  *
  */
 
-export * from './ChannelSearchOptions';
-export * from './ChannelSearchResult';
-export * from './TeamContact';
-export * from './TeamSearchAPI';
-export * from './TeamSearchOptions';
-export * from './TeamSearchResult';
+export * from './channelSearchOptions';
+export * from './channelSearchResult';
+export * from './teamContact';
+export * from './teamSearchApi';
+export * from './teamSearchOptions';
+export * from './teamSearchResult';

@@ -34,7 +34,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {FormatButton} from './FormatButton/FormatButton';
 import {wrapperStyles} from './FormatToolbar.styles';

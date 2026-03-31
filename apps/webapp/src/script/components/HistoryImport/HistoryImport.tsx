@@ -24,19 +24,19 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/Icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
-import {BackupRepository} from 'Repositories/backup/BackupRepository';
+import {BackupRepository} from 'Repositories/backup/backupRepository';
 import {
   CancelError,
   DifferentAccountError,
   IncompatibleBackupError,
   IncompatibleBackupFormatError,
   InvalidPassword,
-} from 'Repositories/backup/Error';
+} from 'Repositories/backup/error';
 import {User} from 'Repositories/entity/User';
 import {ContentState} from 'src/script/page/useAppState';
-import {checkBackupEncryption} from 'Util/BackupUtil';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {checkBackupEncryption} from 'Util/backupUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 import {loadFileBuffer} from 'Util/util';
 
 import {BackupFileUpload} from './BackupFileUpload';

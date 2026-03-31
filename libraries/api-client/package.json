@@ -10,16 +10,16 @@
   "files": [
     "lib"
   ],
-  "main": "lib/APIClient",
-  "types": "lib/APIClient.d.ts",
+  "main": "lib/apiClient",
+  "types": "lib/apiClient.d.ts",
   "browser": {
     "./lib/shims/node/buffer": "./lib/shims/browser/buffer.js",
     "./lib/shims/node/cookie": "./lib/shims/browser/cookie.js",
     "./lib/shims/node/websocket": "./lib/shims/browser/websocket.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1007.0",
-    "@aws-sdk/lib-storage": "3.1008.0",
+    "@aws-sdk/client-s3": "3.1014.0",
+    "@aws-sdk/lib-storage": "3.1014.0",
     "@wireapp/priority-queue": "2.1.19",
     "@wireapp/protocol-messaging": "1.56.0",
     "axios-retry": "4.5.0",

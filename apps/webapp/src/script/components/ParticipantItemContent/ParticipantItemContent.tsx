@@ -26,7 +26,7 @@ import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {
   contentInfoWrapper,
@@ -106,7 +106,7 @@ export const ParticipantItemContent = ({
         )}
       </div>
 
-      {showArrow && <Icon.ChevronRight css={chevronIcon} data-hoverClass="chevron-icon" />}
+      {showArrow && <Icon.ChevronRight css={chevronIcon} data-hover-class="chevron-icon" />}
     </div>
   );
 };

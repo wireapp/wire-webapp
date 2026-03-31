@@ -22,16 +22,16 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
-import {CacheRepository} from 'Repositories/cache/CacheRepository';
+import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import type {StorageRepository} from 'Repositories/storage/StorageRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
-import {getLogger, Logger} from 'Util/Logger';
-import {includesString} from 'Util/StringUtil';
-import {appendParameter} from 'Util/UrlUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {includesString} from 'Util/stringUtil';
+import {appendParameter} from 'Util/urlUtil';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {URLParameter} from '../../auth/URLParameter';

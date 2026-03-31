@@ -17,10 +17,10 @@
  *
  */
 
-export * from './TypePredicateUtil';
-export * from './TaskScheduler';
-export * from './LowPrecisionTaskScheduler';
-export * from './RecurringTaskScheduler';
+export * from './typePredicateUtil';
+export * from './taskScheduler';
+export * from './lowPrecisionTaskScheduler';
+export * from './recurringTaskScheduler';
 export * from './qualifiedIdUtil';
 export * from './fullyQualifiedClientIdUtils';
 export * from './numberToHex';

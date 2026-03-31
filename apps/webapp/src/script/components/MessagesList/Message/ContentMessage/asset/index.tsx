@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {AssetType} from 'Repositories/assets/AssetType';
+import {AssetType} from 'Repositories/assets/assetType';
 import {Asset} from 'Repositories/entity/message/Asset';
 import {Button} from 'Repositories/entity/message/Button';
 import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
@@ -31,8 +31,8 @@ import type {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Multipart} from 'Repositories/entity/message/Multipart';
 import {Text} from 'Repositories/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {includesOnlyEmojis} from 'Util/emojiUtil';
 
 import {AudioAsset} from './AudioAsset/AudioAsset';
 import {FileAsset} from './FileAsset/FileAsset';

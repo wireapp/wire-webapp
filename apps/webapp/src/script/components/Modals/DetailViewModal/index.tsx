@@ -25,15 +25,15 @@ import cx from 'classnames';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ZoomableImage} from 'Components/ZoomableImage';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {User} from 'Repositories/entity/User';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';

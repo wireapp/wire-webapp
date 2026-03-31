@@ -107,6 +107,8 @@ jobs:
   deploy_to_production:
     name: Deploy to production
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-central-1
     needs: [validate_request, build_artifact]
     environment: wire-webapp-prod
 
@@ -116,20 +118,26 @@ jobs:
         with:
           name: build-artifact-${{ needs.validate_request.outputs.tag }}
 
-      - name: Deploy to wire-webapp-prod
-        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
         with:
-          application_name: Webapp
-          aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          deployment_package: ebs.zip
-          environment_name: wire-webapp-prod
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{ needs.build_artifact.outputs.commit_sha }}
-          version_label: '${{ github.run_id }}-wire-webapp-prod-redeploy'
-          wait_for_deployment: false
-          wait_for_environment_recovery: 150
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to wire-webapp-prod
+        id: deploy
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: wire-webapp-prod
+          version-label: ${{ github.run_id }}-wire-webapp-prod-redeploy
+          deployment-package-path: ebs.zip
+          wait-for-deployment: false
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
 
   notify_redeploy:
     name: Notify redeploy

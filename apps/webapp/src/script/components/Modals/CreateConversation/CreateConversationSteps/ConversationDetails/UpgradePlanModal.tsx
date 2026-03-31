@@ -21,9 +21,9 @@ import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {Config} from 'src/script/Config';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {
   salesModalWrapperCss,

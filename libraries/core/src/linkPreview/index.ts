@@ -17,4 +17,4 @@
  *
  */
 
-export * from './LinkPreviewService';
+export * from './linkPreviewService';

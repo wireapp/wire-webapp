@@ -28,12 +28,12 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
-import {ConnectionMapper} from 'Repositories/connection/ConnectionMapper';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
+import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
@@ -61,8 +61,8 @@ import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {entities, payload} from 'test/api/payloads';
-import {t} from 'Util/LocalizerUtil';
-import {truncate} from 'Util/StringUtil';
+import {t} from 'Util/localizerUtil';
+import {truncate} from 'Util/stringUtil';
 import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';

@@ -21,7 +21,7 @@ import React from 'react';
 
 import {createRoot, Root} from 'react-dom/client';
 
-import {getLogger} from './Logger';
+import {getLogger} from './logger';
 
 const logger = getLogger('renderElement');
 

@@ -27,7 +27,7 @@ import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {CoreCryptoLogLevel} from 'Util/DebugUtil';
+import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 

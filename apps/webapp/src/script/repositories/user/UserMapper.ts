@@ -17,10 +17,10 @@
  *
  */
 
-import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/AssetMapper';
+import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
 import {User} from 'Repositories/entity/User';
 import {UserRecord} from 'Repositories/storage';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {isSelfAPIUser} from './UserGuards';
 

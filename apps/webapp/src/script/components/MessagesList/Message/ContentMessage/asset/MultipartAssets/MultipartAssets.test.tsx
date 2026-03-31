@@ -22,7 +22,7 @@ import {RestNode} from 'cells-sdk-ts';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {MultipartAssets} from './MultipartAssets';

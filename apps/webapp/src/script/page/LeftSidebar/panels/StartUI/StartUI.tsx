@@ -40,7 +40,7 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';

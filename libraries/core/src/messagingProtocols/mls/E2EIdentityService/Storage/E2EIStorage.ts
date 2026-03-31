@@ -19,7 +19,7 @@
 
 import {EnrollmentFlowData} from './E2EIStorage.schema';
 
-import {CoreDatabase} from '../../../../storage/CoreDB';
+import {CoreDatabase} from '../../../../storage/coreDb';
 
 const PENDING_ENROLLMENT_TABLE = 'pendingEnrollmentData';
 const STORAGE_KEY = 'data';

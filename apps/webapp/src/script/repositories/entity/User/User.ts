@@ -26,14 +26,14 @@ import ko from 'knockout';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ROLE as TEAM_ROLE} from 'Repositories/user/UserPermission';
-import {t} from 'Util/LocalizerUtil';
-import {clamp} from 'Util/NumberUtil';
-import {getFirstChar} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {clamp} from 'Util/numberUtil';
+import {getFirstChar} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ACCENT_ID} from '../../../Config';
 

@@ -17,5 +17,5 @@
  *
  */
 
-export * from './ScimTokenInfoList';
-export * from './NewScimToken';
+export * from './scimTokenInfoList';
+export * from './newScimToken';

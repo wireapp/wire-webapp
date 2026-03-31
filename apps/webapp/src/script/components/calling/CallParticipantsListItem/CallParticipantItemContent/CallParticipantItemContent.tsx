@@ -24,8 +24,8 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/LocalizerUtil';
-import {capitalizeFirstChar} from 'Util/StringUtil';
+import {t} from 'Util/localizerUtil';
+import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {
   selfIndicator,
@@ -61,7 +61,7 @@ export const CallParticipantItemContent = ({
           {isSelf && <div css={selfIndicator}>{selfString}</div>}
           {isAudioEstablished && showContextMenu && (
             <button
-              data-hoverClass="chevron-icon"
+              data-hover-class="chevron-icon"
               tabIndex={TabIndex.UNFOCUSABLE}
               css={chevronIcon}
               onClick={onDropdownClick}

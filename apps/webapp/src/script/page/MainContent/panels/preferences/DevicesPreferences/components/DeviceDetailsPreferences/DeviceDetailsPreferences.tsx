@@ -23,8 +23,8 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../../../../Config';
 import {MotionDuration} from '../../../../../../../motion/MotionDuration';

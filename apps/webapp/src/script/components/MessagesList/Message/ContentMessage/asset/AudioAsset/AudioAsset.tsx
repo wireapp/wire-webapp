@@ -23,13 +23,13 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import * as Icon from 'Components/Icon';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {getLogger} from 'Util/Logger';
-import {formatSeconds} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {getLogger} from 'Util/logger';
+import {formatSeconds} from 'Util/timeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
 import {AudioSeekBar} from './AudioSeekBar/AudioSeekBar';

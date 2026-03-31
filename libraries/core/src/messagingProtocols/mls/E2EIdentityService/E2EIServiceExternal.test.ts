@@ -24,10 +24,10 @@ import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} f
 import {E2EIServiceExternal} from './E2EIServiceExternal';
 
 import {ClientService} from '../../../client';
-import {openDB} from '../../../storage/CoreDB';
-import {getUUID} from '../../../test/PayloadHelper';
+import {openDB} from '../../../storage/coreDb';
+import {getUUID} from '../../../test/payloadHelper';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
-import {RecurringTaskScheduler} from '../../../util/RecurringTaskScheduler';
+import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {MLSService} from '../MLSService';
 
 async function buildE2EIService(dbName = 'core-test-db') {

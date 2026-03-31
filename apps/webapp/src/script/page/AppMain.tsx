@@ -48,7 +48,7 @@ import {showInitialModal} from 'Repositories/user/AvailabilityModal';
 import {UserState} from 'Repositories/user/UserState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {AppLock} from './AppLock';
 import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';
@@ -72,7 +72,7 @@ import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
-import {TIME_IN_MILLIS} from '../util/TimeUtil';
+import {TIME_IN_MILLIS} from '../util/timeUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
 

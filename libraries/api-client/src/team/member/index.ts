@@ -17,10 +17,10 @@
  *
  */
 
-export * from './MemberAPI';
-export * from './MemberData';
-export * from './MemberCSVResponse';
-export * from './Members';
-export * from './Permissions';
-export * from './PermissionsData';
-export * from './Role';
+export * from './memberApi';
+export * from './memberData';
+export * from './memberCsvResponse';
+export * from './members';
+export * from './permissions';
+export * from './permissionsData';
+export * from './role';

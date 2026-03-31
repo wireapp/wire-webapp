@@ -43,7 +43,7 @@ import {
   BaseSelection,
 } from 'lexical';
 
-import {KEY} from 'Util/KeyboardUtil';
+import {KEY} from 'Util/keyboardUtil';
 
 import {$isMentionNode} from './MentionNode';
 

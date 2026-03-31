@@ -23,9 +23,9 @@ import {Maybe} from 'true-myth';
 
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
-import {isFileEditable} from 'Util/FileTypeUtil';
+import {isFileEditable} from 'Util/fileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
-import {getBestPreviewSource} from 'Util/ImageUtil';
+import {getBestPreviewSource} from 'Util/imageUtil';
 import {getFileExtensionFromUrl} from 'Util/util';
 
 import {FileEditor} from './FileEditor/FileEditor';

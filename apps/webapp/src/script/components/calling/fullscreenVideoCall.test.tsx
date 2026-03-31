@@ -114,12 +114,16 @@ describe('fullscreenVideoCall', () => {
     const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
     const callViewToggleButton = getByTestId('do-call-controls-video-call-view');
 
-    callViewToggleButton.click();
+    act(() => {
+      callViewToggleButton.click();
+    });
 
     await waitFor(() => expect(getByText('videoCallOverlayViewModeLabel')).toBeDefined());
 
     const viewModeAllSpeakersOption = getByText('videoCallOverlayViewModeSpeakers');
-    viewModeAllSpeakersOption.click();
+    act(() => {
+      viewModeAllSpeakersOption.click();
+    });
 
     expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });

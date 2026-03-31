@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {getLinksFromHtml} from 'Util/UrlUtil';
+import {getLinksFromHtml} from 'Util/urlUtil';
 
 import {MediaEmbeds} from './MediaEmbeds';
 

@@ -23,7 +23,7 @@ export * from './conversation/';
 export {CoreError} from './CoreError';
 export * from './cryptography/';
 export * from './util';
-export * as MessageBuilder from './conversation/message/MessageBuilder';
+export * as MessageBuilder from './conversation/message/messageBuilder';
 export * from './errors';
 export * from './client/';
 export * from './messagingProtocols/mls/';
