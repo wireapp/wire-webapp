@@ -23,6 +23,7 @@ import {act, renderHook} from '@testing-library/react';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 import {useCellsNewFileForm} from './useCellsNewFileForm';
+import type {CellsFileType} from './useCellsNewFileForm';
 
 jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
@@ -42,10 +43,10 @@ describe('useCellsNewFileForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFileForm = () =>
+  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document') =>
     renderHook(() =>
       useCellsNewFileForm({
-        fileType: 'document',
+        fileType,
         cellsRepository: mockCellsRepository,
         conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
         onSuccess,
@@ -129,6 +130,7 @@ describe('useCellsNewFileForm', () => {
     expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'New file.docx',
+        templateUuid: '01-Microsoft Word.docx',
       }),
     );
     expect(onSuccess).toHaveBeenCalledTimes(1);
@@ -148,6 +150,27 @@ describe('useCellsNewFileForm', () => {
     expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'doc124.ppt.docx',
+        templateUuid: '01-Microsoft Word.docx',
+      }),
+    );
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses matching template UUID for spreadsheet files', async () => {
+    const {result} = renderUseCellsNewFileForm('spreadsheet');
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'Budget'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Budget.xlsx',
+        templateUuid: '02-Microsoft Excel.xlsx',
       }),
     );
     expect(onSuccess).toHaveBeenCalledTimes(1);

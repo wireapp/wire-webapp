@@ -443,11 +443,13 @@ export class CellsAPI {
     uuid,
     type,
     versionId = '',
+    templateUuid,
   }: {
     path: NonNullable<RestNodeLocator['Path']>;
     uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
     type: RestIncomingNode['Type'];
     versionId?: RestIncomingNode['VersionId'];
+    templateUuid?: NonNullable<RestIncomingNode['TemplateUuid']>;
   }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
@@ -460,6 +462,7 @@ export class CellsAPI {
           Locator: {Path: path.normalize('NFC')},
           ResourceUuid: uuid,
           VersionId: versionId,
+          ...(templateUuid ? {TemplateUuid: templateUuid} : {}),
         },
       ],
     });
@@ -471,16 +474,19 @@ export class CellsAPI {
     path,
     uuid,
     versionId,
+    templateUuid,
   }: {
     path: NonNullable<RestNodeLocator['Path']>;
     uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
     versionId: NonNullable<RestIncomingNode['VersionId']>;
+    templateUuid?: NonNullable<RestIncomingNode['TemplateUuid']>;
   }): Promise<RestNodeCollection> {
     return this.createNode({
       path,
       uuid,
       type: 'LEAF',
       versionId,
+      templateUuid,
     });
   }
 

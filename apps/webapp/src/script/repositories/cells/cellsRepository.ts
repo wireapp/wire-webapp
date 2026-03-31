@@ -171,12 +171,12 @@ export class CellsRepository {
     return this.apiClient.api.cells.createFolder({path: filePath, uuid});
   }
 
-  async createFile({path, name}: {path: string; name: string}) {
+  async createFile({path, name, templateUuid}: {path: string; name: string; templateUuid?: string}) {
     const filePath = `${path || this.basePath}/${name}`;
     const uuid = createUuid();
     const versionId = createUuid();
 
-    return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId});
+    return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId, templateUuid});
   }
 
   async createPublicLink({

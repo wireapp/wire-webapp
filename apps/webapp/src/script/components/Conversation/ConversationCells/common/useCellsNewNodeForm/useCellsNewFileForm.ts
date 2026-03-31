@@ -33,6 +33,17 @@ const FILE_EXTENSION_BY_TYPE: Record<CellsFileType, string> = {
   presentation: 'pptx',
 };
 
+const FILE_TEMPLATE_ID_BY_TYPE: Record<CellsFileType, string> = {
+  document: '01-Microsoft Word.docx',
+  spreadsheet: '02-Microsoft Excel.xlsx',
+  presentation: '03-Microsoft PowerPoint.pptx',
+};
+
+// TO-DO Replace hard coded values with server values when GET /templates endpoint ready
+const getTemplateUuidByType = (fileType: CellsFileType): string => {
+  return FILE_TEMPLATE_ID_BY_TYPE[fileType];
+};
+
 interface UseCellsNewFileFormProps {
   fileType: CellsFileType;
   cellsRepository: CellsRepository;
@@ -55,7 +66,8 @@ export const useCellsNewFileForm = ({
 
   const createFile = async (name: string) => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
-    await cellsRepository.createFile({path, name});
+    const templateUuid = getTemplateUuidByType(fileType);
+    await cellsRepository.createFile({path, name, templateUuid});
     onSuccess();
   };
 
