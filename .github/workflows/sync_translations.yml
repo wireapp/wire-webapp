@@ -2,7 +2,7 @@ name: Sync translations
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   schedule:
     - cron: '0 8 * * *'
   workflow_dispatch:
@@ -57,4 +57,4 @@ jobs:
           source: '/apps/webapp/src/i18n/en-US.json'
           translation: '/apps/webapp/src/i18n/%locale%.json'
           base_path: '.'
-          pull_request_base_branch_name: 'main'
+          pull_request_base_branch_name: 'master'
