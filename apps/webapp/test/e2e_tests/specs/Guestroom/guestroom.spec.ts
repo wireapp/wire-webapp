@@ -339,9 +339,55 @@ test.describe('Guestroom', () => {
       await expect(ownerPages.conversation().invitePeopleButton).toBeVisible();
 
       await ownerPages.conversation().invitePeopleButton.click();
-      
+
       await expect(ownerPages.guestOptions().guestsToggle).toHaveAttribute('data-uie-value', 'checked');
       await expect(ownerPages.guestOptions().createLinkButton).toBeVisible();
+    },
+  );
+
+  test(
+    'I want to see a system message when wireless guest has expired',
+    {tag: ['@TC-3337', '@regression']},
+    async ({createPage}) => {
+      test.setTimeout(150_000);
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
+
+      const pages = PageManager.from(userAPage).webapp.pages;
+      const guestPages = PageManager.from(guestPage).webapp.pages;
+
+      await test.step('User A creates invite link', async () => {
+        await createGroup(pages, groupName, []);
+        createdLink = await generateGroupGuestsLink(pages, groupName);
+      });
+
+      await test.step('User B joins the group using the invitation link', async () => {
+        await guestPage.goto(createdLink.toString());
+        await guestPages.conversationJoin().joinBrowserButton.click();
+        await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+        // Add expires_in query parameter to simulate account expiration
+        const joinLink = new URL(guestPage.url());
+        joinLink.searchParams.set('expires_in', '60');
+
+        await guestPage.goto(joinLink.toString());
+        await guestPages.conversationJoin().joinAsGuest(guestUser.firstName);
+      });
+
+      await test.step('User A sees guest details (to trigger access validation) after 1 minute', async () => {
+        await pages.conversation().toggleGroupInformation();
+        const guestMember = pages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName});
+        await expect(guestMember).toBeVisible({timeout: LOGIN_TIMEOUT});
+
+        await userAPage.waitForTimeout(60_000);
+        await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
+        await expect(pages.participantDetails().userStatus).toBeVisible();
+      });
+
+      await test.step('User A sees a system message when wireless guest has expired', async () => {
+        await expect(
+          pages.conversation().systemMessages.filter({hasText: `${guestUser.firstName} left`}),
+        ).toBeVisible();
+      });
     },
   );
 
