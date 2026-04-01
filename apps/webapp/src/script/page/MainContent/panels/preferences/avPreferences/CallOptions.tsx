@@ -56,6 +56,8 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     !!propertiesRepository.properties.settings.call.enable_press_space_to_unmute,
   );
 
+  const hardwareAccelerationDescriptionId = 'status-preference-hardware-acceleration-description';
+
   const desktopSettings = Config.getDesktopSettings();
 
   const isHardwareAccelerationChangeable = Runtime.isDesktopApp() && !!desktopSettings;
@@ -202,13 +204,13 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
             checked={isHardwareAccelerationEnabled}
             id="status-preference-hardware-acceleration"
             data-uie-name="status-preference-hardware-acceleration"
-            aria-label={t('preferencesOptionsEnableHardwareAcceleration')}
+            aria-describedby={hardwareAccelerationDescriptionId}
           >
             <CheckboxLabel htmlFor="status-preference-hardware-acceleration">
               {t('preferencesOptionsEnableHardwareAcceleration')}
             </CheckboxLabel>
           </Checkbox>
-          <p className="preferences-detail preferences-detail-intended">
+          <p id={hardwareAccelerationDescriptionId} className="preferences-detail preferences-detail-intended">
             {t('preferencesOptionsEnableHardwareAccelerationDetails')}
           </p>
         </div>
