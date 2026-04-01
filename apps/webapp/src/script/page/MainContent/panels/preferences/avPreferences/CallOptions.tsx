@@ -202,6 +202,7 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
             checked={isHardwareAccelerationEnabled}
             id="status-preference-hardware-acceleration"
             data-uie-name="status-preference-hardware-acceleration"
+            aria-label={t('preferencesOptionsEnableHardwareAcceleration')}
           >
             <CheckboxLabel htmlFor="status-preference-hardware-acceleration">
               {t('preferencesOptionsEnableHardwareAcceleration')}
