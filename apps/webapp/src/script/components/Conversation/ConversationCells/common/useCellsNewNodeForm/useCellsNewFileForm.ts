@@ -51,6 +51,10 @@ const createAlreadyExistsError = () => {
   return error;
 };
 
+export const getFileExtensionByType = (fileType: CellsFileType): string => {
+  return FILE_EXTENSION_BY_TYPE[fileType];
+};
+
 interface UseCellsNewFileFormProps {
   fileType: CellsFileType;
   cellsRepository: CellsRepository;
@@ -67,7 +71,7 @@ export const useCellsNewFileForm = ({
   currentPath,
 }: UseCellsNewFileFormProps) => {
   const normalizeNameForCreation = (rawName: string): string => {
-    const extension = FILE_EXTENSION_BY_TYPE[fileType];
+    const extension = getFileExtensionByType(fileType);
     return `${rawName}.${extension}`;
   };
 

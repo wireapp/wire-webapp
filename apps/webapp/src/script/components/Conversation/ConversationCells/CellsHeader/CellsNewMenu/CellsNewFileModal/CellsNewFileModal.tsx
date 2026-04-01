@@ -22,6 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {
   CellsFileType,
+  getFileExtensionByType,
   useCellsNewFileForm,
 } from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFileForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -57,10 +58,12 @@ export const CellsNewFileModal = ({
     onSuccess,
     currentPath,
   });
+  const fileExtension = getFileExtensionByType(fileType);
+  const headline = `${t('cells.newItemMenuModal.headlineFile', {fileType})} (.${fileExtension})`;
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>{t('cells.newItemMenuModal.headlineFile', {fileType})}</CellsModal.Header>
+      <CellsModal.Header>{headline}</CellsModal.Header>
       <p css={descriptionStyles}>{t('cells.newItemMenuModal.descriptionFile')}</p>
       <CellsNewNodeForm
         label={t('cells.newItemMenuModal.labelFile')}
