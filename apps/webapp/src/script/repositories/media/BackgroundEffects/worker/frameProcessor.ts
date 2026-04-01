@@ -229,6 +229,7 @@ function ensureSegmenterForTier(tier: QualityTier): void {
       nextSegmenter.close();
       if (initId === currentInitId) {
         state.pendingModelPath = null;
+        state.lastTimestampMs = 0;
 
         if (!state.segmenter) {
           state.segmenter = null;
@@ -249,6 +250,7 @@ function ensureSegmenterForTier(tier: QualityTier): void {
     state.segmenter = nextSegmenter;
     state.currentModelPath = desiredPath;
     state.pendingModelPath = null;
+    state.lastTimestampMs = 0;
   })();
 
   void state.segmenterInitPromise.finally(() => {

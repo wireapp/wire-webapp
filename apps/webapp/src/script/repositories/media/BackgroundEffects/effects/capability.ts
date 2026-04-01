@@ -18,6 +18,7 @@
  */
 
 import type {CapabilityInfo} from '../types';
+import {Runtime} from "@wireapp/commons";
 
 /**
  * Detects browser capabilities required for background effects rendering.
@@ -108,7 +109,7 @@ export function choosePipeline(
   preferWorker: boolean,
 ): 'worker-webgl2' | 'main-webgl2' | 'canvas2d' | 'passthrough' {
   // Priority 1: Worker + OffscreenCanvas + WebGL2 (best performance)
-  if (cap.webgl2 && cap.worker && cap.offscreenCanvas && preferWorker) {
+  if (cap.webgl2 && cap.worker && cap.offscreenCanvas && preferWorker && !Runtime.isFirefox()) {
     return 'worker-webgl2';
   }
   // Priority 2: Main-thread WebGL2 (GPU-accelerated, but blocks main thread)
