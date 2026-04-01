@@ -17,14 +17,14 @@
  *
  */
 
-export * from './AbortReason';
-export * from './AssetService';
-export * from './AssetTransferState';
-export * from './ClientActionType';
-export * from './ConversationService';
-export * from './GenericMessageType';
-export * from './MessageTimer';
-export * from './message/PayloadBundle';
-export * from './message/Message.types';
-export * from './ReactionType';
-export * from './InCallEmojiType';
+export * from './abortReason';
+export * from './assetService';
+export * from './assetTransferState';
+export * from './clientActionType';
+export * from './conversationService';
+export * from './genericMessageType';
+export * from './messageTimer';
+export * from './message/payloadBundle';
+export * from './message/message.types';
+export * from './reactionType';
+export * from './inCallEmojiType';

@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     timeout-minutes: 20
 
     outputs:
@@ -107,7 +107,7 @@ jobs:
 
       - name: Deploy to precommit environment
         id: deploy
-        uses: aws-actions/aws-elasticbeanstalk-deploy@e90ca3136d2cf14ddb5c7a30538d6f214d9a3c0e
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
         with:
           aws-region: ${{ env.AWS_REGION }}
           application-name: Webapp
@@ -171,7 +171,7 @@ jobs:
 
   e2e_tests:
     name: E2E Tests Execution
-    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
     needs: [check_edits_to_e2e_tests, deploy_to_aws]
     uses: ./.github/workflows/e2e-tests.yml
     with:
@@ -183,7 +183,7 @@ jobs:
 
   run_e2e_tests:
     name: Playwright Critical Flow (precommit)
-    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
     needs: [e2e_tests]
     runs-on: ubuntu-latest
     steps:

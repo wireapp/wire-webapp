@@ -25,7 +25,7 @@ import cx from 'classnames';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ZoomableImage} from 'Components/ZoomableImage';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

@@ -21,7 +21,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import type {CellNode} from 'src/script/types/cellNode';
 

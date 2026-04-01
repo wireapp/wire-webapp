@@ -28,8 +28,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import 'Components/calling/ChooseScreen';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {AudioRepository} from 'Repositories/audio/AudioRepository';
-import {AudioType} from 'Repositories/audio/AudioType';
+import type {AudioRepository} from 'Repositories/audio/audioRepository';
+import {AudioType} from 'Repositories/audio/audioType';
 import type {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';

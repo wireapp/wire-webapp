@@ -23,13 +23,16 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
+import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingCell} from 'Components/calling/CallingCell';
+import {parseAccountDeepLink} from 'Components/Conversation/utils/parseAccountDeepLink';
 import {Giphy} from 'Components/Giphy';
 import {InputBar} from 'Components/InputBar';
 import {MessageListWrapper} from 'Components/MessagesList/MessageListWrapper';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {showUserModal} from 'Components/Modals/UserModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TitleBar} from 'Components/TitleBar';
 import {CallState} from 'Repositories/calling/CallState';
@@ -296,8 +299,48 @@ export const Conversation = ({
     return false;
   };
 
+  const openUserProfile = async (id: string, domain?: string) => {
+    try {
+      const userEntity = await repositories.user.getUserById({
+        id,
+        domain: domain ?? '',
+      });
+
+      showUserModal(userEntity);
+    } catch (error: unknown) {
+      if (error instanceof UserError && error.type === UserError.TYPE.USER_NOT_FOUND) {
+        messageListLogger.warn('Could not resolve user profile deep link', {id, domain});
+        return;
+      }
+      throw error;
+    }
+  };
+
   const handleMarkdownLinkClick = (event: MouseEvent | KeyboardEvent, messageDetails: MessageDetails) => {
     const href = messageDetails.href!;
+
+    const parsed = parseAccountDeepLink(href, CONFIG.URL.ACCOUNT_BASE);
+
+    if (parsed?.type === 'user-profile') {
+      event.preventDefault();
+      void openUserProfile(parsed.id, parsed.domain);
+      return false;
+    }
+
+    if (parsed?.type === 'conversation-join') {
+      event.preventDefault();
+
+      window.dispatchEvent(
+        new CustomEvent(WebAppEvents.CONVERSATION.JOIN, {
+          detail: {
+            key: parsed.key,
+            code: parsed.code,
+            domain: parsed.domain,
+          },
+        }),
+      );
+      return false;
+    }
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
         action: () => safeWindowOpen(href),

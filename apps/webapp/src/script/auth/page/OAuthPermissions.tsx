@@ -40,8 +40,8 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';

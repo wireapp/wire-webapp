@@ -19,16 +19,21 @@
 
 import axios, {AxiosInstance} from 'axios';
 
+const CALLING_SERVICE_URL = process.env.CALLING_SERVICE_URL;
+const CALLING_SERVICE_BASIC_AUTH = process.env.CALLING_SERVICE_BASIC_AUTH;
+const CALLING_SERVICE_BACKEND = process.env.CALLING_SERVICE_BACKEND;
+const CALLING_SERVICE_INSTANCE_VERSION = process.env.CALLING_SERVICE_INSTANCE_VERSION;
+
 export class CallingServiceClientE2E {
   private readonly axiosInstance: AxiosInstance;
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: process.env.CALLING_SERVICE_URL,
+      baseURL: CALLING_SERVICE_URL,
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Basic ${process.env.CALLING_SERVICE_BASIC_AUTH}`,
+        Authorization: `Basic ${CALLING_SERVICE_BASIC_AUTH}`,
       },
     });
   }
@@ -38,10 +43,10 @@ export class CallingServiceClientE2E {
       email,
       password,
       verificationCode: '',
-      backend: 'MASTER',
+      backend: CALLING_SERVICE_BACKEND,
       instanceType: {
         name: 'chrome',
-        version: '103.0.5060.53',
+        version: CALLING_SERVICE_INSTANCE_VERSION,
         path: '/chrome/Contents/MacOS/Google Chrome',
         zcall: false,
         firefox: false,

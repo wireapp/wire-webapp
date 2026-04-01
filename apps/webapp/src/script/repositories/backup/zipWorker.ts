@@ -20,7 +20,7 @@
 import JSZip from 'jszip';
 import sodium, {ready} from 'libsodium-wrappers-sumo';
 
-import {ImportError} from './Error';
+import {ImportError} from './error';
 
 import {toError} from '../../util/toError';
 

@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     name: Build Docker image and Helm Chart
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
 
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.targets }}
@@ -32,7 +32,6 @@ jobs:
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
       CHANGELOG_FILE: './changelog.md'
-      AWS_REGION: eu-central-1
 
     steps:
       - name: Checkout
@@ -287,6 +286,8 @@ jobs:
   deploy_to_aws:
     name: 'Deploy to live environments'
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-central-1
     environment: ${{ matrix.target }}
     needs: [build, set_deployment_targets]
     if: ${{needs.set_deployment_targets.outputs.deployment_targets}}
@@ -309,7 +310,7 @@ jobs:
 
       - name: Deploy to ${{matrix.target}}
         id: deploy
-        uses: aws-actions/aws-elasticbeanstalk-deploy@e90ca3136d2cf14ddb5c7a30538d6f214d9a3c0e
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
         with:
           aws-region: ${{ env.AWS_REGION }}
           application-name: Webapp

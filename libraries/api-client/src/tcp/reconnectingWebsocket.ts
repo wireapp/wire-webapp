@@ -17,8 +17,10 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import logdown from 'logdown';
 import RWS, {CloseEvent, ErrorEvent, Event, Options} from 'reconnecting-websocket';
+import {Maybe} from 'true-myth';
 
 import {LogFactory, TimeUtil} from '@wireapp/commons';
 
@@ -45,6 +47,13 @@ export enum PingMessage {
   PONG = 'pong',
 }
 
+export type LongRunningRetryDetails = {
+  readonly retryCount: number;
+  readonly retryDurationInMilliseconds: number;
+};
+
+const longRunningRetryThresholdInMilliseconds = TimeUtil.TimeInMillis.MINUTE;
+
 export class ReconnectingWebsocket {
   private static readonly RECONNECTING_OPTIONS: Options = {
     WebSocket: WebSocketNode,
@@ -65,6 +74,7 @@ export class ReconnectingWebsocket {
   private onMessage?: (data: string) => void;
   private onError?: (error: ErrorEvent) => void;
   private onClose?: (event: CloseEvent) => void;
+  private onLongRunningRetry?: (retryDetails: LongRunningRetryDetails) => void;
   /**
    * Cleanup function returned by onBackFromSleep to stop the sleep detection interval.
    * This prevents memory leaks by ensuring the interval is cleared when the WebSocket is disconnected.
@@ -74,6 +84,10 @@ export class ReconnectingWebsocket {
   private isPingingEnabled = true;
   private readonly pendingHealthChecks = new Set<(isHealthy: boolean) => void>();
   private lastMessageTimestamp = 0;
+  private reconnectAttemptCount = 0;
+  private reconnectSequenceRetryCount = 0;
+  private reconnectSequenceStartTimestamp: Maybe<number> = Maybe.nothing<number>();
+  private hasReportedLongRunningRetry = false;
 
   constructor(
     private readonly onReconnect: () => Promise<string>,
@@ -136,6 +150,7 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnOpen = (event: Event) => {
     this.logger.debug('WebSocket opened');
+    this.resetLongRunningRetrySequence();
     if (this.socket) {
       this.socket.binaryType = 'arraybuffer';
     }
@@ -146,6 +161,7 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnReconnect = async (): Promise<string> => {
     this.logger.debug('Connecting to WebSocket');
+    this.recordReconnectAttempt(Date.now());
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
     if (this.isPingingEnabled) {
@@ -194,6 +210,7 @@ export class ReconnectingWebsocket {
   };
 
   public connect(): void {
+    this.resetLongRunningRetrySequence();
     this.socket = this.getReconnectingWebsocket();
     this.socket.onmessage = this.internalOnMessage;
     this.socket.onerror = this.internalOnError;
@@ -258,6 +275,7 @@ export class ReconnectingWebsocket {
   }
 
   public disconnect(reason = 'Closed by client'): void {
+    this.resetLongRunningRetrySequence();
     if (this.socket) {
       this.logger.info(`Disconnecting from WebSocket (reason: "${reason}")`);
       this.socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
@@ -305,8 +323,58 @@ export class ReconnectingWebsocket {
     this.onClose = onClose;
   }
 
+  public setOnLongRunningRetry(onLongRunningRetry: (retryDetails: LongRunningRetryDetails) => void): void {
+    this.onLongRunningRetry = onLongRunningRetry;
+  }
+
   public disablePinging(): void {
     this.isPingingEnabled = false;
     this.stopPinging();
+  }
+
+  private recordReconnectAttempt(nowInMilliseconds: number): void {
+    this.reconnectAttemptCount += 1;
+
+    if (this.reconnectAttemptCount === 1) {
+      return;
+    }
+
+    if (this.reconnectSequenceStartTimestamp.isNothing) {
+      this.reconnectSequenceStartTimestamp = Maybe.just(nowInMilliseconds);
+    }
+
+    this.reconnectSequenceRetryCount += 1;
+    this.reportLongRunningRetryIfNeeded(nowInMilliseconds);
+  }
+
+  private reportLongRunningRetryIfNeeded(nowInMilliseconds: number): void {
+    if (this.hasReportedLongRunningRetry) {
+      return;
+    }
+
+    const reconnectSequenceStartTimestamp = this.reconnectSequenceStartTimestamp.unwrapOr(undefined);
+
+    if (!is.number(reconnectSequenceStartTimestamp)) {
+      return;
+    }
+
+    const retryDurationInMilliseconds = nowInMilliseconds - reconnectSequenceStartTimestamp;
+
+    if (retryDurationInMilliseconds < longRunningRetryThresholdInMilliseconds) {
+      return;
+    }
+
+    this.hasReportedLongRunningRetry = true;
+    this.onLongRunningRetry?.({
+      retryCount: this.reconnectSequenceRetryCount,
+      retryDurationInMilliseconds,
+    });
+  }
+
+  private resetLongRunningRetrySequence(): void {
+    this.hasReportedLongRunningRetry = false;
+    this.reconnectAttemptCount = 0;
+    this.reconnectSequenceRetryCount = 0;
+    this.reconnectSequenceStartTimestamp = Maybe.nothing<number>();
   }
 }
