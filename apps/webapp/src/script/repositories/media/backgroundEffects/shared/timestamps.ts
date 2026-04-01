@@ -39,5 +39,8 @@ export const toMonotonicTimestampMs = (
   nowMs: number = performance.now(),
 ): number => {
   const candidate = Math.floor(sourceTimestampSeconds * 1000);
+  if (candidate > lastTimestampMs) {
+    return candidate;
+  }
   return Math.max(candidate, lastTimestampMs + 1, Math.floor(nowMs));
 };
