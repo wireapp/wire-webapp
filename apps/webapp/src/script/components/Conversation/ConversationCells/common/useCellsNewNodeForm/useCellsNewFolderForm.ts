@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
-import {ITEM_ALREADY_EXISTS_ERROR, getErrorStatus, getNameValidationError} from './cellsNodeFormUtils';
+import {ITEM_ALREADY_EXISTS_ERROR, getClientSideNodeNameError, getErrorStatus} from './cellsNodeFormUtils';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
@@ -81,7 +81,7 @@ export const useCellsNewFolderForm = ({
     setIsSubmitting(true);
 
     try {
-      await createFolder(normalizedName);
+      await createFolder(trimmedName);
     } finally {
       setIsSubmitting(false);
     }
