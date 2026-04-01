@@ -120,7 +120,7 @@ const Config = {
     return window.desktopAppConfig;
   },
   getDesktopSettings: () => {
-    if (!Runtime.isDesktopApp) {
+    if (!Runtime.isDesktopApp()) {
       return undefined;
     }
 
