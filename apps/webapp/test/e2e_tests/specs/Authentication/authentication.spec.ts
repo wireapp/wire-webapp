@@ -170,7 +170,7 @@ test.describe('Authentication', () => {
           const message = pages.conversation().getMessage({content: 'Before refresh'});
           await expect(message).toBeVisible();
 
-          await pageManager.refreshPage();
+          await pageManager.refreshPage({waitUntil: 'load'});
 
           await pages.conversationList().openConversation(userB.fullName);
           await expect(message).toBeVisible();
