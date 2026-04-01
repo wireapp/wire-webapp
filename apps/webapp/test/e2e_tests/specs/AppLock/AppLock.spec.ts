@@ -132,7 +132,7 @@ test.describe('AppLock', () => {
     async ({createPage}) => {
       const page = await createPage(withLogin(memberA));
       const pageManager = PageManager.from(page);
-      const {pages, modals} = PageManager.from(page).webapp;
+      const {pages, modals} = pageManager.webapp;
       await handleAppLockState(pageManager, appLockPassCode);
 
       await page.reload();
