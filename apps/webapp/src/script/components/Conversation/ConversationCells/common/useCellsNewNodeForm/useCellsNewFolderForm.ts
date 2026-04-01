@@ -20,6 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
