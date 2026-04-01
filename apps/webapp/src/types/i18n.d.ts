@@ -1694,6 +1694,12 @@ declare module 'I18n/en-US.json' {
     'preferencesOptionsEmojiReplaceDetail': `:-) → [icon]`;
     'preferencesOptionsEnableAgcCheckbox': `Automatic gain control (AGC)`;
     'preferencesOptionsEnableAgcDetails': `Enable to allow your microphone volume to be adjusted automatically to ensure all participants in a call are heard with similar and comfortable loudness.`;
+    'preferencesOptionsEnableHardwareAcceleration': `Hardware acceleration`;
+    'preferencesOptionsEnableHardwareAccelerationDetails': `This improves stability and video performance while reducing CPU usage. If you change the setting, you need to restart the app.`;
+    'preferencesOptionsEnableHardwareAccelerationModalCancel': `Cancel`;
+    'preferencesOptionsEnableHardwareAccelerationModalMessage': `To update the hardware acceleration setting, you need to restart the app.`;
+    'preferencesOptionsEnableHardwareAccelerationModalOk': `Restart App`;
+    'preferencesOptionsEnableHardwareAccelerationModalTitle': `Restart app`;
     'preferencesOptionsEnablePressSpaceToUnmute': `Unmute with space bar`;
     'preferencesOptionsEnablePressSpaceToUnmuteDetails': `Enable to unmute your microphone by pressing and holding the space bar as long as you want to speak. You can use this option in full view.`;
     'preferencesOptionsEnableSoundlessIncomingCalls': `Silence other calls`;
