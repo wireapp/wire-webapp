@@ -1,3 +1,4 @@
+import {Page} from 'playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {
@@ -415,10 +416,25 @@ test.describe('Guestroom', () => {
     },
   );
 
-  test(
-    'I want to see the "Open in Wire" button if I was logged in permanently before',
-    {tag: ['@TC-3351', '@regression']},
-    async ({createPage}) => {
+  [
+    {
+      description: 'I want to see the "Open in Wire" button if I was logged in permanently before',
+      tag: '@TC-3351',
+      verify: async (guestPages: PageManager['webapp']['pages'], guestPage: Page) => {
+        await expect(guestPages.conversationJoin().joinAsMemberButton).toBeVisible();
+        await expect(guestPage.getByText(`You are logged in as ${guestUser.fullName}`)).toBeVisible();
+      },
+    },
+    {
+      description: 'I want to see a link to join anonymously when I was logged in before',
+      tag: '@TC-3352',
+      verify: async (guestPages: PageManager['webapp']['pages'], guestPage: Page) => {
+        await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+        await expect(guestPage.getByRole('heading', {name: "Don't have an account?"})).toBeVisible();
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
       const [userAPage, guestPage] = await Promise.all([
         createPage(withLogin(userA)),
         createPage(withLogin(guestUser)),
@@ -444,10 +460,9 @@ test.describe('Guestroom', () => {
       invitationLink.hostname = envUrl.hostname;
       await guestPage.goto(invitationLink.toString());
 
-      await expect(guestPages.conversationJoin().joinAsMemberButton).toBeVisible();
-      await expect(guestPage.getByText(`You are logged in as ${guestUser.fullName}`)).toBeVisible();
-    },
-  );
+      await verify(guestPages, guestPage);
+    });
+  });
 
   test(
     'I want to get logged out with a reason when my account expires',
