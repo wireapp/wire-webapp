@@ -465,6 +465,31 @@ test.describe('Guestroom', () => {
   });
 
   test(
+    'I want to see my time left in left column list, participant details and account settings',
+    {tag: ['@TC-3363', '@regression']},
+    async ({createPage}) => {
+      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+
+      await createGroup(pages, groupName, []);
+      createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      const guestPage = await createPage(withGuestUser(createdLink, guestUser.firstName));
+      const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
+
+      await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+      await guestModals.confirm().actionButton.click();
+
+      await expect(guestPage.locator('#temporary-guest')).toContainText('24h left in this guest room');
+
+      await guestPages.conversation().sendMessage('Message from Guest');
+      const message = guestPages.conversation().getMessage({content: 'Message from Guest'});
+      await message.getByTestId('element-avatar-temporary-guest').click();
+
+      await expect(guestPage.getByTestId('status-expiration-text')).toContainText('24h left');
+    },
+  );
+
+  test(
     'I want to see the conversation added to the conversation list',
     {tag: ['@TC-3354', '@regression']},
     async ({createPage}) => {
