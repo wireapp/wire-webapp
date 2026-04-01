@@ -416,6 +416,40 @@ test.describe('Guestroom', () => {
   );
 
   test(
+    'I want to see the "Open in Wire" button if I was logged in permanently before',
+    {tag: ['@TC-3351', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, guestPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(guestUser)),
+      ]);
+
+      const guestPageManager = PageManager.from(guestPage);
+      const guestPages = guestPageManager.webapp.pages;
+      const pages = PageManager.from(userAPage).webapp.pages;
+
+      // UserA creates a guest link for a conversation
+      await createGroup(pages, groupName, []);
+      createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      // Quest confirms that he was logged in before and can join the conversation directly
+      await guestPage.goto(createdLink.toString());
+      await guestPages.conversationJoin().joinBrowserButton.click();
+      await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+      // Sync domain with WEBAPP_URL using in test to ensure login cookies are sent.
+      const envUrl = new URL(process.env.WEBAPP_URL);
+      const invitationLink = new URL(guestPage.url());
+
+      invitationLink.hostname = envUrl.hostname;
+      await guestPage.goto(invitationLink.toString());
+
+      await expect(guestPages.conversationJoin().joinAsMemberButton).toBeVisible();
+      await expect(guestPage.getByText(`You are logged in as ${guestUser.fullName}`)).toBeVisible();
+    },
+  );
+
+  test(
     'I want to get logged out with a reason when my account expires',
     {tag: ['@TC-3365', '@regression']},
     async ({createPage}) => {
