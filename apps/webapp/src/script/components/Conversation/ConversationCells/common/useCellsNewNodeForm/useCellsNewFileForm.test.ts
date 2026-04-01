@@ -64,6 +64,21 @@ describe('useCellsNewFileForm', () => {
     expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
   });
 
+  it('does not submit when name validation fails', async () => {
+    const {result} = renderUseCellsNewFileForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'file/name'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe('cells.newItemMenuModalForm.invalidCharactersError');
+    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
+  });
+
   it('maps 409 responses to already-exists error', async () => {
     mockCellsRepository.createFile.mockRejectedValueOnce({
       response: {status: 409},

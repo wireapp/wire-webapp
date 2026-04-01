@@ -23,23 +23,52 @@ import {t} from 'Util/localizerUtil';
 import {isAxiosError} from 'Util/typePredicateUtil';
 
 export const ITEM_ALREADY_EXISTS_ERROR = 409;
+export const NODE_NAME_MAX_LENGTH = 64;
 
-export const getNameValidationError = (name: string): string | null => {
+const INVALID_NODE_NAME_PATTERN = /[\\/"]/u;
+const LEADING_DOT_PATTERN = /^\./u;
+
+export const getNameValidationError = (name: string): Maybe<string> => {
   if (!name) {
-    return t('cells.newItemMenuModalForm.nameRequired');
+    return Maybe.just(t('cells.newItemMenuModalForm.nameRequired'));
   }
 
-  return null;
+  return Maybe.nothing();
 };
 
-export const getErrorStatus = (error: unknown): number | undefined => {
-  return Maybe.of(error)
-    .andThen(caughtError => {
-      if (!isAxiosError(caughtError)) {
-        return Maybe.nothing();
-      }
+export const getClientSideNodeNameError = (name: string): Maybe<string> => {
+  const requiredNameError = getNameValidationError(name);
+  if (requiredNameError.isJust) {
+    return requiredNameError;
+  }
 
-      return Maybe.of(caughtError.response?.status);
-    })
-    .unwrapOr(undefined);
+  if (name.length > NODE_NAME_MAX_LENGTH) {
+    return Maybe.just(t('cells.newItemMenuModalForm.maxLengthError'));
+  }
+
+  if (LEADING_DOT_PATTERN.test(name) || INVALID_NODE_NAME_PATTERN.test(name)) {
+    return Maybe.just(t('cells.newItemMenuModalForm.invalidCharactersError'));
+  }
+
+  return Maybe.nothing();
+};
+
+export const isClientSideNodeNameError = (error: string | null): Maybe<boolean> => {
+  const clientSideNameErrors = new Set([
+    t('cells.newItemMenuModalForm.nameRequired'),
+    t('cells.newItemMenuModalForm.maxLengthError'),
+    t('cells.newItemMenuModalForm.invalidCharactersError'),
+  ]);
+
+  return Maybe.of(error).map(errorMessage => clientSideNameErrors.has(errorMessage));
+};
+
+export const getErrorStatus = (error: unknown): Maybe<number> => {
+  return Maybe.of(error).andThen(caughtError => {
+    if (!isAxiosError(caughtError)) {
+      return Maybe.nothing();
+    }
+
+    return Maybe.of(caughtError.response?.status);
+  });
 };

@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
-import {ITEM_ALREADY_EXISTS_ERROR, getErrorStatus, getNameValidationError} from './cellsNodeFormUtils';
+import {ITEM_ALREADY_EXISTS_ERROR, getClientSideNodeNameError, getErrorStatus} from './cellsNodeFormUtils';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
@@ -52,8 +52,10 @@ export const useCellsNewFolderForm = ({
       await cellsRepository.createFolder({path, name: folderName});
       onSuccess();
     } catch (err: unknown) {
-      const status = getErrorStatus(err);
-      if (status === ITEM_ALREADY_EXISTS_ERROR) {
+      const isAlreadyExistsError = getErrorStatus(err)
+        .map(status => status === ITEM_ALREADY_EXISTS_ERROR)
+        .unwrapOr(false);
+      if (isAlreadyExistsError) {
         setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
       } else {
         setError(t('cells.newItemMenuModalForm.genericError'));
@@ -68,8 +70,8 @@ export const useCellsNewFolderForm = ({
       return;
     }
 
-    const normalizedName = name.trim();
-    const validationError = getNameValidationError(normalizedName);
+    const trimmedName = name.trim();
+    const validationError = getClientSideNodeNameError(trimmedName).unwrapOr(null);
     if (validationError) {
       setError(validationError);
       return;
@@ -79,7 +81,7 @@ export const useCellsNewFolderForm = ({
     setIsSubmitting(true);
 
     try {
-      await createFolder(normalizedName);
+      await createFolder(trimmedName);
     } finally {
       setIsSubmitting(false);
     }
