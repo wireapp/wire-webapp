@@ -70,8 +70,8 @@ export const useCellsNewFolderForm = ({
       return;
     }
 
-    const normalizedName = name.trim();
-    const validationError = getNameValidationError(normalizedName).unwrapOr(null);
+    const trimmedName = name.trim();
+    const validationError = getClientSideNodeNameError(trimmedName).unwrapOr(null);
     if (validationError) {
       setError(validationError);
       return;
