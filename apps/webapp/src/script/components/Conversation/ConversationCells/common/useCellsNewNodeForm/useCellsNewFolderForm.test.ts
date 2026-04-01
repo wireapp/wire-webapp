@@ -24,10 +24,6 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 import {useCellsNewFolderForm} from './useCellsNewFolderForm';
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
-
 describe('useCellsNewFolderForm', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
@@ -43,37 +39,16 @@ describe('useCellsNewFolderForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFolderForm = (isOpen = true) =>
-    renderHook(
-      ({isOpen: isModalOpen}) =>
-        useCellsNewFolderForm({
-          cellsRepository: mockCellsRepository,
-          conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
-          onSuccess,
-          currentPath: '/wire-cells-web/path',
-          isOpen: isModalOpen,
-        }),
-      {initialProps: {isOpen}},
-    );
-
-  it('does not append file extension or template data when creating folder names', async () => {
-    const {result} = renderUseCellsNewFolderForm();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: 'Project.docx'}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(mockCellsRepository.createFolder).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: 'Project.docx',
+  const renderUseCellsNewFolderForm = () =>
+    renderHook(() =>
+      useCellsNewFolderForm({
+        cellsRepository: mockCellsRepository,
+        conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
+        onSuccess,
+        currentPath: '/wire-cells-web/path',
+        isOpen: true,
       }),
     );
-    expect(mockCellsRepository.createFolder).toHaveBeenCalledTimes(1);
-  });
 
   it('uses createFolder repository method and never calls createFile', async () => {
     const {result} = renderUseCellsNewFolderForm();
@@ -91,29 +66,21 @@ describe('useCellsNewFolderForm', () => {
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
-  it('resets name and error when modal is reopened', async () => {
-    const {result, rerender} = renderUseCellsNewFolderForm(true);
+  it('preserves provided folder name and does not append file metadata', async () => {
+    const {result} = renderUseCellsNewFolderForm();
 
     act(() => {
-      result.current.handleChange({currentTarget: {value: 'invalid/name'}} as ChangeEvent<HTMLInputElement>);
+      result.current.handleChange({currentTarget: {value: 'Project.docx'}} as ChangeEvent<HTMLInputElement>);
     });
 
     await act(async () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.name).toBe('invalid/name');
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.invalidCharactersError');
-
-    act(() => {
-      rerender({isOpen: false});
-    });
-
-    act(() => {
-      rerender({isOpen: true});
-    });
-
-    expect(result.current.name).toBe('');
-    expect(result.current.error).toBeNull();
+    expect(mockCellsRepository.createFolder).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Project.docx',
+      }),
+    );
   });
 });

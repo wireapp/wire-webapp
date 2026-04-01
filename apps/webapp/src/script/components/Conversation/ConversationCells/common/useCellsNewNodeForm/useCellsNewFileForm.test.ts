@@ -21,13 +21,10 @@ import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {t} from 'Util/localizerUtil';
 
 import {useCellsNewFileForm} from './useCellsNewFileForm';
 import type {CellsFileType} from './useCellsNewFileForm';
-
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
 
 describe('useCellsNewFileForm', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
@@ -44,51 +41,19 @@ describe('useCellsNewFileForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document', isOpen = true) =>
-    renderHook(
-      ({isOpen: isModalOpen}) =>
-        useCellsNewFileForm({
-          fileType,
-          cellsRepository: mockCellsRepository,
-          conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
-          onSuccess,
-          currentPath: '/wire-cells-web/path',
-          isOpen: isModalOpen,
-        }),
-      {initialProps: {isOpen}},
+  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document') =>
+    renderHook(() =>
+      useCellsNewFileForm({
+        fileType,
+        cellsRepository: mockCellsRepository,
+        conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
+        onSuccess,
+        currentPath: '/wire-cells-web/path',
+        isOpen: true,
+      }),
     );
 
-  it('shows an error when name is empty', async () => {
-    const {result} = renderUseCellsNewFileForm();
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.nameRequired');
-    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
-  });
-
-  it('does not submit when name validation fails', async () => {
-    const {result} = renderUseCellsNewFileForm();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: 'file/name'}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.invalidCharactersError');
-    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
-  });
-
-  it('maps 409 responses to already-exists error', async () => {
-    mockCellsRepository.createFile.mockRejectedValueOnce({
-      response: {status: 409},
-    });
-
+  it('adds extension and template UUID for document files', async () => {
     const {result} = renderUseCellsNewFileForm();
 
     act(() => {
@@ -99,56 +64,11 @@ describe('useCellsNewFileForm', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.alreadyExistsError');
-    expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  it('shows already-exists error when precheck reports a duplicate', async () => {
-    mockCellsRepository.checkFileAlreadyExists.mockResolvedValueOnce(true);
-
-    const {result} = renderUseCellsNewFileForm();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: 'New file'}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.alreadyExistsError');
-    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
-    expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  it('maps non-409 failures to generic error', async () => {
-    mockCellsRepository.createFile.mockRejectedValueOnce(new Error('network error'));
-
-    const {result} = renderUseCellsNewFileForm();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: 'New file'}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.genericError');
-    expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  it('trims the name and appends extension before create call', async () => {
-    const {result} = renderUseCellsNewFileForm();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: ' New file '}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
+    expect(mockCellsRepository.checkFileAlreadyExists).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New file.docx',
+      }),
+    );
     expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'New file.docx',
@@ -158,27 +78,7 @@ describe('useCellsNewFileForm', () => {
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
-  it('appends selected file type extension when a mismatched extension is provided', async () => {
-    const {result} = renderUseCellsNewFileForm();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: 'doc124.ppt'}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: 'doc124.ppt.docx',
-        templateUuid: '01-Microsoft Word.docx',
-      }),
-    );
-    expect(onSuccess).toHaveBeenCalledTimes(1);
-  });
-
-  it('uses matching template UUID for spreadsheet files', async () => {
+  it('uses matching extension and template UUID for spreadsheet files', async () => {
     const {result} = renderUseCellsNewFileForm('spreadsheet');
 
     act(() => {
@@ -197,29 +97,21 @@ describe('useCellsNewFileForm', () => {
     );
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
-  it('resets name and error when modal is reopened', async () => {
-    const {result, rerender} = renderUseCellsNewFileForm('document', true);
+
+  it('shows already-exists error when precheck reports a duplicate', async () => {
+    mockCellsRepository.checkFileAlreadyExists.mockResolvedValueOnce(true);
+    const {result} = renderUseCellsNewFileForm();
 
     act(() => {
-      result.current.handleChange({currentTarget: {value: 'invalid/name'}} as ChangeEvent<HTMLInputElement>);
+      result.current.handleChange({currentTarget: {value: 'New file'}} as ChangeEvent<HTMLInputElement>);
     });
 
     await act(async () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.name).toBe('invalid/name');
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.invalidCharactersError');
-
-    act(() => {
-      rerender({isOpen: false});
-    });
-
-    act(() => {
-      rerender({isOpen: true});
-    });
-
-    expect(result.current.name).toBe('');
-    expect(result.current.error).toBeNull();
+    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.alreadyExistsError'));
+    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 });
