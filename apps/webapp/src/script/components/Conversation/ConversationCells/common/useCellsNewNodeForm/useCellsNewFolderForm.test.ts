@@ -20,7 +20,7 @@
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 import {useCellsNewFolderForm} from './useCellsNewFolderForm';
 
@@ -38,11 +38,12 @@ describe('useCellsNewFolderForm', () => {
     jest.clearAllMocks();
     mockCellsRepository = {
       createFolder: jest.fn().mockResolvedValue(undefined),
+      createFile: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<CellsRepository>;
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFolderForm = () =>
+  const setup = () =>
     renderHook(() =>
       useCellsNewFolderForm({
         cellsRepository: mockCellsRepository,
@@ -52,58 +53,11 @@ describe('useCellsNewFolderForm', () => {
       }),
     );
 
-  it('shows an error when name is empty', async () => {
-    const {result} = renderUseCellsNewFolderForm();
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.nameRequired');
-    expect(mockCellsRepository.createFolder).not.toHaveBeenCalled();
-  });
-
-  it('maps 409 responses to already-exists error', async () => {
-    mockCellsRepository.createFolder.mockRejectedValueOnce({
-      response: {status: 409},
-    });
-
-    const {result} = renderUseCellsNewFolderForm();
+  it('does not append file extension or template data when creating folder names', async () => {
+    const {result} = setup();
 
     act(() => {
-      result.current.handleChange({currentTarget: {value: 'New folder'}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.alreadyExistsError');
-    expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  it('maps non-409 failures to generic error', async () => {
-    mockCellsRepository.createFolder.mockRejectedValueOnce(new Error('network error'));
-
-    const {result} = renderUseCellsNewFolderForm();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: 'New folder'}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.genericError');
-    expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  it('trims the name before create call', async () => {
-    const {result} = renderUseCellsNewFolderForm();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: ' New folder '}} as ChangeEvent<HTMLInputElement>);
+      result.current.handleChange({currentTarget: {value: 'Project.docx'}} as ChangeEvent<HTMLInputElement>);
     });
 
     await act(async () => {
@@ -112,10 +66,25 @@ describe('useCellsNewFolderForm', () => {
 
     expect(mockCellsRepository.createFolder).toHaveBeenCalledWith(
       expect.objectContaining({
-        name: 'New folder',
+        name: 'Project.docx',
       }),
     );
-    expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(mockCellsRepository.createFolder).toHaveBeenCalledTimes(1);
   });
 
+  it('uses createFolder repository method and never calls createFile', async () => {
+    const {result} = setup();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'New folder'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(mockCellsRepository.createFolder).toHaveBeenCalledTimes(1);
+    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
 });

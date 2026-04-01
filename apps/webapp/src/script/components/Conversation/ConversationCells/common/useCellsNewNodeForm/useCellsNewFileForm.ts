@@ -17,19 +17,11 @@
  *
  */
 
-import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
-
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
 
-import {
-  ITEM_ALREADY_EXISTS_ERROR,
-  getClientSideNodeNameError,
-  getErrorStatus,
-  isClientSideNodeNameError,
-} from './cellsNodeFormUtils';
+import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
 
@@ -56,69 +48,16 @@ export const useCellsNewFileForm = ({
   onSuccess,
   currentPath,
 }: UseCellsNewFileFormProps) => {
-  const [name, setName] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const normalizeNameForCreation = (rawName: string): string => {
     const extension = FILE_EXTENSION_BY_TYPE[fileType];
     return `${rawName}.${extension}`;
   };
 
-  const createFile = async (fileName: string) => {
+  const createFile = async (name: string) => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
-
-    try {
-      await cellsRepository.createFile({path, name: fileName});
-      onSuccess();
-    } catch (err: unknown) {
-      const isAlreadyExistsError = getErrorStatus(err)
-        .map(status => status === ITEM_ALREADY_EXISTS_ERROR)
-        .unwrapOr(false);
-      if (isAlreadyExistsError) {
-        setError(t('cells.newItemMenuModalForm.alreadyExistsError'));
-      } else {
-        setError(t('cells.newItemMenuModalForm.genericError'));
-      }
-    }
+    await cellsRepository.createFile({path, name});
+    onSuccess();
   };
 
-  const handleSubmit = async (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
-    formEvent.preventDefault();
-
-    if (isSubmitting) {
-      return;
-    }
-
-    const trimmedName = name.trim();
-    const validationError = getClientSideNodeNameError(trimmedName).unwrapOr(null);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-
-    setError(null);
-    setIsSubmitting(true);
-
-    try {
-      await createFile(normalizeNameForCreation(trimmedName));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.currentTarget.value);
-    if (isClientSideNodeNameError(error).unwrapOr(false)) {
-      setError(null);
-    }
-  };
-
-  return {
-    name,
-    error,
-    isSubmitting,
-    handleSubmit,
-    handleChange,
-  };
+  return useCellsNewNodeFormBase({createNode: createFile, normalizeNameForCreation});
 };
