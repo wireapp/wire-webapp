@@ -61,6 +61,7 @@ interface UseCellsNewFileFormProps {
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
   currentPath: string;
+  isOpen: boolean;
 }
 
 export const useCellsNewFileForm = ({
@@ -69,6 +70,7 @@ export const useCellsNewFileForm = ({
   conversationQualifiedId,
   onSuccess,
   currentPath,
+  isOpen,
 }: UseCellsNewFileFormProps) => {
   const normalizeNameForCreation = (rawName: string): string => {
     const extension = getFileExtensionByType(fileType);
@@ -87,5 +89,5 @@ export const useCellsNewFileForm = ({
     onSuccess();
   };
 
-  return useCellsNewNodeFormBase({createNode: createFile, normalizeNameForCreation});
+  return useCellsNewNodeFormBase({createNode: createFile, normalizeNameForCreation, isOpen});
 };

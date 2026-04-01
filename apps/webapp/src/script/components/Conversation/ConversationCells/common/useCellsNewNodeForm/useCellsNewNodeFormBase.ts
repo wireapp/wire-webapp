@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
+import {ChangeEvent, FormEvent, MouseEvent, useEffect, useState} from 'react';
 
 import {t} from 'Util/localizerUtil';
 
@@ -31,6 +31,7 @@ import {
 interface UseCellsNewNodeFormBaseProps {
   createNode: (name: string) => Promise<void>;
   normalizeNameForCreation?: (rawName: string) => string;
+  isOpen?: boolean;
 }
 
 const defaultNameNormalizer = (value: string) => value;
@@ -38,10 +39,21 @@ const defaultNameNormalizer = (value: string) => value;
 export const useCellsNewNodeFormBase = ({
   createNode,
   normalizeNameForCreation = defaultNameNormalizer,
+  isOpen = true,
 }: UseCellsNewNodeFormBaseProps) => {
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    setName('');
+    setError(null);
+    setIsSubmitting(false);
+  }, [isOpen]);
 
   const handleSubmit = async (formEvent: FormEvent<HTMLFormElement> | MouseEvent<HTMLButtonElement>) => {
     formEvent.preventDefault();
@@ -84,11 +96,17 @@ export const useCellsNewNodeFormBase = ({
     }
   };
 
+  const handleClear = () => {
+    setName('');
+    setError(null);
+  };
+
   return {
     name,
     error,
     isSubmitting,
     handleSubmit,
     handleChange,
+    handleClear,
   };
 };

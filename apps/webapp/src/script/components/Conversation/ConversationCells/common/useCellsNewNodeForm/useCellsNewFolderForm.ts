@@ -30,6 +30,7 @@ interface UseCellsNewFolderFormProps {
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
   currentPath: string;
+  isOpen: boolean;
 }
 
 export const useCellsNewFolderForm = ({
@@ -37,6 +38,7 @@ export const useCellsNewFolderForm = ({
   conversationQualifiedId,
   onSuccess,
   currentPath,
+  isOpen,
 }: UseCellsNewFolderFormProps) => {
   const createFolder = async (name: string) => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
@@ -44,5 +46,5 @@ export const useCellsNewFolderForm = ({
     onSuccess();
   };
 
-  return useCellsNewNodeFormBase({createNode: createFolder});
+  return useCellsNewNodeFormBase({createNode: createFolder, isOpen});
 };

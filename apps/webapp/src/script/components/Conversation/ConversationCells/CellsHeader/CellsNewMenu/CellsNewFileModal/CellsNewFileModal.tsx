@@ -51,12 +51,13 @@ export const CellsNewFileModal = ({
   onSuccess,
   currentPath,
 }: CellsNewFileModalProps) => {
-  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewFileForm({
+  const {name, error, isSubmitting, handleSubmit, handleChange, handleClear} = useCellsNewFileForm({
     fileType,
     cellsRepository,
     conversationQualifiedId,
     onSuccess,
     currentPath,
+    isOpen,
   });
   const fileExtension = getFileExtensionByType(fileType);
   const headline = `${t('cells.newItemMenuModal.headlineFile', {fileType})} (.${fileExtension})`;
@@ -71,6 +72,7 @@ export const CellsNewFileModal = ({
         onSubmit={handleSubmit}
         inputValue={name}
         onChange={handleChange}
+        onClear={handleClear}
         error={error}
         isOpen={isOpen}
       />

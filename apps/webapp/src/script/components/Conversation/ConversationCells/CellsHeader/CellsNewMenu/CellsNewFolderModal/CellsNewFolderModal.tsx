@@ -45,11 +45,12 @@ export const CellsNewFolderModal = ({
   onSuccess,
   currentPath,
 }: CellsNewFolderModalProps) => {
-  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewFolderForm({
+  const {name, error, isSubmitting, handleSubmit, handleChange, handleClear} = useCellsNewFolderForm({
     cellsRepository,
     conversationQualifiedId,
     onSuccess,
     currentPath,
+    isOpen,
   });
 
   return (
@@ -62,6 +63,7 @@ export const CellsNewFolderModal = ({
         onSubmit={handleSubmit}
         inputValue={name}
         onChange={handleChange}
+        onClear={handleClear}
         error={error}
         isOpen={isOpen}
       />

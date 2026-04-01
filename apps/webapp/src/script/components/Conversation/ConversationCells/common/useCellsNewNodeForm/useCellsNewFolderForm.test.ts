@@ -43,18 +43,21 @@ describe('useCellsNewFolderForm', () => {
     onSuccess = jest.fn();
   });
 
-  const setup = () =>
-    renderHook(() =>
-      useCellsNewFolderForm({
-        cellsRepository: mockCellsRepository,
-        conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
-        onSuccess,
-        currentPath: '/wire-cells-web/path',
-      }),
+  const renderUseCellsNewFolderForm = (isOpen = true) =>
+    renderHook(
+      ({isOpen: isModalOpen}) =>
+        useCellsNewFolderForm({
+          cellsRepository: mockCellsRepository,
+          conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
+          onSuccess,
+          currentPath: '/wire-cells-web/path',
+          isOpen: isModalOpen,
+        }),
+      {initialProps: {isOpen}},
     );
 
   it('does not append file extension or template data when creating folder names', async () => {
-    const {result} = setup();
+    const {result} = renderUseCellsNewFolderForm();
 
     act(() => {
       result.current.handleChange({currentTarget: {value: 'Project.docx'}} as ChangeEvent<HTMLInputElement>);
@@ -73,7 +76,7 @@ describe('useCellsNewFolderForm', () => {
   });
 
   it('uses createFolder repository method and never calls createFile', async () => {
-    const {result} = setup();
+    const {result} = renderUseCellsNewFolderForm();
 
     act(() => {
       result.current.handleChange({currentTarget: {value: 'New folder'}} as ChangeEvent<HTMLInputElement>);
@@ -86,5 +89,31 @@ describe('useCellsNewFolderForm', () => {
     expect(mockCellsRepository.createFolder).toHaveBeenCalledTimes(1);
     expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
     expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('resets name and error when modal is reopened', async () => {
+    const {result, rerender} = renderUseCellsNewFolderForm(true);
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'invalid/name'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.name).toBe('invalid/name');
+    expect(result.current.error).toBe('cells.newItemMenuModalForm.invalidCharactersError');
+
+    act(() => {
+      rerender({isOpen: false});
+    });
+
+    act(() => {
+      rerender({isOpen: true});
+    });
+
+    expect(result.current.name).toBe('');
+    expect(result.current.error).toBeNull();
   });
 });

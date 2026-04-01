@@ -44,15 +44,18 @@ describe('useCellsNewFileForm', () => {
     onSuccess = jest.fn();
   });
 
-  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document') =>
-    renderHook(() =>
-      useCellsNewFileForm({
-        fileType,
-        cellsRepository: mockCellsRepository,
-        conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
-        onSuccess,
-        currentPath: '/wire-cells-web/path',
-      }),
+  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document', isOpen = true) =>
+    renderHook(
+      ({isOpen: isModalOpen}) =>
+        useCellsNewFileForm({
+          fileType,
+          cellsRepository: mockCellsRepository,
+          conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
+          onSuccess,
+          currentPath: '/wire-cells-web/path',
+          isOpen: isModalOpen,
+        }),
+      {initialProps: {isOpen}},
     );
 
   it('shows an error when name is empty', async () => {
@@ -193,5 +196,30 @@ describe('useCellsNewFileForm', () => {
       }),
     );
     expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+  it('resets name and error when modal is reopened', async () => {
+    const {result, rerender} = renderUseCellsNewFileForm('document', true);
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'invalid/name'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.name).toBe('invalid/name');
+    expect(result.current.error).toBe('cells.newItemMenuModalForm.invalidCharactersError');
+
+    act(() => {
+      rerender({isOpen: false});
+    });
+
+    act(() => {
+      rerender({isOpen: true});
+    });
+
+    expect(result.current.name).toBe('');
+    expect(result.current.error).toBeNull();
   });
 });
