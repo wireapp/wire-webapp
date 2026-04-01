@@ -32,7 +32,7 @@ import {CallOptions} from './CallOptions';
 
 import {Config} from '../../../../../Config';
 
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
 }));
 
