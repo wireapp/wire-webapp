@@ -23,7 +23,7 @@ import {Select} from '@wireapp/react-ui-kit';
 
 import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
 import * as Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   videoOptionInlineMenuStyles,

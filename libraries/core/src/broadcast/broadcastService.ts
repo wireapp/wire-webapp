@@ -23,8 +23,8 @@ import {APIClient} from '@wireapp/api-client';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {sendMessage} from '../conversation/message/messageSender';
-import {MessageService} from '../conversation/message/MessageService';
-import {flattenUserMap} from '../conversation/message/UserClientsUtil';
+import {MessageService} from '../conversation/message/messageService';
+import {flattenUserMap} from '../conversation/message/userClientsUtil';
 import {ProteusService} from '../messagingProtocols/proteus';
 
 export class BroadcastService {

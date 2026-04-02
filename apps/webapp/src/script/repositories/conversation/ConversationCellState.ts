@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';

@@ -55,7 +55,7 @@ import {
   ButtonAction,
 } from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
 import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';

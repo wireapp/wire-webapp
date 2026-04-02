@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     timeout-minutes: 20
 
     outputs:
@@ -85,6 +85,8 @@ jobs:
   deploy_to_aws:
     name: Deploy to precommit
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-central-1
     needs: [build]
     timeout-minutes: 25
 
@@ -96,20 +98,25 @@ jobs:
         with:
           name: build-artifact
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
       - name: Deploy to precommit environment
         id: deploy
-        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027 # v22
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
         with:
-          application_name: Webapp
-          aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          deployment_package: ${{ needs.build.outputs.build_artifact }}
-          environment_name: wire-webapp-precommit
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{ needs.build.outputs.committer }} — ${{ needs.build.outputs.commit_url }}
-          version_label: ${{ github.run_id }}
-          wait_for_deployment: true # ✅ wait until EB is green
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: wire-webapp-precommit
+          version-label: ${{ github.run_id }}
+          deployment-package-path: ${{ needs.build.outputs.build_artifact }}
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          use-existing-application-version-if-available: true
 
       - name: Fetch precommit URL
         id: fetch_url
@@ -119,10 +126,6 @@ jobs:
             --environment-names wire-webapp-precommit \
             --query "Environments[0].CNAME" --output text)
           echo "url=https://$URL" >> "$GITHUB_OUTPUT"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
 
       - name: Deployment Status
         if: ${{ always() }}
@@ -166,9 +169,9 @@ jobs:
           echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
           echo "Merge queue run detected, executing critical flow tests"
 
-  run_e2e_tests:
-    name: Playwright Critical Flow (precommit)
-    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' }}
+  e2e_tests:
+    name: E2E Tests Execution
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
     needs: [check_edits_to_e2e_tests, deploy_to_aws]
     uses: ./.github/workflows/e2e-tests.yml
     with:
@@ -178,9 +181,18 @@ jobs:
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
 
+  run_e2e_tests:
+    name: Playwright Critical Flow (precommit)
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
+    needs: [e2e_tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report Status
+        run: echo "E2E tests completed with status - ${{ needs.e2e_tests.result }}"
+
   e2e-report:
     name: Generate test report
-    needs: run_e2e_tests
+    needs: e2e_tests
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     permissions:
@@ -205,7 +217,7 @@ jobs:
       - name: Download report
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          artifact-ids: ${{ needs.run_e2e_tests.outputs.reportArtifactId }}
+          artifact-ids: ${{ needs.e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
 
       - name: Generate PR comment
@@ -238,7 +250,7 @@ jobs:
         with:
           header: playwright-summary
           message: |
-            🔗 [Download Full Report Artifact](${{ needs.run_e2e_tests.outputs.reportUrl }})
+            🔗 [Download Full Report Artifact](${{ needs.e2e_tests.outputs.reportUrl }})
 
             ${{ steps.generate_comment.outputs.comment }}
         env:

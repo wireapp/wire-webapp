@@ -17,7 +17,7 @@
  *
  */
 
-import {mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/AssetMapper';
+import {mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
 
 import {ProviderData, ProviderEntity} from './ProviderEntity';
 import {ServiceData, ServiceEntity} from './ServiceEntity';

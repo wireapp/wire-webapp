@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';

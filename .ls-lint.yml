@@ -71,6 +71,36 @@ ls:
     .ts: camelCase
     .tsx: camelCase
     .test.tsx: camelCase
+  apps/webapp/src/script/repositories/media/backgroundEffects:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/repositories/assets:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/audio:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/backup:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/cache:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/cells:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/connection:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
   apps/server/routes:
     .dir: camelCase
     .ts: camelCase
@@ -277,3 +307,59 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .store.ts: camelCase
+  libraries/core/src/cryptography:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/secretStore:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .test.node.ts: camelCase
+  libraries/core/src/test:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/conversation/assetService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/conversationMapper:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/messageTimer:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/subconversationService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/content:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/conversation/message:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/conversation/conversationService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/utility:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService/cryptoClient:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+    .store.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService/decryptionErrorGenerator:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase

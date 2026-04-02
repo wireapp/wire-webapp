@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
 
     outputs:
       unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
@@ -71,6 +71,8 @@ jobs:
   deploy_to_aws:
     name: 'Deploy to live environments'
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-central-1
     needs: [build]
 
     steps:
@@ -85,23 +87,28 @@ jobs:
           if [[ ${{ needs.build.outputs.total_additions }} -le 100 || "${{ github.actor }}" == "dependabot[bot]" ]]; then
             echo "Skipping deployment"
             exit 0
-            fi
+          fi
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy to precommit environment
         id: deploy
-        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
         with:
-          application_name: Webapp
-          aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          deployment_package: ${{needs.build.outputs.build_artifact}}
-          environment_name: wire-webapp-precommit
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{ github.sha }}
-          version_label: ${{ github.run_id }}
-          wait_for_deployment: false
-          wait_for_environment_recovery: 150
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: wire-webapp-precommit
+          version-label: ${{ github.run_id }}
+          deployment-package-path: ${{ needs.build.outputs.build_artifact }}
+          wait-for-deployment: false
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
 
       - name: Deployment Status
         if: ${{ always() }}

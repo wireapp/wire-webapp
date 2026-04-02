@@ -40,7 +40,7 @@ jobs:
         run: yarn playwright install --only-shell --with-deps chromium
 
       - name: Install 1Password
-        uses: 1password/install-cli-action@143a85f84a90555d121cde2ff5872e393a47ab9f
+        uses: 1password/install-cli-action@8d006a0d0a4fd505af7f7ce589e7f768385ff5e4
 
       - name: Generate env file
         run: op inject -i apps/webapp/test/e2e_tests/.env.$ENV.tpl -o apps/webapp/test/e2e_tests/.env

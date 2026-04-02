@@ -20,7 +20,7 @@
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile} from 'Util/util';

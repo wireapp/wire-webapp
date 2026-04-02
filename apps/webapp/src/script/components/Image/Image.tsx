@@ -24,7 +24,7 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/InViewport';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

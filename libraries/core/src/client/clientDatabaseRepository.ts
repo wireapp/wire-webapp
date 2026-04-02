@@ -24,7 +24,7 @@ import {CRUDEngine} from '@wireapp/store-engine';
 
 import {MetaClient} from './clientService';
 
-import {constructSessionId} from '../messagingProtocols/proteus/Utility/SessionHandler';
+import {constructSessionId} from '../messagingProtocols/proteus/utility/sessionHandler';
 
 export enum DatabaseStores {
   CLIENTS = 'clients',

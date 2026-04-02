@@ -39,10 +39,8 @@ test.describe('In Conversation Search', () => {
     'Verify main overview shows media from all categories',
     {tag: ['@TC-352', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const userBPage = await createPage(withLogin(userB));
+      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
@@ -64,6 +62,65 @@ test.describe('In Conversation Search', () => {
       await expect(collection.getSection('Images')).toBeVisible();
       await expect(collection.getSection('Audio')).toBeVisible();
       await expect(collection.getSection('Files')).toBeVisible();
+    },
+  );
+
+  test(
+    "Verify ephemeral messages aren't shown in collection after timeout",
+    {tag: ['@TC-354', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversation().enableSelfDeletingMessages();
+      await userBPages.conversation().sendMessage('Gone in 10s');
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
+      await userAPage.waitForTimeout(10_000);
+
+
+      await userAPages.conversation().searchButton.click();
+
+      const collection = userAPages.collection();
+      await collection.searchBar.fill('Gone in 10s');
+
+      await expect(collection.searchResults).toHaveCount(0);
+    },
+  );
+
+  test(
+    'Verify ephemeral messages show in collection before timeout',
+    {tag: ['@TC-355', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversation().enableSelfDeletingMessages();
+      await userBPages.conversation().sendMessage('Gone in 10s');
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
+
+      await userAPages.conversation().searchButton.click();
+
+      const collection = userAPages.collection();
+      await collection.searchBar.fill('Gone in 10s');
+
+      await expect(collection.searchResults).toHaveCount(1);
+      await expect(collection.searchResults).toContainText('Gone in 10s');
     },
   );
 

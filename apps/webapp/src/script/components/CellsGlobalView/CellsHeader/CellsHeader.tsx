@@ -17,7 +17,7 @@
  *
  */
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
 import {CellsFilters} from './CellsFilters/CellsFilters';

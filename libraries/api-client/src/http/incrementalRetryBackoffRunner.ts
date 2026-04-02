@@ -33,6 +33,7 @@ export type RunWithIncrementalRetryBackoffDependencies<ResponseValue> = {
   readonly getIncrementalRetryBackoffState: () => IncrementalRetryBackoffState;
   readonly getRetryBackoffResetCount: () => number;
   readonly isRequestAborted: () => boolean;
+  readonly onIncrementalRetryBackoffStateChanged?: (incrementalRetryBackoffState: IncrementalRetryBackoffState) => void;
   readonly runRequestAttempt: () => Promise<ResponseValue>;
   readonly setIncrementalRetryBackoffState: (
     incrementalRetryBackoffState: IncrementalRetryBackoffState,
@@ -59,6 +60,7 @@ export function createIncrementalRetryBackoffRunner(
         getIncrementalRetryBackoffState,
         getRetryBackoffResetCount,
         isRequestAborted,
+        onIncrementalRetryBackoffStateChanged,
         runRequestAttempt,
         setIncrementalRetryBackoffState,
       } = runWithIncrementalRetryBackoffDependencies;
@@ -79,6 +81,7 @@ export function createIncrementalRetryBackoffRunner(
           );
 
           setIncrementalRetryBackoffState(nextIncrementalRetryBackoffState);
+          onIncrementalRetryBackoffStateChanged?.(nextIncrementalRetryBackoffState);
 
           const retryBackoffResetCount = getRetryBackoffResetCount();
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetType} from 'Repositories/assets/AssetType';
+import {AssetType} from 'Repositories/assets/assetType';
 
 import {Asset} from './Asset';
 

@@ -18,7 +18,7 @@
  */
 
 /* eslint-disable import/order */
-import * as Recipients from '../Utility/Recipients';
+import * as Recipients from '../utility/recipients';
 
 import {
   CONVERSATION_CELLS_STATE,
@@ -31,10 +31,10 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 
 import {AddUsersFailureReasons, MessageSendingState, MessageTargetMode} from '../../../conversation';
-import {buildTextMessage} from '../../../conversation/message/MessageBuilder';
+import {buildTextMessage} from '../../../conversation/message/messageBuilder';
 import {SendProteusMessageParams} from './ProteusService.types';
 import {buildProteusService, cleanupProteusServiceMocks} from './ProteusService.mocks';
-import {constructSessionId} from '../Utility/SessionHandler';
+import {constructSessionId} from '../utility/sessionHandler';
 import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 import {ProteusService} from './ProteusService';
@@ -42,7 +42,7 @@ import {NonFederatingBackendsError} from '../../../errors';
 import {generateQualifiedId, generateQualifiedIds} from '../../../testUtils';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-jest.mock('./CryptoClient/CoreCryptoWrapper/PrekeysTracker', () => {
+jest.mock('./cryptoClient/coreCryptoWrapper/prekeysTracker', () => {
   return {
     PrekeyTracker: jest.fn().mockImplementation(() => {
       return {
@@ -54,8 +54,8 @@ jest.mock('./CryptoClient/CoreCryptoWrapper/PrekeysTracker', () => {
   };
 });
 
-jest.mock('../Utility/Recipients', () => ({
-  ...jest.requireActual('../Utility/Recipients'),
+jest.mock('../utility/recipients', () => ({
+  ...jest.requireActual('../utility/recipients'),
   getRecipientsForConversation: jest.fn(),
   getQualifiedRecipientsForConversation: jest.fn(),
 }));

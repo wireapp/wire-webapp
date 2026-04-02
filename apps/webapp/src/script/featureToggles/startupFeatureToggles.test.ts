@@ -23,7 +23,7 @@ import {
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
 import {
-  collaboraClipboardAccessFeatureToggleName,
+  collaboraNewDocumentCreationMenuFeatureToggleName,
   countlyIncrementalBackoffRetryReportingFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
   startupFeatureToggleNames,
@@ -31,7 +31,7 @@ import {
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
-  collaboraClipboardAccessFeatureToggleName,
+  collaboraNewDocumentCreationMenuFeatureToggleName,
   countlyIncrementalBackoffRetryReportingFeatureToggleName,
 ] as const;
 
@@ -68,12 +68,12 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
   });
 
-  it('enables the collabora clipboard access feature toggle when present in the query parameter', () => {
+  it('enables the collabora new document creation feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${collaboraClipboardAccessFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${collaboraNewDocumentCreationMenuFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(collaboraClipboardAccessFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(collaboraNewDocumentCreationMenuFeatureToggleName)).toBe(true);
   });
 
   it('keeps only whitelisted feature toggles when known and unknown values are mixed', () => {
@@ -136,7 +136,7 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
-      collaboraClipboardAccessFeatureToggleName,
+      collaboraNewDocumentCreationMenuFeatureToggleName,
       countlyIncrementalBackoffRetryReportingFeatureToggleName,
     ]);
   });

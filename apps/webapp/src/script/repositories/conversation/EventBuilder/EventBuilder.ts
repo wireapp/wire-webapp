@@ -26,13 +26,13 @@ import {
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure} from '@wireapp/core/lib/conversation';
 import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
-import {ReactionType} from '@wireapp/core/lib/conversation/ReactionType';
+import {ReactionType} from '@wireapp/core/lib/conversation/reactionType';
 import {DecryptionError} from '@wireapp/core/lib/errors/decryptionError';
 
 import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';

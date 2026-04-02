@@ -24,7 +24,7 @@ import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@w
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   backgroundSettingsHeaderStyles,

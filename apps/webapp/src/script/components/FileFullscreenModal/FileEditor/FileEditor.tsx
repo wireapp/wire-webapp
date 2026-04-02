@@ -25,10 +25,8 @@ import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
-import {collaboraClipboardAccessFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -45,7 +43,6 @@ interface FileEditorProps {
 
 export const FileEditor = ({id}: FileEditorProps) => {
   const cellsRepository = container.resolve(CellsRepository);
-  const {isFeatureToggleEnabled} = useApplicationContext();
   const [node, setNode] = useState<Node | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
@@ -141,7 +138,6 @@ export const FileEditor = ({id}: FileEditorProps) => {
     Maybe.of(node?.EditorURLs?.collabora?.Url),
     Config.getConfig().CELLS_PYDIO_URL,
   );
-  const shouldDelegateClipboardAccess = isFeatureToggleEnabled(collaboraClipboardAccessFeatureToggleName);
 
   if (result.isErr(urlValidation)) {
     return null;
@@ -149,7 +145,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
   return (
     <iframe
-      allow={shouldDelegateClipboardAccess ? 'clipboard-read; clipboard-write' : undefined}
+      allow="clipboard-read; clipboard-write"
       css={styles.editorIframe}
       src={urlValidation.value}
       title={t('fileFullscreenModal.editor.iframeTitle')}

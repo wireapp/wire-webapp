@@ -18,6 +18,6 @@
  */
 
 export * from './ProteusService';
-export * from '../Utility';
+export * from '../utility';
 export * from './ProteusService.types';
-export {ProteusErrors} from './DecryptionErrorGenerator';
+export {ProteusErrors} from './decryptionErrorGenerator';

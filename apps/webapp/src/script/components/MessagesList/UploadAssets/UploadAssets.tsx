@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {UploadAssetItem} from './components/UploadAssetItem';

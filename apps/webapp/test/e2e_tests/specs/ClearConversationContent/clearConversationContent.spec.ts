@@ -106,10 +106,8 @@ test.describe('Clear Conversation Content', () => {
       `I want to ${type} content of 1:1 conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const [userAPageManager, userBPageManager] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-          PageManager.from(createPage(withLogin(userB))),
-        ]);
+        const userBPageManager = PageManager.from(await createPage(withLogin(userB)));
+        const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;
@@ -155,11 +153,12 @@ test.describe('Clear Conversation Content', () => {
       `I want to see incoming picture, ping and call after I clear content of a ${conversationType} conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const [userAPage, userBPage, userCPage] = await Promise.all([
-          createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC)),
+        const [userBPage, userCPage] = await Promise.all([
           createPage(withLogin(userB)),
           createPage(withLogin(userC)),
         ]);
+
+        const userAPage = await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC));
 
         const userAPageManager = PageManager.from(userAPage);
         const userBPageManager = PageManager.from(userBPage);
@@ -258,10 +257,8 @@ test.describe('Clear Conversation Content', () => {
       `I want to clear the ${conversationType} conversation content from conversation details options`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const [userAPageManager, userBPageManager] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-          PageManager.from(createPage(withLogin(userB))),
-        ]);
+        const userBPageManager = PageManager.from(await createPage(withLogin(userB)));
+        const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;

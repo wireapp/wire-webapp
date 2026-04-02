@@ -44,7 +44,7 @@ test.describe('Conversations', () => {
       const userAPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
 
       await createGroup(userAPages, groupName, [userB, userC]);
-      userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().openConversation(groupName);
 
       const firstMessage = userAPages.conversation().systemMessages.first();
       await expect(firstMessage).toContainText(new RegExp(`You started the conversation\\s*${groupName}\\s*with`, 'i'));

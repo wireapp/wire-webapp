@@ -53,8 +53,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
+import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {Message} from 'Repositories/entity/message/Message';

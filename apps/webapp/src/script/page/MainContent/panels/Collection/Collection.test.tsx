@@ -20,7 +20,7 @@
 import {fireEvent, render, waitFor, act} from '@testing-library/react';
 import {container} from 'tsyringe';
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';

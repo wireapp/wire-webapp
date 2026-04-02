@@ -21,7 +21,7 @@ import {FeatureList, FEATURE_STATUS, CONVERSATION_PROTOCOL} from '@wireapp/api-c
 
 import {randomUUID} from 'crypto';
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
 import {ROLE} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';

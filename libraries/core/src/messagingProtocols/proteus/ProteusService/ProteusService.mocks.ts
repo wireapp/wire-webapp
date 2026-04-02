@@ -21,12 +21,12 @@ import {ClientType} from '@wireapp/api-client/lib/client';
 
 import {APIClient} from '@wireapp/api-client';
 
-import {CryptoClient} from './CryptoClient';
-import {CoreCryptoWrapper} from './CryptoClient/CoreCryptoWrapper/CoreCryptoWrapper';
+import {CryptoClient} from './cryptoClient';
+import {CoreCryptoWrapper} from './cryptoClient/coreCryptoWrapper/coreCryptoWrapper';
 import {ProteusService} from './ProteusService';
 
-import {getUUID} from '../../../test/PayloadHelper';
-import {createMemoryEngine} from '../../../test/StoreHelper';
+import {getUUID} from '../../../test/payloadHelper';
+import {createMemoryEngine} from '../../../test/storeHelper';
 
 const createdApiClients: APIClient[] = [];
 

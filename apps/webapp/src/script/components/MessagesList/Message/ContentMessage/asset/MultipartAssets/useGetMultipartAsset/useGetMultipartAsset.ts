@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 type Status = 'idle' | 'loading' | 'success' | 'error' | 'retrying';
 

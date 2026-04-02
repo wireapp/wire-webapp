@@ -27,7 +27,7 @@ import {
 } from '@wireapp/api-client/lib/event';
 
 import {MessageSendingState, PayloadBundle, PayloadBundleType} from '../conversation';
-import {createId} from '../conversation/message/MessageBuilder';
+import {createId} from '../conversation/message/messageBuilder';
 import {NotificationSource} from '../notification';
 
 export class UserMapper {

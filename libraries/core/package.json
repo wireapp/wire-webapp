@@ -22,7 +22,7 @@
     }
   },
   "browser": {
-    "./lib/cryptography/AssetCryptography/crypto.node": "./lib/cryptography/AssetCryptography/crypto.browser.js"
+    "./lib/cryptography/assetCryptography/crypto.node": "./lib/cryptography/assetCryptography/crypto.browser.js"
   },
   "dependencies": {
     "@wireapp/api-client": "27.96.0",

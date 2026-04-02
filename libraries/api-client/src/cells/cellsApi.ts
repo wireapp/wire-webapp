@@ -192,6 +192,29 @@ export class CellsAPI {
     return result.data;
   }
 
+  async checkNodeCreation({
+    path,
+    uuid,
+    versionId,
+    type,
+  }: {
+    path: NonNullable<RestNodeLocator['Path']>;
+    uuid: string;
+    versionId: string;
+    type: RestIncomingNode['Type'];
+  }): Promise<RestCreateCheckResponse> {
+    if (!this.client || !this.storageService) {
+      throw new Error(CONFIGURATION_ERROR);
+    }
+
+    const result = await this.client.createCheck({
+      Inputs: [{Type: type, Locator: {Path: path.normalize('NFC'), Uuid: uuid}, VersionId: versionId}],
+      FindAvailablePath: false,
+    });
+
+    return result.data;
+  }
+
   async promoteNodeDraft({uuid, versionId}: {uuid: string; versionId: string}): Promise<RestPromoteVersionResponse> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
@@ -443,11 +466,13 @@ export class CellsAPI {
     uuid,
     type,
     versionId = '',
+    templateUuid,
   }: {
     path: NonNullable<RestNodeLocator['Path']>;
     uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
     type: RestIncomingNode['Type'];
     versionId?: RestIncomingNode['VersionId'];
+    templateUuid?: NonNullable<RestIncomingNode['TemplateUuid']>;
   }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
@@ -460,6 +485,7 @@ export class CellsAPI {
           Locator: {Path: path.normalize('NFC')},
           ResourceUuid: uuid,
           VersionId: versionId,
+          ...(templateUuid ? {TemplateUuid: templateUuid} : {}),
         },
       ],
     });
@@ -471,16 +497,19 @@ export class CellsAPI {
     path,
     uuid,
     versionId,
+    templateUuid,
   }: {
     path: NonNullable<RestNodeLocator['Path']>;
     uuid: NonNullable<RestIncomingNode['ResourceUuid']>;
     versionId: NonNullable<RestIncomingNode['VersionId']>;
+    templateUuid?: NonNullable<RestIncomingNode['TemplateUuid']>;
   }): Promise<RestNodeCollection> {
     return this.createNode({
       path,
       uuid,
       type: 'LEAF',
       versionId,
+      templateUuid,
     });
   }
 

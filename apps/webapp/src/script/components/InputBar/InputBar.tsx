@@ -31,7 +31,7 @@ import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar'
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

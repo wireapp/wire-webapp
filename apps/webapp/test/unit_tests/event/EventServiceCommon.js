@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {ConversationError} from 'src/script/error/ConversationError';
 import {StorageError} from 'src/script/error/StorageError';

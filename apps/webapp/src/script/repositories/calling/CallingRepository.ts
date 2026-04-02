@@ -23,8 +23,8 @@ import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
 import {TaskScheduler} from '@wireapp/core/lib/util';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {amplify} from 'amplify';
@@ -70,7 +70,7 @@ import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
+import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
@@ -1633,7 +1633,6 @@ export class CallingRepository {
     const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
       conversationId,
       conversation.groupId,
-      true,
     );
 
     if (!subconversationEpochInfo) {

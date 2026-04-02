@@ -20,8 +20,8 @@
 import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';

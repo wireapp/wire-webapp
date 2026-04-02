@@ -25,7 +25,7 @@ import {EventEmitter} from 'events';
 import {LogFactory} from '@wireapp/commons';
 
 import {AcknowledgeType} from './acknowledgeEvent.types';
-import {ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
+import {LongRunningRetryDetails, ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../config';
@@ -41,6 +41,7 @@ import {
 enum TOPIC {
   ON_ERROR = 'WebSocketClient.TOPIC.ON_ERROR',
   ON_INVALID_TOKEN = 'WebSocketClient.TOPIC.ON_INVALID_TOKEN',
+  ON_LONG_RUNNING_RETRY = 'WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY',
   ON_MESSAGE = 'WebSocketClient.TOPIC.ON_MESSAGE',
   ON_STATE_CHANGE = 'WebSocketClient.TOPIC.ON_STATE_CHANGE',
 }
@@ -48,6 +49,7 @@ enum TOPIC {
 export interface WebSocketClient {
   on(event: TOPIC.ON_ERROR, listener: (error: Error | ErrorEvent) => void): this;
   on(event: TOPIC.ON_INVALID_TOKEN, listener: (error: InvalidTokenError | MissingCookieError) => void): this;
+  on(event: TOPIC.ON_LONG_RUNNING_RETRY, listener: (retryDetails: LongRunningRetryDetails) => void): this;
   on(event: TOPIC.ON_MESSAGE, listener: (notification: Notification | ConsumableNotification) => void): this;
   on(event: TOPIC.ON_STATE_CHANGE, listener: (state: WEBSOCKET_STATE) => void): this;
 }
@@ -139,6 +141,10 @@ export class WebSocketClient extends EventEmitter {
     this.onStateChange(this.socket.getState());
   };
 
+  private readonly onLongRunningRetry = (retryDetails: LongRunningRetryDetails) => {
+    this.emit(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, retryDetails);
+  };
+
   /**
    * Attaches all listeners to the websocket and establishes the connection.
    *
@@ -157,6 +163,7 @@ export class WebSocketClient extends EventEmitter {
     this.onStateChange(WEBSOCKET_STATE.CONNECTING);
     this.socket.setOnMessage(this.onMessage);
     this.socket.setOnError(this.onError);
+    this.socket.setOnLongRunningRetry(this.onLongRunningRetry);
     this.socket.setOnOpen(() => {
       this.onOpen();
       if (onConnect) {

@@ -36,7 +36,7 @@ import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/M
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 

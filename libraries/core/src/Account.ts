@@ -58,7 +58,7 @@ import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
 import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
-import {SubconversationService} from './conversation/SubconversationService/SubconversationService';
+import {SubconversationService} from './conversation/subconversationService/subconversationService';
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {CoreCryptoConfig} from './messagingProtocols/common.types';
@@ -81,8 +81,8 @@ import {
 } from './messagingProtocols/mls/EventHandler/events/messageAdd/IncomingProposalsQueue';
 import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
-import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
-import {wipeCoreCryptoDb} from './messagingProtocols/proteus/ProteusService/CryptoClient/CoreCryptoWrapper';
+import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/cryptoClient';
+import {wipeCoreCryptoDb} from './messagingProtocols/proteus/ProteusService/cryptoClient/coreCryptoWrapper';
 import {deleteIdentity} from './messagingProtocols/proteus/ProteusService/identityClearer';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
@@ -447,7 +447,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
 
     if (this.options.coreCryptoConfig?.enabled) {
-      const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/CryptoClient/CoreCryptoWrapper');
+      const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/cryptoClient/coreCryptoWrapper');
       const client = await buildClient(
         storeEngine,
         {
@@ -460,7 +460,7 @@ export class Account extends TypedEventEmitter<Events> {
       return [CryptoClientType.CORE_CRYPTO, client] as const;
     }
 
-    const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/CryptoClient/CryptoboxWrapper');
+    const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/cryptoClient/cryptoboxWrapper');
     const client = buildClient(storeEngine, baseConfig);
     return [CryptoClientType.CRYPTOBOX, client] as const;
   };

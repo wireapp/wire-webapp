@@ -31,9 +31,9 @@ import {
   performancePanelSelectStyles,
   performancePanelStyles,
 } from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel.styles';
-import {QualityMode} from 'Repositories/media/BackgroundEffects';
-import {CapabilityInfo} from 'Repositories/media/BackgroundEffects/types';
-import type {BackgroundEffectsHandler} from 'Repositories/media/BackgroundEffectsHandler';
+import {QualityMode} from 'Repositories/media/backgroundEffects';
+import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 
 type PerformancePanelProps = {
