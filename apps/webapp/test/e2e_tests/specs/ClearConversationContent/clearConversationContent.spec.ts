@@ -106,8 +106,8 @@ test.describe('Clear Conversation Content', () => {
       `I want to ${type} content of 1:1 conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const userBPageManager = await PageManager.from(createPage(withLogin(userB)));
-        const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+        const userBPageManager = PageManager.from(await createPage(withLogin(userB)));
+        const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;
@@ -257,8 +257,8 @@ test.describe('Clear Conversation Content', () => {
       `I want to clear the ${conversationType} conversation content from conversation details options`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const userBPageManager = await PageManager.from(createPage(withLogin(userB)));
-        const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+        const userBPageManager = PageManager.from(await createPage(withLogin(userB)));
+        const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;
