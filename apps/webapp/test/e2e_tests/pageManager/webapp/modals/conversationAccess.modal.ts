@@ -22,16 +22,21 @@ import {Locator, Page} from '@playwright/test';
 import {BaseModal} from './base.modal';
 
 /** Modal shown when a link for guests to join a group conversation with a password is created */
-export class GuestLinkPasswordModal extends BaseModal {
-  readonly setPasswordInput: Locator;
-  readonly confirmPasswordInput: Locator;
-  readonly errorMessage: Locator;
+export class ConversationAccessModal extends BaseModal {
+  readonly passwordInput: Locator;
+  readonly submitButton: Locator;
+  readonly joinForm: Locator;
 
   constructor(page: Page) {
-    super(page, 'modal-template-guest-link-password');
+    super(page, 'modal');
 
-    this.setPasswordInput = this.modal.getByRole('textbox', {name: 'Set password'});
-    this.confirmPasswordInput = this.modal.getByRole('textbox', {name: 'Confirm password'});
-    this.errorMessage = this.modal.getByTestId('primary-modals-error-message');
+    this.passwordInput = this.modal.getByRole('textbox', {name: 'Conversation password'});
+    this.submitButton = this.modal.getByRole('button', {name: 'Join conversation'});
+    this.joinForm = this.modal.getByTestId('guest-password-join-form');
+  }
+
+  async joinConversation(password: string) {
+    await this.passwordInput.fill(password);
+    await this.submitButton.click();
   }
 }

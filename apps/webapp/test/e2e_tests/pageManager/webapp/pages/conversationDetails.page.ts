@@ -211,6 +211,10 @@ export class ConversationDetailsPage {
     await this.blockConversationButton.click();
   }
 
+  async openGuestOptions() {
+    await this.guestOptionsButton.click();
+  }
+
   async clickClearConversationContentButton() {
     await this.clearConversationContentButton.click();
   }
