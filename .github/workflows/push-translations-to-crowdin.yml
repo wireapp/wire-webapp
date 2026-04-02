@@ -1,18 +1,16 @@
-name: Sync translations
+name: Push translations to Crowdin
 
 on:
   push:
     branches: [dev]
-  schedule:
-    - cron: '0 8 * * *'
   workflow_dispatch:
 
 concurrency:
-  group: translations-${{ github.ref }}
+  group: crowdin-push-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  sync_translations:
+  push_to_crowdin:
     runs-on: ubuntu-latest
 
     steps:
@@ -36,24 +34,19 @@ jobs:
       - name: Merge translations
         run: yarn nx run webapp:translate-merge
 
-      - name: Download translations
+      - name: Upload sources to Crowdin
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
         env:
-          GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+          GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
           CROWDIN_PROJECT_ID: 342359
           INPUT_DEBUG_MODE: false
         with:
           upload_sources: true
           upload_translations: false
-          github_user_name: otto-the-bot
-          github_user_email: webapp+otto@wire.com
-          download_translations: true
-          push_translations: true
-          create_pull_request: true
-          localization_branch_name: 'translations'
-          pull_request_title: 'chore: Update translations'
-          commit_message: 'chore: Update translations'
-          token: ${{secrets.WEBTEAM_CROWDIN_TOKEN}}
+          download_translations: false
+          push_translations: false
+          create_pull_request: false
+          token: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
           source: '/apps/webapp/src/i18n/en-US.json'
           translation: '/apps/webapp/src/i18n/%locale%.json'
           base_path: '.'
