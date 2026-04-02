@@ -28,7 +28,9 @@
  * - Handles video element lifecycle (play, pause, cleanup)
  */
 
-import {getLogger, Logger} from 'Util/Logger';
+import {Runtime} from '@wireapp/commons';
+
+import {getLogger, Logger} from 'Util/logger';
 
 /**
  * Callback function invoked for each video frame.
@@ -118,9 +120,13 @@ export class VideoSource {
 
     // Prefer requestVideoFrameCallback (more accurate timestamps)
     if ('requestVideoFrameCallback' in this.videoEl) {
+      const isFirefox = Runtime.isFirefox();
       const callback = (now: number, metadata: VideoFrameCallbackMetadata) => {
-        // Use mediaTime for accurate frame timing
-        onFrame(metadata.mediaTime, width(), height());
+        // VideoFrameCallbackMetadata is a Chromium-based idea and not fully supported in Firefox.
+        // we calculate the timestamp in firefox by now value
+        // and use mediaTime for accurate frame timing in Chromium-based browsers.
+        const timestamp = isFirefox ? now : metadata.mediaTime;
+        onFrame(timestamp, width(), height());
         // Schedule next frame callback (rVFC requires re-registration)
         this.rVFCHandle = (this.videoEl as any).requestVideoFrameCallback(callback);
       };

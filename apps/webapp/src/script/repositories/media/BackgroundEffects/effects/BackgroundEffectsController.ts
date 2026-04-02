@@ -32,6 +32,7 @@
  * to produce an output MediaStreamTrack with effects applied.
  */
 
+import {TARGET_FPS} from 'Repositories/media/BackgroundEffectsHandler';
 import {getLogger, Logger} from 'Util/Logger';
 
 import {detectCapabilities, choosePipeline} from './capability';
@@ -95,7 +96,7 @@ export class BackgroundEffectsController {
   /** Quality mode ('auto' for adaptive, or fixed tier. */
   private quality: QualityMode = 'auto';
   /** Target frames per second for adaptive quality control. */
-  private targetFps = 15;
+  private targetFps = TARGET_FPS;
   /** Per-tier segmentation model overrides. */
   private segmentationModelByTier: SegmentationModelByTier = {
     superhigh: TIER_DEFINITIONS.superhigh.modelPath,
@@ -738,7 +739,7 @@ export class BackgroundEffectsController {
     this.backgroundPumpCancel?.();
 
     let lastTimestamp = 0;
-    const targetInterval = 1000 / 15;
+    const targetInterval = 1000 / this.targetFps;
     let active = true;
     let rVFCHandle: number | null = null;
     let rafHandle: number | null = null;
