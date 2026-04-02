@@ -633,6 +633,7 @@ describe('CallingRepository ISO', () => {
         {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
         } as any, // ServerTimeHandler
+        {} as any, // BackgroundEffectsHandler
         {} as any, // APIClient
         {
           findConversation: jest.fn().mockImplementation(() => conversation),
@@ -754,6 +755,7 @@ describe.skip('E2E audio call', () => {
     eventRepository,
     {} as UserRepository,
     serverTimeHandler as any,
+    {} as any,
     {} as any,
     {} as any,
   );
@@ -898,6 +900,7 @@ describe('NotificationHandlingState', () => {
     serverTimeHandler as any,
     mediaDevicesHandler,
     {} as any,
+    {} as any,
   );
   const user = new User('user-1');
   let wCall: Wcall;
@@ -957,6 +960,7 @@ describe('init AVS state', () => {
     {} as UserRepository,
     serverTimeHandler as any,
     mediaDevicesHandler,
+    {} as any,
     {} as any,
   );
   const user = new User('user-1');

@@ -71,6 +71,12 @@ ls:
     .ts: camelCase
     .tsx: camelCase
     .test.tsx: camelCase
+  apps/webapp/src/script/repositories/media/backgroundEffects:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .types.ts: camelCase
   apps/webapp/src/script/repositories/assets:
     .dir: camelCase
     .ts: camelCase
