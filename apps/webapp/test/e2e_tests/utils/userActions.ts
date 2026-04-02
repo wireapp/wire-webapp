@@ -98,13 +98,15 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
 export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
   const {modals} = pageManager.webapp;
   const appLockModal = modals.appLock();
-  if (await appLockModal.isVisible()) {
-    if (await appLockModal.lockPasscodeInput.isVisible()) {
-      await appLockModal.setPasscode(appLockPassCode);
-    } else {
-      await appLockModal.unlockAppWithPasscode(appLockPassCode);
-    }
+
+  if (!(await appLockModal.isVisible())) return;
+
+  if (await appLockModal.lockPasscodeInput.isVisible()) {
+    await appLockModal.setPasscode(appLockPassCode);
+    return;
   }
+
+  await appLockModal.unlockAppWithPasscode(appLockPassCode);
 };
 
 /**
