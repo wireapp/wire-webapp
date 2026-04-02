@@ -19,7 +19,6 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {checkAnyIndexedDBExists} from 'test/e2e_tests/utils/indexedDB.util';
 import {handleAppLockState} from 'test/e2e_tests/utils/userActions';
 
 import {test, expect, withLogin} from '../../test.fixtures';
@@ -91,40 +90,52 @@ test.describe('AppLock', () => {
       });
 
       test(
-        'Web: I want to unlock the app with passphrase after login',
-        {tag: ['@TC-2754', '@TC-2755', '@TC-2758', '@TC-2763', '@regression']},
+        'Web: I want the app to automatically lock after refreshing the page',
+        {tag: ['@TC-2754', '@regression']},
         async ({createPage}) => {
           const page = await createPage(withLogin(memberA));
           const pageManager = PageManager.from(page);
-          const {modals, pages} = pageManager.webapp;
+          const {modals} = PageManager.from(page).webapp;
 
-          await test.step('Web: I want the app to automatically lock after refreshing the page', async () => {
-            await handleAppLockState(pageManager, appLockPassCode);
-            await pageManager.refreshPage();
+          await handleAppLockState(pageManager, appLockPassCode);
 
-            await expect(modals.appLock().appLockModal).toBeVisible();
-          });
+          await page.reload();
 
-          await test.step('Web: I should not be able to unlock the app with wrong passphrase', async () => {
-            await handleAppLockState(pageManager, 'wrongCredentials');
-            await expect(modals.appLock().errorMessage).toHaveText('Wrong passcode');
-          });
+          await expect(modals.appLock().appLockModal).toBeVisible();
+        },
+      );
 
-          await test.step('Web: I should not be able to wipe database with wrong account password', async () => {
-            await modals.appLock().clickForgotPassphrase();
-            await modals.appLock().clickWipeDB();
-            await modals.appLock().clickReset();
-            await modals.appLock().inputUserPassword('wrong password');
+      test(
+        'Web: I want to unlock the app with passphrase after login',
+        {tag: ['@TC-2755', '@regression']},
+        async ({createPage}) => {
+          const page = await createPage(withLogin(memberA));
+          const pageManager = PageManager.from(page);
+          const {modals} = PageManager.from(page).webapp;
 
-            expect(await checkAnyIndexedDBExists(page)).toBeTruthy();
-          });
+          await handleAppLockState(pageManager, appLockPassCode);
 
-          await test.step('I want to wipe database when I forgot my app lock passphrase', async () => {
-            await modals.appLock().inputUserPassword(memberA.password);
+          await page.reload();
+          await modals.appLock().unlockAppWithPasscode(appLockPassCode);
 
-            await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
-            expect(await checkAnyIndexedDBExists(page)).toBeFalsy();
-          });
+          await expect(modals.appLock().appLockModal).not.toBeVisible();
+        },
+      );
+
+      test(
+        'Web: I should not be able to unlock the app with wrong passphrase',
+        {tag: ['@TC-2758', '@regression']},
+        async ({createPage}) => {
+          const page = await createPage(withLogin(memberA));
+          const pageManager = PageManager.from(page);
+          const {modals} = PageManager.from(page).webapp;
+
+          await handleAppLockState(pageManager, appLockPassCode);
+
+          await page.reload();
+          await modals.appLock().unlockAppWithPasscode('wrongCredentials');
+
+          await expect(modals.appLock().errorMessage).toContainText('Wrong passcode');
         },
       );
 
@@ -146,6 +157,28 @@ test.describe('AppLock', () => {
           // After redirect to login page verify the whole indexDB was cleared
           await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
           await expect.poll(() => page.evaluate(() => indexedDB.databases())).toHaveLength(0);
+        },
+      );
+
+      test(
+        'Web: I should not be able to wipe database with wrong account password',
+        {tag: ['@TC-2763', '@regression']},
+        async ({createPage}) => {
+          const page = await createPage(withLogin(memberA));
+          const pageManager = PageManager.from(page);
+          const {modals} = PageManager.from(page).webapp;
+
+          await handleAppLockState(pageManager, appLockPassCode);
+
+          await page.reload();
+          await modals.appLock().clickForgotPassphrase();
+          await modals.appLock().clickWipeDB();
+          await modals.appLock().clickReset();
+          await modals.appLock().inputUserPassword('invalid');
+
+          // The modal should show an error for the invalid password and not wipe indexDB
+          await expect(modals.appLock().errorMessage).toContainText('Wrong password');
+          await expect.poll(() => page.evaluate(() => indexedDB.databases())).not.toHaveLength(0);
         },
       );
 
