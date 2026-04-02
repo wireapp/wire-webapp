@@ -1460,7 +1460,8 @@ export class CallingRepository {
       if (error) {
         this.logger.error('Failed answering call', error);
       }
-      this.rejectCall(conversation.qualifiedId);
+      this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.CONVERSATION_DEGRADED);
+      call.reason(REASON.ERROR);
       if (!!conversation && this.isMLSConference(conversation)) {
         await this.leaveMLSConferenceBecauseError(conversation);
       }
