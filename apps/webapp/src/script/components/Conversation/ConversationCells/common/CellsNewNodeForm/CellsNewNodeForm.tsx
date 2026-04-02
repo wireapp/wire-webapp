@@ -19,7 +19,7 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 
-import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
+import {TextInput} from 'Components/TextInput';
 
 import {inputWrapperStyles} from './CellsNewNodeForm.styles';
 
@@ -31,6 +31,7 @@ interface CellsNewNodeFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onClear: () => void;
   error: string | null;
   isOpen: boolean;
 }
@@ -41,6 +42,7 @@ export const CellsNewNodeForm = ({
   onSubmit,
   inputValue,
   onChange,
+  onClear,
   error,
   isOpen,
 }: CellsNewNodeFormProps) => {
@@ -49,14 +51,18 @@ export const CellsNewNodeForm = ({
   return (
     <form onSubmit={onSubmit}>
       <div css={inputWrapperStyles}>
-        <Label htmlFor="cells-new-item-name">{label}</Label>
-        <Input
-          id="cells-new-item-name"
+        <TextInput
+          label={label}
+          name="cells-new-item-name"
           value={inputValue}
           ref={inputRef}
           placeholder={placeholder}
           onChange={onChange}
-          error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
+          onCancel={onClear}
+          isError={Boolean(error)}
+          errorMessage={error ?? undefined}
+          uieName="cells-new-item-name"
+          errorUieName="cells-new-item-name-error"
         />
       </div>
     </form>

@@ -19,24 +19,37 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
+import {t} from 'Util/localizerUtil';
 
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
+type CreateNodeMock = jest.MockedFunction<(name: string) => Promise<void>>;
+
+interface SetupOptions {
+  createNode?: CreateNodeMock;
+  normalizeNameForCreation?: (rawName: string) => string;
+  isOpen?: boolean;
+}
 
 describe('useCellsNewNodeFormBase', () => {
   const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
+  const createNodeMock = () => jest.fn().mockResolvedValue(undefined) as CreateNodeMock;
 
-  const setup = (
-    createNode: jest.Mock<Promise<void>, [string]> = jest.fn().mockResolvedValue(undefined),
-    normalizeNameForCreation?: (rawName: string) => string,
-  ) => {
-    const {result} = renderHook(() => useCellsNewNodeFormBase({createNode, normalizeNameForCreation}));
+  const setup = ({createNode = createNodeMock(), normalizeNameForCreation, isOpen = true}: SetupOptions = {}) => {
+
+    const {result, rerender} = renderHook(
+      ({modalIsOpen}: {modalIsOpen: boolean}) =>
+        useCellsNewNodeFormBase({
+          createNode,
+          normalizeNameForCreation,
+          isOpen: modalIsOpen,
+        }),
+      {initialProps: {modalIsOpen: isOpen}},
+    );
 
     return {
       result,
+      rerender,
       createNode,
     };
   };
@@ -48,7 +61,7 @@ describe('useCellsNewNodeFormBase', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.nameRequired');
+    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.nameRequired'));
     expect(createNode).not.toHaveBeenCalled();
   });
 
@@ -63,13 +76,13 @@ describe('useCellsNewNodeFormBase', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.invalidCharactersError');
+    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
     expect(createNode).not.toHaveBeenCalled();
   });
 
   it('trims input and applies normalizeNameForCreation before calling createNode', async () => {
     const normalizeNameForCreation = jest.fn((rawName: string) => `${rawName}.normalized`);
-    const {result, createNode} = setup(jest.fn().mockResolvedValue(undefined), normalizeNameForCreation);
+    const {result, createNode} = setup({normalizeNameForCreation});
 
     act(() => {
       result.current.handleChange({currentTarget: {value: ' New item '}} as ChangeEvent<HTMLInputElement>);
@@ -84,7 +97,7 @@ describe('useCellsNewNodeFormBase', () => {
   });
 
   it('maps 409 failures to already-exists error', async () => {
-    const {result} = setup(jest.fn().mockRejectedValueOnce({response: {status: 409}}));
+    const {result} = setup({createNode: jest.fn().mockRejectedValueOnce({response: {status: 409}})});
 
     act(() => {
       result.current.handleChange({currentTarget: {value: 'New item'}} as ChangeEvent<HTMLInputElement>);
@@ -94,11 +107,11 @@ describe('useCellsNewNodeFormBase', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.alreadyExistsError');
+    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.alreadyExistsError'));
   });
 
   it('maps non-409 failures to generic error', async () => {
-    const {result} = setup(jest.fn().mockRejectedValueOnce(new Error('network error')));
+    const {result} = setup({createNode: jest.fn().mockRejectedValueOnce(new Error('network error'))});
 
     act(() => {
       result.current.handleChange({currentTarget: {value: 'New item'}} as ChangeEvent<HTMLInputElement>);
@@ -108,6 +121,54 @@ describe('useCellsNewNodeFormBase', () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(result.current.error).toBe('cells.newItemMenuModalForm.genericError');
+    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.genericError'));
+  });
+
+  it('clears name and error when handleClear is called', async () => {
+    const {result} = setup();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'invalid/name'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.name).toBe('invalid/name');
+    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
+
+    act(() => {
+      result.current.handleClear();
+    });
+
+    expect(result.current.name).toBe('');
+    expect(result.current.error).toBeNull();
+  });
+
+  it('resets state when modal is reopened', async () => {
+    const {result, rerender} = setup({isOpen: true});
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'invalid/name'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.name).toBe('invalid/name');
+    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
+
+    act(() => {
+      rerender({modalIsOpen: false});
+    });
+
+    act(() => {
+      rerender({modalIsOpen: true});
+    });
+
+    expect(result.current.name).toBe('');
+    expect(result.current.error).toBeNull();
   });
 });

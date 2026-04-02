@@ -79,6 +79,7 @@ export const CellsMoveNodeModal = ({
     isSubmitting,
     handleSubmit: handleCreateNewFolder,
     handleChange,
+    handleClear,
   } = useCellsNewFolderForm({
     cellsRepository,
     conversationQualifiedId,
@@ -87,6 +88,7 @@ export const CellsMoveNodeModal = ({
       setActiveModalContent('move');
     },
     currentPath,
+    isOpen,
   });
 
   useEffect(() => {
@@ -134,6 +136,7 @@ export const CellsMoveNodeModal = ({
             onSubmit={handleCreateNewFolder}
             inputValue={name}
             onChange={handleChange}
+            onClear={handleClear}
             error={error}
             isOpen={isOpen}
           />

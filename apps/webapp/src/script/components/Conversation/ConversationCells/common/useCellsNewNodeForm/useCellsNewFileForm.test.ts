@@ -21,57 +21,97 @@ import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {t} from 'Util/localizerUtil';
 
 import {useCellsNewFileForm} from './useCellsNewFileForm';
-
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
+import type {CellsFileType} from './useCellsNewFileForm';
 
 describe('useCellsNewFileForm', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
 
+  const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
+
   beforeEach(() => {
     jest.clearAllMocks();
     mockCellsRepository = {
+      checkFileAlreadyExists: jest.fn().mockResolvedValue(false),
       createFile: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<CellsRepository>;
     onSuccess = jest.fn();
   });
 
-  const setup = () => {
-    const {result} = renderHook(() =>
+  const renderUseCellsNewFileForm = (fileType: CellsFileType = 'document') =>
+    renderHook(() =>
       useCellsNewFileForm({
-        fileType: 'document',
+        fileType,
         cellsRepository: mockCellsRepository,
         conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
         onSuccess,
         currentPath: '/wire-cells-web/path',
+        isOpen: true,
       }),
     );
 
-    return {
-      result,
-      createNodeMock: mockCellsRepository.createFile,
-      onSuccess,
-    };
-  };
-
-  it('appends selected file type extension when a mismatched extension is provided', async () => {
-    const {result} = setup();
-    const createEvent = () => ({preventDefault: jest.fn()}) as unknown as FormEvent<HTMLFormElement>;
+  it('adds extension and template UUID for document files', async () => {
+    const {result} = renderUseCellsNewFileForm();
 
     act(() => {
-      result.current.handleChange({currentTarget: {value: 'doc124.ppt'}} as ChangeEvent<HTMLInputElement>);
+      result.current.handleChange({currentTarget: {value: 'New file'}} as ChangeEvent<HTMLInputElement>);
     });
 
     await act(async () => {
       await result.current.handleSubmit(createEvent());
     });
 
-    expect(mockCellsRepository.createFile).toHaveBeenCalledWith(expect.objectContaining({name: 'doc124.ppt.docx'}));
+    expect(mockCellsRepository.checkFileAlreadyExists).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New file.docx',
+      }),
+    );
+    expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'New file.docx',
+        templateUuid: '01-Microsoft Word.docx',
+      }),
+    );
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
+  it('uses matching extension and template UUID for spreadsheet files', async () => {
+    const {result} = renderUseCellsNewFileForm('spreadsheet');
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'Budget'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(mockCellsRepository.createFile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Budget.xlsx',
+        templateUuid: '02-Microsoft Excel.xlsx',
+      }),
+    );
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows already-exists error when precheck reports a duplicate', async () => {
+    mockCellsRepository.checkFileAlreadyExists.mockResolvedValueOnce(true);
+    const {result} = renderUseCellsNewFileForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'New file'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(result.current.error).toBe(t('cells.newItemMenuModalForm.alreadyExistsError'));
+    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
 });

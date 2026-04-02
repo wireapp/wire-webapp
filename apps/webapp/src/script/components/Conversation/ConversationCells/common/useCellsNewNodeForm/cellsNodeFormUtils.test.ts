@@ -17,40 +17,38 @@
  *
  */
 
-import {getClientSideNodeNameError, getErrorStatus, isClientSideNodeNameError, NODE_NAME_MAX_LENGTH} from './cellsNodeFormUtils';
+import {t} from 'Util/localizerUtil';
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
+import {getClientSideNodeNameError, getErrorStatus, isClientSideNodeNameError, NODE_NAME_MAX_LENGTH} from './cellsNodeFormUtils';
 
 describe('cellsNodeFormUtils', () => {
   describe('getClientSideNodeNameError', () => {
     it('returns required error for empty name', () => {
-      expect(getClientSideNodeNameError('').unwrapOr(null)).toBe('cells.newItemMenuModalForm.nameRequired');
+      expect(getClientSideNodeNameError('').unwrapOr(null)).toBe(t('cells.newItemMenuModalForm.nameRequired'));
     });
 
     it('returns max length error for names longer than the maximum', () => {
       expect(getClientSideNodeNameError('a'.repeat(NODE_NAME_MAX_LENGTH + 1)).unwrapOr(null)).toBe(
-        'cells.newItemMenuModalForm.maxLengthError',
+        t('cells.newItemMenuModalForm.maxLengthError'),
       );
     });
 
     it('returns max length error before invalid character error', () => {
       const tooLongNameWithInvalidCharacter = `${'a'.repeat(NODE_NAME_MAX_LENGTH)}/`;
       expect(getClientSideNodeNameError(tooLongNameWithInvalidCharacter).unwrapOr(null)).toBe(
-        'cells.newItemMenuModalForm.maxLengthError',
+        t('cells.newItemMenuModalForm.maxLengthError'),
       );
     });
 
     it('returns invalid character error for names starting with "."', () => {
-      expect(getClientSideNodeNameError('.hidden').unwrapOr(null)).toBe('cells.newItemMenuModalForm.invalidCharactersError');
-      expect(getClientSideNodeNameError('.').unwrapOr(null)).toBe('cells.newItemMenuModalForm.invalidCharactersError');
+      expect(getClientSideNodeNameError('.hidden').unwrapOr(null)).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
+      expect(getClientSideNodeNameError('.').unwrapOr(null)).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
     });
 
     it('returns invalid character error for forbidden characters', () => {
-      expect(getClientSideNodeNameError('report/name').unwrapOr(null)).toBe('cells.newItemMenuModalForm.invalidCharactersError');
-      expect(getClientSideNodeNameError('report\\name').unwrapOr(null)).toBe('cells.newItemMenuModalForm.invalidCharactersError');
-      expect(getClientSideNodeNameError('report"name').unwrapOr(null)).toBe('cells.newItemMenuModalForm.invalidCharactersError');
+      expect(getClientSideNodeNameError('report/name').unwrapOr(null)).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
+      expect(getClientSideNodeNameError('report\\name').unwrapOr(null)).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
+      expect(getClientSideNodeNameError('report"name').unwrapOr(null)).toBe(t('cells.newItemMenuModalForm.invalidCharactersError'));
     });
 
     it('accepts names containing dots when dot is not at the beginning', () => {
@@ -62,14 +60,14 @@ describe('cellsNodeFormUtils', () => {
 
   describe('isClientSideNodeNameError', () => {
     it('returns true for node name validation errors', () => {
-      expect(isClientSideNodeNameError('cells.newItemMenuModalForm.nameRequired').unwrapOr(false)).toBe(true);
-      expect(isClientSideNodeNameError('cells.newItemMenuModalForm.maxLengthError').unwrapOr(false)).toBe(true);
-      expect(isClientSideNodeNameError('cells.newItemMenuModalForm.invalidCharactersError').unwrapOr(false)).toBe(true);
+      expect(isClientSideNodeNameError(t('cells.newItemMenuModalForm.nameRequired')).unwrapOr(false)).toBe(true);
+      expect(isClientSideNodeNameError(t('cells.newItemMenuModalForm.maxLengthError')).unwrapOr(false)).toBe(true);
+      expect(isClientSideNodeNameError(t('cells.newItemMenuModalForm.invalidCharactersError')).unwrapOr(false)).toBe(true);
     });
 
     it('returns false for non-validation errors', () => {
       expect(isClientSideNodeNameError(null).isNothing).toBe(true);
-      expect(isClientSideNodeNameError('cells.newItemMenuModalForm.genericError').unwrapOr(false)).toBe(false);
+      expect(isClientSideNodeNameError(t('cells.newItemMenuModalForm.genericError')).unwrapOr(false)).toBe(false);
     });
   });
 
