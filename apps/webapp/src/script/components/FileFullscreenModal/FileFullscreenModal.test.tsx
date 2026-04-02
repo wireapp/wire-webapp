@@ -103,6 +103,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    window.location.hash = '#/conversation/test/files/';
   });
 
   describe('Modal Rendering', () => {
@@ -278,6 +279,28 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
       expect(screen.queryByTestId('pdf-viewer')).not.toBeInTheDocument();
       expect(screen.getByTestId('image-view')).toBeInTheDocument();
+    });
+  });
+
+  describe('Behavior for Recycled Files', () => {
+    it('should not allow editing if file is in recycle bin', () => {
+      window.location.hash = '#/conversation/test/files/recycle_bin';
+      render(<FileFullscreenModal {...defaultProps} isEditMode />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+      expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    });
+
+    it('should keep view mode when edit mode prop changes while file is in recycle bin', () => {
+      window.location.hash = '#/conversation/test/files/recycle_bin';
+      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode={false} />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+
+      rerender(<FileFullscreenModal {...defaultProps} isEditMode />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+      expect(screen.getByTestId('no-preview')).toBeInTheDocument();
     });
   });
 });

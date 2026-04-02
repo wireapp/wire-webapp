@@ -31,6 +31,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {EditIcon} from 'Components/Icon';
 import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
@@ -83,6 +84,7 @@ export const FileHeader = ({
 }: FileHeaderProps) => {
   const timeAgo = useRelativeTimestamp(timestamp);
   const fileNameWithExtension = getFileNameWithExtension(fileName, fileExtension);
+  const isRecycleBin = isInRecycleBin();
   const cellsRepository = container.resolve(CellsRepository);
   const {showModal} = useFileHistoryModal();
 
@@ -125,28 +127,32 @@ export const FileHeader = ({
             <ShowIcon width={16} height={16} />
             Viewing
           </button>
-          <button
-            title="Editing"
-            aria-label="Editing"
-            className={isInEditMode ? 'active' : ''}
-            onClick={() => onEditModeChange(true)}
-          >
-            <EditIcon width={14} height={14} />
-            Editing
-          </button>
+          {!isRecycleBin && (
+            <button
+              title="Editing"
+              aria-label="Editing"
+              className={isInEditMode ? 'active' : ''}
+              onClick={() => onEditModeChange(true)}
+            >
+              <EditIcon width={14} height={14} />
+              Editing
+            </button>
+          )}
         </div>
       )}
       <div css={actionButtonsStyles}>
-        <Button
-          variant={ButtonVariant.TERTIARY}
-          css={downloadButtonStyles}
-          onClick={handleFileDownload}
-          disabled={!fileUrl}
-          aria-label={t('cells.imageFullScreenModal.downloadButton')}
-        >
-          <DownloadIcon />
-        </Button>
-        {isEditable && (
+        {!isRecycleBin && (
+          <Button
+            variant={ButtonVariant.TERTIARY}
+            css={downloadButtonStyles}
+            onClick={handleFileDownload}
+            disabled={!fileUrl}
+            aria-label={t('cells.imageFullScreenModal.downloadButton')}
+          >
+            <DownloadIcon />
+          </Button>
+        )}
+        {!isRecycleBin && isEditable && (
           <DropdownMenu>
             <DropdownMenu.Trigger asChild>
               <Button variant={ButtonVariant.TERTIARY} css={downloadButtonStyles} aria-label={t('cells.options.label')}>

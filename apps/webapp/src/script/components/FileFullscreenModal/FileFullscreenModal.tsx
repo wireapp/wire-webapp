@@ -21,6 +21,7 @@ import {useEffect, useState} from 'react';
 
 import {Maybe} from 'true-myth';
 
+import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
 import {isFileEditable} from 'Util/fileTypeUtil';
@@ -65,7 +66,8 @@ export const FileFullscreenModal = ({
   badges,
   isEditMode,
 }: FileFullscreenModalProps) => {
-  const [isEditableState, setIsEditableState] = useState(isEditMode);
+  const notInRecycleBin = !isInRecycleBin();
+  const [isEditableState, setIsEditableState] = useState(!!isEditMode && notInRecycleBin);
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
 
@@ -79,8 +81,8 @@ export const FileFullscreenModal = ({
   };
 
   useEffect(() => {
-    setIsEditableState(!!isEditMode);
-  }, [isEditMode]);
+    setIsEditableState(!!isEditMode && notInRecycleBin);
+  }, [isEditMode, notInRecycleBin]);
 
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>
