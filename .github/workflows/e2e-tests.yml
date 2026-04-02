@@ -58,9 +58,65 @@ on:
         value: ${{ jobs.e2e-report.outputs.reportUrl }}
 
 jobs:
+  prepare:
+    name: Prepare Dependencies (One Time Setup)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install dependencies once
+        run: yarn --immutable
+
+      - name: Install Playwright browsers
+        run: yarn playwright install --only-shell --with-deps chromium
+
+      - name: Install 1Password CLI
+        run: |
+          curl -sSfLo op.zip https://cache.agilebits.com/dist/1P/op2/pkg/v2.30.0/op_linux_amd64_v2.30.0.zip
+          mkdir -p $HOME/.local/bin
+          unzip -od $HOME/.local/bin op.zip
+          rm op.zip
+          chmod +x $HOME/.local/bin/op
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Verify paths exist before caching
+        run: |
+          echo "=== Checking node_modules ==="
+          ls -la node_modules/ | head -5
+          echo "=== Checking Playwright browsers ==="
+          ls -la ~/.cache/ms-playwright/ | head -5
+          echo "=== Checking 1Password CLI ==="
+          ls -la $HOME/.local/bin/op
+          echo "=== All paths verified ==="
+
+      - name: Cache dependencies for test shards
+        id: cache-save
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            node_modules
+            apps/webapp/node_modules
+            apps/server/node_modules
+            libraries/*/node_modules
+            .yarn/cache
+            ~/.cache/ms-playwright
+            ~/.local/bin/op
+          key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
+      
+      - name: Verify cache was saved
+        run: |
+          echo "Cache save step completed"
+          echo "Cache key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}"
+
   test:
     name: Run E2E Tests
     runs-on: ubuntu-latest
+    needs: prepare
 
     strategy:
       fail-fast: false
@@ -82,11 +138,40 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
 
-      - run: yarn --immutable
-      - run: yarn playwright install --only-shell --with-deps chromium
-      - uses: 1password/install-cli-action@8d006a0d0a4fd505af7f7ce589e7f768385ff5e4
+      - name: Debug cache key
+        run: |
+          echo "Looking for cache key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}"
+          echo "Runner OS: ${{ runner.os }}"
+          echo "Yarn lock hash: ${{ hashFiles('yarn.lock') }}"
+          echo "Run ID: ${{ github.run_id }}"
+
+      # Restore dependencies installed in prepare job (NOT reinstalling!)
+      - name: Restore cached dependencies
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            node_modules
+            apps/webapp/node_modules
+            apps/server/node_modules
+            libraries/*/node_modules
+            .yarn/cache
+            ~/.cache/ms-playwright
+            ~/.local/bin/op
+          key: e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}
+          fail-on-cache-miss: true
+
+      - name: Verify cache was restored
+        run: |
+          echo "Cache restored: ${{ steps.cache-restore.outputs.cache-hit }}"
+          ls -la ~/.local/bin/op || echo "1Password CLI not found"
+          ls ~/.cache/ms-playwright/ | head -3 || echo "Playwright browsers not found"
+
+      - name: Add 1Password CLI to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # ✅ No yarn install! ✅ No playwright install! Everything restored from cache!
 
       - name: Generate env file
         run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
@@ -112,8 +197,8 @@ jobs:
 
   e2e-report:
     runs-on: ubuntu-latest
-    if: ${{ !cancelled() }}
-    needs: [test]
+    if: ${{ needs.prepare.result == 'success' && needs.test.result == 'success' }}
+    needs: [prepare, test]
 
     # It's necessary to define the outputs of the job so the calling workflow can access them
     outputs:
@@ -126,9 +211,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
-          cache: 'yarn'
 
-      - run: yarn --immutable
+      - name: Install dependencies
+        run: yarn --immutable
 
       - name: Download blob reports
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -183,3 +268,19 @@ jobs:
           node apps/webapp/test/e2e_tests/scripts/send-playwright-results-to-testiny.ts \
             --report apps/webapp/playwright-report/report.json \
             --run-name "$TESTINY_RUN_NAME"
+
+  cleanup:
+    name: Cleanup Cache
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs: [prepare, test, e2e-report]
+    
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Delete workflow cache
+        run: |
+          gh cache delete "e2e-deps-${{ runner.os }}-${{ hashFiles('yarn.lock') }}-${{ github.run_id }}" \
+            --repo ${{ github.repository }} || echo "Cache already deleted or not found"
+        env:
+          GH_TOKEN: ${{ github.token }}
