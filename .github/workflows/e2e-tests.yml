@@ -26,6 +26,10 @@ on:
       testinyRunName:
         type: string
         description: Define Testiny Run name to upload results to
+      keep_traces:
+        description: 'Attach traces to HTML report'
+        type: boolean
+        default: false
   # Options for calling the workflow within an other workflow
   workflow_call:
     inputs:
@@ -38,6 +42,10 @@ on:
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
+      keep_traces:
+        type: boolean
+        description: 'Keep Playwright traces'
+        default: false
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN:
         required: true
@@ -129,12 +137,29 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
 
-      # Merge reports and delete blob reports, only keep resources to include within the artifact
+      # Merge reports and delete blob reports and zip archives for traces, only keep resources to include within the artifact
       - name: Merge playwright reports
         working-directory: apps/webapp
         run: |
           yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
-          rm -rf playwright-report/blob-reports/report*
+          rm -rf playwright-report/blob-reports
+
+      - name: Delete trace artifacts
+        if: ${{ !inputs.keep_traces }}
+        working-directory: apps/webapp
+        run: |
+          if [ -d "playwright-report/html/data" ]; then
+            DELETED_COUNT=$(find playwright-report/html/data -name "*.zip" -type f -delete -print)
+            echo "Deleted $DELETED_COUNT trace archive files"
+          else
+            echo "Trace data directory not found, skipping trace cleanup"
+          fi
+
+      - name: Delete blob report artifacts
+        if: always()
+        uses: geekyeggo/delete-artifact@d79b2442431e4adbc383d29a28e630374eceb303
+        with:
+          name: blob-report-*
 
       - name: Upload test report
         id: upload_playwright_report

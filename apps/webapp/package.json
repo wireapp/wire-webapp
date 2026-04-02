@@ -41,7 +41,7 @@
     "@wireapp/core": "workspace:^",
     "@wireapp/kalium-backup": "0.0.4",
     "@wireapp/promise-queue": "2.4.13",
-    "@wireapp/react-ui-kit": "9.75.0",
+    "@wireapp/react-ui-kit": "9.76.0",
     "@wireapp/store-engine-dexie": "2.1.24",
     "@wireapp/telemetry": "0.3.10",
     "@wireapp/webapp-events": "0.29.2",

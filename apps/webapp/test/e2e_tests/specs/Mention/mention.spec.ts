@@ -290,10 +290,8 @@ test.describe('Mention', () => {
   );
 
   test('I want to receive a message containing a mention', {tag: ['@TC-3521', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const userBPages = await PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages);
+    const userAPages = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages);
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
@@ -516,16 +514,16 @@ test.describe('Mention', () => {
     {tag: ['@TC-3545', '@regression']},
     async ({createUser, createPage}) => {
       const otherUser = await createUser();
-      const [userAPages, userBPages, otherUserPages] = await Promise.all([
+      const otherUserPages = await PageManager.from(createPage(withLogin(otherUser))).then(pm => pm.webapp.pages);
+
+      const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectionRequest(otherUser))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(otherUser))).then(async pm => {
-          await pm.webapp.pages.conversationList().pendingConnectionRequest.click();
-          await pm.webapp.pages.connectRequest().connectButton.click();
-          return pm.webapp.pages;
-        }),
       ]);
 
+      await otherUserPages.conversationList().pendingConnectionRequest.click();
+      await otherUserPages.connectRequest().connectButton.click();
+      
       await test.step('UserA creates a group including userB and otherUser', async () => {
         await createGroup(userAPages, 'Test Group', [userB, otherUser]);
       });

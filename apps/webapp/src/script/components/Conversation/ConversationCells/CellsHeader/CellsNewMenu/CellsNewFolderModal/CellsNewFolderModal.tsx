@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,57 +20,50 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
-import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
+import {useCellsNewFolderForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
-import {descriptionStyles} from './CellsNewItemModal.styles';
+import {descriptionStyles} from './CellsNewFolderModal.styles';
 
 import {CellsModal} from '../../../common/CellsModal/CellsModal';
 
-interface CellsNewItemModalProps {
+interface CellsNewFolderModalProps {
   isOpen: boolean;
   onClose: () => void;
-  type: CellNode['type'];
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
   currentPath: string;
 }
 
-export const CellsNewItemModal = ({
+export const CellsNewFolderModal = ({
   isOpen,
   onClose,
-  type,
   cellsRepository,
   conversationQualifiedId,
   onSuccess,
   currentPath,
-}: CellsNewItemModalProps) => {
-  const isFolder = type === 'folder';
-
-  const {name, error, isSubmitting, handleSubmit, handleChange} = useCellsNewItemForm({
-    type,
+}: CellsNewFolderModalProps) => {
+  const {name, error, isSubmitting, handleSubmit, handleChange, handleClear} = useCellsNewFolderForm({
     cellsRepository,
     conversationQualifiedId,
     onSuccess,
     currentPath,
+    isOpen,
   });
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
-      <CellsModal.Header>
-        {t(isFolder ? 'cells.newItemMenuModal.headlineFolder' : 'cells.newItemMenuModal.headlineFile')}
-      </CellsModal.Header>
-      <p css={descriptionStyles}>
-        {t(isFolder ? 'cells.newItemMenuModal.descriptionFolder' : 'cells.newItemMenuModal.descriptionFile')}
-      </p>
+      <CellsModal.Header>{t('cells.newItemMenuModal.headlineFolder')}</CellsModal.Header>
+      <p css={descriptionStyles}>{t('cells.newItemMenuModal.descriptionFolder')}</p>
       <CellsNewNodeForm
-        type={type}
+        label={t('cells.newItemMenuModal.labelFolder')}
+        placeholder={t('cells.newItemMenuModal.placeholderFolder')}
         onSubmit={handleSubmit}
         inputValue={name}
         onChange={handleChange}
+        onClear={handleClear}
         error={error}
         isOpen={isOpen}
       />

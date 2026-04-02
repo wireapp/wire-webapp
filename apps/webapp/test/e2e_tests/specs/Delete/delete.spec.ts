@@ -321,10 +321,8 @@ test.describe('Delete', () => {
 
   testCases.forEach(({name, tc, sendAction}) => {
     test(`Delete "For Everyone" works for ${name}`, {tag: [tc, '@regression']}, async ({createPage, api}) => {
-      const [pageA, pageB] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const pageB = await createPage(withLogin(userB));
+      const pageA = await  createPage(withLogin(userA), withConnectedUser(userB));
 
       const userAPages = PageManager.from(pageA).webapp.pages;
       const userBPages = PageManager.from(pageB).webapp.pages;

@@ -19,42 +19,50 @@
 
 import {ChangeEvent, FormEvent} from 'react';
 
-import {ErrorMessage, Input, Label} from '@wireapp/react-ui-kit';
-
-import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
+import {TextInput} from 'Components/TextInput';
 
 import {inputWrapperStyles} from './CellsNewNodeForm.styles';
 
 import {useInputAutoFocus} from '../useInputAutoFocus/useInputAutoFocus';
 
 interface CellsNewNodeFormProps {
-  type: CellNode['type'];
+  label: string;
+  placeholder: string;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  onClear: () => void;
   error: string | null;
   isOpen: boolean;
 }
 
-export const CellsNewNodeForm = ({type, onSubmit, inputValue, onChange, error, isOpen}: CellsNewNodeFormProps) => {
+export const CellsNewNodeForm = ({
+  label,
+  placeholder,
+  onSubmit,
+  inputValue,
+  onChange,
+  onClear,
+  error,
+  isOpen,
+}: CellsNewNodeFormProps) => {
   const {inputRef} = useInputAutoFocus({enabled: isOpen});
 
   return (
     <form onSubmit={onSubmit}>
       <div css={inputWrapperStyles}>
-        <Label htmlFor="cells-new-item-name">{t('cells.newItemMenuModal.label')}</Label>
-        <Input
-          id="cells-new-item-name"
+        <TextInput
+          label={label}
+          name="cells-new-item-name"
           value={inputValue}
           ref={inputRef}
-          placeholder={
-            type === 'folder'
-              ? t('cells.newItemMenuModal.placeholderFolder')
-              : t('cells.newItemMenuModal.placeholderFile')
-          }
+          placeholder={placeholder}
           onChange={onChange}
-          error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
+          onCancel={onClear}
+          isError={Boolean(error)}
+          errorMessage={error ?? undefined}
+          uieName="cells-new-item-name"
+          errorUieName="cells-new-item-name-error"
         />
       </div>
     </form>

@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
 
     outputs:
       unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}

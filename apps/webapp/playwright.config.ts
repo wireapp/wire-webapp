@@ -23,8 +23,8 @@ import {resolve} from 'node:path';
 
 config({path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true});
 
-const numberOfRetriesOnCI = 1;
-const numberOfParallelWorkersOnCI = 3;
+const numberOfRetriesOnCI = 3;
+const numberOfParallelWorkersOnCI = 1;
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -50,7 +50,12 @@ module.exports = defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: {
+      mode: 'on-first-retry',
+      snapshots: false,
+      sources: false,
+      attachments: false,
+    },
     screenshot: 'only-on-failure',
     permissions: ['camera', 'microphone'],
     actionTimeout: 20_000, // 20 seconds
