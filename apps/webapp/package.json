@@ -95,7 +95,7 @@
     "use-debounce": "10.1.0",
     "webgl-utils.js": "1.1.0",
     "webrtc-adapter": "9.0.4",
-    "xstate": "5.28.0",
+    "xstate": "5.30.0",
     "zustand": "4.5.7"
   },
   "devDependencies": {
