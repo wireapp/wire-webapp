@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "@wireapp/api-client": "27.96.0",
-    "@wireapp/core-crypto": "9.3.2",
+    "@wireapp/core-crypto": "9.3.3",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/priority-queue": "2.1.19",
     "@wireapp/promise-queue": "2.4.13",
