@@ -16,7 +16,7 @@
     "@faker-js/faker": "9.9.0",
     "@ls-lint/ls-lint": "2.3.1",
     "@nx/jest": "22.6.1",
-    "@nx/node": "22.6.1",
+    "@nx/node": "22.6.4",
     "@nx/workspace": "22.6.1",
     "@stylistic/eslint-plugin": "5.10.0",
     "@tony.ganchev/eslint-plugin-header": "3.3.3",
