@@ -20,6 +20,7 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
+import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
@@ -44,9 +45,16 @@ export const Preference = () => {
 
   const teamState = container.resolve(TeamState);
 
-  const {isCellsEnabled: isCellsEnabledForTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, [
+  const {
+    isCellsEnabled: isCellsEnabledForTeam,
+    isMLSEnabled,
+    isAppsEnabled,
+    hasWhitelistedServices,
+  } = useKoSubscribableChildren(teamState, [
     'isCellsEnabled',
     'isMLSEnabled',
+    'isAppsEnabled',
+    'hasWhitelistedServices',
   ]);
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
@@ -57,6 +65,12 @@ export const Preference = () => {
 
   // Read receipts are temorarily disabled for MLS groups and channels until it is supported
   const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
+
+  const isAppsFeatureAvailable =
+    (defaultProtocol === CONVERSATION_PROTOCOL.MLS && isAppsEnabled) ||
+    (defaultProtocol === CONVERSATION_PROTOCOL.PROTEUS &&
+      hasWhitelistedServices &&
+      conversationType !== ConversationType.Channel);
 
   return (
     <>
@@ -76,9 +90,10 @@ export const Preference = () => {
           dataUieName="services"
           info={t('servicesRoomToggleInfoExtended')}
           setIsChecked={setIsServicesEnabled}
-          isDisabled={false}
+          isDisabled={!isAppsFeatureAvailable}
           name={t('servicesOptionsTitle')}
-          isChecked={isServicesEnabled}
+          isChecked={isServicesEnabled && isAppsFeatureAvailable}
+          label={!isAppsFeatureAvailable && <AppsDisabledNote />}
         />
       )}
       {areReadReceiptsEnabled && (
