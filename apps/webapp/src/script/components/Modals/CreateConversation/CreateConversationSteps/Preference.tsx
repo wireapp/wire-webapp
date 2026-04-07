@@ -28,7 +28,6 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
-import {ConversationType} from '../types';
 
 export const Preference = () => {
   const {
@@ -40,7 +39,6 @@ export const Preference = () => {
     setIsReadReceiptsEnabled,
     isServicesEnabled,
     setIsServicesEnabled,
-    conversationType,
   } = useCreateConversationModal();
 
   const teamState = container.resolve(TeamState);
@@ -68,9 +66,7 @@ export const Preference = () => {
 
   const isAppsFeatureAvailable =
     (defaultProtocol === CONVERSATION_PROTOCOL.MLS && isAppsEnabled) ||
-    (defaultProtocol === CONVERSATION_PROTOCOL.PROTEUS &&
-      hasWhitelistedServices &&
-      conversationType !== ConversationType.Channel);
+    (defaultProtocol === CONVERSATION_PROTOCOL.PROTEUS && hasWhitelistedServices);
 
   return (
     <>
