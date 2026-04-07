@@ -58,4 +58,53 @@ describe('EphemeralTimer', () => {
 
     expect(parseFloat(window.getComputedStyle(circle).getPropertyValue('stroke-dashoffset'))).toBeCloseTo(expected, 5);
   });
+
+  it('has proper accessibility attributes for screen readers', () => {
+    const message = new Message();
+    const remaining = 10_000; // 10 seconds
+    const now = Date.now();
+    message.ephemeral_started(now);
+    message.ephemeral_expires(now + remaining);
+    message.ephemeral_remaining(remaining);
+
+    const {container} = render(<EphemeralTimer message={message} />);
+    const svg = container.querySelector('svg');
+
+    expect(svg).toHaveAttribute('role', 'timer');
+    expect(svg).toHaveAttribute('aria-live', 'polite');
+    expect(svg).toHaveAttribute('aria-atomic', 'true');
+    expect(svg).toHaveAttribute('tabIndex', '0');
+    expect(svg?.getAttribute('aria-label')).toContain('Self-deleting message, timer is counting down.');
+  });
+
+  it('includes remaining time in aria-label when timer is active', () => {
+    const message = new Message();
+    const remaining = 600_000; // 10 minutes
+    const now = Date.now();
+    message.ephemeral_started(now);
+    message.ephemeral_expires(now + remaining);
+    message.ephemeral_remaining(remaining);
+
+    const {container} = render(<EphemeralTimer message={message} />);
+    const svg = container.querySelector('svg');
+
+    const ariaLabel = svg?.getAttribute('aria-label');
+    expect(ariaLabel).toContain('Self-deleting message, timer is counting down.');
+    // Should also contain the ephemeralCaption with remaining time
+    expect(ariaLabel).toContain('remaining');
+  });
+
+  it('is keyboard focusable for accessibility', () => {
+    const message = new Message();
+    const remaining = 30_000;
+    const now = Date.now();
+    message.ephemeral_started(now);
+    message.ephemeral_expires(now + remaining);
+    message.ephemeral_remaining(remaining);
+
+    const {container} = render(<EphemeralTimer message={message} />);
+    const svg = container.querySelector('svg');
+
+    expect(svg).toHaveAttribute('tabIndex', '0');
+  });
 });

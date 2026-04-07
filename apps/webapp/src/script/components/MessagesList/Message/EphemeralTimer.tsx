@@ -34,13 +34,27 @@ const EphemeralTimer = ({message}: EphemeralTimerProps) => {
     ephemeral_remaining: remaining,
     ephemeral_started: started,
     ephemeral_expires: expires,
-  } = useKoSubscribableChildren(message, ['ephemeral_remaining', 'ephemeral_started', 'ephemeral_expires']);
+    ephemeralCaption,
+  } = useKoSubscribableChildren(message, [
+    'ephemeral_remaining',
+    'ephemeral_started',
+    'ephemeral_expires',
+    'ephemeralCaption',
+  ]);
 
   const duration = Number(expires) - started;
 
+  // Combine static label with dynamic remaining time for screen readers
+  const accessibleLabel = ephemeralCaption
+    ? `${t('accessibility.selfDeletingMessage.timer')} ${ephemeralCaption}`
+    : t('accessibility.selfDeletingMessage.timer');
+
   return (
     <svg
-      aria-label={t('accessibility.selfDeletingMessage.timer')}
+      role="timer"
+      aria-label={accessibleLabel}
+      aria-live="polite"
+      aria-atomic="true"
       className="ephemeral-timer"
       tabIndex={TabIndex.FOCUSABLE}
       viewBox="0 0 8 8"
