@@ -84,18 +84,17 @@ export const Preference = () => {
         dataUieName="read-receipts"
       />
 
-      {conversationType === ConversationType.Group && (
-        <InfoToggle
-          className="modal-style"
-          dataUieName="services"
-          info={t('servicesRoomToggleInfoExtended')}
-          setIsChecked={setIsServicesEnabled}
-          isDisabled={!isAppsFeatureAvailable}
-          name={t('servicesOptionsTitle')}
-          isChecked={isServicesEnabled && isAppsFeatureAvailable}
-          label={!isAppsFeatureAvailable && <AppsDisabledNote />}
-        />
-      )}
+      <InfoToggle
+        className="modal-style"
+        dataUieName="info-toggle-services"
+        info={t('servicesRoomToggleInfoExtended')}
+        setIsChecked={setIsServicesEnabled}
+        isDisabled={!isAppsFeatureAvailable}
+        name={t('servicesOptionsTitle')}
+        isChecked={isServicesEnabled && isAppsFeatureAvailable}
+        label={!isAppsFeatureAvailable && <AppsDisabledNote />}
+      />
+
       {areReadReceiptsEnabled && (
         <InfoToggle
           className="modal-style"
