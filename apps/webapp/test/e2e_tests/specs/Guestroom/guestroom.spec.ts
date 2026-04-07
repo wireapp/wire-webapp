@@ -11,6 +11,15 @@ import {
 } from 'test/e2e_tests/test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
+/**
+ * Navigates through the UI to generate a guest invitation link for a specific group.
+ * @param pages - The PageManager instance providing access to webapp page objects.
+ * @param groupName - The exact display name of the group to open.
+ * @param password - (Optional) If provided, the generated link will be password-protected.
+ * Omit this if you want to generate an unprotected link.
+ * * @returns A promise that resolves to the generated guest link string.
+ */
+
 const generateGroupGuestsLink = async (pages: PageManager['webapp']['pages'], groupName: string, password?: string) => {
   await pages.conversationList().openConversation(groupName);
   await pages.conversation().toggleGroupInformation();
@@ -23,7 +32,6 @@ test.describe('Guestroom', () => {
   let team: Team;
   let userA: User;
   let guestUser: User;
-  let createdLink: string;
   const groupName = 'Guestroom';
   const password = 'Test1234?';
 
@@ -38,6 +46,7 @@ test.describe('Guestroom', () => {
     {tag: ['@TC-8140', '@regression']},
     async ({createPage}) => {
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
+      let createdLink: string;
 
       const {pages: guestPages, modals: guestBModals} = PageManager.from(guestPage).webapp;
       const {pages} = PageManager.from(userAPage).webapp;
@@ -74,29 +83,32 @@ test.describe('Guestroom', () => {
     await createGroup(pages, groupName, []);
     await pages.conversationList().openConversation(groupName);
 
-    // UserA sees an error message when trying to create a password secured link with a weak password
-    await pages.conversation().toggleGroupInformation();
-    await pages.conversationDetails().openGuestOptions();
-    await pages.guestOptions().createLinkButton.click();
+    await test.step('User A sees an error message when trying to create a password secured link with a weak password', async () => {
+      await pages.conversation().toggleGroupInformation();
+      await pages.conversationDetails().openGuestOptions();
+      await pages.guestOptions().createLinkButton.click();
 
-    await modals.guestLinkPassword().setPasswordInput.fill('wrongPassword');
-    await modals.guestLinkPassword().confirmPasswordInput.fill('wrongPassword');
-    await modals.guestLinkPassword().actionButton.click();
-    await expect(modals.guestLinkPassword().errorMessage).toContainText(
-      'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
-    );
+      await modals.guestLinkPassword().setPasswordInput.fill('wrongPassword');
+      await modals.guestLinkPassword().confirmPasswordInput.fill('wrongPassword');
+      await modals.guestLinkPassword().actionButton.click();
+      await expect(modals.guestLinkPassword().errorMessage).toContainText(
+        'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
+      );
+    });
 
-    // UserA cancels the creation of the password secured link
-    await modals.guestLinkPassword().setPasswordInput.fill(password);
-    await modals.guestLinkPassword().confirmPasswordInput.fill(password);
-    await modals.guestLinkPassword().actionButton.click();
-    await modals.confirm().cancelButton.click();
-    await expect(pages.guestOptions().guestLink).not.toBeVisible();
+    await test.step('UserA cancels the creation of the password secured link', async () => {
+      await modals.guestLinkPassword().setPasswordInput.fill(password);
+      await modals.guestLinkPassword().confirmPasswordInput.fill(password);
+      await modals.guestLinkPassword().actionButton.click();
+      await modals.confirm().cancelButton.click();
+      await expect(pages.guestOptions().guestLink).not.toBeVisible();
+    });
 
-    // UserA creates a password secured link with a valid password
-    await pages.guestOptions().createLink({password});
-    await expect(pages.guestOptions().guestLink).toBeVisible();
-    await expect(userAPage.getByText('Link is password secured')).toBeVisible();
+    await test.step('UserA creates a password secured link with a valid password', async () => {
+      await pages.guestOptions().createLink({password});
+      await expect(pages.guestOptions().guestLink).toBeVisible();
+      await expect(userAPage.getByText('Link is password secured')).toBeVisible();
+    });
   });
 
   test('I want to revoke a password secured guest link', {tag: ['@TC-8142', '@regression']}, async ({createPage}) => {
@@ -147,7 +159,7 @@ test.describe('Guestroom', () => {
       const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
       await createGroup(pages, groupName, []);
-      createdLink = await generateGroupGuestsLink(pages, groupName);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
 
       await createPage(withGuestUser(createdLink, guestUser.firstName));
 
@@ -175,23 +187,29 @@ test.describe('Guestroom', () => {
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
 
-      await createGroup(ownerPages, groupName, [guestUser]);
-      await ownerPages.conversationList().openConversation(groupName);
-      await ownerPages.conversation().toggleGroupInformation();
-      await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.fullName})).toBeVisible();
+      await test.step('Owner creates a group with guest', async () => {
+        await createGroup(ownerPages, groupName, [guestUser]);
+        await ownerPages.conversationList().openConversation(groupName);
+        await ownerPages.conversation().toggleGroupInformation();
+        await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.fullName})).toBeVisible();
+      });
 
-      await ownerPages.conversationDetails().openGuestOptions();
-      await ownerPages.guestOptions().toggleGuests();
-      await ownerPages.conversation().toggleGroupInformation();
-      await expect(
-        ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.fullName}),
-      ).not.toBeVisible();
+      await test.step('Guest is removed when Allow guests is turned off', async () => {
+        await ownerPages.conversationDetails().openGuestOptions();
+        await ownerPages.guestOptions().toggleGuests();
+        await ownerPages.conversation().toggleGroupInformation();
+        await expect(
+          ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.fullName}),
+        ).not.toBeVisible();
+      });
 
-      await ownerPages.conversationDetails().clickAddPeopleButton();
-      await ownerPages.conversationDetails().searchPeopleInput.fill(guestUser.fullName);
-      await expect(ownerPages.conversationDetails().searchList).toContainText(
-        'No matching results. Try entering a different name.',
-      );
+      await test.step('Owner should not see guest in search result, when adding people to conversation with Allow guests turned off', async () => {
+        await ownerPages.conversationDetails().clickAddPeopleButton();
+        await ownerPages.conversationDetails().searchPeopleInput.fill(guestUser.fullName);
+        await expect(ownerPages.conversationDetails().searchList).toContainText(
+          'No matching results. Try entering a different name.',
+        );
+      });
     },
   );
 
@@ -283,6 +301,7 @@ test.describe('Guestroom', () => {
     async ({createPage}) => {
       test.setTimeout(150_000);
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
+      let createdLink: string;
 
       const userAPageManager = PageManager.from(userAPage).webapp;
       const guestPageManager = PageManager.from(guestPage);
