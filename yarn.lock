@@ -5191,23 +5191,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/docker@npm:22.6.1":
-  version: 22.6.1
-  resolution: "@nx/docker@npm:22.6.1"
+"@nx/docker@npm:22.6.4":
+  version: 22.6.4
+  resolution: "@nx/docker@npm:22.6.4"
   dependencies:
-    "@nx/devkit": "npm:22.6.1"
+    "@nx/devkit": "npm:22.6.4"
     enquirer: "npm:~2.3.6"
     tslib: "npm:^2.3.0"
-  checksum: 10/488cb8735198ec410d06ff49559774ac7d60778d1a9aa381a2fe0df274e5b399ab4bb85c81866e2e126f0f7ff3141afdb3f6def07b22cff883c70f0de2f927d3
+  checksum: 10/b167a23c77cb4e183dc2d3a97baeaa1703124dadbce665b8c447ad0603ee2b74e7ef2d842c952813a1e5d96f190033ad9304976a7f8eceec918eabc59ac23ab9
   languageName: node
   linkType: hard
 
-"@nx/eslint@npm:22.6.1":
-  version: 22.6.1
-  resolution: "@nx/eslint@npm:22.6.1"
+"@nx/eslint@npm:22.6.4":
+  version: 22.6.4
+  resolution: "@nx/eslint@npm:22.6.4"
   dependencies:
-    "@nx/devkit": "npm:22.6.1"
-    "@nx/js": "npm:22.6.1"
+    "@nx/devkit": "npm:22.6.4"
+    "@nx/js": "npm:22.6.4"
     semver: "npm:^7.6.3"
     tslib: "npm:^2.3.0"
     typescript: "npm:~5.9.2"
@@ -5217,30 +5217,7 @@ __metadata:
   peerDependenciesMeta:
     "@zkochan/js-yaml":
       optional: true
-  checksum: 10/f6ce57f70f6187525771e5ac05fadf9e78ab701814f4afa0b2e2e05c5ed05ea902ba8780d7d1a7be03c2ad7c235bef06ef4215119efd10eeae6c91e8802c57fd
-  languageName: node
-  linkType: hard
-
-"@nx/jest@npm:22.6.1":
-  version: 22.6.1
-  resolution: "@nx/jest@npm:22.6.1"
-  dependencies:
-    "@jest/reporters": "npm:^30.0.2"
-    "@jest/test-result": "npm:^30.0.2"
-    "@nx/devkit": "npm:22.6.1"
-    "@nx/js": "npm:22.6.1"
-    "@phenomnomnominal/tsquery": "npm:~6.1.4"
-    identity-obj-proxy: "npm:3.0.0"
-    jest-config: "npm:^30.0.2"
-    jest-resolve: "npm:^30.0.2"
-    jest-util: "npm:^30.0.2"
-    minimatch: "npm:10.2.4"
-    picocolors: "npm:^1.1.0"
-    resolve.exports: "npm:2.0.3"
-    semver: "npm:^7.6.3"
-    tslib: "npm:^2.3.0"
-    yargs-parser: "npm:21.1.1"
-  checksum: 10/1f24748898a2dada2a21e7deb835849f181d1afbd9db46937ed3d9e0f048d084e479c34a672b4deb9d9ccaf440fe357208cc6c3481a94d62c9a5569e9d5c176e
+  checksum: 10/773551bde9b9092efe1dafef8fdc98b76067e75d45d878d960a1dd8748e5eb90205895e67a147d489f93d4761256da3530f9263b161f85bfee4c03e9a309eaef
   languageName: node
   linkType: hard
 
@@ -5345,19 +5322,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nx/node@npm:22.6.1":
-  version: 22.6.1
-  resolution: "@nx/node@npm:22.6.1"
+"@nx/node@npm:22.6.4":
+  version: 22.6.4
+  resolution: "@nx/node@npm:22.6.4"
   dependencies:
-    "@nx/devkit": "npm:22.6.1"
-    "@nx/docker": "npm:22.6.1"
-    "@nx/eslint": "npm:22.6.1"
-    "@nx/jest": "npm:22.6.1"
-    "@nx/js": "npm:22.6.1"
+    "@nx/devkit": "npm:22.6.4"
+    "@nx/docker": "npm:22.6.4"
+    "@nx/eslint": "npm:22.6.4"
+    "@nx/jest": "npm:22.6.4"
+    "@nx/js": "npm:22.6.4"
     kill-port: "npm:^1.6.1"
     tcp-port-used: "npm:^1.0.2"
     tslib: "npm:^2.3.0"
-  checksum: 10/937c83c7c577bef81f323a5cd5cc1ca8517aa35efecc6637948a5b7d7da2fdd75aa4b21ec02223210948f7e184ca8dc0c0d38b8088046c901426fc7bccf5c2cb
+  checksum: 10/de2074e6687ad286037b6baa70e571da67de080ab3072a88f8d4c60f68d9824536ba0bda1134de415d0b2c2dda6e851fb00a99e5c363f2d53a508212f60bc1a6
   languageName: node
   linkType: hard
 
@@ -29000,7 +28977,7 @@ __metadata:
     "@faker-js/faker": "npm:9.9.0"
     "@ls-lint/ls-lint": "npm:2.3.1"
     "@nx/jest": "npm:22.6.4"
-    "@nx/node": "npm:22.6.1"
+    "@nx/node": "npm:22.6.4"
     "@nx/workspace": "npm:22.6.1"
     "@stylistic/eslint-plugin": "npm:5.10.0"
     "@tony.ganchev/eslint-plugin-header": "npm:3.3.3"
