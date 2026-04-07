@@ -24,7 +24,7 @@ import {resolve} from 'node:path';
 config({path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true});
 
 const numberOfRetriesOnCI = 3;
-const numberOfParallelWorkersOnCI = 1;
+const numberOfParallelWorkersOnCI = 3;
 
 /**
  * See https://playwright.dev/docs/test-configuration.
