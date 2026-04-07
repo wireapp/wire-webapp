@@ -17,7 +17,7 @@
  *
  */
 
-import {useId} from 'react';
+import React, {useId} from 'react';
 
 import cx from 'classnames';
 
@@ -29,6 +29,7 @@ interface InfoToggleProps {
   name: string;
   className?: string;
   setIsChecked: (checked: boolean) => void;
+  label?: React.ReactNode;
 }
 
 const InfoToggle = ({
@@ -39,6 +40,7 @@ const InfoToggle = ({
   isDisabled,
   name,
   setIsChecked,
+  label,
 }: InfoToggleProps) => {
   const dataUieNameInfoText = `status-info-toggle-${dataUieName}`;
   const dataUieNameLabelText = `do-toggle-${dataUieName}`;
@@ -77,6 +79,7 @@ const InfoToggle = ({
           </button>
         </div>
       </div>
+      {label}
     </div>
   );
 };
