@@ -17,6 +17,7 @@
  *
  */
 
+import {Locator} from 'playwright-core';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
@@ -31,56 +32,77 @@ test.describe('Markdown', () => {
     userA = team.owner;
   });
 
-  test('I want to write a bold message', {tag: ['@TC-1313', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+  [
+    {
+      description: 'I want to write a bold message',
+      tag: '@TC-1313',
+      message: '**Bold Message from User A**',
+      getSelector: (locator: Locator) => locator.getByRole('strong'),
+      expectedText: 'Bold Message from User A',
+    },
+    {
+      description: 'I want to write strikethrough message',
+      tag: '@TC-9481',
+      message: '~~Strikethrough Message from User A~~',
+      getSelector: (locator: Locator) => locator.locator('s'),
+      expectedText: 'Strikethrough Message from User A',
+    },
+    {
+      description: 'I want to write a emphasized message',
+      tag: '@TC-1314',
+      message: '*Emphasized message from User A*',
+      getSelector: (locator: Locator) => locator.getByRole('emphasis'),
+      expectedText: 'Emphasized message from User A',
+    },
+    {
+      description: 'I want to write a code message',
+      tag: '@TC-1315',
+      message: '`Code message from User A`',
+      getSelector: (locator: Locator) => locator.getByRole('code'),
+      expectedText: 'Code message from User A',
+    },
+  ].forEach(({description, tag, message, getSelector, expectedText}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversation().sendTypedMessage('**Bold Message from User A**');
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversation().sendTypedMessage(message);
 
-    for (const pages of [userAPages, userBPages]) {
-      const message = pages.conversation().getMessage({sender: userA});
-      await expect(message).toBeVisible();
-      await expect(message.getByRole('strong')).toHaveText('Bold Message from User A');
-    }
+      for (const pages of [userAPages, userBPages]) {
+        const message = pages.conversation().getMessage({sender: userA});
+        await expect(message).toBeVisible();
+        await expect(getSelector(message)).toHaveText(expectedText);
+      }
+    });
   });
 
-  test('I want to write a emphasized message', {tag: ['@TC-1314', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+  test(
+    'I want to paste link with "_" symbol in it and verify that it opens correct URL',
+    {tag: ['@TC-9482', '@regression']},
+    async ({createPage}) => {
+      const targetUrl = 'https://example.com/test_path_with_underscores';
+      const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
+      const {pages, modals} = userAPageManager.webapp;
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversation().sendTypedMessage('*Emphasized message from User A*');
+      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversation().sendTypedMessage(targetUrl);
 
-    for (const pages of [userAPages, userBPages]) {
       const message = pages.conversation().getMessage({sender: userA});
-      await expect(message).toBeVisible();
-      await expect(message.getByRole('emphasis')).toHaveText('Emphasized message from User A');
-    }
-  });
+      const link = message.getByRole('link', {name: targetUrl});
 
-  test('I want to write a code message', {tag: ['@TC-1315', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+      await expect(link).toHaveAttribute('href', targetUrl);
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversation().sendTypedMessage('`Code message from User A`');
+      await link.click();
+      await modals.confirm().clickAction();
+      const newPage = await userAPageManager.getContext().waitForEvent('page');
 
-    for (const pages of [userAPages, userBPages]) {
-      const message = pages.conversation().getMessage({sender: userA});
-      await expect(message).toBeVisible();
-      await expect(message.getByRole('code')).toContainText('Code message from User A');
-    }
-  });
+      await expect(newPage).toHaveURL(targetUrl);
+    },
+  );
 
   test('I want to write a long code message', {tag: ['@TC-1316', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
