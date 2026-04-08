@@ -19,9 +19,13 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
+import {RestVersion} from 'cells-sdk-ts';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
@@ -70,7 +74,15 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 
         setFileInfo(info);
 
-        const groupedVersions = groupVersionsByDate(versions || []);
+        const ownerNameByUserId = getOwnerNameByUserId(versions || []);
+        const groupedVersions = groupVersionsByDate(versions || [], version => {
+          const ownerQualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
+          if (!ownerQualifiedId) {
+            return undefined;
+          }
+
+          return ownerNameByUserId.get(ownerQualifiedId.id);
+        });
         setFileVersions(groupedVersions);
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToLoadVersions');
@@ -138,4 +150,38 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     setToBeRestoredVersionId,
     toBeRestoredVersionId,
   };
+};
+
+const parseOwnerQualifiedId = (ownerUuid?: string): QualifiedId | undefined => {
+  if (!ownerUuid) {
+    return undefined;
+  }
+
+  try {
+    return parseQualifiedId(ownerUuid.trim());
+  } catch {
+    return undefined;
+  }
+};
+
+const getOwnerNameByUserId = (versions: Partial<RestVersion>[]): Map<string, string> => {
+  const ownerIds = new Set(
+    versions.flatMap(version => {
+      const qualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
+      return qualifiedId ? [qualifiedId.id] : [];
+    }),
+  );
+
+  if (!ownerIds.size) {
+    return new Map();
+  }
+
+  try {
+    const users = container.resolve(UserState).users();
+    const matchingUsers = users.filter(user => ownerIds.has(user.id) && user.name());
+
+    return new Map<string, string>(matchingUsers.map(user => [user.id, user.name()]));
+  } catch {
+    return new Map();
+  }
 };
