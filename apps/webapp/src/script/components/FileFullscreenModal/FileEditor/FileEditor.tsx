@@ -44,6 +44,7 @@ interface FileEditorProps {
 export const FileEditor = ({id}: FileEditorProps) => {
   const cellsRepository = container.resolve(CellsRepository);
   const [node, setNode] = useState<Node | null>(null);
+  const [isRecycled, setIsRecycled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const hasShownErrorModal = useRef(false);
@@ -53,6 +54,14 @@ export const FileEditor = ({id}: FileEditorProps) => {
       setIsLoading(true);
       setIsError(false);
       const fetchedNode = await cellsRepository.getNode({uuid: id, flags: ['WithEditorURLs']});
+
+      if (fetchedNode.IsRecycled) {
+        setIsRecycled(true);
+        setNode(null);
+        return false;
+      }
+
+      setIsRecycled(false);
       setNode(fetchedNode);
       return true;
     } catch (err: unknown) {
@@ -98,7 +107,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
   }, [node, fetchNode]);
 
   useEffect(() => {
-    if (isLoading || (!isError && node)) {
+    if (isLoading || isRecycled || (!isError && node)) {
       return;
     }
 
@@ -122,16 +131,20 @@ export const FileEditor = ({id}: FileEditorProps) => {
         title: t('fileFullscreenModal.editor.errorTitle'),
       },
     });
-  }, [handleRetry, isError, isLoading, node]);
+  }, [handleRetry, isError, isLoading, isRecycled, node]);
 
   useEffect(() => {
-    if (!isLoading && !isError && node) {
+    if (!isLoading && !isError && node && !isRecycled) {
       hasShownErrorModal.current = false;
     }
-  }, [isError, isLoading, node]);
+  }, [isError, isLoading, isRecycled, node]);
 
   if (isLoading) {
     return <FileLoader />;
+  }
+
+  if (isRecycled) {
+    return null;
   }
 
   const urlValidation = validateCollaboraUrl(
