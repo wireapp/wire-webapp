@@ -515,7 +515,7 @@ const GroupCreationModal = ({
                 />
                 <InfoToggle
                   className="modal-style"
-                  dataUieName="services"
+                  dataUieName="info-toggle-services"
                   isChecked={isServicesEnabled}
                   setIsChecked={clickOnToggleServicesMode}
                   isDisabled={!isAppsFeatureAvailable}
