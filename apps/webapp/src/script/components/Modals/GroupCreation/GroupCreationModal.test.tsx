@@ -5,16 +5,14 @@ import {GroupCreationModal} from "Components/Modals/GroupCreation/GroupCreationM
 import {act, getByRole} from "@testing-library/react";
 import {UserState} from "Repositories/user/UserState";
 import {User} from "Repositories/entity/User";
-import {ConversationRepository} from "Repositories/conversation/ConversationRepository";
-import {SearchRepository} from "Repositories/search/SearchRepository";
-import {TeamRepository} from "Repositories/team/TeamRepository";
-import {RootContext} from "../../../page/RootProvider";
+import {RootContext, RootContextValue} from "../../../page/RootProvider";
 import {amplify} from "amplify";
 import {WebAppEvents} from "@wireapp/webapp-events";
 import {mountComponent} from "../../../auth/util/test/TestUtil";
 import {mockStoreFactory} from "../../../auth/util/test/mockStoreFactory";
 import {initialRootState} from "../../../auth/module/reducer";
 import {t} from "Util/localizerUtil";
+import {TypeUtil} from "@wireapp/commons";
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
@@ -70,7 +68,7 @@ describe('GroupCreationModal', () => {
         connectRequests: ko.pureComputed(() => [] as User[]),
       };
 
-      const mockTeamState: Partial<TeamState> = {
+      const mockTeamState: TypeUtil.RecursivePartial<TeamState> = {
         isMLSEnabled: ko.pureComputed(() => isMLSEnabled),
         isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
         hasWhitelistedServices: ko.observable(hasWhitelistedServices),
@@ -93,17 +91,17 @@ describe('GroupCreationModal', () => {
         mainViewModel: {
           content: {
             repositories: {
-              conversation: {} as ConversationRepository,
-              search: {} as SearchRepository,
-              team: {} as TeamRepository,
+              conversation: {},
+              search: {},
+              team: {},
             }
           }
         }
-      };
+      } as RootContextValue;
 
       // Act
       const {getByTestId} = mountComponent(
-        <RootContext.Provider value={mockRootContext as any}>
+        <RootContext.Provider value={mockRootContext}>
           <GroupCreationModal userState={mockUserState} teamState={mockTeamState as TeamState}/>
         </RootContext.Provider>,
         mockStoreFactory()({
