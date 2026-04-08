@@ -37,7 +37,7 @@
     "lodash": "4.18.1"
   },
   "devDependencies": {
-    "@swc/core": "1.15.18",
+    "@swc/core": "1.15.21",
     "@swc/jest": "0.2.39",
     "@types/lodash": "4.17.24",
     "@types/long": "5.0.0",
