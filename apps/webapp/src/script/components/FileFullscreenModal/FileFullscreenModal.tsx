@@ -50,6 +50,7 @@ interface FileFullscreenModalProps {
   timestamp: number;
   badges?: string[];
   isEditMode?: boolean;
+  checkIsInRecycleBin?: () => boolean;
 }
 
 export const FileFullscreenModal = ({
@@ -64,10 +65,11 @@ export const FileFullscreenModal = ({
   senderName,
   timestamp,
   badges,
-  isEditMode,
+  isEditMode = false,
+  checkIsInRecycleBin = isInRecycleBin,
 }: FileFullscreenModalProps) => {
-  const notInRecycleBin = !isInRecycleBin();
-  const [isEditableState, setIsEditableState] = useState(!!isEditMode && notInRecycleBin);
+  const notInRecycleBin = !checkIsInRecycleBin();
+  const [isEditableState, setIsEditableState] = useState(isEditMode && notInRecycleBin);
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
 
@@ -81,7 +83,7 @@ export const FileFullscreenModal = ({
   };
 
   useEffect(() => {
-    setIsEditableState(!!isEditMode && notInRecycleBin);
+    setIsEditableState(isEditMode && notInRecycleBin);
   }, [isEditMode, notInRecycleBin]);
 
   return (
