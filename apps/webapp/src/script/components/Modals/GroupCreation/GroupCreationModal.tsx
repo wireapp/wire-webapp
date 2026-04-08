@@ -33,6 +33,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
 import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
@@ -79,11 +80,13 @@ const GroupCreationModal = ({
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
     isCellsEnabled: isCellsEnabledForTeam,
+    isAppsEnabled: isAppsEnabledForTeam,
   } = useKoSubscribableChildren(teamState, [
     'isTeam',
     'isMLSEnabled',
     'isProtocolToggleEnabledForUser',
     'isCellsEnabled',
+    'isAppsEnabled',
   ]);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
@@ -154,7 +157,13 @@ const GroupCreationModal = ({
   const isGuestAndServicesRoom = accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES;
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
-  const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
+
+  const isAppsFeatureAvailable =
+    isTeam &&
+    ((selectedProtocol.value == CONVERSATION_PROTOCOL.PROTEUS && teamState?.hasWhitelistedServices()) ||
+      (selectedProtocol.value == CONVERSATION_PROTOCOL.MLS && isAppsEnabledForTeam));
+
+  const isServicesEnabled = isAppsFeatureAvailable && (isServicesRoom || isGuestAndServicesRoom);
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
@@ -504,17 +513,17 @@ const GroupCreationModal = ({
                   name={t('guestOptionsTitle')}
                   info={t('guestRoomToggleInfo')}
                 />
-                {selectedProtocol.value !== CONVERSATION_PROTOCOL.MLS && (
-                  <InfoToggle
-                    className="modal-style"
-                    dataUieName="services"
-                    isChecked={isServicesEnabled}
-                    setIsChecked={clickOnToggleServicesMode}
-                    isDisabled={false}
-                    name={t('servicesOptionsTitle')}
-                    info={t('servicesRoomToggleInfo')}
-                  />
-                )}
+                <InfoToggle
+                  className="modal-style"
+                  dataUieName="services"
+                  isChecked={isServicesEnabled}
+                  setIsChecked={clickOnToggleServicesMode}
+                  isDisabled={!isAppsFeatureAvailable}
+                  name={t('servicesOptionsTitle')}
+                  info={t('servicesRoomToggleInfo')}
+                  label={!isAppsFeatureAvailable && <AppsDisabledNote />}
+                />
+
                 {areReadReceiptsEnabled && (
                   <InfoToggle
                     className="modal-style"
