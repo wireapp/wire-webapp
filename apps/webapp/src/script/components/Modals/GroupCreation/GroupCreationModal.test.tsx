@@ -1,7 +1,6 @@
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from "@wireapp/api-client/lib/team";
 import {TeamState} from "Repositories/team/TeamState";
 import ko from "knockout";
-import {container} from "tsyringe";
 import {GroupCreationModal} from "Components/Modals/GroupCreation/GroupCreationModal";
 import {act, getByRole} from "@testing-library/react";
 import {UserState} from "Repositories/user/UserState";
@@ -89,9 +88,6 @@ describe('GroupCreationModal', () => {
           },
         }),
       };
-
-      container.clearInstances();
-      container.registerInstance(UserState, mockUserState as any);
 
       const mockRootContext = {
         mainViewModel: {
