@@ -20,51 +20,40 @@
 import {AppsFeatureOptions, checkAppsFeatureAvailability} from "Util/featureUtil";
 import {CONVERSATION_PROTOCOL} from "@wireapp/api-client/lib/team";
 
-type AppsFeatureDataSet = {
-  featureOptions: AppsFeatureOptions;
-  expected: boolean;
-}
+type AppsFeatureDataSet = AppsFeatureOptions & { expected: boolean };
 
 describe('featureUtil', () => {
   it.each<AppsFeatureDataSet>([
     {
-      featureOptions: {
-        protocol: CONVERSATION_PROTOCOL.PROTEUS,
-        isAppsEnabled: false,
-        hasWhitelistedServices: true,
-      },
+      protocol: CONVERSATION_PROTOCOL.PROTEUS,
+      isAppsEnabled: false,
+      hasWhitelistedServices: true,
       expected: true
     },
     {
-      featureOptions: {
-        protocol: CONVERSATION_PROTOCOL.PROTEUS,
-        isAppsEnabled: false,
-        hasWhitelistedServices: false,
-      },
+      protocol: CONVERSATION_PROTOCOL.PROTEUS,
+      isAppsEnabled: false,
+      hasWhitelistedServices: false,
       expected: false
     },
     {
-      featureOptions: {
-        protocol: CONVERSATION_PROTOCOL.MLS,
-        isAppsEnabled: true,
-        hasWhitelistedServices: false,
-      },
+      protocol: CONVERSATION_PROTOCOL.MLS,
+      isAppsEnabled: true,
+      hasWhitelistedServices: false,
       expected: true
     },
     {
-      featureOptions: {
-        protocol: CONVERSATION_PROTOCOL.MLS,
-        isAppsEnabled: false,
-        hasWhitelistedServices: true,
-      },
+      protocol: CONVERSATION_PROTOCOL.MLS,
+      isAppsEnabled: false,
+      hasWhitelistedServices: true,
       expected: false
     },
   ])('apps feature is $expected when { protocol: $protocol, isAppsEnabled: $isAppsEnabled, hasWhitelistedServices: $hasWhitelistedServices }',
-    ({featureOptions, expected}) => {
+    (testData) => {
     // Act
-    const result = checkAppsFeatureAvailability(featureOptions)
+    const result = checkAppsFeatureAvailability(testData)
 
     //Assert
-    expect(result).toBe(expected);
+    expect(result).toBe(testData.expected);
   });
 });
