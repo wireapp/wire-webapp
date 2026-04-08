@@ -21,6 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
+import {ITEM_ALREADY_EXISTS_ERROR} from './cellsNodeFormUtils';
 import {useCellsNewNodeFormBase} from './useCellsNewNodeFormBase';
 
 import {getCellsApiPath} from '../getCellsApiPath/getCellsApiPath';
@@ -33,12 +34,34 @@ const FILE_EXTENSION_BY_TYPE: Record<CellsFileType, string> = {
   presentation: 'pptx',
 };
 
+const FILE_TEMPLATE_ID_BY_TYPE: Record<CellsFileType, string> = {
+  document: '01-Microsoft Word.docx',
+  spreadsheet: '02-Microsoft Excel.xlsx',
+  presentation: '03-Microsoft PowerPoint.pptx',
+};
+
+// TO-DO Replace hard coded values with server values when GET /templates endpoint ready
+const getTemplateUuidByType = (fileType: CellsFileType): string => {
+  return FILE_TEMPLATE_ID_BY_TYPE[fileType];
+};
+
+const createAlreadyExistsError = () => {
+  const error = new Error('File already exists') as Error & {response: {status: number}};
+  error.response = {status: ITEM_ALREADY_EXISTS_ERROR};
+  return error;
+};
+
+export const getFileExtensionByType = (fileType: CellsFileType): string => {
+  return FILE_EXTENSION_BY_TYPE[fileType];
+};
+
 interface UseCellsNewFileFormProps {
   fileType: CellsFileType;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   onSuccess: () => void;
   currentPath: string;
+  isOpen: boolean;
 }
 
 export const useCellsNewFileForm = ({
@@ -47,17 +70,24 @@ export const useCellsNewFileForm = ({
   conversationQualifiedId,
   onSuccess,
   currentPath,
+  isOpen,
 }: UseCellsNewFileFormProps) => {
   const normalizeNameForCreation = (rawName: string): string => {
-    const extension = FILE_EXTENSION_BY_TYPE[fileType];
+    const extension = getFileExtensionByType(fileType);
     return `${rawName}.${extension}`;
   };
 
   const createFile = async (name: string) => {
     const path = getCellsApiPath({conversationQualifiedId, currentPath});
-    await cellsRepository.createFile({path, name});
+    const templateUuid = getTemplateUuidByType(fileType);
+    const fileAlreadyExists = await cellsRepository.checkFileAlreadyExists({path, name});
+    if (fileAlreadyExists) {
+      throw createAlreadyExistsError();
+    }
+
+    await cellsRepository.createFile({path, name, templateUuid});
     onSuccess();
   };
 
-  return useCellsNewNodeFormBase({createNode: createFile, normalizeNameForCreation});
+  return useCellsNewNodeFormBase({createNode: createFile, normalizeNameForCreation, isOpen});
 };

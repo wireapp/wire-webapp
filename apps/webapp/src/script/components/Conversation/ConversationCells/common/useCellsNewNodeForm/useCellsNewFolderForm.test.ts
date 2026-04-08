@@ -24,10 +24,6 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 import {useCellsNewFolderForm} from './useCellsNewFolderForm';
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
-
 describe('useCellsNewFolderForm', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let onSuccess: jest.Mock;
@@ -43,18 +39,35 @@ describe('useCellsNewFolderForm', () => {
     onSuccess = jest.fn();
   });
 
-  const setup = () =>
+  const renderUseCellsNewFolderForm = () =>
     renderHook(() =>
       useCellsNewFolderForm({
         cellsRepository: mockCellsRepository,
         conversationQualifiedId: {id: 'conversation-id', domain: 'wire.com'},
         onSuccess,
         currentPath: '/wire-cells-web/path',
+        isOpen: true,
       }),
     );
 
-  it('does not append file extension or template data when creating folder names', async () => {
-    const {result} = setup();
+  it('uses createFolder repository method and never calls createFile', async () => {
+    const {result} = renderUseCellsNewFolderForm();
+
+    act(() => {
+      result.current.handleChange({currentTarget: {value: 'New folder'}} as ChangeEvent<HTMLInputElement>);
+    });
+
+    await act(async () => {
+      await result.current.handleSubmit(createEvent());
+    });
+
+    expect(mockCellsRepository.createFolder).toHaveBeenCalledTimes(1);
+    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  it('preserves provided folder name and does not append file metadata', async () => {
+    const {result} = renderUseCellsNewFolderForm();
 
     act(() => {
       result.current.handleChange({currentTarget: {value: 'Project.docx'}} as ChangeEvent<HTMLInputElement>);
@@ -69,22 +82,5 @@ describe('useCellsNewFolderForm', () => {
         name: 'Project.docx',
       }),
     );
-    expect(mockCellsRepository.createFolder).toHaveBeenCalledTimes(1);
-  });
-
-  it('uses createFolder repository method and never calls createFile', async () => {
-    const {result} = setup();
-
-    act(() => {
-      result.current.handleChange({currentTarget: {value: 'New folder'}} as ChangeEvent<HTMLInputElement>);
-    });
-
-    await act(async () => {
-      await result.current.handleSubmit(createEvent());
-    });
-
-    expect(mockCellsRepository.createFolder).toHaveBeenCalledTimes(1);
-    expect(mockCellsRepository.createFile).not.toHaveBeenCalled();
-    expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 });

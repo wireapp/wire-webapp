@@ -39,10 +39,8 @@ test.describe('In Conversation Search', () => {
     'Verify main overview shows media from all categories',
     {tag: ['@TC-352', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const userBPage = await createPage(withLogin(userB));
+      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;

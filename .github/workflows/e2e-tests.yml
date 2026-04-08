@@ -157,7 +157,7 @@ jobs:
 
       - name: Delete blob report artifacts
         if: always()
-        uses: geekyeggo/delete-artifact@751caa63d0e09850ee55dcd2f0561e00476fbfa0
+        uses: geekyeggo/delete-artifact@d79b2442431e4adbc383d29a28e630374eceb303
         with:
           name: blob-report-*
 

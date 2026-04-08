@@ -71,6 +71,12 @@ ls:
     .ts: camelCase
     .tsx: camelCase
     .test.tsx: camelCase
+  apps/webapp/src/script/repositories/media/backgroundEffects:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .types.ts: camelCase
   apps/webapp/src/script/repositories/assets:
     .dir: camelCase
     .ts: camelCase
@@ -357,3 +363,26 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService:
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+    .mocks.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/recovery:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/MLSService:
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/EventHandler:
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/E2EIdentityService/Connection/AcmeServer:
+    .ts: camelCase
+    .types.ts: camelCase
+    .schema.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/E2EIdentityService/Storage:
+    .ts: camelCase
+    .schema.ts: camelCase

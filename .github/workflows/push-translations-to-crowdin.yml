@@ -1,0 +1,52 @@
+name: Push translations to Crowdin
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+concurrency:
+  group: crowdin-push-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  push_to_crowdin:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Authenticate git clone
+        env:
+          GH_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
+        run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Merge translations
+        run: yarn nx run webapp:translate-merge
+
+      - name: Upload sources to Crowdin
+        uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d
+        env:
+          GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
+          CROWDIN_PROJECT_ID: 342359
+          INPUT_DEBUG_MODE: false
+        with:
+          upload_sources: true
+          upload_translations: false
+          download_translations: false
+          push_translations: false
+          create_pull_request: false
+          token: ${{ secrets.WEBTEAM_CROWDIN_TOKEN }}
+          source: '/apps/webapp/src/i18n/en-US.json'
+          translation: '/apps/webapp/src/i18n/%locale%.json'
+          base_path: '.'
