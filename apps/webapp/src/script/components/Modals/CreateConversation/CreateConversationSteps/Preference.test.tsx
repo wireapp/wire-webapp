@@ -16,6 +16,10 @@ type TeamStateDateSet = {
 };
 
 describe('Preference', () => {
+  beforeEach(() => {
+    container.clearInstances();
+  });
+
   it.each<TeamStateDateSet>([
     // PROTEUS
     {
@@ -70,8 +74,7 @@ describe('Preference', () => {
       }),
     };
 
-    container.clearInstances();
-    container.registerInstance(TeamState, mockTeamState as any);
+    container.registerInstance(TeamState, mockTeamState);
 
     // Act
     const { getByTestId } = render(<Preference />);
