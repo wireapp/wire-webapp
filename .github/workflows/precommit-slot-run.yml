@@ -75,6 +75,8 @@ jobs:
         env:
           ENV_NAME: ${{ inputs.env_name }}
         run: |
+          echo "Deploying to precommit environment: $ENV_NAME"
+          echo "Resolved precommit URL: https://$ENV_NAME.zinfra.io/"
           echo "url=https://$ENV_NAME.zinfra.io/" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Status
