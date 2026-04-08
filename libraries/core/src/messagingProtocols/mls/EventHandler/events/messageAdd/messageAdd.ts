@@ -27,7 +27,7 @@ import {GenericMessage} from '@wireapp/protocol-messaging';
 import {queueProposal} from './IncomingProposalsQueue';
 
 import {HandledEventPayload} from '../../../../../notification';
-import {MLSService, optionalToUint8Array} from '../../../MLSService/MLSService';
+import {MLSService, optionalToUint8Array} from '../../../MLSService/mlsService';
 
 const logger = LogFactory.getLogger('@wireapp/core/mls/messageAdd');
 

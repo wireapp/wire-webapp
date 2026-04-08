@@ -367,3 +367,7 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/MLSService:
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase

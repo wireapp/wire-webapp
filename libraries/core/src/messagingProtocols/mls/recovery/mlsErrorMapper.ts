@@ -37,7 +37,7 @@ import {
   isBrokenMLSConversationError,
   getMLSGroupOutOfSyncErrorMissingUsers,
   ConversationAlreadyExistsError,
-} from '../MLSService/CoreCryptoMLSError';
+} from '../MLSService/coreCryptoMlsError';
 
 /**
  * Domain error taxonomy used by policies and orchestrator.
