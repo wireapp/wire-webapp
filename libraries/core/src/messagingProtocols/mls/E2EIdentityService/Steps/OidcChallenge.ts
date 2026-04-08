@@ -19,7 +19,7 @@
 
 import {Converter} from 'bazinga64';
 
-import {AcmeService} from '../Connection/AcmeServer';
+import {AcmeService} from '../Connection/AcmeServer/acmeService';
 import {E2eiEnrollment, Nonce} from '../E2EIService.types';
 import {UnidentifiedEnrollmentFlowData} from '../Storage/E2EIStorage.schema';
 
