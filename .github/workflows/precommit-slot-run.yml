@@ -70,16 +70,12 @@ jobs:
           wait-for-environment-recovery: true
           use-existing-application-version-if-available: true
 
-      - name: Fetch precommit URL
+      - name: Set precommit URL
         id: fetch_url
         env:
           ENV_NAME: ${{ inputs.env_name }}
         run: |
-          URL=$(aws elasticbeanstalk describe-environments \
-            --region eu-central-1 \
-            --environment-names "$ENV_NAME" \
-            --query "Environments[0].CNAME" --output text)
-          echo "url=https://$URL" >> "$GITHUB_OUTPUT"
+          echo "url=https://$ENV_NAME.zinfra.io/" >> "$GITHUB_OUTPUT"
 
       - name: Deployment Status
         if: ${{ always() }}
