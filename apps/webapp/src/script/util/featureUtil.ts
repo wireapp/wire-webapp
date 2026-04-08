@@ -19,7 +19,7 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team/feature/';
 
-interface AppsFeatureOptions {
+export interface AppsFeatureOptions {
   protocol: CONVERSATION_PROTOCOL;
   isAppsEnabled: boolean;
   hasWhitelistedServices: boolean;
