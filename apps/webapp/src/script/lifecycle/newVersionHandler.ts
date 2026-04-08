@@ -17,8 +17,8 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getLogger} from 'Util/logger';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 type OnNewVersionAvailableFn = (serverVersion: string) => void;
 
@@ -29,7 +29,7 @@ interface VersionListener {
 
 const logger = getLogger('newVersionHandler');
 const VERSION_URL = '/version/';
-const CHECK_INTERVAL = TIME_IN_MILLIS.HOUR * 3;
+const CHECK_INTERVAL = TIME_IN_MILLIS.MINUTE * 15;
 
 let newVersionListeners: VersionListener[] = [];
 let pollInterval: number;

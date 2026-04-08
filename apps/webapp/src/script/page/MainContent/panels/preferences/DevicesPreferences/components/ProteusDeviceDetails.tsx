@@ -18,9 +18,9 @@
  */
 
 import {VerificationBadges} from 'Components/Badge';
-import {t} from 'Util/LocalizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
-import {formatTimestamp} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {splitFingerprint} from 'Util/stringUtil';
+import {formatTimestamp} from 'Util/timeUtil';
 
 import {type DeviceProps} from './DetailedDevice';
 import {FormattedId} from './FormattedId';

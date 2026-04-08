@@ -27,9 +27,9 @@ import {UserSearchableList} from 'Components/UserSearchableList';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
 import {RootContext} from 'src/script/page/RootProvider';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {participantsSelectionListCss, participantsSelectionSearchCss} from './CreateConversationSteps.styles';
 

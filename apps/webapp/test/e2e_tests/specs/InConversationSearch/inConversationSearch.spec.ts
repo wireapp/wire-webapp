@@ -39,20 +39,20 @@ test.describe('In Conversation Search', () => {
     'Verify main overview shows media from all categories',
     {tag: ['@TC-352', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const userBPage = await createPage(withLogin(userB));
+      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       // Preconditions: User B sends media from all categories (images, links, audio and files)
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      const {page} = userBPages.conversation();
       // Image
-      await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
+      await shareAssetHelper(getImageFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add picture'}));
       // Audio
-      await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+      await shareAssetHelper(getAudioFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
       // File
-      await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+      await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
 
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       await expect(userAPages.conversation().getMessage({sender: userB})).toHaveCount(3);
@@ -66,21 +66,81 @@ test.describe('In Conversation Search', () => {
   );
 
   test(
+    "Verify ephemeral messages aren't shown in collection after timeout",
+    {tag: ['@TC-354', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversation().enableSelfDeletingMessages();
+      await userBPages.conversation().sendMessage('Gone in 10s');
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
+      await userAPage.waitForTimeout(10_000);
+
+
+      await userAPages.conversation().searchButton.click();
+
+      const collection = userAPages.collection();
+      await collection.searchBar.fill('Gone in 10s');
+
+      await expect(collection.searchResults).toHaveCount(0);
+    },
+  );
+
+  test(
+    'Verify ephemeral messages show in collection before timeout',
+    {tag: ['@TC-355', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversation().enableSelfDeletingMessages();
+      await userBPages.conversation().sendMessage('Gone in 10s');
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
+
+      await userAPages.conversation().searchButton.click();
+
+      const collection = userAPages.collection();
+      await collection.searchBar.fill('Gone in 10s');
+
+      await expect(collection.searchResults).toHaveCount(1);
+      await expect(collection.searchResults).toContainText('Gone in 10s');
+    },
+  );
+
+  test(
     'Verify opening overview of all pictures from sender and receiver in group',
     {tag: ['@TC-356', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      const [pageA, pageB] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
       ]);
+
+      const userAPages = PageManager.from(pageA).webapp.pages;
+      const userBPages = PageManager.from(pageB).webapp.pages;
 
       const conversationName = 'Test Group';
       await createGroup(userAPages, conversationName, [userB]);
 
       await userBPages.conversationList().openConversation(conversationName);
       await userAPages.conversationList().openConversation(conversationName);
-      const {page: pageB} = userBPages.conversation();
-      const {page: pageA} = userAPages.conversation();
 
       for (let imageCount = 0; imageCount < 10; imageCount++) {
         await shareAssetHelper(getImageFilePath(), pageB, pageB.getByRole('button', {name: 'Add picture'}));
@@ -100,19 +160,18 @@ test.describe('In Conversation Search', () => {
     'Verify opening single picture from all shared media overview',
     {tag: ['@TC-357', '@regression']},
     async ({createPage}) => {
-      const [userAPageManager, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      const [pageA, pageB] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
       ]);
 
-      const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+      const {pages: userAPages, modals: userAModals} = PageManager.from(pageA).webapp;
+      const userBPages = PageManager.from(pageB).webapp.pages;
 
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      const {page: pageB} = userBPages.conversation();
       await shareAssetHelper(getImageFilePath(), pageB, pageB.getByRole('button', {name: 'Add picture'}));
 
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      const {page: pageA} = userAPages.conversation();
       await shareAssetHelper(getImageFilePath(), pageA, pageA.getByRole('button', {name: 'Add picture'}));
 
       await userAPages.conversation().searchButton.click();
@@ -139,20 +198,21 @@ test.describe('In Conversation Search', () => {
   });
 
   test('Verify opening overview of all files', {tag: ['@TC-359', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+    const [pageA, pageB] = await Promise.all([
+      createPage(withLogin(userA), withConnectedUser(userB)),
+      createPage(withLogin(userB)),
     ]);
 
+    const userAPages = PageManager.from(pageA).webapp.pages;
+    const userBPages = PageManager.from(pageB).webapp.pages;
+
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    const {page: pageB} = userBPages.conversation();
 
     for (let fileCount = 0; fileCount < 10; fileCount++) {
       await shareAssetHelper(getTextFilePath(), pageB, pageB.getByRole('button', {name: 'Add file'}));
     }
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    const {page: pageA} = userAPages.conversation();
     for (let fileCount = 0; fileCount < 10; fileCount++) {
       await shareAssetHelper(getTextFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
     }
@@ -165,13 +225,15 @@ test.describe('In Conversation Search', () => {
     "Verify deleted media isn't in collection on other side",
     {tag: ['@TC-360', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      const [pageA, pageB] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
       ]);
 
+      const userAPages = PageManager.from(pageA).webapp.pages;
+      const userBPages = PageManager.from(pageB).webapp.pages;
+
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      const {page: pageB} = userBPages.conversation();
       await shareAssetHelper(getImageFilePath(), pageB, pageB.getByRole('button', {name: 'Add picture'}));
 
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});

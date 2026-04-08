@@ -17,6 +17,8 @@
  *
  */
 
+import {Decoder} from 'bazinga64';
+
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
@@ -30,10 +32,10 @@ import {getCertificate} from './Steps/Certificate';
 import {doWireDpopChallenge} from './Steps/DpopChallenge';
 import {doWireOidcChallenge} from './Steps/OidcChallenge';
 import {createNewOrder, finalizeOrder} from './Steps/Order';
-import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
-import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/E2EIStorage.schema';
+import {createE2EIEnrollmentStorage} from './Storage/e2eiStorage';
+import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/e2eiStorage.schema';
 
-import {CoreDatabase} from '../../../storage/CoreDB';
+import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
@@ -274,12 +276,25 @@ export class E2EIServiceInternal {
       const newCrlDistributionPoints = await cx.saveX509Credential(identity, certificate);
       for (const conversation of conversations) {
         if (Boolean(conversation.group_id?.length)) {
-          const idAsBytes = new TextEncoder().encode(conversation.group_id);
-          await cx.e2eiRotate(new ConversationId(idAsBytes));
+          try {
+            const idAsBytes = Decoder.fromBase64(conversation.group_id).asBytes;
+            const conversationId = new ConversationId(idAsBytes);
+
+            // Check if conversation exists before rotating
+            const conversationExists = await cx.conversationExists(conversationId);
+            if (conversationExists) {
+              await cx.e2eiRotate(conversationId);
+            }
+          } catch (error) {
+            // Log error but don't fail the entire enrollment if one conversation fails
+            this.logger.warn('Failed to rotate conversation', {groupId: conversation.group_id, error});
+          }
         } else {
           this.logger.error('No group id found in conversation');
         }
       }
+
+      await cx.deleteStaleKeyPackages(cipherSuite);
 
       const keyPackages = await cx.clientKeypackages(cipherSuite, CredentialType.X509, this.keyPackagesAmount);
 

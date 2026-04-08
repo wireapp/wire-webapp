@@ -22,11 +22,11 @@
     }
   },
   "browser": {
-    "./lib/cryptography/AssetCryptography/crypto.node": "./lib/cryptography/AssetCryptography/crypto.browser.js"
+    "./lib/cryptography/assetCryptography/crypto.node": "./lib/cryptography/assetCryptography/crypto.browser.js"
   },
   "dependencies": {
     "@wireapp/api-client": "27.96.0",
-    "@wireapp/core-crypto": "9.3.0",
+    "@wireapp/core-crypto": "9.3.2",
     "@wireapp/cryptobox": "12.8.0",
     "@wireapp/priority-queue": "2.1.19",
     "@wireapp/promise-queue": "2.4.13",
@@ -34,7 +34,7 @@
     "@wireapp/store-engine": "5.1.19",
     "hash.js": "1.1.7",
     "idb": "8.0.3",
-    "lodash": "4.17.23"
+    "lodash": "4.18.1"
   },
   "devDependencies": {
     "@swc/core": "1.15.18",

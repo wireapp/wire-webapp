@@ -19,8 +19,8 @@
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CellNodeType, CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/LocalizerUtil';
-import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
+import {t} from 'Util/localizerUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 import {modalContentStyles} from './showRestoreNestedNodeModal.styles';
 

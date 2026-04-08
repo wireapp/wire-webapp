@@ -35,13 +35,13 @@ import '@testing-library/jest-dom';
  * Wire specific side-effect mocks (mutate global objects when imported)
  * ---------------------------------------------------------------------------
  */
-import 'src/script/util/test/mock/createObjectURLMock';
+import 'src/script/util/test/mock/createObjectUrlMock';
 import 'src/script/util/test/mock/cryptoMock';
 import 'src/script/util/test/mock/matchMediaMock';
 import 'src/script/util/test/mock/mediaDevicesMock';
 import 'src/script/util/test/mock/navigatorPermissionsMock';
-import 'src/script/util/test/mock/ResponseMock';
-import 'src/script/util/test/mock/WebRTCMock';
+import 'src/script/util/test/mock/responseMock';
+import 'src/script/util/test/mock/webRtcMock';
 import 'src/script/util/test/mock/resizeObserver.mock';
 import 'src/script/util/test/mock/wireEnvMock';
 import 'src/script/util/test/mock/browserApiMock';
@@ -63,11 +63,11 @@ jest.mock('axios');
 jest.mock('@formkit/auto-animate/react');
 jest.mock('react-pdf');
 jest.mock('@wireapp/react-ui-kit');
-jest.mock('@wireapp/api-client/lib/team/feature/FeatureAPI');
+jest.mock('@wireapp/api-client/lib/team/feature/featureApi');
 jest.mock('@wireapp/core');
 jest.mock('@wireapp/core-crypto');
 
 // Important: the team module re-exports FeatureAPI. Requiring both modules here
 // ensures Node's module cache captures the mocked constructors instead of the real ones.
-require('@wireapp/api-client/lib/team/feature/FeatureAPI');
+require('@wireapp/api-client/lib/team/feature/featureApi');
 require('@wireapp/api-client/lib/team');

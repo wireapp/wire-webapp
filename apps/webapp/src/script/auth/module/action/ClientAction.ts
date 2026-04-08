@@ -24,7 +24,7 @@ import {ClientInfo} from '@wireapp/core/lib/client/';
 import {Runtime} from '@wireapp/commons';
 
 import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
-import {toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
 
 import {ClientActionCreator} from './creator/';
 

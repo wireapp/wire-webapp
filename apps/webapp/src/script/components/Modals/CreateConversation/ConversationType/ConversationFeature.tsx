@@ -20,7 +20,7 @@
 import {ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {CheckIcon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   conversationFeatureContainerCss,

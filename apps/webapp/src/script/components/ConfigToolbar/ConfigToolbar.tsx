@@ -27,7 +27,7 @@ import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {CoreCryptoLogLevel} from 'Util/DebugUtil';
+import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 
@@ -43,6 +43,9 @@ export function ConfigToolbar() {
   const wrapperRef = useRef(null);
   const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger());
   const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsRustSFT());
+  const [videoBackgroundEffectsFeatureEnabled, setVideoBackgroundEffectsFeatureEnabled] = useState(
+    !!window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled(),
+  );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
@@ -219,6 +222,24 @@ export function ConfigToolbar() {
     );
   };
 
+  const handleBackgroundEffectsFeature = (isChecked: boolean) => {
+    setVideoBackgroundEffectsFeatureEnabled(!!window.wire?.app?.debug?.enableVideoBackgroundEffectsFeature(isChecked));
+  };
+  const renderBackgroundEffectsFeatureSelect = () => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="video-background-effects-feature-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          ENABLE VIDEO BACKGROUND EFFECTS
+        </label>
+        <Switch
+          id="video-background-effects-feature-checkbox"
+          checked={videoBackgroundEffectsFeatureEnabled}
+          onToggle={isChecked => handleBackgroundEffectsFeature(isChecked)}
+        />
+      </div>
+    );
+  };
+
   const renderGzipSwitch = () => {
     return (
       <div style={{marginBottom: '10px'}}>
@@ -315,6 +336,10 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderAvsRustSftSwitch()}</div>
+
+      <hr />
+
+      <div>{renderBackgroundEffectsFeatureSelect()}</div>
 
       <hr />
 

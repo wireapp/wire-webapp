@@ -3,24 +3,24 @@
   "defaultBase": "dev",
   "targetDefaults": {
     "build": {
-      "dependsOn": ["^build"], // build all upstream dependencies first
+      "dependsOn": ["^build"],
       "cache": true,
-      "inputs": ["production"], // skip test-only files when hashing builds
+      "inputs": ["production"],
       "outputs": ["{projectRoot}/dist"]
     },
     "test": {
-      "dependsOn": ["^build"], // build all upstream dependencies first
+      "dependsOn": ["^build"],
       "cache": true,
-      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"] // include shared preset in cache key
+      "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
     },
     "lint": {
-      "dependsOn": ["^build"], // build all upstream dependencies first
+      "dependsOn": ["^build"],
       "cache": true,
-      "inputs": ["default", "{workspaceRoot}/eslint.config.ts"] // workspace lint config in hash
+      "inputs": ["default", "{workspaceRoot}/eslint.config.ts"]
     }
   },
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"], // everything under the project by default
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
     "production": [
       "default",
       "!{projectRoot}/**/?(*.)+(spec|test).[jt]s?(x)?(.snap)",
@@ -30,9 +30,10 @@
       "!{projectRoot}/src/test-setup.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": [] // hook for root-level shared files if needed
+    "sharedGlobals": []
   },
   "defaultProject": "webapp",
+  "neverConnectToCloud": true,
   "release": {
     "projects": ["tag:npm:public"],
     "projectsRelationship": "independent",
@@ -51,5 +52,6 @@
         "createRelease": "github"
       }
     }
-  }
+  },
+  "analytics": false
 }

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './UserService';
+export * from './userService';

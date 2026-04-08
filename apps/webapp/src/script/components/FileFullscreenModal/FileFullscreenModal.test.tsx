@@ -63,7 +63,7 @@ jest.mock('./PdfViewer/PdfViewer', () => ({
   PDFViewer: () => <div data-uie-name="pdf-viewer">PDF Viewer</div>,
 }));
 
-jest.mock('Util/FileTypeUtil', () => ({
+jest.mock('Util/fileTypeUtil', () => ({
   isFileEditable: (extension: string) => ['txt', 'md', 'json'].includes(extension),
 }));
 
@@ -278,6 +278,42 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
       expect(screen.queryByTestId('pdf-viewer')).not.toBeInTheDocument();
       expect(screen.getByTestId('image-view')).toBeInTheDocument();
+    });
+  });
+
+  describe('Behavior for Recycled Files', () => {
+    it('should not allow editing if file is in recycle bin', () => {
+      render(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => true} />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+      expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    });
+
+    it('should keep view mode when edit mode prop changes while file is in recycle bin', () => {
+      const {rerender} = render(
+        <FileFullscreenModal {...defaultProps} isEditMode={false} checkIsInRecycleBin={() => true} />,
+      );
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+
+      rerender(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => true} />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+      expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    });
+
+    it('should be editable and previewable if file is not in recycle bin', () => {
+      const {rerender} = render(
+        <FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => false} />,
+      );
+
+      expect(screen.getByTestId('file-editor')).toBeInTheDocument();
+      expect(screen.queryByTestId('no-preview')).not.toBeInTheDocument();
+
+      rerender(<FileFullscreenModal {...defaultProps} isEditMode={false} checkIsInRecycleBin={() => false} />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+      expect(screen.getByTestId('no-preview')).toBeInTheDocument();
     });
   });
 });

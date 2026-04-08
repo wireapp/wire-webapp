@@ -25,9 +25,9 @@ import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {Declension, joinNames, replaceLink, t} from 'Util/LocalizerUtil';
-import {replaceReactComponents} from 'Util/LocalizerUtil/ReactLocalizerUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {Declension, joinNames, replaceLink, t} from 'Util/localizerUtil';
+import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export const CONFIG = {
   MAX_USERS_VISIBLE: 17,

@@ -21,7 +21,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export class UserFilter {
   static isParticipant(conversationEntity: Conversation, userId: QualifiedId) {

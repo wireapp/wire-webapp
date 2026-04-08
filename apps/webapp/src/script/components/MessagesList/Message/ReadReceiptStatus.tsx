@@ -23,9 +23,9 @@ import cx from 'classnames';
 
 import {ReadIcon} from 'Components/Icon';
 import {Message} from 'Repositories/entity/message/Message';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatTimeShort} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {formatTimeShort} from 'Util/timeUtil';
 
 interface ReadReceiptStatusProps {
   is1to1Conversation: boolean;

@@ -17,8 +17,9 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/LowPrecisionTaskScheduler';
+import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {amplify} from 'amplify';
 import {SigninResponse} from 'oidc-client-ts';
 import {container} from 'tsyringe';
@@ -27,12 +28,11 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {UserState} from 'Repositories/user/UserState';
 import {Core} from 'src/script/service/CoreSingleton';
-import {getLogger} from 'Util/Logger';
-import {formatDelayTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {removeUrlParameters} from 'Util/UrlUtil';
+import {getLogger} from 'Util/logger';
+import {formatDelayTime, TIME_IN_MILLIS} from 'Util/timeUtil';
+import {removeUrlParameters} from 'Util/urlUtil';
 
 import {
   hasActiveCertificate,
@@ -313,12 +313,21 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           return userData.id_token;
         },
         certificateTtl: this.certificateTtl,
-        getAllConversations: () => {
-          const conversationState = container.resolve(ConversationState);
-          const conversations = conversationState.conversations().map(conversation => ({
-            group_id: conversation.groupId ?? '',
-          }));
-          return Promise.resolve(conversations);
+        getAllConversations: async () => {
+          if (is.undefined(this.core.service)) {
+            return [];
+          }
+          const conversations = await this.core.service.conversation.getConversations();
+
+          if (!is.array(conversations.found)) {
+            return [];
+          }
+
+          return conversations.found
+            .filter(conversation => is.nonEmptyString(conversation.group_id))
+            .map(({group_id}) => ({
+              group_id: group_id!,
+            }));
         },
       });
 

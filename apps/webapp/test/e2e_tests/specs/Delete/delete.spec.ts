@@ -321,10 +321,11 @@ test.describe('Delete', () => {
 
   testCases.forEach(({name, tc, sendAction}) => {
     test(`Delete "For Everyone" works for ${name}`, {tag: [tc, '@regression']}, async ({createPage, api}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const pageB = await createPage(withLogin(userB));
+      const pageA = await  createPage(withLogin(userA), withConnectedUser(userB));
+
+      const userAPages = PageManager.from(pageA).webapp.pages;
+      const userBPages = PageManager.from(pageB).webapp.pages;
 
       await test.step('Await mls conversation creation', async () => {
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
@@ -332,15 +333,13 @@ test.describe('Delete', () => {
       });
 
       await test.step('Execute send action', async () => {
-        const {page: pageA} = userAPages.conversation();
-        const {page: pageB} = userBPages.conversation();
         await sendAction({pageA, pageB, api});
       });
 
       let messageA: Locator;
       let messageB: Locator;
 
-      await test.step('Veryify send action', async () => {
+      await test.step('Verify send action', async () => {
         messageA = userAPages.conversation().getMessage({sender: userA});
         messageB = userBPages.conversation().getMessage({sender: userA});
         await expect(messageA).toBeAttached();

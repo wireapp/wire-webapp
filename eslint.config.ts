@@ -7,6 +7,7 @@ import path from 'path';
 import {FlatCompat} from '@eslint/eslintrc';
 // @ts-ignore - No types available for @emotion/eslint-plugin with ESLint 9
 import emotionPlugin from '@emotion/eslint-plugin';
+import stylisticPlugin from '@stylistic/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
 import tsParser from '@typescript-eslint/parser';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
@@ -85,6 +86,15 @@ const config: Linter.Config[] = [
       'no-unsanitized/DOM': 'off', // deprecated config variant; rely on recommended defaults instead
       'valid-jsdoc': 'off', // rule removed in ESLint 9
       'header/header': 'off', // disable existing header rule to use our own
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,js,jsx,cjs,mjs}'],
+    plugins: {
+      '@stylistic': stylisticPlugin,
+    },
+    rules: {
+      '@stylistic/eol-last': ['error', 'always'],
     },
   },
   {

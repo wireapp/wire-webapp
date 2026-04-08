@@ -25,8 +25,8 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {Button, ContainerXS, Form, H1, Input} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
+import {toError} from 'Util/toError';
 
 import {Page} from './Page';
 

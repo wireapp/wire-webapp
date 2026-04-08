@@ -33,8 +33,8 @@ import {
   useSidebarStore,
 } from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 interface ConversationFolderTabProps {
   title: string;

@@ -21,7 +21,7 @@ import {ReactNode} from 'react';
 
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   errorIconStyles,

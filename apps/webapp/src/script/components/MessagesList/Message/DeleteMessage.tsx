@@ -20,8 +20,8 @@
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {t} from 'Util/LocalizerUtil';
-import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageHeader} from './ContentMessage/MessageHeader';
 import {MessageTime} from './MessageTime';

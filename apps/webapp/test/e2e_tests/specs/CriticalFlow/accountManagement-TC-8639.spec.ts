@@ -45,7 +45,7 @@ test('Account Management', {tag: ['@TC-8639', '@crit-flow-web']}, async ({create
   });
 
   await test.step('Member verifies if applock is working', async () => {
-    await pageManager.refreshPage();
+    await pageManager.page.reload();
     await expect(modals.appLock().appLockModalHeader).toContainText('Enter passcode to unlock', {
       timeout: LOGIN_TIMEOUT,
     });

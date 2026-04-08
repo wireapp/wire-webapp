@@ -26,7 +26,7 @@ const e2eRootDir = path.join(__dirname, '../');
 const fileTransferAssetsDir = path.join(e2eRootDir, 'assets/filetransfer');
 export const VideoFileName = 'example.mp4';
 const AudioFileName = 'example.mp3';
-const TextFileName = 'example.txt';
+export const TextFileName = 'example.txt';
 
 export const readLocalFile = (filePath: string): Promise<Buffer> => {
   return new Promise<Buffer>((resolve, reject) => {

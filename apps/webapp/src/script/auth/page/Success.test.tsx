@@ -27,7 +27,7 @@ import {mountComponent} from '../util/test/TestUtil';
 import * as trackingUtil from '../util/trackingUtil';
 import * as urlUtil from '../util/urlUtil';
 
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
   setStrings: jest.fn(),
 }));

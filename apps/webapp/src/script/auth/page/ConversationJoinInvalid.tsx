@@ -23,7 +23,7 @@ import {FormattedMessage} from 'react-intl';
 
 import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../Config';
 import {WirelessContainer} from '../component/WirelessContainer';

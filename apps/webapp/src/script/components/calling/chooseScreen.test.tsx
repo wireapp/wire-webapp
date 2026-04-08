@@ -21,11 +21,11 @@ import {render, fireEvent} from '@testing-library/react';
 import {container} from 'tsyringe';
 
 import {CallState} from 'Repositories/calling/CallState';
-import {captureModalFocusContext} from 'Util/ModalFocusUtil';
+import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
 import {ChooseScreen} from './ChooseScreen';
 
-jest.mock('Util/ModalFocusUtil', () => ({
+jest.mock('Util/modalFocusUtil', () => ({
   captureModalFocusContext: jest.fn(),
 }));
 

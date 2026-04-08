@@ -26,10 +26,10 @@ import {ClientRepository, ClientEntity} from 'Repositories/client';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
-import {partition} from 'Util/ArrayUtil';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {capitalizeFirstChar} from 'Util/StringUtil';
+import {partition} from 'Util/arrayUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {capitalizeFirstChar} from 'Util/stringUtil';
 
 import {DeviceDetails} from './components/DeviceDetails';
 import {DeviceList} from './components/DeviceList';

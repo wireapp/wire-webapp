@@ -20,7 +20,7 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNode} from 'cells-sdk-ts';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 import {useGetMultipartAsset} from './useGetMultipartAsset';
 

@@ -29,7 +29,7 @@ import {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
-import {buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
+import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 
@@ -62,6 +62,7 @@ describe('fullscreenVideoCall', () => {
       isMuted: false,
       propertiesRepository: new PropertiesRepository({} as PropertiesService, {} as SelfService),
       mediaDevicesHandler: buildMediaDevicesHandler(),
+      callingRepository: buildCallingRepository(),
       videoGrid: {grid: [], thumbnail: null} as Grid,
     };
     return props as FullscreenVideoCallProps;
@@ -114,12 +115,16 @@ describe('fullscreenVideoCall', () => {
     const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
     const callViewToggleButton = getByTestId('do-call-controls-video-call-view');
 
-    callViewToggleButton.click();
+    act(() => {
+      callViewToggleButton.click();
+    });
 
     await waitFor(() => expect(getByText('videoCallOverlayViewModeLabel')).toBeDefined());
 
     const viewModeAllSpeakersOption = getByText('videoCallOverlayViewModeSpeakers');
-    viewModeAllSpeakersOption.click();
+    act(() => {
+      viewModeAllSpeakersOption.click();
+    });
 
     expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
   });

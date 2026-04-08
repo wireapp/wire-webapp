@@ -24,7 +24,7 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {FileHistoryContent} from './FileHistoryContent';
 import {FileVersion} from './types';
 
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string, replacements?: Record<string, string>) => {
     if (replacements) {
       let result = key;

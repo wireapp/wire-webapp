@@ -24,8 +24,8 @@ import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
 import {User} from 'Repositories/entity/User';
-import {applyBlur} from 'Repositories/media/VideoBackgroundBlur';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export type UserId = string;
 export type ClientId = string;
@@ -33,8 +33,11 @@ export type ClientId = string;
 export class Participant {
   // Video
   public readonly videoState = observable(VIDEO_STATE.STOPPED);
+  // The (self-) participant hold everytime the original video and this will never change.
   public readonly videoStream = observable<MediaStream | undefined>();
-  public readonly blurredVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
+  // In case of background changes effected we store this resulting media stream here.
+  // The CallingRepository will decide if this stream is sent. Because background changes are global app state changes!
+  public readonly processedVideoStream = observable<{stream: MediaStream; release: () => void} | undefined>();
   public readonly hasActiveVideo: ko.PureComputed<boolean>;
   public readonly hasPausedVideo: ko.PureComputed<boolean>;
   public readonly sharesScreen: ko.PureComputed<boolean>;
@@ -44,6 +47,7 @@ export class Participant {
   public readonly isActivelySpeaking = observable(false);
   public readonly isSendingVideo: ko.PureComputed<boolean>;
   public readonly isAudioEstablished = observable(false);
+  private readonly logger: Logger;
 
   // Audio
   public readonly audioStream = observable<MediaStream | undefined>();
@@ -54,6 +58,7 @@ export class Participant {
     public readonly user: User,
     public readonly clientId: ClientId,
   ) {
+    this.logger = getLogger('Participant');
     this.hasActiveVideo = pureComputed(() => {
       return (this.sharesCamera() || this.sharesScreen()) && !!this.videoStream();
     });
@@ -82,19 +87,10 @@ export class Participant {
     });
   }
 
-  public releaseBlurredVideoStream(): void {
-    this.blurredVideoStream()?.release();
-    this.blurredVideoStream(undefined);
-  }
-
-  public async setBlurredBackground(isBlurred: boolean) {
-    const originalVideoStream = this.videoStream();
-    if (isBlurred && originalVideoStream) {
-      this.blurredVideoStream(await applyBlur(originalVideoStream));
-    } else {
-      this.releaseBlurredVideoStream();
-    }
-    return this.blurredVideoStream()?.stream;
+  public releaseProcessedVideoStream(): void {
+    this.logger.info('Stop the current background effect!');
+    this.processedVideoStream()?.release();
+    this.processedVideoStream(undefined);
   }
 
   readonly doesMatchIds = (userId: QualifiedId, clientId: ClientId): boolean =>
@@ -106,7 +102,7 @@ export class Participant {
   }
 
   setVideoStream(videoStream: MediaStream, stopTracks: boolean): void {
-    this.releaseBlurredVideoStream();
+    this.releaseProcessedVideoStream();
     this.releaseStream(this.videoStream(), stopTracks);
     this.videoStream(videoStream);
   }
@@ -124,13 +120,13 @@ export class Participant {
   getMediaStream(): MediaStream {
     const audioTracks: MediaStreamTrack[] = this.audioStream()?.getTracks() ?? [];
     const videoTracks: MediaStreamTrack[] =
-      this.blurredVideoStream()?.stream.getTracks() ?? this.videoStream()?.getTracks() ?? [];
+      this.processedVideoStream()?.stream.getTracks() ?? this.videoStream()?.getTracks() ?? [];
     return new MediaStream(audioTracks.concat(videoTracks));
   }
 
   releaseVideoStream(stopTracks: boolean): void {
     this.releaseStream(this.videoStream(), stopTracks);
-    this.releaseBlurredVideoStream();
+    this.releaseProcessedVideoStream();
     this.videoStream(undefined);
   }
 

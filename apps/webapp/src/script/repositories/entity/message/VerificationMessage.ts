@@ -21,7 +21,7 @@ import ko from 'knockout';
 
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {Message} from './Message';
 

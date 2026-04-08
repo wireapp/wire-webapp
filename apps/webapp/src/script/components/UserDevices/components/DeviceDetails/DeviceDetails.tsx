@@ -32,11 +32,11 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import type {Logger} from 'Util/Logger';
-import {splitFingerprint} from 'Util/StringUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import type {Logger} from 'Util/logger';
+import {splitFingerprint} from 'Util/stringUtil';
+import {toError} from 'Util/toError';
 
 import {Config} from '../../../../Config';
 import {MotionDuration} from '../../../../motion/MotionDuration';

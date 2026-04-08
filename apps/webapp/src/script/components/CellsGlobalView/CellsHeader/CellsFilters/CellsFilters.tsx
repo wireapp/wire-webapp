@@ -18,7 +18,7 @@
  */
 
 import {useCellsStore} from 'Components/CellsGlobalView/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 import {CellsClearFilters} from './CellsClearFilters/CellsClearFilters';
 import {CellsFiltersMenu} from './CellsFiltersMenu/CellsFiltersMenu';

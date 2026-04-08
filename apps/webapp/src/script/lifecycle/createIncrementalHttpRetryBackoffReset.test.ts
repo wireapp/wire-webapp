@@ -20,8 +20,6 @@
 import assert from 'assert';
 
 import {APIClient} from '../service/APIClientSingleton';
-import {incrementalHttpRetryBackoffFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from './createIncrementalHttpRetryBackoffReset';
 
 type ListenerMap = Map<string, () => void>;
@@ -70,26 +68,6 @@ function createConfigureIncrementalHttpRetryBackoffResetDependenciesForTest(): C
 }
 
 describe('createIncrementalHttpRetryBackoffReset', () => {
-  it('does not register listeners when the startup feature toggle is disabled', () => {
-    const dependenciesForTest = createConfigureIncrementalHttpRetryBackoffResetDependenciesForTest();
-
-    createIncrementalHttpRetryBackoffReset({
-      ...dependenciesForTest,
-      visibilityState: () => {
-        return 'visible';
-      },
-      isElectron: () => {
-        return false;
-      },
-      isFeatureToggleEnabled: (_featureToggleName: StartupFeatureToggleName) => {
-        return false;
-      },
-    });
-
-    expect(dependenciesForTest.subscribeToApplicationSignal).not.toHaveBeenCalled();
-    expect(dependenciesForTest.subscribeToRuntimeSignal).not.toHaveBeenCalled();
-  });
-
   it('resets retry backoff when the browser tab becomes visible and when the app goes online', () => {
     const dependenciesForTest = createConfigureIncrementalHttpRetryBackoffResetDependenciesForTest();
     let currentDocumentVisibilityState: DocumentVisibilityState = 'hidden';
@@ -101,9 +79,6 @@ describe('createIncrementalHttpRetryBackoffReset', () => {
       },
       isElectron: () => {
         return false;
-      },
-      isFeatureToggleEnabled: (featureToggleName: StartupFeatureToggleName) => {
-        return featureToggleName === incrementalHttpRetryBackoffFeatureToggleName;
       },
     });
 
@@ -147,9 +122,6 @@ describe('createIncrementalHttpRetryBackoffReset', () => {
       },
       isElectron: () => {
         return true;
-      },
-      isFeatureToggleEnabled: (featureToggleName: StartupFeatureToggleName) => {
-        return featureToggleName === incrementalHttpRetryBackoffFeatureToggleName;
       },
     });
 

@@ -32,7 +32,7 @@ import {
   MemberLeaveReason,
   RECEIPT_MODE,
 } from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/conversationTypingData';
 import {
   CONVERSATION_EVENT,
   ConversationAddPermissionUpdateEvent,
@@ -65,12 +65,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
-import {ConnectionState} from 'Repositories/connection/ConnectionState';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
+import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
+import {ConnectionState} from 'Repositories/connection/connectionState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {DeleteConversationMessage} from 'Repositories/entity/message/DeleteConversationMessage';
@@ -92,11 +92,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserFilter} from 'Repositories/user/UserFilter';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {getNextItem} from 'Util/ArrayUtil';
-import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {getNextItem} from 'Util/arrayUtil';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
 import {
   compareTransliteration,
@@ -104,9 +104,10 @@ import {
   sortByPriority,
   sortUsersByPriority,
   startsWith,
-} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {isBackendError, isErrorWithType, toError} from 'Util/TypePredicateUtil';
+} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {toError} from 'Util/toError';
+import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';

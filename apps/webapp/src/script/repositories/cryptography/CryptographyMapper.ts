@@ -55,14 +55,14 @@ import {
   ButtonAction,
 } from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
 import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
 import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
-import {getLogger, Logger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {toError} from 'Util/toError';
 import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';

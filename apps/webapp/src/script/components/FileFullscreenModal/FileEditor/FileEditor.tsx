@@ -25,12 +25,10 @@ import {container} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
-import {collaboraClipboardAccessFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/LocalizerUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import * as styles from './FileEditor.styles';
 import {validateCollaboraUrl} from './validateCollaboraUrl';
@@ -45,8 +43,8 @@ interface FileEditorProps {
 
 export const FileEditor = ({id}: FileEditorProps) => {
   const cellsRepository = container.resolve(CellsRepository);
-  const {isFeatureToggleEnabled} = useApplicationContext();
   const [node, setNode] = useState<Node | null>(null);
+  const [isRecycled, setIsRecycled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const hasShownErrorModal = useRef(false);
@@ -56,6 +54,14 @@ export const FileEditor = ({id}: FileEditorProps) => {
       setIsLoading(true);
       setIsError(false);
       const fetchedNode = await cellsRepository.getNode({uuid: id, flags: ['WithEditorURLs']});
+
+      if (fetchedNode.IsRecycled) {
+        setIsRecycled(true);
+        setNode(null);
+        return false;
+      }
+
+      setIsRecycled(false);
       setNode(fetchedNode);
       return true;
     } catch (err: unknown) {
@@ -101,7 +107,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
   }, [node, fetchNode]);
 
   useEffect(() => {
-    if (isLoading || (!isError && node)) {
+    if (isLoading || isRecycled || (!isError && node)) {
       return;
     }
 
@@ -125,23 +131,26 @@ export const FileEditor = ({id}: FileEditorProps) => {
         title: t('fileFullscreenModal.editor.errorTitle'),
       },
     });
-  }, [handleRetry, isError, isLoading, node]);
+  }, [handleRetry, isError, isLoading, isRecycled, node]);
 
   useEffect(() => {
-    if (!isLoading && !isError && node) {
+    if (!isLoading && !isError && node && !isRecycled) {
       hasShownErrorModal.current = false;
     }
-  }, [isError, isLoading, node]);
+  }, [isError, isLoading, isRecycled, node]);
 
   if (isLoading) {
     return <FileLoader />;
+  }
+
+  if (isRecycled) {
+    return null;
   }
 
   const urlValidation = validateCollaboraUrl(
     Maybe.of(node?.EditorURLs?.collabora?.Url),
     Config.getConfig().CELLS_PYDIO_URL,
   );
-  const shouldDelegateClipboardAccess = isFeatureToggleEnabled(collaboraClipboardAccessFeatureToggleName);
 
   if (result.isErr(urlValidation)) {
     return null;
@@ -149,7 +158,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
   return (
     <iframe
-      allow={shouldDelegateClipboardAccess ? 'clipboard-read; clipboard-write' : undefined}
+      allow="clipboard-read; clipboard-write"
       css={styles.editorIframe}
       src={urlValidation.value}
       title={t('fileFullscreenModal.editor.iframeTitle')}

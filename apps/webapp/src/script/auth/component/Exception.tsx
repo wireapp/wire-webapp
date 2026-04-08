@@ -23,8 +23,8 @@ import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
 
-import {errorHandlerStrings} from 'Util/ErrorUtil';
-import {validationErrorStrings} from 'Util/ValidationUtil';
+import {errorHandlerStrings} from 'Util/errorUtil';
+import {validationErrorStrings} from 'Util/validationUtil';
 
 import {Config} from '../../Config';
 

@@ -22,8 +22,8 @@ import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {AssetData} from 'Repositories/cryptography/CryptographyMapper';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -61,10 +61,11 @@ import type {Text as TextAsset} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
-import {isErrorWithType, toError} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {userReactionMapToReactionMap} from 'Util/reactionUtil';
+import {toError} from 'Util/toError';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 import {base64ToArray} from 'Util/util';
 
 import {

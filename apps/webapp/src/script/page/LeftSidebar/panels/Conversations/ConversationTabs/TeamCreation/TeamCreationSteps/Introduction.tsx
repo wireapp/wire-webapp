@@ -20,7 +20,7 @@
 import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {StepProps} from './StepProps';
 import {

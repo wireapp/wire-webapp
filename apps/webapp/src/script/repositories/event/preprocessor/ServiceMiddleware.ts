@@ -24,8 +24,8 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
 import type {UserRepository} from 'Repositories/user/UserRepository';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {ClientEvent} from '../Client';
 import {EventMiddleware, IncomingEvent} from '../EventProcessor';

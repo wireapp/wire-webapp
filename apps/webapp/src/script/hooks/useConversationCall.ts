@@ -25,8 +25,8 @@ import {STATE as CALL_STATE} from '@wireapp/avs';
 
 import {CallState} from 'Repositories/calling/CallState';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 interface ConversationCallState {
   /** connecting/joining */

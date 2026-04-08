@@ -38,9 +38,9 @@ import {
   MultiPartContent,
   TextContent,
 } from '@wireapp/core/lib/conversation/content';
-import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
-import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
-import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
+import * as MessageBuilder from '@wireapp/core/lib/conversation/message/messageBuilder';
+import {OtrMessage} from '@wireapp/core/lib/conversation/message/otrMessage';
+import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/textContentBuilder';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -51,11 +51,11 @@ import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protoc
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/AssetMetaDataBuilder';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
-import {AudioType} from 'Repositories/audio/AudioType';
+import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
+import {AudioType} from 'Repositories/audio/audioType';
 import {ClientState} from 'Repositories/client/ClientState';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
@@ -84,16 +84,16 @@ import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
-} from 'Util/LinkPreviewSender';
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {isMarkdownText} from 'Util/MarkdownUtil';
+} from 'Util/linkPreviewSender';
+import {Declension, joinNames, t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {isMarkdownText} from 'Util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {roundLogarithmic} from 'Util/NumberUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {capitalizeFirstChar} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {isBackendError, isErrorWithCode} from 'Util/TypePredicateUtil';
+import {roundLogarithmic} from 'Util/numberUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {capitalizeFirstChar} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
 import {loadUrlBlob, supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 

@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {
   StorageService,
   DatabaseListenerCallback,
@@ -33,8 +33,8 @@ import {
   hasQuoteForMessage,
 } from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {getLogger, Logger} from 'Util/Logger';
-import {toError} from 'Util/TypePredicateUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {toError} from 'Util/toError';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 

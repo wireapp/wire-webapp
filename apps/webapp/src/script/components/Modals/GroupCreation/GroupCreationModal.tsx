@@ -20,7 +20,7 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 
 import is from '@sindresorhus/is';
-import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/ConversationReceiptModeUpdateData';
+import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
 import {amplify} from 'amplify';
@@ -50,10 +50,10 @@ import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/KeyboardUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';

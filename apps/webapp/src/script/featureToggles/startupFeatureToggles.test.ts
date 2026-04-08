@@ -23,16 +23,16 @@ import {
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
 import {
-  collaboraClipboardAccessFeatureToggleName,
-  incrementalHttpRetryBackoffFeatureToggleName,
+  collaboraNewDocumentCreationMenuFeatureToggleName,
+  countlyIncrementalBackoffRetryReportingFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
   startupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
-  incrementalHttpRetryBackoffFeatureToggleName,
-  collaboraClipboardAccessFeatureToggleName,
+  collaboraNewDocumentCreationMenuFeatureToggleName,
+  countlyIncrementalBackoffRetryReportingFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -68,20 +68,12 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
   });
 
-  it('enables the incremental http retry backoff feature toggle when present in the query parameter', () => {
+  it('enables the collabora new document creation feature toggle when present in the query parameter', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${incrementalHttpRetryBackoffFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${collaboraNewDocumentCreationMenuFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(incrementalHttpRetryBackoffFeatureToggleName)).toBe(true);
-  });
-
-  it('enables the collabora clipboard access feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${collaboraClipboardAccessFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(collaboraClipboardAccessFeatureToggleName)).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(collaboraNewDocumentCreationMenuFeatureToggleName)).toBe(true);
   });
 
   it('keeps only whitelisted feature toggles when known and unknown values are mixed', () => {
@@ -91,6 +83,16 @@ describe('startupFeatureToggles', function () {
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain('unknown-feature');
+  });
+
+  it('enables the countly incremental backoff retry reporting feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${countlyIncrementalBackoffRetryReportingFeatureToggleName}`,
+    );
+
+    expect(
+      startupFeatureToggles.isFeatureToggleEnabled(countlyIncrementalBackoffRetryReportingFeatureToggleName),
+    ).toBe(true);
   });
 
   it('trims whitespace around feature toggle names', () => {
@@ -134,8 +136,8 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
-      incrementalHttpRetryBackoffFeatureToggleName,
-      collaboraClipboardAccessFeatureToggleName,
+      collaboraNewDocumentCreationMenuFeatureToggleName,
+      countlyIncrementalBackoffRetryReportingFeatureToggleName,
     ]);
   });
 

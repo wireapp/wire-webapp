@@ -33,7 +33,7 @@ import {
   PreferenceNotificationRepository,
 } from 'Repositories/notification/PreferenceNotificationRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {ListWrapper} from './ListWrapper';
 

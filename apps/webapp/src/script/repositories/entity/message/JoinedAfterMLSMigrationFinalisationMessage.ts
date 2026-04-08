@@ -19,7 +19,7 @@
 
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 

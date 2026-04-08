@@ -22,7 +22,7 @@ import {useState} from 'react';
 import {User} from 'Repositories/entity/User';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ConfirmLeaveModal} from './ConfirmLeaveModal';
 import {TeamCreationModal} from './TeamCreationModal';

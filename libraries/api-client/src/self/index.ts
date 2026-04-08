@@ -17,13 +17,13 @@
  *
  */
 
-export * from './ChangePassword';
-export * from './Consent';
-export * from './ConsentResults';
-export * from './ConsentType';
-export * from './Delete';
-export * from './Name';
-export * from './Picture';
-export * from './Self';
-export * from './SelfAPI';
-export * from './SSOSignature';
+export * from './changePassword';
+export * from './consent';
+export * from './consentResults';
+export * from './consentType';
+export * from './delete';
+export * from './name';
+export * from './picture';
+export * from './self';
+export * from './selfApi';
+export * from './ssoSignature';

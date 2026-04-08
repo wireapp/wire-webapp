@@ -29,7 +29,7 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';

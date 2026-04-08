@@ -20,8 +20,8 @@
 import {render, waitFor} from '@testing-library/react';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
 
 import {AvatarImage} from './AvatarImage';

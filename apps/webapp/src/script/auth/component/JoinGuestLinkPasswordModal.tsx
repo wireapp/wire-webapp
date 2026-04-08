@@ -23,7 +23,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../Config';
 

@@ -27,9 +27,9 @@ export class HistoryInfoPage {
     this.page = page;
     this.continueButton = this.page.getByTestId('do-history-confirm');
   }
-  async isButtonVisible() {
+  async isButtonVisible(timeout = 3_000) {
     try {
-      await this.continueButton.waitFor({state: 'visible'});
+      await this.continueButton.waitFor({state: 'visible', timeout});
       return true;
     } catch (err: unknown) {
       return false;
@@ -38,5 +38,11 @@ export class HistoryInfoPage {
 
   async clickConfirmButton() {
     await this.continueButton.click();
+  }
+
+  async clickConfirmButtonIfVisible(timeout = 3_000) {
+    if (await this.isButtonVisible(timeout)) {
+      await this.clickConfirmButton();
+    }
   }
 }

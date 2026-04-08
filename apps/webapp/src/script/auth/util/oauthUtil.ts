@@ -17,7 +17,7 @@
  *
  */
 
-import {OAuthBody} from '@wireapp/api-client/lib/oauth/OAuthBody';
+import {OAuthBody} from '@wireapp/api-client/lib/oauth/oAuthBody';
 
 import {Scope} from '../page/OAuthPermissions';
 

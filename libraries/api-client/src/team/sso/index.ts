@@ -17,5 +17,5 @@
  *
  */
 
-export * from './SSOAPI';
-export * from './SSOAPI.types';
+export * from './ssoApi';
+export * from './ssoApi.types';

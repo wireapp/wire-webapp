@@ -17,17 +17,49 @@
  *
  */
 
-import sodium, {ready, to_string} from 'libsodium-wrappers-sumo';
+import sodium, {ready} from 'libsodium-wrappers-sumo';
 import {container, singleton} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {AppLockState} from './AppLockState';
 import {UserState} from './UserState';
 
 const APP_LOCK_STORAGE = 'app_lock';
 const APP_LOCK_ENABLED_STORAGE = 'app_lock_enabled';
+
+export interface AppLockCrypto {
+  readonly cryptoPwhashMemLimitInteractive: number;
+  readonly cryptoPwhashOpsLimitInteractive: number;
+  readonly ready: Promise<void>;
+  cryptoPwhashStr(code: string, opsLimit: number, memLimit: number): Uint8Array | string;
+  cryptoPwhashStrVerify(hashedCode: string, code: string): boolean;
+}
+
+const defaultAppLockCrypto: AppLockCrypto = {
+  get cryptoPwhashMemLimitInteractive(): number {
+    return sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE;
+  },
+  get cryptoPwhashOpsLimitInteractive(): number {
+    return sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE;
+  },
+  ready,
+  cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number): Uint8Array | string =>
+    sodium.crypto_pwhash_str(code, opsLimit, memLimit),
+  cryptoPwhashStrVerify: (hashedCode: string, code: string): boolean =>
+    sodium.crypto_pwhash_str_verify(hashedCode, code),
+};
+
+// libsodium-wrappers-sumo currently returns a string here despite the published typings.
+// Upstream report: https://github.com/jedisct1/libsodium.js/issues/364
+const getStoredHash = (hashed: Uint8Array | string): string => {
+  if (typeof hashed !== 'string') {
+    throw new TypeError('Unexpected crypto_pwhash_str output type');
+  }
+
+  return hashed;
+};
 
 @singleton()
 export class AppLockRepository {
@@ -36,6 +68,7 @@ export class AppLockRepository {
   constructor(
     private readonly userState = container.resolve(UserState),
     private readonly appLockState = container.resolve(AppLockState),
+    private readonly appLockCrypto: AppLockCrypto = defaultAppLockCrypto,
   ) {
     this.getPassphraseStorageKey = (): string => `${APP_LOCK_STORAGE}_${this.userState.self().id}`;
     this.getEnabledStorageKey = (): string => `${APP_LOCK_ENABLED_STORAGE}_${this.userState.self().id}`;
@@ -105,13 +138,13 @@ export class AppLockRepository {
 
   setCode = async (code: string): Promise<void> => {
     this.stopPassphraseObserver();
-    await ready;
-    const hashed = sodium.crypto_pwhash_str(
+    await this.appLockCrypto.ready;
+    const hashed = this.appLockCrypto.cryptoPwhashStr(
       code,
-      sodium.crypto_pwhash_OPSLIMIT_INTERACTIVE,
-      sodium.crypto_pwhash_MEMLIMIT_INTERACTIVE,
+      this.appLockCrypto.cryptoPwhashOpsLimitInteractive,
+      this.appLockCrypto.cryptoPwhashMemLimitInteractive,
     );
-    window.localStorage.setItem(this.getPassphraseStorageKey(), to_string(hashed));
+    window.localStorage.setItem(this.getPassphraseStorageKey(), getStoredHash(hashed));
     this.startPassphraseObserver();
     this.appLockState.hasPassphrase(true);
   };
@@ -128,7 +161,7 @@ export class AppLockRepository {
       return false;
     }
 
-    await ready;
-    return sodium.crypto_pwhash_str_verify(hashedCode, code);
+    await this.appLockCrypto.ready;
+    return this.appLockCrypto.cryptoPwhashStrVerify(hashedCode, code);
   };
 }

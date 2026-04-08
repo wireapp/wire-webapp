@@ -99,12 +99,13 @@ test.describe('Authentication', () => {
       await test.step('Log out of public computer', async () => {
         await pages.settings().accountButton.click();
         await pages.account().clickLogoutButton();
+        await expect(pages.singleSignOn().ssoSignInButton).toBeVisible();
       });
 
       await test.step('Log in again on non public computer', async () => {
         await pageManager.openLoginPage();
         await pages.login().login(user);
-        await pages.historyInfo().clickConfirmButton();
+        await pages.historyInfo().clickConfirmButtonIfVisible();
         await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       });
 
@@ -169,7 +170,7 @@ test.describe('Authentication', () => {
           const message = pages.conversation().getMessage({content: 'Before refresh'});
           await expect(message).toBeVisible();
 
-          await pageManager.refreshPage();
+          await pageManager.refreshPage({waitUntil: 'load'});
 
           await pages.conversationList().openConversation(userB.fullName);
           await expect(message).toBeVisible();
@@ -221,12 +222,13 @@ test.describe('Authentication', () => {
         await components.conversationSidebar().clickPreferencesButton();
         await pages.settings().accountButton.click();
         await pages.account().clickLogoutButton();
+        await expect(pages.singleSignOn().ssoSignInButton).toBeVisible();
       });
 
       await test.step('Log in again', async () => {
         await pageManager.openLoginPage();
         await pages.login().login(userA);
-        await pages.historyInfo().clickConfirmButton();
+        await pages.historyInfo().clickConfirmButtonIfVisible();
         await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       });
 

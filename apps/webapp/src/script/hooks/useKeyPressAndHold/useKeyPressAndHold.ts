@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef} from 'react';
 
-import {KEY} from 'Util/KeyboardUtil';
+import {KEY} from 'Util/keyboardUtil';
 
 interface KeyPressAndHoldParams {
   key: (typeof KEY)[keyof typeof KEY];

@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import {getConnectionQualityHander} from 'Util/ConnectionQualityHandler';
+import {getConnectionQualityHander} from 'Util/connectionQualityHandler';
 
 export const useConnectionQuality = () => {
   const [isSlow, setIsSlow] = useState(false);

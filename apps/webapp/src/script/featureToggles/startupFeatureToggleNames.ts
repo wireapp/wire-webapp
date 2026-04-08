@@ -18,13 +18,13 @@
  */
 
 export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
-export const incrementalHttpRetryBackoffFeatureToggleName = 'incremental-http-retry-backoff';
-export const collaboraClipboardAccessFeatureToggleName = 'collabora-clipboard-access';
+export const collaboraNewDocumentCreationMenuFeatureToggleName = 'collabora-new-document-creation-menu';
+export const countlyIncrementalBackoffRetryReportingFeatureToggleName = 'countly-incremental-backoff-retry-reporting';
 
 export const startupFeatureToggleNames = [
   reliableWebsocketConnectionFeatureToggleName,
-  incrementalHttpRetryBackoffFeatureToggleName,
-  collaboraClipboardAccessFeatureToggleName,
+  collaboraNewDocumentCreationMenuFeatureToggleName,
+  countlyIncrementalBackoffRetryReportingFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

@@ -21,11 +21,12 @@ import {useEffect, useState} from 'react';
 
 import {Maybe} from 'true-myth';
 
+import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
 import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
-import {isFileEditable} from 'Util/FileTypeUtil';
+import {isFileEditable} from 'Util/fileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
-import {getBestPreviewSource} from 'Util/ImageUtil';
+import {getBestPreviewSource} from 'Util/imageUtil';
 import {getFileExtensionFromUrl} from 'Util/util';
 
 import {FileEditor} from './FileEditor/FileEditor';
@@ -49,6 +50,7 @@ interface FileFullscreenModalProps {
   timestamp: number;
   badges?: string[];
   isEditMode?: boolean;
+  checkIsInRecycleBin?: () => boolean;
 }
 
 export const FileFullscreenModal = ({
@@ -63,9 +65,11 @@ export const FileFullscreenModal = ({
   senderName,
   timestamp,
   badges,
-  isEditMode,
+  isEditMode = false,
+  checkIsInRecycleBin = isInRecycleBin,
 }: FileFullscreenModalProps) => {
-  const [isEditableState, setIsEditableState] = useState(isEditMode);
+  const notInRecycleBin = !checkIsInRecycleBin();
+  const [isEditableState, setIsEditableState] = useState(isEditMode && notInRecycleBin);
   const [refreshKey, setRefreshKey] = useState(0);
   const isEditable = isFileEditable(fileExtension);
 
@@ -79,8 +83,8 @@ export const FileFullscreenModal = ({
   };
 
   useEffect(() => {
-    setIsEditableState(!!isEditMode);
-  }, [isEditMode]);
+    setIsEditableState(isEditMode && notInRecycleBin);
+  }, [isEditMode, notInRecycleBin]);
 
   return (
     <FullscreenModal id={id} isOpen={isOpen} onClose={onCloseModal}>

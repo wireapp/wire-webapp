@@ -17,7 +17,7 @@
  *
  */
 
-import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/config';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -118,6 +118,13 @@ const Config = {
     }
 
     return window.desktopAppConfig;
+  },
+  getDesktopSettings: () => {
+    if (!Runtime.isDesktopApp()) {
+      return undefined;
+    }
+
+    return window.desktopAppSettings;
   },
 };
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {handleEscDown} from 'Util/KeyboardUtil';
+import {handleEscDown} from 'Util/keyboardUtil';
 
 import {ConfirmDiscardModal} from './ConversationType/ConfirmDiscardModal';
 import {createConversationModalWrapperCss} from './CreateConversation.styles';

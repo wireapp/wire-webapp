@@ -21,9 +21,9 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {isErrorWithCode} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
 

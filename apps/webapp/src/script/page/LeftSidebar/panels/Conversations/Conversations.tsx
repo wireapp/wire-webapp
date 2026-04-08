@@ -46,7 +46,7 @@ import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';

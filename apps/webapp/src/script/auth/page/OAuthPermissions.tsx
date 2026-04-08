@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 
-import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {container} from 'tsyringe';
@@ -40,11 +40,11 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {toError} from 'Util/TypePredicateUtil';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
+import {toError} from 'Util/toError';
 import {loadDataUrl} from 'Util/util';
 
 import {

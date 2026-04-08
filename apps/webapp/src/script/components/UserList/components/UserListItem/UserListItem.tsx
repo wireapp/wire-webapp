@@ -28,9 +28,9 @@ import {listItem, listWrapper} from 'Components/ParticipantItemContent/Participa
 import {UserlistMode} from 'Components/UserList';
 import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {capitalizeFirstChar} from 'Util/StringUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {capitalizeFirstChar} from 'Util/stringUtil';
 
 interface UserListItemProps {
   groupId?: string;

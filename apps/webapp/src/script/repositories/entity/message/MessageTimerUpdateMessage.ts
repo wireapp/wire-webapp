@@ -20,8 +20,8 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import {t} from 'Util/LocalizerUtil';
-import {formatDuration} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {formatDuration} from 'Util/timeUtil';
 
 import {SystemMessage} from './SystemMessage';
 

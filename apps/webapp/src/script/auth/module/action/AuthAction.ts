@@ -17,18 +17,19 @@
  *
  */
 
-import type {DomainData} from '@wireapp/api-client/lib/account/DomainData';
+import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
 import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
-import {VerificationActionType} from '@wireapp/api-client/lib/auth/VerificationActionType';
+import {VerificationActionType} from '@wireapp/api-client/lib/auth/verificationActionType';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
-import {OAuthBody} from '@wireapp/api-client/lib/oauth/OAuthBody';
-import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
+import {OAuthBody} from '@wireapp/api-client/lib/oauth/oAuthBody';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import {LowDiskSpaceError} from '@wireapp/store-engine/lib/engine/error';
 import {StatusCodes as HTTP_STATUS, StatusCodes} from 'http-status-codes';
 
-import {isAxiosError, isBackendError, toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isAxiosError, isBackendError} from 'Util/typePredicateUtil';
 
 import {AuthActionCreator} from './creator/';
 import {LabeledError} from './LabeledError';

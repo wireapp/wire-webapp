@@ -23,7 +23,7 @@ import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit'
 
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   buttonGroupStyles,

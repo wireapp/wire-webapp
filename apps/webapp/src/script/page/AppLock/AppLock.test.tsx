@@ -25,22 +25,23 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ClientRepository} from 'Repositories/client';
+import {User} from 'Repositories/entity/User/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockRepository} from 'Repositories/user/AppLockRepository';
+import {AppLockCrypto, AppLockRepository} from 'Repositories/user/AppLockRepository';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {UserState} from 'Repositories/user/UserState';
 import {createUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
 
-// https://github.com/jedisct1/libsodium.js/issues/235
-jest.mock('libsodium-wrappers', () => ({
-  crypto_pwhash_str: (value: string) => value,
-  crypto_pwhash_str_verify: (value1: string, value2: string) => value1 === value2,
-  ready: Promise.resolve,
-}));
-
 const clientRepository = {} as unknown as ClientRepository;
+const appLockCrypto: AppLockCrypto = {
+  cryptoPwhashMemLimitInteractive: 1,
+  cryptoPwhashOpsLimitInteractive: 1,
+  ready: Promise.resolve(),
+  cryptoPwhashStr: (value: string) => value,
+  cryptoPwhashStrVerify: (value1: string, value2: string) => value1 === value2,
+};
 
 const createTeamState = ({
   status = 'enabled',
@@ -75,8 +76,8 @@ const createAppLockState = (teamState?: TeamState) => {
 const createAppLockRepository = (appLockState?: AppLockState) => {
   const userState = new UserState();
   appLockState = appLockState ?? createAppLockState();
-  jest.spyOn(userState, 'self').mockImplementation(ko.observable({id: createUuid()}));
-  const appLockRepository = new AppLockRepository(userState, appLockState);
+  userState.self(new User(createUuid(), ''));
+  const appLockRepository = new AppLockRepository(userState, appLockState, appLockCrypto);
   return appLockRepository;
 };
 describe('AppLock', () => {

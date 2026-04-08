@@ -25,15 +25,15 @@ import {container} from 'tsyringe';
 import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 
 import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
-import {AssetError} from 'Repositories/assets/AssetError';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetError} from 'Repositories/assets/assetError';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatSeconds} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {formatSeconds} from 'Util/timeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
 import {MediaButton} from '../common/MediaButton/MediaButton';

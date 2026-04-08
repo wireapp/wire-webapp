@@ -17,6 +17,8 @@
  *
  */
 
+import {HttpClient, LongRunningRetryDetails} from '@wireapp/api-client/lib/http';
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -27,10 +29,10 @@ import type {ContributedSegmentations, MessageRepository} from 'Repositories/con
 import {ClientEvent} from 'Repositories/event/Client';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
-import {getLogger, Logger} from 'Util/Logger';
-import {loadValue, storeValue, resetStoreValue} from 'Util/StorageUtil';
-import {includesString} from 'Util/StringUtil';
-import {getParameter} from 'Util/UrlUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {loadValue, storeValue, resetStoreValue} from 'Util/storageUtil';
+import {includesString} from 'Util/stringUtil';
+import {getParameter} from 'Util/urlUtil';
 import {createUuid} from 'Util/uuid';
 
 import {EventName} from './EventName';
@@ -45,8 +47,32 @@ import {UserData} from './UserData';
 
 import {URLParameter} from '../../auth/URLParameter';
 import {Config} from '../../Config';
+import {APIClient} from '../../service/APIClientSingleton';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;
+
+type HttpRetryReportingClient = {
+  readonly on: (
+    event: typeof HttpClient.TOPIC.ON_LONG_RUNNING_RETRY,
+    listener: (retryDetails: LongRunningRetryDetails) => void,
+  ) => unknown;
+  readonly removeListener: (
+    event: typeof HttpClient.TOPIC.ON_LONG_RUNNING_RETRY,
+    listener: (retryDetails: LongRunningRetryDetails) => void,
+  ) => unknown;
+};
+
+type WebSocketRetryReportingClient = {
+  readonly on: (
+    event: typeof WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY,
+    listener: (retryDetails: LongRunningRetryDetails) => void,
+  ) => unknown;
+  readonly removeListener: (
+    event: typeof WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY,
+    listener: (retryDetails: LongRunningRetryDetails) => void,
+  ) => unknown;
+};
+
 export class EventTrackingRepository {
   private isProductReportingActivated: boolean = false;
   private sendAppOpenEvent: boolean = true;
@@ -72,6 +98,8 @@ export class EventTrackingRepository {
 
   constructor(
     private readonly messageRepository: MessageRepository,
+    private readonly apiClient: APIClient,
+    private readonly isCountlyIncrementalBackoffRetryReportingEnabled: boolean,
     private readonly teamState = container.resolve(TeamState),
     private readonly userState = container.resolve(UserState),
   ) {
@@ -309,7 +337,31 @@ export class EventTrackingRepository {
       },
     );
 
+    if (this.isCountlyIncrementalBackoffRetryReportingEnabled) {
+      const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
+      const webSocketRetryReportingClient = this.apiClient.transport.ws as unknown as WebSocketRetryReportingClient;
+
+      httpRetryReportingClient.on(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
+      webSocketRetryReportingClient.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningWebSocketRetry);
+    }
+
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
+  }
+
+  private readonly onLongRunningRetry = (retryDetails: LongRunningRetryDetails): void => {
+    this.trackLongRunningRetry('api', retryDetails);
+  };
+
+  private readonly onLongRunningWebSocketRetry = (retryDetails: LongRunningRetryDetails): void => {
+    this.trackLongRunningRetry('websocket', retryDetails);
+  };
+
+  private trackLongRunningRetry(transport: 'api' | 'websocket', retryDetails: LongRunningRetryDetails): void {
+    this.trackProductReportingEvent(EventName.CONNECTIVITY.RETRYING_FOR_ONE_MINUTE, {
+      [Segmentation.CONNECTIVITY.RETRY_COUNT]: retryDetails.retryCount,
+      [Segmentation.CONNECTIVITY.RETRY_DURATION_IN_MILLISECONDS]: retryDetails.retryDurationInMilliseconds,
+      [Segmentation.CONNECTIVITY.TRANSPORT]: transport,
+    });
   }
 
   private startProductReportingSession(): void {
@@ -384,6 +436,18 @@ export class EventTrackingRepository {
 
   private unsubscribeFromProductTrackingEvents(): void {
     this.logger.debug('Unsubscribing from product tracking events');
+
+    if (this.isCountlyIncrementalBackoffRetryReportingEnabled) {
+      const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
+      const webSocketRetryReportingClient = this.apiClient.transport.ws as unknown as WebSocketRetryReportingClient;
+
+      httpRetryReportingClient.removeListener(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
+      webSocketRetryReportingClient.removeListener(
+        WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY,
+        this.onLongRunningWebSocketRetry,
+      );
+    }
+
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
 }

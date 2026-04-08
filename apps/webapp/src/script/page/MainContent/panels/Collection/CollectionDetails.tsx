@@ -22,9 +22,9 @@ import {Fragment} from 'react';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatLocale, isThisYear, isToday} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {formatLocale, isThisYear, isToday} from 'Util/timeUtil';
 import {noop} from 'Util/util';
 
 import {CollectionItem} from './CollectionItem';

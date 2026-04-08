@@ -18,8 +18,8 @@
  */
 
 import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
-import type {ConnectionState} from 'Repositories/connection/ConnectionState';
+import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
+import type {ConnectionState} from 'Repositories/connection/connectionState';
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';

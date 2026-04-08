@@ -29,8 +29,8 @@ import * as Icon from 'Components/Icon';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/LocalizerUtil';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {t} from 'Util/localizerUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {
   headerStyles,

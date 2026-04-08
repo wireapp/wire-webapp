@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {ReactionMap} from 'Repositories/storage';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Message} from './Message';
 

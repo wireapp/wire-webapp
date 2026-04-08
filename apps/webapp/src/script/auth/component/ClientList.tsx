@@ -26,7 +26,7 @@ import {useNavigate} from 'react-router-dom';
 import {UrlUtil} from '@wireapp/commons';
 import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {ClientItem} from './ClientItem';
 

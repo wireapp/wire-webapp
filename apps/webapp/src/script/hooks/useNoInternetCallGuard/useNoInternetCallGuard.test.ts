@@ -33,7 +33,7 @@ jest.mock('Components/Modals/PrimaryModal', () => ({
     show: jest.fn(),
   },
 }));
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
 }));
 

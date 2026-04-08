@@ -35,9 +35,10 @@ import {AppLockRepository} from 'Repositories/user/AppLockRepository';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import {isErrorWithCode, toError} from 'Util/TypePredicateUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import {toError} from 'Util/toError';
+import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',

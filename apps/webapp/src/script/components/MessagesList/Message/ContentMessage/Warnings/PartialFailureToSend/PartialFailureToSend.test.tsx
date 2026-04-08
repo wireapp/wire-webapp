@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import en from 'I18n/en-US.json';
 import {generateQualifiedIds, generateUserClients, generateUsers, withTheme} from 'src/script/auth/util/test/TestUtil';
-import {setStrings} from 'Util/LocalizerUtil';
+import {setStrings} from 'Util/localizerUtil';
 
 import {PartialFailureToSendWarning} from './PartialFailureToSend';
 

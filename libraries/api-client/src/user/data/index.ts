@@ -17,15 +17,15 @@
  *
  */
 
-export * from './UserActivateData';
-export * from './UserClientAddData';
-export * from './UserLegalHoldRequestData';
-export * from './UserClientRemoveData';
-export * from './UserConnectionData';
-export * from './UserDeleteData';
-export * from './UserLegalHoldDisableData';
-export * from './UserLegalHoldEnableData';
-export * from './UserPropertiesSetData';
-export * from './UserPropertiesDeleteData';
-export * from './UserPushRemoveData';
-export * from './UserUpdateData';
+export * from './userActivateData';
+export * from './userClientAddData';
+export * from './userLegalHoldRequestData';
+export * from './userClientRemoveData';
+export * from './userConnectionData';
+export * from './userDeleteData';
+export * from './userLegalHoldDisableData';
+export * from './userLegalHoldEnableData';
+export * from './userPropertiesSetData';
+export * from './userPropertiesDeleteData';
+export * from './userPushRemoveData';
+export * from './userUpdateData';

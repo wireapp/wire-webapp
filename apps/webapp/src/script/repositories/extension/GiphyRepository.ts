@@ -19,7 +19,7 @@
 
 import type {GiphyService} from './GiphyService';
 
-import {Logger, getLogger} from '../../util/Logger';
+import {Logger, getLogger} from '../../util/logger';
 
 export interface Gif {
   animated: string;

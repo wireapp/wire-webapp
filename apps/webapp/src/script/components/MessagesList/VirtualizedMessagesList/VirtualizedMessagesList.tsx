@@ -34,7 +34,7 @@ import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/ut
 import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList/useScrollMessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';
 

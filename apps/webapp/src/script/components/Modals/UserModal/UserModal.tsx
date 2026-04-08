@@ -34,9 +34,9 @@ import {UserDetails} from 'Components/panel/UserDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 
 import {useUserModalState} from './UserModal.state';
 import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';

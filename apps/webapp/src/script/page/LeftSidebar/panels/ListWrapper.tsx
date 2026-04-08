@@ -25,8 +25,8 @@ import {throttle} from 'underscore';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
-import {t} from 'Util/LocalizerUtil';
-import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scroll-helpers';
+import {t} from 'Util/localizerUtil';
+import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scrollHelpers';
 
 const scrollStyle = css`
   flex: 1 1 auto;

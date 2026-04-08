@@ -22,7 +22,7 @@ import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
 import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 import {ShowMoreButton} from './ShowMoreButton';
 

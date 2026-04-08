@@ -20,8 +20,8 @@
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 interface NoDevicesFoundProps {
   noPadding: boolean;

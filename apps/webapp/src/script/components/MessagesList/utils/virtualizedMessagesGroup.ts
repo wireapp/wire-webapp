@@ -18,7 +18,7 @@
  */
 
 import {Message} from 'Repositories/entity/message/Message';
-import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {isSameDay, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 export type Marker = {
   messageType: 'marker';

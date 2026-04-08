@@ -17,7 +17,7 @@
  *
  */
 
-import {StringIdentifer, TranslationStrings} from 'Util/LocalizerUtil';
+import {StringIdentifer, TranslationStrings} from 'Util/localizerUtil';
 
 type TranslationKeyWithoutPlaceholders = {
   [Key in StringIdentifer]: TranslationStrings[Key] extends `${string}{${string}}${string}` ? never : Key;

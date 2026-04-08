@@ -23,11 +23,13 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {CellNodeType} from 'src/script/types/cellNode';
-import {t} from 'Util/LocalizerUtil';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {collaboraNewDocumentCreationMenuFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext} from 'src/script/page/RootProvider';
+import {t} from 'Util/localizerUtil';
 
-import {CellsNewItemModal} from './CellsNewItemModal/CellsNewItemModal';
+import {CellsNewFileModal} from './CellsNewFileModal/CellsNewFileModal';
+import {CellsNewFolderModal} from './CellsNewFolderModal/CellsNewFolderModal';
 import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
 
 import {getCellsFilesPath} from '../../common/getCellsFilesPath/getCellsFilesPath';
@@ -38,13 +40,28 @@ interface CellsNewMenuProps {
   onRefresh: () => void;
 }
 
-export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<CellNodeType>(CellNodeType.FILE);
+export type CellsNewFileType = 'document' | 'spreadsheet' | 'presentation';
 
-  const openModal = (type: CellNodeType) => {
-    setModalType(type);
-    setIsModalOpen(true);
+export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
+  const {isFeatureToggleEnabled} = useApplicationContext();
+  const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
+  const [isFileModalOpen, setIsFileModalOpen] = useState(false);
+  const [fileType, setFileType] = useState<CellsNewFileType>('document');
+  const isCollaboraNewDocumentCreationMenuEnabled = isFeatureToggleEnabled(
+    collaboraNewDocumentCreationMenuFeatureToggleName,
+  );
+
+  const openFolderModal = () => setIsFolderModalOpen(true);
+
+  const openFileModal = (selectedFileType: CellsNewFileType) => {
+    setFileType(selectedFileType);
+    setIsFileModalOpen(true);
+  };
+
+  const commonProps = {
+    cellsRepository,
+    conversationQualifiedId,
+    currentPath: getCellsFilesPath(),
   };
 
   return (
@@ -57,22 +74,43 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
           </Button>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          <DropdownMenu.Item onClick={() => openModal(CellNodeType.FOLDER)}>
-            {t('cells.newItemMenu.folder')}
-          </DropdownMenu.Item>
+          <DropdownMenu.Item onClick={openFolderModal}>{t('cells.newItemMenu.folder')}</DropdownMenu.Item>
+          {isCollaboraNewDocumentCreationMenuEnabled && (
+            <DropdownMenu.Sub>
+              <DropdownMenu.SubTrigger>{t('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>
+              <DropdownMenu.SubContent>
+                <DropdownMenu.Item onClick={() => openFileModal('document')}>
+                  {t('cells.newItemMenu.document')}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => openFileModal('spreadsheet')}>
+                  {t('cells.newItemMenu.spreadsheet')}
+                </DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => openFileModal('presentation')}>
+                  {t('cells.newItemMenu.presentation')}
+                </DropdownMenu.Item>
+              </DropdownMenu.SubContent>
+            </DropdownMenu.Sub>
+          )}
         </DropdownMenu.Content>
       </DropdownMenu>
-      {isModalOpen && (
-        <CellsNewItemModal
-          type={modalType}
-          currentPath={getCellsFilesPath()}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          cellsRepository={cellsRepository}
-          conversationQualifiedId={conversationQualifiedId}
+      <CellsNewFolderModal
+        {...commonProps}
+        isOpen={isFolderModalOpen}
+        onClose={() => setIsFolderModalOpen(false)}
+        onSuccess={() => {
+          onRefresh();
+          setIsFolderModalOpen(false);
+        }}
+      />
+      {isCollaboraNewDocumentCreationMenuEnabled && (
+        <CellsNewFileModal
+          {...commonProps}
+          isOpen={isFileModalOpen}
+          fileType={fileType}
+          onClose={() => setIsFileModalOpen(false)}
           onSuccess={() => {
             onRefresh();
-            setIsModalOpen(false);
+            setIsFileModalOpen(false);
           }}
         />
       )}

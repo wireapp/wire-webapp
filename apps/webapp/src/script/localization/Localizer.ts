@@ -41,10 +41,10 @@ import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
 import {StorageKey} from 'Repositories/storage/StorageKey';
-import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/LocalizerUtil';
-import {loadValue, storeValue} from 'Util/StorageUtil';
-import {setDateLocale, LocaleType} from 'Util/TimeUtil';
-import {getParameter} from 'Util/UrlUtil';
+import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/localizerUtil';
+import {loadValue, storeValue} from 'Util/storageUtil';
+import {setDateLocale, LocaleType} from 'Util/timeUtil';
+import {getParameter} from 'Util/urlUtil';
 
 import {URLParameter} from '../auth/URLParameter';
 

@@ -17,7 +17,7 @@
  *
  */
 
-export * from './AssetAPI';
-export * from './AssetRetentionPolicy';
-export {AssetUploadData} from './AssetAPI.schema';
-export * from './AssetUtil';
+export * from './assetApi';
+export * from './assetRetentionPolicy';
+export {AssetUploadData} from './assetApi.schema';
+export * from './assetUtil';

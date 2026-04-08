@@ -17,8 +17,8 @@
  *
  */
 
-import {getWebEnvironment} from 'Util/Environment';
-import {getLogger, Logger} from 'Util/Logger';
+import {getWebEnvironment} from 'Util/environment';
+import {getLogger, Logger} from 'Util/logger';
 
 import {Config} from '../../Config';
 

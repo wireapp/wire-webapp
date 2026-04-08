@@ -24,7 +24,7 @@ import {Muted, Option, Select} from '@wireapp/react-ui-kit';
 
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {channelSettingsTextCss} from './ConversationDetails.styles';

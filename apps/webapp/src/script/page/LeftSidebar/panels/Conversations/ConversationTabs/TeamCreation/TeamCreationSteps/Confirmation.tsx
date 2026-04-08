@@ -27,7 +27,7 @@ import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {TeamService} from 'Repositories/team/TeamService';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {StepProps} from './StepProps';
 import {

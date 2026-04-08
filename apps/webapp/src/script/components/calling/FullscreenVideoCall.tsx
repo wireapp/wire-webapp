@@ -17,14 +17,13 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import {ChangeEvent, useEffect, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {
-  TabIndex,
   Checkbox,
   CheckboxLabel,
   CloseDetachedWindowIcon,
@@ -32,11 +31,13 @@ import {
   IconButtonVariant,
   OpenDetachedWindowIcon,
   QUERY,
+  TabIndex,
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
+import {VideoBackgroundPerformancePanel} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
@@ -47,15 +48,18 @@ import {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
+import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
@@ -63,14 +67,15 @@ import {Duration} from './Duration';
 import {
   classifiedBarStyles,
   headerActionsWrapperStyles,
-  paginationWrapperStyles,
-  videoTopBarStyles,
   minimizeButtonStyles,
   openDetachedWindowButtonStyles,
   paginationStyles,
+  paginationWrapperStyles,
+  videoTopBarStyles,
 } from './FullscreenVideoCall.styles';
 import {GroupVideoGrid} from './GroupVideoGrid';
 import {Pagination} from './Pagination/Pagination';
+import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
@@ -95,7 +100,7 @@ export interface FullscreenVideoCallProps {
   switchCameraInput: (deviceId: string) => void;
   switchMicrophoneInput: (deviceId: string) => void;
   switchSpeakerOutput: (deviceId: string) => void;
-  switchBlurredBackground: (status: boolean) => void;
+  switchVideoBackgroundEffect: (effect: BackgroundEffectSelection) => void;
   teamState?: TeamState;
   callState?: CallState;
   toggleCamera: (call: Call) => void;
@@ -125,7 +130,7 @@ const FullscreenVideoCall = ({
   switchCameraInput,
   switchMicrophoneInput,
   switchSpeakerOutput,
-  switchBlurredBackground,
+  switchVideoBackgroundEffect,
   setMaximizedParticipant,
   setActiveCallViewTab,
   toggleMute,
@@ -189,6 +194,7 @@ const FullscreenVideoCall = ({
   const openPopup = () => callingRepository.setViewModeDetached();
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
+  const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
 
   const callNotification = useAppNotification({
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
@@ -276,6 +282,17 @@ const FullscreenVideoCall = ({
   const isPaginationVisible = !maximizedParticipant && activeCallViewTab === CallViewTab.ALL && totalPages > 1;
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
+  const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
+
+  const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
+
+  const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
+    void switchVideoBackgroundEffect(effect);
+  };
+
+  const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
+    callingRepository.allowSuperhighQualityTier(event.target.checked);
+  };
 
   return (
     <div
@@ -395,6 +412,16 @@ const FullscreenVideoCall = ({
               onClose={toggleParticipantsList}
             />
           )}
+          {isMobile && isBackgroundSidebarOpen && (
+            <VideoBackgroundSettings
+              selectedEffect={selectedBackgroundEffect}
+              backgrounds={BUILTIN_BACKGROUNDS}
+              onSelectEffect={handleBackgroundSidebarSelect}
+              onEnableHighQualityBlur={handleEnableHighQualityBlur}
+              onClose={() => setIsBackgroundSidebarOpen(false)}
+              highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
+            />
+          )}
         </div>
 
         {isMobile && isPaginationVisible && (
@@ -445,11 +472,12 @@ const FullscreenVideoCall = ({
               toggleIsHandRaised={toggleIsHandRaised}
               switchMicrophoneInput={switchMicrophoneInput}
               switchSpeakerOutput={switchSpeakerOutput}
-              switchBlurredBackground={switchBlurredBackground}
+              switchVideoBackgroundEffect={switchVideoBackgroundEffect}
               switchCameraInput={switchCameraInput}
               setActiveCallViewTab={setActiveCallViewTab}
               setMaximizedParticipant={setMaximizedParticipant}
               sendEmoji={sendEmoji}
+              onOpenBackgroundSettings={() => setIsBackgroundSidebarOpen(true)}
             />
           </>
         )}
@@ -464,6 +492,16 @@ const FullscreenVideoCall = ({
           isSelfVerified={selfUser?.is_verified()}
           showParticipants={true}
           onClose={toggleParticipantsList}
+        />
+      )}
+      {!isMobile && isBackgroundSidebarOpen && (
+        <VideoBackgroundSettings
+          selectedEffect={selectedBackgroundEffect}
+          backgrounds={BUILTIN_BACKGROUNDS}
+          onSelectEffect={handleBackgroundSidebarSelect}
+          onEnableHighQualityBlur={handleEnableHighQualityBlur}
+          onClose={() => setIsBackgroundSidebarOpen(false)}
+          highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
         />
       )}
       <ModalComponent
@@ -490,7 +528,7 @@ const FullscreenVideoCall = ({
                 wrapperCSS={{marginTop: 16}}
                 data-uie-name="do-not-ask-again-checkbox"
                 id="do-not-ask-again-checkbox"
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   localStorage.setItem(
                     LOCAL_STORAGE_KEY_FOR_SCREEN_SHARING_CONFIRM_MODAL,
                     event.target.checked.toString(),
@@ -535,6 +573,7 @@ const FullscreenVideoCall = ({
           </>
         )}
       </ModalComponent>
+      <VideoBackgroundPerformancePanel backgroundEffectsHandler={backgroundEffectsHandler} />
     </div>
   );
 };

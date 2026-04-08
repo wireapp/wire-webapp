@@ -41,6 +41,7 @@ import {useTheme} from './hooks/useTheme';
 
 import {WallClock} from '../../clock/wallClock';
 import {Config, Configuration} from '../../Config';
+import {countlyIncrementalBackoffRetryReportingFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
@@ -59,7 +60,19 @@ type AppProps = {
 
 export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallClock}: AppProps) => {
   setAppLocale();
-  const app = useMemo(() => new App(container.resolve(Core), container.resolve(APIClient), config), [config]);
+  const isCountlyIncrementalBackoffRetryReportingEnabled = isFeatureToggleEnabled(
+    countlyIncrementalBackoffRetryReportingFeatureToggleName,
+  );
+  const app = useMemo(
+    () =>
+      new App(
+        container.resolve(Core),
+        container.resolve(APIClient),
+        config,
+        isCountlyIncrementalBackoffRetryReportingEnabled,
+      ),
+    [config, isCountlyIncrementalBackoffRetryReportingEnabled],
+  );
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 
   // Publishing application on the global scope for debug and testing purposes.

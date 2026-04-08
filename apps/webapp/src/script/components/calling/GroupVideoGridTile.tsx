@@ -37,9 +37,9 @@ import {
 } from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/Icon';
 import type {Participant} from 'Repositories/calling/Participant';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isEnterKey} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Video} from './Video';
 
@@ -65,7 +65,7 @@ const GroupVideoGridTile = ({
     videoState,
     handRaisedAt,
     videoStream,
-    blurredVideoStream,
+    processedVideoStream,
     isActivelySpeaking,
     isAudioEstablished,
     isSwitchingVideoResolution,
@@ -73,7 +73,7 @@ const GroupVideoGridTile = ({
     'isMuted',
     'handRaisedAt',
     'videoStream',
-    'blurredVideoStream',
+    'processedVideoStream',
     'isActivelySpeaking',
     'videoState',
     'isAudioEstablished',
@@ -142,7 +142,7 @@ const GroupVideoGridTile = ({
                see https://developer.mozilla.org/en-US/docs/Web/Media/Autoplay_guide.
             */
             muted
-            srcObject={blurredVideoStream?.stream ?? videoStream}
+            srcObject={processedVideoStream?.stream ?? videoStream}
             className="group-video-grid__element-video"
             css={groupVideoElementVideo(isMaximized || sharesScreen, participant === selfParticipant && sharesCamera)}
           />

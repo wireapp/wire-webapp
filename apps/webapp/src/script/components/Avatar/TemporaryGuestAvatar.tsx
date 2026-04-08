@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {User} from 'Repositories/entity/User';
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
+import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
 import {AvatarBackground} from './AvatarBackground';
 import {AvatarBadge} from './AvatarBadge';

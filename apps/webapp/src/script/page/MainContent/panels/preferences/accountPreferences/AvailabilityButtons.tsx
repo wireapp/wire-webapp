@@ -24,8 +24,8 @@ import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {availabilityStatus} from 'Util/AvailabilityStatus';
-import {t} from 'Util/LocalizerUtil';
+import {availabilityStatus} from 'Util/availabilityStatus';
+import {t} from 'Util/localizerUtil';
 
 import {ContextMenuEntry} from '../../../../../ui/ContextMenu';
 

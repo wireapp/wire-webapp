@@ -19,12 +19,12 @@
 
 import type {MessageSendingStatus, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation/';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {difference, intersection} from 'underscore';
 
 import {User} from 'Repositories/entity/User';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 type UserClient = {clients: string[]; userId: QualifiedId};
 

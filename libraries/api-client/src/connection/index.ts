@@ -17,10 +17,10 @@
  *
  */
 
-export * from './Connection';
-export * from './ConnectionAPI';
-export * from './ConnectionRequest';
-export * from './ConnectionStatus';
-export * from './ConnectionUpdate';
-export * from './UserConnectionList';
-export * from './ConnectionError';
+export * from './connection';
+export * from './connectionApi';
+export * from './connectionRequest';
+export * from './connectionStatus';
+export * from './connectionUpdate';
+export * from './userConnectionList';
+export * from './connectionError';

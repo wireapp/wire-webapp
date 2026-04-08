@@ -22,7 +22,7 @@ import ko from 'knockout';
 
 import {IAttachment, ICellAsset} from '@wireapp/protocol-messaging';
 
-import {AssetType} from 'Repositories/assets/AssetType';
+import {AssetType} from 'Repositories/assets/assetType';
 import {containsOnlyLink} from 'Repositories/conversation/linkPreviews/helpers';
 import {mediaParser} from 'Repositories/media/MediaParser';
 import {renderMessage} from 'Util/messageRenderer';

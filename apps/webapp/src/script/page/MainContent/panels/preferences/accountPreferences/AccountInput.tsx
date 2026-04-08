@@ -26,7 +26,7 @@ import {TextInput} from 'Components/TextInput';
 import {useIsMounted} from 'Util/useIsMounted';
 
 import {MotionDuration} from '../../../../../motion/MotionDuration';
-import {isEnterKey, isTabKey} from '../../../../../util/KeyboardUtil';
+import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 
 interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {
   allowedChars?: string;

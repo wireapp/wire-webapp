@@ -24,9 +24,9 @@ import {container} from 'tsyringe';
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {isPreviewableImage} from 'Util/ImageUtil';
-import {t} from 'Util/LocalizerUtil';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {isPreviewableImage} from 'Util/imageUtil';
+import {t} from 'Util/localizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {MediaFilePreviewCard} from './common/MediaFilePreviewCard/MediaFilePreviewCard';

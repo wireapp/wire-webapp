@@ -25,9 +25,9 @@ import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {type ClientEntity} from 'Repositories/client/ClientEntity';
 import {WireIdentity} from 'src/script/E2EIdentity';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
+import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 import * as Icon from '../../../Icon';

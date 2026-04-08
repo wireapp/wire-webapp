@@ -25,7 +25,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {PingMessage} from 'Repositories/entity/message/PingMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {generateCellState} from './ConversationCellState';

@@ -16,7 +16,7 @@ concurrency:
 jobs:
   build:
     name: Build Docker image and Helm Chart
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
 
     outputs:
       wire_builds_target_branches: ${{ steps.output_target_branches.outputs.targets }}
@@ -122,7 +122,7 @@ jobs:
           release_name="${TAG:-v${packageVersion}}"
           echo "release_name=$release_name" >> $GITHUB_OUTPUT
 
-      - uses: azure/setup-helm@v4.3.1
+      - uses: azure/setup-helm@v5.0.0
         with:
           version: '3.12.2'
 
@@ -286,6 +286,8 @@ jobs:
   deploy_to_aws:
     name: 'Deploy to live environments'
     runs-on: ubuntu-latest
+    env:
+      AWS_REGION: eu-central-1
     environment: ${{ matrix.target }}
     needs: [build, set_deployment_targets]
     if: ${{needs.set_deployment_targets.outputs.deployment_targets}}
@@ -299,20 +301,26 @@ jobs:
         with:
           name: 'build-artifact'
 
-      - name: Deploy to ${{matrix.target}}
-        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
         with:
-          application_name: Webapp
-          aws_access_key: ${{secrets.WEBTEAM_AWS_ACCESS_KEY_ID}}
-          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
-          deployment_package: ${{needs.build.outputs.build_artifact}}
-          environment_name: ${{matrix.target}}
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{github.sha}}
-          version_label: '${{github.run_id}}-${{matrix.target}}'
-          wait_for_deployment: false
-          wait_for_environment_recovery: 150
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to ${{matrix.target}}
+        id: deploy
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: ${{ matrix.target }}
+          version-label: ${{ github.run_id }}-${{ matrix.target }}
+          deployment-package-path: ${{ needs.build.outputs.build_artifact }}
+          wait-for-deployment: false
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
 
   create_gh_release:
     name: 'Create Github release'

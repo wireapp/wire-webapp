@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 export const serverTimeHandler = {
   computeTimeOffset(serverTimeString: string): void {

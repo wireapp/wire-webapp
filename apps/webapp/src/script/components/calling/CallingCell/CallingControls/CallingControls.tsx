@@ -30,8 +30,8 @@ import {Call} from 'Repositories/calling/Call';
 import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {CallActions} from '../../../../view_model/CallingViewModel';
 

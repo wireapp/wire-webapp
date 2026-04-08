@@ -19,7 +19,7 @@
 
 import {RestVersion} from 'cells-sdk-ts';
 
-import {calculateDaysDifference, formatDateKey, formatTime, getDayPrefix, TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {calculateDaysDifference, formatDateKey, formatTime, getDayPrefix, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes} from 'Util/util';
 
 import {FileVersion} from '../types';

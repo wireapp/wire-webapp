@@ -20,9 +20,9 @@
 import JSZip from 'jszip';
 import sodium, {ready} from 'libsodium-wrappers-sumo';
 
-import {ImportError} from './Error';
+import {ImportError} from './error';
 
-import {toError} from '../../util/TypePredicateUtil';
+import {toError} from '../../util/toError';
 
 type Payload =
   | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}

@@ -26,7 +26,7 @@ import {Account} from '@wireapp/core';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {Core as CoreSingleton} from 'src/script/service/CoreSingleton';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
 import {initialiseMigrationOfProteusConversations, joinUnestablishedMixedConversations} from './migrationInitialiser';

@@ -17,7 +17,7 @@
  *
  */
 
-import {toError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
 
 import {UserActionCreator} from './creator/';
 

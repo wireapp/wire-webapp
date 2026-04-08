@@ -21,7 +21,7 @@ import {ADD_PERMISSION} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {ChatHistory, ConversationAccess, ConversationType, HistorySharingUnit} from './types';
 

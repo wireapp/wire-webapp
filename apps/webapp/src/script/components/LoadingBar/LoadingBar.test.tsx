@@ -21,6 +21,14 @@ import {render} from '@testing-library/react';
 
 import {LoadingBar} from './LoadingBar';
 
+jest.mock('@wireapp/react-ui-kit', () => {
+  const originalModule = jest.requireActual('@wireapp/react-ui-kit');
+  return {
+    ...originalModule,
+    Loading: (properties: Record<string, unknown>) => <div {...properties} />,
+  };
+});
+
 describe('LoadingBar', () => {
   it('renders correct progress', async () => {
     const props = {message: 'example', progress: 30};

@@ -45,10 +45,10 @@ import {
   isTabVisible,
 } from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isDataDogEnabled} from 'Util/DataDog';
-import {getWebEnvironment} from 'Util/Environment';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isDataDogEnabled} from 'Util/dataDog';
+import {getWebEnvironment} from 'Util/environment';
+import {replaceLink, t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {

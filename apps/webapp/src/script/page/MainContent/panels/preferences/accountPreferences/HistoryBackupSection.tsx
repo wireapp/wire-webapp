@@ -24,7 +24,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {BackupFileUpload} from 'Components/HistoryImport/BackupFileUpload';
 import {Config} from 'src/script/Config';
 import {ContentState} from 'src/script/page/useAppState';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {PreferencesSection} from '../components/PreferencesSection';
 

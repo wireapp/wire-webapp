@@ -41,6 +41,11 @@ jest.mock('@formkit/auto-animate/react', () => ({
   useAutoAnimate: jest.fn(),
 }));
 
+jest.mock('react-transition-group', () => ({
+  CSSTransition: ({children}: any) => children,
+  SwitchTransition: ({children}: any) => children,
+}));
+
 const mockDevicesHandler = {
   availableDevices: (): (MediaDeviceInfo | ElectronDesktopCapturerSource)[] => [],
   currentDeviceId: () => 'mock-device-id',
