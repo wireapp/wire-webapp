@@ -96,9 +96,10 @@ test.describe('Markdown', () => {
 
       await expect(link).toHaveAttribute('href', targetUrl);
 
+      const newPagePromise = userAPageManager.getContext().waitForEvent('page');
       await link.click();
       await modals.confirm().clickAction();
-      const newPage = await userAPageManager.getContext().waitForEvent('page');
+      const newPage = await newPagePromise;
 
       await expect(newPage).toHaveURL(targetUrl);
     },
