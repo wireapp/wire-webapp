@@ -25,6 +25,7 @@ import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {checkAppsFeatureAvailability} from 'Util/featureUtils';
 import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
@@ -64,9 +65,11 @@ export const Preference = () => {
   // Read receipts are temorarily disabled for MLS groups and channels until it is supported
   const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
 
-  const isAppsFeatureAvailable =
-    (defaultProtocol === CONVERSATION_PROTOCOL.MLS && isAppsEnabled) ||
-    (defaultProtocol === CONVERSATION_PROTOCOL.PROTEUS && hasWhitelistedServices);
+  const isAppsFeatureAvailable = checkAppsFeatureAvailability({
+    protocol: defaultProtocol,
+    isAppsEnabled,
+    hasWhitelistedServices,
+  });
 
   return (
     <>

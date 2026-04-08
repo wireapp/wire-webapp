@@ -52,6 +52,7 @@ import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/C
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {checkAppsFeatureAvailability} from 'Util/featureUtils';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
@@ -160,8 +161,11 @@ const GroupCreationModal = ({
 
   const isAppsFeatureAvailable =
     isTeam &&
-    ((selectedProtocol.value == CONVERSATION_PROTOCOL.PROTEUS && teamState?.hasWhitelistedServices()) ||
-      (selectedProtocol.value == CONVERSATION_PROTOCOL.MLS && isAppsEnabledForTeam));
+    checkAppsFeatureAvailability({
+      protocol: selectedProtocol.value,
+      isAppsEnabled: isAppsEnabledForTeam,
+      hasWhitelistedServices: teamState?.hasWhitelistedServices(),
+    });
 
   const isServicesEnabled = isAppsFeatureAvailable && (isServicesRoom || isGuestAndServicesRoom);
 
