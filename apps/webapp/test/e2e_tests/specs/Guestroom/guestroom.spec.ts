@@ -1,5 +1,5 @@
 import {Page} from 'playwright/test';
-import {User} from 'test/e2e_tests/data/user';
+import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {
   test,
@@ -294,12 +294,12 @@ test.describe('Guestroom', () => {
     {tag: ['@TC-3334', '@regression']},
     async ({createPage}) => {
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
-
+     
       const ownerPages = PageManager.from(userAPage).webapp.pages;
       const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
 
       await createGroup(ownerPages, groupName, []);
-      createdLink = await generateGroupGuestsLink(ownerPages, groupName);
+      const createdLink = await generateGroupGuestsLink(ownerPages, groupName);
 
       await guestPage.goto(createdLink.toString());
       await guestPages.conversationJoin().joinBrowserButton.click();
@@ -361,6 +361,7 @@ test.describe('Guestroom', () => {
     {tag: ['@TC-3337', '@regression']},
     async ({createPage}) => {
       test.setTimeout(150_000);
+      let createdLink: string;
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
 
       const pages = PageManager.from(userAPage).webapp.pages;
@@ -409,7 +410,7 @@ test.describe('Guestroom', () => {
       const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
       await createGroup(pages, groupName, []);
-      createdLink = await generateGroupGuestsLink(pages, groupName);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
 
       await createPage(withGuestUser(createdLink, guestUser.firstName));
       await expect(pages.conversation().guestsIndicator).toBeVisible({timeout: LOGIN_TIMEOUT});
@@ -446,7 +447,7 @@ test.describe('Guestroom', () => {
 
       // UserA creates a guest link for a conversation
       await createGroup(pages, groupName, []);
-      createdLink = await generateGroupGuestsLink(pages, groupName);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
 
       // Quest confirms that he was logged in before and can join the conversation directly
       await guestPage.goto(createdLink.toString());
@@ -471,7 +472,7 @@ test.describe('Guestroom', () => {
       const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
       await createGroup(pages, groupName, []);
-      createdLink = await generateGroupGuestsLink(pages, groupName);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
 
       const guestPage = await createPage(withGuestUser(createdLink, guestUser.firstName));
       const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
@@ -504,7 +505,7 @@ test.describe('Guestroom', () => {
 
       // UserA creates a guest link for a conversation
       await createGroup(pages, groupName, []);
-      createdLink = await generateGroupGuestsLink(pages, groupName);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
 
       // Quest confirms that he was logged in before and can join the conversation directly
       await guestPage.goto(createdLink.toString());
@@ -573,6 +574,55 @@ test.describe('Guestroom', () => {
           'You were signed out because your account was deleted.',
         );
       });
+    },
+  );
+
+  const ssoUser = getUser({
+    email: process.env.SCIM_USER_SSO_CODE,
+    username: process.env.SCIM_USER_EMAIL,
+    password: process.env.SCIM_USER_PASSWORD,
+  });
+
+  test(
+    'I want to join guestroom invite with enterprise login',
+    {tag: ['@TC-3477', '@regression']},
+    async ({context, createPage, api}) => {
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage(context)]);
+
+      const userAPageManager = PageManager.from(userAPage).webapp;
+      const guestPageManager = PageManager.from(guestPage);
+      const {pages: guestPages, components: guestComponents} = guestPageManager.webapp;
+      const {pages} = userAPageManager;
+
+      await createGroup(pages, groupName, []);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      await guestPage.goto(createdLink.toString());
+      await guestPages.conversationJoin().joinBrowserButton.click();
+      await expect(guestPages.conversationJoin().enterpriseLoginButton).toBeVisible();
+
+      await guestPages.conversationJoin().enterpriseLoginButton.click();
+
+      const [idpPage] = await Promise.all([
+        context.waitForEvent('page'),
+        guestPages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
+      ]);
+
+      await idpPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
+      await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
+      await idpPage.getByRole('button', {name: 'Sign In'}).click();
+
+      await guestPage.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
+      // // We will also always be prompted to confirm the new history on this device
+      await guestPages.historyInfo().clickConfirmButton();
+
+      await expect(guestComponents.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible(
+        {
+          timeout: LOGIN_TIMEOUT,
+        },
+      );
+
+      await expect(guestPages.conversationList().list.filter({hasText: groupName})).toBeVisible();
     },
   );
 });
