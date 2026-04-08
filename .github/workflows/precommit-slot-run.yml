@@ -72,10 +72,12 @@ jobs:
 
       - name: Fetch precommit URL
         id: fetch_url
+        env:
+          ENV_NAME: ${{ inputs.env_name }}
         run: |
           URL=$(aws elasticbeanstalk describe-environments \
             --region eu-central-1 \
-            --environment-names "${{ inputs.env_name }}" \
+            --environment-names "$ENV_NAME" \
             --query "Environments[0].CNAME" --output text)
           echo "url=https://$URL" >> "$GITHUB_OUTPUT"
 
