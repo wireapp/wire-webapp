@@ -72,6 +72,7 @@ jobs:
           ENV_NAME: ${{ steps.slot.outputs.env_name }}
         run: |
           echo "Selected precommit environment: $ENV_NAME"
+          echo "Selected precommit URL: https://$ENV_NAME.zinfra.io/"
 
       - name: Derive PR commit metadata
         id: meta
