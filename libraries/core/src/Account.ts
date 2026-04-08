@@ -78,7 +78,7 @@ import {
   getProposalQueueLength,
   pauseProposalProcessing,
   resumeProposalProcessing,
-} from './messagingProtocols/mls/EventHandler/events/messageAdd/IncomingProposalsQueue';
+} from './messagingProtocols/mls/EventHandler/events/messageAdd/incomingProposalsQueue';
 import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/cryptoClient';
