@@ -52,7 +52,7 @@ import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/C
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtils';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';

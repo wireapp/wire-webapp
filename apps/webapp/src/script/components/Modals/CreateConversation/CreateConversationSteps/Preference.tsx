@@ -25,7 +25,7 @@ import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {checkAppsFeatureAvailability} from 'Util/featureUtils';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
