@@ -21,7 +21,7 @@ import {toBufferSource} from '../../../../util/bufferUtils';
 import {AcmeService} from '../Connection';
 import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../E2EIService.types';
 import {jsonToByteArray} from '../Helper';
-import {EnrollmentFlowData} from '../Storage/E2EIStorage.schema';
+import {EnrollmentFlowData} from '../Storage/e2eiStorage.schema';
 
 interface GetAuthorizationParams {
   nonce: Nonce;

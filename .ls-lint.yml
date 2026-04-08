@@ -383,3 +383,6 @@ ls:
     .ts: camelCase
     .types.ts: camelCase
     .schema.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/E2EIdentityService/Storage:
+    .ts: camelCase
+    .schema.ts: camelCase
