@@ -23,7 +23,7 @@ import {Encoder} from 'bazinga64';
 
 import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
 
-import {createDefaultMlsErrorMapper} from './MlsErrorMapper';
+import {createDefaultMlsErrorMapper} from './mlsErrorMapper';
 
 import {
   CORE_CRYPTO_ERROR_NAMES,

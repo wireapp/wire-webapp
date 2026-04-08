@@ -363,3 +363,7 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/recovery:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
