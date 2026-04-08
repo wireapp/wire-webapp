@@ -1,0 +1,101 @@
+name: precommit-slot-run
+
+on:
+  workflow_call:
+    inputs:
+      env_name:
+        type: string
+        required: true
+      backendUrl:
+        type: string
+        required: true
+      grep:
+        type: string
+        required: false
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN:
+        required: true
+      WEBTEAM_AWS_ACCESS_KEY_ID:
+        required: true
+      WEBTEAM_AWS_SECRET_ACCESS_KEY:
+        required: true
+    outputs:
+      precommit_url:
+        description: URL of the deployed precommit environment
+        value: ${{ jobs.deploy_to_aws.outputs.precommit_url }}
+      reportArtifactId:
+        description: ID of the playwright report artifact
+        value: ${{ jobs.e2e_tests.outputs.reportArtifactId }}
+      reportUrl:
+        description: URL of the playwright report artifact
+        value: ${{ jobs.e2e_tests.outputs.reportUrl }}
+
+concurrency:
+  group: precommit-slot-${{ inputs.env_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy_to_aws:
+    name: Deploy to precommit
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      AWS_REGION: eu-central-1
+
+    outputs:
+      precommit_url: ${{ steps.fetch_url.outputs.url }}
+
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: build-artifact
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to precommit environment
+        id: deploy
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: ${{ inputs.env_name }}
+          version-label: ${{ github.run_id }}
+          deployment-package-path: ebs.zip
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          use-existing-application-version-if-available: true
+
+      - name: Set precommit URL
+        id: fetch_url
+        env:
+          ENV_NAME: ${{ inputs.env_name }}
+        run: |
+          echo "Deploying to precommit environment: $ENV_NAME"
+          echo "Resolved precommit URL: https://$ENV_NAME.zinfra.io/"
+          echo "url=https://$ENV_NAME.zinfra.io/" >> "$GITHUB_OUTPUT"
+
+      - name: Deployment Status
+        if: ${{ always() }}
+        run: |
+          if [[ "${{ steps.deploy.outcome }}" == "success" ]]; then
+            echo "Deployment completed successfully"
+          else
+            echo "Deployment failed"; exit 1
+          fi
+
+  e2e_tests:
+    name: E2E Tests Execution
+    needs: [deploy_to_aws]
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
+    uses: ./.github/workflows/e2e-tests.yml
+    with:
+      webappUrl: ${{ needs.deploy_to_aws.outputs.precommit_url }}
+      backendUrl: ${{ inputs.backendUrl }}
+      grep: ${{ inputs.grep }}
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
