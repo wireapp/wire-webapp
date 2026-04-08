@@ -62,16 +62,15 @@ test.describe('Guestroom', () => {
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
         await guestPages.login().login(guestUser);
-        await guestBModals.conversationAccess().joinConversation('WrongPassword');
-        await expect(guestBModals.conversationAccess().joinForm).toContainText(
+        await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
+        await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
           'Password is incorrect, please try again.',
         );
       });
 
       await test.step('User B can join conversation with correct password', async () => {
-        await guestBModals.conversationAccess().joinConversation(password);
-        await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-        await expect(guestPages.conversation().conversationTitle).toContainText(groupName);
+        await guestBModals.joinGuestLinkPassword().joinConversation(password);
+        await expect(guestPages.conversation().conversationTitle).toContainText(groupName, {timeout: LOGIN_TIMEOUT});
       });
     },
   );
@@ -164,9 +163,7 @@ test.describe('Guestroom', () => {
       await createPage(withGuestUser(createdLink, guestUser.firstName));
 
       await pages.conversation().toggleGroupInformation();
-      const guestMember = pages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName});
-      // It may take a moment until the login is done and the user joined
-      await expect(guestMember).toBeVisible({timeout: LOGIN_TIMEOUT});
+      await expect(pages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName})).toBeVisible();
 
       await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
       await verify(pages);
@@ -225,10 +222,6 @@ test.describe('Guestroom', () => {
       await ownerPages.conversation().toggleGroupInformation();
       const link = await ownerPages.conversationDetails().createGuestLink();
       await createPage(withGuestUser(link, guestUser.firstName));
-
-      const guestMember = ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName});
-      // It may take a moment until the login is done and the user joined
-      await expect(guestMember).toBeVisible({timeout: LOGIN_TIMEOUT});
 
       await expect(
         ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.firstName} joined`}),

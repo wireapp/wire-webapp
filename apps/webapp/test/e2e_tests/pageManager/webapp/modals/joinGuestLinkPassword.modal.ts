@@ -22,7 +22,7 @@ import {Locator, Page} from '@playwright/test';
 import {BaseModal} from './base.modal';
 
 /** Modal shown when a link for guests to join a group conversation with a password is created */
-export class ConversationAccessModal extends BaseModal {
+export class JoinGuestLinkPasswordModal extends BaseModal {
   readonly passwordInput: Locator;
   readonly submitButton: Locator;
   readonly joinForm: Locator;
