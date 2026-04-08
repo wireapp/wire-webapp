@@ -17,4 +17,4 @@
  *
  */
 
-export * from './IncomingProposalsQueue';
+export * from './incomingProposalsQueue';

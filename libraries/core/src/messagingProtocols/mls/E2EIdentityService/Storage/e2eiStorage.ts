@@ -17,7 +17,7 @@
  *
  */
 
-import {EnrollmentFlowData} from './E2EIStorage.schema';
+import {EnrollmentFlowData} from './e2eiStorage.schema';
 
 import {CoreDatabase} from '../../../../storage/coreDb';
 

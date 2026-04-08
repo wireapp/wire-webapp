@@ -26,7 +26,7 @@ import {
   GetInitialNonceReturnValue,
   PostJoseRequestParams,
   PostJoseRequestReturnValue,
-} from './AcmeService.types';
+} from './acmeService.types';
 import {
   AuthorizationResponseSchema,
   DirectoryResponseSchema,

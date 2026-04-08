@@ -32,7 +32,7 @@ import {
   isMLSStaleMessageError,
   serializeAbortReason,
   shouldMLSDecryptionErrorBeIgnored,
-} from './CoreCryptoMLSError';
+} from './coreCryptoMlsError';
 
 describe('CoreCryptoMLSError helpers', () => {
   describe('epoch and conversation existence guards', () => {

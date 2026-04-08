@@ -40,7 +40,7 @@ import type {
   AddUsersToProteusConversationParams,
   ProteusServiceConfig,
   SendProteusMessageParams,
-} from './ProteusService.types';
+} from './proteusService.types';
 import {migrateToQualifiedSessionIds} from './sessionIdMigrator';
 import {filterUsersFromDomains} from './userDomainFilters';
 

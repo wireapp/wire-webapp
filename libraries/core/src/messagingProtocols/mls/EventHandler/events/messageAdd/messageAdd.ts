@@ -24,10 +24,10 @@ import {LogFactory} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {queueProposal} from './IncomingProposalsQueue';
+import {queueProposal} from './incomingProposalsQueue';
 
 import {HandledEventPayload} from '../../../../../notification';
-import {MLSService, optionalToUint8Array} from '../../../MLSService/MLSService';
+import {MLSService, optionalToUint8Array} from '../../../MLSService/mlsService';
 
 const logger = LogFactory.getLogger('@wireapp/core/mls/messageAdd');
 

@@ -51,13 +51,13 @@ import {
   CoreCryptoContext,
 } from '@wireapp/core-crypto';
 
-import {ClientMLSError, ClientMLSErrorLabel} from './ClientMLSError';
+import {ClientMLSError, ClientMLSErrorLabel} from './clientMlsError';
 import {
   isCoreCryptoMLSConversationAlreadyExistsError,
   serializeAbortReason,
   shouldMLSDecryptionErrorBeIgnored,
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
-} from './CoreCryptoMLSError';
+} from './coreCryptoMlsError';
 
 import {AddUsersFailure, AddUsersFailureReasons, KeyPackageClaimUser} from '../../../conversation';
 import {CoreDatabase} from '../../../storage/coreDb';

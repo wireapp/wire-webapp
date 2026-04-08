@@ -34,7 +34,7 @@ import {
 
 import {AcmeService} from './Connection';
 import {getE2EIClientId} from './Helper';
-import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
+import {createE2EIEnrollmentStorage} from './Storage/e2eiStorage';
 
 import {ClientService} from '../../../client';
 import {CoreDatabase} from '../../../storage/coreDb';

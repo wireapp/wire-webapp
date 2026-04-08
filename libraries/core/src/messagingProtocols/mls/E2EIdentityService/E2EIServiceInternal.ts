@@ -32,8 +32,8 @@ import {getCertificate} from './Steps/Certificate';
 import {doWireDpopChallenge} from './Steps/DpopChallenge';
 import {doWireOidcChallenge} from './Steps/OidcChallenge';
 import {createNewOrder, finalizeOrder} from './Steps/Order';
-import {createE2EIEnrollmentStorage} from './Storage/E2EIStorage';
-import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/E2EIStorage.schema';
+import {createE2EIEnrollmentStorage} from './Storage/e2eiStorage';
+import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/e2eiStorage.schema';
 
 import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';

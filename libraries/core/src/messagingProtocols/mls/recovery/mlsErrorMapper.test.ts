@@ -23,13 +23,13 @@ import {Encoder} from 'bazinga64';
 
 import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
 
-import {createDefaultMlsErrorMapper} from './MlsErrorMapper';
+import {createDefaultMlsErrorMapper} from './mlsErrorMapper';
 
 import {
   CORE_CRYPTO_ERROR_NAMES,
   serializeAbortReason,
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
-} from '../MLSService/CoreCryptoMLSError';
+} from '../MLSService/coreCryptoMlsError';
 
 // Helpers
 const id: QualifiedId = {id: 'conv-id', domain: 'wire.test'};

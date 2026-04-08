@@ -22,7 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {LogFactory} from '@wireapp/commons';
 
-import {DomainMlsError, DomainMlsErrorType, MlsErrorMapper} from './MlsErrorMapper';
+import {DomainMlsError, DomainMlsErrorType, MlsErrorMapper} from './mlsErrorMapper';
 
 import {BaseCreateConversationResponse} from '../../../conversation';
 

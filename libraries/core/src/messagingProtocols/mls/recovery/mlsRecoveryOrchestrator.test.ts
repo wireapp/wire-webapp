@@ -20,14 +20,14 @@
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {DomainMlsError, MlsErrorMapper} from './MlsErrorMapper';
+import {DomainMlsError, MlsErrorMapper} from './mlsErrorMapper';
 import {
   MlsRecoveryOrchestratorImpl,
   minimalDefaultPolicies,
   PolicyTable,
   OperationName,
   RecoveryActionKind,
-} from './MlsRecoveryOrchestrator';
+} from './mlsRecoveryOrchestrator';
 
 function qid(id = 'conv-1'): QualifiedId {
   return {id, domain: 'wire.test'};

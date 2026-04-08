@@ -32,12 +32,12 @@ import {
 
 import {AddUsersFailureReasons, MessageSendingState, MessageTargetMode} from '../../../conversation';
 import {buildTextMessage} from '../../../conversation/message/messageBuilder';
-import {SendProteusMessageParams} from './ProteusService.types';
-import {buildProteusService, cleanupProteusServiceMocks} from './ProteusService.mocks';
+import {SendProteusMessageParams} from './proteusService.types';
+import {buildProteusService, cleanupProteusServiceMocks} from './proteusService.mocks';
 import {constructSessionId} from '../utility/sessionHandler';
 import {CONVERSATION_EVENT, ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 import {GenericMessage} from '@wireapp/protocol-messaging';
-import {ProteusService} from './ProteusService';
+import {ProteusService} from './proteusService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {generateQualifiedId, generateQualifiedIds} from '../../../testUtils';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';

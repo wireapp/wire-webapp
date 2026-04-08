@@ -23,7 +23,7 @@ import {APIClient} from '@wireapp/api-client';
 
 import {CryptoClient} from './cryptoClient';
 import {CoreCryptoWrapper} from './cryptoClient/coreCryptoWrapper/coreCryptoWrapper';
-import {ProteusService} from './ProteusService';
+import {ProteusService} from './proteusService';
 
 import {getUUID} from '../../../test/payloadHelper';
 import {createMemoryEngine} from '../../../test/storeHelper';

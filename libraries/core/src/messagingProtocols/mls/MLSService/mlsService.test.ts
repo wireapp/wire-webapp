@@ -39,8 +39,8 @@ import {
   WelcomeBundle,
 } from '@wireapp/core-crypto';
 
-import {CORE_CRYPTO_ERROR_NAMES} from './CoreCryptoMLSError';
-import {InitClientOptions, MLSService} from './MLSService';
+import {CORE_CRYPTO_ERROR_NAMES} from './coreCryptoMlsError';
+import {InitClientOptions, MLSService} from './mlsService';
 
 import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB} from '../../../storage/coreDb';
