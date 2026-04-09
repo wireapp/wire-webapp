@@ -25,6 +25,7 @@ import {formatBytes} from 'Util/util';
 import {FileVersion} from '../types';
 
 type RestVersionWithOptionalFields = Partial<RestVersion>;
+type ResolveOwnerName = (version: RestVersionWithOptionalFields) => string | undefined;
 
 /**
  * Transform a RestVersion to FileVersion
@@ -32,11 +33,12 @@ type RestVersionWithOptionalFields = Partial<RestVersion>;
 export const transformRestVersionToFileVersion = (
   version: RestVersionWithOptionalFields,
   timestamp: number,
+  resolveOwnerName?: ResolveOwnerName,
 ): FileVersion => {
   return {
     versionId: version.VersionId || '',
     time: formatTime(timestamp),
-    ownerName: version.OwnerName || '',
+    ownerName: resolveOwnerName?.(version) ?? version.OwnerName ?? '',
     size: formatBytes(Number(version.Size) || 0),
     downloadUrl: version.PreSignedGET?.Url || '',
   };
@@ -45,7 +47,10 @@ export const transformRestVersionToFileVersion = (
 /**
  * Group file versions by date
  */
-export const groupVersionsByDate = (versions: RestVersionWithOptionalFields[]): Record<string, FileVersion[]> => {
+export const groupVersionsByDate = (
+  versions: RestVersionWithOptionalFields[],
+  resolveOwnerName?: ResolveOwnerName,
+): Record<string, FileVersion[]> => {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
@@ -67,7 +72,7 @@ export const groupVersionsByDate = (versions: RestVersionWithOptionalFields[]): 
         acc[dateKey] = [];
       }
 
-      acc[dateKey].push(transformRestVersionToFileVersion(version, timestamp));
+      acc[dateKey].push(transformRestVersionToFileVersion(version, timestamp, resolveOwnerName));
       return acc;
     },
     {} as Record<string, FileVersion[]>,
