@@ -24,6 +24,9 @@ module.exports = {
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
   moduleDirectories: ['node_modules', __dirname],
   moduleNameMapper: {
+    '^@wireapp/api-client$': '<rootDir>/../../libraries/api-client/lib/APIClient.js',
+    '^@wireapp/api-client/lib$': '<rootDir>/../../libraries/api-client/lib/index.js',
+    '^@wireapp/api-client/lib/(.*)$': '<rootDir>/../../libraries/api-client/lib/$1',
     'Components/(.*)': '<rootDir>/src/script/components/$1',
     'Hooks/(.*)': '<rootDir>/src/script/hooks/$1',
     'I18n/(.*)': '<rootDir>/src/i18n/$1',
