@@ -124,9 +124,20 @@ const GroupCreationModal = ({
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
   const [selectedProtocol, setSelectedProtocol] = useState<ProtocolOption>(initialProtocol);
+
+  const isAppsFeatureAvailable =
+    isTeam &&
+    checkAppsFeatureAvailability({
+      protocol: selectedProtocol.value,
+      isAppsEnabled: isAppsEnabledForTeam,
+      hasWhitelistedServices: hasWhitelistedServicesInTeam,
+    });
+
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
-  const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+  const [accessState, setAccessState] = useState<ACCESS_STATE>(
+    isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM,
+  );
   const [nameError, setNameError] = useState<string>('');
   const [groupName, setGroupName] = useState<string>('');
   const [participantsInput, setParticipantsInput] = useState<string>('');
@@ -160,14 +171,6 @@ const GroupCreationModal = ({
   const isGuestAndServicesRoom = accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES;
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
-
-  const isAppsFeatureAvailable =
-    isTeam &&
-    checkAppsFeatureAvailability({
-      protocol: selectedProtocol.value,
-      isAppsEnabled: isAppsEnabledForTeam,
-      hasWhitelistedServices: hasWhitelistedServicesInTeam,
-    });
 
   const isServicesEnabled = isAppsFeatureAvailable && (isServicesRoom || isGuestAndServicesRoom);
 
