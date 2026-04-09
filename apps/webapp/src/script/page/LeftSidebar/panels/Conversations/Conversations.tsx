@@ -404,7 +404,6 @@ export const Conversations = ({
               isTeam={isTeam}
               changeTab={changeTab}
               currentTab={currentTab}
-              conversations={conversations}
               groupConversations={groupConversations}
               directConversations={directConversations}
               unreadConversations={unreadConversations}

@@ -20,15 +20,15 @@
 import {container} from 'tsyringe';
 
 import {
+  ChannelIcon,
+  CollectionIcon,
+  ExternalLinkIcon,
   GroupIcon,
   MessageIcon,
   StarIcon,
-  ExternalLinkIcon,
-  Tooltip,
   SupportIcon,
-  ChannelIcon,
-  CollectionIcon,
   TeamIcon,
+  Tooltip,
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -40,9 +40,9 @@ import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {
+  isTabVisible,
   SidebarTabs,
   useSidebarStore,
-  isTabVisible,
 } from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -52,11 +52,11 @@ import {replaceLink, t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
+  conversationsTitleWrapper,
   footerDisclaimer,
   footerDisclaimerEllipsis,
   footerDisclaimerTooltip,
   iconStyle,
-  conversationsTitleWrapper,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
 import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
@@ -65,10 +65,9 @@ import {Config} from '../../../../../Config';
 import {ContentState} from '../../../../useAppState';
 import {ConversationTab} from '../ConversationTab';
 import {conversationFilters} from '../helpers';
-import {TabsFilterButton} from '../TabsFilterButton';
+import {TabAndFilterSettings} from '../tabAndFilterSettings';
 
 interface ConversationTabsProps {
-  conversations: Conversation[];
   unreadConversations: Conversation[];
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
@@ -85,7 +84,6 @@ interface ConversationTabsProps {
 }
 
 export const ConversationTabs = ({
-  conversations,
   unreadConversations,
   favoriteConversations,
   archivedConversations,
@@ -138,6 +136,18 @@ export const ConversationTabs = ({
   ).length;
   const directConversationsLength = directConversations.filter(filterUnreadAndArchivedConversations).length;
 
+  const channelsTab = shouldShowChannelTab
+    ? [
+        {
+          type: SidebarTabs.CHANNELS,
+          title: t('conversationLabelChannels'),
+          dataUieName: 'go-channels-view',
+          Icon: <ChannelIcon />,
+          unreadConversations: channelConversationsLength,
+        },
+      ]
+    : [];
+
   const conversationTabs = [
     {
       type: SidebarTabs.RECENT,
@@ -188,6 +198,7 @@ export const ConversationTabs = ({
       Icon: <Icon.DraftMessageIcon />,
       unreadConversations: draftsCount,
     },
+    ...channelsTab,
     {
       type: SidebarTabs.GROUPS,
       title: t('conversationLabelGroups'),
@@ -221,16 +232,6 @@ export const ConversationTabs = ({
     },
   ];
 
-  if (shouldShowChannelTab) {
-    conversationTabs.splice(7, 0, {
-      type: SidebarTabs.CHANNELS,
-      title: t('conversationLabelChannels'),
-      dataUieName: 'go-channels-view',
-      Icon: <ChannelIcon />,
-      unreadConversations: channelConversationsLength,
-    });
-  }
-
   // Filter tabs based on visibility preferences
   const visibleConversationTabs = conversationTabs.filter(tab => isTabVisible(tab.type, visibleTabs));
 
@@ -249,7 +250,7 @@ export const ConversationTabs = ({
       >
         <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
           <span>{t('videoCallOverlayConversations')}</span>
-          <TabsFilterButton />
+          <TabAndFilterSettings />
         </div>
 
         {visibleConversationTabs.map((conversationTab, index) => {

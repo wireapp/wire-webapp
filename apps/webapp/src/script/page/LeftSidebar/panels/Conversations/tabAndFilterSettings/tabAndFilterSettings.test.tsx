@@ -22,9 +22,9 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 import en from 'I18n/en-US.json';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {setStrings} from 'Util/LocalizerUtil';
+import {setStrings} from 'Util/localizerUtil';
 
-import {TabsFilterButton} from './TabsFilterButton';
+import {TabAndFilterSettings} from './tabAndFilterSettings';
 import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
 jest.mock('Util/useChannelsFeatureFlag', () => ({
@@ -48,7 +48,7 @@ jest.mock('Components/Icon', () => ({
   SettingsIcon: () => <div data-testid="settings-icon" />,
 }));
 
-describe('TabsFilterButton', () => {
+describe('TabAndFilterSettings', () => {
   beforeEach(() => {
     setStrings({en});
     Config._dangerouslySetConfigFeaturesForDebug({
@@ -61,7 +61,7 @@ describe('TabsFilterButton', () => {
   });
 
   it('opens the dropdown and toggles a tab visibility', async () => {
-    const {getByTitle, getByText} = render(withTheme(<TabsFilterButton />));
+    const {getByTitle, getByText} = render(withTheme(<TabAndFilterSettings />));
 
     fireEvent.click(getByTitle('Customize visible tabs'));
 

@@ -41,9 +41,9 @@ import {
   filterButton,
   filterButtonWrapper,
   roundCheckbox,
-} from './TabsFilterButton.styles';
+} from './tabAndFilterSettings.styles';
 
-export const TabsFilterButton = () => {
+export const TabAndFilterSettings = () => {
   const {visibleTabs, toggleTabVisibility} = useSidebarStore();
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(0);

@@ -26,9 +26,9 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 
 import {
+  conversationsSidebarHandleIconStyles,
   conversationsSidebarHandleStyles,
   conversationsSidebarStyles,
-  conversationsSidebarHandleIconStyles,
 } from './ConversationSidebar.styles';
 
 import {ContentState} from '../../../../useAppState';
@@ -45,7 +45,6 @@ type ConversationSidebarProps = {
   isTeam: boolean;
   changeTab: (nextTab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
-  conversations: Conversation[];
   groupConversations: Conversation[];
   channelConversations: Conversation[];
   directConversations: Conversation[];
@@ -67,7 +66,6 @@ export const ConversationSidebar = ({
   isTeam,
   changeTab,
   currentTab,
-  conversations,
   groupConversations,
   directConversations,
   unreadConversations,
@@ -92,7 +90,6 @@ export const ConversationSidebar = ({
         <ConversationTabs
           onChangeTab={changeTab}
           currentTab={currentTab}
-          conversations={conversations}
           groupConversations={groupConversations}
           directConversations={directConversations}
           unreadConversations={unreadConversations}
