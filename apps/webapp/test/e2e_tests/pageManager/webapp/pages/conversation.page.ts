@@ -27,7 +27,7 @@ import {ConfirmModal} from '../modals/confirm.modal';
 type EmojiReaction = 'plus-one' | 'heart' | 'joy';
 
 export class ConversationPage {
-  private readonly page: Page;
+  protected readonly page: Page;
 
   /** The back button is shown on narrow screens e.g. phones to navigate back to the conversation list */
   readonly backButton: Locator;

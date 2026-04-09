@@ -64,8 +64,13 @@ export const sendTextMessageToConversation = async (
 };
 
 type UserPages = PageManager['webapp']['pages'];
-export const createGroup = async (pages: UserPages, conversationName: string, user: User[]) => {
+export const createGroup = async (pages: UserPages, conversationName: string, user: User[], cells?: boolean) => {
   await pages.conversationList().clickCreateGroup();
+
+  if(cells) {
+    await pages.groupCreation().enableFilesCheckbox();
+  }
+
   await pages.groupCreation().setGroupName(conversationName);
   await pages.groupCreation().selectGroupMembers(...user.map(user => user.username));
   await pages.groupCreation().clickCreateGroupButton();

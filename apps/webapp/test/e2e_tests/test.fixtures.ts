@@ -56,7 +56,7 @@ type Fixtures = {
     teamName: string,
     options?: {
       users: (User | {user: User; role?: keyof typeof Role})[];
-      features?: {conferenceCalling?: boolean; channels?: boolean; mls?: boolean};
+      features?: {conferenceCalling?: boolean; channels?: boolean; mls?: boolean; cells?: boolean};
     },
   ) => Promise<Team>;
 };
@@ -187,6 +187,12 @@ export const test = baseTest.extend<Fixtures>({
           await api.brig.unlockChannelFeature(teamId);
           await api.brig.enableChannelsFeature(teamId);
           await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
+        }
+
+        if (options.features.cells) {
+          await api.brig.unlockCellsFeature(teamId);
+          await api.brig.enableCells(teamId);
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, teamId, owner.token);
         }
       }
 
