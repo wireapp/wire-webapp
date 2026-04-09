@@ -40,7 +40,7 @@ jest.mock('Repositories/team/TeamState', () => ({
   },
 }));
 
-jest.mock('Util/ComponentUtil', () => ({
+jest.mock('Util/componentUtil', () => ({
   useKoSubscribableChildren: () => ({isCellsEnabled: false}),
 }));
 
