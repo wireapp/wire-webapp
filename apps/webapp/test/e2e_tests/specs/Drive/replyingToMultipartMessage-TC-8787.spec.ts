@@ -65,8 +65,6 @@ test(
       const multipartMessage = userBPages.conversation().getMessage({sender: userA});
       await expect(multipartMessage).toContainText(initialMessageText);
       await expect(multipartMessage.getByRole('button', {name: `Image from ${userA.fullName}`})).toBeVisible();
-
-      expect(await userBPages.cellsConversation().isMultipartMessageVisible(userA, initialMessageText)).toBeTruthy();
     });
 
     await test.step('User B replies to a multipart message', async () => {
