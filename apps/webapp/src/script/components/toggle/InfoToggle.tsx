@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useId} from 'react';
+import {ReactNode, useId} from 'react';
 
 import cx from 'classnames';
 
@@ -29,7 +29,7 @@ interface InfoToggleProps {
   name: string;
   className?: string;
   setIsChecked: (checked: boolean) => void;
-  footer?: React.ReactNode;
+  footer?: ReactNode;
 }
 
 const InfoToggle = ({
