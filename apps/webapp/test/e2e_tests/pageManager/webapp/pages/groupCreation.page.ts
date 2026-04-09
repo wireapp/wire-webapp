@@ -31,6 +31,8 @@ export class GroupCreationPage {
 
   readonly searchPeopleInput: Locator;
   readonly searchPeopleResults: Locator;
+  readonly selectedPeopleList: Locator;
+  readonly toggleSelectedListButton: Locator;
   readonly errorGroupName: Locator;
 
   constructor(page: Page) {
@@ -45,6 +47,8 @@ export class GroupCreationPage {
     this.searchPeopleInput = page.getByRole('dialog').getByLabel('Search by name');
     this.searchPeopleList = page.getByRole('dialog').getByRole('list');
     this.searchPeopleResults = this.searchPeopleList.getByRole('listitem');
+    this.selectedPeopleList = page.getByTestId('selected-search-list');
+    this.toggleSelectedListButton = page.getByTestId('do-toggle-selected-search-list');
     this.errorGroupName = page.getByTestId('error-group-name');
   }
 
@@ -83,5 +87,10 @@ export class GroupCreationPage {
       await this.searchPeopleInput.fill(username);
       await this.searchPeopleResults.filter({hasText: username}).click();
     }
+  }
+
+  async deselectGroupMember(username: string) {
+    await this.groupCreationModal.getByTestId('do-toggle-selected-search-list').click();
+    await this.selectedPeopleList.filter({hasText: username}).click();
   }
 }

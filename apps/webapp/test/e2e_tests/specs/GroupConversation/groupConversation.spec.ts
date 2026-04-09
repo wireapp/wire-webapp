@@ -36,7 +36,8 @@ test.describe('Group Conversation', () => {
 
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
-    team = await createTeam('Test Team', {users: [userB]});
+    userC = await createUser();
+    team = await createTeam('Test Team', {users: [userB, userC]});
     userA = team.owner;
   });
 
@@ -67,6 +68,28 @@ test.describe('Group Conversation', () => {
       await userAPages.conversationList().clickCreateGroup();
       await userAPages.groupCreation().groupNameInput.fill(' ');
       await expect(userAPages.groupCreation().errorGroupName).toHaveText('At least 1 character');
+    },
+  );
+
+  test(
+    'I see count of participants increase and decrease when I select or unselect',
+    {tag: ['@TC-516', '@regression']},
+    async ({createPage}) => {
+      const userAPages = PageManager.from(
+        await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC)),
+      ).webapp.pages;
+
+      await userAPages.conversationList().clickCreateGroup();
+      await userAPages.groupCreation().setGroupName(groupName);
+
+      await userAPages.groupCreation().selectGroupMembers(userB.fullName);
+      await expect(userAPages.groupCreation().toggleSelectedListButton).toContainText('Selected (1)');
+
+      await userAPages.groupCreation().selectGroupMembers(userC.fullName);
+      await expect(userAPages.groupCreation().toggleSelectedListButton).toContainText('Selected (2)');
+
+      await userAPages.groupCreation().deselectGroupMember(userB.fullName);
+      await expect(userAPages.groupCreation().toggleSelectedListButton).toContainText('Selected (1)');
     },
   );
 });
