@@ -29,7 +29,7 @@ interface InfoToggleProps {
   name: string;
   className?: string;
   setIsChecked: (checked: boolean) => void;
-  label?: React.ReactNode;
+  footer?: React.ReactNode;
 }
 
 const InfoToggle = ({
@@ -40,7 +40,7 @@ const InfoToggle = ({
   isDisabled,
   name,
   setIsChecked,
-  label,
+  footer,
 }: InfoToggleProps) => {
   const inputId = useId();
 
@@ -75,7 +75,7 @@ const InfoToggle = ({
           </button>
         </div>
       </div>
-      {label}
+      {footer}
     </div>
   );
 };

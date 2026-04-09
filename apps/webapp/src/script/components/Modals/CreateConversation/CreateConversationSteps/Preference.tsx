@@ -91,7 +91,7 @@ export const Preference = () => {
         isDisabled={!isAppsFeatureAvailable}
         name={t('servicesOptionsTitle')}
         isChecked={isServicesEnabled && isAppsFeatureAvailable}
-        label={!isAppsFeatureAvailable && <AppsDisabledNote />}
+        footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
       />
 
       {areReadReceiptsEnabled && (

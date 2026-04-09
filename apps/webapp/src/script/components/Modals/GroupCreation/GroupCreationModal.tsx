@@ -525,7 +525,7 @@ const GroupCreationModal = ({
                   isDisabled={!isAppsFeatureAvailable}
                   name={t('servicesOptionsTitle')}
                   info={t('servicesRoomToggleInfo')}
-                  label={!isAppsFeatureAvailable && <AppsDisabledNote />}
+                  footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
                 />
 
                 {areReadReceiptsEnabled && (
