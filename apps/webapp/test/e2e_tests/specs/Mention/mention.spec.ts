@@ -291,7 +291,9 @@ test.describe('Mention', () => {
 
   test('I want to receive a message containing a mention', {tag: ['@TC-3521', '@regression']}, async ({createPage}) => {
     const userBPages = await PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages);
-    const userAPages = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages);
+    const userAPages = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(
+      pm => pm.webapp.pages,
+    );
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
@@ -497,8 +499,7 @@ test.describe('Mention', () => {
 
       await test.step('Verify the temporary user is shown as group member', async () => {
         const guestMember = pages.conversationDetails().groupMembers.filter({hasText: 'Guest User'});
-        // It may take a moment until the login is done and the user joined
-        await expect(guestMember).toBeVisible({timeout: 60_000});
+        await expect(guestMember).toBeVisible();
       });
 
       await test.step('Verify the mention suggestion for the guest has a "guest" indicator', async () => {
