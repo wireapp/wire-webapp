@@ -42,7 +42,7 @@ test.beforeEach(async ({createTeam, createUser}) => {
 test(
   'Uploading an file in a group conversation',
   {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
-  async ({createPage, api}, testInfo) => {
+  async ({createPage}, testInfo) => {
     const [userAPageManager, userBPageManager] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
       PageManager.from(createPage(withLogin(userB))),
@@ -61,11 +61,11 @@ test(
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().clickSendMessage();
 
-      await expect(userBPages.cellsConversation().getImageLocator(userA)).toBeVisible();
+      await expect(userBPages.conversation().getCellsImageLocator(userA)).toBeVisible();
     });
 
     await test.step('User B opens the image in the conversation', async () => {
-      await userBPages.cellsConversation().clickImage(userA);
+      await userBPages.conversation().getCellsImageLocator(userA).click();
 
       await expect(userBModals.cellsFileDetailView().image).toBeVisible();
     });

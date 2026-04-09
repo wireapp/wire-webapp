@@ -69,8 +69,8 @@ test(
     });
 
     await test.step('User B replies to a multipart message', async () => {
-      const message = userBPages.cellsConversation().getMessage({sender: userA});
-      await userBPages.cellsConversation().replyToMessage(message);
+      const message = userBPages.conversation().getMessage({sender: userA});
+      await userBPages.conversation().replyToMessage(message);
       await userBComponents.inputBarControls().setMessageInput(replyMessageText);
       await userBComponents.inputBarControls().clickSendMessage();
 
