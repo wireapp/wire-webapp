@@ -291,7 +291,7 @@ export const ConversationTabs = ({
           type={SidebarTabs.CONNECT}
           Icon={<Icon.AddParticipantsIcon />}
           onChangeTab={onChangeTab}
-          conversationTabIndex={conversationTabs.length + 1}
+          conversationTabIndex={visibleConversationTabs.length + 1}
           dataUieName="go-people"
           isActive={currentTab === SidebarTabs.CONNECT}
         />
@@ -310,7 +310,7 @@ export const ConversationTabs = ({
               type={SidebarTabs.CELLS}
               Icon={<CollectionIcon />}
               onChangeTab={onChangeTab}
-              conversationTabIndex={conversationTabs.length + 2}
+              conversationTabIndex={visibleConversationTabs.length + 2}
               dataUieName="go-cells"
               isActive={currentTab === SidebarTabs.CELLS}
             />

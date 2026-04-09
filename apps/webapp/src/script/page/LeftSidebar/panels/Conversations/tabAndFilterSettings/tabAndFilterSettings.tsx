@@ -19,15 +19,11 @@
 
 import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
-import {container} from 'tsyringe';
-
 import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
@@ -53,10 +49,6 @@ export const TabAndFilterSettings = () => {
   const menuId = useId();
 
   const {shouldShowChannelTab} = useChannelsFeatureFlag();
-  const teamState = container.resolve(TeamState);
-  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
-
-  const showCells = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
 
   const availableTabs = [
     {type: SidebarTabs.FAVORITES, label: t('conversationLabelFavorites')},
@@ -73,10 +65,6 @@ export const TabAndFilterSettings = () => {
 
   if (shouldShowChannelTab) {
     availableTabs.splice(2, 0, {type: SidebarTabs.CHANNELS, label: t('conversationLabelChannels')});
-  }
-
-  if (showCells) {
-    availableTabs.push({type: SidebarTabs.CELLS, label: t('cells.sidebar.title')});
   }
 
   const handleMenuKeyDown = useCallback(
