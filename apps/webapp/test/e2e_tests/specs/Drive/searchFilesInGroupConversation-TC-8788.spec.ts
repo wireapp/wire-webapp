@@ -22,7 +22,8 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {getVideoFilePath, VideoFileName} from 'test/e2e_tests/utils/asset.util';
 
-import {test, expect, withLogin} from '../../test.fixtures';
+import {test, expect, withLogin, withConnectedUser} from '../../test.fixtures';
+import {createGroup} from '../../utils/userActions';
 
 // User A is a team owner, User B is a team member
 let userA: User;
@@ -36,33 +37,25 @@ const videoFilePath = getVideoFilePath();
 
 test.beforeEach(async ({createTeam, createUser}) => {
   userB = await createUser();
-  const team = await createTeam(teamName, {users: [userB]});
+  const team = await createTeam(teamName, {users: [userB], features: {cells: true}});
   userA = team.owner;
 });
 
 test(
   'Searching files in a group conversation',
   {tag: ['@crit-flow-cells', '@regression', '@TC-8788']},
-  async ({createPage, api}) => {
-    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+  async ({createPage}) => {
+    const [userAPageManager, userBPageManager] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+      PageManager.from(createPage(withLogin(userB))),
+    ]);
 
-    const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-    const userBPages = PageManager.from(userBPage).webapp.pages;
+    const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
+    const {pages: userBPages} = userBPageManager.webapp;
 
-    await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      await api.brig.unlockCellsFeature(userA.teamId);
-      await api.brig.enableCells(userA.teamId);
-    });
 
     await test.step('Preconditions: Create group with drive enabled', async () => {
-      await userAPages.conversationList().clickCreateGroup();
-      // Files should be disabled by default
-      await expect(userAPages.groupCreation().sharedDriveToggle).toHaveAttribute('data-uie-value', 'unchecked');
-
-      await userAPages.groupCreation().enableFilesCheckbox();
-      await userAPages.groupCreation().setGroupName(conversationName);
-      await userAPages.groupCreation().selectGroupMembers(userB.username);
-      await userAPages.groupCreation().clickCreateGroupButton();
+      await createGroup(userAPages, conversationName, [userB], true)
     });
 
     await test.step('User A sends a message with assets in a group conversation', async () => {

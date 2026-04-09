@@ -53,8 +53,9 @@ test(
     const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
     const {pages: userBPages} = userBPageManager.webapp;
 
-    // create group with cells active
-    await createGroup(userAPages, conversationName, [userB], true);
+    await test.step('Preconditions: Create group with drive enabled', async () => {
+      await createGroup(userAPages, conversationName, [userB], true);
+    });
 
     await test.step('User A sends a multipart message in a group conversation', async () => {
       await userAPages.conversationList().openConversation(conversationName);
