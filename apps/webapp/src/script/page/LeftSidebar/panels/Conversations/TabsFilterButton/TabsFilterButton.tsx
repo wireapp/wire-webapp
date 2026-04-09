@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, useRef, useEffect, useId, useCallback} from 'react';
+import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
 import {container} from 'tsyringe';
 
@@ -27,9 +27,9 @@ import * as Icon from 'Components/Icon';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleEscDown, isKey, KEY, isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
