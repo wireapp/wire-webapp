@@ -57,4 +57,16 @@ test.describe('Group Conversation', () => {
     ).toBeVisible();
     await expect(message).toBeVisible();
   });
+
+  test(
+    'I cannot set empty or space-only conversation name',
+    {tag: ['@TC-514', '@regression']},
+    async ({createPage}) => {
+      const userAPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await userAPages.conversationList().clickCreateGroup();
+      await userAPages.groupCreation().groupNameInput.fill(' ');
+      await expect(userAPages.groupCreation().errorGroupName).toHaveText('At least 1 character');
+    },
+  );
 });

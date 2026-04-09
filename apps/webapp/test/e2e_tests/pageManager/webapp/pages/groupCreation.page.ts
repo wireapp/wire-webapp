@@ -31,6 +31,7 @@ export class GroupCreationPage {
 
   readonly searchPeopleInput: Locator;
   readonly searchPeopleResults: Locator;
+  readonly errorGroupName: Locator;
 
   constructor(page: Page) {
     this.groupCreationModal = page.locator('#group-creation-modal');
@@ -44,6 +45,7 @@ export class GroupCreationPage {
     this.searchPeopleInput = page.getByRole('dialog').getByLabel('Search by name');
     this.searchPeopleList = page.getByRole('dialog').getByRole('list');
     this.searchPeopleResults = this.searchPeopleList.getByRole('listitem');
+    this.errorGroupName = page.getByTestId('error-group-name');
   }
 
   async setGroupName(name: string) {
