@@ -38,7 +38,7 @@ export const transformRestVersionToFileVersion = (
   return {
     versionId: version.VersionId || '',
     time: formatTime(timestamp),
-    ownerName: resolveOwnerName?.(version) || version.OwnerName || '',
+    ownerName: resolveOwnerName?.(version) ?? version.OwnerName ?? '',
     size: formatBytes(Number(version.Size) || 0),
     downloadUrl: version.PreSignedGET?.Url || '',
   };

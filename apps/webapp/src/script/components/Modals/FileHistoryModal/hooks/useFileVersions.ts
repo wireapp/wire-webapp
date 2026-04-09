@@ -27,10 +27,13 @@ import {container} from 'tsyringe';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
 import {FileInfo, FileVersion} from '../types';
 import {groupVersionsByDate} from '../utils/fileVersionUtils';
+
+const logger = getLogger('FileVersionHistoryModal');
 
 /**
  * Hook to fetch and manage file versions for a given node UUID.
@@ -74,14 +77,14 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 
         setFileInfo(info);
 
-        const ownerNameByUserId = getOwnerNameByUserId(versions || []);
+        const ownerNamesByUserIdMap = getOwnerNamesByUserIdMap(versions || []);
         const groupedVersions = groupVersionsByDate(versions || [], version => {
           const ownerQualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
           if (!ownerQualifiedId) {
             return undefined;
           }
 
-          return ownerNameByUserId.get(ownerQualifiedId.id);
+          return ownerNamesByUserIdMap.get(ownerQualifiedId.id);
         });
         setFileVersions(groupedVersions);
       } catch (err: unknown) {
@@ -159,12 +162,13 @@ const parseOwnerQualifiedId = (ownerUuid?: string): QualifiedId | undefined => {
 
   try {
     return parseQualifiedId(ownerUuid.trim());
-  } catch {
+  } catch (error) {
+    logger.warn('Failed to parse qualifiedId', ownerUuid, error);
     return undefined;
   }
 };
 
-const getOwnerNameByUserId = (versions: Partial<RestVersion>[]): Map<string, string> => {
+const getOwnerNamesByUserIdMap = (versions: Partial<RestVersion>[]): Map<string, string> => {
   const ownerIds = new Set(
     versions.flatMap(version => {
       const qualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
@@ -181,7 +185,8 @@ const getOwnerNameByUserId = (versions: Partial<RestVersion>[]): Map<string, str
     const matchingUsers = users.filter(user => ownerIds.has(user.id) && user.name());
 
     return new Map<string, string>(matchingUsers.map(user => [user.id, user.name()]));
-  } catch {
+  } catch (error) {
+    logger.warn('Failed to resolve owner names from UserState', {ownerIdsCount: ownerIds.size, error});
     return new Map();
   }
 };
