@@ -17,75 +17,42 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
-import {addCreatedTeam, removeCreatedTeam} from 'test/e2e_tests/utils/tearDown.util';
-import {inviteMembers, loginUser} from 'test/e2e_tests/utils/userActions';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect} from '../../test.fixtures';
+import {test, expect, withLogin, withConnectedUser} from '../../test.fixtures';
 
 // User A is a team owner, User B is a team member
-let userA = getUser();
-userA.firstName = 'integrationtest';
-userA.lastName = 'integrationtest';
-userA.fullName = 'integrationtest';
-
-const userB = getUser();
+let userA: User;
+let userB: User;
 
 const teamName = 'Cells Critical Team';
 const conversationName = 'Cells Critical Conversation';
 
 const imageFilePath = getImageFilePath();
 
+test.beforeEach(async ({createTeam, createUser}) => {
+  userB = await createUser();
+  const team = await createTeam(teamName, {users: [userB], features: {cells: true}});
+  userA = team.owner;
+});
+
 test(
   'Uploading an file in a group conversation',
   {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
-  async ({pageManager: userAPageManager, browser, api}, testInfo) => {
+  async ({createPage, api}, testInfo) => {
+    const [userAPageManager, userBPageManager] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+      PageManager.from(createPage(withLogin(userB))),
+    ]);
+
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
-
-    const userBContext = await browser.newContext();
-    const userBPage = await userBContext.newPage();
-    const userBPageManager = new PageManager(userBPage);
-
     const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
 
-    await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      await api.createTeamOwner(userA, teamName).then(user => {
-        userA = {...userA, ...user};
-      });
-      addCreatedTeam(userA, userA.teamId);
-      await inviteMembers([userB], userA, api);
-
-      await api.brig.unlockCellsFeature(userA.teamId);
-      await api.brig.enableCells(userA.teamId);
-    });
-
     await test.step('Preconditions: Both users log in and open the group', async () => {
-      const loginOwner = async () => {
-        await userAPageManager.openMainPage();
-        await loginUser(userA, userAPageManager);
-        await userAModals.dataShareConsent().clickDecline();
-        await userAPages.conversationList().clickCreateGroup();
-        // Files should be disabled by default
-        expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeFalsy();
-
-        await userAPages.groupCreation().enableFilesCheckbox();
-        await userAPages.groupCreation().setGroupName(conversationName);
-        await userAPages.groupCreation().selectGroupMembers(userB.username);
-        await userAPages.groupCreation().clickCreateGroupButton();
-      };
-
-      const loginMember = async () => {
-        await userBPageManager.openMainPage();
-        await loginUser(userB, userBPageManager);
-        await userBModals.dataShareConsent().clickDecline();
-      };
-
-      await Promise.all([loginOwner(), loginMember()]);
-
-      // Wait for some time before uploading the file to make sure the cell is ready
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await createGroup(userAPages, conversationName, [userB], true)
     });
 
     await test.step('User A sends an image to User B in a group conversation', async () => {
@@ -100,7 +67,7 @@ test(
     await test.step('User B opens the image in the conversation', async () => {
       await userBPages.cellsConversation().clickImage(userA);
 
-      expect(await userBModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
+      await expect(userBModals.cellsFileDetailView().image).toBeVisible();
     });
 
     await test.step('User B downloads the image in the conversation', async () => {
@@ -114,11 +81,7 @@ test(
       await userAPages.conversation().clickFilesTab();
       await userAPages.cellsConversationFiles().getFile(ImageQRCodeFileName).click();
 
-      expect(await userAModals.cellsFileDetailView().isImageVisible()).toBeTruthy();
+      await expect(userAModals.cellsFileDetailView().image).toBeVisible();
     });
   },
 );
-
-test.afterAll(async ({api}) => {
-  await removeCreatedTeam(api, userA);
-});
