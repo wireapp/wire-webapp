@@ -59,10 +59,12 @@ test.describe('Guestroom', () => {
 
       await test.step('User B sees error when entering incorrect password', async () => {
         await guestPage.goto(createdLink.toString());
+        await expect(guestPages.conversationJoin().joinBrowserButton).toBeVisible();
         await guestPages.conversationJoin().joinBrowserButton.click();
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
         await guestPages.login().login(guestUser);
+        await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
         await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
         await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
           'Password is incorrect, please try again.',
@@ -215,11 +217,12 @@ test.describe('Guestroom', () => {
     'I want to see Wire and Wireless guest(s) are removed when I change the Allow guests from on to off',
     {tag: ['@TC-3322', '@regression']},
     async ({createPage}) => {
-      const {pages: ownerPages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+      const ownerPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(ownerPages, groupName, []);
       await ownerPages.conversationList().openConversation(groupName);
 
+      // Owner creates a guest link
       await ownerPages.conversation().toggleGroupInformation();
       const link = await ownerPages.conversationDetails().createGuestLink();
       await createPage(withGuestUser(link, guestUser.firstName));
@@ -228,6 +231,7 @@ test.describe('Guestroom', () => {
         ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.firstName} joined`}),
       ).toBeVisible();
 
+      // Owner turns off Allow guests toggle
       await ownerPages.conversationDetails().openGuestOptions();
       await ownerPages.guestOptions().toggleGuests();
 
@@ -249,6 +253,7 @@ test.describe('Guestroom', () => {
       await ownerPages.conversation().toggleGroupInformation();
 
       await ownerPages.conversationDetails().openGuestOptions();
+      // Turn off Guest options as it is on by default
       await ownerPages.guestOptions().guestsToggle.click();
 
       await expect(ownerPage.getByTestId('status-guest-options-info')).toContainText(
@@ -268,8 +273,7 @@ test.describe('Guestroom', () => {
     },
   ].forEach(({description, tag}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const ownerPage = await createPage(withLogin(userA));
-      const ownerPages = PageManager.from(ownerPage).webapp.pages;
+      const ownerPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       // UserA sees allow guests toggle is ON on group creation page
       await ownerPages.conversationList().clickCreateGroup();
@@ -294,13 +298,13 @@ test.describe('Guestroom', () => {
     {tag: ['@TC-3334', '@regression']},
     async ({createPage}) => {
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
-     
       const ownerPages = PageManager.from(userAPage).webapp.pages;
       const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
 
       await createGroup(ownerPages, groupName, []);
       const createdLink = await generateGroupGuestsLink(ownerPages, groupName);
 
+      // Guest joins the conversation using the invitation link
       await guestPage.goto(createdLink.toString());
       await guestPages.conversationJoin().joinBrowserButton.click();
       await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
@@ -312,6 +316,7 @@ test.describe('Guestroom', () => {
         ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.fullName} joined`}),
       ).toBeVisible();
 
+      // Guest leaves the conversation
       await guestPages.conversation().toggleGroupInformation();
       await guestPages.conversation().leaveConversation();
       await guestModals.leaveConversation().clickConfirm();
@@ -342,8 +347,7 @@ test.describe('Guestroom', () => {
     },
   ].forEach(({description, tag, verify}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const ownerPage = await createPage(withLogin(userA));
-      const ownerPages = PageManager.from(ownerPage).webapp.pages;
+      const ownerPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(ownerPages, groupName, []);
       await ownerPages.conversationList().openConversation(groupName);
@@ -407,13 +411,13 @@ test.describe('Guestroom', () => {
     'I want to see Guests are present indicator if there are guests in the conversation',
     {tag: ['@TC-3338', '@regression']},
     async ({createPage}) => {
-      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(pages, groupName, []);
       const createdLink = await generateGroupGuestsLink(pages, groupName);
 
       await createPage(withGuestUser(createdLink, guestUser.firstName));
-      await expect(pages.conversation().guestsIndicator).toBeVisible({timeout: LOGIN_TIMEOUT});
+      await expect(pages.conversation().guestsIndicator).toBeVisible();
     },
   );
 
@@ -441,8 +445,7 @@ test.describe('Guestroom', () => {
         createPage(withLogin(guestUser)),
       ]);
 
-      const guestPageManager = PageManager.from(guestPage);
-      const guestPages = guestPageManager.webapp.pages;
+      const guestPages = PageManager.from(guestPage).webapp.pages;
       const pages = PageManager.from(userAPage).webapp.pages;
 
       // UserA creates a guest link for a conversation
@@ -469,7 +472,7 @@ test.describe('Guestroom', () => {
     'I want to see my time left in left column list, participant details and account settings',
     {tag: ['@TC-3363', '@regression']},
     async ({createPage}) => {
-      const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(pages, groupName, []);
       const createdLink = await generateGroupGuestsLink(pages, groupName);
@@ -477,9 +480,7 @@ test.describe('Guestroom', () => {
       const guestPage = await createPage(withGuestUser(createdLink, guestUser.firstName));
       const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
 
-      await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       await guestModals.confirm().actionButton.click();
-
       await expect(guestPage.locator('#temporary-guest')).toContainText('24h left in this guest room');
 
       await guestPages.conversation().sendMessage('Message from Guest');
@@ -499,8 +500,7 @@ test.describe('Guestroom', () => {
         createPage(withLogin(guestUser)),
       ]);
 
-      const guestPageManager = PageManager.from(guestPage);
-      const guestPages = guestPageManager.webapp.pages;
+      const guestPages = PageManager.from(guestPage).webapp.pages;
       const pages = PageManager.from(userAPage).webapp.pages;
 
       // UserA creates a guest link for a conversation
@@ -586,7 +586,7 @@ test.describe('Guestroom', () => {
   test(
     'I want to join guestroom invite with enterprise login',
     {tag: ['@TC-3477', '@regression']},
-    async ({context, createPage, api}) => {
+    async ({context, createPage}) => {
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage(context)]);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
@@ -602,6 +602,7 @@ test.describe('Guestroom', () => {
       await expect(guestPages.conversationJoin().enterpriseLoginButton).toBeVisible();
 
       await guestPages.conversationJoin().enterpriseLoginButton.click();
+      await expect(guestPages.singleSignOn().header).toBeVisible();
 
       const [idpPage] = await Promise.all([
         context.waitForEvent('page'),
