@@ -123,8 +123,8 @@ export const fileVersionItemWrapperCss: CSSObject = {
   borderRadius: '8px',
   ':hover': {
     backgroundColor: 'var(--gray-20)',
-    button: {
-      visibility: 'visible',
+    '& [data-version-actions="true"]': {
+      display: 'flex',
     },
   },
 };
@@ -151,6 +151,7 @@ export const versionDotOldCss: CSSObject = {
 
 export const versionInfoContainerCss: CSSObject = {
   flex: 1,
+  minWidth: 0,
 };
 
 export const versionTimeTextCss: CSSObject = {
@@ -163,21 +164,33 @@ export const versionMetaTextCss: CSSObject = {
   color: 'var(--gray-70)',
   marginTop: '4px',
   margin: 0,
+  display: 'flex',
+  alignItems: 'center',
+  minWidth: 0,
 };
 
 export const versionOwnerSpanCss: CSSObject = {
+  flexShrink: 1,
+  minWidth: 0,
   marginRight: '8px',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+};
+
+export const versionSizeSpanCss: CSSObject = {
+  flexShrink: 0,
 };
 
 // Action button styles
 export const versionActionsWrapperCss: CSSObject = {
-  display: 'flex',
+  display: 'none',
   gap: '8px',
   marginLeft: 'auto',
+  flexShrink: 0,
 };
 
 export const versionButtonCss: CSSObject = {
-  visibility: 'hidden',
   height: '32px',
   minHeight: 'auto',
   minWidth: 'auto',
