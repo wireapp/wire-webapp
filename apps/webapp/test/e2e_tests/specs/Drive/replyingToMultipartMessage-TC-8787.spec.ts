@@ -110,7 +110,8 @@ test(
       await userBComponents.inputBarControls().setMessageInput(replyMessageText);
       await userBComponents.inputBarControls().clickSendMessage();
 
-      expect(await userAPages.cellsConversation().isReplyMessageVisible(replyMessageText)).toBeTruthy();
+      const reply = userAPages.conversation().getMessage({content: replyMessageText});
+      await expect(reply).toBeVisible();
     });
   },
 );

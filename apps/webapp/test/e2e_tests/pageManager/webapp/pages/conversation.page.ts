@@ -330,17 +330,6 @@ export class ConversationPage {
     await audioPlayButton.click();
   }
 
-  async isReplyMessageVisible(replyText: string) {
-    const replyMessageLocator = this.page
-      .getByTestId('item-message')
-      .locator('.message-body.message-quoted .text', {hasText: replyText});
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await replyMessageLocator.first().waitFor({state: 'visible'});
-
-    return await replyMessageLocator.isVisible();
-  }
-
   async downloadFile(outputDir: string) {
     const downloadButton = this.page.getByTestId('item-message').getByTestId('file-asset');
 
