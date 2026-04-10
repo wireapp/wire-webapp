@@ -121,15 +121,15 @@ test(
     await test.step('User A sends audio file', async () => {
       const {pages, components} = userAPageManager.webapp;
       await components.inputBarControls().clickShareFile(audioFilePath);
-      expect(await pages.conversation().isAudioMessageVisible()).toBeTruthy();
+      await expect(pages.conversation().getMessage({sender: userA}).locator('audio')).toBeAttached();
     });
 
     await test.step('User B can play the audio file', async () => {
       const {pages} = userBPageManager.webapp;
+      await expect(pages.conversation().getMessage({sender: userA}).locator('audio')).toHaveJSProperty('paused', true);
+
       await pages.conversation().playAudio();
-      // Wait for 5 seconds to ensure audio starts playing
-      await userBPage.waitForTimeout(3000);
-      expect(await pages.conversation().isAudioPlaying()).toBeTruthy();
+      await expect(pages.conversation().getMessage({sender: userA}).locator('audio')).toHaveJSProperty('paused', false);
     });
 
     await test.step('User A sends a quick (10 sec) self deleting message', async () => {

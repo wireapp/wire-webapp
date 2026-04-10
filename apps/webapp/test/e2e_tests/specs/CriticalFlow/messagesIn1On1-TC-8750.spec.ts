@@ -118,8 +118,10 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
   });
   await test.step('User B can play the file', async () => {
     const {pages} = memberAPageManager.webapp;
+    await expect(pages.conversation().getMessage({sender: memberA}).locator('audio')).toHaveJSProperty('paused', true);
+
     await pages.conversation().playAudio();
-    await expect.poll(() => pages.conversation().isAudioPlaying()).toBeTruthy();
+    await expect(pages.conversation().getMessage({sender: memberA}).locator('audio')).toHaveJSProperty('paused', false);
   });
 
   // Step 6: Ephemeral messages

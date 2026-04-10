@@ -330,29 +330,6 @@ export class ConversationPage {
     await audioPlayButton.click();
   }
 
-  async isAudioPlaying() {
-    const audioTimeLocator = this.page
-      .getByTestId('item-message')
-      .getByTestId('audio-asset')
-      .getByTestId('status-audio-time');
-
-    const audioTimeText = (await audioTimeLocator.textContent())?.trim();
-    if (!audioTimeText) {
-      throw new Error('Audio time text is empty or undefined');
-    }
-    const seconds = parseInt(audioTimeText.split(':')[1], 10);
-    return seconds > 0;
-  }
-
-  async isAudioMessageVisible() {
-    const audioMessageLocator = this.page.getByTestId('item-message').getByTestId('audio-asset');
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await audioMessageLocator.first().waitFor({state: 'visible'});
-
-    return await audioMessageLocator.isVisible();
-  }
-
   async isFileMessageVisible() {
     const fileMessageLocator = this.page.getByTestId('item-message').getByTestId('file-asset');
 
