@@ -379,10 +379,6 @@ export class ConversationPage {
     await this.addMemberButton.click();
   }
 
-  async getTitle() {
-    return await this.conversationTitle.innerText();
-  }
-
   async sendPing() {
     await this.pingButton.click();
   }
