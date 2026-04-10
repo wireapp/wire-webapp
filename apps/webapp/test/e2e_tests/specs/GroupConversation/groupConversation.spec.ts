@@ -92,4 +92,37 @@ test.describe('Group Conversation', () => {
       await expect(userAPages.groupCreation().toggleSelectedListButton).toContainText('Selected (1)');
     },
   );
+
+  test(
+    'I want to delete a group as the Group Creator',
+    {tag: ['@TC-1089', '@TC-1090', '@TC-1090', '@regression']},
+    async ({createPage}) => {
+      const {pages, modals} = PageManager.from(
+        await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC)),
+      ).webapp;
+
+      await createGroup(pages, groupName, [userB, userC]);
+      const conversation = pages.conversationList().list.filter({hasText: groupName});
+
+      await pages.conversationList().openConversation(groupName);
+      await pages.conversation().clickConversationInfoButton();
+      await pages.conversationDetails().deleteGroupButton.click();
+
+      // User sees a confirmation dialog with explanation when he initiates delete group
+      await expect(modals.confirm().modalText).toContainText(
+        'This will delete the conversation and all content for all participants on all devices',
+      );
+
+      // User can cancel the delete group from the confirmation dialog
+      await modals.confirm().cancelButton.click();
+      await expect(conversation).toBeVisible();
+
+      // User can delete group as the group creator
+      await pages.conversationDetails().deleteGroupButton.click();
+      await modals.confirm().actionButton.click();
+
+      await conversation.waitFor({state: 'detached'});
+      await expect(conversation).not.toBeVisible();
+    },
+  );
 });
