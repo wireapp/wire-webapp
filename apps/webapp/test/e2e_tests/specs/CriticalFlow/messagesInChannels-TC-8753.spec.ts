@@ -71,7 +71,12 @@ test(
       await pages.conversationList().openConversation(channelName);
       await components.inputBarControls().clickShareImage(imageFilePath);
 
-      expect(await userBPageManager.webapp.pages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
+      await expect(
+        userBPageManager.webapp.pages
+          .conversation()
+          .getMessage({sender: userA})
+          .getByRole('button', {name: `Image from ${userA.fullName}`}),
+      ).toBeVisible();
     });
 
     await test.step('User B can open the image preview and see the image', async () => {

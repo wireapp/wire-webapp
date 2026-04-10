@@ -66,7 +66,12 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
     await pages.conversationList().openConversation(conversationName);
     await components.inputBarControls().clickShareImage(imageFilePath);
 
-    expect(await userBPageManager.webapp.pages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
+    await expect(
+        userBPageManager.webapp.pages
+          .conversation()
+          .getMessage({sender: userA})
+          .getByRole('button', {name: `Image from ${userA.fullName}`}),
+      ).toBeVisible();
   });
 
   await test.step('User B can open the image preview and see the image', async () => {

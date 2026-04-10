@@ -190,16 +190,6 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
-  async isImageFromUserVisible(user: User) {
-    // Trying multiple times for the image to appear
-    const locator = this.getImageLocator(user);
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await locator.first().waitFor({state: 'visible'});
-
-    return await locator.isVisible();
-  }
-
   async getImageScreenshot(user: User): Promise<Buffer> {
     const locator = this.getImageLocator(user);
 
