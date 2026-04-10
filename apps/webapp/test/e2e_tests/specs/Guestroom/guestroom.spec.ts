@@ -452,12 +452,14 @@ test.describe('Guestroom', () => {
       await createGroup(pages, groupName, []);
       const createdLink = await generateGroupGuestsLink(pages, groupName);
 
-      // Quest confirms that he was logged in before and can join the conversation directly
+      // Guest confirms that he was logged in before and can join the conversation directly
       await guestPage.goto(createdLink.toString());
       await guestPages.conversationJoin().joinBrowserButton.click();
       await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
-      // Sync domain with WEBAPP_URL using in test to ensure login cookies are sent.
+      // WORKAROUND: The 'Join in Browser' button currently redirects to Production.
+      // To maintain the existing logged-in session, we must force the invitation
+      // URL to use the same environment as our current test session.
       const envUrl = new URL(process.env.WEBAPP_URL);
       const invitationLink = new URL(guestPage.url());
 
@@ -481,7 +483,7 @@ test.describe('Guestroom', () => {
       const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
 
       await guestModals.confirm().actionButton.click();
-      await expect(guestPage.locator('#temporary-guest')).toContainText('24h left in this guest room');
+      await expect(guestPage.getByRole('complementary')).toContainText('24h left in this guest room');
 
       await guestPages.conversation().sendMessage('Message from Guest');
       const message = guestPages.conversation().getMessage({content: 'Message from Guest'});
@@ -507,12 +509,14 @@ test.describe('Guestroom', () => {
       await createGroup(pages, groupName, []);
       const createdLink = await generateGroupGuestsLink(pages, groupName);
 
-      // Quest confirms that he was logged in before and can join the conversation directly
+      // Guest confirms that he was logged in before and can join the conversation directly
       await guestPage.goto(createdLink.toString());
       await guestPages.conversationJoin().joinBrowserButton.click();
       await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
-      // Sync domain with WEBAPP_URL using in test to ensure login cookies are sent.
+      // WORKAROUND: The 'Join in Browser' button currently redirects to Production.
+      // To maintain the existing logged-in session, we must force the invitation
+      // URL to use the same environment as our current test session.
       const envUrl = new URL(process.env.WEBAPP_URL);
       const invitationLink = new URL(guestPage.url());
 
