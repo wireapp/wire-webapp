@@ -57,7 +57,7 @@ test(
     await test.step('Preconditions: Create group with drive enabled', async () => {
       await userAPages.conversationList().clickCreateGroup();
       // Files should be disabled by default
-      await expect(userAPages.groupCreation().filesCheckbox).toHaveAttribute('data-uie-value', 'unchecked');
+      await expect(userAPages.groupCreation().sharedDriveToggle).toHaveAttribute('data-uie-value', 'unchecked');
 
       await userAPages.groupCreation().enableFilesCheckbox();
       await userAPages.groupCreation().setGroupName(conversationName);
