@@ -163,7 +163,7 @@ test(
     await test.step('User A sends asset', async () => {
       const {pages, components} = userAPageManager.webapp;
       await components.inputBarControls().clickShareFile(textFilePath);
-      expect(await pages.conversation().isFileMessageVisible()).toBeTruthy();
+      await expect(pages.conversation().getMessage({sender: userA}).getByTestId('file-asset')).toBeVisible();
     });
 
     await test.step('User B can download the file', async () => {

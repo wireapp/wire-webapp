@@ -330,15 +330,6 @@ export class ConversationPage {
     await audioPlayButton.click();
   }
 
-  async isFileMessageVisible() {
-    const fileMessageLocator = this.page.getByTestId('item-message').getByTestId('file-asset');
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await fileMessageLocator.first().waitFor({state: 'visible'});
-
-    return await fileMessageLocator.isVisible();
-  }
-
   async isReplyMessageVisible(replyText: string) {
     const replyMessageLocator = this.page
       .getByTestId('item-message')
