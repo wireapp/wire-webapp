@@ -186,16 +186,6 @@ export class ConversationPage {
     await this.messageInput.press('Enter');
   }
 
-  async getImageScreenshot(user: User): Promise<Buffer> {
-    const locator = this.getImageLocator(user);
-
-    // Wait for the image to be visible
-    await locator.waitFor({state: 'visible'});
-
-    // Take a screenshot of the image
-    return await locator.screenshot();
-  }
-
   /**
    * Util to get a message in the conversation
    * @param options.content Only match messages containing this text

@@ -66,7 +66,12 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
 
     // Verify QR Code in the image
     const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
-    const imageScreenshot = await memberBPageManager.webapp.pages.conversation().getImageScreenshot(memberA);
+    const imageScreenshot = await memberBPageManager.webapp.pages
+      .conversation()
+      .getMessage()
+      .locator(`img[alt*="Image from ${memberA.fullName}"]`)
+      .screenshot();
+
     const screenshotQRCodeValue = await getQRCodeValueFromScreenshot(imageScreenshot);
     expect(screenshotQRCodeValue).toBe(localQRCodeValue);
   });
