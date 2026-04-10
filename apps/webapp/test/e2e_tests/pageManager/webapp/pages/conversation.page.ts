@@ -313,15 +313,6 @@ export class ConversationPage {
     return await plusOneReactionIcon.isVisible();
   }
 
-  async isVideoMessageVisible() {
-    const videoMessageLocator = this.page.getByTestId('item-message').getByTestId('video-asset');
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await videoMessageLocator.first().waitFor({state: 'visible'});
-
-    return await videoMessageLocator.isVisible();
-  }
-
   async playVideo() {
     const videoPlayButton = this.page
       .getByTestId('item-message')
@@ -329,20 +320,6 @@ export class ConversationPage {
       .getByTestId('do-play-media');
 
     await videoPlayButton.click();
-  }
-
-  async isVideoPlaying() {
-    const videoTimeLocator = this.page
-      .getByTestId('item-message')
-      .getByTestId('video-asset')
-      .getByTestId('status-video-time');
-
-    const videoTimeText = (await videoTimeLocator.textContent())?.trim();
-    if (!videoTimeText) {
-      throw new Error('Video time text is empty or undefined');
-    }
-    const seconds = parseInt(videoTimeText.split(':')[1]);
-    return seconds < 30;
   }
 
   async playAudio() {

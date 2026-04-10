@@ -103,15 +103,15 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
   await test.step('User A sends video message', async () => {
     const {pages, components} = userAPageManager.webapp;
     await components.inputBarControls().clickShareFile(videoFilePath);
-    expect(await pages.conversation().isVideoMessageVisible()).toBeTruthy();
+    await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toBeAttached();
   });
 
   await test.step('User B can play the received video', async () => {
     const {pages} = userBPageManager.webapp;
+    await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toHaveJSProperty('paused', true);
+
     await pages.conversation().playVideo();
-    // Wait for 5 seconds to ensure video starts playing
-    await userBPage.waitForTimeout(5000);
-    // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
+    await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toHaveJSProperty('paused', false);
   });
 
   await test.step('User A sends audio file', async () => {

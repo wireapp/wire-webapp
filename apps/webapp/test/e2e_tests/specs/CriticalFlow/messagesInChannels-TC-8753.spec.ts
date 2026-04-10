@@ -36,14 +36,9 @@ const textFilePath = getTextFilePath();
 test(
   'Messages in Channels',
   {tag: ['@TC-8753', '@crit-flow-web']},
-  async ({createUser, createTeam, createPage, api}, testInfo) => {
+  async ({createUser, createTeam, createPage}, testInfo) => {
     const userB = await createUser();
-    const {owner: userA} = await createTeam('Critical Team', {users: [userB]});
-
-    // TODO: Remove below line when we have a SQS workaround
-    await api.brig.enableMLSFeature(userA.teamId);
-    await api.brig.unlockChannelFeature(userA.teamId);
-    await api.brig.enableChannelsFeature(userA.teamId);
+    const {owner: userA} = await createTeam('Critical Team', {users: [userB], features: {channels: true}});
 
     const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
     const [userAPageManager, userBPageManager] = [PageManager.from(userAPage), PageManager.from(userBPage)];
@@ -84,9 +79,8 @@ test(
       // Click on the image to open it in a preview
       await pages.conversation().clickImage(userA);
       // Verify that the detail view modal is visible
-      await modals.detailViewModal().waitForVisibility();
-      expect(await modals.detailViewModal().isVisible()).toBeTruthy();
-      expect(await modals.detailViewModal().isImageVisible()).toBeTruthy();
+      await expect(modals.detailViewModal().mainWindow).toBeVisible();
+      await expect(modals.detailViewModal().image).toBeVisible();
     });
 
     await test.step('User B can download the image', async () => {
@@ -113,15 +107,15 @@ test(
     await test.step('User A sends video message', async () => {
       const {pages, components} = userAPageManager.webapp;
       await components.inputBarControls().clickShareFile(videoFilePath);
-      expect(await pages.conversation().isVideoMessageVisible()).toBeTruthy();
+      await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toBeAttached();
     });
 
     await test.step('User B can play the received video', async () => {
       const {pages} = userBPageManager.webapp;
+      await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toHaveJSProperty('paused', true);
+
       await pages.conversation().playVideo();
-      // Wait for 5 seconds to ensure video starts playing
-      await userBPage.waitForTimeout(5000);
-      // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
+      await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toHaveJSProperty('paused', false);
     });
 
     await test.step('User A sends audio file', async () => {
