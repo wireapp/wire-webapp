@@ -346,13 +346,6 @@ export class ConversationPage {
     await this.openGroupInformationViaName.click();
   }
 
-  async isUserGroupMember(name: string) {
-    return this.membersList
-      .getByTestId('item-user')
-      .and(this.page.locator(`[data-uie-value="${name}"]`))
-      .isVisible();
-  }
-
   async isUserGroupAdmin(name: string) {
     await this.adminsList
       .getByTestId('item-user')
