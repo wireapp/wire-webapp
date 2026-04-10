@@ -148,6 +148,10 @@ const GroupCreationModal = ({
   const rootContext = useContext(RootContext);
 
   useEffect(() => {
+    console.log(`accessState changed to ${accessState}`);
+  }, [accessState]);
+
+  useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
       setEnableReadReceipts(isTeam);
       setIsShown(true);
@@ -235,7 +239,9 @@ const GroupCreationModal = ({
     setParticipantsInput('');
     setSelectedContacts([]);
     setGroupCreationState(GroupCreationModalState.DEFAULT);
-    setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+
+    // TODO: THIS IS THE PROBLEM! ACCESS STATE IS ONLY REFRESHED WHEN THE DIALOG IS CLOSED --.--
+    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
   const clickOnCreate = async (
@@ -256,6 +262,7 @@ const GroupCreationModal = ({
           },
         );
 
+        console.log(`created conversation ${JSON.stringify(conversation)}`);
         setCurrentSidebarTab(SidebarTabs.RECENT);
 
         if (isKeyboardEvent(event)) {
