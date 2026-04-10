@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,11 @@
  *
  */
 
-.service-options {
-  &__content {
-    display: flex;
-    flex-direction: column;
-    padding: 32px 16px;
-    gap: 24px;
-  }
-}
+import {CSSObject} from '@emotion/react';
+
+export const serviceOptionContainer: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '32px 16px',
+  gap: '24px',
+};

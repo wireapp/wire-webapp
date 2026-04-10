@@ -27,6 +27,8 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {t} from 'Util/localizerUtil';
 
+import {serviceOptionContainer} from './serviceOptions.styles';
+
 interface ServicesOptionsProps {
   activeConversation: Conversation;
   toggleAccessState: (accessType: number, text: string, hasService: boolean) => void;
@@ -66,7 +68,7 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
   };
 
   return (
-    <div className="service-options__content">
+    <div css={serviceOptionContainer}>
       {displayAppsToggle ? (
         <BaseToggle
           isChecked={isServicesEnabled}
