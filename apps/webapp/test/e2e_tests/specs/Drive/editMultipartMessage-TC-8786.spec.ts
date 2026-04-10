@@ -70,8 +70,8 @@ test(
     });
 
     await test.step('User A edits text part of the multipart message', async () => {
-      const message = userAPages.cellsConversation().getMessage({sender: userA});
-      await userAPages.cellsConversation().editMessage(message);
+      const message = userAPages.conversation().getMessage({sender: userA});
+      await userAPages.conversation().editMessage(message);
       await userAComponents.inputBarControls().setMessageInput(editedMessageText);
       await userAComponents.inputBarControls().clickSendMessage();
 
