@@ -97,16 +97,20 @@ test(
       await userAComponents.inputBarControls().setMessageInput(initialMessageText);
       await userAComponents.inputBarControls().clickSendMessage();
 
-      expect(await userBPages.cellsConversation().isMultipartMessageVisible(userA, initialMessageText)).toBeTruthy();
+      const message = userBPages.conversation().getMessage({sender: userA});
+      await expect(message).toContainText(initialMessageText);
+      await expect(message.getByRole('button', {name: `Image from ${userA.fullName}`})).toBeVisible();
     });
 
     await test.step('User A edits text part of the multipart message', async () => {
-      const message = userAPages.cellsConversation().getMessage({sender: userA});
-      await userAPages.cellsConversation().editMessage(message);
+      const message = userAPages.conversation().getMessage({sender: userA});
+      await userAPages.conversation().editMessage(message);
       await userAComponents.inputBarControls().setMessageInput(editedMessageText);
       await userAComponents.inputBarControls().clickSendMessage();
 
-      expect(await userBPages.cellsConversation().isMultipartMessageVisible(userA, editedMessageText)).toBeTruthy();
+      const userBMessage = userBPages.conversation().getMessage({sender: userA});
+      await expect(userBMessage).toContainText(editedMessageText);
+      await expect(userBMessage.getByRole('button', {name: `Image from ${userA.fullName}`})).toBeVisible();
     });
   },
 );

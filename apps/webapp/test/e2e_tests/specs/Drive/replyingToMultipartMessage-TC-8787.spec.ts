@@ -97,7 +97,9 @@ test(
       await userAComponents.inputBarControls().setMessageInput(initialMessageText);
       await userAComponents.inputBarControls().clickSendMessage();
 
-      expect(await userBPages.cellsConversation().isMultipartMessageVisible(userA, initialMessageText)).toBeTruthy();
+      const message = userBPages.conversation().getMessage({sender: userA});
+      await expect(message).toContainText(initialMessageText);
+      await expect(message.getByRole('button', {name: `Image from ${userA.fullName}`})).toBeVisible();
     });
 
     await test.step('User B replies to a multipart message', async () => {
