@@ -342,14 +342,6 @@ export class ConversationPage {
     await startCallButton.click();
   }
 
-  async isConversationReadonly() {
-    await this.messageInput.waitFor({state: 'detached'});
-  }
-
-  async isMessageInputVisible() {
-    return await this.messageInput.isVisible();
-  }
-
   async toggleGroupInformation() {
     await this.openGroupInformationViaName.click();
   }
