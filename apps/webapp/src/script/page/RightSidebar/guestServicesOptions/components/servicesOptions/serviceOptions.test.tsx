@@ -38,7 +38,7 @@ describe('serviceOptions', () => {
     // PROTEUS
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
-      isAppsEnabled: false,
+      isAppsEnabled: true,
       hasWhitelistedServices: false,
       isServicesRoom: false,
       isGuestAndServicesRoom: false,
