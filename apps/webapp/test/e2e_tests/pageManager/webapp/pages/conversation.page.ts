@@ -342,11 +342,6 @@ export class ConversationPage {
     await startCallButton.click();
   }
 
-  async isSystemMessageVisible(messageText: string) {
-    await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible'});
-    return true;
-  }
-
   async isConversationReadonly() {
     await this.messageInput.waitFor({state: 'detached'});
   }

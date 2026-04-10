@@ -183,7 +183,9 @@ test(
       await pages.conversation().removeMemberFromGroup(member2.fullName);
 
       // Verify member is no longer in the conversation by checking system message
-      expect(await pages.conversation().isSystemMessageVisible(`You removed ${member2.fullName}`)).toBeTruthy();
+      await expect(
+        pages.conversation().systemMessages.filter({hasText: `You removed ${member2.fullName}`}),
+      ).toBeVisible();
     });
 
     await test.step('Team owner removes a service from a group', async () => {
@@ -192,7 +194,7 @@ test(
       await pages.conversationDetails().removeServiceFromConversation('Poll');
 
       // Verify service was removed by checking for system message
-      expect(await pages.conversation().isSystemMessageVisible('You removed Poll Bot')).toBeTruthy();
+      await expect(pages.conversation().systemMessages.filter({hasText: 'You removed Poll Bot'})).toBeVisible();
     });
   },
 );
