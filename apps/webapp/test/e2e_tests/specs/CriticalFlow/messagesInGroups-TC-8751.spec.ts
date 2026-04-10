@@ -55,7 +55,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
 
   await test.step('User B should receive mention', async () => {
     const {pages} = userBPageManager.webapp;
-    expect(await pages.conversationList().doesConversationHasMentionIndicator(conversationName)).toBeTruthy();
+    await expect(pages.conversationList().getConversationLocator(conversationName).mentionIndicator).toBeVisible();
 
     await pages.conversationList().openConversation(conversationName);
     await expect(pages.conversation().getMessage({content: `@${userB.fullName} ${messageText}`})).toBeVisible();
