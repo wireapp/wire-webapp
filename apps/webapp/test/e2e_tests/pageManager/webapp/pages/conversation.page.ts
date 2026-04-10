@@ -300,19 +300,6 @@ export class ConversationPage {
     await locator.click();
   }
 
-  async isPlusOneReactionVisible() {
-    const plusOneReactionIcon = this.page
-      .getByTestId('item-message')
-      .getByTestId('message-reactions')
-      .getByTestId('emoji-pill')
-      .and(this.page.locator('button[aria-label="1 reaction, react with +1 emoji"]'));
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await plusOneReactionIcon.first().waitFor({state: 'visible'});
-
-    return await plusOneReactionIcon.isVisible();
-  }
-
   async playVideo() {
     const videoPlayButton = this.page
       .getByTestId('item-message')

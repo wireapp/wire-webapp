@@ -96,12 +96,16 @@ test(
       const {pages, modals} = userBPageManager.webapp;
       await modals.detailViewModal().givePlusOneReaction();
       await modals.detailViewModal().closeModal();
-      expect(await pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+
+      const message = pages.conversation().getMessage({sender: userA});
+      await expect(pages.conversation().getReactionOnMessage(message, 'plus-one')).toBeVisible();
     });
 
     await test.step('User A can see the reaction', async () => {
       const {pages} = userAPageManager.webapp;
-      expect(await pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+
+      const message = pages.conversation().getMessage({sender: userA});
+      await expect(pages.conversation().getReactionOnMessage(message, 'plus-one')).toBeVisible();
     });
 
     await test.step('User A sends video message', async () => {
