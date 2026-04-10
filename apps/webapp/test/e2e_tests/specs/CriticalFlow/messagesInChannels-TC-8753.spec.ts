@@ -65,7 +65,7 @@ test(
 
     await test.step('User B should receive mention', async () => {
       const {pages} = userBPageManager.webapp;
-      expect(await pages.conversationList().doesConversationHasMentionIndicator(channelName)).toBeTruthy();
+      await expect(pages.conversationList().getConversationLocator(channelName).mentionIndicator).toBeVisible();
 
       await pages.conversationList().openConversation(channelName);
       await expect(pages.conversation().getMessage({content: `@${userB.fullName} ${messageText}`})).toBeVisible();
