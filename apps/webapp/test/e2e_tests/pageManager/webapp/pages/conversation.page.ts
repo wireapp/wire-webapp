@@ -117,10 +117,6 @@ export class ConversationPage {
       .and(this.page.locator(`[alt^="${this.getImageAltText(user)}"]`));
   }
 
-  async isConversationOpen(conversationName: string) {
-    return (await this.page.getByTestId('status-conversation-title-bar-label').textContent()) === conversationName;
-  }
-
   async clickConversationTitle() {
     await this.conversationTitle.click();
   }
