@@ -21882,14 +21882,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nock@npm:14.0.11":
-  version: 14.0.11
-  resolution: "nock@npm:14.0.11"
+"nock@npm:14.0.12":
+  version: 14.0.12
+  resolution: "nock@npm:14.0.12"
   dependencies:
     "@mswjs/interceptors": "npm:^0.41.0"
     json-stringify-safe: "npm:^5.0.1"
     propagate: "npm:^2.0.0"
-  checksum: 10/2fc579f3bee5148ebfacdfc7588a1f45205b139dcc6e32a5bef436f74f479383c7445a9812f433908600f62a0e142ff4bbbe7da7d5e9ed1781bad278b792cf98
+  checksum: 10/1258e62f50c8c5fcae30f4de87d5e0049c5b957cb8d4d62e4d9ee964b4e39a6e2c8554a0173e8cdd60815aa457ddcaa46f7af1dd0772724d6764398e6c66e276
   languageName: node
   linkType: hard
 
@@ -29048,7 +29048,7 @@ __metadata:
     jsdom: "npm:25.0.1"
     logdown: "npm:3.3.1"
     long: "npm:5.3.2"
-    nock: "npm:14.0.11"
+    nock: "npm:14.0.12"
     nx: "npm:22.6.1"
     playwright: "npm:1.59.1"
     prettier: "npm:3.8.1"
