@@ -317,7 +317,7 @@ jobs:
           environment-name: ${{ matrix.target }}
           version-label: ${{ github.run_id }}-${{ matrix.target }}
           deployment-package-path: ${{ needs.build.outputs.build_artifact }}
-          wait-for-deployment: false
+          wait-for-deployment: true
           wait-for-environment-recovery: true
           deployment-timeout: 150
           use-existing-application-version-if-available: true

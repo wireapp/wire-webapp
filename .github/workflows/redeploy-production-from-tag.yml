@@ -134,7 +134,7 @@ jobs:
           environment-name: wire-webapp-prod
           version-label: ${{ github.run_id }}-wire-webapp-prod-redeploy
           deployment-package-path: ebs.zip
-          wait-for-deployment: false
+          wait-for-deployment: true
           wait-for-environment-recovery: true
           deployment-timeout: 150
           use-existing-application-version-if-available: true
