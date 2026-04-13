@@ -148,10 +148,6 @@ const GroupCreationModal = ({
   const rootContext = useContext(RootContext);
 
   useEffect(() => {
-    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
-  }, [isShown, isAppsFeatureAvailable]);
-
-  useEffect(() => {
     const showCreateGroup = (_: string, userEntity: User) => {
       setEnableReadReceipts(isTeam);
       setIsShown(true);
@@ -231,6 +227,10 @@ const GroupCreationModal = ({
 
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
+
+  const onOpen = () => {
+    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
+  };
 
   const onClose = () => {
     setIsCreatingConversation(false);
@@ -379,6 +379,7 @@ const GroupCreationModal = ({
       className="group-creation__modal"
       wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
       isShown={isShown}
+      onOpened={onOpen}
       onClosed={onClose}
       data-uie-name="group-creation-label"
       onKeyDown={stateIsPreferences ? handleEscape : undefined}
