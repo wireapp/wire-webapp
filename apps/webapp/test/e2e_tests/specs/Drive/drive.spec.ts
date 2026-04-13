@@ -24,6 +24,24 @@ import {getVideoFilePath, VideoFileName} from 'test/e2e_tests/utils/asset.util';
 
 import {test, expect, withLogin, withConnectedUser} from '../../test.fixtures';
 import {createGroup} from '../../utils/userActions';
+import {ConversationPage} from '../../pageManager/webapp/pages/conversation.page';
+import {Locator} from '@playwright/test';
+
+const getMultipartAssetRoot = (conversation: ConversationPage, user: User): Locator => {
+  return conversation.messageItems.getByLabel(new RegExp(`^Image from ${user.fullName}`));
+}
+
+const getImageInMultipartMessageLocator = (conversation: ConversationPage, user: User): Locator => {
+  return getMultipartAssetRoot(conversation, user).getByRole('img');
+}
+
+const getVideoInMultipartMessageLocator = (conversation: ConversationPage, user: User): Locator => {
+  return getMultipartAssetRoot(conversation, user).locator('video');
+}
+
+const getCellsImageLocator = (conversation: ConversationPage, user: User): Locator => {
+  return conversation.messageItems.getByRole('button', {name: new RegExp(`^Image from ${user.fullName}`)});
+};
 
 test.describe('Conversations', () => {
   // User A is a team owner, User B is a team member
@@ -67,11 +85,11 @@ test.describe('Conversations', () => {
         await userAComponents.inputBarControls().clickShareFile(imageFilePath);
         await userAComponents.inputBarControls().clickSendMessage();
 
-        await expect(userBPages.conversation().getCellsImageLocator(userA)).toBeVisible();
+        await expect(getCellsImageLocator(userBPages.conversation(), userA)).toBeVisible();
       });
 
       await test.step('User B opens the image in the conversation', async () => {
-        await userBPages.conversation().getCellsImageLocator(userA).click();
+        await getCellsImageLocator(userBPages.conversation(), userA).click();
 
         await expect(userBModals.cellsFileDetailView().image).toBeVisible();
       });
@@ -196,8 +214,8 @@ test.describe('Conversations', () => {
         await userAComponents.inputBarControls().clickSendMessage();
         await userBPages.conversationList().openConversation(conversationName);
 
-        await expect(userBPages.conversation().getImageInMultipartMessageLocator(userA)).toBeVisible();
-        await expect(userBPages.conversation().getVideoInMultipartMessageLocator(userA)).toBeVisible();
+        await expect(getImageInMultipartMessageLocator(userBPages.conversation(), userA)).toBeVisible();
+        await expect(getVideoInMultipartMessageLocator(userBPages.conversation(), userA)).toBeVisible();
       });
 
       await test.step('User B opens Files tab and searches for a file', async () => {

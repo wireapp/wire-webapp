@@ -356,22 +356,4 @@ export class ConversationPage {
   getPing(): Locator {
     return this.messageItems.getByTestId('element-message-ping');
   }
-
-  // ----------------------------------------------------
-  // helper functions for conversation with cells enabled
-  // ----------------------------------------------------
-
-  public getImageInMultipartMessageLocator(user: User): Locator {
-    return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).getByRole('img');
-  }
-
-  public getVideoInMultipartMessageLocator(user: User): Locator {
-    return this.page.getByLabel(new RegExp(`^Image from ${user.fullName}`)).locator('video');
-  }
-
-  public getCellsImageLocator(user: User): Locator {
-    return this.page
-      .getByTestId('item-message')
-      .getByRole('button', {name: new RegExp(`^Image from ${user.fullName}`)});
-  }
 }
