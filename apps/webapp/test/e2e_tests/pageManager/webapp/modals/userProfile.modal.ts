@@ -24,12 +24,39 @@ export class UserProfileModal {
   readonly connectButton: Locator;
   readonly startConversationButton: Locator;
   readonly unblockButton: Locator;
+  readonly blockButton: Locator;
+  readonly openConversationButton: Locator;
+  readonly guestChip: Locator;
+  readonly connectWarning: Locator;
+  readonly participantFullname: Locator;
+  readonly participantUsername: Locator;
+  readonly userEmailLabel: Locator;
+  readonly userEmailEntry: Locator;
+  readonly domainLabel: Locator;
+  readonly cancelButton: Locator;
+  readonly modalCloseButton: Locator;
 
   constructor(page: Page) {
     this.modal = page.getByTestId('modal-user-profile');
     this.connectButton = page.getByTestId('modal-user-profile').getByTestId('do-send-request');
     this.startConversationButton = page.getByTestId('modal-user-profile').getByTestId('start-conversation');
     this.unblockButton = page.getByTestId('modal-user-profile').getByTestId('do-unblock');
+    this.blockButton = page.getByRole('button', {name: 'Block...'});
+    this.openConversationButton = this.modal.getByRole('button', {name: 'Open conversation'}).getByTestId('go-conversation');
+    this.guestChip = page.getByTestId('status-guest');
+    this.connectWarning = page.getByText(/Get certainty about .*’s identity before connecting/);
+    this.participantFullname = this.modal.getByTestId('status-label');
+    this.participantUsername = this.modal.getByTestId('status-username');
+
+    const emailContainer = page.locator('.enriched-fields__entry').filter({
+      has: page.locator('[data-uie-name="item-enriched-key"]', {hasText: 'Email'}),
+    });
+    this.userEmailLabel = emailContainer.getByRole('paragraph').getByText('Email');
+    this.userEmailEntry = emailContainer.getByTestId('item-enriched-value');
+
+    this.domainLabel = page.getByRole('paragraph').getByText('Domain');
+    this.cancelButton = this.modal.getByRole('button', {name: 'Cancel', exact: true});
+    this.modalCloseButton = this.modal.getByTestId('do-close');
   }
 
   async isVisible() {
