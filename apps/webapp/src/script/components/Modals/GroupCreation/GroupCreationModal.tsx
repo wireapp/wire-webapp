@@ -239,7 +239,6 @@ const GroupCreationModal = ({
     setParticipantsInput('');
     setSelectedContacts([]);
     setGroupCreationState(GroupCreationModalState.DEFAULT);
-
     setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
