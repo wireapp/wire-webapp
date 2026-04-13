@@ -24,7 +24,8 @@ const MODE_BLUR = 'blur' as const;
 const MODE_VIRTUAL = 'virtual' as const;
 
 const TARGET_FPS = 30;
-const BUDGET_MS = 1000 / TARGET_FPS;
+const PERFORMANCE_THRESHOLD = 1000;
+const BUDGET_MS = PERFORMANCE_THRESHOLD / TARGET_FPS;
 const DOWNGRADE_THRESHOLD_MS = BUDGET_MS * DEFAULT_TUNING.downgradeThresholdRatio;
 const HYSTERESIS_FRAMES = DEFAULT_TUNING.hysteresisFrames;
 const DOWNGRADE_MIN_SAMPLES = DEFAULT_TUNING.maxSamples * DEFAULT_TUNING.downgradeWarmupWindows;
@@ -59,7 +60,7 @@ describe('QualityController', () => {
 
     // first downgrade
     let guard = 0;
-    while (params.tier === 'superhigh' && guard++ < 1000) {
+    while (params.tier === 'superhigh' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(gpuBoundSample, MODE_BLUR);
     }
 
@@ -67,14 +68,14 @@ describe('QualityController', () => {
 
     // next downgrade
     guard = 0;
-    while (params.tier === 'high' && guard++ < 1000) {
+    while (params.tier === 'high' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(gpuBoundSample, MODE_BLUR);
     }
 
     expect(params.tier).toBe('low');
 
     guard = 0;
-    while (guard++ < 1000) {
+    while (guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(gpuBoundSample, MODE_BLUR);
     }
     expect(params.tier).toBe('low');
@@ -144,10 +145,10 @@ describe('QualityController', () => {
 
     // Trigger downgrade with CPU-bound samples (superhigh -> high)
     let guard = 0;
-    while (params.tier === 'superhigh' && guard++ < 1000) {
+    while (params.tier === 'superhigh' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
-    expect(guard).toBeLessThan(1000);
+    expect(guard).toBeLessThan(PERFORMANCE_THRESHOLD);
     expect(params.tier).toBe('high');
 
     // Provide fast samples immediately after downgrade
@@ -215,12 +216,12 @@ describe('QualityController', () => {
     // Balanced sample: neither CPU nor GPU dominates (>55%)
     let params = controller.getTier(MODE_BLUR);
     let guard = 0;
-    while (params.tier === 'superhigh' && guard++ < 1000) {
+    while (params.tier === 'superhigh' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(balancedSample, MODE_BLUR);
     }
     // Should step down normally (superhigh -> high) for balanced workloads
     expect(params?.tier).toBe('high');
-    expect(guard).toBeLessThan(1000);
+    expect(guard).toBeLessThan(PERFORMANCE_THRESHOLD);
   });
 
   it('manually sets tier and resets counters', () => {
@@ -240,35 +241,35 @@ describe('QualityController', () => {
 
     // superhigh -> high
     let guard = 0;
-    while (params.tier === 'superhigh' && guard++ < 1000) {
+    while (params.tier === 'superhigh' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('high');
 
     // high -> medium (CPU-bound downgrade)
     guard = 0;
-    while (params.tier === 'high' && guard++ < 1000) {
+    while (params.tier === 'high' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
     expect(params.tier).toBe('medium');
 
     // medium -> low (further downgrade)
     guard = 0;
-    while (params.tier === 'medium' && guard++ < 1000) {
+    while (params.tier === 'medium' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(slowSample, MODE_BLUR);
     }
     expect(params?.tier).toBe('low');
 
     // low must remain low, never bypass
     guard = 0;
-    while (params.tier === 'low' && guard++ < 1000) {
+    while (params.tier === 'low' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(slowSample, MODE_BLUR);
     }
     expect(params.tier).toBe('low');
 
     // low -> medium (upgrade path still works)
     guard = 0;
-    while (params.tier === 'low' && guard++ < 1000) {
+    while (params.tier === 'low' && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     expect(params.tier).toBe('medium');
@@ -292,7 +293,7 @@ describe('QualityController', () => {
 
   it('handles boundary conditions at thresholds', () => {
     const controller = new QualityController(TARGET_FPS);
-    const budget = 1000 / TARGET_FPS;
+    const budget = PERFORMANCE_THRESHOLD / TARGET_FPS;
     const upgradeThreshold = budget * DEFAULT_TUNING.upgradeThresholdRatio;
     const justAboveUpgrade = upgradeThreshold + 0.5;
     const clearlyBelowUpgrade = upgradeThreshold - 5;
@@ -320,7 +321,7 @@ describe('QualityController', () => {
 
     let params = controller.getTier(MODE_BLUR);
 
-    for (let i = 0; i < 1000; i += 1) {
+    for (let i = 0; i < PERFORMANCE_THRESHOLD; i += 1) {
       params = controller.update(slowSample, MODE_BLUR);
     }
 
