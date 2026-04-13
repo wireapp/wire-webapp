@@ -179,7 +179,7 @@ jobs:
         continue-on-error: true
         uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
         with:
           status: ${{ job.status }}
           text: |
@@ -192,7 +192,7 @@ jobs:
         continue-on-error: true
         uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
         with:
           status: ${{ job.status }}
           text: |
