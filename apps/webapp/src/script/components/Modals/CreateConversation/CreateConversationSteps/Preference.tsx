@@ -17,6 +17,8 @@
  *
  */
 
+import {useEffect} from 'react';
+
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
@@ -70,6 +72,12 @@ export const Preference = () => {
     isAppsEnabled,
     hasWhitelistedServices,
   });
+
+  useEffect(() => {
+    if (!isAppsFeatureAvailable && isServicesEnabled) {
+      setIsServicesEnabled(false);
+    }
+  }, [isAppsFeatureAvailable, isServicesEnabled, setIsServicesEnabled]);
 
   return (
     <>
