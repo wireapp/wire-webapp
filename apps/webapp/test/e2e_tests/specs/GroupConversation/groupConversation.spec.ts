@@ -125,4 +125,44 @@ test.describe('Group Conversation', () => {
       await expect(conversation).not.toBeVisible();
     },
   );
+
+  test(
+    'I want to be notified about the group deletion when app is in background',
+    {tag: ['@TC-1093', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+
+      await createGroup(userAPages, groupName, [userB]);
+
+      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
+
+      const blankTab = await userBPage.context().newPage();
+      await blankTab.goto('about:blank');
+      await blankTab.bringToFront();
+
+      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversation().clickConversationInfoButton();
+      await userAPages.conversationDetails().deleteGroupButton.click();
+      await userAModals.confirm().actionButton.click();
+      await userAPages.conversationList().list.filter({hasText: groupName}).waitFor({state: 'detached'});
+
+      await expect
+        .poll(() => getUserBNotifications())
+        .toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              body: `${groupName} has been deleted`,
+              data: expect.objectContaining({
+                messageType: 'team.delete',
+              }),
+            }),
+          ]),
+        );
+    },
+  );
 });
