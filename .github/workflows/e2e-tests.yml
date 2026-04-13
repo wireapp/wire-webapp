@@ -62,8 +62,7 @@ on:
 jobs:
   test:
     name: Run E2E Tests
-    if: github.repository == 'wireapp/wire-webapp'
-    runs-on: [self-hosted, Linux, X64, office]
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
