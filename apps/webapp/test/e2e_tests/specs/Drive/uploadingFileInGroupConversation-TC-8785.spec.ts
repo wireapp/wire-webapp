@@ -52,7 +52,7 @@ test(
     const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
 
     await test.step('Preconditions: Both users log in and open the group', async () => {
-      await createGroup(userAPages, conversationName, [userB], true)
+      await createGroup(userAPages, conversationName, [userB], {cells: true});
     });
 
     await test.step('User A sends an image to User B in a group conversation', async () => {

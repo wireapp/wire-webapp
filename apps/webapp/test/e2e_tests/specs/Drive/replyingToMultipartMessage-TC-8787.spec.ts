@@ -53,7 +53,7 @@ test(
     const {pages: userBPages, components: userBComponents} = userBPageManager.webapp;
 
     await test.step('Preconditions: Create group with drive enabled', async () => {
-      await createGroup(userAPages, conversationName, [userB], true);
+      await createGroup(userAPages, conversationName, [userB], {cells: true});
     });
 
     await test.step('User A sends a multipart message to User B in a group conversation', async () => {
