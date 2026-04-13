@@ -49,6 +49,8 @@ on:
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN:
         required: true
+      WIRE_E2E_TEST_BOT_WEBHOOK_URL:
+        required: true
     outputs:
       reportArtifactId:
         description: ID of the playwright report artifact
@@ -60,7 +62,8 @@ on:
 jobs:
   test:
     name: Run E2E Tests
-    runs-on: ubuntu-latest
+    if: github.repository == 'wireapp/wire-webapp'
+    runs-on: [self-hosted, Linux, X64, office]
 
     strategy:
       fail-fast: false
