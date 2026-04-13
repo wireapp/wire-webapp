@@ -44,7 +44,7 @@ test.beforeEach(async ({createTeam, createUser}) => {
 test(
   'Edit multipart message in a group conversation',
   {tag: ['@crit-flow-cells', '@regression', '@TC-8786']},
-  async ({createPage, api}) => {
+  async ({createPage}) => {
     const [userAPageManager, userBPageManager] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
       PageManager.from(createPage(withLogin(userB))),
