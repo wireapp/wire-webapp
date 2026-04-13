@@ -66,7 +66,12 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
     await pages.conversationList().openConversation(conversationName);
     await components.inputBarControls().clickShareImage(imageFilePath);
 
-    expect(await userBPageManager.webapp.pages.conversation().isImageFromUserVisible(userA)).toBeTruthy();
+    await expect(
+        userBPageManager.webapp.pages
+          .conversation()
+          .getMessage({sender: userA})
+          .getByRole('button', {name: `Image from ${userA.fullName}`}),
+      ).toBeVisible();
   });
 
   await test.step('User B can open the image preview and see the image', async () => {
@@ -92,40 +97,43 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
     const {pages, modals} = userBPageManager.webapp;
     await modals.detailViewModal().givePlusOneReaction();
     await modals.detailViewModal().closeModal();
-    expect(await pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+
+    const message = pages.conversation().getMessage({sender: userA});
+      await expect(pages.conversation().getReactionOnMessage(message, 'plus-one')).toBeVisible();
   });
 
   await test.step('User A can see the reaction', async () => {
     const {pages} = userAPageManager.webapp;
-    expect(await pages.conversation().isPlusOneReactionVisible()).toBeTruthy();
+    const message = pages.conversation().getMessage({sender: userA});
+      await expect(pages.conversation().getReactionOnMessage(message, 'plus-one')).toBeVisible();
   });
 
   await test.step('User A sends video message', async () => {
     const {pages, components} = userAPageManager.webapp;
     await components.inputBarControls().clickShareFile(videoFilePath);
-    expect(await pages.conversation().isVideoMessageVisible()).toBeTruthy();
+    await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toBeAttached();
   });
 
   await test.step('User B can play the received video', async () => {
     const {pages} = userBPageManager.webapp;
+    await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toHaveJSProperty('paused', true);
+
     await pages.conversation().playVideo();
-    // Wait for 5 seconds to ensure video starts playing
-    await userBPage.waitForTimeout(5000);
-    // ToDO: Bug -> Video is not loaded from the server, so we cannot check if it is playing
+    await expect(pages.conversation().getMessage({sender: userA}).locator('video')).toHaveJSProperty('paused', false);
   });
 
   await test.step('User A sends audio file', async () => {
     const {pages, components} = userAPageManager.webapp;
     await components.inputBarControls().clickShareFile(audioFilePath);
-    expect(await pages.conversation().isAudioMessageVisible()).toBeTruthy();
+    await expect(pages.conversation().getMessage({sender: userA}).locator("audio")).toBeAttached()
   });
 
   await test.step('User B can play the audio file', async () => {
     const {pages} = userBPageManager.webapp;
+    await expect(pages.conversation().getMessage({sender: userA}).locator('audio')).toHaveJSProperty('paused', true);
+
     await pages.conversation().playAudio();
-    // Wait for 3 seconds to ensure audio starts playing
-    await userBPage.waitForTimeout(3000);
-    expect(await pages.conversation().isAudioPlaying()).toBeTruthy();
+    await expect(pages.conversation().getMessage({sender: userA}).locator('audio')).toHaveJSProperty('paused', false);
   });
   await test.step('User A sends a quick (10 sec) self deleting message', async () => {
     const {pages} = userAPageManager.webapp;
@@ -158,7 +166,7 @@ test('Messages in Groups', {tag: ['@TC-8751', '@crit-flow-web']}, async ({create
   await test.step('User A sends asset', async () => {
     const {pages, components} = userAPageManager.webapp;
     await components.inputBarControls().clickShareFile(textFilePath);
-    expect(await pages.conversation().isFileMessageVisible()).toBeTruthy();
+    await expect(pages.conversation().getMessage({sender: userA}).getByTestId('file-asset')).toBeVisible();
   });
 
   await test.step('User B can download the file', async () => {

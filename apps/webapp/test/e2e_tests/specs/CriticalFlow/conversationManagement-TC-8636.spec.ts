@@ -101,7 +101,6 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
     await pages.conversationList().leaveConversation();
     await modals.leaveConversation().toggleCheckbox();
     await modals.leaveConversation().clickConfirm();
-    await pages.conversation().isConversationReadonly();
-    expect(await pages.conversation().isMessageInputVisible()).toBeFalsy();
+    await expect(pages.conversation().messageInput).not.toBeAttached();
   });
 });
