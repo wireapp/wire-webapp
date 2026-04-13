@@ -53,7 +53,7 @@ describe('QualityController', () => {
     expect(params?.tier).toBe('high');
   });
 
-  it('downgrades GPU-bound workloads more aggressively', () => {
+  it('downgrades GPU-bound workloads more aggressively without entering bypass', () => {
     const controller = new QualityController(TARGET_FPS);
     let params = controller.getTier(MODE_BLUR);
 
@@ -71,6 +71,12 @@ describe('QualityController', () => {
       params = controller.update(gpuBoundSample, MODE_BLUR);
     }
 
+    expect(params.tier).toBe('low');
+
+    guard = 0;
+    while (guard++ < 1000) {
+      params = controller.update(gpuBoundSample, MODE_BLUR);
+    }
     expect(params.tier).toBe('low');
   });
 
@@ -228,7 +234,7 @@ describe('QualityController', () => {
     expect(controller.getTier(MODE_BLUR).tier).toBe('high');
   });
 
-  it('handles multiple tier transitions', () => {
+  it('handles multiple tier transitions without auto-downgrading to bypass', () => {
     const controller = new QualityController(TARGET_FPS);
     let params = controller.getTier(MODE_BLUR);
 
@@ -253,19 +259,19 @@ describe('QualityController', () => {
     }
     expect(params?.tier).toBe('low');
 
-    // low -> bypass (final downgrade)
+    // low must remain low, never bypass
     guard = 0;
     while (params.tier === 'low' && guard++ < 1000) {
       params = controller.update(slowSample, MODE_BLUR);
     }
-    expect(params.tier).toBe('bypass');
+    expect(params.tier).toBe('low');
 
-    // bypass -> low (upgrade path)
+    // low -> medium (upgrade path still works)
     guard = 0;
-    while (params.tier === 'bypass' && guard++ < 1000) {
+    while (params.tier === 'low' && guard++ < 1000) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
-    expect(params.tier).toBe('low');
+    expect(params.tier).toBe('medium');
   });
 
   it('maintains sample window size limit', () => {
@@ -306,5 +312,18 @@ describe('QualityController', () => {
     }
     // Well below threshold, should upgrade.
     expect(params?.tier).toBe('superhigh');
+  });
+
+  it('does not auto-downgrade from low to bypass', () => {
+    const controller = new QualityController(TARGET_FPS);
+    controller.setTier('low');
+
+    let params = controller.getTier(MODE_BLUR);
+
+    for (let i = 0; i < 1000; i += 1) {
+      params = controller.update(slowSample, MODE_BLUR);
+    }
+
+    expect(params.tier).toBe('low');
   });
 });

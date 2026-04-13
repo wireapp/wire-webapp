@@ -440,15 +440,12 @@ export class QualityController {
       // CPU-bound: normal step down to B
       return dominant === 'gpu' ? 'low' : 'medium';
     }
-    if (this.tier === 'medium') {
+    if (this.tier === 'medium' || this.tier === 'low') {
       return 'low';
     }
-    if (this.tier === 'low') {
-      return 'bypass';
-    }
-
     // last case
-    return 'bypass';
+    // Never auto-downgrade to bypass; low is the minimum allowed tier for privacy reasons.
+    return 'low';
   }
 
   /**
