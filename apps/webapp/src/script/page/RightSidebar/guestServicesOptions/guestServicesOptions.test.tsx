@@ -83,6 +83,6 @@ describe('GuestServicesOptions', () => {
     const defaultProps = getDefaultParams(false);
     const {getByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={conversation} />);
 
-    expect(getByText('servicesRoomToggleInfo')).not.toBeNull();
+    expect(getByText('servicesNotEnabledNoteTitle')).not.toBeNull();
   });
 });
