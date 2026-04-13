@@ -65,9 +65,7 @@ function resetPrimaryModalState(): void {
   });
 }
 
-function createForceReloadModalTestElement(
-  contextValue: ForceReloadModalTestContextValue,
-): ReactElement {
+function createForceReloadModalTestElement(contextValue: ForceReloadModalTestContextValue): ReactElement {
   const {
     doesApplicationNeedForceReload,
     reloadApplication,

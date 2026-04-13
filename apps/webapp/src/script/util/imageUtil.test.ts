@@ -145,22 +145,56 @@ describe('imageUtil', () => {
 
   describe('getBestPreviewSource', () => {
     it('returns the original fileUrl for browser-previewable formats (JPEG, PNG, WebP, GIF)', () => {
-      expect(getBestPreviewSource({fileExtension: 'jpg', fileUrl: Maybe.of('original.jpg'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('original.jpg'));
-      expect(getBestPreviewSource({fileExtension: 'png', fileUrl: Maybe.of('original.png'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('original.png'));
-      expect(getBestPreviewSource({fileExtension: 'webp', fileUrl: Maybe.of('original.webp'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('original.webp'));
-      expect(getBestPreviewSource({fileExtension: 'gif', fileUrl: Maybe.of('original.gif'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('original.gif'));
+      expect(
+        getBestPreviewSource({
+          fileExtension: 'jpg',
+          fileUrl: Maybe.of('original.jpg'),
+          filePreviewUrl: Maybe.of('preview.jpg'),
+        }),
+      ).toStrictEqual(Maybe.just('original.jpg'));
+      expect(
+        getBestPreviewSource({
+          fileExtension: 'png',
+          fileUrl: Maybe.of('original.png'),
+          filePreviewUrl: Maybe.of('preview.jpg'),
+        }),
+      ).toStrictEqual(Maybe.just('original.png'));
+      expect(
+        getBestPreviewSource({
+          fileExtension: 'webp',
+          fileUrl: Maybe.of('original.webp'),
+          filePreviewUrl: Maybe.of('preview.jpg'),
+        }),
+      ).toStrictEqual(Maybe.just('original.webp'));
+      expect(
+        getBestPreviewSource({
+          fileExtension: 'gif',
+          fileUrl: Maybe.of('original.gif'),
+          filePreviewUrl: Maybe.of('preview.jpg'),
+        }),
+      ).toStrictEqual(Maybe.just('original.gif'));
     });
 
     it('returns the server-generated preview for HEIC files (not natively decodable by browsers)', () => {
-      expect(getBestPreviewSource({fileExtension: 'heic', fileUrl: Maybe.of('original.heic'), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('preview.jpg'));
+      expect(
+        getBestPreviewSource({
+          fileExtension: 'heic',
+          fileUrl: Maybe.of('original.heic'),
+          filePreviewUrl: Maybe.of('preview.jpg'),
+        }),
+      ).toStrictEqual(Maybe.just('preview.jpg'));
     });
 
     it('falls back to filePreviewUrl when fileUrl is absent for a previewable format', () => {
-      expect(getBestPreviewSource({fileExtension: 'jpg', fileUrl: Maybe.nothing(), filePreviewUrl: Maybe.of('preview.jpg')})).toStrictEqual(Maybe.just('preview.jpg'));
+      expect(
+        getBestPreviewSource({fileExtension: 'jpg', fileUrl: Maybe.nothing(), filePreviewUrl: Maybe.of('preview.jpg')}),
+      ).toStrictEqual(Maybe.just('preview.jpg'));
     });
 
     it('returns Nothing when both fileUrl and filePreviewUrl are absent', () => {
-      expect(getBestPreviewSource({fileExtension: 'jpg', fileUrl: Maybe.nothing(), filePreviewUrl: Maybe.nothing()})).toStrictEqual(Maybe.nothing());
+      expect(
+        getBestPreviewSource({fileExtension: 'jpg', fileUrl: Maybe.nothing(), filePreviewUrl: Maybe.nothing()}),
+      ).toStrictEqual(Maybe.nothing());
     });
 
     it('can be safely unwrapped to undefined for UI src props when no source exists', () => {

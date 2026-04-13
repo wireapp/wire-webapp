@@ -86,14 +86,17 @@ describe('Server Config', () => {
         expectedBackendWebSocket: '',
         expectedTlsEnabled: false,
       },
-    ])('should $description', ({params, expectedAppBase, expectedBackendRest, expectedBackendWebSocket, expectedTlsEnabled}) => {
-      const config = generateConfig(params, mockEnv);
+    ])(
+      'should $description',
+      ({params, expectedAppBase, expectedBackendRest, expectedBackendWebSocket, expectedTlsEnabled}) => {
+        const config = generateConfig(params, mockEnv);
 
-      expect(config.APP_BASE).toBe(expectedAppBase);
-      expect(config.BACKEND_REST).toBe(expectedBackendRest);
-      expect(config.BACKEND_WS).toBe(expectedBackendWebSocket);
-      expect(config.DEVELOPMENT_ENABLE_TLS).toBe(expectedTlsEnabled);
-    });
+        expect(config.APP_BASE).toBe(expectedAppBase);
+        expect(config.BACKEND_REST).toBe(expectedBackendRest);
+        expect(config.BACKEND_WS).toBe(expectedBackendWebSocket);
+        expect(config.DEVELOPMENT_ENABLE_TLS).toBe(expectedTlsEnabled);
+      },
+    );
 
     it('should parse PORT correctly with default', () => {
       const config = generateConfig(mockParams, mockEnv);

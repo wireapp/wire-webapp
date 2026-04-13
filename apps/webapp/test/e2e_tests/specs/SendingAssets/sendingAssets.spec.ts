@@ -353,7 +353,7 @@ test.describe('Sending Assets', () => {
       await pages.conversationList().openConversation(userB.fullName);
       await shareAssetHelper(getImageFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add picture'}));
       await pages.conversation().clickImage(userA);
-      
+
       await expect(modals.detailViewModal().mainWindow).toBeVisible();
       await expect(modals.detailViewModal().image).toBeVisible();
     },

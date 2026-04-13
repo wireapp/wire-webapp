@@ -17,12 +17,12 @@
  *
  */
 
-import {queryByRole, render} from "@testing-library/react";
-import {ServicesOptions} from "./servicesOptions";
-import {TeamState} from "Repositories/team/TeamState";
-import ko from "knockout";
-import {Conversation} from "Repositories/entity/Conversation";
-import {CONVERSATION_PROTOCOL} from "@wireapp/api-client/lib/team";
+import {queryByRole, render} from '@testing-library/react';
+import {ServicesOptions} from './servicesOptions';
+import {TeamState} from 'Repositories/team/TeamState';
+import ko from 'knockout';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 type TestData = {
   protocol: CONVERSATION_PROTOCOL;
@@ -31,7 +31,7 @@ type TestData = {
   isServicesRoom: boolean;
   isGuestAndServicesRoom: boolean;
   expectedToggleToBeVisible: boolean;
-}
+};
 
 describe('serviceOptions', () => {
   it.each<TestData>([
@@ -42,7 +42,7 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: false,
       isServicesRoom: false,
       isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: false
+      expectedToggleToBeVisible: false,
     },
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
@@ -50,7 +50,7 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: false,
       isServicesRoom: true,
       isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: true
+      expectedToggleToBeVisible: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
@@ -58,7 +58,7 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: false,
       isServicesRoom: false,
       isGuestAndServicesRoom: true,
-      expectedToggleToBeVisible: true
+      expectedToggleToBeVisible: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
@@ -66,7 +66,7 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: true,
       isServicesRoom: false,
       isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: true
+      expectedToggleToBeVisible: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
@@ -74,7 +74,7 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: true,
       isServicesRoom: true,
       isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: true
+      expectedToggleToBeVisible: true,
     },
     // MLS
     {
@@ -83,7 +83,7 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: true,
       isServicesRoom: false,
       isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: false
+      expectedToggleToBeVisible: false,
     },
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
@@ -91,7 +91,7 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: false,
       isServicesRoom: true,
       isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: true
+      expectedToggleToBeVisible: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
@@ -99,7 +99,7 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: false,
       isServicesRoom: false,
       isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: true
+      expectedToggleToBeVisible: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
@@ -107,33 +107,47 @@ describe('serviceOptions', () => {
       hasWhitelistedServices: false,
       isServicesRoom: true,
       isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: true
+      expectedToggleToBeVisible: true,
     },
   ])(
     'should make toggle visibility $expectedToggleToBeVisible',
-    ({protocol, isAppsEnabled, hasWhitelistedServices, isServicesRoom, isGuestAndServicesRoom, expectedToggleToBeVisible}) => {
-      // Arrange
-    const mockTeamState: Partial<TeamState> = {
-      hasWhitelistedServices: ko.observable(hasWhitelistedServices),
-      isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
-    };
-
-    const mockConversation: Partial<Conversation> = {
+    ({
       protocol,
-      isServicesRoom: ko.pureComputed(() => isServicesRoom),
-      isGuestAndServicesRoom: ko.pureComputed(() => isGuestAndServicesRoom),
-    };
+      isAppsEnabled,
+      hasWhitelistedServices,
+      isServicesRoom,
+      isGuestAndServicesRoom,
+      expectedToggleToBeVisible,
+    }) => {
+      // Arrange
+      const mockTeamState: Partial<TeamState> = {
+        hasWhitelistedServices: ko.observable(hasWhitelistedServices),
+        isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
+      };
 
-    // Act
-    const {container} = render(<ServicesOptions activeConversation={mockConversation as Conversation} toggleAccessState={jest.fn()} teamState={mockTeamState as TeamState} />)
+      const mockConversation: Partial<Conversation> = {
+        protocol,
+        isServicesRoom: ko.pureComputed(() => isServicesRoom),
+        isGuestAndServicesRoom: ko.pureComputed(() => isGuestAndServicesRoom),
+      };
 
-    // Assert
-    if(expectedToggleToBeVisible) {
-      expect(container).not.toHaveTextContent('servicesNotEnabledNoteTitle');
-      expect(queryByRole(container,'checkbox')).toBeInTheDocument();
-    } else {
-      expect(container).toHaveTextContent('servicesNotEnabledNoteTitle');
-      expect(queryByRole(container,'checkbox')).not.toBeInTheDocument();
-    }
-  });
+      // Act
+      const {container} = render(
+        <ServicesOptions
+          activeConversation={mockConversation as Conversation}
+          toggleAccessState={jest.fn()}
+          teamState={mockTeamState as TeamState}
+        />,
+      );
+
+      // Assert
+      if (expectedToggleToBeVisible) {
+        expect(container).not.toHaveTextContent('servicesNotEnabledNoteTitle');
+        expect(queryByRole(container, 'checkbox')).toBeInTheDocument();
+      } else {
+        expect(container).toHaveTextContent('servicesNotEnabledNoteTitle');
+        expect(queryByRole(container, 'checkbox')).not.toBeInTheDocument();
+      }
+    },
+  );
 });

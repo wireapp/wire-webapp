@@ -17,10 +17,10 @@
  *
  */
 
-import {AppsFeatureOptions, checkAppsFeatureAvailability} from "Util/featureUtil";
-import {CONVERSATION_PROTOCOL} from "@wireapp/api-client/lib/team";
+import {AppsFeatureOptions, checkAppsFeatureAvailability} from 'Util/featureUtil';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-type AppsFeatureDataSet = AppsFeatureOptions & { expected: boolean };
+type AppsFeatureDataSet = AppsFeatureOptions & {expected: boolean};
 
 describe('featureUtil', () => {
   it.each<AppsFeatureDataSet>([
@@ -28,32 +28,34 @@ describe('featureUtil', () => {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
       hasWhitelistedServices: true,
-      expected: true
+      expected: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
       hasWhitelistedServices: false,
-      expected: false
+      expected: false,
     },
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: true,
       hasWhitelistedServices: false,
-      expected: true
+      expected: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: false,
       hasWhitelistedServices: true,
-      expected: false
+      expected: false,
     },
-  ])('apps feature is $expected when { protocol: $protocol, isAppsEnabled: $isAppsEnabled, hasWhitelistedServices: $hasWhitelistedServices }',
-    (testData) => {
-    // Act
-    const result = checkAppsFeatureAvailability(testData)
+  ])(
+    'apps feature is $expected when { protocol: $protocol, isAppsEnabled: $isAppsEnabled, hasWhitelistedServices: $hasWhitelistedServices }',
+    testData => {
+      // Act
+      const result = checkAppsFeatureAvailability(testData);
 
-    //Assert
-    expect(result).toBe(testData.expected);
-  });
+      //Assert
+      expect(result).toBe(testData.expected);
+    },
+  );
 });

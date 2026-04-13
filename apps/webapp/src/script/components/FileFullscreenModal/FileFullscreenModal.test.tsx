@@ -303,9 +303,7 @@ describe('FileFullscreenModal - File Version Restore', () => {
     });
 
     it('should be editable and previewable if file is not in recycle bin', () => {
-      const {rerender} = render(
-        <FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => false} />,
-      );
+      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => false} />);
 
       expect(screen.getByTestId('file-editor')).toBeInTheDocument();
       expect(screen.queryByTestId('no-preview')).not.toBeInTheDocument();
