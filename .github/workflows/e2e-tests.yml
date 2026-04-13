@@ -177,7 +177,7 @@ jobs:
       - name: Report to Slack
         uses: kenfdev/playwright-report-slack-action@38c73e6550c22c925ace4a7b87559ca129ef97cb
         with:
-          results-json-path: 'report.json'
+          results-json-path: 'apps/webapp/playwright-report/report.json'
           artifact-url: ${{ steps.upload_playwright_report.outputs.artifact-url }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
