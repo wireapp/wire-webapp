@@ -165,4 +165,41 @@ test.describe('Group Conversation', () => {
         );
     },
   );
+
+  test('I should not be able to search for deleted group', {tag: ['@TC-1095', '@regression']}, async ({createPage}) => {
+    const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
+      createPage(withLogin(userA)),
+      createPage(withLogin(userB)),
+      createPage(withLogin(userC), withConnectedUser(userA)),
+    ]);
+
+    const userAPages = PageManager.from(userAPageManager).webapp.pages;
+    const userBPages = PageManager.from(userBPageManager).webapp.pages;
+    const userCPages = PageManager.from(userCPageManager).webapp.pages;
+
+    await createGroup(userAPages, 'Group A', [userB, userC]);
+    await createGroup(userBPages, 'Group B', [userA, userC]);
+    await expect(userCPages.conversationList().list.getByRole('listitem')).toHaveCount(3);
+
+    const groups = [
+      {name: 'Group A', owner: userAPageManager, members: [userB, userC]},
+      {name: 'Group B', owner: userBPageManager, members: [userA, userC]},
+    ];
+
+    for (const group of groups) {
+      const {pages, modals} = PageManager.from(group.owner).webapp;
+
+      await pages.conversationList().openConversation(group.name);
+      await pages.conversation().clickConversationInfoButton();
+      await pages.conversationDetails().deleteGroupButton.click();
+      await modals.confirm().actionButton.click();
+      await pages.conversationList().list.filter({hasText: group.name}).waitFor({state: 'detached'});
+
+      await expect(userCPages.conversationList().list.filter({hasText: group.name})).not.toBeVisible();
+      
+      await userCPages.conversationList().searchConversationsInput.fill(group.name);
+      await expect(userCPages.conversationList().list).toContainText('No results found');
+      await userCPages.conversationList().searchConversationsInput.fill(''); // Clear search input for next iteration
+    }
+  });
 });
