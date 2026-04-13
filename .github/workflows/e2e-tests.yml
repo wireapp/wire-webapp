@@ -174,13 +174,32 @@ jobs:
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
 
-      - name: Report to Slack
-        uses: kenfdev/playwright-report-slack-action@38c73e6550c22c925ace4a7b87559ca129ef97cb
-        with:
-          results-json-path: 'apps/webapp/playwright-report/report.json'
-          artifact-url: ${{ steps.upload_playwright_report.outputs.artifact-url }}
+      - name: Notify on Wire if succeeded
+        if: success()
+        continue-on-error: true
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_CELLS_E2E_TEST_BOT_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
+        with:
+          status: ${{ job.status }}
+          text: |
+            ✅ Web E2E Tests succeeded ✅
+            **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
+            **Triggered by:** ${{ github.triggering_actor }}
+            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      - name: Notify on Wire if failed
+        if: failure()
+        continue-on-error: true
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
+        with:
+          status: ${{ job.status }}
+          text: |
+            ❌ Web E2E Tests failed ❌
+            **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
+            **Triggered by:** ${{ github.triggering_actor }}
+            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Update Testiny Run with results
         if: ${{ inputs.testinyRunName }}
