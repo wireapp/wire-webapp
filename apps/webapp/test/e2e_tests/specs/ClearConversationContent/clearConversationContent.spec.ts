@@ -153,10 +153,7 @@ test.describe('Clear Conversation Content', () => {
       `I want to see incoming picture, ping and call after I clear content of a ${conversationType} conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const [userBPage, userCPage] = await Promise.all([
-          createPage(withLogin(userB)),
-          createPage(withLogin(userC)),
-        ]);
+        const [userBPage, userCPage] = await Promise.all([createPage(withLogin(userB)), createPage(withLogin(userC))]);
 
         const userAPage = await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC));
 

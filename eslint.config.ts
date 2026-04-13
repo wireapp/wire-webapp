@@ -11,7 +11,7 @@ import stylisticPlugin from '@stylistic/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
 import tsParser from '@typescript-eslint/parser';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
-import headerPlugin, { HeaderOptions, HeaderRuleConfig } from '@tony.ganchev/eslint-plugin-header';
+import headerPlugin, {HeaderOptions, HeaderRuleConfig} from '@tony.ganchev/eslint-plugin-header';
 import globals from 'globals';
 import type {Linter} from 'eslint';
 

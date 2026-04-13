@@ -85,7 +85,6 @@ test.describe('In Conversation Search', () => {
       await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
       await userAPage.waitForTimeout(10_000);
 
-
       await userAPages.conversation().searchButton.click();
 
       const collection = userAPages.collection();

@@ -17,7 +17,6 @@
  *
  */
 
-
 import {toError} from 'Util/toError';
 
 describe('toError', () => {

@@ -57,6 +57,9 @@ jobs:
       - name: Lint file names
         run: yarn lint:fileNames
 
+      - name: Lint formatting
+        run: yarn lint:other
+
       - name: Lint
         run: yarn nx run-many -t lint --all
 
