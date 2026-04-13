@@ -17,7 +17,10 @@
  *
  */
 
-import {BackgroundEffectsController} from './backgroundEffectsController';
+import { BackgroundEffectsController } from "./backgroundEffectsController";
+import { PassthroughPipeline } from "Repositories/media/backgroundEffects/pipelines/passthroughPipeline";
+import { choosePipeline } from "Repositories/media/backgroundEffects";
+import { MainWebGlPipeline } from "Repositories/media/backgroundEffects/pipelines/mainWebGlPipeline"; // Mocks
 
 // Mocks
 jest.mock('./capability', () => ({
@@ -153,5 +156,114 @@ describe('BackgroundEffectsController', () => {
     controller.setDebugMode('maskOnly');
 
     expect((controller as any).debugMode).toBe('maskOnly');
+  });
+
+  it('calls stop before starting again', async () => {
+    const stopSpy = jest.spyOn(controller, 'stop');
+
+    await controller.start(mockTrack);
+
+    expect(stopSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('clamps blur strength from start options', async () => {
+    await controller.start(mockTrack, {blurStrength: 999});
+
+    expect((controller as any).blurStrength).toBe(1);
+  });
+
+  it('returns true for isProcessing after start', async () => {
+    await controller.start(mockTrack);
+
+    expect(controller.isProcessing()).toBe(true);
+  });
+
+  it('uses pipeline override when provided', async () => {
+    await controller.start(mockTrack, {pipelineOverride: 'passthrough'});
+
+    expect(choosePipeline).toHaveBeenCalled();
+    expect((controller as any).pipeline).toBe('passthrough');
+    expect(PassthroughPipeline).toHaveBeenCalled();
+  });
+
+  it('uses chosen pipeline when no override is provided', async () => {
+    await controller.start(mockTrack);
+
+    expect(choosePipeline).toHaveBeenCalled();
+    expect((controller as any).pipeline).toBe('main-webgl2');
+    expect(MainWebGlPipeline).toHaveBeenCalled();
+  });
+
+  it('applies runtime config from start options', async () => {
+    await controller.start(mockTrack, {
+      mode: 'virtual',
+      debugMode: 'maskOnly',
+      quality: 'high',
+      targetFps: 24,
+    } as any);
+
+    expect((controller as any).mode).toBe('virtual');
+    expect((controller as any).debugMode).toBe('maskOnly');
+    expect((controller as any).quality).toBe('high');
+    expect((controller as any).targetFps).toBe(24);
+  });
+
+  it('updates pipeline config when setters are called', async () => {
+    await controller.start(mockTrack);
+
+    const pipelineInstance = (MainWebGlPipeline as jest.Mock).mock.results[0].value;
+
+    controller.setMode('virtual');
+    controller.setDebugMode('maskOnly');
+    controller.setBlurStrength(0.3);
+    controller.setQuality('auto');
+
+    expect(pipelineInstance.updateConfig).toHaveBeenCalled();
+    expect(pipelineInstance.updateConfig).toHaveBeenLastCalledWith({
+      mode: 'virtual',
+      debugMode: 'maskOnly',
+      blurStrength: 0.3,
+      quality: 'auto',
+    });
+  });
+
+  it('falls back to passthrough pipeline if init fails', async () => {
+    (MainWebGlPipeline as jest.Mock).mockImplementationOnce(() => ({
+      init: jest.fn().mockRejectedValue(new Error('init failed')),
+      processFrame: jest.fn().mockResolvedValue(undefined),
+      updateConfig: jest.fn(),
+      stop: jest.fn(),
+      isOutputCanvasTransferred: jest.fn(() => false),
+      notifyDroppedFrames: jest.fn(),
+      setBackgroundImage: jest.fn(),
+      setBackgroundVideoFrame: jest.fn(),
+      clearBackground: jest.fn(),
+    }));
+
+    await controller.start(mockTrack);
+
+    expect(PassthroughPipeline).toHaveBeenCalled();
+    expect((controller as any).pipeline).toBe('passthrough');
+  });
+
+  it('sets max quality tier', () => {
+    controller.setMaxQualityTier('high');
+
+    expect(controller.getMaxQualityTier()).toBe('high');
+  });
+
+  it('registers ended listener on input track', async () => {
+    await controller.start(mockTrack);
+
+    expect(mockTrack.addEventListener).toHaveBeenCalledWith('ended', expect.any(Function));
+  });
+
+  it('stops previous resources on repeated start', async () => {
+    await controller.start(mockTrack);
+    const firstOutputTrack = (controller as any).outputTrack;
+
+    await controller.start(mockTrack);
+
+    expect(firstOutputTrack.stop).toHaveBeenCalled();
   });
 });
