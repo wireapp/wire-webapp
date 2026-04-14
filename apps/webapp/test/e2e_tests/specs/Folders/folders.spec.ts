@@ -33,8 +33,7 @@ async function createCustomFolder(pageManager: PageManager, conversationName: st
   const {pages, modals} = pageManager.webapp;
   const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
   await contextMenu.moveToButton.click();
-
-  await pages.conversationList().createNewFolderButton.click();
+  await contextMenu.getByRole('button', {name: 'Create new folder'}).click();
 
   await modals.optionModal().modal.getByPlaceholder('Folder Name').fill(folderName);
   await modals.optionModal().clickAction();
@@ -193,7 +192,7 @@ test.describe('Folders', () => {
     // Step 2: User A wants to move 1:1 conversation with User B into custom folder
     const contextMenu = await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
     await contextMenu.moveToButton.click();
-    await userAPages.conversationList().createNewFolderButton.click();
+    await contextMenu.getByRole('button', {name: 'Create new folder'}).click();
 
     // Step 3: 'Create Folder Modal' should still be visible after click on create
     await expect(userAModals.optionModal().actionButton).toBeDisabled();
