@@ -171,7 +171,8 @@ test.describe('Notifications', () => {
       await userAPages.conversation().clickCallButton();
 
       // Verify that User B sees a "Join" button on the muted conversation
-      await expect(userBPages.conversationList().joinCallButton).toBeVisible();
+      const {joinCallButton} = userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'});
+      await expect(joinCallButton).toBeVisible();
     },
   );
 
