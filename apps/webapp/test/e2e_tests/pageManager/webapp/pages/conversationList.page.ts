@@ -29,7 +29,6 @@ export class ConversationListPage {
   readonly pendingConnectionRequest: Locator;
   readonly searchConversationsInput: Locator;
   readonly conversationListHeaderTitle: Locator;
-  readonly addToFavoritesButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -39,7 +38,6 @@ export class ConversationListPage {
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
     this.searchConversationsInput = page.getByTestId('search-conversations');
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
-    this.addToFavoritesButton = page.getByRole('menuitem', {name: 'Add to favorites'});
   }
 
   async openConversation(conversationName: string, options?: Parameters<typeof this.getConversationLocator>[1]) {
