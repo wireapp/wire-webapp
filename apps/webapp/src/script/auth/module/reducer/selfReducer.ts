@@ -18,8 +18,9 @@
  */
 
 import type {Self} from '@wireapp/api-client/lib/self/';
+import {UserType} from '@wireapp/api-client/lib/user';
 
-import {AUTH_ACTION, AppActions, SELF_ACTION} from '../action/creator/';
+import {AppActions, AUTH_ACTION, SELF_ACTION} from '../action/creator/';
 
 export interface SelfState {
   consents: {[key: number]: number};
@@ -42,6 +43,7 @@ const unsetSelf: Self = {
   qualified_id: {id: '', domain: ''},
   sso_id: undefined,
   team: undefined,
+  type: UserType.REGULAR,
 };
 
 export const initialSelfState: SelfState = {
