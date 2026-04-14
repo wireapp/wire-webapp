@@ -32,7 +32,6 @@ export class ConversationListPage {
   readonly archiveConversationMenuButton: Locator;
   readonly unarchiveConversationMenuButton: Locator;
   readonly blockedChip: Locator;
-  readonly unblockConversationMenuButton: Locator;
   readonly moveConversationButton: Locator;
   readonly moveToMenu: Locator;
   readonly createNewFolderButton: Locator;
@@ -53,9 +52,6 @@ export class ConversationListPage {
     this.archiveConversationMenuButton = page.locator('#btn-archive');
     this.unarchiveConversationMenuButton = page.locator('#btn-unarchive');
     this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
-    this.unblockConversationMenuButton = page
-      .getByTestId('conversation-list-options-menu')
-      .and(page.locator('#btn-unblock'));
     this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
     this.moveToMenu = page.getByRole('menu');
     this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
@@ -126,6 +122,7 @@ export class ConversationListPage {
 
     return Object.assign(contextMenu, {
       blockButton: contextMenu.getByRole('button', {name: 'Block'}),
+      unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
     });
   }
 
@@ -144,10 +141,6 @@ export class ConversationListPage {
 
   getUserStatusIcon(user: User) {
     return this.getConversationLocator(user.fullName).getByTestId('status-availability-icon');
-  }
-
-  async clickUnblockConversation() {
-    await this.unblockConversationMenuButton.click();
   }
 
   getRemoveConversationFromFolderButton(folderName: string) {
