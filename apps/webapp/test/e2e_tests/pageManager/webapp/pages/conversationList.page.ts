@@ -114,11 +114,6 @@ export class ConversationListPage {
     });
   }
 
-  async searchConversation(conversationName: string) {
-    await this.searchConversationsInput.fill(conversationName);
-    await this.openConversation(conversationName);
-  }
-
   async getUserAvatarWrapper(user: User): Promise<Locator> {
     return this.getConversationLocator(user.fullName).getByTestId('element-avatar-user');
   }

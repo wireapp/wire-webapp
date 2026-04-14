@@ -89,7 +89,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
 
   await test.step('Team owner open searched conversation', async () => {
     const {pages} = ownerPageManager.webapp;
-    await pages.conversationList().searchConversation(conversationName);
+    await pages.conversationList().searchConversationsInput.fill(conversationName);
     await pages.conversationList().openConversation(conversationName);
     await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
     await pages.conversationList().openConversation(conversationName);
