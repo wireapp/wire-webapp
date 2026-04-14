@@ -280,4 +280,51 @@ test.describe('Group Conversation', () => {
       await expect(userBPages.conversation().makeAdminToggle).not.toBeVisible();
     },
   );
+
+  test(
+    'I should not be admin anymore after being removed and re-added to the group',
+    {tag: ['@TC-1649', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await test.step('Setup: Create group and promote User B to Admin', async () => {
+        await createGroup(userAPages, groupName, [userB, userC]);
+        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversation().toggleGroupInformation();
+        await userAPages.conversation().makeUserAdmin(userB.fullName);
+
+        // Verify User B is an admin
+        await userBPages.conversationList().openConversation(groupName);
+        await userBPages.conversation().toggleGroupInformation();
+        await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userB.fullName})).toBeVisible();
+      });
+
+      await test.step('Act: User A removes User B from the group', async () => {
+        await userAPages.conversation().toggleGroupInformation();
+        await userAPages.conversation().removeAdminFromGroup(userB.fullName);
+        await userAModals.confirm().actionButton.click();
+
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: `You removed ${userB.fullName}`}),
+        ).toBeVisible();
+      });
+
+      await test.step('Act: User A re-adds User B to the group', async () => {
+        await userAPages.conversation().clickAddMemberButton();
+        await userAPages.conversationDetails().addUsersToConversation([userB.fullName]);
+
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: `You added ${userB.fullName} to the conversation`}),
+        ).toBeVisible();
+      });
+
+      await test.step('Assert: Verify User B is a regular member and not an admin', async () => {
+        // User B should appear in members list but NOT in admin list
+        await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userB.fullName})).not.toBeVisible();
+        await expect(userBPages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+      });
+    },
+  );
 });
