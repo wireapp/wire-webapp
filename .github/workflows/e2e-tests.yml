@@ -60,7 +60,7 @@ on:
 jobs:
   test:
     name: Run E2E Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -111,7 +111,7 @@ jobs:
           retention-days: 1
 
   e2e-report:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ !cancelled() }}
     needs: [test]
 

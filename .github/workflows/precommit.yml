@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     outputs:
       unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
@@ -70,7 +70,7 @@ jobs:
 
   deploy_to_aws:
     name: 'Deploy to live environments'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       AWS_REGION: eu-central-1
     needs: [build]

@@ -8,7 +8,7 @@ permissions:
 # This job will enable auto merge on dependabots and otto-the-bot's PRs
 jobs:
   activate-auto-merge:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot'}}
     steps:
       - name: Fetch Dependabot metadata
