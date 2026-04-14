@@ -207,8 +207,11 @@ test.describe('User Blocking', () => {
         await blockUserFromProfileView(userAPageManagerInstance);
         await expect(userAPages.conversation().messageInput).toBeHidden();
         // Step 3: User A unblocks User B from Conversation Details Options
-        await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).openContextMenu();
-        await userAPages.conversationList().clickUnblockConversation();
+        const contextMenu = await userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName, {protocol: 'mls'})
+          .openContextMenu();
+        await contextMenu.unblockButton.click();
         await userAModals.confirm().clickAction();
         // Step 4: User A send message to User B
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
