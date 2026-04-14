@@ -187,10 +187,10 @@ jobs:
             echo "::error::Report file not found at $REPORT"
             exit 1
           fi
-          PASSED=$(jq '[.suites[].specs[].tests[] | select((.results | length) == 1 and (.results[0].status == "passed"))] | length' "$REPORT")
-          FAILED=$(jq '[.suites[].specs[].tests[] | select(.results[-1].status == "failed" or .results[-1].status == "timedOut")] | length' "$REPORT")
-          SKIPPED=$(jq '[.suites[].specs[].tests[] | select((.results | length) == 1 and (.results[0].status == "skipped"))] | length' "$REPORT")
-          FLAKY=$(jq '[.suites[].specs[].tests[] | select((.results | length) > 1 and (.results[-1].status == "passed"))] | length' "$REPORT")
+          PASSED=$(jq '.stats.expected' "$REPORT")
+          FAILED=$(jq '.stats.unexpected' "$REPORT")
+          SKIPPED=$(jq '.stats.skipped' "$REPORT")
+          FLAKY=$(jq '.stats.flaky' "$REPORT")
           TOTAL=$((PASSED + FAILED + SKIPPED + FLAKY))
           echo "passed=$PASSED" >> $GITHUB_OUTPUT
           echo "failed=$FAILED" >> $GITHUB_OUTPUT
