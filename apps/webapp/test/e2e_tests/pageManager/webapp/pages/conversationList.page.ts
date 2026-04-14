@@ -25,7 +25,6 @@ export class ConversationListPage {
   private readonly page: Page;
 
   readonly list: Locator;
-  readonly blockConversationMenuButton: Locator;
   readonly createGroupButton: Locator;
   readonly pendingConnectionRequest: Locator;
   readonly leaveConversationButton: Locator;
@@ -47,7 +46,6 @@ export class ConversationListPage {
     this.page = page;
 
     this.list = page.getByRole('list', {name: 'Conversation list'});
-    this.blockConversationMenuButton = page.getByRole('menu').getByRole('button', {name: 'Block'});
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
     this.leaveConversationButton = page.getByTestId('conversation-leave');
@@ -74,10 +72,6 @@ export class ConversationListPage {
 
   async openPendingConnectionRequest() {
     await this.pendingConnectionRequest.click();
-  }
-
-  async clickBlockConversation() {
-    await this.blockConversationMenuButton.click();
   }
 
   async archiveConversation() {
@@ -117,8 +111,22 @@ export class ConversationListPage {
     });
   }
 
+  /**
+   * Open the context menu of the given conversation
+   * @returns an enhanced locator for the open context menu
+   *
+   * @example
+   * const contextMenu = await pages.conversationList().openContextMenu(conversationLocator);
+   * await contextMenu.archiveButton.click();
+   */
   async openContextMenu(conversation: Locator) {
     await conversation.getByRole('button', {name: 'Open conversation options'}).click();
+
+    const contextMenu = this.page.getByRole('menu');
+
+    return Object.assign(contextMenu, {
+      blockButton: contextMenu.getByRole('button', {name: 'Block'}),
+    });
   }
 
   async leaveConversation() {
