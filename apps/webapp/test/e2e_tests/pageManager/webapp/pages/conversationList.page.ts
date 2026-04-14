@@ -68,10 +68,6 @@ export class ConversationListPage {
     this.addToFavoritesButton = page.getByRole('menuitem', {name: 'Add to favorites'});
   }
 
-  async isConversationBlocked(conversationName: string) {
-    return await this.getConversationLocator(conversationName).getByTestId('status-blocked').isVisible();
-  }
-
   async openConversation(conversationName: string, options?: Parameters<typeof this.getConversationLocator>[1]) {
     await this.getConversationLocator(conversationName, options).click();
   }
