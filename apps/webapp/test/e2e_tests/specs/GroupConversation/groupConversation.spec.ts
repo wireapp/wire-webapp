@@ -196,10 +196,34 @@ test.describe('Group Conversation', () => {
       await pages.conversationList().list.filter({hasText: group.name}).waitFor({state: 'detached'});
 
       await expect(userCPages.conversationList().list.filter({hasText: group.name})).not.toBeVisible();
-      
+
       await userCPages.conversationList().searchConversationsInput.fill(group.name);
       await expect(userCPages.conversationList().list).toContainText('No results found');
       await userCPages.conversationList().searchConversationsInput.fill(''); // Clear search input for next iteration
     }
   });
+
+  test(
+    'I want to leave a group conversation via conversation list dropdown options',
+    {tag: ['@TC-1197', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await createGroup(userBPages, groupName, [userA]);
+      await userBPages.conversationList().openConversation(groupName);
+
+      // User A leaves conversation through options menu from conversation list
+      await userAPages.conversationList().clickConversationOptions(groupName);
+      await userAPages.conversationList().leaveConversation();
+      await userAModals.leaveConversation().confirmButton.click();
+
+      await expect(userBPages.conversation().systemMessages.filter({hasText: `${userA.fullName} left`})).toBeVisible();
+    },
+  );
 });
