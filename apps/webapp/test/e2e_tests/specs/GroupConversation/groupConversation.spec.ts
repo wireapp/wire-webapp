@@ -216,7 +216,7 @@ test.describe('Group Conversation', () => {
       await userBPages.conversationList().openConversation(groupName);
 
       // User A leaves conversation through options menu from conversation list
-      await userAPages.conversationList().clickConversationOptions(groupName);
+      await userAPages.conversationList().getConversationLocator(groupName).openContextMenu();
       await userAPages.conversationList().leaveConversation();
       await userAModals.leaveConversation().confirmButton.click();
 
