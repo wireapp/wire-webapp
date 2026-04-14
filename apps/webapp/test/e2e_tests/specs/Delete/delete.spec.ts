@@ -139,8 +139,8 @@ test.describe('Delete', () => {
 
       await test.step('Unarchive conversation', async () => {
         await components.conversationSidebar().clickArchive();
-        await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
-        await pages.conversationList().unarchiveConversation();
+        const contextMenu = await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+        await contextMenu.unarchiveButton.click();
         await components.conversationSidebar().clickAllConversationsButton();
       });
 
