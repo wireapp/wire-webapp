@@ -37,7 +37,7 @@ concurrency:
 jobs:
   deploy_to_aws:
     name: Deploy to precommit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
       AWS_REGION: eu-central-1

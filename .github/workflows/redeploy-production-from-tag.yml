@@ -20,7 +20,7 @@ concurrency:
 jobs:
   validate_request:
     name: Validate redeploy request
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       tag: ${{ steps.validate.outputs.tag }}
 
@@ -47,7 +47,7 @@ jobs:
 
   build_artifact:
     name: Rebuild tagged release artifact
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: validate_request
     outputs:
       commit_sha: ${{ steps.git_metadata.outputs.commit_sha }}
@@ -106,7 +106,7 @@ jobs:
 
   deploy_to_production:
     name: Deploy to production
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       AWS_REGION: eu-central-1
     needs: [validate_request, build_artifact]
@@ -141,7 +141,7 @@ jobs:
 
   notify_redeploy:
     name: Notify redeploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [validate_request, build_artifact, deploy_to_production]
     if: ${{ needs.deploy_to_production.result == 'success' }}
 

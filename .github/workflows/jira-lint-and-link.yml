@@ -8,7 +8,7 @@ jobs:
   add-jira-description:
     # On merge_group there is no pull request payload; keep the required check green there.
     if: ${{ github.event_name == 'merge_group' || (github.actor != 'dependabot[bot]' && github.actor != 'otto-the-bot') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Skip on merge queue
         if: ${{ github.event_name == 'merge_group' }}
