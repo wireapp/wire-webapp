@@ -19,8 +19,6 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {User} from 'test/e2e_tests/data/user';
-
 export class ConversationListPage {
   private readonly page: Page;
 
@@ -66,6 +64,7 @@ export class ConversationListPage {
 
     return Object.assign(conversation, {
       userAvatar: conversation.getByTestId('element-avatar-user'),
+      statusAvailabilityIcon: conversation.getByTestId('status-availability-icon'),
       unreadIndicator: conversation.getByTitle('Unread message'),
       mutedIndicator: conversation.getByTitle('Muted conversation'),
       mentionIndicator: conversation.getByTitle('Unread mention'),
@@ -98,9 +97,5 @@ export class ConversationListPage {
       clearContentButton: contextMenu.getByRole('button', {name: 'Clear content'}),
       leaveConversationButton: contextMenu.getByRole('button', {name: 'Leave'}),
     });
-  }
-
-  getUserStatusIcon(user: User) {
-    return this.getConversationLocator(user.fullName).getByTestId('status-availability-icon');
   }
 }

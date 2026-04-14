@@ -434,8 +434,11 @@ test.describe('Status', () => {
     const userBPages = userBPageManager.webapp.pages;
 
     // User B verify no status is set in conversation list
-    await userBPages.conversationList().openConversation(userA.fullName);
-    await expect(userBPages.conversationList().getUserStatusIcon(userA)).not.toBeVisible();
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    const {statusAvailabilityIcon} = userBPages
+      .conversationList()
+      .getConversationLocator(userA.fullName, {protocol: 'mls'});
+    await expect(statusAvailabilityIcon).not.toBeVisible();
 
     // User A opens preferences by clicking the gear button
     await components.conversationSidebar().clickPreferencesButton();
@@ -456,8 +459,8 @@ test.describe('Status', () => {
     await expect(pages.account().statusOption(UserStatus.None)).not.toHaveAccessibleName('Selected, None');
 
     // User B verifies status is Available in conversation list
-    await expect(userBPages.conversationList().getUserStatusIcon(userA)).toBeVisible();
-    await expect(userBPages.conversationList().getUserStatusIcon(userA)).toHaveAttribute('data-uie-value', 'available');
+    await expect(statusAvailabilityIcon).toBeVisible();
+    await expect(statusAvailabilityIcon).toHaveAttribute('data-uie-value', 'available');
   });
 
   test(
