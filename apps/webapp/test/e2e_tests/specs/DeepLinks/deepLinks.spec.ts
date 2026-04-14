@@ -111,6 +111,7 @@ test.describe('Deep Links', () => {
       await expect(userAModals.userProfile().modal).toBeVisible();
       await expect(userAModals.userProfile().participantFullname).toContainText(userC.fullName);
       await expect(userAModals.userProfile().participantUsername).toContainText(userC.username);
+      await expect(userAModals.userProfile().guestChip).toBeVisible();
       await expect(userAModals.userProfile().domainLabel).toBeVisible();
       await expect(userAModals.userProfile().connectWarning).toBeVisible();
       await expect(userAModals.userProfile().openConversationButton).toBeVisible();
