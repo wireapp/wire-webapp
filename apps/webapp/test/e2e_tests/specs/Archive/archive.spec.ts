@@ -40,8 +40,8 @@ test.describe('Archive', () => {
       const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
       const {pages, components} = PageManager.from(page).webapp;
 
-      await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
-      await pages.conversationList().archiveConversation();
+      const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      await contextMenu.archiveButton.click();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
 
       await components.conversationSidebar().clickArchive();
@@ -69,11 +69,11 @@ test.describe('Archive', () => {
       await memberBPages.conversationList().openConversation(memberA.fullName, {protocol: 'mls'});
 
       await test.step('MemberA archives conversation with memberB', async () => {
-        await memberAPages
+        const contextMenu = await memberAPages
           .conversationList()
           .getConversationLocator(memberB.fullName, {protocol: 'mls'})
           .openContextMenu();
-        await memberAPages.conversationList().archiveConversation();
+        await contextMenu.archiveButton.click();
       });
 
       await test.step('MemberB sends message in archived conversation', async () => {
@@ -108,8 +108,8 @@ test.describe('Archive', () => {
       }
 
       await test.step('User archives the conversation', async () => {
-        await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
-        await pages.conversationList().archiveConversation();
+        const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+        await contextMenu.archiveButton.click();
         await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
       });
 

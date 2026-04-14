@@ -60,8 +60,11 @@ test.describe('Notifications', () => {
 
       // Archive conversation for user B
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).openContextMenu();
-      await userBPages.conversationList().archiveConversation();
+      const contextMenu = await userBPages
+        .conversationList()
+        .getConversationLocator(userA.fullName, {protocol: 'mls'})
+        .openContextMenu();
+      await contextMenu.archiveButton.click();
 
       // Send message from A to B in 1on1 conversation
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
