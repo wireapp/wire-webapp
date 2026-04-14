@@ -132,10 +132,6 @@ export class ConversationListPage {
     return this.getConversationLocator(user.fullName).getByTestId('status-availability-icon');
   }
 
-  getRemoveConversationFromFolderButton(folderName: string) {
-    return this.page.getByRole('button', {name: `Remove from "${folderName}"`});
-  }
-
   async getMutedConversationBadge(conversationName: string) {
     return this.getConversationLocator(conversationName).getByTitle('Muted conversation');
   }
