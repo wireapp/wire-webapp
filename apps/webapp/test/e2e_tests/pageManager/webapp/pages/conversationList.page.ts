@@ -38,10 +38,6 @@ export class ConversationListPage {
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
   }
 
-  async openConversation(conversationName: string, options?: Parameters<typeof this.getConversationLocator>[1]) {
-    await this.getConversationLocator(conversationName, options).click();
-  }
-
   async openPendingConnectionRequest() {
     await this.pendingConnectionRequest.click();
   }
