@@ -190,6 +190,12 @@ export class UserMapper {
     if (app) {
       userEntity.description = app.description;
       userEntity.category = app.category;
+    } else {
+      userEntity.description = undefined;
+      userEntity.category = undefined;
+    }
+      userEntity.description = app.description;
+      userEntity.category = app.category;
     }
 
     return userEntity;
