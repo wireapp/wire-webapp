@@ -30,7 +30,6 @@ export class ConversationListPage {
   readonly searchConversationsInput: Locator;
   readonly conversationListHeaderTitle: Locator;
   readonly joinCallButton: Locator;
-  readonly clearContentButton: Locator;
   readonly notificationsButton: Locator;
   readonly addToFavoritesButton: Locator;
 
@@ -43,7 +42,6 @@ export class ConversationListPage {
     this.searchConversationsInput = page.getByTestId('search-conversations');
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
     this.joinCallButton = page.getByRole('button', {name: 'Join'});
-    this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
     this.notificationsButton = page.getByRole('menuitem', {name: 'Notifications'});
     this.addToFavoritesButton = page.getByRole('menuitem', {name: 'Add to favorites'});
   }
@@ -105,6 +103,7 @@ export class ConversationListPage {
       blockButton: contextMenu.getByRole('button', {name: 'Block'}),
       unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
       moveToButton: contextMenu.getByRole('button', {name: 'Move to'}),
+      clearContentButton: contextMenu.getByRole('button', {name: 'Clear content'}),
       leaveConversationButton: contextMenu.getByRole('button', {name: 'Leave'}),
     });
   }
