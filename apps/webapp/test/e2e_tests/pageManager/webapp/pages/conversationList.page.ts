@@ -28,7 +28,6 @@ export class ConversationListPage {
   readonly createGroupButton: Locator;
   readonly pendingConnectionRequest: Locator;
   readonly searchConversationsInput: Locator;
-  readonly blockedChip: Locator;
   readonly moveToMenu: Locator;
   readonly createNewFolderButton: Locator;
   readonly conversationListHeaderTitle: Locator;
@@ -44,7 +43,6 @@ export class ConversationListPage {
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
     this.searchConversationsInput = page.getByTestId('search-conversations');
-    this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
     this.moveToMenu = page.getByRole('menu');
     this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
@@ -87,6 +85,7 @@ export class ConversationListPage {
       unreadIndicator: conversation.getByTitle('Unread message'),
       mutedIndicator: conversation.getByTitle('Muted conversation'),
       mentionIndicator: conversation.getByTitle('Unread mention'),
+      blockedIndicator: conversation.locator(`span[data-uie-name="status-label"] + span`),
       openContextMenu: () => this.openContextMenu(conversation),
     });
   }
