@@ -219,12 +219,16 @@ export class ConversationDetailsPage {
     await this.clearConversationContentButton.click();
   }
 
-  async setNotifications(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
+  async setNotifications(value: Parameters<typeof this.selectNotificationsLevel>[0]) {
     await this.notificationsButton.click();
-    await this.page.getByRole('radiogroup').getByText(value).click();
+    await this.selectNotificationsLevel(value);
 
     // Close the settings by clicking "Go back" button.
     await this.page.getByRole('button', {name: 'Go back'}).click();
+  }
+
+  async selectNotificationsLevel(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
+    await this.page.getByRole('radiogroup').getByText(value).click();
   }
 
   async changeConversationName(newConversationName: string) {

@@ -52,11 +52,6 @@ export class ConversationListPage {
     await this.pendingConnectionRequest.click();
   }
 
-  async setNotifications(level: 'Everything' | 'Mentions and replies' | 'Nothing') {
-    await this.notificationsButton.click(); // Click the "Notifications" menu item
-    await this.page.getByRole('radiogroup').locator('label', {hasText: level}).click(); // Click the specified radio button
-  }
-
   async clickCreateGroup() {
     await this.createGroupButton.click();
   }
@@ -102,6 +97,7 @@ export class ConversationListPage {
       blockButton: contextMenu.getByRole('button', {name: 'Block'}),
       unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
       moveToButton: contextMenu.getByRole('button', {name: 'Move to'}),
+      notificationsButton: contextMenu.getByRole('menuitem', {name: 'Notifications'}),
       clearContentButton: contextMenu.getByRole('button', {name: 'Clear content'}),
       leaveConversationButton: contextMenu.getByRole('button', {name: 'Leave'}),
     });
