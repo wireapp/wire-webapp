@@ -124,9 +124,20 @@ const GroupCreationModal = ({
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
   const [selectedProtocol, setSelectedProtocol] = useState<ProtocolOption>(initialProtocol);
+
+  const isAppsFeatureAvailable =
+    isTeam &&
+    checkAppsFeatureAvailability({
+      protocol: selectedProtocol.value,
+      isAppsEnabled: isAppsEnabledForTeam,
+      hasWhitelistedServices: hasWhitelistedServicesInTeam,
+    });
+
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
-  const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+  const [accessState, setAccessState] = useState<ACCESS_STATE>(
+    isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM,
+  );
   const [nameError, setNameError] = useState<string>('');
   const [groupName, setGroupName] = useState<string>('');
   const [participantsInput, setParticipantsInput] = useState<string>('');
@@ -160,14 +171,6 @@ const GroupCreationModal = ({
   const isGuestAndServicesRoom = accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES;
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
-
-  const isAppsFeatureAvailable =
-    isTeam &&
-    checkAppsFeatureAvailability({
-      protocol: selectedProtocol.value,
-      isAppsEnabled: isAppsEnabledForTeam,
-      hasWhitelistedServices: hasWhitelistedServicesInTeam,
-    });
 
   const isServicesEnabled = isAppsFeatureAvailable && (isServicesRoom || isGuestAndServicesRoom);
 
@@ -225,6 +228,10 @@ const GroupCreationModal = ({
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
+  const onOpen = () => {
+    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
+  };
+
   const onClose = () => {
     setIsCreatingConversation(false);
     setNameError('');
@@ -232,7 +239,7 @@ const GroupCreationModal = ({
     setParticipantsInput('');
     setSelectedContacts([]);
     setGroupCreationState(GroupCreationModalState.DEFAULT);
-    setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
   const clickOnCreate = async (
@@ -372,6 +379,7 @@ const GroupCreationModal = ({
       className="group-creation__modal"
       wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
       isShown={isShown}
+      onOpened={onOpen}
       onClosed={onClose}
       data-uie-name="group-creation-label"
       onKeyDown={stateIsPreferences ? handleEscape : undefined}
