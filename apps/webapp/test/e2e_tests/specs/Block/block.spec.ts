@@ -138,7 +138,9 @@ test.describe('User Blocking', () => {
         const message = userAPages.conversation().getMessage({sender: userB});
         await expect(message).not.toBeVisible();
         // Step 7: 'Blocked' chip is visible next to the name of User B in the conversation list
-        const statusTextElement = userAPages.conversationList().blockedChip;
+        const statusTextElement = userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName, {protocol: 'mls'}).blockedIndicator;
         await expect(statusTextElement).toBeVisible();
         await expect(statusTextElement).toHaveText('Blocked');
         // Step 8: Profile Picture of User B is replaced by 'blocked' picture
