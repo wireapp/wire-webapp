@@ -102,8 +102,9 @@ test.describe('Archive', () => {
 
       if (tag === '@TC-103') {
         await test.step('User mutes the conversation', async () => {
-          await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
-          await pages.conversationList().setNotifications('Nothing');
+          const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+          await contextMenu.notificationsButton.click();
+          await pages.conversationDetails().selectNotificationsLevel('Nothing');
         });
       }
 
