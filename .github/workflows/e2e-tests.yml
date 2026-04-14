@@ -183,21 +183,20 @@ jobs:
         id: test-results
         run: |
           REPORT="${{ env.PLAYWRIGHT_REPORT_PATH }}/report.json"
-          if [ -f "$REPORT" ]; then
-            PASSED=$(jq '[.suites[].specs[].tests[].results[].status] | map(select(. == "passed")) | length' "$REPORT")
-            FAILED=$(jq '[.suites[].specs[].tests[].results[].status] | map(select(. == "failed" or . == "timedOut")) | length' "$REPORT")
-            SKIPPED=$(jq '[.suites[].specs[].tests[].results[].status] | map(select(. == "skipped")) | length' "$REPORT")
-            TOTAL=$((PASSED + FAILED + SKIPPED))
-            echo "passed=$PASSED" >> $GITHUB_OUTPUT
-            echo "failed=$FAILED" >> $GITHUB_OUTPUT
-            echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
-            echo "total=$TOTAL" >> $GITHUB_OUTPUT
-          else
-            echo "passed=0" >> $GITHUB_OUTPUT
-            echo "failed=0" >> $GITHUB_OUTPUT
-            echo "skipped=0" >> $GITHUB_OUTPUT
-            echo "total=0" >> $GITHUB_OUTPUT
+          if [ ! -f "$REPORT" ]; then
+            echo "::error::Report file not found at $REPORT"
+            exit 1
           fi
+          PASSED=$(jq '[.suites[].specs[].tests[] | select((.results | length) == 1 and (.results[0].status == "passed"))] | length' "$REPORT")
+          FAILED=$(jq '[.suites[].specs[].tests[] | select(.results[-1].status == "failed" or .results[-1].status == "timedOut")] | length' "$REPORT")
+          SKIPPED=$(jq '[.suites[].specs[].tests[] | select((.results | length) == 1 and (.results[0].status == "skipped"))] | length' "$REPORT")
+          FLAKY=$(jq '[.suites[].specs[].tests[] | select((.results | length) > 1 and (.results[-1].status == "passed"))] | length' "$REPORT")
+          TOTAL=$((PASSED + FAILED + SKIPPED + FLAKY))
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+          echo "flaky=$FLAKY" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
 
       - name: Notify on Wire if succeeded
         if: success()
@@ -209,7 +208,7 @@ jobs:
           status: ${{ job.status }}
           text: |
             ✅ Web E2E Tests succeeded ✅
-            **Results:** ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.skipped }} skipped
+            **Results:** ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped
             **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
             **Triggered by:** ${{ github.triggering_actor }}
             **Report:** ${{ steps.upload_playwright_report.outputs.artifact-url }}
@@ -225,7 +224,7 @@ jobs:
           status: ${{ job.status }}
           text: |
             ❌ Web E2E Tests failed ❌
-            **Results:** ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.skipped }} skipped
+            **Results:** ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped
             **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
             **Triggered by:** ${{ github.triggering_actor }}
             **Report:** ${{ steps.upload_playwright_report.outputs.artifact-url }}
