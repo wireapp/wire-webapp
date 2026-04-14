@@ -33,7 +33,7 @@ export async function blockUserFromConversationList(pageManager: PageManager, us
   const {pages, modals} = pageManager.webapp;
 
   await pages.conversationList().openConversation(userToBlock.fullName);
-  await pages.conversationList().clickConversationOptions(userToBlock.fullName);
+  await pages.conversationList().getConversationLocator(userToBlock.fullName).openContextMenu();
   await pages.conversationList().clickBlockConversation();
   await modals.blockWarning().clickBlock();
 }
@@ -94,7 +94,7 @@ test.describe('User Blocking', () => {
         // Step 1: User A opens conversation with User B
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         // Step 2: User A opens the options menu for user B
-        await userAPages.conversationList().clickConversationOptions(userB.fullName);
+        await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).openContextMenu();
         // Step 3: User A opens modal and clicks 'Block' button
         await userAPages.conversationList().clickBlockConversation();
         // Step 4: User A clicks 'Cancel' button
@@ -204,7 +204,7 @@ test.describe('User Blocking', () => {
         await blockUserFromProfileView(userAPageManagerInstance);
         await expect(userAPages.conversation().messageInput).toBeHidden();
         // Step 3: User A unblocks User B from Conversation Details Options
-        await userAPages.conversationList().clickConversationOptions(userB.fullName);
+        await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).openContextMenu();
         await userAPages.conversationList().clickUnblockConversation();
         await userAModals.confirm().clickAction();
         // Step 4: User A send message to User B
@@ -343,7 +343,7 @@ test.describe('User Blocking', () => {
       await userAPages.conversationList().openConversation(userB.fullName);
 
       // Step 2: User A opens the options menu for user B
-      await userAPages.conversationList().clickConversationOptions(userB.fullName);
+      await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
 
       // Step 3: Block conversation button is not visible for team members
       await expect(userAPages.conversationList().blockConversationMenuButton).not.toBeAttached();

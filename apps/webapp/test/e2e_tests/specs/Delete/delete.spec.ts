@@ -139,7 +139,7 @@ test.describe('Delete', () => {
 
       await test.step('Unarchive conversation', async () => {
         await components.conversationSidebar().clickArchive();
-        await pages.conversationList().clickConversationOptions(userB.fullName);
+        await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
         await pages.conversationList().unarchiveConversation();
         await components.conversationSidebar().clickAllConversationsButton();
       });

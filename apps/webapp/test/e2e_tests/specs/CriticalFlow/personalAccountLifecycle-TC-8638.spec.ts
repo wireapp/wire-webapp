@@ -116,10 +116,10 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   await test.step('Personal user A blocks personal user B', async () => {
     const {pages, modals} = pageManagerA.webapp;
-    const conversation = pages.conversationList().getConversationLocator(userB.fullName);
+    const conversation = pages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'});
 
     await expect(conversation).not.toContainText('Blocked');
-    await pages.conversationList().clickConversationOptions(userB.fullName);
+    await conversation.openContextMenu();
     await pages.conversationList().clickBlockConversation();
     await expect(modals.blockWarning().modal).toBeVisible();
     await expect(modals.blockWarning().modalTitle).toContainText(`Block ${userB.fullName}`);

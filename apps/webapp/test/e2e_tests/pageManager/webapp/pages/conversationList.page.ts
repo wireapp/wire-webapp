@@ -80,10 +80,6 @@ export class ConversationListPage {
     await this.pendingConnectionRequest.click();
   }
 
-  async clickConversationOptions(conversationName: string) {
-    await this.getConversationLocator(conversationName).getByTestId('go-options').first().click();
-  }
-
   async clickBlockConversation() {
     await this.blockConversationMenuButton.click();
   }
