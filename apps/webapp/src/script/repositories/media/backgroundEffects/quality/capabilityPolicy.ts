@@ -17,13 +17,15 @@
  *
  */
 
+import {QUALITY_TIERS} from 'Repositories/media/backgroundEffects/quality/qualityController';
+
 import {TIER_DEFINITIONS} from './definitions';
 
 import type {
   CapabilityInfo,
   QualityPolicyMode,
-  QualityPolicyResult,
   QualityPolicyResolver,
+  QualityPolicyResult,
   QualityTier,
 } from '../backgroundEffectsWorkerTypes';
 
@@ -34,16 +36,16 @@ import type {
  * @returns Next lower tier, or 'D' if already at minimum.
  */
 const downgradeTier = (tier: QualityTier): QualityTier => {
-  if (tier === 'superhigh') {
-    return 'high';
+  if (tier === QUALITY_TIERS.SUPERHIGH) {
+    return QUALITY_TIERS.HIGH;
   }
-  if (tier === 'high') {
-    return 'medium';
+  if (tier === QUALITY_TIERS.HIGH) {
+    return QUALITY_TIERS.MEDIUM;
   }
-  if (tier === 'medium') {
-    return 'low';
+  if (tier === QUALITY_TIERS.MEDIUM) {
+    return QUALITY_TIERS.LOW;
   }
-  return 'bypass';
+  return QUALITY_TIERS.BYPASS;
 };
 
 /**
@@ -53,16 +55,16 @@ const downgradeTier = (tier: QualityTier): QualityTier => {
  * @returns Next higher tier, or 'A' if already at maximum.
  */
 const upgradeTier = (tier: QualityTier): QualityTier => {
-  if (tier === 'bypass') {
-    return 'low';
+  if (tier === QUALITY_TIERS.BYPASS) {
+    return QUALITY_TIERS.LOW;
   }
-  if (tier === 'low') {
-    return 'medium';
+  if (tier === QUALITY_TIERS.LOW) {
+    return QUALITY_TIERS.MEDIUM;
   }
-  if (tier === 'medium') {
-    return 'high';
+  if (tier === QUALITY_TIERS.MEDIUM) {
+    return QUALITY_TIERS.HIGH;
   }
-  return 'superhigh';
+  return QUALITY_TIERS.SUPERHIGH;
 };
 
 /**
@@ -79,15 +81,15 @@ const upgradeTier = (tier: QualityTier): QualityTier => {
  */
 export const baselineTierForCapabilities = (capabilities: CapabilityInfo): QualityTier => {
   if (capabilities.webgl2 && capabilities.worker && capabilities.offscreenCanvas) {
-    return 'superhigh';
+    return QUALITY_TIERS.SUPERHIGH;
   }
   if (capabilities.webgl2) {
-    return 'medium';
+    return QUALITY_TIERS.MEDIUM;
   }
   if (typeof document !== 'undefined') {
-    return 'low';
+    return QUALITY_TIERS.LOW;
   }
-  return 'bypass';
+  return QUALITY_TIERS.BYPASS;
 };
 
 /**
