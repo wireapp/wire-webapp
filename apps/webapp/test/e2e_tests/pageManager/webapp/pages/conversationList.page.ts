@@ -27,7 +27,6 @@ export class ConversationListPage {
   readonly list: Locator;
   readonly createGroupButton: Locator;
   readonly pendingConnectionRequest: Locator;
-  readonly leaveConversationButton: Locator;
   readonly searchConversationsInput: Locator;
   readonly blockedChip: Locator;
   readonly moveToMenu: Locator;
@@ -44,7 +43,6 @@ export class ConversationListPage {
     this.list = page.getByRole('list', {name: 'Conversation list'});
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
-    this.leaveConversationButton = page.getByTestId('conversation-leave');
     this.searchConversationsInput = page.getByTestId('search-conversations');
     this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
     this.moveToMenu = page.getByRole('menu');
@@ -112,11 +110,8 @@ export class ConversationListPage {
       blockButton: contextMenu.getByRole('button', {name: 'Block'}),
       unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
       moveToButton: contextMenu.getByRole('button', {name: 'Move to'}),
+      leaveConversationButton: contextMenu.getByRole('button', {name: 'Leave'}),
     });
-  }
-
-  async leaveConversation() {
-    await this.leaveConversationButton.click();
   }
 
   async searchConversation(conversationName: string) {

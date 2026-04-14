@@ -97,8 +97,8 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
 
   await test.step('Team owner leave conversation with clear history', async () => {
     const {pages, modals} = ownerPageManager.webapp;
-    await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
-    await pages.conversationList().leaveConversation();
+    const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
+    await contextMenu.leaveConversationButton.click();
     await modals.leaveConversation().toggleCheckbox();
     await modals.leaveConversation().clickConfirm();
     await expect(pages.conversation().messageInput).not.toBeAttached();
