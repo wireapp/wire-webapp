@@ -93,38 +93,41 @@ test.describe('Group Conversation', () => {
     },
   );
 
-  test(
-    'I want to delete a group as the Group Creator',
-    {tag: ['@TC-1089', '@TC-1090', '@TC-1090', '@regression']},
-    async ({createPage}) => {
-      const {pages, modals} = PageManager.from(
-        await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC)),
-      ).webapp;
+  test('I want to delete a group as the Group Creator', {tag: ['@TC-1089', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await createGroup(pages, groupName, [userB, userC]);
-      const conversation = pages.conversationList().list.filter({hasText: groupName});
+    await createGroup(userAPages, groupName, [userB, userC]);
+    const adminGroupLocator = userAPages.conversationList().list.filter({hasText: groupName});
+    const memberGroupLocator = userBPages.conversationList().list.filter({hasText: groupName});
 
-      await pages.conversationList().openConversation(groupName);
-      await pages.conversation().clickConversationInfoButton();
-      await pages.conversationDetails().deleteGroupButton.click();
+    // Pre-condition: Ensure the member can see the group before the creator deletes it
+    await expect(memberGroupLocator).toBeVisible();
 
-      // User sees a confirmation dialog with explanation when he initiates delete group
-      await expect(modals.confirm().modalText).toContainText(
-        'This will delete the conversation and all content for all participants on all devices',
-      );
+    // User A initiate group deletion
+    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversation().clickConversationInfoButton();
+    await userAPages.conversationDetails().deleteGroupButton.click();
 
-      // User can cancel the delete group from the confirmation dialog
-      await modals.confirm().cancelButton.click();
-      await expect(conversation).toBeVisible();
+    // User sees a confirmation dialog with explanation when he initiates delete group
+    await expect(userAModals.confirm().modalText).toContainText(
+      'This will delete the conversation and all content for all participants on all devices',
+    );
 
-      // User can delete group as the group creator
-      await pages.conversationDetails().deleteGroupButton.click();
-      await modals.confirm().actionButton.click();
+    // User can cancel the delete group from the confirmation dialog
+    await userAModals.confirm().cancelButton.click();
+    await expect(adminGroupLocator).toBeVisible();
 
-      await conversation.waitFor({state: 'detached'});
-      await expect(conversation).not.toBeVisible();
-    },
-  );
+    // User can delete group as the group creator
+    await userAPages.conversationDetails().deleteGroupButton.click();
+    await userAModals.confirm().actionButton.click();
+
+    // Verify the group no longer exists for any user
+    await adminGroupLocator.waitFor({state: 'detached'});
+    await expect(adminGroupLocator).toBeHidden();
+    await expect(memberGroupLocator).toBeHidden();
+  });
 
   test(
     'I want to be notified about the group deletion when app is in background',
