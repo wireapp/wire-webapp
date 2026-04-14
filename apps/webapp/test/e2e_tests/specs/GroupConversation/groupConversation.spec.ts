@@ -245,4 +245,39 @@ test.describe('Group Conversation', () => {
       ).toBeVisible();
     },
   );
+
+  test(
+    'As an Admin I want to see the group admin toggle on a participants profile in Conversation details',
+    {tag: ['@TC-1481', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await createGroup(pages, groupName, [userB]);
+      await pages.conversationList().openConversation(groupName);
+      await pages.conversation().toggleGroupInformation();
+
+      await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+      await pages.conversationDetails().openParticipantDetails(userB.fullName);
+      await expect(pages.conversation().makeAdminToggle).toBeVisible();
+    },
+  );
+
+  test(
+    'As a group member I should not see group admin toggle while viewing Admin`s profile in Conversation details',
+    {tag: ['@TC-1483', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await createGroup(userAPages, groupName, [userB]);
+      await userBPages.conversationList().openConversation(groupName);
+      await userBPages.conversation().toggleGroupInformation();
+
+      await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userA.fullName})).toBeVisible();
+      await userBPages.conversationDetails().openParticipantDetails(userA.fullName);
+      await expect(userBPages.conversation().makeAdminToggle).not.toBeVisible();
+    },
+  );
 });
