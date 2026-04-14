@@ -121,12 +121,12 @@ export class ConversationListPage {
       unreadIndicator: conversation.getByTitle('Unread message'),
       mutedIndicator: conversation.getByTitle('Muted conversation'),
       mentionIndicator: conversation.getByTitle('Unread mention'),
+      openContextMenu: () => this.openContextMenu(conversation),
     });
   }
 
-  async openContextMenu(conversationName: string) {
-    await this.getConversationLocator(conversationName).click();
-    await this.getConversationLocator(conversationName).click({button: 'right'});
+  async openContextMenu(conversation: Locator) {
+    await conversation.getByRole('button', {name: 'Open conversation options'}).click();
   }
 
   async leaveConversation() {
