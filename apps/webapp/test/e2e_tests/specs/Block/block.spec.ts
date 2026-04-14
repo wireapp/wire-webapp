@@ -143,9 +143,10 @@ test.describe('User Blocking', () => {
           .getConversationLocator(userB.fullName, {protocol: 'mls'}).blockedIndicator;
         await expect(statusTextElement).toBeVisible();
         await expect(statusTextElement).toHaveText('Blocked');
+
         // Step 8: Profile Picture of User B is replaced by 'blocked' picture
-        const avatarWrapperUserB = await userAPages.conversationList().getUserAvatarWrapper(userB);
-        const blockedIcon = avatarWrapperUserB.locator('[data-uie-value="blocked"]');
+        const {userAvatar} = userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'});
+        const blockedIcon = userAvatar.locator('[data-uie-value="blocked"]');
         await expect(blockedIcon).toBeVisible();
       },
     );
