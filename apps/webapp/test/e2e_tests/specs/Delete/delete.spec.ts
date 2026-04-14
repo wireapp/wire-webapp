@@ -133,8 +133,8 @@ test.describe('Delete', () => {
       });
 
       await test.step('Archive conversation', async () => {
-        await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
-        await pages.conversationList().archiveConversation();
+        const contextMenu = await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+        await contextMenu.archiveButton.click();
       });
 
       await test.step('Unarchive conversation', async () => {
