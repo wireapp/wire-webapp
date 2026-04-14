@@ -28,7 +28,6 @@ export class ConversationListPage {
   readonly createGroupButton: Locator;
   readonly pendingConnectionRequest: Locator;
   readonly searchConversationsInput: Locator;
-  readonly moveToMenu: Locator;
   readonly conversationListHeaderTitle: Locator;
   readonly joinCallButton: Locator;
   readonly clearContentButton: Locator;
@@ -42,7 +41,6 @@ export class ConversationListPage {
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
     this.searchConversationsInput = page.getByTestId('search-conversations');
-    this.moveToMenu = page.getByRole('menu');
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
     this.joinCallButton = page.getByRole('button', {name: 'Join'});
     this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
