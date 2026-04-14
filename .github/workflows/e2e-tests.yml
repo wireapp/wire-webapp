@@ -199,7 +199,7 @@ jobs:
           echo "total=$TOTAL" >> $GITHUB_OUTPUT
 
       - name: Notify on Wire if succeeded
-        if: success()
+        if: needs.test.result == 'success'
         continue-on-error: true
         uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
@@ -215,7 +215,7 @@ jobs:
             **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
       - name: Notify on Wire if failed
-        if: failure()
+        if: needs.test.result == 'failure'
         continue-on-error: true
         uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
