@@ -77,7 +77,7 @@ export const Preference = () => {
     if (!isAppsFeatureAvailable && isServicesEnabled) {
       setIsServicesEnabled(false);
     }
-  }, [isAppsFeatureAvailable, isServicesEnabled, setIsServicesEnabled]);
+  }, [isAppsFeatureAvailable, isServicesEnabled]);
 
   return (
     <>
