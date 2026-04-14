@@ -50,7 +50,7 @@ on:
       OP_SERVICE_ACCOUNT_TOKEN:
         required: true
       WIRE_E2E_TEST_BOT_WEBHOOK_URL:
-        required: true
+        required: false
     outputs:
       reportArtifactId:
         description: ID of the playwright report artifact
@@ -199,11 +199,11 @@ jobs:
           echo "total=$TOTAL" >> $GITHUB_OUTPUT
 
       - name: Notify on Wire if succeeded
-        if: needs.test.result == 'success'
+        if: needs.test.result == 'success' && env.WIRE_WEBHOOK_URL != ''
         continue-on-error: true
         uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
+          WIRE_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
         with:
           status: custom
           custom_payload: |
@@ -212,11 +212,11 @@ jobs:
             }
 
       - name: Notify on Wire if failed
-        if: needs.test.result == 'failure'
+        if: needs.test.result == 'failure' && env.WIRE_WEBHOOK_URL != ''
         continue-on-error: true
         uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
+          WIRE_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
         with:
           status: custom
           custom_payload: |
