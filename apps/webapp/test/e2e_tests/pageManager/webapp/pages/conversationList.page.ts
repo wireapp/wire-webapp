@@ -65,6 +65,7 @@ export class ConversationListPage {
     }
 
     return Object.assign(conversation, {
+      userAvatar: conversation.getByTestId('element-avatar-user'),
       unreadIndicator: conversation.getByTitle('Unread message'),
       mutedIndicator: conversation.getByTitle('Muted conversation'),
       mentionIndicator: conversation.getByTitle('Unread mention'),
@@ -97,10 +98,6 @@ export class ConversationListPage {
       clearContentButton: contextMenu.getByRole('button', {name: 'Clear content'}),
       leaveConversationButton: contextMenu.getByRole('button', {name: 'Leave'}),
     });
-  }
-
-  async getUserAvatarWrapper(user: User): Promise<Locator> {
-    return this.getConversationLocator(user.fullName).getByTestId('element-avatar-user');
   }
 
   getUserStatusIcon(user: User) {
