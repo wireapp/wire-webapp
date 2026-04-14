@@ -29,7 +29,6 @@ export class ConversationListPage {
   readonly pendingConnectionRequest: Locator;
   readonly searchConversationsInput: Locator;
   readonly conversationListHeaderTitle: Locator;
-  readonly notificationsButton: Locator;
   readonly addToFavoritesButton: Locator;
 
   constructor(page: Page) {
@@ -40,7 +39,6 @@ export class ConversationListPage {
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
     this.searchConversationsInput = page.getByTestId('search-conversations');
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
-    this.notificationsButton = page.getByRole('menuitem', {name: 'Notifications'});
     this.addToFavoritesButton = page.getByRole('menuitem', {name: 'Add to favorites'});
   }
 
