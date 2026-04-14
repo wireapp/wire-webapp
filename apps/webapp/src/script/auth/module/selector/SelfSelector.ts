@@ -18,6 +18,7 @@
  */
 
 import type {Self} from '@wireapp/api-client/lib/self/';
+import {UserType} from '@wireapp/api-client/lib/user';
 
 import {Config} from '../../../Config';
 import type {RootState} from '../reducer';
@@ -33,6 +34,7 @@ const unsetSelf: Self = {
   name: '',
   sso_id: undefined,
   team: undefined,
+  type: UserType.REGULAR,
 };
 
 export const getConsents = (state: RootState) => state.selfState.consents || {};

@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 
@@ -102,6 +102,9 @@ export class User {
   public teamId?: string;
   /** The federated domain (when the user is on a federated server) */
   public domain: string;
+  public type: UserType;
+  public category?: string;
+  public description?: string;
   public readonly isBlockedLegalHold: ko.PureComputed<boolean>;
   public readonly supportedProtocols: ko.Observable<null | CONVERSATION_PROTOCOL[]>;
 
@@ -140,6 +143,8 @@ export class User {
     this.isDeleted = false;
     this.providerId = undefined;
     this.serviceId = undefined;
+    this.category = undefined;
+    this.description = undefined;
 
     this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
 
