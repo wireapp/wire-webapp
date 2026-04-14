@@ -216,8 +216,8 @@ test.describe('Group Conversation', () => {
       await userBPages.conversationList().openConversation(groupName);
 
       // User A leaves conversation through options menu from conversation list
-      await userAPages.conversationList().getConversationLocator(groupName).openContextMenu();
-      await userAPages.conversationList().leaveConversation();
+      const contextMenu = await userAPages.conversationList().getConversationLocator(groupName).openContextMenu();
+      await contextMenu.leaveConversationButton.click();
       await userAModals.leaveConversation().confirmButton.click();
 
       await expect(userBPages.conversation().systemMessages.filter({hasText: `${userA.fullName} left`})).toBeVisible();
