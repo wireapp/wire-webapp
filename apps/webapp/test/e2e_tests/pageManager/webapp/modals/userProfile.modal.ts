@@ -41,7 +41,7 @@ export class UserProfileModal {
     this.connectButton = page.getByTestId('modal-user-profile').getByTestId('do-send-request');
     this.startConversationButton = page.getByTestId('modal-user-profile').getByTestId('start-conversation');
     this.unblockButton = page.getByTestId('modal-user-profile').getByTestId('do-unblock');
-    this.blockButton = page.getByRole('button', {name: 'Block...'});
+    this.blockButton = page.getByRole('button', {name: 'Block…'}).getByTestId('do-block');
     this.openConversationButton = this.modal.getByRole('button', {name: 'Open conversation'}).getByTestId('go-conversation');
     this.guestChip = page.getByTestId('status-guest');
     this.connectWarning = page.getByText(/Get certainty about .*’s identity before connecting/);
