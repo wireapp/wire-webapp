@@ -76,11 +76,11 @@ test.describe('Clear Conversation Content', () => {
         await expect(userAPages.conversation().messages).toHaveCount(3);
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-        await userAPages
+        const contextMenu = await userAPages
           .conversationList()
-          .getConversationLocator(conversationName, {protocol: 'mls'})
+          .getConversationLocator(conversationName)
           .openContextMenu();
-        await userAPages.conversationList().clearContentButton.click();
+        await contextMenu.clearContentButton.click();
         // Step 4: Warning Popup should open
         await expect(userAModals.optionModal().modal).toBeVisible();
 
@@ -127,8 +127,11 @@ test.describe('Clear Conversation Content', () => {
         await expect(userAPages.conversation().messages).toHaveCount(2);
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-        await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).openContextMenu();
-        await userAPages.conversationList().clearContentButton.click();
+        const contextMenu = await userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName, {protocol: 'mls'})
+          .openContextMenu();
+        await contextMenu.clearContentButton.click();
         // Step 4: Warning Popup should open
         await expect(userAModals.confirm().modal).toBeVisible();
 
@@ -195,11 +198,11 @@ test.describe('Clear Conversation Content', () => {
         }
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-        await userAPages
+        const contextMenu = await userAPages
           .conversationList()
           .getConversationLocator(conversationName, {protocol: conversationType === '1:1' ? 'mls' : undefined})
           .openContextMenu();
-        await userAPages.conversationList().clearContentButton.click();
+        await contextMenu.clearContentButton.click();
 
         // Step 4: Warning Popup should open and User A clicks 'Clear'
         if (conversationType === 'group') {
