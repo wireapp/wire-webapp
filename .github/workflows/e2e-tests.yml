@@ -181,7 +181,6 @@ jobs:
 
       - name: Extract test results
         id: test-results
-        working-directory: apps/webapp
         run: |
           REPORT="${{ env.PLAYWRIGHT_REPORT_PATH }}/report.json"
           if [ -f "$REPORT" ]; then
