@@ -23,7 +23,7 @@ import {resolve} from 'node:path';
 
 config({path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true});
 
-const numberOfRetriesOnCI = 3;
+const numberOfRetriesOnCI = 2;
 const numberOfParallelWorkersOnCI = 3;
 
 /**
