@@ -31,8 +31,8 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
  */
 async function createCustomFolder(pageManager: PageManager, conversationName: string, folderName: string) {
   const {pages, modals} = pageManager.webapp;
-  await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
-  await pages.conversationList().moveConversationButton.click();
+  const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
+  await contextMenu.moveToButton.click();
 
   await pages.conversationList().createNewFolderButton.click();
 
@@ -48,9 +48,9 @@ async function createCustomFolder(pageManager: PageManager, conversationName: st
  */
 async function moveConversationToFolder(pageManager: PageManager, conversationName: string, folderName: string) {
   const pages = pageManager.webapp.pages;
-  await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
-  await pages.conversationList().moveConversationButton.click();
-  await pages.conversationList().getMoveToFolderButton(folderName).click();
+  const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
+  await contextMenu.moveToButton.click();
+  await contextMenu.getByRole('button', {name: folderName, exact: true}).click();
 }
 
 /* ============================ */
@@ -181,8 +181,8 @@ test.describe('Folders', () => {
     // Step 1: User A opens 1:1 conversation with User B
     await userAPages.conversationList().openConversation(userB.fullName);
     // Step 2: User A wants to move 1:1 conversation with User B into custom folder
-    await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
-    await userAPages.conversationList().moveConversationButton.click();
+    const contextMenu = await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+    await contextMenu.moveToButton.click();
     await userAPages.conversationList().createNewFolderButton.click();
 
     // Step 3: 'Create Folder Modal' should still be visible after click on create

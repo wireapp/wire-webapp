@@ -30,7 +30,6 @@ export class ConversationListPage {
   readonly leaveConversationButton: Locator;
   readonly searchConversationsInput: Locator;
   readonly blockedChip: Locator;
-  readonly moveConversationButton: Locator;
   readonly moveToMenu: Locator;
   readonly createNewFolderButton: Locator;
   readonly conversationListHeaderTitle: Locator;
@@ -48,7 +47,6 @@ export class ConversationListPage {
     this.leaveConversationButton = page.getByTestId('conversation-leave');
     this.searchConversationsInput = page.getByTestId('search-conversations');
     this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
-    this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
     this.moveToMenu = page.getByRole('menu');
     this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
@@ -113,6 +111,7 @@ export class ConversationListPage {
       unarchiveButton: contextMenu.getByRole('button', {name: 'Unarchive'}),
       blockButton: contextMenu.getByRole('button', {name: 'Block'}),
       unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
+      moveToButton: contextMenu.getByRole('button', {name: 'Move to'}),
     });
   }
 
@@ -135,10 +134,6 @@ export class ConversationListPage {
 
   getRemoveConversationFromFolderButton(folderName: string) {
     return this.page.getByRole('button', {name: `Remove from "${folderName}"`});
-  }
-
-  getMoveToFolderButton(folderName: string) {
-    return this.moveToMenu.getByRole('button', {name: folderName, exact: true});
   }
 
   async getMutedConversationBadge(conversationName: string) {
