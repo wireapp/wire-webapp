@@ -32,8 +32,8 @@ import {createGroup} from '../../utils/userActions';
 export async function blockUserFromConversationList(pageManager: PageManager, userToBlock: User) {
   const {pages, modals} = pageManager.webapp;
 
-  await pages.conversationList().openConversation(userToBlock.fullName);
-  const contextMenu = await pages.conversationList().getConversationLocator(userToBlock.fullName).openContextMenu();
+  const conversation = await pages.conversationList().getConversationLocator(userToBlock.fullName).open();
+  const contextMenu = await conversation.openContextMenu();
   await contextMenu.blockButton.click();
   await modals.blockWarning().clickBlock();
 }
@@ -92,18 +92,18 @@ test.describe('User Blocking', () => {
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A opens conversation with User B
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        // Step 2: User A opens the options menu for user B
-        const contextMenu = await userAPages
+        const conversation = await userAPages
           .conversationList()
           .getConversationLocator(userB.fullName, {protocol: 'mls'})
-          .openContextMenu();
+          .open();
+        // Step 2: User A opens the options menu for user B
+        const contextMenu = await conversation.openContextMenu();
         // Step 3: User A opens modal and clicks 'Block' button
         await contextMenu.blockButton.click();
         // Step 4: User A clicks 'Cancel' button
         await userAModals.blockWarning().clickCancel();
         // Step 5: Conversation is still present, and User A can open it
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await conversation.open();
         // Step 6: User A still can send message to User B
         await expect(userAPages.conversation().messageInput).toBeVisible();
       },
@@ -122,7 +122,12 @@ test.describe('User Blocking', () => {
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A and B have a 1:1 conversation
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        const conversation = await userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName, {protocol: 'mls'})
+          .open();
+        await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+
         // Step 2: User A opens conversation info
         await userAPages.conversation().clickConversationInfoButton();
         // Step 3: User A clicks 'Block conversation' button
@@ -130,23 +135,18 @@ test.describe('User Blocking', () => {
         // Step 4: User A clicks 'Confirm' button
         await userAModals.blockWarning().clickBlock();
         // Step 5: User A cannot send message to User B
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await conversation.open();
         await expect(userAPages.conversation().messageInput).not.toBeVisible();
         // Step 6: User B cannot send message to User A
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userBPages.conversation().sendMessage('Message after block');
         const message = userAPages.conversation().getMessage({sender: userB});
         await expect(message).not.toBeVisible();
         // Step 7: 'Blocked' chip is visible next to the name of User B in the conversation list
-        const statusTextElement = userAPages
-          .conversationList()
-          .getConversationLocator(userB.fullName, {protocol: 'mls'}).blockedIndicator;
-        await expect(statusTextElement).toBeVisible();
-        await expect(statusTextElement).toHaveText('Blocked');
+        await expect(conversation.blockedIndicator).toBeVisible();
+        await expect(conversation.blockedIndicator).toHaveText('Blocked');
 
         // Step 8: Profile Picture of User B is replaced by 'blocked' picture
-        const {userAvatar} = userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'});
-        const blockedIcon = userAvatar.locator('[data-uie-value="blocked"]');
+        const blockedIcon = conversation.userAvatar.locator('[data-uie-value="blocked"]');
         await expect(blockedIcon).toBeVisible();
       },
     );
@@ -163,27 +163,27 @@ test.describe('User Blocking', () => {
         // Preconditions: User B accepts the connection request
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
         await userBPages.connectRequest().clickConnectButton();
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
         await createGroup(userAPages, conversationName, [userB]);
 
         await test.step('Step 1: User B sends message to group chat with User A', async () => {
-          await userBPages.conversationList().openConversation(conversationName);
+          await userBPages.conversationList().getConversationLocator(conversationName).open();
           await userBPages.conversation().sendMessage('message before block');
         });
 
         await test.step('Step 2: User A blocks User B from group conversation', async () => {
           // Ensures User A is in the group before blocking
-          await userAPages.conversationList().openConversation(conversationName);
+          await userAPages.conversationList().getConversationLocator(conversationName).open();
           await blockUserFromOpenGroupProfileView(userAPageManager, userB);
         });
 
         await test.step('Step 3: User B writes second message to the group chat after being blocked by User A', async () => {
-          await userBPages.conversationList().openConversation(conversationName);
+          await userBPages.conversationList().getConversationLocator(conversationName).open();
           await userBPages.conversation().sendMessage('message after block');
         });
 
         await test.step('Step 4: User A receives message from User B in Group Chat even though User B is blocked', async () => {
-          await userAPages.conversationList().openConversation(conversationName);
+          await userAPages.conversationList().getConversationLocator(conversationName).open();
           await expect(userAPages.conversation().messages).toHaveCount(2);
         });
       },
@@ -205,27 +205,26 @@ test.describe('User Blocking', () => {
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A and B have a 1:1 conversation
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        const conversation = await userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName, {protocol: 'mls'})
+          .open();
         // Step 2: User A blocks User B
         await blockUserFromProfileView(userAPageManagerInstance);
         await expect(userAPages.conversation().messageInput).toBeHidden();
         // Step 3: User A unblocks User B from Conversation Details Options
-        const contextMenu = await userAPages
-          .conversationList()
-          .getConversationLocator(userB.fullName, {protocol: 'mls'})
-          .openContextMenu();
+        const contextMenu = await conversation.openContextMenu();
         await contextMenu.unblockButton.click();
         await userAModals.confirm().clickAction();
         // Step 4: User A send message to User B
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await conversation.open();
         await userAPages.conversation().sendMessage('Message after unblock');
         // Step 5: User B receives message from User A
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
         await expect(userBPages.conversation().messages).toHaveCount(1);
         // Step 6: User B writes message to User A
         await userBPages.conversation().sendMessage('Message after being unblocked');
         // Step 7: User A receives message from User B
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         const message = userAPages.conversation().getMessage({sender: userB});
         await expect(message).toContainText('Message after being unblocked');
       },
@@ -251,7 +250,7 @@ test.describe('User Blocking', () => {
         // Step 1: User B blocks User A
         await test.step('User B blocks User A', async () => {
           // Open the conversation with User C to prevent the "Wire cannot open this conversation" modal
-          await userAPages.conversationList().openConversation(userC.fullName);
+          await userAPages.conversationList().getConversationLocator(userC.fullName).open();
           await blockUserFromConversationList(userBPageManagerInstance, userA);
         });
 
@@ -304,7 +303,7 @@ test.describe('User Blocking', () => {
         await userBPages.connectRequest().clickConnectButton();
 
         await test.step('User A blocks User B', async () => {
-          await userAPages.conversationList().openConversation(userC.fullName);
+          await userAPages.conversationList().getConversationLocator(userC.fullName).open();
           await blockUserFromConversationList(userAPageManagerInstance, userB);
         });
 
@@ -317,16 +316,16 @@ test.describe('User Blocking', () => {
         });
 
         await test.step('User B receives message sent by User A', async () => {
-          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
           await userAPages.conversation().sendMessage('Message after unblocking');
-          await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+          await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
           await expect(userBPages.conversation().messages).toHaveCount(1);
         });
 
         await test.step('User A receives message sent by User B', async () => {
-          await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+          await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
           await userBPages.conversation().sendMessage('Message after being unblocked');
-          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
           const message = userAPages.conversation().getMessage({sender: userB});
           await expect(message).toContainText('Message after being unblocked');
         });
@@ -349,10 +348,10 @@ test.describe('User Blocking', () => {
       const userAPages = userAPageManager.pages;
 
       // Step 1: User A opens conversation with User B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      const conversation = await userAPages.conversationList().getConversationLocator(userB.fullName).open();
 
       // Step 2: User A opens the options menu for user B
-      const contextMenu = await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+      const contextMenu = await conversation.openContextMenu();
 
       // Step 3: Block conversation button is not visible for team members
       await expect(contextMenu.blockButton).not.toBeAttached();

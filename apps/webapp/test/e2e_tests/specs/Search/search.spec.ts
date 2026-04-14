@@ -49,7 +49,7 @@ test.describe('Search', () => {
 
       const conversationName = 'Group conversation';
       await createGroup(userAPages, conversationName, [userB]);
-      await userAPages.conversationList().openConversation(conversationName);
+      await userAPages.conversationList().getConversationLocator(conversationName).open();
       await userAPages.conversation().sendMessage(`@${userB.username} Group message with mention of User B`);
       await userAPages.conversationList().searchConversationsInput.fill(`@${userB.username}`);
 

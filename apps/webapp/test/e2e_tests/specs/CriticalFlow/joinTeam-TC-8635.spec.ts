@@ -44,10 +44,10 @@ test(
     const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(owner))).webapp.pages;
 
     await test.step('A sends text to owner', async () => {
-      await userAPages.conversationList().openConversation(owner.fullName);
+      await userAPages.conversationList().getConversationLocator(owner.fullName).open();
       await userAPages.conversation().sendMessage('Hello Team Owner!');
 
-      await ownerPages.conversationList().openConversation(userA.fullName);
+      await ownerPages.conversationList().getConversationLocator(userA.fullName).open();
       await expect(ownerPages.conversation().getMessage({content: 'Hello Team Owner!'})).toBeVisible();
     });
 
@@ -57,7 +57,7 @@ test(
     });
 
     await test.step('Owner adds A to group chat and mentions him', async () => {
-      await ownerPages.conversationList().openConversation('Test Group');
+      await ownerPages.conversationList().getConversationLocator('Test Group').open();
 
       // Add user A to group chat
       await ownerPages.conversation().toggleGroupInformation();
@@ -69,7 +69,7 @@ test(
     });
 
     await test.step('User A receives mention in group chat', async () => {
-      await userAPages.conversationList().openConversation('Test Group');
+      await userAPages.conversationList().getConversationLocator('Test Group').open();
       await expect(userAPages.conversation().getMessage({content: `@${userA.fullName}`})).toBeVisible();
     });
   },

@@ -28,7 +28,7 @@ async function openParticipantDetailsFromGroup(
   groupName: string,
   participantName: string,
 ) {
-  await pages.conversationList().openConversation(groupName);
+  await pages.conversationList().getConversationLocator(groupName).open();
   await pages.conversation().clickConversationInfoButton();
   await pages.conversationDetails().openParticipantDetails(participantName);
 }
@@ -64,7 +64,7 @@ test.describe('Participant Profile', () => {
       await acceptConnectionRequest(userCPages);
 
       await test.step('Go to any 1:1 conversation', async () => {
-        await userAPages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversationLocator(userC.fullName, {protocol: 'mls'}).open();
       });
 
       await test.step('Open People popover', async () => {
@@ -149,7 +149,7 @@ test.describe('Participant Profile', () => {
       });
 
       await test.step('User C opens people popover', async () => {
-        await pages.conversationList().openConversation(groupName);
+        await pages.conversationList().getConversationLocator(groupName).open();
         await pages.conversation().clickConversationTitle();
       });
 
@@ -232,7 +232,7 @@ test.describe('Participant Profile', () => {
 
       await createGroup(adminPage, groupName, [userB]);
 
-      await adminPage.conversationList().openConversation(groupName);
+      await adminPage.conversationList().getConversationLocator(groupName).open();
       await adminPage.conversation().clickConversationInfoButton();
 
       await adminPage.conversation().makeUserAdmin(userB.fullName);

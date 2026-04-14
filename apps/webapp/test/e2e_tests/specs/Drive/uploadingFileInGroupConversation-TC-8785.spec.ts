@@ -89,8 +89,8 @@ test(
     });
 
     await test.step('User A sends an image to User B in a group conversation', async () => {
-      await userAPages.conversationList().openConversation(conversationName);
-      await userBPages.conversationList().openConversation(conversationName);
+      await userAPages.conversationList().getConversationLocator(conversationName).open();
+      await userBPages.conversationList().getConversationLocator(conversationName).open();
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().clickSendMessage();
 

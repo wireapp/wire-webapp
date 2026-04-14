@@ -85,14 +85,14 @@ test(
       };
 
       await Promise.all([loginOwner(), loginMember()]);
-      await userBPages.conversationList().openConversation(conversationName);
+      await userBPages.conversationList().getConversationLocator(conversationName).open();
 
       // Wait for some time before uploading the file to make sure the cell is ready
       await new Promise(resolve => setTimeout(resolve, 5000));
     });
 
     await test.step('User A sends a multipart message in a group conversation', async () => {
-      await userAPages.conversationList().openConversation(conversationName);
+      await userAPages.conversationList().getConversationLocator(conversationName).open();
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().setMessageInput(initialMessageText);
       await userAComponents.inputBarControls().clickSendMessage();

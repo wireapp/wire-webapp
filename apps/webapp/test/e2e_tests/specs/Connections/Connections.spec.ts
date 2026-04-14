@@ -72,7 +72,7 @@ test.describe('Connections', () => {
       });
 
       await test.step('B sends a connection request to C via the group conversation', async () => {
-        await memberBPages.conversationList().openConversation('Group');
+        await memberBPages.conversationList().getConversationLocator('Group').open();
         await memberBPages.conversation().conversationInfoButton.click();
         await memberBPages.conversationDetails().openParticipantDetails(memberC.fullName);
         await memberBPages.participantDetails().sendConnectRequest();
@@ -106,10 +106,11 @@ test.describe('Connections', () => {
     async ({createPage}) => {
       const {pages} = PageManager.from(await createPage(withLogin(memberA), withConnectionRequest(memberB))).webapp;
 
-      const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      const conversation = pages.conversationList().getConversationLocator(memberB.fullName);
+      const contextMenu = await conversation.openContextMenu();
       await contextMenu.archiveButton.click();
 
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+      await expect(conversation).toBeVisible();
     },
   );
 });

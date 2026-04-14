@@ -49,7 +49,7 @@ test('Group Video call', {tag: ['@TC-8637', '@crit-flow-web']}, async ({createTe
   });
 
   await test.step('Owner invites guest user to the group', async () => {
-    await ownerPages.conversationList().openConversation(conversationName);
+    await ownerPages.conversationList().getConversationLocator(conversationName).open();
     await ownerPages.conversation().clickConversationTitle();
     await ownerPages.conversationDetails().clickAddPeopleButton();
     await ownerPages.conversationDetails().addUsersToConversation([guestUser.fullName]);

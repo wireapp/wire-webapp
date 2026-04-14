@@ -46,7 +46,7 @@ test.describe('In Conversation Search', () => {
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
       // Preconditions: User B sends media from all categories (images, links, audio and files)
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
       // Image
       await shareAssetHelper(getImageFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add picture'}));
       // Audio
@@ -54,7 +54,7 @@ test.describe('In Conversation Search', () => {
       // File
       await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       await expect(userAPages.conversation().getMessage({sender: userB})).toHaveCount(3);
 
       await userAPages.conversation().searchButton.click();
@@ -77,11 +77,11 @@ test.describe('In Conversation Search', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().enableSelfDeletingMessages();
       await userBPages.conversation().sendMessage('Gone in 10s');
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
       await userAPage.waitForTimeout(10_000);
 
@@ -106,11 +106,11 @@ test.describe('In Conversation Search', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().enableSelfDeletingMessages();
       await userBPages.conversation().sendMessage('Gone in 10s');
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
 
       await userAPages.conversation().searchButton.click();
@@ -138,8 +138,8 @@ test.describe('In Conversation Search', () => {
       const conversationName = 'Test Group';
       await createGroup(userAPages, conversationName, [userB]);
 
-      await userBPages.conversationList().openConversation(conversationName);
-      await userAPages.conversationList().openConversation(conversationName);
+      await userBPages.conversationList().getConversationLocator(conversationName).open();
+      await userAPages.conversationList().getConversationLocator(conversationName).open();
 
       for (let imageCount = 0; imageCount < 10; imageCount++) {
         await shareAssetHelper(getImageFilePath(), pageB, pageB.getByRole('button', {name: 'Add picture'}));
@@ -167,10 +167,10 @@ test.describe('In Conversation Search', () => {
       const {pages: userAPages, modals: userAModals} = PageManager.from(pageA).webapp;
       const userBPages = PageManager.from(pageB).webapp.pages;
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
       await shareAssetHelper(getImageFilePath(), pageB, pageB.getByRole('button', {name: 'Add picture'}));
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       await shareAssetHelper(getImageFilePath(), pageA, pageA.getByRole('button', {name: 'Add picture'}));
 
       await userAPages.conversation().searchButton.click();
@@ -186,10 +186,10 @@ test.describe('In Conversation Search', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
     // Step: User B sends several links
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
     // Step: User B sends several links
 
     await userAPages.conversation().searchButton.click();
@@ -205,13 +205,13 @@ test.describe('In Conversation Search', () => {
     const userAPages = PageManager.from(pageA).webapp.pages;
     const userBPages = PageManager.from(pageB).webapp.pages;
 
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
 
     for (let fileCount = 0; fileCount < 10; fileCount++) {
       await shareAssetHelper(getTextFilePath(), pageB, pageB.getByRole('button', {name: 'Add file'}));
     }
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
     for (let fileCount = 0; fileCount < 10; fileCount++) {
       await shareAssetHelper(getTextFilePath(), pageA, pageA.getByRole('button', {name: 'Add file'}));
     }
@@ -232,10 +232,10 @@ test.describe('In Conversation Search', () => {
       const userAPages = PageManager.from(pageA).webapp.pages;
       const userBPages = PageManager.from(pageB).webapp.pages;
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
       await shareAssetHelper(getImageFilePath(), pageB, pageB.getByRole('button', {name: 'Add picture'}));
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       const messageWithImage = userAPages.conversation().getMessage({sender: userB});
       await expect(messageWithImage).toBeVisible();
 
@@ -255,10 +255,10 @@ test.describe('In Conversation Search', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
     await userBPages.conversation().sendMessage('User B message');
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
     await userAPages.conversation().sendMessage('User A Message');
 
     await userAPages.conversation().searchButton.click();
@@ -283,10 +283,10 @@ test.describe('In Conversation Search', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('User B message');
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Here is a link: [LinkPreview]https://www.kaufland.de');
 
       await userAPages.conversation().searchButton.click();
@@ -304,10 +304,10 @@ test.describe('In Conversation Search', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
     await userBPages.conversation().sendMessage('User B message');
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
     await userAPages.conversation().sendMessage('https://www.kaufland.de');
 
     await expect(userBPages.conversation().getMessage({content: 'https://www.kaufland.de'})).toBeVisible();
@@ -326,10 +326,10 @@ test.describe('In Conversation Search', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
     await userBPages.conversation().sendMessage('User B message: Papaya');
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
     await userAPages.conversation().sendMessage('User A message: Guava');
 
     const messageUserB = userBPages.conversation().getMessage({sender: userB});
@@ -351,13 +351,13 @@ test.describe('In Conversation Search', () => {
       ]);
 
       // User B sends the first (older) message
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('Older Message from User B');
 
       await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
 
       //  User A sends the second (newer) message
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Newer Message from User A');
 
       await userAPages.conversation().searchButton.click();
@@ -378,8 +378,8 @@ test.describe('In Conversation Search', () => {
 
     const specialWord = 'Crème brûlée';
 
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
 
     await userBPages.conversation().sendMessage(`Message with diacritical letter: ${specialWord}`);
     await expect(userAPages.conversation().getMessage({content: specialWord})).toBeAttached();
@@ -397,8 +397,8 @@ test.describe('In Conversation Search', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
 
     await userBPages.conversation().sendMessage('User B message');
     await expect(userAPages.conversation().getMessage({sender: userB})).toBeVisible();
@@ -419,10 +419,10 @@ test.describe('In Conversation Search', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('Papaya');
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       await expect(userAPages.conversation().getMessage({content: 'Papaya'})).toBeVisible();
       await userAPages.conversation().sendMessage(`Message from User A: 1`);
       await userAPages.conversation().sendMessage('Empty\n'.repeat(50));
