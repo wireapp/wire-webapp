@@ -29,7 +29,6 @@ export class ConversationListPage {
   readonly pendingConnectionRequest: Locator;
   readonly leaveConversationButton: Locator;
   readonly searchConversationsInput: Locator;
-  readonly unarchiveConversationMenuButton: Locator;
   readonly blockedChip: Locator;
   readonly moveConversationButton: Locator;
   readonly moveToMenu: Locator;
@@ -48,7 +47,6 @@ export class ConversationListPage {
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
     this.leaveConversationButton = page.getByTestId('conversation-leave');
     this.searchConversationsInput = page.getByTestId('search-conversations');
-    this.unarchiveConversationMenuButton = page.locator('#btn-unarchive');
     this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
     this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
     this.moveToMenu = page.getByRole('menu');
@@ -71,10 +69,6 @@ export class ConversationListPage {
   async setNotifications(level: 'Everything' | 'Mentions and replies' | 'Nothing') {
     await this.notificationsButton.click(); // Click the "Notifications" menu item
     await this.page.getByRole('radiogroup').locator('label', {hasText: level}).click(); // Click the specified radio button
-  }
-
-  async unarchiveConversation() {
-    await this.unarchiveConversationMenuButton.click();
   }
 
   async clickCreateGroup() {
@@ -116,6 +110,7 @@ export class ConversationListPage {
 
     return Object.assign(contextMenu, {
       archiveButton: contextMenu.getByRole('button', {name: 'Archive'}),
+      unarchiveButton: contextMenu.getByRole('button', {name: 'Unarchive'}),
       blockButton: contextMenu.getByRole('button', {name: 'Block'}),
       unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
     });

@@ -40,15 +40,15 @@ test.describe('Archive', () => {
       const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
       const {pages, components} = PageManager.from(page).webapp;
 
-      const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      let contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
       await contextMenu.archiveButton.click();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
 
       await components.conversationSidebar().clickArchive();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
 
-      await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
-      await pages.conversationList().unarchiveConversation();
+      contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      await contextMenu.unarchiveButton.click();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
 
       await components.conversationSidebar().clickAllConversationsButton();
