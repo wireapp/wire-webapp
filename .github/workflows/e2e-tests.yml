@@ -205,14 +205,11 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
         with:
-          status: ${{ job.status }}
-          text: |
-            ✅ Web E2E Tests succeeded ✅
-            **Results:** ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped
-            **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
-            **Triggered by:** ${{ github.triggering_actor }}
-            **Report:** ${{ steps.upload_playwright_report.outputs.artifact-url }}
-            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          status: custom
+          custom_payload: |
+            {
+              "text": "✅ Web E2E Tests succeeded ✅\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*CHANGELOG:* ${{ needs.changelog.outputs.changelog-url }}\n*Triggered by:* ${{ github.triggering_actor }}\n*Report:* ${{ steps.upload_playwright_report.outputs.artifact-url }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
 
       - name: Notify on Wire if failed
         if: needs.test.result == 'failure'
@@ -221,14 +218,12 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
         with:
-          status: ${{ job.status }}
-          text: |
-            ❌ Web E2E Tests failed ❌
-            **Results:** ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped
-            **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
-            **Triggered by:** ${{ github.triggering_actor }}
-            **Report:** ${{ steps.upload_playwright_report.outputs.artifact-url }}
-            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          status: custom
+          custom_payload: |
+            {
+              "text": "❌ Web E2E Tests failed ❌\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*CHANGELOG:* ${{ needs.changelog.outputs.changelog-url }}\n*Triggered by:* ${{ github.triggering_actor }}\n*Report:* ${{ steps.upload_playwright_report.outputs.artifact-url }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+              
       - name: Update Testiny Run with results
         if: ${{ inputs.testinyRunName }}
         env:
