@@ -131,8 +131,4 @@ export class ConversationListPage {
   getUserStatusIcon(user: User) {
     return this.getConversationLocator(user.fullName).getByTestId('status-availability-icon');
   }
-
-  async getMutedConversationBadge(conversationName: string) {
-    return this.getConversationLocator(conversationName).getByTitle('Muted conversation');
-  }
 }
