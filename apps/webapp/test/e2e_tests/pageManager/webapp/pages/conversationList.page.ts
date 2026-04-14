@@ -62,7 +62,7 @@ export class ConversationListPage {
       conversation = conversation.and(this.page.locator(`[data-protocol="${options.protocol}"]`));
     }
 
-    return Object.assign(conversation, {
+    const enhancedLocator = Object.assign(conversation, {
       userAvatar: conversation.getByTestId('element-avatar-user'),
       statusAvailabilityIcon: conversation.getByTestId('status-availability-icon'),
       unreadIndicator: conversation.getByTitle('Unread message'),
@@ -70,8 +70,17 @@ export class ConversationListPage {
       mentionIndicator: conversation.getByTitle('Unread mention'),
       blockedIndicator: conversation.locator(`span[data-uie-name="status-label"] + span`),
       joinCallButton: conversation.getByRole('button', {name: 'Join'}),
+
+      // This is just syntactic sugar to allow capturing the enhanced locator from the open function
+      open: async () => {
+        await conversation.click();
+        return enhancedLocator;
+      },
+
       openContextMenu: () => this.openContextMenu(conversation),
     });
+
+    return enhancedLocator;
   }
 
   /**
