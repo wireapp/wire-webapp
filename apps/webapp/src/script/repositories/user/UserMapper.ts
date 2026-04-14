@@ -99,6 +99,7 @@ export class UserMapper {
     const {
       accent_id: accentId,
       availability,
+      app,
       assets,
       deleted,
       email,
@@ -108,6 +109,7 @@ export class UserMapper {
       service,
       team: teamId,
       supported_protocols: supportedProtocols,
+      type,
     } = userData;
 
     if (accentId) {
@@ -179,6 +181,15 @@ export class UserMapper {
 
     if (deleted) {
       userEntity.isDeleted = true;
+    }
+
+    if (type) {
+      userEntity.type = type;
+    }
+
+    if (app) {
+      userEntity.description = app.description;
+      userEntity.category = app.category;
     }
 
     return userEntity;

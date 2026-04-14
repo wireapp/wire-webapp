@@ -19,6 +19,7 @@
 
 import {AccentColor} from '@wireapp/commons';
 
+import {App} from './app';
 import {QualifiedId} from './qualifiedId';
 
 import {ServiceRef} from '../conversation/';
@@ -26,8 +27,15 @@ import {Picture} from '../self/';
 import {CONVERSATION_PROTOCOL} from '../team';
 import {UserAsset} from '../user/';
 
+export enum UserType {
+  REGULAR = 'regular',
+  APP = 'app',
+  BOT = 'bot',
+}
+
 export interface User {
   accent_id?: AccentColor.AccentColorID;
+  app?: App;
   assets?: UserAsset[];
   deleted?: boolean;
   email?: string;
@@ -42,4 +50,5 @@ export interface User {
   team?: string;
   searchable?: boolean;
   supported_protocols?: CONVERSATION_PROTOCOL[];
+  type: UserType;
 }
