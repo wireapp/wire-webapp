@@ -72,7 +72,7 @@ test.describe('Authentication', () => {
     },
   );
 
-  test.skip(
+  test(
     'Verify current browser is set as temporary device',
     {tag: ['@TC-3460', '@regression']},
     async ({createUser, createPage}) => {
@@ -99,7 +99,7 @@ test.describe('Authentication', () => {
       await test.step('Log out of public computer', async () => {
         await pages.settings().accountButton.click();
         await pages.account().clickLogoutButton();
-        await expect(pages.login().signInButton).toBeVisible({timeout: LOGIN_TIMEOUT});
+        await expect(pages.singleSignOn().ssoSignInButton).toBeVisible();
       });
 
       await test.step('Log in again on non public computer', async () => {
@@ -170,7 +170,7 @@ test.describe('Authentication', () => {
           const message = pages.conversation().getMessage({content: 'Before refresh'});
           await expect(message).toBeVisible();
 
-          await pageManager.refreshPage();
+          await pageManager.refreshPage({waitUntil: 'load'});
 
           await pages.conversationList().openConversation(userB.fullName);
           await expect(message).toBeVisible();
@@ -194,7 +194,7 @@ test.describe('Authentication', () => {
     },
   );
 
-  test.skip(
+  test(
     'Make sure user does not see data of user of previous sessions on same browser',
     {tag: ['@TC-1311', '@regression']},
     async ({createUser, createTeam, createPage}) => {
@@ -222,7 +222,7 @@ test.describe('Authentication', () => {
         await components.conversationSidebar().clickPreferencesButton();
         await pages.settings().accountButton.click();
         await pages.account().clickLogoutButton();
-        await expect(pages.login().signInButton).toBeVisible({timeout: LOGIN_TIMEOUT});
+        await expect(pages.singleSignOn().ssoSignInButton).toBeVisible();
       });
 
       await test.step('Log in again', async () => {

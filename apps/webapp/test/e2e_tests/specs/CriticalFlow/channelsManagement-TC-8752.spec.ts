@@ -56,7 +56,7 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({creat
 
     await memberPages.conversation().leaveConversation();
     await memberModals.leaveConversation().clickConfirm();
-    await memberPages.conversation().isConversationReadonly();
+    await expect(memberPages.conversation().messageInput).not.toBeAttached();
   });
 
   await test.step('Team owner confirm member left', async () => {
@@ -89,7 +89,7 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({creat
 
   await test.step('Team member verifies they have been removed by the owner', async () => {
     await memberPages.conversationList().openConversation(conversation2);
-    await memberPages.conversation().isConversationReadonly();
+    await expect(memberPages.conversation().messageInput).not.toBeAttached();
   });
 
   await test.step('Team owner add member back to the same conversation', async () => {

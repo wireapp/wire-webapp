@@ -17,5 +17,5 @@
  *
  */
 
-export * from './MLSService';
-export * from './ClientMLSError';
+export * from './mlsService';
+export * from './clientMlsError';

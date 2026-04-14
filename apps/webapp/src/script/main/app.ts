@@ -69,6 +69,8 @@ import {GiphyService} from 'Repositories/extension/GiphyService';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {IntegrationService} from 'Repositories/integration/IntegrationService';
 import {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
+import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/effects/backgroundEffectsController';
+import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
@@ -212,6 +214,7 @@ export class App {
 
     const mediaStreamHandler = new MediaStreamHandler(mediaConstraintsHandler);
     const mediaDevicesHandler = new MediaDevicesHandler();
+    const backgroundEffectsHandler = new BackgroundEffectsHandler(new BackgroundEffectsController());
 
     container.registerInstance(MediaDevicesHandler, mediaDevicesHandler);
     container.registerInstance(MediaStreamHandler, mediaStreamHandler);
@@ -274,6 +277,7 @@ export class App {
       mediaStreamHandler,
       mediaDevicesHandler,
       serverTimeHandler,
+      backgroundEffectsHandler,
     );
 
     repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);

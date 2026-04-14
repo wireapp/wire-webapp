@@ -171,12 +171,21 @@ export class CellsRepository {
     return this.apiClient.api.cells.createFolder({path: filePath, uuid});
   }
 
-  async createFile({path, name}: {path: string; name: string}) {
+  async createFile({path, name, templateUuid}: {path: string; name: string; templateUuid?: string}) {
     const filePath = `${path || this.basePath}/${name}`;
     const uuid = createUuid();
     const versionId = createUuid();
 
-    return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId});
+    return this.apiClient.api.cells.createFile({path: filePath, uuid, versionId, templateUuid});
+  }
+
+  async checkFileAlreadyExists({path, name}: {path: string; name: string}): Promise<boolean> {
+    const filePath = `${path || this.basePath}/${name}`;
+    const uuid = createUuid();
+    const versionId = createUuid();
+    const result = await this.apiClient.api.cells.checkNodeCreation({path: filePath, uuid, versionId, type: 'LEAF'});
+
+    return result.Results?.some(checkResult => checkResult.Exists) ?? false;
   }
 
   async createPublicLink({

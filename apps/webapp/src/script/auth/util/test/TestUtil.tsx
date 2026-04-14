@@ -57,9 +57,12 @@ import sk from 'I18n/sk-SK.json';
 import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
+import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/effects/backgroundEffectsController';
+import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {setStrings} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
@@ -189,4 +192,17 @@ export const buildMediaDevicesHandler = () => {
     currentAvailableDeviceId: mediaDevices,
     setOnMediaDevicesRefreshHandler: jest.fn(),
   } as unknown as MediaDevicesHandler;
+};
+
+export const buildCallingRepository = () => {
+  const controller: BackgroundEffectsController = {
+    getQuality: jest.fn(),
+    getCapabilityInfo: jest.fn(),
+  } as unknown as BackgroundEffectsController;
+  const backgroundEffectsHandler = new BackgroundEffectsHandler(controller);
+
+  return {
+    getBackgroundEffectsHandler: () => backgroundEffectsHandler,
+    isSuperhighQualityTierAllowed: jest.fn(),
+  } as unknown as CallingRepository;
 };

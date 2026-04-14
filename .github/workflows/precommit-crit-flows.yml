@@ -7,10 +7,10 @@ on:
   merge_group:
     branches: [master, dev, release/*]
 
-# One at a time lane for the shared precommit environment
+# Cancel superseded runs on the same PR; slot-level concurrency guards the shared EB environments
 concurrency:
-  group: precommit-deploy
-  cancel-in-progress: false # queue newer runs
+  group: precommit-pr-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -23,6 +23,7 @@ jobs:
       total_additions: ${{ steps.check_additions.outputs.total_additions }}
       commit_url: ${{ steps.meta.outputs.commit_url }}
       committer: ${{ steps.meta.outputs.committer }}
+      env_name: ${{ steps.slot.outputs.env_name }}
 
     env:
       BUILD_DIR: apps/server/dist/s3/
@@ -53,6 +54,26 @@ jobs:
       - run: yarn nx run webapp:configure
       - run: yarn nx run server:package
 
+      - name: Compute target EB environment
+        id: slot
+        run: |
+          if [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
+            # Dependabot gets the original dedicated environment
+            echo "env_name=wire-webapp-precommit" >> "$GITHUB_OUTPUT"
+          else
+            # Spread other PRs across 3 pre-created EB environments; merge queue uses run_id
+            ID="${{ github.event.pull_request.number || github.run_id }}"
+            SLOT=$(( (ID % 3) + 1 ))
+            echo "env_name=wire-webapp-precommit-$SLOT" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Log target EB environment
+        env:
+          ENV_NAME: ${{ steps.slot.outputs.env_name }}
+        run: |
+          echo "Selected precommit environment: $ENV_NAME"
+          echo "Selected precommit URL: https://$ENV_NAME.zinfra.io/"
+
       - name: Derive PR commit metadata
         id: meta
         run: |
@@ -64,7 +85,7 @@ jobs:
           echo "commit_url=$COMMIT_URL" >> "$GITHUB_OUTPUT"
           echo "committer=$AUTHOR" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: build-artifact
           path: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
@@ -82,68 +103,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy_to_aws:
-    name: Deploy to precommit
-    runs-on: ubuntu-latest
-    env:
-      AWS_REGION: eu-central-1
-    needs: [build]
-    timeout-minutes: 25
-
-    outputs:
-      precommit_url: ${{ steps.fetch_url.outputs.url }}
-
-    steps:
-      - uses: actions/download-artifact@v8
-        with:
-          name: build-artifact
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
-        with:
-          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Deploy to precommit environment
-        id: deploy
-        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
-        with:
-          aws-region: ${{ env.AWS_REGION }}
-          application-name: Webapp
-          environment-name: wire-webapp-precommit
-          version-label: ${{ github.run_id }}
-          deployment-package-path: ${{ needs.build.outputs.build_artifact }}
-          wait-for-deployment: true
-          wait-for-environment-recovery: true
-          use-existing-application-version-if-available: true
-
-      - name: Fetch precommit URL
-        id: fetch_url
-        run: |
-          URL=$(aws elasticbeanstalk describe-environments \
-            --region eu-central-1 \
-            --environment-names wire-webapp-precommit \
-            --query "Environments[0].CNAME" --output text)
-          echo "url=https://$URL" >> "$GITHUB_OUTPUT"
-
-      - name: Deployment Status
-        if: ${{ always() }}
-        run: |
-          if [[ "${{ steps.deploy.outcome }}" == "success" ]]; then
-            echo "✅ Deployment completed successfully"
-          else
-            echo "❌ Deployment failed"; exit 1
-          fi
-
   # An extra step is needed to see if the e2e_tests folder was touched as part of the PR
   check_edits_to_e2e_tests:
     name: Check if the PR touches e2e tests
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       tests_to_run: ${{ steps.check_e2e_tests.outputs.tests_to_run || steps.set_default_tests_for_merge_queue.outputs.tests_to_run }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
 
@@ -169,32 +137,36 @@ jobs:
           echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
           echo "Merge queue run detected, executing critical flow tests"
 
-  e2e_tests:
-    name: E2E Tests Execution
+  deploy_and_run_e2e:
+    name: Deploy to precommit and run E2E
     if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
-    needs: [check_edits_to_e2e_tests, deploy_to_aws]
-    uses: ./.github/workflows/e2e-tests.yml
+    needs: [build, check_edits_to_e2e_tests]
+    uses: ./.github/workflows/precommit-slot-run.yml
     with:
-      webappUrl: https://wire-webapp-precommit.zinfra.io/
+      env_name: ${{ needs.build.outputs.env_name }}
       backendUrl: https://staging-nginz-https.zinfra.io/
       grep: ${{ needs.check_edits_to_e2e_tests.outputs.tests_to_run }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+      WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
 
   run_e2e_tests:
     name: Playwright Critical Flow (precommit)
     if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
-    needs: [e2e_tests]
+    needs: [deploy_and_run_e2e]
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Report Status
-        run: echo "E2E tests completed with status - ${{ needs.e2e_tests.result }}"
+        run: echo "E2E tests completed with status - ${{ needs.deploy_and_run_e2e.result }}"
 
   e2e-report:
     name: Generate test report
-    needs: e2e_tests
+    needs: deploy_and_run_e2e
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read
       pull-requests: write
@@ -217,7 +189,7 @@ jobs:
       - name: Download report
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          artifact-ids: ${{ needs.e2e_tests.outputs.reportArtifactId }}
+          artifact-ids: ${{ needs.deploy_and_run_e2e.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
 
       - name: Generate PR comment
@@ -246,11 +218,11 @@ jobs:
 
       - name: Comment on PR
         if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-        uses: marocchino/sticky-pull-request-comment@70d2764d1a7d5d9560b100cbea0077fc8f633987
+        uses: marocchino/sticky-pull-request-comment@d4d6b0936434b21bc8345ad45a440c5f7d2c40ff
         with:
           header: playwright-summary
           message: |
-            🔗 [Download Full Report Artifact](${{ needs.e2e_tests.outputs.reportUrl }})
+            🔗 [Download Full Report Artifact](${{ needs.deploy_and_run_e2e.outputs.reportUrl }})
 
             ${{ steps.generate_comment.outputs.comment }}
         env:

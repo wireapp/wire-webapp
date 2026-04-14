@@ -24,9 +24,9 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
 import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
 import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
-import {useCellsNewItemForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewNodeForm';
+import {useCellsNewFolderForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {CellNode, CellNodeType} from 'src/script/types/cellNode';
+import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
 import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/CellsFoldersListModalContent';
@@ -79,8 +79,8 @@ export const CellsMoveNodeModal = ({
     isSubmitting,
     handleSubmit: handleCreateNewFolder,
     handleChange,
-  } = useCellsNewItemForm({
-    type: CellNodeType.FOLDER,
+    handleClear,
+  } = useCellsNewFolderForm({
     cellsRepository,
     conversationQualifiedId,
     onSuccess: () => {
@@ -88,6 +88,7 @@ export const CellsMoveNodeModal = ({
       setActiveModalContent('move');
     },
     currentPath,
+    isOpen,
   });
 
   useEffect(() => {
@@ -130,10 +131,12 @@ export const CellsMoveNodeModal = ({
       ) : (
         <>
           <CellsNewNodeForm
-            type={CellNodeType.FOLDER}
+            label={t('cells.newItemMenuModal.labelFolder')}
+            placeholder={t('cells.newItemMenuModal.placeholderFolder')}
             onSubmit={handleCreateNewFolder}
             inputValue={name}
             onChange={handleChange}
+            onClear={handleClear}
             error={error}
             isOpen={isOpen}
           />

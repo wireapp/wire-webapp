@@ -21,7 +21,7 @@ import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {DBSchema, deleteDB as idbDeleteDB, IDBPDatabase, openDB as idbOpenDb} from 'idb';
 
-import {EnrollmentFlowData} from '../messagingProtocols/mls/E2EIdentityService/Storage/E2EIStorage.schema';
+import {EnrollmentFlowData} from '../messagingProtocols/mls/E2EIdentityService/Storage/e2eiStorage.schema';
 const VERSION = 6;
 
 interface CoreDBSchema extends DBSchema {

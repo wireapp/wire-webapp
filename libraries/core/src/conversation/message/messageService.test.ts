@@ -34,7 +34,7 @@ import {MessageService} from './messageService';
 import {
   buildProteusService,
   cleanupProteusServiceMocks,
-} from '../../messagingProtocols/proteus/ProteusService/ProteusService.mocks';
+} from '../../messagingProtocols/proteus/ProteusService/proteusService.mocks';
 import {getUUID} from '../../test/payloadHelper';
 
 const baseMessageSendingStatus: MessageSendingStatus = {

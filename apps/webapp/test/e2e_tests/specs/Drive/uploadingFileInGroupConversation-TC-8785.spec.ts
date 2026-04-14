@@ -65,9 +65,7 @@ test(
       const loginOwner = async () => {
         await userAPageManager.openMainPage();
         await loginUser(userA, userAPageManager);
-        if (process.env.ENV_NAME === 'staging') {
-          await userAModals.dataShareConsent().clickDecline();
-        }
+        await userAModals.dataShareConsent().clickDecline();
         await userAPages.conversationList().clickCreateGroup();
         // Files should be disabled by default
         expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeFalsy();
@@ -81,9 +79,7 @@ test(
       const loginMember = async () => {
         await userBPageManager.openMainPage();
         await loginUser(userB, userBPageManager);
-        if (process.env.ENV_NAME === 'staging') {
-          await userBModals.dataShareConsent().clickDecline();
-        }
+        await userBModals.dataShareConsent().clickDecline();
       };
 
       await Promise.all([loginOwner(), loginMember()]);

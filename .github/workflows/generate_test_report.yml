@@ -3,8 +3,8 @@ name: Generate test reports
 on:
   workflow_dispatch:
     inputs:
-      commit:
-        description: 'Commit SHA'
+      branch:
+        description: 'Git branch to generate the test report for'
         required: true
         type: string
 
@@ -19,7 +19,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          ref: ${{ inputs.commit }}
+          ref: refs/heads/${{ inputs.branch }}
+
+      - name: Capture checked out commit SHA
+        run: echo "TESTED_COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Set TITLE
         env:
@@ -47,9 +50,18 @@ jobs:
 
       - name: Test
         run: |
-          set -o pipefail
-          yarn nx run-many -t test --all -- --coverage --coverage_reporters=lcov 2>&1 | tee ${{ env.UNIT_TEST_REPORT_FILE }}
-          echo -e "COMMIT SHA = ${{ inputs.commit }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
+          set -euo pipefail
+          : > ${{ env.UNIT_TEST_REPORT_FILE }}
+          (
+            cd ./apps/server
+            node ../../node_modules/jest/bin/jest.js --config jest.config.js --coverage --coverageReporters=lcov
+          ) 2>&1 | tee -a ${{ env.UNIT_TEST_REPORT_FILE }}
+          (
+            cd ./apps/webapp
+            node ../../node_modules/jest/bin/jest.js --config jest.report.config.cjs --coverage --coverageReporters=lcov --verbose
+          ) 2>&1 | tee -a ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "BRANCH = ${{ inputs.branch }}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
+          echo -e "COMMIT SHA = ${TESTED_COMMIT_SHA}" >> ${{ env.UNIT_TEST_REPORT_FILE }}
           echo -e "TEST RUN DATE = $(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> ${{ env.UNIT_TEST_REPORT_FILE }}
 
       - name: Upload unit-tests.log to S3
@@ -59,4 +71,4 @@ jobs:
           AWS_DEFAULT_REGION: eu-west-1
         run: |
           TIMESTAMP=$(date -u +'%Y%m%dT%H%M%SZ')
-          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-${TIMESTAMP}-${{ inputs.commit }}.log
+          aws s3 cp ${{ env.UNIT_TEST_REPORT_FILE }} s3://wire-webapp/unit-tests-${TIMESTAMP}-${TESTED_COMMIT_SHA}.log

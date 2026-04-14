@@ -29,7 +29,7 @@ import {PanelActions} from 'Components/panel/PanelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {isGroupMLSConversation, isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {isGroupMLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -126,7 +126,7 @@ const ConversationDetailsOptions = ({
   const showOptionGuests = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotificationsGroup = isMutable && isGroupOrChannel;
   const showOptionTimedMessages = isActiveGroupParticipant && isSelfDeletingMessagesEnabled;
-  const showOptionServices = isActiveGroupParticipant && isTeamConversation && !isMLSConversation(activeConversation);
+  const showOptionServices = isActiveGroupParticipant && isTeamConversation;
   const showOptionNotifications1To1 = isMutable && !isGroupOrChannel;
   const showOptionReadReceipts = isTeamConversation && !isGroupMLSConversation(activeConversation);
   const showChannelOptions = isChannel && isChannelsEnabled;

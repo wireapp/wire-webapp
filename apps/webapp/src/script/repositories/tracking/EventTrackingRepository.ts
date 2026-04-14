@@ -18,6 +18,7 @@
  */
 
 import {HttpClient, LongRunningRetryDetails} from '@wireapp/api-client/lib/http';
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -57,6 +58,17 @@ type HttpRetryReportingClient = {
   ) => unknown;
   readonly removeListener: (
     event: typeof HttpClient.TOPIC.ON_LONG_RUNNING_RETRY,
+    listener: (retryDetails: LongRunningRetryDetails) => void,
+  ) => unknown;
+};
+
+type WebSocketRetryReportingClient = {
+  readonly on: (
+    event: typeof WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY,
+    listener: (retryDetails: LongRunningRetryDetails) => void,
+  ) => unknown;
+  readonly removeListener: (
+    event: typeof WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY,
     listener: (retryDetails: LongRunningRetryDetails) => void,
   ) => unknown;
 };
@@ -327,20 +339,30 @@ export class EventTrackingRepository {
 
     if (this.isCountlyIncrementalBackoffRetryReportingEnabled) {
       const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
+      const webSocketRetryReportingClient = this.apiClient.transport.ws as unknown as WebSocketRetryReportingClient;
 
       httpRetryReportingClient.on(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
+      webSocketRetryReportingClient.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningWebSocketRetry);
     }
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
   }
 
   private readonly onLongRunningRetry = (retryDetails: LongRunningRetryDetails): void => {
+    this.trackLongRunningRetry('api', retryDetails);
+  };
+
+  private readonly onLongRunningWebSocketRetry = (retryDetails: LongRunningRetryDetails): void => {
+    this.trackLongRunningRetry('websocket', retryDetails);
+  };
+
+  private trackLongRunningRetry(transport: 'api' | 'websocket', retryDetails: LongRunningRetryDetails): void {
     this.trackProductReportingEvent(EventName.CONNECTIVITY.RETRYING_FOR_ONE_MINUTE, {
       [Segmentation.CONNECTIVITY.RETRY_COUNT]: retryDetails.retryCount,
       [Segmentation.CONNECTIVITY.RETRY_DURATION_IN_MILLISECONDS]: retryDetails.retryDurationInMilliseconds,
-      [Segmentation.CONNECTIVITY.TRANSPORT]: 'api',
+      [Segmentation.CONNECTIVITY.TRANSPORT]: transport,
     });
-  };
+  }
 
   private startProductReportingSession(): void {
     if (!telemetry.isLoaded()) {
@@ -417,8 +439,13 @@ export class EventTrackingRepository {
 
     if (this.isCountlyIncrementalBackoffRetryReportingEnabled) {
       const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
+      const webSocketRetryReportingClient = this.apiClient.transport.ws as unknown as WebSocketRetryReportingClient;
 
       httpRetryReportingClient.removeListener(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
+      webSocketRetryReportingClient.removeListener(
+        WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY,
+        this.onLongRunningWebSocketRetry,
+      );
     }
 
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);

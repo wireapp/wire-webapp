@@ -17,4 +17,4 @@
  *
  */
 
-export * from './AcmeService';
+export * from './acmeService';

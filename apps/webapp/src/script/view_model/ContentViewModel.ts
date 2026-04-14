@@ -293,10 +293,12 @@ export class ContentViewModel {
       this.showAndNavigate(conversationEntity, openNotificationSettings, filePath);
     } catch (error: unknown) {
       if (this.isConversationNotFoundError(error)) {
+        const qualifiedId = isConversationEntity(conversation) ? conversation.qualifiedId : conversation;
+
         // Retry fetching the conversation to handle race conditions
         const fetchSucceeded = await this.retryFetchConversationWithBackoff({
-          id: conversation.domain,
-          domain: conversation.domain,
+          id: qualifiedId.id,
+          domain: qualifiedId.domain,
         });
 
         if (fetchSucceeded) {

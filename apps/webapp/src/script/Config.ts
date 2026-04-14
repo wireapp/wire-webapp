@@ -119,6 +119,13 @@ const Config = {
 
     return window.desktopAppConfig;
   },
+  getDesktopSettings: () => {
+    if (!Runtime.isDesktopApp()) {
+      return undefined;
+    }
+
+    return window.desktopAppSettings;
+  },
 };
 
 export {Config};

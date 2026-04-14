@@ -138,10 +138,7 @@ describe('wall clock', () => {
     const clearTimeoutInvocationContexts: unknown[] = [];
     const clearTimeoutArguments: ReturnType<typeof globalThis.setTimeout>[] = [];
 
-    function clearTimeoutStub(
-      this: unknown,
-      providedTimeoutIdentifier: ReturnType<typeof globalThis.setTimeout>,
-    ) {
+    function clearTimeoutStub(this: unknown, providedTimeoutIdentifier: ReturnType<typeof globalThis.setTimeout>) {
       clearTimeoutInvocationContexts.push(this);
       clearTimeoutArguments.push(providedTimeoutIdentifier);
     }
