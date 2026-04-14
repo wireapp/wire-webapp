@@ -117,6 +117,9 @@ jobs:
     if: ${{ !cancelled() }}
     needs: [test]
 
+    env:
+      PLAYWRIGHT_REPORT_PATH: apps/webapp/playwright-report
+
     # It's necessary to define the outputs of the job so the calling workflow can access them
     outputs:
       reportArtifactId: ${{ steps.generate-outputs.outputs.reportArtifactId }}
@@ -168,13 +171,34 @@ jobs:
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
         with:
           name: playwright-report
-          path: apps/webapp/playwright-report/
+          path: ${{ env.PLAYWRIGHT_REPORT_PATH }}/
 
       - name: Generate outputs
         id: generate-outputs
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
+
+      - name: Extract test results
+        id: test-results
+        working-directory: apps/webapp
+        run: |
+          REPORT="${{ env.PLAYWRIGHT_REPORT_PATH }}/report.json"
+          if [ -f "$REPORT" ]; then
+            PASSED=$(jq '[.suites[].specs[].tests[].results[].status] | map(select(. == "passed")) | length' "$REPORT")
+            FAILED=$(jq '[.suites[].specs[].tests[].results[].status] | map(select(. == "failed" or . == "timedOut")) | length' "$REPORT")
+            SKIPPED=$(jq '[.suites[].specs[].tests[].results[].status] | map(select(. == "skipped")) | length' "$REPORT")
+            TOTAL=$((PASSED + FAILED + SKIPPED))
+            echo "passed=$PASSED" >> $GITHUB_OUTPUT
+            echo "failed=$FAILED" >> $GITHUB_OUTPUT
+            echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+            echo "total=$TOTAL" >> $GITHUB_OUTPUT
+          else
+            echo "passed=0" >> $GITHUB_OUTPUT
+            echo "failed=0" >> $GITHUB_OUTPUT
+            echo "skipped=0" >> $GITHUB_OUTPUT
+            echo "total=0" >> $GITHUB_OUTPUT
+          fi
 
       - name: Notify on Wire if succeeded
         if: success()
@@ -186,9 +210,12 @@ jobs:
           status: ${{ job.status }}
           text: |
             ✅ Web E2E Tests succeeded ✅
+            **Results:** ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.skipped }} skipped
             **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
             **Triggered by:** ${{ github.triggering_actor }}
+            **Report:** ${{ steps.upload_playwright_report.outputs.artifact-url }}
             **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
       - name: Notify on Wire if failed
         if: failure()
         continue-on-error: true
@@ -199,10 +226,11 @@ jobs:
           status: ${{ job.status }}
           text: |
             ❌ Web E2E Tests failed ❌
+            **Results:** ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.skipped }} skipped
             **CHANGELOG:** ${{ needs.changelog.outputs.changelog-url }}
             **Triggered by:** ${{ github.triggering_actor }}
+            **Report:** ${{ steps.upload_playwright_report.outputs.artifact-url }}
             **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
       - name: Update Testiny Run with results
         if: ${{ inputs.testinyRunName }}
         env:
