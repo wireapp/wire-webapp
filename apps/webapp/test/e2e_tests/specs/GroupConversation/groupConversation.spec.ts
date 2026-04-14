@@ -207,10 +207,7 @@ test.describe('Group Conversation', () => {
     'I want to leave a group conversation via conversation list dropdown options',
     {tag: ['@TC-1197', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
 
       const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
       const userBPages = PageManager.from(userBPage).webapp.pages;
@@ -224,6 +221,28 @@ test.describe('Group Conversation', () => {
       await userAModals.leaveConversation().confirmButton.click();
 
       await expect(userBPages.conversation().systemMessages.filter({hasText: `${userA.fullName} left`})).toBeVisible();
+    },
+  );
+
+  test(
+    'Verify you can remove participants from a group conversation',
+    {tag: ['@TC-1475', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await createGroup(pages, groupName, [userB, userC]);
+      await pages.conversationList().openConversation(groupName);
+      await pages.conversation().toggleGroupInformation();
+
+      await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+
+      await pages.conversationDetails().openParticipantDetails(userB.fullName);
+      await pages.participantDetails().removeFromGroup();
+
+      await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).not.toBeVisible();
+      await expect(
+        pages.conversation().systemMessages.filter({hasText: `You removed ${userB.fullName}`}),
+      ).toBeVisible();
     },
   );
 });
