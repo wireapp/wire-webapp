@@ -14,7 +14,7 @@ jobs:
         if: ${{ github.event_name == 'merge_group' }}
         run: echo "Skipping Jira pull request description validation on merge queue."
 
-      - uses: cakeinpanic/jira-description-action@master
+      - uses: cakeinpanic/jira-description-action@f24c12158ee2d350a6f8c3cbe90a55af7a859ff6
         if: ${{ github.event_name == 'pull_request' }}
         name: jira-description-action
         with:
