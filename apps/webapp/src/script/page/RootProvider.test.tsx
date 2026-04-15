@@ -25,13 +25,7 @@ import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles'
 import {createDeterministicWallClock} from '../clock/deterministicWallClock';
 import {reliableWebsocketConnectionFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {MainViewModel} from '../view_model/MainViewModel';
-import {
-  RootContext,
-  RootContextValue,
-  RootProvider,
-  useApplicationContext,
-  useMainViewModel,
-} from './RootProvider';
+import {RootContext, RootContextValue, RootProvider, useApplicationContext, useMainViewModel} from './RootProvider';
 
 interface WrapperProperties {
   children: ReactNode;

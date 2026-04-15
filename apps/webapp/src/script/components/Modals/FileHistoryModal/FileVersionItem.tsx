@@ -25,6 +25,7 @@ import {
   fileVersionItemWrapperCss,
   iconMarginRightCss,
   restoreIconCss,
+  versionTimelineConnectorCss,
   versionActionsWrapperCss,
   versionButtonCss,
   versionDotCurrentCss,
@@ -45,15 +46,23 @@ interface FileVersionItemProps {
     downloadUrl: string;
   };
   isCurrentVersion: boolean;
+  showTimelineConnector: boolean;
   onDownload: (downloadUrl: string) => void | Promise<void>;
   onRestore: (versionId: string) => void;
 }
 
-export const FileVersionItem = ({version, isCurrentVersion, onDownload, onRestore}: FileVersionItemProps) => {
+export const FileVersionItem = ({
+  version,
+  isCurrentVersion,
+  showTimelineConnector,
+  onDownload,
+  onRestore,
+}: FileVersionItemProps) => {
   const versionDetailsTitle = `${version.ownerName} ${version.size}`.trim();
 
   return (
     <div key={version.versionId} css={fileVersionItemWrapperCss}>
+      {showTimelineConnector && <div css={versionTimelineConnectorCss} aria-hidden="true" />}
       <div css={isCurrentVersion ? versionDotCurrentCss : versionDotOldCss} aria-hidden="true" />
       <div css={versionInfoContainerCss}>
         <p css={versionTimeTextCss}>

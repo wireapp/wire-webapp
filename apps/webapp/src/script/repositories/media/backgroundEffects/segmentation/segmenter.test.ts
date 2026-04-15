@@ -60,8 +60,7 @@ describe('Segmenter', () => {
         constructor(
           public width: number,
           public height: number,
-        ) {
-        }
+        ) {}
 
         getContext(): any {
           return null;

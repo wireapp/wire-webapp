@@ -22,19 +22,25 @@ import {FC} from 'react';
 import {BaseToggle} from 'Components/toggle/BaseToggle';
 import {ACCESS_TYPES} from 'Repositories/conversation/ConversationAccessPermission';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {t} from 'Util/localizerUtil';
+
+import {serviceOptionContainer} from './serviceOptions.styles';
 
 interface ServicesOptionsProps {
   activeConversation: Conversation;
   toggleAccessState: (accessType: number, text: string, hasService: boolean) => void;
   isToggleDisabled?: boolean;
+  teamState: TeamState;
 }
 
 const ServicesOptions: FC<ServicesOptionsProps> = ({
   activeConversation,
   toggleAccessState,
   isToggleDisabled = false,
+  teamState,
 }) => {
   const {hasService, isServicesRoom, isGuestAndServicesRoom} = useKoSubscribableChildren(activeConversation, [
     'hasService',
@@ -42,22 +48,42 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
     'isGuestAndServicesRoom',
   ]);
 
+  const {hasWhitelistedServices, isAppsEnabled} = useKoSubscribableChildren(teamState, [
+    'hasWhitelistedServices',
+    'isAppsEnabled',
+  ]);
+
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
+
+  const isAppsFeatureEnabled = checkAppsFeatureAvailability({
+    protocol: activeConversation.protocol,
+    hasWhitelistedServices: hasWhitelistedServices,
+    isAppsEnabled: isAppsEnabled,
+  });
+
+  const displayAppsToggle = isAppsFeatureEnabled || isServicesEnabled;
 
   const toggleServicesAccessState = () => {
     toggleAccessState(ACCESS_TYPES.SERVICE, t('modalConversationRemoveServicesMessage'), hasService);
   };
 
   return (
-    <div className="guest-options__content">
-      <BaseToggle
-        isChecked={isServicesEnabled}
-        setIsChecked={toggleServicesAccessState}
-        isDisabled={isToggleDisabled}
-        infoText={t('servicesRoomToggleInfo')}
-        toggleName={t('servicesOptionsTitle')}
-        toggleId="services"
-      />
+    <div css={serviceOptionContainer}>
+      {displayAppsToggle ? (
+        <BaseToggle
+          isChecked={isServicesEnabled}
+          setIsChecked={toggleServicesAccessState}
+          isDisabled={isToggleDisabled}
+          infoText={t('servicesRoomToggleInfo')}
+          toggleName={t('servicesOptionsTitle')}
+          toggleId="services"
+        />
+      ) : (
+        <>
+          <h4>{t('servicesNotEnabledNoteTitle')}</h4>
+          <p>{t('servicesNotEnabledBody')}</p>
+        </>
+      )}
     </div>
   );
 };

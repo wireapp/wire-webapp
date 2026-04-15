@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   semantic-commit-pr-title-lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Skip on merge queue
         if: ${{ github.event_name == 'merge_group' }}

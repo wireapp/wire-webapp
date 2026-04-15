@@ -1,4 +1,5 @@
-import {User} from 'test/e2e_tests/data/user';
+import {Page} from 'playwright/test';
+import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {
   test,
@@ -58,10 +59,12 @@ test.describe('Guestroom', () => {
 
       await test.step('User B sees error when entering incorrect password', async () => {
         await guestPage.goto(createdLink.toString());
+        await expect(guestPages.conversationJoin().joinBrowserButton).toBeVisible();
         await guestPages.conversationJoin().joinBrowserButton.click();
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
         await guestPages.login().login(guestUser);
+        await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
         await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
         await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
           'Password is incorrect, please try again.',
@@ -214,11 +217,12 @@ test.describe('Guestroom', () => {
     'I want to see Wire and Wireless guest(s) are removed when I change the Allow guests from on to off',
     {tag: ['@TC-3322', '@regression']},
     async ({createPage}) => {
-      const {pages: ownerPages} = PageManager.from(await createPage(withLogin(userA))).webapp;
+      const ownerPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(ownerPages, groupName, []);
       await ownerPages.conversationList().openConversation(groupName);
 
+      // Owner creates a guest link
       await ownerPages.conversation().toggleGroupInformation();
       const link = await ownerPages.conversationDetails().createGuestLink();
       await createPage(withGuestUser(link, guestUser.firstName));
@@ -227,6 +231,7 @@ test.describe('Guestroom', () => {
         ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.firstName} joined`}),
       ).toBeVisible();
 
+      // Owner turns off Allow guests toggle
       await ownerPages.conversationDetails().openGuestOptions();
       await ownerPages.guestOptions().toggleGuests();
 
@@ -248,6 +253,7 @@ test.describe('Guestroom', () => {
       await ownerPages.conversation().toggleGroupInformation();
 
       await ownerPages.conversationDetails().openGuestOptions();
+      // Turn off Guest options as it is on by default
       await ownerPages.guestOptions().guestsToggle.click();
 
       await expect(ownerPage.getByTestId('status-guest-options-info')).toContainText(
@@ -267,8 +273,7 @@ test.describe('Guestroom', () => {
     },
   ].forEach(({description, tag}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const ownerPage = await createPage(withLogin(userA));
-      const ownerPages = PageManager.from(ownerPage).webapp.pages;
+      const ownerPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       // UserA sees allow guests toggle is ON on group creation page
       await ownerPages.conversationList().clickCreateGroup();
@@ -287,6 +292,242 @@ test.describe('Guestroom', () => {
       await expect(ownerPages.guestOptions().guestsToggle).toHaveAttribute('data-uie-value', 'checked');
     });
   });
+
+  test(
+    'I want to see a system message when wireless guest has joined or left',
+    {tag: ['@TC-3334', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
+      const ownerPages = PageManager.from(userAPage).webapp.pages;
+      const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
+
+      await createGroup(ownerPages, groupName, []);
+      const createdLink = await generateGroupGuestsLink(ownerPages, groupName);
+
+      // Guest joins the conversation using the invitation link
+      await guestPage.goto(createdLink.toString());
+      await guestPages.conversationJoin().joinBrowserButton.click();
+      await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+      await guestPages.login().login(guestUser);
+      await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+
+      await expect(
+        ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.fullName} joined`}),
+      ).toBeVisible();
+
+      // Guest leaves the conversation
+      await guestPages.conversation().toggleGroupInformation();
+      await guestPages.conversation().leaveConversation();
+      await guestModals.leaveConversation().clickConfirm();
+
+      await expect(
+        ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.fullName} left`}),
+      ).toBeVisible();
+    },
+  );
+
+  [
+    {
+      description: 'I want to see Invite People button when Allow Guests is on',
+      tag: '@TC-3335',
+      verify: async (pages: PageManager['webapp']['pages']) => {
+        await expect(pages.conversation().invitePeopleButton).toBeVisible();
+      },
+    },
+    {
+      description:
+        'I want to see a hint text that people from outside can join if the conversation is opened for guests',
+      tag: '@TC-3340',
+      verify: async (pages: PageManager['webapp']['pages']) => {
+        await expect(
+          pages.conversation().systemMessages.filter({hasText: `People outside your team can join this conversation.`}),
+        ).toBeVisible();
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const ownerPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await createGroup(ownerPages, groupName, []);
+      await ownerPages.conversationList().openConversation(groupName);
+
+      await verify(ownerPages);
+      await ownerPages.conversation().invitePeopleButton.click();
+
+      await expect(ownerPages.guestOptions().guestsToggle).toHaveAttribute('data-uie-value', 'checked');
+      await expect(ownerPages.guestOptions().createLinkButton).toBeVisible();
+    });
+  });
+
+  test(
+    'I want to see a system message when wireless guest has expired',
+    {tag: ['@TC-3337', '@regression']},
+    async ({createPage}) => {
+      test.setTimeout(150_000);
+      let createdLink: string;
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
+
+      const pages = PageManager.from(userAPage).webapp.pages;
+      const guestPages = PageManager.from(guestPage).webapp.pages;
+
+      await test.step('User A creates invite link', async () => {
+        await createGroup(pages, groupName, []);
+        createdLink = await generateGroupGuestsLink(pages, groupName);
+      });
+
+      await test.step('User B joins the group using the invitation link', async () => {
+        await guestPage.goto(createdLink.toString());
+        await guestPages.conversationJoin().joinBrowserButton.click();
+        await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+        // Add expires_in query parameter to simulate account expiration
+        const joinLink = new URL(guestPage.url());
+        joinLink.searchParams.set('expires_in', '60');
+
+        await guestPage.goto(joinLink.toString());
+        await guestPages.conversationJoin().joinAsGuest(guestUser.firstName);
+      });
+
+      await test.step('User A sees guest details (to trigger access validation) after 1 minute', async () => {
+        await pages.conversation().toggleGroupInformation();
+        const guestMember = pages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName});
+        await expect(guestMember).toBeVisible({timeout: LOGIN_TIMEOUT});
+
+        await userAPage.waitForTimeout(60_000);
+        await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
+        await expect(pages.participantDetails().userStatus).toBeVisible();
+      });
+
+      await test.step('User A sees a system message when wireless guest has expired', async () => {
+        await expect(
+          pages.conversation().systemMessages.filter({hasText: `${guestUser.firstName} left`}),
+        ).toBeVisible();
+      });
+    },
+  );
+
+  test(
+    'I want to see Guests are present indicator if there are guests in the conversation',
+    {tag: ['@TC-3338', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await createGroup(pages, groupName, []);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      await createPage(withGuestUser(createdLink, guestUser.firstName));
+      await expect(pages.conversation().guestsIndicator).toBeVisible();
+    },
+  );
+
+  [
+    {
+      description: 'I want to see the "Open in Wire" button if I was logged in permanently before',
+      tag: '@TC-3351',
+      verify: async (guestPages: PageManager['webapp']['pages'], guestPage: Page) => {
+        await expect(guestPages.conversationJoin().joinAsMemberButton).toBeVisible();
+        await expect(guestPage.getByText(`You are logged in as ${guestUser.fullName}`)).toBeVisible();
+      },
+    },
+    {
+      description: 'I want to see a link to join anonymously when I was logged in before',
+      tag: '@TC-3352',
+      verify: async (guestPages: PageManager['webapp']['pages'], guestPage: Page) => {
+        await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+        await expect(guestPage.getByRole('heading', {name: "Don't have an account?"})).toBeVisible();
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPage, guestPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(guestUser)),
+      ]);
+
+      const guestPages = PageManager.from(guestPage).webapp.pages;
+      const pages = PageManager.from(userAPage).webapp.pages;
+
+      // UserA creates a guest link for a conversation
+      await createGroup(pages, groupName, []);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      // Guest confirms that he was logged in before and can join the conversation directly
+      await guestPage.goto(createdLink.toString());
+      await guestPages.conversationJoin().joinBrowserButton.click();
+      await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+      // WORKAROUND: The 'Join in Browser' button currently redirects to Production.
+      // To maintain the existing logged-in session, we must force the invitation
+      // URL to use the same environment as our current test session.
+      const envUrl = new URL(process.env.WEBAPP_URL);
+      const invitationLink = new URL(guestPage.url());
+
+      invitationLink.hostname = envUrl.hostname;
+      await guestPage.goto(invitationLink.toString());
+
+      await verify(guestPages, guestPage);
+    });
+  });
+
+  test(
+    'I want to see my time left in left column list, participant details and account settings',
+    {tag: ['@TC-3363', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await createGroup(pages, groupName, []);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      const guestPage = await createPage(withGuestUser(createdLink, guestUser.firstName));
+      const {pages: guestPages, modals: guestModals} = PageManager.from(guestPage).webapp;
+
+      await guestModals.confirm().actionButton.click();
+      await expect(guestPage.getByRole('complementary')).toContainText('24h left in this guest room');
+
+      await guestPages.conversation().sendMessage('Message from Guest');
+      const message = guestPages.conversation().getMessage({content: 'Message from Guest'});
+      await message.getByTestId('element-avatar-temporary-guest').click();
+
+      await expect(guestPage.getByTestId('status-expiration-text')).toContainText('24h left');
+    },
+  );
+
+  test(
+    'I want to see the conversation added to the conversation list',
+    {tag: ['@TC-3354', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, guestPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(guestUser)),
+      ]);
+
+      const guestPages = PageManager.from(guestPage).webapp.pages;
+      const pages = PageManager.from(userAPage).webapp.pages;
+
+      // UserA creates a guest link for a conversation
+      await createGroup(pages, groupName, []);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      // Guest confirms that he was logged in before and can join the conversation directly
+      await guestPage.goto(createdLink.toString());
+      await guestPages.conversationJoin().joinBrowserButton.click();
+      await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+      // WORKAROUND: The 'Join in Browser' button currently redirects to Production.
+      // To maintain the existing logged-in session, we must force the invitation
+      // URL to use the same environment as our current test session.
+      const envUrl = new URL(process.env.WEBAPP_URL);
+      const invitationLink = new URL(guestPage.url());
+
+      invitationLink.hostname = envUrl.hostname;
+      await guestPage.goto(invitationLink.toString());
+
+      await guestPages.conversationJoin().joinAsMemberButton.click();
+      await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
+      await expect(guestPages.conversationList().list.filter({hasText: groupName})).toBeVisible();
+    },
+  );
 
   test(
     'I want to get logged out with a reason when my account expires',
@@ -337,6 +578,56 @@ test.describe('Guestroom', () => {
           'You were signed out because your account was deleted.',
         );
       });
+    },
+  );
+
+  const ssoUser = getUser({
+    email: process.env.SCIM_USER_SSO_CODE,
+    username: process.env.SCIM_USER_EMAIL,
+    password: process.env.SCIM_USER_PASSWORD,
+  });
+
+  test(
+    'I want to join guestroom invite with enterprise login',
+    {tag: ['@TC-3477', '@regression']},
+    async ({context, createPage}) => {
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage(context)]);
+
+      const userAPageManager = PageManager.from(userAPage).webapp;
+      const guestPageManager = PageManager.from(guestPage);
+      const {pages: guestPages, components: guestComponents} = guestPageManager.webapp;
+      const {pages} = userAPageManager;
+
+      await createGroup(pages, groupName, []);
+      const createdLink = await generateGroupGuestsLink(pages, groupName);
+
+      await guestPage.goto(createdLink.toString());
+      await guestPages.conversationJoin().joinBrowserButton.click();
+      await expect(guestPages.conversationJoin().enterpriseLoginButton).toBeVisible();
+
+      await guestPages.conversationJoin().enterpriseLoginButton.click();
+      await expect(guestPages.singleSignOn().header).toBeVisible();
+
+      const [idpPage] = await Promise.all([
+        context.waitForEvent('page'),
+        guestPages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
+      ]);
+
+      await idpPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
+      await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
+      await idpPage.getByRole('button', {name: 'Sign In'}).click();
+
+      await guestPage.getByRole('button', {name: 'Remove device'}).first().click({timeout: LOGIN_TIMEOUT});
+      // // We will also always be prompted to confirm the new history on this device
+      await guestPages.historyInfo().clickConfirmButton();
+
+      await expect(guestComponents.conversationSidebar().sidebar, `Login took more than ${LOGIN_TIMEOUT}s`).toBeVisible(
+        {
+          timeout: LOGIN_TIMEOUT,
+        },
+      );
+
+      await expect(guestPages.conversationList().list.filter({hasText: groupName})).toBeVisible();
     },
   );
 });

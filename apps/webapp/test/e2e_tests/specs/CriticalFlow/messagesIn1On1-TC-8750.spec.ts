@@ -66,7 +66,12 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
 
     // Verify QR Code in the image
     const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
-    const imageScreenshot = await memberBPageManager.webapp.pages.conversation().getImageScreenshot(memberA);
+    const imageScreenshot = await memberBPageManager.webapp.pages
+      .conversation()
+      .getMessage()
+      .locator(`img[alt*="Image from ${memberA.fullName}"]`)
+      .screenshot();
+
     const screenshotQRCodeValue = await getQRCodeValueFromScreenshot(imageScreenshot);
     expect(screenshotQRCodeValue).toBe(localQRCodeValue);
   });
@@ -108,7 +113,7 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
   await test.step('User B can play the video', async () => {
     const {pages} = memberBPageManager.webapp;
     await pages.conversation().playVideo();
-    await expect.poll(() => pages.conversation().isVideoPlaying()).toBeTruthy();
+    await expect(pages.conversation().getMessage({sender: memberA}).locator('video')).toHaveJSProperty('paused', false);
   });
 
   // Step 5: Audio Files
@@ -118,8 +123,10 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
   });
   await test.step('User B can play the file', async () => {
     const {pages} = memberAPageManager.webapp;
+    await expect(pages.conversation().getMessage({sender: memberA}).locator('audio')).toHaveJSProperty('paused', true);
+
     await pages.conversation().playAudio();
-    await expect.poll(() => pages.conversation().isAudioPlaying()).toBeTruthy();
+    await expect(pages.conversation().getMessage({sender: memberA}).locator('audio')).toHaveJSProperty('paused', false);
   });
 
   // Step 6: Ephemeral messages

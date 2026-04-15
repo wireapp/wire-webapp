@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     outputs:
@@ -45,7 +45,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -85,7 +85,7 @@ jobs:
           echo "commit_url=$COMMIT_URL" >> "$GITHUB_OUTPUT"
           echo "committer=$AUTHOR" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: build-artifact
           path: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
@@ -106,7 +106,7 @@ jobs:
   # An extra step is needed to see if the e2e_tests folder was touched as part of the PR
   check_edits_to_e2e_tests:
     name: Check if the PR touches e2e tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       tests_to_run: ${{ steps.check_e2e_tests.outputs.tests_to_run || steps.set_default_tests_for_merge_queue.outputs.tests_to_run }}
@@ -155,7 +155,7 @@ jobs:
     name: Playwright Critical Flow (precommit)
     if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
     needs: [deploy_and_run_e2e]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Report Status
@@ -165,7 +165,7 @@ jobs:
     name: Generate test report
     needs: deploy_and_run_e2e
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: read
@@ -181,7 +181,7 @@ jobs:
         if: ${{ github.event_name == 'merge_group' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -218,7 +218,7 @@ jobs:
 
       - name: Comment on PR
         if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-        uses: marocchino/sticky-pull-request-comment@d4d6b0936434b21bc8345ad45a440c5f7d2c40ff
+        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0
         with:
           header: playwright-summary
           message: |

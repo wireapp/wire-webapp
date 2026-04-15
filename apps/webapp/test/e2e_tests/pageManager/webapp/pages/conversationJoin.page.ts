@@ -6,6 +6,8 @@ export const ConversationJoinPage = (page: Page) => {
   const nameInput = page.getByRole('textbox', {name: 'Your name'});
   const acceptTermsCheckBox = page.getByText(/I accept .* terms of use/i);
   const joinAsGuestButton = page.getByRole('button', {name: 'Join as Temporary Guest'});
+  const joinAsMemberButton = page.getByRole('button', {name: 'Join', exact: true});
+  const enterpriseLoginButton = page.getByRole('button', {name: 'Enterprise Login'});
 
   const joinAsGuest = async (name: string) => {
     await nameInput.fill(name);
@@ -18,5 +20,7 @@ export const ConversationJoinPage = (page: Page) => {
     joinAsGuest,
     joinBrowserButton,
     joinAsGuestButton,
+    joinAsMemberButton,
+    enterpriseLoginButton,
   };
 };

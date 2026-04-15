@@ -1,18 +1,18 @@
-import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from "@wireapp/api-client/lib/team";
-import {TeamState} from "Repositories/team/TeamState";
-import ko from "knockout";
-import {GroupCreationModal} from "Components/Modals/GroupCreation/GroupCreationModal";
-import {act, getByRole} from "@testing-library/react";
-import {UserState} from "Repositories/user/UserState";
-import {User} from "Repositories/entity/User";
-import {RootContext, RootContextValue} from "../../../page/RootProvider";
-import {amplify} from "amplify";
-import {WebAppEvents} from "@wireapp/webapp-events";
-import {mountComponent} from "../../../auth/util/test/TestUtil";
-import {mockStoreFactory} from "../../../auth/util/test/mockStoreFactory";
-import {initialRootState} from "../../../auth/module/reducer";
-import {t} from "Util/localizerUtil";
-import {TypeUtil} from "@wireapp/commons";
+import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
+import {TeamState} from 'Repositories/team/TeamState';
+import ko from 'knockout';
+import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
+import {act, getByRole} from '@testing-library/react';
+import {UserState} from 'Repositories/user/UserState';
+import {User} from 'Repositories/entity/User';
+import {RootContext, RootContextValue} from '../../../page/RootProvider';
+import {amplify} from 'amplify';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {mountComponent} from '../../../auth/util/test/TestUtil';
+import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
+import {initialRootState} from '../../../auth/module/reducer';
+import {t} from 'Util/localizerUtil';
+import {TypeUtil} from '@wireapp/commons';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
@@ -30,14 +30,14 @@ describe('GroupCreationModal', () => {
       isAppsEnabled: false,
       hasWhitelistedServices: true,
       isMLSEnabled: false,
-      expectedAppsEnabled: true
+      expectedAppsEnabled: true,
     },
     {
       defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
       hasWhitelistedServices: false,
       isMLSEnabled: false,
-      expectedAppsEnabled: false
+      expectedAppsEnabled: false,
     },
 
     // MLS
@@ -46,14 +46,14 @@ describe('GroupCreationModal', () => {
       isAppsEnabled: false,
       hasWhitelistedServices: true,
       isMLSEnabled: true,
-      expectedAppsEnabled: false
+      expectedAppsEnabled: false,
     },
     {
       defaultProtocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: true,
       hasWhitelistedServices: false,
       isMLSEnabled: true,
-      expectedAppsEnabled: true
+      expectedAppsEnabled: true,
     },
   ])(
     'should result in expectedAppsEnabled=$expectedAppsEnabled when { protocol: $defaultProtocol, appsEnabled: $isAppsEnabled, whitelisted: $hasWhitelistedServices, mlsEnabled: $isMLSEnabled }',
@@ -80,9 +80,9 @@ describe('GroupCreationModal', () => {
               supportedProtocols: [defaultProtocol],
               defaultCipherSuite: 1,
               allowedCipherSuites: [1],
-              protocolToggleUsers: ['protocolToggleUsers']
+              protocolToggleUsers: ['protocolToggleUsers'],
             },
-            status: FEATURE_STATUS.ENABLED
+            status: FEATURE_STATUS.ENABLED,
           },
         }),
       };
@@ -94,15 +94,15 @@ describe('GroupCreationModal', () => {
               conversation: {},
               search: {},
               team: {},
-            }
-          }
-        }
+            },
+          },
+        },
       } as RootContextValue;
 
       // Act
       const {getByTestId} = mountComponent(
         <RootContext.Provider value={mockRootContext}>
-          <GroupCreationModal userState={mockUserState} teamState={mockTeamState as TeamState}/>
+          <GroupCreationModal userState={mockUserState} teamState={mockTeamState as TeamState} />
         </RootContext.Provider>,
         mockStoreFactory()({
           ...initialRootState,
@@ -117,19 +117,20 @@ describe('GroupCreationModal', () => {
       );
 
       act(() => {
-        amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, "test-event", null);
+        amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'test-event', null);
       });
 
       // Assert
       const servicesToggleContainer = getByTestId('info-toggle-services');
       const servicesCheckbox = getByRole(servicesToggleContainer, 'checkbox');
 
-      if(expectedAppsEnabled) {
+      if (expectedAppsEnabled) {
         expect(servicesCheckbox).toBeEnabled();
         expect(servicesToggleContainer).not.toHaveTextContent(t('servicesNotEnabledNoteTitle'));
       } else {
         expect(servicesCheckbox).toBeDisabled();
         expect(servicesToggleContainer).toHaveTextContent(t('servicesNotEnabledNoteTitle'));
       }
-    });
+    },
+  );
 });

@@ -524,7 +524,7 @@ test.describe('Mention', () => {
 
       await otherUserPages.conversationList().pendingConnectionRequest.click();
       await otherUserPages.connectRequest().connectButton.click();
-      
+
       await test.step('UserA creates a group including userB and otherUser', async () => {
         await createGroup(userAPages, 'Test Group', [userB, otherUser]);
       });

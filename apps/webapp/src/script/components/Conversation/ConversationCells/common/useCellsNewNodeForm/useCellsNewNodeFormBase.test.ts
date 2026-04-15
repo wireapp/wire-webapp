@@ -36,7 +36,6 @@ describe('useCellsNewNodeFormBase', () => {
   const createNodeMock = () => jest.fn().mockResolvedValue(undefined) as CreateNodeMock;
 
   const setup = ({createNode = createNodeMock(), normalizeNameForCreation, isOpen = true}: SetupOptions = {}) => {
-
     const {result, rerender} = renderHook(
       ({modalIsOpen}: {modalIsOpen: boolean}) =>
         useCellsNewNodeFormBase({

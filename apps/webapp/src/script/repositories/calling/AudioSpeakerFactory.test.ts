@@ -35,8 +35,7 @@ describe('AudioSpeakerFactory', () => {
   });
 
   it('creates new audio element and appends it to base element', () => {
-    const audioElement =
-      AudioSpeakerFactory.createNewCallingAudioSpeaker(mockStream);
+    const audioElement = AudioSpeakerFactory.createNewCallingAudioSpeaker(mockStream);
 
     expect(audioElement).toBeDefined();
     expect(audioElement.srcObject).toBe(mockStream);
@@ -49,8 +48,8 @@ describe('AudioSpeakerFactory', () => {
     jest.resetModules();
     AudioSpeakerFactory = require('./AudioSpeakerFactory').AudioSpeakerFactory;
 
-    expect(() =>
-      AudioSpeakerFactory.createNewCallingAudioSpeaker(mockStream),
-    ).toThrow('Audio element could not be crated!');
+    expect(() => AudioSpeakerFactory.createNewCallingAudioSpeaker(mockStream)).toThrow(
+      'Audio element could not be crated!',
+    );
   });
 });
