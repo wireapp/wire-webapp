@@ -168,25 +168,25 @@ export const test = baseTest.extend<Fixtures>({
       }
 
       if (options?.features && Object.values(options.features).every(Boolean)) {
-        // The team will be reset right after initialization, so we need to wait a short time for it to finish
+        // The team will be reset right after initialization, so we wait for a feature which is unlocked by default to be locked by ibis
         // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await api.waitForFeature(FEATURE_KEY.CONVERSATION_GUEST_LINKS, owner.token, 'locked');
 
         if (options.features.conferenceCalling) {
           await api.enableConferenceCallingFeature(teamId);
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
+          await api.waitForFeature(FEATURE_KEY.CONFERENCE_CALLING, owner.token);
         }
 
         // Creating channels depends on MLS to be enabled
         if (options.features.mls || options.features.channels) {
           await api.brig.enableMLSFeature(owner.teamId);
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+          await api.waitForFeature(FEATURE_KEY.MLS, owner.token);
         }
 
         if (options.features.channels) {
           await api.brig.unlockChannelFeature(teamId);
           await api.brig.enableChannelsFeature(teamId);
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
+          await api.waitForFeature(FEATURE_KEY.CHANNELS, owner.token);
         }
       }
 
