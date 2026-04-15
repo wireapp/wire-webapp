@@ -30,6 +30,7 @@ export interface ServiceData {
   name?: string;
   provider?: string;
   summary?: string;
+  category?: string;
   tags?: string[];
 }
 
@@ -43,10 +44,19 @@ export class ServiceEntity {
   providerName: ko.Observable<string>;
   summary: string;
   tags: string[];
+  category?: string;
   isService: boolean;
 
   constructor(serviceData: ServiceData = {}) {
-    const {description = '', id = '', name = '', provider: providerId = '', summary = '', tags = []} = serviceData;
+    const {
+      description = '',
+      id = '',
+      name = '',
+      provider: providerId = '',
+      summary = '',
+      category = '',
+      tags = [],
+    } = serviceData;
 
     this.id = id;
     this.description = description;
@@ -54,6 +64,7 @@ export class ServiceEntity {
     this.providerId = providerId;
     this.providerName = ko.observable(' ');
     this.summary = summary;
+    this.category = category;
     this.tags = tags;
 
     this.isService = true;
