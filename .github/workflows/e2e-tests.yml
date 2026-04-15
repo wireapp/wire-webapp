@@ -141,8 +141,13 @@ jobs:
       - name: Merge playwright reports
         working-directory: apps/webapp
         run: |
-          yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
-          rm -rf playwright-report/blob-reports
+          if [ -d "playwright-report/blob-reports" ]; then
+            yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
+            rm -rf playwright-report/blob-reports
+          else
+            echo "No blob-reports directory found; skipping merge."
+            ls -la playwright-report || true
+          fi
 
       - name: Delete trace artifacts
         if: ${{ !inputs.keep_traces }}
