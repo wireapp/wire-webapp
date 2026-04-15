@@ -25,6 +25,8 @@ export const FullScreenCallPage = (page: Page) => {
   const component = page.locator('.video-calling-wrapper');
 
   const reactButton = component.getByTitle('Reactions');
+  const raiseHandButton = component.getByTestId('do-toggle-hand-raise');
+  const selfVideoThumbnail = page.getByTestId('self-video-thumbnail-wrapper');
 
   /* Press the react button and click the given emoji within the opened toolbar */
   const sendReaction = async (emoji: '👍') => {
@@ -45,8 +47,14 @@ export const FullScreenCallPage = (page: Page) => {
     });
   };
 
+  const toggleHandRaise = async () => {
+    await raiseHandButton.click();
+  };
+
   return {
     sendReaction,
     getReaction,
+    toggleHandRaise,
+    selfVideoThumbnail,
   };
 };

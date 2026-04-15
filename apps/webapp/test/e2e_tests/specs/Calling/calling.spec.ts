@@ -28,6 +28,7 @@ test.describe('Calling', () => {
   let userA: User;
   let userB: User;
   let userC: User;
+  const groupName = 'Calling group';
 
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
@@ -68,6 +69,40 @@ test.describe('Calling', () => {
       await expect(userBPages.calling().callCell).not.toBeVisible();
     },
   );
+
+  test('Verify Raise hand functionality', {tag: ['@TC-8773', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([
+      createPage(withLogin(userA), withConnectedUser(userB)),
+      createPage(withLogin(userB)),
+    ]);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await createGroup(userAPages, groupName, [userB]);
+
+    // Establish group call; required precondition for hand-raise testing
+    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversation().clickCallButton();
+    await userBPages.calling().clickAcceptCallButton();
+
+    await expect(userBPages.calling().callCell).toBeVisible();
+
+    const userACall = await userAPages.calling().maximizeCell();
+    await expect(userACall.selfVideoThumbnail).toBeVisible();
+
+    // User A raises hand and verifies the indicator appears on their thumbnail
+    await userACall.toggleHandRaise();
+    await expect(userACall.selfVideoThumbnail.getByText('✋')).toBeVisible();
+
+    const toast = userAPage.getByText('You have raised your hand up');
+    await expect(toast).toBeVisible();
+
+    await expect(toast).toBeHidden({timeout: 3000});
+
+    await userACall.toggleHandRaise();
+    await expect(userACall.selfVideoThumbnail.getByText('✋')).toBeHidden();
+  });
 
   test('Verify in call reactions', {tag: ['@TC-8774', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
