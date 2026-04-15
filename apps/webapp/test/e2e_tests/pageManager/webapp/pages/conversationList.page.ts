@@ -51,7 +51,7 @@ export class ConversationListPage {
    * @param conversationName Name of the conversation to search for
    * @param options.protocol Only locate conversations matching this protocol (mls only works for 1on1 conversations as groups still use proteus) - Default: "mls"
    */
-  getConversationLocator(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}) {
+  getConversation(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}) {
     let conversation = this.page.getByTestId('item-conversation').filter({hasText: conversationName});
 
     if (options?.protocol) {

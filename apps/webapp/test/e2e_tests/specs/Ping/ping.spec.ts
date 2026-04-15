@@ -52,13 +52,13 @@ test.describe('Ping', () => {
 
         if (scenario.isGroup) {
           await createGroup(userAPages, conversationName, [userB]);
-          await userBPages.conversationList().getConversationLocator(conversationName).open();
+          await userBPages.conversationList().getConversation(conversationName).open();
           await userBPages.conversation().sendPing();
-          await userAPages.conversationList().getConversationLocator(conversationName).open();
+          await userAPages.conversationList().getConversation(conversationName).open();
         } else {
-          await userBPages.conversationList().getConversationLocator(userA.fullName).open();
+          await userBPages.conversationList().getConversation(userA.fullName).open();
           await userBPages.conversation().sendPing();
-          await userAPages.conversationList().getConversationLocator(userB.fullName).open();
+          await userAPages.conversationList().getConversation(userB.fullName).open();
         }
 
         await expect(userAPages.conversation().getPing()).toBeVisible();
@@ -72,12 +72,12 @@ test.describe('Ping', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userBPages.conversationList().getConversationLocator(userA.fullName).open();
+    await userBPages.conversationList().getConversation(userA.fullName).open();
     await userBPages.conversation().sendPing();
     await expect(userBPages.conversation().pingButton).toBeDisabled();
     await userBPages.conversation().sendPing();
 
-    await userAPages.conversationList().getConversationLocator(userB.fullName).open();
+    await userAPages.conversationList().getConversation(userB.fullName).open();
     await expect(userAPages.conversation().getPing()).toHaveCount(2);
   });
 
@@ -98,7 +98,7 @@ test.describe('Ping', () => {
       const conversationName = 'Test Group';
       await createGroup(userAPages, conversationName, [userB, ...usersForBigGroup]);
 
-      await userAPages.conversationList().getConversationLocator(conversationName).open();
+      await userAPages.conversationList().getConversation(conversationName).open();
       await userAPages.conversation().sendPing();
 
       await expect(userAModals.confirm().modal).toBeVisible();

@@ -66,11 +66,11 @@ test(
     });
 
     await test.step('User A sends a message with assets in a group conversation', async () => {
-      await userAPages.conversationList().getConversationLocator(conversationName).open();
+      await userAPages.conversationList().getConversation(conversationName).open();
       await userAComponents.inputBarControls().clickShareFile(imageFilePath);
       await userAComponents.inputBarControls().clickShareFile(videoFilePath);
       await userAComponents.inputBarControls().clickSendMessage();
-      await userBPages.conversationList().getConversationLocator(conversationName).open();
+      await userBPages.conversationList().getConversation(conversationName).open();
 
       await expect(userBPages.cellsConversation().getImageInMultipartMessageLocator(userA)).toBeVisible();
       await expect(userBPages.cellsConversation().getVideoInMultipartMessageLocator(userA)).toBeVisible();

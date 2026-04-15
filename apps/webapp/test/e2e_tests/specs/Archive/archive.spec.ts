@@ -40,7 +40,7 @@ test.describe('Archive', () => {
       const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
       const {pages, components} = PageManager.from(page).webapp;
 
-      const conversation = pages.conversationList().getConversationLocator(memberB.fullName);
+      const conversation = pages.conversationList().getConversation(memberB.fullName);
       let contextMenu = await conversation.openContextMenu();
       await contextMenu.archiveButton.click();
       await expect(conversation).not.toBeVisible();
@@ -68,9 +68,9 @@ test.describe('Archive', () => {
 
       const memberAConversation = await memberAPages
         .conversationList()
-        .getConversationLocator(memberB.fullName, {protocol: 'mls'})
+        .getConversation(memberB.fullName, {protocol: 'mls'})
         .open();
-      await memberBPages.conversationList().getConversationLocator(memberA.fullName, {protocol: 'mls'}).open();
+      await memberBPages.conversationList().getConversation(memberA.fullName, {protocol: 'mls'}).open();
 
       await test.step('MemberA archives conversation with memberB', async () => {
         const contextMenu = await memberAConversation.openContextMenu();
@@ -99,7 +99,7 @@ test.describe('Archive', () => {
       const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
       const {pages, components} = PageManager.from(page).webapp;
 
-      const conversation = await pages.conversationList().getConversationLocator(memberB.fullName).open();
+      const conversation = await pages.conversationList().getConversation(memberB.fullName).open();
 
       if (tag === '@TC-103') {
         await test.step('User mutes the conversation', async () => {
@@ -143,10 +143,10 @@ test.describe('Archive', () => {
         let conversation: Locator;
         if (tag === '@TC-104') {
           await createGroup(pages, 'Test Group', [memberB]);
-          conversation = pages.conversationList().getConversationLocator('Test Group');
+          conversation = pages.conversationList().getConversation('Test Group');
         } else {
           await connectWithUser(pageManager, memberB);
-          conversation = pages.conversationList().getConversationLocator(memberB.fullName);
+          conversation = pages.conversationList().getConversation(memberB.fullName);
         }
 
         await pages.conversation().conversationInfoButton.click();

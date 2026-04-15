@@ -140,7 +140,7 @@ test.describe('Localization', () => {
       await pages.startUI().component.getByRole('button', {name: userB.fullName}).click();
       await modals.userProfile().startConversationButton.click();
 
-      const conversation = await pages.conversationList().getConversationLocator(userB.fullName).open();
+      const conversation = await pages.conversationList().getConversation(userB.fullName).open();
       const messagePlaceholder = page.locator('[data-uie-name="input-placeholder"]');
       await expect(messagePlaceholder).toHaveText(deTranslations['tooltipConversationInputPlaceholder']);
 

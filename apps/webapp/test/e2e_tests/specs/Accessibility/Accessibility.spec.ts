@@ -44,8 +44,8 @@ test.describe('Accessibility', () => {
       ]);
 
       await createGroup(userAPages, 'Accessible Group', [userB]);
-      await userAPages.conversationList().getConversationLocator('Accessible Group').open();
-      await userBPages.conversationList().getConversationLocator('Accessible Group').open();
+      await userAPages.conversationList().getConversation('Accessible Group').open();
+      await userBPages.conversationList().getConversation('Accessible Group').open();
 
       await test.step('User A starts typing in group and B sees typing indicator', async () => {
         await userAPages.conversation().messageInput.pressSequentially('Test', {delay: 100});
@@ -60,7 +60,7 @@ test.describe('Accessibility', () => {
 
       await test.step('User A types more into group', async () => {
         await userAPages.sidebar().allConverationsButton.click();
-        await userAPages.conversationList().getConversationLocator('Accessible Group').open();
+        await userAPages.conversationList().getConversation('Accessible Group').open();
         await userAPages.conversation().messageInput.pressSequentially('Test', {delay: 100});
         // Since A disabled the typing indicator B should not see it
         await expect(userBPages.conversation().typingIndicator).not.toBeVisible();
@@ -92,11 +92,11 @@ test.describe('Accessibility', () => {
         await pages.conversation().messageInput.fill('Draft Message');
 
         await pages.conversation().backButton.click();
-        await pages.conversationList().getConversationLocator(userB.fullName).open();
+        await pages.conversationList().getConversation(userB.fullName).open();
         await expect(pages.conversation().messageInput).toBeEmpty();
 
         await pages.conversation().backButton.click();
-        await pages.conversationList().getConversationLocator('Test Group').open();
+        await pages.conversationList().getConversation('Test Group').open();
         await expect(pages.conversation().messageInput).toHaveText('Draft Message');
       },
     );
