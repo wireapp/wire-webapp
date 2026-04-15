@@ -100,26 +100,33 @@ export class ApiManagerE2E {
    * This is to wait until stripe/ibis has set free account restrictions after team creation.
    *
    * @param token - The access token of the user.
+   * @param state - The expected state of the feature
    * @returns A promise that resolves to true if the feature is enabled, false otherwise.
    */
-  async waitForFeatureToBeEnabled(featureKey: FEATURE_KEY, teamId: string, token?: string): Promise<boolean> {
-    if (!token) {
-      throw new Error('Token is required to check for feature');
-    }
-
+  async waitForFeature(
+    featureKey: FEATURE_KEY,
+    token: string,
+    state: 'enabled' | 'disabled' | 'unlocked' | 'locked' = 'enabled',
+  ): Promise<boolean> {
     const timeout = 300000;
     const interval = 1000;
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeout) {
-      const isEnabled = await this.featureConfig.isFeatureEnabled(token, featureKey);
-      if (isEnabled) {
-        return true;
+      if (state === 'enabled' || state === 'disabled') {
+        const isEnabled = await this.featureConfig.isFeatureEnabled(token, featureKey);
+        if (isEnabled && state === 'enabled') return true;
+        if (!isEnabled && state === 'disabled') return true;
+      } else {
+        const isUnlocked = await this.featureConfig.isFeatureUnlocked(token, featureKey);
+        if (isUnlocked && state === 'unlocked') return true;
+        if (!isUnlocked && state === 'locked') return true;
       }
+
       await new Promise(resolve => setTimeout(resolve, interval));
     }
 
-    throw new Error(`${featureKey} feature is not enabled after waiting for ${timeout / 1000} seconds`);
+    throw new Error(`${featureKey} feature is not ${state} after waiting for ${timeout / 1000} seconds`);
   }
 
   async createTeamOwner(user: User, teamName: string) {
