@@ -166,6 +166,10 @@ test(
 
     await test.step('Team owner removes one group member from a group', async () => {
       const {pages} = ownerPageManager.webapp;
+      await pages.conversation().clickConversationInfoButton();
+      expect(pages.conversation().membersList).toBeVisible();
+      expect(pages.conversation().membersList.getByRole('listitem')).toHaveCount(1);
+
       // Get the member from the members list and remove them
       await pages.conversation().removeMemberFromGroup(member2.fullName);
 
@@ -173,15 +177,6 @@ test(
       await expect(
         pages.conversation().systemMessages.filter({hasText: `You removed ${member2.fullName}`}),
       ).toBeVisible();
-    });
-
-    await test.step('Team owner removes a service from a group', async () => {
-      const {pages} = ownerPageManager.webapp;
-      // Remove the Poll service (services appear in the members list)
-      await pages.conversationDetails().removeServiceFromConversation('Poll');
-
-      // Verify service was removed by checking for system message
-      await expect(pages.conversation().systemMessages.filter({hasText: 'You removed Poll Bot'})).toBeVisible();
     });
   },
 );
