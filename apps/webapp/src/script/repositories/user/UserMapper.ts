@@ -27,6 +27,8 @@ import {isSelfAPIUser} from './UserGuards';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import '../../view_model/bindings/CommonBindings';
 
+import {UserType} from '@wireapp/api-client/lib/user';
+
 export class UserMapper {
   private readonly logger: Logger;
 
@@ -183,9 +185,7 @@ export class UserMapper {
       userEntity.isDeleted = true;
     }
 
-    if (type) {
-      userEntity.type = type;
-    }
+    userEntity.type = type ?? UserType.REGULAR;
 
     if (app) {
       userEntity.description = app.description;
@@ -193,9 +193,6 @@ export class UserMapper {
     } else {
       userEntity.description = undefined;
       userEntity.category = undefined;
-    }
-      userEntity.description = app.description;
-      userEntity.category = app.category;
     }
 
     return userEntity;
