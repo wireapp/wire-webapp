@@ -19,6 +19,7 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -121,6 +122,10 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     }
     return connectedUsers;
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
+
+  const apps = useMemo(() => {
+    return contacts.map(contact => integrationRepository.mapServiceFromUser(contact));
+  }, [contacts, integrationRepository]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
@@ -292,7 +297,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     </ul>
                   )}
 
-                  <ServiceList services={services} onServiceClick={onServiceSelect} isSearching={isSearching} />
+                  <ServiceList
+                    services={activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS ? services : apps}
+                    onServiceClick={onServiceSelect}
+                    isSearching={isSearching}
+                  />
                 </>
               )}
 
