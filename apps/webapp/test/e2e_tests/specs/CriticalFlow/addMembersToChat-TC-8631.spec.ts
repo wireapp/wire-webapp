@@ -44,6 +44,8 @@ test(
       const team = await createTeam('Critical', {users: [member1, member2]});
       owner = team.owner;
 
+      await api.team.addServiceToTeamWhitelist(owner.teamId, Services.POLL_SERVICE, owner.token);
+
       const [pmOwner, pm1, pm2] = await Promise.all([
         PageManager.from(createPage(withLogin(owner))),
         PageManager.from(createPage(withLogin(member1))),
@@ -62,7 +64,6 @@ test(
 
     await test.step('Team owner adds a service to newly created group', async () => {
       const {pages} = ownerPageManager.webapp;
-      await api.team.addServiceToTeamWhitelist(owner.teamId, Services.POLL_SERVICE, owner.token);
       // Add the Poll service to the conversation
       await pages.conversation().clickConversationTitle();
       await pages.conversationDetails().waitForSidebar();
