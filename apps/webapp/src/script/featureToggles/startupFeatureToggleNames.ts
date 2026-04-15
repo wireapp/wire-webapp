@@ -20,13 +20,13 @@
 export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
 export const collaboraNewDocumentCreationMenuFeatureToggleName = 'collabora-new-document-creation-menu';
 export const countlyIncrementalBackoffRetryReportingFeatureToggleName = 'countly-incremental-backoff-retry-reporting';
-export const applockForgotPasswordFeatureToggleName = 'applock-forgot-password';
+export const applockV2FeatureToggleName = 'applock-v2';
 
 export const startupFeatureToggleNames = [
   reliableWebsocketConnectionFeatureToggleName,
   collaboraNewDocumentCreationMenuFeatureToggleName,
   countlyIncrementalBackoffRetryReportingFeatureToggleName,
-  applockForgotPasswordFeatureToggleName,
+  applockV2FeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];
