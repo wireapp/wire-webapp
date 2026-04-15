@@ -22,6 +22,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withConnectedUser, withLogin, expect} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Calling', () => {
   let userA: User;
@@ -31,7 +32,10 @@ test.describe('Calling', () => {
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
     userC = await createUser();
-    const team = await createTeam('Team Call Team', {users: [userB, userC]});
+    const team = await createTeam('Team Call Team', {
+      users: [userB, userC],
+      features: {conferenceCalling: true},
+    });
     userA = team.owner;
   });
 
@@ -106,10 +110,19 @@ test.describe('Calling', () => {
     },
   );
 
-  test(
-    'Verify 1on1 call ringing terminates on second client when accepting call',
-    {tag: ['@TC-2823', '@regression']},
-    async ({createPage}) => {
+  [
+    {
+      description: 'Verify 1on1 call ringing terminates on second client when accepting call',
+      tag: '@TC-2823',
+      conversationType: '1on1',
+    },
+    {
+      description: 'Verify group call ringing stops on second client when accepting call',
+      tag: '@TC-2824',
+      conversationType: 'group',
+    },
+  ].forEach(({description, tag, conversationType}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
       const [userAPage, userBPage1] = await Promise.all([
         createPage(withLogin(userA), withConnectedUser(userB)),
         createPage(withLogin(userB)),
@@ -121,13 +134,22 @@ test.describe('Calling', () => {
       const userBPage2 = await createPage(withLogin(userB, {confirmNewHistory: true}));
       const userBDevice2Pages = PageManager.from(userBPage2).webapp.pages;
 
+      if (conversationType === '1on1') {
+        await userAPages.conversationList().openConversation(userB.fullName);
+      } else {
+        await createGroup(userAPages, 'Calling group', [userB]);
+        await userAPages.conversationList().openConversation('Calling group');
+      }
+
       // Ensure no audio is playing on both devices initially
-      await userAPages.conversationList().openConversation(userB.fullName);
       await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(false);
       await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(false);
 
       // User A calls user B, confirming both devices are ringing
       await userAPages.conversation().clickCallButton();
+      await expect(userAPages.calling().callCell).toBeVisible();
+
+      await expect(userBDevice1Pages.calling().callCell).toBeVisible();
       await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(true);
       await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(true);
 
@@ -137,8 +159,8 @@ test.describe('Calling', () => {
       await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(false);
       await expect(userBDevice2Pages.calling().callCell).not.toBeVisible();
       await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(false);
-    },
-  );
+    });
+  });
 
   test(
     'Verify I can make another call while current one is ignored',
