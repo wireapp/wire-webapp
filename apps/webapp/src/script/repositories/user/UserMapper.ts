@@ -17,6 +17,8 @@
  *
  */
 
+import {UserType} from '@wireapp/api-client/lib/user';
+
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
 import {User} from 'Repositories/entity/User';
 import {UserRecord} from 'Repositories/storage';
@@ -26,8 +28,6 @@ import {isSelfAPIUser} from './UserGuards';
 
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import '../../view_model/bindings/CommonBindings';
-
-import {UserType} from '@wireapp/api-client/lib/user';
 
 export class UserMapper {
   private readonly logger: Logger;
