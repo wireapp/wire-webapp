@@ -19,7 +19,6 @@
 
 import {FC, useMemo, useState} from 'react';
 
-import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -134,16 +133,8 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const isService = !!firstUserEntity?.isService;
     const allowIntegrations = isGroupOrChannel || isService;
 
-    return (
-      isTeam &&
-      allowIntegrations &&
-      inTeam &&
-      !isTeamOnly &&
-      isServicesEnabled &&
-      activeConversation.protocol !== CONVERSATION_PROTOCOL.MLS
-    );
+    return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled;
   }, [
-    activeConversation.protocol,
     firstUserEntity?.isService,
     inTeam,
     isGroupOrChannel,
