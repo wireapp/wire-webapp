@@ -34,7 +34,7 @@ test.describe('Calling', () => {
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
     userC = await createUser();
-    team = await createTeam('Team Call Team', {
+    const team = await createTeam('Team Call Team', {
       users: [userB, userC],
       features: {conferenceCalling: true},
     });
