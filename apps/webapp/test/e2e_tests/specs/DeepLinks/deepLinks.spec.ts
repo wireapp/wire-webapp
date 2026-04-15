@@ -85,10 +85,10 @@ test.describe('Deep Links', () => {
 
     await test.step('User B copies and sends profile deeplink to User A and User A verifies information', async () => {
       const copiedProfileLinkUserB = await copyProfileLink(userBPage, userBPageManager);
-      await userBPages.conversationList().openConversation(userA.fullName);
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userBPages.conversation().sendMessage('UserB profile link: ' + copiedProfileLinkUserB);
 
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       await userAPages.conversation().getMessage({sender: userB}).click();
       await expect(userAModals.userProfile().modal).toBeVisible();
       await expect(userAModals.userProfile().participantFullname).toContainText(userB.fullName);
@@ -103,10 +103,10 @@ test.describe('Deep Links', () => {
 
     await test.step('User C copies and sends profile deeplink to User A and User A verifies information', async () => {
       const copiedProfileLinkUserC = await copyProfileLink(userCPage, userCPageManager);
-      await userCPages.conversationList().openConversation(userA.fullName);
+      await userCPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userCPages.conversation().sendMessage('UserC profile link: ' + copiedProfileLinkUserC);
 
-      await userAPages.conversationList().openConversation(userC.fullName);
+      await userAPages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
       await userAPages.conversation().getMessage({sender: userC}).click();
       await expect(userAModals.userProfile().modal).toBeVisible();
       await expect(userAModals.userProfile().participantFullname).toContainText(userC.fullName);
@@ -119,8 +119,34 @@ test.describe('Deep Links', () => {
       await userAModals.userProfile().modalCloseButton.click();
     });
 
+    await test.step('User D copies and sends profile deeplink to User B, who sends this link to User A and User A verifies information', async () => {
+      const copiedProfileLinkUserD = await copyProfileLink(userDPage, userDPageManager);
+      await userDPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userDPages.conversation().sendMessage('UserD profile link: ' + copiedProfileLinkUserD);
+      await userBPages.conversationList().openConversation(userD.fullName, {protocol: 'mls'});
+      await expect(userBPages.conversation().getMessage({sender: userD})).toBeVisible();
+      const profileLinkUserD = userBPages.conversation().getMessage({sender: userD});
+      await profileLinkUserD.hover();
+      await userBPages.conversation().copyMessage(profileLinkUserD);
 
-    await expect(userAModals.userProfile().modal).toBeVisible();
+      const copiedProfileLinkFromUserD = await userBPage.evaluate(async () => {
+        return await navigator.clipboard.readText();
+      });
 
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversation().sendMessage(copiedProfileLinkFromUserD);
+
+      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversation().getMessage({content: 'UserD'}).click();
+
+      await expect(userAModals.userProfile().modal).toBeVisible();
+      await expect(userAModals.userProfile().participantFullname).toContainText(userD.fullName);
+      await expect(userAModals.userProfile().participantUsername).toContainText(userD.username);
+      await expect(userAModals.userProfile().guestChip).toBeVisible();
+      await expect(userAModals.userProfile().domainLabel).toBeVisible();
+      await expect(userAModals.userProfile().connectWarning).toBeVisible();
+      await expect(userAModals.userProfile().connectButton).toBeVisible();
+      await userAModals.userProfile().cancelButton.click();
+    });
   });
 });
