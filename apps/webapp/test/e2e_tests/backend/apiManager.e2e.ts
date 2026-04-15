@@ -108,7 +108,7 @@ export class ApiManagerE2E {
     token: string,
     state: 'enabled' | 'disabled' | 'unlocked' | 'locked' = 'enabled',
   ): Promise<boolean> {
-    const timeout = 300000;
+    const timeout = 60_000;
     const interval = 1000;
     const startTime = Date.now();
 
