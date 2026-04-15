@@ -143,6 +143,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
       activeConversation.protocol !== CONVERSATION_PROTOCOL.MLS
     );
   }, [
+    activeConversation.protocol,
     firstUserEntity?.isService,
     inTeam,
     isGroupOrChannel,
