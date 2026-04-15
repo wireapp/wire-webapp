@@ -20,9 +20,10 @@
 import {FC, useMemo, useState} from 'react';
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {UserType} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
@@ -43,7 +44,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
+import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/stringUtil';
 
 import {getManageServicesUrl} from '../../../externalRoute';
 import {PanelHeader} from '../panelHeader';
@@ -124,8 +125,17 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
 
   const apps = useMemo(() => {
-    return contacts.map(contact => integrationRepository.mapServiceFromUser(contact));
-  }, [contacts, integrationRepository]);
+    const normalizedQuery = searchInput.trim().toLowerCase();
+    return contacts
+      .filter(contact => contact.type === UserType.APP)
+      .map(contact => integrationRepository.mapServiceFromUser(contact))
+      .filter(contact => compareTransliteration(contact.name(), normalizedQuery))
+      .sort((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
+  }, [contacts, integrationRepository, searchInput]);
+
+  const servicesList = useMemo(() => {
+    return activeConversation.protocol === CONVERSATION_PROTOCOL.MLS ? apps : services;
+  }, [activeConversation.protocol, apps, services]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
@@ -187,7 +197,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const onSearchInput = async (value: string) => {
     setSearchInput(value);
 
-    if (isAddServiceState) {
+    if (isAddServiceState && CONVERSATION_PROTOCOL.PROTEUS) {
       await searchServices(value);
     }
   };
@@ -270,7 +280,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
           {isAddServiceState && (
             <>
-              {!!services.length && (
+              {!!servicesList.length && (
                 <>
                   {canManageServices() && !!manageServicesUrl && (
                     <ul className="panel-manage-services left-list-items">
@@ -297,15 +307,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     </ul>
                   )}
 
-                  <ServiceList
-                    services={activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS ? services : apps}
-                    onServiceClick={onServiceSelect}
-                    isSearching={isSearching}
-                  />
+                  <ServiceList services={servicesList} onServiceClick={onServiceSelect} isSearching={isSearching} />
                 </>
               )}
 
-              {!services.length && !isInitialServiceSearch && (
+              {!servicesList.length && !isInitialServiceSearch && (
                 <div className="search__no-services">
                   <Icon.ServiceIcon className="search__no-services__icon" />
 
