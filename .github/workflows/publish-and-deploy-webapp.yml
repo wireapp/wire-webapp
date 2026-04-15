@@ -346,27 +346,9 @@ jobs:
           body_path: ${{ needs.build.outputs.changelog }}
           draft: true
           prerelease: ${{contains(needs.build.outputs.release_name, 'staging')}}
-
-  announce_deployment:
-    name: 'Announce deployment to wire chats'
-    runs-on: ubuntu-24.04
-    needs: create_gh_release
-
-    steps:
-      - name: Announce staging release
-        if: ${{ needs.create_gh_release.outputs.release_url }}
-        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
-        with:
-          status: success
-          text: |
-            ✅ New release done ✅
-            **Changelog:** ${{ needs.create_gh_release.outputs.release_url }}
-
   notify_deployment_failure:
     name: 'Notify deployment failure to wire chats'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [build, deploy_to_aws]
     if: ${{ always() && needs.deploy_to_aws.result == 'failure' }}
 

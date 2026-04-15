@@ -138,28 +138,9 @@ jobs:
           wait-for-environment-recovery: true
           deployment-timeout: 150
           use-existing-application-version-if-available: true
-
-  notify_redeploy:
-    name: Notify redeploy
-    runs-on: ubuntu-24.04
-    needs: [validate_request, build_artifact, deploy_to_production]
-    if: ${{ needs.deploy_to_production.result == 'success' }}
-
-    steps:
-      - name: Announce production redeploy
-        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
-        with:
-          status: success
-          text: |
-            ✅ Production redeploy completed for tag ${{ needs.validate_request.outputs.tag }} ✅
-            **Triggered by:** ${{ github.actor }}
-            **Commit:** [${{ needs.build_artifact.outputs.commit_sha }}](${{ needs.build_artifact.outputs.commit_url }}) — ${{ needs.build_artifact.outputs.commit_subject }}
-
   notify_redeploy_failure:
     name: Notify redeploy failure
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [validate_request, build_artifact, deploy_to_production]
     if: ${{ always() && needs.deploy_to_production.result == 'failure' }}
 
