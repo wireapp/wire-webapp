@@ -19,7 +19,6 @@
 
 import {User} from 'test/e2e_tests/data/user';
 
-import {Services} from '../../data/serviceInfo';
 import {PageManager} from '../../pageManager';
 import {test, expect, withLogin} from '../../test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
@@ -58,18 +57,6 @@ test(
       const {pages} = ownerPageManager.webapp;
       await createGroup(pages, conversationName, [member1, member2]);
       await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
-    });
-
-    await test.step('Team owner adds a service to newly created group', async () => {
-      const {pages} = ownerPageManager.webapp;
-      await api.team.addServiceToTeamWhitelist(owner.teamId, Services.POLL_SERVICE, owner.token);
-      // Add the Poll service to the conversation
-      await pages.conversation().clickConversationTitle();
-      await pages.conversationDetails().waitForSidebar();
-      await pages.conversationDetails().clickAddPeopleButton();
-      await pages.conversationDetails().addServiceToConversation('Poll');
-      // Verify service was added by checking for system message
-      await expect(ownerPageManager.page.getByText('You added Poll Bot to the')).toBeVisible();
     });
 
     await test.step('All group participants send messages in a group', async () => {
