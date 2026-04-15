@@ -85,7 +85,7 @@ export const UserSearchableList = ({
   const fetchMembersFromBackend = useDebouncedCallback(async (query: string, ignoreMembers: User[]) => {
     const resultUsers = await searchRepository.searchByName(query, selfUser.teamId);
     const selfTeamId = selfUser.teamId;
-    const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId && user.type === UserType.REGULAR);
+    const foundMembers = resultUsers.filter(user => user.teamId === selfTeamId);
     const ignoreIds = ignoreMembers.map(member => member.id);
     const uniqueMembers = foundMembers.filter(member => !ignoreIds.includes(member.id));
 
@@ -108,11 +108,10 @@ export const UserSearchableList = ({
       .searchUserInSet(filter, users)
       .filter(
         user =>
-          (user.isMe ||
-            conversationState.hasConversationWith(user) ||
-            teamRepository.isSelfConnectedTo(user.id) ||
-            user.username() === normalizedQuery) &&
-          user.type === UserType.REGULAR,
+          user.isMe ||
+          conversationState.hasConversationWith(user) ||
+          teamRepository.isSelfConnectedTo(user.id) ||
+          user.username() === normalizedQuery,
       );
 
     if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch) {
