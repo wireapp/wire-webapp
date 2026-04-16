@@ -138,7 +138,7 @@
     "babel-loader": "10.1.1",
     "babel-plugin-transform-import-meta": "2.3.3",
     "baseline-browser-mapping": "2.10.10",
-    "browserslist": "4.28.1",
+    "browserslist": "4.28.2",
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.4",
     "cssnano": "7.1.4",
