@@ -17,16 +17,11 @@
  *
  */
 
-import {assign, createMachine, fromCallback} from 'xstate';
+import {assign, createMachine, fromCallback, sendTo} from 'xstate';
 
 import {WallClock} from '../../clock/wallClock';
 
 const DEFAULT_INACTIVITY_TIMEOUT_MS = 60_000; // 1 minute
-
-/**
- * DOM events that count as user activity and reset the inactivity debounce timer.
- */
-const ACTIVITY_EVENTS = ['mousemove', 'keydown', 'mousedown', 'touchstart', 'wheel', 'scroll'] as const;
 
 export const appLockEventType = Object.freeze({
   /** User enables "Lock with passcode" in preferences. */
@@ -37,6 +32,8 @@ export const appLockEventType = Object.freeze({
   lockEnforced: 'LOCK_ENFORCED',
   /** User successfully set or changed their passcode. */
   passcodeConfirmed: 'PASSCODE_CONFIRMED',
+  /** User activity detected (injected from outside the machine). */
+  userActivity: 'USER_ACTIVITY',
   /** Inactivity debounce timer fired — no user activity for inactivityTimeoutMs. */
   inactivityTimeout: 'INACTIVITY_TIMEOUT',
   /** User entered the correct passcode on the lock screen. */
@@ -119,36 +116,50 @@ type InactivityActorInput = {
   readonly timeoutMs: number;
 };
 
-type InactivityActorEvent = {type: typeof appLockEventType.inactivityTimeout};
+/**
+ * Events that the inactivity timer actor can receive.
+ */
+type InactivityActorEvent =
+  | {type: 'RESET_TIMER'} // Sent when user activity is detected
+  | {type: typeof appLockEventType.inactivityTimeout}; // Not used as input, only sent to parent
 
-const inactivityCallbackActor = fromCallback<InactivityActorEvent, InactivityActorInput>(({sendBack, input}) => {
-  const {wallClock, timeoutMs} = input;
-  let debounceTimeoutId: ReturnType<typeof wallClock.setTimeout> | null = null;
+/**
+ * This callback actor manages a debounced inactivity timer.
+ * It starts a timer when created and resets it whenever it receives a RESET_TIMER event.
+ * After timeout milliseconds of no RESET_TIMER events, it sends INACTIVITY_TIMEOUT to the parent machine.
+ */
+const inactivityCallbackActor = fromCallback<InactivityActorEvent, InactivityActorInput>(
+  ({sendBack, input, receive}) => {
+    const {wallClock, timeoutMs} = input;
+    let debounceTimeoutId: ReturnType<typeof wallClock.setTimeout> | null = null;
 
-  const scheduleTimeout = () => {
-    if (debounceTimeoutId !== null) {
-      wallClock.clearTimeout(debounceTimeoutId);
-    }
-    debounceTimeoutId = wallClock.setTimeout(() => {
-      sendBack({type: appLockEventType.inactivityTimeout});
-    }, timeoutMs);
-  };
+    const scheduleTimeout = () => {
+      if (debounceTimeoutId !== null) {
+        wallClock.clearTimeout(debounceTimeoutId);
+      }
+      debounceTimeoutId = wallClock.setTimeout(() => {
+        sendBack({type: appLockEventType.inactivityTimeout});
+      }, timeoutMs);
+    };
 
-  ACTIVITY_EVENTS.forEach(event => {
-    globalThis.addEventListener(event, scheduleTimeout, {passive: true});
-  });
+    // Start the initial timer
+    scheduleTimeout();
 
-  scheduleTimeout();
-
-  return () => {
-    if (debounceTimeoutId !== null) {
-      wallClock.clearTimeout(debounceTimeoutId);
-    }
-    ACTIVITY_EVENTS.forEach(event => {
-      globalThis.removeEventListener(event, scheduleTimeout);
+    // Listen for RESET_TIMER events from the parent machine
+    receive(event => {
+      if (event.type === 'RESET_TIMER') {
+        scheduleTimeout();
+      }
     });
-  };
-});
+
+    // Cleanup on actor stop
+    return () => {
+      if (debounceTimeoutId !== null) {
+        wallClock.clearTimeout(debounceTimeoutId);
+      }
+    };
+  },
+);
 
 function resolveInitialState(input: AppLockMachineInput): AppLockStateName {
   if (input.requiresPasscodeCreation) {
@@ -218,6 +229,9 @@ export function createAppLockStateMachine(input: AppLockMachineInput) {
           }),
         },
         on: {
+          [appLockEventType.userActivity]: {
+            actions: sendTo('inactivityTimer', {type: 'RESET_TIMER'}),
+          },
           [appLockEventType.inactivityTimeout]: {
             target: appLockStateName.locked,
           },
