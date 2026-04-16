@@ -130,7 +130,7 @@
     "axios": "1.15.0",
     "dexie": "4.0.7",
     "dotenv": "17.4.1",
-    "@types/react": "18.3.27",
+    "@types/react": "18.3.28",
     "@types/react-dom": "18.3.7"
   },
   "version": "0.27.0",
