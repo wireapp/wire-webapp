@@ -608,10 +608,13 @@ test.describe('Guestroom', () => {
       await guestPages.conversationJoin().enterpriseLoginButton.click();
       await expect(guestPages.singleSignOn().header).toBeVisible();
 
-      const [idpPage] = await Promise.all([
-        context.waitForEvent('page'),
-        guestPages.singleSignOn().enterEmailOnSSOPage(ssoUser.email),
-      ]);
+      // Try to open the idp page (retry if it didn't open on the first try)
+      const idpPagePromise = context.waitForEvent('page');
+      await expect(async () => {
+        await guestPages.singleSignOn().enterEmailOnSSOPage(ssoUser.email);
+        await expect(idpPagePromise).resolves.toBeDefined();
+      }).toPass();
+      const idpPage = await idpPagePromise;
 
       await idpPage.getByRole('textbox', {name: 'Username'}).fill(ssoUser.username, {timeout: 20_000});
       await idpPage.getByRole('textbox', {name: 'Password'}).fill(ssoUser.password);
