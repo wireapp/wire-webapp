@@ -18,8 +18,8 @@
  */
 
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {AccountInput, useInputDone} from './AccountInput';
 
@@ -43,7 +43,7 @@ const NameInput = ({name, userRepository, canEditProfile}: NameInputProps) => {
       try {
         await userRepository.changeName(newName);
         nameInputDone.done();
-      } catch (error) {
+      } catch (error: unknown) {
         logger.warn('Failed to update name', error);
       }
     }

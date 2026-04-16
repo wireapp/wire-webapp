@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useCallback, useMemo, useState} from 'react';
+import {ChangeEvent, useCallback, useId, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
@@ -30,9 +30,9 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {isEnterKey, isSpaceKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {isEnterKey, isSpaceKey} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 
 import {UserListItem} from './components/UserListItem';
 
@@ -157,6 +157,8 @@ export const UserList = ({
     [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, teamState],
   );
 
+  const adminsHeaderId = useId();
+  const membersHeaderId = useId();
   let content;
 
   const showRoles = !!conversation;
@@ -188,12 +190,16 @@ export const UserList = ({
       <>
         {(admins.length > 0 || showEmptyAdmin) && (
           <>
-            <h3 className="user-list__header" data-uie-name="label-conversation-admins">
+            <h3 id={adminsHeaderId} className="user-list__header" data-uie-name="label-conversation-admins">
               {t('searchListAdmins', {count: adminCount})}
             </h3>
 
             {admins.length > 0 && (
-              <ul className={cx('search-list', cssClasses)} data-uie-name="list-admins">
+              <ul
+                className={cx('search-list', cssClasses)}
+                data-uie-name="list-admins"
+                aria-labelledby={adminsHeaderId}
+              >
                 {admins.slice(0, maxShownUsers).map(user => renderListItem(user))}
               </ul>
             )}
@@ -208,11 +214,15 @@ export const UserList = ({
 
         {members.length > 0 && maxShownUsers > admins.length && (
           <>
-            <h3 className="user-list__header" data-uie-name="label-conversation-members">
+            <h3 id={membersHeaderId} className="user-list__header" data-uie-name="label-conversation-members">
               {t('searchListMembers', {count: memberCount})}
             </h3>
 
-            <ul className={cx('search-list', cssClasses)} data-uie-name="list-members">
+            <ul
+              className={cx('search-list', cssClasses)}
+              data-uie-name="list-members"
+              aria-labelledby={membersHeaderId}
+            >
               {members.slice(0, maxShownUsers - admins.length).map(user => renderListItem(user))}
             </ul>
           </>

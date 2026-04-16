@@ -19,7 +19,7 @@
 
 import {act, renderHook, waitFor} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';

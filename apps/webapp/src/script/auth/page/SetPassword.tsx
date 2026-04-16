@@ -26,7 +26,8 @@ import {AnyAction, Dispatch} from 'redux';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
+import {toError} from 'Util/toError';
 
 import {Page} from './Page';
 
@@ -46,17 +47,21 @@ const SetPasswordComponent = ({
   doSetPassword,
   isFetching,
 }: Props & ConnectedProps & DispatchProps) => {
-  const passwordInput = useRef<HTMLInputElement>();
-  const [error, setError] = useState();
+  const passwordInput = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<Error | null>(null);
   const [isValidPassword, setIsValidPassword] = useState(true);
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const onSetPassword = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
-    let validationError: Error;
+    let validationError: ValidationError | null = null;
 
     const currentInputNode = passwordInput.current;
+    if (currentInputNode === null) {
+      return;
+    }
+
     currentInputNode.focus();
     if (!currentInputNode.checkValidity()) {
       validationError = ValidationError.handleValidationState(currentInputNode.name, currentInputNode.validity);
@@ -68,8 +73,8 @@ const SetPasswordComponent = ({
       }
       await doSetPassword({new_password: password});
       navigate(ROUTE.SET_HANDLE);
-    } catch (error) {
-      setError(error);
+    } catch (error: unknown) {
+      setError(toError(error));
     }
   };
 
@@ -95,7 +100,10 @@ const SetPasswordComponent = ({
             hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
             markInvalid={!isValidPassword}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              passwordInput.current.setCustomValidity('');
+              if (passwordInput.current !== null) {
+                passwordInput.current.setCustomValidity('');
+              }
+
               setError(null);
               setPassword(event.target.value);
               setIsValidPassword(true);

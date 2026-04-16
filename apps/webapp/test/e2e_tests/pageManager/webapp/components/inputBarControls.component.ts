@@ -24,7 +24,7 @@ import {shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 export const EPHEMERAL_TIMER_CHOICES = ['10 seconds', '5 minutes', '1 hour', 'Off'] as const;
 
 export class InputBarControls {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly shareImage: Locator;
   readonly shareFile: Locator;

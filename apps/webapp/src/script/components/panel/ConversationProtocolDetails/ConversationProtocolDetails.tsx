@@ -22,7 +22,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 interface ConversationProtocolDetailsProps {
   protocol: CONVERSATION_PROTOCOL;

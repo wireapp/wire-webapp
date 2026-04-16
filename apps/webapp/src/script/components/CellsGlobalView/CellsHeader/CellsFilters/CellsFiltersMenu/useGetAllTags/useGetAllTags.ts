@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
   const [tags, setTags] = useState<string[]>([]);
@@ -32,7 +32,7 @@ export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsReposito
       const tags = await cellsRepository.getAllTags();
       const filteredTags = tags.Values?.map(tag => tag).filter(Boolean) ?? [];
       setTags(filteredTags);
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error : new Error('Unknown error'));
     } finally {
       setIsLoading(false);

@@ -21,7 +21,7 @@ import React from 'react';
 
 import {render, act, fireEvent, waitFor} from '@testing-library/react';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {MessageReactions, MessageReactionsProps} from './MessageReactions';
 

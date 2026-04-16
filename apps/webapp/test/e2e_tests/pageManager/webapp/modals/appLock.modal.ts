@@ -17,11 +17,9 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {expect, Locator, Page} from '@playwright/test';
 
 export class AppLockModal {
-  readonly page: Page;
-
   readonly lockPasscodeInput: Locator;
   readonly unlockPasscodeInput: Locator;
   readonly appLockWipeInput: Locator;
@@ -35,8 +33,6 @@ export class AppLockModal {
   readonly wipeDatabaseButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.appLockModal = page.locator("[data-uie-name='applock-modal']");
     this.lockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-set-a']");
     this.unlockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-unlock']");
@@ -45,7 +41,7 @@ export class AppLockModal {
     this.appLockModalHeader = page.locator("[data-uie-name='applock-modal'] [data-uie-name='applock-modal-header']");
     this.appLockModalText = page.locator("[data-uie-name='applock-modal'] [data-uie-name='label-applock-unlock-text']");
     this.loadingBar = page.locator('.progress-bar');
-    this.errorMessage = this.appLockModal.getByTestId('label-applock-unlock-error');
+    this.errorMessage = this.appLockModal.getByTestId(/label-applock-(unlock|wipe)-error/);
     this.forgotPassphraseButton = this.appLockModal.getByTestId('go-forgot-passphrase');
     this.wipeDatabaseButton = this.appLockModal.getByTestId('go-wipe-database');
   }
@@ -53,6 +49,7 @@ export class AppLockModal {
   async setPasscode(passcode: string) {
     await this.lockPasscodeInput.fill(passcode);
     await this.appLockActionButton.click();
+    await expect(this.appLockModal).toBeHidden();
   }
 
   async unlockAppWithPasscode(passcode: string) {

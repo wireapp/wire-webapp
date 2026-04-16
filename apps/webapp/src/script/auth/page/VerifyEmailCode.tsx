@@ -27,8 +27,8 @@ import {AnyAction, Dispatch} from 'redux';
 
 import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {Page} from './Page';
 import {styles} from './VerifyEmailCode.styles';
@@ -62,7 +62,7 @@ const VerifyEmailCodeComponent = ({
       };
       await doRegisterPersonal(validAccount, entropyData);
       navigate(ROUTE.SET_HANDLE, {state: {isNewAccount: true}});
-    } catch (error) {
+    } catch (error: unknown) {
       trackTelemetryPageView(PageView.ACCOUNT_VERIFICATION_FAILED_SCREEN_2_5);
       logger.error('Failed to create personal account', error);
     }
@@ -76,7 +76,7 @@ const VerifyEmailCodeComponent = ({
 
     try {
       await doSendActivationCode(account.email);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to send email code', error);
     }
   };

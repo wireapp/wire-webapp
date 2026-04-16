@@ -30,8 +30,8 @@ import {Navigate, useNavigate} from 'react-router-dom';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {Config} from '../../Config';
 import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
@@ -152,11 +152,11 @@ const SingleSignOnFormComponent = ({
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
       setIsValidLink(true);
-      doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
+      doCheckConversationCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         console.warn('Invalid conversation code', error);
         setIsValidLink(false);
       });
-      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         console.warn('Failed to fetch conversation info', error);
         setIsValidLink(false);
       });
@@ -248,7 +248,7 @@ const SingleSignOnFormComponent = ({
       } else {
         await loginWithSSO(codeOrMail, password);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setIsLoading(false);
       if (isBackendError(error)) {
         switch (error.label) {

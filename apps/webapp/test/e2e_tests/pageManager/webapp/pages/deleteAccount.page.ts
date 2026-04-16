@@ -20,14 +20,10 @@
 import {Page, Locator} from '@playwright/test';
 
 export class DeleteAccountPage {
-  readonly page: Page;
-
   readonly deleteAccountButton: Locator;
   readonly accountDeletedHeadline: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.deleteAccountButton = page.locator("[data-uie-name='do-delete-account']");
     this.accountDeletedHeadline = page.locator("[data-uie-name='successful-delete-account-headline']");
   }

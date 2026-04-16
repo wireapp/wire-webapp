@@ -32,7 +32,7 @@ import {
   MemberLeaveReason,
   RECEIPT_MODE,
 } from '@wireapp/api-client/lib/conversation/data';
-import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/ConversationTypingData';
+import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/conversationTypingData';
 import {
   CONVERSATION_EVENT,
   ConversationAddPermissionUpdateEvent,
@@ -65,12 +65,12 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
-import {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
-import {ConnectionState} from 'Repositories/connection/ConnectionState';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
+import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
+import {ConnectionState} from 'Repositories/connection/connectionState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {DeleteConversationMessage} from 'Repositories/entity/message/DeleteConversationMessage';
@@ -92,11 +92,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserFilter} from 'Repositories/user/UserFilter';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {getNextItem} from 'Util/ArrayUtil';
-import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/FileTypeUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {getNextItem} from 'Util/arrayUtil';
+import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {removeClientFromUserClientMap} from 'Util/removeClientFromUserClientMap';
 import {
   compareTransliteration,
@@ -104,9 +104,10 @@ import {
   sortByPriority,
   sortUsersByPriority,
   startsWith,
-} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {toError} from 'Util/toError';
+import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -533,7 +534,7 @@ export class ConversationRepository {
       }
 
       return conversationEntity;
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error)) {
         switch (error.label) {
           case BackendErrorLabel.CLIENT_ERROR:
@@ -581,7 +582,7 @@ export class ConversationRepository {
       try {
         await this.loadMissingConversations();
         await this.refreshAllConversationsUnavailableParticipants();
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(`failed to refresh missing users & conversations metat data`, error);
       }
     }, TIME_IN_MILLIS.HOUR * 3);
@@ -651,10 +652,12 @@ export class ConversationRepository {
    * @returns the fetched backend conversation entity
    */
   public fetchBackendConversationEntityById = async (qualifiedId: QualifiedId): Promise<BackendConversation> => {
-    const backendConversationEntity = await this.conversationService.getConversationById(qualifiedId).catch(error => {
-      this.logger.error(`Failed to get conversation from backend: ${error.message}`);
-      throw error;
-    });
+    const backendConversationEntity = await this.conversationService
+      .getConversationById(qualifiedId)
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to get conversation from backend: ${toError(error).message}`);
+        throw error;
+      });
     return backendConversationEntity;
   };
 
@@ -666,8 +669,8 @@ export class ConversationRepository {
     connections: ConnectionEntity[],
     deadConnections: ConnectionEntity[],
   ): Promise<Conversation[]> {
-    const remoteConversations = await this.conversationService.getAllConversations().catch(error => {
-      this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+    const remoteConversations = await this.conversationService.getAllConversations().catch((error: unknown) => {
+      this.logger.error(`Failed to get all conversations from backend: ${toError(error).message}`);
       return {found: []} as RemoteConversations;
     });
     return this.loadRemoteConversations(remoteConversations, connections, deadConnections);
@@ -684,8 +687,8 @@ export class ConversationRepository {
     }
     const remoteConversations = await this.conversationService
       .getConversationByIds(missingConversations)
-      .catch(error => {
-        this.logger.error(`Failed to get all conversations from backend: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to get all conversations from backend: ${toError(error).message}`);
         return {found: [], failed: missingConversations} as RemoteConversations;
       });
 
@@ -1114,7 +1117,7 @@ export class ConversationRepository {
           // In case a user is missing in the local state, then they will be considered an `unavailable` user
           await this.addEventsToConversation(events, conversationEntity, {offline: true});
         }
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(`Could not load unread events for conversation: ${conversationEntity.id}`, error);
       }
       conversationEntity.isLoadingMessages(false);
@@ -1193,7 +1196,7 @@ export class ConversationRepository {
     try {
       await this.conversationService.deleteConversation(teamId, conversationEntity.id);
       return this.deleteConversationLocally(conversationEntity, true);
-    } catch (error) {
+    } catch (error: unknown) {
       const isAlreadyDeletedOnBackend = isBackendError(error) && error.label === BackendErrorLabel.NO_CONVERSATION;
       if (isAlreadyDeletedOnBackend) {
         return this.deleteConversationLocally(conversationEntity, true);
@@ -1268,10 +1271,11 @@ export class ConversationRepository {
 
     try {
       return await this.fetchConversationById(conversation_id);
-    } catch (error) {
-      const isConversationNotFound = error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
+    } catch (error: unknown) {
+      const isConversationNotFound =
+        isErrorWithType(error) && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (isConversationNotFound) {
-        this.logger.warn(`Failed to get conversation '${conversation_id.id}': ${error.message}`, error);
+        this.logger.warn(`Failed to get conversation '${conversation_id.id}': ${toError(error).message}`, error);
       }
 
       throw error;
@@ -1516,8 +1520,8 @@ export class ConversationRepository {
       const conversationEntity = await this.getConversationById(conversation_id);
       const messageEntity = await this.messageRepository.getMessageInConversationById(conversationEntity, message_id);
       return conversationEntity.last_read_timestamp() >= messageEntity.timestamp();
-    } catch (error) {
-      const messageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+    } catch (error: unknown) {
+      const messageNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (messageNotFound) {
         return true;
       }
@@ -1578,7 +1582,11 @@ export class ConversationRepository {
                 await this.onMemberJoin(conversationEntity, response);
               }
               amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
-            } catch (error) {
+            } catch (error: unknown) {
+              if (!isBackendError(error)) {
+                throw error;
+              }
+
               switch (error.label) {
                 case BackendErrorLabel.ACCESS_DENIED:
                 case BackendErrorLabel.NO_CONVERSATION:
@@ -1608,7 +1616,11 @@ export class ConversationRepository {
             : t('modalConversationJoinHeadline'),
         },
       });
-    } catch (error) {
+    } catch (error: unknown) {
+      if (!isBackendError(error)) {
+        throw error;
+      }
+
       switch (error.label) {
         case BackendErrorLabel.NO_CONVERSATION:
         case BackendErrorLabel.NO_CONVERSATION_CODE: {
@@ -1749,7 +1761,7 @@ export class ConversationRepository {
       mlsConversation.mutedTimestamp(proteusConversationToBeKept.mutedTimestamp());
       mlsConversation.status(proteusConversationToBeKept.status());
       mlsConversation.verification_state(proteusConversationToBeKept.verification_state());
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn('Failed to migrate conversation properties', {
         error,
         proteusConversationToBeKept: JSON.stringify(proteusConversationToBeKept),
@@ -1937,7 +1949,7 @@ export class ConversationRepository {
     try {
       initialisedMLSConversation = await this.establishMLS1to1Conversation(mlsConversation, otherUserId);
       initialisedMLSConversation.readOnlyState(null);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Failed to establish MLS 1:1 conversation with user ${otherUserId.id}`, error);
       if (!allowUnestablished) {
         throw error;
@@ -2189,7 +2201,7 @@ export class ConversationRepository {
       this.conversationState.conversations.notifySubscribers();
 
       return updatedConversation;
-    } catch (error) {
+    } catch (error: unknown) {
       const isConversationNotFound =
         error instanceof ConversationError && error.type === ConversationError.TYPE.CONVERSATION_NOT_FOUND;
       if (!isConversationNotFound) {
@@ -2222,13 +2234,24 @@ export class ConversationRepository {
   }): Promise<void> => {
     this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
     if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
-      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
-      if (epoch === 0) {
+      const coreCryptoEpochNumber = await core.service?.mls?.getEpoch(groupId);
+      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch, coreCryptoEpochNumber});
+      if (coreCryptoEpochNumber === 0) {
         if (!retry) {
-          this.logger.error('Epoch is 0, but retry is false, not retrying again', {conversationId, groupId, epoch});
+          this.logger.error('Epoch is 0, but retry is false, not retrying again', {
+            conversationId,
+            groupId,
+            epoch,
+            coreCryptoEpochNumber,
+          });
           return;
         }
-        return this.recoverFromLocalUnestablishedMLSConversations({conversationId, groupId, epoch, core});
+        return this.recoverFromLocalUnestablishedMLSConversations({
+          conversationId,
+          groupId,
+          epoch: coreCryptoEpochNumber,
+          core,
+        });
       }
       return;
     }
@@ -2324,7 +2347,7 @@ export class ConversationRepository {
       }
 
       return this.ensureConversationExists({conversationId, groupId, epoch: remoteEpoch, core, retry: false});
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to recover from local unestablished MLS conversation', {
         error,
         conversationId,
@@ -2346,7 +2369,7 @@ export class ConversationRepository {
         // a conversation marked `not_found` could be either non existing on backend or it could mean the self user is not part of it
         // We need to check if the conversation exists on backend
         await this.conversationService.getConversationById(inccessibleConversation);
-      } catch (error) {
+      } catch (error: unknown) {
         if (isBackendError(error) && error.label === BackendErrorLabel.NO_CONVERSATION) {
           // Only if the conversation triggers a not found error, we delete it locally
           await this.deleteConversationLocally(inccessibleConversation, true);
@@ -2379,7 +2402,7 @@ export class ConversationRepository {
     for (const connection of connections) {
       try {
         await this.mapConnection(connection);
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(
           `Failed when mapping a connection with user ${connection.userId} to a conversation, error: `,
           error,
@@ -2425,7 +2448,7 @@ export class ConversationRepository {
     for (const conversation of sortedConverstions) {
       try {
         await this.init1to1Conversation(conversation);
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(`Failed when initialising 1:1 conversation with id ${conversation.id}, error: `, error);
       }
     }
@@ -2662,7 +2685,7 @@ export class ConversationRepository {
           }
         }
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error)) {
         this.handleAddToConversationError(error, conversation, qualifiedUsers);
       }
@@ -2699,12 +2722,12 @@ export class ConversationRepository {
       try {
         await this.addService(conversationEntity, {providerId, serviceId});
         return conversationEntity;
-      } catch (error) {
+      } catch (error: unknown) {
         // If we fail to add the service to the newly created conversation, we should delete the conversation
         await this.deleteConversation(conversationEntity);
         throw error;
       }
-    } catch (error) {
+    } catch (error: unknown) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
           message: t('modalIntegrationUnavailableMessage'),
@@ -2750,7 +2773,7 @@ export class ConversationRepository {
   ) {
     try {
       await this.addService(conversationEntity, {providerId, serviceId});
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error)) {
         return this.handleAddToConversationError(error, conversationEntity, [{domain: '', id: serviceId}]);
       }
@@ -3157,8 +3180,8 @@ export class ConversationRepository {
       const logMessage = `Changed notification state of conversation to '${mutedStatus}' on '${mutedRef}'`;
       this.logger.debug(logMessage);
       return response;
-    } catch (error) {
-      const log = `Failed to change notification state of conversation '${conversationEntity.id}': ${error.message}`;
+    } catch (error: unknown) {
+      const log = `Failed to change notification state of conversation '${conversationEntity.id}': ${toError(error).message}`;
       const rejectError = new Error(log);
       this.logger.warn(rejectError.message, error);
       throw rejectError;
@@ -3229,11 +3252,12 @@ export class ConversationRepository {
 
     const updatePromise = conversationEntity.isSelfUserRemoved()
       ? Promise.resolve()
-      : this.conversationService.updateMemberProperties(conversationId, payload).catch(error => {
-          const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${error.code}`;
+      : this.conversationService.updateMemberProperties(conversationId, payload).catch((error: unknown) => {
+          const errorCode = isBackendError(error) ? error.code : 'unknown';
+          const logMessage = `Failed to change archived state of '${conversationId}' to '${newState}': ${errorCode}`;
           this.logger.error(logMessage);
 
-          const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
+          const isNotFound = isBackendError(error) && error.code === HTTP_STATUS.NOT_FOUND;
           if (!isNotFound) {
             throw error;
           }
@@ -3471,13 +3495,13 @@ export class ConversationRepository {
       .then((entityObject = {} as EntityObject) =>
         this.handleConversationNotification(entityObject as EntityObject, eventSource, type),
       )
-      .catch((error: BaseError) => {
+      .catch((error: unknown) => {
         const ignoredErrorTypes: string[] = [
           ConversationError.TYPE.MESSAGE_NOT_FOUND,
           ConversationError.TYPE.CONVERSATION_NOT_FOUND,
         ];
 
-        if (!ignoredErrorTypes.includes(error.type)) {
+        if (!isErrorWithType(error) || !ignoredErrorTypes.includes(error.type)) {
           throw error;
         }
       });
@@ -3873,8 +3897,8 @@ export class ConversationRepository {
         await this.saveConversation(conversationEntity);
       }
       return conversationEntity;
-    } catch (error) {
-      const isNoChanges = error.type === ConversationError.TYPE.NO_CHANGES;
+    } catch (error: unknown) {
+      const isNoChanges = isErrorWithType(error) && error.type === ConversationError.TYPE.NO_CHANGES;
       if (!isNoChanges) {
         throw error;
       }
@@ -4205,8 +4229,8 @@ export class ConversationRepository {
       .then(() => {
         return this.messageRepository.deleteMessageById(conversationEntity, eventData.message_id);
       })
-      .catch(error => {
-        const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+      .catch((error: unknown) => {
+        const isNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
         if (!isNotFound) {
           this.logger.warn(`Failed to delete message for conversation '${conversationEntity.id}'`, error);
           throw error;
@@ -4239,7 +4263,7 @@ export class ConversationRepository {
       }
       const conversationEntity = await this.getConversationById({domain: '', id: eventData.conversation_id});
       return await this.messageRepository.deleteMessageById(conversationEntity, eventData.message_id);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(
         `Failed to delete message '${eventData.message_id}' for conversation '${eventData.conversation_id}'`,
         error,
@@ -4271,8 +4295,8 @@ export class ConversationRepository {
       if (changes) {
         await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
       }
-    } catch (error) {
-      const isNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+    } catch (error: unknown) {
+      const isNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (!isNotFound) {
         const log = `Failed to handle reaction to message '${messageId}' in conversation '${conversationEntity.id}'`;
         this.logger.error(log, error);
@@ -4414,7 +4438,7 @@ export class ConversationRepository {
       this.logger.info(
         `Updated conversation group ID from ${oldGroupId} to ${newGroupId} for conversation ${conversationEntity.id} and set epoch to 0`,
       );
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to reset MLS conversation ${conversationEntity.id}`, error);
     }
   }

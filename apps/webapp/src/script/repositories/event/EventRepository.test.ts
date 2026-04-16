@@ -18,8 +18,12 @@
  */
 
 import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {ConnectionState} from '@wireapp/core';
+import {WebAppEvents} from '@wireapp/webapp-events';
+import {amplify} from 'amplify';
 
 import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
+import {Warnings} from '../../view_model/WarningsContainer';
 
 import {ClientEvent} from './Client';
 import {EventRepository} from './EventRepository';
@@ -149,9 +153,298 @@ describe('EventRepository', () => {
         type: 'conversation.unable-to-decrypt',
       } as ClientConversationEvent;
 
-      return testFactory.event_repository.injectEvent(event).then(() => {
+      return testFactory.event_repository!.injectEvent(event).then(() => {
         expect(testFactory.event_repository!['distributeEvent']).toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('updateConnectivityStatus', () => {
+    let eventRepository: EventRepository;
+
+    beforeEach(() => {
+      // Create a minimal EventRepository instance for testing
+      const mockEventService: any = {};
+      const mockNotificationService: any = {};
+      const mockServerTimeHandler: any = {};
+      const mockUserState: any = {};
+
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        mockUserState,
+      );
+
+      // Spy on Warnings methods
+      jest.spyOn(Warnings, 'showWarning').mockImplementation(() => {});
+      jest.spyOn(Warnings, 'hideWarning').mockImplementation(() => {});
+
+      // Spy on amplify publish
+      jest.spyOn(amplify, 'publish').mockReturnValue(true);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should handle ConnectionState.CONNECTING', () => {
+      eventRepository['updateConnectivityStatus'](ConnectionState.CONNECTING);
+
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.NO_INTERNET);
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+      // Note: CONNECTING does not change notificationHandlingState
+    });
+
+    it('should handle ConnectionState.PROCESSING_NOTIFICATIONS', () => {
+      eventRepository['updateConnectivityStatus'](ConnectionState.PROCESSING_NOTIFICATIONS);
+
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.STREAM);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.NO_INTERNET);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECOVERY);
+    });
+
+    it('should handle ConnectionState.CLOSED', () => {
+      eventRepository['updateConnectivityStatus'](ConnectionState.CLOSED);
+
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.CLOSED);
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.NO_INTERNET);
+    });
+
+    it('should handle ConnectionState.LIVE', () => {
+      eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
+
+      expect(eventRepository.notificationHandlingState()).toBe(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.CONNECTION.ONLINE);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.NO_INTERNET);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECONNECT);
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CONNECTIVITY_RECOVERY);
+    });
+
+    it('should log the connection state change', () => {
+      const logSpy = jest.spyOn(eventRepository.logger, 'log').mockImplementation(() => {});
+
+      eventRepository['updateConnectivityStatus'](ConnectionState.LIVE);
+
+      expect(logSpy).toHaveBeenCalledWith('Websocket connection state changed to', ConnectionState.LIVE);
+    });
+  });
+
+  describe('CONFIG', () => {
+    it('should have HEARTBEAT_INTERVAL configured', () => {
+      expect(EventRepository.CONFIG.HEARTBEAT_INTERVAL).toBeDefined();
+      expect(EventRepository.CONFIG.HEARTBEAT_INTERVAL).toBe(30000); // 30 seconds in milliseconds
+    });
+
+    it('should have existing configurations', () => {
+      expect(EventRepository.CONFIG.E_CALL_EVENT_LIFETIME).toBeDefined();
+      expect(EventRepository.CONFIG.IGNORED_ERRORS).toBeDefined();
+      expect(EventRepository.CONFIG.NOTIFICATION_BATCHES).toBeDefined();
+    });
+  });
+
+  describe('connectWebSocket', () => {
+    let eventRepository: EventRepository;
+    let mockAccount: any;
+    let mockEventService: any;
+    let mockNotificationService: any;
+    let mockServerTimeHandler: any;
+
+    beforeEach(() => {
+      mockEventService = {};
+      mockNotificationService = {
+        getServerTime: jest.fn().mockResolvedValue('2024-01-01T00:00:00.000Z'),
+      };
+      mockServerTimeHandler = {
+        computeTimeOffset: jest.fn(),
+      };
+
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
+
+      mockAccount = {
+        listen: jest.fn().mockResolvedValue(jest.fn()),
+      };
+
+      // Mock window event listeners
+      jest.spyOn(window, 'addEventListener');
+      jest.spyOn(window, 'removeEventListener');
+      jest.spyOn(window, 'setInterval').mockReturnValue(123 as any);
+      jest.spyOn(window, 'clearInterval');
+
+      // Mock document event listeners
+      jest.spyOn(document, 'addEventListener');
+      jest.spyOn(document, 'removeEventListener');
+
+      // Mock Warnings
+      jest.spyOn(Warnings, 'showWarning').mockImplementation(() => {});
+      jest.spyOn(Warnings, 'hideWarning').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should setup online and offline event listeners', async () => {
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(window.addEventListener).toHaveBeenCalledWith('online', expect.any(Function));
+      expect(window.addEventListener).toHaveBeenCalledWith('offline', expect.any(Function));
+    });
+
+    it('should setup heartbeat interval', async () => {
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(window.setInterval).toHaveBeenCalledWith(expect.any(Function), 30000);
+    });
+
+    it('should setup visibilitychange listener in browser', async () => {
+      const originalIsElectron = (window as any).isElectron;
+      (window as any).isElectron = undefined;
+
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(document.addEventListener).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
+
+      (window as any).isElectron = originalIsElectron;
+    });
+
+    it('should call account.listen with correct parameters', async () => {
+      const progressCallback = jest.fn();
+
+      await eventRepository.connectWebSocket(mockAccount, true, progressCallback, false);
+
+      expect(mockAccount.listen).toHaveBeenCalledWith({
+        useLegacy: true,
+        onConnectionStateChanged: expect.any(Function),
+        onEvent: expect.any(Function),
+        onMissedNotifications: expect.any(Function),
+        onNotificationStreamProgress: progressCallback,
+        dryRun: false,
+      });
+    });
+
+    it('should handle connection errors gracefully', async () => {
+      mockAccount.listen.mockRejectedValueOnce(new Error('Connection failed'));
+
+      await expect(eventRepository.connectWebSocket(mockAccount, false, jest.fn())).resolves.not.toThrow();
+    });
+
+    it('should compute time offset on initialization', async () => {
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(mockNotificationService.getServerTime).toHaveBeenCalled();
+      expect(mockServerTimeHandler.computeTimeOffset).toHaveBeenCalled();
+    });
+
+    it('should handle server time fetch error', async () => {
+      const timeError = {response: {time: '2024-01-01T00:00:00.000Z'}};
+      mockNotificationService.getServerTime.mockRejectedValueOnce(timeError);
+
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      expect(mockServerTimeHandler.computeTimeOffset).toHaveBeenCalledWith('2024-01-01T00:00:00.000Z');
+    });
+
+    it('should not reconnect when already connecting', async () => {
+      let connectResolve: any;
+      const connectPromise = new Promise(resolve => {
+        connectResolve = resolve;
+      });
+
+      mockAccount.listen.mockReturnValueOnce(connectPromise);
+
+      const connectionPromise = eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      // Try to trigger reconnection while connection is in progress
+      // The connect function should skip if already connecting
+      await new Promise(resolve => setTimeout(resolve, 10));
+
+      connectResolve(jest.fn());
+      await connectionPromise;
+
+      // Should only be called once despite potential multiple triggers
+      expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('handleIncomingEvent', () => {
+    let eventRepository: EventRepository;
+
+    beforeEach(() => {
+      const mockEventService: any = {};
+      const mockNotificationService: any = {};
+      const mockServerTimeHandler: any = {};
+
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
+      jest.spyOn<any, any>(eventRepository, 'handleEvent').mockResolvedValue(undefined);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should handle events sequentially through the queue', async () => {
+      const event1 = {event: {type: 'test.event1'}} as any;
+      const event2 = {event: {type: 'test.event2'}} as any;
+
+      await eventRepository['handleIncomingEvent'](event1, 'NOTIFICATION_STREAM' as any);
+      await eventRepository['handleIncomingEvent'](event2, 'NOTIFICATION_STREAM' as any);
+
+      expect(eventRepository['handleEvent']).toHaveBeenCalledTimes(2);
+    });
+
+    it('should throw errors from non-stream sources', async () => {
+      const mockError = new Error('Test error');
+      jest.spyOn<any, any>(eventRepository, 'handleEvent').mockRejectedValueOnce(mockError);
+
+      const event = {event: {type: 'test.event'}} as any;
+
+      await expect(eventRepository['handleIncomingEvent'](event, 'WEBSOCKET' as any)).rejects.toThrow(mockError);
+    });
+  });
+
+  describe('importEvents', () => {
+    let eventRepository: EventRepository;
+
+    beforeEach(() => {
+      const mockEventService: any = {};
+      const mockNotificationService: any = {};
+      const mockServerTimeHandler: any = {};
+
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
+      jest.spyOn<any, any>(eventRepository, 'handleIncomingEvent').mockResolvedValue(undefined);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should import multiple events sequentially', async () => {
+      const events = [
+        {event: {type: 'test.event1'}} as any,
+        {event: {type: 'test.event2'}} as any,
+        {event: {type: 'test.event3'}} as any,
+      ];
+
+      await eventRepository.importEvents(events as any);
+
+      expect(eventRepository['handleIncomingEvent']).toHaveBeenCalledTimes(3);
     });
   });
 });

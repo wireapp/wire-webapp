@@ -27,7 +27,7 @@ import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {generateUser} from 'test/helper/UserGenerator';
-import {setStrings} from 'Util/LocalizerUtil';
+import {setStrings} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {MessageWrapper} from './MessageWrapper';

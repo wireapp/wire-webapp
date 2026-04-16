@@ -50,24 +50,37 @@ const logger = logdown('config', {
   markdown: false,
 });
 
-function readFile(filePath: string, fallback?: string): string {
+function readFile(filePath: string, fallback: string = ''): string {
   try {
     return fs.readFileSync(filePath, {encoding: 'utf8', flag: 'r'});
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn(`Cannot access "${filePath}": ${(error as Error).message}`);
     return fallback;
   }
 }
 
-function parseCommaSeparatedList(list: string = ''): string[] {
+function parseCommaSeparatedList(list: string | undefined = ''): string[] {
   const cleanedList = list.replace(/\s/g, '');
-  if (!cleanedList) {
+  if (cleanedList.length === 0) {
     return [];
   }
   return cleanedList.split(',');
 }
 
-function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): Record<string, Iterable<string>> {
+function getNonEmptyStringValueOrDefault(value: string | undefined, fallback: string): string {
+  return value !== undefined && value.length > 0 ? value : fallback;
+}
+
+function resolveServerCertificatePath(certificateFileName: string): string {
+  const certificatePathInWorkspaceRoot = path.resolve(process.cwd(), `certificate/${certificateFileName}`);
+  if (fs.existsSync(certificatePathInWorkspaceRoot)) {
+    return certificatePathInWorkspaceRoot;
+  }
+
+  return path.resolve(process.cwd(), `apps/server/dist/certificate/${certificateFileName}`);
+}
+
+function mergedCSP({urls}: ConfigGeneratorParams, env: Env): Record<string, Iterable<string>> {
   const objectSrc = parseCommaSeparatedList(env.CSP_EXTRA_OBJECT_SRC);
   const csp = {
     connectSrc: [
@@ -96,16 +109,30 @@ function mergedCSP({urls}: ConfigGeneratorParams, env: Record<string, string>): 
 
 export function generateConfig(params: ConfigGeneratorParams, env: Env) {
   const {commit, version, urls, env: nodeEnv} = params;
+  const baseUrl = urls.base ?? '';
+  const apiUrl = urls.api ?? '';
+  const websocketUrl = urls.ws ?? '';
+  const parsedHttpPort = Number(env.PORT);
+  const isHttpPortMissingOrZero = Number.isNaN(parsedHttpPort) || parsedHttpPort === 0;
+  const httpPort = isHttpPortMissingOrZero ? 21080 : parsedHttpPort;
+  const defaultSslCertificateKeyPath = resolveServerCertificatePath('development-key.pem');
+  const defaultSslCertificatePath = resolveServerCertificatePath('development-cert.pem');
+  const sslCertificateKeyPath = getNonEmptyStringValueOrDefault(
+    env.SSL_CERTIFICATE_KEY_PATH,
+    defaultSslCertificateKeyPath,
+  );
+  const sslCertificatePath = getNonEmptyStringValueOrDefault(env.SSL_CERTIFICATE_PATH, defaultSslCertificatePath);
+
   return {
-    APP_BASE: urls.base,
+    APP_BASE: baseUrl,
     COMMIT: commit,
     VERSION: version,
     CACHE_DURATION_SECONDS: 300,
     CSP: mergedCSP(params, env),
-    BACKEND_REST: urls.api,
-    BACKEND_WS: urls.ws,
+    BACKEND_REST: apiUrl,
+    BACKEND_WS: websocketUrl,
     DEVELOPMENT: nodeEnv === 'development',
-    DEVELOPMENT_ENABLE_TLS: urls.base.startsWith('https://'),
+    DEVELOPMENT_ENABLE_TLS: baseUrl.startsWith('https://'),
     ENFORCE_HTTPS: env.ENFORCE_HTTPS != 'false',
     ENVIRONMENT: nodeEnv,
     GOOGLE_WEBMASTER_ID: env.GOOGLE_WEBMASTER_ID,
@@ -115,23 +142,15 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
       TITLE: env.OPEN_GRAPH_TITLE,
     },
     ENABLE_DYNAMIC_HOSTNAME: env.ENABLE_DYNAMIC_HOSTNAME === 'true',
-    PORT_HTTP: Number(env.PORT) || 21080,
-    MINIMUM_REQUIRED_CLIENT_BUILD_DATE: env.MINIMUM_REQUIRED_CLIENT_BUILD_DATE,
+    ENABLE_CLIENT_VERSION_ENFORCEMENT: env.ENABLE_CLIENT_VERSION_ENFORCEMENT === 'true',
+    PORT_HTTP: httpPort,
     ROBOTS: {
       ALLOW: readFile(ROBOTS_ALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
       ALLOWED_HOSTS: ['app.wire.com'],
       DISALLOW: readFile(ROBOTS_DISALLOW_FILE, 'User-agent: *\r\nDisallow: /'),
     },
-    SSL_CERTIFICATE_KEY_PATH:
-      env.SSL_CERTIFICATE_KEY_PATH ||
-      (fs.existsSync(path.resolve(process.cwd(), 'certificate/development-key.pem'))
-        ? path.resolve(process.cwd(), 'certificate/development-key.pem')
-        : path.resolve(process.cwd(), 'apps/server/dist/certificate/development-key.pem')),
-    SSL_CERTIFICATE_PATH:
-      env.SSL_CERTIFICATE_PATH ||
-      (fs.existsSync(path.resolve(process.cwd(), 'certificate/development-cert.pem'))
-        ? path.resolve(process.cwd(), 'certificate/development-cert.pem')
-        : path.resolve(process.cwd(), 'apps/server/dist/certificate/development-cert.pem')),
+    SSL_CERTIFICATE_KEY_PATH: sslCertificateKeyPath,
+    SSL_CERTIFICATE_PATH: sslCertificatePath,
   } as const;
 }
 

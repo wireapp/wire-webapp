@@ -22,7 +22,7 @@ import {MouseEvent, useRef, useEffect, useState} from 'react';
 import {CSSObject} from '@emotion/react';
 
 import {usePausableInterval} from '../../hooks/usePausableInterval';
-import {EntropyData} from '../../util/Entropy';
+import {EntropyData} from '../../util/entropy';
 
 interface CanvasProps {
   css?: CSSObject;

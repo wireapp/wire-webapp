@@ -20,16 +20,12 @@
 import {Locator, Page} from '@playwright/test';
 
 export class MarketingConsentModal {
-  readonly page: Page;
-
   readonly modalTitle: Locator;
   readonly modalText: Locator;
   readonly modalLink: Locator;
   readonly actionButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.modalTitle = page.locator(
       "[data-uie-name='modal-marketing-consent'] [data-uie-name='modal-marketing-consent-title']",
     );

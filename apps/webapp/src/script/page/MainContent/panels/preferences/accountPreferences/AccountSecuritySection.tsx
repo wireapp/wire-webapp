@@ -30,8 +30,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
 import {PreferencesSection} from '../components/PreferencesSection';

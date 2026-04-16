@@ -17,14 +17,14 @@
  *
  */
 
-import type {CallConfigData} from '@wireapp/api-client/lib/account/CallConfigData';
+import type {CallConfigData} from '@wireapp/api-client/lib/account/callConfigData';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data';
 import {MessageSendingState} from '@wireapp/core/lib/conversation';
-import {flattenUserMap} from '@wireapp/core/lib/conversation/message/UserClientsUtil';
-import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/SubconversationService/SubconversationService';
+import {flattenUserMap} from '@wireapp/core/lib/conversation/message/userClientsUtil';
+import {SubconversationEpochInfoMember} from '@wireapp/core/lib/conversation/subconversationService/subconversationService';
 import {TaskScheduler} from '@wireapp/core/lib/util';
 import {constructFullyQualifiedClientId} from '@wireapp/core/lib/util/fullyQualifiedClientIdUtils';
 import {amplify} from 'amplify';
@@ -70,25 +70,28 @@ import {CallingEvent} from 'Repositories/event/CallingEvent';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
+import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
 import * as trackingHelpers from 'Repositories/tracking/Helpers';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/Telemetry.helpers';
 import type {UserRepository} from 'Repositories/user/UserRepository';
-import {flatten} from 'Util/ArrayUtil';
+import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {captureModalFocusContext} from 'Util/ModalFocusUtil';
-import {roundLogarithmic} from 'Util/NumberUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {captureModalFocusContext} from 'Util/modalFocusUtil';
+import {roundLogarithmic} from 'Util/numberUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 import {copyStyles} from 'Util/renderElement';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {toError} from 'Util/toError';
 import {createUuid} from 'Util/uuid';
 
 import {Call, SerializedConversationId} from './Call';
@@ -151,7 +154,6 @@ export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
   private readonly logger: Logger;
-  private enableBackgroundBlur = false;
   private avsVersion: number = 0;
   private incomingCallCallback: (call: Call) => void;
   private isReady: boolean = false;
@@ -190,6 +192,7 @@ export class CallingRepository {
     private readonly mediaStreamHandler: MediaStreamHandler,
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly backgroundEffectsHandler: BackgroundEffectsHandler,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),
@@ -317,20 +320,110 @@ export class CallingRepository {
     }
   };
 
-  public async switchVideoBackgroundBlur(enable: boolean): Promise<void> {
+  /**
+   * Switches the video background effect for the self participant in the active call.
+   *
+   * This method:
+   * 1. Stores the effect as the preferred background effect
+   * 2. Applies the effect to the participant's video stream
+   * 3. Replaces the media source with the processed stream if successfully applied
+   *
+   * If no active call exists or no video feed is available, only updates the
+   * participant's effect observable without applying processing. For 'none' effect,
+   * switches back to the original video feed.
+   *
+   * @param effect - Background effect to apply ('none', 'blur', 'virtual', or 'custom').
+   * @param customBackground - Optional custom background source for 'custom' effect type.
+   * @returns Promise that resolves when the effect switch is complete.
+   */
+  public async switchVideoBackgroundEffect(
+    effect: BackgroundEffectSelection,
+    customBackground?: BackgroundSource,
+  ): Promise<void> {
+    // persisted chosen background effect, don't care we have call or not
+    this.backgroundEffectsHandler.setPreferredBackgroundEffect(effect, customBackground);
+    await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
+  }
+
+  public allowSuperhighQualityTier(event: boolean) {
+    if (this.isSuperhighQualityTierAllowed()) {
+      this.backgroundEffectsHandler.enableSuperhighQualityTier(event);
+    }
+  }
+
+  public isSuperhighQualityTierAllowed() {
+    return this.backgroundEffectsHandler.isSuperhighQualityTierAllowed();
+  }
+
+  public getBackgroundEffectsHandler(): BackgroundEffectsHandler {
+    return this.backgroundEffectsHandler;
+  }
+
+  private async applyCurrentBackgroundEffectOnSelfParticipant(
+    changeAvsSendingMediaSource = false,
+  ): Promise<MediaStream | void> {
     const activeCall = this.callState.joinedCall();
     if (!activeCall) {
+      // There is no call even there is no self-participant!
+      this.logger.warn('There is no call even there is no self-participant to apply background effects');
       return;
     }
+
+    // Read self-Participant state to change
     const selfParticipant = activeCall.getSelfParticipant();
-    selfParticipant.releaseBlurredVideoStream();
-    const videoFeed = selfParticipant.videoStream();
-    if (!videoFeed) {
+    const hasActiveVideo = selfParticipant.hasActiveVideo();
+    const sharesScreen = selfParticipant.sharesScreen();
+
+    if (sharesScreen) {
+      this.logger.error('The application allows to apply background effects in case of screen shares');
       return;
     }
-    this.enableBackgroundBlur = enable;
-    const newVideoFeed = enable ? ((await selfParticipant.setBlurredBackground(true)) as MediaStream) : videoFeed;
-    this.changeMediaSource(newVideoFeed, MediaType.VIDEO, false);
+
+    // let's check if background should be disabled, then let's do it and go back to the original video
+    if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+      selfParticipant.releaseProcessedVideoStream();
+      if (hasActiveVideo && changeAvsSendingMediaSource) {
+        // So let's switch back to the original video source
+        this.logger.info('Disable background effects.');
+        this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+      }
+      return selfParticipant.videoStream();
+    }
+
+    if (!hasActiveVideo) {
+      // no Video nothing to change!!
+      this.logger.warn('No video exists to apply apply background effects');
+      return;
+    }
+
+    // Hold a reference to the old stream so we can release it AFTER the new one is assigned,
+    const previousStream = selfParticipant.processedVideoStream();
+
+    const {applied, media} = await this.backgroundEffectsHandler.applyBackgroundEffect(selfParticipant.videoStream());
+
+    // The BackgroundEffectsHandler decide not to change the video stream, so we're going on with the original video.
+    if (!applied) {
+      previousStream?.release();
+      selfParticipant.processedVideoStream(undefined);
+      if (changeAvsSendingMediaSource) {
+        this.logger.info('Background effect could not applied! Switch back to original video stream!');
+        this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+      }
+      return selfParticipant.videoStream();
+    }
+
+    // Assign new stream first, then release old.
+    selfParticipant.processedVideoStream(media);
+    if (previousStream !== media) {
+      previousStream?.release();
+    }
+
+    // in case we also want to instantly change AVS sending source we do it now,
+    if (changeAvsSendingMediaSource) {
+      this.changeMediaSource(media.stream, MediaType.VIDEO, false);
+      this.logger.info('Background effect applied!');
+    }
+    return media.stream;
   }
 
   getStats(conversationId: QualifiedId) {
@@ -400,7 +493,7 @@ export class CallingRepository {
         if (userId) {
           try {
             wCall.setBackground(this.wUser, 0);
-          } catch (e) {
+          } catch (e: unknown) {
             this.logger.warn(`Informed AVS about background mode failed. ${e}`);
           }
         } else {
@@ -598,6 +691,8 @@ export class CallingRepository {
   }
 
   private storeCall(call: Call): void {
+    // @TODO check why this is needed, backgound effect should be global
+    // call.getSelfParticipant().backgroundEffect(this.preferredBackgroundEffect);
     this.callState.calls.push(call);
   }
 
@@ -619,7 +714,9 @@ export class CallingRepository {
       const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
         selfParticipant.updateMediaStream(mediaStream, true);
-        await selfParticipant.setBlurredBackground(this.enableBackgroundBlur);
+        if (this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+          await this.applyCurrentBackgroundEffectOnSelfParticipant();
+        }
         if (camera) {
           call.getSelfParticipant().videoState(VIDEO_STATE.STARTED);
         }
@@ -627,7 +724,7 @@ export class CallingRepository {
         mediaStream.getTracks().forEach(track => track.stop());
       }
       return true;
-    } catch (_error) {
+    } catch (_error: unknown) {
       return false;
     }
   }
@@ -1061,7 +1158,7 @@ export class CallingRepository {
       });
 
       return call;
-    } catch (error) {
+    } catch (error: unknown) {
       if (error) {
         this.logger.error('Failed starting call', error);
       }
@@ -1183,7 +1280,7 @@ export class CallingRepository {
         VIDEO_STATE.SCREENSHARE,
       );
       selfParticipant.startedScreenSharingAt(Date.now());
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.info('Failed to get screen sharing stream', error);
     }
   };
@@ -1256,7 +1353,7 @@ export class CallingRepository {
       };
 
       call.analyticsScreenSharing = true;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error in toggleScreenShareWithVideo:', error);
       if (screenStream) {
         screenStream.getTracks().forEach(track => track.stop());
@@ -1455,11 +1552,12 @@ export class CallingRepository {
       this.sendCallingEvent(EventName.CALLING.JOINED_CALL, call, {
         [Segmentation.CALL.DIRECTION]: this.getCallDirection(call),
       });
-    } catch (error) {
+    } catch (error: unknown) {
       if (error) {
         this.logger.error('Failed answering call', error);
       }
-      this.rejectCall(conversation.qualifiedId);
+      this.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.CALL_SETUP_ERROR);
+      call.reason(REASON.ERROR);
       if (!!conversation && this.isMLSConference(conversation)) {
         await this.leaveMLSConferenceBecauseError(conversation);
       }
@@ -1536,7 +1634,6 @@ export class CallingRepository {
     const subconversationEpochInfo = await this.subconversationService.getSubconversationEpochInfo(
       conversationId,
       conversation.groupId,
-      true,
     );
 
     if (!subconversationEpochInfo) {
@@ -1718,7 +1815,7 @@ export class CallingRepository {
         setConversationId(conversationId);
         setQualityFeedbackModalShown(true);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Storage data can't found: ${(error as Error).message}`);
       setConversationId(conversationId);
       setQualityFeedbackModalShown(true);
@@ -1812,12 +1909,12 @@ export class CallingRepository {
         return this.mediaDevicesHandler
           .initializeMediaDevices(camera)
           .then(() => stream)
-          .catch(error => {
+          .catch((error: unknown) => {
             this.logger.warn('Failed to initialize media devices:', error);
             return stream;
           });
       })
-      .catch(error => {
+      .catch((error: unknown) => {
         this.logger.error('Failed to get media stream:', error);
         throw error;
       });
@@ -1854,7 +1951,14 @@ export class CallingRepository {
   public async refreshVideoInput() {
     const stream = await this.mediaStreamHandler.requestMediaStream(false, true, false, false);
     this.stopMediaSource(MediaType.VIDEO);
-    const clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
+    let clonedMediaStream = this.changeMediaSource(stream, MediaType.VIDEO);
+    const activeCall = this.callState.joinedCall();
+    if (activeCall && this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+      const processedStream = await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
+      if (processedStream) {
+        clonedMediaStream = processedStream;
+      }
+    }
     return clonedMediaStream;
   }
 
@@ -1863,6 +1967,14 @@ export class CallingRepository {
     this.stopMediaSource(MediaType.AUDIO);
     this.changeMediaSource(stream, MediaType.AUDIO);
     return stream;
+  }
+
+  public refreshAudioOutput() {
+    const activeCall = this.callState.joinedCall();
+    if (!activeCall) {
+      return;
+    }
+    activeCall.updateAudioStreamsSink();
   }
 
   /**
@@ -1999,7 +2111,7 @@ export class CallingRepository {
       };
     }
 
-    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch(error => {
+    this.sendCallingMessage(conversationId, payload, options, myClientsOnly === 1).catch((error: unknown) => {
       this.logger.warn('Failed to send calling message, aborting call', error);
       this.abortCall(conversationId, LEAVE_CALL_REASON.ABORTED_BECAUSE_FAILED_TO_SEND_CALLING_MESSAGE);
     });
@@ -2084,8 +2196,8 @@ export class CallingRepository {
       this.wCall?.sftResp(this.wUser!, status, jsonData, jsonData.length, context);
     };
     const avsSftResponseFailedCode = 1000;
-    _sendSFTRequest().catch(error => {
-      this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${error?.message}`, error);
+    _sendSFTRequest().catch((error: unknown) => {
+      this.avsLogHandler(LOG_LEVEL.WARN, `Request to sft server failed with error: ${toError(error).message}`, error);
       avsLogger.warn(`Request to sft server failed with error`, error);
       this.wCall?.sftResp(this.wUser!, avsSftResponseFailedCode, '', 0, context);
     });
@@ -2105,7 +2217,7 @@ export class CallingRepository {
 
       this.wCall?.configUpdate(this.wUser, 0, JSON.stringify(config));
     };
-    _requestConfig().catch(error => {
+    _requestConfig().catch((error: unknown) => {
       this.logger.warn('Failed fetching calling config', error);
       this.wCall?.configUpdate(this.wUser, 1, '');
     });
@@ -2529,9 +2641,13 @@ export class CallingRepository {
         const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
         selfParticipant.updateMediaStream(mediaStream, true);
-        await selfParticipant.setBlurredBackground(this.enableBackgroundBlur);
+
+        if (this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+          await this.applyCurrentBackgroundEffectOnSelfParticipant();
+        }
+
         return selfParticipant.getMediaStream();
-      } catch (error) {
+      } catch (error: unknown) {
         this.mediaStreamQuery = undefined;
         this.logger.warn('Could not get mediaStream for call', error);
         this.handleMediaStreamError(call, missingStreams, error);

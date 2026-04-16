@@ -22,13 +22,15 @@ import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
+import {AudioSpeakerFactory} from 'Repositories/calling/AudioSpeakerFactory';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CanvasMediaStreamMixer} from 'Repositories/media/CanvasMediaStreamMixer';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {chunk, getDifference, partition} from 'Util/ArrayUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {chunk, getDifference, partition} from 'Util/arrayUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {CallingEpochCache} from './CallingEpochCache';
 import {MuteState} from './CallState';
@@ -45,6 +47,7 @@ interface ActiveSpeaker {
 }
 
 export class Call {
+  private readonly logger: Logger = getLogger('Call');
   public readonly reason: ko.Observable<number | undefined> = ko.observable();
   public readonly startedAt: ko.Observable<number | undefined> = ko.observable();
   public readonly endedAt: ko.Observable<number> = ko.observable(0);
@@ -67,7 +70,7 @@ export class Call {
   public readonly maximizedParticipant: ko.Observable<Participant | null>;
   public readonly isActive: ko.PureComputed<boolean>;
   public readonly epochCache = new CallingEpochCache();
-  private readonly audios: Record<string, {audioElement: HTMLAudioElement; stream: MediaStream}> = {};
+  private readonly audios: Record<string, {audioElement: HTMLAudioElement | null; stream: MediaStream}> = {};
   /**
    * set to `true` if anyone has enabled their video during a call (used for analytics)
    */
@@ -158,10 +161,12 @@ export class Call {
         audio.audioElement.remove();
         audio.audioElement.srcObject = null;
       }
-      const audioElement = new Audio();
-      audioElement.srcObject = audio.stream;
-      audioElement.play();
-      audio.audioElement = audioElement;
+
+      try {
+        audio.audioElement = AudioSpeakerFactory.createNewCallingAudioSpeaker(audio.stream);
+      } catch (e: unknown) {
+        this.logger.warn('Fail to playAudioStreams:', e);
+      }
     });
     this.updateAudioStreamsSink();
   }

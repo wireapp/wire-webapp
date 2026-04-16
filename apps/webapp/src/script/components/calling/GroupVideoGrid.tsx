@@ -30,8 +30,8 @@ import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {Call} from 'Repositories/calling/Call';
 import type {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 import {Video} from './Video';
@@ -144,7 +144,7 @@ const GroupVideoGrid = ({
     'hasActiveVideo',
     'sharesScreen',
     'videoStream',
-    'blurredVideoStream',
+    'processedVideoStream',
   ]);
 
   const [rowsAndColumns, setRowsAndColumns] = useState<RowsAndColumns>(
@@ -287,7 +287,7 @@ const GroupVideoGrid = ({
             css={{
               transform: thumbnail.hasActiveVideo && !thumbnail.sharesScreen ? 'rotateY(180deg)' : 'initial',
             }}
-            srcObject={thumbnail.blurredVideoStream?.stream ?? thumbnail.videoStream}
+            srcObject={thumbnail.processedVideoStream?.stream ?? thumbnail.videoStream}
           />
           {selfIsMuted && !minimized && (
             <span className="group-video-grid__element__label__icon" data-uie-name="status-call-audio-muted">

@@ -21,8 +21,8 @@ import {useCallback, useState} from 'react';
 
 import {useAppNotification} from 'Components/AppNotification';
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {t} from 'Util/localizerUtil';
 
 type SendFilesStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -52,7 +52,7 @@ export const useSendFiles = ({files, clearAllFiles, cellsRepository, conversatio
       await Promise.all(files.map(sendFile));
       files.map(file => file.preview && URL.revokeObjectURL(file.preview));
       setStatus('success');
-    } catch (error) {
+    } catch (error: unknown) {
       errorNotification.show();
       setStatus('error');
       throw error;

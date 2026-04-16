@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
 
 export class CellsFileDetailViewModal {
-  readonly page: Page;
+  private readonly page: Page;
   readonly closeButton: Locator;
   readonly downloadButton: Locator;
   readonly image: Locator;
@@ -42,8 +42,8 @@ export class CellsFileDetailViewModal {
     await this.closeButton.click();
   }
 
-  async downloadAsset() {
+  async downloadAsset(outputDir: string) {
     await this.downloadButton.waitFor({state: 'visible'});
-    return await downloadAssetAndGetFilePath(this.page, this.downloadButton);
+    return await downloadAssetAndGetFilePath(this.page, this.downloadButton, outputDir);
   }
 }

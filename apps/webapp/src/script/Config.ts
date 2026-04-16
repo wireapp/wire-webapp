@@ -17,7 +17,7 @@
  *
  */
 
-import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/Config';
+import {MINIMUM_API_VERSION} from '@wireapp/api-client/lib/config';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -100,7 +100,7 @@ const config = {
   AVS_VERSION: packageJson.dependencies['@wireapp/avs'],
 
   COUNTLY_SERVER_URL: 'https://wire.count.ly/',
-  GET_WIRE_URL: 'https://get.wire.com',
+  GET_WIRE_URL: 'https://wire.com/app-download',
 } as const;
 
 export type Configuration = typeof config;
@@ -118,6 +118,13 @@ const Config = {
     }
 
     return window.desktopAppConfig;
+  },
+  getDesktopSettings: () => {
+    if (!Runtime.isDesktopApp()) {
+      return undefined;
+    }
+
+    return window.desktopAppSettings;
   },
 };
 

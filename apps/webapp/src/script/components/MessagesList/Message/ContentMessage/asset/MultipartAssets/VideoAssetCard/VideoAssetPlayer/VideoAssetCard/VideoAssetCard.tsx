@@ -20,7 +20,7 @@
 import {forwardRef, ReactNode, useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {contentWrapperStyles} from './VideoAssetCard.styles';
 

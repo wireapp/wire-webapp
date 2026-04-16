@@ -34,11 +34,11 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {safeWindowOpen} from 'Util/SanitizationUtil';
-import {sortByPriority} from 'Util/StringUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {safeWindowOpen} from 'Util/sanitizationUtil';
+import {sortByPriority} from 'Util/stringUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {TopPeople} from './components/TopPeople';
 
@@ -194,7 +194,7 @@ export const PeopleTab = ({
           onSearchResults(results);
           setResults(results);
         }
-      } catch (error) {
+      } catch (error: unknown) {
         if (isBackendError(error)) {
           if (error.code === HTTP_STATUS.UNPROCESSABLE_ENTITY) {
             return setHasFederationError(true);

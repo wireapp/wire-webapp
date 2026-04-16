@@ -18,7 +18,7 @@
  */
 
 import {renderHook} from '@testing-library/react';
-import {act} from 'react-dom/test-utils';
+import {act} from 'react';
 
 import {useRoveFocus} from './useRoveFocus';
 

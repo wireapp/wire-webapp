@@ -17,54 +17,7 @@
  *
  */
 
-import {RestVersion} from 'cells-sdk-ts';
-
-import {calculateDaysDifference, formatDateKey, formatTime, getDayPrefix, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {formatBytes} from 'Util/util';
-
-import {FileVersion} from '../types';
-
-/**
- * Transform a RestVersion to FileVersion
- */
-export const transformRestVersionToFileVersion = (version: RestVersion, timestamp: number): FileVersion => {
-  return {
-    versionId: version.VersionId || '',
-    time: formatTime(timestamp),
-    ownerName: version.OwnerName || '',
-    size: formatBytes(Number(version.Size) || 0),
-    downloadUrl: version.PreSignedGET?.Url || '',
-  };
-};
-
-/**
- * Group file versions by date
- */
-export const groupVersionsByDate = (versions: RestVersion[]): Record<string, FileVersion[]> => {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  return versions.reduce(
-    (acc, version) => {
-      // Skip versions with missing critical data
-      if (!version.VersionId || !version.MTime) {
-        return acc;
-      }
-
-      const timestamp = Number(version.MTime || 0) * TIME_IN_MILLIS.SECOND;
-      const versionDate = new Date(timestamp);
-
-      const daysDiff = calculateDaysDifference(today, versionDate);
-      const dayPrefix = getDayPrefix(daysDiff, timestamp);
-      const dateKey = formatDateKey(timestamp, dayPrefix);
-
-      if (!acc[dateKey]) {
-        acc[dateKey] = [];
-      }
-
-      acc[dateKey].push(transformRestVersionToFileVersion(version, timestamp));
-      return acc;
-    },
-    {} as Record<string, FileVersion[]>,
-  );
-};
+export {
+  groupVersionsByDate,
+  transformRestVersionToFileVersion,
+} from '../../../../Modals/FileHistoryModal/utils/fileVersionUtils';

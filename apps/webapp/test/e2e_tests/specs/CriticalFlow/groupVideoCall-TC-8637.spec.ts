@@ -17,129 +17,100 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-
 import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
-const conversationName = 'CritiCall';
+test('Group Video call', {tag: ['@TC-8637', '@crit-flow-web']}, async ({createTeam, createUser, createPage, api}) => {
+  test.setTimeout(150_000);
+  let callingServiceInstanceId: string;
 
-// ToDo(WPB-22442): Backoffice does not unlock calling feature for teams created during tests
-test.fixme(
-  'Group Video call',
-  {tag: ['@TC-8637', '@crit-flow-web']},
-  async ({createTeam, createUser, createPage, api}) => {
-    test.setTimeout(150_000);
+  const conversationName = 'CriticalCall';
+  const teamMember = await createUser();
+  const guestUser = await createUser();
+  const team = await createTeam('Critical', {users: [teamMember], features: {conferenceCalling: true}});
+  const teamOwner = team.owner;
 
-    let teamOwner: User;
-    let teamMember: User;
-    let guestUser: User;
-    let ownerPageManager: PageManager;
-    let guestPageManager: PageManager;
-    let callingServiceInstanceId: string;
+  const [ownerPageManager, guestPageManager] = await Promise.all([
+    PageManager.from(createPage(withLogin(teamOwner), withConnectionRequest(guestUser))),
+    PageManager.from(createPage(withLogin(guestUser))),
+  ]);
 
-    await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-      const team = await createTeam('Critical', {withMembers: 1});
-      teamOwner = team.owner;
-      teamMember = team.members[0];
+  const ownerPages = ownerPageManager.webapp.pages;
+  const guestPages = guestPageManager.webapp.pages;
 
-      await api.enableConferenceCallingFeature(teamOwner.teamId!);
+  await test.step('Guest user accepts connection request from owner', async () => {
+    await guestPages.conversationList().openPendingConnectionRequest();
+    await guestPages.connectRequest().clickConnectButton();
+  });
 
-      guestUser = await createUser();
+  await test.step('Owner and team member are in a group conversation together', async () => {
+    await createGroup(ownerPages, conversationName, [teamMember]);
+  });
 
-      const [pmOwner, pmGuest] = await Promise.all([
-        PageManager.from(createPage(withLogin(teamOwner), withConnectionRequest(guestUser))),
-        PageManager.from(createPage(withLogin(guestUser))),
-      ]);
-      ownerPageManager = pmOwner;
-      guestPageManager = pmGuest;
-    });
+  await test.step('Owner invites guest user to the group', async () => {
+    await ownerPages.conversationList().openConversation(conversationName);
+    await ownerPages.conversation().clickConversationTitle();
+    await ownerPages.conversationDetails().clickAddPeopleButton();
+    await ownerPages.conversationDetails().addUsersToConversation([guestUser.fullName]);
+    await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.fullName})).toBeVisible();
+    await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: teamMember.fullName})).toBeVisible();
+  });
 
-    await test.step('Guest user accepts connection request from owner', async () => {
-      const {pages} = guestPageManager.webapp;
-      await pages.conversationList().openPendingConnectionRequest();
-      await pages.connectRequest().clickConnectButton();
-    });
+  await test.step('Guest user joins the group', async () => {
+    await expect(guestPages.conversationList().getConversationLocator(conversationName)).toBeVisible();
+  });
 
-    await test.step('Owner and team member are in a group conversation together', async () => {
-      const {pages} = ownerPageManager.webapp;
-      await createGroup(pages, conversationName, [teamMember]);
-      expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
-    });
+  await test.step('Owner calls the group', async () => {
+    const response = await api.callingService.createInstance(teamMember.password, teamMember.email);
+    callingServiceInstanceId = response.id;
+    await api.callingService.setAcceptNextCall(callingServiceInstanceId);
+    await ownerPages.conversation().clickCallButton();
+    await expect(ownerPages.calling().callCell).toBeVisible();
+  });
 
-    await test.step('Owner invites guest user to the group', async () => {
-      const {pages} = ownerPageManager.webapp;
-      await pages.conversationList().openConversation(conversationName);
-      await pages.conversation().clickConversationTitle();
-      await pages.conversationDetails().clickAddPeopleButton();
-      await pages.conversationDetails().addUsersToConversation([guestUser.fullName]);
-      expect(await pages.conversationDetails().isUserPartOfConversationAsMember(guestUser.fullName)).toBeTruthy();
-      expect(await pages.conversationDetails().isUserPartOfConversationAsMember(teamMember.fullName)).toBeTruthy();
-    });
+  await test.step('Team member and guest user answer call from calling notification', async () => {
+    // Team member answers the call automatically with the help of Calling Service
+    await guestPages.calling().clickAcceptCallButton();
+  });
 
-    await test.step('Guest user joins the group', async () => {
-      const {pages} = guestPageManager.webapp;
-      expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
-    });
+  await test.step('Owner switches audio on and sends audio', async () => {});
 
-    await test.step('Owner calls the group', async () => {
-      const {pages} = ownerPageManager.webapp;
-      const response = await api.callingService.createInstance(teamMember.password, teamMember.email);
-      callingServiceInstanceId = response.id;
-      await api.callingService.setAcceptNextCall(callingServiceInstanceId);
+  await test.step(`Team member is able to "hear" owner's audio`, async () => {
+    await api.callingService.verifyAudioIsBeingReceived(callingServiceInstanceId);
+  });
 
-      await pages.conversation().clickConversationInfoButton();
-      await pages.conversation().clickCallButton();
-    });
+  await test.step('Owner turns on camera', async () => {
+    await ownerPages.calling().clickToggleVideoButton();
+  });
 
-    await test.step('Team member and guest user answer call from calling notification', async () => {
-      const {pages} = guestPageManager.webapp;
-      // Team member answers the call automatically with the help of Calling Service
-      await pages.calling().clickAcceptCallButton();
-    });
+  await test.step('Team member is able to "see" owner', async () => {
+    await api.callingService.verifyVideoIsBeingReceived(callingServiceInstanceId);
+  });
 
-    await test.step('Owner switches audio on and sends audio', async () => {});
+  await test.step('Owner swaps video and audio devices', async () => {
+    const {pages, components} = ownerPageManager.webapp;
+    await components.conversationSidebar().clickPreferencesButton();
+    await pages.settings().clickAudioVideoSettingsButton();
+    await pages.audioVideoSettings().selectMicrophone('Fake Audio Input 2');
+    await pages.audioVideoSettings().selectSpeaker('Fake Audio Output 2');
+    await pages.audioVideoSettings().selectCamera('Fake Camera 2');
+  });
 
-    await test.step(`Team member is able to "hear" owner's audio`, async () => {
-      await api.callingService.verifyAudioIsBeingReceived(callingServiceInstanceId);
-    });
+  await test.step("Team member is able to 'see' and 'hear' owner's new audio and video", async () => {
+    await api.callingService.verifyAudioIsBeingReceived(callingServiceInstanceId);
+    await api.callingService.verifyVideoIsBeingReceived(callingServiceInstanceId);
+  });
 
-    await test.step('Owner turns on camera', async () => {
-      const {pages} = ownerPageManager.webapp;
-      await pages.calling().clickToggleVideoButton();
-    });
+  await test.step('Owner turns on screenshare', async () => {
+    await ownerPages.calling().clickToggleScreenShareButton();
+  });
 
-    await test.step('Team member is able to "see" owner', async () => {
-      await api.callingService.verifyVideoIsBeingReceived(callingServiceInstanceId);
-    });
+  await test.step("Team member is able to 'see' owner's screen", async () => {
+    await api.callingService.verifyVideoIsBeingReceived(callingServiceInstanceId);
+  });
 
-    await test.step('Owner swaps video and audio devices', async () => {
-      const {pages, components} = ownerPageManager.webapp;
-      await components.conversationSidebar().clickPreferencesButton();
-      await pages.settings().clickAudioVideoSettingsButton();
-      await pages.audioVideoSettings().selectMicrophone('Fake Audio Input 2');
-      await pages.audioVideoSettings().selectSpeaker('Fake Audio Output 2');
-      await pages.audioVideoSettings().selectCamera('Fake Camera 2');
-    });
-
-    await test.step("Team member is able to 'see' and 'hear' owner's new audio and video", async () => {
-      await api.callingService.verifyAudioIsBeingReceived(callingServiceInstanceId);
-      await api.callingService.verifyVideoIsBeingReceived(callingServiceInstanceId);
-    });
-
-    await test.step('Owner turns on screenshare', async () => {
-      const {pages} = ownerPageManager.webapp;
-      await pages.calling().clickToggleScreenShareButton();
-    });
-
-    await test.step("Team member is able to 'see' owner's screen", async () => {
-      await api.callingService.verifyVideoIsBeingReceived(callingServiceInstanceId);
-    });
-
-    await test.step('Owner ends call', async () => {
-      const {pages} = ownerPageManager.webapp;
-      await pages.calling().clickLeaveCallButton();
-    });
-  },
-);
+  await test.step('Owner ends call', async () => {
+    await ownerPages.calling().clickLeaveCallButton();
+  });
+});

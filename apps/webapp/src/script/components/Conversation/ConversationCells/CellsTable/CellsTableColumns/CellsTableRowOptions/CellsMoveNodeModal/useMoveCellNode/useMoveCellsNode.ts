@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
 import {openBreadcrumb} from 'Components/Conversation/ConversationCells/common/openBreadcrumb/openBreadcrumb';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
 interface UseMoveCellsNodeProps {
@@ -51,7 +51,7 @@ export const useMoveCellsNode = ({
         targetPath,
       });
       setStatus('success');
-    } catch (error) {
+    } catch (error: unknown) {
       setStatus('error');
     }
   };

@@ -40,16 +40,18 @@ export interface User {
     domain: string;
     id: string;
   };
+  locale?: 'en-US' | 'de-DE';
 }
 
 export const getUser = (user: Partial<User> = {}): User => {
   // Ensure lastName is always defined, as it is used in email and username generation
   const lastName = user.lastName ?? generateLastName();
   const firstName = user.firstName ?? generateFirstName();
+  const email = user.email ?? generateWireEmail(firstName, lastName);
 
   return {
     ...user,
-    email: user.email ?? generateWireEmail(lastName),
+    email,
     password: user.password ?? generateSecurePassword(),
     firstName,
     lastName,

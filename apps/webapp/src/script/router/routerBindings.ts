@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {KEY} from 'Util/KeyboardUtil';
+import {KEY} from 'Util/keyboardUtil';
 
 import {navigate} from './Router';
 

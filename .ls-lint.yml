@@ -1,0 +1,388 @@
+ls:
+  libraries/config/src:
+    .dir: camelCase
+    .ts: camelCase
+    .spec.ts: camelCase
+    .config.ts: camelCase
+    .config.spec.ts: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/util/localizerUtil:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/util/connectionQualityHandler:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/util:
+    .ts: camelCase
+    .tsx: camelCase
+    .test.ts: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/util/test/mock:
+    .ts: camelCase
+    .mock.ts: camelCase
+  apps/webapp/src/script/page/RightSidebar/access:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/page/RightSidebar/addParticipants:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/conversationParticipants:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/groupParticipantService:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/groupParticipantUser:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/participantDevices:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/timedMessages:
+    .ts: camelCase
+    .tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/panelHeader:
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/notifications:
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/messageDetails:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/conversationHistory:
+    .ts: camelCase
+    .tsx: camelCase
+    .styles.ts: camelCase
+  apps/webapp/src/script/page/RightSidebar/conversationDetails:
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/page/RightSidebar/guestServicesOptions:
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+  apps/webapp/src/script/repositories/media/backgroundEffects:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .types.ts: camelCase
+  apps/webapp/src/script/repositories/assets:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/audio:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/backup:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/cache:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/cells:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/connection:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/server/routes:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/server/util:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/api-client/src/broadcast:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/env:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/generic:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/services:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/federation/data:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/giphy:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/utils/backFromSleepHandler:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/api-client/src/validation:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/obfuscation:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/api-client/src/oauth:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/types:
+    .dir: camelCase
+    .d.ts: camelCase
+  libraries/api-client/src/serviceProvider:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/tcp:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/api-client/src/asset:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .schema.ts: camelCase
+  libraries/api-client/src/cells:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .schema.ts: camelCase
+  libraries/api-client/src/notification:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .mocks.ts: camelCase
+  libraries/api-client/src/connection:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/account:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/event:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/userGroups:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/self:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/client:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/auth:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/api-client/src/http:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/api-client/src/user:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/conversation/data:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/conversation:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/api-client/src/team/conversation:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/data:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/scim:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/identityprovider:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/sso:
+    .dir: camelCase
+    .ts: camelCase
+    .types.ts: camelCase
+  libraries/api-client/src/team/search:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/invitation:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/feature:
+    .dir: camelCase
+    .ts: camelCase
+    .schema.ts: camelCase
+    .types.ts: camelCase
+    .helper.ts: camelCase
+  libraries/api-client/src/team/legalhold:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/service:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/team:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/member:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/api-client/src/team/payment:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team/billing:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src/team:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/api-client/src:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/account:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/connection:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/self:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/giphy:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/team:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/user:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/notification:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/auth:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/linkPreview:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/broadcast:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/client:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/errors:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/storage:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/util:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .store.ts: camelCase
+  libraries/core/src/cryptography:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/secretStore:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .test.node.ts: camelCase
+  libraries/core/src/test:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/conversation/assetService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/conversationMapper:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/messageTimer:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/subconversationService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/conversation/content:
+    .dir: camelCase
+    .ts: camelCase
+  libraries/core/src/conversation/message:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/conversation/conversationService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/utility:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService/cryptoClient:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+    .store.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService/decryptionErrorGenerator:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/messagingProtocols/proteus/ProteusService:
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+    .mocks.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/recovery:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/MLSService:
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/EventHandler:
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/E2EIdentityService/Connection/AcmeServer:
+    .ts: camelCase
+    .types.ts: camelCase
+    .schema.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/E2EIdentityService/Storage:
+    .ts: camelCase
+    .schema.ts: camelCase

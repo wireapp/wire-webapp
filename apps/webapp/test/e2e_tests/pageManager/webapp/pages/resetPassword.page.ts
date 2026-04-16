@@ -20,15 +20,11 @@
 import {Locator, Page} from '@playwright/test';
 
 export class ResetPasswordPage {
-  readonly page: Page;
-
   readonly newPasswordInput: Locator;
   readonly passwordChangeMessage: Locator;
   readonly setNewPasswordButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.newPasswordInput = page.getByTestId('enter-new-password');
     this.passwordChangeMessage = page.getByText('You can now log in with your new password.');
     this.setNewPasswordButton = page.getByTestId('do-set-new-password');

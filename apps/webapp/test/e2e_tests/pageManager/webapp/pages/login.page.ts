@@ -21,27 +21,30 @@ import type {Page, Locator} from '@playwright/test';
 import type {User} from 'test/e2e_tests/data/user';
 
 export class LoginPage {
-  readonly page: Page;
-
   readonly signInButton: Locator;
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
   readonly loginErrorText: Locator;
   readonly publicComputerCheckbox: Locator;
+  readonly header: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.signInButton = page.locator('[data-uie-name="do-sign-in"]');
     this.emailInput = page.locator('[data-uie-name="enter-email"]');
     this.passwordInput = page.locator('[data-uie-name="enter-password"]');
     this.loginErrorText = page.locator('[data-uie-name="error-message"]');
     this.publicComputerCheckbox = page.getByText('This is a public computer');
+    this.header = page.getByRole('heading');
   }
 
-  async login(user: Pick<User, 'email' | 'password'>) {
+  async login(user: Pick<User, 'email' | 'password'>, options?: {publicComputer?: boolean}) {
     await this.emailInput.fill(user.email);
     await this.passwordInput.fill(user.password);
+
+    if (options?.publicComputer) {
+      await this.publicComputerCheckbox.click();
+    }
+
     await this.signInButton.click();
   }
 }

@@ -119,38 +119,35 @@ describe('E2EICertificateDetails', () => {
   });
 
   describe('shows the update certificate button for the current device', () => {
-    it('for expired certificate', async () => {
-      const identity = generateIdentity(MLSStatuses.EXPIRED);
+    it.each([
+      ['valid', MLSStatuses.VALID],
+      ['expired', MLSStatuses.EXPIRED],
+      ['revoked', MLSStatuses.REVOKED],
+      ['expires soon', MLSStatuses.EXPIRES_SOON],
+    ])('for %s certificate', async (_label, status) => {
+      const identity = generateIdentity(status);
 
       const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
 
       await waitFor(() => {
-        const E2EIdentityStatus = getByText('E2EI.updateCertificate');
-        expect(E2EIdentityStatus).toBeDefined();
+        const updateCertificateButton = getByText('E2EI.updateCertificate');
+        expect(updateCertificateButton).toBeDefined();
       });
     });
 
-    it('for certificate that expires soon', async () => {
-      const identity = generateIdentity(MLSStatuses.VALID);
+    it('does not show update certificate button when certificate is not activated', async () => {
+      const {queryByText} = render(withTheme(<E2EICertificateDetails isCurrentDevice />));
 
-      const instance = E2EIHandler.getInstance();
-      jest.spyOn(instance, 'hasGracePeriodStartedForSelfClient').mockResolvedValue(true);
-
-      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
-
-      await waitFor(() => {
-        const E2EIdentityStatus = getByText('E2EI.updateCertificate');
-        expect(E2EIdentityStatus).toBeDefined();
-      });
+      expect(queryByText('E2EI.updateCertificate')).toBeNull();
     });
 
-    it('for not downloaded certificate', async () => {
+    it('shows get certificate button when certificate is not activated', async () => {
       const identity = generateIdentity(MLSStatuses.NOT_ACTIVATED);
 
       const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
 
-      const E2EIdentityStatus = getByText('E2EI.getCertificate');
-      expect(E2EIdentityStatus).toBeDefined();
+      const getCertificateButton = getByText('E2EI.getCertificate');
+      expect(getCertificateButton).toBeDefined();
     });
   });
 });

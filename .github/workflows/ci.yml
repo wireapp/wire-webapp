@@ -18,21 +18,21 @@ concurrency:
 
 jobs:
   test:
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout (pull_request)
         if: ${{ github.event_name == 'pull_request' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           # Uses the head commit (not merge commit) for PRs
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout (non-PR)
         if: ${{ github.event_name != 'pull_request' }}
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -40,8 +40,25 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Verify generated i18n artifacts are committed
+        run: |
+          yarn nx run webapp:translate-merge
+          yarn nx run webapp:translate-generate-types
+
+          if ! test -z "$(git status --porcelain)"; then
+            echo "Repository is not clean after generation. Run generation locally and commit the changes."
+            git status
+            exit 1
+          fi
+
       - name: Build libraries
         run: yarn nx run-many -t build --projects=tag:type:lib
+
+      - name: Lint file names
+        run: yarn lint:fileNames
+
+      - name: Lint formatting
+        run: yarn lint:other
 
       - name: Lint
         run: yarn nx run-many -t lint --all
@@ -50,7 +67,7 @@ jobs:
         run: yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
       - name: Upload webapp coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           fail_ci_if_error: false
           files: ./apps/webapp/coverage/lcov.info
@@ -58,7 +75,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload server coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           fail_ci_if_error: false
           files: ./apps/server/coverage/lcov.info
@@ -66,7 +83,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload core library coverage to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           fail_ci_if_error: false
           files: ./coverage/libraries/core/lcov.info
@@ -74,7 +91,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload api-client library coverage to Codecov
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
         with:
           fail_ci_if_error: false
           files: ./coverage/libraries/api-client/lcov.info
@@ -84,6 +101,17 @@ jobs:
       - name: Build and package
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
         run: yarn nx run server:package
+
+      - name: Verify Quay credentials availability
+        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
+        env:
+          DOCKER_PASSWORD: ${{ secrets.WEBTEAM_QUAY_PASSWORD }}
+          DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
+        run: |
+          if [[ -z "${DOCKER_USERNAME}" || -z "${DOCKER_PASSWORD}" ]]; then
+            echo "Missing Quay credentials. Configure WEBTEAM_QUAY_USERNAME and WEBTEAM_QUAY_PASSWORD for pull request image publishing."
+            exit 1
+          fi
 
       - name: Push PR Docker image
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}

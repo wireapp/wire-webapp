@@ -21,8 +21,8 @@ import {HTMLProps, useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 export interface InputLevelProps extends HTMLProps<HTMLDivElement> {
   disabled: boolean;
@@ -79,7 +79,7 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
       audioContext
         ?.close()
         .then(() => logger.info('Closed existing AudioContext', audioContext))
-        .catch(error => logger.error(error));
+        .catch((error: unknown) => logger.error(error));
 
       audioSource?.disconnect();
       setLevel(0);

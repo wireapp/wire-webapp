@@ -19,8 +19,8 @@
 
 import {Runtime} from '@wireapp/commons';
 
-import {getLogger, Logger} from 'Util/Logger';
-import {loadValue, storeValue} from 'Util/StorageUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {loadValue, storeValue} from 'Util/storageUtil';
 
 import {MediaDeviceType} from './MediaDeviceType';
 import {MediaDevicesState, mediaDevicesStore} from './useMediaDevicesStore';
@@ -266,7 +266,7 @@ export class MediaDevicesHandler {
       this.onMediaDevicesRefresh?.();
 
       return mediaDevices;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update MediaDevice list: ${error instanceof Error ? error.message : ''}`, error);
       throw error;
     }

@@ -20,16 +20,12 @@
 import {Page, Locator} from '@playwright/test';
 
 export class LeaveConversationModal {
-  readonly page: Page;
-
   readonly modal: Locator;
   readonly modalCheckbox: Locator;
   readonly cancelButton: Locator;
   readonly confirmButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.modal = page.getByTestId('modal-template-option');
     this.modalCheckbox = this.modal.getByText('clear the content');
     this.cancelButton = this.modal.getByTestId('do-secondary');

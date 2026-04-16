@@ -25,7 +25,7 @@ import {AnyAction, Dispatch} from 'redux';
 import {UrlUtil, StringUtil, Runtime} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, useTimeout} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Page} from './Page';
 
@@ -68,7 +68,7 @@ const ClientManagerComponent = ({doGetAllClients, doLogout}: Props & ConnectedPr
   const logout = async () => {
     try {
       await doLogout();
-    } catch (error) {
+    } catch (error: unknown) {
       // ignore errors on logout
     }
   };

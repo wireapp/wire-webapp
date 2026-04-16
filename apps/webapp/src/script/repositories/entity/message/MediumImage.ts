@@ -19,9 +19,9 @@
 
 import ko from 'knockout';
 
-import type {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetType} from 'Repositories/assets/AssetType';
-import {getLogger} from 'Util/Logger';
+import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetType} from 'Repositories/assets/assetType';
+import {getLogger} from 'Util/logger';
 
 import {FileAsset} from './FileAsset';
 

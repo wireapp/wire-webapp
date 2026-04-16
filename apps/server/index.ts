@@ -19,23 +19,49 @@
 
 import {clientConfig, serverConfig} from './config';
 import {Server} from './Server';
-import {formatDate} from './util/TimeUtil';
+import {logServerStartup} from './serverStartupLog';
+import {formatDate} from './util/timeUtil';
 
 const server = new Server(serverConfig, clientConfig);
+
+function getUnhandledRejectionType(unhandledRejection: unknown): string {
+  if (unhandledRejection instanceof Error) {
+    return unhandledRejection.name;
+  }
+  if (unhandledRejection === null) {
+    return 'null';
+  }
+  return typeof unhandledRejection;
+}
 
 server
   .start()
   .then(port => {
-    console.info(`[${formatDate()}] Server is running on port ${port}.`);
+    logServerStartup(
+      {
+        port,
+        serverConfiguration: serverConfig,
+      },
+      {
+        logInformation: message => {
+          console.info(`[${formatDate()}] ${message}`);
+        },
+      },
+    );
+
     if (serverConfig.DEVELOPMENT) {
       require('opn')(serverConfig.APP_BASE);
     }
   })
-  .catch(error => console.error(`[${formatDate()}] ${error.stack}`));
+  .catch((error: unknown) => {
+    const errorOutput = error instanceof Error ? error.stack : String(error);
+
+    console.error(`[${formatDate()}] ${errorOutput}`);
+  });
 
 process.on('uncaughtException', error =>
   console.error(`[${formatDate()}] Uncaught exception: ${error.message}`, error),
 );
 process.on('unhandledRejection', error =>
-  console.error(`[${formatDate()}] Uncaught rejection "${error.constructor.name}"`, error),
+  console.error(`[${formatDate()}] Uncaught rejection "${getUnhandledRejectionType(error)}"`, error),
 );

@@ -40,7 +40,7 @@ const SetEntropyPageComponent = ({pushEntropyData}: Props & ConnectedProps & Dis
     try {
       await pushEntropyData(entropyData);
       navigate(ROUTE.VERIFY_EMAIL_CODE);
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn(error);
     }
   };

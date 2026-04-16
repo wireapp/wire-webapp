@@ -20,17 +20,17 @@ concurrency:
 
 jobs:
   create_image:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       UNIT_TEST_REPORT_FILE: './unit-tests.log'
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -71,7 +71,7 @@ jobs:
       - name: Create GitHub release
         if: ${{inputs.create_release}}
         id: create_release_production
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
         env:
           GITHUB_TOKEN: ${{github.token}}
         with:

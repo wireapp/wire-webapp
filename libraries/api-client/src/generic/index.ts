@@ -17,4 +17,4 @@
  *
  */
 
-export * from './GenericAPI';
+export * from './genericApi';

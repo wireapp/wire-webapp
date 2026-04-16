@@ -22,8 +22,8 @@ import {container} from 'tsyringe';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
 import {AssetData} from 'Repositories/cryptography/CryptographyMapper';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -61,9 +61,11 @@ import type {Text as TextAsset} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {userReactionMapToReactionMap} from 'Util/ReactionUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {userReactionMapToReactionMap} from 'Util/reactionUtil';
+import {toError} from 'Util/toError';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 import {base64ToArray} from 'Util/util';
 
 import {
@@ -116,8 +118,8 @@ export class EventMapper {
     const mappedEvents = reversedEvents.map((event): Message | void => {
       try {
         return this._mapJsonEvent(event, conversationEntity);
-      } catch (error) {
-        const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+      } catch (error: unknown) {
+        const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
         this.logger.error(errorMessage, error);
       }
     });
@@ -134,12 +136,12 @@ export class EventMapper {
   mapJsonEvent(event: ConversationEvent | ClientConversationEvent, conversationEntity: Conversation) {
     try {
       return this._mapJsonEvent(event, conversationEntity);
-    } catch (error) {
-      const isMessageNotFound = error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
+    } catch (error: unknown) {
+      const isMessageNotFound = isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND;
       if (isMessageNotFound) {
         throw error;
       }
-      const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${error.message}`;
+      const errorMessage = `Failure while mapping events. Affected '${event.type}' event: ${toError(error).message}`;
       this.logger.error(errorMessage, error);
 
       throw new ConversationError(
@@ -1093,8 +1095,8 @@ export class EventMapper {
         if (mentionEntity) {
           try {
             return mentionEntity.validate(messageText, allMentions);
-          } catch (error) {
-            this.logger.warn(`Removed invalid mention when mapping message: ${error.message}`);
+          } catch (error: unknown) {
+            this.logger.warn(`Removed invalid mention when mapping message: ${toError(error).message}`);
             return false;
           }
         }

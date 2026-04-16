@@ -17,8 +17,8 @@
  *
  */
 
-export * from './ConversationEvent';
-export * from './BackendEvent';
-export * from './TeamEvent';
-export * from './UserEvent';
-export * from './FederationEvent';
+export * from './conversationEvent';
+export * from './backendEvent';
+export * from './teamEvent';
+export * from './userEvent';
+export * from './federationEvent';

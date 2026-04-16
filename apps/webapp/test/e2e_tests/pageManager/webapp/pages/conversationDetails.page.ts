@@ -18,9 +18,13 @@
  */
 
 import {Locator, Page} from '@playwright/test';
+import {GuestOptionsPage} from './guestOptions.page';
 
 export class ConversationDetailsPage {
-  readonly page: Page;
+  private readonly page: Page;
+
+  readonly groupAdmins: Locator;
+  readonly groupMembers: Locator;
 
   readonly addPeopleButton: Locator;
   readonly conversationDetails: Locator;
@@ -30,6 +34,7 @@ export class ConversationDetailsPage {
   readonly blockConversationButton: Locator;
   readonly clearConversationContentButton: Locator;
   readonly selectedSearchList: Locator;
+  readonly searchPeopleInput: Locator;
   readonly searchList: Locator;
   readonly deleteGroupButton: Locator;
   readonly notificationsButton: Locator;
@@ -38,16 +43,20 @@ export class ConversationDetailsPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.conversationDetails = page.locator('#conversation-details');
+
+    this.groupAdmins = this.conversationDetails.getByRole('list', {name: 'Group Admins'}).getByRole('listitem');
+    this.groupMembers = this.conversationDetails.getByRole('list', {name: 'Group Members'}).getByRole('listitem');
 
     this.addPeopleButton = page.getByTestId('go-add-people');
-    this.conversationDetails = page.locator('#conversation-details');
     this.guestOptionsButton = this.conversationDetails.locator('[data-uie-name="go-guest-options"]');
     this.selfDeletingMessageButton = this.conversationDetails.getByRole('button', {name: 'Self-deleting messages'});
     this.archiveButton = this.conversationDetails.getByTestId('do-archive');
     this.blockConversationButton = this.conversationDetails.getByTestId('do-block');
     this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
     this.selectedSearchList = this.page.getByTestId('selected-search-list');
-    this.searchList = this.page.getByTestId('search-list');
+    this.searchPeopleInput = page.getByRole('textbox', {name: 'Search by name'});
+    this.searchList = this.page.locator('#add-participants').getByRole('list');
     this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
     this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
     this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
@@ -107,18 +116,23 @@ export class ConversationDetailsPage {
   }
 
   async openParticipantDetails(fullName: string) {
-    const userLocator = await this.getLocatorByUser(fullName);
-    await userLocator.click();
+    await this.getLocatorByUser(fullName).click();
   }
 
-  async getLocatorByUser(fullName: string) {
-    const userLocator = this.page
+  getUserRoleIcon(fullName: string) {
+    return this.getLocatorByUser(fullName).getByTestId(/^status-(external|guest|admin)$/);
+  }
+
+  getUserAvailabilityIcon(fullName: string) {
+    return this.getLocatorByUser(fullName).getByTestId('status-availability-icon');
+  }
+
+  getLocatorByUser(fullName: string) {
+    return this.page
       .locator('#conversation-details')
-      .getByTestId('list-members')
+      .getByTestId('list-users')
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${fullName}"]`));
-    await userLocator.waitFor({state: 'visible'});
-    return userLocator;
   }
 
   async clickArchiveButton() {
@@ -132,6 +146,17 @@ export class ConversationDetailsPage {
     // The radio options are currently not accessible so accessible locators can't be used
     await selfDeletingMessagesPanel.getByRole('radiogroup').locator('label', {hasText: value}).click();
     await selfDeletingMessagesPanel.getByRole('button', {name: 'Go back'}).click();
+  }
+
+  /** Opens the guests panel, creates a link for guests to join the group, closes the panel and returns the created link */
+  async createGuestLink(options?: Parameters<ReturnType<typeof GuestOptionsPage>['createLink']>[0]) {
+    await this.guestOptionsButton.click();
+
+    const guestOptionsPage = GuestOptionsPage(this.page);
+    const link = await guestOptionsPage.createLink(options);
+
+    await guestOptionsPage.backButton.click();
+    return link;
   }
 
   async addServiceToConversation(serviceName: string) {
@@ -186,14 +211,20 @@ export class ConversationDetailsPage {
     await this.blockConversationButton.click();
   }
 
+  async openGuestOptions() {
+    await this.guestOptionsButton.click();
+  }
+
   async clickClearConversationContentButton() {
     await this.clearConversationContentButton.click();
   }
 
-  async setNotificationsForConversation(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
+  async setNotifications(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
     await this.notificationsButton.click();
-    const notificationsPanel = this.page.locator('aside#right-column');
-    await notificationsPanel.getByRole('radiogroup').getByText(value).click();
+    await this.page.getByRole('radiogroup').getByText(value).click();
+
+    // Close the settings by clicking "Go back" button.
+    await this.page.getByRole('button', {name: 'Go back'}).click();
   }
 
   async changeConversationName(newConversationName: string) {

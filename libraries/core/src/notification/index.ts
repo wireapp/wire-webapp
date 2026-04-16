@@ -17,5 +17,5 @@
  *
  */
 
-export * from './NotificationService';
-export * from './Notifications.types';
+export * from './notificationService';
+export * from './notificationSource.types';

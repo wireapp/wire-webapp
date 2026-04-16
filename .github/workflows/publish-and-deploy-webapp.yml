@@ -1,0 +1,365 @@
+name: Publish and deploy webapp
+
+on:
+  push:
+    branches: [master, dev, release/*]
+    tags:
+      - '*q1-2024*'
+      - '*q2-2025*'
+      - '*staging*'
+      - '*production*'
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build Docker image and Helm Chart
+    runs-on: ubuntu-24.04
+
+    outputs:
+      wire_builds_target_branches: ${{ steps.output_target_branches.outputs.targets }}
+      image_tag: ${{ steps.push_docker_image.outputs.image_tag }}
+      release_name: ${{ steps.push_docker_image.outputs.release_name }}
+      chart_version: ${{ steps.bump_chart_version.outputs.chart_version }}
+      changelog: ${{ steps.generate_changelog.outputs.changelog }}
+      build_artifact: ${{ env.BUILD_ARTIFACT }}
+
+    env:
+      BUILD_DIR: apps/server/dist/s3/
+      BUILD_ARTIFACT: ebs.zip
+      COMMIT_URL: ${{github.event.head_commit.url}}
+      COMMITTER: ${{github.event.head_commit.committer.name}}
+      CHANGELOG_FILE: './changelog.md'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+
+      - name: Set environment variables
+        shell: bash
+        run: |
+          echo "BRANCH_NAME=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            echo "TAG=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          else
+            echo "TAG=" >> "$GITHUB_ENV"
+          fi
+
+      - name: Print environment variables
+        run: |
+          echo -e "BRANCH_NAME = ${BRANCH_NAME}"
+          echo -e "TAG = ${TAG}"
+          echo -e "COMMIT_URL = ${COMMIT_URL}"
+          echo -e "COMMITTER = ${COMMITTER}"
+
+      - name: Install JS dependencies
+        run: yarn --immutable
+
+      - name: Update configuration
+        run: yarn nx run webapp:configure
+
+      - name: Build and package
+        run: yarn nx run server:package
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: 'build-artifact'
+          path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
+
+      - uses: kanga333/variable-mapper@3681b75f5c6c00162721168fb91ab74925eaebcb
+        id: changelog
+        with:
+          key: '${{github.ref}}'
+          map: |
+            {
+              "production": {
+                "changelog_type": "production"
+              },
+              "staging": {
+                "changelog_type": "staging"
+              }
+            }
+          export_to: env
+
+      - name: Generate changelog
+        id: generate_changelog
+        if: ${{ env.changelog_type }}
+        run: |
+          yarn nx run workspace-tools:changelog-${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
+          echo "changelog=${{ env.CHANGELOG_FILE }}" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: ${{ env.changelog_type }}
+        with:
+          name: 'changelog'
+          path: ${{ env.CHANGELOG_FILE }}
+
+      - name: Push Docker image
+        id: push_docker_image
+        env:
+          DOCKER_PASSWORD: ${{secrets.WEBTEAM_QUAY_PASSWORD}}
+          DOCKER_USERNAME: ${{secrets.WEBTEAM_QUAY_USERNAME}}
+          aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
+        run: |
+          version_tag="${TAG:-$BRANCH_NAME}"
+          yarn docker "$version_tag" ./image_tag.txt
+
+          image_tag="$(cat ./image_tag.txt)"
+          echo "image_tag=$image_tag" >> $GITHUB_OUTPUT
+
+          packageVersion=$(cat ./package.json | jq -r '.version')
+          release_name="${TAG:-v${packageVersion}}"
+          echo "release_name=$release_name" >> $GITHUB_OUTPUT
+
+      - uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2
+        with:
+          version: '3.12.2'
+
+      - name: Bump helm chart version
+        shell: bash
+        id: bump_chart_version
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.CHARTS_WEBAPP_AUTOMATION_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          set -eo pipefail
+
+          image_tag="${{steps.push_docker_image.outputs.image_tag}}"
+
+          helm plugin install https://github.com/hypnoglow/helm-s3.git --version 0.15.1
+
+          helm repo add charts-webapp s3://public.wire.com/charts-webapp
+
+          if [[ "${{github.ref}}" =~ "/refs/tags" ]]; then
+            chart_version="$(./bin/chart-next-version.sh release)"
+          else
+            chart_version="$(./bin/chart-next-version.sh prerelease)"
+          fi
+          echo "chart_version=$chart_version" >> $GITHUB_OUTPUT
+
+          chart_patched="$(yq -Mr ".version = \"$chart_version\" | .appVersion = \"$image_tag\"" ./charts/webapp/Chart.yaml)"
+          echo "$chart_patched" > ./charts/webapp/Chart.yaml
+
+          helm package ./charts/webapp
+
+          helm s3 push --relative webapp-*.tgz charts-webapp
+
+      # generates a mapping between branches/tag to wire-build branches
+      - name: Define target branches in wireapp/wire-builds to bump
+        uses: kanga333/variable-mapper@3681b75f5c6c00162721168fb91ab74925eaebcb
+        id: output_target_branches
+        with:
+          key: '${{github.ref}}'
+          # TODO  Add staging if we ever use a wire-builds as a source for staging (we use k8s)
+          # "staging": {
+          #   "targets": "[\"TBD\"]"
+          # },
+          map: |
+            {
+              "production": {
+                "targets": "[\"main\"]"
+              },
+              "dev": {
+                "targets": "[\"dev\"]"
+              },
+              "q1-2024": {
+                "targets": "[\"q1-2024\"]"
+              },
+              "q2-2025": {
+                "targets": "[\"q2-2025\"]"
+              }
+            }
+          export_to: log,output
+
+  publish_wire_builds:
+    name: Bump webapp chart in wire-builds
+    runs-on: ubuntu-24.04
+    needs: build
+    if: ${{needs.build.outputs.wire_builds_target_branches}}
+
+    strategy:
+      matrix:
+        target_branch: ${{fromJSON(needs.build.outputs.wire_builds_target_branches)}}
+
+    steps:
+      - name: Check out wire-builds
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: wireapp/wire-builds
+          token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
+          ref: ${{matrix.target_branch}}
+          fetch-depth: 1
+
+      - name: Create new build in wire-build
+        shell: bash
+        run: |
+          set -eo pipefail
+
+          chart_version="${{needs.build.outputs.chart_version}}"
+          image_tag="${{needs.build.outputs.image_tag}}"
+
+          git config --global user.email "zebot@users.noreply.github.com"
+          git config --global user.name "Zebot"
+
+          for retry in $(seq 3); do
+            set +e
+            (
+            set -e
+
+            if (( retry > 1 )); then
+              echo "Retrying..."
+            fi
+
+            git fetch --depth 1 origin "${{ matrix.target_branch }}"
+            git checkout "${{ matrix.target_branch }}"
+            git reset --hard @{upstream}
+
+            build_json=$(cat ./build.json | \
+              ./bin/set-chart-fields webapp \
+              "version=$chart_version" \
+              "repo=https://s3-eu-west-1.amazonaws.com/public.wire.com/charts-webapp" \
+              "meta.appVersion=$image_tag" \
+              "meta.commitURL=${{github.event.head_commit.url}}" \
+              "meta.commit=${{github.event.head_commit.id}}" \
+              | ./bin/bump-prerelease )
+            echo "$build_json" > ./build.json
+
+            git add build.json
+            git commit -m "Bump webapp to $chart_version"
+            git push origin "${{ matrix.target_branch }}"
+
+            )
+            if [ $? -eq 0 ]; then
+              echo "pushing to wire-builds succeeded"
+              break
+            else
+              echo "pushing to wire-builds FAILED (in retry $retry)"
+            fi
+            set -e
+          done
+          if (( $? != 0 )); then
+              echo "Retrying didn't help. Failing the step."
+              exit 1
+          fi
+
+  set_deployment_targets:
+    name: 'Set deployment targets'
+    runs-on: ubuntu-24.04
+    needs: build
+    outputs:
+      deployment_targets: ${{env.targets}}
+
+    steps:
+      # generates a mapping between branches/tag to aws envs to deploy to
+      - uses: kanga333/variable-mapper@3681b75f5c6c00162721168fb91ab74925eaebcb
+        id: targets
+        with:
+          key: '${{github.ref}}'
+          map: |
+            {
+              "dev": {
+                "targets": "[\"wire-webapp-dev\", \"wire-webapp-edge\"]"
+              },
+              "master": {
+                "targets": "[\"wire-webapp-main\"]"
+              },
+              "production": {
+                "targets": "[\"wire-webapp-prod\"]"
+              },
+              "staging": {
+                "targets": "[\"wire-webapp-staging\"]"
+              }
+            }
+          export_to: env
+
+  deploy_to_aws:
+    name: 'Deploy to live environments'
+    runs-on: ubuntu-24.04
+    env:
+      AWS_REGION: eu-central-1
+    environment: ${{ matrix.target }}
+    needs: [build, set_deployment_targets]
+    if: ${{needs.set_deployment_targets.outputs.deployment_targets}}
+
+    strategy:
+      matrix:
+        target: ${{fromJson(needs.set_deployment_targets.outputs.deployment_targets)}}
+
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: 'build-artifact'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
+        with:
+          aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to ${{matrix.target}}
+        id: deploy
+        uses: aws-actions/aws-elasticbeanstalk-deploy@1f56e4e813ae4eb167e69ca324234c336c1df573
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          application-name: Webapp
+          environment-name: ${{ matrix.target }}
+          version-label: ${{ github.run_id }}-${{ matrix.target }}
+          deployment-package-path: ${{ needs.build.outputs.build_artifact }}
+          wait-for-deployment: true
+          wait-for-environment-recovery: true
+          deployment-timeout: 150
+          use-existing-application-version-if-available: true
+
+  create_gh_release:
+    name: 'Create Github release'
+    runs-on: ubuntu-24.04
+    needs: [deploy_to_aws, build]
+    if: ${{ needs.build.outputs.changelog }}
+
+    outputs:
+      release_url: ${{ steps.release.outputs.url }}
+
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          name: 'changelog'
+
+      - name: Create GitHub release
+        id: 'release'
+        uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda
+        env:
+          GITHUB_TOKEN: ${{github.token}}
+        with:
+          tag_name: ${{needs.build.outputs.release_name}}
+          body_path: ${{ needs.build.outputs.changelog }}
+          draft: true
+          prerelease: ${{contains(needs.build.outputs.release_name, 'staging')}}
+  notify_deployment_failure:
+    name: 'Notify deployment failure to wire chats'
+    runs-on: ubuntu-24.04
+    needs: [build, deploy_to_aws]
+    if: ${{ always() && needs.deploy_to_aws.result == 'failure' }}
+
+    steps:
+      - name: Announce deployment failure
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+        with:
+          status: failure
+          text: |
+            ❌ Deployment failed for ${{ needs.build.outputs.release_name }} ❌
+            **Triggered by:** ${{ github.actor }}
+            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

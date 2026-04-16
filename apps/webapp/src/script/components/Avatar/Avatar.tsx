@@ -21,8 +21,8 @@ import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoard
 
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/keyboardUtil';
 
 import {PlaceholderAvatar} from './PlaceholderAvatar';
 import {ServiceAvatar} from './ServiceAvatar';

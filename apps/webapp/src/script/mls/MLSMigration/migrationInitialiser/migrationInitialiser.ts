@@ -99,7 +99,7 @@ const initialiseMigrationOfProteusConversation = async (
       qualifiedUsers: otherUsersToAdd,
       selfUserId: selfUserId,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     mlsMigrationLogger.error(
       `Error while initialising MLS migration for "proteus" conversation: ${proteusConversation.qualifiedId.id}`,
       error,

@@ -40,7 +40,7 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';
@@ -90,9 +90,14 @@ const StartUI = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
+  const appsEnabled = teamState?.isAppsEnabled();
   const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
-  const areServicesSupportedByProtocol = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
-  const showServiceTab = isTeam && canChatWithServices() && areServicesSupportedByProtocol;
+  const isProteus = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
+
+  const showServiceTab =
+    isTeam &&
+    canChatWithServices() &&
+    ((isProteus && teamState?.hasWhitelistedServices()) || (!isProteus && appsEnabled));
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);

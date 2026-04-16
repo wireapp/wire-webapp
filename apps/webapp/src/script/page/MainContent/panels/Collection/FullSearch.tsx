@@ -26,8 +26,8 @@ import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {Message} from 'Repositories/entity/message/Message';
 import {getSearchRegex} from 'Repositories/search/FullTextSearch';
-import {t} from 'Util/LocalizerUtil';
-import {isScrolledBottom} from 'Util/scroll-helpers';
+import {t} from 'Util/localizerUtil';
+import {isScrolledBottom} from 'Util/scrollHelpers';
 import {useEffectRef} from 'Util/useEffectRef';
 import {noop} from 'Util/util';
 

@@ -27,9 +27,10 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 import {validateProfileImageResolution} from 'Util/util';
 
 import {FileInput} from './FileInput';
@@ -98,7 +99,7 @@ export const AvatarInput = ({
       const messageString = t('modalPictureTooSmallMessage');
       const titleString = t('modalPictureTooSmallHeadline');
       return await showUploadWarning(titleString, messageString);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Failed to validate profile image', error);
       return false;
     } finally {
@@ -116,8 +117,8 @@ export const AvatarInput = ({
     }
     const newUserPicture = files.item(0);
     if (newUserPicture) {
-      setPicture(newUserPicture).catch(error => {
-        const isInvalidUpdate = error.type === UserError.TYPE.INVALID_UPDATE;
+      setPicture(newUserPicture).catch((error: unknown) => {
+        const isInvalidUpdate = isErrorWithType(error) && error.type === UserError.TYPE.INVALID_UPDATE;
         if (!isInvalidUpdate) {
           throw error;
         }

@@ -17,7 +17,6 @@
  *
  */
 
-import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {createGroup, sendTextMessageToConversation} from 'test/e2e_tests/utils/userActions';
 
@@ -26,31 +25,25 @@ import {test, expect, withLogin} from '../../test.fixtures';
 // Generating test data
 const conversationName = 'Test Conversation';
 
-test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({createTeam, createPage}) => {
+test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({createUser, createTeam, createPage}) => {
   test.setTimeout(150_000);
 
-  let owner: User;
-  let members: User[];
-  let ownerPageManager: PageManager;
-  let memberPageManagers: PageManager[];
+  const members = await Promise.all(Array.from({length: 5}, createUser));
+  const {owner} = await createTeam('Conversation Management', {users: members});
 
-  await test.step('Preconditions: Team owner created a team with 5 members', async () => {
-    const team = await createTeam('Conversation Management', {withMembers: 5});
-    owner = team.owner;
-    members = team.members;
-
-    const [pmOwner, ...pmMembers] = await Promise.all([
-      PageManager.from(createPage(withLogin(owner))),
-      ...members.map(member => PageManager.from(createPage(withLogin(member)))),
-    ]);
-    ownerPageManager = pmOwner;
-    memberPageManagers = pmMembers;
-  });
+  const [ownerPage, ...memberPages] = await Promise.all([
+    createPage(withLogin(owner)),
+    ...members.map(member => createPage(withLogin(member))),
+  ]);
+  const [ownerPageManager, ...memberPageManagers] = [
+    PageManager.from(ownerPage),
+    ...memberPages.map(page => PageManager.from(page)),
+  ];
 
   await test.step('Team owner creates a group with all the five members', async () => {
     const {pages} = ownerPageManager.webapp;
     await createGroup(pages, conversationName, members);
-    expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+    await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
   });
 
   await test.step('Team owner sends a message in the conversation', async () => {
@@ -88,7 +81,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
 
     await expect(pages.conversation().getMessage({content: textMessage})).toBeVisible();
     // Wait for more than 10 seconds to ensure the message is deleted
-    await pages.conversation().page.waitForTimeout(11000);
+    await ownerPage.waitForTimeout(11000);
 
     await expect(pages.conversation().getMessage({content: textMessage})).not.toBeVisible();
     await components.inputBarControls().setEphemeralTimerTo('Off');
@@ -98,7 +91,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
     const {pages} = ownerPageManager.webapp;
     await pages.conversationList().searchConversation(conversationName);
     await pages.conversationList().openConversation(conversationName);
-    expect(await pages.conversationList().isConversationItemVisible(conversationName)).toBeTruthy();
+    await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
     await pages.conversationList().openConversation(conversationName);
   });
 
@@ -108,7 +101,6 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
     await pages.conversationList().leaveConversation();
     await modals.leaveConversation().toggleCheckbox();
     await modals.leaveConversation().clickConfirm();
-    await pages.conversation().isConversationReadonly();
-    expect(await pages.conversation().isMessageInputVisible()).toBeFalsy();
+    await expect(pages.conversation().messageInput).not.toBeAttached();
   });
 });

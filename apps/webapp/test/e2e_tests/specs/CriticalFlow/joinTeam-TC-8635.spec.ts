@@ -26,9 +26,9 @@ test(
   'New person joins team and sets up device',
   {tag: ['@TC-8635', '@crit-flow-web']},
   async ({createTeam, createPage, createUser}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+    const existingMember = await createUser();
+    const team = await createTeam('Test Team', {users: [existingMember]});
     const owner = team.owner;
-    const existingMember = team.members[0];
 
     const ownerPages = PageManager.from(await createPage(withLogin(owner))).webapp.pages;
 
@@ -38,7 +38,7 @@ test(
 
     const userA = await createUser();
     await test.step('Owner adds user A to team', async () => {
-      await team.addMember(userA);
+      await team.addTeamMember(userA);
     });
 
     const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(owner))).webapp.pages;

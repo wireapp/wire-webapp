@@ -41,7 +41,7 @@ const imageFilePath = getImageFilePath();
 test(
   'Uploading an file in a group conversation',
   {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
-  async ({pageManager: userAPageManager, browser, api}) => {
+  async ({pageManager: userAPageManager, browser, api}, testInfo) => {
     const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
 
     const userBContext = await browser.newContext();
@@ -65,9 +65,7 @@ test(
       const loginOwner = async () => {
         await userAPageManager.openMainPage();
         await loginUser(userA, userAPageManager);
-        if (process.env.ENV_NAME === 'staging') {
-          await userAModals.dataShareConsent().clickDecline();
-        }
+        await userAModals.dataShareConsent().clickDecline();
         await userAPages.conversationList().clickCreateGroup();
         // Files should be disabled by default
         expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeFalsy();
@@ -81,9 +79,7 @@ test(
       const loginMember = async () => {
         await userBPageManager.openMainPage();
         await loginUser(userB, userBPageManager);
-        if (process.env.ENV_NAME === 'staging') {
-          await userBModals.dataShareConsent().clickDecline();
-        }
+        await userBModals.dataShareConsent().clickDecline();
       };
 
       await Promise.all([loginOwner(), loginMember()]);
@@ -108,7 +104,7 @@ test(
     });
 
     await test.step('User B downloads the image in the conversation', async () => {
-      const filePath = await userBModals.cellsFileDetailView().downloadAsset();
+      const filePath = await userBModals.cellsFileDetailView().downloadAsset(testInfo.outputDir);
       const downloadQRCodeValue = await getLocalQRCodeValue(filePath);
       const localQRCodeValue = await getLocalQRCodeValue(imageFilePath);
       expect(downloadQRCodeValue).toBe(localQRCodeValue);

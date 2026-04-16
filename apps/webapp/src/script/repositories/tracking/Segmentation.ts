@@ -78,6 +78,11 @@ export const Segmentation = {
       BEFORE_BACKUP: 'before_backup',
     },
   },
+  CONNECTIVITY: {
+    RETRY_COUNT: 'retry_count',
+    RETRY_DURATION_IN_MILLISECONDS: 'retry_duration_in_milliseconds',
+    TRANSPORT: 'transport',
+  },
   GENERAL: {
     STEP: 'step',
     YES: 'yes',

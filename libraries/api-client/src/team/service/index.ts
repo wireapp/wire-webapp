@@ -17,8 +17,8 @@
  *
  */
 
-export * from './ServiceAPI';
-export * from './Service';
-export * from './Provider';
-export * from './ServiceWhitelistData';
-export * from './Services';
+export * from './serviceApi';
+export * from './service';
+export * from './provider';
+export * from './serviceWhitelistData';
+export * from './services';

@@ -19,7 +19,7 @@
 
 import type {GiphyService} from './GiphyService';
 
-import {Logger, getLogger} from '../../util/Logger';
+import {Logger, getLogger} from '../../util/logger';
 
 export interface Gif {
   animated: string;
@@ -152,7 +152,7 @@ export class GiphyRepository {
       }
 
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`Unable to fetch GIF for query: ${query}`, error);
       throw error;
     }

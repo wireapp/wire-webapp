@@ -18,19 +18,61 @@
  */
 
 import {Locator, Page} from '@playwright/test';
+import {ConfirmModal} from '../modals/confirm.modal';
 
 export class ParticipantDetails {
-  readonly page: Page;
+  private readonly page: Page;
 
+  readonly userPicture: Locator;
+  readonly userName: Locator;
+  readonly userStatus: Locator;
+  readonly userHandle: Locator;
+  readonly createGroup: Locator;
   readonly block: Locator;
+  readonly closeButton: Locator;
+  readonly cancelRequest: Locator;
+  readonly unblockButton: Locator;
+  readonly removeFromGroupButton: Locator;
+  readonly openConversationButton: Locator;
+  readonly connectButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
-
-    this.block = this.page.getByTestId('do-block-item-text');
+    this.userPicture = this.page.getByTestId('status-profile-picture');
+    this.userName = this.page.locator('.panel-participant').getByTestId('status-name');
+    this.userHandle = this.page.locator('.panel-participant').getByTestId('status-username');
+    this.userStatus = this.page
+      .locator('#group-participant-user')
+      .getByTestId(/^status-(external|guest|admin)$/)
+      .and(this.page.locator('.panel-participant__label'));
+    this.createGroup = this.page.locator('#conversation-details').getByRole('button', {name: 'Create group'});
+    this.block = this.page.getByRole('button', {name: 'Block'});
+    this.closeButton = this.page.getByRole('button', {name: 'Close conversation info'});
+    this.cancelRequest = this.page.getByRole('button', {name: 'Cancel request'});
+    this.unblockButton = this.page.getByRole('button', {name: 'Unblock'});
+    this.removeFromGroupButton = this.page.getByRole('button', {name: 'Remove from group'});
+    this.openConversationButton = this.page.getByRole('button', {name: 'Open conversation', exact: true});
+    this.connectButton = this.page.getByRole('button', {name: 'Connect'});
   }
 
   async blockUser() {
-    this.block.click();
+    await this.block.click();
+  }
+
+  getUserEmailLocator(email: string) {
+    return this.page.getByTestId('item-enriched-value').and(this.page.locator(`[data-uie-value="${email}"]`));
+  }
+
+  async closeParticipantDetails() {
+    await this.closeButton.click();
+  }
+
+  async sendConnectRequest() {
+    await this.connectButton.click();
+  }
+
+  async removeFromGroup() {
+    await this.removeFromGroupButton.click();
+    await new ConfirmModal(this.page).actionButton.click();
   }
 }

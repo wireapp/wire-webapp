@@ -27,7 +27,8 @@ import {Navigate} from 'react-router-dom';
 import {UrlUtil} from '@wireapp/commons';
 import {Column, Columns, H1, Muted} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 import {noop} from 'Util/util';
 
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
@@ -111,8 +112,8 @@ const ConversationJoinComponent = ({
         }
         await doGetAllClients();
       })
-      .catch(error => {
-        if (error.label === BackendErrorLabel.INVALID_CREDENTIALS) {
+      .catch((error: unknown) => {
+        if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CREDENTIALS) {
           return;
         }
         setIsValidLink(false);
@@ -143,9 +144,9 @@ const ConversationJoinComponent = ({
       await setLastEventDate(conversationEvent?.time ? new Date(conversationEvent.time) : new Date());
 
       routeToApp(conversationEvent?.conversation, conversationEvent?.qualified_conversation?.domain ?? '');
-    } catch (error) {
+    } catch (error: unknown) {
       setIsSubmitingName(false);
-      if (error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
+      if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
         setIsJoinGuestLinkPasswordModalOpen(true);
         return;
       }
@@ -178,9 +179,9 @@ const ConversationJoinComponent = ({
         entropyData,
       );
       await getConversationInfoAndJoin(password);
-    } catch (error) {
+    } catch (error: unknown) {
       setIsSubmitingName(false);
-      if (error.label) {
+      if (isBackendError(error)) {
         switch (error.label) {
           default: {
             const isValidationError = Object.values(ValidationError.ERROR).some(errorType =>

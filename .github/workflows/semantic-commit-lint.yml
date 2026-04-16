@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   semantic-commit-pr-title-lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Skip on merge queue
         if: ${{ github.event_name == 'merge_group' }}
@@ -21,7 +21,7 @@ jobs:
       # https://github.com/amannn/action-semantic-pull-request/releases
       - name: Run Semantic Commint Linter
         if: ${{ github.event_name == 'pull_request_target' }}
-        uses: amannn/action-semantic-pull-request@v5
+        uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

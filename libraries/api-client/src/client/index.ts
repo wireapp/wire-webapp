@@ -17,14 +17,14 @@
  *
  */
 
-export * from './ClientAPI';
-export * from './ClientCapability';
-export * from './ClientCapabilityData';
-export * from './ClientClassification';
-export * from './ClientError';
-export * from './ClientType';
-export * from './Location';
-export * from './NewClient';
-export * from './PublicClient';
-export * from './QualifiedPublicClients';
-export * from './RegisteredClient';
+export * from './clientApi';
+export * from './clientCapability';
+export * from './clientCapabilityData';
+export * from './clientClassification';
+export * from './clientError';
+export * from './clientType';
+export * from './location';
+export * from './newClient';
+export * from './publicClient';
+export * from './qualifiedPublicClients';
+export * from './registeredClient';

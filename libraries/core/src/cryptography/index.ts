@@ -17,6 +17,6 @@
  *
  */
 
-export * from './AssetCryptography/EncryptedAsset';
-export * from './SessionPayloadBundle';
-export * from './MessageHashService';
+export * from './assetCryptography/encryptedAsset';
+export * from './sessionPayloadBundle';
+export * from './messageHashService';

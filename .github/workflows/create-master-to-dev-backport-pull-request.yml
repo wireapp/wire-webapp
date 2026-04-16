@@ -1,0 +1,127 @@
+name: Create master to dev backport pull request
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - master
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create_master_to_dev_backport_pull_request:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN != '' && secrets.OTTO_THE_BOT_GH_TOKEN || github.token }}
+      REPOSITORY_NAME: ${{ github.repository }}
+      REPOSITORY_OWNER_NAME: ${{ github.repository_owner }}
+    steps:
+      - name: Check for open master to dev pull request
+        id: check_open_master_to_dev_pull_request
+        run: |
+          set -euo pipefail
+
+          open_pull_request_count="$(
+            gh api \
+              --method GET \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${REPOSITORY_NAME}/pulls" \
+              -f state='open' \
+              -f base='dev' \
+              -f head="${REPOSITORY_OWNER_NAME}:master" \
+              --jq 'length'
+          )"
+
+          if [ "$open_pull_request_count" -gt 0 ]; then
+            echo "open_pull_request_exists=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "open_pull_request_exists=false" >> "$GITHUB_OUTPUT"
+
+      - name: Skip because open pull request already exists
+        if: steps.check_open_master_to_dev_pull_request.outputs.open_pull_request_exists == 'true'
+        run: echo "An open pull request from master to dev already exists."
+
+      - name: Check whether master is ahead of dev
+        if: steps.check_open_master_to_dev_pull_request.outputs.open_pull_request_exists == 'false'
+        id: check_whether_master_is_ahead_of_dev
+        run: |
+          set -euo pipefail
+
+          master_commits_ahead_of_dev="$(
+            gh api \
+              --method GET \
+              -H "Accept: application/vnd.github+json" \
+              "/repos/${REPOSITORY_NAME}/compare/dev...master" \
+              --jq '.ahead_by'
+          )"
+
+          if [ "$master_commits_ahead_of_dev" -gt 0 ]; then
+            echo "master_is_ahead_of_dev=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "master_is_ahead_of_dev=false" >> "$GITHUB_OUTPUT"
+
+      - name: Skip because master and dev are aligned
+        if: steps.check_whether_master_is_ahead_of_dev.outputs.master_is_ahead_of_dev == 'false'
+        run: echo "No backport pull request is needed because master and dev are aligned."
+
+      - name: Create backport pull request from master to dev
+        if: steps.check_whether_master_is_ahead_of_dev.outputs.master_is_ahead_of_dev == 'true'
+        env:
+          SOURCE_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          if ! [[ "${SOURCE_PULL_REQUEST_NUMBER}" =~ ^[0-9]+$ ]]; then
+            echo "Invalid source pull request number: ${SOURCE_PULL_REQUEST_NUMBER}"
+            exit 1
+          fi
+
+          source_pull_request_url="https://github.com/${REPOSITORY_NAME}/pull/${SOURCE_PULL_REQUEST_NUMBER}"
+
+          generated_pull_request_title="chore: merge master into dev after pull request #${SOURCE_PULL_REQUEST_NUMBER}"
+          generated_pull_request_body="$(cat <<EOF
+          This pull request was generated automatically after a pull request was merged into \`master\`.
+
+          Source pull request:
+          - Number: #${SOURCE_PULL_REQUEST_NUMBER}
+          - URL: ${source_pull_request_url}
+
+          Reason:
+          - Keep \`dev\` and edge deployments aligned with merged hotfixes on \`master\`.
+
+          Merge note:
+          - Use a merge strategy that preserves commit identity (avoid squash merging for this pull request).
+          EOF
+          )"
+
+          creation_error_log_file="$(mktemp)"
+
+          if gh api \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${REPOSITORY_NAME}/pulls" \
+            -f title="${generated_pull_request_title}" \
+            -f head="master" \
+            -f base="dev" \
+            -f body="${generated_pull_request_body}" \
+            1>/dev/null \
+            2>"${creation_error_log_file}"; then
+            echo "Created pull request from master to dev."
+            exit 0
+          fi
+
+          if grep -q "A pull request already exists" "${creation_error_log_file}"; then
+            echo "A pull request from master to dev was created by another workflow run."
+            exit 0
+          fi
+
+          cat "${creation_error_log_file}"
+          exit 1

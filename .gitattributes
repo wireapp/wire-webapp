@@ -5,9 +5,16 @@
 *.eot binary
 *.jar binary
 *.jpg binary
+*.mp3 binary
+*.mp4 binary
 *.otf binary
 *.png binary
 *.svg binary
 *.ttf binary
 *.woff binary
 *.woff2 binary
+# Machine Learning Models
+*.tflite binary
+*.onnx binary
+*.pb binary
+*.pt binary

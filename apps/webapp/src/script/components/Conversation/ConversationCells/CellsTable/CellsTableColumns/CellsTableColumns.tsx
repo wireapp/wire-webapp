@@ -20,9 +20,9 @@
 import {createColumnHelper} from '@tanstack/react-table';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
 import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';

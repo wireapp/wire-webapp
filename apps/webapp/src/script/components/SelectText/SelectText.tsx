@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 interface SelectTextProps {
   text: string;

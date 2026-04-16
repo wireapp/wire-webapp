@@ -24,8 +24,8 @@ import {Runtime} from '@wireapp/commons';
 
 import type {Conversation} from 'Repositories/entity/Conversation';
 
-import {isTabKey} from './KeyboardUtil';
-import {getLogger} from './Logger';
+import {isTabKey} from './keyboardUtil';
+import {getLogger} from './logger';
 
 import {AuthError} from '../error/AuthError';
 
@@ -48,7 +48,7 @@ export const checkIndexedDb = (): Promise<void> => {
         }
         return undefined;
       };
-    } catch (error) {
+    } catch (error: unknown) {
       return Promise.reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
     }
 

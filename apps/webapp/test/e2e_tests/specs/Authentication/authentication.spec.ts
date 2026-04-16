@@ -18,7 +18,7 @@
  */
 
 import {PageManager, webAppPath} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
 import {IncomingMessage} from 'node:http';
@@ -29,7 +29,8 @@ test.describe('Authentication', () => {
   test(
     'Verify sign in button is disabled in case of empty credentials',
     {tag: ['@TC-3457', '@regression']},
-    async ({pageManager}) => {
+    async ({createPage}) => {
+      const pageManager = PageManager.from(await createPage());
       const {pages} = pageManager.webapp;
       const {emailInput, passwordInput, signInButton} = pages.login();
       await pageManager.openLoginPage();
@@ -48,13 +49,9 @@ test.describe('Authentication', () => {
   test(
     'I want to be asked to share telemetry data when I log in',
     {tag: ['@TC-8780', '@regression']},
-    async ({page, pageManager, createUser}) => {
-      const {pages, modals} = pageManager.webapp;
-      const user = await createUser({disableTelemetry: false});
-
-      await pageManager.openLoginPage();
-      await pages.login().login(user);
-      await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
+    async ({createUser, createPage}) => {
+      const pageManager = await PageManager.from(createPage(withLogin(createUser({disableTelemetry: false}))));
+      const {modals} = pageManager.webapp;
 
       await expect(modals.dataShareConsent().modalTitle).toBeVisible();
     },
@@ -62,8 +59,9 @@ test.describe('Authentication', () => {
 
   test(
     'Verify sign in error appearance in case of suspended team account',
-    {tag: ['@TC-3468', '@regression']},
-    async ({pageManager}) => {
+    {tag: ['@TC-3458', '@regression']},
+    async ({createPage}) => {
+      const pageManager = PageManager.from(await createPage());
       const {pages} = pageManager.webapp;
       await pageManager.openLoginPage();
 
@@ -77,16 +75,16 @@ test.describe('Authentication', () => {
   test(
     'Verify current browser is set as temporary device',
     {tag: ['@TC-3460', '@regression']},
-    async ({page, pageManager, createUser}) => {
+    async ({createUser, createPage}) => {
       const user = await createUser();
+      const pageManager = await PageManager.from(createPage());
       const {pages, components} = pageManager.webapp;
 
       await test.step('Log in with public computer checked', async () => {
         await pageManager.openLoginPage();
-        await pages.login().publicComputerCheckbox.click();
-        await pages.login().login(user);
+        await pages.login().login(user, {publicComputer: true});
         await pages.historyInfo().clickConfirmButton();
-        await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
+        await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       });
 
       let proteusId: string;
@@ -101,12 +99,14 @@ test.describe('Authentication', () => {
       await test.step('Log out of public computer', async () => {
         await pages.settings().accountButton.click();
         await pages.account().clickLogoutButton();
+        await expect(pages.singleSignOn().ssoSignInButton).toBeVisible();
       });
 
       await test.step('Log in again on non public computer', async () => {
         await pageManager.openLoginPage();
         await pages.login().login(user);
-        await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
+        await pages.historyInfo().clickConfirmButtonIfVisible();
+        await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       });
 
       await test.step("Open device settings and ensure the public computer isn't active and the ID was re-generated", async () => {
@@ -122,10 +122,11 @@ test.describe('Authentication', () => {
   test(
     'Verify sign in error appearance in case of wrong credentials',
     {tag: ['@TC-3465', '@regression']},
-    async ({pageManager}) => {
+    async ({createPage}) => {
+      const pageManager = await PageManager.from(createPage());
       const {pages} = pageManager.webapp;
-      await pageManager.openLoginPage();
 
+      await pageManager.openLoginPage();
       await pages.login().login({email: 'invalid@wire.com', password: 'invalid'});
 
       await expect(pages.login().loginErrorText).toHaveText('Please verify your details and try again');
@@ -139,24 +140,24 @@ test.describe('Authentication', () => {
     test(
       `I want to keep my history after refreshing the page on ${deviceType} device`,
       {tag: [tag, '@regression']},
-      async ({page, pageManager, createTeam}) => {
-        const {pages} = pageManager.webapp;
-        const team = await createTeam('Test Team', {withMembers: 1});
-        const userA = team.owner;
-        const userB = team.members[0];
+      async ({createUser, createTeam, createPage}) => {
+        const userB = await createUser();
+        const {owner: userA} = await createTeam('Test Team', {users: [userB]});
+
+        const pageManager = PageManager.from(await createPage());
+        const {pages, components} = pageManager.webapp;
 
         await test.step('Log in and connect with user B', async () => {
           await pageManager.openLoginPage();
 
           if (deviceType === 'temporary') {
-            await pages.login().publicComputerCheckbox.click();
-            await pages.login().login(userA);
+            await pages.login().login(userA, {publicComputer: true});
             await pages.historyInfo().clickConfirmButton();
           } else {
             await pages.login().login(userA);
           }
 
-          await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
+          await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
           await connectWithUser(pageManager, userB);
         });
 
@@ -169,7 +170,7 @@ test.describe('Authentication', () => {
           const message = pages.conversation().getMessage({content: 'Before refresh'});
           await expect(message).toBeVisible();
 
-          await pageManager.refreshPage();
+          await pageManager.refreshPage({waitUntil: 'load'});
 
           await pages.conversationList().openConversation(userB.fullName);
           await expect(message).toBeVisible();
@@ -178,7 +179,7 @@ test.describe('Authentication', () => {
     );
   });
 
-  // Bug: Connecting using TLSv1.2 should not be allowed but succeeds
+  // Bug: Connecting using TLSv1.2 should not be allowed but succeeds (See: WPB-22162)
   test.skip(
     'I want to make sure i connect to webapp only through TLS >= 1.3 connection',
     {tag: ['@TC-3480', '@regression']},
@@ -196,37 +197,39 @@ test.describe('Authentication', () => {
   test(
     'Make sure user does not see data of user of previous sessions on same browser',
     {tag: ['@TC-1311', '@regression']},
-    async ({page, pageManager, createTeam}) => {
+    async ({createUser, createTeam, createPage}) => {
+      const userB = await createUser();
+      const {owner: userA} = await createTeam('Test Team', {users: [userB]});
+
+      const pageManager = await PageManager.from(createPage());
       const {pages, components} = pageManager.webapp;
-      const team = await createTeam('Test Team', {withMembers: 1});
-      const userA = team.owner;
-      const userB = team.members[0];
 
       await test.step('Log in with public computer checked', async () => {
         await pageManager.openLoginPage();
-        await pages.login().publicComputerCheckbox.click();
-        await pages.login().login(userA);
+        await pages.login().login(userA, {publicComputer: true});
         await pages.historyInfo().clickConfirmButton();
-        await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
+        await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       });
 
       await test.step('Connect with and send message to userB', async () => {
         await connectWithUser(pageManager, userB);
         await pages.conversationList().openConversation(userB.fullName);
         await pages.conversation().sendMessage('Test message');
+        await expect(pages.conversation().getMessage({content: 'Test message'})).toBeVisible();
       });
 
       await test.step('Log out of public computer', async () => {
         await components.conversationSidebar().clickPreferencesButton();
         await pages.settings().accountButton.click();
         await pages.account().clickLogoutButton();
+        await expect(pages.singleSignOn().ssoSignInButton).toBeVisible();
       });
 
       await test.step('Log in again', async () => {
         await pageManager.openLoginPage();
         await pages.login().login(userA);
-        await pages.historyInfo().clickConfirmButton();
-        await page.waitForURL(webAppPath, {timeout: 30_000, waitUntil: 'networkidle'});
+        await pages.historyInfo().clickConfirmButtonIfVisible();
+        await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       });
 
       await test.step('Verify previously sent message is gone', async () => {
@@ -241,7 +244,7 @@ test.describe('Authentication', () => {
     {tag: ['@TC-1312', '@regression']},
     async ({createPage, createUser}) => {
       const user = await createUser();
-      const device1Pages = PageManager.from(await createPage(withLogin(user))).webapp.pages;
+      const device1Page = await createPage(withLogin(user));
 
       const {
         pages: device2Pages,
@@ -256,9 +259,7 @@ test.describe('Authentication', () => {
       await device2Modals.password().passwordInput.fill(user.password);
       await device2Modals.password().clickAction();
 
-      await expect(
-        device1Pages.singleSignOn().page.getByText('You were signed out because your device was deleted'),
-      ).toBeVisible();
+      await expect(device1Page.getByText('You were signed out because your device was deleted')).toBeVisible();
     },
   );
 });

@@ -23,7 +23,7 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
 import {User} from 'Repositories/entity/User';
 import type {EventRecord} from 'Repositories/storage/record/EventRecord';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {StatusType} from '../../../message/StatusType';
 import {ClientEvent} from '../Client';

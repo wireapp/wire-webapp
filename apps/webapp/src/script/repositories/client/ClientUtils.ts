@@ -19,7 +19,7 @@
 
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 
-import {weeksPassedSinceDate} from 'Util/TimeUtil';
+import {weeksPassedSinceDate} from 'Util/timeUtil';
 
 export const wasClientActiveWithinLast4Weeks = ({last_active: lastActiveISODate}: RegisteredClient): boolean => {
   //if client has not requested /notifications endpoint yet with backend supporting last_active field, we assume it is not active

@@ -19,7 +19,7 @@
 
 import {container} from 'tsyringe';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/logger';
 
 import {StorageService} from './StorageService';
 

@@ -7,8 +7,8 @@ on:
 jobs:
   label:
     name: Label PR based on title
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: srvaroa/labeler@v1.11
+      - uses: srvaroa/labeler@bfe288801b8091b6a70e67f3ce7c9e87c88921cf
         env:
           GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}

@@ -18,7 +18,7 @@
  */
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 const CONFIG = Config.getConfig();
 

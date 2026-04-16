@@ -17,7 +17,7 @@
  *
  */
 
-import {useId} from 'react';
+import {ReactNode, useId} from 'react';
 
 import cx from 'classnames';
 
@@ -29,6 +29,7 @@ interface InfoToggleProps {
   name: string;
   className?: string;
   setIsChecked: (checked: boolean) => void;
+  footer?: ReactNode;
 }
 
 const InfoToggle = ({
@@ -39,21 +40,18 @@ const InfoToggle = ({
   isDisabled,
   name,
   setIsChecked,
+  footer,
 }: InfoToggleProps) => {
-  const dataUieNameInfoText = `status-info-toggle-${dataUieName}`;
-  const dataUieNameLabelText = `do-toggle-${dataUieName}`;
   const inputId = useId();
 
   return (
-    <div className={cx('info-toggle', className)}>
+    <div data-uie-name={dataUieName} className={cx('info-toggle', className)}>
       <div className="info-toggle__row">
         <div>
           <label htmlFor={inputId} className="heading-h3">
             {name}
           </label>
-          <p className="info-toggle__details" data-uie-name={dataUieNameInfoText}>
-            {info}
-          </p>
+          <p className="info-toggle__details">{info}</p>
         </div>
         <div className={cx('slider', {disabled: isDisabled})}>
           <input
@@ -64,12 +62,12 @@ const InfoToggle = ({
             onChange={event => setIsChecked(event.target.checked)}
             type="checkbox"
             data-uie-name="info-toggle-input"
+            disabled={isDisabled}
           />
           <button
             className="button-label"
             aria-pressed={isChecked}
             onClick={() => setIsChecked(!isChecked)}
-            data-uie-name={dataUieNameLabelText}
             data-uie-value={isChecked ? 'checked' : 'unchecked'}
           >
             <span className="button-label__switch" />
@@ -77,6 +75,7 @@ const InfoToggle = ({
           </button>
         </div>
       </div>
+      {footer}
     </div>
   );
 };

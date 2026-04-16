@@ -21,7 +21,7 @@ import {FeatureList, FEATURE_STATUS, CONVERSATION_PROTOCOL} from '@wireapp/api-c
 
 import {randomUUID} from 'crypto';
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
 import {ROLE} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';
@@ -70,11 +70,13 @@ describe('TeamRepository', () => {
   };
   const team_metadata = teams_data.teams[0];
 
+  const services_data: {has_more: boolean; services: any[]} = {has_more: false, services: []};
+
   describe('getTeam()', () => {
     it('returns the team entity', async () => {
       const [teamRepo, {teamService}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
-
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
       jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
 
       const team_et = await teamRepo.getTeam();
@@ -89,6 +91,7 @@ describe('TeamRepository', () => {
     it('updates team feature config from backend', async () => {
       const [teamRepo, {teamService, teamState}] = buildConnectionRepository();
       jest.spyOn(teamService, 'getTeamById').mockResolvedValue(team_metadata);
+      jest.spyOn(teamService, 'getWhitelistedServices').mockResolvedValue(services_data);
       jest.spyOn(teamRepo, 'getSelfMember').mockResolvedValue(new TeamMemberEntity(randomUUID()));
 
       const localFeatures = {

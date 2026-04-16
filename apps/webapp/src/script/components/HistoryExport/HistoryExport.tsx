@@ -19,6 +19,7 @@
 
 import {useContext, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -27,15 +28,15 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
-import {CancelError} from 'Repositories/backup/Error';
+import {CancelError} from 'Repositories/backup/error';
 import {ClientState} from 'Repositories/client/ClientState';
 import {User} from 'Repositories/entity/User';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {ContentState} from 'src/script/page/useAppState';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {getCurrentDate} from 'Util/TimeUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../Config';
@@ -70,17 +71,17 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
   const [archiveBlob, setArchiveBlob] = useState<Blob | null>(null);
 
-  const mainViewModel = useContext(RootContext);
+  const rootContext = useContext(RootContext);
 
   useEffect(() => {
     showBackupModal();
   }, []);
 
-  if (!mainViewModel) {
+  if (is.null_(rootContext)) {
     return null;
   }
 
-  const {content: contentViewModel} = mainViewModel;
+  const contentViewModel = rootContext.mainViewModel.content;
   const backupRepository = contentViewModel.repositories.backup;
 
   const loadingProgress = Math.floor((numberOfProcessedRecords / numberOfRecords) * 100);
@@ -219,7 +220,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       } else {
         throw new Error('No local client found');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       onError(error as Error);
     }
   };

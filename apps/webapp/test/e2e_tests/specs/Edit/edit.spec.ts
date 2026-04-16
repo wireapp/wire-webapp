@@ -26,10 +26,10 @@ test.describe('Edit', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({createPage}) => {
@@ -94,9 +94,11 @@ test.describe('Edit', () => {
   test('I cannot edit another users message', {tag: ['@TC-683', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
+    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
     await userAPages.conversation().sendMessage('Test Message');
 
     const message = userBPages.conversation().getMessage({sender: userA});
@@ -126,7 +128,7 @@ test.describe('Edit', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
       await test.step('Create group as second conversation', async () => {
@@ -136,17 +138,17 @@ test.describe('Edit', () => {
       });
 
       await test.step('Send message from user A to B', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().sendMessage('Test Message');
       });
 
       await test.step('Check user B has a unread conversation with A containing the sent message', async () => {
         const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
-        await expect(conversation.getByTestId('status-unread')).toBeVisible();
+        await expect(conversation.unreadIndicator).toBeVisible();
 
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await expect(conversation).toContainText('Test Message');
-        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
+        await expect(conversation.unreadIndicator).not.toBeVisible();
       });
 
       await test.step("Open group conversation to ensure new messages won't be read immediately", async () => {
@@ -163,7 +165,7 @@ test.describe('Edit', () => {
 
       await test.step('Check B received the updated message without marking the conversation as unread', async () => {
         const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
-        await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
+        await expect(conversation.unreadIndicator).not.toBeVisible();
 
         await userBPages.conversationList().openConversation(userA.fullName);
         await expect(userBPages.conversation().getMessage({sender: userA})).toContainText('Edited Message');
@@ -177,8 +179,11 @@ test.describe('Edit', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
+
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
       await userAPages.conversation().sendMessage('Test');
       const sentMessage = userAPages.conversation().getMessage({sender: userA});

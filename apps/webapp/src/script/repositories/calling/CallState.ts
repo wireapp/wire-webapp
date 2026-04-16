@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
 import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {Call} from './Call';
 

@@ -21,7 +21,7 @@ import {Locator, Page} from '@playwright/test';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
 
 export class HistoryExportPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly exportSuccessHeadline: Locator;
   readonly saveFileButton: Locator;
@@ -47,7 +47,7 @@ export class HistoryExportPage {
     await this.cancelButton.click();
   }
 
-  async downloadFile() {
-    return await downloadAssetAndGetFilePath(this.page, this.saveFileButton);
+  async downloadFile(outputDir: string) {
+    return await downloadAssetAndGetFilePath(this.page, this.saveFileButton, outputDir);
   }
 }

@@ -23,7 +23,7 @@ import {FileHistoryHeader} from './FileHistoryHeader';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 
 jest.mock('./hooks/useFileHistoryModal');
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
 }));
 

@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 export const useGetAllTags = ({
   cellsRepository,
@@ -41,7 +41,7 @@ export const useGetAllTags = ({
       const filteredTags = tags.Values?.map(tag => tag).filter(Boolean) ?? [];
       setTags(filteredTags);
       onSuccess(filteredTags);
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error : new Error('Unknown error'));
     } finally {
       setIsLoading(false);

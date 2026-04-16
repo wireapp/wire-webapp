@@ -19,9 +19,9 @@
 
 import {ChangeEvent, FormEvent, MouseEvent, useState} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getFileExtension, trimFileExtension} from 'Util/util';
 
 interface UseCellsRenameFormProps {
@@ -51,7 +51,7 @@ export const useCellsRenameForm = ({node, cellsRepository, onSuccess}: UseCellsR
     try {
       await cellsRepository.renameNode({currentPath: node.path, newName: buildNewName(name)});
       onSuccess();
-    } catch (error) {
+    } catch (error: unknown) {
       setError(t('cells.renameNodeModal.error'));
     }
   };

@@ -19,6 +19,7 @@
 
 import {ReactNode, useContext, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
@@ -37,8 +38,8 @@ import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {Collection} from './panels/Collection';
@@ -77,7 +78,7 @@ const MainContent = ({
   reloadApp,
 }: MainContentProps) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const mainViewModel = useContext(RootContext);
+  const rootContext = useContext(RootContext);
 
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
@@ -102,10 +103,10 @@ const MainContent = ({
     }
   }, [teamState, showRequestModal]);
 
-  if (!mainViewModel) {
+  if (is.null_(rootContext)) {
     return null;
   }
-  const {content: contentViewModel} = mainViewModel;
+  const contentViewModel = rootContext.mainViewModel.content;
   const {isFederated, repositories, switchContent} = contentViewModel;
 
   /* eslint-disable react-hooks/rules-of-hooks */

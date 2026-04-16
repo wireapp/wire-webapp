@@ -20,7 +20,13 @@
 import {serializeShareModalInput} from './shareModalSerializer';
 
 describe('serializeShareModalInput', () => {
-  const baseInput = {
+  const baseInput: {
+    passwordEnabled: boolean;
+    passwordValue: string;
+    expirationEnabled: boolean;
+    expirationDateTime: Date | null;
+    expirationInvalid: boolean;
+  } = {
     passwordEnabled: true,
     passwordValue: '',
     expirationEnabled: false,

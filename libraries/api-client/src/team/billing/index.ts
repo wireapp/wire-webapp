@@ -17,9 +17,9 @@
  *
  */
 
-export * from './BillingAPI';
-export * from './BillingInfo';
-export * from './CardData';
-export * from './InvoiceData';
-export * from './InvoiceListData';
-export * from './SupportedCurrency';
+export * from './billingApi';
+export * from './billingInfo';
+export * from './cardData';
+export * from './invoiceData';
+export * from './invoiceListData';
+export * from './supportedCurrency';

@@ -20,14 +20,10 @@
 import {Locator, Page} from '@playwright/test';
 
 export class DevicesPage {
-  readonly page: Page;
-
   readonly proteusId: Locator;
   readonly activeDevices: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     // The id is not using any label or similar but just multiple paragraphs beneath each other
     this.proteusId = page.locator("p:text('Proteus ID') + p");
     this.activeDevices = page.getByRole('group', {name: 'Active'}).getByRole('button', {name: /device details/});

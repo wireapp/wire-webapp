@@ -65,19 +65,28 @@ export const fileHeaderFileInfoCss: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '6px',
-  color: 'var(--gray-70)',
+  color: 'var(--base-secondary-text)',
   height: '21px',
 };
 
 export const fileHistoryCloseButtonCss: CSSObject = {
   background: 'none',
   border: 'none',
+  color: 'var(--main-color)',
   cursor: 'pointer',
   display: 'flex',
   alignSelf: 'flex-start',
-  padding: '0px',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '32px',
+  height: '32px',
+  padding: 0,
+  borderRadius: '8px',
+  '& svg': {
+    fill: 'currentColor',
+  },
   '&:hover': {
-    opacity: 0.7,
+    backgroundColor: 'var(--cells-version-history-item-hover-bg)',
   },
 };
 
@@ -105,52 +114,77 @@ export const fileHistoryDateHeadingCss: CSSObject = {
 
 export const fileHistoryTimelineContainerCss: CSSObject = {
   position: 'relative',
-  ':before': {
-    content: '""',
-    position: 'absolute',
-    left: '20px',
-    top: '15px',
-    bottom: '40px',
-    borderLeft: '1px dashed var(--gray-50)',
-  },
 };
 
 // Version item styles
 export const fileVersionItemWrapperCss: CSSObject = {
+  // Keep these values in `rem` so they scale with the user's font size.
+  '--cells-vh-item-padding-y': '0.5rem',
+  '--cells-vh-item-padding-x': '1rem',
+  '--cells-vh-dot-size': '0.5625rem',
+  '--cells-vh-dot-margin-top': '0.5rem',
+  '--cells-vh-dot-center-offset':
+    'calc(var(--cells-vh-item-padding-y) + var(--cells-vh-dot-margin-top) + (var(--cells-vh-dot-size) / 2))',
   display: 'flex',
   gap: '12px',
-  padding: '8px 16px',
+  padding: 'var(--cells-vh-item-padding-y) var(--cells-vh-item-padding-x)',
   borderRadius: '8px',
+  position: 'relative',
   ':hover': {
-    backgroundColor: 'var(--gray-20)',
-    button: {
-      visibility: 'visible',
+    backgroundColor: 'var(--cells-version-history-item-hover-bg)',
+    '& [data-version-actions="true"]': {
+      display: 'flex',
     },
+  },
+  ':focus-within': {
+    backgroundColor: 'var(--cells-version-history-item-hover-bg)',
+    '& [data-version-actions="true"]': {
+      display: 'flex',
+    },
+  },
+  ':focus-visible': {
+    outline: '2px solid var(--accent-color)',
+    outlineOffset: '2px',
   },
 };
 
 export const versionDotCurrentCss: CSSObject = {
-  width: '9px',
-  height: '9px',
+  width: 'var(--cells-vh-dot-size)',
+  height: 'var(--cells-vh-dot-size)',
   backgroundColor: 'var(--accent-color)',
   border: 'none',
   borderRadius: '50%',
-  marginTop: '8px',
+  marginTop: 'var(--cells-vh-dot-margin-top)',
   position: 'relative',
+  zIndex: 1,
 };
 
 export const versionDotOldCss: CSSObject = {
-  width: '9px',
-  height: '9px',
-  backgroundColor: 'var(--modal-bg)',
-  border: '1px solid var(--gray-70)',
+  width: 'var(--cells-vh-dot-size)',
+  height: 'var(--cells-vh-dot-size)',
+  backgroundColor: 'var(--cells-version-history-dot-fill-color)',
+  border: '1px solid var(--cells-version-history-dot-border-color)',
   borderRadius: '50%',
-  marginTop: '8px',
+  marginTop: 'var(--cells-vh-dot-margin-top)',
   position: 'relative',
+  zIndex: 1,
+};
+
+export const versionTimelineConnectorCss: CSSObject = {
+  position: 'absolute',
+  left: 'calc(var(--cells-vh-item-padding-x) + (var(--cells-vh-dot-size) / 2))',
+  top: 'var(--cells-vh-dot-center-offset)',
+  bottom: 'calc(-1 * var(--cells-vh-dot-center-offset))',
+  width: '1px',
+  backgroundImage:
+    'repeating-linear-gradient(to bottom, var(--cells-version-history-timeline-color) 0 4px, transparent 4px 12px)',
+  pointerEvents: 'none',
+  zIndex: 0,
 };
 
 export const versionInfoContainerCss: CSSObject = {
   flex: 1,
+  minWidth: 0,
 };
 
 export const versionTimeTextCss: CSSObject = {
@@ -160,24 +194,36 @@ export const versionTimeTextCss: CSSObject = {
 };
 
 export const versionMetaTextCss: CSSObject = {
-  color: 'var(--gray-70)',
+  color: 'var(--base-secondary-text)',
   marginTop: '4px',
   margin: 0,
+  display: 'flex',
+  alignItems: 'center',
+  minWidth: 0,
 };
 
 export const versionOwnerSpanCss: CSSObject = {
+  flexShrink: 1,
+  minWidth: 0,
   marginRight: '8px',
+  overflow: 'hidden',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+};
+
+export const versionSizeSpanCss: CSSObject = {
+  flexShrink: 0,
 };
 
 // Action button styles
 export const versionActionsWrapperCss: CSSObject = {
-  display: 'flex',
+  display: 'none',
   gap: '8px',
   marginLeft: 'auto',
+  flexShrink: 0,
 };
 
 export const versionButtonCss: CSSObject = {
-  visibility: 'hidden',
   height: '32px',
   minHeight: 'auto',
   minWidth: 'auto',

@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {
   StorageService,
   DatabaseListenerCallback,
@@ -33,7 +33,8 @@ import {
   hasQuoteForMessage,
 } from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
+import {toError} from 'Util/toError';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
@@ -86,9 +87,9 @@ export class EventService {
       return records
         .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
         .sort(compareEventsById);
-    } catch (error) {
+    } catch (error: unknown) {
       const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
-        error.message
+        toError(error).message
       }`;
       this.logger.error(logMessage, error);
       throw error;
@@ -116,8 +117,8 @@ export class EventService {
       return records
         .filter(record => record.conversation === conversationId && !!record.ephemeral_expires)
         .sort(compareEventsById);
-    } catch (error) {
-      const logMessage = `Failed to get ephemeral events for conversation '${conversationId}': ${error.message}`;
+    } catch (error: unknown) {
+      const logMessage = `Failed to get ephemeral events for conversation '${conversationId}': ${toError(error).message}`;
       this.logger.error(logMessage, error);
       throw error;
     }
@@ -156,8 +157,8 @@ export class EventService {
         .filter(record => record.id === eventId && record.conversation === conversationId)
         .sort(compareEventsById)
         .shift();
-    } catch (error) {
-      const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${error.message}`;
+    } catch (error: unknown) {
+      const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${toError(error).message}`;
       this.logger.error(logMessage, error);
       throw error;
     }
@@ -251,8 +252,8 @@ export class EventService {
       return this.storageService.db
         ? await (events as Dexie.Collection<any, any>).reverse().sortBy('time')
         : (events as EventRecord[]).reverse().sort(compareEventsByTime);
-    } catch (error) {
-      const message = `Failed to load events for conversation '${conversationId}' from database: '${error.message}'`;
+    } catch (error: unknown) {
+      const message = `Failed to load events for conversation '${conversationId}' from database: '${toError(error).message}'`;
       this.logger.error(message);
       throw error;
     }
@@ -524,8 +525,8 @@ export class EventService {
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records;
-    } catch (error) {
-      const logMessage = `Failed to get events for conversation '${conversationId}': ${error.message}`;
+    } catch (error: unknown) {
+      const logMessage = `Failed to get events for conversation '${conversationId}': ${toError(error).message}`;
       this.logger.error(logMessage, error);
       throw error;
     }

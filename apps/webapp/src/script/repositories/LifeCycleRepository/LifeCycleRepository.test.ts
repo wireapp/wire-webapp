@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
-import {CacheRepository} from 'Repositories/cache/CacheRepository';
+import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
@@ -115,7 +115,10 @@ describe('LifeCycleRepository', () => {
   });
 
   afterEach(() => {
-    window.location = originalLocation;
+    Object.defineProperty(window, 'location', {
+      writable: true,
+      value: originalLocation,
+    });
     Object.defineProperty(window, 'navigator', {
       writable: true,
       value: originalNavigator,

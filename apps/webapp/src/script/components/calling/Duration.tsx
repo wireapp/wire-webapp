@@ -19,7 +19,7 @@
 
 import {useState, useEffect} from 'react';
 
-import {formatSeconds} from 'Util/TimeUtil';
+import {formatSeconds} from 'Util/timeUtil';
 
 interface DurationProps {
   startedAt?: number;

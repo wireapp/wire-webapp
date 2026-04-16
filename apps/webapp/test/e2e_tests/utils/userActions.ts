@@ -71,27 +71,6 @@ export const createGroup = async (pages: UserPages, conversationName: string, us
   await pages.groupCreation().clickCreateGroupButton();
 };
 
-export const createChannel = async (pages: UserPages, conversationName: string, user: User[]) => {
-  await pages.conversationList().clickCreateGroup();
-  await pages.groupCreation().setGroupName(conversationName);
-  await pages.groupCreation().clickNextButton();
-  // task: set params for testing
-  await pages.groupCreation().selectGroupMembers(...user.flatMap(user => user.username));
-  await pages.groupCreation().clickCreateGroupButton();
-};
-
-export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
-  const {modals} = pageManager.webapp;
-  const appLockModal = await modals.appLock();
-  if (await appLockModal.isVisible()) {
-    if (await appLockModal.lockPasscodeInput.isVisible()) {
-      await appLockModal.setPasscode(appLockPassCode);
-    } else {
-      await appLockModal.unlockAppWithPasscode(appLockPassCode);
-    }
-  }
-};
-
 /**
  * Opens the connections tab, searches for the given user and starts a conversation with him
  * Note: This util only works if both users are part of the same team.
@@ -116,6 +95,20 @@ export async function sendConnectionRequest(senderPageManager: PageManager, rece
   await modals.userProfile().clickConnectButton();
 }
 
+export const handleAppLockState = async (pageManager: PageManager, appLockPassCode: string) => {
+  const {modals} = pageManager.webapp;
+  const appLockModal = modals.appLock();
+
+  if (!(await appLockModal.isVisible())) return;
+
+  if (await appLockModal.lockPasscodeInput.isVisible()) {
+    await appLockModal.setPasscode(appLockPassCode);
+    return;
+  }
+
+  await appLockModal.unlockAppWithPasscode(appLockPassCode);
+};
+
 /**
  * @param testInfo is needed to create unique backup filename
  */
@@ -136,7 +129,7 @@ export async function createAndSaveBackup(
   await expect(modals.passwordAdvancedSecurity().modal).toBeHidden();
   await expect(pages.historyExport().exportSuccessHeadline).toBeVisible();
   const [download] = await Promise.all([
-    pages.historyExport().page.waitForEvent('download'),
+    pageManager.page.waitForEvent('download'),
     pages.historyExport().clickSaveFileButton(),
   ]);
   const safePrefix = filenamePrefix ?? '';

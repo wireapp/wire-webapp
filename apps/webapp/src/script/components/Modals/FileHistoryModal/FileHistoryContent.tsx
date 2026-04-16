@@ -47,6 +47,7 @@ export const FileHistoryContent = ({
                   key={version.versionId}
                   version={version}
                   isCurrentVersion={versionIndex === 0 && groupIndex === 0}
+                  showTimelineConnector={versionIndex < fileVersions[date].length - 1}
                   onDownload={handleDownload}
                   onRestore={handleRestore}
                 />

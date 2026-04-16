@@ -24,7 +24,7 @@ import {InitialConfigType} from '@lexical/react/LexicalComposer';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {EmojiNode} from './nodes/EmojiNode';
 import {MentionNode} from './nodes/MentionNode';

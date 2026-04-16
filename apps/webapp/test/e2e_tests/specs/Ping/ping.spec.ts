@@ -27,10 +27,10 @@ test.describe('Ping', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   const pingScenarios = [
@@ -88,7 +88,7 @@ test.describe('Ping', () => {
       const usersForBigGroup: User[] = [];
       for (let i = 0; i < 4; i++) {
         const newMember = await createUser();
-        await team.addMember(newMember);
+        await team.addTeamMember(newMember);
         usersForBigGroup.push(newMember);
       }
 

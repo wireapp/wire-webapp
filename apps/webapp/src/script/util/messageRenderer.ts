@@ -22,7 +22,7 @@ import MarkdownIt from 'markdown-it';
 import {escape} from 'underscore';
 
 import {highlightCode, languages} from './highlightCode';
-import {replaceInRange} from './StringUtil';
+import {replaceInRange} from './stringUtil';
 
 import type {MentionEntity} from '../message/MentionEntity';
 

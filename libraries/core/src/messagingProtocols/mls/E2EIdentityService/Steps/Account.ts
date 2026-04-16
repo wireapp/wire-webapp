@@ -17,7 +17,7 @@
  *
  */
 
-import {AcmeService} from '../Connection/AcmeServer';
+import {AcmeService} from '../Connection/AcmeServer/acmeService';
 import {AcmeDirectory, E2eiEnrollment, Nonce} from '../E2EIService.types';
 import {jsonToByteArray} from '../Helper';
 

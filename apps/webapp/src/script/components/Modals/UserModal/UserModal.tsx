@@ -19,6 +19,7 @@
 
 import {useContext, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
@@ -33,9 +34,9 @@ import {UserDetails} from 'Components/panel/UserDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {replaceLink, t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 
 import {useUserModalState} from './UserModal.state';
 import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
@@ -62,7 +63,7 @@ interface UserModalUserActionsSectionProps {
 
 const UserModalUserActionsSection = ({user, onAction, isSelfActivated, selfUser}: UserModalUserActionsSectionProps) => {
   const {isBlockedLegalHold} = useKoSubscribableChildren(user, ['isBlockedLegalHold']);
-  const mainViewModel = useContext(RootContext);
+  const rootContext = useContext(RootContext);
 
   if (isBlockedLegalHold) {
     const replaceLinkLegalHold = replaceLink(
@@ -80,14 +81,14 @@ const UserModalUserActionsSection = ({user, onAction, isSelfActivated, selfUser}
     );
   }
 
-  if (!mainViewModel) {
+  if (is.null_(rootContext)) {
     return null;
   }
 
   return (
     <UserActions
       user={user}
-      actionsViewModel={mainViewModel.actions}
+      actionsViewModel={rootContext.mainViewModel.actions}
       onAction={onAction}
       isSelfActivated={isSelfActivated}
       selfUser={selfUser}

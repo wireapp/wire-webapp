@@ -27,7 +27,7 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {ZoomInIcon, ZoomOutIcon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {buttonStyles, pageNumberStyles, wrapperStyles} from './PdfControls.styles';
 

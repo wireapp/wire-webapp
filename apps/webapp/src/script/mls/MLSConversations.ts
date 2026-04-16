@@ -30,7 +30,7 @@ import {
 } from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 const logger = getLogger('Webapp/MLSConversations');
 
@@ -117,7 +117,7 @@ export async function initMLSGroupConversation(
     });
 
     onSuccessfulJoin?.(mlsConversation);
-  } catch (error) {
+  } catch (error: unknown) {
     onError?.(mlsConversation, error);
   }
 }

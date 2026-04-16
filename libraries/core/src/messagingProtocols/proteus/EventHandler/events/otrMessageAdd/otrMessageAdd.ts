@@ -24,7 +24,7 @@ import {LogFactory} from '@wireapp/commons';
 import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 
 import {GenericMessageType} from '../../../../../conversation';
-import {DecryptionError} from '../../../../../errors/DecryptionError';
+import {DecryptionError} from '../../../../../errors/decryptionError';
 import {HandledEventPayload} from '../../../../../notification';
 import {ProteusService} from '../../../ProteusService';
 
@@ -63,7 +63,7 @@ export const handleOtrMessageAdd = async ({
       event,
       decryptedData: decodedData,
     };
-  } catch (error) {
+  } catch (error: unknown) {
     logger.warn('Failed to decrypt OTR message', {error});
     if (error instanceof DecryptionError) {
       return {event, decryptionError: error};

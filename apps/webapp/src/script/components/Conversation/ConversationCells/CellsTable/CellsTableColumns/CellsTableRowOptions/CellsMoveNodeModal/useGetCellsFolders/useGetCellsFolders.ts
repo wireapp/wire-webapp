@@ -22,7 +22,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
 import {transformNodesToCellsFolders} from './transformNodesToCellsFolders';
@@ -80,7 +80,7 @@ export const useGetCellsFolders = ({
 
       setFolders(filteredFolders);
       setStatus('success');
-    } catch (error) {
+    } catch (error: unknown) {
       setFolders([]);
       setStatus('error');
       throw error;

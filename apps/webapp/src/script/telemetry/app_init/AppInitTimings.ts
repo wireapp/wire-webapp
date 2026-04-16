@@ -17,8 +17,8 @@
  *
  */
 
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {Logger, getLogger} from 'Util/logger';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {AppInitTimingsStep} from './AppInitTimingsStep';
 

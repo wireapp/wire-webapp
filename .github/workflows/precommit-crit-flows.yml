@@ -2,18 +2,19 @@ name: precommit-crit-flows
 
 on:
   pull_request:
-    branches: [dev]
+    branches: [master, dev, release/*]
+    types: [opened, synchronize, reopened, ready_for_review]
+  merge_group:
+    branches: [master, dev, release/*]
 
-# One at a time lane for the shared precommit environment
+# Cancel superseded runs on the same PR; slot-level concurrency guards the shared EB environments
 concurrency:
-  group: precommit-deploy
-  cancel-in-progress: false # queue newer runs
+  group: precommit-pr-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    # Skip entire job for Dependabot PRs
-    if: ${{ github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-    runs-on: buildjet-8vcpu-ubuntu-2204
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
 
     outputs:
@@ -22,6 +23,7 @@ jobs:
       total_additions: ${{ steps.check_additions.outputs.total_additions }}
       commit_url: ${{ steps.meta.outputs.commit_url }}
       committer: ${{ steps.meta.outputs.committer }}
+      env_name: ${{ steps.slot.outputs.env_name }}
 
     env:
       BUILD_DIR: apps/server/dist/s3/
@@ -30,12 +32,20 @@ jobs:
       UNIT_TEST_REPORT_FILE: ./unit-tests.log
 
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v6
+      - name: Checkout (merge_group)
+        if: ${{ github.event_name == 'merge_group' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -44,10 +54,30 @@ jobs:
       - run: yarn nx run webapp:configure
       - run: yarn nx run server:package
 
+      - name: Compute target EB environment
+        id: slot
+        run: |
+          if [[ "${{ github.actor }}" == "renovate[bot]" ]]; then
+            # Renovate uses the dedicated precommit environment.
+            echo "env_name=wire-webapp-precommit" >> "$GITHUB_OUTPUT"
+          else
+            # Spread other PRs across 3 pre-created EB environments; merge queue uses run_id.
+            ID="${{ github.event.pull_request.number || github.run_id }}"
+            SLOT=$(( (ID % 3) + 1 ))
+            echo "env_name=wire-webapp-precommit-$SLOT" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Log target EB environment
+        env:
+          ENV_NAME: ${{ steps.slot.outputs.env_name }}
+        run: |
+          echo "Selected precommit environment: $ENV_NAME"
+          echo "Selected precommit URL: https://$ENV_NAME.zinfra.io/"
+
       - name: Derive PR commit metadata
         id: meta
         run: |
-          SHA="${{ github.event.pull_request.head.sha }}"
+          SHA="${{ github.event.pull_request.head.sha || github.sha }}"
           COMMIT_URL="https://github.com/${{ github.repository }}/commit/$SHA"
           AUTHOR="$(git show -s --format='%an' "$SHA" || true)"
           echo "COMMIT_URL=$COMMIT_URL" >> "$GITHUB_ENV"
@@ -55,12 +85,13 @@ jobs:
           echo "commit_url=$COMMIT_URL" >> "$GITHUB_OUTPUT"
           echo "committer=$AUTHOR" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: build-artifact
           path: ${{ env.BUILD_DIR }}${{ env.BUILD_ARTIFACT }}
 
       - name: Check total PR additions
+        if: ${{ github.event_name == 'pull_request' }}
         id: check_additions
         run: |
           total_additions=$(gh api -H "Accept: application/vnd.github.v3+json" \
@@ -72,70 +103,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy_to_aws:
-    name: Deploy to precommit
-    if: ${{ github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-    runs-on: ubuntu-latest
-    needs: [build]
-    timeout-minutes: 25
-
-    outputs:
-      precommit_url: ${{ steps.fetch_url.outputs.url }}
-
-    steps:
-      - uses: actions/download-artifact@v5
-        with:
-          name: build-artifact
-
-      - name: Deploy to precommit environment
-        id: deploy
-        uses: einaregilsson/beanstalk-deploy@27edd8a0ebe8656ac70654372c73f06f7e9a1027 # v22
-        with:
-          application_name: Webapp
-          aws_access_key: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          deployment_package: ${{ needs.build.outputs.build_artifact }}
-          environment_name: wire-webapp-precommit
-          region: eu-central-1
-          use_existing_version_if_available: true
-          version_description: ${{ needs.build.outputs.committer }} — ${{ needs.build.outputs.commit_url }}
-          version_label: ${{ github.run_id }}
-          wait_for_deployment: true # ✅ wait until EB is green
-
-      - name: Fetch precommit URL
-        id: fetch_url
-        run: |
-          URL=$(aws elasticbeanstalk describe-environments \
-            --region eu-central-1 \
-            --environment-names wire-webapp-precommit \
-            --query "Environments[0].CNAME" --output text)
-          echo "url=https://$URL" >> "$GITHUB_OUTPUT"
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-
-      - name: Deployment Status
-        if: ${{ always() }}
-        run: |
-          if [[ "${{ steps.deploy.outcome }}" == "success" ]]; then
-            echo "✅ Deployment completed successfully"
-          else
-            echo "❌ Deployment failed"; exit 1
-          fi
-
   # An extra step is needed to see if the e2e_tests folder was touched as part of the PR
   check_edits_to_e2e_tests:
     name: Check if the PR touches e2e tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     outputs:
-      tests_to_run: ${{ steps.check_e2e_tests.outputs.tests_to_run}}
+      tests_to_run: ${{ steps.check_e2e_tests.outputs.tests_to_run || steps.set_default_tests_for_merge_queue.outputs.tests_to_run }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
 
       - name: Check for e2e tests changes
+        if: ${{ github.event_name == 'pull_request' }}
         id: check_e2e_tests
         run: |
           git diff --exit-code origin/${{ github.base_ref }}...HEAD -- apps/webapp/test/e2e_tests/ || RESULT=$?
@@ -149,41 +130,70 @@ jobs:
             echo "E2E Tests have not been modified, executing critical flow tests only"
           fi
 
-  run_e2e_tests:
-    name: Playwright Critical Flow (precommit)
-    if: ${{ !cancelled() && github.repository == 'wireapp/wire-webapp' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
-    needs: [check_edits_to_e2e_tests, deploy_to_aws]
-    uses: ./.github/workflows/e2e-tests.yml
+      - name: Use critical flow tests on merge queue
+        if: ${{ github.event_name == 'merge_group' }}
+        id: set_default_tests_for_merge_queue
+        run: |
+          echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
+          echo "Merge queue run detected, executing critical flow tests"
+
+  deploy_and_run_e2e:
+    name: Deploy to precommit and run E2E
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
+    needs: [build, check_edits_to_e2e_tests]
+    uses: ./.github/workflows/precommit-slot-run.yml
     with:
-      webappUrl: https://wire-webapp-precommit.zinfra.io/
+      env_name: ${{ needs.build.outputs.env_name }}
       backendUrl: https://staging-nginz-https.zinfra.io/
       grep: ${{ needs.check_edits_to_e2e_tests.outputs.tests_to_run }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+      WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+
+  run_e2e_tests:
+    name: Playwright Critical Flow (precommit)
+    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
+    needs: [deploy_and_run_e2e]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Report Status
+        run: echo "E2E tests completed with status - ${{ needs.deploy_and_run_e2e.result }}"
 
   e2e-report:
     name: Generate test report
-    needs: run_e2e_tests
+    needs: deploy_and_run_e2e
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout (pull_request)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - uses: actions/setup-node@v6
+      - name: Checkout (merge_group)
+        if: ${{ github.event_name == 'merge_group' }}
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Download report
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
-          artifact-ids: ${{ needs.run_e2e_tests.outputs.reportArtifactId }}
+          artifact-ids: ${{ needs.deploy_and_run_e2e.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
 
       - name: Generate PR comment
-        if: always()
+        if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'renovate[bot]' }}
         id: generate_comment
         run: |
           echo "Checking for Playwright report..."
@@ -207,12 +217,12 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
-        if: always()
-        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405
+        if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'renovate[bot]' }}
+        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0
         with:
           header: playwright-summary
           message: |
-            🔗 [Download Full Report Artifact](${{ needs.run_e2e_tests.outputs.reportUrl }})
+            🔗 [Download Full Report Artifact](${{ needs.deploy_and_run_e2e.outputs.reportUrl }})
 
             ${{ steps.generate_comment.outputs.comment }}
         env:

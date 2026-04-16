@@ -25,7 +25,9 @@ import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
 import {getPermissionStates} from 'Repositories/permission/permissionHandlers';
 import {PermissionType} from 'Repositories/permission/PermissionType';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
+import {toError} from 'Util/toError';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 import {MEDIA_STREAM_ERROR} from './MediaStreamError';
@@ -60,12 +62,12 @@ export class MediaStreamHandler {
     }
   }
 
-  requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
+  async requestMediaStream(audio: boolean, video: boolean, screen: boolean, isGroup: boolean): Promise<MediaStream> {
     const hasPermission = this.hasPermissionToAccess(audio, video);
     try {
-      return this.getMediaStream(audio, video, screen, isGroup, hasPermission);
-    } catch (error) {
-      const isPermissionDenied = error.type === PermissionError.TYPE.DENIED;
+      return await this.getMediaStream(audio, video, screen, isGroup, hasPermission);
+    } catch (error: unknown) {
+      const isPermissionDenied = isErrorWithType(error) && error.type === PermissionError.TYPE.DENIED;
       throw isPermissionDenied
         ? new MediaError(MediaError.TYPE.MEDIA_STREAM_PERMISSION, MediaError.MESSAGE.MEDIA_STREAM_PERMISSION)
         : error;
@@ -82,8 +84,10 @@ export class MediaStreamHandler {
     return window.navigator.mediaDevices
       .getUserMedia({audio: true, video})
       .then((mediaStream: MediaStream) => mediaStream)
-      .catch((error: Error) => {
-        if (!isMediaStreamReadDeviceError(error.name)) {
+      .catch((error: unknown) => {
+        const mediaStreamError = toError(error);
+
+        if (!isMediaStreamReadDeviceError(mediaStreamError.name)) {
           throw error;
         }
         this.schedulePermissionHint(true, video, false);
@@ -182,9 +186,10 @@ export class MediaStreamHandler {
         this.clearPermissionRequestHint(audio, video, screen);
         return mediaStream;
       })
-      .catch((error: Error) => {
-        const message = error.message;
-        const name = error.name as MEDIA_STREAM_ERROR;
+      .catch((error: unknown) => {
+        const mediaStreamError = toError(error);
+        const message = mediaStreamError.message;
+        const name = mediaStreamError.name as MEDIA_STREAM_ERROR;
         this.logger.warn(
           `MediaStream request for (audio: ${audio}, video: ${video}, screen: ${screen}) failed: ${name} ${message}`,
           error,
@@ -203,7 +208,7 @@ export class MediaStreamHandler {
             MEDIA_STREAM_ERROR.NOT_FOUND_ERROR,
           ].includes(name)
         ) {
-          throw new NoAudioInputError(error);
+          throw new NoAudioInputError(mediaStreamError);
         }
 
         if (MEDIA_STREAM_ERROR_TYPES.DEVICE.includes(name)) {

@@ -20,23 +20,20 @@
 import {Page, Locator} from '@playwright/test';
 
 export class OptionsPage {
-  readonly checkboxSoundAlertsAll: Locator;
-  readonly checkboxSoundAlertsSome: Locator;
-  readonly checkboxSoundAlertsNone: Locator;
+  readonly soundAlertsRadioGroup: Locator;
+  readonly notificationsRadioGroup: Locator;
 
   constructor(page: Page) {
-    this.checkboxSoundAlertsAll = page.getByTestId('preferences-options-audio-all');
-    this.checkboxSoundAlertsSome = page.getByTestId('preferences-options-audio-some');
-    this.checkboxSoundAlertsNone = page.getByTestId('preferences-options-audio-none');
+    this.soundAlertsRadioGroup = page.getByRole('group', {name: 'Sound alerts'}).getByRole('radiogroup');
+    this.notificationsRadioGroup = page.getByRole('group', {name: 'Notifications'}).getByRole('radiogroup');
   }
 
-  async checkSoundAll() {
-    await this.checkboxSoundAlertsAll.check();
+  async setSoundAlerts(option: 'All' | 'Some' | 'None') {
+    await this.soundAlertsRadioGroup.locator('label', {hasText: option}).click();
   }
-  async checkSoundSome() {
-    await this.checkboxSoundAlertsSome.check();
-  }
-  async checkSoundNone() {
-    await this.checkboxSoundAlertsNone.check();
+
+  async setNotifications(option: 'Show sender and message' | 'Show sender' | 'Hide details' | 'Off') {
+    // Radio groups in Wire are not a11y compliant so we need to click them since checking doesn't work
+    await this.notificationsRadioGroup.locator('label', {hasText: new RegExp(`^${option}$`)}).click();
   }
 }

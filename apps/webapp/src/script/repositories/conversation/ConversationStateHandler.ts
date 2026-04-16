@@ -24,7 +24,8 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
+import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
 import {ACCESS_STATE} from './AccessState';
@@ -73,7 +74,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
             await this.conversationService.putConversationAccess(conversationId, accessModes, accessRole);
 
             conversationEntity.accessState(accessState);
-          } catch (e) {
+          } catch (e: unknown) {
             let messageString: string;
             const {featureName, ...featureInfo} = featureFromStateChange(prevAccessState, accessState);
 
@@ -96,8 +97,8 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     try {
       const response = await this.conversationService.getConversationCode(conversationEntity.id);
       return ConversationMapper.mapAccessCode(conversationEntity, response);
-    } catch (error) {
-      const isNotFound = error.code === HTTP_STATUS.NOT_FOUND;
+    } catch (error: unknown) {
+      const isNotFound = isErrorWithCode(error) && error.code === HTTP_STATUS.NOT_FOUND;
       if (!isNotFound) {
         this._showModal(t('modalConversationGuestOptionsGetCodeMessage'));
       }
@@ -111,7 +112,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
       if (accessCode) {
         ConversationMapper.mapAccessCode(conversationEntity, accessCode);
       }
-    } catch (e) {
+    } catch (e: unknown) {
       return this._showModal(t('modalConversationGuestOptionsRequestCodeMessage'));
     }
   }
@@ -120,7 +121,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     try {
       await this.conversationService.deleteConversationCode(conversationEntity.id);
       conversationEntity.accessCode(undefined);
-    } catch (e) {
+    } catch (e: unknown) {
       return this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage'));
     }
   }

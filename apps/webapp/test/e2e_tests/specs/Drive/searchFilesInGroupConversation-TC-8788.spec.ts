@@ -34,10 +34,10 @@ const conversationName = 'Cells Critical Conversation';
 const imageFilePath = getImageFilePath();
 const videoFilePath = getVideoFilePath();
 
-test.beforeEach(async ({createTeam}) => {
-  const team = await createTeam(teamName, {withMembers: 1});
+test.beforeEach(async ({createTeam, createUser}) => {
+  userB = await createUser();
+  const team = await createTeam(teamName, {users: [userB]});
   userA = team.owner;
-  userB = team.members[0];
 });
 
 test(
@@ -57,7 +57,7 @@ test(
     await test.step('Preconditions: Create group with drive enabled', async () => {
       await userAPages.conversationList().clickCreateGroup();
       // Files should be disabled by default
-      await expect(userAPages.groupCreation().filesCheckbox).toHaveAttribute('data-uie-value', 'unchecked');
+      await expect(userAPages.groupCreation().sharedDriveToggle).toHaveAttribute('data-uie-value', 'unchecked');
 
       await userAPages.groupCreation().enableFilesCheckbox();
       await userAPages.groupCreation().setGroupName(conversationName);

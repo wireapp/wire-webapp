@@ -33,7 +33,7 @@ import {EventService} from '../EventService';
 
 function buildQuotedMessageMiddleware() {
   const eventService = {
-    loadEvent: jest.fn(() => []),
+    loadEvent: jest.fn((): never[] => []),
     loadEventsReplyingToMessage: jest.fn(),
     loadReplacingEvent: jest.fn(),
     replaceEvent: jest.fn(),

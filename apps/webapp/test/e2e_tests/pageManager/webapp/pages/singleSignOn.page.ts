@@ -20,16 +20,14 @@
 import {Locator, Page} from '@playwright/test';
 
 export class SingleSignOnPage {
-  readonly page: Page;
-
   readonly ssoCodeEmailInput: Locator;
   readonly ssoSignInButton: Locator;
+  readonly header: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.ssoCodeEmailInput = page.locator('#sso-code-email');
     this.ssoSignInButton = page.locator('[data-uie-name="do-sso-sign-in"]');
+    this.header = page.locator('#sso-login-heading-text');
   }
 
   async enterEmailOnSSOPage(email: string) {

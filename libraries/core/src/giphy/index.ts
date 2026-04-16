@@ -17,4 +17,4 @@
  *
  */
 
-export * from './GiphyService';
+export * from './giphyService';

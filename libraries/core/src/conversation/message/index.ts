@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Message.types';
+export * from './message.types';

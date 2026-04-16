@@ -30,7 +30,7 @@ import type {User} from 'Repositories/entity/User';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/logger';
 
 import type {ConversationService} from './ConversationService';
 
@@ -87,7 +87,7 @@ export class ConversationRoleRepository {
       try {
         const response = await this.teamRepository.getTeamConversationRoles();
         this.teamRoles = response.conversation_roles;
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn('Could not load team conversation roles', error);
       }
     }

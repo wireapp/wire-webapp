@@ -23,15 +23,37 @@ import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
 import {Config} from '../Config';
 
+const wireClientHeaderName = 'Wire-Client';
+const wireClientVersionHeaderName = 'Wire-Client-Version';
+const wireClientIdentifier = 'Web';
+
+type RetryBackoffResettableHttpClient = {
+  readonly resetRetryBackoff: () => void;
+};
+
 @singleton()
 export class APIClient extends APIClientUnconfigured {
   constructor() {
-    super({
-      urls: {
-        name: Config.getConfig().ENVIRONMENT,
-        rest: Config.getConfig().BACKEND_REST,
-        ws: Config.getConfig().BACKEND_WS,
+    const webAppConfiguration = Config.getConfig();
+
+    const unconfiguredApiClientConfiguration = {
+      headers: {
+        [wireClientHeaderName]: wireClientIdentifier,
+        [wireClientVersionHeaderName]: webAppConfiguration.VERSION,
       },
-    });
+      urls: {
+        name: webAppConfiguration.ENVIRONMENT,
+        rest: webAppConfiguration.BACKEND_REST,
+        ws: webAppConfiguration.BACKEND_WS,
+      },
+    };
+
+    super(unconfiguredApiClientConfiguration);
+  }
+
+  public resetIncrementalRetryBackoff(): void {
+    const retryBackoffResettableHttpClient = this.transport.http as unknown as RetryBackoffResettableHttpClient;
+
+    retryBackoffResettableHttpClient.resetRetryBackoff();
   }
 }

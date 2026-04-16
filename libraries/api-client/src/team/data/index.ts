@@ -17,10 +17,10 @@
  *
  */
 
-export * from './TeamConversationCreateData';
-export * from './TeamConversationDeleteData';
-export * from './TeamMemberJoinData';
-export * from './TeamMemberLeaveData';
-export * from './TeamMemberUpdateData';
-export * from './TeamUpdateData';
-export * from './TeamFeatureConfigurationUpdateEventData';
+export * from './teamConversationCreateData';
+export * from './teamConversationDeleteData';
+export * from './teamMemberJoinData';
+export * from './teamMemberLeaveData';
+export * from './teamMemberUpdateData';
+export * from './teamUpdateData';
+export * from './teamFeatureConfigurationUpdateEventData';

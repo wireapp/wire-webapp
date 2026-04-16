@@ -18,18 +18,66 @@ concurrency:
 jobs:
   publish:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'publish-to-npm'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           # Pin to the exact merge commit to avoid publishing code from a newer dev head
           # if other PRs merge between trigger and job start
           ref: ${{ github.event.pull_request.merge_commit_sha }}
 
+      - name: Retarget release tags to squash merge commit
+        if: github.event_name == 'pull_request'
+        env:
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          echo "🔧 Retargeting release tags from PR head to merge commit"
+          echo "PR_HEAD_SHA=$PR_HEAD_SHA"
+          echo "MERGE_SHA=$MERGE_SHA"
+
+          git fetch --force --tags origin
+
+          # Tags are created on the PR branch commit. After squash-merge, that commit is no longer on dev,
+          # so we force-move those tags to the squash merge commit.
+          ALL_POINTS_AT="$(git tag --points-at "$PR_HEAD_SHA" || true)"
+          if [ -z "$ALL_POINTS_AT" ]; then
+            echo "❌ No git tags found pointing at PR head commit ($PR_HEAD_SHA)."
+            echo "This likely means the release workflow didn't create/push tags for this PR. Aborting publish."
+            exit 1
+          fi
+
+          # Only retarget tags matching the expected {lib}@{version} shape.
+          TAGS_TO_MOVE="$(printf '%s\n' "$ALL_POINTS_AT" | grep -E '^[A-Za-z0-9._-]+@[0-9]+\.[0-9]+\.[0-9]+([+-][0-9A-Za-z.-]+)?$' || true)"
+          if [ -z "$TAGS_TO_MOVE" ]; then
+            echo "❌ Tags pointing at PR head exist, but none match the {lib}@{version} pattern. Aborting publish."
+            echo "Tags found:"
+            printf '%s\n' "$ALL_POINTS_AT"
+            exit 1
+          fi
+
+          echo "📌 Tags to retarget:"
+          printf '%s\n' "$TAGS_TO_MOVE"
+
+          while IFS= read -r tag; do
+            [ -n "$tag" ] || continue
+
+            old_sha="$(git rev-parse "$tag^{commit}")"
+            git tag -f "$tag" "$MERGE_SHA"
+            new_sha="$(git rev-parse "$tag^{commit}")"
+
+            echo "🔁 $tag: $old_sha -> $new_sha"
+
+            # Force-push the updated tag ref.
+            git push origin -f "refs/tags/$tag"
+          done <<< "$TAGS_TO_MOVE"
+
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'

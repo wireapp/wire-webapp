@@ -26,7 +26,7 @@ import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {Call} from 'Repositories/calling/Call';
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ConversationType, UserType, PlatformType} from './attribute';
 import {EventName} from './EventName';

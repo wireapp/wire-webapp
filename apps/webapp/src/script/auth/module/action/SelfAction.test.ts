@@ -21,6 +21,7 @@ import type {Self} from '@wireapp/api-client/lib/self/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {SelfActionCreator} from './creator/';
+import {toError} from 'Util/toError';
 
 import {mockStoreFactory} from '../../util/test/mockStoreFactory';
 
@@ -126,6 +127,7 @@ describe('SelfAction', () => {
 
   it('handles failed password check', async () => {
     const error = {response: {status: HTTP_STATUS.BAD_REQUEST}} as unknown as Error;
+    const expectedError = toError(error);
     const mockedApiClient = {
       api: {self: {headPassword: () => Promise.reject(error)}},
     };
@@ -136,12 +138,12 @@ describe('SelfAction', () => {
     try {
       await store.dispatch(actionRoot.selfAction.doCheckPasswordState());
       fail();
-    } catch (backendError) {
+    } catch (backendError: unknown) {
       // TODO: Check for thrown error with jest error helpers (`await expect(Promise).rejects.toThrow()`)
       // eslint-disable-next-line jest/no-conditional-expect
       expect(store.getActions()).toEqual([
         SelfActionCreator.startSetPasswordState(),
-        SelfActionCreator.failedSetPasswordState(error),
+        SelfActionCreator.failedSetPasswordState(expectedError),
       ]);
     }
   });

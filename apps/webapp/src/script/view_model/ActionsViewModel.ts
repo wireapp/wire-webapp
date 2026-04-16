@@ -26,9 +26,9 @@ import {container} from 'tsyringe';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {ClientEntity} from 'Repositories/client';
-import type {ConnectionRepository} from 'Repositories/connection/ConnectionRepository';
+import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
@@ -39,8 +39,8 @@ import type {IntegrationRepository} from 'Repositories/integration/IntegrationRe
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {t} from 'Util/LocalizerUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
 
@@ -195,7 +195,7 @@ export class ActionsViewModel {
                   await this.selfRepository.deleteSelfUserClient(clientEntity.id, password);
                   removeCurrentModal();
                   resolve();
-                } catch (error) {
+                } catch (error: unknown) {
                   if (isBackendError(error)) {
                     const {updateErrorMessage} = usePrimaryModalState.getState();
                     if (
@@ -403,7 +403,7 @@ export class ActionsViewModel {
               try {
                 await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
                 resolve();
-              } catch (error) {
+              } catch (error: unknown) {
                 reject(error);
               }
             },

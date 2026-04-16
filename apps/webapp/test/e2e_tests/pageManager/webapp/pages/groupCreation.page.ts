@@ -20,30 +20,30 @@
 import {Page, Locator} from '@playwright/test';
 
 export class GroupCreationPage {
-  readonly page: Page;
-
   readonly groupCreationModal: Locator;
+  readonly searchPeopleList: Locator;
   readonly groupNameInput: Locator;
   readonly nextButton: Locator;
   readonly createGroupButton: Locator;
   readonly addMembersButton: Locator;
-  readonly filesCheckbox: Locator;
+  readonly sharedDriveToggle: Locator;
+  readonly guestsToggle: Locator;
 
   readonly searchPeopleInput: Locator;
   readonly searchPeopleResults: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.groupCreationModal = page.locator('#group-creation-modal');
     this.groupNameInput = page.locator('[data-uie-name="enter-group-name"]');
     this.nextButton = page.locator('[data-uie-name="go-next"]');
     this.createGroupButton = page.locator('[data-uie-name="do-create-group"]');
     this.addMembersButton = page.locator('[data-uie-name="do-create"]');
-    this.filesCheckbox = page.locator('[data-uie-name="do-toggle-cells"]');
+    this.sharedDriveToggle = page.getByRole('button', {name: 'Shared Drive', exact: true});
+    this.guestsToggle = page.getByRole('button', {name: 'Guests', exact: true});
 
     this.searchPeopleInput = page.getByRole('dialog').getByLabel('Search by name');
-    this.searchPeopleResults = page.getByRole('dialog').getByRole('list').getByRole('listitem');
+    this.searchPeopleList = page.getByRole('dialog').getByRole('list');
+    this.searchPeopleResults = this.searchPeopleList.getByRole('listitem');
   }
 
   async setGroupName(name: string) {
@@ -64,11 +64,11 @@ export class GroupCreationPage {
   }
 
   async enableFilesCheckbox() {
-    await this.filesCheckbox.click();
+    await this.sharedDriveToggle.click();
   }
 
   async isFilesCheckboxChecked() {
-    const value = await this.filesCheckbox.getAttribute('data-uie-value');
+    const value = await this.sharedDriveToggle.getAttribute('data-uie-value');
     return value === 'checked';
   }
 

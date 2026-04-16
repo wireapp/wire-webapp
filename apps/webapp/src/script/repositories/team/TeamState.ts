@@ -28,7 +28,7 @@ import {User} from 'Repositories/entity/User';
 import {ROLE, roleMap} from 'Repositories/user/UserPermission';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {sortUsersByPriority} from 'Util/StringUtil';
+import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {TeamEntity} from './TeamEntity';
 
@@ -38,6 +38,7 @@ export class TeamState {
   public readonly memberInviters: ko.Observable<Record<string, string>>;
   public readonly memberRoles: ko.Observable<Record<string, ROLE>>;
   public readonly supportsLegalHold: ko.Observable<boolean>;
+  public readonly hasWhitelistedServices: ko.Observable<boolean>;
   public readonly teamName: ko.PureComputed<string>;
   public readonly teamFeatures: ko.Observable<FeatureList | undefined>;
   public readonly classifiedDomains: ko.PureComputed<string[] | undefined>;
@@ -62,6 +63,7 @@ export class TeamState {
   readonly selfRole: ko.PureComputed<Role | undefined>;
   readonly isCellsEnabled: ko.PureComputed<boolean>;
   readonly isAuditLogEnabled: ko.PureComputed<boolean>;
+  readonly isAppsEnabled: ko.PureComputed<boolean>;
 
   constructor(private readonly userState = container.resolve(UserState)) {
     this.isTeam = ko.pureComputed(() => !!this.team()?.id);
@@ -84,6 +86,7 @@ export class TeamState {
     });
 
     this.supportsLegalHold = ko.observable(false);
+    this.hasWhitelistedServices = ko.observable(false);
 
     this.isFileSharingSendingEnabled = ko.pureComputed(() => {
       const status = this.teamFeatures()?.fileSharing?.status;
@@ -141,6 +144,10 @@ export class TeamState {
 
     this.isCellsEnabled = ko.pureComputed(() => {
       return this.teamFeatures()?.cells?.status === FEATURE_STATUS.ENABLED;
+    });
+
+    this.isAppsEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.apps?.status === FEATURE_STATUS.ENABLED;
     });
 
     this.isAuditLogEnabled = ko.pureComputed(() => {

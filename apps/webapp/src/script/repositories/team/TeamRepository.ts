@@ -25,10 +25,10 @@ import type {
   TeamFeatureConfigurationUpdateEvent,
   TeamMemberLeaveEvent,
 } from '@wireapp/api-client/lib/event';
-import {TEAM_EVENT} from '@wireapp/api-client/lib/event/TeamEvent';
+import {TEAM_EVENT} from '@wireapp/api-client/lib/event/teamEvent';
 import {FEATURE_KEY, FeatureList, CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
-import type {PermissionsData} from '@wireapp/api-client/lib/team/member/PermissionsData';
-import type {TeamData} from '@wireapp/api-client/lib/team/team/TeamData';
+import type {PermissionsData} from '@wireapp/api-client/lib/team/member/permissionsData';
+import type {TeamData} from '@wireapp/api-client/lib/team/team/teamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -38,7 +38,7 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
@@ -48,10 +48,10 @@ import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/use
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {Environment} from 'Util/Environment';
-import {replaceLink, t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {Environment} from 'Util/environment';
+import {replaceLink, t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {loadDataUrl} from 'Util/util';
 
 import {TeamEntity} from './TeamEntity';
@@ -218,7 +218,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
         updateRemoteConfigLogger.info('Updating team-settings');
         await this.getTeam();
         await this.updateFeatureConfig();
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(error);
       }
     };
@@ -282,8 +282,12 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
     const teamEntity = teamData ? this.teamMapper.mapTeamFromObject(teamData, this.teamState.team()) : new TeamEntity();
     this.teamState.team(teamEntity);
+
     if (teamId) {
       await this.getSelfMember(teamId);
+      this.teamState.hasWhitelistedServices(
+        (await this.teamService.getWhitelistedServices(teamId)).services.length > 0,
+      );
     }
     // doesn't need to be awaited because it publishes the account info over amplify.
     this.sendAccountInfo();
@@ -419,7 +423,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
           if (imageBlob) {
             imageDataUrl = await loadDataUrl(imageBlob);
           }
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.warn(`Account image could not be loaded`, error);
         }
       }

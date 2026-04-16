@@ -38,9 +38,9 @@ import {
   MultiPartContent,
   TextContent,
 } from '@wireapp/core/lib/conversation/content';
-import * as MessageBuilder from '@wireapp/core/lib/conversation/message/MessageBuilder';
-import {OtrMessage} from '@wireapp/core/lib/conversation/message/OtrMessage';
-import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/TextContentBuilder';
+import * as MessageBuilder from '@wireapp/core/lib/conversation/message/messageBuilder';
+import {OtrMessage} from '@wireapp/core/lib/conversation/message/otrMessage';
+import {TextContentBuilder} from '@wireapp/core/lib/conversation/message/textContentBuilder';
 import {isQualifiedUserClients} from '@wireapp/core/lib/util';
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -51,11 +51,11 @@ import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protoc
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/AssetMetaDataBuilder';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
-import {AudioType} from 'Repositories/audio/AudioType';
+import {buildMetadata, ImageMetadata, isAudio, isImage, isVideo} from 'Repositories/assets/assetMetaDataBuilder';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
+import {AudioType} from 'Repositories/audio/audioType';
 import {ClientState} from 'Repositories/client/ClientState';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {PROTO_MESSAGE_TYPE} from 'Repositories/cryptography/ProtoMessageType';
@@ -84,16 +84,16 @@ import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
-} from 'Util/LinkPreviewSender';
-import {Declension, joinNames, t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {isMarkdownText} from 'Util/MarkdownUtil';
+} from 'Util/linkPreviewSender';
+import {Declension, joinNames, t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {isMarkdownText} from 'Util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
-import {roundLogarithmic} from 'Util/NumberUtil';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {capitalizeFirstChar} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {roundLogarithmic} from 'Util/numberUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {capitalizeFirstChar} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
 import {loadUrlBlob, supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
@@ -622,7 +622,7 @@ export class MessageRepository {
 
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
       this.logger.info(`Finished to upload asset for conversation'${conversation.id} in ${uploadDuration}`);
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof RequestCancellationError) {
         return;
       }
@@ -671,7 +671,7 @@ export class MessageRepository {
       return this.eventService.updateEvent(messageEntity.primary_key, {
         fileData: file,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;
       }
@@ -750,7 +750,7 @@ export class MessageRepository {
       const message = MessageBuilder.buildFileMetaDataMessage({metaData: meta as FileMetaDataContent}, originalId);
       this.assetRepository.addToProcessQueue(message, conversation.id);
       return {message, metaData: meta as FileMetaDataContent};
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Error while building metadata for asset', JSON.stringify(error));
       const logMessage = `Couldn't render asset preview from metadata. Asset might be corrupt: ${
         (error as Error).message
@@ -1015,7 +1015,7 @@ export class MessageRepository {
         await handleSuccess(result);
       }
       return result;
-    } catch (error) {
+    } catch (error: unknown) {
       await this.updateMessageAsFailed(conversation, payload.messageId, error);
       return {id: payload.messageId, sentAt: new Date().toISOString(), state: SendAndInjectSendingState.FAILED};
     }
@@ -1066,7 +1066,7 @@ export class MessageRepository {
         amplify.publish(WebAppEvents.USER.CLIENTS_UPDATED, userId);
       }
       return await this.sendSessionReset(userId, clientId, conversation);
-    } catch (error) {
+    } catch (error: unknown) {
       const message = error instanceof Error ? error.message : error;
       const logMessage = `Failed to reset session for client '${clientId}' of user '${userId.id}': ${message}`;
       this.logger.warn(logMessage, error);
@@ -1239,8 +1239,8 @@ export class MessageRepository {
       if (!options.optimisticRemoval) {
         this.deleteMessageById(conversation, message.id);
       }
-    } catch (error) {
-      const isConversationNotFound = error.code === HTTP_STATUS.NOT_FOUND;
+    } catch (error: unknown) {
+      const isConversationNotFound = isErrorWithCode(error) && error.code === HTTP_STATUS.NOT_FOUND;
       if (isConversationNotFound) {
         this.logger.warn(`Conversation '${conversationId}' not found. Deleting message for self user only.`);
         this.deleteMessage(conversation, message);
@@ -1269,7 +1269,7 @@ export class MessageRepository {
 
       await this.sendToSelfConversations(payload);
       await this.deleteMessageById(conversation, message.id);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(
         `Failed to send delete message with id '${message.id}' for conversation '${conversation.id}'`,
         error,
@@ -1341,7 +1341,7 @@ export class MessageRepository {
       });
       const messageEntity = await this.getMessageInConversationById(conversation, message.id);
       await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
-    } catch (error) {
+    } catch (error: unknown) {
       message.waitingButtonId(undefined);
       return message.setButtonError(buttonId, t('buttonActionError'));
     }
@@ -1432,7 +1432,7 @@ export class MessageRepository {
       if ((EventTypeHandling.STORE as string[]).includes(messageEntity.type) || messageEntity.hasAssetImage()) {
         return await this.eventService.updateEvent(messageEntity.primary_key, changes);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;
       }
@@ -1453,7 +1453,7 @@ export class MessageRepository {
           : StatusType.FAILED;
       messageEntity.status(errorStatus);
       return this.eventService.updateEvent(messageEntity.primary_key, {status: errorStatus});
-    } catch (error) {
+    } catch (error: unknown) {
       if ((error as any).type !== ConversationError.TYPE.MESSAGE_NOT_FOUND) {
         throw error;
       }

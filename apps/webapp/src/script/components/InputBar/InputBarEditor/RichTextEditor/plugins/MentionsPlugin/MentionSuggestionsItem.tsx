@@ -26,8 +26,8 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/Icon';
 import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 type MentionSuggestionsItemProps = {
   isSelected: boolean;

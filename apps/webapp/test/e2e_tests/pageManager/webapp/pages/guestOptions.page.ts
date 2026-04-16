@@ -17,32 +17,62 @@
  *
  */
 
-import {Page, Locator} from '@playwright/test';
+import {Page} from '@playwright/test';
+import {GuestLinkPasswordModal} from '../modals/guestLinkPassword.modal';
+import {ConfirmModal} from '../modals/confirm.modal';
 
-export class GuestOptionsPage {
-  readonly page: Page;
+export const GuestOptionsPage = (page: Page) => {
+  const panel = page.getByRole('complementary').filter({has: page.getByRole('heading', {name: 'Guests'})});
+  const createPasswordModal = new GuestLinkPasswordModal(page);
 
-  readonly createLinkButton: Locator;
-  readonly inviteLink: Locator;
-  readonly copyLinkButton: Locator;
+  const backButton = panel.getByRole('button', {name: 'Go back'});
+  const passwordSecuredRadioButton = panel.getByRole('radiogroup').getByText('Password secured', {exact: true});
+  const notPasswordSecuredRadioButton = panel.getByRole('radiogroup').getByText('Not password secured', {exact: true});
+  const createLinkButton = panel.getByRole('button', {name: 'Create link'});
+  const revokeLinkButton = panel.getByRole('button', {name: 'Revoke link'});
+  const guestsToggle = panel.getByRole('button', {name: 'Allow Guests'});
 
-  constructor(page: Page) {
-    this.page = page;
+  const guestLink = panel.getByRole('button', {name: /https:\/\/.+\/conversation-join\//});
 
-    this.createLinkButton = page.locator('[data-uie-name="do-create-link"]');
-    this.inviteLink = page.locator('[data-uie-name="status-invite-link"]');
-    this.copyLinkButton = page.locator('[data-uie-name="do-copy-link"]');
-  }
+  const createLink = async (options?: {password?: string}) => {
+    if (options?.password) {
+      await passwordSecuredRadioButton.click();
+    } else {
+      await notPasswordSecuredRadioButton.click();
+    }
 
-  async clickCreateLinkButton() {
-    await this.createLinkButton.click();
-  }
+    await createLinkButton.click();
 
-  async getInviteLink() {
-    return this.inviteLink.textContent();
-  }
+    if (options?.password) {
+      await createPasswordModal.setPasswordInput.fill(options.password);
+      await createPasswordModal.confirmPasswordInput.fill(options.password);
+      await createPasswordModal.actionButton.click();
 
-  async clickCopyLinkButton() {
-    await this.copyLinkButton.click();
-  }
-}
+      // After the link was created a second modal to copy the password will open
+      await new ConfirmModal(page).actionButton.click();
+    }
+
+    return await guestLink.textContent();
+  };
+
+  const revokeLink = async () => {
+    await revokeLinkButton.click();
+    await new ConfirmModal(page).actionButton.click();
+  };
+
+  const toggleGuests = async () => {
+    await guestsToggle.click();
+    await new ConfirmModal(page).actionButton.click();
+  };
+
+  return {
+    backButton,
+    createLink,
+    revokeLink,
+    toggleGuests,
+    guestsToggle,
+    passwordSecuredRadioButton,
+    createLinkButton,
+    guestLink,
+  };
+};

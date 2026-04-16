@@ -20,7 +20,6 @@
 import {Locator, Page} from '@playwright/test';
 
 export abstract class BaseModal {
-  readonly page: Page;
   readonly modal: Locator;
   readonly modalTitle: Locator;
   readonly modalText: Locator;
@@ -28,7 +27,6 @@ export abstract class BaseModal {
   readonly cancelButton: Locator;
 
   constructor(page: Page, modalLocator: string) {
-    this.page = page;
     this.modal = page.getByTestId(modalLocator);
     this.modalTitle = this.modal.getByTestId('status-modal-title');
     this.modalText = this.modal.getByTestId('status-modal-text');

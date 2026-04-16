@@ -27,7 +27,7 @@ import {mountComponent} from '../util/test/TestUtil';
 import * as trackingUtil from '../util/trackingUtil';
 import * as urlUtil from '../util/urlUtil';
 
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
   setStrings: jest.fn(),
 }));
@@ -82,7 +82,7 @@ describe('Success', () => {
     const {getAllByText} = renderComponent(<Success />);
     const downloadButton = getAllByText('success.downloadButton')[0];
     fireEvent.click(downloadButton);
-    expect(window.location.replace).toHaveBeenCalledWith('https://get.wire.com');
+    expect(window.location.replace).toHaveBeenCalledWith('https://wire.com/app-download');
   });
 
   it('navigates to webapp url when open webapp button is clicked', () => {

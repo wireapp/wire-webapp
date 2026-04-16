@@ -17,7 +17,7 @@
  *
  */
 
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 import {BrowserPermissionStatus} from './BrowserPermissionStatus';
 import {permissionsStore} from './Permissions.store';
@@ -62,7 +62,7 @@ export const queryBrowserPermission = async (
     const permissionStatus = await navigator.permissions.query({name: permissionType as any});
     logger.debug(`Permission state for '${permissionType}' is '${permissionStatus.state}'`);
     return permissionStatus.state as BrowserPermissionStatus;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.debug(`Failed to query permission for '${permissionType}'`, error);
     return null;
   }
@@ -89,7 +89,7 @@ export const setupPermissionListener = async (
     };
 
     return permissionStatus;
-  } catch (error) {
+  } catch (error: unknown) {
     logger.debug(`Failed to setup permission listener for '${permissionType}'`, error);
     return null;
   }
@@ -118,7 +118,7 @@ export const initializePermissions = async (
       await setupPermissionListener(permissionType, newState => {
         setPermissionState(permissionType, newState);
       });
-    } catch (error) {
+    } catch (error: unknown) {
       logger.debug(`Failed to initialize permission '${permissionType}'`, error);
     }
   });

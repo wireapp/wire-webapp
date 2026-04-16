@@ -20,14 +20,11 @@
 import {Page, Locator} from '@playwright/test';
 
 export class RequestResetPasswordPage {
-  readonly page: Page;
-
   readonly emailInput: Locator;
   readonly resetPasswordButton: Locator;
   readonly goBackToLoginButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.emailInput = page.getByTestId('enter-email');
     this.resetPasswordButton = page.getByTestId('do-send-password-reset-email');
     this.goBackToLoginButton = page.getByTestId('do-go-back-to-login');

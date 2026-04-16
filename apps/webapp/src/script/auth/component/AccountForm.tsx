@@ -27,9 +27,9 @@ import {AnyAction, Dispatch} from 'redux';
 import {ValidationUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, Form, Input, Text} from '@wireapp/react-ui-kit';
 
-import {handleEnterDown} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {handleEnterDown} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {styles} from './AccountForm.styles';
 import {Exception} from './Exception';
@@ -146,7 +146,7 @@ const AccountFormComponent = ({
       }
 
       return onSubmit();
-    } catch (error) {
+    } catch (error: unknown) {
       const label = (error as BackendError)?.label;
       if (label) {
         switch (label) {

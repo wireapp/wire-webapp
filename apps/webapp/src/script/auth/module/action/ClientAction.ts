@@ -24,6 +24,7 @@ import {ClientInfo} from '@wireapp/core/lib/client/';
 import {Runtime} from '@wireapp/commons';
 
 import {getClientMLSConfig} from 'Repositories/client/clientMLSConfig';
+import {toError} from 'Util/toError';
 
 import {ClientActionCreator} from './creator/';
 
@@ -38,8 +39,8 @@ export class ClientAction {
         const clients = await apiClient.api.client.getClients();
         dispatch(ClientActionCreator.successfulGetAllClients(clients));
         return clients;
-      } catch (error) {
-        dispatch(ClientActionCreator.failedGetAllClients(error));
+      } catch (error: unknown) {
+        dispatch(ClientActionCreator.failedGetAllClients(toError(error)));
         throw error;
       }
     };
@@ -51,8 +52,8 @@ export class ClientAction {
       try {
         await apiClient.api.client.deleteClient(clientId, password);
         dispatch(ClientActionCreator.successfulRemoveClient(clientId));
-      } catch (error) {
-        dispatch(ClientActionCreator.failedRemoveClient(error));
+      } catch (error: unknown) {
+        dispatch(ClientActionCreator.failedRemoveClient(toError(error)));
         throw error;
       }
     };

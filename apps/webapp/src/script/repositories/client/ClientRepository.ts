@@ -34,10 +34,12 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/StorageKey';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {loadValue} from 'Util/StorageUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {loadValue} from 'Util/storageUtil';
+import {toError} from 'Util/toError';
+import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
 import {ClientEntity} from './ClientEntity';
 import {constructClientId, parseClientId} from './ClientIdUtil';
@@ -128,8 +130,8 @@ export class ClientRepository {
    * @returns Resolves with the retrieved client information
    */
   private getClientByIdFromBackend(clientId: string): Promise<RegisteredClient> {
-    return this.clientService.getClientById(clientId).catch(error => {
-      const status = error.response?.status;
+    return this.clientService.getClientById(clientId).catch((error: unknown) => {
+      const status = isAxiosError(error) ? error.response?.status : undefined;
       const clientNotFoundBackend = status === HTTP_STATUS.NOT_FOUND;
       if (clientNotFoundBackend) {
         this.logger.warn(`Local client no longer exists on the backend`, error);
@@ -254,10 +256,11 @@ export class ClientRepository {
       }
 
       return currentClient;
-    } catch (error) {
-      const clientNotValidated = error.type === ClientError.TYPE.NO_VALID_CLIENT;
+    } catch (error: unknown) {
+      const clientNotValidated = isErrorWithType(error) && error.type === ClientError.TYPE.NO_VALID_CLIENT;
       if (!clientNotValidated) {
-        this.logger.error(`Getting valid local client failed: ${error.code || error.message}`, error);
+        const errorMessage = isErrorWithCode(error) ? String(error.code) : toError(error).message;
+        this.logger.error(`Getting valid local client failed: ${errorMessage}`, error);
       }
 
       throw error;
@@ -496,8 +499,8 @@ export class ClientRepository {
         }
         return clientEntities;
       })
-      .catch(error => {
-        this.logger.error(`Unable to retrieve clients for user '${userId}': ${error.message}`, error);
+      .catch((error: unknown) => {
+        this.logger.error(`Unable to retrieve clients for user '${userId}': ${toError(error).message}`, error);
         throw error;
       });
   }

@@ -25,11 +25,11 @@ import {MessageSendingState} from '@wireapp/core/lib/conversation';
 import {Account} from '@wireapp/core';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
-import {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Button} from 'Repositories/entity/message/Button';

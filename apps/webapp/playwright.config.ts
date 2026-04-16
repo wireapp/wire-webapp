@@ -17,14 +17,14 @@
  *
  */
 
-import {defineConfig, devices, ReporterDescription} from '@playwright/test';
+import {defineConfig, devices} from '@playwright/test';
 import {config} from 'dotenv';
 import {resolve} from 'node:path';
 
 config({path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true});
 
-const numberOfRetriesOnCI = 1;
-const numberOfParallelWorkersOnCI = 1;
+const numberOfRetriesOnCI = 2;
+const numberOfParallelWorkersOnCI = 3;
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -50,7 +50,12 @@ module.exports = defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: {
+      mode: 'on-first-retry',
+      snapshots: false,
+      sources: false,
+      attachments: false,
+    },
     screenshot: 'only-on-failure',
     permissions: ['camera', 'microphone'],
     actionTimeout: 20_000, // 20 seconds
@@ -60,14 +65,11 @@ module.exports = defineConfig({
     timeout: 10_000, // 10 seconds
   },
   projects: [
-    /* Test against branded browsers. */
     {
-      name: 'Google Chrome',
+      name: 'Chromium',
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome',
-        headless: process.env.HEADLESS !== 'false',
-        permissions: ['notifications'],
+        permissions: ['notifications', 'clipboard-read', 'clipboard-write'],
         launchOptions: {
           args: [
             '--use-fake-device-for-media-stream', // Provide fake devices for audio & video device input
@@ -75,7 +77,7 @@ module.exports = defineConfig({
             '--mute-audio', // Mute all audio output from the test browser because e.g. the ringtone of a call can be annoying during testing
           ],
         },
-      }, // or 'chrome-beta'
+      },
     },
   ],
 });

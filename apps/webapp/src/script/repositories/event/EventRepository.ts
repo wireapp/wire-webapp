@@ -28,6 +28,7 @@ import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
+import {Runtime} from '@wireapp/commons';
 import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {PromiseQueue} from '@wireapp/promise-queue';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -36,8 +37,10 @@ import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/E
 import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
 import {EventName} from 'Repositories/tracking/EventName';
 import {UserState} from 'Repositories/user/UserState';
-import {getLogger, Logger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {toError} from 'Util/toError';
+import {isAxiosError} from 'Util/typePredicateUtil';
 
 import {ClientEvent} from './Client';
 import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
@@ -68,6 +71,7 @@ export class EventRepository {
   static get CONFIG() {
     return {
       E_CALL_EVENT_LIFETIME: TIME_IN_MILLIS.SECOND * 30,
+      HEARTBEAT_INTERVAL: TIME_IN_MILLIS.SECOND * 30,
       IGNORED_ERRORS: [
         CryptographyError.TYPE.IGNORED_ASSET,
         CryptographyError.TYPE.IGNORED_PREVIEW,
@@ -129,7 +133,7 @@ export class EventRepository {
   // WebSocket handling
   //##############################################################################
 
-  private readonly updateConnectivitityStatus = (state: ConnectionState) => {
+  private readonly updateConnectivityStatus = (state: ConnectionState) => {
     this.logger.log('Websocket connection state changed to', state);
     switch (state) {
       case ConnectionState.CONNECTING: {
@@ -145,6 +149,7 @@ export class EventRepository {
         return;
       }
       case ConnectionState.CLOSED: {
+        this.notificationHandlingState(NOTIFICATION_HANDLING_STATE.CLOSED);
         Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
         return;
       }
@@ -166,9 +171,9 @@ export class EventRepository {
     return this.eventQueue.push(async () => {
       try {
         await this.handleEvent(payload, source);
-      } catch (error) {
+      } catch (error: unknown) {
         if (source === EventSource.NOTIFICATION_STREAM) {
-          this.logger.warn(`Failed to handle event of type "${event.type}": ${error.message}`, error);
+          this.logger.warn(`Failed to handle event of type "${event.type}": ${toError(error).message}`, error);
         } else {
           throw error;
         }
@@ -202,38 +207,114 @@ export class EventRepository {
     dryRun = false,
   ): Promise<void> {
     await this.handleTimeDrift();
-    const connect = () => {
-      // We make sure there is only be a single active connection to the WebSocket.
-      this.disconnectWebSocket?.();
-      return new Promise<void>(async resolve => {
-        this.disconnectWebSocket = await account.listen({
+
+    const cleanupHandlers: Array<() => void> = [];
+    let actualDisconnect: () => void = () => {};
+    let connectionInProgress = false;
+
+    const connect = async () => {
+      if (connectionInProgress) {
+        this.logger.info('Connection attempt already in progress, skipping...');
+        return;
+      }
+
+      connectionInProgress = true;
+      actualDisconnect();
+      try {
+        actualDisconnect = await account.listen({
           useLegacy,
           onConnectionStateChanged: connectionState => {
-            this.updateConnectivitityStatus(connectionState);
-            if (connectionState === ConnectionState.LIVE) {
-              resolve();
-            }
+            this.updateConnectivityStatus(connectionState);
           },
           onEvent: this.handleIncomingEvent,
           onMissedNotifications: this.triggerMissedSystemEventMessageRendering,
           onNotificationStreamProgress: onNotificationStreamProgress,
           dryRun,
         });
-      });
+      } catch {
+        actualDisconnect = () => {};
+      } finally {
+        connectionInProgress = false;
+      }
     };
 
-    window.addEventListener('online', () => {
+    const handleOnline = () => {
+      if (!navigator.onLine) {
+        return;
+      }
+
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      connect();
-    });
+      void connect();
+    };
 
-    window.addEventListener('offline', () => {
+    const handleOffline = () => {
       this.logger.warn('Internet connection lost');
-      this.disconnectWebSocket();
+      actualDisconnect();
       Warnings.showWarning(Warnings.TYPE.NO_INTERNET);
+    };
+
+    if (Runtime.isElectron()) {
+      // In Electron, use window focus events instead of visibilitychange
+      const handleFocus = () => {
+        if (navigator.onLine) {
+          this.logger.info('Window focused, verifying connection...');
+          const currentState = this.notificationHandlingState();
+          if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
+            handleOnline();
+          }
+        }
+      };
+
+      window.addEventListener('focus', handleFocus);
+      cleanupHandlers.push(() => window.removeEventListener('focus', handleFocus));
+    } else {
+      // In browser, use visibilitychange
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible' && navigator.onLine) {
+          this.logger.info('Tab became visible, verifying connection...');
+          const currentState = this.notificationHandlingState();
+          if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
+            handleOnline();
+          }
+        }
+      };
+
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      cleanupHandlers.push(() => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      });
+    }
+
+    // Online/Offline handlers work for both environments
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    cleanupHandlers.push(() => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
     });
 
-    return connect();
+    // Heartbeat to check connection state every 30 seconds
+    const heartbeatInterval = window.setInterval(() => {
+      const currentState = this.notificationHandlingState();
+      if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED && navigator.onLine) {
+        this.logger.info('Heartbeat: Connection is closed and app is online, attempting reconnection...');
+        handleOnline();
+      }
+    }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
+
+    cleanupHandlers.push(() => {
+      window.clearInterval(heartbeatInterval);
+    });
+
+    // Connect first to get the actual disconnect function
+    await connect();
+
+    // Then override disconnect to include cleanup
+    this.disconnectWebSocket = () => {
+      cleanupHandlers.forEach(cleanup => cleanup());
+      actualDisconnect();
+    };
   }
 
   /**
@@ -244,13 +325,37 @@ export class EventRepository {
   //##############################################################################
   // Notification Stream handling
   //##############################################################################
+  private getServerTimeFromAxiosError(errorResponse: unknown): string | undefined {
+    if (!isAxiosError<{time?: string}>(errorResponse) || !errorResponse.response) {
+      return undefined;
+    }
+
+    if ('time' in errorResponse.response && typeof errorResponse.response.time === 'string') {
+      return errorResponse.response.time;
+    }
+
+    if (
+      'data' in errorResponse.response &&
+      errorResponse.response.data &&
+      typeof errorResponse.response.data === 'object' &&
+      'time' in errorResponse.response.data &&
+      typeof errorResponse.response.data.time === 'string'
+    ) {
+      return errorResponse.response.data.time;
+    }
+
+    return undefined;
+  }
+
   private async handleTimeDrift() {
     try {
       const time = await this.notificationService.getServerTime();
       this.serverTimeHandler.computeTimeOffset(time);
-    } catch (errorResponse) {
-      if (errorResponse.response?.time) {
-        this.serverTimeHandler.computeTimeOffset(errorResponse.response?.time);
+    } catch (errorResponse: unknown) {
+      const serverTime = this.getServerTimeFromAxiosError(errorResponse);
+
+      if (serverTime !== undefined) {
+        this.serverTimeHandler.computeTimeOffset(serverTime);
       }
     }
   }
@@ -450,7 +555,7 @@ export class EventRepository {
       for (const eventProcessMiddleware of this.eventProcessMiddlewares) {
         event = await eventProcessMiddleware.processEvent(event, source);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof EventValidationError) {
         this.logger.warn(`Event validation failed: ${error.message}`, error);
         return;

@@ -20,8 +20,8 @@
 import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, HistorySharingUnit} from '../../types';

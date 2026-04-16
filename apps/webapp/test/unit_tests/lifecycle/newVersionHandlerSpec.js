@@ -32,13 +32,13 @@ describe('newVersionHandler', () => {
       expect(window.setInterval).toHaveBeenCalled();
     });
 
-    it('polls the server every 3 hours', () => {
+    it('polls the server every 15 minutes', () => {
       jest.useFakeTimers();
       spyOn(window, 'fetch').and.returnValue(Promise.resolve(new Response()));
 
       startNewVersionPolling('', () => {});
 
-      jest.advanceTimersByTime(6 * 60 * 60 * 1000);
+      jest.advanceTimersByTime(30 * 60 * 1000);
 
       expect(window.fetch).toHaveBeenCalledTimes(2);
       jest.useRealTimers();
@@ -57,7 +57,7 @@ describe('newVersionHandler', () => {
 
       startNewVersionPolling(testData.currentVersion, testData.callback);
 
-      jest.advanceTimersByTime(4 * 60 * 60 * 1000);
+      jest.advanceTimersByTime(16 * 60 * 1000);
       jest.useRealTimers();
 
       setTimeout(() => {

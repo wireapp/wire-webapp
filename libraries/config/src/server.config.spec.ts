@@ -37,6 +37,7 @@ describe('Server Config', () => {
     NODE_ENV: 'production',
     PORT: '21080',
     ENFORCE_HTTPS: 'true',
+    ENABLE_CLIENT_VERSION_ENFORCEMENT: 'false',
     GOOGLE_WEBMASTER_ID: 'test-google-id',
     OPEN_GRAPH_DESCRIPTION: 'Wire secure messenger',
     OPEN_GRAPH_IMAGE_URL: 'https://wire.com/image.png',
@@ -65,13 +66,37 @@ describe('Server Config', () => {
       expect(config.ENVIRONMENT).toBe('production');
     });
 
-    it('should map URL parameters correctly', () => {
-      const config = generateConfig(mockParams, mockEnv);
+    it.each([
+      {
+        description: 'maps configured URL parameters',
+        params: mockParams,
+        expectedAppBase: 'https://app.wire.com',
+        expectedBackendRest: 'https://prod-nginz-https.wire.com',
+        expectedBackendWebSocket: 'wss://prod-nginz-ssl.wire.com',
+        expectedTlsEnabled: true,
+      },
+      {
+        description: 'defaults missing URL parameters to empty strings',
+        params: {
+          ...mockParams,
+          urls: {},
+        },
+        expectedAppBase: '',
+        expectedBackendRest: '',
+        expectedBackendWebSocket: '',
+        expectedTlsEnabled: false,
+      },
+    ])(
+      'should $description',
+      ({params, expectedAppBase, expectedBackendRest, expectedBackendWebSocket, expectedTlsEnabled}) => {
+        const config = generateConfig(params, mockEnv);
 
-      expect(config.APP_BASE).toBe('https://app.wire.com');
-      expect(config.BACKEND_REST).toBe('https://prod-nginz-https.wire.com');
-      expect(config.BACKEND_WS).toBe('wss://prod-nginz-ssl.wire.com');
-    });
+        expect(config.APP_BASE).toBe(expectedAppBase);
+        expect(config.BACKEND_REST).toBe(expectedBackendRest);
+        expect(config.BACKEND_WS).toBe(expectedBackendWebSocket);
+        expect(config.DEVELOPMENT_ENABLE_TLS).toBe(expectedTlsEnabled);
+      },
+    );
 
     it('should parse PORT correctly with default', () => {
       const config = generateConfig(mockParams, mockEnv);
@@ -164,6 +189,26 @@ describe('Server Config', () => {
       const envWithoutDynamicHostname = {...mockEnv, ENABLE_DYNAMIC_HOSTNAME: 'false'};
       const configFalse = generateConfig(mockParams, envWithoutDynamicHostname);
       expect(configFalse.ENABLE_DYNAMIC_HOSTNAME).toBe(false);
+    });
+
+    it('should handle ENABLE_CLIENT_VERSION_ENFORCEMENT flag', () => {
+      const envWithClientVersionEnforcement = {...mockEnv, ENABLE_CLIENT_VERSION_ENFORCEMENT: 'true'};
+      const config = generateConfig(mockParams, envWithClientVersionEnforcement);
+      expect(config.ENABLE_CLIENT_VERSION_ENFORCEMENT).toBe(true);
+
+      const envWithoutClientVersionEnforcement = {...mockEnv, ENABLE_CLIENT_VERSION_ENFORCEMENT: 'false'};
+      const configFalse = generateConfig(mockParams, envWithoutClientVersionEnforcement);
+      expect(configFalse.ENABLE_CLIENT_VERSION_ENFORCEMENT).toBe(false);
+
+      const envWithoutDefinedClientVersionEnforcement = {
+        ...mockEnv,
+        ENABLE_CLIENT_VERSION_ENFORCEMENT: undefined,
+      } as Env;
+      const configWithUndefinedClientVersionEnforcement = generateConfig(
+        mockParams,
+        envWithoutDefinedClientVersionEnforcement,
+      );
+      expect(configWithUndefinedClientVersionEnforcement.ENABLE_CLIENT_VERSION_ENFORCEMENT).toBe(false);
     });
 
     describe('Content Security Policy (CSP)', () => {

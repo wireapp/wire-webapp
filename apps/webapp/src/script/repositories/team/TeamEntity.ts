@@ -19,8 +19,8 @@
 
 import ko from 'knockout';
 
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {isValidAsset} from 'Util/ValidationUtil';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {isValidAsset} from 'Util/validationUtil';
 
 export class TeamEntity {
   creator?: string;
@@ -44,7 +44,7 @@ export class TeamEntity {
 
     try {
       hasIcon = !!this.icon && isValidAsset(this.icon);
-    } catch (error) {
+    } catch (error: unknown) {
       // ignore error
     }
 

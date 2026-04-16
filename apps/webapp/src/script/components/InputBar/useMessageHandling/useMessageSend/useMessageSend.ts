@@ -27,7 +27,7 @@ import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/us
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
@@ -39,7 +39,8 @@ import {ConversationError} from 'src/script/error/ConversationError';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {t} from 'Util/LocalizerUtil';
+import {isErrorWithType} from 'src/script/util/typePredicateUtil';
+import {t} from 'Util/localizerUtil';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';
 
@@ -119,11 +120,13 @@ export const useMessageSend = ({
       }
 
       if (editedMessage) {
-        messageRepository.sendMessageEdit(conversation, messageText, editedMessage, mentionEntities).catch(error => {
-          if (error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
-            throw error;
-          }
-        });
+        messageRepository
+          .sendMessageEdit(conversation, messageText, editedMessage, mentionEntities)
+          .catch((error: unknown) => {
+            if (!isErrorWithType(error) || error.type !== ConversationError.TYPE.NO_MESSAGE_CHANGES) {
+              throw error;
+            }
+          });
 
         cancelMessageReply();
       }

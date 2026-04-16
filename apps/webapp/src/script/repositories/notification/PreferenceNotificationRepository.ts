@@ -29,8 +29,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import type {User} from 'Repositories/entity/User';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {matchQualifiedIds} from 'Util/QualifiedId';
-import {loadValue, resetStoreValue, storeValue} from 'Util/StorageUtil';
+import {matchQualifiedIds} from 'Util/qualifiedId';
+import {loadValue, resetStoreValue, storeValue} from 'Util/storageUtil';
 
 export type ClientNotificationData = {
   domain?: string;

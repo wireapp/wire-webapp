@@ -5,7 +5,7 @@
     "paths": {
       "@wireapp/core/lib/*": ["libraries/core/src/*"],
       "@wireapp/core": ["libraries/core/src/index.ts"],
-      "@wireapp/api-client": ["libraries/api-client/src/APIClient.ts"]
+      "@wireapp/api-client": ["libraries/api-client/src/apiClient.ts"]
     }
   },
   "include": [

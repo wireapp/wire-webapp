@@ -17,7 +17,7 @@
  *
  */
 
-import {AssetType} from 'Repositories/assets/AssetType';
+import {AssetType} from 'Repositories/assets/assetType';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Asset} from 'Repositories/entity/message/Asset';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';

@@ -17,8 +17,8 @@
  *
  */
 
-export * from './UserGroup';
-export * from './UserGroupAPI';
-export * from './UserGroupCreateRequest';
-export * from './UserGroupSearchResult';
-export * from './UserGroupManagedBy';
+export * from './userGroup';
+export * from './userGroupApi';
+export * from './userGroupCreateRequest';
+export * from './userGroupSearchResult';
+export * from './userGroupManagedBy';

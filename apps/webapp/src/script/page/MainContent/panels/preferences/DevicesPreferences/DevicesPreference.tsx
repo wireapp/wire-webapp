@@ -29,8 +29,8 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {DetailedDevice} from './components/DetailedDevice';
 import {Device} from './components/Device';

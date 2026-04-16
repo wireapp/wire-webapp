@@ -24,18 +24,27 @@ import 'core-js/full/reflect';
 import {ClientType} from '@wireapp/api-client/lib/client/';
 
 import {createRoot} from 'react-dom/client';
+import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
 import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
-import {enableLogging} from 'Util/LoggerUtil';
-import {loadValue} from 'Util/StorageUtil';
+import {enableLogging} from 'Util/loggerUtil';
+import {loadValue} from 'Util/storageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
 
+import {createApplicationServices} from './createApplicationServices';
+
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
+import {createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
+import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
+import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
+import {APIClient} from '../service/APIClientSingleton';
+import {Core} from '../service/CoreSingleton';
+import {createAPIClient} from '../service/createAPIClient';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -63,7 +72,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     return doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
   }
 
+  const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
+  const applicationServices = createApplicationServices({
+    createWallClock,
+  });
+  const {isFeatureToggleEnabled} = startupFeatureToggles;
+  const {wallClock} = applicationServices;
+  const apiClient = createAPIClient();
+  const core = new Core(apiClient);
+  const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
+    apiClient,
+    visibilityState: () => {
+      return document.visibilityState;
+    },
+    isElectron: () => {
+      return Runtime.isElectron();
+    },
+    subscribeToApplicationSignal: (signalName, listener) => {
+      document.addEventListener(signalName, listener);
+    },
+    subscribeToRuntimeSignal: (signalName, listener) => {
+      globalThis.addEventListener(signalName, listener);
+    },
+    unsubscribeFromApplicationSignal: (signalName, listener) => {
+      document.removeEventListener(signalName, listener);
+    },
+    unsubscribeFromRuntimeSignal: (signalName, listener) => {
+      globalThis.removeEventListener(signalName, listener);
+    },
+  });
+
+  container.registerInstance(APIClient, apiClient);
+  container.registerInstance(Core, core);
+  globalThis.addEventListener('unload', cleanupIncrementalHttpRetryBackoffReset);
+
   createRoot(appContainer).render(
-    <AppContainer config={config} clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY} />,
+    <AppContainer
+      config={config}
+      clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
+      isFeatureToggleEnabled={isFeatureToggleEnabled}
+      wallClock={wallClock}
+    />,
   );
 });

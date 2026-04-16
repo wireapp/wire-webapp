@@ -21,7 +21,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import type {CellNode} from 'src/script/types/cellNode';
 
@@ -74,7 +74,7 @@ export const useCellPublicLink = ({
       setPublicLink(newLink);
       setLinkData(link);
       setStatus('success');
-    } catch (err) {
+    } catch (err: unknown) {
       setStatus('error');
       setPublicLink(undefined);
       createdLinkUuid.current = null;
@@ -105,7 +105,7 @@ export const useCellPublicLink = ({
       setLinkData(link);
       fetchedLinkId.current = linkId;
       setStatus('success');
-    } catch (err) {
+    } catch (err: unknown) {
       setStatus('error');
       setPublicLink(undefined);
     }
@@ -129,7 +129,7 @@ export const useCellPublicLink = ({
       await cellsRepository.deletePublicLink({uuid: linkUuid});
       setPublicLink(undefined);
       createdLinkUuid.current = null; // Clear after successful deletion
-    } catch (err) {
+    } catch (err: unknown) {
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
@@ -201,7 +201,7 @@ export const useCellPublicLink = ({
         }
 
         setStatus('success');
-      } catch (err) {
+      } catch (err: unknown) {
         setStatus('error');
         throw err;
       }

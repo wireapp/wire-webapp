@@ -17,10 +17,10 @@
  *
  */
 
-export * from './NewTeamData';
-export * from './TeamAPI';
-export * from './TeamChunkData';
-export * from './TeamData';
-export * from './TeamInfo';
-export * from './UpdateTeamData';
-export * from './TeamSizeData';
+export * from './newTeamData';
+export * from './teamApi';
+export * from './teamChunkData';
+export * from './teamData';
+export * from './teamInfo';
+export * from './updateTeamData';
+export * from './teamSizeData';

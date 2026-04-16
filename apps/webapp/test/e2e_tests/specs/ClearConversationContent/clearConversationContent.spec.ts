@@ -30,11 +30,15 @@ test.describe('Clear Conversation Content', () => {
   let userB: User;
   let userC: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 2});
+  test.beforeEach(async ({createTeam, createUser}, testInfo) => {
+    userB = await createUser();
+    userC = await createUser();
+    const team = await createTeam('Test Team', {
+      users: [userB, userC],
+      // Only one of the test cases requires conference calling to be enabled
+      features: {conferenceCalling: testInfo.tags.includes('@TC-156')},
+    });
     userA = team.owner;
-    userB = team.members[0];
-    userC = team.members[1];
   });
 
   [
@@ -102,21 +106,19 @@ test.describe('Clear Conversation Content', () => {
       `I want to ${type} content of 1:1 conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const [userAPageManager, userBPageManager] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-          PageManager.from(createPage(withLogin(userB))),
-        ]);
+        const userBPageManager = PageManager.from(await createPage(withLogin(userB)));
+        const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;
 
         // Step 1: Create a 1:1 conversation with User A and B
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
 
         // Step 2: Write messages in the conversation
         await userAPages.conversation().sendMessage('Message from User A');
 
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userBPages.conversation().sendMessage('Message from User B');
 
         await expect(userAPages.conversation().messages).toHaveCount(2);
@@ -151,25 +153,25 @@ test.describe('Clear Conversation Content', () => {
       `I want to see incoming picture, ping and call after I clear content of a ${conversationType} conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        test.skip(conversationType === 'group', 'Blocked [WPB-22442] - Group call feature requires Enterprise Account');
+        const [userBPage, userCPage] = await Promise.all([createPage(withLogin(userB)), createPage(withLogin(userC))]);
 
-        // Step 1: Create a group conversation with User A, B and C
-        const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))),
-          PageManager.from(createPage(withLogin(userB))),
-          PageManager.from(createPage(withLogin(userC))),
-        ]);
+        const userAPage = await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC));
+
+        const userAPageManager = PageManager.from(userAPage);
+        const userBPageManager = PageManager.from(userBPage);
+        const userCPageManager = PageManager.from(userCPage);
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;
         const userCPages = userCPageManager.webapp.pages;
 
+        // Step 1: Create a group conversation with User A, B and C
         const conversationName = conversationType === 'group' ? 'Group conversation' : userB.fullName;
 
         if (conversationType === 'group') {
           await createGroup(userAPages, conversationName, [userB, userC]);
         } else {
-          await userAPages.conversationList().openConversation(conversationName);
+          await userAPages.conversationList().openConversation(conversationName, {protocol: 'mls'});
         }
 
         // Step 2: Write messages in the conversation
@@ -218,22 +220,21 @@ test.describe('Clear Conversation Content', () => {
         await expect(userAPages.conversation().getPing()).toBeVisible();
 
         // 5.3 Pictures
-        const {page} = userBPages.conversation();
-        await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
+        await shareAssetHelper(getImageFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add picture'}));
 
         const messageWithImage = userAPages
           .conversation()
           .getMessage({sender: userB})
-          .filter({has: userAPages.conversation().page.getByRole('img')});
+          .filter({has: userAPage.getByRole('img')});
         await expect(messageWithImage).toBeVisible();
 
         // 5.4 Files
         await userAPages.conversationList().openConversation(conversationName);
-        await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
+        await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
         const messageWithFile = userAPages
           .conversation()
           .getMessage({sender: userB})
-          .filter({has: userAPages.conversation().page.locator('[data-uie-name="file-asset"]')});
+          .filter({has: userAPage.locator('[data-uie-name="file-asset"]')});
         await expect(messageWithFile).toBeVisible();
 
         // 5.5 Calls
@@ -253,10 +254,8 @@ test.describe('Clear Conversation Content', () => {
       `I want to clear the ${conversationType} conversation content from conversation details options`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const [userAPageManager, userBPageManager] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-          PageManager.from(createPage(withLogin(userB))),
-        ]);
+        const userBPageManager = PageManager.from(await createPage(withLogin(userB)));
+        const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;
@@ -272,10 +271,10 @@ test.describe('Clear Conversation Content', () => {
           await userBPages.conversation().sendMessage('Message from User B');
         } else {
           // Step 1: User A and B write in conversation
-          await userAPages.conversationList().openConversation(userB.fullName);
+          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
           await userAPages.conversation().sendMessage('Message from User A');
 
-          await userBPages.conversationList().openConversation(userA.fullName);
+          await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
           await userBPages.conversation().sendMessage('Message from User B');
         }
         await expect(userAPages.conversation().messages).toHaveCount(2);

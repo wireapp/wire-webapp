@@ -30,8 +30,8 @@ import {Call} from 'Repositories/calling/Call';
 import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {CallActions} from '../../../../view_model/CallingViewModel';
 
@@ -39,7 +39,6 @@ interface CallingControlsProps {
   answerCall: () => void;
   call: Call;
   callActions: CallActions;
-  call1To1StartedAlert: string;
   isDetachedWindow: boolean;
   isFullUi?: boolean;
   isMuted?: boolean;
@@ -61,7 +60,6 @@ export const CallingControls = ({
   answerCall,
   call,
   callActions,
-  call1To1StartedAlert,
   isFullUi,
   isMuted,
   isConnecting,
@@ -176,8 +174,8 @@ export const CallingControls = ({
               className="call-ui__button call-ui__button--red call-ui__button--large"
               onClick={() => (isIncoming ? callActions.reject(call) : callActions.leave(call))}
               onBlur={() => clearShowAlert()}
-              title={!isGroup && showAlert ? call1To1StartedAlert : t('videoCallOverlayHangUp')}
-              aria-label={!isGroup && showAlert ? call1To1StartedAlert : t('videoCallOverlayHangUp')}
+              title={t('videoCallOverlayHangUp')}
+              aria-label={t('videoCallOverlayHangUp')}
               type="button"
               data-uie-name="do-call-controls-call-decline"
             >

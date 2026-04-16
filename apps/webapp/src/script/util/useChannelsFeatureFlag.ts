@@ -22,7 +22,7 @@ import {container} from 'tsyringe';
 
 import {Config} from 'src/script/Config';
 import {TeamState} from 'src/script/repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Core} from '../service/CoreSingleton';
 

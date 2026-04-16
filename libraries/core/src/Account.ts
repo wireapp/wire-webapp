@@ -37,9 +37,9 @@ import {
   ConsumableNotification,
   ConsumableNotificationEvent,
   ConsumableNotificationSynchronization,
-} from '@wireapp/api-client/lib/notification/ConsumableNotification';
+} from '@wireapp/api-client/lib/notification/consumableNotification';
 import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
-import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/ReconnectingWebsocket';
+import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
@@ -58,7 +58,7 @@ import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
 import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
-import {SubconversationService} from './conversation/SubconversationService/SubconversationService';
+import {SubconversationService} from './conversation/subconversationService/subconversationService';
 import {GiphyService} from './giphy/';
 import {LinkPreviewService} from './linkPreview';
 import {CoreCryptoConfig} from './messagingProtocols/common.types';
@@ -78,21 +78,21 @@ import {
   getProposalQueueLength,
   pauseProposalProcessing,
   resumeProposalProcessing,
-} from './messagingProtocols/mls/EventHandler/events/messageAdd/IncomingProposalsQueue';
+} from './messagingProtocols/mls/EventHandler/events/messageAdd/incomingProposalsQueue';
 import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
-import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/CryptoClient';
-import {wipeCoreCryptoDb} from './messagingProtocols/proteus/ProteusService/CryptoClient/CoreCryptoWrapper';
+import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/cryptoClient';
+import {wipeCoreCryptoDb} from './messagingProtocols/proteus/ProteusService/cryptoClient/coreCryptoWrapper';
 import {deleteIdentity} from './messagingProtocols/proteus/ProteusService/identityClearer';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
 import {SelfService} from './self/';
-import {CoreDatabase, deleteDB, openDB} from './storage/CoreDB';
+import {CoreDatabase, deleteDB, openDB} from './storage/coreDb';
 import {TeamService} from './team/';
 import {UserService} from './user/';
-import {LocalStorageStore} from './util/LocalStorageStore';
-import {RecurringTaskScheduler} from './util/RecurringTaskScheduler';
+import {LocalStorageStore} from './util/localStorageStore';
+import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
 
 export type ProcessedEventPayload = HandledEventPayload;
 
@@ -225,7 +225,7 @@ export class Account extends TypedEventEmitter<Events> {
       if (cookie && this.storeEngine) {
         try {
           await this.persistCookie(this.storeEngine, cookie);
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.error('Failed to save cookie:', error);
         }
       }
@@ -447,7 +447,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
 
     if (this.options.coreCryptoConfig?.enabled) {
-      const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/CryptoClient/CoreCryptoWrapper');
+      const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/cryptoClient/coreCryptoWrapper');
       const client = await buildClient(
         storeEngine,
         {
@@ -460,7 +460,7 @@ export class Account extends TypedEventEmitter<Events> {
       return [CryptoClientType.CORE_CRYPTO, client] as const;
     }
 
-    const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/CryptoClient/CryptoboxWrapper');
+    const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/cryptoClient/cryptoboxWrapper');
     const client = buildClient(storeEngine, baseConfig);
     return [CryptoClientType.CRYPTOBOX, client] as const;
   };
@@ -585,7 +585,7 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly wipeCommonData = async (): Promise<void> => {
     try {
       await this.service?.client.deleteLocalClient();
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to delete local client during logout cleanup:', error);
     }
 
@@ -593,14 +593,14 @@ export class Account extends TypedEventEmitter<Events> {
       if (this.storeEngine) {
         await wipeCoreCryptoDb(this.storeEngine);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to wipe crypto database during logout cleanup:', error);
     }
 
     try {
       // needs to be wiped last
       await this.encryptedDb?.wipe();
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to delete encrypted database during logout cleanup:', error);
     }
   };
@@ -613,7 +613,7 @@ export class Account extends TypedEventEmitter<Events> {
       if (this.storeEngine) {
         await deleteIdentity(this.storeEngine, false);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to delete identity during logout cleanup:', error);
     }
 
@@ -621,7 +621,7 @@ export class Account extends TypedEventEmitter<Events> {
       if (this.db) {
         await deleteDB(this.db);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to delete database during logout cleanup:', error);
     }
 
@@ -637,7 +637,7 @@ export class Account extends TypedEventEmitter<Events> {
       if (this.storeEngine) {
         await deleteIdentity(this.storeEngine, true);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to delete identity during logout cleanup:', error);
     }
 
@@ -860,7 +860,10 @@ export class Account extends TypedEventEmitter<Events> {
         .push(async () => {
           try {
             const start = Date.now();
-            const notificationTime = this.getNotificationEventTime(notification.payload[0]);
+            const firstNotificationPayload = notification.payload[0];
+            const notificationTime = firstNotificationPayload
+              ? this.getNotificationEventTime(firstNotificationPayload)
+              : null;
             this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`);
             this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
@@ -875,7 +878,7 @@ export class Account extends TypedEventEmitter<Events> {
             }
 
             this.logger.info(`Finished processing legacy notification "${notification.id}" in ${Date.now() - start}ms`);
-          } catch (error) {
+          } catch (error: unknown) {
             this.logger.error(
               `Failed to handle legacy notification "${notification.id}": ${(error as any).message}`,
               error,
@@ -909,7 +912,7 @@ export class Account extends TypedEventEmitter<Events> {
         this.notificationProcessingQueue
           .push(() => this.decryptAckEmitNotification(notification, handleEvent, source, onNotificationStreamProgress))
           .catch(this.handleNotificationQueueError);
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(`Failed to handle notification "${notification.type}": ${(error as any).message}`, error);
       }
     };
@@ -971,7 +974,8 @@ export class Account extends TypedEventEmitter<Events> {
       this.logger.info(`Sending consumable notification for decryption`, notification.data.event.id);
       const payloads = this.service!.notification.handleNotification(notification.data.event, source);
 
-      const notificationTime = this.getNotificationEventTime(notification.data.event.payload[0]);
+      const firstEventPayload = notification.data.event.payload[0];
+      const notificationTime = firstEventPayload ? this.getNotificationEventTime(firstEventPayload) : null;
       if (this.connectionState !== ConnectionState.LIVE && notificationTime) {
         onNotificationStreamProgress(notificationTime);
       }
@@ -982,7 +986,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       this.logger.info(`Acknowledging consumable notification on the backend "${notification.data.delivery_tag}"`);
       this.apiClient.transport.ws.acknowledgeNotification(notification);
-    } catch (err) {
+    } catch (err: unknown) {
       this.logger.error(`Failed to process notification ${notification.data.delivery_tag}`, err);
     }
   };

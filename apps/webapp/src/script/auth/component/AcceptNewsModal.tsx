@@ -23,7 +23,7 @@ import {FormattedMessage} from 'react-intl';
 
 import {Button, COLOR, Column, Columns, Container, H3, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../Config';
 

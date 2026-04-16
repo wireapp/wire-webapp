@@ -21,7 +21,7 @@ import {UIEvent} from 'react';
 
 import {css, SerializedStyles} from '@emotion/react';
 
-import {handleKeyDown, KEY} from 'Util/KeyboardUtil';
+import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 interface DeviceToggleButtonProps {
   currentDevice: string;
   devices: string[];

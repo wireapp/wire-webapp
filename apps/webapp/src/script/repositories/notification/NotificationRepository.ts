@@ -27,13 +27,13 @@ import {Runtime} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {AudioRepository} from 'Repositories/audio/AudioRepository';
-import {AudioType} from 'Repositories/audio/AudioType';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {AudioRepository} from 'Repositories/audio/audioRepository';
+import {AudioType} from 'Repositories/audio/audioType';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
-import type {ConnectionEntity} from 'Repositories/connection/ConnectionEntity';
+import type {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -52,12 +52,12 @@ import {getPermissionState, setPermissionState} from 'Repositories/permission/pe
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {UserState} from 'Repositories/user/UserState';
-import {Declension, t, getUserName} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
+import {Declension, t, getUserName} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
-import {truncate} from 'Util/StringUtil';
-import {formatDuration, TIME_IN_MILLIS} from 'Util/TimeUtil';
-import {ValidationUtilError} from 'Util/ValidationUtil';
+import {truncate} from 'Util/stringUtil';
+import {formatDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
+import {ValidationUtilError} from 'Util/validationUtil';
 
 import {AppPermissionState} from './AppPermissionState';
 
@@ -584,7 +584,7 @@ export class NotificationRepository {
     if (canShowUserImage) {
       try {
         return await this.assetRepository.getObjectUrl(userEntity.previewPictureResource());
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof ValidationUtilError) {
           this.logger.error(`Failed to validate an asset URL: ${error.message}`);
         }

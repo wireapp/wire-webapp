@@ -17,5 +17,5 @@
  *
  */
 
-export * from './FederationDeleteData';
-export * from './FederationConnectionRemovedData';
+export * from './federationDeleteData';
+export * from './federationConnectionRemovedData';

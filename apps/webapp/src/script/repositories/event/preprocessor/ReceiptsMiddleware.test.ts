@@ -28,7 +28,7 @@ import {ClientEvent} from '../Client';
 
 function buildReadReceiptMiddleware() {
   const selfUser = new User(createUuid());
-  const eventService = {loadEvents: jest.fn(() => []), replaceEvent: jest.fn()} as any;
+  const eventService = {loadEvents: jest.fn((): never[] => []), replaceEvent: jest.fn()} as any;
 
   return [new ReceiptsMiddleware(eventService, {} as any, selfUser), {eventService, selfUser}] as const;
 }

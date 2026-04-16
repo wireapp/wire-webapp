@@ -22,7 +22,7 @@ import {useState, useRef, useEffect} from 'react';
 import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
 import {ConversationFilter, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   dropdown,
@@ -64,12 +64,12 @@ export const ConversationFilterButton = () => {
   }
 
   const filterOptions = [
-    {value: ConversationFilter.NONE, label: t('conversationFilterNone')},
-    {value: ConversationFilter.UNREAD, label: t('conversationFilterUnread')},
-    {value: ConversationFilter.MENTIONS, label: t('conversationFilterMentions')},
-    {value: ConversationFilter.REPLIES, label: t('conversationFilterReplies')},
-    {value: ConversationFilter.DRAFTS, label: t('conversationFilterDrafts')},
-    {value: ConversationFilter.PINGS, label: t('conversationFilterPings')},
+    {value: ConversationFilter.NONE, label: t('conversationViewAllConversations')},
+    {value: ConversationFilter.UNREAD, label: t('searchUnreadConversations')},
+    {value: ConversationFilter.MENTIONS, label: t('searchMentionsConversations')},
+    {value: ConversationFilter.REPLIES, label: t('searchRepliesConversations')},
+    {value: ConversationFilter.DRAFTS, label: t('searchDraftsConversations')},
+    {value: ConversationFilter.PINGS, label: t('searchPingsConversations')},
   ];
 
   const handleFilterSelect = (filter: ConversationFilter) => {
@@ -85,7 +85,7 @@ export const ConversationFilterButton = () => {
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         data-uie-name="conversation-filter-button"
-        title={t('conversationFilterTooltip')}
+        title={t('tabsFilterTooltip')}
         css={filterButton(isFilterActive)}
         type="button"
       >

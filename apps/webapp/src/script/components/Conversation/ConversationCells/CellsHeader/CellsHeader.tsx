@@ -23,8 +23,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {t} from 'Util/localizerUtil';
 
 import {actionsStyles, contentStyles, searchInputStyles, wrapperStyles} from './CellsHeader.styles';
 import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';

@@ -21,7 +21,7 @@ import {toBufferSource} from '../../../../util/bufferUtils';
 import {AcmeService} from '../Connection';
 import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../E2EIService.types';
 import {jsonToByteArray} from '../Helper';
-import {EnrollmentFlowData} from '../Storage/E2EIStorage.schema';
+import {EnrollmentFlowData} from '../Storage/e2eiStorage.schema';
 
 interface GetAuthorizationParams {
   nonce: Nonce;
@@ -43,6 +43,11 @@ export const getAuthorizationChallenges = async ({
     const response = await connection.getAuthorization(authzUrl, reqBody);
     // The backend returns a list of challenges (to be inline with the protocol), but in our case we are only ever going to have a single element in the list
     const backendChallenge = response.data.challenges[0];
+
+    if (backendChallenge === undefined) {
+      throw new Error('missing backend challenge');
+    }
+
     const challenge = await identity.newAuthzResponse(jsonToByteArray(response.data));
     challenges.push({type: backendChallenge.type, challenge});
     nonce = response.nonce;

@@ -26,6 +26,7 @@ window.z = {userPermission: {}};
 
 window.URL.createObjectURL = jest.fn();
 window.URL.revokeObjectURL = jest.fn();
+window.scrollTo = jest.fn();
 
 Object.defineProperty(document, 'elementFromPoint', {
   writable: true,

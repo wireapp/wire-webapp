@@ -21,7 +21,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Logger, getLogger} from 'Util/Logger';
+import {Logger, getLogger} from 'Util/logger';
 
 import {AppInitStatisticsValue} from './AppInitStatisticsValue';
 

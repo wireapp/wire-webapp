@@ -45,6 +45,12 @@ jest.mock('@wireapp/react-ui-kit', () => ({
   useMatchMedia: jest.fn(),
 }));
 
+jest.mock('Components/calling/useCallAlertState', () => ({
+  useCallAlertState: () => ({
+    showStartedCallAlert: jest.fn(),
+  }),
+}));
+
 const mockedUiKit = uiKit as jest.Mocked<typeof uiKit>;
 
 jest.spyOn(Runtime, 'isSupportingConferenceCalling').mockReturnValue(true);

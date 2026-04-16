@@ -17,12 +17,12 @@
  *
  */
 
-import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/ConversationJoinData';
+import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/conversationJoinData';
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
-import {isError} from 'underscore';
 
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {toError} from 'Util/toError';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {ConversationActionCreator} from './creator/';
 
@@ -35,10 +35,8 @@ export class ConversationAction {
       try {
         await apiClient.api.conversation.postConversationCodeCheck({code, key, uri});
         dispatch(ConversationActionCreator.successfulConversationCodeCheck());
-      } catch (error) {
-        if (isError(error)) {
-          dispatch(ConversationActionCreator.failedConversationCodeCheck(error));
-        }
+      } catch (error: unknown) {
+        dispatch(ConversationActionCreator.failedConversationCodeCheck(toError(error)));
         throw error;
       }
     };
@@ -56,7 +54,7 @@ export class ConversationAction {
         const conversationEvent = await apiClient.api.conversation.postJoinByCode({code, key, uri, password});
         dispatch(ConversationActionCreator.successfulJoinConversationByCode(conversationEvent));
         return conversationEvent;
-      } catch (error) {
+      } catch (error: unknown) {
         /*
           Backend does return a password-invalid error even though we have not submitted any password
           expected: passsword-required.
@@ -71,7 +69,7 @@ export class ConversationAction {
           );
           throw error;
         }
-        dispatch(ConversationActionCreator.failedJoinConversationByCode(error));
+        dispatch(ConversationActionCreator.failedJoinConversationByCode(toError(error)));
         throw error;
       }
     };
@@ -84,7 +82,7 @@ export class ConversationAction {
         const conversationInfo = await apiClient.api.conversation.getJoinByCode({code, key});
         dispatch(ConversationActionCreator.successfulConversationCodeGetInfo(conversationInfo));
         return conversationInfo;
-      } catch (error) {
+      } catch (error: unknown) {
         if (isBackendError(error)) {
           dispatch(ConversationActionCreator.failedConversationCodeGetInfo(error));
           return undefined;

@@ -21,11 +21,11 @@ import {useState} from 'react';
 
 import {Accept, FileRejection, useDropzone} from 'react-dropzone';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
 import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
@@ -74,7 +74,7 @@ export const useFilesUploadDropzone = ({
     accept,
     onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
-        error => {
+        (error: unknown) => {
           logger.error('Processing incoming files failed', error);
         },
       );
@@ -128,7 +128,7 @@ export const useFilesUploadDropzone = ({
 
     try {
       await attatchMetadataToFiles(transformedAcceptedFiles);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Attaching file metadata failed', error);
     }
 
@@ -168,7 +168,7 @@ export const useFilesUploadDropzone = ({
         fileId: file.id,
         data: {remoteUuid: uuid, remoteVersionId: versionId, uploadStatus: 'success'},
       });
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error && error.name === 'AbortError') {
         return;
       }
@@ -202,7 +202,7 @@ export const useFilesUploadDropzone = ({
             fileId: file.id,
             data: {...metadata},
           });
-        } catch (error) {
+        } catch (error: unknown) {
           logger.warn('Building file metadata failed', error);
         }
       }),

@@ -70,14 +70,21 @@ export class ValidationError extends Error {
   };
 
   static getErrorKeyByValue = (errorValue: string): string => {
-    return Object.entries(ValidationError.ERROR).find(([key, value]) => value === errorValue)[0];
+    const matchingErrorEntry = Object.entries(ValidationError.ERROR).find(([, value]) => {
+      return value === errorValue;
+    });
+
+    if (matchingErrorEntry === undefined) {
+      throw new Error(`Unknown validation error value: ${errorValue}`);
+    }
+
+    return matchingErrorEntry[0];
   };
 
   static mapErrorsToField = (fieldName: string): ErrorTypes => {
-    return Object.entries(ValidationError.ERROR).reduce(
-      (errors, [key, value]) => ({...errors, [key]: `${fieldName}-${value}`}),
-      ValidationError.ERROR,
-    );
+    return Object.entries(ValidationError.ERROR).reduce((errors, [key, value]) => {
+      return {...errors, [key]: `${fieldName}-${value}`};
+    }, ValidationError.ERROR);
   };
 
   static FIELD = {
@@ -91,6 +98,14 @@ export class ValidationError extends Error {
   };
 
   static getFieldByName = (fieldName: string): ErrorTypes => {
-    return Object.entries(ValidationError.FIELD).find(([key, value]) => value.name === fieldName)[1];
+    const matchingFieldEntry = Object.entries(ValidationError.FIELD).find(([, value]) => {
+      return value.name === fieldName;
+    });
+
+    if (matchingFieldEntry === undefined) {
+      throw new Error(`Unknown validation field: ${fieldName}`);
+    }
+
+    return matchingFieldEntry[1];
   };
 }

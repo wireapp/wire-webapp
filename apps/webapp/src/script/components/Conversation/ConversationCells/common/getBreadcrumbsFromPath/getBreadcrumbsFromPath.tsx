@@ -19,7 +19,7 @@
 
 import {TrashIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {RECYCLE_BIN_PATH} from '../recycleBin/recycleBin';
 

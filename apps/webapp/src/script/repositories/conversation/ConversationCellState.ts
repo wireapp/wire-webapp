@@ -17,15 +17,15 @@
  *
  */
 
-import {AssetTransferState} from 'Repositories/assets/AssetTransferState';
+import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import type {Text} from 'Repositories/entity/message/Text';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
-import {matchQualifiedIds} from 'Util/QualifiedId';
+import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 

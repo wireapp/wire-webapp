@@ -17,37 +17,29 @@
  *
  */
 
-import {removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 import {createAndSaveBackup, createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
-import {getUser} from '../../data/user';
-import {test, expect} from '../../test.fixtures';
+import {User} from '../../data/user';
+import {test, expect, withLogin, withConnectedUser, LOGIN_TIMEOUT} from '../../test.fixtures';
+import {PageManager} from 'test/e2e_tests/pageManager';
 
-// Generating test data
-const userA = getUser();
-const userB = getUser();
 const groupName = 'Critical Group';
 const personalMessage = 'Hello, this is a personal message!';
 const groupMessage = 'This is a group message!';
 let backupName: string;
 let passwordProtectedBackupName: string;
 
-test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({pageManager, api}, testInfo) => {
+let userA: User;
+let userB: User;
+test.beforeEach(async ({createTeam, createUser}) => {
+  userB = await createUser();
+  const team = await createTeam('Test Team', {users: [userB]});
+  userA = team.owner;
+});
+
+test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({createPage}, testInfo) => {
+  const pageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
   const {pages, modals, components} = pageManager.webapp;
-
-  // Creating preconditions for the test via API
-  await test.step('Preconditions: Creating preconditions for the test via API', async () => {
-    await api.createPersonalUser(userA);
-    await api.createPersonalUser(userB);
-    await api.connectUsers(userA, userB);
-  });
-
-  // Test steps
-  await test.step('User logs in', async () => {
-    await pageManager.openMainPage();
-    await loginUser(userA, pageManager);
-    await modals.dataShareConsent().clickDecline();
-  });
 
   await test.step('User generates data', async () => {
     await pages.conversationList().openConversation(userB.fullName);
@@ -77,9 +69,10 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   await test.step('User logs back in', async () => {
     await loginUser(userA, pageManager);
     await pages.historyInfo().clickConfirmButton();
+    await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   });
 
-  await test.step('User doesnt see previous data (messages)', async () => {
+  await test.step("User doesn't see previous data (messages)", async () => {
     await pages.conversationList().openConversation(userB.fullName);
     await expect(pages.conversation().getMessage({content: personalMessage})).not.toBeVisible();
 
@@ -97,6 +90,7 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().backupFileInput.setInputFiles(passwordProtectedBackupName);
     await expect(modals.passwordAdvancedSecurity().modalTitle).toBeVisible();
+
     await modals.passwordAdvancedSecurity().enterPassword(userA.password);
     await modals.passwordAdvancedSecurity().clickAction();
     await expect(modals.passwordAdvancedSecurity().modalTitle).not.toBeVisible();
@@ -111,9 +105,4 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
     await pages.conversationList().openConversation(userB.fullName);
     await expect(pages.conversation().getMessage({content: personalMessage})).toBeVisible();
   });
-});
-
-test.afterAll(async ({api}) => {
-  await removeCreatedUser(api, userA);
-  await removeCreatedUser(api, userB);
 });

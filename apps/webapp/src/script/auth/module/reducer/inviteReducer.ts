@@ -22,7 +22,7 @@ import type {TeamInvitation} from '@wireapp/api-client/lib/team/';
 import {INVITATION_ACTION, InvitationActions} from '../action/creator/';
 
 export interface InvitationState {
-  error: Error;
+  error: Error | null;
   fetching: boolean;
   invites: TeamInvitation[];
 }

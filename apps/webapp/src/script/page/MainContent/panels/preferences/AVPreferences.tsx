@@ -28,7 +28,7 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';
 import {CallOptions} from './avPreferences/CallOptions';
@@ -68,7 +68,12 @@ const AVPreferencesComponent = ({propertiesRepository, callingRepository, device
           hasActiveCall={callingRepository.hasActiveCall()}
         />
       )}
-      {areMediaDevicesInitialized && deviceSupport.audiooutput && <AudioOutPreferences />}
+      {areMediaDevicesInitialized && deviceSupport.audiooutput && (
+        <AudioOutPreferences
+          refreshCallOutputSpeaker={() => callingRepository.refreshAudioOutput()}
+          hasActiveCall={callingRepository.hasActiveCall()}
+        />
+      )}
       {areMediaDevicesInitialized && deviceSupport.videoinput && (
         <CameraPreferences
           key={`camera-${shouldReloadCamera}`} // Force remount when call ends

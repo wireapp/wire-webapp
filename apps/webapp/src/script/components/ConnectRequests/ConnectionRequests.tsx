@@ -19,6 +19,7 @@
 
 import {useContext, useEffect, useRef} from 'react';
 
+import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
@@ -32,8 +33,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {RootContext} from '../../page/RootProvider';
 
@@ -49,7 +50,7 @@ export const ConnectRequests = ({
   const connectRequestsRefEnd = useRef<HTMLDivElement | null>(null);
   const temporaryConnectRequestsCount = useRef<number>(0);
 
-  const mainViewModel = useContext(RootContext);
+  const rootContext = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests: unsortedConnectionRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const connectionRequests = unsortedConnectionRequests.sort((user1, user2) => {
@@ -88,11 +89,11 @@ export const ConnectRequests = ({
     scrollToBottom();
   }, []);
 
-  if (!mainViewModel) {
+  if (is.null_(rootContext)) {
     return null;
   }
 
-  const actionsViewModel = mainViewModel.actions;
+  const actionsViewModel = rootContext.mainViewModel.actions;
 
   const onIgnoreClick = (userEntity: User): void => {
     actionsViewModel.ignoreConnectionRequest(userEntity);

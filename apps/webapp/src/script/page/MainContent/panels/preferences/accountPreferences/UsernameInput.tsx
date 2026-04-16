@@ -23,7 +23,8 @@ import cx from 'classnames';
 
 import {validateHandle} from 'Repositories/user/UserHandleGenerator';
 import {UserRepository} from 'Repositories/user/UserRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
 
@@ -65,8 +66,8 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
             setErrorState(UserNameState.AVAILABLE);
           }
         })
-        .catch(error => {
-          const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
+        .catch((error: unknown) => {
+          const isUsernameTaken = isErrorWithType(error) && error.type === UserError.TYPE.USERNAME_TAKEN;
           const isCurrentRequest = requestedName === enteredUsername;
           if (isUsernameTaken && isCurrentRequest) {
             setErrorState(UserNameState.TAKEN);
@@ -100,7 +101,7 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
         setErrorState(null);
         usernameInputDone.done();
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof UserError) {
         const isUsernameTaken = error.type === UserError.TYPE.USERNAME_TAKEN;
         const isCurrentRequest = requestedName === submittedName;

@@ -47,7 +47,7 @@ export async function generateSecretKey({
     let key;
     try {
       key = await secretsDb.getSecretValue(keyId);
-    } catch (error) {
+    } catch (error: unknown) {
       await secretsDb.deleteSecretValue(keyId);
       throw new CorruptedKeyError('Could not decrypt key');
     }
@@ -70,7 +70,7 @@ export async function generateSecretKey({
       freshlyGenerated = true;
     }
     return {key, deleteKey: () => secretsDb.deleteSecretValue(keyId), freshlyGenerated};
-  } catch (error) {
+  } catch (error: unknown) {
     throw error;
   }
 }

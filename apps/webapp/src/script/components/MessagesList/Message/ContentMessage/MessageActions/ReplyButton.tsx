@@ -20,7 +20,7 @@
 import {FC} from 'react';
 
 import * as Icon from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
 import {reactionImgSize} from './MessageReactions/EmojiChar.styles';

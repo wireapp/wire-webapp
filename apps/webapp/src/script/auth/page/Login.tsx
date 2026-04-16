@@ -54,9 +54,9 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import {LogoFullIcon} from 'Components/Icon';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
-import {isBackendError} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
+import {isBackendError} from 'Util/typePredicateUtil';
 
 import {EntropyContainer} from './EntropyContainer';
 import {separator} from './Login.styles';
@@ -186,10 +186,10 @@ const LoginComponent = ({
     if (keyAndCodeExistent) {
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
-      doCheckConversationCode(queryConversationKey, queryConversationCode).catch(error => {
+      doCheckConversationCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         logger.warn('Invalid conversation code', error);
       });
-      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch(error => {
+      doGetConversationInfoByCode(queryConversationKey, queryConversationCode).catch((error: unknown) => {
         logger.warn('Failed to fetch conversation info', error);
       });
     }
@@ -219,7 +219,7 @@ const LoginComponent = ({
         return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
       return navigate(ROUTE.HISTORY_INFO);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.error('Unable to login immediately', error);
       setShowEntropyForm(false);
     }
@@ -252,7 +252,7 @@ const LoginComponent = ({
       if (hasKeyAndCode) {
         try {
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
-        } catch (error) {
+        } catch (error: unknown) {
           if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD) {
             await resetAuthError();
             setConversationSubmitData(formLoginData);
@@ -277,7 +277,7 @@ const LoginComponent = ({
       }
 
       return navigate(ROUTE.HISTORY_INFO);
-    } catch (error) {
+    } catch (error: unknown) {
       if (isBackendError(error)) {
         switch (error.label) {
           case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
@@ -342,7 +342,7 @@ const LoginComponent = ({
       if (email) {
         await doSendTwoFactorCode(email);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       setTwoFactorSubmitError(
         new BackendError('', SyntheticErrorLabel.TOO_MANY_REQUESTS, StatusCodes.TOO_MANY_REQUESTS),
       );

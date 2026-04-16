@@ -30,7 +30,7 @@ export function getStorage(): Storage | undefined {
      * (note: Some version of Firefox do not throw an error but, instead, return a null object, we also need to account for that scenario)
      */
     return window.localStorage;
-  } catch (error) {
+  } catch (error: unknown) {
     return undefined;
   }
 }

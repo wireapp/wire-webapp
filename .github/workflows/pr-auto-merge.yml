@@ -5,34 +5,23 @@ permissions:
   pull-requests: write
   contents: write
 
-# This job will enable auto merge on dependabots and otto-the-bot's PRs
+# This job will enable auto merge on otto-the-bot's PRs
 jobs:
   activate-auto-merge:
-    runs-on: ubuntu-latest
-    if: ${{github.actor == 'dependabot[bot]' || github.actor == 'otto-the-bot'}}
+    runs-on: ubuntu-24.04
+    if: ${{github.actor == 'otto-the-bot'}}
     steps:
-      - name: Fetch Dependabot metadata
-        if: ${{github.actor == 'dependabot[bot]'}}
-        id: dependabot-metadata
-        uses: dependabot/fetch-metadata@v2.5.0
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-
       - name: Approve PR
-        if: ${{ github.actor == 'otto-the-bot' || (github.actor == 'dependabot[bot]' && (steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major')) }}
+        if: ${{ github.actor == 'otto-the-bot' }}
         run: gh pr review --approve "$PR_URL"
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           PR_URL: ${{github.event.pull_request.html_url}}
 
       - name: Enable auto-merge
-        if: ${{github.actor == 'otto-the-bot' || (github.actor == 'dependabot[bot]' && steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major') || (github.event.pull_request.labels && contains(github.event.pull_request.labels.*.name, 'publish-to-npm')) }}
+        if: ${{github.actor == 'otto-the-bot' || (github.event.pull_request.labels && contains(github.event.pull_request.labels.*.name, 'publish-to-npm')) }}
         run: |
-          if [[ "${{ github.event.pull_request.labels }}" == *publish-to-npm* ]]; then
-            gh pr merge --auto --merge "$PR_URL"
-          else
-            gh pr merge --auto --squash "$PR_URL"
-          fi
+          gh pr merge --auto --squash "$PR_URL"
         env:
           GITHUB_TOKEN: ${{secrets.OTTO_THE_BOT_GH_TOKEN}}
           PR_URL: ${{github.event.pull_request.html_url}}

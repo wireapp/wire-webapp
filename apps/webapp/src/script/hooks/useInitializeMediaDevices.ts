@@ -21,7 +21,7 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 const logger = getLogger('useInitializeMediaDevices');
 
@@ -37,7 +37,7 @@ export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, s
       }
       await devicesHandler?.initializeMediaDevices();
       setAreMediaDevicesInitialized(true);
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn(`Initialization of media devices failed:`, error);
       setAreMediaDevicesInitialized(false);
     }

@@ -23,8 +23,8 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
 import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {E2eEncryptionMessage} from '../E2eEncryptionMessage/E2eEncryptionMessage';
 

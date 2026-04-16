@@ -34,8 +34,8 @@ import {
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {Logger, getLogger} from 'Util/Logger';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {Logger, getLogger} from 'Util/logger';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
@@ -171,7 +171,7 @@ export class SelfRepository extends TypedEventEmitter<Events> {
       await this.selfService.putSupportedProtocols(supportedProtocols);
       await this.userRepository.updateUserSupportedProtocols(this.selfUser.qualifiedId, supportedProtocols);
       this.emit('selfSupportedProtocolsUpdated', supportedProtocols);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to update self supported protocols: ', error);
     }
   }

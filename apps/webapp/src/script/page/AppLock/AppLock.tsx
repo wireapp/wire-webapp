@@ -35,8 +35,8 @@ import {AppLockRepository} from 'Repositories/user/AppLockRepository';
 import {AppLockState} from 'Repositories/user/AppLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {applockStyles} from './Applock.styles';
 

@@ -20,12 +20,12 @@
 import {ChangeEvent, FormEvent} from 'react';
 import {act, renderHook} from '@testing-library/react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellsRenameForm} from './useCellsRenameNodeForm';
 
-jest.mock('Util/LocalizerUtil', () => ({
+jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
 }));
 

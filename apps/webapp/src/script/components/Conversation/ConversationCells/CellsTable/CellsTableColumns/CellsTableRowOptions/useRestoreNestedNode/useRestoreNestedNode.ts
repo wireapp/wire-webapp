@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
 interface UseRestoreNestedNodeProps {
@@ -43,7 +43,7 @@ export const useRestoreNestedNode = ({
       try {
         removeNode({conversationId: conversationQualifiedId.id, nodeId: node.id});
         await cellsRepository.restoreNode({uuid: node.id});
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(error);
         onError();
       }

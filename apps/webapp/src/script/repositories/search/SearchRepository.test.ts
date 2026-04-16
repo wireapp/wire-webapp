@@ -30,7 +30,7 @@ import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
 
 function buildSearchRepository() {
-  const userRepository = {getUsersById: jest.fn(() => [])} as unknown as jest.Mocked<UserRepository>;
+  const userRepository = {getUsersById: jest.fn((): User[] => [])} as unknown as jest.Mocked<UserRepository>;
   const core = {backendFeatures: {isFederated: false}} as unknown as jest.Mocked<Core>;
   const apiClient = {api: {user: {getSearchContacts: jest.fn()}}} as unknown as jest.Mocked<APIClient>;
   const searchRepository = new SearchRepository(userRepository, core, apiClient);

@@ -20,7 +20,7 @@
 import {useState} from 'react';
 
 import {FileCard} from 'Components/FileCard/FileCard';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {hollowWrapperButtonStyles} from '../../MultipartAssets.styles';
 import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';

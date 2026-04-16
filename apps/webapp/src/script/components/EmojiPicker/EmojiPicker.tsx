@@ -17,32 +17,30 @@
  *
  */
 
-import {useState, useEffect, useRef, RefObject} from 'react';
+import {useState, useEffect, useRef} from 'react';
+import type {FunctionComponent, RefObject} from 'react';
 
-import EmojiPickerReact, {EmojiClickData, EmojiStyle, SkinTones} from 'emoji-picker-react';
 import {createPortal} from 'react-dom';
 
+import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {isEnterKey, isEscapeKey} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
 
-interface EmojiPickerProps {
-  posX: number;
-  posY: number;
-  onKeyPress: () => void;
-  resetActionMenuStates: () => void;
-  wrapperRef: RefObject<HTMLDivElement>;
-  handleReactionClick: (emoji: string) => void;
+import {EmojiPickerAdapter, SkinTones} from './EmojiPickerAdapter';
+import type {EmojiPickerSelection} from './EmojiPickerAdapter';
+
+interface EmojiPickerProperties {
+  readonly posX: number;
+  readonly posY: number;
+  readonly onKeyPress: () => void;
+  readonly resetActionMenuStates: () => void;
+  readonly wrapperRef: RefObject<HTMLDivElement>;
+  readonly handleReactionClick: (emoji: string) => void;
 }
 
-export const EmojiPicker = ({
-  posX,
-  posY,
-  onKeyPress,
-  resetActionMenuStates,
-  wrapperRef,
-  handleReactionClick,
-}: EmojiPickerProps) => {
+export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties => {
+  const {posX, posY, onKeyPress, resetActionMenuStates, wrapperRef, handleReactionClick} = properties;
   const emojiRef = useRef<HTMLDivElement>(null);
   useClickOutside(emojiRef, resetActionMenuStates, wrapperRef);
   const [style, setStyle] = useState<object>({
@@ -80,10 +78,10 @@ export const EmojiPicker = ({
     return () => window.removeEventListener('resize', updateSize);
   }, [posX, posY]);
 
-  function onEmojiClick(emojiData: EmojiClickData, event: MouseEvent) {
-    localStorage.setItem('activeSkinTone', emojiData.activeSkinTone);
+  function onEmojiClick(emojiPickerSelection: EmojiPickerSelection) {
+    localStorage.setItem('activeSkinTone', emojiPickerSelection.activeSkinTone);
 
-    handleReactionClick(emojiData.emoji);
+    handleReactionClick(emojiPickerSelection.emoji);
 
     if (isKeyboardEvent) {
       // keyboard event still retains emoji button focus
@@ -116,8 +114,7 @@ export const EmojiPicker = ({
             }
           }}
         >
-          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
-          <div
+          <IgnoreOutsideClickWrapper
             ref={emojiRef}
             style={{maxHeight: window.innerHeight, ...style}}
             role="dialog"
@@ -128,13 +125,12 @@ export const EmojiPicker = ({
               event.stopPropagation();
             }}
           >
-            <EmojiPickerReact
-              emojiStyle={EmojiStyle.NATIVE}
+            <EmojiPickerAdapter
               onEmojiClick={onEmojiClick}
-              searchPlaceHolder={t('accessibility.emojiPickerSearchPlaceholder')}
+              searchPlaceholder={t('accessibility.emojiPickerSearchPlaceholder')}
               defaultSkinTone={getSkinTone()}
             />
-          </div>
+          </IgnoreOutsideClickWrapper>
         </div>,
         document.body,
       )}

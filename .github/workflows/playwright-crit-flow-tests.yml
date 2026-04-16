@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
 
@@ -27,10 +27,10 @@ jobs:
         run: yarn --immutable
 
       - name: Install Playwright browsers
-        run: yarn playwright install --with-deps && yarn playwright install chrome
+        run: yarn playwright install --only-shell --with-deps chromium
 
       - name: Install 1Password
-        uses: 1password/install-cli-action@v1
+        uses: 1password/install-cli-action@8d006a0d0a4fd505af7f7ce589e7f768385ff5e4
 
       - name: Generate env file
         run: op inject -i apps/webapp/test/e2e_tests/.env.staging.tpl -o apps/webapp/test/e2e_tests/.env
@@ -42,7 +42,7 @@ jobs:
 
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report
           path: playwright-report/
@@ -59,7 +59,7 @@ jobs:
 
       - name: Comment on PR
         if: always()
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0
         with:
           header: playwright-summary
           message: |

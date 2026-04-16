@@ -19,7 +19,7 @@
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageKey} from 'Repositories/storage';
-import {getLogger} from 'Util/Logger';
+import {getLogger} from 'Util/logger';
 
 const logger = getLogger('draftUtils');
 
@@ -53,7 +53,7 @@ export const conversationHasDraft = (conversation: Conversation): boolean => {
     const draft = (amplifyData as AmplifyWrapper).data || (amplifyData as DraftData);
     // Check if draft has content (editorState or plainMessage)
     return Boolean(draft && (draft.editorState || draft.plainMessage));
-  } catch (error) {
+  } catch (error: unknown) {
     // Only log error type, not the actual error to avoid exposing draft content
     logger.warn(
       `Failed to parse draft data for conversation ${conversation.id}: ${

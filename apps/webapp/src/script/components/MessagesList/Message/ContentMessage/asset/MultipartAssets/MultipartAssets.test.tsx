@@ -22,13 +22,13 @@ import {RestNode} from 'cells-sdk-ts';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {MultipartAssets} from './MultipartAssets';
 
 jest.mock('Hooks/useInView/useInView', () => ({
-  useInView: () => ({
+  useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => ({
     elementRef: {current: null},
     hasBeenInView: true,
   }),

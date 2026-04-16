@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 type Status = 'idle' | 'loading' | 'success' | 'error' | 'retrying';
 
@@ -118,7 +118,7 @@ export const useGetMultipartAsset = ({
         setPath(asset.Path);
         setIsRecycled(asset.IsRecycled);
         setStatus('success');
-      } catch (err) {
+      } catch (err: unknown) {
         if (!isMounted.current) {
           return;
         }

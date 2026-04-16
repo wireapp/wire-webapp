@@ -48,7 +48,11 @@ jest.mock('./FileLoader/FileLoader', () => ({
 }));
 
 jest.mock('./ImageFileView/ImageFileView', () => ({
-  ImageFileView: () => <div data-uie-name="image-view">Image View</div>,
+  ImageFileView: ({src}: {src?: string}) => (
+    <div data-uie-name="image-view" data-src={src}>
+      Image View
+    </div>
+  ),
 }));
 
 jest.mock('./NoPreviewAvailable/NoPreviewAvailable', () => ({
@@ -59,7 +63,7 @@ jest.mock('./PdfViewer/PdfViewer', () => ({
   PDFViewer: () => <div data-uie-name="pdf-viewer">PDF Viewer</div>,
 }));
 
-jest.mock('Util/FileTypeUtil', () => ({
+jest.mock('Util/fileTypeUtil', () => ({
   isFileEditable: (extension: string) => ['txt', 'md', 'json'].includes(extension),
 }));
 
@@ -206,6 +210,47 @@ describe('FileFullscreenModal - File Version Restore', () => {
     });
   });
 
+  describe('Image source selection', () => {
+    it('passes the original fileUrl to the image viewer for browser-previewable formats', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          filePreviewUrl="https://example.com/preview.jpg"
+          fileExtension="jpg"
+          fileUrl="https://example.com/original.jpg"
+        />,
+      );
+
+      expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/original.jpg');
+    });
+
+    it('passes the server-generated preview to the image viewer for HEIC files (not browser-decodable)', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          filePreviewUrl="https://example.com/preview.jpg"
+          fileExtension="heic"
+          fileUrl="https://example.com/original.heic"
+        />,
+      );
+
+      expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/preview.jpg');
+    });
+
+    it('falls back to filePreviewUrl when fileUrl is absent for a previewable format', () => {
+      render(
+        <FileFullscreenModal
+          {...defaultProps}
+          filePreviewUrl="https://example.com/preview.jpg"
+          fileExtension="jpg"
+          fileUrl={undefined}
+        />,
+      );
+
+      expect(screen.getByTestId('image-view')).toHaveAttribute('data-src', 'https://example.com/preview.jpg');
+    });
+  });
+
   describe('Content Refresh After Version Restore', () => {
     it('should render fresh content when component remounts', () => {
       const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode />);
@@ -233,6 +278,40 @@ describe('FileFullscreenModal - File Version Restore', () => {
 
       expect(screen.queryByTestId('pdf-viewer')).not.toBeInTheDocument();
       expect(screen.getByTestId('image-view')).toBeInTheDocument();
+    });
+  });
+
+  describe('Behavior for Recycled Files', () => {
+    it('should not allow editing if file is in recycle bin', () => {
+      render(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => true} />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+      expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    });
+
+    it('should keep view mode when edit mode prop changes while file is in recycle bin', () => {
+      const {rerender} = render(
+        <FileFullscreenModal {...defaultProps} isEditMode={false} checkIsInRecycleBin={() => true} />,
+      );
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+
+      rerender(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => true} />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+      expect(screen.getByTestId('no-preview')).toBeInTheDocument();
+    });
+
+    it('should be editable and previewable if file is not in recycle bin', () => {
+      const {rerender} = render(<FileFullscreenModal {...defaultProps} isEditMode checkIsInRecycleBin={() => false} />);
+
+      expect(screen.getByTestId('file-editor')).toBeInTheDocument();
+      expect(screen.queryByTestId('no-preview')).not.toBeInTheDocument();
+
+      rerender(<FileFullscreenModal {...defaultProps} isEditMode={false} checkIsInRecycleBin={() => false} />);
+
+      expect(screen.queryByTestId('file-editor')).not.toBeInTheDocument();
+      expect(screen.getByTestId('no-preview')).toBeInTheDocument();
     });
   });
 });

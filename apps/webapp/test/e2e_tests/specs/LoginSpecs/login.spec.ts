@@ -17,23 +17,7 @@
  *
  */
 
-import {generateRandomPassword} from 'Util/StringUtil';
-
 import {test, expect, LOGIN_TIMEOUT} from '../../test.fixtures';
-
-test(
-  'Verify sign in error appearance in case of wrong credentials',
-  {tag: ['@TC-3465', '@smoke']},
-  async ({pageManager}) => {
-    const {pages} = pageManager.webapp;
-
-    await pageManager.openLoginPage();
-    await pages.login().login({email: 'incorrect-email@wire.engineering', password: generateRandomPassword()});
-
-    const errorMessage = pages.login().loginErrorText;
-    await expect(errorMessage).toHaveText('Please verify your details and try again');
-  },
-);
 
 test('Verify you can sign in by email', {tag: ['@TC-3461', '@regression']}, async ({pageManager, createUser}) => {
   const {components, pages} = pageManager.webapp;

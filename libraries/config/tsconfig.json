@@ -3,6 +3,9 @@
   "compilerOptions": {
     "outDir": "./lib",
     "rootDir": "./src",
+    "composite": true,
+    "noUncheckedIndexedAccess": true,
+    "tsBuildInfoFile": "./lib/tsconfig.tsbuildinfo",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,

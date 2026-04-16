@@ -7,19 +7,20 @@ on:
 jobs:
   add-jira-description:
     # On merge_group there is no pull request payload; keep the required check green there.
-    if: ${{ github.event_name == 'merge_group' || (github.actor != 'dependabot[bot]' && github.actor != 'otto-the-bot') }}
-    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'merge_group' || (github.actor != 'otto-the-bot' && github.actor != 'renovate[bot]') }}
+    runs-on: ubuntu-24.04
     steps:
       - name: Skip on merge queue
         if: ${{ github.event_name == 'merge_group' }}
         run: echo "Skipping Jira pull request description validation on merge queue."
 
-      - uses: cakeinpanic/jira-description-action@master
+      - uses: cakeinpanic/jira-description-action@f24c12158ee2d350a6f8c3cbe90a55af7a859ff6
         if: ${{ github.event_name == 'pull_request' }}
         name: jira-description-action
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           jira-token: ${{ secrets.JIRA_TOKEN }}
           jira-base-url: https://wearezeta.atlassian.net
+          custom-issue-number-regexp: '(WPB-\d+)'
           skip-branches: '^(dev|master|release\/*)$'
           fail-when-jira-issue-not-found: true

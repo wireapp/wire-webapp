@@ -54,13 +54,15 @@ export function parseAccessToken(accessToken: string): AccessTokenInfo {
   }
 
   const expirationDateInMillis = Number(parseValue(accessToken, 'd')) * 1000;
+  const tokenSections = accessToken.split('.');
+  const token = tokenSections[0] ?? '';
 
   return {
     clientId: parseValue(accessToken, 'c'),
     expirationDate: new Date(expirationDateInMillis),
     keyIndex: Number(parseValue(accessToken, 'k')),
     tag: parseValue(accessToken, 'l'),
-    token: accessToken.split('.')[0],
+    token,
     type: parseValue(accessToken, 't') === 'a' ? AccessTokenType.ACCESS_DATA : AccessTokenType.USER_DATA,
     userData: parseValue(accessToken, 'r'),
     userId: parseValue(accessToken, 'u'),

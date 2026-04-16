@@ -17,14 +17,14 @@
  *
  */
 
-export * from './BackendError';
-export * from './BackendErrorLabel';
-export * from './BackendErrorMapper';
-export * from './ConnectionState';
-export * from './ContentType';
-export * from './HttpClient';
-export * from './NetworkError';
-export * from './RequestCancelable';
-export * from './RequestProgressHandler';
-export * from './TraceState';
+export * from './backendError';
+export * from './backendErrorLabel';
+export * from './backendErrorMapper';
+export * from './connectionState';
+export * from './contentType';
+export * from './httpClient';
+export * from './networkError';
+export * from './requestCancelable';
+export * from './requestProgressHandler';
+export * from './traceState';
 export {StatusCodes as StatusCode} from 'http-status-codes';

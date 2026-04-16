@@ -20,8 +20,6 @@
 import {Locator, Page} from '@playwright/test';
 
 export class WelcomePage {
-  readonly page: Page;
-
   readonly loginButton: Locator;
   readonly createAccountButton: Locator;
   readonly createEnterpriseAccountButton: Locator;
@@ -30,8 +28,6 @@ export class WelcomePage {
   readonly ssoCode: Locator;
 
   constructor(page: Page) {
-    this.page = page;
-
     this.loginButton = page.locator('[data-uie-name="go-login"]');
     this.createAccountButton = page.locator('[data-uie-name="go-create-account"]');
     this.createEnterpriseAccountButton = page.locator(

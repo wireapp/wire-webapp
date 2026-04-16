@@ -19,7 +19,7 @@
 
 import {renderHook, act} from '@testing-library/react';
 
-import {formatLocale, formatTimeShort} from 'Util/TimeUtil';
+import {formatLocale, formatTimeShort} from 'Util/timeUtil';
 
 import {useRelativeTimestamp} from './useRelativeTimestamp';
 

@@ -34,7 +34,7 @@ import {EventName} from 'Repositories/tracking/EventName';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
 import {UserState} from 'Repositories/user/UserState';
 import {TestFactory} from 'test/helper/TestFactory';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 

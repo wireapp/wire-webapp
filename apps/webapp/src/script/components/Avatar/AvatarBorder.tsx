@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {CSS_FILL_PARENT} from 'Util/CSSMixin';
+import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
 interface AvatarBorderProps {
   borderRadius?: string;

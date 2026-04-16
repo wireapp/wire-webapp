@@ -30,10 +30,10 @@ test.describe('Delete', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   test(
@@ -62,7 +62,7 @@ test.describe('Delete', () => {
   test('I can delete messages in group from me and others', {tag: ['@TC-570', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
     await test.step('Create test group', async () => {
@@ -98,7 +98,7 @@ test.describe('Delete', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
       await createGroup(userAPages, 'Test Group', [userB]);
@@ -157,7 +157,7 @@ test.describe('Delete', () => {
     async ({context, createPage}) => {
       const [userAPage, userBPage] = await Promise.all([
         createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(context, withLogin(userB), withConnectedUser(userA)),
+        createPage(context, withLogin(userB)),
       ]);
       const userAPages = PageManager.from(userAPage).webapp.pages;
       let userBPages = PageManager.from(userBPage).webapp.pages;
@@ -191,9 +191,11 @@ test.describe('Delete', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userAPages.conversation().sendMessage('Test Message');
 
       const messageA = userAPages.conversation().getMessage({sender: userA});
@@ -217,7 +219,7 @@ test.describe('Delete', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
       await test.step('Create test group', async () => {
@@ -274,7 +276,7 @@ test.describe('Delete', () => {
     {
       name: 'location sharing',
       tc: '@TC-582',
-      sendAction: async ({pageB, api}) => {
+      sendAction: async ({api}) => {
         const {instanceId} = await api.testService.createInstance(
           userA.password,
           userA.email,
@@ -282,7 +284,10 @@ test.describe('Delete', () => {
           false,
         );
 
-        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+        const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!, {
+          protocol: 'mls',
+        });
+        if (conversationId === undefined) throw new Error("Couldn't find MLS conversation of userB with userA");
         await api.testService.sendLocation(instanceId, conversationId, {
           locationName: 'Test Location',
           latitude: 52.5170365,
@@ -316,10 +321,11 @@ test.describe('Delete', () => {
 
   testCases.forEach(({name, tc, sendAction}) => {
     test(`Delete "For Everyone" works for ${name}`, {tag: [tc, '@regression']}, async ({createPage, api}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const pageB = await createPage(withLogin(userB));
+      const pageA = await createPage(withLogin(userA), withConnectedUser(userB));
+
+      const userAPages = PageManager.from(pageA).webapp.pages;
+      const userBPages = PageManager.from(pageB).webapp.pages;
 
       await test.step('Await mls conversation creation', async () => {
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
@@ -327,15 +333,13 @@ test.describe('Delete', () => {
       });
 
       await test.step('Execute send action', async () => {
-        const {page: pageA} = userAPages.conversation();
-        const {page: pageB} = userBPages.conversation();
         await sendAction({pageA, pageB, api});
       });
 
       let messageA: Locator;
       let messageB: Locator;
 
-      await test.step('Veryify send action', async () => {
+      await test.step('Verify send action', async () => {
         messageA = userAPages.conversation().getMessage({sender: userA});
         messageB = userBPages.conversation().getMessage({sender: userA});
         await expect(messageA).toBeAttached();
@@ -357,7 +361,7 @@ test.describe('Delete', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
       await test.step('Create group as second conversation', async () => {

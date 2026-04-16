@@ -41,6 +41,7 @@ interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
   id?: string;
   className?: string;
   onBgClick?: () => void;
+  onOpened?: () => void;
   onClosed?: () => void;
   showLoading?: boolean;
   wrapperCSS?: CSSObject;
@@ -54,6 +55,7 @@ const ModalComponent = ({
   className = '',
   isShown,
   onBgClick = noop,
+  onOpened = noop,
   onClosed = noop,
   showLoading = false,
   wrapperCSS,
@@ -88,6 +90,7 @@ const ModalComponent = ({
     const mounting = isMounting.current;
     isMounting.current = false;
     if (isShown) {
+      onOpened();
       return setDisplayNone(false);
     }
 

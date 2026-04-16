@@ -53,6 +53,12 @@
         }
       }
     },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint --config eslint.config.ts --quiet --ext .js,.ts {projectRoot}"
+      }
+    },
     "type-check": {
       "executor": "nx:run-commands",
       "options": {

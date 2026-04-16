@@ -26,8 +26,8 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './DeviceSelect';
 import {InputLevel} from './InputLevel';
@@ -62,7 +62,7 @@ const MicrophonePreferences = ({streamHandler, refreshStream, hasActiveCall}: Mi
     setIsRequesting(true);
     try {
       setStream(await refreshStream());
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         logger.warn(`Requesting MediaStream for type "${MediaType.AUDIO}" failed: ${error.message}`, error);
       }

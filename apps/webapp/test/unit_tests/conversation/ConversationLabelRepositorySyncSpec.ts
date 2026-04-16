@@ -50,7 +50,7 @@ describe('ConversationLabelRepository Synchronization', () => {
     // Create repository instance
     conversationLabelRepository = new ConversationLabelRepository(
       mockAllConversations,
-      () => mockConversations(),
+      ko.pureComputed(() => mockConversations()),
       mockPropertiesService,
     );
   });
@@ -212,7 +212,7 @@ describe('ConversationLabelRepository Synchronization', () => {
       // Assert
       const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
       expect(storedData).toBeTruthy();
-      const parsedData = JSON.parse(storedData!);
+      const parsedData = JSON.parse(storedData);
       expect(parsedData.labels).toHaveLength(1);
       expect(parsedData.lastSyncTimestamp).toBeTruthy();
     });

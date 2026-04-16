@@ -26,7 +26,7 @@ import {
   RECYCLE_BIN_PATH,
 } from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
 interface UseRestoreParentNodeProps {
@@ -68,7 +68,7 @@ export const useRestoreParentNode = ({
             path: RECYCLE_BIN_PATH,
           });
         });
-      } catch (error) {
+      } catch (error: unknown) {
         console.error(error);
         onError();
       }

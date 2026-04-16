@@ -22,9 +22,26 @@ import React from 'react';
 import {Select} from '@wireapp/react-ui-kit';
 
 import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
+import * as Icon from 'Components/Icon';
+import {t} from 'Util/localizerUtil';
 
-type VideoControlsSelectProps = Pick<
-  React.ComponentProps<typeof Select<false>>,
+import {
+  videoOptionInlineMenuStyles,
+  videoOptionLabelIconStyles,
+  videoOptionLabelStyles,
+  videoOptionLabelTextStyles,
+  videoOptionsInlineWrapperStyles,
+  videoOptionsSelectGroupHeadingStyles,
+  videoOptionsSelectMenuStyles,
+  videoOptionsSheetHeaderStyles,
+  videoOptionsSheetTitleStyles,
+} from '../VideoControls.styles';
+
+type SelectProps = React.ComponentProps<typeof Select<false>>;
+type SelectOption = SelectProps['options'] extends Array<infer T> ? T : never;
+
+type BaseSelectProps = Pick<
+  SelectProps,
   | 'value'
   | 'id'
   | 'dataUieName'
@@ -32,10 +49,38 @@ type VideoControlsSelectProps = Pick<
   | 'onChange'
   | 'onMenuClose'
   | 'menuIsOpen'
+  | 'menuPlacement'
   | 'onKeyDown'
   | 'wrapperCSS'
   | 'menuCSS'
+  | 'isOptionSelected'
+  | 'overlayMenu'
 >;
+
+export type VideoControlsSelectProps = BaseSelectProps & {
+  showHeader?: boolean;
+  onClose?: () => void;
+};
+
+type VideoOptionLabelProps = {
+  option: SelectOption & {
+    icon?: React.ReactNode;
+    label: React.ReactNode;
+  };
+};
+
+const VideoOptionLabel = ({option}: VideoOptionLabelProps) => {
+  if (!option.icon) {
+    return <>{option.label}</>;
+  }
+
+  return (
+    <div css={videoOptionLabelStyles}>
+      <span css={videoOptionLabelTextStyles}>{option.label}</span>
+      <span css={videoOptionLabelIconStyles}>{option.icon}</span>
+    </div>
+  );
+};
 
 export const VideoControlsSelect = ({
   value,
@@ -46,30 +91,62 @@ export const VideoControlsSelect = ({
   onKeyDown,
   onMenuClose,
   menuIsOpen,
+  menuPlacement,
   wrapperCSS,
   menuCSS,
+  overlayMenu,
+  showHeader,
+  onClose,
+  isOptionSelected,
 }: VideoControlsSelectProps) => {
+  const isInlineMenu = overlayMenu === false;
+  const menuCssWithInlineMenu = isInlineMenu
+    ? {
+        ...videoOptionsSelectMenuStyles,
+        ...videoOptionInlineMenuStyles,
+      }
+    : menuCSS;
+
   return (
-    <Select
-      // eslint-disable-next-line jsx-a11y/no-autofocus
-      autoFocus
-      value={value}
-      id={id}
-      dataUieName={dataUieName}
-      controlShouldRenderValue={false}
-      isClearable={false}
-      backspaceRemovesValue={false}
-      hideSelectedOptions={false}
-      options={options}
-      onChange={onChange}
-      onKeyDown={onKeyDown}
-      onMenuClose={onMenuClose}
-      menuPlacement="top"
-      menuIsOpen={menuIsOpen}
-      wrapperCSS={wrapperCSS}
-      menuCSS={menuCSS}
-      hideControl
-      selectGroupCSS={selectGroupStyles}
-    />
+    <>
+      {showHeader && (
+        <div css={videoOptionsSheetHeaderStyles}>
+          <span css={videoOptionsSheetTitleStyles}>{t('videoCallMenuMoreVideoSettings')}</span>
+          {onClose && (
+            <button className="icon-button" type="button" aria-label={t('cells.modal.closeButton')} onClick={onClose}>
+              <Icon.CloseIcon width={12} height={12} />
+            </button>
+          )}
+        </div>
+      )}
+
+      <Select
+        // eslint-disable-next-line jsx-a11y/no-autofocus
+        autoFocus
+        value={value}
+        id={id}
+        dataUieName={dataUieName}
+        controlShouldRenderValue={false}
+        isClearable={false}
+        backspaceRemovesValue={false}
+        hideSelectedOptions={false}
+        options={options}
+        onChange={onChange}
+        onKeyDown={onKeyDown}
+        onMenuClose={onMenuClose}
+        menuPlacement={isInlineMenu ? 'bottom' : (menuPlacement ?? 'top')}
+        menuIsOpen={menuIsOpen}
+        overlayMenu={overlayMenu}
+        menuCSS={menuCssWithInlineMenu}
+        selectGroupHeadingCSS={isInlineMenu ? videoOptionsSelectGroupHeadingStyles : undefined}
+        wrapperCSS={isInlineMenu ? (!showHeader ? videoOptionsInlineWrapperStyles : undefined) : wrapperCSS}
+        hideControl
+        selectGroupCSS={selectGroupStyles}
+        isOptionSelected={isOptionSelected}
+        formatOptionLabel={
+          isInlineMenu ? option => <VideoOptionLabel option={option as VideoOptionLabelProps['option']} /> : undefined
+        }
+      />
+    </>
   );
 };

@@ -29,10 +29,10 @@ import type {Message} from 'Repositories/entity/message/Message';
 import {Text} from 'Repositories/entity/message/Text';
 import type {EventService} from 'Repositories/event/EventService';
 import type {EventRecord} from 'Repositories/storage';
-import {getLogger, Logger} from 'Util/Logger';
-import {clamp} from 'Util/NumberUtil';
-import {obfuscate} from 'Util/StringUtil';
-import {TIME_IN_MILLIS} from 'Util/TimeUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {clamp} from 'Util/numberUtil';
+import {obfuscate} from 'Util/stringUtil';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {arrayToBase64, noop} from 'Util/util';
 
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';

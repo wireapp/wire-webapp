@@ -17,10 +17,19 @@
  *
  */
 
+const React = require('react');
 const actualUIKit = jest.requireActual('@wireapp/react-ui-kit');
 
 module.exports = {
   ...actualUIKit,
+  Button: React.forwardRef(({isActive, ...properties}, ref) =>
+    React.createElement(actualUIKit.Button, {...properties, ref}),
+  ),
+  Input: React.forwardRef(({showTogglePasswordLabel, hideTogglePasswordLabel, ...properties}, ref) =>
+    React.createElement(actualUIKit.Input, {...properties, ref}),
+  ),
+  Loading: properties => React.createElement('div', properties),
+  Modal: ({children}) => React.createElement('div', null, children),
   Transition: ({children}) => children,
   TransitionContainer: ({children}) => children,
 };

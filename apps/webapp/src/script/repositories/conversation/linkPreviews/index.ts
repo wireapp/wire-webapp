@@ -19,11 +19,11 @@
 
 import type {Data as OpenGraphResult} from 'open-graph';
 
-import {deArrayify} from 'Util/ArrayUtil';
-import {getLogger} from 'Util/Logger';
-import {truncate} from 'Util/StringUtil';
+import {deArrayify} from 'Util/arrayUtil';
+import {getLogger} from 'Util/logger';
+import {truncate} from 'Util/stringUtil';
 import {base64ToArray, getContentTypeFromDataUrl} from 'Util/util';
-import {isTweetUrl} from 'Util/ValidationUtil';
+import {isTweetUrl} from 'Util/validationUtil';
 
 import {isBlacklisted} from './blackList';
 import {getFirstLinkWithOffset} from './helpers';
@@ -52,6 +52,10 @@ declare global {
   interface Window {
     openGraphAsync?: (url: string) => Promise<OpenGraphResult>;
     desktopAppConfig?: {version: string; supportsCallingPopoutWindow?: boolean};
+    desktopAppSettings?: {
+      setHardwareAccelerationEnabled: (enabled: boolean) => void;
+      isHardwareAccelerationEnabled: () => boolean;
+    };
   }
 }
 const logger = getLogger('LinkPreviewRepository');
@@ -74,7 +78,7 @@ export async function getLinkPreviewFromString(string: string): Promise<LinkPrev
 
   try {
     return await getLinkPreview(linkData.url, linkData.offset);
-  } catch (error) {
+  } catch (error: unknown) {
     const isLinkPreviewError = error instanceof LinkPreviewError;
     if (!isLinkPreviewError) {
       throw error;
@@ -155,7 +159,7 @@ async function fetchOpenGraphData(link: string): Promise<OpenGraphResult | undef
       }, {} as OpenGraphResult);
     }
     return undefined;
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof Error) {
       logger.warn(`Error while fetching OpenGraph data: ${error.message}`);
     }

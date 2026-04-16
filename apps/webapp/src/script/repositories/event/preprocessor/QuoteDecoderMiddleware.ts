@@ -21,7 +21,7 @@ import {Quote} from '@wireapp/protocol-messaging';
 
 import {MessageAddEvent, MultipartMessageAddEvent, QuoteData} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage/record/EventRecord';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 import {base64ToArray} from 'Util/util';
 
 import {QuoteEntity} from '../../../message/QuoteEntity';
@@ -128,7 +128,7 @@ export class QuotedMessageMiddleware implements EventMiddleware {
     try {
       const encodedQuote = base64ToArray(rawQuote);
       quote = Quote.decode(encodedQuote);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn('Failed to decode quoted message.', error);
       const quoteData: ProcessedQuoteData = {
         error: {

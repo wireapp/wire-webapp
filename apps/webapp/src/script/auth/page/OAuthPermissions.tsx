@@ -19,7 +19,7 @@
 
 import React, {useState} from 'react';
 
-import {OAuthClient} from '@wireapp/api-client/lib/oauth/OAuthClient';
+import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {container} from 'tsyringe';
@@ -40,10 +40,11 @@ import {
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
-import {AssetRepository} from 'Repositories/assets/AssetRepository';
-import {handleEscDown, handleKeyDown, KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+import {AssetRepository} from 'Repositories/assets/assetRepository';
+import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
+import {toError} from 'Util/toError';
 import {loadDataUrl} from 'Util/util';
 
 import {
@@ -107,7 +108,7 @@ const OAuthPermissionsComponent = ({
     try {
       const url = await postOauthCode({...oauthParams, scope: cleanedScopes});
       window.location.replace(url);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
     }
   };
@@ -135,12 +136,12 @@ const OAuthPermissionsComponent = ({
         throw Error('OAuth client not found');
       }
     };
-    getUserData().catch(error => {
+    getUserData().catch((error: unknown) => {
       console.error(error);
-      if (error.message === 'OAuth client not found') {
+      if (toError(error).message === 'OAuth client not found') {
         window.location.replace('/');
       } else {
-        doLogout().catch(error => {
+        doLogout().catch((error: unknown) => {
           console.error(error);
         });
       }

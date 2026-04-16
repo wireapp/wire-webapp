@@ -32,10 +32,11 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Multipart} from 'Repositories/entity/message/Multipart';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {includesOnlyEmojis} from 'Util/EmojiUtil';
-import {t} from 'Util/LocalizerUtil';
-import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/TimeUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {includesOnlyEmojis} from 'Util/emojiUtil';
+import {t} from 'Util/localizerUtil';
+import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
+import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AudioAsset} from './asset/AudioAsset/AudioAsset';
 import {FileAsset} from './asset/FileAsset/FileAsset';
@@ -114,8 +115,8 @@ export const Quote: FC<QuoteProps> = ({
         .then(message => {
           setQuotedMessage(message as ContentMessage);
         })
-        .catch(error => {
-          if (error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {
+        .catch((error: unknown) => {
+          if (isErrorWithType(error) && error.type === ConversationError.TYPE.MESSAGE_NOT_FOUND) {
             return setError(QuoteEntity.ERROR.MESSAGE_NOT_FOUND);
           }
           throw error;

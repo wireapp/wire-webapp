@@ -23,8 +23,9 @@ import {singleton} from 'tsyringe';
 import {CRUDEngine, error as StoreEngineError} from '@wireapp/store-engine';
 import {IndexedDBEngine} from '@wireapp/store-engine-dexie';
 
-import {Logger, getLogger} from 'Util/Logger';
-import {loadValue, storeValue} from 'Util/StorageUtil';
+import {Logger, getLogger} from 'Util/logger';
+import {loadValue, storeValue} from 'Util/storageUtil';
+import {toError} from 'Util/toError';
 
 import {DexieDatabase} from './DexieDatabase';
 import {StorageSchemata} from './StorageSchemata';
@@ -79,8 +80,8 @@ export class StorageService {
         this._initCrudHooks(this.db);
       }
       return this.dbName;
-    } catch (error) {
-      const logMessage = `Failed to initialize database '${this.dbName}': ${error.message || error}`;
+    } catch (error: unknown) {
+      const logMessage = `Failed to initialize database '${this.dbName}': ${toError(error).message}`;
       this.logger.error(logMessage, {error});
       throw new StorageError(StorageError.TYPE.FAILED_TO_OPEN, StorageError.MESSAGE.FAILED_TO_OPEN);
     }
@@ -171,7 +172,7 @@ export class StorageService {
       this.logger.info(`Deleting database '${this.dbName}' successful`);
       this.dbName = undefined;
       return true;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Deleting database '${this.dbName}' failed`);
       throw error;
     }
@@ -229,7 +230,7 @@ export class StorageService {
     try {
       const records = await this.engine.readAll<T>(storeName);
       return records.filter(Boolean);
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to load objects from store '${storeName}'`, error);
       throw error;
     }
@@ -257,7 +258,7 @@ export class StorageService {
   async load<T = Object>(storeName: string, primaryKey: string): Promise<T | undefined> {
     try {
       return await this.engine.read<T>(storeName, primaryKey);
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof StoreEngineError.RecordNotFoundError) {
         return undefined;
       }
@@ -290,7 +291,7 @@ export class StorageService {
     try {
       const newKey = await this.engine.updateOrCreate(storeName, primaryKey, entity);
       return newKey;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update or create '${primaryKey}' in store '${storeName}'`, error);
       throw error;
     }
@@ -345,7 +346,7 @@ export class StorageService {
       this.notifyListeners(storeName, DEXIE_CRUD_EVENT.UPDATING, oldRecord, newRecord);
 
       return 1;
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error(`Failed to update '${primaryKey}' in store '${storeName}'`, error);
       throw error;
     }

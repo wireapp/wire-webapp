@@ -22,7 +22,7 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
@@ -100,7 +100,7 @@ export const useConversationSearchFiles = ({
         }
 
         setStatus('success');
-      } catch (error) {
+      } catch (error: unknown) {
         setStatus('error');
         setNodes({conversationId: id, nodes: []});
         setPagination({conversationId: id, pagination: null});

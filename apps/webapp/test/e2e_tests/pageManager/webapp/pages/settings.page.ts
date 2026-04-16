@@ -20,15 +20,12 @@
 import {Page, Locator} from '@playwright/test';
 
 export class SettingsPage {
-  readonly page: Page;
-
   readonly accountButton: Locator;
   readonly devicesButton: Locator;
   readonly optionsButton: Locator;
   readonly audioVideoButton: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.accountButton = page.getByRole('button', {name: 'Account'});
     this.devicesButton = page.getByRole('button', {name: 'Devices'});
     this.optionsButton = page.getByRole('button', {name: 'Options'});

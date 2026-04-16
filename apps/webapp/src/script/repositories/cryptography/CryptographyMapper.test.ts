@@ -491,7 +491,7 @@ describe('CryptographyMapper', () => {
       mapper
         .mapGenericMessage(undefined as any, {id: 'ABC'} as any)
         .then(done.fail)
-        .catch(error => {
+        .catch((error: unknown) => {
           expect(error instanceof CryptographyError).toBeTruthy();
           expect(error.type).toBe(CryptographyError.TYPE.NO_GENERIC_MESSAGE);
           done();

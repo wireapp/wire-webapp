@@ -20,7 +20,6 @@
 import {useEffect, useMemo, useState} from 'react';
 
 import cx from 'classnames';
-import type {DexieError} from 'dexie';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -33,10 +32,11 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import type {User} from 'Repositories/entity/User';
 import {WireIdentity} from 'src/script/E2EIdentity';
 import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
-import type {Logger} from 'Util/Logger';
-import {splitFingerprint} from 'Util/StringUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
+import type {Logger} from 'Util/logger';
+import {splitFingerprint} from 'Util/stringUtil';
+import {toError} from 'Util/toError';
 
 import {Config} from '../../../../Config';
 import {MotionDuration} from '../../../../motion/MotionDuration';
@@ -88,7 +88,7 @@ export const DeviceDetails = ({
     const toggleVerified = !isVerified;
     clientRepository
       .verifyClient(user.qualifiedId, device, toggleVerified)
-      .catch((error: DexieError) => logger.warn(`Failed to toggle client verification: ${error.message}`));
+      .catch((error: unknown) => logger.warn(`Failed to toggle client verification: ${toError(error).message}`));
   };
 
   const clickToResetSession = () => {

@@ -25,11 +25,15 @@ export class StartUIPage {
   readonly searchInput: Locator;
   readonly searchResults: Locator;
 
+  readonly inviteButton: Locator;
+
   constructor(page: Page) {
     this.component = page.locator('#start-ui');
 
     this.searchInput = this.component.getByLabel('Search people');
     this.searchResults = this.component.getByRole('list', {name: 'Conversation List'}).getByRole('listitem');
+
+    this.inviteButton = this.component.getByRole('button', {name: 'Invite people'});
   }
 
   /** Search and select each of the provided usernames */

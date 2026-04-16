@@ -23,10 +23,10 @@ import {container} from 'tsyringe';
 
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {KEY} from 'Util/KeyboardUtil';
-import {t} from 'Util/LocalizerUtil';
-import {captureModalFocusContext} from 'Util/ModalFocusUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {KEY} from 'Util/keyboardUtil';
+import {t} from 'Util/localizerUtil';
+import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
 interface ChooseScreenProps {
   choose: (screenId: string) => void;

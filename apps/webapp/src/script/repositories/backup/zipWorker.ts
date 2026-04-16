@@ -18,9 +18,11 @@
  */
 
 import JSZip from 'jszip';
-import sodium from 'libsodium-wrappers-sumo';
+import sodium, {ready} from 'libsodium-wrappers-sumo';
 
-import {ImportError} from './Error';
+import {ImportError} from './error';
+
+import {toError} from '../../util/toError';
 
 type Payload =
   | {type: 'zip'; files: Record<string, ArrayBuffer | string>; encrytionKey?: Uint8Array}
@@ -53,9 +55,9 @@ export async function handleZipEvent(payload: Payload) {
         const headerLength = payload.headerLength ? payload.headerLength : 0;
         try {
           decryptedBytes = await decryptFile(payloadBytes, encrytionKey, headerLength);
-        } catch (error) {
+        } catch (error: unknown) {
           // Handle decryption failure
-          throw new ImportError(error.message);
+          throw new ImportError(toError(error).message);
         }
       } else {
         decryptedBytes = payload.bytes;
@@ -73,10 +75,10 @@ export async function handleZipEvent(payload: Payload) {
 
 // Encrypt a file
 async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): Promise<Uint8Array> {
-  await sodium.ready;
+  await ready;
 
   const headerBytes = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES;
-  const stateAndHeader = sodium.crypto_secretstream_xchacha20poly1305_init_push(encryptionKey);
+  const stateAndHeader = sodium.crypto_secretstream_xchacha20poly1305_init_push(encryptionKey, 'uint8array');
   const {state, header} = stateAndHeader;
 
   const encryptedFile = sodium.crypto_secretstream_xchacha20poly1305_push(
@@ -84,7 +86,13 @@ async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): 
     fileContent,
     null,
     sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE,
+    'uint8array',
   );
+
+  if (!(header instanceof Uint8Array) || !(encryptedFile instanceof Uint8Array)) {
+    throw new ImportError('Unexpected encryption output type');
+  }
+
   const encrypted = new Uint8Array(headerBytes + encryptedFile.length);
 
   encrypted.set(header);
@@ -95,17 +103,21 @@ async function encryptFile(fileContent: Uint8Array, encryptionKey: Uint8Array): 
 
 // Decrypt a file
 async function decryptFile(encryptedDataSource: Uint8Array, encryptionKey: Uint8Array, headerLength: number) {
-  await sodium.ready;
+  await ready;
 
   const metaDataHeader = headerLength;
   const headerBytes = sodium.crypto_secretstream_xchacha20poly1305_HEADERBYTES;
   const header = encryptedDataSource.slice(metaDataHeader, metaDataHeader + headerBytes);
   const state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(header, encryptionKey);
   const encryptedContent = encryptedDataSource.slice(headerBytes + metaDataHeader);
-  const decrypted = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent);
+  const decrypted = sodium.crypto_secretstream_xchacha20poly1305_pull(state, encryptedContent, null, 'uint8array');
 
   if (!decrypted) {
     throw new ImportError('WRONG_PASSWORD');
+  }
+
+  if (!(decrypted.message instanceof Uint8Array)) {
+    throw new ImportError('Unexpected decryption output type');
   }
 
   return decrypted.message;
@@ -114,7 +126,7 @@ self.addEventListener('message', async (event: MessageEvent<Payload>) => {
   try {
     const result = await handleZipEvent(event.data);
     self.postMessage(result);
-  } catch (error) {
-    self.postMessage({error: error.message});
+  } catch (error: unknown) {
+    self.postMessage({error: toError(error).message});
   }
 });

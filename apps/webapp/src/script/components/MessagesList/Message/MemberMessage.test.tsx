@@ -28,10 +28,17 @@ import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {generateUser} from 'test/helper/UserGenerator';
-import {setStrings} from 'Util/LocalizerUtil';
+import {setStrings} from 'Util/localizerUtil';
 
 import {MemberMessage} from './MemberMessage';
 import {CONFIG} from './MemberMessage/MessageContent';
+
+jest.mock('Components/Avatar', () => ({
+  AVATAR_SIZE: {
+    X_LARGE: 'avatar-xl',
+  },
+  Avatar: () => <div data-uie-name="mock-avatar" />,
+}));
 
 setStrings({en});
 

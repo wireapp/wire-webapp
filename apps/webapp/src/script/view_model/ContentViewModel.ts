@@ -34,9 +34,9 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {isConversationEntity} from 'Util/TypePredicateUtil';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {isConversationEntity} from 'Util/typePredicateUtil';
 
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
@@ -233,7 +233,7 @@ export class ContentViewModel {
         await new Promise(resolve => setTimeout(resolve, initialDelayMs * (attempt + 1)));
         await this.conversationRepository.fetchBackendConversationEntityById(conversationId);
         return true;
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(`Retry attempt ${attempt + 1}/${maxRetries} failed for conversation fetch`, error);
       }
     }
@@ -293,10 +293,12 @@ export class ContentViewModel {
       this.showAndNavigate(conversationEntity, openNotificationSettings, filePath);
     } catch (error: unknown) {
       if (this.isConversationNotFoundError(error)) {
+        const qualifiedId = isConversationEntity(conversation) ? conversation.qualifiedId : conversation;
+
         // Retry fetching the conversation to handle race conditions
         const fetchSucceeded = await this.retryFetchConversationWithBackoff({
-          id: conversation.domain,
-          domain: conversation.domain,
+          id: qualifiedId.id,
+          domain: qualifiedId.domain,
         });
 
         if (fetchSucceeded) {

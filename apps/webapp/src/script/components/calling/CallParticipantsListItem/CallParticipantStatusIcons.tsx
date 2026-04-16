@@ -19,7 +19,7 @@
 
 import * as Icon from 'Components/Icon';
 import {Participant} from 'Repositories/calling/Participant';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {
   callStatusIcons,

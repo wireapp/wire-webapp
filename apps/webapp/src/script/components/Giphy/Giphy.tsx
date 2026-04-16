@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {GifImage} from 'Components/Giphy/GifImage';
 import * as Icon from 'Components/Icon';
 import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 const GIPHY_CLOSE_TIMEOUT = 350;
 
@@ -100,7 +100,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
         setGifs(fetchedGifs);
         setGiphyState(GiphyState.RESULTS);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.warn(error);
       setGiphyState(GiphyState.ERROR);
     }
@@ -143,7 +143,7 @@ const Giphy: FC<GiphyProps> = ({giphyRepository, defaultGiphyState = GiphyState.
       setGifs([gif]);
       setSelectedGif(gif);
       setGiphyState(GiphyState.RESULT);
-    } catch (error) {
+    } catch (error: unknown) {
       setGiphyState(GiphyState.ERROR);
     }
   };

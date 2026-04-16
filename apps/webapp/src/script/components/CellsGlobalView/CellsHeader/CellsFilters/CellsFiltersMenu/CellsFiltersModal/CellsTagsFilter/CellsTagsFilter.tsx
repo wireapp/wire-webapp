@@ -19,7 +19,7 @@
 
 import {ComboboxSelect, ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {wrapperStyles, menuListCSS} from './CellsTagsFilter.styles';
 

@@ -24,10 +24,10 @@ import cx from 'classnames';
 import {container} from 'tsyringe';
 
 import {InViewport} from 'Components/InViewport';
-import {AssetRemoteData} from 'Repositories/assets/AssetRemoteData';
+import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {getImageStyle, getWrapperStyles} from './Image.styles';
 import {RestrictedImage} from './RestrictedImage';
@@ -94,7 +94,7 @@ export const Image = ({
             return;
           }
           setImageUrl(url);
-        } catch (error) {
+        } catch (error: unknown) {
           console.error(error);
         }
       })();

@@ -31,8 +31,8 @@ import {ErrorFallback} from 'Components/ErrorFallback';
 import * as Icon from 'Components/Icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 interface UserDetailsProps {
   badge?: string;

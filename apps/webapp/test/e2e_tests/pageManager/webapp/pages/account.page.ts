@@ -20,7 +20,7 @@
 import {Page, Locator} from '@playwright/test';
 
 export class AccountPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   readonly sendUsageDataCheckbox: Locator;
   readonly appLockCheckboxLabel: Locator;
@@ -46,8 +46,8 @@ export class AccountPage {
     this.page = page;
 
     this.sendUsageDataCheckbox = page.locator("[data-uie-name='status-preference-telemetry']+label");
-    this.appLockCheckboxLabel = page.locator("[data-uie-name='status-preference-applock']+label");
-    this.appLockCheckbox = page.locator("[data-uie-name='status-preference-applock']");
+    this.appLockCheckboxLabel = page.getByText('Lock with passcode', {exact: true});
+    this.appLockCheckbox = page.getByRole('checkbox', {name: 'Lock with passcode'});
     this.deleteAccountButton = page.getByTestId('go-delete-account');
     this.backUpButton = page.getByTestId('do-backup-export');
     this.backupFileInput = page.getByTestId('input-import-file');
@@ -64,6 +64,17 @@ export class AccountPage {
     this.resetPasswordButton = page.getByTestId('do-reset-password');
     this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
     this.typingIndicator = page.locator("[data-uie-name='status-preference-typing-indicator']+label");
+  }
+
+  /** Locator for the privacy section within the account settings, including utils for the options inside it */
+  get privacySection() {
+    const section = this.page.getByRole('group', {name: 'Privacy'});
+    return Object.assign(section, {
+      appLock: {
+        checkbox: section.locator('[data-uie-name="status-preference-applock"]'),
+        label: section.locator('[data-uie-name="status-preference-applock"]+label'),
+      },
+    });
   }
 
   async clickBackUpButton() {
@@ -94,10 +105,6 @@ export class AccountPage {
     return this.sendUsageDataCheckbox.isChecked();
   }
 
-  async toggleAppLock() {
-    await this.appLockCheckboxLabel.click();
-  }
-
   async clickLogoutButton() {
     await this.logoutButton.click();
   }
@@ -112,6 +119,14 @@ export class AccountPage {
     await this.resetPasswordButton.click();
   }
 
+  async uploadProfilePicture(imagePath: string) {
+    const [filePicker] = await Promise.all([
+      this.page.waitForEvent('filechooser'),
+      this.page.getByLabel('Change your picture').click(),
+    ]);
+    await filePicker.setFiles(imagePath);
+  }
+
   async changeEmailAddress(newEmail: string) {
     await this.editEmailButton.click();
     await this.emailInput.fill(newEmail);
@@ -122,5 +137,13 @@ export class AccountPage {
     await this.editDisplayNameButton.click();
     await this.displayNameInput.fill(newName);
     await this.displayNameInput.press('Enter');
+  }
+
+  statusOption(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    return this.page.getByRole('button', {name: new RegExp(`${status}`, 'i')});
+  }
+
+  async selectStatus(status: 'Away' | 'Busy' | 'Available' | 'None') {
+    await this.statusOption(status).click();
   }
 }

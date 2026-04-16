@@ -20,7 +20,7 @@
 import {useState} from 'react';
 
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
-import {t} from 'Util/LocalizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {iconWrapperStyles, videoStyles} from './VideoAssetSmall.styles';
 

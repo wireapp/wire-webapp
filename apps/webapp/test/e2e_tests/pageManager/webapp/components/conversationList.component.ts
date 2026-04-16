@@ -20,11 +20,9 @@
 import {Page, Locator} from '@playwright/test';
 
 export class ContactList {
-  readonly page: Page;
   readonly searchList: Locator;
 
   constructor(page: Page) {
-    this.page = page;
     this.searchList = page.getByTestId('search-list');
   }
 

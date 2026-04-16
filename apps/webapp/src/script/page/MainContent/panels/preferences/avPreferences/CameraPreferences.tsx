@@ -25,8 +25,8 @@ import * as Icon from 'Components/Icon';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger} from 'Util/Logger';
+import {t} from 'Util/localizerUtil';
+import {getLogger} from 'Util/logger';
 
 import {DeviceSelect} from './DeviceSelect';
 
@@ -73,7 +73,7 @@ const CameraPreferencesComponent = ({streamHandler, refreshStream, hasActiveCame
         }
         setStream(stream);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof Error) {
         logger.warn(`Requesting MediaStream for type "${MediaType.VIDEO}" failed: ${error.message}`, error);
       }

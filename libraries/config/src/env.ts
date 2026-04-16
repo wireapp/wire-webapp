@@ -110,16 +110,11 @@ export type Env = {
   /** Feature toggle for account registration. Can be set to true or false */
   FEATURE_ENABLE_ACCOUNT_REGISTRATION: string;
 
-  /** Feature toggle for account registration whether the user is promped to accept terms of use only
-   * or terms of use *and* privacy policy at once. Can be set to true or false. Defaults to false.
-   */
-  FEATURE_ENABLE_ACCOUNT_REGISTRATION_ACCEPT_TERMS_AND_PRIVACY_POLICY: string;
-
   /** Feature toggle for advanced filters */
   FEATURE_ENABLE_ADVANCED_FILTERS: string;
 
-  /** Feature toggle to blur the background during video call */
-  FEATURE_ENABLE_BLUR_BACKGROUND: string;
+  /** Optional override path for the multiclass segmentation model */
+  FEATURE_MULTICLASS_MODEL_PATH: string;
 
   /** Feature toggle for debug utils. Can be set to true or false */
   FEATURE_ENABLE_DEBUG: string;
@@ -228,8 +223,8 @@ export type Env = {
   /** Limits the number of participants in a legacy video call */
   MAX_VIDEO_PARTICIPANTS: string;
 
-  /** Minimum required client build date */
-  MINIMUM_REQUIRED_CLIENT_BUILD_DATE: string | undefined;
+  /** Enables exact client/server version enforcement for incident-driven force reloads */
+  ENABLE_CLIENT_VERSION_ENFORCEMENT: string | undefined;
 
   /** Minimum number of characters when setting a password */
   NEW_PASSWORD_MINIMUM_LENGTH: string;

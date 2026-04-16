@@ -47,7 +47,7 @@ apiClient.login(credentials);
 
 ```ts
 import {APIClient} from '@wireapp/api-client';
-import {Config} from '@wireapp/api-client/lib/Config';
+import {Config} from '@wireapp/api-client/lib/config';
 import {LoginData} from '@wireapp/api-client/lib/auth/';
 import {ClientType} from '@wireapp/api-client/lib/client';
 
@@ -69,16 +69,6 @@ const apiClient = new APIClient(apiConfig);
 
 apiClient.login(credentials);
 ```
-
-### Examples
-
-**Browser**
-
-- [index.html](index.html)
-
-**Node.js**
-
-- [demo.ts](demo.ts)
 
 ### Execution
 

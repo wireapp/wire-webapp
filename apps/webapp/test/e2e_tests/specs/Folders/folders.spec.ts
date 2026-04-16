@@ -60,10 +60,10 @@ test.describe('Folders', () => {
   let userB: User;
   let userAPageManager: PageManager;
 
-  test.beforeEach(async ({createTeam, createPage}) => {
-    const team = await createTeam('Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createPage, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
     userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
   });
 

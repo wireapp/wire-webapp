@@ -17,6 +17,8 @@
  *
  */
 
+import {toError} from 'Util/toError';
+
 import {UserActionCreator} from './creator/';
 
 import {currentLanguage} from '../../localeConfig';
@@ -36,8 +38,8 @@ export class UserAction {
       try {
         await apiClient.api.user.postActivationCode({email, locale: currentLanguage()});
         dispatch(UserActionCreator.successfulSendActivationCode());
-      } catch (error) {
-        dispatch(UserActionCreator.failedSendActivationCode(error));
+      } catch (error: unknown) {
+        dispatch(UserActionCreator.failedSendActivationCode(toError(error)));
         throw error;
       }
     };

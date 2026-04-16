@@ -27,8 +27,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientState} from 'Repositories/client/ClientState';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {t} from 'Util/LocalizerUtil';
-import {splitFingerprint} from 'Util/StringUtil';
+import {t} from 'Util/localizerUtil';
+import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
 import {DeviceCard} from '../DeviceCard';

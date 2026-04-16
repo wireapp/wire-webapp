@@ -25,8 +25,8 @@ import * as Icon from 'Components/Icon';
 import {AssetImage} from 'Components/Image';
 import {MultipartAssetPreview} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssetPreview';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
-import {t} from 'Util/LocalizerUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
 
 interface ReplyBarProps {

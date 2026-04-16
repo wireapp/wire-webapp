@@ -19,7 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
-import {useKoSubscribableChildren} from 'Util/ComponentUtil';
+import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Call} from './Call';
 import type {Participant} from './Participant';

@@ -21,8 +21,8 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import {CellsRepository} from 'src/script/repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
 import {FileInfo, FileVersion} from '../types';
@@ -72,7 +72,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 
         const groupedVersions = groupVersionsByDate(versions || []);
         setFileVersions(groupedVersions);
-      } catch (err) {
+      } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToLoadVersions');
         setError(errorMessage);
       } finally {
@@ -120,7 +120,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
         uuid: nodeUuid,
         versionId: toBeRestoredVersionId,
       });
-    } catch (err) {
+    } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToRestore');
       setError(errorMessage);
     } finally {

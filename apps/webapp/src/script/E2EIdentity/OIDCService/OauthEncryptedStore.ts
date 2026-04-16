@@ -42,7 +42,7 @@ export class EncryptedStorage {
       );
       const base64Value = Encoder.toBase64(encryptedValue).asString;
       window.localStorage.setItem(key, JSON.stringify({value: base64Value, iv: Array.from(iv)}));
-    } catch (error) {
+    } catch (error: unknown) {
       console.error(error);
       throw error;
     }

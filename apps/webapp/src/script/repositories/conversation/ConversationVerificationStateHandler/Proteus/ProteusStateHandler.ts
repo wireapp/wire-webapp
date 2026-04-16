@@ -26,7 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {UserState} from 'Repositories/user/UserState';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
-import {getLogger, Logger} from 'Util/Logger';
+import {getLogger, Logger} from 'Util/logger';
 
 import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';
 import {ConversationState} from '../../ConversationState';

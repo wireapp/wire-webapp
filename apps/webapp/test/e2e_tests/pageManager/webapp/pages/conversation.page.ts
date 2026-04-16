@@ -27,7 +27,7 @@ import {ConfirmModal} from '../modals/confirm.modal';
 type EmojiReaction = 'plus-one' | 'heart' | 'joy';
 
 export class ConversationPage {
-  readonly page: Page;
+  private readonly page: Page;
 
   /** The back button is shown on narrow screens e.g. phones to navigate back to the conversation list */
   readonly backButton: Locator;
@@ -59,6 +59,9 @@ export class ConversationPage {
   readonly itemPendingRequest: Locator;
   readonly ignoreButton: Locator;
   readonly cancelRequest: Locator;
+  readonly mentionSuggestions: Locator;
+  readonly invitePeopleButton: Locator;
+  readonly guestsIndicator: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -102,8 +105,11 @@ export class ConversationPage {
     this.filesTab = page.locator('#conversation-tab-files');
     this.typingIndicator = page.getByTestId('typing-indicator-title');
     this.itemPendingRequest = page.getByTestId('item-pending-requests');
-    this.ignoreButton = page.getByTestId('do-ignore');
-    this.cancelRequest = page.getByTestId('do-cancel-request');
+    this.ignoreButton = page.getByRole('button', {name: 'Ignore'});
+    this.cancelRequest = page.getByRole('button', {name: 'Cancel connection request'});
+    this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
+    this.invitePeopleButton = page.getByRole('button', {name: 'Invite people'});
+    this.guestsIndicator = page.getByTestId('status-indication-badge');
   }
 
   getImageLocator(user: User): Locator {
@@ -113,14 +119,6 @@ export class ConversationPage {
       .getByTestId('image-asset')
       .getByTestId('image-asset-img')
       .and(this.page.locator(`[alt^="${this.getImageAltText(user)}"]`));
-  }
-
-  async isConversationOpen(conversationName: string) {
-    return (await this.page.getByTestId('status-conversation-title-bar-label').textContent()) === conversationName;
-  }
-
-  async clickItemPendingRequest() {
-    await this.itemPendingRequest.click();
   }
 
   async clickConversationTitle() {
@@ -143,10 +141,6 @@ export class ConversationPage {
     await this.ignoreButton.click();
   }
 
-  async clickCancelRequest() {
-    await this.cancelRequest.click();
-  }
-
   async sendMessage(message: string) {
     await this.messageInput.fill(message);
     await this.sendMessageButton.click();
@@ -156,6 +150,18 @@ export class ConversationPage {
     await this.messageInput.click();
     // Use pressSequentially which simulates realistic typing with built-in delays
     await this.messageInput.pressSequentially(message, {delay: 100});
+  }
+
+  async sendTypedMessage(message: string) {
+    await this.messageInput.clear();
+    await this.typeMessage(message);
+    await this.sendMessageButton.click();
+  }
+
+  async mentionUser(userFullName: string, searchQuery?: string) {
+    const textToType = searchQuery ? `@${searchQuery}` : `@${userFullName.slice(0, 3)}`;
+    await this.messageInput.pressSequentially(textToType);
+    await this.mentionSuggestions.filter({hasText: userFullName}).click({timeout: 5000});
   }
 
   async replyToMessage(message: Locator) {
@@ -174,38 +180,14 @@ export class ConversationPage {
   }
 
   async sendMessageWithUserMention(userFullName: string, messageText?: string) {
-    await this.messageInput.fill(`@`);
-    await this.page
-      .getByTestId('item-mention-suggestion')
-      .getByTestId('status-name')
-      .filter({hasText: userFullName})
-      .click({timeout: 1000});
+    await this.messageInput.fill(''); // Clear the input initially
+    await this.mentionUser(userFullName);
 
     if (messageText) {
       await this.messageInput.pressSequentially(messageText);
     }
 
     await this.messageInput.press('Enter');
-  }
-
-  async isImageFromUserVisible(user: User) {
-    // Trying multiple times for the image to appear
-    const locator = this.getImageLocator(user);
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await locator.first().waitFor({state: 'visible'});
-
-    return await locator.isVisible();
-  }
-
-  async getImageScreenshot(user: User): Promise<Buffer> {
-    const locator = this.getImageLocator(user);
-
-    // Wait for the image to be visible
-    await locator.waitFor({state: 'visible'});
-
-    // Take a screenshot of the image
-    return await locator.screenshot();
   }
 
   /**
@@ -298,28 +280,6 @@ export class ConversationPage {
     await locator.click();
   }
 
-  async isPlusOneReactionVisible() {
-    const plusOneReactionIcon = this.page
-      .getByTestId('item-message')
-      .getByTestId('message-reactions')
-      .getByTestId('emoji-pill')
-      .and(this.page.locator('button[aria-label="1 reaction, react with +1 emoji"]'));
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await plusOneReactionIcon.first().waitFor({state: 'visible'});
-
-    return await plusOneReactionIcon.isVisible();
-  }
-
-  async isVideoMessageVisible() {
-    const videoMessageLocator = this.page.getByTestId('item-message').getByTestId('video-asset');
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await videoMessageLocator.first().waitFor({state: 'visible'});
-
-    return await videoMessageLocator.isVisible();
-  }
-
   async playVideo() {
     const videoPlayButton = this.page
       .getByTestId('item-message')
@@ -337,53 +297,10 @@ export class ConversationPage {
     await audioPlayButton.click();
   }
 
-  async isAudioPlaying() {
-    const audioTimeLocator = this.page
-      .getByTestId('item-message')
-      .getByTestId('audio-asset')
-      .getByTestId('status-audio-time');
-
-    const audioTimeText = (await audioTimeLocator.textContent())?.trim();
-    if (!audioTimeText) {
-      throw new Error('Audio time text is empty or undefined');
-    }
-    const seconds = parseInt(audioTimeText.split(':')[1], 10);
-    return seconds > 0;
-  }
-
-  async isAudioMessageVisible() {
-    const audioMessageLocator = this.page.getByTestId('item-message').getByTestId('audio-asset');
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await audioMessageLocator.first().waitFor({state: 'visible'});
-
-    return await audioMessageLocator.isVisible();
-  }
-
-  async isFileMessageVisible() {
-    const fileMessageLocator = this.page.getByTestId('item-message').getByTestId('file-asset');
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await fileMessageLocator.first().waitFor({state: 'visible'});
-
-    return await fileMessageLocator.isVisible();
-  }
-
-  async isReplyMessageVisible(replyText: string) {
-    const replyMessageLocator = this.page
-      .getByTestId('item-message')
-      .locator('.message-body.message-quoted .text', {hasText: replyText});
-
-    // Wait for at least one matching element to appear (optional timeout can be set)
-    await replyMessageLocator.first().waitFor({state: 'visible'});
-
-    return await replyMessageLocator.isVisible();
-  }
-
-  async downloadFile() {
+  async downloadFile(outputDir: string) {
     const downloadButton = this.page.getByTestId('item-message').getByTestId('file-asset');
 
-    const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton);
+    const filePath = await downloadAssetAndGetFilePath(this.page, downloadButton, outputDir);
     return filePath;
   }
 
@@ -392,36 +309,8 @@ export class ConversationPage {
     await startCallButton.click();
   }
 
-  async isSystemMessageVisible(messageText: string) {
-    await this.systemMessages.filter({hasText: messageText}).first().waitFor({state: 'visible'});
-    return true;
-  }
-
-  async isConversationReadonly() {
-    await this.messageInput.waitFor({state: 'detached'});
-  }
-
-  async isMessageInputVisible() {
-    return await this.messageInput.isVisible();
-  }
-
   async toggleGroupInformation() {
     await this.openGroupInformationViaName.click();
-  }
-
-  async isUserGroupMember(name: string) {
-    return this.membersList
-      .getByTestId('item-user')
-      .and(this.page.locator(`[data-uie-value="${name}"]`))
-      .isVisible();
-  }
-
-  async isUserGroupAdmin(name: string) {
-    await this.adminsList
-      .getByTestId('item-user')
-      .and(this.page.locator(`[data-uie-value="${name}"]`))
-      .waitFor({state: 'visible'});
-    return true;
   }
 
   async makeUserAdmin(name: string) {
@@ -437,7 +326,8 @@ export class ConversationPage {
       .getByTestId('item-user')
       .and(this.page.locator(`[data-uie-value="${name}"]`))
       .click();
-    return this.removeUserButton.click();
+    await this.removeUserButton.click();
+    await new ConfirmModal(this.page).clickAction();
   }
 
   async removeAdminFromGroup(name: string) {
@@ -456,21 +346,8 @@ export class ConversationPage {
     await this.addMemberButton.click();
   }
 
-  async messageCount() {
-    return await this.messages.count();
-  }
-
-  async getTitle() {
-    return await this.conversationTitle.innerText();
-  }
-
   async sendPing() {
     await this.pingButton.click();
-  }
-
-  async getCurrentFocusedToolTip(message: Locator) {
-    await message.getByTestId('emoji-pill').first().hover();
-    return this.page.locator('[data-testid="tooltip-content"]');
   }
 
   /**

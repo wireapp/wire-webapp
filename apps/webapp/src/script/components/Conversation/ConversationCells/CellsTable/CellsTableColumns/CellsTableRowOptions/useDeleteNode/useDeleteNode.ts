@@ -21,8 +21,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {useAppNotification} from 'Components/AppNotification';
 import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
-import {t} from 'Util/LocalizerUtil';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {t} from 'Util/localizerUtil';
 
 interface UseDeleteNodeProps {
   conversationQualifiedId: QualifiedId;
@@ -41,7 +41,7 @@ export const useDeleteNode = ({conversationQualifiedId, cellsRepository}: UseDel
       try {
         removeNode({conversationId: conversationQualifiedId.id, nodeId: uuid});
         await cellsRepository.deleteNode({uuid, permanently});
-      } catch (error) {
+      } catch (error: unknown) {
         deleteFileFailedNotification.show();
         console.error(error);
       }

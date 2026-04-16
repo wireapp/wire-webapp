@@ -29,13 +29,13 @@
     "release-staging": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "git checkout dev && git pull && ts-node ./bin/release_tag.ts staging"
+        "command": "git checkout master && git pull origin master && ts-node ./bin/release_tag.ts staging"
       }
     },
     "release-production": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "git checkout master && git pull && ts-node ./bin/release_tag.ts production"
+        "command": "git checkout master && git pull origin master && ts-node ./bin/release_tag.ts production"
       }
     },
     "release-custom": {
@@ -52,6 +52,7 @@
     },
     "test": {
       "executor": "nx:run-commands",
+      "dependsOn": [],
       "options": {
         "command": "echo \"workspace-tools has no tests\""
       }
@@ -64,6 +65,7 @@
     },
     "lint": {
       "executor": "nx:run-commands",
+      "dependsOn": [],
       "options": {
         "command": "echo \"workspace-tools has no lint\""
       }

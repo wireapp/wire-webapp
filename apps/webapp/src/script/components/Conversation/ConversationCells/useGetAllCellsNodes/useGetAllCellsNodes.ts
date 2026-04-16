@@ -21,7 +21,7 @@ import {useEffect, useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsRepository} from 'Repositories/cells/CellsRepository';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
@@ -79,7 +79,7 @@ export const useGetAllCellsNodes = ({
       setPagination({conversationId: id, pagination});
 
       setStatus('success');
-    } catch (error) {
+    } catch (error: unknown) {
       setError(error instanceof Error ? error : new Error('Failed to fetch files', {cause: error}));
       setPagination({conversationId: id, pagination: null});
       setStatus('error');

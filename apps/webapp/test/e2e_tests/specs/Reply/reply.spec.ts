@@ -19,7 +19,6 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {ConfirmModal} from 'test/e2e_tests/pageManager/webapp/modals/confirm.modal';
 import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
@@ -29,10 +28,10 @@ test.describe('Reply', () => {
   let userA: User;
   let userB: User;
 
-  test.beforeEach(async ({createTeam}) => {
-    const team = await createTeam('Test Team', {withMembers: 1});
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    const team = await createTeam('Test Team', {users: [userB]});
     userA = team.owner;
-    userB = team.members[0];
   });
 
   test('I should not be able to reply to a ping', {tag: ['@TC-8038', '@regression']}, async ({createPage}) => {
@@ -63,9 +62,11 @@ test.describe('Reply', () => {
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userAPages.conversation().sendMessage('Test');
 
       const messageToReplyTo = userBPages.conversation().getMessage({content: 'Test'});
@@ -123,8 +124,8 @@ test.describe('Reply', () => {
   );
 
   test('I want to reply to a picture', {tag: ['@TC-3002', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
-    const {page} = pages.conversation();
+    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const pages = PageManager.from(page).webapp.pages;
     await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
 
     const messageWithImage = pages.conversation().getMessage({sender: userA});
@@ -136,8 +137,9 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to an audio message', {tag: ['@TC-3003', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
-    const {page} = pages.conversation();
+    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const pages = PageManager.from(page).webapp.pages;
+
     await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
     const messageWithAudio = pages.conversation().getMessage({sender: userA});
@@ -149,8 +151,8 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a video message', {tag: ['@TC-3004', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
-    const {page} = pages.conversation();
+    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const pages = PageManager.from(page).webapp.pages;
     await shareAssetHelper(getVideoFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
     const messageWithVideo = pages.conversation().getMessage({sender: userA});
@@ -170,12 +172,12 @@ test.describe('Reply', () => {
     await pages.conversation().sendMessage('Reply');
 
     const reply = pages.conversation().getMessage({content: 'Reply'});
-    await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
+    await expect(reply.getByTestId('quote-item').getByRole('link', {name: /https:\/\/www\.lidl\.de\/?/})).toBeVisible();
   });
 
   test('I want to reply to a file', {tag: ['@TC-3006', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
-    const {page} = pages.conversation();
+    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const pages = PageManager.from(page).webapp.pages;
     await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
     const messageWithFile = pages.conversation().getMessage({sender: userA});
@@ -212,7 +214,7 @@ test.describe('Reply', () => {
 
     const reply = pages.conversation().getMessage({content: 'Reply'});
     await expect(reply.getByTestId('quote-item')).toContainText('Link: https://www.lidl.de');
-    await expect(reply.getByTestId('quote-item').getByTestId('markdown-link')).toBeVisible();
+    await expect(reply.getByTestId('quote-item').getByRole('link', {name: /https:\/\/www\.lidl\.de\/?/})).toBeVisible();
   });
 
   test('I want to reply to a location share', {tag: ['@TC-3009', '@regression']}, async ({createPage, api}) => {
@@ -226,6 +228,7 @@ test.describe('Reply', () => {
         false,
       );
       const conversationId = await api.conversation.getConversationWithUser(userA.token, userB.id!);
+      if (conversationId === undefined) throw new Error("Couldn't find conversation of userA with userB");
       await api.testService.sendLocation(instanceId, conversationId, {
         locationName: 'Test Location',
         latitude: 52.5170365,
@@ -306,7 +309,6 @@ test.describe('Reply', () => {
 
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversation().removeMemberFromGroup(userB.fullName);
-      await new ConfirmModal(userAPages.conversation().page).clickAction();
       await expect(
         userBPages.conversation().systemMessages.filter({hasText: `${userA.fullName} removed you`}),
       ).toBeVisible();

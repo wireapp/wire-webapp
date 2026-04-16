@@ -17,6 +17,8 @@
  *
  */
 
+import {toError} from 'Util/toError';
+
 import {LocalStorageActionCreator} from './creator/';
 
 import type {ThunkAction} from '../reducer';
@@ -36,8 +38,8 @@ export class LocalStorageAction {
       try {
         localStorage.setItem(key, JSON.stringify({data: value}));
         dispatch(LocalStorageActionCreator.successfulLocalStorageSet(key, value));
-      } catch (error) {
-        dispatch(LocalStorageActionCreator.failedLocalStorageSet(error));
+      } catch (error: unknown) {
+        dispatch(LocalStorageActionCreator.failedLocalStorageSet(toError(error)));
         throw error;
       }
     };
@@ -51,8 +53,8 @@ export class LocalStorageAction {
         data = JSON.parse(localStorage.getItem(key) ?? '{}').data;
         dispatch(LocalStorageActionCreator.successfulLocalStorageGet(key, data));
         return data;
-      } catch (error) {
-        dispatch(LocalStorageActionCreator.failedLocalStorageGet(error));
+      } catch (error: unknown) {
+        dispatch(LocalStorageActionCreator.failedLocalStorageGet(toError(error)));
         throw error;
       }
     };
@@ -64,8 +66,8 @@ export class LocalStorageAction {
       try {
         localStorage.removeItem(key);
         dispatch(LocalStorageActionCreator.successfulLocalStorageDelete(key));
-      } catch (error) {
-        dispatch(LocalStorageActionCreator.failedLocalStorageDelete(error));
+      } catch (error: unknown) {
+        dispatch(LocalStorageActionCreator.failedLocalStorageDelete(toError(error)));
         throw error;
       }
     };

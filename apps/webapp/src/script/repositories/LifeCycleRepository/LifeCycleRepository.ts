@@ -22,16 +22,16 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
-import {CacheRepository} from 'Repositories/cache/CacheRepository';
+import {CacheRepository} from 'Repositories/cache/cacheRepository';
 import type {ClientRepository} from 'Repositories/client/ClientRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import type {StorageRepository} from 'Repositories/storage/StorageRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
-import {getLogger, Logger} from 'Util/Logger';
-import {includesString} from 'Util/StringUtil';
-import {appendParameter} from 'Util/UrlUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {includesString} from 'Util/stringUtil';
+import {appendParameter} from 'Util/urlUtil';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {URLParameter} from '../../auth/URLParameter';
@@ -159,7 +159,7 @@ export class LifeCycleRepository {
       this.logger.info(`Logout triggered by '${signOutReason}': Disconnecting user from the backend.`);
       try {
         await performLogout();
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.error(
           `Logout triggered by '${signOutReason}' and errored: ${error instanceof Error ? error.message : error}.`,
         );
@@ -174,7 +174,7 @@ export class LifeCycleRepository {
     if (requiresImmediateLogout) {
       try {
         return await performLogout();
-      } catch (error) {
+      } catch (error: unknown) {
         if (error instanceof BaseError) {
           this.logger.error(`Logout triggered by '${signOutReason}' and errored: ${error.message}.`);
         }
@@ -206,7 +206,7 @@ export class LifeCycleRepository {
       try {
         await this.dependencies.conversationRepository.sendTypingStop(activeConversation);
         this.logger.debug('Sent typing stop notification for active conversation during logout.');
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn('Failed to send typing stop before logout.', error);
       }
     }
@@ -271,7 +271,7 @@ export class LifeCycleRepository {
 
     try {
       return this.dependencies.clientRepository.isCurrentClientPermanent();
-    } catch (error) {
+    } catch (error: unknown) {
       // Handle case where client is not set
       const isClientNotSetError = error instanceof ClientError && error.type === ClientError.TYPE.CLIENT_NOT_SET;
       if (isClientNotSetError) {
@@ -355,7 +355,7 @@ export class LifeCycleRepository {
     try {
       await this.dependencies.storageRepository.deleteDatabase();
       this.logger.info('Database deleted successfully as part of persistent storage cleanup.');
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.error('Failed to delete database before logout', error);
     }
   };

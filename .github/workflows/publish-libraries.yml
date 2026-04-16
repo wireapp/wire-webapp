@@ -14,18 +14,18 @@ concurrency:
 jobs:
   create-release-pr:
     name: Create Release PR
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           fetch-depth: 0
           ref: dev
           token: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -77,6 +77,6 @@ jobs:
             --head "$RELEASE_BRANCH" \
             --title "chore(release): publish libraries [WPB-22420]" \
             --label "publish-to-npm" \
-            --body "Automated release PR created by nx release. ⚠️ **Important:** Do NOT squash merge this PR. Use 'Merge commit' to preserve git tags."
+            --body "Automated release PR created by nx release. ⚠️ **Important:** Squash-merge this PR (do not use 'Merge commit')."
         env:
           GITHUB_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}

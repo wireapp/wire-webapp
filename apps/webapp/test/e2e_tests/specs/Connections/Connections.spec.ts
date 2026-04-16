@@ -17,65 +17,99 @@
  *
  */
 
-import {getUser} from 'test/e2e_tests/data/user';
+import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {completeLogin} from 'test/e2e_tests/utils/setup.util';
-import {tearDownAll} from 'test/e2e_tests/utils/tearDown.util';
 
-import {test, expect} from '../../test.fixtures';
+import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Connections', () => {
-  const members = Array.from({length: 2}, () => getUser());
-  const [memberA, memberB] = members;
+  let memberA: User;
+  let memberB: User;
 
-  test.beforeAll(async ({api}) => {
-    await api.createPersonalUser(memberA);
-    await api.createPersonalUser(memberB);
+  test.beforeEach(async ({createUser}) => {
+    [memberA, memberB] = await Promise.all([createUser(), createUser()]);
   });
 
   test(
     'Verify 1on1 conversation is not created on the second end after you ignore connection request',
-    {tag: ['@TC-365', '@TC-369', '@TC-370', '@TC-371', '@regression']},
-    async ({pageManager: memberPageManagerA, browser}) => {
-      const memberContext = await browser.newContext();
-      const memberPage = await memberContext.newPage();
-      const memberPageManagerB = PageManager.from(memberPage);
+    {tag: ['@TC-365', '@regression']},
+    async ({createPage}) => {
+      const [memberBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(memberA), withConnectionRequest(memberB))),
+      ]);
 
-      const {pages, components, modals} = memberPageManagerA.webapp;
-      const {pages: pagesB} = memberPageManagerB.webapp;
+      await memberBPages.conversationList().pendingConnectionRequest.click();
+      await memberBPages.conversation().clickIgnoreButton();
 
-      await Promise.all([completeLogin(memberPageManagerA, memberA), completeLogin(memberPageManagerB, memberB)]);
+      await expect(memberBPages.conversation().itemPendingRequest).not.toBeVisible();
+    },
+  );
 
-      await components.conversationSidebar().clickConnectButton();
-      await pages.startUI().selectUsers(memberB.username);
-      await modals.userProfile().clickConnectButton();
-      await pagesB.conversationList().openPendingConnectionRequest();
-      await pagesB.conversation().clickItemPendingRequest();
-      await pagesB.conversation().clickIgnoreButton();
+  test(
+    'Verify sending a connection request to user from conversation view',
+    {tag: ['@TC-369', '@regression']},
+    async ({createPage, createUser}) => {
+      const memberC = await createUser();
+      const [memberAPages, memberBPages, memberCPages] = await Promise.all([
+        PageManager.from(
+          createPage(withLogin(memberA), withConnectionRequest(memberB), withConnectionRequest(memberC)),
+        ).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(memberC))).then(pm => pm.webapp.pages),
+      ]);
 
-      await expect(pagesB.conversation().itemPendingRequest).toHaveCount(0);
-
-      await test.step('I want to cancel a pending request from conversation list', async () => {
-        await pages.conversation().clickCancelRequest();
-        await modals.confirm().clickAction();
+      await test.step('B & C accept connection requests from A', async () => {
+        for (const pages of [memberBPages, memberCPages]) {
+          await pages.conversationList().pendingConnectionRequest.click();
+          await pages.connectRequest().connectButton.click();
+        }
       });
 
-      await test.step('I want to archive a pending request from conversation list', async () => {
-        await components.conversationSidebar().clickConnectButton();
-        await pages.startUI().selectUsers(memberB.username);
-        await modals.userProfile().clickConnectButton();
-        await pagesB.conversationList().openPendingConnectionRequest();
-        await pagesB.conversation().clickItemPendingRequest();
-        await pages.conversationList().clickConversationOptions(memberB.fullName);
-        await pages.conversationList().archiveConversation();
-        await components.conversationSidebar().clickArchive();
+      await test.step('A creates a group with B & C', async () => {
+        await createGroup(memberAPages, 'Group', [memberB, memberC]);
+      });
 
-        expect(await pages.conversationList().isConversationItemVisible(memberB.fullName)).toBeTruthy();
+      await test.step('B sends a connection request to C via the group conversation', async () => {
+        await memberBPages.conversationList().openConversation('Group');
+        await memberBPages.conversation().conversationInfoButton.click();
+        await memberBPages.conversationDetails().openParticipantDetails(memberC.fullName);
+        await memberBPages.participantDetails().sendConnectRequest();
+      });
+
+      await test.step('C sees the connection request from B', async () => {
+        await expect(memberCPages.conversationList().pendingConnectionRequest).toBeVisible();
       });
     },
   );
 
-  test.afterAll(async ({api}) => {
-    await tearDownAll(api);
-  });
+  test(
+    'I want to cancel a pending request from conversation list',
+    {tag: ['@TC-370', '@regression']},
+    async ({createPage}) => {
+      const [memberBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(memberA), withConnectionRequest(memberB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await memberBPages.conversationList().pendingConnectionRequest.click();
+      await memberBPages.conversation().ignoreButton.click();
+
+      await expect(memberBPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+    },
+  );
+
+  test(
+    'I want to archive a pending request from conversation list',
+    {tag: ['@TC-371', '@regression']},
+    async ({createPage}) => {
+      const {pages} = PageManager.from(await createPage(withLogin(memberA), withConnectionRequest(memberB))).webapp;
+
+      await pages.conversationList().clickConversationOptions(memberB.fullName);
+      await pages.conversationList().archiveConversation();
+
+      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+    },
+  );
 });

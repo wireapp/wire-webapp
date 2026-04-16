@@ -27,9 +27,10 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {t} from 'Util/LocalizerUtil';
-import {getLogger, Logger} from 'Util/Logger';
-import {TypedEventTarget} from 'Util/TypedEventTarget';
+import {t} from 'Util/localizerUtil';
+import {getLogger, Logger} from 'Util/logger';
+import {fixWebsocketString} from 'Util/stringUtil';
+import {TypedEventTarget} from 'Util/typedEventTarget';
 import {createUuid} from 'Util/uuid';
 
 export enum LabelType {
@@ -137,7 +138,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     if (storedData) {
       try {
         parsedStoredData = JSON.parse(storedData);
-      } catch (error) {
+      } catch (error: unknown) {
         this.logger.warn(`Failed to parse stored labels: ${error instanceof Error ? error.message : String(error)}`);
         // Clear corrupted data
         localStorage.removeItem(ConversationLabelRepository.LocalStorageKey);
@@ -164,7 +165,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       if (conversationLabelJson) {
         try {
           localData = JSON.parse(conversationLabelJson);
-        } catch (error) {
+        } catch (error: unknown) {
           this.logger.warn(
             `Failed to parse stored labels, clearing corrupted data: ${error instanceof Error ? error.message : String(error)}`,
           );
@@ -216,7 +217,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         this.persistValues(updatedData);
       }
       // If both are null, labels remain empty (default state)
-    } catch (error) {
+    } catch (error: unknown) {
       this.logger.warn(`No labels were loaded: ${error instanceof Error ? error.message : String(error)}`);
       // Don't save empty state on error
     }
@@ -229,7 +230,17 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly onUserEvent = (event: any) => {
     if (event.type === USER_EVENT.PROPERTIES_SET && event.key === propertiesKey) {
-      this.unmarshal(event.value);
+      const normalizedLabels = event.value?.labels?.map((label: ConversationLabelJson) => {
+        return {
+          ...label,
+          name: label.name ? fixWebsocketString(label.name) : undefined,
+        };
+      });
+      const value: LabelProperty = {
+        ...event.value,
+        labels: normalizedLabels ?? [],
+      };
+      this.unmarshal(value);
     }
   };
 

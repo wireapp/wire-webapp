@@ -17,4 +17,4 @@
  *
  */
 
-export * from './TeamService';
+export * from './teamService';

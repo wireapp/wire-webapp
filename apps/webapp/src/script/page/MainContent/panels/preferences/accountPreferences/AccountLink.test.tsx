@@ -23,7 +23,7 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {AccountLink} from './AccountLink';
 
-import * as utils from '../../../../../util/ClipboardUtil';
+import * as utils from '../../../../../util/clipboardUtil';
 
 test('copies correct text', async () => {
   const mockCopy: any = jest.spyOn(utils, 'copyText');
