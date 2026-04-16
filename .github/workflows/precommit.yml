@@ -84,7 +84,7 @@ jobs:
         id: check_deploy
         if: ${{ always() }}
         run: |
-          if [[ ${{ needs.build.outputs.total_additions }} -le 100 || "${{ github.actor }}" == "dependabot[bot]" ]]; then
+          if [[ ${{ needs.build.outputs.total_additions }} -le 100 || "${{ github.actor }}" == "renovate[bot]" ]]; then
             echo "Skipping deployment"
             exit 0
           fi
@@ -118,8 +118,8 @@ jobs:
           elif [[ "${{ steps.deploy.outcome }}" == "skipped" ]]; then
             if [[ "${{ needs.build.outputs.total_additions }}" -le 100 ]]; then
               echo "⏭️ Deployment was skipped: PR has ${{ needs.build.outputs.total_additions }} additions (threshold: 100)"
-            elif [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
-              echo "⏭️ Deployment was skipped: PR is from dependabot"
+            elif [[ "${{ github.actor }}" == "renovate[bot]" ]]; then
+              echo "⏭️ Deployment was skipped: PR is from renovate"
             else
               echo "⏭️ Deployment was skipped"
             fi
