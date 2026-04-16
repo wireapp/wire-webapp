@@ -101,6 +101,7 @@ export const IntegrationMapper = {
       serviceEntity.category = user.category;
       serviceEntity.previewPictureResource = user.previewPictureResource;
       serviceEntity.mediumPictureResource = user.mediumPictureResource;
+      serviceEntity.qualifiedId = user.qualifiedId;
     }
 
     return serviceEntity;
