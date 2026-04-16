@@ -71,8 +71,9 @@ export const appLockStateName = Object.freeze({
    */
   setup: 'setup',
   /**
-   * App is unlocked. The inactivity callback actor is running and debouncing
-   * user activity. After inactivityTimeoutMs of silence it fires INACTIVITY_TIMEOUT.
+   * App is unlocked. The inactivity callback actor is running and tracking
+   * time since last user activity. After inactivityTimeoutMs of no activity,
+   * it fires INACTIVITY_TIMEOUT.
    * Modal shown: none (app is fully accessible).
    */
   unlocked: 'unlocked',
@@ -124,38 +125,41 @@ type InactivityActorEvent =
   | {type: typeof appLockEventType.inactivityTimeout}; // Not used as input, only sent to parent
 
 /**
- * This callback actor manages a debounced inactivity timer.
+ * This callback actor manages an inactivity timer.
  * It starts a timer when created and resets it whenever it receives a RESET_TIMER event.
  * After timeout milliseconds of no RESET_TIMER events, it sends INACTIVITY_TIMEOUT to the parent machine.
+ * 
+ * Note: This is NOT a debounce of activity events - it's a trailing-edge inactivity detector.
+ * Every activity event resets the timer; we're measuring time since last activity, not rate-limiting events.
  */
 const inactivityCallbackActor = fromCallback<InactivityActorEvent, InactivityActorInput>(
   ({sendBack, input, receive}) => {
     const {wallClock, timeoutMs} = input;
-    let debounceTimeoutId: ReturnType<typeof wallClock.setTimeout> | null = null;
+    let inactivityTimeoutId: ReturnType<typeof wallClock.setTimeout> | null = null;
 
-    const scheduleTimeout = () => {
-      if (debounceTimeoutId !== null) {
-        wallClock.clearTimeout(debounceTimeoutId);
+    const resetInactivityTimer = () => {
+      if (inactivityTimeoutId !== null) {
+        wallClock.clearTimeout(inactivityTimeoutId);
       }
-      debounceTimeoutId = wallClock.setTimeout(() => {
+      inactivityTimeoutId = wallClock.setTimeout(() => {
         sendBack({type: appLockEventType.inactivityTimeout});
       }, timeoutMs);
     };
 
-    // Start the initial timer
-    scheduleTimeout();
+    // Start the initial inactivity timer
+    resetInactivityTimer();
 
     // Listen for RESET_TIMER events from the parent machine
     receive(event => {
       if (event.type === 'RESET_TIMER') {
-        scheduleTimeout();
+        resetInactivityTimer();
       }
     });
 
     // Cleanup on actor stop
     return () => {
-      if (debounceTimeoutId !== null) {
-        wallClock.clearTimeout(debounceTimeoutId);
+      if (inactivityTimeoutId !== null) {
+        wallClock.clearTimeout(inactivityTimeoutId);
       }
     };
   },
