@@ -34,7 +34,7 @@ interface ServiceListItemProps {
 
 export const ServiceListItem = ({service, onClick}: ServiceListItemProps) => {
   const {name: serviceName} = useKoSubscribableChildren(service, ['name']);
-  const serviceShortDescription = service.summary;
+  const serviceShortDescription = service.isApp ? service.description : service.summary;
 
   const onServiceClick = () => onClick(service);
 
