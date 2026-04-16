@@ -84,19 +84,21 @@ test.describe('Calling', () => {
     // Establish group call; required precondition for hand-raise testing
     await userAPages.conversationList().openConversation(groupName);
     await userAPages.conversation().clickCallButton();
-    await userBPages.calling().clickAcceptCallButton();
 
     await expect(userBPages.calling().callCell).toBeVisible();
+    await userBPages.calling().clickAcceptCallButton();
+
+    await expect(userBPages.calling().goFullScreen).toBeVisible();
 
     const userACall = await userAPages.calling().maximizeCell();
     await expect(userACall.selfVideoThumbnail).toBeVisible();
 
     // User A raises hand and verifies the indicator appears on their thumbnail
     await userACall.toggleHandRaise();
-    await expect(userACall.selfVideoThumbnail.getByText('✋')).toBeVisible();
-
     const toast = userAPage.getByText('You have raised your hand up');
-    await expect(toast).toBeVisible();
+
+    await expect(toast).toBeVisible({timeout: 1_000});
+    await expect(userACall.selfVideoThumbnail.getByText('✋')).toBeVisible();
 
     await expect(toast).toBeHidden({timeout: 3000});
 
@@ -221,4 +223,32 @@ test.describe('Calling', () => {
       await expect(userBPages.calling().callCell).toBeVisible();
     },
   );
+
+  test('Verify able to join ongoing call', {tag: ['@TC-2820', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages, userCPage] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB), withConnectedUser(userC))).then(pm => pm.webapp.pages),
+      createPage(withLogin(userC)),
+    ]);
+
+    const userCPages = PageManager.from(userCPage).webapp.pages;
+    await createGroup(userAPages, groupName, [userB, userC]);
+
+    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversation().clickCallButton();
+
+    await expect(userAPages.calling().callCell).toBeVisible();
+    await expect(userBPages.calling().callCell).toBeVisible();
+
+    await userBPages.calling().clickAcceptCallButton();
+    // Confirm the calls grid is visible
+    await expect(userBPages.calling().goFullScreen).toBeVisible();
+
+    // User C joins the ongoing call
+    await expect(userCPages.conversationList().joinCallButton).toBeVisible();
+    await userCPages.conversationList().joinCallButton.click();
+
+    // Confirm that user C joined the call
+    await expect(userCPages.calling().goFullScreen).toBeVisible();
+  });
 });
