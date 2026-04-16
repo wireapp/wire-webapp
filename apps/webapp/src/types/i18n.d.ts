@@ -1276,12 +1276,12 @@ declare module 'I18n/en-US.json' {
     'modalAppLockForgotMessage': `The data stored on this device can only be accessed with your app lock passcode.`;
     'modalAppLockForgotSecondMessage': `If you have forgotten your passcode, you can log out of this account and set a new passcode the next time you log in.`;
     'modalAppLockForgotTitle': `Forgot passcode?`;
+    'modalAppLockInputPlaceholder': `Enter passcode`;
     'modalAppLockLockedError': `Wrong passcode`;
     'modalAppLockLockedForgotCTA': `Forgot passcode?`;
-    'modalAppLockLogoutCancelButton': `Cancel`;
-    'modalAppLockInputPlaceholder': `Enter passcode`;
     'modalAppLockLockedTitle': `Enter passcode to unlock {brandName}`;
     'modalAppLockLockedUnlockButton': `Unlock`;
+    'modalAppLockLogoutCancelButton': `Cancel`;
     'modalAppLockPasscode': `Passcode`;
     'modalAppLockSetupAcceptButton': `Create Passcode`;
     'modalAppLockSetupChangeMessage': `Your organization needs to lock your app when {brandName} is not in use to keep the team safe.[br]Create a passlock to unlock {brandName}. Please, remember it, as it can not be recovered.`;
