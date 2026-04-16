@@ -251,4 +251,26 @@ test.describe('Calling', () => {
     // Confirm that user C joined the call
     await expect(userCPages.calling().goFullScreen).toBeVisible();
   });
+
+  test('Verify Call UI checks', {tag: ['@TC-8771', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+    ]);
+
+    await createGroup(userAPages, groupName, [userB, userC]);
+
+    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversation().clickCallButton();
+
+    await expect(userAPages.calling().callCell).toBeVisible();
+    await expect(userBPages.calling().callCell).toBeVisible();
+
+    await userBPages.calling().clickAcceptCallButton();
+    await expect(userBPages.calling().goFullScreen).toBeVisible();
+
+    await userAPages.calling().maximizeCell();
+    await expect(userAPages.calling().selfVideoThumbnail).toBeVisible();
+    await expect(userAPages.calling().getGridTile(userA.fullName).muteIcon).not.toBeAttached();
+  });
 });
