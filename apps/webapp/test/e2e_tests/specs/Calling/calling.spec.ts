@@ -325,4 +325,54 @@ test.describe('Calling', () => {
     await expect(userBPages.calling().callCell).toBeHidden();
     await expect.poll(() => isPlayingAudio(userBPage, AudioType.INCOMING_CALL)).toBe(false);
   });
+
+  test(
+    'Verify joining and leaving call from second client does not disconnect the first client',
+    {tag: ['@TC-2827', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      // Log in a second session/device for User A.
+      const userAPage2 = await createPage(withLogin(userA, {confirmNewHistory: true}));
+      const userADevice2Pages = PageManager.from(userAPage2).webapp.pages;
+
+      // Setup: Create a group to host the call
+      await createGroup(userAPages, groupName, [userB]);
+
+      await test.step('User A starts a call and User B joins', async () => {
+        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversation().clickCallButton();
+
+        await expect(userAPages.calling().callCell).toBeVisible();
+        await expect(userBPages.calling().callCell).toBeVisible();
+
+        await userBPages.calling().clickAcceptCallButton();
+        await expect(userBPages.calling().goFullScreen).toBeVisible();
+      });
+
+      await test.step('User A joins then leaves the call from their second device', async () => {
+        await userADevice2Pages.conversationList().openConversation(groupName);
+        await userADevice2Pages.conversation().clickCallButton();
+        await expect(userADevice2Pages.calling().callCell).toBeVisible();
+
+        await userAPage2.waitForTimeout(30_000);
+        await expect(userADevice2Pages.calling().gridTiles).toHaveCount(3);
+
+        // Verify second device successfully disconnected
+        await userADevice2Pages.calling().clickLeaveCallButton();
+        await expect(userADevice2Pages.calling().callCell).not.toBeAttached();
+      });
+
+      await test.step('Verify User A’s first device remains in the call throughout', async () => {
+        await expect(userAPages.calling().goFullScreen).toBeVisible();
+
+        await userAPages.calling().clickLeaveCallButton();
+        await expect(userAPages.calling().callCell).not.toBeAttached();
+        // Verify the call is still "joinable" (User B is still there)
+        await expect(userAPages.conversationList().joinCallButton).toBeVisible({timeout: 1_000});
+      });
+    },
+  );
 });
