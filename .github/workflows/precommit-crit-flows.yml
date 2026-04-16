@@ -57,11 +57,11 @@ jobs:
       - name: Compute target EB environment
         id: slot
         run: |
-          if [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
-            # Dependabot gets the original dedicated environment
+          if [[ "${{ github.actor }}" == "renovate[bot]" ]]; then
+            # Renovate uses the dedicated precommit environment.
             echo "env_name=wire-webapp-precommit" >> "$GITHUB_OUTPUT"
           else
-            # Spread other PRs across 3 pre-created EB environments; merge queue uses run_id
+            # Spread other PRs across 3 pre-created EB environments; merge queue uses run_id.
             ID="${{ github.event.pull_request.number || github.run_id }}"
             SLOT=$(( (ID % 3) + 1 ))
             echo "env_name=wire-webapp-precommit-$SLOT" >> "$GITHUB_OUTPUT"
@@ -193,7 +193,7 @@ jobs:
           path: apps/webapp/playwright-report
 
       - name: Generate PR comment
-        if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
+        if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'renovate[bot]' }}
         id: generate_comment
         run: |
           echo "Checking for Playwright report..."
@@ -217,7 +217,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Comment on PR
-        if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'dependabot[bot]' && github.actor != 'dependabot' }}
+        if: ${{ always() && github.event_name == 'pull_request' && github.actor != 'renovate[bot]' }}
         uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0
         with:
           header: playwright-summary
