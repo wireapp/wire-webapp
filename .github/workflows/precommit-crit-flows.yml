@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.event_name == 'merge_group' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
 
@@ -106,6 +107,7 @@ jobs:
   # An extra step is needed to see if the e2e_tests folder was touched as part of the PR
   check_edits_to_e2e_tests:
     name: Check if the PR touches e2e tests
+    if: ${{ github.event_name == 'merge_group' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
@@ -164,7 +166,7 @@ jobs:
   e2e-report:
     name: Generate test report
     needs: deploy_and_run_e2e
-    if: ${{ !cancelled() }}
+    if: ${{ success() && (github.event_name == 'merge_group' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
