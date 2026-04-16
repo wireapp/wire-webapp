@@ -19,7 +19,15 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin, Team, withConnectionRequest} from 'test/e2e_tests/test.fixtures';
+import {
+  test,
+  expect,
+  withConnectedUser,
+  withLogin,
+  Team,
+  withConnectionRequest,
+  LOGIN_TIMEOUT,
+} from 'test/e2e_tests/test.fixtures';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
 import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
@@ -535,6 +543,7 @@ test.describe('Conversations', () => {
       // User A logs in
       await userAPageManager.openLoginPage();
       await pages.login().login(userA);
+      await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       await components.conversationSidebar().clickAllConversationsButton();
 
       await expect(pages.conversationList().list).not.toContainText('Welcome to Wire');

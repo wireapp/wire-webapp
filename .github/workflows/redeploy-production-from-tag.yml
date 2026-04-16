@@ -138,18 +138,21 @@ jobs:
           wait-for-environment-recovery: true
           deployment-timeout: 150
           use-existing-application-version-if-available: true
-
-  notify_redeploy:
-    name: Notify redeploy
+  notify_redeploy_failure:
+    name: Notify redeploy failure
     runs-on: ubuntu-24.04
     needs: [validate_request, build_artifact, deploy_to_production]
-    if: ${{ needs.deploy_to_production.result == 'success' }}
+    if: ${{ always() && needs.deploy_to_production.result == 'failure' }}
 
     steps:
-      - name: Announce production redeploy
-        uses: wireapp/github-action-wire-messenger@52e881163d104d9431fe66f2e5587b209eeaa63f
+      - name: Announce production redeploy failure
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
         with:
-          email: ${{ secrets.WIRE_BOT_EMAIL }}
-          password: ${{ secrets.WIRE_BOT_PASSWORD }}
-          conversation: '697c93e8-0b13-4204-a35e-59270462366a'
-          send_text: 'Production redeploy completed for tag ${{ needs.validate_request.outputs.tag }} by ${{ github.actor }}. Commit: [${{ needs.build_artifact.outputs.commit_sha }}](${{ needs.build_artifact.outputs.commit_url }}) — ${{ needs.build_artifact.outputs.commit_subject }}'
+          status: failure
+          text: |
+            ❌ Production redeploy failed for tag ${{ needs.validate_request.outputs.tag }} ❌
+            **Triggered by:** ${{ github.actor }}
+            **Commit:** [${{ needs.build_artifact.outputs.commit_sha }}](${{ needs.build_artifact.outputs.commit_url }}) — ${{ needs.build_artifact.outputs.commit_subject }}
+            **Build log:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
