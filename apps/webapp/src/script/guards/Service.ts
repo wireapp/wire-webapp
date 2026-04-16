@@ -20,3 +20,6 @@
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 
 export const isServiceEntity = (entity: any): entity is ServiceEntity => 'isService' in entity && entity.isService;
+export const isAppEntity = (entity: any): entity is ServiceEntity => 'isApp' in entity && entity.isApp;
+export const isAppOrServiceEntity = (entity: any): entity is ServiceEntity =>
+  isServiceEntity(entity) || isAppEntity(entity);

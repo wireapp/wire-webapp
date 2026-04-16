@@ -26,10 +26,18 @@ const isServiceEntity = (entity: PanelEntity): entity is ServiceEntity => {
   return 'isService' in entity && entity.isService;
 };
 
+const isAppEntity = (entity: PanelEntity): entity is ServiceEntity => {
+  return 'isApp' in entity && entity.isApp;
+};
+
 export const isUserEntity = (entity: PanelEntity): entity is User => {
   return !isServiceEntity(entity) && entity instanceof User;
 };
 
 export const isUserServiceEntity = (entity: PanelEntity): entity is User => {
   return isServiceEntity(entity);
+};
+
+export const isUserAppOrServiceEntity = (entity: PanelEntity): entity is User => {
+  return isServiceEntity(entity) || isAppEntity(entity);
 };
