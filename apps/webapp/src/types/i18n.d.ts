@@ -717,13 +717,6 @@ declare module 'I18n/en-US.json' {
     'conversationFileUploadOverlayDescription': `Drag & drop to add files`;
     'conversationFileUploadOverlayTitle': `Upload files`;
     'conversationFileVideoPreviewLabel': `Video file preview for: {src}`;
-    'conversationFilterDrafts': `Drafts`;
-    'conversationFilterMentions': `Mentions`;
-    'conversationFilterNone': `No filter`;
-    'conversationFilterPings': `Pings`;
-    'conversationFilterReplies': `Replies`;
-    'conversationFilterTooltip': `Filter conversations`;
-    'conversationFilterUnread': `Unread`;
     'conversationFoldersEmptyText': `Add your conversations to folders to stay organized.`;
     'conversationFoldersEmptyTextLearnMore': `Learn more`;
     'conversationFooterArchive': `Archive`;
@@ -1288,7 +1281,7 @@ declare module 'I18n/en-US.json' {
     'modalAppLockSetupDigit': `A digit`;
     'modalAppLockSetupLong': `At least {minPasswordLength} characters long`;
     'modalAppLockSetupLower': `A lowercase letter`;
-    'modalAppLockSetupMessage': `The app will lock itself after a certain time of inactivity.[br]To unlock the app you need to enter this passcode.[br]Make sure to remember this passcode as there is no way to recover it.`;
+    'modalAppLockSetupMessage': `Wire will lock itself after 1 minute of inactivity. To unlock the app you need to enter this passcode or use biometric authentication.[br]Make sure to remember this passcode as there is no way to recover it.`;
     'modalAppLockSetupSecondPlaceholder': `Repeat passcode`;
     'modalAppLockSetupSpecial': `A special character`;
     'modalAppLockSetupTitle': `Create passcode`;
