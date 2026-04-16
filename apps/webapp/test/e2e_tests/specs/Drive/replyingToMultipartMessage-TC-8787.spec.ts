@@ -67,9 +67,7 @@ test(
       const loginOwner = async () => {
         await userAPageManager.openMainPage();
         await loginUser(userA, userAPageManager);
-        if (process.env.ENV_NAME === 'staging') {
-          await userAModals.dataShareConsent().clickDecline();
-        }
+        await userAModals.dataShareConsent().clickDecline();
         await userAPages.conversationList().clickCreateGroup();
         // Files should be disabled by default
         expect(await userAPages.groupCreation().isFilesCheckboxChecked()).toBeFalsy();
@@ -83,9 +81,7 @@ test(
       const loginMember = async () => {
         await userBPageManager.openMainPage();
         await loginUser(userB, userBPageManager);
-        if (process.env.ENV_NAME === 'staging') {
-          await userBModals.dataShareConsent().clickDecline();
-        }
+        await userBModals.dataShareConsent().clickDecline();
       };
 
       await Promise.all([loginOwner(), loginMember()]);
@@ -101,7 +97,9 @@ test(
       await userAComponents.inputBarControls().setMessageInput(initialMessageText);
       await userAComponents.inputBarControls().clickSendMessage();
 
-      expect(await userBPages.cellsConversation().isMultipartMessageVisible(userA, initialMessageText)).toBeTruthy();
+      const message = userBPages.conversation().getMessage({sender: userA});
+      await expect(message).toContainText(initialMessageText);
+      await expect(message.getByRole('button', {name: `Image from ${userA.fullName}`})).toBeVisible();
     });
 
     await test.step('User B replies to a multipart message', async () => {
@@ -110,7 +108,8 @@ test(
       await userBComponents.inputBarControls().setMessageInput(replyMessageText);
       await userBComponents.inputBarControls().clickSendMessage();
 
-      expect(await userAPages.cellsConversation().isReplyMessageVisible(replyMessageText)).toBeTruthy();
+      const reply = userAPages.conversation().getMessage({content: replyMessageText});
+      await expect(reply).toBeVisible();
     });
   },
 );

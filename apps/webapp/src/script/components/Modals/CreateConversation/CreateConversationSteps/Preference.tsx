@@ -17,17 +17,20 @@
  *
  */
 
+import {useEffect} from 'react';
+
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
+import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {t} from 'Util/localizerUtil';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
-import {ConversationType} from '../types';
 
 export const Preference = () => {
   const {
@@ -39,14 +42,20 @@ export const Preference = () => {
     setIsReadReceiptsEnabled,
     isServicesEnabled,
     setIsServicesEnabled,
-    conversationType,
   } = useCreateConversationModal();
 
   const teamState = container.resolve(TeamState);
 
-  const {isCellsEnabled: isCellsEnabledForTeam, isMLSEnabled} = useKoSubscribableChildren(teamState, [
+  const {
+    isCellsEnabled: isCellsEnabledForTeam,
+    isMLSEnabled,
+    isAppsEnabled,
+    hasWhitelistedServices,
+  } = useKoSubscribableChildren(teamState, [
     'isCellsEnabled',
     'isMLSEnabled',
+    'isAppsEnabled',
+    'hasWhitelistedServices',
   ]);
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
@@ -57,6 +66,18 @@ export const Preference = () => {
 
   // Read receipts are temorarily disabled for MLS groups and channels until it is supported
   const areReadReceiptsEnabled = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
+
+  const isAppsFeatureAvailable = checkAppsFeatureAvailability({
+    protocol: defaultProtocol,
+    isAppsEnabled,
+    hasWhitelistedServices,
+  });
+
+  useEffect(() => {
+    if (!isAppsFeatureAvailable && isServicesEnabled) {
+      setIsServicesEnabled(false);
+    }
+  }, [isAppsFeatureAvailable, isServicesEnabled]);
 
   return (
     <>
@@ -70,17 +91,17 @@ export const Preference = () => {
         dataUieName="read-receipts"
       />
 
-      {conversationType === ConversationType.Group && (
-        <InfoToggle
-          className="modal-style"
-          dataUieName="services"
-          info={t('servicesRoomToggleInfoExtended')}
-          setIsChecked={setIsServicesEnabled}
-          isDisabled={false}
-          name={t('servicesOptionsTitle')}
-          isChecked={isServicesEnabled}
-        />
-      )}
+      <InfoToggle
+        className="modal-style"
+        dataUieName="info-toggle-services"
+        info={t('servicesRoomToggleInfoExtended')}
+        setIsChecked={setIsServicesEnabled}
+        isDisabled={!isAppsFeatureAvailable}
+        name={t('servicesOptionsTitle')}
+        isChecked={isServicesEnabled && isAppsFeatureAvailable}
+        footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
+      />
+
       {areReadReceiptsEnabled && (
         <InfoToggle
           className="modal-style"

@@ -23,6 +23,7 @@ import {
   startupFeatureToggleQueryParameterName,
 } from './startupFeatureToggles';
 import {
+  applockRefactoredFeatureToggleName,
   collaboraNewDocumentCreationMenuFeatureToggleName,
   countlyIncrementalBackoffRetryReportingFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
@@ -33,6 +34,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
   collaboraNewDocumentCreationMenuFeatureToggleName,
   countlyIncrementalBackoffRetryReportingFeatureToggleName,
+  applockRefactoredFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -90,9 +92,17 @@ describe('startupFeatureToggles', function () {
       `?${startupFeatureToggleQueryParameterName}=${countlyIncrementalBackoffRetryReportingFeatureToggleName}`,
     );
 
-    expect(
-      startupFeatureToggles.isFeatureToggleEnabled(countlyIncrementalBackoffRetryReportingFeatureToggleName),
-    ).toBe(true);
+    expect(startupFeatureToggles.isFeatureToggleEnabled(countlyIncrementalBackoffRetryReportingFeatureToggleName)).toBe(
+      true,
+    );
+  });
+
+  it('enables the applock refactored feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
   });
 
   it('trims whitespace around feature toggle names', () => {
@@ -109,7 +119,9 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([reliableWebsocketConnectionFeatureToggleName]);
+    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([
+      reliableWebsocketConnectionFeatureToggleName,
+    ]);
   });
 
   it('ignores empty list entries in the feature toggle query parameter', () => {
@@ -118,7 +130,9 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([reliableWebsocketConnectionFeatureToggleName]);
+    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([
+      reliableWebsocketConnectionFeatureToggleName,
+    ]);
   });
 
   it('treats feature toggle names as case-sensitive', () => {
@@ -127,9 +141,7 @@ describe('startupFeatureToggles', function () {
       `?${startupFeatureToggleQueryParameterName}=${uppercaseFeatureToggleName}`,
     );
 
-    expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(
-      false,
-    );
+    expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(false);
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain(uppercaseFeatureToggleName);
   });
 
@@ -138,6 +150,7 @@ describe('startupFeatureToggles', function () {
       reliableWebsocketConnectionFeatureToggleName,
       collaboraNewDocumentCreationMenuFeatureToggleName,
       countlyIncrementalBackoffRetryReportingFeatureToggleName,
+      applockRefactoredFeatureToggleName,
     ]);
   });
 

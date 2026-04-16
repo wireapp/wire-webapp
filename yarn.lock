@@ -8267,6 +8267,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@simple-git/args-pathspec@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@simple-git/args-pathspec@npm:1.0.2"
+  checksum: 10/8ff2289110aa1c556aadb67da55c01f9430af6a647a9e4823aa023c59b11d3406819cfaead8a9c71c7fd44231271be9e71179ec817b6a3cb99d1da36cd17788e
+  languageName: node
+  linkType: hard
+
+"@simple-git/argv-parser@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@simple-git/argv-parser@npm:1.0.3"
+  dependencies:
+    "@simple-git/args-pathspec": "npm:^1.0.2"
+  checksum: 10/cfb11a054a854135d8262a7aae4b2bd1d2108f3763437080e60dcd9498f32b626857f752bb8b6c6d285cc120a7f221c6a3b2556df9c55c1b30ae136a3ba8e1be
+  languageName: node
+  linkType: hard
+
 "@sinclair/typebox@npm:^0.27.8":
   version: 0.27.8
   resolution: "@sinclair/typebox@npm:0.27.8"
@@ -9018,90 +9034,106 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@swc/core-darwin-arm64@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-darwin-arm64@npm:1.15.18"
+"@swc/core-darwin-arm64@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-darwin-arm64@npm:1.15.21"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@swc/core-darwin-x64@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-darwin-x64@npm:1.15.18"
+"@swc/core-darwin-x64@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-darwin-x64@npm:1.15.21"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm-gnueabihf@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-linux-arm-gnueabihf@npm:1.15.18"
+"@swc/core-linux-arm-gnueabihf@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-linux-arm-gnueabihf@npm:1.15.21"
   conditions: os=linux & cpu=arm
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm64-gnu@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-linux-arm64-gnu@npm:1.15.18"
+"@swc/core-linux-arm64-gnu@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-linux-arm64-gnu@npm:1.15.21"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@swc/core-linux-arm64-musl@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-linux-arm64-musl@npm:1.15.18"
+"@swc/core-linux-arm64-musl@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-linux-arm64-musl@npm:1.15.21"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@swc/core-linux-x64-gnu@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-linux-x64-gnu@npm:1.15.18"
+"@swc/core-linux-ppc64-gnu@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-linux-ppc64-gnu@npm:1.15.21"
+  conditions: os=linux & cpu=ppc64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@swc/core-linux-s390x-gnu@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-linux-s390x-gnu@npm:1.15.21"
+  conditions: os=linux & cpu=s390x & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@swc/core-linux-x64-gnu@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-linux-x64-gnu@npm:1.15.21"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@swc/core-linux-x64-musl@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-linux-x64-musl@npm:1.15.18"
+"@swc/core-linux-x64-musl@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-linux-x64-musl@npm:1.15.21"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@swc/core-win32-arm64-msvc@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-win32-arm64-msvc@npm:1.15.18"
+"@swc/core-win32-arm64-msvc@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-win32-arm64-msvc@npm:1.15.21"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@swc/core-win32-ia32-msvc@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-win32-ia32-msvc@npm:1.15.18"
+"@swc/core-win32-ia32-msvc@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-win32-ia32-msvc@npm:1.15.21"
   conditions: os=win32 & cpu=ia32
   languageName: node
   linkType: hard
 
-"@swc/core-win32-x64-msvc@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core-win32-x64-msvc@npm:1.15.18"
+"@swc/core-win32-x64-msvc@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core-win32-x64-msvc@npm:1.15.21"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@swc/core@npm:1.15.18":
-  version: 1.15.18
-  resolution: "@swc/core@npm:1.15.18"
+"@swc/core@npm:1.15.21":
+  version: 1.15.21
+  resolution: "@swc/core@npm:1.15.21"
   dependencies:
-    "@swc/core-darwin-arm64": "npm:1.15.18"
-    "@swc/core-darwin-x64": "npm:1.15.18"
-    "@swc/core-linux-arm-gnueabihf": "npm:1.15.18"
-    "@swc/core-linux-arm64-gnu": "npm:1.15.18"
-    "@swc/core-linux-arm64-musl": "npm:1.15.18"
-    "@swc/core-linux-x64-gnu": "npm:1.15.18"
-    "@swc/core-linux-x64-musl": "npm:1.15.18"
-    "@swc/core-win32-arm64-msvc": "npm:1.15.18"
-    "@swc/core-win32-ia32-msvc": "npm:1.15.18"
-    "@swc/core-win32-x64-msvc": "npm:1.15.18"
+    "@swc/core-darwin-arm64": "npm:1.15.21"
+    "@swc/core-darwin-x64": "npm:1.15.21"
+    "@swc/core-linux-arm-gnueabihf": "npm:1.15.21"
+    "@swc/core-linux-arm64-gnu": "npm:1.15.21"
+    "@swc/core-linux-arm64-musl": "npm:1.15.21"
+    "@swc/core-linux-ppc64-gnu": "npm:1.15.21"
+    "@swc/core-linux-s390x-gnu": "npm:1.15.21"
+    "@swc/core-linux-x64-gnu": "npm:1.15.21"
+    "@swc/core-linux-x64-musl": "npm:1.15.21"
+    "@swc/core-win32-arm64-msvc": "npm:1.15.21"
+    "@swc/core-win32-ia32-msvc": "npm:1.15.21"
+    "@swc/core-win32-x64-msvc": "npm:1.15.21"
     "@swc/counter": "npm:^0.1.3"
     "@swc/types": "npm:^0.1.25"
   peerDependencies:
@@ -9117,6 +9149,10 @@ __metadata:
       optional: true
     "@swc/core-linux-arm64-musl":
       optional: true
+    "@swc/core-linux-ppc64-gnu":
+      optional: true
+    "@swc/core-linux-s390x-gnu":
+      optional: true
     "@swc/core-linux-x64-gnu":
       optional: true
     "@swc/core-linux-x64-musl":
@@ -9130,7 +9166,7 @@ __metadata:
   peerDependenciesMeta:
     "@swc/helpers":
       optional: true
-  checksum: 10/ef198b9feb6eee034e3a912c37988ece2885fec35419e8245d467adbc1fc47a5c3e61869d1bdbe6fff76cbd9186ef278120cbb9746d5f7446576f4a7f15c2dcd
+  checksum: 10/0b3246ef93280d536ddc230e837678da5813e2794b329506bbf03f01f355fd4d84e4e1e3e704bc151405e7606be968dbd937829739d1e9bd7bd8a6fd59e52445
   languageName: node
   linkType: hard
 
@@ -9987,13 +10023,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:18.3.27":
-  version: 18.3.27
-  resolution: "@types/react@npm:18.3.27"
+"@types/react@npm:18.3.28":
+  version: 18.3.28
+  resolution: "@types/react@npm:18.3.28"
   dependencies:
     "@types/prop-types": "npm:*"
     csstype: "npm:^3.2.2"
-  checksum: 10/90155820a2af315cad1ff47df695f3f2f568c12ad641a7805746a6a9a9aa6c40b1374e819e50d39afe0e375a6b9160a73176cbdb4e09807262bc6fcdc06e67db
+  checksum: 10/6db7bb7f19957ee9f530baa7d143527f8befedad1585b064eb80777be0d84621157de75aba4f499ff429b10c5ef0c7d13e89be6bca3296ef71c80472894ff0eb
   languageName: node
   linkType: hard
 
@@ -11110,7 +11146,7 @@ __metadata:
   dependencies:
     "@aws-sdk/client-s3": "npm:3.1014.0"
     "@aws-sdk/lib-storage": "npm:3.1014.0"
-    "@swc/core": "npm:1.15.18"
+    "@swc/core": "npm:1.15.21"
     "@swc/jest": "npm:0.2.39"
     "@types/axios": "npm:0.14.4"
     "@types/jest": "npm:29.5.14"
@@ -11203,10 +11239,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/core-crypto@npm:9.3.2":
-  version: 9.3.2
-  resolution: "@wireapp/core-crypto@npm:9.3.2"
-  checksum: 10/608470af7c114b48bb25ce5bb4699378474866b845461da067985ad027000d6895c6291f9e67c7b3e577c5714fd033f1921a9cd076dd9eb09bfb95519872883c
+"@wireapp/core-crypto@npm:9.3.3":
+  version: 9.3.3
+  resolution: "@wireapp/core-crypto@npm:9.3.3"
+  checksum: 10/d6ea75da2f04514a3390139640bfa1a7363de5be19bcb8b68a7ffc45a93f36718c80f3c5cc75b89b4e1de245e072b166360e11aa49857f6b170171138ad48a53
   languageName: node
   linkType: hard
 
@@ -11214,12 +11250,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/core@workspace:libraries/core"
   dependencies:
-    "@swc/core": "npm:1.15.18"
+    "@swc/core": "npm:1.15.21"
     "@swc/jest": "npm:0.2.39"
     "@types/lodash": "npm:4.17.24"
     "@types/long": "npm:5.0.0"
     "@wireapp/api-client": "npm:27.96.0"
-    "@wireapp/core-crypto": "npm:9.3.2"
+    "@wireapp/core-crypto": "npm:9.3.3"
     "@wireapp/cryptobox": "npm:12.8.0"
     "@wireapp/priority-queue": "npm:2.1.19"
     "@wireapp/promise-queue": "npm:2.4.13"
@@ -11506,7 +11542,7 @@ __metadata:
     "@types/open-graph": "npm:0.2.6"
     "@types/platform": "npm:1.3.6"
     "@types/prismjs": "npm:1.26.6"
-    "@types/react": "npm:18.3.27"
+    "@types/react": "npm:18.3.28"
     "@types/react-dom": "npm:18.3.7"
     "@types/react-transition-group": "npm:4.4.12"
     "@types/redux-mock-store": "npm:1.5.0"
@@ -11611,7 +11647,7 @@ __metadata:
     underscore: "npm:1.13.8"
     use-debounce: "npm:10.1.0"
     webgl-utils.js: "npm:1.1.0"
-    webpack: "npm:5.105.4"
+    webpack: "npm:5.106.0"
     webpack-bundle-analyzer: "npm:4.10.2"
     webpack-cli: "npm:6.0.1"
     webpack-dev-middleware: "npm:7.4.5"
@@ -12417,14 +12453,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.13.6":
-  version: 1.13.6
-  resolution: "axios@npm:1.13.6"
+"axios@npm:1.15.0":
+  version: 1.15.0
+  resolution: "axios@npm:1.15.0"
   dependencies:
     follow-redirects: "npm:^1.15.11"
     form-data: "npm:^4.0.5"
-    proxy-from-env: "npm:^1.1.0"
-  checksum: 10/a7ed83c2af3ef21d64609df0f85e76893a915a864c5934df69241001d0578082d6521a0c730bf37518ee458821b5695957cb10db9fc705f2a8996c8686ea7a89
+    proxy-from-env: "npm:^2.1.0"
+  checksum: 10/d39a2c0ebc7ff4739401b282e726cc2673377949d6c46d60eb619458f8d7a2f7eadbcada7097f4dbc7d5c59abb4d3bf6fac33d474412bc3415d3f5aa7ed45530
   languageName: node
   linkType: hard
 
@@ -15020,10 +15056,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:17.3.1":
-  version: 17.3.1
-  resolution: "dotenv@npm:17.3.1"
-  checksum: 10/4dde6571dff22c2323a3e33ac25e1e7d51c4b6d60dc884f59e3efe85c8fd3cc8800d6b3925d05c46b19dca08cba821a0a24e22f75a1b9b768c859b98bb927b04
+"dotenv@npm:17.4.1":
+  version: 17.4.1
+  resolution: "dotenv@npm:17.4.1"
+  checksum: 10/addbff54aed55b80b5d4527ba0a221a63718835c10a2ed7d949f5caeab96995796a4c88f30263724aa71014aa4e3092a1ef551559ddef44d68c429494e13ff68
   languageName: node
   linkType: hard
 
@@ -21862,14 +21898,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nock@npm:14.0.11":
-  version: 14.0.11
-  resolution: "nock@npm:14.0.11"
+"nock@npm:14.0.12":
+  version: 14.0.12
+  resolution: "nock@npm:14.0.12"
   dependencies:
     "@mswjs/interceptors": "npm:^0.41.0"
     json-stringify-safe: "npm:^5.0.1"
     propagate: "npm:^2.0.0"
-  checksum: 10/2fc579f3bee5148ebfacdfc7588a1f45205b139dcc6e32a5bef436f74f479383c7445a9812f433908600f62a0e142ff4bbbe7da7d5e9ed1781bad278b792cf98
+  checksum: 10/1258e62f50c8c5fcae30f4de87d5e0049c5b957cb8d4d62e4d9ee964b4e39a6e2c8554a0173e8cdd60815aa457ddcaa46f7af1dd0772724d6764398e6c66e276
   languageName: node
   linkType: hard
 
@@ -24280,10 +24316,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"proxy-from-env@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "proxy-from-env@npm:1.1.0"
-  checksum: 10/f0bb4a87cfd18f77bc2fba23ae49c3b378fb35143af16cc478171c623eebe181678f09439707ad80081d340d1593cd54a33a0113f3ccb3f4bc9451488780ee23
+"proxy-from-env@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "proxy-from-env@npm:2.1.0"
+  checksum: 10/fbbaf4dab2a6231dc9e394903a5f66f20475e36b734335790b46feb9da07c37d6b32e2c02e3e2ea4d4b23774c53d8562e5b7cc73282cb43f4a597b7eacaee2ee
   languageName: node
   linkType: hard
 
@@ -26108,14 +26144,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.33.0":
-  version: 3.33.0
-  resolution: "simple-git@npm:3.33.0"
+"simple-git@npm:3.35.2":
+  version: 3.35.2
+  resolution: "simple-git@npm:3.35.2"
   dependencies:
     "@kwsites/file-exists": "npm:^1.1.1"
     "@kwsites/promise-deferred": "npm:^1.1.1"
+    "@simple-git/args-pathspec": "npm:^1.0.2"
+    "@simple-git/argv-parser": "npm:^1.0.3"
     debug: "npm:^4.4.0"
-  checksum: 10/5175133df68053f52db3c160e060939ec6584409378e89cc5e57f60a00739a507a99a7dbcec0401925fdfdca9c9c60ec6ef84d9669e815d0806f4c18bf7aa820
+  checksum: 10/4bfb2ac73041db774e8cfaefbc97e4cacf2725d955e458e135647209829336505223128f928aac9f86b92e30d0e7c4128daad0268a1303c2d88fda8be1fda0d1
   languageName: node
   linkType: hard
 
@@ -28708,6 +28746,44 @@ __metadata:
   languageName: node
   linkType: hard
 
+"webpack@npm:5.106.0":
+  version: 5.106.0
+  resolution: "webpack@npm:5.106.0"
+  dependencies:
+    "@types/eslint-scope": "npm:^3.7.7"
+    "@types/estree": "npm:^1.0.8"
+    "@types/json-schema": "npm:^7.0.15"
+    "@webassemblyjs/ast": "npm:^1.14.1"
+    "@webassemblyjs/wasm-edit": "npm:^1.14.1"
+    "@webassemblyjs/wasm-parser": "npm:^1.14.1"
+    acorn: "npm:^8.16.0"
+    acorn-import-phases: "npm:^1.0.3"
+    browserslist: "npm:^4.28.1"
+    chrome-trace-event: "npm:^1.0.2"
+    enhanced-resolve: "npm:^5.20.0"
+    es-module-lexer: "npm:^2.0.0"
+    eslint-scope: "npm:5.1.1"
+    events: "npm:^3.2.0"
+    glob-to-regexp: "npm:^0.4.1"
+    graceful-fs: "npm:^4.2.11"
+    json-parse-even-better-errors: "npm:^2.3.1"
+    loader-runner: "npm:^4.3.1"
+    mime-types: "npm:^2.1.27"
+    neo-async: "npm:^2.6.2"
+    schema-utils: "npm:^4.3.3"
+    tapable: "npm:^2.3.0"
+    terser-webpack-plugin: "npm:^5.3.17"
+    watchpack: "npm:^2.5.1"
+    webpack-sources: "npm:^3.3.4"
+  peerDependenciesMeta:
+    webpack-cli:
+      optional: true
+  bin:
+    webpack: bin/webpack.js
+  checksum: 10/0062ac6c45a1839e1432e8602e1428b71c1e1a1abf2739d62afabf86e69fb253b44d0243a6e403cc2dba2cb21ca145b40c1f67087ba75ab915f778d7e3f5e72c
+  languageName: node
+  linkType: hard
+
 "webpack@npm:^5, webpack@npm:^5.101.3":
   version: 5.104.1
   resolution: "webpack@npm:5.104.1"
@@ -28998,10 +29074,10 @@ __metadata:
     "@wireapp/eslint-config": "npm:3.1.9"
     "@wireapp/prettier-config": "npm:0.6.11"
     archiver: "npm:7.0.1"
-    axios: "npm:1.13.6"
+    axios: "npm:1.15.0"
     babel-jest: "npm:29.7.0"
     cross-env: "npm:10.1.0"
-    dotenv: "npm:17.3.1"
+    dotenv: "npm:17.4.1"
     dotenv-extended: "npm:2.9.0"
     dpdm: "npm:3.15.1"
     eslint: "npm:9.39.4"
@@ -29028,12 +29104,12 @@ __metadata:
     jsdom: "npm:25.0.1"
     logdown: "npm:3.3.1"
     long: "npm:5.3.2"
-    nock: "npm:14.0.11"
+    nock: "npm:14.0.12"
     nx: "npm:22.6.1"
     playwright: "npm:1.59.1"
     prettier: "npm:3.8.1"
     rimraf: "npm:6.1.3"
-    simple-git: "npm:3.33.0"
+    simple-git: "npm:3.35.2"
     stylelint: "npm:16.26.1"
     stylelint-config-idiomatic-order: "npm:10.0.0"
     ts-node: "npm:10.9.2"

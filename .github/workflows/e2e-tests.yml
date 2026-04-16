@@ -49,6 +49,8 @@ on:
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN:
         required: true
+      WIRE_E2E_TEST_BOT_WEBHOOK_URL:
+        required: false
     outputs:
       reportArtifactId:
         description: ID of the playwright report artifact
@@ -60,7 +62,7 @@ on:
 jobs:
   test:
     name: Run E2E Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -77,9 +79,9 @@ jobs:
           - 8080:8080
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -104,16 +106,19 @@ jobs:
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: blob-report-${{ matrix.shard }}
           path: apps/webapp/playwright-report/blob-reports
           retention-days: 1
 
   e2e-report:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ !cancelled() }}
     needs: [test]
+
+    env:
+      PLAYWRIGHT_REPORT_PATH: apps/webapp/playwright-report
 
     # It's necessary to define the outputs of the job so the calling workflow can access them
     outputs:
@@ -121,9 +126,9 @@ jobs:
       reportUrl: ${{ steps.generate-outputs.outputs.reportUrl }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
@@ -163,16 +168,61 @@ jobs:
 
       - name: Upload test report
         id: upload_playwright_report
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report
-          path: apps/webapp/playwright-report/
+          path: ${{ env.PLAYWRIGHT_REPORT_PATH }}/
 
       - name: Generate outputs
         id: generate-outputs
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
+
+      - name: Extract test results
+        id: test-results
+        run: |
+          REPORT="${{ env.PLAYWRIGHT_REPORT_PATH }}/report.json"
+          if [ ! -f "$REPORT" ]; then
+            echo "::error::Report file not found at $REPORT"
+            exit 1
+          fi
+          PASSED=$(jq '.stats.expected' "$REPORT")
+          FAILED=$(jq '.stats.unexpected' "$REPORT")
+          SKIPPED=$(jq '.stats.skipped' "$REPORT")
+          FLAKY=$(jq '.stats.flaky' "$REPORT")
+          TOTAL=$((PASSED + FAILED + SKIPPED + FLAKY))
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+          echo "flaky=$FLAKY" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+
+      - name: Notify on Wire if succeeded
+        if: needs.test.result == 'success' && env.SLACK_WEBHOOK_URL != ''
+        continue-on-error: true
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "text": "✅ Web E2E Tests succeeded ✅\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*Triggered by:* ${{ github.triggering_actor }}\n*Report:* ${{ steps.upload_playwright_report.outputs.artifact-url }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+
+      - name: Notify on Wire if failed
+        if: needs.test.result == 'failure' && env.SLACK_WEBHOOK_URL != ''
+        continue-on-error: true
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "text": "❌ Web E2E Tests failed ❌\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*Triggered by:* ${{ github.triggering_actor }}\n*Report:* ${{ steps.upload_playwright_report.outputs.artifact-url }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
 
       - name: Update Testiny Run with results
         if: ${{ inputs.testinyRunName }}

@@ -34,7 +34,8 @@ const createAppLockRepository = (): AppLockRepository => {
     cryptoPwhashMemLimitInteractive: 1,
     cryptoPwhashOpsLimitInteractive: 1,
     ready: Promise.resolve(),
-    cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number) => mockCryptoPwhashStr(code, opsLimit, memLimit),
+    cryptoPwhashStr: (code: string, opsLimit: number, memLimit: number) =>
+      mockCryptoPwhashStr(code, opsLimit, memLimit),
     cryptoPwhashStrVerify: (hashedCode: string, code: string) => mockCryptoPwhashStrVerify(hashedCode, code),
   };
 

@@ -117,7 +117,10 @@ export function generateConfig(params: ConfigGeneratorParams, env: Env) {
   const httpPort = isHttpPortMissingOrZero ? 21080 : parsedHttpPort;
   const defaultSslCertificateKeyPath = resolveServerCertificatePath('development-key.pem');
   const defaultSslCertificatePath = resolveServerCertificatePath('development-cert.pem');
-  const sslCertificateKeyPath = getNonEmptyStringValueOrDefault(env.SSL_CERTIFICATE_KEY_PATH, defaultSslCertificateKeyPath);
+  const sslCertificateKeyPath = getNonEmptyStringValueOrDefault(
+    env.SSL_CERTIFICATE_KEY_PATH,
+    defaultSslCertificateKeyPath,
+  );
   const sslCertificatePath = getNonEmptyStringValueOrDefault(env.SSL_CERTIFICATE_PATH, defaultSslCertificatePath);
 
   return {

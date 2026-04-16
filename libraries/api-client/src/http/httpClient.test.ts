@@ -162,18 +162,16 @@ describe('HttpClient', () => {
   });
 
   describe('sendRequest with incremental retry backoff', () => {
-    it.each(
-      [
-        {
-          expectedDescription: '420',
-          retryableStatusCode: 420,
-        },
-        {
-          expectedDescription: '429',
-          retryableStatusCode: StatusCode.TOO_MANY_REQUESTS,
-        },
-      ] as const,
-    )(
+    it.each([
+      {
+        expectedDescription: '420',
+        retryableStatusCode: 420,
+      },
+      {
+        expectedDescription: '429',
+        retryableStatusCode: StatusCode.TOO_MANY_REQUESTS,
+      },
+    ] as const)(
       'retries $expectedDescription backend errors with incremental retry backoff',
       async ({retryableStatusCode}) => {
         const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
@@ -258,7 +256,7 @@ describe('HttpClient', () => {
       let scheduledTimeoutHandler: (() => void) | undefined;
       const observedDelayInMilliseconds: number[] = [];
       let resolveWaitWasScheduled: (() => void) | undefined;
-      const waitWasScheduled = new Promise<void>((resolve) => {
+      const waitWasScheduled = new Promise<void>(resolve => {
         resolveWaitWasScheduled = resolve;
       });
       const clearTimeout = jest.fn();
@@ -302,7 +300,7 @@ describe('HttpClient', () => {
       let scheduledTimeoutHandler: (() => void) | undefined;
       const observedDelayInMilliseconds: number[] = [];
       let resolveWaitWasScheduled: (() => void) | undefined;
-      const waitWasScheduled = new Promise<void>((resolve) => {
+      const waitWasScheduled = new Promise<void>(resolve => {
         resolveWaitWasScheduled = resolve;
       });
       const abortController = new AbortController();
@@ -315,18 +313,16 @@ describe('HttpClient', () => {
 
         return 1 as ReturnType<typeof globalThis.setTimeout>;
       });
-      const client = new HttpClient(
-        testConfig,
-        mockedAccessTokenStore as AccessTokenStore,
-        {
-          dependencies: {
-            clearTimeout,
-            setTimeout,
-          },
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        dependencies: {
+          clearTimeout,
+          setTimeout,
         },
-      );
+      });
 
-      client._sendRequest = jest.fn().mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE));
+      client._sendRequest = jest
+        .fn()
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE));
 
       const responsePromise = client.sendRequest({method: 'GET', url: '/conversations'}, false, abortController);
       await waitWasScheduled;

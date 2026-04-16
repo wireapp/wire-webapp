@@ -42,7 +42,7 @@ jobs:
 
       - name: Upload test report
         if: always()
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report
           path: playwright-report/
@@ -59,7 +59,7 @@ jobs:
 
       - name: Comment on PR
         if: always()
-        uses: marocchino/sticky-pull-request-comment@d4d6b0936434b21bc8345ad45a440c5f7d2c40ff
+        uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0
         with:
           header: playwright-summary
           message: |

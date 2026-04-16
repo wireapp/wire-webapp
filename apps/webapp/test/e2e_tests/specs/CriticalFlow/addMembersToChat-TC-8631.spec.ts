@@ -44,6 +44,8 @@ test(
       const team = await createTeam('Critical', {users: [member1, member2]});
       owner = team.owner;
 
+      await api.team.addServiceToTeamWhitelist(owner.teamId, Services.POLL_SERVICE, owner.token);
+
       const [pmOwner, pm1, pm2] = await Promise.all([
         PageManager.from(createPage(withLogin(owner))),
         PageManager.from(createPage(withLogin(member1))),
@@ -62,7 +64,6 @@ test(
 
     await test.step('Team owner adds a service to newly created group', async () => {
       const {pages} = ownerPageManager.webapp;
-      await api.team.addServiceToTeamWhitelist(owner.teamId, Services.POLL_SERVICE, owner.token);
       // Add the Poll service to the conversation
       await pages.conversation().clickConversationTitle();
       await pages.conversationDetails().waitForSidebar();
@@ -183,7 +184,9 @@ test(
       await pages.conversation().removeMemberFromGroup(member2.fullName);
 
       // Verify member is no longer in the conversation by checking system message
-      expect(await pages.conversation().isSystemMessageVisible(`You removed ${member2.fullName}`)).toBeTruthy();
+      await expect(
+        pages.conversation().systemMessages.filter({hasText: `You removed ${member2.fullName}`}),
+      ).toBeVisible();
     });
 
     await test.step('Team owner removes a service from a group', async () => {
@@ -192,7 +195,7 @@ test(
       await pages.conversationDetails().removeServiceFromConversation('Poll');
 
       // Verify service was removed by checking for system message
-      expect(await pages.conversation().isSystemMessageVisible('You removed Poll Bot')).toBeTruthy();
+      await expect(pages.conversation().systemMessages.filter({hasText: 'You removed Poll Bot'})).toBeVisible();
     });
   },
 );

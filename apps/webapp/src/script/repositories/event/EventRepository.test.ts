@@ -260,7 +260,12 @@ describe('EventRepository', () => {
         computeTimeOffset: jest.fn(),
       };
 
-      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
 
       mockAccount = {
         listen: jest.fn().mockResolvedValue(jest.fn()),
@@ -376,7 +381,12 @@ describe('EventRepository', () => {
       const mockNotificationService: any = {};
       const mockServerTimeHandler: any = {};
 
-      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
       jest.spyOn<any, any>(eventRepository, 'handleEvent').mockResolvedValue(undefined);
     });
 
@@ -412,7 +422,12 @@ describe('EventRepository', () => {
       const mockNotificationService: any = {};
       const mockServerTimeHandler: any = {};
 
-      eventRepository = new EventRepository(mockEventService, mockNotificationService, mockServerTimeHandler, {} as any);
+      eventRepository = new EventRepository(
+        mockEventService,
+        mockNotificationService,
+        mockServerTimeHandler,
+        {} as any,
+      );
       jest.spyOn<any, any>(eventRepository, 'handleIncomingEvent').mockResolvedValue(undefined);
     });
 

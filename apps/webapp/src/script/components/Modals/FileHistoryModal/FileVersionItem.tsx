@@ -25,6 +25,7 @@ import {
   fileVersionItemWrapperCss,
   iconMarginRightCss,
   restoreIconCss,
+  versionTimelineConnectorCss,
   versionActionsWrapperCss,
   versionButtonCss,
   versionDotCurrentCss,
@@ -32,6 +33,7 @@ import {
   versionInfoContainerCss,
   versionMetaTextCss,
   versionOwnerSpanCss,
+  versionSizeSpanCss,
   versionTimeTextCss,
 } from './FileHistoryModal.styles';
 
@@ -44,24 +46,34 @@ interface FileVersionItemProps {
     downloadUrl: string;
   };
   isCurrentVersion: boolean;
+  showTimelineConnector: boolean;
   onDownload: (downloadUrl: string) => void | Promise<void>;
   onRestore: (versionId: string) => void;
 }
 
-export const FileVersionItem = ({version, isCurrentVersion, onDownload, onRestore}: FileVersionItemProps) => {
+export const FileVersionItem = ({
+  version,
+  isCurrentVersion,
+  showTimelineConnector,
+  onDownload,
+  onRestore,
+}: FileVersionItemProps) => {
+  const versionDetailsTitle = `${version.ownerName} ${version.size}`.trim();
+
   return (
     <div key={version.versionId} css={fileVersionItemWrapperCss}>
+      {showTimelineConnector && <div css={versionTimelineConnectorCss} aria-hidden="true" />}
       <div css={isCurrentVersion ? versionDotCurrentCss : versionDotOldCss} aria-hidden="true" />
       <div css={versionInfoContainerCss}>
         <p css={versionTimeTextCss}>
           {version.time} {isCurrentVersion && t('cells.versionHistory.current')}
         </p>
-        <p css={versionMetaTextCss}>
+        <p css={versionMetaTextCss} title={versionDetailsTitle} data-version-meta-text="true">
           <span css={versionOwnerSpanCss}>{version.ownerName}</span>
-          {version.size}
+          <span css={versionSizeSpanCss}>{version.size}</span>
         </p>
       </div>
-      <div css={versionActionsWrapperCss}>
+      <div css={versionActionsWrapperCss} data-version-actions="true">
         <Button
           variant={ButtonVariant.SECONDARY}
           css={versionButtonCss}

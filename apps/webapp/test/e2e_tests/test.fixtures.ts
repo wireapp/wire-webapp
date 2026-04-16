@@ -250,7 +250,14 @@ export const withGuestUser =
   async page => {
     await page.goto(link);
     await page.getByRole('link', {name: 'Join in Browser'}).click();
-    await PageManager.from(page).webapp.pages.conversationJoin().joinAsGuest(guestName);
+    const pageManager = PageManager.from(page);
+    await pageManager.webapp.pages.conversationJoin().joinAsGuest(guestName);
+
+    /**
+     * Since the login may take up to 40s we manually wait for it to finish here instead of increasing the timeout on all actions / assertions after this util
+     * This is an exception to the general best practice of using playwrights web assertions. (See: https://playwright.dev/docs/best-practices#use-web-first-assertions)
+     */
+    await pageManager.webapp.pages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   };
 
 const createUser = async (

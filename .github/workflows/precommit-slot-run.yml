@@ -37,7 +37,7 @@ concurrency:
 jobs:
   deploy_to_aws:
     name: Deploy to precommit
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     env:
       AWS_REGION: eu-central-1
@@ -46,12 +46,12 @@ jobs:
       precommit_url: ${{ steps.fetch_url.outputs.url }}
 
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: build-artifact
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
         with:
           aws-access-key-id: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}

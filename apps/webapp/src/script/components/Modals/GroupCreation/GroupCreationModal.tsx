@@ -33,6 +33,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
 import {SearchInput} from 'Components/SearchInput';
 import {TextInput} from 'Components/TextInput';
 import {InfoToggle} from 'Components/toggle/InfoToggle';
@@ -51,6 +52,7 @@ import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/C
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
@@ -79,11 +81,15 @@ const GroupCreationModal = ({
     isMLSEnabled: isMLSEnabledForTeam,
     isProtocolToggleEnabledForUser,
     isCellsEnabled: isCellsEnabledForTeam,
+    isAppsEnabled: isAppsEnabledForTeam,
+    hasWhitelistedServices: hasWhitelistedServicesInTeam,
   } = useKoSubscribableChildren(teamState, [
     'isTeam',
     'isMLSEnabled',
     'isProtocolToggleEnabledForUser',
     'isCellsEnabled',
+    'isAppsEnabled',
+    'hasWhitelistedServices',
   ]);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
@@ -118,9 +124,20 @@ const GroupCreationModal = ({
   const [selectedContacts, setSelectedContacts] = useState<User[]>([]);
   const [enableReadReceipts, setEnableReadReceipts] = useState<boolean>(false);
   const [selectedProtocol, setSelectedProtocol] = useState<ProtocolOption>(initialProtocol);
+
+  const isAppsFeatureAvailable =
+    isTeam &&
+    checkAppsFeatureAvailability({
+      protocol: selectedProtocol.value,
+      isAppsEnabled: isAppsEnabledForTeam,
+      hasWhitelistedServices: hasWhitelistedServicesInTeam,
+    });
+
   const [showContacts, setShowContacts] = useState<boolean>(false);
   const [isCreatingConversation, setIsCreatingConversation] = useState<boolean>(false);
-  const [accessState, setAccessState] = useState<ACCESS_STATE>(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+  const [accessState, setAccessState] = useState<ACCESS_STATE>(
+    isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM,
+  );
   const [nameError, setNameError] = useState<string>('');
   const [groupName, setGroupName] = useState<string>('');
   const [participantsInput, setParticipantsInput] = useState<string>('');
@@ -154,7 +171,8 @@ const GroupCreationModal = ({
   const isGuestAndServicesRoom = accessState === ACCESS_STATE.TEAM.GUESTS_SERVICES;
   const isGuestRoom = accessState === ACCESS_STATE.TEAM.GUEST_ROOM;
   const isGuestEnabled = isGuestRoom || isGuestAndServicesRoom;
-  const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
+
+  const isServicesEnabled = isAppsFeatureAvailable && (isServicesRoom || isGuestAndServicesRoom);
 
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
@@ -210,6 +228,10 @@ const GroupCreationModal = ({
   const maxNameLength = ConversationRepository.CONFIG.GROUP.MAX_NAME_LENGTH;
   const maxSize = ConversationRepository.CONFIG.GROUP.MAX_SIZE;
 
+  const onOpen = () => {
+    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
+  };
+
   const onClose = () => {
     setIsCreatingConversation(false);
     setNameError('');
@@ -217,7 +239,7 @@ const GroupCreationModal = ({
     setParticipantsInput('');
     setSelectedContacts([]);
     setGroupCreationState(GroupCreationModalState.DEFAULT);
-    setAccessState(ACCESS_STATE.TEAM.GUESTS_SERVICES);
+    setAccessState(isAppsFeatureAvailable ? ACCESS_STATE.TEAM.GUESTS_SERVICES : ACCESS_STATE.TEAM.GUEST_ROOM);
   };
 
   const clickOnCreate = async (
@@ -357,6 +379,7 @@ const GroupCreationModal = ({
       className="group-creation__modal"
       wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
       isShown={isShown}
+      onOpened={onOpen}
       onClosed={onClose}
       data-uie-name="group-creation-label"
       onKeyDown={stateIsPreferences ? handleEscape : undefined}
@@ -504,17 +527,17 @@ const GroupCreationModal = ({
                   name={t('guestOptionsTitle')}
                   info={t('guestRoomToggleInfo')}
                 />
-                {selectedProtocol.value !== CONVERSATION_PROTOCOL.MLS && (
-                  <InfoToggle
-                    className="modal-style"
-                    dataUieName="services"
-                    isChecked={isServicesEnabled}
-                    setIsChecked={clickOnToggleServicesMode}
-                    isDisabled={false}
-                    name={t('servicesOptionsTitle')}
-                    info={t('servicesRoomToggleInfo')}
-                  />
-                )}
+                <InfoToggle
+                  className="modal-style"
+                  dataUieName="info-toggle-services"
+                  isChecked={isServicesEnabled}
+                  setIsChecked={clickOnToggleServicesMode}
+                  isDisabled={!isAppsFeatureAvailable}
+                  name={t('servicesOptionsTitle')}
+                  info={t('servicesRoomToggleInfo')}
+                  footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
+                />
+
                 {areReadReceiptsEnabled && (
                   <InfoToggle
                     className="modal-style"

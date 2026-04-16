@@ -72,12 +72,6 @@ export class ConversationListPage {
     return await this.getConversationLocator(conversationName).getByTestId('status-blocked').isVisible();
   }
 
-  async doesConversationHasMentionIndicator(conversationName: string) {
-    const mentionIndicator = this.getConversationLocator(conversationName).getByTestId('status-mention');
-    await mentionIndicator.waitFor({state: 'visible'});
-    return await mentionIndicator.isVisible();
-  }
-
   async openConversation(conversationName: string, options?: Parameters<typeof this.getConversationLocator>[1]) {
     await this.getConversationLocator(conversationName, options).click();
   }

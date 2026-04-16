@@ -36,7 +36,6 @@ test.describe('Localization', () => {
     userA = team.owner;
   });
 
-
   test('Verify welcome page is localized', {tag: ['@TC-3455', '@regression']}, async ({createPage, browser}) => {
     // Localization checks for GERMAN browser
     const dePageManager = PageManager.from(await createPage());
@@ -50,9 +49,7 @@ test.describe('Localization', () => {
       'placeholder',
       deTranslations['ssoLogin.codeOrMailInputPlaceholder'],
     );
-    await expect(dePages.singleSignOn().ssoSignInButton).toHaveText(
-      deTranslations['authAccountSignIn'],
-    );
+    await expect(dePages.singleSignOn().ssoSignInButton).toHaveText(deTranslations['authAccountSignIn']);
 
     // Localization checks for ENGLISH browser
     const enContext = await browser.newContext({locale: 'en-US'});
@@ -93,7 +90,10 @@ test.describe('Localization', () => {
       const {pages} = pageManager.webapp;
       await pageManager.openRegistrationPage();
 
-      await expect(pages.registration().nameInput).toHaveAttribute('placeholder', deTranslations['accountForm.namePlaceholder']);
+      await expect(pages.registration().nameInput).toHaveAttribute(
+        'placeholder',
+        deTranslations['accountForm.namePlaceholder'],
+      );
       await expect(pages.registration().emailInput).toHaveAttribute(
         'placeholder',
         deTranslations['accountForm.emailPersonalPlaceholder'],
@@ -103,7 +103,10 @@ test.describe('Localization', () => {
         deTranslations['accountForm.passwordPlaceholder'],
       );
 
-      const termsText = deTranslations['accountForm.termsAndConditions'].replace('{termsAndConditionsLink}', deTranslations['accountForm.termsAndConditionsLink']);
+      const termsText = deTranslations['accountForm.termsAndConditions'].replace(
+        '{termsAndConditionsLink}',
+        deTranslations['accountForm.termsAndConditionsLink'],
+      );
       await expect(pages.registration().termsLabel).toContainText(termsText);
       await expect(pages.registration().header).toHaveText(deTranslations['createPersonalAccount.headLine']);
     },
@@ -130,7 +133,10 @@ test.describe('Localization', () => {
 
       // Connect users manually due to the current locators don't work in german browser
       await components.conversationSidebar().connectButton.click();
-      await pages.startUI().component.getByPlaceholder(deTranslations['searchPeopleOnlyPlaceholder']).fill(userB.fullName);
+      await pages
+        .startUI()
+        .component.getByPlaceholder(deTranslations['searchPeopleOnlyPlaceholder'])
+        .fill(userB.fullName);
       await pages.startUI().component.getByRole('button', {name: userB.fullName}).click();
       await modals.userProfile().startConversationButton.click();
 
@@ -154,7 +160,8 @@ test.describe('Localization', () => {
             deTranslations['conversationsPopoverClear'], // clear content button
           ]),
         );
-    });
+    },
+  );
 
   test('Verify registration email is de', {tag: ['@TC-1277', '@regression']}, async ({createPage, api}) => {
     const pageManager = PageManager.from(await createPage());

@@ -404,7 +404,6 @@ describe('MediaEmbeds', () => {
 
         expect(new MediaParser().renderMediaEmbeds(message)).toBe(iframe);
       });
-
     });
 
     describe('SoundCloud', () => {

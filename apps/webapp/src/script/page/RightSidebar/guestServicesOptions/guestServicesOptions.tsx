@@ -126,6 +126,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
             activeConversation={activeConversation}
             toggleAccessState={toggleAccessState}
             isToggleDisabled={isToggleDisabled}
+            teamState={teamState}
           />
         )}
       </FadingScrollbar>

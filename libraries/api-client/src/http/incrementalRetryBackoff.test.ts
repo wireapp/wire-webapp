@@ -19,9 +19,7 @@
 
 import {Maybe} from 'true-myth';
 
-import {
-  createIncrementalRetryBackoffPolicy,
-} from './incrementalRetryBackoff';
+import {createIncrementalRetryBackoffPolicy} from './incrementalRetryBackoff';
 
 const badRequestStatusCode = 400;
 const unauthorizedStatusCode = 401;
@@ -46,8 +44,9 @@ describe('IncrementalRetryBackoff', function () {
     const currentIncrementalRetryBackoffState =
       incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
 
-    const nextIncrementalRetryBackoffState =
-      incrementalRetryBackoffPolicy.advanceState(currentIncrementalRetryBackoffState);
+    const nextIncrementalRetryBackoffState = incrementalRetryBackoffPolicy.advanceState(
+      currentIncrementalRetryBackoffState,
+    );
 
     expect(nextIncrementalRetryBackoffState.delayInMilliseconds).toBe(100);
     expect(nextIncrementalRetryBackoffState.retryCount).toBe(1);
@@ -57,12 +56,15 @@ describe('IncrementalRetryBackoff', function () {
   it('doubles the retry delay on each advancement', () => {
     const initialIncrementalRetryBackoffState =
       incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
-    const firstIncrementalRetryBackoffState =
-      incrementalRetryBackoffPolicy.advanceState(initialIncrementalRetryBackoffState);
-    const secondIncrementalRetryBackoffState =
-      incrementalRetryBackoffPolicy.advanceState(firstIncrementalRetryBackoffState);
-    const thirdIncrementalRetryBackoffState =
-      incrementalRetryBackoffPolicy.advanceState(secondIncrementalRetryBackoffState);
+    const firstIncrementalRetryBackoffState = incrementalRetryBackoffPolicy.advanceState(
+      initialIncrementalRetryBackoffState,
+    );
+    const secondIncrementalRetryBackoffState = incrementalRetryBackoffPolicy.advanceState(
+      firstIncrementalRetryBackoffState,
+    );
+    const thirdIncrementalRetryBackoffState = incrementalRetryBackoffPolicy.advanceState(
+      secondIncrementalRetryBackoffState,
+    );
 
     expect(firstIncrementalRetryBackoffState.delayInMilliseconds).toBe(100);
     expect(secondIncrementalRetryBackoffState.delayInMilliseconds).toBe(200);
@@ -88,8 +90,9 @@ describe('IncrementalRetryBackoff', function () {
   it('resets back to no delay before the next retry', () => {
     const initialIncrementalRetryBackoffState =
       incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
-    const advancedIncrementalRetryBackoffState =
-      incrementalRetryBackoffPolicy.advanceState(initialIncrementalRetryBackoffState);
+    const advancedIncrementalRetryBackoffState = incrementalRetryBackoffPolicy.advanceState(
+      initialIncrementalRetryBackoffState,
+    );
 
     const resetBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
 
@@ -122,11 +125,9 @@ describe('IncrementalRetryBackoff', function () {
     expect(incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(badRequestStatusCode))).toBe(
       false,
     );
-    expect(
-      incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(unauthorizedStatusCode)),
-    ).toBe(false);
-    expect(incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(notFoundStatusCode))).toBe(
+    expect(incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(unauthorizedStatusCode))).toBe(
       false,
     );
+    expect(incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(notFoundStatusCode))).toBe(false);
   });
 });
