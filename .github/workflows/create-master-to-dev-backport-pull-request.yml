@@ -14,7 +14,7 @@ permissions:
 jobs:
   create_master_to_dev_backport_pull_request:
     if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       GH_TOKEN: ${{ secrets.OTTO_THE_BOT_GH_TOKEN != '' && secrets.OTTO_THE_BOT_GH_TOKEN || github.token }}
       REPOSITORY_NAME: ${{ github.repository }}

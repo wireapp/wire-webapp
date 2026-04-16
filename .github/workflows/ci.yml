@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout (pull_request)
@@ -109,7 +109,7 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.WEBTEAM_QUAY_USERNAME }}
         run: |
           if [[ -z "${DOCKER_USERNAME}" || -z "${DOCKER_PASSWORD}" ]]; then
-            echo "Missing Quay credentials. For Dependabot pull requests, configure WEBTEAM_QUAY_USERNAME and WEBTEAM_QUAY_PASSWORD as Dependabot secrets."
+            echo "Missing Quay credentials. Configure WEBTEAM_QUAY_USERNAME and WEBTEAM_QUAY_PASSWORD for pull request image publishing."
             exit 1
           fi
 

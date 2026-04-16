@@ -17,6 +17,8 @@
  *
  */
 
+import {UserType} from '@wireapp/api-client/lib/user';
+
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
 import {User} from 'Repositories/entity/User';
 import {UserRecord} from 'Repositories/storage';
@@ -99,6 +101,7 @@ export class UserMapper {
     const {
       accent_id: accentId,
       availability,
+      app,
       assets,
       deleted,
       email,
@@ -108,6 +111,7 @@ export class UserMapper {
       service,
       team: teamId,
       supported_protocols: supportedProtocols,
+      type,
     } = userData;
 
     if (accentId) {
@@ -179,6 +183,16 @@ export class UserMapper {
 
     if (deleted) {
       userEntity.isDeleted = true;
+    }
+
+    userEntity.type = type ?? UserType.REGULAR;
+
+    if (app) {
+      userEntity.description = app.description;
+      userEntity.category = app.category;
+    } else {
+      userEntity.description = undefined;
+      userEntity.category = undefined;
     }
 
     return userEntity;

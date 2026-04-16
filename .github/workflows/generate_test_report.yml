@@ -10,7 +10,7 @@ on:
 
 jobs:
   generate_test_report:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       UNIT_TEST_REPORT_FILE: './unit-tests.log'

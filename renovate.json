@@ -1,0 +1,129 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":semanticCommits"],
+  "labels": ["renovate"],
+  "timezone": "Europe/Berlin",
+  "dependencyDashboard": true,
+  "rebaseWhen": "conflicted",
+  "prConcurrentLimit": 5,
+  "configMigration": true,
+  "minimumReleaseAge": "3 days",
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true
+    },
+    {
+      "matchFileNames": ["apps/webapp/app-config/package.json"],
+      "groupName": "webapp app configuration"
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github actions"
+    },
+    {
+      "matchManagers": ["dockerfile"],
+      "groupName": "docker images"
+    },
+    {
+      "matchPackageNames": ["nx", "@nx/**"],
+      "groupName": "nx monorepo tooling"
+    },
+    {
+      "extends": ["monorepo:typescript-eslint"],
+      "groupName": "typescript-eslint"
+    },
+    {
+      "matchPackageNames": [
+        "eslint",
+        "@types/eslint",
+        "@stylistic/**",
+        "@tony.ganchev/eslint-plugin-header",
+        "@wireapp/eslint-config",
+        "eslint-import-resolver-typescript",
+        "eslint-plugin-header",
+        "eslint-plugin-import",
+        "eslint-plugin-jest",
+        "eslint-plugin-jest-dom",
+        "eslint-plugin-jsdoc",
+        "eslint-plugin-jsx-a11y",
+        "eslint-plugin-no-unsanitized",
+        "eslint-plugin-prettier",
+        "eslint-plugin-react",
+        "eslint-plugin-react-hooks",
+        "eslint-plugin-testing-library",
+        "eslint-plugin-unused-imports"
+      ],
+      "groupName": "eslint tooling"
+    },
+    {
+      "matchPackageNames": [
+        "jest",
+        "babel-jest",
+        "jest-environment-jsdom",
+        "jest-jasmine2",
+        "@types/jest",
+        "@nx/jest",
+        "@swc/jest",
+        "@testing-library/dom",
+        "@testing-library/jest-dom",
+        "@testing-library/react",
+        "jest-canvas-mock",
+        "jest-transform-stub",
+        "jest-websocket-mock"
+      ],
+      "groupName": "test tooling"
+    },
+    {
+      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"],
+      "groupName": "react runtime and types"
+    },
+    {
+      "matchPackageNames": ["@datadog/**"],
+      "groupName": "datadog"
+    },
+    {
+      "matchPackageNames": ["lexical", "@lexical/**"],
+      "groupName": "lexical"
+    },
+    {
+      "matchPackageNames": [
+        "webpack",
+        "webpack-cli",
+        "webpack-dev-middleware",
+        "webpack-hot-middleware",
+        "webpack-bundle-analyzer",
+        "workbox-webpack-plugin",
+        "copy-webpack-plugin",
+        "html-webpack-plugin",
+        "babel-loader",
+        "css-loader",
+        "less-loader",
+        "postcss",
+        "postcss-import",
+        "postcss-less",
+        "postcss-loader",
+        "postcss-preset-env",
+        "postcss-scss",
+        "autoprefixer",
+        "cssnano",
+        "style-loader",
+        "raw-loader",
+        "svg-inline-loader",
+        "@nx/webpack"
+      ],
+      "groupName": "webapp build tooling"
+    },
+    {
+      "matchPackageNames": ["dexie-encrypted"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["geolite2"],
+      "allowedVersions": "<2"
+    }
+  ]
+}

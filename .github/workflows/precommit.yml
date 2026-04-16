@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     outputs:
       unit_tests_report: ${{ env.UNIT_TEST_REPORT_FILE }}
@@ -48,7 +48,7 @@ jobs:
       - name: Build and package
         run: yarn nx run server:package
 
-      - uses: actions/upload-artifact@v7.0.1
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: 'build-artifact'
           path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
@@ -70,13 +70,13 @@ jobs:
 
   deploy_to_aws:
     name: 'Deploy to live environments'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       AWS_REGION: eu-central-1
     needs: [build]
 
     steps:
-      - uses: actions/download-artifact@v8
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: 'build-artifact'
 
@@ -84,7 +84,7 @@ jobs:
         id: check_deploy
         if: ${{ always() }}
         run: |
-          if [[ ${{ needs.build.outputs.total_additions }} -le 100 || "${{ github.actor }}" == "dependabot[bot]" ]]; then
+          if [[ ${{ needs.build.outputs.total_additions }} -le 100 || "${{ github.actor }}" == "renovate[bot]" ]]; then
             echo "Skipping deployment"
             exit 0
           fi
@@ -118,8 +118,8 @@ jobs:
           elif [[ "${{ steps.deploy.outcome }}" == "skipped" ]]; then
             if [[ "${{ needs.build.outputs.total_additions }}" -le 100 ]]; then
               echo "⏭️ Deployment was skipped: PR has ${{ needs.build.outputs.total_additions }} additions (threshold: 100)"
-            elif [[ "${{ github.actor }}" == "dependabot[bot]" ]]; then
-              echo "⏭️ Deployment was skipped: PR is from dependabot"
+            elif [[ "${{ github.actor }}" == "renovate[bot]" ]]; then
+              echo "⏭️ Deployment was skipped: PR is from renovate"
             else
               echo "⏭️ Deployment was skipped"
             fi
