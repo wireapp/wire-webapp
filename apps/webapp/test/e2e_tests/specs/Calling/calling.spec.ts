@@ -273,4 +273,35 @@ test.describe('Calling', () => {
     await expect(userAPages.calling().selfVideoThumbnail).toBeVisible();
     await expect(userAPages.calling().getGridTile(userA.fullName).muteIcon).not.toBeAttached();
   });
+
+  test('Verify leaving and coming back to the group call', {tag: ['@TC-2808', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+    ]);
+
+    await createGroup(userAPages, groupName, [userB]);
+
+    // User A initiates the call
+    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversation().clickCallButton();
+
+    await expect(userAPages.calling().callCell).toBeVisible();
+    await expect(userBPages.calling().callCell).toBeVisible();
+
+    // User B joins the call
+    await userBPages.calling().clickAcceptCallButton();
+    await expect(userBPages.calling().goFullScreen).toBeVisible();
+
+    // User B leaves the group call
+    await userBPages.calling().clickLeaveCallButton();
+    await expect(userBPages.calling().callCell).toBeHidden();
+
+    // User B re-joins the ongoing call from the conversation list
+    const joinButton = userBPages.conversationList().joinCallButton;
+    await expect(joinButton).toBeVisible({timeout: 10_000});
+    await joinButton.click();
+
+    await expect(userBPages.calling().goFullScreen).toBeVisible();
+  });
 });
