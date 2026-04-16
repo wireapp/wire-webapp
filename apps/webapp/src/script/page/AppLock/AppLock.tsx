@@ -210,9 +210,6 @@ const AppLock = ({
   };
 
   const onLogout = (clearData: boolean) => {
-    if (!isAppLockEnforced) {
-      appLockRepository.disableFeature();
-    }
     appLockRepository.removeCode();
     amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
   };
