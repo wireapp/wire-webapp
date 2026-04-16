@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,15 +20,15 @@
 import {container} from 'tsyringe';
 
 import {
+  ChannelIcon,
+  CollectionIcon,
+  ExternalLinkIcon,
   GroupIcon,
   MessageIcon,
   StarIcon,
-  ExternalLinkIcon,
-  Tooltip,
   SupportIcon,
-  ChannelIcon,
-  CollectionIcon,
   TeamIcon,
+  Tooltip,
 } from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -39,7 +39,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {
+  isTabVisible,
+  SidebarTabs,
+  useSidebarStore,
+} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDataDogEnabled} from 'Util/dataDog';
@@ -48,19 +52,20 @@ import {replaceLink, t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
+  conversationsTitleWrapper,
   footerDisclaimer,
   footerDisclaimerEllipsis,
   footerDisclaimerTooltip,
   iconStyle,
-  conversationsTitleWrapper,
 } from './ConversationTabs.styles';
 import {FolderIcon} from './FolderIcon';
 import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
 
 import {Config} from '../../../../../Config';
 import {ContentState} from '../../../../useAppState';
-import {ConversationFilterButton} from '../ConversationFilterButton';
 import {ConversationTab} from '../ConversationTab';
+import {conversationFilters} from '../helpers';
+import {TabAndFilterSettings} from '../tabAndFilterSettings';
 
 interface ConversationTabsProps {
   unreadConversations: Conversation[];
@@ -69,6 +74,7 @@ interface ConversationTabsProps {
   groupConversations: Conversation[];
   directConversations: Conversation[];
   channelConversations: Conversation[];
+  draftConversations: Conversation[];
   conversationRepository: ConversationRepository;
   onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
   currentTab: SidebarTabs;
@@ -84,6 +90,7 @@ export const ConversationTabs = ({
   groupConversations,
   conversationRepository,
   directConversations,
+  draftConversations,
   onChangeTab,
   currentTab,
   onClickPreferences,
@@ -91,7 +98,8 @@ export const ConversationTabs = ({
   selfUser,
   channelConversations,
 }: ConversationTabsProps) => {
-  const {isChannelsEnabled, isChannelsFeatureEnabled} = useChannelsFeatureFlag();
+  const {visibleTabs} = useSidebarStore();
+  const {isChannelsEnabled, shouldShowChannelTab} = useChannelsFeatureFlag();
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
@@ -107,7 +115,7 @@ export const ConversationTabs = ({
   ).length;
 
   const filterUnreadAndArchivedConversations = (conversation: Conversation) =>
-    !conversation.is_archived() && conversation.hasUnread();
+    conversationFilters.notArchived(conversation) && conversationFilters.hasUnread(conversation);
 
   const isTeamCreationEnabled =
     Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
@@ -115,6 +123,30 @@ export const ConversationTabs = ({
 
   const channelConversationsLength = channelConversations.filter(filterUnreadAndArchivedConversations).length;
   const groupConversationsLength = groupConversations.filter(filterUnreadAndArchivedConversations).length;
+  const unreadCount = unreadConversations.filter(conversationFilters.notArchived).length;
+  const mentionsCount = unreadConversations.filter(
+    conv => conversationFilters.notArchived(conv) && conversationFilters.hasMentions(conv),
+  ).length;
+  const repliesCount = unreadConversations.filter(
+    conv => conversationFilters.notArchived(conv) && conversationFilters.hasReplies(conv),
+  ).length;
+  const draftsCount = draftConversations.filter(conversationFilters.notArchived).length;
+  const pingsCount = unreadConversations.filter(
+    conv => conversationFilters.notArchived(conv) && conversationFilters.hasPings(conv),
+  ).length;
+  const directConversationsLength = directConversations.filter(filterUnreadAndArchivedConversations).length;
+
+  const channelsTab = shouldShowChannelTab
+    ? [
+        {
+          type: SidebarTabs.CHANNELS,
+          title: t('conversationLabelChannels'),
+          dataUieName: 'go-channels-view',
+          Icon: <ChannelIcon />,
+          unreadConversations: channelConversationsLength,
+        },
+      ]
+    : [];
 
   const conversationTabs = [
     {
@@ -132,6 +164,42 @@ export const ConversationTabs = ({
       unreadConversations: totalUnreadFavoriteConversations,
     },
     {
+      type: SidebarTabs.UNREAD,
+      title: t('conversationLabelUnread'),
+      dataUieName: 'go-unread-view',
+      Icon: <Icon.MarkAsUnreadIcon />,
+      unreadConversations: unreadCount,
+    },
+    {
+      type: SidebarTabs.MENTIONS,
+      title: t('conversationLabelMentions'),
+      dataUieName: 'go-mentions-view',
+      Icon: <Icon.MentionIcon />,
+      unreadConversations: mentionsCount,
+    },
+    {
+      type: SidebarTabs.PINGS,
+      title: t('conversationLabelPings'),
+      dataUieName: 'go-pings-view',
+      Icon: <Icon.PingIcon />,
+      unreadConversations: pingsCount,
+    },
+    {
+      type: SidebarTabs.REPLIES,
+      title: t('conversationLabelReplies'),
+      dataUieName: 'go-replies-view',
+      Icon: <Icon.ReplyIcon />,
+      unreadConversations: repliesCount,
+    },
+    {
+      type: SidebarTabs.DRAFTS,
+      title: t('conversationLabelDrafts'),
+      dataUieName: 'go-drafts-view',
+      Icon: <Icon.DraftMessageIcon />,
+      unreadConversations: draftsCount,
+    },
+    ...channelsTab,
+    {
       type: SidebarTabs.GROUPS,
       title: t('conversationLabelGroups'),
       dataUieName: 'go-groups-view',
@@ -145,7 +213,7 @@ export const ConversationTabs = ({
       title: t('conversationLabelDirects'),
       dataUieName: 'go-directs-view',
       Icon: <Icon.PeopleIcon />,
-      unreadConversations: directConversations.filter(filterUnreadAndArchivedConversations).length,
+      unreadConversations: directConversationsLength,
     },
     {
       type: SidebarTabs.FOLDER,
@@ -164,15 +232,9 @@ export const ConversationTabs = ({
     },
   ];
 
-  if (isChannelsEnabled && (channelConversations.some(channel => !channel.is_archived()) || isChannelsFeatureEnabled)) {
-    conversationTabs.splice(2, 0, {
-      type: SidebarTabs.CHANNELS,
-      title: t('conversationLabelChannels'),
-      dataUieName: 'go-channels-view',
-      Icon: <ChannelIcon />,
-      unreadConversations: channelConversationsLength,
-    });
-  }
+  // Filter tabs based on visibility preferences
+  const visibleConversationTabs = conversationTabs.filter(tab => isTabVisible(tab.type, visibleTabs));
+
   const manageTeamUrl = getManageTeamUrl();
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
 
@@ -188,10 +250,10 @@ export const ConversationTabs = ({
       >
         <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
           <span>{t('videoCallOverlayConversations')}</span>
-          <ConversationFilterButton />
+          <TabAndFilterSettings />
         </div>
 
-        {conversationTabs.map((conversationTab, index) => {
+        {visibleConversationTabs.map((conversationTab, index) => {
           if (conversationTab.type === SidebarTabs.FOLDER) {
             return (
               <ConversationFolderTab
@@ -229,7 +291,7 @@ export const ConversationTabs = ({
           type={SidebarTabs.CONNECT}
           Icon={<Icon.AddParticipantsIcon />}
           onChangeTab={onChangeTab}
-          conversationTabIndex={conversationTabs.length + 1}
+          conversationTabIndex={visibleConversationTabs.length + 1}
           dataUieName="go-people"
           isActive={currentTab === SidebarTabs.CONNECT}
         />
@@ -248,7 +310,7 @@ export const ConversationTabs = ({
               type={SidebarTabs.CELLS}
               Icon={<CollectionIcon />}
               onChangeTab={onChangeTab}
-              conversationTabIndex={conversationTabs.length + 2}
+              conversationTabIndex={visibleConversationTabs.length + 2}
               dataUieName="go-cells"
               isActive={currentTab === SidebarTabs.CELLS}
             />
