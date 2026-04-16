@@ -25,6 +25,16 @@ import type {Mode, QualityTier, QualityTierParams} from '../backgroundEffectsWor
 
 const DEFAULT_TARGET_FPS = 30;
 
+export const QUALITY_TIERS = {
+  SUPERHIGH: 'superhigh' as const,
+  HIGH: 'high' as const,
+  MEDIUM: 'medium' as const,
+  LOW: 'low' as const,
+  BYPASS: 'bypass' as const,
+  // Privacy boundary constant
+  MIN_ALLOWED_TIER: 'low' as const,
+} as const;
+
 /**
  * Adaptive quality controller that dynamically adjusts rendering quality tiers
  * based on real-time performance measurements.
@@ -55,7 +65,7 @@ export class QualityController {
   /** Total number of samples observed since the last reset. */
   private totalSamplesSeen = 0;
   /** Current quality tier. Starts at (highest quality). */
-  private tier: QualityTier = 'superhigh';
+  private tier: QualityTier = QUALITY_TIERS.SUPERHIGH;
   /** Maximum tier allowed for upgrades once performance caps are applied. */
   private maxTier: QualityTier | null = null;
   /** Frame time budget in milliseconds derived from target FPS. */
@@ -233,8 +243,8 @@ export class QualityController {
       const dominant = this.getDominantCost(ewmaTotalMs, ewmaSegmentationMs, ewmaGpuMs);
       const nextTier = this.downgradeTier(dominant);
       if (nextTier !== this.tier) {
-        if (this.tier === 'superhigh') {
-          this.applyMaxTierCap('high');
+        if (this.tier === QUALITY_TIERS.SUPERHIGH) {
+          this.applyMaxTierCap(QUALITY_TIERS.HIGH);
         }
         this.registerUpgradeFailure(nextTier);
         if (process.env.NODE_ENV !== 'production') {
@@ -431,24 +441,21 @@ export class QualityController {
    * @returns The next lower quality tier.
    */
   private downgradeTier(dominant: 'cpu' | 'gpu' | 'balanced'): QualityTier {
-    if (this.tier === 'superhigh') {
-      return 'high';
+    if (this.tier === QUALITY_TIERS.SUPERHIGH) {
+      return QUALITY_TIERS.HIGH;
     }
 
-    if (this.tier === 'high') {
+    if (this.tier === QUALITY_TIERS.HIGH) {
       // GPU-bound: skip medium tier for stronger GPU cost reduction
       // CPU-bound: normal step down to B
-      return dominant === 'gpu' ? 'low' : 'medium';
+      return dominant === 'gpu' ? QUALITY_TIERS.LOW : QUALITY_TIERS.MEDIUM;
     }
-    if (this.tier === 'medium') {
-      return 'low';
+    if (this.tier === QUALITY_TIERS.MEDIUM || this.tier === QUALITY_TIERS.LOW) {
+      return QUALITY_TIERS.LOW;
     }
-    if (this.tier === 'low') {
-      return 'bypass';
-    }
-
     // last case
-    return 'bypass';
+    // Never auto-downgrade to bypass; low is the minimum allowed tier for privacy reasons.
+    return QUALITY_TIERS.MIN_ALLOWED_TIER;
   }
 
   /**
@@ -458,21 +465,23 @@ export class QualityController {
    * @returns The next higher quality tier, or current tier if already at maximum.
    */
   private upgradeTier(): QualityTier {
-    if (this.tier === 'superhigh') {
-      return 'superhigh';
+    if (this.tier === QUALITY_TIERS.SUPERHIGH) {
+      return QUALITY_TIERS.SUPERHIGH;
     }
-    if (this.tier === 'bypass') {
-      return this.canUpgradeTo('low') ? 'low' : 'bypass';
+    if (this.tier === QUALITY_TIERS.BYPASS) {
+      return this.canUpgradeTo(QUALITY_TIERS.LOW) ? QUALITY_TIERS.LOW : QUALITY_TIERS.BYPASS;
     }
-    if (this.tier === 'low') {
-      return this.canUpgradeTo('medium') ? 'medium' : 'low';
+    if (this.tier === QUALITY_TIERS.LOW) {
+      return this.canUpgradeTo(QUALITY_TIERS.MEDIUM) ? QUALITY_TIERS.MEDIUM : QUALITY_TIERS.LOW;
     }
 
-    if (this.tier === 'medium') {
-      return this.canUpgradeTo('high') ? 'high' : 'medium';
+    if (this.tier === QUALITY_TIERS.MEDIUM) {
+      return this.canUpgradeTo(QUALITY_TIERS.HIGH) ? QUALITY_TIERS.HIGH : QUALITY_TIERS.MEDIUM;
     }
     // Tier can only go to superhigh (maximum quality)
-    return this.tier === 'high' && this.canUpgradeTo('superhigh') ? 'superhigh' : 'high';
+    return this.tier === QUALITY_TIERS.HIGH && this.canUpgradeTo(QUALITY_TIERS.SUPERHIGH)
+      ? QUALITY_TIERS.SUPERHIGH
+      : QUALITY_TIERS.HIGH;
   }
 
   /**

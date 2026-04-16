@@ -17,14 +17,15 @@
  *
  */
 
-import {QualityController} from './qualityController';
+import {QUALITY_TIERS, QualityController} from './qualityController';
 import {DEFAULT_TUNING} from './tuning';
 
 const MODE_BLUR = 'blur' as const;
 const MODE_VIRTUAL = 'virtual' as const;
 
 const TARGET_FPS = 30;
-const BUDGET_MS = 1000 / TARGET_FPS;
+const PERFORMANCE_THRESHOLD = 1000;
+const BUDGET_MS = PERFORMANCE_THRESHOLD / TARGET_FPS;
 const DOWNGRADE_THRESHOLD_MS = BUDGET_MS * DEFAULT_TUNING.downgradeThresholdRatio;
 const HYSTERESIS_FRAMES = DEFAULT_TUNING.hysteresisFrames;
 const DOWNGRADE_MIN_SAMPLES = DEFAULT_TUNING.maxSamples * DEFAULT_TUNING.downgradeWarmupWindows;
@@ -50,28 +51,34 @@ describe('QualityController', () => {
     for (let i = 0; i < DOWNGRADE_TRIGGER_SAMPLES; i += 1) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('high');
+    expect(params?.tier).toBe(QUALITY_TIERS.HIGH);
   });
 
-  it('downgrades GPU-bound workloads more aggressively', () => {
+  it('downgrades GPU-bound workloads more aggressively without entering bypass', () => {
     const controller = new QualityController(TARGET_FPS);
     let params = controller.getTier(MODE_BLUR);
 
     // first downgrade
     let guard = 0;
-    while (params.tier === 'superhigh' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.SUPERHIGH && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(gpuBoundSample, MODE_BLUR);
     }
 
-    expect(params.tier).toBe('high');
+    expect(params.tier).toBe(QUALITY_TIERS.HIGH);
 
     // next downgrade
     guard = 0;
-    while (params.tier === 'high' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.HIGH && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(gpuBoundSample, MODE_BLUR);
     }
 
-    expect(params.tier).toBe('low');
+    expect(params.tier).toBe(QUALITY_TIERS.LOW);
+
+    guard = 0;
+    while (guard++ < PERFORMANCE_THRESHOLD) {
+      params = controller.update(gpuBoundSample, MODE_BLUR);
+    }
+    expect(params.tier).toBe(QUALITY_TIERS.LOW);
   });
 
   it('applies mode-specific overlays', () => {
@@ -84,12 +91,12 @@ describe('QualityController', () => {
 
   it('resets hysteresis when mode changes', () => {
     const controller = new QualityController(TARGET_FPS);
-    controller.setTier('low');
+    controller.setTier(QUALITY_TIERS.LOW);
     for (let i = 0; i < HYSTERESIS_FRAMES - 1; i += 1) {
       controller.update(fastSample, MODE_BLUR);
     }
     const params = controller.update(fastSample, MODE_VIRTUAL);
-    expect(params.tier).toBe('low');
+    expect(params.tier).toBe(QUALITY_TIERS.LOW);
   });
 
   it('does not oscillate within a single hysteresis window', () => {
@@ -98,20 +105,20 @@ describe('QualityController', () => {
     for (let i = 0; i < HYSTERESIS_FRAMES - 5; i += 1) {
       params = controller.update(i % 2 === 0 ? slowSample : fastSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('superhigh');
+    expect(params?.tier).toBe(QUALITY_TIERS.SUPERHIGH);
   });
 
   it('starts at tier superhigh', () => {
     const controller = new QualityController(TARGET_FPS);
     const params = controller.getTier(MODE_BLUR);
-    expect(params.tier).toBe('superhigh');
+    expect(params.tier).toBe(QUALITY_TIERS.SUPERHIGH);
   });
 
   it('upgrades tier when performance improves', () => {
     const controller = new QualityController(TARGET_FPS);
     // Start at tier C
-    controller.setTier('low');
-    expect(controller.getTier(MODE_BLUR).tier).toBe('low');
+    controller.setTier(QUALITY_TIERS.LOW);
+    expect(controller.getTier(MODE_BLUR).tier).toBe(QUALITY_TIERS.LOW);
 
     // Provide fast samples to trigger upgrade
     let params;
@@ -119,14 +126,14 @@ describe('QualityController', () => {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     // Should upgrade from C to B
-    expect(params?.tier).toBe('medium');
+    expect(params?.tier).toBe(QUALITY_TIERS.MEDIUM);
 
     // Continue with fast samples to upgrade further
     for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
     // Should upgrade from B to A
-    expect(params?.tier).toBe('high');
+    expect(params?.tier).toBe(QUALITY_TIERS.HIGH);
   });
 
   it('prevents immediate upgrade after downgrade due to cooldown', () => {
@@ -134,15 +141,15 @@ describe('QualityController', () => {
 
     // Start at tier superhigh
     let params = controller.getTier(MODE_BLUR);
-    expect(params.tier).toBe('superhigh');
+    expect(params.tier).toBe(QUALITY_TIERS.SUPERHIGH);
 
     // Trigger downgrade with CPU-bound samples (superhigh -> high)
     let guard = 0;
-    while (params.tier === 'superhigh' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.SUPERHIGH && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
-    expect(guard).toBeLessThan(1000);
-    expect(params.tier).toBe('high');
+    expect(guard).toBeLessThan(PERFORMANCE_THRESHOLD);
+    expect(params.tier).toBe(QUALITY_TIERS.HIGH);
 
     // Provide fast samples immediately after downgrade
     // Cooldown decrements each frame, so after 60 frames it will be 0
@@ -150,7 +157,7 @@ describe('QualityController', () => {
     for (let i = 0; i < 5; i++) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
-    expect(params.tier).toBe('high'); // stay on high because cooldown > 0
+    expect(params.tier).toBe(QUALITY_TIERS.HIGH); // stay on high because cooldown > 0
 
     // Enough frames for cooldown
     guard = 0;
@@ -164,9 +171,9 @@ describe('QualityController', () => {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
 
-    // must NOT exceed 'high' due to maxTier cap
-    expect(params.tier).not.toBe('superhigh');
-    expect(['high', 'medium']).toContain(params.tier);
+    // must NOT exceed QUALITY_TIERS.HIGH due to maxTier cap
+    expect(params.tier).not.toBe(QUALITY_TIERS.SUPERHIGH);
+    expect([QUALITY_TIERS.HIGH, QUALITY_TIERS.MEDIUM]).toContain(params.tier);
   });
 
   it('applies bypass mode and zero temporal alpha for tier bypass', () => {
@@ -180,7 +187,7 @@ describe('QualityController', () => {
 
   it('applies tier low virtual mode adjustments', () => {
     const controller = new QualityController(TARGET_FPS);
-    controller.setTier('low');
+    controller.setTier(QUALITY_TIERS.LOW);
     const virtualParams = controller.getTier(MODE_VIRTUAL);
     const blurParams = controller.getTier(MODE_BLUR);
 
@@ -209,63 +216,63 @@ describe('QualityController', () => {
     // Balanced sample: neither CPU nor GPU dominates (>55%)
     let params = controller.getTier(MODE_BLUR);
     let guard = 0;
-    while (params.tier === 'superhigh' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.SUPERHIGH && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(balancedSample, MODE_BLUR);
     }
     // Should step down normally (superhigh -> high) for balanced workloads
-    expect(params?.tier).toBe('high');
-    expect(guard).toBeLessThan(1000);
+    expect(params?.tier).toBe(QUALITY_TIERS.HIGH);
+    expect(guard).toBeLessThan(PERFORMANCE_THRESHOLD);
   });
 
   it('manually sets tier and resets counters', () => {
     const controller = new QualityController(TARGET_FPS);
     // Manually set to tier C
-    controller.setTier('low');
-    expect(controller.getTier(MODE_BLUR).tier).toBe('low');
+    controller.setTier(QUALITY_TIERS.LOW);
+    expect(controller.getTier(MODE_BLUR).tier).toBe(QUALITY_TIERS.LOW);
 
     // Should allow immediate tier change after setTier
-    controller.setTier('high');
-    expect(controller.getTier(MODE_BLUR).tier).toBe('high');
+    controller.setTier(QUALITY_TIERS.HIGH);
+    expect(controller.getTier(MODE_BLUR).tier).toBe(QUALITY_TIERS.HIGH);
   });
 
-  it('handles multiple tier transitions', () => {
+  it('handles multiple tier transitions without auto-downgrading to bypass', () => {
     const controller = new QualityController(TARGET_FPS);
     let params = controller.getTier(MODE_BLUR);
 
     // superhigh -> high
     let guard = 0;
-    while (params.tier === 'superhigh' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.SUPERHIGH && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('high');
+    expect(params?.tier).toBe(QUALITY_TIERS.HIGH);
 
     // high -> medium (CPU-bound downgrade)
     guard = 0;
-    while (params.tier === 'high' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.HIGH && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(cpuBoundSample, MODE_BLUR);
     }
-    expect(params.tier).toBe('medium');
+    expect(params.tier).toBe(QUALITY_TIERS.MEDIUM);
 
     // medium -> low (further downgrade)
     guard = 0;
-    while (params.tier === 'medium' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.MEDIUM && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(slowSample, MODE_BLUR);
     }
-    expect(params?.tier).toBe('low');
+    expect(params?.tier).toBe(QUALITY_TIERS.LOW);
 
-    // low -> bypass (final downgrade)
+    // low must remain low, never bypass
     guard = 0;
-    while (params.tier === 'low' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.LOW && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(slowSample, MODE_BLUR);
     }
-    expect(params.tier).toBe('bypass');
+    expect(params.tier).toBe(QUALITY_TIERS.LOW);
 
-    // bypass -> low (upgrade path)
+    // low -> medium (upgrade path still works)
     guard = 0;
-    while (params.tier === 'bypass' && guard++ < 1000) {
+    while (params.tier === QUALITY_TIERS.LOW && guard++ < PERFORMANCE_THRESHOLD) {
       params = controller.update(veryFastSample, MODE_BLUR);
     }
-    expect(params.tier).toBe('low');
+    expect(params.tier).toBe(QUALITY_TIERS.MEDIUM);
   });
 
   it('maintains sample window size limit', () => {
@@ -286,25 +293,38 @@ describe('QualityController', () => {
 
   it('handles boundary conditions at thresholds', () => {
     const controller = new QualityController(TARGET_FPS);
-    const budget = 1000 / TARGET_FPS;
+    const budget = PERFORMANCE_THRESHOLD / TARGET_FPS;
     const upgradeThreshold = budget * DEFAULT_TUNING.upgradeThresholdRatio;
     const justAboveUpgrade = upgradeThreshold + 0.5;
     const clearlyBelowUpgrade = upgradeThreshold - 5;
 
     const atUpgradeThreshold = {totalMs: justAboveUpgrade, segmentationMs: 10, gpuMs: 8};
-    controller.setTier('medium');
+    controller.setTier(QUALITY_TIERS.MEDIUM);
     let params;
     for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
       params = controller.update(atUpgradeThreshold, MODE_BLUR);
     }
     // Just above threshold, should not upgrade.
-    expect(params?.tier).toBe('medium');
+    expect(params?.tier).toBe(QUALITY_TIERS.MEDIUM);
 
     const belowUpgradeThreshold = {totalMs: clearlyBelowUpgrade, segmentationMs: 9, gpuMs: 8};
     for (let i = 0; i < HYSTERESIS_FRAMES + 1; i += 1) {
       params = controller.update(belowUpgradeThreshold, MODE_BLUR);
     }
     // Well below threshold, should upgrade.
-    expect(params?.tier).toBe('superhigh');
+    expect(params?.tier).toBe(QUALITY_TIERS.SUPERHIGH);
+  });
+
+  it('does not auto-downgrade from low to bypass', () => {
+    const controller = new QualityController(TARGET_FPS);
+    controller.setTier(QUALITY_TIERS.MIN_ALLOWED_TIER);
+
+    let params = controller.getTier(MODE_BLUR);
+
+    for (let i = 0; i < PERFORMANCE_THRESHOLD; i += 1) {
+      params = controller.update(slowSample, MODE_BLUR);
+    }
+
+    expect(params.tier).toBe(QUALITY_TIERS.LOW);
   });
 });
