@@ -128,7 +128,7 @@ type InactivityActorEvent =
  * This callback actor manages an inactivity timer.
  * It starts a timer when created and resets it whenever it receives a RESET_TIMER event.
  * After timeout milliseconds of no RESET_TIMER events, it sends INACTIVITY_TIMEOUT to the parent machine.
- * 
+ *
  * Note: This is NOT a debounce of activity events - it's a trailing-edge inactivity detector.
  * Every activity event resets the timer; we're measuring time since last activity, not rate-limiting events.
  */
