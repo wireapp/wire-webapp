@@ -2641,7 +2641,7 @@ export class ConversationRepository {
    * @param userEntities Users to be added to the conversation
    * @returns Resolves when members were added
    */
-  async addUsers(conversation: Conversation, userEntities: User[]) {
+  async addUsers(conversation: Conversation, userEntities: Pick<User, 'qualifiedId'>[]) {
     /**
      * ToDo: Fetch all MLS Events from backend before doing anything else
      * Needs to be done to receive the latest epoch and avoid epoch mismatch errors
