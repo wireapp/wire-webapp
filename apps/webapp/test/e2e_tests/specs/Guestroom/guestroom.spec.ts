@@ -64,7 +64,7 @@ test.describe('Guestroom', () => {
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
         await guestPages.login().login(guestUser);
-        await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
+        await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible({timeout: LOGIN_TIMEOUT});
         await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
         await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
           'Password is incorrect, please try again.',
