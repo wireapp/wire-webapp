@@ -17,14 +17,10 @@
  *
  */
 
-import {Page} from 'playwright/test';
-import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
-import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
-import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Group Conversation', () => {
@@ -99,8 +95,8 @@ test.describe('Group Conversation', () => {
     const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await createGroup(userAPages, groupName, [userB, userC]);
-    const adminGroupLocator = userAPages.conversationList().list.filter({hasText: groupName});
-    const memberGroupLocator = userBPages.conversationList().list.filter({hasText: groupName});
+    const adminGroupLocator = userAPages.conversationList().getConversationLocator(groupName);
+    const memberGroupLocator = userBPages.conversationList().getConversationLocator(groupName);
 
     // Pre-condition: Ensure the member can see the group before the creator deletes it
     await expect(memberGroupLocator).toBeVisible();
@@ -124,9 +120,8 @@ test.describe('Group Conversation', () => {
     await userAModals.confirm().actionButton.click();
 
     // Verify the group no longer exists for any user
-    await adminGroupLocator.waitFor({state: 'detached'});
-    await expect(adminGroupLocator).toBeHidden();
-    await expect(memberGroupLocator).toBeHidden();
+    await expect(adminGroupLocator).toBeHidden({timeout: 20_000});
+    await expect(memberGroupLocator).toBeHidden({timeout: 20_000});
   });
 
   test(
@@ -139,8 +134,10 @@ test.describe('Group Conversation', () => {
       ]);
 
       const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userAPages, groupName, [userB]);
+      await expect(userBPages.conversationList().getConversationLocator(groupName)).toBeVisible();
 
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
@@ -152,7 +149,7 @@ test.describe('Group Conversation', () => {
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversationDetails().deleteGroupButton.click();
       await userAModals.confirm().actionButton.click();
-      await userAPages.conversationList().list.filter({hasText: groupName}).waitFor({state: 'detached'});
+      await expect(userAPages.conversationList().getConversationLocator(groupName)).not.toBeAttached({timeout: 20_000});
 
       await expect
         .poll(() => getUserBNotifications())
@@ -196,9 +193,9 @@ test.describe('Group Conversation', () => {
       await pages.conversation().clickConversationInfoButton();
       await pages.conversationDetails().deleteGroupButton.click();
       await modals.confirm().actionButton.click();
-      await pages.conversationList().list.filter({hasText: group.name}).waitFor({state: 'detached'});
-
-      await expect(userCPages.conversationList().list.filter({hasText: group.name})).not.toBeVisible();
+      await expect(userCPages.conversationList().getConversationLocator(group.name)).not.toBeAttached({
+        timeout: 20_000,
+      });
 
       await userCPages.conversationList().searchConversationsInput.fill(group.name);
       await expect(userCPages.conversationList().list).toContainText('No results found');
