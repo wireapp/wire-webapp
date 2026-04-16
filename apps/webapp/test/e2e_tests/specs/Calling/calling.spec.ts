@@ -304,4 +304,25 @@ test.describe('Calling', () => {
 
     await expect(userBPages.calling().goFullScreen).toBeVisible();
   });
+
+  test('Verify ignoring group call', {tag: ['@TC-2811', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await createGroup(userAPages, groupName, [userB]);
+
+    // User A initiates the call
+    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversation().clickCallButton();
+
+    await expect(userAPages.calling().callCell).toBeVisible();
+    await expect(userBPages.calling().callCell).toBeVisible();
+    await expect.poll(() => isPlayingAudio(userBPage, AudioType.INCOMING_CALL)).toBe(true);
+
+    await userBPages.calling().clickLeaveCallButton();
+    await expect(userBPages.calling().callCell).toBeHidden();
+    await expect.poll(() => isPlayingAudio(userBPage, AudioType.INCOMING_CALL)).toBe(false);
+  });
 });
