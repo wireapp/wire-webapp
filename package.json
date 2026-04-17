@@ -15,7 +15,7 @@
   "devDependencies": {
     "@faker-js/faker": "9.9.0",
     "@ls-lint/ls-lint": "2.3.1",
-    "@nx/jest": "22.6.4",
+    "@nx/jest": "22.6.5",
     "@nx/node": "22.6.5",
     "@nx/workspace": "22.6.5",
     "@stylistic/eslint-plugin": "5.10.0",
