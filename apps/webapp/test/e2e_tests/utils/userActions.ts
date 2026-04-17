@@ -64,7 +64,12 @@ export const sendTextMessageToConversation = async (
 };
 
 type UserPages = PageManager['webapp']['pages'];
-export const createGroup = async (pages: UserPages, conversationName: string, user: User[], features?: {cells?: boolean}) => {
+export const createGroup = async (
+  pages: UserPages,
+  conversationName: string,
+  user: User[],
+  features?: {cells?: boolean},
+) => {
   await pages.conversationList().clickCreateGroup();
 
   if (features?.cells) {

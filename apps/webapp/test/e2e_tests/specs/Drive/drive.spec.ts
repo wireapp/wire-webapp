@@ -29,15 +29,15 @@ import {Locator} from '@playwright/test';
 
 const getMultipartAssetRoot = (conversation: ConversationPage, user: User): Locator => {
   return conversation.messageItems.getByLabel(new RegExp(`^Image from ${user.fullName}`));
-}
+};
 
 const getImageInMultipartMessageLocator = (conversation: ConversationPage, user: User): Locator => {
   return getMultipartAssetRoot(conversation, user).getByRole('img');
-}
+};
 
 const getVideoInMultipartMessageLocator = (conversation: ConversationPage, user: User): Locator => {
   return getMultipartAssetRoot(conversation, user).locator('video');
-}
+};
 
 const getCellsImageLocator = (conversation: ConversationPage, user: User): Locator => {
   return conversation.messageItems.getByRole('button', {name: new RegExp(`^Image from ${user.fullName}`)});
