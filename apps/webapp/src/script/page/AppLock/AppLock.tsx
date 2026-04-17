@@ -262,12 +262,6 @@ const AppLock = ({
     }
   };
 
-  const ErrorMessage = () => (
-    <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
-      {unlockError}
-    </p>
-  );
-
   return (
     <ModalComponent isShown={isVisible} onClosed={onClosed} data-uie-name="applock-modal">
       <div className="modal__header" css={applockStyles.headerStyle}>
@@ -457,7 +451,7 @@ const AppLock = ({
               data-uie-name="input-applock-unlock"
               autoComplete="current-password"
               aria-invalid={Boolean(unlockError)}
-              error={ErrorMessage()}
+              error={unlockError ? <ErrorMessage message={unlockError} /> : undefined}
             />
 
             <Button block type="submit" data-uie-name="do-action" css={applockStyles.unlockButtonStyle}>
@@ -534,5 +528,11 @@ const AppLock = ({
     </ModalComponent>
   );
 };
+
+const ErrorMessage = ({message}: {message: string}) => (
+  <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
+    {message}
+  </p>
+);
 
 export {AppLock};
