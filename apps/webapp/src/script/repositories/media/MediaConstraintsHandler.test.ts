@@ -18,29 +18,51 @@
  */
 
 import {User} from 'Repositories/entity/User';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
+import {defaultAudioOutputId, mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/UserState';
 import {createUuid} from 'Util/uuid';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 
+interface SelectedDeviceId {
+  exact?: string;
+}
+
+interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
+  audio: {
+    autoGainControl?: boolean;
+    deviceId?: SelectedDeviceId;
+  };
+  video: {
+    facingMode?: string;
+    deviceId?: SelectedDeviceId;
+  };
+}
+
+interface CreateAvailableDevicesParams {
+  audio?: string;
+  video?: string;
+  screen?: string;
+}
+
 describe('MediaConstraintsHandler', () => {
-  const createAvailableDevices = ({
+  const createAvailableDevices = async ({
     audio = 'mic',
-    video = 'screen1',
-    output = 'speaker',
-    screen = 'camera',
-  }: {
-    audio?: string;
-    video?: string;
-    output?: string;
-    screen?: string;
-  } = {}) => {
-    const state = mediaDevicesStore.getState();
-    state.setAudioInputDeviceId(audio);
-    state.setVideoInputDeviceId(video);
-    state.setAudioOutputDeviceId(output);
-    state.setScreenInputDeviceId(screen);
+    video = 'camera1',
+    screen = 'screen1',
+  }: CreateAvailableDevicesParams = {}) => {
+    mediaDevicesStore.setState({
+      audio: {
+        input: {devices: [], supported: false, selectedId: audio},
+        output: {devices: [], supported: false, selectedId: defaultAudioOutputId},
+      },
+      video: {
+        input: {devices: [], selectedId: video, supported: false},
+      },
+      screen: {
+        input: {devices: [], selectedId: screen, supported: false},
+      },
+    });
   };
 
   const resetStore = () => {
@@ -58,19 +80,29 @@ describe('MediaConstraintsHandler', () => {
     return new MediaConstraintsHandler(userState as UserState);
   };
 
-  afterEach(() => resetStore());
+  const defaultId = MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
+
+  beforeEach(() => {
+    resetStore();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
+  });
 
   describe('getMediaStreamConstraints', () => {
     it('returns devices id constraints if current devices are defined', () => {
       createAvailableDevices();
 
-      setTimeout(() => {
-        const constraintsHandler = createConstraintsHandler();
-        const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
+      const constraintsHandler = createConstraintsHandler();
+      const constraints = constraintsHandler.getMediaStreamConstraints(
+        true,
+        true,
+        false,
+      ) as ExtendedMediaTrackConstraints;
 
-        expect(constraints.audio.deviceId.exact).toBe('mic');
-        expect(constraints.video.deviceId.exact).toBe('screen1');
-      });
+      expect(constraints.audio.deviceId.exact).toBe('mic');
+      expect(constraints.video.deviceId.exact).toBe('camera1');
     });
 
     it('returns default constraints when current devices are not defined', () => {
@@ -78,7 +110,11 @@ describe('MediaConstraintsHandler', () => {
       createAvailableDevices({audio: defaultId, video: defaultId});
 
       const constraintsHandler = createConstraintsHandler();
-      const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as any;
+      const constraints = constraintsHandler.getMediaStreamConstraints(
+        true,
+        true,
+        false,
+      ) as ExtendedMediaTrackConstraints;
 
       expect(constraints.audio.deviceId).toBeUndefined();
       expect(constraints.audio).toEqual({autoGainControl: false});
@@ -91,6 +127,60 @@ describe('MediaConstraintsHandler', () => {
           resizeMode: 'none',
         }),
       );
+    });
+
+    describe('Audio Constraints', () => {
+      it('should apply the AGC preference from storage to the audio constraints', () => {
+        const selfUserId = createUuid();
+        const constraintsHandler = createConstraintsHandler(selfUserId);
+
+        localStorage.setItem(`agc_enabled_${selfUserId}`, 'true');
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio.autoGainControl).toBe(true);
+      });
+
+      it('should include exact deviceId when a specific audio device is selected', () => {
+        createAvailableDevices({audio: 'specific-mic-id'});
+        const constraintsHandler = createConstraintsHandler();
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio.deviceId.exact).toBe('specific-mic-id');
+      });
+
+      it('should NOT include deviceId when the default audio device is selected', () => {
+        createAvailableDevices({audio: defaultId});
+        const constraintsHandler = createConstraintsHandler();
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(true, false) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.audio.deviceId).toBeUndefined();
+      });
+    });
+
+    describe('Video Constraints', () => {
+      it('should apply facingMode: user ONLY when no specific video device is selected', () => {
+        createAvailableDevices({video: defaultId});
+        const constraintsHandler = createConstraintsHandler();
+        const preferredFacing = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE;
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(false, true) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.video.facingMode).toBe(preferredFacing);
+        expect(constraints.video.deviceId).toBeUndefined();
+      });
+
+      it('should apply exact deviceId and OMIT facingMode when a specific video device is selected', () => {
+        createAvailableDevices({video: 'webcam-123'});
+        const constraintsHandler = createConstraintsHandler();
+
+        const constraints = constraintsHandler.getMediaStreamConstraints(false, true) as ExtendedMediaTrackConstraints;
+
+        expect(constraints.video.deviceId.exact).toBe('webcam-123');
+        expect(constraints.video.facingMode).toBeUndefined();
+      });
     });
   });
 
@@ -108,7 +198,7 @@ describe('MediaConstraintsHandler', () => {
     });
 
     it('returns constraints to get the screen stream if browser uses desktopCapturer in one to one call', () => {
-      createAvailableDevices({screen: 'camera'});
+      createAvailableDevices({screen: 'screen2'});
       const constraintsHandler = createConstraintsHandler();
 
       const constraints: MediaStreamConstraints | undefined = constraintsHandler.getScreenStreamConstraints(
@@ -119,7 +209,7 @@ describe('MediaConstraintsHandler', () => {
         expect(constraints?.audio).toBe(false);
         expect((constraints?.video as MediaTrackConstraintsExt).mandatory).toEqual({
           chromeMediaSource: 'desktop',
-          chromeMediaSourceId: 'camera',
+          chromeMediaSourceId: 'screen2',
           maxFrameRate: 5,
         });
       });

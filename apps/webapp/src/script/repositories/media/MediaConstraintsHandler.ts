@@ -187,22 +187,34 @@ export class MediaConstraintsHandler {
     }
   }
 
+  private getDeviceConstraint(mediaDeviceId?: string) {
+    const hasMediaDevice = mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
+
+    return hasMediaDevice ? {deviceId: {exact: mediaDeviceId}} : {};
+  }
+
   private getAudioStreamConstraints(mediaDeviceId: string = ''): MediaTrackConstraints & {autoGainControl: boolean} {
-    const requireExactMediaDevice = mediaDeviceId && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID;
-    return requireExactMediaDevice
-      ? {autoGainControl: this.getAgcPreference(), deviceId: {exact: mediaDeviceId}}
-      : {autoGainControl: this.getAgcPreference()};
+    return {
+      autoGainControl: this.getAgcPreference(),
+      ...this.getDeviceConstraint(mediaDeviceId),
+    };
   }
 
   private getVideoStreamConstraints(mediaDeviceId?: string, mode: VIDEO_QUALITY_MODE = VIDEO_QUALITY_MODE.MOBILE) {
     const streamConstraints = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO[mode];
 
-    if (typeof mediaDeviceId === 'string' && mediaDeviceId !== MediaConstraintsHandler.CONFIG.DEFAULT_DEVICE_ID) {
-      streamConstraints.deviceId = {exact: mediaDeviceId};
-    } else {
-      streamConstraints.facingMode = MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE;
+    const deviceConstraint = this.getDeviceConstraint(mediaDeviceId);
+
+    if (deviceConstraint.deviceId) {
+      return {
+        ...streamConstraints,
+        ...deviceConstraint,
+      };
     }
 
-    return streamConstraints;
+    return {
+      ...streamConstraints,
+      facingMode: MediaConstraintsHandler.CONFIG.CONSTRAINTS.VIDEO.PREFERRED_FACING_MODE,
+    };
   }
 }
