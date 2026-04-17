@@ -375,4 +375,41 @@ test.describe('Calling', () => {
       });
     },
   );
+
+  test(
+    'I should not stay in the call when I get removed from the group',
+    {tag: ['@TC-2837', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages, userCPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      ]);
+
+      await createGroup(userAPages, groupName, [userB, userC]);
+
+      // User A initiates the call
+      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversation().clickCallButton();
+
+      await expect(userAPages.calling().callCell).toBeVisible();
+
+      // Ensure all invited members join the call
+      for (const member of [userBPages, userCPages]) {
+        await expect(member.calling().callCell).toBeVisible();
+        await member.calling().clickAcceptCallButton();
+        await expect(member.calling().goFullScreen).toBeVisible();
+      }
+      
+      // User A removes User B from the group
+      await userAPages.conversation().toggleGroupInformation();
+      await userAPages.conversation().removeMemberFromGroup(userB.fullName);
+      await expect(
+        userAPages.conversation().systemMessages.filter({hasText: `You removed ${userB.fullName}`}),
+      ).toBeVisible();
+
+      // User B is kicked out of a call
+      await expect(userBPages.calling().callCell).not.toBeAttached();
+    },
+  );
 });
