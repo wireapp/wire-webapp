@@ -96,10 +96,11 @@ export const IntegrationMapper = {
     const serviceEntity = new ServiceEntity();
 
     if (user.type === UserType.APP) {
-      const {id, name, description, category, previewPictureResource, mediumPictureResource} = user;
+      const {id, qualifiedId, name, description, category, previewPictureResource, mediumPictureResource} = user;
 
       Object.assign(serviceEntity, {
         id,
+        qualifiedId,
         name,
         description,
         category,
