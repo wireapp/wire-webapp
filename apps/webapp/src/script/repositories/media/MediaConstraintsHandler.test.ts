@@ -18,7 +18,7 @@
  */
 
 import {User} from 'Repositories/entity/User';
-import {defaultAudioOutputId, mediaDevicesStore,} from 'Repositories/media/useMediaDevicesStore';
+import {defaultAudioOutputId, mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/UserState';
 import {createUuid} from 'Util/uuid';
 
@@ -40,7 +40,11 @@ interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
 }
 
 describe('MediaConstraintsHandler', () => {
-  const createAvailableDevices = async ({audio = 'mic', video = 'camera1', screen = 'screen1'}: {audio?: string; video?: string, screen?: string} = {}) => {
+  const createAvailableDevices = async ({
+    audio = 'mic',
+    video = 'camera1',
+    screen = 'screen1',
+  }: {audio?: string; video?: string; screen?: string} = {}) => {
     mediaDevicesStore.setState({
       audio: {
         input: {devices: [], supported: false, selectedId: audio},
@@ -85,7 +89,11 @@ describe('MediaConstraintsHandler', () => {
       createAvailableDevices();
 
       const constraintsHandler = createConstraintsHandler();
-      const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as ExtendedMediaTrackConstraints;
+      const constraints = constraintsHandler.getMediaStreamConstraints(
+        true,
+        true,
+        false,
+      ) as ExtendedMediaTrackConstraints;
 
       expect(constraints.audio.deviceId.exact).toBe('mic');
       expect(constraints.video.deviceId.exact).toBe('camera1');
@@ -96,7 +104,11 @@ describe('MediaConstraintsHandler', () => {
       createAvailableDevices({audio: defaultId, video: defaultId});
 
       const constraintsHandler = createConstraintsHandler();
-      const constraints = constraintsHandler.getMediaStreamConstraints(true, true, false) as ExtendedMediaTrackConstraints;
+      const constraints = constraintsHandler.getMediaStreamConstraints(
+        true,
+        true,
+        false,
+      ) as ExtendedMediaTrackConstraints;
 
       expect(constraints.audio.deviceId).toBeUndefined();
       expect(constraints.audio).toEqual({autoGainControl: false});
