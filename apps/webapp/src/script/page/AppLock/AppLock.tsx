@@ -71,7 +71,7 @@ const AppLock = ({
   appLockState = container.resolve(AppLockState),
   appLockRepository = container.resolve(AppLockRepository),
 }: AppLockProps) => {
-  const [state, setState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
+  const [localAppState, setLocalAppState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [unlockError, setUnlockError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
   const [setupPassphrase, setSetupPassphrase] = useState('');
@@ -176,10 +176,10 @@ const AppLock = ({
       modalObserver.disconnect();
       appObserver.disconnect();
     };
-  }, [state, isVisible]);
+  }, [localAppState, isVisible]);
 
   const showAppLock = () => {
-    setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setLocalAppState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
@@ -215,7 +215,7 @@ const AppLock = ({
   };
 
   const changePassphrase = () => {
-    setState(APPLOCK_STATE.SETUP);
+    setLocalAppState(APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
@@ -227,13 +227,13 @@ const AppLock = ({
   const isSetupPassphraseSpecial = passwordRegexSpecial.test(setupPassphrase);
 
   const clearUnlockError = () => setUnlockError('');
-  const onGoBack = () => setState(APPLOCK_STATE.LOCKED);
-  const onClickForgot = () => setState(APPLOCK_STATE.FORGOT);
+  const onGoBack = () => setLocalAppState(APPLOCK_STATE.LOCKED);
+  const onClickForgot = () => setLocalAppState(APPLOCK_STATE.FORGOT);
   const onClickLogout = async () => {
     if (isTemporaryClient) {
       await clientRepository.logoutClient();
     } else {
-      setState(APPLOCK_STATE.LOGOUT);
+      setLocalAppState(APPLOCK_STATE.LOGOUT);
     }
   };
   const onClosed = () => {
@@ -290,8 +290,8 @@ const AppLock = ({
         </h2>
       </div>
 
-      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
-        {state === APPLOCK_STATE.SETUP && (
+      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={localAppState}>
+        {localAppState === APPLOCK_STATE.SETUP && (
           <form onSubmit={onSetCode}>
             <p
               className="modal__text"
@@ -497,7 +497,7 @@ const AppLock = ({
           </Fragment>
         )}
 
-        {state === APPLOCK_STATE.LOGOUT && (
+        {localAppState === APPLOCK_STATE.LOGOUT && (
           <Fragment>
             <Checkbox
               checked={clearData}
