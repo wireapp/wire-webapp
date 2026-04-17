@@ -71,7 +71,7 @@ const AppLock = ({
   appLockState = container.resolve(AppLockState),
   appLockRepository = container.resolve(AppLockRepository),
 }: AppLockProps) => {
-  const [localAppState, setLocalAppState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
+  const [localAppLockState, setLocalAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [unlockError, setUnlockError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
   const [setupPassphrase, setSetupPassphrase] = useState('');
@@ -176,10 +176,10 @@ const AppLock = ({
       modalObserver.disconnect();
       appObserver.disconnect();
     };
-  }, [localAppState, isVisible]);
+  }, [localAppLockState, isVisible]);
 
   const showAppLock = () => {
-    setLocalAppState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setLocalAppLockState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
@@ -215,7 +215,7 @@ const AppLock = ({
   };
 
   const changePassphrase = () => {
-    setLocalAppState(APPLOCK_STATE.SETUP);
+    setLocalAppLockState(APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
@@ -227,17 +227,17 @@ const AppLock = ({
   const isSetupPassphraseSpecial = passwordRegexSpecial.test(setupPassphrase);
 
   const clearUnlockError = () => setUnlockError('');
-  const onGoBack = () => setLocalAppState(APPLOCK_STATE.LOCKED);
-  const onClickForgot = () => setLocalAppState(APPLOCK_STATE.FORGOT);
+  const onGoBack = () => setLocalAppLockState(APPLOCK_STATE.LOCKED);
+  const onClickForgot = () => setLocalAppLockState(APPLOCK_STATE.FORGOT);
   const onClickLogout = async () => {
     if (isTemporaryClient) {
       await clientRepository.logoutClient();
     } else {
-      setLocalAppState(APPLOCK_STATE.LOGOUT);
+      setLocalAppLockState(APPLOCK_STATE.LOGOUT);
     }
   };
   const onClosed = () => {
-    setState(APPLOCK_STATE.NONE);
+    setLocalAppLockState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
   };
   const onCancelAppLock = () => {
@@ -246,7 +246,7 @@ const AppLock = ({
   };
 
   const headerText = () => {
-    switch (state) {
+    switch (localAppLockState) {
       case APPLOCK_STATE.SETUP_CHANGE:
         return t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME});
       case APPLOCK_STATE.SETUP:
@@ -290,8 +290,8 @@ const AppLock = ({
         </h2>
       </div>
 
-      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={localAppState}>
-        {localAppState === APPLOCK_STATE.SETUP && (
+      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={localAppLockState}>
+        {localAppLockState === APPLOCK_STATE.SETUP && (
           <form onSubmit={onSetCode}>
             <p
               className="modal__text"
@@ -383,7 +383,7 @@ const AppLock = ({
           </form>
         )}
 
-        {state === APPLOCK_STATE.SETUP_CHANGE && (
+        {localAppLockState === APPLOCK_STATE.SETUP_CHANGE && (
           <form onSubmit={onSetCode}>
             <div
               className="modal__text"
@@ -441,7 +441,7 @@ const AppLock = ({
           </form>
         )}
 
-        {state === APPLOCK_STATE.LOCKED && (
+        {localAppLockState === APPLOCK_STATE.LOCKED && (
           <form onSubmit={onUnlock}>
             <label htmlFor="input-applock-unlock" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
@@ -476,7 +476,7 @@ const AppLock = ({
           </form>
         )}
 
-        {state === APPLOCK_STATE.FORGOT && (
+        {localAppLockState === APPLOCK_STATE.FORGOT && (
           <Fragment>
             <p>{t('modalAppLockForgotMessage')}</p>
             <br />
@@ -497,7 +497,7 @@ const AppLock = ({
           </Fragment>
         )}
 
-        {localAppState === APPLOCK_STATE.LOGOUT && (
+        {localAppLockState === APPLOCK_STATE.LOGOUT && (
           <Fragment>
             <Checkbox
               checked={clearData}
