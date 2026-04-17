@@ -17,33 +17,68 @@
  *
  */
 
-import {render} from "@testing-library/react";
-import {AddParticipants} from "./addParticipants";
-import {Conversation} from "Repositories/entity/Conversation";
-import {ConversationRepository} from "Repositories/conversation/ConversationRepository";
-import {IntegrationRepository} from "Repositories/integration/IntegrationRepository";
-import {SearchRepository} from "Repositories/search/SearchRepository";
-import { PanelState, PanelEntity } from "..";
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {createConversation, mountComponent} from 'src/script/auth/util/test/TestUtil';
+import {AddParticipants} from './addParticipants';
+import {TeamState} from 'Repositories/team/TeamState';
+import ko from 'knockout';
+import {UserState} from 'Repositories/user/UserState';
+import {User} from 'Repositories/entity/User';
+import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {IntegrationMapper} from 'Repositories/integration/IntegrationMapper';
+import {ROLE} from 'Repositories/user/UserPermission';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
+import {mockStoreFactory} from 'src/script/auth/util/test/mockStoreFactory';
+import {initialRootState} from 'src/script/auth/module/reducer';
 
 describe('addParticipants', () => {
-  it('renders correctly', () => {
+  it('renders', () => {
     // Arrange
-    var conversation = new Conversation();
+    const conversation = createConversation(CONVERSATION_TYPE.REGULAR, CONVERSATION_PROTOCOL.MLS);
+    const teamState: Partial<TeamState> = {
+      isTeam: ko.pureComputed(() => false),
+      teamMembers: ko.pureComputed((): User[] => []),
+      teamUsers: ko.pureComputed((): User[] => []),
+    };
+    const conversationRepository: Partial<ConversationRepository> = {};
+    const searchRepository: Partial<SearchRepository> = {
+      normalizeQuery: query => ({query, isHandleQuery: true}),
+      searchUserInSet: (_term, users) => users,
+    };
+    const integrationRepository: Partial<IntegrationRepository> = {
+      services: ko.observableArray([]),
+      mapServiceFromUser: IntegrationMapper.mapServiceFromUser,
+      searchForServices: jest.fn(),
+    };
+    const teamRepository: Partial<TeamRepository> = {
+      filterRemoteDomainUsers: jest.fn(),
+    };
+    const userState: Partial<UserState> = {
+      connectedUsers: ko.pureComputed((): User[] => []),
+    };
+    const selfUser: Partial<User> = {
+      teamRole: ko.observable(ROLE.OWNER),
+    };
 
     // Act
-    render(<AddParticipants
-      activeConversation={conversation}
-      onBack={() => {
-      }}
-      onClose={() => {
-      }}
-      conversationRepository={{} as ConversationRepository}
-      integrationRepository={{} as IntegrationRepository}
-      searchRepository={{} as SearchRepository}
-      togglePanel={function (panel: PanelState, entity: PanelEntity, addMode?: boolean): void {
-        throw new Error("Function not implemented.");
-      }} teamRepository={undefined} teamState={undefined} userState={undefined} selfUser={undefined}    />);
-
-    // Assert
+    mountComponent(
+      <AddParticipants
+        activeConversation={conversation}
+        onBack={jest.fn()}
+        onClose={jest.fn()}
+        conversationRepository={conversationRepository as ConversationRepository}
+        integrationRepository={integrationRepository as IntegrationRepository}
+        searchRepository={searchRepository as SearchRepository}
+        togglePanel={jest.fn()}
+        teamRepository={teamRepository as TeamRepository}
+        teamState={teamState as TeamState}
+        userState={userState as UserState}
+        selfUser={selfUser as User}
+      />,
+      mockStoreFactory()(initialRootState),
+    );
   });
-})
+});

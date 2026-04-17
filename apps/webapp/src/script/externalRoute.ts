@@ -55,7 +55,7 @@ const getTermsOfUseTeamUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_
  * @returns  The URL for managing services with optional UTM parameters.
  */
 export const getManageServicesUrl = (utmSource?: string): string | undefined =>
-  getTeamSettingsUrl(URL.URL_PATH.MANAGE_SERVICES, utmSource);
+  getTeamSettingsUrl(URL.URL_PATH?.MANAGE_SERVICES, utmSource);
 
 /**
  * Retrieves the URL for managing team settings with optional UTM parameters.
