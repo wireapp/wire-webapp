@@ -76,10 +76,10 @@ type ConversationEventData = {
   items?: CompositeMessageItem[];
 };
 
-type ConversationEvent = {type?: string; data?: ConversationEventData};
+type SearchableConversationEvent = {type?: string; data?: ConversationEventData};
 type ConversationSearchEventLoader = Pick<EventService, 'loadEventsWithCategory'>;
 
-const TextExtractors: Partial<Record<string, (event: ConversationEvent) => string>> = {
+const TextExtractors: Partial<Record<string, (event: SearchableConversationEvent) => string>> = {
   [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => event.data?.content || event.data?.message || '',
   [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => event.data?.text?.content || '',
   [ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD]: event => {
@@ -478,7 +478,7 @@ export class ConversationService {
       });
   }
 
-  private getEventSearchableText(event: ConversationEvent): string {
+  private getEventSearchableText(event: SearchableConversationEvent): string {
     try {
       const contentOrLegacyText = event.data?.content || event.data?.message || '';
       const extractor = event.type ? TextExtractors[event.type] : undefined;
