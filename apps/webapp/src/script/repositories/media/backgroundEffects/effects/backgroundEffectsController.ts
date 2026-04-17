@@ -54,6 +54,7 @@ import {MainWebGlPipeline} from '../pipelines/mainWebGlPipeline';
 import {PassthroughPipeline} from '../pipelines/passthroughPipeline';
 import {WorkerWebGlPipeline} from '../pipelines/workerWebGlPipeline';
 import {resolveQualityPolicy, resolveSegmentationModelPath, TIER_DEFINITIONS} from '../quality';
+import {TARGET_FPS} from "Repositories/media/backgroundEffectsHandler";
 
 /**
  * Main controller for background effects processing.
@@ -95,7 +96,7 @@ export class BackgroundEffectsController {
   /** Quality mode ('auto' for adaptive, or fixed tier. */
   private quality: QualityMode = 'auto';
   /** Target frames per second for adaptive quality control. */
-  private targetFps = 15;
+  private targetFps = TARGET_FPS;
   /** Per-tier segmentation model overrides. */
   private segmentationModelByTier: SegmentationModelByTier = {
     superhigh: TIER_DEFINITIONS.superhigh.modelPath,
@@ -719,7 +720,7 @@ export class BackgroundEffectsController {
       throw new Error('Failed to create 2D context for solid background.');
     }
     ctx.fillStyle = color;
-    ctx.fillRect(0, 0, 1, 1);
+    ctx?.fillRect(0, 0, 1, 1);
     return createImageBitmap(canvas as OffscreenCanvas | HTMLCanvasElement);
   }
 
@@ -738,7 +739,7 @@ export class BackgroundEffectsController {
     this.backgroundPumpCancel?.();
 
     let lastTimestamp = 0;
-    const targetInterval = 1000 / 15;
+    const targetInterval = 1000 / TARGET_FPS;
     let active = true;
     let rVFCHandle: number | null = null;
     let rafHandle: number | null = null;

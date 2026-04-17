@@ -24,6 +24,7 @@ import type {WorkerOptions, WorkerResponse} from '../backgroundEffectsWorkerType
 import {QualityController, resolveSegmentationModelPath} from '../quality';
 import {WebGlRenderer} from '../renderer/webGlRenderer';
 import {Segmenter} from '../segmentation/segmenter';
+import {TARGET_FPS} from "Repositories/media/backgroundEffectsHandler";
 
 /**
  * Handles worker initialization message.
@@ -59,7 +60,7 @@ export async function handleInit(
   const renderer = new WebGlRenderer(canvas, width, height);
   state.renderer = renderer;
 
-  state.qualityController = new QualityController(options.targetFps ?? 15);
+  state.qualityController = new QualityController(options.targetFps ?? TARGET_FPS);
   if (state.quality === 'auto') {
     state.qualityController.setTier(options.initialTier);
   } else {
