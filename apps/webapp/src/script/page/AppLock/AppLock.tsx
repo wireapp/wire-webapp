@@ -443,13 +443,15 @@ const AppLock = ({
 
         {state === APPLOCK_STATE.LOCKED && (
           <form onSubmit={onUnlock}>
+            <label htmlFor="input-applock-unlock" data-uie-name="label-applock-unlock-text">
+              {t('modalAppLockPasscode')}
+            </label>
             <Input
               aria-label={t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME})}
-              label={t('modalAppLockPasscode')}
               autoFocus
               type="password"
               placeholder={t('modalAppLockInputPlaceholder')}
-              id={Math.random().toString()}
+              id="input-applock-unlock"
               name="password"
               onKeyDown={clearUnlockError}
               data-uie-name="input-applock-unlock"
