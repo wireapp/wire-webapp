@@ -24,6 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
@@ -40,6 +41,7 @@ interface GroupParticipantServiceProps {
   activeConversation: Conversation;
   actionsViewModel: ActionsViewModel;
   integrationRepository: IntegrationRepository;
+  conversationRepository: ConversationRepository;
   enableRemove: boolean;
   goToRoot: () => void;
   onBack: () => void;
@@ -53,6 +55,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   activeConversation,
   actionsViewModel,
   integrationRepository,
+  conversationRepository,
   enableRemove,
   goToRoot,
   onBack,
@@ -84,7 +87,11 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   };
 
   const onAdd = () => {
-    integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
+    if (serviceEntity.isService) {
+      integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
+    } else if (serviceEntity.qualifiedId) {
+      conversationRepository.addUsers(activeConversation, [{qualifiedId: serviceEntity.qualifiedId}]);
+    }
     goToRoot();
   };
 
