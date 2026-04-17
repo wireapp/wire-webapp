@@ -18,7 +18,7 @@
  */
 
 import {AcmeService} from '../Connection';
-import {E2eiEnrollment, Nonce} from '../E2EIService.types';
+import {E2eiEnrollment, Nonce} from '../e2eiService.types';
 
 interface GetCertificateParams {
   identity: E2eiEnrollment;

@@ -18,7 +18,7 @@
  */
 
 import {AcmeService} from '../Connection';
-import {AcmeDirectory, E2eiEnrollment, NewAcmeOrder, Nonce} from '../E2EIService.types';
+import {AcmeDirectory, E2eiEnrollment, NewAcmeOrder, Nonce} from '../e2eiService.types';
 import {jsonToByteArray} from '../Helper';
 
 type OrderUrl = string;

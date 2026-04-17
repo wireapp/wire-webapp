@@ -19,7 +19,7 @@
 
 import {toBufferSource} from '../../../../util/bufferUtils';
 import {AcmeService} from '../Connection';
-import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../E2EIService.types';
+import {E2eiEnrollment, NewAcmeAuthz, Nonce} from '../e2eiService.types';
 import {jsonToByteArray} from '../Helper';
 import {EnrollmentFlowData} from '../Storage/e2eiStorage.schema';
 

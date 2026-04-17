@@ -24,14 +24,14 @@ import {LogFactory} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
 
 import {AcmeService} from './Connection/AcmeServer';
-import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './E2EIService.types';
+import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './e2eiService.types';
 import {isResponseStatusValid} from './Helper';
-import {createNewAccount} from './Steps/Account';
-import {getAuthorizationChallenges} from './Steps/Authorization';
-import {getCertificate} from './Steps/Certificate';
+import {createNewAccount} from './Steps/account';
+import {getAuthorizationChallenges} from './Steps/authorization';
+import {getCertificate} from './Steps/certificate';
 import {doWireDpopChallenge} from './Steps/DpopChallenge/dpopChallenge';
-import {doWireOidcChallenge} from './Steps/OidcChallenge';
-import {createNewOrder, finalizeOrder} from './Steps/Order';
+import {doWireOidcChallenge} from './Steps/oidcChallenge';
+import {createNewOrder, finalizeOrder} from './Steps/order';
 import {createE2EIEnrollmentStorage} from './Storage/e2eiStorage';
 import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/e2eiStorage.schema';
 

@@ -70,7 +70,7 @@ import {
   E2EIServiceInternal,
   getAllConversationsCallback,
   getTokenCallback,
-} from '../E2EIdentityService/E2EIServiceInternal';
+} from '../E2EIdentityService/e2eiServiceInternal';
 import {
   getMLSDeviceStatus,
   getSignatureAlgorithmForCiphersuite,

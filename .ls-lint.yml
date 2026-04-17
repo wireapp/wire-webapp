@@ -379,6 +379,10 @@ ls:
   libraries/core/src/messagingProtocols/mls/EventHandler:
     .ts: camelCase
     .test.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/E2EIdentityService:
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
   libraries/core/src/messagingProtocols/mls/E2EIdentityService/Connection/AcmeServer:
     .ts: camelCase
     .types.ts: camelCase

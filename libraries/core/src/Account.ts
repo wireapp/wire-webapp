@@ -72,7 +72,7 @@ import {E2EIServiceExternal, User} from './messagingProtocols/mls/E2EIdentitySer
 import {
   getAllConversationsCallback,
   getTokenCallback,
-} from './messagingProtocols/mls/E2EIdentityService/E2EIServiceInternal';
+} from './messagingProtocols/mls/E2EIdentityService/e2eiServiceInternal';
 import {
   flushProposalsQueue,
   getProposalQueueLength,

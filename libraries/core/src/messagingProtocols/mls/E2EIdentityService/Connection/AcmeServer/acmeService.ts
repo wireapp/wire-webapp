@@ -46,7 +46,7 @@ import {
   CrlResponseSchema,
 } from './schema';
 
-import {AcmeChallenge, AcmeDirectory} from '../../E2EIService.types';
+import {AcmeChallenge, AcmeDirectory} from '../../e2eiService.types';
 
 export class AcmeService {
   private logger = LogFactory.getLogger('@wireapp/core/AcmeService');

@@ -17,5 +17,5 @@
  *
  */
 
-export * from './E2EIService.types';
-export * from './E2EIServiceExternal';
+export * from './e2eiService.types';
+export * from './e2eiServiceExternal';

@@ -21,7 +21,7 @@ import axios from 'axios';
 
 import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
 
-import {E2EIServiceExternal} from './E2EIServiceExternal';
+import {E2EIServiceExternal} from './e2eiServiceExternal';
 
 import {ClientService} from '../../../client';
 import {openDB} from '../../../storage/coreDb';
