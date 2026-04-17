@@ -11495,7 +11495,7 @@ __metadata:
     text-encoding: "npm:0.7.0"
     tsyringe: "npm:4.10.0"
     underscore: "npm:1.13.8"
-    use-debounce: "npm:10.1.0"
+    use-debounce: "npm:10.1.1"
     webgl-utils.js: "npm:1.1.0"
     webpack: "npm:5.106.1"
     webpack-bundle-analyzer: "npm:4.10.2"
@@ -28061,12 +28061,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"use-debounce@npm:10.1.0":
-  version: 10.1.0
-  resolution: "use-debounce@npm:10.1.0"
+"use-debounce@npm:10.1.1":
+  version: 10.1.1
+  resolution: "use-debounce@npm:10.1.1"
   peerDependencies:
     react: "*"
-  checksum: 10/71d58898a687214573112c9e795c93a631b2115e97b3976203fcb3017ed060c32f8c883bc1364655abe6a363da52e6520e1746479052e7883f09a8d7b42e12e6
+  checksum: 10/3d8d45eabc3ac797a9416adc29f84d88b9c5b9a2d5598bdfb397b10d2a5fcb2ac5f69fce5596b84021084b8c95c0006b9e4b6c940d9d770470be19ad3b86b599
   languageName: node
   linkType: hard
 
