@@ -20,7 +20,7 @@
 import {AudioType} from 'Repositories/audio/audioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withConnectedUser, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {test, withConnectedUser, withLogin, expect, Team} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
@@ -29,11 +29,12 @@ test.describe('Calling', () => {
   let userB: User;
   let userC: User;
   const groupName = 'Calling group';
+  let team: Team;
 
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
     userC = await createUser();
-    const team = await createTeam('Team Call Team', {
+    team = await createTeam('Team Call Team', {
       users: [userB, userC],
       features: {conferenceCalling: true},
     });
@@ -442,6 +443,31 @@ test.describe('Calling', () => {
       // User B cannot join the group call
       await expect(userBPages.calling().callCell).not.toBeAttached();
       await expect(userBPages.conversationList().joinCallButton).not.toBeAttached();
+    },
+  );
+
+  test(
+    'I want to see warning when calling a big group',
+    {tag: ['@TC-2842', '@regression']},
+    async ({createPage, createUser}) => {
+      // Create Users and add to team
+      const extraMembers = await Promise.all(Array.from({length: 4}, () => createUser()));
+
+      for (const member of extraMembers) {
+        team.addTeamMember(member);
+      }
+
+      const allMembers = [userB, userC, ...extraMembers];
+      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+
+      await createGroup(userAPages, groupName, allMembers);
+      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversation().clickCallButton();
+
+      await expect(userAPage.getByTestId('modal-without-title')).toContainText(
+        `Are you sure you want to call ${allMembers.length} people?`,
+      );
     },
   );
 });
