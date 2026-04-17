@@ -49,7 +49,7 @@ test('Group Video call', {tag: ['@TC-8637', '@crit-flow-web']}, async ({createTe
   });
 
   await test.step('Owner invites guest user to the group', async () => {
-    await ownerPages.conversationList().openConversation(conversationName);
+    await ownerPages.conversationList().getConversation(conversationName).open();
     await ownerPages.conversation().clickConversationTitle();
     await ownerPages.conversationDetails().clickAddPeopleButton();
     await ownerPages.conversationDetails().addUsersToConversation([guestUser.fullName]);
@@ -58,7 +58,7 @@ test('Group Video call', {tag: ['@TC-8637', '@crit-flow-web']}, async ({createTe
   });
 
   await test.step('Guest user joins the group', async () => {
-    await expect(guestPages.conversationList().getConversationLocator(conversationName)).toBeVisible();
+    await expect(guestPages.conversationList().getConversation(conversationName)).toBeVisible();
   });
 
   await test.step('Owner calls the group', async () => {

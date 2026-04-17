@@ -40,19 +40,20 @@ test.describe('Archive', () => {
       const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
       const {pages, components} = PageManager.from(page).webapp;
 
-      let contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      const conversation = pages.conversationList().getConversation(memberB.fullName);
+      let contextMenu = await conversation.openContextMenu();
       await contextMenu.archiveButton.click();
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      await expect(conversation).not.toBeVisible();
 
       await components.conversationSidebar().clickArchive();
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+      await expect(conversation).toBeVisible();
 
-      contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      contextMenu = await conversation.openContextMenu();
       await contextMenu.unarchiveButton.click();
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      await expect(conversation).not.toBeVisible();
 
       await components.conversationSidebar().clickAllConversationsButton();
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+      await expect(conversation).toBeVisible();
     },
   );
 
@@ -65,25 +66,25 @@ test.describe('Archive', () => {
         PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
       ]);
 
-      await memberAPages.conversationList().openConversation(memberB.fullName, {protocol: 'mls'});
-      await memberBPages.conversationList().openConversation(memberA.fullName, {protocol: 'mls'});
+      const memberAConversation = await memberAPages
+        .conversationList()
+        .getConversation(memberB.fullName, {protocol: 'mls'})
+        .open();
+      await memberBPages.conversationList().getConversation(memberA.fullName, {protocol: 'mls'}).open();
 
       await test.step('MemberA archives conversation with memberB', async () => {
-        const contextMenu = await memberAPages
-          .conversationList()
-          .getConversationLocator(memberB.fullName, {protocol: 'mls'})
-          .openContextMenu();
+        const contextMenu = await memberAConversation.openContextMenu();
         await contextMenu.archiveButton.click();
       });
 
       await test.step('MemberB sends message in archived conversation', async () => {
         await memberBPages.conversation().sendMessage('Test message');
-        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+        await expect(memberAConversation).not.toBeVisible();
       });
 
       await test.step('MemberB pings in archived conversation', async () => {
         await memberBPages.conversation().sendPing();
-        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+        await expect(memberAConversation).not.toBeVisible();
       });
     },
   );
@@ -98,35 +99,35 @@ test.describe('Archive', () => {
       const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
       const {pages, components} = PageManager.from(page).webapp;
 
-      await pages.conversationList().openConversation(memberB.fullName);
+      const conversation = await pages.conversationList().getConversation(memberB.fullName).open();
 
       if (tag === '@TC-103') {
         await test.step('User mutes the conversation', async () => {
-          const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+          const contextMenu = await conversation.openContextMenu();
           await contextMenu.notificationsButton.click();
           await pages.conversationDetails().selectNotificationsLevel('Nothing');
         });
       }
 
       await test.step('User archives the conversation', async () => {
-        const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+        const contextMenu = await conversation.openContextMenu();
         await contextMenu.archiveButton.click();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+        await expect(conversation).not.toBeVisible();
       });
 
       await test.step('User switches to archived conversations and sees it there', async () => {
         await components.conversationSidebar().archiveButton.click();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+        await expect(conversation).toBeVisible();
       });
 
       await test.step('User starts a call in the archived conversation', async () => {
-        await pages.conversationList().openConversation(memberB.fullName);
+        await conversation.open();
         await pages.conversation().startCall();
       });
 
       await test.step('The conversation should still not be shown within all conversations', async () => {
         await components.conversationSidebar().allConverationsButton.click();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+        await expect(conversation).not.toBeVisible();
       });
     });
   });
@@ -142,10 +143,10 @@ test.describe('Archive', () => {
         let conversation: Locator;
         if (tag === '@TC-104') {
           await createGroup(pages, 'Test Group', [memberB]);
-          conversation = pages.conversationList().getConversationLocator('Test Group');
+          conversation = pages.conversationList().getConversation('Test Group');
         } else {
           await connectWithUser(pageManager, memberB);
-          conversation = pages.conversationList().getConversationLocator(memberB.fullName);
+          conversation = pages.conversationList().getConversation(memberB.fullName);
         }
 
         await pages.conversation().conversationInfoButton.click();

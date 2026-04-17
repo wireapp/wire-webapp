@@ -72,7 +72,7 @@ test.describe('Connections', () => {
       });
 
       await test.step('B sends a connection request to C via the group conversation', async () => {
-        await memberBPages.conversationList().openConversation('Group');
+        await memberBPages.conversationList().getConversation('Group').open();
         await memberBPages.conversation().conversationInfoButton.click();
         await memberBPages.conversationDetails().openParticipantDetails(memberC.fullName);
         await memberBPages.participantDetails().sendConnectRequest();
@@ -96,7 +96,7 @@ test.describe('Connections', () => {
       await memberBPages.conversationList().pendingConnectionRequest.click();
       await memberBPages.conversation().ignoreButton.click();
 
-      await expect(memberBPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      await expect(memberBPages.conversationList().getConversation(memberB.fullName)).not.toBeVisible();
     },
   );
 
@@ -106,10 +106,11 @@ test.describe('Connections', () => {
     async ({createPage}) => {
       const {pages} = PageManager.from(await createPage(withLogin(memberA), withConnectionRequest(memberB))).webapp;
 
-      const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      const conversation = pages.conversationList().getConversation(memberB.fullName);
+      const contextMenu = await conversation.openContextMenu();
       await contextMenu.archiveButton.click();
 
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+      await expect(conversation).toBeVisible();
     },
   );
 });

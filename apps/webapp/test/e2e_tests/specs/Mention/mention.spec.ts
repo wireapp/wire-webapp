@@ -31,11 +31,11 @@ test.describe('Mention', () => {
     await createGroup(userAPages, 'Mention Group', [userB]);
 
     // User A sends a message with a mention
-    await userAPages.conversationList().openConversation('Mention Group');
+    await userAPages.conversationList().getConversation('Mention Group').open();
     await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hey');
 
     // User B receives the message
-    await userBPages.conversationList().openConversation('Mention Group');
+    await userBPages.conversationList().getConversation('Mention Group').open();
     const messageOnUserB = userBPages.conversation().getMessage({content: 'Hey', sender: userA});
     await expect(messageOnUserB).toBeVisible();
     const mentionOnUserB = messageOnUserB.getByRole('button', {name: `@${userB.fullName}`});
@@ -53,11 +53,11 @@ test.describe('Mention', () => {
       ]);
 
       await createGroup(userAPages, 'Multi-Mention Group', [userB, userC]);
-      await userBPages.conversationList().openConversation('Multi-Mention Group');
-      await userCPages.conversationList().openConversation('Multi-Mention Group');
+      await userBPages.conversationList().getConversation('Multi-Mention Group').open();
+      await userCPages.conversationList().getConversation('Multi-Mention Group').open();
 
       // User A sends a message with multiple mentions
-      await userAPages.conversationList().openConversation('Multi-Mention Group');
+      await userAPages.conversationList().getConversation('Multi-Mention Group').open();
       const conversationPageA = userAPages.conversation();
 
       await conversationPageA.messageInput.fill('Hello ');
@@ -87,9 +87,9 @@ test.describe('Mention', () => {
 
       await test.step('Create group', async () => {
         await createGroup(userAPages, 'Edit-Mention Group', [userB, userC]);
-        await userAPages.conversationList().openConversation('Edit-Mention Group');
-        await userBPages.conversationList().openConversation('Edit-Mention Group');
-        await userCPages.conversationList().openConversation('Edit-Mention Group');
+        await userAPages.conversationList().getConversation('Edit-Mention Group').open();
+        await userBPages.conversationList().getConversation('Edit-Mention Group').open();
+        await userCPages.conversationList().getConversation('Edit-Mention Group').open();
       });
 
       await test.step('User A sends an initial message mentioning userB', async () => {
@@ -130,8 +130,8 @@ test.describe('Mention', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
     await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hello');
 
@@ -153,8 +153,8 @@ test.describe('Mention', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       // User A sends a self deleting message with a mention
       await userAPages.conversation().enableSelfDeletingMessages();
@@ -182,8 +182,8 @@ test.describe('Mention', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       // User A sends a message with the same person mentioned twice
       const conversationPageA = userAPages.conversation();
@@ -207,7 +207,7 @@ test.describe('Mention', () => {
     {tag: ['@TC-3493', '@regression']},
     async ({createPage}) => {
       const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversation(userB.fullName).open();
 
       const conversationPageA = userAPages.conversation();
       await conversationPageA.messageInput.fill(''); // Clear input
@@ -231,8 +231,8 @@ test.describe('Mention', () => {
         createPage(withLogin(userA), withConnectedUser(userB)).then(page => PageManager.from(page).webapp.pages),
         createPage(withLogin(userB)).then(page => PageManager.from(page).webapp.pages),
       ]);
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       const conversationPageA = userAPages.conversation();
 
@@ -264,8 +264,9 @@ test.describe('Mention', () => {
       await createGroup(userAPages, 'Draft Group', [userB]);
 
       const conversationPageA = userAPages.conversation();
+      const draftGroupConversation = userAPages.conversationList().getConversation('Draft Group');
       await test.step('Draft a message with a mention in the group chat', async () => {
-        await userAPages.conversationList().openConversation('Draft Group');
+        await draftGroupConversation.open();
         await conversationPageA.messageInput.fill('Draft message with ');
         await conversationPageA.mentionUser(userB.fullName);
 
@@ -274,12 +275,12 @@ test.describe('Mention', () => {
       });
 
       await test.step('Switch to the 1:1 chat', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().getConversation(userB.fullName).open();
         await expect(conversationPageA.messageInput).toBeEmpty();
       });
 
       await test.step('Switch back to the group chat and verify the draft with the mention is preserved', async () => {
-        await userAPages.conversationList().openConversation('Draft Group');
+        await draftGroupConversation.open();
         await expect(conversationPageA.messageInput).toHaveText(`Draft message with @${userB.fullName}`);
 
         const preservedMention = conversationPageA.messageInput.getByTestId('item-input-mention');
@@ -295,8 +296,8 @@ test.describe('Mention', () => {
       pm => pm.webapp.pages,
     );
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
     // User A sends a message with a mention to User B
     await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hello');
@@ -320,15 +321,15 @@ test.describe('Mention', () => {
 
       // Create and open a group conversation for userB to ensure the message from A won't be read immediately
       await createGroup(userBPages, 'Distraction Group', [userC]);
-      await userBPages.conversationList().openConversation('Distraction Group');
+      await userBPages.conversationList().getConversation('Distraction Group').open();
 
       // User A opens conversation with user B and sends a message with mention
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hey, you have an unread mention!');
 
       // User B is in the 'Distraction Group', so the conversation with user A is unread.
       // Now check for the mention indicator in the conversation list.
-      const {mentionIndicator} = userBPages.conversationList().getConversationLocator(userA.fullName);
+      const {mentionIndicator} = userBPages.conversationList().getConversation(userA.fullName);
       await expect(mentionIndicator).toBeVisible();
     },
   );
@@ -345,11 +346,11 @@ test.describe('Mention', () => {
       await test.step('Create and open a distraction group conversation for User B', async () => {
         // userA creates the group, userB opens it. This is the distraction.
         await createGroup(userAPages, 'Distraction Group', [userB]);
-        await userBPages.conversationList().openConversation('Distraction Group');
+        await userBPages.conversationList().getConversation('Distraction Group').open();
       });
 
       await test.step('User A tries to call User B in 1:1 conversation but B declines', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
         await userAPages.conversation().startCall();
         await userBPages.calling().leaveCallButton.click();
         await userAPages.calling().leaveCallButton.click();
@@ -368,7 +369,7 @@ test.describe('Mention', () => {
       });
 
       await test.step('Verify User B sees both unread mention and unread message indicators for 1:1 conversation', async () => {
-        const {mentionIndicator} = userBPages.conversationList().getConversationLocator(userA.fullName);
+        const {mentionIndicator} = userBPages.conversationList().getConversation(userA.fullName);
         await expect(mentionIndicator).toBeVisible();
       });
     },
@@ -384,11 +385,11 @@ test.describe('Mention', () => {
       ]);
 
       await createGroup(userAPages, 'Test Group', [userB]);
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation('Test Group');
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation('Test Group').open();
 
       await userAPages.conversation().sendMessageWithUserMention(userB.fullName);
-      const {mentionIndicator} = userBPages.conversationList().getConversationLocator(userA.fullName);
+      const {mentionIndicator} = userBPages.conversationList().getConversation(userA.fullName);
       await expect(mentionIndicator).toBeVisible();
 
       await userAPages.conversation().deleteMessage(userAPages.conversation().getMessage({sender: userA}), 'Everyone');
@@ -405,8 +406,8 @@ test.describe('Mention', () => {
         PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage(`@${userB.fullName} Hello`);
 
       for (const pages of [userAPages, userBPages]) {
@@ -422,7 +423,7 @@ test.describe('Mention', () => {
     {tag: ['@TC-3532', '@regression']},
     async ({createPage}) => {
       const {pages} = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp;
-      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversationList().getConversation(userB.fullName).open();
 
       await pages.conversation().messageInput.pressSequentially(`test@${userB.firstName}`);
       await expect(pages.conversation().mentionSuggestions).toHaveCount(0);
@@ -436,7 +437,7 @@ test.describe('Mention', () => {
       const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
       await createGroup(pages, 'Test Group', [userB]);
-      await pages.conversationList().openConversation('Test Group');
+      await pages.conversationList().getConversation('Test Group').open();
 
       // It should be possible to mention userB as he's part of the group
       await pages.conversation().messageInput.pressSequentially(`@${userB.firstName}`);
@@ -456,7 +457,7 @@ test.describe('Mention', () => {
       const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
       await createGroup(pages, 'Test Group', [userB, userC]);
-      await pages.conversationList().openConversation('Test Group');
+      await pages.conversationList().getConversation('Test Group').open();
 
       // It should be possible to mention userB as he's part of the group
       await pages.conversation().messageInput.pressSequentially(`@`);
@@ -475,7 +476,7 @@ test.describe('Mention', () => {
 
       const {pages} = PageManager.from(await createPage(withLogin(userA))).webapp;
       await createGroup(pages, 'Test Group', [memberWithStrangeName]);
-      await pages.conversationList().openConversation('Test Group');
+      await pages.conversationList().getConversation('Test Group').open();
 
       await pages.conversation().messageInput.pressSequentially('@Gunter');
       await expect(pages.conversation().mentionSuggestions).toHaveCount(1);
@@ -491,7 +492,7 @@ test.describe('Mention', () => {
       await createGroup(pages, 'Test Group', []);
 
       await test.step('Create guest link for group & join as guest user', async () => {
-        await pages.conversationList().openConversation('Test Group');
+        await pages.conversationList().getConversation('Test Group').open();
         await pages.conversation().clickConversationTitle();
         const link = await pages.conversationDetails().createGuestLink();
         await createPage(withGuestUser(link, 'Guest User'));
@@ -530,12 +531,12 @@ test.describe('Mention', () => {
       });
 
       await test.step("UserB mentions otherUser in the group although they're not connected", async () => {
-        await userBPages.conversationList().openConversation('Test Group');
+        await userBPages.conversationList().getConversation('Test Group').open();
         await userBPages.conversation().sendMessageWithUserMention(otherUser.fullName);
       });
 
       await test.step('OtherUser receives the message from userB including the mention', async () => {
-        await otherUserPages.conversationList().openConversation('Test Group');
+        await otherUserPages.conversationList().getConversation('Test Group').open();
         const mentionInMessage = otherUserPages
           .conversation()
           .getMessage({sender: userB})
@@ -553,7 +554,7 @@ test.describe('Mention', () => {
       await createGroup(userAPages, 'Test Group', [userB, userC]);
 
       await test.step('UserA removes userB from the group', async () => {
-        await userAPages.conversationList().openConversation('Test Group');
+        await userAPages.conversationList().getConversation('Test Group').open();
         await userAPages.conversation().conversationTitle.click();
         await userAPages.conversationDetails().openParticipantDetails(userB.fullName);
         await userAPages.participantDetails().removeFromGroup();

@@ -27,8 +27,8 @@ test.describe('Logs', () => {
       const messageA = 'Hello from UserA! This is a secret message.';
       const messageB = 'Hi from UserB! No logging allowed.';
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage(messageA);
       await userBPages.conversation().sendMessage(messageB);
 

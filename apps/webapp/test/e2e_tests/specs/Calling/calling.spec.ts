@@ -47,13 +47,13 @@ test.describe('Calling', () => {
       ]);
 
       // User A has a call with user B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversation(userB.fullName).open();
       await userAPages.conversation().clickCallButton();
       await userBPages.calling().clickAcceptCallButton();
       await expect(userBPages.calling().callCell).toBeVisible();
 
       // User A starts a call with user C while in a call with user B
-      await userAPages.conversationList().openConversation(userC.fullName);
+      await userAPages.conversationList().getConversation(userC.fullName).open();
       await userAPages.conversation().clickCallButton();
 
       // A modal is shown prompting him to confirm before cancelling the ongoing call
@@ -71,7 +71,7 @@ test.describe('Calling', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversationList().getConversation(userB.fullName).open();
     await userAPages.conversation().clickCallButton();
     await userBPages.calling().clickAcceptCallButton();
 
@@ -94,10 +94,10 @@ test.describe('Calling', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().clickCallButton();
 
-      const {joinCallButton} = userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'});
+      const {joinCallButton} = userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'});
       await expect(joinCallButton).toBeVisible();
       await expect(userBPages.calling().acceptCallButton).toBeVisible();
 
@@ -122,7 +122,7 @@ test.describe('Calling', () => {
       const userBDevice2Pages = PageManager.from(userBPage2).webapp.pages;
 
       // Ensure no audio is playing on both devices initially
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversation(userB.fullName).open();
       await expect.poll(() => isPlayingAudio(userBPage1, AudioType.INCOMING_CALL)).toBe(false);
       await expect.poll(() => isPlayingAudio(userBPage2, AudioType.INCOMING_CALL)).toBe(false);
 
@@ -150,7 +150,7 @@ test.describe('Calling', () => {
       ]);
 
       // User A calls user B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversation(userB.fullName).open();
       await userAPages.conversation().clickCallButton();
 
       // User B declines the call
@@ -158,7 +158,7 @@ test.describe('Calling', () => {
       await expect(userBPages.calling().callCell).not.toBeVisible();
 
       // User B calls user C instead
-      await userBPages.conversationList().openConversation(userC.fullName);
+      await userBPages.conversationList().getConversation(userC.fullName).open();
       await expect(userBPages.conversation().callButton).toBeEnabled();
       await userBPages.conversation().startCall();
       await expect(userBPages.calling().callCell).toBeVisible();

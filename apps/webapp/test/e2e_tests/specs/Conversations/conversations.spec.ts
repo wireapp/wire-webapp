@@ -52,7 +52,7 @@ test.describe('Conversations', () => {
       const userAPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
 
       await createGroup(userAPages, groupName, [userB, userC]);
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
 
       const firstMessage = userAPages.conversation().systemMessages.first();
       await expect(firstMessage).toContainText(new RegExp(`You started the conversation\\s*${groupName}\\s*with`, 'i'));
@@ -71,7 +71,7 @@ test.describe('Conversations', () => {
       ]);
 
       await createGroup(userAPages, groupName, [userB, userC]);
-      userBPages.conversationList().openConversation(groupName);
+      userBPages.conversationList().getConversation(groupName).open();
 
       const pattern = new RegExp(
         `${userA.fullName} started the conversation\\s*${groupName}\\s*with\\s*${userC.fullName}\\s*and\\s*you`,
@@ -121,7 +121,7 @@ test.describe('Conversations', () => {
 
       await createGroup(userAPages, groupName, [userB, userC]);
 
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversationDetails().changeConversationName('New Group Name');
 
@@ -145,7 +145,7 @@ test.describe('Conversations', () => {
 
       await createGroup(adminPage, groupName, [userB, guestUser]);
 
-      await adminPage.conversationList().openConversation(groupName);
+      await adminPage.conversationList().getConversation(groupName).open();
       await adminPage.conversation().clickConversationInfoButton();
       await expect(adminPage.conversationDetails().getUserRoleIcon(guestUser.fullName)).toHaveAttribute(
         'data-uie-name',
@@ -170,7 +170,7 @@ test.describe('Conversations', () => {
 
       await createGroup(adminPage, groupName, [userB, guestUser]);
 
-      await adminPage.conversationList().openConversation(groupName);
+      await adminPage.conversationList().getConversation(groupName).open();
       await adminPage.conversation().clickConversationInfoButton();
 
       await expect(adminPage.conversation().membersList.filter({hasText: guestUser.fullName})).toBeVisible();
@@ -191,20 +191,20 @@ test.describe('Conversations', () => {
       await createGroup(adminPages, groupName, [userB, userC]);
 
       // Confirm that the userA is an admin in the group
-      await userBPages.conversationList().openConversation(groupName);
+      await userBPages.conversationList().getConversation(groupName).open();
       await userBPages.conversation().clickConversationInfoButton();
       expect(userBPages.conversation().adminsList).toBeVisible();
       expect(userBPages.conversation().adminsList.getByRole('listitem')).toHaveCount(1);
 
       // User A leaves the group
-      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().clickConversationInfoButton();
       await adminPages.conversation().leaveConversation();
       await modals.leaveConversation().clickConfirm();
       await expect(adminPages.conversation().systemMessages.filter({hasText: 'You left'})).toBeVisible();
 
       // User B sees the empty admins section
-      await userBPages.conversationList().openConversation(groupName);
+      await userBPages.conversationList().getConversation(groupName).open();
       await userBPages.conversation().clickConversationInfoButton();
       expect(adminPages.conversation().adminsList).not.toBeVisible();
     },
@@ -222,7 +222,7 @@ test.describe('Conversations', () => {
       await createGroup(adminPages, groupName, [userB]);
 
       // User B can see members section
-      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().clickConversationInfoButton();
       expect(adminPages.conversation().membersList).toBeVisible();
       expect(adminPages.conversation().membersList.getByRole('listitem')).toHaveCount(1);
@@ -231,7 +231,7 @@ test.describe('Conversations', () => {
       await adminPages.conversation().makeUserAdmin(userB.fullName);
 
       // User A and B cannot see members section
-      await userBPages.conversationList().openConversation(groupName);
+      await userBPages.conversationList().getConversation(groupName).open();
 
       for (const userPages of [adminPages, userBPages]) {
         await userPages.conversation().clickConversationInfoButton();
@@ -248,7 +248,7 @@ test.describe('Conversations', () => {
       const adminPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
       await createGroup(adminPages, groupName, [userB]);
 
-      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().clickConversationInfoButton();
 
       await expect(adminPages.conversation().adminsList.getByRole('listitem')).toHaveCount(1);
@@ -269,7 +269,7 @@ test.describe('Conversations', () => {
 
       await createGroup(adminPage, groupName, [userB, externalUser]);
 
-      await adminPage.conversationList().openConversation(groupName);
+      await adminPage.conversationList().getConversation(groupName).open();
       await adminPage.conversation().clickConversationInfoButton();
       await expect(adminPage.conversation().membersList).toBeVisible();
       await expect(adminPage.conversationDetails().getUserRoleIcon(externalUser.fullName)).toHaveAttribute(
@@ -290,12 +290,12 @@ test.describe('Conversations', () => {
       await createGroup(adminPages, groupName, [userB, userC]);
 
       // User A makes userB an admin
-      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().clickConversationInfoButton();
       await adminPages.conversation().makeUserAdmin(userB.fullName);
 
       // User B can see delete group and options in conversation details
-      await userBPages.conversationList().openConversation(groupName);
+      await userBPages.conversationList().getConversation(groupName).open();
       await userBPages.conversation().clickConversationInfoButton();
       await expect(userBPages.conversationDetails().deleteGroupButton).toBeVisible();
       await expect(userBPages.conversationDetails().guestOptionsButton).toBeVisible();
@@ -316,10 +316,10 @@ test.describe('Conversations', () => {
       const totalMessages = 20;
 
       await test.step('User B opens conversation with User A to mark previous history as read', async () => {
-        await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await pages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
         // User A sends "Read" messages while User B is looking at the chat
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
         for (let i = 1; i <= totalMessages; i++) {
           await userAPages.conversation().sendMessage(`READ message: ${i}`);
         }
@@ -333,7 +333,7 @@ test.describe('Conversations', () => {
       });
 
       await test.step('User B switches context to another conversation', async () => {
-        await pages.conversationList().openConversation(userC.fullName);
+        await pages.conversationList().getConversation(userC.fullName).open();
       });
 
       await test.step('User A sends new unread messages to User B', async () => {
@@ -341,15 +341,13 @@ test.describe('Conversations', () => {
           await userAPages.conversation().sendMessage(`UNREAD message: ${i}`);
         }
 
-        const conversationWithUserA = pages
-          .conversationList()
-          .getConversationLocator(userA.fullName, {protocol: 'mls'});
+        const conversationWithUserA = pages.conversationList().getConversation(userA.fullName, {protocol: 'mls'});
         await expect(conversationWithUserA.getByTestId('status-unread')).toContainText(`${totalMessages}`);
       });
 
       await test.step('User B opens the conversation and verifies scroll position', async () => {
         await components.conversationSidebar().clickAllConversationsButton();
-        await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await pages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
         // 1. Verify conversation scroll is NOT at the very bottom (last unread shouldn't be visible yet)
         const lastUnreadMessage = pages
@@ -370,9 +368,7 @@ test.describe('Conversations', () => {
         const lastMessage = pages.conversation().getMessage({sender: userA}).last();
         await lastMessage.scrollIntoViewIfNeeded();
 
-        const conversationWithUserA = pages
-          .conversationList()
-          .getConversationLocator(userA.fullName, {protocol: 'mls'});
+        const conversationWithUserA = pages.conversationList().getConversation(userA.fullName, {protocol: 'mls'});
         await expect(conversationWithUserA.getByTestId('status-unread')).not.toBeVisible();
       });
     },
@@ -391,10 +387,10 @@ test.describe('Conversations', () => {
         await createGroup(userBPages, groupName, [userA, userC]);
 
         // User A and B both send messages to start conversation
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().sendMessage('Message 1');
 
-        await userBPages.conversationList().openConversation(groupName);
+        await userBPages.conversationList().getConversation(groupName).open();
         await userBPages.conversation().sendMessage('Message 2');
 
         // User A reacts to Message 2 while still a member
@@ -461,7 +457,7 @@ test.describe('Conversations', () => {
       pm => pm.webapp.pages,
     );
 
-    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversationList().getConversation(userB.fullName).open();
 
     await userAPages.conversation().messageInput.pressSequentially(':) ', {delay: 100});
     expect(userAPages.conversation().messageInput).toContainText('🙂');
@@ -478,7 +474,7 @@ test.describe('Conversations', () => {
       await createGroup(adminPages, groupName, [userB, userC]);
 
       // User A renames the conversation
-      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().clickConversationInfoButton();
       await adminPages.conversationDetails().changeConversationName('New Group Name');
 
@@ -502,11 +498,11 @@ test.describe('Conversations', () => {
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(adminPages, groupName, [userB, userC]);
-      await userBPages.conversationList().openConversation(groupName);
+      await userBPages.conversationList().getConversation(groupName).open();
 
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
       // User A makes User C an admin
-      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().toggleGroupInformation();
       await adminPages.conversation().makeUserAdmin(userC.fullName);
 

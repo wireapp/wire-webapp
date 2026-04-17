@@ -41,13 +41,16 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   const pageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
   const {pages, modals, components} = pageManager.webapp;
 
+  const userBConversation = pages.conversationList().getConversation(userB.fullName);
+  const groupConversation = pages.conversationList().getConversation(groupName);
+
   await test.step('User generates data', async () => {
-    await pages.conversationList().openConversation(userB.fullName);
+    await userBConversation.open();
     await pages.conversation().sendMessage(personalMessage);
     await expect(pages.conversation().getMessage({content: personalMessage})).toBeVisible();
 
     await createGroup(pages, groupName, [userB]);
-    await pages.conversationList().openConversation(groupName);
+    await groupConversation.open();
     await pages.conversation().sendMessage(groupMessage);
 
     await expect(pages.conversation().getMessage({content: groupMessage})).toBeVisible();
@@ -73,10 +76,10 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   });
 
   await test.step("User doesn't see previous data (messages)", async () => {
-    await pages.conversationList().openConversation(userB.fullName);
+    await userBConversation.open();
     await expect(pages.conversation().getMessage({content: personalMessage})).not.toBeVisible();
 
-    await pages.conversationList().openConversation(groupName);
+    await groupConversation.open();
     await expect(pages.conversation().getMessage({content: groupMessage})).not.toBeVisible();
   });
 
@@ -99,10 +102,10 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
 
   await test.step('All data (chat history, contacts) are restored', async () => {
     await components.conversationSidebar().clickAllConversationsButton();
-    await pages.conversationList().openConversation(groupName);
+    await groupConversation.open();
     await expect(pages.conversation().getMessage({content: groupMessage})).toBeVisible();
 
-    await pages.conversationList().openConversation(userB.fullName);
+    await userBConversation.open();
     await expect(pages.conversation().getMessage({content: personalMessage})).toBeVisible();
   });
 });

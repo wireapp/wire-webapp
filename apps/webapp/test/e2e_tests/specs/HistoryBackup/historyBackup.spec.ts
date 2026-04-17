@@ -52,9 +52,9 @@ test.describe('History Backup', () => {
       const messageUserB = 'Message from User B';
 
       await test.step('User A and B write messages to each other', async () => {
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversationList().getConversation(conversationName).open();
         await userAPages.conversation().sendMessage(messageUserA);
-        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().getConversation(conversationName).open();
         await userBPages.conversation().sendMessage(messageUserB);
       });
 
@@ -103,7 +103,7 @@ test.describe('History Backup', () => {
 
       await test.step('Validate conversation is still visible with all messages after restoring backup', async () => {
         await userAComponents2.conversationSidebar().allConverationsButton.click();
-        await userAPages2.conversationList().openConversation(conversationName);
+        await userAPages2.conversationList().getConversation(conversationName).open();
         await expect(userAPages2.conversation().getMessage({sender: userB})).toContainText(messageUserB);
         await expect(userAPages2.conversation().getMessage({sender: userA})).toContainText(messageUserA);
       });
@@ -126,9 +126,9 @@ test.describe('History Backup', () => {
       const messageUserB = 'Message from User B';
 
       await test.step('User A and B write messages to each other', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
         await userAPages.conversation().sendMessage(messageUserA);
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
         await userBPages.conversation().sendMessage(messageUserB);
       });
 
@@ -177,9 +177,9 @@ test.describe('History Backup', () => {
       const renamedConversationName = 'renamedConversationName';
 
       await test.step('User A and B write in their group conversation', async () => {
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversationList().getConversation(conversationName).open();
         await userAPages.conversation().sendMessage(messageUserA);
-        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().getConversation(conversationName).open();
         await userBPages.conversation().sendMessage(messageUserB);
       });
 
@@ -189,7 +189,7 @@ test.describe('History Backup', () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
         backupName = await createAndSaveBackup(testInfo, userAPageManager);
         await userAComponents.conversationSidebar().allConverationsButton.click();
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       });
 
       await test.step('User B renames group conversation', async () => {
@@ -205,10 +205,10 @@ test.describe('History Backup', () => {
       await test.step('Validate User A sees renamed conversation and system message', async () => {
         // User A sees renamed conversation
         await userAComponents.conversationSidebar().allConverationsButton.click();
-        await expect(userAPages.conversationList().getConversationLocator(renamedConversationName)).toBeVisible();
+        await expect(userAPages.conversationList().getConversation(renamedConversationName)).toBeVisible();
 
         // User A sees system message that User B had renamed the conversation
-        await userAPages.conversationList().openConversation(renamedConversationName);
+        await userAPages.conversationList().getConversation(renamedConversationName).open();
         const renamedSystemMessage = userAPages
           .conversation()
           .systemMessages.filter({hasText: `${userB.fullName} renamed the conversation`});
@@ -235,9 +235,9 @@ test.describe('History Backup', () => {
       const messageUserB = 'Message from User B';
 
       await test.step('User A and B write messages to each other', async () => {
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversationList().getConversation(conversationName).open();
         await userAPages.conversation().sendMessage(messageUserA);
-        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().getConversation(conversationName).open();
         await userBPages.conversation().sendMessage(messageUserB);
       });
 
@@ -247,7 +247,7 @@ test.describe('History Backup', () => {
       });
 
       await test.step('User A archives 1:1 conversation with User B', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().getConversation(userB.fullName).open();
         await userAPages.conversation().conversationInfoButton.click();
         await userAPages.conversationDetails().archiveButton.click();
       });
@@ -272,13 +272,11 @@ test.describe('History Backup', () => {
 
       await test.step('Validate muted and archived state are the same', async () => {
         await userAComponents.conversationSidebar().allConverationsButton.click();
-        await userAPages.conversationList().openConversation(conversationName);
-        await expect(
-          userAPages.conversationList().getConversationLocator(conversationName).mutedIndicator,
-        ).toBeVisible();
+        const conversation = await userAPages.conversationList().getConversation(conversationName).open();
+        await expect(conversation.mutedIndicator).toBeVisible();
 
         await userAComponents.conversationSidebar().archiveButton.click();
-        const archivedConversation = userAPages.conversationList().getConversationLocator(userB.fullName);
+        const archivedConversation = userAPages.conversationList().getConversation(userB.fullName);
         await expect(archivedConversation).toBeVisible();
       });
     },
@@ -300,9 +298,9 @@ test.describe('History Backup', () => {
       const messageUserB = 'Message from User B';
 
       await test.step('User A and B write messages to each other', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
         await userAPages.conversation().sendMessage(messageUserA);
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
         await userBPages.conversation().sendMessage(messageUserB);
       });
 
@@ -348,9 +346,9 @@ test.describe('History Backup', () => {
       const messageUserB = 'Message from User B';
 
       await test.step('User A and User B write messages to each other', async () => {
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversationList().getConversation(conversationName).open();
         await userAPages.conversation().sendMessage(messageUserA);
-        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().getConversation(conversationName).open();
         await userBPages.conversation().sendMessage(messageUserB);
       });
 
@@ -374,7 +372,7 @@ test.describe('History Backup', () => {
 
       await test.step('Validate deleted group conversation is no longer visible', async () => {
         await userAComponents.conversationSidebar().allConverationsButton.click();
-        await expect(userAPages.conversationList().getConversationLocator(conversationName)).not.toBeVisible();
+        await expect(userAPages.conversationList().getConversation(conversationName)).not.toBeVisible();
       });
     },
   );

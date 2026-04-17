@@ -43,7 +43,7 @@ test.describe('Delete', () => {
       const deviceA = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
 
       const deviceB = (await PageManager.from(createPage(withLogin(userA, {confirmNewHistory: true})))).webapp.pages;
-      await deviceB.conversationList().openConversation(userB.fullName);
+      await deviceB.conversationList().getConversation(userB.fullName).open();
 
       await deviceA.conversation().sendMessage('Test Message');
 
@@ -67,20 +67,20 @@ test.describe('Delete', () => {
 
     await test.step('Create test group', async () => {
       await createGroup(userAPages, 'Test Group', [userB]);
-      await userBPages.conversationList().openConversation('Test Group');
+      await userAPages.conversationList().getConversation('Test Group').open();
+      await userBPages.conversationList().getConversation('Test Group').open();
     });
 
     let messageA: Locator;
     let messageB: Locator;
 
     await test.step('Send message from user A to B', async () => {
-      await userAPages.conversationList().openConversation('Test Group');
       await userAPages.conversation().sendMessage('Test Message');
 
       messageA = userAPages.conversation().getMessage({sender: userA});
       await expect(messageA).toContainText('Test Message');
 
-      messageB = userAPages.conversation().getMessage({sender: userA});
+      messageB = userBPages.conversation().getMessage({sender: userA});
       await expect(messageB).toContainText('Test Message');
     });
 
@@ -102,7 +102,7 @@ test.describe('Delete', () => {
       ]);
 
       await createGroup(userAPages, 'Test Group', [userB]);
-      await userBPages.conversationList().openConversation('Test Group');
+      await userBPages.conversationList().getConversation('Test Group').open();
 
       const systemMessage = userAPages.conversation().systemMessages.last();
 
@@ -119,9 +119,9 @@ test.describe('Delete', () => {
     async ({createPage}) => {
       const {components, pages} = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))))
         .webapp;
+      const conversation = await pages.conversationList().getConversation(userB.fullName).open();
 
       let message: Locator;
-
       await test.step('Send and delete message', async () => {
         await pages.conversation().sendMessage('Test Message');
 
@@ -133,19 +133,19 @@ test.describe('Delete', () => {
       });
 
       await test.step('Archive conversation', async () => {
-        const contextMenu = await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+        const contextMenu = await conversation.openContextMenu();
         await contextMenu.archiveButton.click();
       });
 
       await test.step('Unarchive conversation', async () => {
         await components.conversationSidebar().clickArchive();
-        const contextMenu = await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+        const contextMenu = await conversation.openContextMenu();
         await contextMenu.unarchiveButton.click();
         await components.conversationSidebar().clickAllConversationsButton();
       });
 
       await test.step('Verify message remains deleted', async () => {
-        await pages.conversationList().openConversation(userB.fullName);
+        await conversation.open();
         await expect(message).not.toBeAttached();
       });
     },
@@ -162,13 +162,13 @@ test.describe('Delete', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
       let userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Test Message');
 
       const messageA = userAPages.conversation().getMessage({sender: userA});
       await expect(messageA).toContainText('Test Message');
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       let messageB = userBPages.conversation().getMessage({sender: userA});
       await expect(messageB).toContainText('Test Message');
 
@@ -176,7 +176,7 @@ test.describe('Delete', () => {
       await userAPages.conversation().deleteMessage(messageA, 'Everyone');
 
       userBPages = (await PageManager.from(createPage(context, withLogin(userB)))).webapp.pages;
-      await userBPages.conversationList().openConversation(userA.fullName);
+      await userBPages.conversationList().getConversation(userA.fullName).open();
 
       messageB = userBPages.conversation().getMessage({sender: userA});
 
@@ -194,8 +194,8 @@ test.describe('Delete', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Test Message');
 
       const messageA = userAPages.conversation().getMessage({sender: userA});
@@ -224,14 +224,14 @@ test.describe('Delete', () => {
 
       await test.step('Create test group', async () => {
         await createGroup(userAPages, 'Test Group', [userB]);
-        await userBPages.conversationList().openConversation('Test Group');
+        await userBPages.conversationList().getConversation('Test Group').open();
       });
 
       let messageA: Locator;
       let messageB: Locator;
 
       await test.step('Send and delete message from user A to B', async () => {
-        await userAPages.conversationList().openConversation('Test Group');
+        await userAPages.conversationList().getConversation('Test Group').open();
         await userAPages.conversation().sendMessage('Test Message');
 
         messageA = userAPages.conversation().getMessage({sender: userA});
@@ -328,8 +328,8 @@ test.describe('Delete', () => {
       const userBPages = PageManager.from(pageB).webapp.pages;
 
       await test.step('Await mls conversation creation', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+        await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       });
 
       await test.step('Execute send action', async () => {
@@ -367,16 +367,16 @@ test.describe('Delete', () => {
       await test.step('Create group as second conversation', async () => {
         // We need to create a second conversation in order to switch to it to ensure the unread marker can be shown on the not open conversation
         await createGroup(userAPages, 'Test Group', [userB]);
-        await userBPages.conversationList().openConversation('Test Group');
+        await userBPages.conversationList().getConversation('Test Group').open();
       });
 
       await test.step('Send message from user A to B', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().getConversation(userB.fullName).open();
         await userAPages.conversation().sendMessage('Test Message');
       });
 
       await test.step('Check user B has a unread conversation with A', async () => {
-        const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
+        const conversation = userBPages.conversationList().getConversation(userA.fullName);
         await expect(conversation.getByTestId('status-unread')).toBeVisible();
       });
 
@@ -387,10 +387,10 @@ test.describe('Delete', () => {
       });
 
       await test.step('Check B has no unread indicator anymore', async () => {
-        const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
+        const conversation = userBPages.conversationList().getConversation(userA.fullName);
         await expect(conversation.getByTestId('status-unread')).not.toBeVisible();
 
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await conversation.open();
         const message = userBPages.conversation().getMessage({sender: userA});
         await expect(message).not.toBeAttached();
       });
