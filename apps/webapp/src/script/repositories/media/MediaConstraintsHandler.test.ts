@@ -24,19 +24,25 @@ import {createUuid} from 'Util/uuid';
 
 import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
 
+interface SelectedDeviceId {
+  exact?: string;
+}
+
 interface ExtendedMediaTrackConstraints extends MediaTrackConstraints {
   audio: {
     autoGainControl?: boolean;
-    deviceId?: {
-      exact?: string;
-    };
+    deviceId?: SelectedDeviceId;
   };
   video: {
     facingMode?: string;
-    deviceId?: {
-      exact?: string;
-    };
+    deviceId?: SelectedDeviceId;
   };
+}
+
+interface CreateAvailableDevicesParams {
+  audio?: string;
+  video?: string;
+  screen?: string;
 }
 
 describe('MediaConstraintsHandler', () => {
@@ -44,7 +50,7 @@ describe('MediaConstraintsHandler', () => {
     audio = 'mic',
     video = 'camera1',
     screen = 'screen1',
-  }: {audio?: string; video?: string; screen?: string} = {}) => {
+  }: CreateAvailableDevicesParams = {}) => {
     mediaDevicesStore.setState({
       audio: {
         input: {devices: [], supported: false, selectedId: audio},
