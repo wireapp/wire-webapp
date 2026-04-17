@@ -11459,7 +11459,7 @@ __metadata:
     os-browserify: "npm:0.3.0"
     p-wait-for: "npm:6.0.0"
     path-browserify: "npm:1.0.1"
-    path-to-regexp: "npm:8.4.0"
+    path-to-regexp: "npm:8.4.2"
     platform: "npm:1.3.6"
     postcss: "npm:8.5.9"
     postcss-import: "npm:16.1.1"
@@ -22718,10 +22718,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-to-regexp@npm:8.4.0":
-  version: 8.4.0
-  resolution: "path-to-regexp@npm:8.4.0"
-  checksum: 10/6864561ceacaece330a2213c6eb21505519673a65b4249e0e5d518984528f93b302b8bf85ccafc4f9d7f359f919d8b118dc00fdb0b26ded3d21e8802cffdfcb8
+"path-to-regexp@npm:8.4.2":
+  version: 8.4.2
+  resolution: "path-to-regexp@npm:8.4.2"
+  checksum: 10/70fd2cbce0b962cbcf4d312af07818bfce2bae11c09cf3bd86be99c0e30168238a1a7b02b18b452e73f075897df04597d30d63e56da7be41eecfc37998693389
   languageName: node
   linkType: hard
 
