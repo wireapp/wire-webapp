@@ -79,7 +79,7 @@ import {
 } from '../E2EIdentityService/Helper';
 import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
 import {ClientId, HandlePendingProposalsParams} from '../types';
-import {generateMLSDeviceId} from '../utils/MLSId';
+import {generateMLSDeviceId} from '../utils/mlsId';
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 

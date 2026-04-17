@@ -302,6 +302,9 @@ ls:
   libraries/core/src/storage:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src:
+    .ts: camelCase
+    .test.ts: camelCase
   libraries/core/src/util:
     .dir: camelCase
     .ts: camelCase
@@ -376,6 +379,8 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/utils:
+    .ts: camelCase
   libraries/core/src/messagingProtocols/mls/EventHandler:
     .ts: camelCase
     .test.ts: camelCase

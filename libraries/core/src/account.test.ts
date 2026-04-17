@@ -56,7 +56,7 @@ jest.mock('./conversation', () => {
   };
 });
 
-import {Account, ConnectionState} from './Account';
+import {Account, ConnectionState} from './account';
 import {NotificationSource} from './notification';
 
 const BASE_URL = 'mock-backend.wire.com';
