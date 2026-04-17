@@ -69,6 +69,7 @@ export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
   private segmenter: SegmenterLike | null = null;
   private segmenterFactory: SegmenterFactory = MediaPipeSegmenterFactory;
   private segmentationModelByTier: SegmentationModelByTier = {};
+  private lastSegmentationTimestampMs = -1;
   private currentModelPath: string | null = null;
   private maskPostProcessor: MaskPostProcessor = new NoopMaskPostProcessor();
   private qualityController: QualityController | null = null;
@@ -203,7 +204,16 @@ export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
       if (frameIndex % qualityTier.segmentationCadence === 0) {
         this.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
         const segStart = performance.now();
-        const timestampMs = timestamp * 1000;
+        const timestampMs = this.getMonotonicTimestampMs(timestamp);
+
+        if (timestampMs <= this.lastSegmentationTimestampMs) {
+          this.logger.warn('Frame due to non-monotonic timestamp', {
+            timestampMs,
+            lastTimestampMs: this.lastSegmentationTimestampMs,
+            rawTimestamp: timestamp,
+          });
+        }
+
         const includeClassMask = this.config.debugMode === 'classOverlay' || this.config.debugMode === 'classOnly';
         const result = await this.segmenter.segment(frame, timestampMs, {includeClassMask});
         segmentationMs = performance.now() - segStart;
@@ -452,5 +462,15 @@ export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
 
   public getCurrentModelPath(): string | null {
     return '';
+  }
+
+  private getMonotonicTimestampMs(inputTimestamp: number): number {
+    if (Number.isFinite(inputTimestamp) && inputTimestamp > 0) {
+      const candidateMs = Math.floor(inputTimestamp * 1000);
+      if (candidateMs > this.lastSegmentationTimestampMs) {
+        return candidateMs;
+      }
+    }
+    return Math.max(Math.floor(performance.now()), this.lastSegmentationTimestampMs + 1);
   }
 }
