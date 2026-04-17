@@ -142,7 +142,7 @@ test.describe('Markdown', () => {
     }
   });
 
-  test('I want to edit a markdown message', {tag: ['@TC-1319', '@regression']}, async ({createPage}) => {
+  test('I want to edit a markdown message', {tag: ['@TC-1318', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
