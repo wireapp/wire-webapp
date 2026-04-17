@@ -20,9 +20,9 @@
 import {APIClient} from '@wireapp/api-client';
 
 import {ClientId} from '../../../types';
-import {AcmeService} from '../../Connection/AcmeServer/acmeService';
+import {AcmeService} from '../../connection/acmeServer/acmeService';
 import {E2eiEnrollment, Nonce, User} from '../../e2eiService.types';
-import {UnidentifiedEnrollmentFlowData} from '../../Storage/e2eiStorage.schema';
+import {UnidentifiedEnrollmentFlowData} from '../../storage/e2eiStorage.schema';
 
 export interface DoWireDpopChallengeParams {
   apiClient: APIClient;

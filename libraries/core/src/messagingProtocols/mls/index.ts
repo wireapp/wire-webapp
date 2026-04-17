@@ -17,6 +17,6 @@
  *
  */
 
-export * from './MLSService/';
-export * from './E2EIdentityService';
+export * from './mlsService/';
+export * from './e2eIdentityService';
 export * from './types';

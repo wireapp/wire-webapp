@@ -19,9 +19,9 @@
 
 import {Converter} from 'bazinga64';
 
-import {AcmeService} from '../Connection/AcmeServer/acmeService';
+import {AcmeService} from '../connection/acmeServer/acmeService';
 import {E2eiEnrollment, Nonce} from '../e2eiService.types';
-import {UnidentifiedEnrollmentFlowData} from '../Storage/e2eiStorage.schema';
+import {UnidentifiedEnrollmentFlowData} from '../storage/e2eiStorage.schema';
 
 interface DoWireOidcChallengeParams {
   authData: UnidentifiedEnrollmentFlowData;

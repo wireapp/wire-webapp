@@ -68,17 +68,17 @@ import {
   queueConversationRejoin,
   resumeRejoiningMLSConversations,
 } from './messagingProtocols/mls/conversationRejoinQueue';
-import {E2EIServiceExternal, User} from './messagingProtocols/mls/E2EIdentityService';
+import {E2EIServiceExternal, User} from './messagingProtocols/mls/e2eIdentityService';
 import {
   getAllConversationsCallback,
   getTokenCallback,
-} from './messagingProtocols/mls/E2EIdentityService/e2eiServiceInternal';
+} from './messagingProtocols/mls/e2eIdentityService/e2eiServiceInternal';
 import {
   flushProposalsQueue,
   getProposalQueueLength,
   pauseProposalProcessing,
   resumeProposalProcessing,
-} from './messagingProtocols/mls/EventHandler/events/messageAdd/incomingProposalsQueue';
+} from './messagingProtocols/mls/eventHandler/events/messageAdd/incomingProposalsQueue';
 import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
 import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/cryptoClient';

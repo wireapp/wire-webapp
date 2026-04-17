@@ -46,10 +46,10 @@ import {AddUsersFailure, AddUsersFailureReasons} from '../../../conversation';
 import {openDB} from '../../../storage/coreDb';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {TaskScheduler} from '../../../util/taskScheduler';
-import * as Helper from '../E2EIdentityService/Helper';
+import * as Helper from '../e2eIdentityService/helper';
 
-jest.mock('../E2EIdentityService/Helper', () => ({
-  ...jest.requireActual('../E2EIdentityService/Helper'),
+jest.mock('../e2eIdentityService/helper', () => ({
+  ...jest.requireActual('../e2eIdentityService/helper'),
   getMLSDeviceStatus: jest.fn(),
 }));
 

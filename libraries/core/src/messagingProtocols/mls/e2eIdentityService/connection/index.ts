@@ -17,4 +17,4 @@
  *
  */
 
-export * from './AcmeServer';
+export * from './acmeServer';

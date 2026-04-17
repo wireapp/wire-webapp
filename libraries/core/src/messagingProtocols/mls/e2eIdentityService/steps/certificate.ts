@@ -17,7 +17,7 @@
  *
  */
 
-import {AcmeService} from '../Connection';
+import {AcmeService} from '../connection';
 import {E2eiEnrollment, Nonce} from '../e2eiService.types';
 
 interface GetCertificateParams {

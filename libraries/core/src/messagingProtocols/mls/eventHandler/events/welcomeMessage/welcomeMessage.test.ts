@@ -24,7 +24,7 @@ import {Welcome} from '@wireapp/core-crypto';
 import {handleMLSWelcomeMessage} from './welcomeMessage';
 
 import {NotificationSource} from '../../../../../notification';
-import {MLSService, MLSServiceEvents} from '../../../MLSService';
+import {MLSService, MLSServiceEvents} from '../../../mlsService';
 
 jest.mock('bazinga64', () => ({
   ...jest.requireActual('bazinga64'),

@@ -29,7 +29,7 @@ import {
   CORE_CRYPTO_ERROR_NAMES,
   serializeAbortReason,
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
-} from '../MLSService/coreCryptoMlsError';
+} from '../mlsService/coreCryptoMlsError';
 
 // Helpers
 const id: QualifiedId = {id: 'conv-id', domain: 'wire.test'};

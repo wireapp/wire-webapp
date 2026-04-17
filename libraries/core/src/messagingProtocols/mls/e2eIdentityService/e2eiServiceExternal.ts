@@ -32,9 +32,9 @@ import {
   ClientId,
 } from '@wireapp/core-crypto';
 
-import {AcmeService} from './Connection';
-import {getE2EIClientId} from './Helper';
-import {createE2EIEnrollmentStorage} from './Storage/e2eiStorage';
+import {AcmeService} from './connection';
+import {getE2EIClientId} from './helper';
+import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
 import {ClientService} from '../../../client';
 import {CoreDatabase} from '../../../storage/coreDb';
@@ -42,7 +42,7 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {LowPrecisionTaskScheduler} from '../../../util/lowPrecisionTaskScheduler';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
-import {MLSService, MLSServiceEvents} from '../MLSService';
+import {MLSService, MLSServiceEvents} from '../mlsService';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status' | typeof Symbol.dispose> & {
   status?: DeviceStatus;

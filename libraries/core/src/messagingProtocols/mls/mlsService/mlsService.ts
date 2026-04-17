@@ -65,19 +65,19 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {numberToHex} from '../../../util/numberToHex';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
 import {TaskScheduler} from '../../../util/taskScheduler';
-import {User} from '../E2EIdentityService';
+import {User} from '../e2eIdentityService';
 import {
   E2EIServiceInternal,
   getAllConversationsCallback,
   getTokenCallback,
-} from '../E2EIdentityService/e2eiServiceInternal';
+} from '../e2eIdentityService/e2eiServiceInternal';
 import {
   getMLSDeviceStatus,
   getSignatureAlgorithmForCiphersuite,
   isMLSDevice,
   MLSDeviceStatus,
-} from '../E2EIdentityService/Helper';
-import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../EventHandler/events';
+} from '../e2eIdentityService/helper';
+import {handleMLSMessageAdd, handleMLSWelcomeMessage} from '../eventHandler/events';
 import {ClientId, HandlePendingProposalsParams} from '../types';
 import {generateMLSDeviceId} from '../utils/mlsId';
 

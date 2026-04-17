@@ -28,7 +28,7 @@ import {openDB} from '../../../storage/coreDb';
 import {getUUID} from '../../../test/payloadHelper';
 import {stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
-import {MLSService} from '../MLSService';
+import {MLSService} from '../mlsService';
 
 async function buildE2EIService(dbName = 'core-test-db') {
   const transactionContext = {

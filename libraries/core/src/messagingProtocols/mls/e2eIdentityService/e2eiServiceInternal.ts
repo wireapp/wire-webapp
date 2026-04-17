@@ -23,17 +23,17 @@ import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
 import {ConversationId} from '@wireapp/core-crypto';
 
-import {AcmeService} from './Connection/AcmeServer';
+import {AcmeService} from './connection/acmeServer';
 import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './e2eiService.types';
-import {isResponseStatusValid} from './Helper';
-import {createNewAccount} from './Steps/account';
-import {getAuthorizationChallenges} from './Steps/authorization';
-import {getCertificate} from './Steps/certificate';
-import {doWireDpopChallenge} from './Steps/DpopChallenge/dpopChallenge';
-import {doWireOidcChallenge} from './Steps/oidcChallenge';
-import {createNewOrder, finalizeOrder} from './Steps/order';
-import {createE2EIEnrollmentStorage} from './Storage/e2eiStorage';
-import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './Storage/e2eiStorage.schema';
+import {isResponseStatusValid} from './helper';
+import {createNewAccount} from './steps/account';
+import {getAuthorizationChallenges} from './steps/authorization';
+import {getCertificate} from './steps/certificate';
+import {doWireDpopChallenge} from './steps/dpopChallenge/dpopChallenge';
+import {doWireOidcChallenge} from './steps/oidcChallenge';
+import {createNewOrder, finalizeOrder} from './steps/order';
+import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
+import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './storage/e2eiStorage.schema';
 
 import {CoreDatabase} from '../../../storage/coreDb';
 import {toBufferSource} from '../../../util/bufferUtils';

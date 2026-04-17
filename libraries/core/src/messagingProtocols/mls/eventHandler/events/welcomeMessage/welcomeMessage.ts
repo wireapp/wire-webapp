@@ -21,7 +21,7 @@ import {ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {Decoder, Encoder} from 'bazinga64';
 
 import {HandledEventPayload} from '../../../../../notification';
-import {MLSService, MLSServiceEvents} from '../../../MLSService';
+import {MLSService, MLSServiceEvents} from '../../../mlsService';
 
 interface HandleWelcomeMessageParams {
   event: ConversationMLSWelcomeEvent;

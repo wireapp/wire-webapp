@@ -17,9 +17,9 @@
  *
  */
 
-import {AcmeService} from '../Connection/AcmeServer/acmeService';
+import {AcmeService} from '../connection/acmeServer/acmeService';
 import {AcmeDirectory, E2eiEnrollment, Nonce} from '../e2eiService.types';
-import {jsonToByteArray} from '../Helper';
+import {jsonToByteArray} from '../helper';
 
 type CreateNewAccountParams = {
   nonce: Nonce;
