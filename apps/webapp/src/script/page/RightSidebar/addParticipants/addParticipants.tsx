@@ -197,7 +197,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const onSearchInput = async (value: string) => {
     setSearchInput(value);
 
-    if (isAddServiceState && CONVERSATION_PROTOCOL.PROTEUS) {
+    if (isAddServiceState && activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS) {
       await searchServices(value);
     }
   };
