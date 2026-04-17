@@ -13,6 +13,10 @@
   },
   "packageRules": [
     {
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "postUpdateOptions": ["yarnDedupeHighest"]
+    },
+    {
       "matchUpdateTypes": ["major"],
       "dependencyDashboardApproval": true
     },
