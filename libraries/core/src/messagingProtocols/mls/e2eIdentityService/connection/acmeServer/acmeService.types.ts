@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2023 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,4 +17,22 @@
  *
  */
 
-export * from './proteusService';
+import {ZodSchema} from 'zod';
+
+import {Nonce} from '../../e2eiService.types';
+
+export type GetDirectoryReturnValue = Promise<Uint8Array | undefined>;
+
+export type GetInitialNonceReturnValue = Promise<string | undefined>;
+
+export interface PostJoseRequestParams<T> {
+  url: string;
+  payload: Uint8Array;
+  schema: ZodSchema<T>;
+  shouldGetLocation?: boolean;
+}
+export type PostJoseRequestReturnValue<T> = {
+  data: T;
+  nonce: Nonce;
+  location?: string;
+};
