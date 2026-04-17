@@ -17,4 +17,4 @@
  *
  */
 
-export * from './DpopChallenge';
+export * from './dpopChallenge';

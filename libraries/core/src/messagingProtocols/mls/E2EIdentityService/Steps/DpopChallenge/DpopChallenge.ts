@@ -19,7 +19,7 @@
 
 import {Converter} from 'bazinga64';
 
-import {DoWireDpopChallengeParams, GetClientNonceParams} from './DpopChallenge.types';
+import {DoWireDpopChallengeParams, GetClientNonceParams} from './dpopChallenge.types';
 
 const getClientNonce = async ({apiClient, clientId}: GetClientNonceParams) => {
   try {

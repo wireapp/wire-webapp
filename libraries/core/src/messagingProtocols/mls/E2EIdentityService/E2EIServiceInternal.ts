@@ -29,7 +29,7 @@ import {isResponseStatusValid} from './Helper';
 import {createNewAccount} from './Steps/Account';
 import {getAuthorizationChallenges} from './Steps/Authorization';
 import {getCertificate} from './Steps/Certificate';
-import {doWireDpopChallenge} from './Steps/DpopChallenge';
+import {doWireDpopChallenge} from './Steps/DpopChallenge/dpopChallenge';
 import {doWireOidcChallenge} from './Steps/OidcChallenge';
 import {createNewOrder, finalizeOrder} from './Steps/Order';
 import {createE2EIEnrollmentStorage} from './Storage/e2eiStorage';
