@@ -32,6 +32,7 @@
  * to produce an output MediaStreamTrack with effects applied.
  */
 
+import {TARGET_FPS} from 'Repositories/media/backgroundEffectsHandler';
 import {getLogger, Logger} from 'Util/logger';
 
 import {choosePipeline, detectCapabilities} from './capability';
@@ -54,7 +55,6 @@ import {MainWebGlPipeline} from '../pipelines/mainWebGlPipeline';
 import {PassthroughPipeline} from '../pipelines/passthroughPipeline';
 import {WorkerWebGlPipeline} from '../pipelines/workerWebGlPipeline';
 import {resolveQualityPolicy, resolveSegmentationModelPath, TIER_DEFINITIONS} from '../quality';
-import {TARGET_FPS} from "Repositories/media/backgroundEffectsHandler";
 
 /**
  * Main controller for background effects processing.
