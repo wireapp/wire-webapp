@@ -456,6 +456,7 @@ const AppLock = ({
               onKeyDown={clearUnlockError}
               data-uie-name="input-applock-unlock"
               autoComplete="current-password"
+              aria-invalid={Boolean(unlockError)}
               error={ErrorMessage()}
             />
 
