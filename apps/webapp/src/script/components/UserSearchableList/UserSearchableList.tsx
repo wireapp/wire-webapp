@@ -19,7 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -151,7 +151,9 @@ export const UserSearchableList = ({
     : undefined;
 
   const userList = foundUserEntities().filter(
-    user => !props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)),
+    user =>
+      !props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)) &&
+      user.type === UserType.REGULAR,
   );
   const isEmptyUserList = userList.length === 0;
   const isSearching = filter.length > 0;
