@@ -48,11 +48,13 @@ import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
 import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
+import {ClientEvent} from 'Repositories/event/Client';
 import type {EventService} from 'Repositories/event/EventService';
 import {search as fullTextSearch} from 'Repositories/search/FullTextSearch';
 import {StorageService} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {getLogger} from 'Util/logger';
 
 import {MLSCapableConversation} from './ConversationSelectors';
 
@@ -60,11 +62,48 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
 
+const logger = getLogger('AccountForm');
+
+type CompositeMessageItem = {
+  text?: {content?: string; message?: string};
+  button?: {text?: string};
+};
+
+type ConversationEventData = {
+  content?: string;
+  message?: string;
+  text?: {content?: string};
+  items?: CompositeMessageItem[];
+};
+
+type ConversationEvent = {type?: string; data?: ConversationEventData};
+type ConversationSearchEventLoader = Pick<EventService, 'loadEventsWithCategory'>;
+
+const TextExtractors: Partial<Record<string, (event: ConversationEvent) => string>> = {
+  [ClientEvent.CONVERSATION.MESSAGE_ADD]: event => event.data?.content || event.data?.message || '',
+  [ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD]: event => event.data?.text?.content || '',
+  [ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD]: event => {
+    const items = Array.isArray(event.data?.items) ? event.data.items : [];
+    return items
+      .flatMap(item => {
+        if (item?.text) {
+          return [item.text.content || item.text.message || ''];
+        }
+        if (item?.button) {
+          return [item.button.text || ''];
+        }
+        return [];
+      })
+      .filter((text: string) => text.length > 0)
+      .join(' ');
+  },
+};
+
 export class ConversationService {
-  private readonly eventService: EventService;
+  private readonly eventService: ConversationSearchEventLoader;
 
   constructor(
-    eventService: EventService,
+    eventService: ConversationSearchEventLoader,
     private readonly storageService = container.resolve(StorageService),
     private readonly apiClient = container.resolve(APIClient),
     private readonly core = container.resolve(Core),
@@ -433,7 +472,22 @@ export class ConversationService {
     const events = await this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max);
     return events
       .filter(record => record.ephemeral_expires !== true)
-      .filter(({data: event_data}: any) => fullTextSearch(event_data.content, query));
+      .filter(event => {
+        const searchableText = this.getEventSearchableText(event);
+        return searchableText ? fullTextSearch(searchableText, query) : false;
+      });
+  }
+
+  private getEventSearchableText(event: ConversationEvent): string {
+    try {
+      const contentOrLegacyText = event.data?.content || event.data?.message || '';
+      const extractor = event.type ? TextExtractors[event.type] : undefined;
+      const extractedText = extractor?.(event) || '';
+      return extractedText.length ? extractedText : contentOrLegacyText;
+    } catch (err) {
+      logger.error('Error extracting searchable text from event', {event, error: err});
+      return '';
+    }
   }
 
   /**
