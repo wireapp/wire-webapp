@@ -94,13 +94,19 @@ export const IntegrationMapper = {
 
   mapServiceFromUser: (user: User) => {
     const serviceEntity = new ServiceEntity();
+
     if (user.type === UserType.APP) {
-      serviceEntity.id = user.id;
-      serviceEntity.name = user.name;
-      serviceEntity.description = user.description;
-      serviceEntity.category = user.category;
-      serviceEntity.previewPictureResource = user.previewPictureResource;
-      serviceEntity.mediumPictureResource = user.mediumPictureResource;
+      const {id, qualifiedId, name, description, category, previewPictureResource, mediumPictureResource} = user;
+
+      Object.assign(serviceEntity, {
+        id,
+        qualifiedId,
+        name,
+        description,
+        category,
+        previewPictureResource,
+        mediumPictureResource,
+      });
     }
 
     return serviceEntity;
