@@ -400,7 +400,7 @@ test.describe('Calling', () => {
         await member.calling().clickAcceptCallButton();
         await expect(member.calling().goFullScreen).toBeVisible();
       }
-      
+
       // User A removes User B from the group
       await userAPages.conversation().toggleGroupInformation();
       await userAPages.conversation().removeMemberFromGroup(userB.fullName);
@@ -410,6 +410,38 @@ test.describe('Calling', () => {
 
       // User B is kicked out of a call
       await expect(userBPages.calling().callCell).not.toBeAttached();
+    },
+  );
+
+  test(
+    'I should not be able to join a call when I get removed from the group',
+    {tag: ['@TC-2838', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await createGroup(userAPages, groupName, [userB]);
+
+      // User A initiates the call
+      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversation().clickCallButton();
+
+      await expect(userAPages.calling().callCell).toBeVisible();
+      await expect(userBPages.calling().callCell).toBeVisible();
+      await expect(userBPages.conversationList().joinCallButton).toBeVisible();
+
+      // User A removes User B from the group
+      await userAPages.conversation().toggleGroupInformation();
+      await userAPages.conversation().removeMemberFromGroup(userB.fullName);
+      await expect(
+        userAPages.conversation().systemMessages.filter({hasText: `You removed ${userB.fullName}`}),
+      ).toBeVisible();
+
+      // User B cannot join the group call
+      await expect(userBPages.calling().callCell).not.toBeAttached();
+      await expect(userBPages.conversationList().joinCallButton).not.toBeAttached();
     },
   );
 });
