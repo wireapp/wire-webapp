@@ -135,7 +135,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
 
   const togglePanel = (newState: PanelState, entity: PanelEntity | null, isAddMode: boolean = false) => {
     setAnimatePanelToLeft(true);
-    debugger;
     rightSidebar.goTo(newState, {entity, isAddMode});
   };
 
