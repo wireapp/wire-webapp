@@ -54,7 +54,10 @@ export class UserProfileModal {
     this.userEmailLabel = emailContainer.getByRole('paragraph').getByText('Email');
     this.userEmailEntry = emailContainer.getByTestId('item-enriched-value');
 
-    this.domainLabel = page.getByRole('paragraph').getByText('Domain');
+    const domainContainer = page.locator('.enriched-fields__entry').filter({
+      has: page.locator('[data-uie-name="item-enriched-key"]', {hasText: 'Domain'}),
+    });
+    this.domainLabel = domainContainer.getByRole('paragraph').getByText('Domain');
     this.cancelButton = this.modal.getByRole('button', {name: 'Cancel', exact: true});
     this.modalCloseButton = this.modal.getByTestId('do-close');
   }

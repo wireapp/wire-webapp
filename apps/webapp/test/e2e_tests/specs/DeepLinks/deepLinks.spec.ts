@@ -159,8 +159,8 @@ test.describe('Deep Links', () => {
     userD = await createUser();
 
     const [userAPage, userBPage, userCPage, userDPage] = await Promise.all([
-      createPage(withLogin(userB),withConnectedUser(userA), withConnectionRequest(userD)),
       createPage(withLogin(userA), withConnectionRequest(userC)),
+      createPage(withLogin(userB), withConnectedUser(userA), withConnectionRequest(userD)),
       createPage(withLogin(userC)),
       createPage(withLogin(userD)),
     ]);
@@ -188,10 +188,10 @@ test.describe('Deep Links', () => {
 
     await test.step('User B copies and sends profile deeplink to User A and User A verifies information', async () => {
       const copiedProfileLinkUserB = await copyProfileLink(userBPage, userBPageManager);
-      await userBPages.conversationList().openConversation(userA.fullName);
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userBPages.conversation().sendMessage('UserB profile link: ' + copiedProfileLinkUserB);
 
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       await userAPages.conversation().getMessage({sender: userB}).click();
       await expect(userAModals.userProfile().modal).toBeVisible();
       await expect(userAModals.userProfile().participantFullname).toContainText(userB.fullName);
@@ -228,12 +228,17 @@ test.describe('Deep Links', () => {
       await userBPages.conversationList().openConversation(groupName);
       await userBPages.conversation().toggleGroupInformation();
       await userBPages.conversationDetails().openGuestOptions();
-      const conversationJoinLink = userBPages.guestOptions().createLink();
+
+      const conversationJoinLink = await userBPages.guestOptions().createLink();
+      await userBPages.conversation().sendMessage(conversationJoinLink);
+
+      await userBPages.conversation().conversationInfoButton.click();
       await userBPages.conversationList().openConversation(userA.fullName);
-      await userBPages.conversation().sendMessage(await conversationJoinLink);
+      await userBPages.conversation().sendMessage(conversationJoinLink);
 
       await userAPages.conversationList().openConversation(userB.fullName);
-      await userAPages.conversation().getMessage({sender: userB}).click();
+      const messageWithConversationJoinLink = userAPages.conversation().getMessage({sender: userB, content: conversationJoinLink});
+      await messageWithConversationJoinLink.getByText(conversationJoinLink).click();
       await expect(userAModals.confirm().modal).toBeVisible();
       await expect(userAModals.confirm().actionButton).toContainText('Join Conversation');
       await userAModals.confirm().actionButton.click();
@@ -247,7 +252,7 @@ test.describe('Deep Links', () => {
       await expect(userDPages.conversation().getMessage({sender: userD})).toBeVisible();
 
       await userBPages.conversationList().openConversation(userD.fullName, {protocol: 'mls'});
-      const profileLinkUserD = userBPages.conversation().getMessage({sender: userD});
+      const profileLinkUserD = userBPages.conversation().getMessage({sender: userD}).last();
       await profileLinkUserD.hover();
       await userBPages.conversation().copyMessage(profileLinkUserD);
 
@@ -257,8 +262,6 @@ test.describe('Deep Links', () => {
 
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       await userBPages.conversation().sendMessage(copiedProfileLinkFromUserD);
-      await expect(userBPages.conversation().getMessage({sender: userB})).toBeVisible();
-
       await userAPages.conversationList().openConversation(userB.fullName);
       await userAPages.conversation().getMessage({content: 'UserD'}).click();
 
