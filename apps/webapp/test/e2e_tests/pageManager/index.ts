@@ -21,7 +21,6 @@ import {Page} from '@playwright/test';
 
 import {MarketingConsentModal} from './webapp/modals/marketingConsent.modal';
 import {SetUsernamePage} from './webapp/pages/setUsername.page';
-import {CellsConversationPage} from './webapp/cells/cellsConversation.page';
 import {CellsConversationFilesPage} from './webapp/cells/cellsConversationFiles.page';
 import {CellsFileDetailViewModal} from './webapp/cells/cellsFileDetailView.modal';
 import {ContactList} from './webapp/components/conversationList.component';
@@ -164,8 +163,6 @@ export class PageManager {
         this.getOrCreate('webapp.pages.conversationDetails', () => new ConversationDetailsPage(this.page)),
       conversation: () => this.getOrCreate('webapp.pages.conversation', () => new ConversationPage(this.page)),
       collection: () => this.getOrCreate('webapp.pages.collection', () => new CollectionPage(this.page)),
-      cellsConversation: () =>
-        this.getOrCreate('webapp.pages.cellsConversation', () => new CellsConversationPage(this.page)),
       cellsConversationFiles: () =>
         this.getOrCreate('webapp.pages.cellsConversationFiles', () => new CellsConversationFilesPage(this.page)),
       connectRequest: () => this.getOrCreate('webapp.pages.connectRequest', () => new ConnectRequestPage(this.page)),
