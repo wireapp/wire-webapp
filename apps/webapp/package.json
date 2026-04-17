@@ -63,7 +63,7 @@
     "knockout": "3.5.1",
     "ky": "1.14.3",
     "lexical": "0.27.2",
-    "libsodium-wrappers-sumo": "0.8.2",
+    "libsodium-wrappers-sumo": "0.8.3",
     "linkify-it": "5.0.0",
     "markdown-it": "14.1.1",
     "murmurhash": "2.0.1",
