@@ -20,6 +20,8 @@
 import {Locator, Page} from '@playwright/test';
 import {GuestOptionsPage} from './guestOptions.page';
 
+type NotificationLevel = 'Everything' | 'Mentions and replies' | 'Nothing';
+
 export class ConversationDetailsPage {
   private readonly page: Page;
 
@@ -219,16 +221,16 @@ export class ConversationDetailsPage {
     await this.clearConversationContentButton.click();
   }
 
-  async setNotifications(value: Parameters<typeof this.selectNotificationsLevel>[0]) {
+  async setNotifications(level: NotificationLevel) {
     await this.notificationsButton.click();
-    await this.selectNotificationsLevel(value);
+    await this.selectNotificationsLevel(level);
 
     // Close the settings by clicking "Go back" button.
     await this.page.getByRole('button', {name: 'Go back'}).click();
   }
 
-  async selectNotificationsLevel(value: 'Everything' | 'Mentions and replies' | 'Nothing') {
-    await this.page.getByRole('radiogroup').getByText(value).click();
+  async selectNotificationsLevel(level: NotificationLevel) {
+    await this.page.getByRole('radiogroup').getByText(level).click();
   }
 
   async changeConversationName(newConversationName: string) {
