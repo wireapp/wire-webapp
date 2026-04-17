@@ -81,9 +81,9 @@ import {
 } from './messagingProtocols/mls/eventHandler/events/messageAdd/incomingProposalsQueue';
 import {CoreCallbacks, SecretCrypto} from './messagingProtocols/mls/types';
 import {NewClient, ProteusService} from './messagingProtocols/proteus';
-import {CryptoClientType} from './messagingProtocols/proteus/ProteusService/cryptoClient';
-import {wipeCoreCryptoDb} from './messagingProtocols/proteus/ProteusService/cryptoClient/coreCryptoWrapper';
-import {deleteIdentity} from './messagingProtocols/proteus/ProteusService/identityClearer';
+import {CryptoClientType} from './messagingProtocols/proteus/proteusService/cryptoClient';
+import {wipeCoreCryptoDb} from './messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper';
+import {deleteIdentity} from './messagingProtocols/proteus/proteusService/identityClearer';
 import {HandledEventPayload, NotificationService, NotificationSource} from './notification/';
 import {createCustomEncryptedStore, createEncryptedStore, EncryptedStore} from './secretStore/encryptedStore';
 import {generateSecretKey} from './secretStore/secretKeyGenerator';
@@ -447,7 +447,7 @@ export class Account extends TypedEventEmitter<Events> {
     };
 
     if (this.options.coreCryptoConfig?.enabled) {
-      const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/cryptoClient/coreCryptoWrapper');
+      const {buildClient} = await import('./messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper');
       const client = await buildClient(
         storeEngine,
         {
@@ -460,7 +460,7 @@ export class Account extends TypedEventEmitter<Events> {
       return [CryptoClientType.CORE_CRYPTO, client] as const;
     }
 
-    const {buildClient} = await import('./messagingProtocols/proteus/ProteusService/cryptoClient/cryptoboxWrapper');
+    const {buildClient} = await import('./messagingProtocols/proteus/proteusService/cryptoClient/cryptoboxWrapper');
     const client = buildClient(storeEngine, baseConfig);
     return [CryptoClientType.CRYPTOBOX, client] as const;
   };

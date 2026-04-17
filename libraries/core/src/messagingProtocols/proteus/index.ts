@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ProteusService';
+export * from './proteusService';

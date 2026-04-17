@@ -54,7 +54,7 @@ import {
 import {MessageService} from '../../../conversation/message/messageService';
 import {NonFederatingBackendsError} from '../../../errors';
 import {HandledEventPayload} from '../../../notification';
-import {handleOtrMessageAdd} from '../EventHandler/events';
+import {handleOtrMessageAdd} from '../eventHandler/events';
 import {getGenericMessageParams} from '../utility/getGenericMessageParams';
 import {isClearFromMismatch} from '../utility/isClearFromMismatch';
 import {

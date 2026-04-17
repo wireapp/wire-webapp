@@ -26,7 +26,7 @@ import {ClientAction, GenericMessage} from '@wireapp/protocol-messaging';
 import {GenericMessageType} from '../../../../../conversation';
 import {DecryptionError} from '../../../../../errors/decryptionError';
 import {HandledEventPayload} from '../../../../../notification';
-import {ProteusService} from '../../../ProteusService';
+import {ProteusService} from '../../../proteusService';
 
 interface HandleOtrMessageAddParams {
   event: ConversationOtrMessageAddEvent;
