@@ -60,8 +60,11 @@ test.describe('Notifications', () => {
 
       // Archive conversation for user B
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().clickConversationOptions(userA.fullName);
-      await userBPages.conversationList().archiveConversation();
+      const contextMenu = await userBPages
+        .conversationList()
+        .getConversationLocator(userA.fullName, {protocol: 'mls'})
+        .openContextMenu();
+      await contextMenu.archiveButton.click();
 
       // Send message from A to B in 1on1 conversation
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
@@ -83,8 +86,9 @@ test.describe('Notifications', () => {
     async ({createPage}) => {
       const pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
 
-      await pages.conversationList().clickConversationOptions(userB.fullName);
-      await pages.conversationList().setNotifications('Nothing');
+      const contextMenu = await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+      await contextMenu.notificationsButton.click();
+      await pages.conversationDetails().selectNotificationsLevel('Nothing');
 
       const conversation = pages.conversationList().getConversationLocator(userB.fullName);
       await expect(conversation.mutedIndicator).toBeVisible();
@@ -96,17 +100,23 @@ test.describe('Notifications', () => {
     {tag: ['@TC-1438', '@regression']},
     async ({createPage}) => {
       const pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
-
-      await pages.conversationList().clickConversationOptions(userB.fullName);
-      await pages.conversationList().setNotifications('Nothing');
-
       const conversation = pages.conversationList().getConversationLocator(userB.fullName);
-      await expect(conversation.mutedIndicator).toBeVisible();
 
-      await pages.conversationList().clickConversationOptions(userB.fullName);
-      await pages.conversationList().setNotifications('Everything');
+      await test.step('Mute conversation', async () => {
+        const contextMenu = await conversation.openContextMenu();
+        await contextMenu.notificationsButton.click();
+        await pages.conversationDetails().selectNotificationsLevel('Nothing');
 
-      await expect(conversation.mutedIndicator).not.toBeVisible();
+        await expect(conversation.mutedIndicator).toBeVisible();
+      });
+
+      await test.step('Unmute conversation', async () => {
+        const contextMenu = await conversation.openContextMenu();
+        await contextMenu.notificationsButton.click();
+        await pages.conversationDetails().selectNotificationsLevel('Everything');
+
+        await expect(conversation.mutedIndicator).not.toBeVisible();
+      });
     },
   );
 
@@ -161,15 +171,20 @@ test.describe('Notifications', () => {
 
       // User B mutes the conversation with User A
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().clickConversationOptions(userA.fullName);
-      await userBPages.conversationList().setNotifications('Nothing');
+      const contextMenu = await userBPages
+        .conversationList()
+        .getConversationLocator(userA.fullName, {protocol: 'mls'})
+        .openContextMenu();
+      await contextMenu.notificationsButton.click();
+      await userBPages.conversationDetails().selectNotificationsLevel('Nothing');
 
       // User A initiates a call to User B
       await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       await userAPages.conversation().clickCallButton();
 
       // Verify that User B sees a "Join" button on the muted conversation
-      await expect(userBPages.conversationList().joinCallButton).toBeVisible();
+      const {joinCallButton} = userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'});
+      await expect(joinCallButton).toBeVisible();
     },
   );
 
@@ -189,8 +204,12 @@ test.describe('Notifications', () => {
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
 
       // User B mutes the conversation with User A via recent view
-      await userBPages.conversationList().clickConversationOptions(userA.fullName);
-      await userBPages.conversationList().setNotifications('Nothing');
+      const contextMenu = await userBPages
+        .conversationList()
+        .getConversationLocator(userA.fullName, {protocol: 'mls'})
+        .openContextMenu();
+      await contextMenu.notificationsButton.click();
+      await userBPages.conversationDetails().selectNotificationsLevel('Nothing');
 
       // Create group and open it for user B so the message won't be read immediately
       await createGroup(userAPages, 'Test Group', [userB]);

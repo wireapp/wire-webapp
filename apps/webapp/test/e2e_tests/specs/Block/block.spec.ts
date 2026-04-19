@@ -33,8 +33,8 @@ export async function blockUserFromConversationList(pageManager: PageManager, us
   const {pages, modals} = pageManager.webapp;
 
   await pages.conversationList().openConversation(userToBlock.fullName);
-  await pages.conversationList().clickConversationOptions(userToBlock.fullName);
-  await pages.conversationList().clickBlockConversation();
+  const contextMenu = await pages.conversationList().getConversationLocator(userToBlock.fullName).openContextMenu();
+  await contextMenu.blockButton.click();
   await modals.blockWarning().clickBlock();
 }
 
@@ -94,9 +94,12 @@ test.describe('User Blocking', () => {
         // Step 1: User A opens conversation with User B
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         // Step 2: User A opens the options menu for user B
-        await userAPages.conversationList().clickConversationOptions(userB.fullName);
+        const contextMenu = await userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName, {protocol: 'mls'})
+          .openContextMenu();
         // Step 3: User A opens modal and clicks 'Block' button
-        await userAPages.conversationList().clickBlockConversation();
+        await contextMenu.blockButton.click();
         // Step 4: User A clicks 'Cancel' button
         await userAModals.blockWarning().clickCancel();
         // Step 5: Conversation is still present, and User A can open it
@@ -135,12 +138,15 @@ test.describe('User Blocking', () => {
         const message = userAPages.conversation().getMessage({sender: userB});
         await expect(message).not.toBeVisible();
         // Step 7: 'Blocked' chip is visible next to the name of User B in the conversation list
-        const statusTextElement = userAPages.conversationList().blockedChip;
+        const statusTextElement = userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName, {protocol: 'mls'}).blockedIndicator;
         await expect(statusTextElement).toBeVisible();
         await expect(statusTextElement).toHaveText('Blocked');
+
         // Step 8: Profile Picture of User B is replaced by 'blocked' picture
-        const avatarWrapperUserB = await userAPages.conversationList().getUserAvatarWrapper(userB);
-        const blockedIcon = avatarWrapperUserB.locator('[data-uie-value="blocked"]');
+        const {userAvatar} = userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'});
+        const blockedIcon = userAvatar.locator('[data-uie-value="blocked"]');
         await expect(blockedIcon).toBeVisible();
       },
     );
@@ -204,8 +210,11 @@ test.describe('User Blocking', () => {
         await blockUserFromProfileView(userAPageManagerInstance);
         await expect(userAPages.conversation().messageInput).toBeHidden();
         // Step 3: User A unblocks User B from Conversation Details Options
-        await userAPages.conversationList().clickConversationOptions(userB.fullName);
-        await userAPages.conversationList().clickUnblockConversation();
+        const contextMenu = await userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName, {protocol: 'mls'})
+          .openContextMenu();
+        await contextMenu.unblockButton.click();
         await userAModals.confirm().clickAction();
         // Step 4: User A send message to User B
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
@@ -343,10 +352,10 @@ test.describe('User Blocking', () => {
       await userAPages.conversationList().openConversation(userB.fullName);
 
       // Step 2: User A opens the options menu for user B
-      await userAPages.conversationList().clickConversationOptions(userB.fullName);
+      const contextMenu = await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
 
       // Step 3: Block conversation button is not visible for team members
-      await expect(userAPages.conversationList().blockConversationMenuButton).not.toBeAttached();
+      await expect(contextMenu.blockButton).not.toBeAttached();
     });
   });
 });

@@ -19,57 +19,23 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {User} from 'test/e2e_tests/data/user';
-
 export class ConversationListPage {
   private readonly page: Page;
 
   readonly list: Locator;
-  readonly blockConversationMenuButton: Locator;
   readonly createGroupButton: Locator;
   readonly pendingConnectionRequest: Locator;
-  readonly leaveConversationButton: Locator;
   readonly searchConversationsInput: Locator;
-  readonly archiveConversationMenuButton: Locator;
-  readonly unarchiveConversationMenuButton: Locator;
-  readonly blockedChip: Locator;
-  readonly unblockConversationMenuButton: Locator;
-  readonly moveConversationButton: Locator;
-  readonly moveToMenu: Locator;
-  readonly createNewFolderButton: Locator;
   readonly conversationListHeaderTitle: Locator;
-  readonly joinCallButton: Locator;
-  readonly clearContentButton: Locator;
-  readonly notificationsButton: Locator;
-  readonly addToFavoritesButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
     this.list = page.getByRole('list', {name: 'Conversation list'});
-    this.blockConversationMenuButton = page.getByRole('menu').getByRole('button', {name: 'Block'});
     this.pendingConnectionRequest = page.locator('[data-uie-name="connection-request"]');
     this.createGroupButton = page.getByTestId('conversation-list-header').getByTestId('go-create-group');
-    this.leaveConversationButton = page.getByTestId('conversation-leave');
     this.searchConversationsInput = page.getByTestId('search-conversations');
-    this.archiveConversationMenuButton = page.locator('#btn-archive');
-    this.unarchiveConversationMenuButton = page.locator('#btn-unarchive');
-    this.blockedChip = page.locator(`span[data-uie-name="status-label"] + span`);
-    this.unblockConversationMenuButton = page
-      .getByTestId('conversation-list-options-menu')
-      .and(page.locator('#btn-unblock'));
-    this.moveConversationButton = page.getByRole('menu').getByRole('button', {name: 'Move to'});
-    this.moveToMenu = page.getByRole('menu');
-    this.createNewFolderButton = this.moveToMenu.getByRole('button', {name: 'Create new folder'});
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
-    this.joinCallButton = page.getByRole('button', {name: 'Join'});
-    this.clearContentButton = page.getByRole('button', {name: 'Clear content'});
-    this.notificationsButton = page.getByRole('menuitem', {name: 'Notifications'});
-    this.addToFavoritesButton = page.getByRole('menuitem', {name: 'Add to favorites'});
-  }
-
-  async isConversationBlocked(conversationName: string) {
-    return await this.getConversationLocator(conversationName).getByTestId('status-blocked').isVisible();
   }
 
   async openConversation(conversationName: string, options?: Parameters<typeof this.getConversationLocator>[1]) {
@@ -78,27 +44,6 @@ export class ConversationListPage {
 
   async openPendingConnectionRequest() {
     await this.pendingConnectionRequest.click();
-  }
-
-  async clickConversationOptions(conversationName: string) {
-    await this.getConversationLocator(conversationName).getByTestId('go-options').first().click();
-  }
-
-  async clickBlockConversation() {
-    await this.blockConversationMenuButton.click();
-  }
-
-  async archiveConversation() {
-    await this.archiveConversationMenuButton.click();
-  }
-
-  async setNotifications(level: 'Everything' | 'Mentions and replies' | 'Nothing') {
-    await this.notificationsButton.click(); // Click the "Notifications" menu item
-    await this.page.getByRole('radiogroup').locator('label', {hasText: level}).click(); // Click the specified radio button
-  }
-
-  async unarchiveConversation() {
-    await this.unarchiveConversationMenuButton.click();
   }
 
   async clickCreateGroup() {
@@ -124,47 +69,39 @@ export class ConversationListPage {
     }
 
     return Object.assign(conversation, {
+      userAvatar: conversation.getByTestId('element-avatar-user'),
+      statusAvailabilityIcon: conversation.getByTestId('status-availability-icon'),
       unreadIndicator: conversation.getByTitle('Unread message'),
       mutedIndicator: conversation.getByTitle('Muted conversation'),
       mentionIndicator: conversation.getByTitle('Unread mention'),
+      blockedIndicator: conversation.locator(`span[data-uie-name="status-label"] + span`),
+      joinCallButton: conversation.getByRole('button', {name: 'Join'}),
+      openContextMenu: () => this.openContextMenu(conversation),
     });
   }
 
-  async openContextMenu(conversationName: string) {
-    await this.getConversationLocator(conversationName).click();
-    await this.getConversationLocator(conversationName).click({button: 'right'});
-  }
+  /**
+   * Open the context menu of the given conversation
+   * @returns an enhanced locator for the open context menu
+   *
+   * @example
+   * const contextMenu = await pages.conversationList().openContextMenu(conversationLocator);
+   * await contextMenu.archiveButton.click();
+   */
+  async openContextMenu(conversation: Locator) {
+    await conversation.getByRole('button', {name: 'Open conversation options'}).click();
 
-  async leaveConversation() {
-    await this.leaveConversationButton.click();
-  }
+    const contextMenu = this.page.getByRole('menu');
 
-  async searchConversation(conversationName: string) {
-    await this.searchConversationsInput.fill(conversationName);
-    await this.openConversation(conversationName);
-  }
-
-  async getUserAvatarWrapper(user: User): Promise<Locator> {
-    return this.getConversationLocator(user.fullName).getByTestId('element-avatar-user');
-  }
-
-  getUserStatusIcon(user: User) {
-    return this.getConversationLocator(user.fullName).getByTestId('status-availability-icon');
-  }
-
-  async clickUnblockConversation() {
-    await this.unblockConversationMenuButton.click();
-  }
-
-  getRemoveConversationFromFolderButton(folderName: string) {
-    return this.page.getByRole('button', {name: `Remove from "${folderName}"`});
-  }
-
-  getMoveToFolderButton(folderName: string) {
-    return this.moveToMenu.getByRole('button', {name: folderName, exact: true});
-  }
-
-  async getMutedConversationBadge(conversationName: string) {
-    return this.getConversationLocator(conversationName).getByTitle('Muted conversation');
+    return Object.assign(contextMenu, {
+      archiveButton: contextMenu.getByRole('button', {name: 'Archive'}),
+      unarchiveButton: contextMenu.getByRole('button', {name: 'Unarchive'}),
+      blockButton: contextMenu.getByRole('button', {name: 'Block'}),
+      unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
+      moveToButton: contextMenu.getByRole('button', {name: 'Move to'}),
+      notificationsButton: contextMenu.getByRole('menuitem', {name: 'Notifications'}),
+      clearContentButton: contextMenu.getByRole('button', {name: 'Clear content'}),
+      leaveConversationButton: contextMenu.getByRole('button', {name: 'Leave'}),
+    });
   }
 }
