@@ -24,7 +24,7 @@ import {APIClient} from '@wireapp/api-client';
 
 import {constructSessionId, initSession, initSessions} from './sessionHandler';
 
-import {CryptoClient} from '../../ProteusService/cryptoClient';
+import {CryptoClient} from '../../proteusService/cryptoClient';
 
 function generatePrekeys(recipients: QualifiedUserClients) {
   const prekeys: QualifiedUserPreKeyBundleMap = {};
