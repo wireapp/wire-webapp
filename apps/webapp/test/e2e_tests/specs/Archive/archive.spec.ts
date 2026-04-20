@@ -40,15 +40,15 @@ test.describe('Archive', () => {
       const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
       const {pages, components} = PageManager.from(page).webapp;
 
-      await pages.conversationList().clickConversationOptions(memberB.fullName);
-      await pages.conversationList().archiveConversation();
+      let contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      await contextMenu.archiveButton.click();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
 
       await components.conversationSidebar().clickArchive();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
 
-      await pages.conversationList().clickConversationOptions(memberB.fullName);
-      await pages.conversationList().unarchiveConversation();
+      contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      await contextMenu.unarchiveButton.click();
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
 
       await components.conversationSidebar().clickAllConversationsButton();
@@ -69,8 +69,11 @@ test.describe('Archive', () => {
       await memberBPages.conversationList().openConversation(memberA.fullName, {protocol: 'mls'});
 
       await test.step('MemberA archives conversation with memberB', async () => {
-        await memberAPages.conversationList().clickConversationOptions(memberB.fullName);
-        await memberAPages.conversationList().archiveConversation();
+        const contextMenu = await memberAPages
+          .conversationList()
+          .getConversationLocator(memberB.fullName, {protocol: 'mls'})
+          .openContextMenu();
+        await contextMenu.archiveButton.click();
       });
 
       await test.step('MemberB sends message in archived conversation', async () => {
@@ -99,14 +102,15 @@ test.describe('Archive', () => {
 
       if (tag === '@TC-103') {
         await test.step('User mutes the conversation', async () => {
-          await pages.conversationList().clickConversationOptions(memberB.fullName);
-          await pages.conversationList().setNotifications('Nothing');
+          const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+          await contextMenu.notificationsButton.click();
+          await pages.conversationDetails().selectNotificationsLevel('Nothing');
         });
       }
 
       await test.step('User archives the conversation', async () => {
-        await pages.conversationList().clickConversationOptions(memberB.fullName);
-        await pages.conversationList().archiveConversation();
+        const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+        await contextMenu.archiveButton.click();
         await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
       });
 

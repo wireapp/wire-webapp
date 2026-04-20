@@ -31,10 +31,9 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
  */
 async function createCustomFolder(pageManager: PageManager, conversationName: string, folderName: string) {
   const {pages, modals} = pageManager.webapp;
-  await pages.conversationList().openContextMenu(conversationName);
-  await pages.conversationList().moveConversationButton.click();
-
-  await pages.conversationList().createNewFolderButton.click();
+  const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
+  await contextMenu.moveToButton.click();
+  await contextMenu.getByRole('button', {name: 'Create new folder'}).click();
 
   await modals.optionModal().modal.getByPlaceholder('Folder Name').fill(folderName);
   await modals.optionModal().clickAction();
@@ -48,9 +47,9 @@ async function createCustomFolder(pageManager: PageManager, conversationName: st
  */
 async function moveConversationToFolder(pageManager: PageManager, conversationName: string, folderName: string) {
   const pages = pageManager.webapp.pages;
-  await pages.conversationList().openContextMenu(conversationName);
-  await pages.conversationList().moveConversationButton.click();
-  await pages.conversationList().getMoveToFolderButton(folderName).click();
+  const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
+  await contextMenu.moveToButton.click();
+  await contextMenu.getByRole('button', {name: folderName, exact: true}).click();
 }
 
 /* ============================ */
@@ -161,17 +160,27 @@ test.describe('Folders', () => {
       await userAPages.conversationList().openConversation(userB.fullName);
       await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
 
-      // Step 1: User A clicks 'remove from custom folder' button
-      await userAPages.conversationList().openContextMenu(userB.fullName);
-      await userAPages.conversationList().getRemoveConversationFromFolderButton(customFolderName).click();
-      // Step 2: The conversation list header is changed to 'All Conversations'
-      const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+      await test.step("User A clicks 'remove from custom folder' button", async () => {
+        const contextMenu = await userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName)
+          .openContextMenu();
+        await contextMenu.getByRole('button', {name: `Remove from "${customFolderName}"`}).click();
+      });
 
-      await expect(actualTitle).toHaveText('All Conversations');
-      // Step 3: Custom Folder Name is no longer visible in the Move-To-Menu
-      await userAPages.conversationList().openContextMenu(userB.fullName);
-      await userAPages.conversationList().moveConversationButton.click();
-      await expect(userAPages.conversationList().getMoveToFolderButton(customFolderName)).not.toBeVisible();
+      await test.step("The conversation list header is changed to 'All Conversations'", async () => {
+        const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+        await expect(actualTitle).toHaveText('All Conversations');
+      });
+
+      await test.step('Custom Folder Name is no longer visible in the Move-To-Menu', async () => {
+        const contextMenu = await userAPages
+          .conversationList()
+          .getConversationLocator(userB.fullName)
+          .openContextMenu();
+        await contextMenu.moveToButton.click();
+        await expect(contextMenu.getByRole('button', {name: customFolderName})).not.toBeVisible();
+      });
     },
   );
 
@@ -181,9 +190,9 @@ test.describe('Folders', () => {
     // Step 1: User A opens 1:1 conversation with User B
     await userAPages.conversationList().openConversation(userB.fullName);
     // Step 2: User A wants to move 1:1 conversation with User B into custom folder
-    await userAPages.conversationList().openContextMenu(userB.fullName);
-    await userAPages.conversationList().moveConversationButton.click();
-    await userAPages.conversationList().createNewFolderButton.click();
+    const contextMenu = await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+    await contextMenu.moveToButton.click();
+    await contextMenu.getByRole('button', {name: 'Create new folder'}).click();
 
     // Step 3: 'Create Folder Modal' should still be visible after click on create
     await expect(userAModals.optionModal().actionButton).toBeDisabled();
@@ -198,14 +207,16 @@ test.describe('Folders', () => {
     await userAPages.conversationList().openConversation(userB.fullName);
     await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
 
-    // Step 1: User A removes conversation with User B from custom folder
-    await userAPages.conversationList().openContextMenu(userB.fullName);
-    await userAPages.conversationList().getRemoveConversationFromFolderButton(customFolderName).click();
+    await test.step('User A removes conversation with User B from custom folder', async () => {
+      const contextMenu = await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+      await contextMenu.getByRole('button', {name: `Remove from "${customFolderName}"`}).click();
+    });
 
-    // Step 2: User A tries to move conversation with User B back into the folder, custom folder name should no longer be visible in the folder menu
-    await userAPages.conversationList().openConversation(userB.fullName);
-    await userAPages.conversationList().openContextMenu(userB.fullName);
-    await userAPages.conversationList().moveConversationButton.click();
-    await expect(userAPages.conversationList().getMoveToFolderButton(customFolderName)).not.toBeVisible();
+    await test.step('User A tries to move conversation with User B back into the folder, custom folder name should no longer be visible in the folder menu', async () => {
+      await userAPages.conversationList().openConversation(userB.fullName);
+      const contextMenu = await userAPages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+      await contextMenu.moveToButton.click();
+      await expect(contextMenu.getByRole('button', {name: customFolderName})).not.toBeVisible();
+    });
   });
 });
