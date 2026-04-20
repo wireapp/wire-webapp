@@ -9153,12 +9153,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tony.ganchev/eslint-plugin-header@npm:3.3.3":
-  version: 3.3.3
-  resolution: "@tony.ganchev/eslint-plugin-header@npm:3.3.3"
+"@tony.ganchev/eslint-plugin-header@npm:3.4.3":
+  version: 3.4.3
+  resolution: "@tony.ganchev/eslint-plugin-header@npm:3.4.3"
   peerDependencies:
     eslint: ">=7.7.0"
-  checksum: 10/de3d450be78294fba89d8ed5651e70d2bf38d111cc320e27c0afa826c38e60b74b7b8cd3e2902aa059fd9cade9313ac7a63328bc4b38c0406cbfa4afc00e1559
+  checksum: 10/55e4e0e7a8e4e4f4af0b60eabee9131ec31295ea38b8532f64a3c7a33c371f2c29b198af35fe9a10aa5624ae11df3b67c7b7dbfd69d03f086560ba220b8218c3
   languageName: node
   linkType: hard
 
@@ -15636,9 +15636,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:29.15.1":
-  version: 29.15.1
-  resolution: "eslint-plugin-jest@npm:29.15.1"
+"eslint-plugin-jest@npm:29.15.2":
+  version: 29.15.2
+  resolution: "eslint-plugin-jest@npm:29.15.2"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.0.0"
   peerDependencies:
@@ -15653,7 +15653,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10/436ae3c695f0dfe443e19d0ad94ede6e78adfaf47ba89db7046ac77b0e82127ad12ac2ed50846ef9f360d6c1bd5f0d2841b7fe5ff6e246eb069b0e85197a42fd
+  checksum: 10/c7bc4dc705e5613e51a1d19bb924a439db9897c67e694f091e29dbacaa218b758040aacbb8d3f9136f2af0171ad69c1c49736b5e3f30098bdf44d4c1e93c6381
   languageName: node
   linkType: hard
 
@@ -15802,9 +15802,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react-hooks@npm:7.0.1":
-  version: 7.0.1
-  resolution: "eslint-plugin-react-hooks@npm:7.0.1"
+"eslint-plugin-react-hooks@npm:7.1.0":
+  version: 7.1.0
+  resolution: "eslint-plugin-react-hooks@npm:7.1.0"
   dependencies:
     "@babel/core": "npm:^7.24.4"
     "@babel/parser": "npm:^7.24.4"
@@ -15812,8 +15812,8 @@ __metadata:
     zod: "npm:^3.25.0 || ^4.0.0"
     zod-validation-error: "npm:^3.5.0 || ^4.0.0"
   peerDependencies:
-    eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
-  checksum: 10/12e96c68d58c6588305fd17d660524a1ef1e872650ec591d5b138f059431290831c373d4b1c9ae8991fb25f96c43935497d2149678c027e65d0417d3d99ecc85
+    eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0 || ^10.0.0
+  checksum: 10/b91814a9edb05a603850b339382c3d4007e515d230cefc8b9f6dceadadab1335f1fb303637fbeac9fb4d82389df7b448dc5ef38582129b28ce05d8d3bf0b61e0
   languageName: node
   linkType: hard
 
@@ -15863,15 +15863,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-testing-library@npm:7.16.1":
-  version: 7.16.1
-  resolution: "eslint-plugin-testing-library@npm:7.16.1"
+"eslint-plugin-testing-library@npm:7.16.2":
+  version: 7.16.2
+  resolution: "eslint-plugin-testing-library@npm:7.16.2"
   dependencies:
     "@typescript-eslint/scope-manager": "npm:^8.56.0"
     "@typescript-eslint/utils": "npm:^8.56.0"
   peerDependencies:
     eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-  checksum: 10/6b14a79eef57fcd1023e4994849f62cc5b139e10f049ff96adfd28582ab2d45cb90424e17892f0a2c9ad9579ed4fb8b5170510c79220b0c01efba8e1f8bad513
+  checksum: 10/6aa06995f147986ce9b923479caca9b8a5f703c52ef3bf57d9757953ded448f940b2dbb12d85217a348fc5b754a20ecdb70b9ee39856b202e89f43e648f788a7
   languageName: node
   linkType: hard
 
@@ -28891,7 +28891,7 @@ __metadata:
     "@nx/node": "npm:22.6.5"
     "@nx/workspace": "npm:22.6.5"
     "@stylistic/eslint-plugin": "npm:5.10.0"
-    "@tony.ganchev/eslint-plugin-header": "npm:3.3.3"
+    "@tony.ganchev/eslint-plugin-header": "npm:3.4.3"
     "@types/eslint": "npm:9.6.1"
     "@types/eslint-plugin-jsx-a11y": "npm:6.10.1"
     "@types/fs-extra": "npm:11.0.4"
@@ -28919,15 +28919,15 @@ __metadata:
     eslint-import-resolver-typescript: "npm:4.4.4"
     eslint-plugin-header: "npm:3.1.1"
     eslint-plugin-import: "npm:2.32.0"
-    eslint-plugin-jest: "npm:29.15.1"
+    eslint-plugin-jest: "npm:29.15.2"
     eslint-plugin-jest-dom: "npm:5.5.0"
     eslint-plugin-jsdoc: "npm:61.7.1"
     eslint-plugin-jsx-a11y: "npm:6.10.2"
     eslint-plugin-no-unsanitized: "npm:4.1.5"
     eslint-plugin-prettier: "npm:5.5.5"
     eslint-plugin-react: "npm:7.37.5"
-    eslint-plugin-react-hooks: "npm:7.0.1"
-    eslint-plugin-testing-library: "npm:7.16.1"
+    eslint-plugin-react-hooks: "npm:7.1.0"
+    eslint-plugin-testing-library: "npm:7.16.2"
     eslint-plugin-unused-imports: "npm:4.4.1"
     fake-indexeddb: "npm:6.2.5"
     fs-extra: "npm:11.3.4"
