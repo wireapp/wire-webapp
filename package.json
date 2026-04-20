@@ -133,6 +133,11 @@
     "@types/react": "18.3.28",
     "@types/react-dom": "18.3.7"
   },
+  "dependenciesMeta": {
+    "canvas": {
+      "built": true
+    }
+  },
   "version": "0.27.0",
-  "packageManager": "yarn@4.12.0"
+  "packageManager": "yarn@4.14.1"
 }

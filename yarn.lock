@@ -2,7 +2,7 @@
 # Manual changes might be lost - proceed with caution!
 
 __metadata:
-  version: 8
+  version: 9
   cacheKey: 10
 
 "@aashutoshrathi/word-wrap@npm:^1.2.3":
@@ -28884,6 +28884,9 @@ __metadata:
     typescript: "npm:5.9.3"
     uuid: "npm:11.1.0"
     zod: "npm:3.25.76"
+  dependenciesMeta:
+    canvas:
+      built: true
   languageName: unknown
   linkType: soft
 
