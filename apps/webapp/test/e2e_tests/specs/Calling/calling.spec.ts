@@ -94,13 +94,14 @@ test.describe('Calling', () => {
     const userACall = await userAPages.calling().maximizeCell();
     await expect(userACall.selfVideoThumbnail).toBeVisible();
 
+    // Wait for the call to stabilize before testing the toast and thumbnail indicators
+    await userAPage.waitForTimeout(2000);
     // User A raises hand and verifies the indicator appears on their thumbnail
     await userACall.toggleHandRaise();
     const toast = userAPage.getByText('You have raised your hand up');
 
-    await expect(toast).toBeVisible({timeout: 2000});
+    await expect(toast).toBeVisible();
     await expect(userACall.selfVideoThumbnail.getByText('✋')).toBeVisible();
-
     await expect(toast).toBeHidden({timeout: 3000});
 
     await userACall.toggleHandRaise();
@@ -246,9 +247,9 @@ test.describe('Calling', () => {
     await expect(userBPages.calling().goFullScreen).toBeVisible();
 
     // User C joins the ongoing call
-    await userCPage.waitForTimeout(5_000);
-    await expect(userCPages.conversationList().joinCallButton).toBeVisible();
-    await userCPages.conversationList().joinCallButton.click();
+    await userCPage.waitForTimeout(5000);
+    await expect(userCPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible();
+    await userCPages.conversationList().getConversationLocator(groupName).joinCallButton.click();
 
     // Confirm that user C joined the call
     await expect(userCPages.calling().goFullScreen).toBeVisible();
@@ -301,7 +302,7 @@ test.describe('Calling', () => {
     await expect(userBPages.calling().callCell).toBeHidden();
 
     // User B re-joins the ongoing call from the conversation list
-    const joinButton = userBPages.conversationList().joinCallButton;
+    const joinButton = userBPages.conversationList().getConversationLocator(groupName).joinCallButton;
     await expect(joinButton).toBeVisible({timeout: 5000});
     await joinButton.click();
 
@@ -374,7 +375,9 @@ test.describe('Calling', () => {
         await userAPages.calling().clickLeaveCallButton();
         await expect(userAPages.calling().callCell).not.toBeAttached();
         // Verify the call is still "joinable" (User B is still there)
-        await expect(userAPages.conversationList().joinCallButton).toBeVisible({timeout: 1_000});
+        await expect(userAPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible({
+          timeout: 1000,
+        });
       });
     },
   );
@@ -433,7 +436,7 @@ test.describe('Calling', () => {
 
       await expect(userAPages.calling().callCell).toBeVisible();
       await expect(userBPages.calling().callCell).toBeVisible();
-      await expect(userBPages.conversationList().joinCallButton).toBeVisible();
+      await expect(userBPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible();
 
       // User A removes User B from the group
       await userAPages.conversation().toggleGroupInformation();
@@ -444,7 +447,7 @@ test.describe('Calling', () => {
 
       // User B cannot join the group call
       await expect(userBPages.calling().callCell).not.toBeAttached();
-      await expect(userBPages.conversationList().joinCallButton).not.toBeAttached();
+      await expect(userBPages.conversationList().getConversationLocator(groupName).joinCallButton).not.toBeAttached();
     },
   );
 
