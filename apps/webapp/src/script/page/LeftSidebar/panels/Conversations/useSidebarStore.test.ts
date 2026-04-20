@@ -107,6 +107,8 @@ describe('useSidebarStore', () => {
     const {visibleTabs} = useSidebarStore.getState();
     const filterTabs = FILTER_TABS;
 
+    expect(FILTER_TABS.length).toBeGreaterThan(0);
+
     filterTabs.forEach(tab => {
       expect(visibleTabs).not.toContain(tab);
     });
