@@ -18,7 +18,7 @@
  */
 
 import {create} from 'zustand';
-import {persist, createJSONStorage} from 'zustand/middleware';
+import {createJSONStorage, persist} from 'zustand/middleware';
 
 export enum SidebarTabs {
   RECENT,
@@ -45,6 +45,30 @@ export enum SidebarTabs {
  */
 export const ALWAYS_VISIBLE_TABS: readonly SidebarTabs[] = [SidebarTabs.RECENT];
 
+/**
+ * Tabs that are only available when the advanced filters FF is enabled.
+ */
+export const FILTER_TABS: readonly SidebarTabs[] = [
+  SidebarTabs.UNREAD,
+  SidebarTabs.MENTIONS,
+  SidebarTabs.REPLIES,
+  SidebarTabs.DRAFTS,
+  SidebarTabs.PINGS,
+];
+
+/**
+ * Tabs that should always be visible until user toggles it off.
+ */
+export const DEFAULT_TABS = [
+  SidebarTabs.RECENT,
+  SidebarTabs.FOLDER,
+  SidebarTabs.FAVORITES,
+  SidebarTabs.GROUPS,
+  SidebarTabs.CHANNELS,
+  SidebarTabs.DIRECTS,
+  SidebarTabs.ARCHIVES,
+];
+
 export const isTabVisible = (tab: SidebarTabs, visibleTabs: SidebarTabs[]): boolean => {
   return ALWAYS_VISIBLE_TABS.includes(tab) || visibleTabs.includes(tab);
 };
@@ -64,6 +88,7 @@ export interface SidebarStore {
   visibleTabs: SidebarTabs[];
   setVisibleTabs: (tabs: SidebarTabs[]) => void;
   toggleTabVisibility: (tab: SidebarTabs) => void;
+  resetDisabledFeatureTabs: () => void;
 }
 
 const useSidebarStore = create<SidebarStore>()(
@@ -75,21 +100,13 @@ const useSidebarStore = create<SidebarStore>()(
       },
       status: SidebarStatus.OPEN,
       setStatus: status => set({status: status}),
-      visibleTabs: [
-        SidebarTabs.RECENT,
-        SidebarTabs.FOLDER,
-        SidebarTabs.FAVORITES,
-        SidebarTabs.GROUPS,
-        SidebarTabs.CHANNELS,
-        SidebarTabs.DIRECTS,
-        SidebarTabs.UNREAD,
-        SidebarTabs.MENTIONS,
-        SidebarTabs.REPLIES,
-        SidebarTabs.DRAFTS,
-        SidebarTabs.PINGS,
-        SidebarTabs.ARCHIVES,
-      ],
+      visibleTabs: [...DEFAULT_TABS],
       setVisibleTabs: (tabs: SidebarTabs[]) => set({visibleTabs: tabs}),
+      resetDisabledFeatureTabs: () =>
+        set(state => ({
+          visibleTabs: DEFAULT_TABS,
+          currentTab: FILTER_TABS.includes(state.currentTab) ? SidebarTabs.RECENT : state.currentTab,
+        })),
       toggleTabVisibility: (tab: SidebarTabs) => {
         if (ALWAYS_VISIBLE_TABS.includes(tab)) {
           return;

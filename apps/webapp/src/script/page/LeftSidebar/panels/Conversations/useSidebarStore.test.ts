@@ -17,7 +17,7 @@
  *
  */
 
-import {SidebarStatus, SidebarTabs, isTabVisible, useSidebarStore} from './useSidebarStore';
+import {DEFAULT_TABS, FILTER_TABS, isTabVisible, SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 describe('useSidebarStore', () => {
   beforeEach(() => {
@@ -26,20 +26,7 @@ describe('useSidebarStore', () => {
     Storage.prototype.removeItem = jest.fn();
     useSidebarStore.setState({
       currentTab: SidebarTabs.RECENT,
-      visibleTabs: [
-        SidebarTabs.RECENT,
-        SidebarTabs.FOLDER,
-        SidebarTabs.FAVORITES,
-        SidebarTabs.GROUPS,
-        SidebarTabs.CHANNELS,
-        SidebarTabs.DIRECTS,
-        SidebarTabs.UNREAD,
-        SidebarTabs.MENTIONS,
-        SidebarTabs.REPLIES,
-        SidebarTabs.DRAFTS,
-        SidebarTabs.PINGS,
-        SidebarTabs.ARCHIVES,
-      ],
+      visibleTabs: [...DEFAULT_TABS],
     });
   });
 
@@ -84,5 +71,54 @@ describe('useSidebarStore', () => {
     expect(isTabVisible(SidebarTabs.RECENT, visibleTabs)).toBe(true);
     expect(isTabVisible(SidebarTabs.FAVORITES, visibleTabs)).toBe(true);
     expect(isTabVisible(SidebarTabs.DRAFTS, visibleTabs)).toBe(false);
+  });
+
+  it('allows a filter tab to be toggled hidden again', () => {
+    useSidebarStore.getState().toggleTabVisibility(SidebarTabs.MENTIONS);
+    expect(useSidebarStore.getState().visibleTabs).toContain(SidebarTabs.MENTIONS);
+
+    useSidebarStore.getState().toggleTabVisibility(SidebarTabs.MENTIONS);
+    expect(useSidebarStore.getState().visibleTabs).not.toContain(SidebarTabs.MENTIONS);
+  });
+
+  it('removes all filter tabs from visible tabs during reset', () => {
+    useSidebarStore.setState({
+      visibleTabs: [...DEFAULT_TABS, ...FILTER_TABS],
+    });
+
+    useSidebarStore.getState().resetDisabledFeatureTabs();
+
+    expect(useSidebarStore.getState().visibleTabs).toEqual(DEFAULT_TABS);
+  });
+
+  it('falls back to RECENT when current tab is a filter tab during reset', () => {
+    useSidebarStore.setState({
+      currentTab: SidebarTabs.UNREAD,
+      visibleTabs: [SidebarTabs.RECENT, SidebarTabs.FOLDER, SidebarTabs.UNREAD],
+    });
+
+    useSidebarStore.getState().resetDisabledFeatureTabs();
+
+    expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.RECENT);
+    expect(useSidebarStore.getState().visibleTabs).toEqual([...DEFAULT_TABS]);
+  });
+
+  it('does not include filter tabs by default', () => {
+    const {visibleTabs} = useSidebarStore.getState();
+    const filterTabs = [...FILTER_TABS];
+
+    filterTabs.forEach(tab => {
+      expect(visibleTabs).not.toContain(tab);
+    });
+  });
+
+  it('restores hidden default tabs during reset', () => {
+    useSidebarStore.setState({
+      visibleTabs: [SidebarTabs.RECENT, SidebarTabs.FOLDER],
+    });
+
+    useSidebarStore.getState().resetDisabledFeatureTabs();
+
+    expect(useSidebarStore.getState().visibleTabs).toEqual([...DEFAULT_TABS]);
   });
 });
