@@ -26,7 +26,7 @@ describe('useSidebarStore', () => {
     Storage.prototype.removeItem = jest.fn();
     useSidebarStore.setState({
       currentTab: SidebarTabs.RECENT,
-      visibleTabs: [...DEFAULT_TABS],
+      visibleTabs: DEFAULT_TABS,
     });
   });
 
@@ -100,12 +100,12 @@ describe('useSidebarStore', () => {
     useSidebarStore.getState().resetDisabledFeatureTabs();
 
     expect(useSidebarStore.getState().currentTab).toBe(SidebarTabs.RECENT);
-    expect(useSidebarStore.getState().visibleTabs).toEqual([...DEFAULT_TABS]);
+    expect(useSidebarStore.getState().visibleTabs).toEqual(DEFAULT_TABS);
   });
 
   it('does not include filter tabs by default', () => {
     const {visibleTabs} = useSidebarStore.getState();
-    const filterTabs = [...FILTER_TABS];
+    const filterTabs = FILTER_TABS;
 
     filterTabs.forEach(tab => {
       expect(visibleTabs).not.toContain(tab);
@@ -119,6 +119,6 @@ describe('useSidebarStore', () => {
 
     useSidebarStore.getState().resetDisabledFeatureTabs();
 
-    expect(useSidebarStore.getState().visibleTabs).toEqual([...DEFAULT_TABS]);
+    expect(useSidebarStore.getState().visibleTabs).toEqual(DEFAULT_TABS);
   });
 });
