@@ -62,7 +62,7 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {APIClient} from '../../service/APIClientSingleton';
 import {Core} from '../../service/CoreSingleton';
 
-const logger = getLogger('AccountForm');
+const logger = getLogger('ConversationService');
 
 type CompositeMessageItem = {
   text?: {content?: string; message?: string};
