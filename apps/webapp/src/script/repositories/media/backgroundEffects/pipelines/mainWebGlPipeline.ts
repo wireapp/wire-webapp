@@ -69,7 +69,6 @@ export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
   private segmenter: SegmenterLike | null = null;
   private segmenterFactory: SegmenterFactory = MediaPipeSegmenterFactory;
   private segmentationModelByTier: SegmentationModelByTier = {};
-  private lastSegmentationTimestampMs = -1;
   private currentModelPath: string | null = null;
   private maskPostProcessor: MaskPostProcessor = new NoopMaskPostProcessor();
   private qualityController: QualityController | null = null;
@@ -206,10 +205,9 @@ export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
         const segStart = performance.now();
         const timestampMs = this.getMonotonicTimestampMs(timestamp);
 
-        if (timestampMs <= this.lastSegmentationTimestampMs) {
+        if (timestampMs <= 0) {
           this.logger.warn('Frame due to non-monotonic timestamp', {
             timestampMs,
-            lastTimestampMs: this.lastSegmentationTimestampMs,
             rawTimestamp: timestamp,
           });
         }
@@ -467,10 +465,10 @@ export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
   private getMonotonicTimestampMs(inputTimestamp: number): number {
     if (Number.isFinite(inputTimestamp) && inputTimestamp > 0) {
       const candidateMs = Math.floor(inputTimestamp * 1000);
-      if (candidateMs > this.lastSegmentationTimestampMs) {
+      if (candidateMs > 0) {
         return candidateMs;
       }
     }
-    return Math.max(Math.floor(performance.now()), this.lastSegmentationTimestampMs + 1);
+    return Math.floor(performance.now());
   }
 }
