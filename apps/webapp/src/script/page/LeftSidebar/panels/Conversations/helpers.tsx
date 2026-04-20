@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,15 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/localizerUtil';
 import {replaceAccents} from 'Util/stringUtil';
 
-import {ConversationFilter, SidebarTabs} from './useSidebarStore';
+import {SidebarTabs} from './useSidebarStore';
+
+export const conversationFilters = {
+  hasUnread: (conv: Conversation) => conv.hasUnread(),
+  hasMentions: (conv: Conversation) => conv.unreadState().selfMentions.length > 0,
+  hasReplies: (conv: Conversation) => conv.unreadState().selfReplies.length > 0,
+  hasPings: (conv: Conversation) => conv.unreadState().pings.length > 0,
+  notArchived: (conv: Conversation) => !conv.is_archived(),
+};
 
 interface GetTabConversationsProps {
   currentTab: SidebarTabs;
@@ -35,40 +43,12 @@ interface GetTabConversationsProps {
   channelAndGroupConversations: Conversation[];
   conversationsFilter: string;
   isChannelsEnabled: boolean;
-  conversationFilter: ConversationFilter;
   draftConversations: Conversation[];
 }
 
 type GetTabConversations = {
   conversations: Conversation[];
   searchInputPlaceholder: string;
-};
-
-const applyAdvancedFilter = (
-  conversations: Conversation[],
-  filter: ConversationFilter,
-  draftConversations: Conversation[],
-): Conversation[] => {
-  if (filter === ConversationFilter.NONE) {
-    return conversations;
-  }
-
-  return conversations.filter(conversation => {
-    switch (filter) {
-      case ConversationFilter.UNREAD:
-        return conversation.hasUnread();
-      case ConversationFilter.MENTIONS:
-        return conversation.unreadState().selfMentions.length > 0;
-      case ConversationFilter.REPLIES:
-        return conversation.unreadState().selfReplies.length > 0;
-      case ConversationFilter.DRAFTS:
-        return draftConversations.some(draftConv => draftConv.id === conversation.id);
-      case ConversationFilter.PINGS:
-        return conversation.unreadState().pings.length > 0;
-      default:
-        return true;
-    }
-  });
 };
 
 export function getTabConversations({
@@ -82,7 +62,6 @@ export function getTabConversations({
   channelConversations,
   isChannelsEnabled,
   channelAndGroupConversations,
-  conversationFilter,
   draftConversations,
 }: GetTabConversationsProps): GetTabConversations {
   const conversationSearchFilter = (conversation: Conversation) => {
@@ -97,7 +76,7 @@ export function getTabConversations({
   if ([SidebarTabs.FOLDER, SidebarTabs.RECENT].includes(currentTab)) {
     if (!conversationsFilter) {
       return {
-        conversations: applyAdvancedFilter(conversations, conversationFilter, draftConversations),
+        conversations: conversations,
         searchInputPlaceholder: t('searchConversations'),
       };
     }
@@ -114,7 +93,7 @@ export function getTabConversations({
     const combinedConversations = [...filteredConversations, ...filteredGroupConversations];
 
     return {
-      conversations: applyAdvancedFilter(combinedConversations, conversationFilter, draftConversations),
+      conversations: combinedConversations,
       searchInputPlaceholder: t('searchConversations'),
     };
   }
@@ -124,7 +103,7 @@ export function getTabConversations({
     const filteredConversations = conversations.filter(conversationArchivedFilter).filter(conversationSearchFilter);
 
     return {
-      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
+      conversations: filteredConversations,
       searchInputPlaceholder: t('searchGroupConversations'),
     };
   }
@@ -135,7 +114,7 @@ export function getTabConversations({
       .filter(conversationSearchFilter);
 
     return {
-      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
+      conversations: filteredConversations,
       searchInputPlaceholder: t('searchChannelConversations'),
     };
   }
@@ -146,7 +125,7 @@ export function getTabConversations({
       .filter(conversationSearchFilter);
 
     return {
-      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
+      conversations: filteredConversations,
       searchInputPlaceholder: t('searchDirectConversations'),
     };
   }
@@ -155,7 +134,7 @@ export function getTabConversations({
     const filteredConversations = favoriteConversations.filter(conversationSearchFilter);
 
     return {
-      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
+      conversations: filteredConversations,
       searchInputPlaceholder: t('searchFavoriteConversations'),
     };
   }
@@ -164,8 +143,67 @@ export function getTabConversations({
     const filteredConversations = archivedConversations.filter(conversationSearchFilter);
 
     return {
-      conversations: applyAdvancedFilter(filteredConversations, conversationFilter, draftConversations),
+      conversations: filteredConversations,
       searchInputPlaceholder: t('searchArchivedConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.UNREAD) {
+    const filteredConversations = conversations
+      .filter(conversationArchivedFilter)
+      .filter(conversationFilters.hasUnread)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchUnreadConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.MENTIONS) {
+    const filteredConversations = conversations
+      .filter(conversationArchivedFilter)
+      .filter(conversationFilters.hasMentions)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchMentionsConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.REPLIES) {
+    const filteredConversations = conversations
+      .filter(conversationArchivedFilter)
+      .filter(conversationFilters.hasReplies)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchRepliesConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.DRAFTS) {
+    const filteredConversations = draftConversations
+      .filter(conversationArchivedFilter)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchDraftsConversations'),
+    };
+  }
+
+  if (currentTab === SidebarTabs.PINGS) {
+    const filteredConversations = conversations
+      .filter(conversationArchivedFilter)
+      .filter(conversationFilters.hasPings)
+      .filter(conversationSearchFilter);
+
+    return {
+      conversations: filteredConversations,
+      searchInputPlaceholder: t('searchPingsConversations'),
     };
   }
 

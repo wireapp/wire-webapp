@@ -30,7 +30,7 @@ import {NotificationDatabaseRepository} from './notificationDatabaseRepository';
 import {NotificationSource} from './notificationSource.types';
 
 import {ConversationService} from '../conversation';
-import {CoreError, NotificationError} from '../CoreError';
+import {CoreError, NotificationError} from '../coreError';
 import {DecryptionError} from '../errors/decryptionError';
 
 export type HandledEventPayload = {

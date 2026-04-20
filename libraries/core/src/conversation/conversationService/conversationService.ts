@@ -69,7 +69,7 @@ import {getConversationQualifiedMembers, ProteusService} from '../../messagingPr
 import {
   AddUsersToProteusConversationParams,
   SendProteusMessageParams,
-} from '../../messagingProtocols/proteus/ProteusService/proteusService.types';
+} from '../../messagingProtocols/proteus/proteusService/proteusService.types';
 import {HandledEventPayload, HandledEventResult} from '../../notification';
 import {CoreDatabase} from '../../storage/coreDb';
 import {isMLSConversation} from '../../util';

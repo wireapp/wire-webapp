@@ -19,6 +19,7 @@ jobs:
       backendUrl: https://staging-nginz-https.zinfra.io/
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WIRE_E2E_TEST_BOT_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
 
   report-to-testiny:
     name: Upload test report to Testiny

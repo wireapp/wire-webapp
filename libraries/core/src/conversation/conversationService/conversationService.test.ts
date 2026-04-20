@@ -46,8 +46,8 @@ import {
   CORE_CRYPTO_ERROR_NAMES,
   serializeAbortReason,
   UPLOAD_COMMIT_BUNDLE_ABORT_REASONS,
-} from '../../messagingProtocols/mls/MLSService/coreCryptoMlsError';
-import {MLSServiceEvents} from '../../messagingProtocols/mls/MLSService/mlsService';
+} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
+import {MLSServiceEvents} from '../../messagingProtocols/mls/mlsService/mlsService';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
 import {openDB} from '../../storage/coreDb';

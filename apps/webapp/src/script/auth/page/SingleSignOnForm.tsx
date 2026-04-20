@@ -343,7 +343,7 @@ const SingleSignOnFormComponent = ({
         <Button
           block
           type="submit"
-          disabled={!codeOrMail}
+          disabled={isFetching || !codeOrMail}
           formNoValidate
           onClick={handleSubmit}
           aria-label={t('login.headline')}

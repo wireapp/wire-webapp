@@ -302,6 +302,9 @@ ls:
   libraries/core/src/storage:
     .dir: camelCase
     .ts: camelCase
+  libraries/core/src:
+    .ts: camelCase
+    .test.ts: camelCase
   libraries/core/src/util:
     .dir: camelCase
     .ts: camelCase
@@ -353,17 +356,19 @@ ls:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
-  libraries/core/src/messagingProtocols/proteus/ProteusService/cryptoClient:
+  libraries/core/src/messagingProtocols/proteus:
+    .dir: camelCase
+  libraries/core/src/messagingProtocols/proteus/proteusService/cryptoClient:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
     .store.ts: camelCase
-  libraries/core/src/messagingProtocols/proteus/ProteusService/decryptionErrorGenerator:
+  libraries/core/src/messagingProtocols/proteus/proteusService/decryptionErrorGenerator:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/messagingProtocols/proteus/ProteusService:
+  libraries/core/src/messagingProtocols/proteus/proteusService:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
@@ -372,17 +377,32 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/MLSService:
+  libraries/core/src/messagingProtocols/mls:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/mlsService:
     .ts: camelCase
     .test.ts: camelCase
     .types.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/EventHandler:
+  libraries/core/src/messagingProtocols/mls/utils:
+    .ts: camelCase
+  libraries/core/src/messagingProtocols/mls/eventHandler:
+    .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/E2EIdentityService/Connection/AcmeServer:
+  libraries/core/src/messagingProtocols/mls/e2eIdentityService:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+    .types.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/e2eIdentityService/connection/acmeServer:
     .ts: camelCase
     .types.ts: camelCase
     .schema.ts: camelCase
-  libraries/core/src/messagingProtocols/mls/E2EIdentityService/Storage:
+  libraries/core/src/messagingProtocols/mls/e2eIdentityService/storage:
     .ts: camelCase
     .schema.ts: camelCase
+  libraries/core/src/messagingProtocols/mls/e2eIdentityService/steps/dpopChallenge:
+    .ts: camelCase
+    .types.ts: camelCase

@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2024 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 
 import {
+  conversationsSidebarHandleIconStyles,
   conversationsSidebarHandleStyles,
   conversationsSidebarStyles,
-  conversationsSidebarHandleIconStyles,
 } from './ConversationSidebar.styles';
 
 import {ContentState} from '../../../../useAppState';
@@ -51,6 +51,7 @@ type ConversationSidebarProps = {
   unreadConversations: Conversation[];
   favoriteConversations: Conversation[];
   archivedConversations: Conversation[];
+  draftConversations: Conversation[];
   conversationRepository: ConversationRepository;
   onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge: boolean;
@@ -70,6 +71,7 @@ export const ConversationSidebar = ({
   unreadConversations,
   favoriteConversations,
   archivedConversations,
+  draftConversations,
   conversationRepository,
   onClickPreferences,
   showNotificationsBadge,
@@ -93,6 +95,7 @@ export const ConversationSidebar = ({
           unreadConversations={unreadConversations}
           favoriteConversations={favoriteConversations}
           archivedConversations={archivedConversations}
+          draftConversations={draftConversations}
           conversationRepository={conversationRepository}
           onClickPreferences={onClickPreferences}
           showNotificationsBadge={showNotificationsBadge}

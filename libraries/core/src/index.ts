@@ -17,10 +17,10 @@
  *
  */
 
-export {Account, ConnectionState, ProcessedEventPayload} from './Account';
+export {Account, ConnectionState, ProcessedEventPayload} from './account';
 export * as auth from './auth/';
 export * from './conversation/';
-export {CoreError} from './CoreError';
+export {CoreError} from './coreError';
 export * from './cryptography/';
 export * from './util';
 export * as MessageBuilder from './conversation/message/messageBuilder';

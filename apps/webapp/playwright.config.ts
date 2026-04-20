@@ -23,8 +23,9 @@ import {resolve} from 'node:path';
 
 config({path: resolve(__dirname, './test/e2e_tests/.env'), quiet: true});
 
+// The number of parallel workers needs to be limited since otherwise the number of parallel requests could run into rate limiting by the backend
+const numberOfParallelWorkersOnCI = 1;
 const numberOfRetriesOnCI = 2;
-const numberOfParallelWorkersOnCI = 3;
 
 /**
  * See https://playwright.dev/docs/test-configuration.

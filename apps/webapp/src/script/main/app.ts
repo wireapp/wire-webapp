@@ -23,7 +23,7 @@ import {Context} from '@wireapp/api-client/lib/auth';
 import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/';
 import {FEATURE_KEY, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {EVENTS as CoreEvents} from '@wireapp/core/lib/Account';
+import {EVENTS as CoreEvents} from '@wireapp/core/lib/account';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import 'core-js/full/reflect';

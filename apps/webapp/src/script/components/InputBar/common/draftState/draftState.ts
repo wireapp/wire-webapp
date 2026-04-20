@@ -17,10 +17,14 @@
  *
  */
 
+import {amplify} from 'amplify';
+
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {StorageKey, StorageRepository} from 'Repositories/storage';
+
+export const DRAFT_STATE_CHANGED_EVENT = 'conversation.draft-changed';
 
 export interface DraftState {
   editorState: string | null;
@@ -60,6 +64,9 @@ export const saveDraftState = async ({
     replyId,
     editedMessageId,
   });
+
+  // Emit event to notify listeners of draft change
+  amplify.publish(DRAFT_STATE_CHANGED_EVENT, conversation.id);
 };
 
 export const loadDraftState = async (

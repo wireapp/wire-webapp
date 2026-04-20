@@ -107,6 +107,12 @@ export class ConversationListPage {
 
   /**
    * Get a locator for a specific conversation in the list
+   *
+   * The `protocol` option exists because wire starts every conversation using "proteus" as protocol, unless it's known that all parties of it support MLS.
+   * So if e.g. userA logs in and starts a conversation with userB this conversation will start as proteus, when userB logs in a migration process will be kicked off to convert the proteus conversation to MLS if both support it.
+   * During this migration it can happen that for a moment two identical conversations exist, one using proteus and one using MLS.
+   * Specifying a protocol prevents issues caused by this situation since e.g. the proteus conversation can be ignored.
+   *
    * @param conversationName Name of the conversation to search for
    * @param options.protocol Only locate conversations matching this protocol (mls only works for 1on1 conversations as groups still use proteus) - Default: "mls"
    */
