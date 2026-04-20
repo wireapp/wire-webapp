@@ -35,6 +35,7 @@ export class UserProfileModal {
   readonly domainLabel: Locator;
   readonly cancelButton: Locator;
   readonly modalCloseButton: Locator;
+  readonly openProfileButton: Locator;
 
   constructor(page: Page) {
     this.modal = page.getByTestId('modal-user-profile');
@@ -62,6 +63,7 @@ export class UserProfileModal {
     this.domainLabel = domainContainer.getByRole('paragraph').getByText('Domain');
     this.cancelButton = this.modal.getByRole('button', {name: 'Cancel', exact: true});
     this.modalCloseButton = this.modal.getByTestId('do-close');
+    this.openProfileButton = this.modal.getByTestId('go-profile');
   }
 
   async isVisible() {

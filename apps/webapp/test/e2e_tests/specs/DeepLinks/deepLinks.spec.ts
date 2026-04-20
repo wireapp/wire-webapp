@@ -32,6 +32,7 @@ type ProfileModalOptions = {
   showConnectButton?: boolean;
   showBlockButton?: boolean;
   showCancelButton?: boolean;
+  showOpenProfileButton?: boolean;
 };
 
 async function verifyUserProfileModal(profileModal: UserProfileModal, user: User, options: ProfileModalOptions) {
@@ -68,6 +69,10 @@ async function verifyUserProfileModal(profileModal: UserProfileModal, user: User
 
     if (options.showCancelButton) {
       await expect(profileModal.cancelButton).toBeVisible();
+    }
+
+    if (options.showOpenProfileButton) {
+      await expect(profileModal.openProfileButton).toBeVisible();
     }
   });
 }
@@ -117,7 +122,7 @@ test.describe('Deep Links', () => {
       ]);
 
       await Promise.all(
-        [userBPage, userCPage, userDPage].map(page =>
+        [userAPage, userBPage, userCPage, userDPage].map(page =>
           page.context().grantPermissions(['clipboard-write', 'clipboard-read']),
         ),
       );
@@ -131,6 +136,22 @@ test.describe('Deep Links', () => {
       await userCPages.connectRequest().connectButton.click();
       await userDPages.conversationList().pendingConnectionRequest.click();
       await userDPages.connectRequest().connectButton.click();
+
+      await test.step('User A copies and sends profile deeplink to User B and User A verifies information', async () => {
+        const copiedProfileLinkUserA = await copyProfileLink(userAPage, userAPageManager);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversation().sendMessage('UserA profile link: ' + copiedProfileLinkUserA);
+
+        await userAPages.conversation().getMessage({sender: userA}).click();
+
+        await verifyUserProfileModal(userAModals.userProfile(), userA, {
+          showEmail: true,
+          showCancelButton: true,
+          showOpenProfileButton: true,
+        });
+
+        await userAModals.userProfile().cancelButton.click();
+      });
 
       await test.step('User B copies and sends profile deeplink to User A and User A verifies information', async () => {
         const copiedProfileLinkUserB = await copyProfileLink(userBPage, userBPageManager);
@@ -195,6 +216,34 @@ test.describe('Deep Links', () => {
           showConnectButton: true,
           showCancelButton: true,
         });
+
+        await userAModals.userProfile().connectButton.click();
+        await expect(userDPages.conversationList().pendingConnectionRequest).toBeVisible();
+      });
+
+      await test.step('User B creates group with User D and sends group link to User A, then User A clicks on the link and verifies popup', async () => {
+        const groupName = 'DeepLinksGroup';
+        await createGroup(userBPages, groupName, [userD]);
+        await userBPages.conversationList().openConversation(groupName);
+        await userBPages.conversation().toggleGroupInformation();
+        await userBPages.conversationDetails().openGuestOptions();
+
+        const conversationJoinLink = await userBPages.guestOptions().createLink();
+        await userBPages.conversation().sendMessage(conversationJoinLink);
+
+        await userBPages.conversation().conversationInfoButton.click();
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversation().sendMessage(conversationJoinLink);
+
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        const messageWithConversationJoinLink = userAPages
+          .conversation()
+          .getMessage({sender: userB, content: conversationJoinLink});
+        await messageWithConversationJoinLink.getByText(conversationJoinLink).click();
+        await expect(userAModals.confirm().modal).toBeVisible();
+        await expect(userAModals.confirm().actionButton).toContainText('Join Conversation');
+        await userAModals.confirm().actionButton.click();
+        await expect(userAPages.conversationList().getConversationLocator(groupName)).toBeVisible();
       });
     },
   );
@@ -224,7 +273,7 @@ test.describe('Deep Links', () => {
       ]);
 
       await Promise.all(
-        [userBPage, userCPage, userDPage].map(page =>
+        [userAPage, userBPage, userCPage, userDPage].map(page =>
           page.context().grantPermissions(['clipboard-write', 'clipboard-read']),
         ),
       );
@@ -238,6 +287,22 @@ test.describe('Deep Links', () => {
       await userCPages.connectRequest().connectButton.click();
       await userDPages.conversationList().pendingConnectionRequest.click();
       await userDPages.connectRequest().connectButton.click();
+
+      await test.step('User A copies and sends profile deeplink to User B and User A verifies information', async () => {
+        const copiedProfileLinkUserA = await copyProfileLink(userAPage, userAPageManager);
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversation().sendMessage('UserA profile link: ' + copiedProfileLinkUserA);
+
+        await userAPages.conversation().getMessage({sender: userA}).click();
+
+        await verifyUserProfileModal(userAModals.userProfile(), userA, {
+          showEmail: true,
+          showCancelButton: true,
+          showOpenProfileButton: true,
+        });
+
+        await userAModals.userProfile().cancelButton.click();
+      });
 
       await test.step('User B copies and sends profile deeplink to User A and User A verifies information', async () => {
         const copiedProfileLinkUserB = await copyProfileLink(userBPage, userBPageManager);
@@ -274,31 +339,6 @@ test.describe('Deep Links', () => {
         await userAModals.userProfile().modalCloseButton.click();
       });
 
-      await test.step('User B creates group with User D and sends group link to User A, then User A clicks on the link and verifies popup', async () => {
-        const groupName = 'DeepLinksGroup';
-        await createGroup(userBPages, groupName, [userD]);
-        await userBPages.conversationList().openConversation(groupName);
-        await userBPages.conversation().toggleGroupInformation();
-        await userBPages.conversationDetails().openGuestOptions();
-
-        const conversationJoinLink = await userBPages.guestOptions().createLink();
-        await userBPages.conversation().sendMessage(conversationJoinLink);
-
-        await userBPages.conversation().conversationInfoButton.click();
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-        await userBPages.conversation().sendMessage(conversationJoinLink);
-
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        const messageWithConversationJoinLink = userAPages
-          .conversation()
-          .getMessage({sender: userB, content: conversationJoinLink});
-        await messageWithConversationJoinLink.getByText(conversationJoinLink).click();
-        await expect(userAModals.confirm().modal).toBeVisible();
-        await expect(userAModals.confirm().actionButton).toContainText('Join Conversation');
-        await userAModals.confirm().actionButton.click();
-        await expect(userAPages.conversationList().getConversationLocator(groupName)).toBeVisible();
-      });
-
       await test.step('User D copies and sends profile deeplink to User B, who sends this link to User A and User A verifies information', async () => {
         const copiedProfileLinkUserD = await copyProfileLink(userDPage, userDPageManager);
         await userDPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
@@ -325,6 +365,34 @@ test.describe('Deep Links', () => {
           showConnectButton: true,
           showCancelButton: true,
         });
+
+        await userAModals.userProfile().connectButton.click();
+        await expect(userDPages.conversationList().pendingConnectionRequest).toBeVisible();
+      });
+
+      await test.step('User B creates group with User D and sends group link to User A, then User A clicks on the link and verifies popup', async () => {
+        const groupName = 'DeepLinksGroup';
+        await createGroup(userBPages, groupName, [userD]);
+        await userBPages.conversationList().openConversation(groupName);
+        await userBPages.conversation().toggleGroupInformation();
+        await userBPages.conversationDetails().openGuestOptions();
+
+        const conversationJoinLink = await userBPages.guestOptions().createLink();
+        await userBPages.conversation().sendMessage(conversationJoinLink);
+
+        await userBPages.conversation().conversationInfoButton.click();
+        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversation().sendMessage(conversationJoinLink);
+
+        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        const messageWithConversationJoinLink = userAPages
+          .conversation()
+          .getMessage({sender: userB, content: conversationJoinLink});
+        await messageWithConversationJoinLink.getByText(conversationJoinLink).click();
+        await expect(userAModals.confirm().modal).toBeVisible();
+        await expect(userAModals.confirm().actionButton).toContainText('Join Conversation');
+        await userAModals.confirm().actionButton.click();
+        await expect(userAPages.conversationList().getConversationLocator(groupName)).toBeVisible();
       });
     },
   );
