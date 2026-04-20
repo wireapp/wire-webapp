@@ -61,6 +61,7 @@ import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
+import {Config} from '../../../../Config';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
@@ -106,6 +107,7 @@ export const Conversations = ({
     status: sidebarStatus,
     setStatus: setSidebarStatus,
     setCurrentTab,
+    resetDisabledFeatureTabs,
   } = useSidebarStore(useShallow(state => state));
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
@@ -329,6 +331,14 @@ export const Conversations = ({
       conversationLabelRepository.removeEventListener('conversation-favorited', openFavorites);
     };
   }, [changeTab, conversationLabelRepository]);
+
+  const isAdvancedFiltersEnabled = Config.getConfig().FEATURE.ENABLE_ADVANCED_FILTERS;
+
+  useEffect(() => {
+    if (!isAdvancedFiltersEnabled) {
+      resetDisabledFeatureTabs();
+    }
+  }, [isAdvancedFiltersEnabled, resetDisabledFeatureTabs]);
 
   const onClickPreferences = useCallback(
     (itemId: ContentState) => {
