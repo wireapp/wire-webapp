@@ -21,6 +21,8 @@ import {forwardRef, useEffect, useMemo, useState} from 'react';
 
 import {CONVERSATION_ACCESS, CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {UserType} from '@wireapp/api-client/lib/user';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -179,7 +181,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const userParticipants = useMemo(() => {
       const filteredUsers: User[] = participatingUserEts.flatMap(user => {
-        const isUser = !isServiceEntity(user);
+        const isUser = user.type === UserType.REGULAR;
         return isUser ? [user] : [];
       });
 
@@ -194,10 +196,25 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const exceedsMaxUserCount = usersCount > CONFIG.MAX_USERS_VISIBLE;
     const allUsersCount = exceedsMaxUserCount ? usersCount : 0;
 
-    const serviceParticipants: ServiceEntity[] = participatingUserEts.flatMap(service => {
-      const isService = isServiceEntity(service);
-      return isService ? [service] : [];
-    });
+    const serviceParticipants: ServiceEntity[] = useMemo(() => {
+      const services = new Array<ServiceEntity>();
+
+      if (activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS) {
+        participatingUserEts.forEach(service => {
+          if (isServiceEntity(service)) {
+            services.push(service);
+          }
+        });
+      }
+
+      participatingUserEts.forEach(user => {
+        if (user.type === UserType.APP) {
+          services.push(integrationRepository.mapServiceFromUser(user));
+        }
+      });
+
+      return services;
+    }, [activeConversation.protocol, integrationRepository, participatingUserEts]);
 
     const toggleMute = () => actionsViewModel.toggleMuteConversation(activeConversation);
 
@@ -209,7 +226,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
     const showService = async (entity: ServiceEntity) => {
-      const serviceEntity = await integrationRepository.getServiceFromUser(entity);
+      const serviceEntity = entity.isService
+        ? await integrationRepository.getServiceFromUser(entity)
+        : integrationRepository.mapServiceFromUser(
+            participatingUserEts.find(participant => participant.id === entity.id),
+          );
 
       if (serviceEntity) {
         togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
