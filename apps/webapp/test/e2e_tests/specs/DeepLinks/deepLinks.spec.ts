@@ -329,7 +329,7 @@ test.describe('Deep Links', () => {
         await expect(userDPages.conversation().getMessage({sender: userD})).toBeVisible();
 
         await userBPages.conversationList().openConversation(userD.fullName, {protocol: 'mls'});
-        const profileLinkUserD = userBPages.conversation().getMessage({sender: userD}).last();
+        const profileLinkUserD = userBPages.conversation().getMessage({sender: userD});
         await profileLinkUserD.hover();
         await userBPages.conversation().copyMessage(profileLinkUserD);
 
