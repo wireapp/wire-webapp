@@ -21,10 +21,10 @@ import {useCallback, useEffect, useRef, useState, Fragment, FormEvent} from 'rea
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 
 import {ValidationUtil} from '@wireapp/commons';
+import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -37,17 +37,16 @@ import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
-import {toError} from 'Util/toError';
-import {isErrorWithCode} from 'Util/typePredicateUtil';
+
+import {applockStyles} from './Applock.styles';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',
   LOCKED = 'applock.locked',
+  LOGOUT = 'applock.logout',
   NONE = 'applock.none',
   SETUP = 'applock.setup',
   SETUP_CHANGE = 'applock.setup_change',
-  WIPE_CONFIRM = 'applock.wipe-confirm',
-  WIPE_PASSWORD = 'applock.wipe-password',
 }
 
 const DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC = 60;
@@ -72,12 +71,11 @@ const AppLock = ({
   appLockState = container.resolve(AppLockState),
   appLockRepository = container.resolve(AppLockRepository),
 }: AppLockProps) => {
-  const [state, setState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
-  const [wipeError, setWipeError] = useState('');
+  const [localAppLockState, setLocalAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [unlockError, setUnlockError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [setupPassphrase, setSetupPassphrase] = useState('');
+  const [clearData, setClearData] = useState(false);
   const [inactivityTimeoutId, setInactivityTimeoutId] = useState<number>();
   const [scheduledTimeoutId, setScheduledTimeoutId] = useState<number>();
   const {isAppLockActivated, isAppLockEnabled, isAppLockEnforced} = useKoSubscribableChildren(appLockState, [
@@ -85,6 +83,8 @@ const AppLock = ({
     'isAppLockEnabled',
     'isAppLockEnforced',
   ]);
+
+  const isTemporaryClient = clientState.currentClient?.isTemporary();
 
   // We log the user out if there is a style change on the app element
   // i.e. if there is an attempt to remove the blur effect
@@ -176,10 +176,10 @@ const AppLock = ({
       modalObserver.disconnect();
       appObserver.disconnect();
     };
-  }, [state, isVisible]);
+  }, [localAppLockState, isVisible]);
 
   const showAppLock = () => {
-    setState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setLocalAppLockState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
@@ -209,28 +209,13 @@ const AppLock = ({
     startScheduledTimeout();
   };
 
-  const onWipeDatabase = async (event: FormEvent) => {
-    const target = event.target as HTMLFormElement & {password: HTMLInputElement};
-    try {
-      setIsLoading(true);
-      const currentClientId = clientState.currentClient.id;
-      await clientRepository.clientService.deleteClient(currentClientId, target.password.value);
-      appLockRepository.removeCode();
-      amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
-    } catch (error: unknown) {
-      setIsLoading(false);
-      if (
-        isErrorWithCode(error) &&
-        [HTTP_STATUS.BAD_REQUEST, HTTP_STATUS.UNAUTHORIZED, HTTP_STATUS.FORBIDDEN].includes(error.code)
-      ) {
-        return setWipeError(t('modalAppLockWipePasswordError'));
-      }
-      setWipeError(toError(error).message);
-    }
+  const onLogout = (clearData: boolean) => {
+    appLockRepository.removeCode();
+    amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
   };
 
   const changePassphrase = () => {
-    setState(APPLOCK_STATE.SETUP);
+    setLocalAppLockState(APPLOCK_STATE.SETUP);
     setIsVisible(true);
   };
 
@@ -241,14 +226,18 @@ const AppLock = ({
   const isSetupPassphraseLength = passwordRegexLength.test(setupPassphrase);
   const isSetupPassphraseSpecial = passwordRegexSpecial.test(setupPassphrase);
 
-  const clearWipeError = () => setWipeError('');
   const clearUnlockError = () => setUnlockError('');
-  const onGoBack = () => setState(APPLOCK_STATE.LOCKED);
-  const onClickForgot = () => setState(APPLOCK_STATE.FORGOT);
-  const onClickWipe = () => setState(APPLOCK_STATE.WIPE_CONFIRM);
-  const onClickWipeConfirm = () => setState(APPLOCK_STATE.WIPE_PASSWORD);
+  const onGoBack = () => setLocalAppLockState(APPLOCK_STATE.LOCKED);
+  const onClickForgot = () => setLocalAppLockState(APPLOCK_STATE.FORGOT);
+  const onClickLogout = async () => {
+    if (isTemporaryClient) {
+      await clientRepository.logoutClient();
+    } else {
+      setLocalAppLockState(APPLOCK_STATE.LOGOUT);
+    }
+  };
   const onClosed = () => {
-    setState(APPLOCK_STATE.NONE);
+    setLocalAppLockState(APPLOCK_STATE.NONE);
     setSetupPassphrase('');
   };
   const onCancelAppLock = () => {
@@ -257,27 +246,25 @@ const AppLock = ({
   };
 
   const headerText = () => {
-    switch (state) {
+    switch (localAppLockState) {
       case APPLOCK_STATE.SETUP_CHANGE:
         return t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME});
       case APPLOCK_STATE.SETUP:
         return t('modalAppLockSetupTitle');
       case APPLOCK_STATE.LOCKED:
         return t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME});
+      case APPLOCK_STATE.LOGOUT:
+        return t('modalAccountLogoutHeadline');
       case APPLOCK_STATE.FORGOT:
         return t('modalAppLockForgotTitle');
-      case APPLOCK_STATE.WIPE_CONFIRM:
-        return t('modalAppLockWipeConfirmTitle');
-      case APPLOCK_STATE.WIPE_PASSWORD:
-        return t('modalAppLockWipePasswordTitle', {brandName: Config.getConfig().BRAND_NAME});
       default:
         return '';
     }
   };
 
   return (
-    <ModalComponent isShown={isVisible} showLoading={isLoading} onClosed={onClosed} data-uie-name="applock-modal">
-      <div className="modal__header">
+    <ModalComponent isShown={isVisible} onClosed={onClosed} data-uie-name="applock-modal">
+      <div className="modal__header" css={applockStyles.headerStyle}>
         {!isAppLockEnforced && !isAppLockActivated && (
           <button
             type="button"
@@ -297,8 +284,8 @@ const AppLock = ({
         </h2>
       </div>
 
-      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={state}>
-        {state === APPLOCK_STATE.SETUP && (
+      <div className="modal__body" data-uie-name="applock-modal-body" data-uie-value={localAppLockState}>
+        {localAppLockState === APPLOCK_STATE.SETUP && (
           <form onSubmit={onSetCode}>
             <p
               className="modal__text"
@@ -306,22 +293,16 @@ const AppLock = ({
               data-uie-name="label-applock-set-text"
             />
 
-            <label
-              className="modal__text modal__label"
-              data-uie-name="label-applock-unlock-text"
-              htmlFor="input-applock-set-a"
-            >
-              {t('modalAppLockPasscode')}
-            </label>
-
             {/* eslint jsx-a11y/no-autofocus : "off" */}
-            <input
+            <Input
               aria-label={t('modalAppLockSetupTitle')}
               autoFocus
               className="modal__input"
+              label={t('modalAppLockPasscode')}
               type="password"
+              placeholder={t('modalAppLockInputPlaceholder')}
               value={setupPassphrase}
-              onChange={event => setSetupPassphrase(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
@@ -370,31 +351,33 @@ const AppLock = ({
               {t('modalAppLockSetupSpecial')}
             </p>
 
-            <div className="modal__buttons">
+            <div css={applockStyles.buttonGroupStyle}>
               {!isAppLockEnforced && (
-                <button
+                <Button
+                  css={applockStyles.buttonStyle}
+                  variant={ButtonVariant.SECONDARY}
                   type="button"
-                  className="modal__button modal__button--secondary"
                   data-uie-name="do-cancel-applock"
                   onClick={onCancelAppLock}
                 >
                   {t('modalConfirmSecondary')}
-                </button>
+                </Button>
               )}
 
-              <button
+              <Button
+                css={!isAppLockEnforced ? applockStyles.buttonStyle : undefined}
+                block={isAppLockEnforced}
                 type="submit"
-                className="modal__button modal__button--primary modal__button--full"
                 data-uie-name="do-action"
                 disabled={!isSetupPassphraseValid}
               >
                 {t('modalAppLockSetupAcceptButton')}
-              </button>
+              </Button>
             </div>
           </form>
         )}
 
-        {state === APPLOCK_STATE.SETUP_CHANGE && (
+        {localAppLockState === APPLOCK_STATE.SETUP_CHANGE && (
           <form onSubmit={onSetCode}>
             <div
               className="modal__text"
@@ -408,17 +391,15 @@ const AppLock = ({
               data-uie-name="label-applock-set-text"
             />
 
-            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
-              {t('modalAppLockPasscode')}
-            </div>
-
-            <input
+            <Input
               aria-label={t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
+              label={t('modalAppLockPasscode')}
               type="password"
+              placeholder={t('modalAppLockInputPlaceholder')}
               value={setupPassphrase}
-              onChange={event => setSetupPassphrase(event.target.value)}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
               data-uie-name="input-applock-set-a"
               autoComplete="new-password"
@@ -447,151 +428,111 @@ const AppLock = ({
             </p>
 
             <div className="modal__buttons">
-              <button
-                type="submit"
-                className="modal__button modal__button--primary modal__button--full"
-                data-uie-name="do-action"
-                disabled={!isSetupPassphraseValid}
-              >
+              <Button block type="submit" data-uie-name="do-action" disabled={!isSetupPassphraseValid}>
                 {t('modalAppLockSetupAcceptButton')}
-              </button>
+              </Button>
             </div>
           </form>
         )}
 
-        {state === APPLOCK_STATE.LOCKED && (
+        {localAppLockState === APPLOCK_STATE.LOCKED && (
           <form onSubmit={onUnlock}>
-            <div className="modal__text modal__label" data-uie-name="label-applock-unlock-text">
+            <label htmlFor="input-applock-unlock" data-uie-name="label-applock-unlock-text">
               {t('modalAppLockPasscode')}
-            </div>
-
-            <input
+            </label>
+            <Input
               aria-label={t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
-              className="modal__input"
               type="password"
-              id={Math.random().toString()}
+              placeholder={t('modalAppLockInputPlaceholder')}
+              id="input-applock-unlock"
               name="password"
               onKeyDown={clearUnlockError}
               data-uie-name="input-applock-unlock"
-              autoComplete="new-password"
+              autoComplete="current-password"
+              aria-invalid={Boolean(unlockError)}
+              error={unlockError ? <ErrorMessage message={unlockError} /> : undefined}
             />
 
-            <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
-              {unlockError}
-            </p>
+            <Button block type="submit" data-uie-name="do-action" css={applockStyles.unlockButtonStyle}>
+              {t('modalAppLockLockedUnlockButton')}
+            </Button>
 
-            <button
+            <Link
+              variant={LinkVariant.PRIMARY}
               type="button"
+              css={applockStyles.linkStyle}
               className="button-reset-default block modal__cta"
               data-uie-name="go-forgot-passphrase"
               onClick={onClickForgot}
             >
               {t('modalAppLockLockedForgotCTA')}
-            </button>
-
-            <div className="modal__buttons">
-              <button
-                type="submit"
-                className="modal__button modal__button--primary modal__button--full"
-                data-uie-name="do-action"
-              >
-                {t('modalAppLockLockedUnlockButton')}
-              </button>
-            </div>
+            </Link>
           </form>
         )}
 
-        {state === APPLOCK_STATE.FORGOT && (
+        {localAppLockState === APPLOCK_STATE.FORGOT && (
           <Fragment>
-            <div className="modal__text" data-uie-name="label-applock-forgot-text">
-              {t('modalAppLockForgotMessage')}
-            </div>
-
-            <button
-              type="button"
-              className="button-reset-default block modal__cta"
-              onClick={onClickWipe}
-              data-uie-name="go-wipe-database"
-            >
-              {t('modalAppLockForgotWipeCTA')}
-            </button>
-
-            <div className="modal__buttons">
-              <button
+            <p>{t('modalAppLockForgotMessage')}</p>
+            <br />
+            <p>{t('modalAppLockForgotSecondMessage')}</p>
+            <div css={applockStyles.buttonGroupStyle}>
+              <Button
+                css={applockStyles.buttonStyle}
+                variant={ButtonVariant.SECONDARY}
                 onClick={onGoBack}
-                className="modal__button modal__button--secondary modal__button--full"
                 data-uie-name="do-go-back"
               >
                 {t('modalAppLockForgotGoBackButton')}
-              </button>
+              </Button>
+              <Button css={applockStyles.buttonStyle} onClick={onClickLogout} data-uie-name="go-wipe-database">
+                {t('modalAccountLogoutAction')}
+              </Button>
             </div>
           </Fragment>
         )}
 
-        {state === APPLOCK_STATE.WIPE_CONFIRM && (
+        {localAppLockState === APPLOCK_STATE.LOGOUT && (
           <Fragment>
-            <div className="modal__text" data-uie-name="label-applock-wipe-confirm-text">
-              {t('modalAppLockWipeConfirmMessage')}
-            </div>
+            <Checkbox
+              checked={clearData}
+              data-uie-name="modal-option-checkbox"
+              id="clear-data-checkbox"
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const value = event.target.checked;
+                setClearData(value);
+              }}
+            >
+              <CheckboxLabel className="label-xs" htmlFor="clear-data-checkbox">
+                {t('modalAccountLogoutOption')}
+              </CheckboxLabel>
+            </Checkbox>
 
-            <div className="modal__buttons">
-              <button onClick={onGoBack} className="modal__button modal__button--secondary" data-uie-name="do-go-back">
-                {t('modalAppLockWipeConfirmGoBackButton')}
-              </button>
-
-              <button
-                onClick={onClickWipeConfirm}
-                className="modal__button modal__button--primary modal__button--alert"
-                data-uie-name="do-action"
-              >
-                {t('modalAppLockWipeConfirmConfirmButton')}
-              </button>
-            </div>
-          </Fragment>
-        )}
-
-        {state === APPLOCK_STATE.WIPE_PASSWORD && (
-          <form onSubmit={onWipeDatabase}>
-            <input
-              aria-label={t('modalAppLockWipePasswordTitle', {brandName: Config.getConfig().BRAND_NAME})}
-              autoFocus
-              className="modal__input"
-              type="password"
-              name="password"
-              autoComplete="new-password"
-              placeholder={t('modalAppLockWipePasswordPlaceholder')}
-              onKeyDown={clearWipeError}
-              data-uie-name="input-applock-wipe"
-            />
-
-            <p className="modal__input__error" style={{height: 20}} data-uie-name="label-applock-wipe-error">
-              {wipeError}
-            </p>
-
-            <div className="modal__buttons">
-              <button
-                type="button"
+            <div css={applockStyles.buttonGroupStyle}>
+              <Button
+                css={applockStyles.buttonStyle}
+                variant={ButtonVariant.SECONDARY}
                 onClick={onGoBack}
-                className="modal__button modal__button--secondary"
                 data-uie-name="do-go-back"
               >
-                {t('modalAppLockWipePasswordGoBackButton')}
-              </button>
+                {t('modalAppLockLogoutCancelButton')}
+              </Button>
 
-              <button
-                type="submit"
-                className="modal__button modal__button--primary modal__button--alert"
-                data-uie-name="do-action"
-              >
-                {t('modalAppLockWipePasswordConfirmButton')}
-              </button>
+              <Button css={applockStyles.buttonStyle} onClick={() => onLogout(clearData)} data-uie-name="do-action">
+                {t('modalAccountLogoutAction')}
+              </Button>
             </div>
-          </form>
+          </Fragment>
         )}
       </div>
     </ModalComponent>
   );
 };
+
+const ErrorMessage = ({message}: {message: string}) => (
+  <p className="modal__input__error" data-uie-name="label-applock-unlock-error">
+    {message}
+  </p>
+);
 
 export {AppLock};
