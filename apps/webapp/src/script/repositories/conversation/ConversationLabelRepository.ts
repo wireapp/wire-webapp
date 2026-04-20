@@ -32,6 +32,7 @@ import {getLogger, Logger} from 'Util/logger';
 import {fixWebsocketString} from 'Util/stringUtil';
 import {TypedEventTarget} from 'Util/typedEventTarget';
 import {createUuid} from 'Util/uuid';
+import is from '@sindresorhus/is';
 
 export enum LabelType {
   Custom = 0,
@@ -183,9 +184,11 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         const localVersion = localData.version || 0;
         const remoteVersion = labelProperties.version || 0;
 
-        // Use local data if it has a newer timestamp, or same timestamp but higher version
+        // Use local data if it has a newer timestamp, or same timestamp but higher version.
+        // If remote has no timestamp, treat remote as source of truth.
         const isLocalNewer =
-          localTimestamp > remoteTimestamp || (localTimestamp === remoteTimestamp && localVersion > remoteVersion);
+          remoteTimestamp > 0 &&
+          (localTimestamp > remoteTimestamp || (localTimestamp === remoteTimestamp && localVersion > remoteVersion));
 
         if (isLocalNewer) {
           // Local data is newer, use it and update backend
@@ -241,6 +244,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         labels: normalizedLabels ?? [],
       };
       this.unmarshal(value);
+      this.persistValues(value);
     }
   };
 
@@ -361,8 +365,8 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     this.labels.splice(folderIndex, 1, updatedFolder);
 
     // Delete folder if it no longer contains any conversation
-    if (!label.conversations().length) {
-      this.labels.remove(label);
+    if (!is.nonEmptyArray(updatedFolder.conversations())) {
+      this.labels.remove(updatedFolder);
       // switch sidebar to recent tabs
       setCurrentTab(SidebarTabs.RECENT);
     } else {
