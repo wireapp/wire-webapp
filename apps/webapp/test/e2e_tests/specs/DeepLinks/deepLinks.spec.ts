@@ -76,8 +76,8 @@ async function verifyUserProfileModal(profileModal: UserProfileModal, user: User
   });
 }
 
-async function copyProfileLink(page: Page, pageManager: PageManager): Promise<string> {
-  const {pages, components} = pageManager.webapp;
+async function copyProfileLink(page: Page): Promise<string> {
+  const {pages, components} = PageManager.from(page).webapp;
 
   await components.conversationSidebar().preferencesButton.click();
   await pages.settings().copyProfileLinkButton.click();
@@ -129,7 +129,7 @@ test.describe('Deep Links', () => {
       await userDPages.connectRequest().connectButton.click();
 
       await test.step('User A copies and sends profile deeplink to User B and User A verifies information', async () => {
-        const copiedProfileLinkUserA = await copyProfileLink(userAPage, userAPageManager);
+        const copiedProfileLinkUserA = await copyProfileLink(userAPage);
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().sendMessage('UserA profile link: ' + copiedProfileLinkUserA);
 
@@ -145,7 +145,7 @@ test.describe('Deep Links', () => {
       });
 
       await test.step('User B copies and sends profile deeplink to User A and User A verifies information', async () => {
-        const copiedProfileLinkUserB = await copyProfileLink(userBPage, userBPageManager);
+        const copiedProfileLinkUserB = await copyProfileLink(userBPage);
         await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userBPages.conversation().sendMessage('UserB profile link: ' + copiedProfileLinkUserB);
 
@@ -162,7 +162,7 @@ test.describe('Deep Links', () => {
       });
 
       await test.step('User C copies and sends profile deeplink to User A and User A verifies information', async () => {
-        const copiedProfileLinkUserC = await copyProfileLink(userCPage, userCPageManager);
+        const copiedProfileLinkUserC = await copyProfileLink(userCPage);
         await userCPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userCPages.conversation().sendMessage('UserC profile link: ' + copiedProfileLinkUserC);
 
@@ -180,7 +180,7 @@ test.describe('Deep Links', () => {
       });
 
       await test.step('User D copies and sends profile deeplink to User B, who sends this link to User A and User A verifies information', async () => {
-        const copiedProfileLinkUserD = await copyProfileLink(userDPage, userDPageManager);
+        const copiedProfileLinkUserD = await copyProfileLink(userDPage);
         await userDPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userDPages.conversation().sendMessage('UserD profile link: ' + copiedProfileLinkUserD);
         await expect(userDPages.conversation().getMessage({sender: userD})).toBeVisible();
@@ -272,7 +272,7 @@ test.describe('Deep Links', () => {
       await userDPages.connectRequest().connectButton.click();
 
       await test.step('User A copies and sends profile deeplink to User B and User A verifies information', async () => {
-        const copiedProfileLinkUserA = await copyProfileLink(userAPage, userAPageManager);
+        const copiedProfileLinkUserA = await copyProfileLink(userAPage);
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().sendMessage('UserA profile link: ' + copiedProfileLinkUserA);
 
@@ -288,7 +288,7 @@ test.describe('Deep Links', () => {
       });
 
       await test.step('User B copies and sends profile deeplink to User A and User A verifies information', async () => {
-        const copiedProfileLinkUserB = await copyProfileLink(userBPage, userBPageManager);
+        const copiedProfileLinkUserB = await copyProfileLink(userBPage);
         await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userBPages.conversation().sendMessage('UserB profile link: ' + copiedProfileLinkUserB);
 
@@ -305,7 +305,7 @@ test.describe('Deep Links', () => {
       });
 
       await test.step('User C copies and sends profile deeplink to User A and User A verifies information', async () => {
-        const copiedProfileLinkUserC = await copyProfileLink(userCPage, userCPageManager);
+        const copiedProfileLinkUserC = await copyProfileLink(userCPage);
         await userCPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userCPages.conversation().sendMessage('UserC profile link: ' + copiedProfileLinkUserC);
 
@@ -323,7 +323,7 @@ test.describe('Deep Links', () => {
       });
 
       await test.step('User D copies and sends profile deeplink to User B, who sends this link to User A and User A verifies information', async () => {
-        const copiedProfileLinkUserD = await copyProfileLink(userDPage, userDPageManager);
+        const copiedProfileLinkUserD = await copyProfileLink(userDPage);
         await userDPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userDPages.conversation().sendMessage('UserD profile link: ' + copiedProfileLinkUserD);
         await expect(userDPages.conversation().getMessage({sender: userD})).toBeVisible();
