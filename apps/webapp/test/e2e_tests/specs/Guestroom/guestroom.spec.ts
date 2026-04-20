@@ -525,7 +525,7 @@ test.describe('Guestroom', () => {
 
       await guestPages.conversationJoin().joinAsMemberButton.click();
       await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-      await expect(guestPages.conversationList().list.filter({hasText: groupName})).toBeVisible();
+      await expect(guestPages.conversationList().getConversationLocator(groupName)).toBeVisible();
     },
   );
 
@@ -627,7 +627,7 @@ test.describe('Guestroom', () => {
         },
       );
 
-      await expect(guestPages.conversationList().list.filter({hasText: groupName})).toBeVisible();
+      await expect(guestPages.conversationList().getConversationLocator(groupName)).toBeVisible();
     },
   );
 });

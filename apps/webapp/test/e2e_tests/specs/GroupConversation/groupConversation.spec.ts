@@ -1,0 +1,330 @@
+/*
+ * Wire
+ * Copyright (C) 2025 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {User} from 'test/e2e_tests/data/user';
+import {PageManager} from 'test/e2e_tests/pageManager';
+import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
+
+test.describe('Group Conversation', () => {
+  let team: Team;
+  let userA: User;
+  let userB: User;
+  let userC: User;
+  const groupName = 'Test group';
+
+  test.beforeEach(async ({createTeam, createUser}) => {
+    userB = await createUser();
+    userC = await createUser();
+    team = await createTeam('Test Team', {users: [userB, userC]});
+    userA = team.owner;
+  });
+
+  test('I can create a conversation with myself only', {tag: ['@TC-509', '@regression']}, async ({createPage}) => {
+    const userAPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+    await createGroup(userAPages, groupName, []);
+    await userAPages.conversationList().openConversation(groupName);
+
+    await userAPages.conversation().sendMessage('Message');
+    const message = userAPages.conversation().getMessage({content: 'Message'});
+
+    await userAPages.conversation().toggleGroupInformation();
+    await expect(userAPages.conversation().membersList.getByRole('listitem')).toHaveCount(0);
+
+    await expect(
+      userAPages.conversation().systemMessages.filter({hasText: 'ALL FINGERPRINTS ARE VERIFIED'}),
+    ).toBeVisible();
+    await expect(message).toBeVisible();
+  });
+
+  test(
+    'I cannot set empty or space-only conversation name',
+    {tag: ['@TC-514', '@regression']},
+    async ({createPage}) => {
+      const userAPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await userAPages.conversationList().clickCreateGroup();
+      await userAPages.groupCreation().groupNameInput.fill(' ');
+      await expect(userAPages.groupCreation().errorGroupName).toHaveText('At least 1 character');
+    },
+  );
+
+  test(
+    'I see count of participants increase and decrease when I select or unselect',
+    {tag: ['@TC-516', '@regression']},
+    async ({createPage}) => {
+      const userAPages = PageManager.from(
+        await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC)),
+      ).webapp.pages;
+
+      await userAPages.conversationList().clickCreateGroup();
+      await userAPages.groupCreation().setGroupName(groupName);
+
+      await userAPages.groupCreation().selectGroupMembers(userB.fullName);
+      await expect(userAPages.groupCreation().toggleSelectedListButton).toContainText('Selected (1)');
+
+      await userAPages.groupCreation().selectGroupMembers(userC.fullName);
+      await expect(userAPages.groupCreation().toggleSelectedListButton).toContainText('Selected (2)');
+
+      await userAPages.groupCreation().deselectGroupMember(userB.fullName);
+      await expect(userAPages.groupCreation().toggleSelectedListButton).toContainText('Selected (1)');
+    },
+  );
+
+  test('I want to delete a group as the Group Creator', {tag: ['@TC-1089', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await createGroup(userAPages, groupName, [userB, userC]);
+    const adminGroupLocator = userAPages.conversationList().getConversationLocator(groupName);
+    const memberGroupLocator = userBPages.conversationList().getConversationLocator(groupName);
+
+    // Pre-condition: Ensure the member can see the group before the creator deletes it
+    await expect(memberGroupLocator).toBeVisible();
+
+    // User A initiate group deletion
+    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversation().clickConversationInfoButton();
+    await userAPages.conversationDetails().deleteGroupButton.click();
+
+    // User sees a confirmation dialog with explanation when he initiates delete group
+    await expect(userAModals.confirm().modalText).toContainText(
+      'This will delete the conversation and all content for all participants on all devices',
+    );
+
+    // User can cancel the delete group from the confirmation dialog
+    await userAModals.confirm().cancelButton.click();
+    await expect(adminGroupLocator).toBeVisible();
+
+    // User can delete group as the group creator
+    await userAPages.conversationDetails().deleteGroupButton.click();
+    await userAModals.confirm().actionButton.click();
+
+    // Verify the group no longer exists for any user
+    await expect(adminGroupLocator).toBeHidden({timeout: 20_000});
+    await expect(memberGroupLocator).toBeHidden({timeout: 20_000});
+  });
+
+  test(
+    'I want to be notified about the group deletion when app is in background',
+    {tag: ['@TC-1093', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await createGroup(userAPages, groupName, [userB]);
+      await expect(userBPages.conversationList().getConversationLocator(groupName)).toBeVisible();
+
+      const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
+
+      const blankTab = await userBPage.context().newPage();
+      await blankTab.goto('about:blank');
+      await blankTab.bringToFront();
+
+      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversation().clickConversationInfoButton();
+      await userAPages.conversationDetails().deleteGroupButton.click();
+      await userAModals.confirm().actionButton.click();
+      await expect(userAPages.conversationList().getConversationLocator(groupName)).not.toBeAttached({timeout: 20_000});
+
+      await expect
+        .poll(() => getUserBNotifications())
+        .toEqual(
+          expect.arrayContaining([
+            expect.objectContaining({
+              body: `${groupName} has been deleted`,
+              data: expect.objectContaining({
+                messageType: 'team.delete',
+              }),
+            }),
+          ]),
+        );
+    },
+  );
+
+  test('I should not be able to search for deleted group', {tag: ['@TC-1095', '@regression']}, async ({createPage}) => {
+    const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
+      createPage(withLogin(userA)),
+      createPage(withLogin(userB)),
+      createPage(withLogin(userC), withConnectedUser(userA)),
+    ]);
+
+    const userAPages = PageManager.from(userAPageManager).webapp.pages;
+    const userBPages = PageManager.from(userBPageManager).webapp.pages;
+    const userCPages = PageManager.from(userCPageManager).webapp.pages;
+
+    await createGroup(userAPages, 'Group A', [userB, userC]);
+    await createGroup(userBPages, 'Group B', [userA, userC]);
+    await expect(userCPages.conversationList().list.getByRole('listitem')).toHaveCount(3);
+
+    const groups = [
+      {name: 'Group A', owner: userAPageManager, members: [userB, userC]},
+      {name: 'Group B', owner: userBPageManager, members: [userA, userC]},
+    ];
+
+    for (const group of groups) {
+      const {pages, modals} = PageManager.from(group.owner).webapp;
+
+      await pages.conversationList().openConversation(group.name);
+      await pages.conversation().clickConversationInfoButton();
+      await pages.conversationDetails().deleteGroupButton.click();
+      await modals.confirm().actionButton.click();
+      await expect(userCPages.conversationList().getConversationLocator(group.name)).not.toBeAttached({
+        timeout: 20_000,
+      });
+
+      await userCPages.conversationList().searchConversationsInput.fill(group.name);
+      await expect(userCPages.conversationList().list).toContainText('No results found');
+      await userCPages.conversationList().searchConversationsInput.fill(''); // Clear search input for next iteration
+    }
+  });
+
+  test(
+    'I want to leave a group conversation via conversation list dropdown options',
+    {tag: ['@TC-1197', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await createGroup(userBPages, groupName, [userA]);
+      await userBPages.conversationList().openConversation(groupName);
+
+      // User A leaves conversation through options menu from conversation list
+      await userAPages.conversationList().clickConversationOptions(groupName);
+      await userAPages.conversationList().leaveConversation();
+      await userAModals.leaveConversation().confirmButton.click();
+
+      await expect(userBPages.conversation().systemMessages.filter({hasText: `${userA.fullName} left`})).toBeVisible();
+    },
+  );
+
+  test(
+    'Verify you can remove participants from a group conversation',
+    {tag: ['@TC-1475', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await createGroup(pages, groupName, [userB, userC]);
+      await pages.conversationList().openConversation(groupName);
+      await pages.conversation().toggleGroupInformation();
+
+      await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+
+      await pages.conversationDetails().openParticipantDetails(userB.fullName);
+      await pages.participantDetails().removeFromGroup();
+
+      await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).not.toBeVisible();
+      await expect(
+        pages.conversation().systemMessages.filter({hasText: `You removed ${userB.fullName}`}),
+      ).toBeVisible();
+    },
+  );
+
+  test(
+    'As an Admin I want to see the group admin toggle on a participants profile in Conversation details',
+    {tag: ['@TC-1481', '@regression']},
+    async ({createPage}) => {
+      const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
+
+      await createGroup(pages, groupName, [userB]);
+      await pages.conversationList().openConversation(groupName);
+      await pages.conversation().toggleGroupInformation();
+
+      await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+      await pages.conversationDetails().openParticipantDetails(userB.fullName);
+      await expect(pages.conversation().makeAdminToggle).toBeVisible();
+    },
+  );
+
+  test(
+    'As a group member I should not see group admin toggle while viewing Admin`s profile in Conversation details',
+    {tag: ['@TC-1483', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
+
+      await createGroup(userAPages, groupName, [userB]);
+      await userBPages.conversationList().openConversation(groupName);
+      await userBPages.conversation().toggleGroupInformation();
+
+      await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userA.fullName})).toBeVisible();
+      await userBPages.conversationDetails().openParticipantDetails(userA.fullName);
+      await expect(userBPages.conversation().makeAdminToggle).not.toBeVisible();
+    },
+  );
+
+  test(
+    'I should not be admin anymore after being removed and re-added to the group',
+    {tag: ['@TC-1649', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await test.step('Setup: Create group and promote User B to Admin', async () => {
+        await createGroup(userAPages, groupName, [userB, userC]);
+        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversation().toggleGroupInformation();
+        await userAPages.conversation().makeUserAdmin(userB.fullName);
+
+        // Verify User B is an admin
+        await userBPages.conversationList().openConversation(groupName);
+        await userBPages.conversation().toggleGroupInformation();
+        await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userB.fullName})).toBeVisible();
+      });
+
+      await test.step('Act: User A removes User B from the group', async () => {
+        await userAPages.conversation().toggleGroupInformation();
+        await userAPages.conversation().removeAdminFromGroup(userB.fullName);
+        await userAModals.confirm().actionButton.click();
+
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: `You removed ${userB.fullName}`}),
+        ).toBeVisible();
+      });
+
+      await test.step('Act: User A re-adds User B to the group', async () => {
+        await userAPages.conversation().clickAddMemberButton();
+        await userAPages.conversationDetails().addUsersToConversation([userB.fullName]);
+
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: `You added ${userB.fullName} to the conversation`}),
+        ).toBeVisible();
+      });
+
+      await test.step('Assert: Verify User B is a regular member and not an admin', async () => {
+        // User B should appear in members list but NOT in admin list
+        await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userB.fullName})).not.toBeVisible();
+        await expect(userBPages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
+      });
+    },
+  );
+});
