@@ -25,6 +25,7 @@ import {
 } from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {createUuid} from 'Util/uuid';
 
 describe('ConversationLabelRepository Synchronization', () => {
@@ -258,6 +259,52 @@ describe('ConversationLabelRepository Synchronization', () => {
           version: expect.any(Number),
         }),
       );
+    });
+  });
+
+  describe('removeConversationFromLabel', () => {
+    let setCurrentTab: jest.Mock;
+
+    beforeEach(() => {
+      setCurrentTab = jest.fn();
+      jest.spyOn(useSidebarStore, 'getState').mockReturnValue({
+        ...useSidebarStore.getState(),
+        setCurrentTab,
+      });
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should remove folder and switch to RECENT when last conversation is removed', () => {
+      const conversation = new Conversation(createUuid());
+      mockAllConversations([conversation]);
+      mockConversations([conversation]);
+
+      const folder = createLabel('My Folder', [conversation], createUuid(), LabelType.Custom);
+      conversationLabelRepository.labels([folder]);
+
+      conversationLabelRepository.removeConversationFromLabel(folder, conversation);
+
+      expect(conversationLabelRepository.labels()).toHaveLength(0);
+      expect(setCurrentTab).toHaveBeenCalledWith(SidebarTabs.RECENT);
+    });
+
+    it('should keep folder and stay on FOLDER tab when other conversations remain', () => {
+      const conversation1 = new Conversation(createUuid());
+      const conversation2 = new Conversation(createUuid());
+      mockAllConversations([conversation1, conversation2]);
+      mockConversations([conversation1, conversation2]);
+
+      const folder = createLabel('My Folder', [conversation1, conversation2], createUuid(), LabelType.Custom);
+      conversationLabelRepository.labels([folder]);
+
+      conversationLabelRepository.removeConversationFromLabel(folder, conversation1);
+
+      expect(conversationLabelRepository.labels()).toHaveLength(1);
+      expect(conversationLabelRepository.labels()[0].conversations()).toEqual([conversation2]);
+      expect(setCurrentTab).toHaveBeenCalledWith(SidebarTabs.FOLDER);
     });
   });
 });
