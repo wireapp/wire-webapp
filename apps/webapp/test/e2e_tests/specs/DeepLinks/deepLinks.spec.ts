@@ -114,12 +114,10 @@ test.describe('Deep Links', () => {
         createPage(withLogin(userD)),
       ]);
 
-      const [userAPageManager, userBPageManager, userCPageManager, userDPageManager] = await Promise.all([
-        PageManager.from(userAPage),
-        PageManager.from(userBPage),
-        PageManager.from(userCPage),
-        PageManager.from(userDPage),
-      ]);
+      const userAPageManager = PageManager.from(userAPage);
+      const userBPageManager = PageManager.from(userBPage);
+      const userCPageManager = PageManager.from(userCPage);
+      const userDPageManager = PageManager.from(userDPage);
 
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -259,12 +257,10 @@ test.describe('Deep Links', () => {
         createPage(withLogin(userD)),
       ]);
 
-      const [userAPageManager, userBPageManager, userCPageManager, userDPageManager] = await Promise.all([
-        PageManager.from(userAPage),
-        PageManager.from(userBPage),
-        PageManager.from(userCPage),
-        PageManager.from(userDPage),
-      ]);
+      const userAPageManager = PageManager.from(userAPage);
+      const userBPageManager = PageManager.from(userBPage);
+      const userCPageManager = PageManager.from(userCPage);
+      const userDPageManager = PageManager.from(userDPage);
 
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
