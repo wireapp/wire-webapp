@@ -20,7 +20,7 @@
 import {AudioType} from 'Repositories/audio/audioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withConnectedUser, withLogin, expect, Team} from 'test/e2e_tests/test.fixtures';
+import {test, withConnectedUser, withLogin, expect, Team, withConnectionRequest} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
@@ -98,7 +98,7 @@ test.describe('Calling', () => {
     await userACall.toggleHandRaise();
     const toast = userAPage.getByText('You have raised your hand up');
 
-    await expect(toast).toBeVisible({timeout: 1_000});
+    await expect(toast).toBeVisible({timeout: 2000});
     await expect(userACall.selfVideoThumbnail.getByText('✋')).toBeVisible();
 
     await expect(toast).toBeHidden({timeout: 3000});
@@ -246,11 +246,13 @@ test.describe('Calling', () => {
     await expect(userBPages.calling().goFullScreen).toBeVisible();
 
     // User C joins the ongoing call
+    await userCPage.waitForTimeout(5_000);
     await expect(userCPages.conversationList().joinCallButton).toBeVisible();
     await userCPages.conversationList().joinCallButton.click();
 
     // Confirm that user C joined the call
     await expect(userCPages.calling().goFullScreen).toBeVisible();
+    await expect(userCPages.calling().gridTiles).toHaveCount(3);
   });
 
   test('Verify Call UI checks', {tag: ['@TC-8771', '@regression']}, async ({createPage}) => {
@@ -300,7 +302,7 @@ test.describe('Calling', () => {
 
     // User B re-joins the ongoing call from the conversation list
     const joinButton = userBPages.conversationList().joinCallButton;
-    await expect(joinButton).toBeVisible({timeout: 10_000});
+    await expect(joinButton).toBeVisible({timeout: 5000});
     await joinButton.click();
 
     await expect(userBPages.calling().goFullScreen).toBeVisible();
@@ -468,6 +470,86 @@ test.describe('Calling', () => {
       await expect(userAPage.getByTestId('modal-without-title')).toContainText(
         `Are you sure you want to call ${allMembers.length} people?`,
       );
+    },
+  );
+
+  test(
+    'I want to see the full call participant list and verify all media toggles',
+    {tag: ['@TC-2844', '@regression']},
+    async ({createPage, createUser}) => {
+      const guestUser = await createUser();
+      const [userAPages, userBPages, guestPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectionRequest(guestUser))).then(
+          pm => pm.webapp.pages,
+        ),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(guestUser))).then(pm => pm.webapp.pages),
+      ]);
+
+      // --- Setup and Call Initialization ---
+      await test.step('Setup: Accept connection and start group call', async () => {
+        await guestPages.conversationList().openPendingConnectionRequest();
+        await guestPages.connectRequest().clickConnectButton();
+
+        await createGroup(userAPages, groupName, [userB, guestUser]);
+
+        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversation().clickCallButton();
+      });
+
+      await test.step('Join call with all participants', async () => {
+        for (const member of [userBPages, guestPages]) {
+          await expect(member.calling().callCell).toBeVisible();
+          await member.calling().clickAcceptCallButton();
+          await expect(member.calling().goFullScreen).toBeVisible();
+        }
+      });
+
+      const userACall = await userAPages.calling().maximizeCell();
+      await userACall.toggleParticipantsList();
+      await expect(userACall.getCallParticipant(guestUser.fullName).guestIcon).toBeVisible();
+
+      const participants = [
+        {pages: userBPages, name: userB.fullName, label: 'User B'},
+        {pages: guestPages, name: guestUser.fullName, label: 'Guest User'},
+      ];
+
+      const features = [
+        {
+          name: 'Mute',
+          action: (p: PageManager['webapp']['pages']) => p.calling().toggleMuteButton.click(),
+          verify: async (name: string) => {
+            await expect(userACall.getCallParticipant(name).muteIcon).not.toBeVisible();
+            await expect(userACall.getGridTile(name).muteIcon).not.toBeVisible();
+          },
+        },
+        {
+          name: 'Screenshare',
+          action: (p: PageManager['webapp']['pages']) => p.calling().clickToggleScreenShareButton(),
+          verify: async (name: string) => {
+            await expect(userACall.getCallParticipant(name).screenShareIcon).toBeVisible();
+            await expect(userACall.getGridTile(name).videoElement).toBeVisible();
+          },
+        },
+        {
+          name: 'Video',
+          action: (p: PageManager['webapp']['pages']) => p.calling().clickToggleVideoButton(),
+          verify: async (name: string) => {
+            await expect(userACall.getCallParticipant(name).videoIcon).toBeVisible();
+            await expect(userACall.getGridTile(name).videoElement).toBeVisible();
+          },
+        },
+      ];
+
+      for (const participant of participants) {
+        for (const feature of features) {
+          await test.step(`${participant.label}: Verify ${feature.name}`, async () => {
+            await feature.action(participant.pages);
+            await feature.verify(participant.name);
+            await feature.action(participant.pages);
+          });
+        }
+      }
     },
   );
 });

@@ -26,7 +26,10 @@ export const FullScreenCallPage = (page: Page) => {
 
   const reactButton = component.getByTitle('Reactions');
   const raiseHandButton = component.getByTestId('do-toggle-hand-raise');
+  const toggleParticipantsBtn = component.getByTestId('do-toggle-call-participants-list');
   const selfVideoThumbnail = page.getByTestId('self-video-thumbnail-wrapper');
+  const callParticipants = component.getByTestId('list-call-ui-participants').getByRole('listitem');
+  const gridTiles = component.getByTestId('item-grid');
 
   /* Press the react button and click the given emoji within the opened toolbar */
   const sendReaction = async (emoji: '👍') => {
@@ -51,10 +54,41 @@ export const FullScreenCallPage = (page: Page) => {
     await raiseHandButton.click();
   };
 
+  const toggleParticipantsList = async () => {
+    await toggleParticipantsBtn.click();
+  };
+
+  const getCallParticipant = (userName: string) => {
+    const user = callParticipants.filter({hasText: userName});
+
+    return Object.assign(user, {
+      muteIcon: user.getByTestId('status-audio-off'),
+      guestIcon: user.getByTestId('status-guest'),
+      // User is an active speaker
+      speakIcon: user.getByTestId('status-active-speaking'),
+      videoIcon: user.getByTestId('status-video'),
+      screenShareIcon: user.getByTestId('status-screenshare'),
+    });
+  };
+
+  const getGridTile = (name: string) => {
+    const tile = gridTiles.filter({hasText: name});
+
+    return Object.assign(tile, {
+      /** Icon indicating that the given user is muted */
+      muteIcon: tile.getByTestId('mic-icon-off'),
+      videoElement: tile.locator('video'),
+    });
+  };
+
   return {
     sendReaction,
     getReaction,
+    toggleParticipantsBtn,
     toggleHandRaise,
     selfVideoThumbnail,
+    toggleParticipantsList,
+    getCallParticipant,
+    getGridTile,
   };
 };
