@@ -761,13 +761,15 @@ type BackgroundPumpState = {
   targetInterval: number;
 };
 
-const getDefaultSegmentationModelByTier = (): SegmentationModelByTier => ({
-  superhigh: TIER_DEFINITIONS.superhigh.modelPath,
-  high: TIER_DEFINITIONS.high.modelPath,
-  medium: TIER_DEFINITIONS.medium.modelPath,
-  low: TIER_DEFINITIONS.low.modelPath,
-  bypass: TIER_DEFINITIONS.bypass.modelPath,
-});
+const getDefaultSegmentationModelByTier = (): SegmentationModelByTier => {
+  return {
+    superhigh: TIER_DEFINITIONS.superhigh.modelPath,
+    high: TIER_DEFINITIONS.high.modelPath,
+    medium: TIER_DEFINITIONS.medium.modelPath,
+    low: TIER_DEFINITIONS.low.modelPath,
+    bypass: TIER_DEFINITIONS.bypass.modelPath,
+  };
+};
 
 const resolveSegmentationModelByTier = (
   opts: StartOptions,
@@ -796,13 +798,15 @@ const resolveSegmentationModelByTier = (
   return defaults;
 };
 
-const resolveRuntimeConfig = (current: RuntimeConfig, opts: StartOptions): RuntimeConfig => ({
-  mode: opts.mode ?? current.mode,
-  debugMode: opts.debugMode ?? current.debugMode,
-  blurStrength: opts.blurStrength !== undefined ? clampBlurStrength(opts.blurStrength) : current.blurStrength,
-  quality: opts.quality ?? current.quality,
-  targetFps: opts.targetFps ?? current.targetFps,
-});
+const resolveRuntimeConfig = (current: RuntimeConfig, opts: StartOptions): RuntimeConfig => {
+  return {
+    mode: opts.mode ?? current.mode,
+    debugMode: opts.debugMode ?? current.debugMode,
+    blurStrength: opts.blurStrength !== undefined ? clampBlurStrength(opts.blurStrength) : current.blurStrength,
+    quality: opts.quality ?? current.quality,
+    targetFps: opts.targetFps ?? current.targetFps,
+  };
+};
 
 const resolveActivePipeline = ({
   cap,
@@ -830,15 +834,18 @@ const buildPipelineConfig = ({
   debugMode: DebugMode;
   blurStrength: number;
   quality: QualityMode;
-}): PipelineConfig => ({
-  mode,
-  debugMode,
-  blurStrength,
-  quality,
-});
+}): PipelineConfig => {
+  return {
+    mode,
+    debugMode,
+    blurStrength,
+    quality,
+  };
+};
 
-const resolveInitialTier = (quality: QualityMode, initialTierFromPolicy: QualityTier): QualityTier =>
-  quality === 'auto' ? initialTierFromPolicy : quality;
+const resolveInitialTier = (quality: QualityMode, initialTierFromPolicy: QualityTier): QualityTier => {
+  return quality === 'auto' ? initialTierFromPolicy : quality;
+};
 
 const getCanvasDimensionsFromTrack = (inputTrack: MediaStreamTrack): {width: number; height: number} => {
   const settings = inputTrack.getSettings();
@@ -858,9 +865,13 @@ const shouldResizeCanvas = ({
   width: number;
   height: number;
   isTransferred: boolean;
-}): boolean => !isTransferred && (outputCanvas.width !== width || outputCanvas.height !== height);
+}): boolean => {
+  return !isTransferred && (outputCanvas.width !== width || outputCanvas.height !== height);
+};
 
-const clampBlurStrength = (value: number): number => Math.max(0, Math.min(1, value));
+const clampBlurStrength = (value: number): number => {
+  return Math.max(0, Math.min(1, value));
+};
 
 const shouldSkipFrame = ({
   outputCanvas,
@@ -870,7 +881,9 @@ const shouldSkipFrame = ({
   outputCanvas: HTMLCanvasElement | null;
   width: number;
   height: number;
-}): boolean => !outputCanvas || width === 0 || height === 0;
+}): boolean => {
+  return !outputCanvas || width === 0 || height === 0;
+};
 
 const safelyCloseFrame = (frame: ImageBitmap): void => {
   try {
@@ -893,19 +906,25 @@ const createPipeline = (type: PipelineType): BackgroundEffectsRenderingPipeline 
   }
 };
 
-const isWebGLContextLost = (webglContextLost: boolean, pipeline: PipelineType): boolean =>
-  webglContextLost || pipeline !== 'main-webgl2';
+const isWebGLContextLost = (webglContextLost: boolean, pipeline: PipelineType): boolean => {
+  return webglContextLost || pipeline !== 'main-webgl2';
+};
 
 const isWebGLContextCannotBeRestored = (
   webglContextLost: boolean,
   webglRestorePipeline: PipelineType | null,
   outputCanvas: HTMLCanvasElement | null,
-): boolean => !webglContextLost || webglRestorePipeline !== 'main-webgl2' || !outputCanvas;
+): boolean => {
+  return !webglContextLost || webglRestorePipeline !== 'main-webgl2' || !outputCanvas;
+};
 
-const shouldHandleWorkerContextLoss = (isStopping: boolean, pipeline: PipelineType): boolean =>
-  !isStopping && pipeline === 'worker-webgl2';
+const shouldHandleWorkerContextLoss = (isStopping: boolean, pipeline: PipelineType): boolean => {
+  return !isStopping && pipeline === 'worker-webgl2';
+};
 
-const didTierChange = (previousTier: QualityTier | null, nextTier: QualityTier): boolean => previousTier !== nextTier;
+const didTierChange = (previousTier: QualityTier | null, nextTier: QualityTier): boolean => {
+  return previousTier !== nextTier;
+};
 
 const createSinglePixelCanvas = (): OffscreenCanvas | HTMLCanvasElement => {
   if (typeof OffscreenCanvas !== 'undefined') {
@@ -918,14 +937,17 @@ const createSinglePixelCanvas = (): OffscreenCanvas | HTMLCanvasElement => {
   return canvas;
 };
 
-const createBackgroundPumpState = (fps: number): BackgroundPumpState => ({
-  active: true,
-  lastTimestamp: 0,
-  targetInterval: 1000 / fps,
-});
+const createBackgroundPumpState = (fps: number): BackgroundPumpState => {
+  return {
+    active: true,
+    lastTimestamp: 0,
+    targetInterval: 1000 / fps,
+  };
+};
 
-const shouldProcessBackgroundVideoFrame = (now: number, lastTimestamp: number, targetInterval: number): boolean =>
-  now - lastTimestamp >= targetInterval;
+const shouldProcessBackgroundVideoFrame = (now: number, lastTimestamp: number, targetInterval: number): boolean => {
+  return now - lastTimestamp >= targetInterval;
+};
 
 const applyInitialBackgroundSources = (
   opts: StartOptions,

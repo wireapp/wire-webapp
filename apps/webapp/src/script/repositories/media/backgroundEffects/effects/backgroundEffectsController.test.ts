@@ -128,8 +128,9 @@ type ControllerInternals = {
   updatePipelineConfig: () => void;
 };
 
-const getInternals = (controller: BackgroundEffectsController): ControllerInternals =>
-  controller as unknown as ControllerInternals;
+const getInternals = (controller: BackgroundEffectsController): ControllerInternals => {
+  return controller as unknown as ControllerInternals;
+};
 
 describe('BackgroundEffectsController', () => {
   let controller: BackgroundEffectsController;

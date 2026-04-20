@@ -39,11 +39,13 @@ export const DEBOUNCE_TIMER = 500;
 const VIDEO_BACKGROUND_EFFECT_STORAGE_KEY = 'video-background-effects';
 const VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY = 'video-background-effects-feature-enabled';
 
-const isVirtualEffect = (effect: BackgroundEffectSelection): boolean =>
-  effect.type === 'virtual' || effect.type === 'custom';
+const isVirtualEffect = (effect: BackgroundEffectSelection): boolean => {
+  return effect.type === 'virtual' || effect.type === 'custom';
+};
 
-const getBlurStrength = (effect: BackgroundEffectSelection) =>
-  effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
+const getBlurStrength = (effect: BackgroundEffectSelection) => {
+  return effect.type === 'blur' ? BLUR_STRENGTHS[effect.level] : BLUR_STRENGTHS.high;
+};
 
 const computeRenderMetrics = (metrics: Metrics): RenderMetrics => {
   const budget = 1000 / TARGET_FPS;
