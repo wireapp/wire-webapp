@@ -17,10 +17,12 @@
  *
  */
 
-import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
+import type {QualifiedId, UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+
+type ServiceType = 'Service' | 'App';
 
 export interface ServiceData {
   assets?: APIClientUserAsset[];
@@ -32,11 +34,14 @@ export interface ServiceData {
   summary?: string;
   category?: string;
   tags?: string[];
+  qualifiedId?: QualifiedId;
+  type?: ServiceType;
 }
 
 export class ServiceEntity {
   description: string;
   id: string;
+  qualifiedId?: QualifiedId;
   mediumPictureResource = ko.observable<AssetRemoteData>();
   name: ko.Observable<string>;
   previewPictureResource = ko.observable<AssetRemoteData>();
@@ -45,7 +50,13 @@ export class ServiceEntity {
   summary: string;
   tags: string[];
   category?: string;
-  isService: boolean;
+  type: ServiceType;
+  get isService() {
+    return this.type === 'Service';
+  }
+  get isApp() {
+    return this.type === 'App';
+  }
 
   constructor(serviceData: ServiceData = {}) {
     this.id = serviceData.id ?? '';
@@ -56,7 +67,6 @@ export class ServiceEntity {
     this.summary = serviceData.summary ?? '';
     this.category = serviceData.category ?? '';
     this.tags = serviceData.tags ?? [];
-
-    this.isService = true;
+    this.type = serviceData.type ?? 'Service';
   }
 }

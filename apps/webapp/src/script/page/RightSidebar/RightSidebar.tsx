@@ -48,8 +48,8 @@ import {ParticipantDevices} from './participantDevices';
 import {TimedMessages} from './timedMessages';
 
 import {isReadableMessage} from '../../guards/Message';
-import {isUserEntity, isUserServiceEntity} from '../../guards/Panel';
-import {isServiceEntity} from '../../guards/Service';
+import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
+import {isAppOrServiceEntity} from '../../guards/Service';
 import {Core} from '../../service/CoreSingleton';
 import {ActionsViewModel} from '../../view_model/ActionsViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
@@ -125,9 +125,9 @@ const RightSidebar: FC<RightSidebarProps> = ({
   const currentState = rightSidebar.history[lastItem];
 
   const userEntity = currentEntity && isUserEntity(currentEntity) ? currentEntity : null;
-  const userServiceEntity = currentEntity && isUserServiceEntity(currentEntity) ? currentEntity : null;
+  const userServiceEntity = currentEntity && isUserAppOrServiceEntity(currentEntity) ? currentEntity : null;
   const messageEntity = currentEntity && isReadableMessage(currentEntity) ? currentEntity : null;
-  const serviceEntity = currentEntity && isServiceEntity(currentEntity) ? currentEntity : null;
+  const serviceEntity = currentEntity && isAppOrServiceEntity(currentEntity) ? currentEntity : null;
 
   const goToRoot = () => rightSidebar.goToRoot(activeConversation || null);
 
@@ -282,6 +282,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               activeConversation={activeConversation}
               actionsViewModel={actionsViewModel}
               integrationRepository={integrationRepository}
+              conversationRepository={conversationRepository}
               enableRemove={conversationRoleRepository.canRemoveParticipants(activeConversation)}
               goToRoot={goToRoot}
               onBack={onBackClick}

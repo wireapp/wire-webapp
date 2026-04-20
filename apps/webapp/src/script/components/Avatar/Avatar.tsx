@@ -29,7 +29,7 @@ import {ServiceAvatar} from './ServiceAvatar';
 import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
 import {UserAvatar} from './UserAvatar';
 
-import {isServiceEntity} from '../../guards/Service';
+import {isAppOrServiceEntity} from '../../guards/Service';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',
@@ -116,7 +116,7 @@ const Avatar = ({
       'isUnknown',
     ]);
 
-  if (isServiceEntity(participant)) {
+  if (isAppOrServiceEntity(participant)) {
     return (
       <ServiceAvatar avatarSize={avatarSize} participant={participant} onClick={handleAvatarInteraction} {...props} />
     );
