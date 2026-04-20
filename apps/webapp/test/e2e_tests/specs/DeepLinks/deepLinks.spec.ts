@@ -22,6 +22,55 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {expect, test, withConnectedUser, withConnectionRequest, withLogin} from 'test/e2e_tests/test.fixtures';
 import {Page} from '@playwright/test';
 import {createGroup} from '../../utils/userActions';
+import {UserProfileModal} from '../../pageManager/webapp/modals/userProfile.modal';
+
+type ProfileModalOptions = {
+  showGuestChip?: boolean;
+  showEmail?: boolean;
+  showConnectWarning?: boolean;
+  showOpenConversationButton?: boolean;
+  showConnectButton?: boolean;
+  showBlockButton?: boolean;
+  showCancelButton?: boolean;
+};
+
+async function verifyUserProfileModal(profileModal: UserProfileModal, user: User, options: ProfileModalOptions) {
+  await test.step(`Verify user profile modal for ${user.fullName}`, async () => {
+    await expect(profileModal.modal).toBeVisible();
+    await expect(profileModal.participantFullname).toContainText(user.fullName);
+    await expect(profileModal.participantUsername).toContainText(user.username);
+    await expect(profileModal.domainLabel).toBeVisible();
+
+    if (options.showEmail) {
+      await expect(profileModal.userEmailLabel).toBeVisible();
+      await expect(profileModal.userEmailEntry).toContainText(user.email);
+    }
+
+    if (options.showGuestChip) {
+      await expect(profileModal.guestChip).toBeVisible();
+    }
+
+    if (options.showConnectWarning) {
+      await expect(profileModal.connectWarning).toBeVisible();
+    }
+
+    if (options.showOpenConversationButton) {
+      await expect(profileModal.openConversationButton).toBeVisible();
+    }
+
+    if (options.showConnectButton) {
+      await expect(profileModal.connectButton).toBeVisible();
+    }
+
+    if (options.showBlockButton) {
+      await expect(profileModal.blockButton).toBeVisible();
+    }
+
+    if (options.showCancelButton) {
+      await expect(profileModal.cancelButton).toBeVisible();
+    }
+  });
+}
 
 test.describe('Deep Links', () => {
   let userA: User;
@@ -44,8 +93,6 @@ test.describe('Deep Links', () => {
     return copiedLink;
   }
   // -----------------------
-
-  test.use({permissions: ['clipboard-write', 'clipboard-read']});
 
   test(
     'Opening profile deep links as a team member',
@@ -71,9 +118,11 @@ test.describe('Deep Links', () => {
         PageManager.from(userDPage),
       ]);
 
-      await userBPage.context().grantPermissions(['clipboard-write', 'clipboard-read']);
-      await userCPage.context().grantPermissions(['clipboard-write', 'clipboard-read']);
-      await userDPage.context().grantPermissions(['clipboard-write', 'clipboard-read']);
+      await Promise.all(
+        [userBPage, userCPage, userDPage].map(page =>
+          page.context().grantPermissions(['clipboard-write', 'clipboard-read']),
+        ),
+      );
 
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -92,14 +141,13 @@ test.describe('Deep Links', () => {
 
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().getMessage({sender: userB}).click();
-        await expect(userAModals.userProfile().modal).toBeVisible();
-        await expect(userAModals.userProfile().participantFullname).toContainText(userB.fullName);
-        await expect(userAModals.userProfile().participantUsername).toContainText(userB.username);
-        await expect(userAModals.userProfile().userEmailLabel).toBeVisible();
-        await expect(userAModals.userProfile().userEmailEntry).toContainText(userB.email);
-        await expect(userAModals.userProfile().domainLabel).toBeVisible();
-        await expect(userAModals.userProfile().openConversationButton).toBeVisible();
-        await expect(userAModals.userProfile().cancelButton).toBeVisible();
+
+        await verifyUserProfileModal(userAModals.userProfile(), userB, {
+          showEmail: true,
+          showOpenConversationButton: true,
+          showCancelButton: true,
+        });
+
         await userAModals.userProfile().cancelButton.click();
       });
 
@@ -110,14 +158,14 @@ test.describe('Deep Links', () => {
 
         await userAPages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
         await userAPages.conversation().getMessage({sender: userC}).click();
-        await expect(userAModals.userProfile().modal).toBeVisible();
-        await expect(userAModals.userProfile().participantFullname).toContainText(userC.fullName);
-        await expect(userAModals.userProfile().participantUsername).toContainText(userC.username);
-        await expect(userAModals.userProfile().guestChip).toBeVisible();
-        await expect(userAModals.userProfile().domainLabel).toBeVisible();
-        await expect(userAModals.userProfile().connectWarning).toBeVisible();
-        await expect(userAModals.userProfile().openConversationButton).toBeVisible();
-        await expect(userAModals.userProfile().blockButton).toBeVisible();
+
+        await verifyUserProfileModal(userAModals.userProfile(), userC, {
+          showGuestChip: true,
+          showConnectWarning: true,
+          showOpenConversationButton: true,
+          showBlockButton: true,
+        })
+
         await userAModals.userProfile().modalCloseButton.click();
       });
 
@@ -143,14 +191,12 @@ test.describe('Deep Links', () => {
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().getMessage({content: 'UserD'}).click();
 
-        await expect(userAModals.userProfile().modal).toBeVisible();
-        await expect(userAModals.userProfile().participantFullname).toContainText(userD.fullName);
-        await expect(userAModals.userProfile().participantUsername).toContainText(userD.username);
-        await expect(userAModals.userProfile().guestChip).toBeVisible();
-        await expect(userAModals.userProfile().domainLabel).toBeVisible();
-        await expect(userAModals.userProfile().connectWarning).toBeVisible();
-        await expect(userAModals.userProfile().connectButton).toBeVisible();
-        await userAModals.userProfile().cancelButton.click();
+        await verifyUserProfileModal(userAModals.userProfile(), userD, {
+          showGuestChip: true,
+          showConnectWarning: true,
+          showConnectButton: true,
+          showCancelButton: true,
+        })
       });
     },
   );
@@ -179,9 +225,11 @@ test.describe('Deep Links', () => {
         PageManager.from(userDPage),
       ]);
 
-      await userBPage.context().grantPermissions(['clipboard-write', 'clipboard-read']);
-      await userCPage.context().grantPermissions(['clipboard-write', 'clipboard-read']);
-      await userDPage.context().grantPermissions(['clipboard-write', 'clipboard-read']);
+      await Promise.all(
+        [userBPage, userCPage, userDPage].map(page =>
+          page.context().grantPermissions(['clipboard-write', 'clipboard-read']),
+        ),
+      );
 
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -200,14 +248,13 @@ test.describe('Deep Links', () => {
 
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().getMessage({sender: userB}).click();
-        await expect(userAModals.userProfile().modal).toBeVisible();
-        await expect(userAModals.userProfile().participantFullname).toContainText(userB.fullName);
-        await expect(userAModals.userProfile().participantUsername).toContainText(userB.username);
-        await expect(userAModals.userProfile().userEmailLabel).toBeVisible();
-        await expect(userAModals.userProfile().userEmailEntry).toContainText(userB.email);
-        await expect(userAModals.userProfile().domainLabel).toBeVisible();
-        await expect(userAModals.userProfile().openConversationButton).toBeVisible();
-        await expect(userAModals.userProfile().cancelButton).toBeVisible();
+
+        await verifyUserProfileModal(userAModals.userProfile(), userB, {
+          showEmail: true,
+          showOpenConversationButton: true,
+          showCancelButton: true,
+        });
+
         await userAModals.userProfile().cancelButton.click();
       });
 
@@ -218,14 +265,14 @@ test.describe('Deep Links', () => {
 
         await userAPages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
         await userAPages.conversation().getMessage({sender: userC}).click();
-        await expect(userAModals.userProfile().modal).toBeVisible();
-        await expect(userAModals.userProfile().participantFullname).toContainText(userC.fullName);
-        await expect(userAModals.userProfile().participantUsername).toContainText(userC.username);
-        await expect(userAModals.userProfile().guestChip).toBeVisible();
-        await expect(userAModals.userProfile().domainLabel).toBeVisible();
-        await expect(userAModals.userProfile().connectWarning).toBeVisible();
-        await expect(userAModals.userProfile().openConversationButton).toBeVisible();
-        await expect(userAModals.userProfile().blockButton).toBeVisible();
+
+        await verifyUserProfileModal(userAModals.userProfile(), userC, {
+          showGuestChip: true,
+          showConnectWarning: true,
+          showOpenConversationButton: true,
+          showBlockButton: true,
+        });
+
         await userAModals.userProfile().modalCloseButton.click();
       });
 
@@ -274,14 +321,12 @@ test.describe('Deep Links', () => {
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().getMessage({content: 'UserD'}).click();
 
-        await expect(userAModals.userProfile().modal).toBeVisible();
-        await expect(userAModals.userProfile().participantFullname).toContainText(userD.fullName);
-        await expect(userAModals.userProfile().participantUsername).toContainText(userD.username);
-        await expect(userAModals.userProfile().guestChip).toBeVisible();
-        await expect(userAModals.userProfile().domainLabel).toBeVisible();
-        await expect(userAModals.userProfile().connectWarning).toBeVisible();
-        await expect(userAModals.userProfile().connectButton).toBeVisible();
-        await userAModals.userProfile().cancelButton.click();
+        await verifyUserProfileModal(userAModals.userProfile(), userD, {
+          showGuestChip: true,
+          showConnectWarning: true,
+          showConnectButton: true,
+          showCancelButton: true,
+        });
       });
     },
   );
