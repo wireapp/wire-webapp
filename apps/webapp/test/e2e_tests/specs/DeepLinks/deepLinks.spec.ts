@@ -133,7 +133,7 @@ test.describe('Deep Links', () => {
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().sendMessage('UserA profile link: ' + copiedProfileLinkUserA);
 
-        await userAPages.conversation().getMessage({sender: userA}).click();
+        await userAPages.conversation().getMessage({sender: userA}).getByRole('link').click();
 
         await verifyUserProfileModal(userAModals.userProfile(), userA, {
           showEmail: true,
@@ -150,7 +150,7 @@ test.describe('Deep Links', () => {
         await userBPages.conversation().sendMessage('UserB profile link: ' + copiedProfileLinkUserB);
 
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        await userAPages.conversation().getMessage({sender: userB}).click();
+        await userAPages.conversation().getMessage({sender: userB}).getByRole('link').click();
 
         await verifyUserProfileModal(userAModals.userProfile(), userB, {
           showEmail: true,
@@ -167,7 +167,7 @@ test.describe('Deep Links', () => {
         await userCPages.conversation().sendMessage('UserC profile link: ' + copiedProfileLinkUserC);
 
         await userAPages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
-        await userAPages.conversation().getMessage({sender: userC}).click();
+        await userAPages.conversation().getMessage({sender: userC}).getByRole('link').click();
 
         await verifyUserProfileModal(userAModals.userProfile(), userC, {
           showGuestChip: true,
@@ -199,7 +199,7 @@ test.describe('Deep Links', () => {
         await expect(userBPages.conversation().getMessage({sender: userB})).toBeVisible();
 
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        await userAPages.conversation().getMessage({content: 'UserD'}).click();
+        await userAPages.conversation().getMessage({content: 'UserD'}).getByRole('link').click();
 
         await verifyUserProfileModal(userAModals.userProfile(), userD, {
           showGuestChip: true,
@@ -230,7 +230,7 @@ test.describe('Deep Links', () => {
         const messageWithConversationJoinLink = userAPages
           .conversation()
           .getMessage({sender: userB, content: conversationJoinLink});
-        await messageWithConversationJoinLink.getByText(conversationJoinLink).click();
+        await messageWithConversationJoinLink.getByRole('link').click();
         await expect(userAModals.confirm().modal).toBeVisible();
         await expect(userAModals.confirm().actionButton).toContainText('Join Conversation');
         await userAModals.confirm().actionButton.click();
@@ -276,7 +276,7 @@ test.describe('Deep Links', () => {
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
         await userAPages.conversation().sendMessage('UserA profile link: ' + copiedProfileLinkUserA);
 
-        await userAPages.conversation().getMessage({sender: userA}).click();
+        await userAPages.conversation().getMessage({sender: userA}).getByRole('link').click();
 
         await verifyUserProfileModal(userAModals.userProfile(), userA, {
           showEmail: true,
@@ -293,7 +293,7 @@ test.describe('Deep Links', () => {
         await userBPages.conversation().sendMessage('UserB profile link: ' + copiedProfileLinkUserB);
 
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        await userAPages.conversation().getMessage({sender: userB}).click();
+        await userAPages.conversation().getMessage({sender: userB}).getByRole('link').click();
 
         await verifyUserProfileModal(userAModals.userProfile(), userB, {
           showEmail: true,
@@ -310,7 +310,7 @@ test.describe('Deep Links', () => {
         await userCPages.conversation().sendMessage('UserC profile link: ' + copiedProfileLinkUserC);
 
         await userAPages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
-        await userAPages.conversation().getMessage({sender: userC}).click();
+        await userAPages.conversation().getMessage({sender: userC}).getByRole('link').click();
 
         await verifyUserProfileModal(userAModals.userProfile(), userC, {
           showGuestChip: true,
@@ -340,7 +340,7 @@ test.describe('Deep Links', () => {
         await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
         await userBPages.conversation().sendMessage(copiedProfileLinkFromUserD);
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-        await userAPages.conversation().getMessage({content: 'UserD'}).click();
+        await userAPages.conversation().getMessage({content: 'UserD'}).getByRole('link').click();
 
         await verifyUserProfileModal(userAModals.userProfile(), userD, {
           showGuestChip: true,
@@ -371,7 +371,7 @@ test.describe('Deep Links', () => {
         const messageWithConversationJoinLink = userAPages
           .conversation()
           .getMessage({sender: userB, content: conversationJoinLink});
-        await messageWithConversationJoinLink.getByText(conversationJoinLink).click();
+        await messageWithConversationJoinLink.getByRole('link').click();
         await expect(userAModals.confirm().modal).toBeVisible();
         await expect(userAModals.confirm().actionButton).toContainText('Join Conversation');
         await userAModals.confirm().actionButton.click();
