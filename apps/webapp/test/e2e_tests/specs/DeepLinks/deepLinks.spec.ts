@@ -72,27 +72,25 @@ async function verifyUserProfileModal(profileModal: UserProfileModal, user: User
   });
 }
 
+async function copyProfileLink(page: Page, pageManager: PageManager): Promise<string> {
+  const {pages, components} = pageManager.webapp;
+
+  await components.conversationSidebar().preferencesButton.click();
+  await pages.settings().copyProfileLinkButton.click();
+  await components.conversationSidebar().allConverationsButton.click();
+
+  const copiedLink = await page.evaluate(async () => {
+    return await navigator.clipboard.readText();
+  });
+
+  return copiedLink;
+}
+
 test.describe('Deep Links', () => {
   let userA: User;
   let userB: User;
   let userC: User;
   let userD: User;
-
-  // --- helper function to copy profile deep link ---
-  async function copyProfileLink(page: Page, pageManager: PageManager): Promise<string> {
-    const {pages, components} = pageManager.webapp;
-
-    await components.conversationSidebar().preferencesButton.click();
-    await pages.settings().copyProfileLinkButton.click();
-    await components.conversationSidebar().allConverationsButton.click();
-
-    const copiedLink = await page.evaluate(async () => {
-      return await navigator.clipboard.readText();
-    });
-
-    return copiedLink;
-  }
-  // -----------------------
 
   test(
     'Opening profile deep links as a team member',
