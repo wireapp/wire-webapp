@@ -80,7 +80,7 @@ test.describe('Delete', () => {
       messageA = userAPages.conversation().getMessage({sender: userA});
       await expect(messageA).toContainText('Test Message');
 
-      messageB = userAPages.conversation().getMessage({sender: userA});
+      messageB = userBPages.conversation().getMessage({sender: userA});
       await expect(messageB).toContainText('Test Message');
     });
 
