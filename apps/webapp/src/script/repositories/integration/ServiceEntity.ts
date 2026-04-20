@@ -22,6 +22,8 @@ import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 
+type ServiceType = 'Service' | 'App';
+
 export interface ServiceData {
   assets?: APIClientUserAsset[];
   description?: string;
@@ -33,6 +35,7 @@ export interface ServiceData {
   category?: string;
   tags?: string[];
   qualifiedId?: QualifiedId;
+  type?: ServiceType;
 }
 
 export class ServiceEntity {
@@ -47,11 +50,12 @@ export class ServiceEntity {
   summary: string;
   tags: string[];
   category?: string;
+  type: ServiceType;
   get isService() {
-    return !this.category;
+    return this.type === 'Service';
   }
   get isApp() {
-    return !!this.category;
+    return this.type === 'App';
   }
 
   constructor(serviceData: ServiceData = {}) {
@@ -63,5 +67,6 @@ export class ServiceEntity {
     this.summary = serviceData.summary ?? '';
     this.category = serviceData.category ?? '';
     this.tags = serviceData.tags ?? [];
+    this.type = serviceData.type ?? 'Service';
   }
 }

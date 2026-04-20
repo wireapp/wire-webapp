@@ -107,6 +107,7 @@ export const IntegrationMapper = {
         previewPictureResource,
         mediumPictureResource,
       });
+      serviceEntity.type = 'App';
     }
 
     return serviceEntity;
