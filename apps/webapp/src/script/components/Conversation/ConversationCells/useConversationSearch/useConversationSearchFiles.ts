@@ -25,6 +25,8 @@ import {useDebouncedCallback} from 'use-debounce';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 
+import {createRequestVersionGate} from './requestVersionGate';
+
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
@@ -54,12 +56,13 @@ export const useConversationSearchFiles = ({
   const [searchQuery, setSearchQuery] = useState('');
   const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
+  const requestVersionGate = useRef(createRequestVersionGate());
 
   const {id} = conversationQualifiedId;
   const conversationPath = getCellsApiPath({conversationQualifiedId});
 
   const searchNodes = useCallback(
-    async ({query}: {query: string}) => {
+    async ({query, requestId}: {query: string; requestId: number}) => {
       try {
         setStatus('loading');
 
@@ -72,6 +75,12 @@ export const useConversationSearchFiles = ({
           sortDirection: shouldSort ? 'desc' : undefined,
           type: 'file',
         });
+
+        // A newer search request started while this one was in flight.
+        // Ignore stale results/errors to avoid overwriting current state.
+        if (!requestVersionGate.current.isCurrent(requestId)) {
+          return;
+        }
 
         if (!result.Nodes?.length) {
           setNodes({conversationId: id, nodes: []});
@@ -100,7 +109,11 @@ export const useConversationSearchFiles = ({
         }
 
         setStatus('success');
-      } catch (error: unknown) {
+      } catch {
+        if (!requestVersionGate.current.isCurrent(requestId)) {
+          return;
+        }
+
         setStatus('error');
         setNodes({conversationId: id, nodes: []});
         setPagination({conversationId: id, pagination: null});
@@ -112,10 +125,13 @@ export const useConversationSearchFiles = ({
   );
 
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
+    const requestId = requestVersionGate.current.next();
     shouldPerformSearch.current = false;
     setSearchQuery(value);
-    await searchNodes({query: value});
-    shouldPerformSearch.current = true;
+    await searchNodes({query: value, requestId});
+    if (requestVersionGate.current.isCurrent(requestId)) {
+      shouldPerformSearch.current = true;
+    }
   }, DEBOUNCE_TIME);
 
   const handleSearch = (value: string) => {
@@ -132,15 +148,17 @@ export const useConversationSearchFiles = ({
 
   const handleClearSearch = () => {
     searchNodesDebounced.cancel();
+    requestVersionGate.current.invalidate();
     setSearchValue('');
     setSearchQuery('');
     shouldPerformSearch.current = false;
   };
 
   const handleReload = async () => {
+    const requestId = requestVersionGate.current.next();
     setStatus('loading');
     clearAll({conversationId: id});
-    await searchNodes({query: searchQuery || FETCH_ALL_QUERY});
+    await searchNodes({query: searchQuery || FETCH_ALL_QUERY, requestId});
   };
 
   useEffect(() => {
@@ -148,7 +166,8 @@ export const useConversationSearchFiles = ({
       return;
     }
 
-    void searchNodes({query: searchQuery || FETCH_ALL_QUERY});
+    const requestId = requestVersionGate.current.next();
+    void searchNodes({query: searchQuery || FETCH_ALL_QUERY, requestId});
   }, [searchNodes, searchQuery, enabled]);
 
   return {
