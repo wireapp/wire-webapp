@@ -135,7 +135,10 @@ export class BrigRepositoryE2E {
     );
   }
 
-  public async enableMLSFeature(teamId: string) {
+  public async enableMLSFeature(
+    teamId: string,
+    config: {defaultProtocol: 'mls' | 'proteus'; supportedProtocols: ('mls' | 'proteus')[]},
+  ) {
     await this.axiosInstance.patch(
       `i/teams/${teamId}/features/mls`,
       {
@@ -143,9 +146,9 @@ export class BrigRepositoryE2E {
         config: {
           protocolToggleUsers: [],
           allowedCipherSuites: [2],
-          defaultProtocol: 'mls',
+          defaultProtocol: config?.defaultProtocol ?? 'mls',
           defaultCipherSuite: 2,
-          supportedProtocols: ['mls', 'proteus'],
+          supportedProtocols: config?.supportedProtocols ?? ['mls', 'proteus'],
         },
       },
       {
