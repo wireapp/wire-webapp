@@ -29,6 +29,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
@@ -42,6 +43,7 @@ interface GroupParticipantServiceProps {
   actionsViewModel: ActionsViewModel;
   integrationRepository: IntegrationRepository;
   conversationRepository: ConversationRepository;
+  teamRepository: TeamRepository;
   enableRemove: boolean;
   goToRoot: () => void;
   onBack: () => void;
@@ -56,6 +58,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   actionsViewModel,
   integrationRepository,
   conversationRepository,
+  teamRepository,
   enableRemove,
   goToRoot,
   onBack,
@@ -73,7 +76,11 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   const {canChatWithServices} = generatePermissionHelpers(teamRole);
 
-  const serviceUser = participatingUserEts.find(user => user.serviceId === serviceEntity.id);
+  const byServiceId = (id: string) => (user: User) => user.serviceId === id;
+  const byUserId = (id: string) => (user: User) => user.id === id;
+  const serviceUser = participatingUserEts.find(() => {
+    return serviceEntity.isService ? byServiceId(serviceEntity.id) : byUserId(serviceEntity.id);
+  });
 
   const showActions = isActiveParticipant && serviceUser && inTeam;
 
@@ -98,6 +105,12 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   useEffect(() => {
     integrationRepository.addProviderNameToParticipant(serviceEntity);
   }, [integrationRepository, serviceEntity]);
+
+  useEffect(() => {
+    if (serviceUser?.teamId) {
+      teamRepository.getTeamNameById(serviceUser.teamId).then(name => serviceEntity.author(name));
+    }
+  }, [teamRepository, serviceUser?.teamId]);
 
   return (
     <div id="group-participant-service" className="panel__page group-participant">

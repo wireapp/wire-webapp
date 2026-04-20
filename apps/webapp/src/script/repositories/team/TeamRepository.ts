@@ -463,6 +463,11 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     this.updateMemberRoles(mappedMembers);
   }
 
+  async getTeamNameById(teamId: string): Promise<string> {
+    const {name} = await this.getTeamById(teamId);
+    return name;
+  }
+
   private getTeamById(teamId: string): Promise<TeamData> {
     return this.teamService.getTeamById(teamId);
   }
