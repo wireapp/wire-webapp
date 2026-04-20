@@ -38,9 +38,11 @@ export type BackgroundEffectsState = {
   preferredEffect: BackgroundEffectSelection;
   metrics: RenderMetrics | undefined;
   model: string;
+  lastVirtualBackgroundId: string | undefined;
 
   setIsFeatureEnabled(value: boolean): void;
   setPreferredEffect(effect: BackgroundEffectSelection): void;
+  setLastVirtualBackgroundId(backgroundId: string | undefined): void;
   setMetrics(metrics: RenderMetrics | undefined): void;
   setModel(model: string | undefined): void;
 };
@@ -51,6 +53,7 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     preferredEffect: DEFAULT_BACKGROUND_EFFECT,
     metrics: undefined,
     model: 'unknown',
+    lastVirtualBackgroundId: undefined,
 
     setIsFeatureEnabled: value =>
       set(state => {
@@ -60,6 +63,10 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     setPreferredEffect: effect =>
       set(state => {
         state.preferredEffect = effect;
+      }),
+    setLastVirtualBackgroundId: backgroundId =>
+      set(state => {
+        state.lastVirtualBackgroundId = backgroundId;
       }),
 
     setMetrics: metrics =>

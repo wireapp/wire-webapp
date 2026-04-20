@@ -47,6 +47,7 @@ describe('BackgroundEffectsHandler', () => {
     backgroundEffectsStore.getState().setIsFeatureEnabled(false);
     backgroundEffectsStore.getState().setPreferredEffect({type: 'none'});
     backgroundEffectsStore.getState().setMetrics(undefined);
+    backgroundEffectsStore.getState().setLastVirtualBackgroundId(undefined);
   });
 
   beforeEach(() => {
@@ -261,5 +262,44 @@ describe('BackgroundEffectsHandler', () => {
 
     expect(result).toBe(false);
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+  });
+
+  it('restores last virtual background ID from storage on init', () => {
+    mockStorage.getItem.mockImplementation((key: string) => {
+      if (key === 'video-background-effects-last-virtual-id') {
+        return 'office-1';
+      }
+      return null;
+    });
+
+    new BackgroundEffectsHandler(mockController);
+
+    expect(backgroundEffectsStore.getState().lastVirtualBackgroundId).toBe('office-1');
+  });
+
+  it('saves last virtual background ID when a virtual effect is selected', () => {
+    const handler = new BackgroundEffectsHandler(mockController);
+
+    handler.setPreferredBackgroundEffect({type: 'virtual', backgroundId: 'office-2'});
+
+    expect(mockStorage.setItem).toHaveBeenCalledWith('video-background-effects-last-virtual-id', 'office-2');
+    expect(backgroundEffectsStore.getState().lastVirtualBackgroundId).toBe('office-2');
+  });
+
+  it('does not overwrite last virtual background ID when a non-virtual effect is selected', () => {
+    const handler = new BackgroundEffectsHandler(mockController);
+
+    handler.setPreferredBackgroundEffect({type: 'virtual', backgroundId: 'office-2'});
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
+
+    // lastVirtualBackgroundId in the store should still point to the last virtual one
+    expect(backgroundEffectsStore.getState().lastVirtualBackgroundId).toBe('office-2');
+
+    // setItem for the virtual ID key should have been called exactly once — only for the virtual selection, not for blur
+    const virtualIdCalls = (mockStorage.setItem as jest.Mock).mock.calls.filter(
+      ([key]) => key === 'video-background-effects-last-virtual-id',
+    );
+    expect(virtualIdCalls).toHaveLength(1);
+    expect(virtualIdCalls[0][1]).toBe('office-2');
   });
 });
