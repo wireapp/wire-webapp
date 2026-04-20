@@ -60,7 +60,7 @@ type Fixtures = {
       features?: {
         conferenceCalling?: boolean;
         channels?: boolean;
-        mls?: boolean | Parameters<BrigRepositoryE2E['enableMLSFeature']>[1];
+        mls?: boolean | Parameters<BrigRepositoryE2E['configureMLSFeature']>[1];
         cells?: boolean;
       };
     },
@@ -171,18 +171,17 @@ export const test = baseTest.extend<Fixtures>({
         }
 
         if (options.features.mls) {
-          await api.brig.enableMLSFeature(
+          await api.brig.configureMLSFeature(
             owner.teamId,
             options.features.mls === true
-              ? {defaultProtocol: 'mls', supportedProtocols: ['mls', 'proteus']}
+              ? {status: 'enabled', defaultProtocol: 'mls', supportedProtocols: ['mls', 'proteus']}
               : options.features.mls,
           );
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
         }
 
         if (options.features.channels) {
           // Creating channels depends on MLS to be enabled
-          await api.brig.enableMLSFeature(owner.teamId, {
+          await api.brig.configureMLSFeature(owner.teamId, {
             defaultProtocol: 'mls',
             supportedProtocols: ['mls', 'proteus'],
           });
