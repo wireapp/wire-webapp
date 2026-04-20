@@ -112,7 +112,7 @@ test.describe('Folders', () => {
 
       // Preconditions: Create a custom folder with group conversation
       await createCustomFolder(userAPageManager, conversationName, customFolderName);
-      await userAComponents.conversationSidebar().allConverationsButton.click();
+      await userAComponents.conversationSidebar().allConversationsButton.click();
 
       // Step 1: User A moves 1:1 conversation with User B into an existing custom folder
       await moveConversationToFolder(userAPageManager, userB.fullName, customFolderName);
@@ -136,7 +136,7 @@ test.describe('Folders', () => {
 
       // Preconditions: Create a custom folder with 1:1 conversation
       await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
-      await userAComponents.conversationSidebar().allConverationsButton.click();
+      await userAComponents.conversationSidebar().allConversationsButton.click();
 
       // Step 1: User A moves group with User B into an existing custom folder
       await moveConversationToFolder(userAPageManager, conversationName, customFolderName);

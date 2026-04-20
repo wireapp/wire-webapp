@@ -332,7 +332,7 @@ test.describe('Notifications', () => {
         await userAComponents.conversationSidebar().preferencesButton.click();
         await userAPages.settings().accountButton.click();
         await userAPages.account().uploadProfilePicture(getImageFilePath());
-        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAComponents.conversationSidebar().allConversationsButton.click();
       });
 
       await test.step(`User B navigates to preferences and sets "${notificationPreference}"`, async () => {
