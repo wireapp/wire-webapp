@@ -164,7 +164,7 @@ test.describe('Deep Links', () => {
           showConnectWarning: true,
           showOpenConversationButton: true,
           showBlockButton: true,
-        })
+        });
 
         await userAModals.userProfile().modalCloseButton.click();
       });
@@ -196,7 +196,7 @@ test.describe('Deep Links', () => {
           showConnectWarning: true,
           showConnectButton: true,
           showCancelButton: true,
-        })
+        });
       });
     },
   );
