@@ -19,6 +19,7 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {UserType} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
@@ -280,7 +281,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
           {isAddServiceState && (
             <>
-              {!!servicesList.length && (
+              {is.nonEmptyArray(servicesList) && (
                 <>
                   {canManageServices() && !!manageServicesUrl && (
                     <ul className="panel-manage-services left-list-items">
