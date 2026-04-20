@@ -20,7 +20,15 @@
 import {AudioType} from 'Repositories/audio/audioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withConnectedUser, withLogin, expect, Team} from 'test/e2e_tests/test.fixtures';
+import {
+  test,
+  withConnectedUser,
+  withLogin,
+  expect,
+  Team,
+  withConnectionRequest,
+  LOGIN_TIMEOUT,
+} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
 import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
@@ -549,6 +557,58 @@ test.describe('Calling', () => {
           });
         }
       }
+    },
+  );
+
+  test(
+    'I want to accept a group video call as a personal account guest',
+    {tag: ['@TC-2852', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
+      const {pages: ownerPages, modals: ownerModals} = PageManager.from(userAPage).webapp;
+      const guestPages = PageManager.from(guestPage).webapp.pages;
+
+      const createdLink = await test.step('Owner: Create group and generate guest invitation link', async () => {
+        await createGroup(ownerPages, groupName, []);
+        await ownerPages.conversationList().openConversation(groupName);
+        await ownerPages.conversation().toggleGroupInformation();
+        await ownerPages.conversationDetails().openGuestOptions();
+        return await ownerPages.guestOptions().createLink();
+      });
+
+      await test.step('Guest: Navigate to link and log in with personal account', async () => {
+        await guestPage.goto(createdLink.toString());
+        await guestPages.conversationJoin().joinBrowserButton.click();
+        await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+        await guestPages.login().login(userB);
+        await guestPages.conversation().conversationTitle.waitFor({
+          state: 'visible',
+          timeout: LOGIN_TIMEOUT,
+        });
+      });
+
+      await test.step('Owner: Verify guest arrival and initiate video call', async () => {
+        await expect(
+          ownerPages.conversation().systemMessages.filter({hasText: `${userB.fullName} joined`}),
+        ).toBeVisible();
+
+        await ownerPages.conversation().toggleGroupInformation();
+        await ownerPages.conversation().clickCallButton();
+        // Warning modal that guest started using a new device
+        await ownerModals.confirm().clickAction();
+        await expect(ownerPages.calling().callCell).toBeVisible();
+      });
+
+      await test.step('Guest: Join the active call', async () => {
+        const {joinCallButton} = guestPages.conversationList().getConversationLocator(groupName);
+
+        await expect(guestPages.calling().callCell).toBeVisible();
+        await expect(joinCallButton).toBeVisible();
+
+        await joinCallButton.click();
+        await expect(ownerPages.calling().goFullScreen).toBeVisible();
+      });
     },
   );
 });
