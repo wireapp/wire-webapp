@@ -121,12 +121,6 @@ test.describe('Deep Links', () => {
         PageManager.from(userDPage),
       ]);
 
-      await Promise.all(
-        [userAPage, userBPage, userCPage, userDPage].map(page =>
-          page.context().grantPermissions(['clipboard-write', 'clipboard-read']),
-        ),
-      );
-
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
       const {pages: userCPages} = userCPageManager.webapp;
@@ -271,12 +265,6 @@ test.describe('Deep Links', () => {
         PageManager.from(userCPage),
         PageManager.from(userDPage),
       ]);
-
-      await Promise.all(
-        [userAPage, userBPage, userCPage, userDPage].map(page =>
-          page.context().grantPermissions(['clipboard-write', 'clipboard-read']),
-        ),
-      );
 
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
