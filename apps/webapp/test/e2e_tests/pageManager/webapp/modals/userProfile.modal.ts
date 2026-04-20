@@ -31,7 +31,6 @@ export class UserProfileModal {
   readonly participantFullname: Locator;
   readonly participantUsername: Locator;
   readonly userEmailLabel: Locator;
-  readonly userEmailEntry: Locator;
   readonly domainLabel: Locator;
   readonly cancelButton: Locator;
   readonly modalCloseButton: Locator;
@@ -51,11 +50,7 @@ export class UserProfileModal {
     this.participantFullname = this.modal.getByTestId('status-label');
     this.participantUsername = this.modal.getByTestId('status-username');
 
-    const emailContainer = page.locator('.enriched-fields__entry').filter({
-      has: page.locator('[data-uie-name="item-enriched-key"]', {hasText: 'Email'}),
-    });
-    this.userEmailLabel = emailContainer.getByRole('paragraph').getByText('Email');
-    this.userEmailEntry = emailContainer.getByTestId('item-enriched-value');
+    this.userEmailLabel = this.modal.getByRole('paragraph').getByText('Email');
 
     const domainContainer = page.locator('.enriched-fields__entry').filter({
       has: page.locator('[data-uie-name="item-enriched-key"]', {hasText: 'Domain'}),

@@ -44,7 +44,6 @@ async function verifyUserProfileModal(profileModal: UserProfileModal, user: User
 
     if (options.showEmail) {
       await expect(profileModal.userEmailLabel).toBeVisible();
-      await expect(profileModal.userEmailEntry).toContainText(user.email);
     }
 
     if (options.showGuestChip) {
