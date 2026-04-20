@@ -59,7 +59,7 @@ export const FILTER_TABS: readonly SidebarTabs[] = [
 /**
  * Tabs that should always be visible until user toggles it off.
  */
-export const DEFAULT_TABS = [
+export const DEFAULT_TABS: readonly SidebarTabs[] = [
   SidebarTabs.RECENT,
   SidebarTabs.FOLDER,
   SidebarTabs.FAVORITES,
@@ -85,8 +85,8 @@ export interface SidebarStore {
   setStatus: (status: SidebarStatus) => void;
   currentTab: SidebarTabs;
   setCurrentTab: (tab: SidebarTabs) => void;
-  visibleTabs: SidebarTabs[];
-  setVisibleTabs: (tabs: SidebarTabs[]) => void;
+  visibleTabs: readonly SidebarTabs[];
+  setVisibleTabs: (tabs: readonly SidebarTabs[]) => void;
   toggleTabVisibility: (tab: SidebarTabs) => void;
   resetDisabledFeatureTabs: () => void;
 }
