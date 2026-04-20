@@ -69,7 +69,7 @@ export const DEFAULT_TABS: readonly SidebarTabs[] = [
   SidebarTabs.ARCHIVES,
 ];
 
-export const isTabVisible = (tab: SidebarTabs, visibleTabs: SidebarTabs[]): boolean => {
+export const isTabVisible = (tab: SidebarTabs, visibleTabs: readonly SidebarTabs[]): boolean => {
   return ALWAYS_VISIBLE_TABS.includes(tab) || visibleTabs.includes(tab);
 };
 
