@@ -22,7 +22,7 @@ import {expect, Locator, Page} from '@playwright/test';
 export class AppLockModal {
   readonly lockPasscodeInput: Locator;
   readonly unlockPasscodeInput: Locator;
-  readonly appLockWipeInput: Locator;
+  readonly clearDataCheckbox: Locator;
   readonly appLockModal: Locator;
   readonly appLockActionButton: Locator;
   readonly appLockModalHeader: Locator;
@@ -36,7 +36,7 @@ export class AppLockModal {
     this.appLockModal = page.locator("[data-uie-name='applock-modal']");
     this.lockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-set-a']");
     this.unlockPasscodeInput = page.locator("[data-uie-name='applock-modal'] [data-uie-name='input-applock-unlock']");
-    this.appLockWipeInput = this.appLockModal.getByTestId('input-applock-wipe');
+    this.clearDataCheckbox = this.appLockModal.getByTestId('modal-option-checkbox');
     this.appLockActionButton = this.appLockModal.locator("[data-uie-name='do-action']");
     this.appLockModalHeader = page.locator("[data-uie-name='applock-modal'] [data-uie-name='applock-modal-header']");
     this.appLockModalText = page.locator("[data-uie-name='applock-modal'] [data-uie-name='label-applock-unlock-text']");
@@ -57,9 +57,8 @@ export class AppLockModal {
     await this.appLockActionButton.click();
   }
 
-  async inputUserPassword(password: string) {
-    await this.appLockWipeInput.fill(password);
-    await this.appLockActionButton.click();
+  async checkClearData() {
+    await this.clearDataCheckbox.dispatchEvent('click');
   }
 
   async isVisible() {
