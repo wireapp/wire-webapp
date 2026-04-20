@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {USER_EVENT} from '@wireapp/api-client/lib/event/';
 import {amplify} from 'amplify';
 import ko from 'knockout';
@@ -32,7 +33,6 @@ import {getLogger, Logger} from 'Util/logger';
 import {fixWebsocketString} from 'Util/stringUtil';
 import {TypedEventTarget} from 'Util/typedEventTarget';
 import {createUuid} from 'Util/uuid';
-import is from '@sindresorhus/is';
 
 export enum LabelType {
   Custom = 0,
