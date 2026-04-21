@@ -365,13 +365,13 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     this.labels.splice(folderIndex, 1, updatedFolder);
 
     // Delete folder if it no longer contains any conversation
-    if (!is.nonEmptyArray(updatedFolder.conversations())) {
+    if (is.nonEmptyArray(updatedFolder.conversations())) {
+      // trigger rerender on folders to remove conversation from folder
+      setCurrentTab(SidebarTabs.FOLDER);
+    } else {
       this.labels.remove(updatedFolder);
       // switch sidebar to recent tabs
       setCurrentTab(SidebarTabs.RECENT);
-    } else {
-      // trigger rerender on folders to remove conversation from folder
-      setCurrentTab(SidebarTabs.FOLDER);
     }
     this.saveLabels();
   };
