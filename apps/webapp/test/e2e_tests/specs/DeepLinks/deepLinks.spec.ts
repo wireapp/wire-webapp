@@ -139,9 +139,9 @@ test.describe('Deep Links', () => {
 
       const groupName = 'DeepLinksGroup';
 
-      await userCPages.conversationList().pendingConnectionRequest.click();
+      await userCPages.conversationList().openPendingConnectionRequest();
       await userCPages.connectRequest().connectButton.click();
-      await userDPages.conversationList().pendingConnectionRequest.click();
+      await userDPages.conversationList().openPendingConnectionRequest();
       await userDPages.connectRequest().connectButton.click();
 
       const profileLinks = await Promise.all(
