@@ -30,7 +30,7 @@ export class AppLockModal {
   readonly loadingBar: Locator;
   readonly errorMessage: Locator;
   readonly forgotPassphraseButton: Locator;
-  readonly wipeDatabaseButton: Locator;
+  readonly proceedToLogoutButton: Locator;
 
   constructor(page: Page) {
     this.appLockModal = page.locator("[data-uie-name='applock-modal']");
@@ -43,7 +43,7 @@ export class AppLockModal {
     this.loadingBar = page.locator('.progress-bar');
     this.errorMessage = this.appLockModal.getByTestId(/label-applock-(unlock|wipe)-error/);
     this.forgotPassphraseButton = this.appLockModal.getByTestId('go-forgot-passphrase');
-    this.wipeDatabaseButton = this.appLockModal.getByTestId('go-wipe-database');
+    this.proceedToLogoutButton = this.appLockModal.getByTestId('go-proceed-to-logout');
   }
 
   async setPasscode(passcode: string) {
@@ -85,7 +85,7 @@ export class AppLockModal {
   async clickReset() {
     await this.appLockActionButton.click();
   }
-  async clickWipeDB() {
-    await this.wipeDatabaseButton.click();
+  async clickProceedToLogout() {
+    await this.proceedToLogoutButton.click();
   }
 }

@@ -149,7 +149,7 @@ test.describe('AppLock', () => {
 
         await page.reload();
         await modals.appLock().clickForgotPassphrase();
-        await modals.appLock().clickWipeDB();
+        await modals.appLock().clickProceedToLogout();
         await modals.appLock().checkClearData();
         await modals.appLock().clickReset();
 
@@ -160,29 +160,8 @@ test.describe('AppLock', () => {
     );
 
     test(
-      'Web: I should not wipe database if I logout without checking the clear data option',
+      'Web: I should not wipe database if I logout without checking the clear data option and recover my session on next login',
       {tag: ['@TC-2763', '@regression']},
-      async ({createPage}) => {
-        const page = await createPage(withLogin(memberA));
-        const pageManager = PageManager.from(page);
-        const {modals} = PageManager.from(page).webapp;
-
-        await handleAppLockState(pageManager, appLockPassCode);
-
-        await page.reload();
-        await modals.appLock().clickForgotPassphrase();
-        await modals.appLock().clickWipeDB();
-        // Intentionally do not check the clear data checkbox
-        await modals.appLock().clickReset();
-
-        // The database should not be wiped when the checkbox was not checked
-        await expect.poll(() => page.evaluate(() => indexedDB.databases())).not.toHaveLength(0);
-      },
-    );
-
-    test(
-      'Web: I should be able to login and recover my existing session after logout without wiping data',
-      {tag: ['@TC-2764', '@regression']},
       async ({createPage}) => {
         const page = await createPage(withLogin(memberA));
         const pageManager = PageManager.from(page);
@@ -192,9 +171,12 @@ test.describe('AppLock', () => {
 
         await page.reload();
         await modals.appLock().clickForgotPassphrase();
-        await modals.appLock().clickWipeDB();
+        await modals.appLock().clickProceedToLogout();
         // Intentionally do not check the clear data checkbox
         await modals.appLock().clickReset();
+
+        // The database should not be wiped when the checkbox was not checked
+        await expect.poll(() => page.evaluate(() => indexedDB.databases())).not.toHaveLength(0);
 
         // Log back in with the same user and verify the existing session is intact
         await loginUser(memberA, pageManager);
