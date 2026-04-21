@@ -629,4 +629,64 @@ test.describe('Calling', () => {
       });
     },
   );
+
+  test(
+    'I want to navigate between call pages',
+    {tag: ['@TC-2924', '@regression']},
+    async ({createPage, createUser}) => {
+      const userAPage = await createPage(withLogin(userA));
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+
+      const {groupMembers, memberPages} =
+        await test.step('Setup: Create members and initialize all browser pages', async () => {
+          // Generate a large participant list to trigger pagination
+          const extraMembers = await Promise.all(Array.from({length: 7}, () => createUser()));
+          const groupMembers = [userB, userC, ...extraMembers];
+
+          const memberPages = await Promise.all(
+            groupMembers.map(async member => {
+              if (![userB, userC].includes(member)) {
+                await team.addTeamMember(member);
+              }
+
+              const page = await createPage(withLogin(member));
+              return PageManager.from(page).webapp.pages;
+            }),
+          );
+
+          return {groupMembers, memberPages};
+        });
+
+      await test.step('Action: User A initiates the group call', async () => {
+        await createGroup(userAPages, groupName, groupMembers);
+        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversation().clickCallButton();
+        // Warning modal about large group call
+        await userAPage.getByTestId('modal-without-title').getByRole('button', {name: 'Call', exact: true}).click();
+        await expect(userAPages.calling().goFullScreen).toBeVisible();
+      });
+
+      await test.step('Action: All members accept the incoming call', async () => {
+        await Promise.all(
+          memberPages.map(async memberPage => {
+            await memberPage.calling().acceptCallButton.click({timeout: 30_000});
+            await expect(memberPage.calling().goFullScreen).toBeVisible();
+          }),
+        );
+      });
+
+      await test.step('Verify: Pagination and Grid Visibility', async () => {
+        const userACall = await userAPages.calling().maximizeCell();
+        await expect(userACall.getGridTile(userA.fullName)).toBeVisible();
+
+        // Navigate and Verify disappearance
+        await userACall.goToNextPage();
+        await expect(userACall.getGridTile(userA.fullName)).toBeHidden();
+
+        // Return and Verify reappearance
+        await userACall.goToPreviousPage();
+        await expect(userACall.getGridTile(userA.fullName)).toBeVisible();
+      });
+    },
+  );
 });

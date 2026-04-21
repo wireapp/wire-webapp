@@ -30,6 +30,8 @@ export const FullScreenCallPage = (page: Page) => {
   const selfVideoThumbnail = page.getByTestId('self-video-thumbnail-wrapper');
   const participantListItems = component.getByTestId('list-call-ui-participants').getByRole('listitem');
   const gridTiles = component.getByTestId('item-grid');
+  const nextPageButton = component.getByRole('button', {name: 'Go to next page'});
+  const previousPageButton = component.getByRole('button', {name: 'Go to previous page'});
 
   /* Press the react button and click the given emoji within the opened toolbar */
   const sendReaction = async (emoji: '👍') => {
@@ -91,5 +93,7 @@ export const FullScreenCallPage = (page: Page) => {
     toggleParticipantsList,
     getSidebarParticipant,
     getGridTile,
+    goToNextPage,
+    goToPreviousPage,
   };
 };
