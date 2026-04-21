@@ -78,8 +78,9 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   const byServiceId = (id: string) => (user: User) => user.serviceId === id;
   const byUserId = (id: string) => (user: User) => user.id === id;
-  const serviceUser = participatingUserEts.find(() => {
-    return serviceEntity.isService ? byServiceId(serviceEntity.id) : byUserId(serviceEntity.id);
+  const serviceUser = participatingUserEts.find(user => {
+    const predicate = serviceEntity.isService ? byServiceId(serviceEntity.id) : byUserId(serviceEntity.id);
+    return predicate(user);
   });
 
   const showActions = isActiveParticipant && serviceUser && inTeam;

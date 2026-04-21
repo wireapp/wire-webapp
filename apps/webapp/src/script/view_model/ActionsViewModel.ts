@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {UserType, QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -393,6 +393,11 @@ export class ActionsViewModel {
     if (conversationEntity && userEntity) {
       if (userEntity.isService) {
         await this.integrationRepository.removeService(conversationEntity, userEntity);
+        return;
+      }
+
+      if (userEntity.type === UserType.APP) {
+        await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
         return;
       }
 
