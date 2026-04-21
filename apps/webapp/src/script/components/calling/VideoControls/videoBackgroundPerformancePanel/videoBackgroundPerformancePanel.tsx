@@ -19,6 +19,8 @@
 
 import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
 
+import {Maybe} from 'true-myth';
+
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
 import {
@@ -39,7 +41,7 @@ import {
 import {QualityMode} from 'Repositories/media/backgroundEffects';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {t} from 'Util/localizerUtil';
 
 type PerformancePanelProps = {
@@ -60,9 +62,45 @@ const formatValue = (value?: string | number | null): string => {
   return value === null || value === undefined || value === '' ? '-' : String(value);
 };
 
+const getMetricRows = (renderMetrics: RenderMetrics) => {
+  return Maybe.of(renderMetrics)
+    .map(metrics => [
+      {label: 'Quality', value: formatValue(metrics.tier)},
+      {label: 'Total', value: formatMs(metrics.avgTotalMs)},
+      {label: 'Segmentation', value: formatMs(metrics.avgSegmentationMs)},
+      {label: 'GPU', value: formatMs(metrics.avgGpuMs)},
+      {label: 'Budget', value: formatMs(metrics.budget)},
+      {label: 'ML delegate type', value: formatValue(metrics.ml)},
+      {label: 'Utilization', value: formatPercent(metrics.utilShare)},
+      {label: 'ML', value: formatPercent(metrics.mlShare)},
+      {label: 'WebGL', value: formatPercent(metrics.webglShare)},
+      {
+        label: 'Delegate',
+        value: formatValue(metrics.segmentationDelegate),
+      },
+      {label: 'Dropped', value: formatValue(metrics.droppedFrames)},
+    ])
+    .unwrapOr([]);
+};
+
+const getCapabilityRows = (capabilityInfo: CapabilityInfo | null | undefined) => {
+  return Maybe.of(capabilityInfo)
+    .map(info => [
+      {label: 'WebGL2', value: info.webgl2 ? '✔' : '✖'},
+      {label: 'Worker', value: info.worker ? '✔' : '✖'},
+      {label: 'OffscreenCanvas', value: info.offscreenCanvas ? '✔' : '✖'},
+      {label: 'VideoFrameCallback', value: info.requestVideoFrameCallback ? '✔' : '✖'},
+    ])
+    .unwrapOr([]);
+};
+
 type MetricRowProps = {
   label: string;
   value: ReactNode;
+};
+
+type MetricsDisplayProps = {
+  readonly capabilityInfo: CapabilityInfo;
 };
 
 const MetricRow = ({label, value}: MetricRowProps) => (
@@ -74,42 +112,13 @@ const MetricRow = ({label, value}: MetricRowProps) => (
 
 const POLLING_INTERVAL = 500;
 
-const MetricsDisplay = ({capabilityInfo}: {capabilityInfo: CapabilityInfo | null}) => {
+const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
   const renderMetrics = useBackgroundEffectsStore(state => state.metrics);
   const model = useBackgroundEffectsStore(state => state.model);
 
-  const metricRows = useMemo(() => {
-    if (!renderMetrics) {
-      return [];
-    }
+  const metricRows = getMetricRows(renderMetrics);
 
-    return [
-      {label: 'Quality', value: formatValue(renderMetrics.tier)},
-      {label: 'Total', value: formatMs(renderMetrics.avgTotalMs)},
-      {label: 'Segmentation', value: formatMs(renderMetrics.avgSegmentationMs)},
-      {label: 'GPU', value: formatMs(renderMetrics.avgGpuMs)},
-      {label: 'Budget', value: formatMs(renderMetrics.budget)},
-      {label: 'ML delegate type', value: formatValue(renderMetrics.ml)},
-      {label: 'Utilization', value: formatPercent(renderMetrics.utilShare)},
-      {label: 'ML', value: formatPercent(renderMetrics.mlShare)},
-      {label: 'WebGL', value: formatPercent(renderMetrics.webglShare)},
-      {label: 'Delegate', value: formatValue(renderMetrics.segmentationDelegate)},
-      {label: 'Dropped', value: formatValue(renderMetrics.droppedFrames)},
-    ];
-  }, [renderMetrics]);
-
-  const capabilityRows = useMemo(() => {
-    if (!capabilityInfo) {
-      return [];
-    }
-
-    return [
-      {label: 'WebGL2', value: capabilityInfo.webgl2 ? '✔' : '✖'},
-      {label: 'Worker', value: capabilityInfo.worker ? '✔' : '✖'},
-      {label: 'OffscreenCanvas', value: capabilityInfo.offscreenCanvas ? '✔' : '✖'},
-      {label: 'VideoFrameCallback', value: capabilityInfo.requestVideoFrameCallback ? '✔' : '✖'},
-    ];
-  }, [capabilityInfo]);
+  const capabilityRows = getCapabilityRows(capabilityInfo);
 
   return (
     <div css={metricsListStyles}>
@@ -184,7 +193,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
 
   const handleQualityChange = useCallback(
     (quality: Option) => {
-      if (!quality) {
+      if (quality === undefined || quality === null) {
         return;
       }
 
