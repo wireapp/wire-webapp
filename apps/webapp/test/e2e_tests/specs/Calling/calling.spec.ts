@@ -234,33 +234,51 @@ test.describe('Calling', () => {
     },
   );
 
-  test('Verify able to join ongoing call', {tag: ['@TC-2820', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages, userCPage] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userC))).then(pm => pm.webapp.pages),
-      createPage(withLogin(userC)),
-    ]);
+  [
+    {
+      description: 'Verify able to join ongoing call',
+      tag: '@TC-2820',
+    },
+    {
+      description: 'Late joiner wants to see the ongoing screen sharing on group call',
+      tag: '@TC-2874',
+      verifyScreenShare: true,
+    },
+  ].forEach(({description, tag, verifyScreenShare}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPages, userBPages, userCPage] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB), withConnectedUser(userC))).then(pm => pm.webapp.pages),
+        createPage(withLogin(userC)),
+      ]);
 
-    const userCPages = PageManager.from(userCPage).webapp.pages;
-    await createGroup(userAPages, groupName, [userB, userC]);
+      const userCPages = PageManager.from(userCPage).webapp.pages;
+      await createGroup(userAPages, groupName, [userB, userC]);
 
-    await userAPages.conversationList().getConversation(groupName).open();
-    await userAPages.conversation().clickCallButton();
+      await userAPages.conversationList().getConversation(groupName).open();
+      await userAPages.conversation().clickCallButton();
 
-    await expect(userAPages.calling().callCell).toBeVisible();
-    await expect(userBPages.calling().callCell).toBeVisible();
+      await expect(userAPages.calling().callCell).toBeVisible();
+      await expect(userBPages.calling().callCell).toBeVisible();
 
-    await userBPages.calling().clickAcceptCallButton();
-    // Confirm the calls grid is visible
-    await expect(userBPages.calling().goFullScreen).toBeVisible();
+      await userBPages.calling().clickAcceptCallButton();
+      // Confirm the calls grid is visible
+      await expect(userBPages.calling().goFullScreen).toBeVisible();
 
-    // // User C joins the ongoing call
-    await userCPage.waitForTimeout(5000);
-    await userCPages.conversationList().getConversation(groupName).joinCallButton.click();
+      // // User C joins the ongoing call
+      await userCPage.waitForTimeout(5000);
+      await userCPages.conversationList().getConversation(groupName).joinCallButton.click();
 
-    // Confirm that user C joined the call
-    await expect(userCPages.calling().goFullScreen).toBeVisible();
-    await expect(userCPages.calling().gridTiles).toHaveCount(3);
+      // Confirm that user C joined the call
+      await expect(userCPages.calling().goFullScreen).toBeVisible();
+      await expect(userCPages.calling().gridTiles).toHaveCount(3);
+
+      if (verifyScreenShare) {
+        await userAPages.calling().clickToggleScreenShareButton();
+        const userCCall = await userCPages.calling().maximizeCell();
+        await expect(userCCall.getGridTile(userA.fullName).videoElement).toBeVisible();
+      }
+    });
   });
 
   test('Verify Call UI checks', {tag: ['@TC-8771', '@regression']}, async ({createPage}) => {
