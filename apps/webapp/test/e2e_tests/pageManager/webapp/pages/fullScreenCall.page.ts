@@ -28,7 +28,7 @@ export const FullScreenCallPage = (page: Page) => {
   const raiseHandButton = component.getByTestId('do-toggle-hand-raise');
   const toggleParticipantsBtn = component.getByTestId('do-toggle-call-participants-list');
   const selfVideoThumbnail = page.getByTestId('self-video-thumbnail-wrapper');
-  const callParticipants = component.getByTestId('list-call-ui-participants').getByRole('listitem');
+  const participantListItems = component.getByTestId('list-call-ui-participants').getByRole('listitem');
   const gridTiles = component.getByTestId('item-grid');
 
   /* Press the react button and click the given emoji within the opened toolbar */
@@ -58,16 +58,17 @@ export const FullScreenCallPage = (page: Page) => {
     await toggleParticipantsBtn.click();
   };
 
-  const getCallParticipant = (userName: string) => {
-    const user = callParticipants.filter({hasText: userName});
+  // Sidebar list of participants in the call
+  const getSidebarParticipant = (userName: string) => {
+    const participant = participantListItems.filter({hasText: userName});
 
-    return Object.assign(user, {
-      muteIcon: user.getByTestId('status-audio-off'),
-      guestIcon: user.getByTestId('status-guest'),
+    return Object.assign(participant, {
+      muteIcon: participant.getByTestId('status-audio-off'),
+      guestIcon: participant.getByTestId('status-guest'),
       // User is an active speaker
-      speakIcon: user.getByTestId('status-active-speaking'),
-      videoIcon: user.getByTestId('status-video'),
-      screenShareIcon: user.getByTestId('status-screenshare'),
+      speakIcon: participant.getByTestId('status-active-speaking'),
+      videoIcon: participant.getByTestId('status-video'),
+      screenShareIcon: participant.getByTestId('status-screenshare'),
     });
   };
 
@@ -88,7 +89,7 @@ export const FullScreenCallPage = (page: Page) => {
     toggleHandRaise,
     selfVideoThumbnail,
     toggleParticipantsList,
-    getCallParticipant,
+    getSidebarParticipant,
     getGridTile,
   };
 };

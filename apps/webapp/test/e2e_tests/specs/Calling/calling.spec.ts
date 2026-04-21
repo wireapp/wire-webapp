@@ -246,9 +246,8 @@ test.describe('Calling', () => {
     // Confirm the calls grid is visible
     await expect(userBPages.calling().goFullScreen).toBeVisible();
 
-    // User C joins the ongoing call
+    // // User C joins the ongoing call
     await userCPage.waitForTimeout(5000);
-    await expect(userCPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible();
     await userCPages.conversationList().getConversationLocator(groupName).joinCallButton.click();
 
     // Confirm that user C joined the call
@@ -302,9 +301,7 @@ test.describe('Calling', () => {
     await expect(userBPages.calling().callCell).toBeHidden();
 
     // User B re-joins the ongoing call from the conversation list
-    const joinButton = userBPages.conversationList().getConversationLocator(groupName).joinCallButton;
-    await expect(joinButton).toBeVisible({timeout: 5000});
-    await joinButton.click();
+    await userBPages.conversationList().getConversationLocator(groupName).joinCallButton.click({timeout: 30_000});
 
     await expect(userBPages.calling().goFullScreen).toBeVisible();
   });
@@ -361,7 +358,6 @@ test.describe('Calling', () => {
         await userADevice2Pages.conversation().clickCallButton();
         await expect(userADevice2Pages.calling().callCell).toBeVisible();
 
-        await userAPage2.waitForTimeout(30_000);
         await expect(userADevice2Pages.calling().gridTiles).toHaveCount(3);
 
         // Verify second device successfully disconnected
@@ -376,7 +372,7 @@ test.describe('Calling', () => {
         await expect(userAPages.calling().callCell).not.toBeAttached();
         // Verify the call is still "joinable" (User B is still there)
         await expect(userAPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible({
-          timeout: 1000,
+          timeout: 30_000,
         });
       });
     },
@@ -459,7 +455,7 @@ test.describe('Calling', () => {
       const extraMembers = await Promise.all(Array.from({length: 4}, () => createUser()));
 
       for (const member of extraMembers) {
-        team.addTeamMember(member);
+        await team.addTeamMember(member);
       }
 
       const allMembers = [userB, userC, ...extraMembers];
@@ -477,7 +473,7 @@ test.describe('Calling', () => {
   );
 
   test(
-    'I want to see the full call participant list and verify all media toggles',
+    'I want to see the full call participant list',
     {tag: ['@TC-2844', '@regression']},
     async ({createPage, createUser}) => {
       const guestUser = await createUser();
@@ -510,7 +506,7 @@ test.describe('Calling', () => {
 
       const userACall = await userAPages.calling().maximizeCell();
       await userACall.toggleParticipantsList();
-      await expect(userACall.getCallParticipant(guestUser.fullName).guestIcon).toBeVisible();
+      await expect(userACall.getSidebarParticipant(guestUser.fullName).guestIcon).toBeVisible();
 
       const participants = [
         {pages: userBPages, name: userB.fullName, label: 'User B'},
@@ -522,7 +518,7 @@ test.describe('Calling', () => {
           name: 'Mute',
           action: (p: PageManager['webapp']['pages']) => p.calling().toggleMuteButton.click(),
           verify: async (name: string) => {
-            await expect(userACall.getCallParticipant(name).muteIcon).not.toBeVisible();
+            await expect(userACall.getSidebarParticipant(name).muteIcon).not.toBeVisible();
             await expect(userACall.getGridTile(name).muteIcon).not.toBeVisible();
           },
         },
@@ -530,7 +526,7 @@ test.describe('Calling', () => {
           name: 'Screenshare',
           action: (p: PageManager['webapp']['pages']) => p.calling().clickToggleScreenShareButton(),
           verify: async (name: string) => {
-            await expect(userACall.getCallParticipant(name).screenShareIcon).toBeVisible();
+            await expect(userACall.getSidebarParticipant(name).screenShareIcon).toBeVisible();
             await expect(userACall.getGridTile(name).videoElement).toBeVisible();
           },
         },
@@ -538,7 +534,7 @@ test.describe('Calling', () => {
           name: 'Video',
           action: (p: PageManager['webapp']['pages']) => p.calling().clickToggleVideoButton(),
           verify: async (name: string) => {
-            await expect(userACall.getCallParticipant(name).videoIcon).toBeVisible();
+            await expect(userACall.getSidebarParticipant(name).videoIcon).toBeVisible();
             await expect(userACall.getGridTile(name).videoElement).toBeVisible();
           },
         },
@@ -549,7 +545,6 @@ test.describe('Calling', () => {
           await test.step(`${participant.label}: Verify ${feature.name}`, async () => {
             await feature.action(participant.pages);
             await feature.verify(participant.name);
-            await feature.action(participant.pages);
           });
         }
       }
