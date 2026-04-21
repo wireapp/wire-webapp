@@ -25,6 +25,7 @@ export class SettingsPage {
   readonly optionsButton: Locator;
   readonly audioVideoButton: Locator;
   readonly copyProfileLinkButton: Locator;
+  readonly profileLink: Locator;
 
   constructor(page: Page) {
     this.accountButton = page.getByRole('button', {name: 'Account'});
@@ -32,6 +33,7 @@ export class SettingsPage {
     this.optionsButton = page.getByRole('button', {name: 'Options'});
     this.audioVideoButton = page.getByRole('button', {name: 'Audio / Video'});
     this.copyProfileLinkButton = page.getByRole('button', {name: 'Copy Profile Link'});
+    this.profileLink = page.getByTestId('element-profile-link');
   }
 
   async clickAudioVideoSettingsButton() {
