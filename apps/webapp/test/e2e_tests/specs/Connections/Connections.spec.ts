@@ -68,6 +68,9 @@ test.describe('Connections', () => {
       });
 
       await test.step('A creates a group with B & C', async () => {
+        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).toBeAttached();
+        await expect(memberAPages.conversationList().getConversationLocator(memberC.fullName)).toBeAttached();
+
         await createGroup(memberAPages, 'Group', [memberB, memberC]);
       });
 
