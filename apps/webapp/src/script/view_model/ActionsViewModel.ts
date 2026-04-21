@@ -352,14 +352,14 @@ export class ActionsViewModel {
     return this.conversationRepository.saveConversation(conversation);
   };
 
-  getOrCreate1to1Conversation = async (userEntity: User): Promise<Conversation> => {
+  getOrCreate1to1Conversation = async (userEntity: Pick<User, 'qualifiedId'>): Promise<Conversation> => {
     const conversationEntity = await this.conversationRepository.resolve1To1Conversation(userEntity.qualifiedId, {
       mls: {allowUnestablished: false},
     });
     if (conversationEntity) {
       return conversationEntity;
     }
-    throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.id}".`);
+    throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.qualifiedId.id}".`);
   };
 
   open1to1Conversation = (conversationEntity: Conversation): Promise<void> => {
@@ -370,7 +370,16 @@ export class ActionsViewModel {
     if (!serviceEntity) {
       throw new Error();
     }
-    const conversationEntity = await this.integrationRepository.get1To1ConversationWithService(serviceEntity);
+
+    let conversationEntity;
+    if (serviceEntity.isService) {
+      conversationEntity = await this.integrationRepository.get1To1ConversationWithService(serviceEntity);
+    } else {
+      if (!serviceEntity.qualifiedId) {
+        throw new Error();
+      }
+      conversationEntity = await this.getOrCreate1to1Conversation({qualifiedId: serviceEntity.qualifiedId});
+    }
     return this.openConversation(conversationEntity);
   };
 
