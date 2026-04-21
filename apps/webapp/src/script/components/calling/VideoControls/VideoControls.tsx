@@ -92,7 +92,7 @@ const mapValueToEffect = (value: BackgroundOptionValue, lastVirtualBackgroundId:
     case 'blur-low':
       return {type: 'blur', level: 'low'};
     case 'virtual':
-      return {type: 'virtual', backgroundId: lastVirtualBackgroundId || DEFAULT_BUILTIN_BACKGROUND_ID};
+      return {type: 'virtual', backgroundId: lastVirtualBackgroundId ?? DEFAULT_BUILTIN_BACKGROUND_ID};
     default:
       return {type: 'none'};
   }

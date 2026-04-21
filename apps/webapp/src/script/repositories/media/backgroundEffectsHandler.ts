@@ -202,7 +202,7 @@ export class BackgroundEffectsHandler {
     try {
       return this.storage.getItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY) === 'true';
     } catch (error) {
-      console.error('Failed to read video background effect feature state', error);
+      this.logger.error('Failed to read video background effect feature state', error);
       return false;
     }
   }
@@ -218,7 +218,7 @@ export class BackgroundEffectsHandler {
       this.storage.setItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY, `${flag}`);
       return flag;
     } catch (error) {
-      console.error('Failed to persist video background effect feature state', error);
+      this.logger.error('Failed to persist video background effect feature state', error);
       return false;
     }
   }
@@ -271,7 +271,7 @@ export class BackgroundEffectsHandler {
     try {
       return parseStoredPreferredEffect(this.storage.getItem(VIDEO_BACKGROUND_EFFECT_STORAGE_KEY));
     } catch (error) {
-      console.error('Failed to read persisted preferred video background effect', error);
+      this.logger.error('Failed to read persisted preferred video background effect', error);
       return DEFAULT_BACKGROUND_EFFECT;
     }
   }
@@ -289,16 +289,16 @@ export class BackgroundEffectsHandler {
     }
   }
 
-  private readLastVirtualBackgroundIdFromStore(): string | undefined {
+  private readLastVirtualBackgroundIdFromStore(): string {
     if (this.storage === undefined) {
-      return undefined;
+      return DEFAULT_BUILTIN_BACKGROUND_ID;
     }
 
     try {
-      return this.storage.getItem(VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY) ?? undefined;
+      return this.storage.getItem(VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY) ?? DEFAULT_BUILTIN_BACKGROUND_ID;
     } catch (error) {
-      console.error('Failed to read last virtual background ID', error);
-      return undefined;
+      this.logger.error('Failed to read last virtual background ID', error);
+      return DEFAULT_BUILTIN_BACKGROUND_ID;
     }
   }
 

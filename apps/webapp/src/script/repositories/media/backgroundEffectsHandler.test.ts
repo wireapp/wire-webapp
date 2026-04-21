@@ -19,6 +19,7 @@
 
 import {BackgroundEffectsHandler, ReleasableMediaStream} from './backgroundEffectsHandler';
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
+import {DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
 
 // Mocks
 jest.mock('Util/localStorage', () => ({
@@ -47,7 +48,7 @@ describe('BackgroundEffectsHandler', () => {
     backgroundEffectsStore.getState().setIsFeatureEnabled(false);
     backgroundEffectsStore.getState().setPreferredEffect({type: 'none'});
     backgroundEffectsStore.getState().setMetrics(undefined);
-    backgroundEffectsStore.getState().setLastVirtualBackgroundId(undefined);
+    backgroundEffectsStore.getState().setLastVirtualBackgroundId(DEFAULT_BUILTIN_BACKGROUND_ID);
   });
 
   beforeEach(() => {

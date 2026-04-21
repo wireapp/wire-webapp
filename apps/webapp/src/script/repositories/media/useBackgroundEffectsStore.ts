@@ -22,7 +22,11 @@ import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
 import {Metrics, QualityTier} from 'Repositories/media/backgroundEffects';
-import {BackgroundEffectSelection, DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
+import {
+  BackgroundEffectSelection,
+  DEFAULT_BACKGROUND_EFFECT,
+  DEFAULT_BUILTIN_BACKGROUND_ID,
+} from 'Repositories/media/VideoBackgroundEffects';
 
 export interface RenderMetrics extends Metrics {
   budget: number;
@@ -38,11 +42,11 @@ export type BackgroundEffectsState = {
   preferredEffect: BackgroundEffectSelection;
   metrics: RenderMetrics | undefined;
   model: string;
-  lastVirtualBackgroundId: string | undefined;
+  lastVirtualBackgroundId: string;
 
   setIsFeatureEnabled(value: boolean): void;
   setPreferredEffect(effect: BackgroundEffectSelection): void;
-  setLastVirtualBackgroundId(backgroundId: string | undefined): void;
+  setLastVirtualBackgroundId(backgroundId: string): void;
   setMetrics(metrics: RenderMetrics | undefined): void;
   setModel(model: string | undefined): void;
 };
@@ -53,7 +57,7 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     preferredEffect: DEFAULT_BACKGROUND_EFFECT,
     metrics: undefined,
     model: 'unknown',
-    lastVirtualBackgroundId: undefined,
+    lastVirtualBackgroundId: DEFAULT_BUILTIN_BACKGROUND_ID,
 
     setIsFeatureEnabled: value =>
       set(state => {
