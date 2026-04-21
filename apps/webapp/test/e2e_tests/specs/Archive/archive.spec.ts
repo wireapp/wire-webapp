@@ -125,7 +125,7 @@ test.describe('Archive', () => {
       });
 
       await test.step('The conversation should still not be shown within all conversations', async () => {
-        await components.conversationSidebar().allConverationsButton.click();
+        await components.conversationSidebar().allConversationsButton.click();
         await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
       });
     });

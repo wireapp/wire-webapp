@@ -144,7 +144,7 @@ test.describe('Localization', () => {
       const messagePlaceholder = page.locator('[data-uie-name="input-placeholder"]');
       await expect(messagePlaceholder).toHaveText(deTranslations['tooltipConversationInputPlaceholder']);
 
-      await components.conversationSidebar().allConverationsButton.click();
+      await components.conversationSidebar().allConversationsButton.click();
       await pages
         .conversationList()
         .getConversationLocator(userB.fullName)

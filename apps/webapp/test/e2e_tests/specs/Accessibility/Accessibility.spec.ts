@@ -59,7 +59,7 @@ test.describe('Accessibility', () => {
       });
 
       await test.step('User A types more into group', async () => {
-        await userAPages.sidebar().allConverationsButton.click();
+        await userAPages.sidebar().allConversationsButton.click();
         await userAPages.conversationList().openConversation('Accessible Group');
         await userAPages.conversation().messageInput.pressSequentially('Test', {delay: 100});
         // Since A disabled the typing indicator B should not see it

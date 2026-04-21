@@ -238,7 +238,7 @@ test.describe('account settings', () => {
       });
 
       await test.step('Channel details', async () => {
-        await components.conversationSidebar().allConverationsButton.click();
+        await components.conversationSidebar().allConversationsButton.click();
 
         await pages.conversationList().clickCreateGroup();
         await modals.createConversation().createChannel('Test Channel', {members: [memberB]});
