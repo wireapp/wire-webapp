@@ -142,6 +142,7 @@ test.describe('Conversations', () => {
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
+      await expect(adminPage.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
 
       await createGroup(adminPage, groupName, [userB, guestUser]);
 
@@ -167,6 +168,7 @@ test.describe('Conversations', () => {
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
+      await expect(adminPage.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
 
       await createGroup(adminPage, groupName, [userB, guestUser]);
 
