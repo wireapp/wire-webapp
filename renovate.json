@@ -122,6 +122,10 @@
       "enabled": false
     },
     {
+      "matchPackageNames": ["@wireapp/avs"],
+      "enabled": false
+    },
+    {
       "matchPackageNames": ["geolite2"],
       "allowedVersions": "<2"
     }
