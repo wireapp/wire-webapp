@@ -148,9 +148,9 @@ test.describe('Deep Links', () => {
         [userAPage, userBPage, userCPage, userDPage].map(async page => {
           const {pages, components} = PageManager.from(page).webapp;
 
-          await components.conversationSidebar().preferencesButton.click();
+          await components.conversationSidebar().clickPreferencesButton();
           const profileLink = await pages.settings().profileLink.textContent();
-          await components.conversationSidebar().allConverationsButton.click();
+          await components.conversationSidebar().clickAllConversationsButton();
 
           return profileLink;
         }),
