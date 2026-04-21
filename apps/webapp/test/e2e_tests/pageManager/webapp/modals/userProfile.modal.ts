@@ -41,10 +41,9 @@ export class UserProfileModal {
     this.connectButton = page.getByTestId('modal-user-profile').getByTestId('do-send-request');
     this.startConversationButton = page.getByTestId('modal-user-profile').getByTestId('start-conversation');
     this.unblockButton = page.getByTestId('modal-user-profile').getByTestId('do-unblock');
-    this.blockButton = page.getByRole('button', {name: 'Block…'}).getByTestId('do-block');
+    this.blockButton = page.getByRole('button', {name: 'Block…', exact: true});
     this.openConversationButton = this.modal
-      .getByRole('button', {name: 'Open conversation'})
-      .getByTestId('go-conversation');
+      .getByRole('button', {name: 'Open conversation', exact: true});
     this.guestChip = page.getByTestId('status-guest');
     this.connectWarning = page.getByText(/Get certainty about .*’s identity before connecting/);
     this.participantFullname = this.modal.getByTestId('status-label');
@@ -52,10 +51,7 @@ export class UserProfileModal {
 
     this.userEmailLabel = this.modal.getByRole('paragraph').getByText('Email');
 
-    const domainContainer = page.locator('.enriched-fields__entry').filter({
-      has: page.locator('[data-uie-name="item-enriched-key"]', {hasText: 'Domain'}),
-    });
-    this.domainLabel = domainContainer.getByRole('paragraph').getByText('Domain');
+    this.domainLabel = this.modal.getByRole('paragraph').getByText('Domain');
     this.cancelButton = this.modal.getByRole('button', {name: 'Cancel', exact: true});
     this.modalCloseButton = this.modal.getByTestId('do-close');
     this.openProfileButton = this.modal.getByTestId('go-profile');
