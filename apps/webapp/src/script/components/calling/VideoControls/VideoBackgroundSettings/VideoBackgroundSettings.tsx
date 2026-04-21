@@ -160,6 +160,7 @@ export const VideoBackgroundSettings = ({
             disabled={true}
             id="enable-high-quality-blur"
             checked={highQualityBlurAllowed}
+            data-uie-name="enable-high-quality-blur"
             onChange={(event: ChangeEvent<HTMLInputElement>) => handleEnableHighQualityBlur(event)}
           >
             <CheckboxLabel htmlFor="enable-high-quality-blur">
