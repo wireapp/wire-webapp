@@ -24,11 +24,11 @@ describe('createRequestVersionGate', () => {
     const requestVersionGate = createRequestVersionGate();
 
     const firstRequest = requestVersionGate.next();
-    expect(requestVersionGate.isCurrent(firstRequest)).toBe(true);
+    expect(requestVersionGate.isStale(firstRequest)).toBe(false);
 
     const secondRequest = requestVersionGate.next();
-    expect(requestVersionGate.isCurrent(firstRequest)).toBe(false);
-    expect(requestVersionGate.isCurrent(secondRequest)).toBe(true);
+    expect(requestVersionGate.isStale(firstRequest)).toBe(true);
+    expect(requestVersionGate.isStale(secondRequest)).toBe(false);
   });
 
   it('invalidates in-flight requests when cleared', () => {
@@ -37,9 +37,9 @@ describe('createRequestVersionGate', () => {
     const searchRequest = requestVersionGate.next();
     requestVersionGate.invalidate();
 
-    expect(requestVersionGate.isCurrent(searchRequest)).toBe(false);
+    expect(requestVersionGate.isStale(searchRequest)).toBe(true);
 
     const freshRequest = requestVersionGate.next();
-    expect(requestVersionGate.isCurrent(freshRequest)).toBe(true);
+    expect(requestVersionGate.isStale(freshRequest)).toBe(false);
   });
 });

@@ -20,17 +20,22 @@
 export interface RequestVersionGate {
   next: () => number;
   invalidate: () => void;
-  isCurrent: (requestId: number) => boolean;
+  isStale: (requestId: number) => boolean;
 }
 
 export const createRequestVersionGate = (): RequestVersionGate => {
   let currentRequestId = 0;
 
   return {
-    next: () => ++currentRequestId,
-    invalidate: () => {
-      ++currentRequestId;
+    next(): number {
+      currentRequestId += 1;
+      return currentRequestId;
     },
-    isCurrent: requestId => requestId === currentRequestId,
+    invalidate(): void {
+      currentRequestId += 1;
+    },
+    isStale(requestId: number): boolean {
+      return requestId !== currentRequestId;
+    },
   };
 };

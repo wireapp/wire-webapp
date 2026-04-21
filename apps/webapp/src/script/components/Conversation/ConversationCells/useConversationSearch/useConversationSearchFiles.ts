@@ -38,6 +38,7 @@ interface UseConversationSearchFilesProps {
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
   onClear?: () => void;
+  debounceMs?: number;
 }
 
 const DEBOUNCE_TIME = 300;
@@ -49,6 +50,7 @@ export const useConversationSearchFiles = ({
   conversationQualifiedId,
   enabled,
   onClear,
+  debounceMs = DEBOUNCE_TIME,
 }: UseConversationSearchFilesProps) => {
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
 
@@ -78,7 +80,7 @@ export const useConversationSearchFiles = ({
 
         // A newer search request started while this one was in flight.
         // Ignore stale results/errors to avoid overwriting current state.
-        if (!requestVersionGate.current.isCurrent(requestId)) {
+        if (requestVersionGate.current.isStale(requestId)) {
           return;
         }
 
@@ -90,6 +92,10 @@ export const useConversationSearchFiles = ({
         }
 
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
+
+        if (requestVersionGate.current.isStale(requestId)) {
+          return;
+        }
 
         // filter out draft nodes from results
         const filteredNodes = result.Nodes.filter(node => !node.IsDraft);
@@ -110,7 +116,7 @@ export const useConversationSearchFiles = ({
 
         setStatus('success');
       } catch {
-        if (!requestVersionGate.current.isCurrent(requestId)) {
+        if (requestVersionGate.current.isStale(requestId)) {
           return;
         }
 
@@ -129,10 +135,10 @@ export const useConversationSearchFiles = ({
     shouldPerformSearch.current = false;
     setSearchQuery(value);
     await searchNodes({query: value, requestId});
-    if (requestVersionGate.current.isCurrent(requestId)) {
+    if (!requestVersionGate.current.isStale(requestId)) {
       shouldPerformSearch.current = true;
     }
-  }, DEBOUNCE_TIME);
+  }, debounceMs);
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -152,6 +158,8 @@ export const useConversationSearchFiles = ({
     setSearchValue('');
     setSearchQuery('');
     shouldPerformSearch.current = false;
+    const requestId = requestVersionGate.current.next();
+    void searchNodes({query: FETCH_ALL_QUERY, requestId});
   };
 
   const handleReload = async () => {
