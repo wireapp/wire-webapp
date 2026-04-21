@@ -90,6 +90,7 @@ export const FullScreenCallPage = (page: Page) => {
     toggleParticipantsBtn,
     toggleHandRaise,
     selfVideoThumbnail,
+    gridTiles,
     toggleParticipantsList,
     getSidebarParticipant,
     getGridTile,

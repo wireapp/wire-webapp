@@ -630,10 +630,31 @@ test.describe('Calling', () => {
     },
   );
 
-  test(
-    'I want to navigate between call pages',
-    {tag: ['@TC-2924', '@regression']},
-    async ({createPage, createUser}) => {
+  [
+    {
+      description: 'I want to navigate between call pages',
+      tag: '@TC-2924',
+      verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>, localUser: string) => {
+        await expect(callScreen.getGridTile(localUser)).toBeVisible();
+        await callScreen.goToNextPage();
+        await expect(callScreen.getGridTile(localUser)).toBeHidden();
+        await callScreen.goToPreviousPage();
+        await expect(callScreen.getGridTile(localUser)).toBeVisible();
+      },
+    },
+    {
+      description: 'I want to see video tiles ordered alphabetically by user names',
+      tag: '@TC-2927',
+      verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>, localUser: string) => {
+        const displayedNames = await callScreen.gridTiles.getByTestId('call-participant-name').allInnerTexts();
+        const listToVerify = displayedNames.filter(name => name !== localUser);
+        const sortedNames = [...listToVerify].sort();
+
+        expect(listToVerify).toEqual(sortedNames);
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage, createUser}) => {
       const userAPage = await createPage(withLogin(userA));
       const userAPages = PageManager.from(userAPage).webapp.pages;
 
@@ -675,18 +696,10 @@ test.describe('Calling', () => {
         );
       });
 
-      await test.step('Verify: Pagination and Grid Visibility', async () => {
-        const userACall = await userAPages.calling().maximizeCell();
-        await expect(userACall.getGridTile(userA.fullName)).toBeVisible();
-
-        // Navigate and Verify disappearance
-        await userACall.goToNextPage();
-        await expect(userACall.getGridTile(userA.fullName)).toBeHidden();
-
-        // Return and Verify reappearance
-        await userACall.goToPreviousPage();
-        await expect(userACall.getGridTile(userA.fullName)).toBeVisible();
+      await test.step('Verify functionality', async () => {
+        const callScreen = await userAPages.calling().maximizeCell();
+        await verify(callScreen, userA.fullName);
       });
-    },
-  );
+    });
+  });
 });
