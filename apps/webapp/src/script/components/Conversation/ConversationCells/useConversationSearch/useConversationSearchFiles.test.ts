@@ -29,10 +29,7 @@ import {useConversationSearchFiles} from './useConversationSearchFiles';
 
 const createNode = (uuid: string, path: string): RestNode => ({Uuid: uuid, Path: path, Type: 'LEAF'});
 
-const createHook = (
-  cellsRepository: jest.Mocked<CellsRepository>,
-  userRepository: jest.Mocked<UserRepository>,
-) =>
+const createHook = (cellsRepository: jest.Mocked<CellsRepository>, userRepository: jest.Mocked<UserRepository>) =>
   renderHook(() =>
     useConversationSearchFiles({
       cellsRepository,
