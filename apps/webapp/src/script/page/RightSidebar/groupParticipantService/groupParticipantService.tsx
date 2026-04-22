@@ -76,11 +76,11 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   const {canChatWithServices} = generatePermissionHelpers(teamRole);
 
-  const byServiceId = (id: string) => (user: User) => user.serviceId === id;
-  const byUserId = (id: string) => (user: User) => user.id === id;
   const serviceUser = participatingUserEts.find(user => {
-    const predicate = serviceEntity.isService ? byServiceId(serviceEntity.id) : byUserId(serviceEntity.id);
-    return predicate(user);
+    if (serviceEntity.isService) {
+      return user.serviceId === serviceEntity.id;
+    }
+    return user.id === serviceEntity.id;
   });
 
   const showActions = isActiveParticipant && serviceUser && inTeam;
