@@ -48,16 +48,12 @@ const ServicesOptions: FC<ServicesOptionsProps> = ({
     'isGuestAndServicesRoom',
   ]);
 
-  const {hasWhitelistedServices, isAppsEnabled} = useKoSubscribableChildren(teamState, [
-    'hasWhitelistedServices',
-    'isAppsEnabled',
-  ]);
+  const {isAppsEnabled} = useKoSubscribableChildren(teamState, ['isAppsEnabled']);
 
   const isServicesEnabled = isServicesRoom || isGuestAndServicesRoom;
 
   const isAppsFeatureEnabled = checkAppsFeatureAvailability({
     protocol: activeConversation.protocol,
-    hasWhitelistedServices: hasWhitelistedServices,
     isAppsEnabled: isAppsEnabled,
   });
 
