@@ -203,4 +203,63 @@ describe('BackgroundEffectsHandler', () => {
 
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
   });
+
+  it('releases processed stream correctly', async () => {
+    const handler = new BackgroundEffectsHandler(mockController);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'} as any);
+
+    const outputTrack = {stop: jest.fn()};
+    const stop = jest.fn();
+
+    mockController.start.mockResolvedValue({outputTrack, stop});
+
+    const stream = createMockStream();
+    const result = await handler.applyBackgroundEffect(stream);
+
+    result.media.release();
+
+    expect(stop).toHaveBeenCalled();
+    expect(outputTrack.stop).toHaveBeenCalled();
+  });
+
+  it('reads preferred effect from storage on init', () => {
+    mockStorage.getItem.mockImplementation((key: string) => {
+      if (key === 'video-background-effects') {
+        return JSON.stringify({type: 'virtual', backgroundId: 'bg1'});
+      }
+      return null;
+    });
+
+    new BackgroundEffectsHandler(mockController);
+
+    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({
+      type: 'virtual',
+      backgroundId: 'bg1',
+    });
+  });
+
+  it('falls back to default preferred effect when stored value is invalid', () => {
+    mockStorage.getItem.mockImplementation((key: string) => {
+      if (key === 'video-background-effects') {
+        return '{invalid-json';
+      }
+      return null;
+    });
+
+    new BackgroundEffectsHandler(mockController);
+
+    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({type: 'none'});
+  });
+
+  it('returns false when saving feature flag fails', () => {
+    mockStorage.setItem.mockImplementation(() => {
+      throw new Error('storage failed');
+    });
+
+    const handler = new BackgroundEffectsHandler(mockController);
+    const result = handler.saveFeatureEnabledStateInStore(true);
+
+    expect(result).toBe(false);
+    expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+  });
 });
