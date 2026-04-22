@@ -18,6 +18,7 @@
  */
 
 import {ConversationMLSMessageAddEvent} from '@wireapp/api-client/lib/event';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Decoder} from 'bazinga64';
 
 import {LogFactory} from '@wireapp/commons';
@@ -35,18 +36,24 @@ interface HandleMLSMessageAddParams {
   event: ConversationMLSMessageAddEvent;
   groupId: string;
   mlsService: MLSService;
+  qualifiedConversationId: QualifiedId;
 }
 
 export const handleMLSMessageAdd = async ({
   event,
   groupId,
   mlsService,
+  qualifiedConversationId,
 }: HandleMLSMessageAddParams): Promise<HandledEventPayload | null> => {
   const encryptedData = Decoder.fromBase64(event.data).asBytes;
 
   const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
-  const decryptedMessage = await mlsService.decryptMessage(new ConversationId(groupIdBytes), encryptedData);
+  const decryptedMessage = await mlsService.decryptMessage(
+    new ConversationId(groupIdBytes),
+    encryptedData,
+    qualifiedConversationId,
+  );
 
   if (!decryptedMessage) {
     // If the message is not decrypted, we return null
