@@ -51,6 +51,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
+      - name: Install pinned package manager
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        run: corepack install
+
       - run: yarn --immutable
       - run: yarn nx run webapp:configure
       - run: yarn nx run server:package
