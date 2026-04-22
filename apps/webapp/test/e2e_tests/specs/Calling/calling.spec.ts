@@ -755,4 +755,63 @@ test.describe('Calling', () => {
       });
     });
   });
+
+  [
+    {
+      description: 'I want to unmute myself after I got muted',
+      tag: '@TC-2931',
+      verify: async (userCallPage: Page) => {
+        const userCallPages = PageManager.from(userCallPage).webapp.pages;
+        await userCallPages.calling().fullScreenMuteButton.click();
+        await expect(userCallPages.calling().getGridTile(userB.fullName).muteIcon).not.toBeVisible();
+      },
+    },
+    {
+      description: 'I want to get notified when I got muted',
+      tag: '@TC-2932',
+      verify: async (userCallPage: Page) => {
+        await expect(userCallPage.getByText('You have been muted')).toBeVisible();
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await test.step('Setup: Create group and start call', async () => {
+        await createGroup(userAPages, groupName, [userB]);
+        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversation().clickCallButton();
+
+        await expect(userAPages.calling().callCell).toBeVisible();
+      });
+
+      await test.step('User B joins the call', async () => {
+        await joinCall(userBPages);
+        await userBPages.calling().toggleMute(); // Ensure active mic state
+        await userBPages.calling().maximizeCell();
+      });
+
+      await test.step('Moderator mutes User B', async () => {
+        const userACall = await userAPages.calling().maximizeCell();
+        await userACall.toggleParticipantsList();
+
+        await expect(userACall.getCallParticipant(userB.fullName).muteIcon).not.toBeVisible();
+
+        await userACall.getCallParticipant(userB.fullName).menuButton.click();
+        await userAPage.getByRole('button', {name: 'Mute', exact: true}).click();
+
+        await expect(userACall.getCallParticipant(userB.fullName).muteIcon).toBeVisible();
+      });
+
+      await test.step('Verify mute functionality', async () => {
+        verify(userBPage);
+      });
+    });
+  });
 });
