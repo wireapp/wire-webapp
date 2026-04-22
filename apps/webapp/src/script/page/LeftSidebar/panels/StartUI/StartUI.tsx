@@ -90,14 +90,10 @@ const StartUI = ({
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();
-  const appsEnabled = teamState?.isAppsEnabled();
   const defaultProtocol = teamState.teamFeatures()?.mls?.config.defaultProtocol;
   const isProteus = defaultProtocol !== CONVERSATION_PROTOCOL.MLS;
 
-  const showServiceTab =
-    isTeam &&
-    canChatWithServices() &&
-    ((isProteus && teamState?.hasWhitelistedServices()) || (!isProteus && appsEnabled));
+  const showServiceTab = isTeam && canChatWithServices() && isProteus && teamState?.hasWhitelistedServices();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState(Tabs.PEOPLE);
