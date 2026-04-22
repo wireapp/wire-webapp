@@ -22,15 +22,14 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team/feature/';
 export interface AppsFeatureOptions {
   protocol: CONVERSATION_PROTOCOL;
   isAppsEnabled: boolean;
-  hasWhitelistedServices: boolean;
 }
 
-export const checkAppsFeatureAvailability = ({protocol, isAppsEnabled, hasWhitelistedServices}: AppsFeatureOptions) => {
+export const checkAppsFeatureAvailability = ({protocol, isAppsEnabled}: AppsFeatureOptions) => {
   switch (protocol) {
     case CONVERSATION_PROTOCOL.MLS:
       return isAppsEnabled;
     case CONVERSATION_PROTOCOL.PROTEUS:
-      return hasWhitelistedServices;
+      return true;
     default:
       return false;
   }

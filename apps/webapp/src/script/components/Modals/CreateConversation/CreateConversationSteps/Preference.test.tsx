@@ -7,7 +7,6 @@ import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/tea
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
-  hasWhitelistedServices: boolean;
   isMLSEnabled: boolean;
   defaultProtocol: CONVERSATION_PROTOCOL;
   expectedAppsEnabled: boolean;
@@ -23,41 +22,30 @@ describe('Preference', () => {
     {
       defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
-      hasWhitelistedServices: true,
       isMLSEnabled: false,
       expectedAppsEnabled: true,
-    },
-    {
-      defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
-      isAppsEnabled: false,
-      hasWhitelistedServices: false,
-      isMLSEnabled: false,
-      expectedAppsEnabled: false,
     },
 
     // MLS
     {
       defaultProtocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: false,
-      hasWhitelistedServices: true,
       isMLSEnabled: true,
       expectedAppsEnabled: false,
     },
     {
       defaultProtocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: true,
-      hasWhitelistedServices: false,
       isMLSEnabled: true,
       expectedAppsEnabled: true,
     },
   ])(
     'should result in expectedAppsEnabled=$expectedAppsEnabled when { protocol: $defaultProtocol, appsEnabled: $isAppsEnabled, whitelisted: $hasWhitelistedServices, mlsEnabled: $isMLSEnabled }',
-    ({isAppsEnabled, hasWhitelistedServices, isMLSEnabled, defaultProtocol, expectedAppsEnabled}) => {
+    ({isAppsEnabled, isMLSEnabled, defaultProtocol, expectedAppsEnabled}) => {
       // Arrange
       const mockTeamState: Partial<TeamState> = {
         isMLSEnabled: ko.pureComputed(() => isMLSEnabled),
         isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
-        hasWhitelistedServices: ko.observable(hasWhitelistedServices),
         teamFeatures: ko.observable({
           mls: {
             config: {
