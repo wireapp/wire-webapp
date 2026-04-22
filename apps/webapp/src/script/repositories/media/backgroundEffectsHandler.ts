@@ -38,6 +38,7 @@ export const DEBOUNCE_TIMER = 500;
 
 const VIDEO_BACKGROUND_EFFECT_STORAGE_KEY = 'video-background-effects';
 const VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY = 'video-background-effects-feature-enabled';
+const VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY = 'video-background-effects-last-virtual-id';
 
 const isVirtualEffect = (effect: BackgroundEffectSelection): boolean => {
   return effect.type === 'virtual' || effect.type === 'custom';
@@ -94,6 +95,7 @@ export class BackgroundEffectsHandler {
     this.storage = getStorage();
     backgroundEffectsStore.getState().setIsFeatureEnabled(this.readFeatureEnabledStateFromStore());
     backgroundEffectsStore.getState().setPreferredEffect(this.readPreferredBackgroundEffectFromStore());
+    backgroundEffectsStore.getState().setLastVirtualBackgroundId(this.readLastVirtualBackgroundIdFromStore());
 
     backgroundEffectsStore.subscribe((state, prevState) => {
       if (state.preferredEffect !== prevState.preferredEffect) {
@@ -104,6 +106,11 @@ export class BackgroundEffectsHandler {
           () => this.savePreferredBackgroundEffectInStore(state.preferredEffect),
           DEBOUNCE_TIMER,
         );
+
+        if (state.preferredEffect.type === 'virtual') {
+          backgroundEffectsStore.getState().setLastVirtualBackgroundId(state.preferredEffect.backgroundId);
+          this.saveLastVirtualBackgroundIdInStore(state.preferredEffect.backgroundId);
+        }
       }
     });
   }
@@ -195,7 +202,7 @@ export class BackgroundEffectsHandler {
     try {
       return this.storage.getItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY) === 'true';
     } catch (error) {
-      console.error('Failed to read video background effect feature state', error);
+      this.logger.error('Failed to read video background effect feature state', error);
       return false;
     }
   }
@@ -211,7 +218,7 @@ export class BackgroundEffectsHandler {
       this.storage.setItem(VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY, `${flag}`);
       return flag;
     } catch (error) {
-      console.error('Failed to persist video background effect feature state', error);
+      this.logger.error('Failed to persist video background effect feature state', error);
       return false;
     }
   }
@@ -264,7 +271,7 @@ export class BackgroundEffectsHandler {
     try {
       return parseStoredPreferredEffect(this.storage.getItem(VIDEO_BACKGROUND_EFFECT_STORAGE_KEY));
     } catch (error) {
-      console.error('Failed to read persisted preferred video background effect', error);
+      this.logger.error('Failed to read persisted preferred video background effect', error);
       return DEFAULT_BACKGROUND_EFFECT;
     }
   }
@@ -279,6 +286,31 @@ export class BackgroundEffectsHandler {
       this.storage.setItem(VIDEO_BACKGROUND_EFFECT_STORAGE_KEY, serialized);
     } catch (error) {
       this.logger.error('Failed to persist preferred video background effect', error);
+    }
+  }
+
+  private readLastVirtualBackgroundIdFromStore(): string {
+    if (this.storage === undefined) {
+      return DEFAULT_BUILTIN_BACKGROUND_ID;
+    }
+
+    try {
+      return this.storage.getItem(VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY) ?? DEFAULT_BUILTIN_BACKGROUND_ID;
+    } catch (error) {
+      this.logger.error('Failed to read last virtual background ID', error);
+      return DEFAULT_BUILTIN_BACKGROUND_ID;
+    }
+  }
+
+  private saveLastVirtualBackgroundIdInStore(backgroundId: string): void {
+    if (this.storage === undefined) {
+      return;
+    }
+
+    try {
+      this.storage.setItem(VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY, backgroundId);
+    } catch (error) {
+      this.logger.error('Failed to persist last virtual background ID', error);
     }
   }
 
