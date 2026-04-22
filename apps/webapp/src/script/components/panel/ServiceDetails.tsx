@@ -18,15 +18,17 @@
  */
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {authorLabel} from 'Components/panel/ServiceDetails.styles';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 interface ServiceDetailsProps {
   service: ServiceEntity;
 }
 
 const ServiceDetails = ({service}: ServiceDetailsProps) => {
-  const {providerName, name} = useKoSubscribableChildren(service, ['providerName', 'name']);
+  const {providerName, name, author} = useKoSubscribableChildren(service, ['providerName', 'name', 'author']);
 
   return (
     <div className="panel-participant">
@@ -44,6 +46,10 @@ const ServiceDetails = ({service}: ServiceDetailsProps) => {
         avatarSize={AVATAR_SIZE.X_LARGE}
         data-uie-name="status-profile-picture"
       />
+
+      <p css={authorLabel} className="panel__info-text--margin">
+        {t('serviceDetailsAuthor', {author})}
+      </p>
 
       <p
         className="panel-participant__service-description panel__info-text--margin"
