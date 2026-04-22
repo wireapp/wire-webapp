@@ -377,7 +377,7 @@ export class ActionsViewModel {
     }
 
     if (!serviceEntity.qualifiedId) {
-      throw new Error();
+      throw new Error("Can't create 1on1 conversation for an entity without qualifiedId");
     }
 
     const conversationEntity = await this.getOrCreate1to1Conversation({qualifiedId: serviceEntity.qualifiedId});
