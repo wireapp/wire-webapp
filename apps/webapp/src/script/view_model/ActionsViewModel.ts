@@ -371,15 +371,16 @@ export class ActionsViewModel {
       throw new Error();
     }
 
-    let conversationEntity;
     if (serviceEntity.isService) {
-      conversationEntity = await this.integrationRepository.get1To1ConversationWithService(serviceEntity);
-    } else {
-      if (!serviceEntity.qualifiedId) {
-        throw new Error();
-      }
-      conversationEntity = await this.getOrCreate1to1Conversation({qualifiedId: serviceEntity.qualifiedId});
+      const conversationEntity = await this.integrationRepository.get1To1ConversationWithService(serviceEntity);
+      return this.openConversation(conversationEntity);
     }
+
+    if (!serviceEntity.qualifiedId) {
+      throw new Error();
+    }
+
+    const conversationEntity = await this.getOrCreate1to1Conversation({qualifiedId: serviceEntity.qualifiedId});
     return this.openConversation(conversationEntity);
   };
 
