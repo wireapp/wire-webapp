@@ -32,6 +32,12 @@ import {
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
 import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
+async function joinCall(userPages: PageManager['webapp']['pages']) {
+  await expect(userPages.calling().callCell).toBeVisible();
+  await userPages.calling().clickAcceptCallButton();
+  await expect(userPages.calling().goFullScreen).toBeVisible();
+}
+
 test.describe('Calling', () => {
   let userA: User;
   let userB: User;
@@ -94,10 +100,7 @@ test.describe('Calling', () => {
     await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
-    await expect(userBPages.calling().callCell).toBeVisible();
-    await userBPages.calling().clickAcceptCallButton();
-
-    await expect(userBPages.calling().goFullScreen).toBeVisible();
+    await joinCall(userBPages);
 
     const userACall = await userAPages.calling().maximizeCell();
     await expect(userACall.selfVideoThumbnail).toBeVisible();
@@ -259,11 +262,7 @@ test.describe('Calling', () => {
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPages.calling().callCell).toBeVisible();
-      await expect(userBPages.calling().callCell).toBeVisible();
-
-      await userBPages.calling().clickAcceptCallButton();
-      // Confirm the calls grid is visible
-      await expect(userBPages.calling().goFullScreen).toBeVisible();
+      await joinCall(userBPages);
 
       // // User C joins the ongoing call
       await userCPage.waitForTimeout(5000);
@@ -293,10 +292,7 @@ test.describe('Calling', () => {
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
-    await expect(userBPages.calling().callCell).toBeVisible();
-
-    await userBPages.calling().clickAcceptCallButton();
-    await expect(userBPages.calling().goFullScreen).toBeVisible();
+    await joinCall(userBPages);
 
     await userAPages.calling().maximizeCell();
     await expect(userAPages.calling().selfVideoThumbnail).toBeVisible();
@@ -316,10 +312,9 @@ test.describe('Calling', () => {
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
-    await expect(userBPages.calling().callCell).toBeVisible();
 
     // User B joins the call
-    await userBPages.calling().clickAcceptCallButton();
+    await joinCall(userBPages);
     await expect(userBPages.calling().goFullScreen).toBeVisible();
 
     // User B leaves the group call
@@ -373,10 +368,8 @@ test.describe('Calling', () => {
         await userAPages.conversation().clickCallButton();
 
         await expect(userAPages.calling().callCell).toBeVisible();
-        await expect(userBPages.calling().callCell).toBeVisible();
 
-        await userBPages.calling().clickAcceptCallButton();
-        await expect(userBPages.calling().goFullScreen).toBeVisible();
+        await joinCall(userBPages);
       });
 
       await test.step('User A joins then leaves the call from their second device', async () => {
@@ -424,9 +417,7 @@ test.describe('Calling', () => {
 
       // Ensure all invited members join the call
       for (const member of [userBPages, userCPages]) {
-        await expect(member.calling().callCell).toBeVisible();
-        await member.calling().clickAcceptCallButton();
-        await expect(member.calling().goFullScreen).toBeVisible();
+        await joinCall(member);
       }
 
       // User A removes User B from the group
@@ -525,9 +516,7 @@ test.describe('Calling', () => {
 
       await test.step('Join call with all participants', async () => {
         for (const member of [userBPages, guestPages]) {
-          await expect(member.calling().callCell).toBeVisible();
-          await member.calling().clickAcceptCallButton();
-          await expect(member.calling().goFullScreen).toBeVisible();
+          await joinCall(member);
         }
       });
 
@@ -690,8 +679,7 @@ test.describe('Calling', () => {
       await test.step('Action: All members accept the incoming call', async () => {
         await Promise.all(
           memberPages.map(async memberPage => {
-            await memberPage.calling().acceptCallButton.click({timeout: 30_000});
-            await expect(memberPage.calling().goFullScreen).toBeVisible();
+            await joinCall(memberPage);
           }),
         );
       });
@@ -702,4 +690,44 @@ test.describe('Calling', () => {
       });
     });
   });
+
+  test(
+    'As a moderator I want to mute another participant',
+    {tag: ['@TC-2928', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPages, userCPages] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      ]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+
+      await createGroup(userAPages, groupName, [userB, userC]);
+
+      // User A initiates the call
+      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversation().clickCallButton();
+
+      await expect(userAPages.calling().callCell).toBeVisible();
+      // Ensure all invited members join the call
+      for (const member of [userBPages, userCPages]) {
+        joinCall(member);
+      }
+
+      // User B un-mutes themselves
+      await userBPages.calling().toggleMute();
+
+      // User A mutes User B from the participants list
+      const userACall = await userAPages.calling().maximizeCell();
+      await userACall.toggleParticipantsList();
+      await expect(userACall.getCallParticipant(userB.fullName).muteIcon).not.toBeVisible();
+
+      await userACall.getCallParticipant(userB.fullName).menuButton.click();
+      await userAPage.getByRole('button', {name: 'Mute', exact: true}).click();
+
+      await expect(userACall.getCallParticipant(userB.fullName).muteIcon).toBeVisible();
+      await expect(userACall.getGridTile(userB.fullName).muteIcon).toBeVisible();
+    },
+  );
 });

@@ -60,6 +60,14 @@ export const FullScreenCallPage = (page: Page) => {
     await toggleParticipantsBtn.click();
   };
 
+  const goToNextPage = async () => {
+    await nextPageButton.click();
+  };
+
+  const goToPreviousPage = async () => {
+    await previousPageButton.click();
+  };
+
   // Sidebar list of participants in the call
   const getSidebarParticipant = (userName: string) => {
     const participant = participantListItems.filter({hasText: userName});
@@ -71,6 +79,7 @@ export const FullScreenCallPage = (page: Page) => {
       speakIcon: participant.getByTestId('status-active-speaking'),
       videoIcon: participant.getByTestId('status-video'),
       screenShareIcon: participant.getByTestId('status-screenshare'),
+      menuButton: participant.getByTestId('participant-menu-icon'),
     });
   };
 
