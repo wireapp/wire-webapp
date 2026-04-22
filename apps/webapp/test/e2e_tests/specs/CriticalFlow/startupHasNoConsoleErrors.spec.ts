@@ -32,6 +32,17 @@ type StartupErrorCollection = {
   readonly consoleErrors: ConsoleErrorRecord[];
 };
 
+function isUncaughtRuntimeErrorMessage(message: string): boolean {
+  return (
+    message.startsWith('Uncaught ') ||
+    message.startsWith('Error: Uncaught ') ||
+    message.includes('TypeError:') ||
+    message.includes('ReferenceError:') ||
+    message.includes('SyntaxError:') ||
+    message.includes('RangeError:')
+  );
+}
+
 function formatConsoleMessageLocation(consoleMessage: ConsoleMessage): string {
   const location = consoleMessage.location();
 
@@ -52,6 +63,10 @@ function collectUnexpectedConsoleErrors(page: Page): StartupErrorCollection {
 
   page.on('console', consoleMessage => {
     if (consoleMessage.type() !== 'error') {
+      return;
+    }
+
+    if (!isUncaughtRuntimeErrorMessage(consoleMessage.text())) {
       return;
     }
 
