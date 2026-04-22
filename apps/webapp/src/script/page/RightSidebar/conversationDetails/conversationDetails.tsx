@@ -200,18 +200,14 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       const services = new Array<ServiceEntity>();
 
       if (activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS) {
-        participatingUserEts.forEach(service => {
-          if (isServiceEntity(service)) {
-            services.push(service);
-          }
-        });
+        services.push(...participatingUserEts.filter(service => isServiceEntity(service)));
+      } else {
+        services.push(
+          ...participatingUserEts
+            .filter(user => user.type === UserType.APP)
+            .map(user => integrationRepository.mapServiceFromUser(user)),
+        );
       }
-
-      participatingUserEts.forEach(user => {
-        if (user.type === UserType.APP) {
-          services.push(integrationRepository.mapServiceFromUser(user));
-        }
-      });
 
       return services;
     }, [activeConversation.protocol, integrationRepository, participatingUserEts]);
