@@ -64,7 +64,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
       const isSmall = ![AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize);
       const loadHiRes = !isSmall && devicePixelRatio > 1;
-      const pictureResource: AssetRemoteData = loadHiRes ? mediumPicture : previewPicture;
+      const pictureResource: AssetRemoteData = loadHiRes ? (mediumPicture ?? previewPicture) : previewPicture;
 
       (async () => {
         if (pictureResource) {

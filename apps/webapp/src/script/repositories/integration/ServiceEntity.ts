@@ -33,6 +33,7 @@ export interface ServiceData {
   provider?: string;
   summary?: string;
   category?: string;
+  author?: string;
   tags?: string[];
   qualifiedId?: QualifiedId;
   type?: ServiceType;
@@ -50,6 +51,7 @@ export class ServiceEntity {
   summary: string;
   tags: string[];
   category?: string;
+  author?: ko.Observable<string>;
   type: ServiceType;
   get isService() {
     return this.type === 'Service';
@@ -68,5 +70,6 @@ export class ServiceEntity {
     this.category = serviceData.category ?? '';
     this.tags = serviceData.tags ?? [];
     this.type = serviceData.type ?? 'Service';
+    this.author = ko.observable(serviceData.author ?? '');
   }
 }

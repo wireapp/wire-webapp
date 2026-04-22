@@ -19,7 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {UserType, QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
@@ -352,14 +352,14 @@ export class ActionsViewModel {
     return this.conversationRepository.saveConversation(conversation);
   };
 
-  getOrCreate1to1Conversation = async (userEntity: User): Promise<Conversation> => {
+  getOrCreate1to1Conversation = async (userEntity: Pick<User, 'qualifiedId'>): Promise<Conversation> => {
     const conversationEntity = await this.conversationRepository.resolve1To1Conversation(userEntity.qualifiedId, {
       mls: {allowUnestablished: false},
     });
     if (conversationEntity) {
       return conversationEntity;
     }
-    throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.id}".`);
+    throw new Error(`Cannot find or create 1:1 conversation with user ID "${userEntity.qualifiedId.id}".`);
   };
 
   open1to1Conversation = (conversationEntity: Conversation): Promise<void> => {
@@ -370,7 +370,17 @@ export class ActionsViewModel {
     if (!serviceEntity) {
       throw new Error();
     }
-    const conversationEntity = await this.integrationRepository.get1To1ConversationWithService(serviceEntity);
+
+    if (serviceEntity.isService) {
+      const conversationEntity = await this.integrationRepository.get1To1ConversationWithService(serviceEntity);
+      return this.openConversation(conversationEntity);
+    }
+
+    if (!serviceEntity.qualifiedId) {
+      throw new Error("Can't create 1on1 conversation for an entity without qualifiedId");
+    }
+
+    const conversationEntity = await this.getOrCreate1to1Conversation({qualifiedId: serviceEntity.qualifiedId});
     return this.openConversation(conversationEntity);
   };
 
@@ -393,6 +403,11 @@ export class ActionsViewModel {
     if (conversationEntity && userEntity) {
       if (userEntity.isService) {
         await this.integrationRepository.removeService(conversationEntity, userEntity);
+        return;
+      }
+
+      if (userEntity.type === UserType.APP) {
+        await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
         return;
       }
 

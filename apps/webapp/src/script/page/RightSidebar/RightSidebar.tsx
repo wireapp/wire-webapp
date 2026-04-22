@@ -283,6 +283,7 @@ const RightSidebar: FC<RightSidebarProps> = ({
               actionsViewModel={actionsViewModel}
               integrationRepository={integrationRepository}
               conversationRepository={conversationRepository}
+              teamRepository={teamRepository}
               enableRemove={conversationRoleRepository.canRemoveParticipants(activeConversation)}
               goToRoot={goToRoot}
               onBack={onBackClick}
