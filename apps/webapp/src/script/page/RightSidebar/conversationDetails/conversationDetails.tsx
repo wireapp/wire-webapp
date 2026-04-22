@@ -222,13 +222,16 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const showUser = (userEntity: User) => togglePanel(PanelState.GROUP_PARTICIPANT_USER, userEntity);
 
     const showService = async (entity: ServiceEntity) => {
-      const serviceEntity = entity.isService
-        ? await integrationRepository.getServiceFromUser(entity)
-        : integrationRepository.mapServiceFromUser(
-            participatingUserEts.find(participant => participant.id === entity.id),
-          );
+      if (entity.isService) {
+        const serviceEntity = await integrationRepository.getServiceFromUser(entity);
+        togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
+        return;
+      }
 
-      if (serviceEntity) {
+      const user = participatingUserEts.find(participant => participant.id === entity.id);
+
+      if (user) {
+        const serviceEntity = integrationRepository.mapServiceFromUser(user);
         togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
       }
     };
