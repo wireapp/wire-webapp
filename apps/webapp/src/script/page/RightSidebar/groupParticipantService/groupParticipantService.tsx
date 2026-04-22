@@ -19,6 +19,8 @@
 
 import {FC, useEffect} from 'react';
 
+import is from '@sindresorhus/is';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -108,7 +110,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   }, [integrationRepository, serviceEntity]);
 
   useEffect(() => {
-    if (serviceUser?.teamId) {
+    if (!is.nullOrUndefined(serviceUser?.teamId)) {
       teamRepository.getTeamNameById(serviceUser.teamId).then(name => serviceEntity.author(name));
     }
   }, [teamRepository, serviceUser?.teamId]);
