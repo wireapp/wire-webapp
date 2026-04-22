@@ -17,8 +17,6 @@
  *
  */
 
-import {Runtime} from '@wireapp/commons';
-
 import type {CapabilityInfo} from '../backgroundEffectsWorkerTypes';
 
 /**
@@ -110,7 +108,7 @@ export function choosePipeline(
   preferWorker: boolean,
 ): 'worker-webgl2' | 'main-webgl2' | 'canvas2d' | 'passthrough' {
   // Priority 1: Worker + OffscreenCanvas + WebGL2 (best performance)
-  if (cap.webgl2 && cap.worker && cap.offscreenCanvas && preferWorker && !Runtime.isFirefox()) {
+  if (cap.webgl2 && cap.worker && cap.offscreenCanvas && preferWorker) {
     return 'worker-webgl2';
   }
   // Priority 2: Main-thread WebGL2 (GPU-accelerated, but blocks main thread)

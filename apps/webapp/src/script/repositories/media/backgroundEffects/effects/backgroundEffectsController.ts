@@ -136,6 +136,10 @@ export class BackgroundEffectsController {
   };
   private maxQualityTier: QualityTier = 'superhigh';
 
+  // take care about init piplines
+  private pipelineInitialized = false;
+  private pipelineInitializing = false;
+
   /**
    * Creates a new background effects controller.
    *
@@ -232,6 +236,9 @@ export class BackgroundEffectsController {
     const settings = inputTrack.getSettings();
     this.outputCanvas.width = settings.width ?? 640;
     this.outputCanvas.height = settings.height ?? 480;
+    // Create output MediaStreamTrack from canvas
+    const captureStream = this.outputCanvas.captureStream(this.targetFps);
+    this.outputTrack = captureStream.getVideoTracks()[0];
 
     // Initialize selected pipeline
     await this.initPipeline(this.pipeline);
@@ -287,10 +294,6 @@ export class BackgroundEffectsController {
         this.pipelineImpl?.notifyDroppedFrames(count);
       },
     );
-
-    // Create output MediaStreamTrack from canvas
-    const captureStream = this.outputCanvas.captureStream(this.targetFps);
-    this.outputTrack = captureStream.getVideoTracks()[0];
 
     // Stop pipeline when input track ends
     inputTrack.addEventListener('ended', async () => await this.stop());
@@ -472,27 +475,42 @@ export class BackgroundEffectsController {
   }
 
   private async initPipeline(type: PipelineType): Promise<void> {
-    if (!this.outputCanvas) {
+    if (this.pipelineInitialized || this.pipelineInitializing) {
+      this.logger.warn('initPipeline called more than once; ignoring subsequent call', {
+        requested: type,
+        active: this.pipeline,
+      });
       return;
     }
-    this.detachWebGLContextHandlers();
-    this.pipelineImpl?.stop();
-    this.pipelineImpl = this.createPipeline(type);
-    this.pipeline = type;
 
-    const config: PipelineConfig = {
-      mode: this.mode,
-      debugMode: this.debugMode,
-      blurStrength: this.blurStrength,
-      quality: this.quality,
-    };
-
-    const cap = detectCapabilities();
-    const policy = resolveQualityPolicy(cap, 'auto');
-    const initialTier = this.quality === 'auto' ? policy.initialTier : this.quality;
-    const segmentationModelPath = resolveSegmentationModelPath(initialTier, this.segmentationModelByTier, undefined);
+    this.pipelineInitializing = true;
 
     try {
+      if (!this.outputCanvas) {
+        return;
+      }
+
+      this.detachWebGLContextHandlers();
+      this.pipelineImpl?.stop();
+      this.pipelineImpl = this.createPipeline(type);
+      this.pipeline = type;
+
+      const config: PipelineConfig = {
+        mode: this.mode,
+        debugMode: this.debugMode,
+        blurStrength: this.blurStrength,
+        quality: this.quality,
+      };
+
+      const cap = detectCapabilities();
+      const policy = resolveQualityPolicy(cap, 'auto');
+      const initialTier = this.quality === 'auto' ? policy.initialTier : this.quality;
+      const segmentationModelPath = resolveSegmentationModelPath(
+        initialTier,
+        this.segmentationModelByTier,
+        undefined,
+      );
+
       await this.pipelineImpl.init({
         outputCanvas: this.outputCanvas,
         targetFps: this.targetFps,
@@ -512,29 +530,14 @@ export class BackgroundEffectsController {
         },
         onWorkerContextLoss: () => this.handleWorkerContextLoss(),
       });
-    } catch (error) {
-      this.logger.warn('BackgroundEffectsRenderingPipeline init failed, falling back to passthrough', error);
-      this.pipelineImpl?.stop();
-      this.pipelineImpl = new PassthroughPipeline();
-      this.pipeline = 'passthrough';
-      await this.pipelineImpl.init({
-        outputCanvas: this.outputCanvas,
-        targetFps: this.targetFps,
-        segmentationModelPath,
-        segmentationModelByTier: this.segmentationModelByTier,
-        initialTier,
-        maxTier: this.maxQualityTier,
-        config,
-        onMetrics: this.onMetrics,
-        onTierChange: tier => this.handleTierChange(tier),
-        onDroppedFrame: () => this.handleFrameDrop(),
-        getDroppedFrames: () => this.droppedFrames,
-        onWorkerContextLoss: () => this.handleWorkerContextLoss(),
-      });
-    }
 
-    if (this.pipeline === 'main-webgl2') {
-      this.bindWebGLContextHandlers();
+      this.pipelineInitialized = true;
+
+      if (this.pipeline === 'main-webgl2') {
+        this.bindWebGLContextHandlers();
+      }
+    } finally {
+      this.pipelineInitializing = false;
     }
   }
 
