@@ -111,7 +111,10 @@ const createMLSService = async () => {
   const mlsService = new MLSService(apiClient, mockCoreCrypto, mockedDb, recurringTaskScheduler);
 
   mlsService['_config'] = {...defaultMLSInitConfig, nbKeyPackages: 100, keyingMaterialUpdateThreshold: 1};
-  return [mlsService, {apiClient, coreCrypto: mockCoreCrypto, recurringTaskScheduler, transactionContext}] as const;
+  return [
+    mlsService,
+    {apiClient, coreCrypto: mockCoreCrypto, recurringTaskScheduler, transactionContext, coreDatabase: mockedDb},
+  ] as const;
 };
 
 afterAll(() => {
@@ -581,6 +584,58 @@ describe('MLSService', () => {
       expect(recurringTaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
       expect(TaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
       expect(transactionContext.wipeConversation).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('pending proposals lifecycle', () => {
+    it('skips commit and clears pending task when local conversation is missing', async () => {
+      const [mlsService, {coreCrypto, transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+
+      coreCrypto.conversationExists = jest.fn().mockResolvedValue(false);
+
+      jest.spyOn(TaskScheduler, 'cancelTask');
+
+      await mlsService.commitPendingProposals(groupId);
+
+      expect(coreCrypto.transaction).not.toHaveBeenCalled();
+      expect(transactionContext.commitPendingProposals).not.toHaveBeenCalled();
+      expect(TaskScheduler.cancelTask).toHaveBeenCalledWith(expect.stringContaining(groupId));
+    });
+
+    it('prunes stale pending proposal tasks on startup rehydration', async () => {
+      const [mlsService, {coreCrypto, coreDatabase}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+
+      await coreDatabase.put('pendingProposals', {groupId, firingDate: Date.now() - 1_000}, groupId);
+      coreCrypto.conversationExists = jest.fn().mockResolvedValue(false);
+
+      jest.spyOn(TaskScheduler, 'addTask');
+
+      await mlsService.initialisePendingProposalsTasks();
+
+      expect(TaskScheduler.addTask).not.toHaveBeenCalled();
+      await expect(coreDatabase.get('pendingProposals', groupId)).resolves.toBeUndefined();
+    });
+
+    it('rehydrates pending proposal task when local conversation exists', async () => {
+      const [mlsService, {coreCrypto, coreDatabase}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+      const firingDate = Date.now() + 5_000;
+
+      await coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
+      coreCrypto.conversationExists = jest.fn().mockResolvedValue(true);
+
+      jest.spyOn(TaskScheduler, 'addTask');
+
+      await mlsService.initialisePendingProposalsTasks();
+
+      expect(TaskScheduler.addTask).toHaveBeenCalledWith(
+        expect.objectContaining({
+          firingDate,
+          key: expect.stringContaining(groupId),
+        }),
+      );
     });
   });
 
