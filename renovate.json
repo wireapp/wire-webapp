@@ -11,6 +11,15 @@
   "lockFileMaintenance": {
     "enabled": true
   },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^\\.github/workflows/e2e-tests\\.yml$/"],
+      "matchStrings": ["image:\\s+mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)-noble"],
+      "depNameTemplate": "mcr.microsoft.com/playwright",
+      "datasourceTemplate": "docker"
+    }
+  ],
   "packageRules": [
     {
       "matchUpdateTypes": ["major"],
@@ -27,6 +36,10 @@
     {
       "matchManagers": ["dockerfile"],
       "groupName": "docker images"
+    },
+    {
+      "matchPackageNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
+      "groupName": "playwright"
     },
     {
       "matchPackageNames": ["nx", "@nx/**"],
@@ -119,6 +132,10 @@
     },
     {
       "matchPackageNames": ["dexie-encrypted"],
+      "enabled": false
+    },
+    {
+      "matchPackageNames": ["@wireapp/avs"],
       "enabled": false
     },
     {

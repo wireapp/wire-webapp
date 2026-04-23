@@ -97,13 +97,7 @@ export class BackgroundEffectsController {
   /** Target frames per second for adaptive quality control. */
   private targetFps = 15;
   /** Per-tier segmentation model overrides. */
-  private segmentationModelByTier: SegmentationModelByTier = {
-    superhigh: TIER_DEFINITIONS.superhigh.modelPath,
-    high: TIER_DEFINITIONS.high.modelPath,
-    medium: TIER_DEFINITIONS.medium.modelPath,
-    low: TIER_DEFINITIONS.low.modelPath,
-    bypass: TIER_DEFINITIONS.bypass.modelPath,
-  };
+  private segmentationModelByTier: SegmentationModelByTier = getDefaultSegmentationModelByTier();
   /** Selected rendering pipeline. */
   private pipeline: PipelineType = 'passthrough';
   /** Cancel function for background video pump (stops video frame extraction). */
@@ -173,56 +167,32 @@ export class BackgroundEffectsController {
     inputTrack: MediaStreamTrack,
     opts: StartOptions = {},
   ): Promise<{outputTrack: MediaStreamTrack; stop: () => void}> {
+    await this.stop();
     this.isStopping = false;
-    // Apply configuration options (use defaults if not provided)
-    this.mode = opts.mode ?? this.mode;
-    this.debugMode = opts.debugMode ?? this.debugMode;
-    this.blurStrength = opts.blurStrength ?? this.blurStrength;
-    this.quality = opts.quality ?? this.quality;
-    this.targetFps = opts.targetFps ?? this.targetFps;
-    // Detect capabilities and select optimal pipeline
+
+    const currentRuntimeConfig = this.getCurrentRuntimeConfig();
+    const resolvedRuntimeConfig = resolveRuntimeConfig(currentRuntimeConfig, opts);
+    this.applyResolvedRuntimeConfig(resolvedRuntimeConfig);
+
     const cap = detectCapabilities();
     this.capabilityInfo = cap;
     const policy = resolveQualityPolicy(cap, opts.qualityPolicy ?? 'auto');
-
-    if (opts.segmentationModelPath) {
-      this.segmentationModelByTier = {
-        superhigh: opts.segmentationModelPath,
-        high: opts.segmentationModelPath,
-        medium: opts.segmentationModelPath,
-        low: opts.segmentationModelPath,
-        bypass: opts.segmentationModelPath,
-      };
-    } else if (opts.segmentationModelByTier || policy.segmentationModelByTier) {
-      this.segmentationModelByTier = {
-        superhigh: TIER_DEFINITIONS.superhigh.modelPath,
-        high: TIER_DEFINITIONS.high.modelPath,
-        medium: TIER_DEFINITIONS.medium.modelPath,
-        low: TIER_DEFINITIONS.low.modelPath,
-        bypass: TIER_DEFINITIONS.bypass.modelPath,
-        ...policy.segmentationModelByTier,
-        ...opts.segmentationModelByTier,
-      };
-    } else {
-      this.segmentationModelByTier = {
-        superhigh: TIER_DEFINITIONS.superhigh.modelPath,
-        high: TIER_DEFINITIONS.high.modelPath,
-        medium: TIER_DEFINITIONS.medium.modelPath,
-        low: TIER_DEFINITIONS.low.modelPath,
-        bypass: TIER_DEFINITIONS.bypass.modelPath,
-      };
-    }
+    this.segmentationModelByTier = resolveSegmentationModelByTier(opts, policy);
     this.onMetrics = opts.onMetrics ?? null;
     this.onModelChange = opts.onModelChange ?? null;
     this.droppedFrames = 0;
     this.pipelineImpl = null;
 
-    const chosenPipeline = choosePipeline(cap, opts.useWorker !== false);
-    this.pipeline = opts.pipelineOverride ?? chosenPipeline;
+    const {chosen, active} = resolveActivePipeline({
+      cap,
+      useWorker: opts.useWorker,
+      pipelineOverride: opts.pipelineOverride,
+    });
+    this.pipeline = active;
 
     this.logger.info('Background effects capabilities', cap);
     this.logger.info('Background effects pipeline', {
-      chosen: chosenPipeline,
+      chosen,
       override: opts.pipelineOverride ?? null,
       active: this.pipeline,
     });
@@ -232,11 +202,10 @@ export class BackgroundEffectsController {
     // Create output canvas for rendering
     this.outputCanvas = document.createElement('canvas');
 
-    // Set canvas dimensions from input track settings
-    const settings = inputTrack.getSettings();
-    this.outputCanvas.width = settings.width ?? 640;
-    this.outputCanvas.height = settings.height ?? 480;
-    // Create output MediaStreamTrack from canvas
+    const {width, height} = getCanvasDimensionsFromTrack(inputTrack);
+    this.outputCanvas.width = width;
+    this.outputCanvas.height = height;
+
     const captureStream = this.outputCanvas.captureStream(this.targetFps);
     this.outputTrack = captureStream.getVideoTracks()[0];
 
@@ -245,27 +214,19 @@ export class BackgroundEffectsController {
     // Start frame processing loop
     await this.frameSource.start(
       async (frame, timestamp, width, height) => {
-        if (!this.outputCanvas) {
-          try {
-            frame.close();
-          } catch {
-            // Ignore close errors.
-          }
-          return;
-        }
-        // Skip frames with invalid dimensions
-        if (width === 0 || height === 0) {
-          try {
-            frame.close();
-          } catch {
-            // Ignore close errors.
-          }
+        if (shouldSkipFrame({outputCanvas: this.outputCanvas, width, height})) {
+          safelyCloseFrame(frame);
           return;
         }
         // Resize canvas if dimensions changed (skip if transferred to worker)
         if (
-          !this.pipelineImpl?.isOutputCanvasTransferred() &&
-          (this.outputCanvas.width !== width || this.outputCanvas.height !== height)
+          this.outputCanvas &&
+          shouldResizeCanvas({
+            outputCanvas: this.outputCanvas,
+            width,
+            height,
+            isTransferred: this.pipelineImpl?.isOutputCanvasTransferred() ?? false,
+          })
         ) {
           try {
             this.outputCanvas.width = width;
@@ -278,11 +239,7 @@ export class BackgroundEffectsController {
         try {
           await this.handleFrame(frame, timestamp, width, height);
         } catch (error) {
-          try {
-            frame.close();
-          } catch {
-            // Ignore close errors.
-          }
+          safelyCloseFrame(frame);
           if (this.isStopping) {
             return;
           }
@@ -298,16 +255,10 @@ export class BackgroundEffectsController {
     // Stop pipeline when input track ends
     inputTrack.addEventListener('ended', async () => await this.stop());
 
-    // Set background sources if provided
-    if (opts.backgroundImage) {
-      this.setBackgroundSource(opts.backgroundImage);
-    }
-    if (opts.backgroundVideo) {
-      this.setBackgroundSource(opts.backgroundVideo);
-    }
-    if (opts.backgroundColor) {
-      this.setBackgroundColor(opts.backgroundColor);
-    }
+    applyInitialBackgroundSources(opts, {
+      setBackgroundSource: source => this.setBackgroundSource(source),
+      setBackgroundColor: color => this.setBackgroundColor(color),
+    });
 
     return {
       outputTrack: this.outputTrack,
@@ -336,7 +287,7 @@ export class BackgroundEffectsController {
    * @param value - Blur strength (0 = no blur, 1 = maximum blur).
    */
   public setBlurStrength(value: number): void {
-    this.blurStrength = Math.max(0, Math.min(1, value));
+    this.blurStrength = clampBlurStrength(value);
     this.updatePipelineConfig();
   }
 
@@ -471,86 +422,79 @@ export class BackgroundEffectsController {
     this.webglRestorePipeline = null;
     this.outputCanvas = null;
     this.onMetrics = null;
+    this.onModelChange = null;
     this.pipeline = 'passthrough';
   }
 
-  private async initPipeline(type: PipelineType): Promise<void> {
-    if (this.pipelineInitialized || this.pipelineInitializing) {
-      this.logger.warn('initPipeline called more than once; ignoring subsequent call', {
-        requested: type,
-        active: this.pipeline,
-      });
-      return;
-    }
-
-    this.pipelineInitializing = true;
-
-    try {
-      if (!this.outputCanvas) {
-        return;
-      }
-
-      this.detachWebGLContextHandlers();
-      this.pipelineImpl?.stop();
-      this.pipelineImpl = this.createPipeline(type);
-      this.pipeline = type;
-
-      const config: PipelineConfig = {
-        mode: this.mode,
-        debugMode: this.debugMode,
-        blurStrength: this.blurStrength,
-        quality: this.quality,
-      };
-
-      const cap = detectCapabilities();
-      const policy = resolveQualityPolicy(cap, 'auto');
-      const initialTier = this.quality === 'auto' ? policy.initialTier : this.quality;
-      const segmentationModelPath = resolveSegmentationModelPath(
-        initialTier,
-        this.segmentationModelByTier,
-        undefined,
-      );
-
-      await this.pipelineImpl.init({
-        outputCanvas: this.outputCanvas,
-        targetFps: this.targetFps,
-        segmentationModelPath,
-        segmentationModelByTier: this.segmentationModelByTier,
-        initialTier,
-        maxTier: this.maxQualityTier,
-        config,
-        onMetrics: this.onMetrics,
-        onTierChange: tier => this.handleTierChange(tier),
-        onDroppedFrame: () => this.handleFrameDrop(),
-        getDroppedFrames: () => this.droppedFrames,
-        onWorkerSegmenterError: error => {
-          if (this.isDev) {
-            this.logger.warn('Worker segmenter init failed', error);
-          }
-        },
-        onWorkerContextLoss: () => this.handleWorkerContextLoss(),
-      });
-
-      this.pipelineInitialized = true;
-
-      if (this.pipeline === 'main-webgl2') {
-        this.bindWebGLContextHandlers();
-      }
-    } finally {
-      this.pipelineInitializing = false;
-    }
+  public isProcessing(): boolean {
+    return this.pipelineImpl !== null;
   }
 
-  private createPipeline(type: PipelineType): BackgroundEffectsRenderingPipeline {
-    switch (type) {
-      case 'worker-webgl2':
-        return new WorkerWebGlPipeline();
-      case 'main-webgl2':
-        return new MainWebGlPipeline();
-      case 'canvas2d':
-        return new Canvas2dPipeline();
-      default:
-        return new PassthroughPipeline();
+  public getCapabilityInfo(): CapabilityInfo {
+    return this.capabilityInfo;
+  }
+
+  public setMaxQualityTier(quality: QualityTier): void {
+    this.maxQualityTier = quality;
+  }
+
+  public getMaxQualityTier(): QualityTier {
+    return this.maxQualityTier;
+  }
+
+  private async initPipeline(type: PipelineType): Promise<void> {
+    if (!this.outputCanvas) {
+      return;
+    }
+    this.detachWebGLContextHandlers();
+    this.pipelineImpl?.stop();
+    this.pipelineImpl = createPipeline(type);
+    this.pipeline = type;
+
+    const config: PipelineConfig = buildPipelineConfig({
+      mode: this.mode,
+      debugMode: this.debugMode,
+      blurStrength: this.blurStrength,
+      quality: this.quality,
+    });
+
+    const policy = resolveQualityPolicy(this.capabilityInfo, 'auto');
+    const initialTier = resolveInitialTier(this.quality, policy.initialTier);
+    const segmentationModelPath = resolveSegmentationModelPath(initialTier, this.segmentationModelByTier, undefined);
+
+    const initArgs = {
+      outputCanvas: this.outputCanvas,
+      targetFps: this.targetFps,
+      segmentationModelPath,
+      segmentationModelByTier: this.segmentationModelByTier,
+      initialTier,
+      maxTier: this.maxQualityTier,
+      config,
+      onMetrics: this.onMetrics,
+      onTierChange: (tier: QualityTier) => this.handleTierChange(tier),
+      onDroppedFrame: () => this.handleFrameDrop(),
+      getDroppedFrames: () => this.droppedFrames,
+      onWorkerSegmenterError: (error: unknown) => {
+        if (this.isDev) {
+          this.logger.warn('Worker segmenter init failed', error);
+        }
+      },
+      onWorkerContextLoss: () => this.handleWorkerContextLoss(),
+    };
+
+    try {
+      await this.pipelineImpl.init(initArgs);
+    } catch (error) {
+      this.logger.warn('BackgroundEffectsRenderingPipeline init failed, falling back to passthrough', error);
+      this.pipelineImpl?.stop();
+      this.pipelineImpl = new PassthroughPipeline();
+      this.pipeline = 'passthrough';
+
+      await this.pipelineImpl.init(initArgs);
+    }
+
+    if (this.pipeline === 'main-webgl2') {
+      this.bindWebGLContextHandlers();
     }
   }
 
@@ -558,12 +502,15 @@ export class BackgroundEffectsController {
     if (!this.pipelineImpl) {
       return;
     }
-    this.pipelineImpl.updateConfig({
-      mode: this.mode,
-      debugMode: this.debugMode,
-      blurStrength: this.blurStrength,
-      quality: this.quality,
-    });
+
+    this.pipelineImpl.updateConfig(
+      buildPipelineConfig({
+        mode: this.mode,
+        debugMode: this.debugMode,
+        blurStrength: this.blurStrength,
+        quality: this.quality,
+      }),
+    );
   }
 
   private bindWebGLContextHandlers(): void {
@@ -594,7 +541,7 @@ export class BackgroundEffectsController {
   }
 
   private handleWebGLContextLost(): void {
-    if (this.webglContextLost || this.pipeline !== 'main-webgl2') {
+    if (isWebGLContextLost(this.webglContextLost, this.pipeline)) {
       return;
     }
     this.webglContextLost = true;
@@ -604,10 +551,7 @@ export class BackgroundEffectsController {
   }
 
   private async handleWebGLContextRestored(): Promise<void> {
-    if (!this.webglContextLost || this.webglRestorePipeline !== 'main-webgl2') {
-      return;
-    }
-    if (!this.outputCanvas) {
+    if (isWebGLContextCannotBeRestored(this.webglContextLost, this.webglRestorePipeline, this.outputCanvas)) {
       return;
     }
     this.logger.info('WebGL context restored; restarting main pipeline');
@@ -634,7 +578,7 @@ export class BackgroundEffectsController {
    * @returns Nothing.
    */
   private handleWorkerContextLoss(): void {
-    if (this.isStopping || this.pipeline !== 'worker-webgl2') {
+    if (!shouldHandleWorkerContextLoss(this.isStopping, this.pipeline)) {
       return;
     }
     this.logger.warn('Worker WebGL context lost; falling back to passthrough');
@@ -691,7 +635,8 @@ export class BackgroundEffectsController {
     if (!this.isDev) {
       return;
     }
-    if (this.lastMainTier !== tier) {
+
+    if (didTierChange(this.lastMainTier, tier)) {
       this.logger.info('Main pipeline quality tier change', {from: this.lastMainTier, to: tier});
       this.lastMainTier = tier;
     }
@@ -703,20 +648,14 @@ export class BackgroundEffectsController {
    * @param tier - New quality tier.
    */
   private maybeLogWorkerTierChange(tier: QualityTier): void {
-    if (this.lastWorkerTier !== tier) {
+    if (didTierChange(this.lastWorkerTier, tier)) {
       this.logger.info('Worker pipeline quality tier change', {from: this.lastWorkerTier, to: tier});
       this.lastWorkerTier = tier;
     }
   }
 
   private async createSolidColorBitmap(color: string): Promise<ImageBitmap> {
-    const canvas =
-      typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : document.createElement('canvas');
-    const isOffscreen = typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas;
-    if (!isOffscreen) {
-      (canvas as HTMLCanvasElement).width = 1;
-      (canvas as HTMLCanvasElement).height = 1;
-    }
+    const canvas = createSinglePixelCanvas();
     const ctx = canvas.getContext('2d');
     if (!ctx) {
       throw new Error('Failed to create 2D context for solid background.');
@@ -740,21 +679,21 @@ export class BackgroundEffectsController {
   private startBackgroundVideoPump(video: HTMLVideoElement): void {
     this.backgroundPumpCancel?.();
 
-    let lastTimestamp = 0;
-    const targetInterval = 1000 / 15;
-    let active = true;
+    const pumpState = createBackgroundPumpState(15);
     let rVFCHandle: number | null = null;
     let rafHandle: number | null = null;
 
     const pump = async (now: number) => {
-      if (!active) {
+      if (!pumpState.active) {
         return;
       }
-      if (now - lastTimestamp < targetInterval) {
+
+      if (!shouldProcessBackgroundVideoFrame(now, pumpState.lastTimestamp, pumpState.targetInterval)) {
         schedule();
         return;
       }
-      lastTimestamp = now;
+
+      pumpState.lastTimestamp = now;
 
       try {
         const bitmap = await createImageBitmap(video);
@@ -780,7 +719,8 @@ export class BackgroundEffectsController {
 
     schedule();
     this.backgroundPumpCancel = () => {
-      active = false;
+      pumpState.active = false;
+
       if (rVFCHandle !== null && 'cancelVideoFrameCallback' in video) {
         (video as any).cancelVideoFrameCallback(rVFCHandle);
       }
@@ -791,19 +731,243 @@ export class BackgroundEffectsController {
     };
   }
 
-  isProcessing() {
-    return this.pipelineImpl !== null;
+  private getCurrentRuntimeConfig(): RuntimeConfig {
+    return {
+      mode: this.mode,
+      debugMode: this.debugMode,
+      blurStrength: this.blurStrength,
+      quality: this.quality,
+      targetFps: this.targetFps,
+    };
   }
 
-  public getCapabilityInfo(): CapabilityInfo {
-    return this.capabilityInfo;
-  }
-
-  public setMaxQualityTier(quality: QualityTier) {
-    this.maxQualityTier = quality;
-  }
-
-  public getMaxQualityTier(): QualityTier {
-    return this.maxQualityTier;
+  private applyResolvedRuntimeConfig(config: RuntimeConfig): void {
+    this.mode = config.mode;
+    this.debugMode = config.debugMode;
+    this.blurStrength = config.blurStrength;
+    this.quality = config.quality;
+    this.targetFps = config.targetFps;
   }
 }
+
+type RuntimeConfig = {
+  mode: EffectMode;
+  debugMode: DebugMode;
+  blurStrength: number;
+  quality: QualityMode;
+  targetFps: number;
+};
+
+type BackgroundPumpState = {
+  active: boolean;
+  lastTimestamp: number;
+  targetInterval: number;
+};
+
+const getDefaultSegmentationModelByTier = (): SegmentationModelByTier => {
+  return {
+    superhigh: TIER_DEFINITIONS.superhigh.modelPath,
+    high: TIER_DEFINITIONS.high.modelPath,
+    medium: TIER_DEFINITIONS.medium.modelPath,
+    low: TIER_DEFINITIONS.low.modelPath,
+    bypass: TIER_DEFINITIONS.bypass.modelPath,
+  };
+};
+
+const resolveSegmentationModelByTier = (
+  opts: StartOptions,
+  policy: ReturnType<typeof resolveQualityPolicy>,
+): SegmentationModelByTier => {
+  const defaults = getDefaultSegmentationModelByTier();
+
+  if (opts.segmentationModelPath) {
+    return {
+      superhigh: opts.segmentationModelPath,
+      high: opts.segmentationModelPath,
+      medium: opts.segmentationModelPath,
+      low: opts.segmentationModelPath,
+      bypass: opts.segmentationModelPath,
+    };
+  }
+
+  if (opts.segmentationModelByTier || policy.segmentationModelByTier) {
+    return {
+      ...defaults,
+      ...policy.segmentationModelByTier,
+      ...opts.segmentationModelByTier,
+    };
+  }
+
+  return defaults;
+};
+
+const resolveRuntimeConfig = (current: RuntimeConfig, opts: StartOptions): RuntimeConfig => {
+  return {
+    mode: opts.mode ?? current.mode,
+    debugMode: opts.debugMode ?? current.debugMode,
+    blurStrength: opts.blurStrength !== undefined ? clampBlurStrength(opts.blurStrength) : current.blurStrength,
+    quality: opts.quality ?? current.quality,
+    targetFps: opts.targetFps ?? current.targetFps,
+  };
+};
+
+const resolveActivePipeline = ({
+  cap,
+  useWorker,
+  pipelineOverride,
+}: {
+  cap: CapabilityInfo;
+  useWorker?: boolean;
+  pipelineOverride?: PipelineType;
+}): {chosen: PipelineType; active: PipelineType} => {
+  const chosen = choosePipeline(cap, useWorker !== false);
+  return {
+    chosen,
+    active: pipelineOverride ?? chosen,
+  };
+};
+
+const buildPipelineConfig = ({
+  mode,
+  debugMode,
+  blurStrength,
+  quality,
+}: {
+  mode: EffectMode;
+  debugMode: DebugMode;
+  blurStrength: number;
+  quality: QualityMode;
+}): PipelineConfig => {
+  return {
+    mode,
+    debugMode,
+    blurStrength,
+    quality,
+  };
+};
+
+const resolveInitialTier = (quality: QualityMode, initialTierFromPolicy: QualityTier): QualityTier => {
+  return quality === 'auto' ? initialTierFromPolicy : quality;
+};
+
+const getCanvasDimensionsFromTrack = (inputTrack: MediaStreamTrack): {width: number; height: number} => {
+  const settings = inputTrack.getSettings();
+  return {
+    width: settings.width ?? 640,
+    height: settings.height ?? 480,
+  };
+};
+
+const shouldResizeCanvas = ({
+  outputCanvas,
+  width,
+  height,
+  isTransferred,
+}: {
+  outputCanvas: HTMLCanvasElement;
+  width: number;
+  height: number;
+  isTransferred: boolean;
+}): boolean => {
+  return !isTransferred && (outputCanvas.width !== width || outputCanvas.height !== height);
+};
+
+const clampBlurStrength = (value: number): number => {
+  return Math.max(0, Math.min(1, value));
+};
+
+const shouldSkipFrame = ({
+  outputCanvas,
+  width,
+  height,
+}: {
+  outputCanvas: HTMLCanvasElement | null;
+  width: number;
+  height: number;
+}): boolean => {
+  return !outputCanvas || width === 0 || height === 0;
+};
+
+const safelyCloseFrame = (frame: ImageBitmap): void => {
+  try {
+    frame.close();
+  } catch {
+    // Ignore close errors.
+  }
+};
+
+const createPipeline = (type: PipelineType): BackgroundEffectsRenderingPipeline => {
+  switch (type) {
+    case 'worker-webgl2':
+      return new WorkerWebGlPipeline();
+    case 'main-webgl2':
+      return new MainWebGlPipeline();
+    case 'canvas2d':
+      return new Canvas2dPipeline();
+    default:
+      return new PassthroughPipeline();
+  }
+};
+
+const isWebGLContextLost = (webglContextLost: boolean, pipeline: PipelineType): boolean => {
+  return webglContextLost || pipeline !== 'main-webgl2';
+};
+
+const isWebGLContextCannotBeRestored = (
+  webglContextLost: boolean,
+  webglRestorePipeline: PipelineType | null,
+  outputCanvas: HTMLCanvasElement | null,
+): boolean => {
+  return !webglContextLost || webglRestorePipeline !== 'main-webgl2' || !outputCanvas;
+};
+
+const shouldHandleWorkerContextLoss = (isStopping: boolean, pipeline: PipelineType): boolean => {
+  return !isStopping && pipeline === 'worker-webgl2';
+};
+
+const didTierChange = (previousTier: QualityTier | null, nextTier: QualityTier): boolean => {
+  return previousTier !== nextTier;
+};
+
+const createSinglePixelCanvas = (): OffscreenCanvas | HTMLCanvasElement => {
+  if (typeof OffscreenCanvas !== 'undefined') {
+    return new OffscreenCanvas(1, 1);
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1;
+  canvas.height = 1;
+  return canvas;
+};
+
+const createBackgroundPumpState = (fps: number): BackgroundPumpState => {
+  return {
+    active: true,
+    lastTimestamp: 0,
+    targetInterval: 1000 / fps,
+  };
+};
+
+const shouldProcessBackgroundVideoFrame = (now: number, lastTimestamp: number, targetInterval: number): boolean => {
+  return now - lastTimestamp >= targetInterval;
+};
+
+const applyInitialBackgroundSources = (
+  opts: StartOptions,
+  handlers: {
+    setBackgroundSource: (source: HTMLImageElement | HTMLVideoElement | ImageBitmap) => void;
+    setBackgroundColor: (color: string) => void;
+  },
+): void => {
+  if (opts.backgroundImage) {
+    handlers.setBackgroundSource(opts.backgroundImage);
+  }
+
+  if (opts.backgroundVideo) {
+    handlers.setBackgroundSource(opts.backgroundVideo);
+  }
+
+  if (opts.backgroundColor) {
+    handlers.setBackgroundColor(opts.backgroundColor);
+  }
+};

@@ -37,6 +37,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
+      - name: Install pinned package manager
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        run: corepack install
+
       - name: Install JS dependencies
         run: yarn --immutable
 

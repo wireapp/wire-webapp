@@ -19,6 +19,7 @@
 
 import {useEffect, useMemo, useRef, useState} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
@@ -38,6 +39,26 @@ const PRE_MARKED_OFFSET = 20;
 const MAX_TEXT_LENGTH = 60;
 const MAX_OFFSET_INDEX = 30;
 const DEBOUNCE_TIME = 100;
+
+export const fullSearchInputSubmitComboStyles: CSSObject = {
+  padding: '0 16px',
+  marginBottom: '20px',
+};
+
+export const fullSearchInputWrapperStyles: CSSObject = {
+  marginBottom: 0,
+  width: '100%',
+  '> div': {
+    width: '100%',
+  },
+  '.wireinput': {
+    boxShadow: 'none',
+    marginRight: 0,
+    '&:focus, &:focus-visible, &:hover, &:active, &:invalid:not(:focus)': {
+      boxShadow: 'none',
+    },
+  },
+};
 
 interface FullSearchProps {
   change?: (query: string) => void;
@@ -123,11 +144,11 @@ const FullSearch = ({searchProvider, click = noop, change = noop}: FullSearchPro
   return (
     <div className="full-search" ref={setElement}>
       <header>
-        <InputSubmitCombo css={{padding: '0 16px', marginBottom: '20px'}}>
+        <InputSubmitCombo css={fullSearchInputSubmitComboStyles}>
           <SearchIcon />
 
           <Input
-            wrapperCSS={{marginBottom: 0, width: '100%', '> div': {width: '100%'}}}
+            wrapperCSS={fullSearchInputWrapperStyles}
             type="text"
             value={searchValue}
             ref={inputRef}

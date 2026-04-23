@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@wireapp/commons": "5.4.13",
-    "axios": "1.15.0",
+    "axios": "1.15.1",
     "dotenv": "17.4.2",
     "dotenv-extended": "2.9.0",
     "fs-extra": "11.3.4",
@@ -9,7 +9,7 @@
     "logdown": "3.3.1",
     "long": "5.3.2",
     "tslib": "2.8.1",
-    "uuid": "11.1.0",
+    "uuid": "14.0.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
@@ -50,7 +50,7 @@
     "eslint-plugin-no-unsanitized": "4.1.5",
     "eslint-plugin-prettier": "5.5.5",
     "eslint-plugin-react": "7.37.5",
-    "eslint-plugin-react-hooks": "7.1.0",
+    "eslint-plugin-react-hooks": "7.1.1",
     "eslint-plugin-testing-library": "7.16.2",
     "eslint-plugin-unused-imports": "4.4.1",
     "fake-indexeddb": "6.2.5",
@@ -127,8 +127,8 @@
     "xml2js": "0.6.2",
     "@stablelib/utf8": "1.0.2",
     "dexie-encrypted@2.0.0": "patch:dexie-encrypted@npm%3A2.0.0#./.yarn/patches/dexie-encrypted-npm-2.0.0-eb61eb5975.patch",
-    "axios": "1.15.0",
-    "dexie": "4.0.7",
+    "axios": "1.15.1",
+    "dexie": "4.4.2",
     "dotenv": "17.4.2",
     "@types/react": "18.3.28",
     "@types/react-dom": "18.3.7"

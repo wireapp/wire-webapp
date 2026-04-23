@@ -10,6 +10,7 @@ jobs:
     name: Run Playwright Critical Flow Tests
     if: github.repository == 'wireapp/wire-webapp'
     runs-on: [self-hosted, Linux, X64, office]
+    timeout-minutes: 45
 
     steps:
       - name: Checkout repository
@@ -27,6 +28,7 @@ jobs:
         run: yarn --immutable
 
       - name: Install Playwright browsers
+        timeout-minutes: 30
         run: yarn playwright install --only-shell --with-deps chromium
 
       - name: Install 1Password

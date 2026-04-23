@@ -17,16 +17,25 @@
  *
  */
 
-module.exports = {
-  displayName: 'api-client-lib',
-  testEnvironment: 'node',
-  clearMocks: true,
-  transform: {
-    '^.+\\.(ts|tsx)$': '@swc/jest',
-    '^.+\\.(js|jsx)$': '@swc/jest',
-  },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid)/)'],
-  coverageDirectory: '../../coverage/libraries/api-client',
-  testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
-  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+export interface RequestVersionGate {
+  next: () => number;
+  invalidate: () => void;
+  isStale: (requestId: number) => boolean;
+}
+
+export const createRequestVersionGate = (): RequestVersionGate => {
+  let currentRequestId = 0;
+
+  return {
+    next(): number {
+      currentRequestId += 1;
+      return currentRequestId;
+    },
+    invalidate(): void {
+      currentRequestId += 1;
+    },
+    isStale(requestId: number): boolean {
+      return requestId !== currentRequestId;
+    },
+  };
 };

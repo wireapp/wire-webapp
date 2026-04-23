@@ -19,13 +19,11 @@
 
 export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
 export const collaboraNewDocumentCreationMenuFeatureToggleName = 'collabora-new-document-creation-menu';
-export const countlyIncrementalBackoffRetryReportingFeatureToggleName = 'countly-incremental-backoff-retry-reporting';
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
 
 export const startupFeatureToggleNames = [
   reliableWebsocketConnectionFeatureToggleName,
   collaboraNewDocumentCreationMenuFeatureToggleName,
-  countlyIncrementalBackoffRetryReportingFeatureToggleName,
   applockRefactoredFeatureToggleName,
 ] as const;
 

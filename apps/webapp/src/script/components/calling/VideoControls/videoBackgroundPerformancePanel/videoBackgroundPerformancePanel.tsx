@@ -17,24 +17,32 @@
  *
  */
 
-import {ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo, useState} from 'react';
+
+import {Maybe} from 'true-myth';
+
+import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
 import {
   buttonBaseStyles,
   buttonNeutralStyles,
-  buttonRowStyles,
   metricsLabelStyles,
   metricsListStyles,
   metricsRowStyles,
   metricsValueStyles,
+  performancePanelCloseButtonStyles,
   performancePanelContainerStyles,
-  performancePanelSelectStyles,
+  performancePanelHeaderStyles,
+  performancePanelResetButtonContainerStyles,
+  performancePanelResetButtonStyles,
   performancePanelStyles,
+  performancePanelTitleStyles,
 } from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel.styles';
 import {QualityMode} from 'Repositories/media/backgroundEffects';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {t} from 'Util/localizerUtil';
 
 type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;
@@ -54,9 +62,45 @@ const formatValue = (value?: string | number | null): string => {
   return value === null || value === undefined || value === '' ? '-' : String(value);
 };
 
+const getMetricRows = (renderMetrics: RenderMetrics) => {
+  return Maybe.of(renderMetrics)
+    .map(metrics => [
+      {label: 'Quality', value: formatValue(metrics.tier)},
+      {label: 'Total', value: formatMs(metrics.avgTotalMs)},
+      {label: 'Segmentation', value: formatMs(metrics.avgSegmentationMs)},
+      {label: 'GPU', value: formatMs(metrics.avgGpuMs)},
+      {label: 'Budget', value: formatMs(metrics.budget)},
+      {label: 'ML delegate type', value: formatValue(metrics.ml)},
+      {label: 'Utilization', value: formatPercent(metrics.utilShare)},
+      {label: 'ML', value: formatPercent(metrics.mlShare)},
+      {label: 'WebGL', value: formatPercent(metrics.webglShare)},
+      {
+        label: 'Delegate',
+        value: formatValue(metrics.segmentationDelegate),
+      },
+      {label: 'Dropped', value: formatValue(metrics.droppedFrames)},
+    ])
+    .unwrapOr([]);
+};
+
+const getCapabilityRows = (capabilityInfo: CapabilityInfo | null | undefined) => {
+  return Maybe.of(capabilityInfo)
+    .map(info => [
+      {label: 'WebGL2', value: info.webgl2 ? '✔' : '✖'},
+      {label: 'Worker', value: info.worker ? '✔' : '✖'},
+      {label: 'OffscreenCanvas', value: info.offscreenCanvas ? '✔' : '✖'},
+      {label: 'VideoFrameCallback', value: info.requestVideoFrameCallback ? '✔' : '✖'},
+    ])
+    .unwrapOr([]);
+};
+
 type MetricRowProps = {
   label: string;
   value: ReactNode;
+};
+
+type MetricsDisplayProps = {
+  readonly capabilityInfo: CapabilityInfo;
 };
 
 const MetricRow = ({label, value}: MetricRowProps) => (
@@ -68,14 +112,47 @@ const MetricRow = ({label, value}: MetricRowProps) => (
 
 const POLLING_INTERVAL = 500;
 
-export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
-  const isFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
+const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
   const renderMetrics = useBackgroundEffectsStore(state => state.metrics);
   const model = useBackgroundEffectsStore(state => state.model);
+
+  const metricRows = getMetricRows(renderMetrics);
+
+  const capabilityRows = getCapabilityRows(capabilityInfo);
+
+  return (
+    <div css={metricsListStyles}>
+      <MetricRow label="Model" value={formatValue(model)} />
+      {metricRows.map(row => (
+        <MetricRow key={row.label} label={row.label} value={row.value} />
+      ))}
+      {capabilityRows.map(row => (
+        <MetricRow key={row.label} label={row.label} value={row.value} />
+      ))}
+    </div>
+  );
+};
+
+export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
+  const isFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
 
   const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => backgroundEffectsHandler.getQuality());
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [capabilityInfo, setCapabilityInfo] = useState<CapabilityInfo | null>(null);
+
+  const qualitySelectOptions = useMemo(
+    () =>
+      QUALITY_OPTIONS.map(option => ({
+        label: option,
+        value: option,
+      })),
+    [],
+  );
+
+  const selectedOption = useMemo(
+    () => qualitySelectOptions.find(option => option.value === selectedQuality) ?? null,
+    [qualitySelectOptions, selectedQuality],
+  );
 
   useEffect(() => {
     setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
@@ -106,66 +183,32 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     setIsPanelOpen(false);
   }, []);
 
+  const togglePerformancePanel = useCallback(() => {
+    if (isPanelOpen) {
+      handleClosePanel();
+    } else {
+      handleOpenPanel();
+    }
+  }, [handleClosePanel, handleOpenPanel, isPanelOpen]);
+
   const handleQualityChange = useCallback(
-    (event: ChangeEvent<HTMLSelectElement>) => {
-      const nextQuality = event.target.value as QualityMode;
+    (quality: Option) => {
+      if (quality === undefined || quality === null) {
+        return;
+      }
+
+      const nextQuality = quality.value as QualityMode;
       setSelectedQuality(nextQuality);
       backgroundEffectsHandler.applyQuality(nextQuality);
     },
     [backgroundEffectsHandler],
   );
 
-  const handleApplyQuality = useCallback(() => {
-    backgroundEffectsHandler.applyQuality(selectedQuality);
-  }, [backgroundEffectsHandler, selectedQuality]);
-
   const handleResetQuality = useCallback(() => {
     const defaultQuality: QualityMode = 'auto';
     setSelectedQuality(defaultQuality);
     backgroundEffectsHandler.applyQuality(defaultQuality);
   }, [backgroundEffectsHandler]);
-
-  const metricRows = useMemo(() => {
-    if (!renderMetrics) {
-      return [];
-    }
-
-    return [
-      {label: 'Quality', value: formatValue(renderMetrics.tier)},
-      {label: 'Total', value: formatMs(renderMetrics.avgTotalMs)},
-      {label: 'Segmentation', value: formatMs(renderMetrics.avgSegmentationMs)},
-      {label: 'GPU', value: formatMs(renderMetrics.avgGpuMs)},
-      {label: 'Budget', value: formatMs(renderMetrics.budget)},
-      {label: 'ML delegate type', value: formatValue(renderMetrics.ml)},
-      {label: 'Utilization', value: formatPercent(renderMetrics.utilShare)},
-      {label: 'ML', value: formatPercent(renderMetrics.mlShare)},
-      {label: 'WebGL', value: formatPercent(renderMetrics.webglShare)},
-      {
-        label: 'Delegate',
-        value: formatValue(renderMetrics.segmentationDelegate),
-      },
-      {label: 'Dropped', value: formatValue(renderMetrics.droppedFrames)},
-    ];
-  }, [renderMetrics]);
-
-  const capabilityRows = useMemo(() => {
-    if (!capabilityInfo) {
-      return [];
-    }
-
-    return [
-      {label: 'WebGL2', value: capabilityInfo.webgl2 ? '✔' : '✖'},
-      {label: 'Worker', value: capabilityInfo.worker ? '✔' : '✖'},
-      {
-        label: 'OffscreenCanvas',
-        value: capabilityInfo.offscreenCanvas ? '✔' : '✖',
-      },
-      {
-        label: 'VideoFrameCallback',
-        value: capabilityInfo.requestVideoFrameCallback ? '✔' : '✖',
-      },
-    ];
-  }, [capabilityInfo]);
 
   if (!isFeatureEnabled) {
     return null;
@@ -175,7 +218,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     <div css={performancePanelContainerStyles}>
       <button
         type="button"
-        onClick={handleOpenPanel}
+        onClick={togglePerformancePanel}
         css={[buttonBaseStyles, buttonNeutralStyles]}
         aria-expanded={isPanelOpen}
         aria-haspopup="dialog"
@@ -184,47 +227,43 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
       </button>
 
       {isPanelOpen && (
-        <div css={performancePanelStyles} role="dialog" aria-label="Performance Panel">
-          <h3>Performance Panel</h3>
+        <div css={performancePanelStyles} role="dialog" aria-label={t('videoCallBackgroundsPerformancePanel')}>
+          <div css={performancePanelHeaderStyles}>
+            <h3 css={performancePanelTitleStyles}>{t('videoCallBackgroundsPerformancePanel')}</h3>
+            <button
+              type="button"
+              className="icon-button"
+              css={performancePanelCloseButtonStyles}
+              onClick={handleClosePanel}
+              aria-label={t('modalCloseButton')}
+            >
+              <CloseIcon width={12} height={12} />
+            </button>
+          </div>
 
-          <select
-            css={performancePanelSelectStyles}
-            value={selectedQuality}
-            onChange={handleQualityChange}
+          <Select
+            id="background-effects-quality"
+            inputId="background-effects-quality"
+            dataUieName="background-effects-quality"
             aria-label="Background effects quality"
-          >
-            {QUALITY_OPTIONS.map(qualityOption => (
-              <option key={qualityOption} value={qualityOption}>
-                {qualityOption}
-              </option>
-            ))}
-          </select>
+            value={selectedOption}
+            options={qualitySelectOptions}
+            isSearchable={true}
+            menuPlacement="auto"
+            onChange={handleQualityChange}
+          />
 
-          <div css={buttonRowStyles}>
-            <button type="button" onClick={handleApplyQuality} css={buttonBaseStyles}>
-              Apply
-            </button>
-
-            <button type="button" onClick={handleResetQuality} css={buttonBaseStyles}>
+          <div css={performancePanelResetButtonContainerStyles}>
+            <Button
+              css={performancePanelResetButtonStyles}
+              variant={ButtonVariant.TERTIARY}
+              onClick={handleResetQuality}
+            >
               Reset (Auto)
-            </button>
-
-            <button type="button" onClick={handleClosePanel} css={buttonBaseStyles}>
-              Close
-            </button>
+            </Button>
           </div>
 
-          <div css={metricsListStyles}>
-            <MetricRow label="Model" value={formatValue(model)} />
-
-            {metricRows.map(row => (
-              <MetricRow key={row.label} label={row.label} value={row.value} />
-            ))}
-
-            {capabilityRows.map(row => (
-              <MetricRow key={row.label} label={row.label} value={row.value} />
-            ))}
-          </div>
+          <MetricsDisplay capabilityInfo={capabilityInfo} />
         </div>
       )}
     </div>

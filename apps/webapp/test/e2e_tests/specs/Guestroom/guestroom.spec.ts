@@ -186,6 +186,7 @@ test.describe('Guestroom', () => {
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
+      await expect(ownerPages.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
 
       await test.step('Owner creates a group with guest', async () => {
         await createGroup(ownerPages, groupName, [guestUser]);

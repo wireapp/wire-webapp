@@ -163,7 +163,8 @@ test.describe('User Blocking', () => {
         // Preconditions: User B accepts the connection request
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
         await userBPages.connectRequest().clickConnectButton();
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+
+        await expect(userAPages.conversationList().getConversationLocator(userB.fullName)).toBeAttached();
         await createGroup(userAPages, conversationName, [userB]);
 
         await test.step('Step 1: User B sends message to group chat with User A', async () => {

@@ -2055,6 +2055,8 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundVirtualSectionLabel': `Virtual Backgrounds`;
     'videoCallBackgroundWire1': `Wire 1`;
     'videoCallBackgroundsLabel': `Backgrounds`;
+    'videoCallBackgroundsPerformancePanel': `Performance Panel`;
+    'videoCallBackgroundsPerformancePanelClose': `Close performance panel`;
     'videoCallMenuMoreAddReaction': `Add reaction`;
     'videoCallMenuMoreAudioSettings': `Audio Settings`;
     'videoCallMenuMoreCameraSettings': `Camera Settings`;

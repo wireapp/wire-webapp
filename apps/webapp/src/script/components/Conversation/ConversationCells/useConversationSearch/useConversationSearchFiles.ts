@@ -25,6 +25,8 @@ import {useDebouncedCallback} from 'use-debounce';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 
+import {createRequestVersionGate} from './requestVersionGate';
+
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
@@ -36,6 +38,7 @@ interface UseConversationSearchFilesProps {
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
   onClear?: () => void;
+  debounceMs?: number;
 }
 
 const DEBOUNCE_TIME = 300;
@@ -47,6 +50,7 @@ export const useConversationSearchFiles = ({
   conversationQualifiedId,
   enabled,
   onClear,
+  debounceMs = DEBOUNCE_TIME,
 }: UseConversationSearchFilesProps) => {
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
 
@@ -54,12 +58,13 @@ export const useConversationSearchFiles = ({
   const [searchQuery, setSearchQuery] = useState('');
   const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
+  const requestVersionGate = useRef(createRequestVersionGate());
 
   const {id} = conversationQualifiedId;
   const conversationPath = getCellsApiPath({conversationQualifiedId});
 
   const searchNodes = useCallback(
-    async ({query}: {query: string}) => {
+    async ({query, requestId}: {query: string; requestId: number}) => {
       try {
         setStatus('loading');
 
@@ -73,6 +78,12 @@ export const useConversationSearchFiles = ({
           type: 'file',
         });
 
+        // A newer search request started while this one was in flight.
+        // Ignore stale results/errors to avoid overwriting current state.
+        if (requestVersionGate.current.isStale(requestId)) {
+          return;
+        }
+
         if (!result.Nodes?.length) {
           setNodes({conversationId: id, nodes: []});
           setPagination({conversationId: id, pagination: null});
@@ -81,6 +92,10 @@ export const useConversationSearchFiles = ({
         }
 
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
+
+        if (requestVersionGate.current.isStale(requestId)) {
+          return;
+        }
 
         // filter out draft nodes from results
         const filteredNodes = result.Nodes.filter(node => !node.IsDraft);
@@ -100,7 +115,11 @@ export const useConversationSearchFiles = ({
         }
 
         setStatus('success');
-      } catch (error: unknown) {
+      } catch {
+        if (requestVersionGate.current.isStale(requestId)) {
+          return;
+        }
+
         setStatus('error');
         setNodes({conversationId: id, nodes: []});
         setPagination({conversationId: id, pagination: null});
@@ -112,11 +131,14 @@ export const useConversationSearchFiles = ({
   );
 
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
+    const requestId = requestVersionGate.current.next();
     shouldPerformSearch.current = false;
     setSearchQuery(value);
-    await searchNodes({query: value});
-    shouldPerformSearch.current = true;
-  }, DEBOUNCE_TIME);
+    await searchNodes({query: value, requestId});
+    if (!requestVersionGate.current.isStale(requestId)) {
+      shouldPerformSearch.current = true;
+    }
+  }, debounceMs);
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
@@ -132,15 +154,19 @@ export const useConversationSearchFiles = ({
 
   const handleClearSearch = () => {
     searchNodesDebounced.cancel();
+    requestVersionGate.current.invalidate();
     setSearchValue('');
     setSearchQuery('');
     shouldPerformSearch.current = false;
+    const requestId = requestVersionGate.current.next();
+    void searchNodes({query: FETCH_ALL_QUERY, requestId});
   };
 
   const handleReload = async () => {
+    const requestId = requestVersionGate.current.next();
     setStatus('loading');
     clearAll({conversationId: id});
-    await searchNodes({query: searchQuery || FETCH_ALL_QUERY});
+    await searchNodes({query: searchQuery || FETCH_ALL_QUERY, requestId});
   };
 
   useEffect(() => {
@@ -148,7 +174,8 @@ export const useConversationSearchFiles = ({
       return;
     }
 
-    void searchNodes({query: searchQuery || FETCH_ALL_QUERY});
+    const requestId = requestVersionGate.current.next();
+    void searchNodes({query: searchQuery || FETCH_ALL_QUERY, requestId});
   }, [searchNodes, searchQuery, enabled]);
 
   return {
