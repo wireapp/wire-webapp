@@ -171,7 +171,12 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
       {isAddMode && (
         <div className="panel__footer">
-          <button className="button button-full" onClick={onAdd} data-uie-name="do-add-service" type="button">
+          <button
+            className="button button-full button-text"
+            onClick={onAdd}
+            data-uie-name="do-add-service"
+            type="button"
+          >
             <span>{t('addParticipantsConfirmLabel')}</span>
           </button>
         </div>
