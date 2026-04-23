@@ -93,7 +93,7 @@ export const useCreateConversation = () => {
       access = toggleFeature(ACCESS_MODES.LINK, access);
     }
 
-    if (isServicesEnabled && conversationType !== ConversationType.Channel) {
+    if (isServicesEnabled) {
       access = toggleFeature(ACCESS_TYPES.SERVICE, access);
     }
 
