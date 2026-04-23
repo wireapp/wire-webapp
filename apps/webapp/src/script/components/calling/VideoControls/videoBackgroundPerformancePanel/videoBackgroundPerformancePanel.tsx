@@ -98,8 +98,8 @@ const areCapabilityInfosEqual = (
   prev: CapabilityInfo | null | undefined,
   current: CapabilityInfo | null | undefined,
 ): boolean => {
-  if (prev === current) {
-    return true;
+  if (prev == null || current == null) {
+    return prev === current;
   }
 
   return Maybe.of(prev)
@@ -172,18 +172,18 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
   );
 
   useEffect(() => {
-    if (!isFeatureEnabled) {
+    if (!isFeatureEnabled || !isPanelOpen) {
       setCapabilityInfo(null);
-      return undefined;
+      return;
     }
 
     setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
-  }, [backgroundEffectsHandler, isFeatureEnabled]);
+  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
 
   // Quality polling (fallback for non-reactive quality)
-  useEffect(() => {
-    if (!isFeatureEnabled) {
-      return undefined;
+  useEffect((): void | (() => void) => {
+    if (!isFeatureEnabled || !isPanelOpen) {
+      return;
     }
 
     const interval = setInterval(() => {
@@ -192,14 +192,16 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
       setSelectedQuality(prev => (prev !== current ? current : prev));
     }, POLLING_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [backgroundEffectsHandler, isFeatureEnabled]);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
 
   // Capability polling (controller updates these after pipeline start)
-  useEffect(() => {
-    if (!isFeatureEnabled) {
+  useEffect((): void | (() => void) => {
+    if (!isFeatureEnabled || !isPanelOpen) {
       setCapabilityInfo(null);
-      return undefined;
+      return;
     }
 
     const syncCapabilities = () => {
@@ -210,8 +212,11 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     syncCapabilities();
 
     const interval = setInterval(syncCapabilities, POLLING_INTERVAL);
-    return () => clearInterval(interval);
-  }, [backgroundEffectsHandler, isFeatureEnabled]);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
 
   // Auto close if disabled
   useEffect(() => {
