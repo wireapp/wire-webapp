@@ -50,13 +50,7 @@ export const Preference = () => {
     isCellsEnabled: isCellsEnabledForTeam,
     isMLSEnabled,
     isAppsEnabled,
-    hasWhitelistedServices,
-  } = useKoSubscribableChildren(teamState, [
-    'isCellsEnabled',
-    'isMLSEnabled',
-    'isAppsEnabled',
-    'hasWhitelistedServices',
-  ]);
+  } = useKoSubscribableChildren(teamState, ['isCellsEnabled', 'isMLSEnabled', 'isAppsEnabled']);
   const isCellsEnabledForEnvironment = Config.getConfig().FEATURE.ENABLE_CELLS;
   const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
 
@@ -70,7 +64,6 @@ export const Preference = () => {
   const isAppsFeatureAvailable = checkAppsFeatureAvailability({
     protocol: defaultProtocol,
     isAppsEnabled,
-    hasWhitelistedServices,
   });
 
   useEffect(() => {
