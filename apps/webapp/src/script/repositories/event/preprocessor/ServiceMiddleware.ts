@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
-import type {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {UserType, type QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
@@ -91,7 +91,7 @@ export class ServiceMiddleware implements EventMiddleware {
 
   private async containsService(users: QualifiedId[]) {
     const userEntities = await this.userRepository.getUsersById(users);
-    return userEntities.some(userEntity => userEntity.isService);
+    return userEntities.some(userEntity => userEntity.isService || userEntity.type === UserType.APP);
   }
 
   private decorateWithHasServiceFlag(event: MemberJoinEvent | ConversationMemberJoinEvent | OneToOneCreationEvent) {
