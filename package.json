@@ -9,7 +9,7 @@
     "logdown": "3.3.1",
     "long": "5.3.2",
     "tslib": "2.8.1",
-    "uuid": "11.1.0",
+    "uuid": "14.0.0",
     "zod": "3.25.76"
   },
   "devDependencies": {
