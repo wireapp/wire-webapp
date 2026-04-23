@@ -29,7 +29,7 @@ import {
 } from '@wireapp/api-client/lib/conversation/';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import ko from 'knockout';
 import {container} from 'tsyringe';
@@ -127,6 +127,7 @@ export class Conversation {
   public readonly hasDirectGuest: ko.PureComputed<boolean>;
   public readonly hasLegalHold: ko.Computed<boolean>;
   public readonly hasService: ko.PureComputed<boolean>;
+  public readonly hasApps: ko.PureComputed<boolean>;
   public readonly hasUnread: ko.PureComputed<boolean>;
   public id: string;
   public readonly inTeam: ko.PureComputed<boolean>;
@@ -315,6 +316,9 @@ export class Conversation {
       return hasGuestUser && this.isGroupOrChannel();
     });
     this.hasService = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isService));
+    this.hasApps = ko.pureComputed(() =>
+      this.participating_user_ets().some(userEntity => userEntity.type === UserType.APP),
+    );
     this.hasExternal = ko.pureComputed(() => this.participating_user_ets().some(userEntity => userEntity.isExternal()));
     this.hasFederatedUsers = ko.pureComputed(() =>
       this.participating_user_ets().some(userEntity => userEntity.isFederated),
