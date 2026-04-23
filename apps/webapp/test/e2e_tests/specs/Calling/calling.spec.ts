@@ -814,4 +814,47 @@ test.describe('Calling', () => {
       });
     });
   });
+
+  test(
+    'I want to see a group call timing out after 30s if I`m the last one left in the call',
+    {tag: ['@TC-2937', '@regression']},
+    async ({createPage}) => {
+      const [userAPages, userBPages, userCPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      ]);
+
+      await test.step('Setup: Create group and start call', async () => {
+        await createGroup(userAPages, groupName, [userB, userC]);
+        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversation().clickCallButton();
+
+        await expect(userAPages.calling().callCell).toBeVisible();
+      });
+
+      await test.step('User B and User C join the call', async () => {
+        for (const member of [userBPages, userCPages]) {
+          await joinCall(member);
+        }
+        await expect(userAPages.calling().gridTiles).toHaveCount(3);
+      });
+
+      await test.step('User B and User C leave the call', async () => {
+        for (const member of [userBPages, userCPages]) {
+          await member.calling().clickLeaveCallButton();
+          await expect(member.calling().goFullScreen).toBeHidden();
+        }
+      });
+
+      await test.step('Verify call ends for User A after 30s of being the last one in the call', async () => {
+        await expect(userAPages.calling().goFullScreen).toBeHidden({timeout: 35_000});
+        await expect(
+          userAPages
+            .conversation()
+            .systemMessages.filter({hasText: 'Your call was ended because all other participants left'}),
+        ).toBeVisible();
+      });
+    },
+  );
 });
