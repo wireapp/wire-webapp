@@ -135,8 +135,9 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   }, [contacts, integrationRepository, searchInput]);
 
   const servicesList = useMemo(() => {
-    return activeConversation.protocol === CONVERSATION_PROTOCOL.MLS ? apps : services;
-  }, [activeConversation.protocol, apps, services]);
+    const allApps = activeConversation.protocol === CONVERSATION_PROTOCOL.MLS ? apps : services;
+    return allApps.filter(app => !participatingUserIds.some(id => id.id === app.id)); // Make sure apps already added to the conversation don't show up again
+  }, [activeConversation.protocol, apps, services, participatingUserIds]);
 
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
