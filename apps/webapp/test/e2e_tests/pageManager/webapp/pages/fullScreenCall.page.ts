@@ -76,7 +76,7 @@ export const FullScreenCallPage = (page: Page) => {
       muteIcon: participant.getByTestId('status-audio-off'),
       guestIcon: participant.getByTestId('status-guest'),
       // User is an active speaker
-      speakIcon: participant.getByTestId('status-active-speaking'),
+      activeSpeakerIcon: participant.getByTestId('status-active-speaking'),
       videoIcon: participant.getByTestId('status-video'),
       screenShareIcon: participant.getByTestId('status-screenshare'),
       menuButton: participant.getByTestId('participant-menu-icon'),

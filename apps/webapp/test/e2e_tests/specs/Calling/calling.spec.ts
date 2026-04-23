@@ -857,4 +857,34 @@ test.describe('Calling', () => {
       });
     },
   );
+
+  test('I want to see multiple active speakers in 1 call', {tag: ['@TC-2945', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages, userCPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+    ]);
+
+    await test.step('Setup: Create group and start call', async () => {
+      await createGroup(userAPages, groupName, [userB, userC]);
+      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversation().clickCallButton();
+
+      await expect(userAPages.calling().callCell).toBeVisible();
+    });
+
+    await test.step('User B and User C join the call', async () => {
+      for (const member of [userBPages, userCPages]) {
+        await joinCall(member);
+      }
+    });
+
+    await test.step('Verify 2 speakers are active in the call', async () => {
+      const userACall = await userAPages.calling().maximizeCell();
+      await userBPages.calling().toggleMute();
+      await userACall.toggleParticipantsList();
+      await expect(userACall.getCallParticipant(userA.fullName).activeSpeakerIcon).toBeVisible();
+      await expect(userACall.getCallParticipant(userB.fullName).activeSpeakerIcon).toBeVisible();
+    });
+  });
 });
