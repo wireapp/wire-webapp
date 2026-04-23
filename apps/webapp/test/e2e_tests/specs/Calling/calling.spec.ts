@@ -21,15 +21,7 @@ import {Page} from 'playwright/test';
 import {AudioType} from 'Repositories/audio/audioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {
-  test,
-  withConnectedUser,
-  withLogin,
-  expect,
-  Team,
-  withConnectionRequest,
-  LOGIN_TIMEOUT,
-} from 'test/e2e_tests/test.fixtures';
+import {test, withConnectedUser, withLogin, expect, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
 import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
@@ -578,7 +570,7 @@ test.describe('Calling', () => {
 
       const createdLink = await test.step('Owner: Create group and generate guest invitation link', async () => {
         await createGroup(ownerPages, groupName, []);
-        await ownerPages.conversationList().openConversation(groupName);
+        await ownerPages.conversationList().getConversation(groupName).open();
         await ownerPages.conversation().toggleGroupInformation();
         await ownerPages.conversationDetails().openGuestOptions();
         return await ownerPages.guestOptions().createLink();
@@ -609,7 +601,7 @@ test.describe('Calling', () => {
       });
 
       await test.step('Guest: Join the active call', async () => {
-        const {joinCallButton} = guestPages.conversationList().getConversationLocator(groupName);
+        const {joinCallButton} = guestPages.conversationList().getConversation(groupName);
 
         await expect(guestPages.calling().callCell).toBeVisible();
         await expect(joinCallButton).toBeVisible();
@@ -638,7 +630,7 @@ test.describe('Calling', () => {
       verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>, localUser: string) => {
         const displayedNames = await callScreen.gridTiles.getByTestId('call-participant-name').allInnerTexts();
         const listToVerify = displayedNames.filter(name => name !== localUser);
-        const sortedNames = [...listToVerify].sort();
+        const sortedNames = [...listToVerify].sort((a, b) => a.localeCompare(b));
 
         expect(listToVerify).toEqual(sortedNames);
       },
@@ -670,7 +662,7 @@ test.describe('Calling', () => {
 
       await test.step('Action: User A initiates the group call', async () => {
         await createGroup(userAPages, groupName, groupMembers);
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
         // Warning modal about large group call
         await userAPage.getByTestId('modal-without-title').getByRole('button', {name: 'Call', exact: true}).click();
@@ -699,7 +691,7 @@ test.describe('Calling', () => {
       verify: async (userPage: Page, callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>) => {
         await userPage.getByRole('button', {name: 'Mute', exact: true}).click();
 
-        await expect(callScreen.getCallParticipant(userB.fullName).muteIcon).toBeVisible();
+        await expect(callScreen.getSidebarParticipant(userB.fullName).muteIcon).toBeVisible();
         await expect(callScreen.getGridTile(userB.fullName).muteIcon).toBeVisible();
       },
     },
@@ -708,11 +700,11 @@ test.describe('Calling', () => {
       tag: '@TC-2929',
       verify: async (userPage: Page, callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>) => {
         await userPage.getByRole('button', {name: 'Mute', exact: true}).click();
-        await callScreen.getCallParticipant(userB.fullName).menuButton.click();
+        await callScreen.getSidebarParticipant(userB.fullName).menuButton.click();
         await userPage.getByRole('button', {name: 'Mute everyone else'}).click();
 
         for (const participant of [userB, userC]) {
-          await expect(callScreen.getCallParticipant(participant.fullName).muteIcon).toBeVisible();
+          await expect(callScreen.getSidebarParticipant(participant.fullName).muteIcon).toBeVisible();
           await expect(callScreen.getGridTile(participant.fullName).muteIcon).toBeVisible();
         }
       },
@@ -729,7 +721,7 @@ test.describe('Calling', () => {
 
       await test.step('Setup: Create group and start call', async () => {
         await createGroup(userAPages, groupName, [userB, userC]);
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
 
         await expect(userAPages.calling().callCell).toBeVisible();
@@ -746,10 +738,10 @@ test.describe('Calling', () => {
         const userACall = await userAPages.calling().maximizeCell();
         await userACall.toggleParticipantsList();
 
-        await expect(userACall.getCallParticipant(userB.fullName).muteIcon).not.toBeVisible();
-        await expect(userACall.getCallParticipant(userC.fullName).muteIcon).not.toBeVisible();
+        await expect(userACall.getSidebarParticipant(userB.fullName).muteIcon).not.toBeVisible();
+        await expect(userACall.getSidebarParticipant(userC.fullName).muteIcon).not.toBeVisible();
 
-        await userACall.getCallParticipant(userB.fullName).menuButton.click();
+        await userACall.getSidebarParticipant(userB.fullName).menuButton.click();
 
         verify(userAPage, userACall);
       });
@@ -785,7 +777,7 @@ test.describe('Calling', () => {
 
       await test.step('Setup: Create group and start call', async () => {
         await createGroup(userAPages, groupName, [userB]);
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
 
         await expect(userAPages.calling().callCell).toBeVisible();
@@ -801,12 +793,12 @@ test.describe('Calling', () => {
         const userACall = await userAPages.calling().maximizeCell();
         await userACall.toggleParticipantsList();
 
-        await expect(userACall.getCallParticipant(userB.fullName).muteIcon).not.toBeVisible();
+        await expect(userACall.getSidebarParticipant(userB.fullName).muteIcon).not.toBeVisible();
 
-        await userACall.getCallParticipant(userB.fullName).menuButton.click();
+        await userACall.getSidebarParticipant(userB.fullName).menuButton.click();
         await userAPage.getByRole('button', {name: 'Mute', exact: true}).click();
 
-        await expect(userACall.getCallParticipant(userB.fullName).muteIcon).toBeVisible();
+        await expect(userACall.getSidebarParticipant(userB.fullName).muteIcon).toBeVisible();
       });
 
       await test.step('Verify mute functionality', async () => {
@@ -814,6 +806,31 @@ test.describe('Calling', () => {
       });
     });
   });
+
+  test(
+    'I want to see a group call timing out after 300s if no one else joined',
+    {tag: ['@TC-2936', '@regression']},
+    async ({createPage}) => {
+      test.setTimeout(390_000);
+      const userAPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
+
+      await createGroup(userAPages, groupName, [userB, userC]);
+
+      // User A initiates the call
+      await userAPages.conversationList().getConversation(groupName).open();
+      await userAPages.conversation().clickCallButton();
+      await expect(userAPages.calling().callCell).toBeVisible();
+
+      await expect(
+        userAPages
+          .conversation()
+          .systemMessages.filter({hasText: 'Your call was ended because no other participant joined.'}),
+      ).toBeVisible({
+        timeout: 302_000,
+      });
+      await expect(userAPages.calling().callCell).not.toBeVisible();
+    },
+  );
 
   test(
     'I want to see a group call timing out after 30s if I`m the last one left in the call',
@@ -827,7 +844,7 @@ test.describe('Calling', () => {
 
       await test.step('Setup: Create group and start call', async () => {
         await createGroup(userAPages, groupName, [userB, userC]);
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
 
         await expect(userAPages.calling().callCell).toBeVisible();
@@ -867,7 +884,7 @@ test.describe('Calling', () => {
 
     await test.step('Setup: Create group and start call', async () => {
       await createGroup(userAPages, groupName, [userB, userC]);
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPages.calling().callCell).toBeVisible();
@@ -881,10 +898,14 @@ test.describe('Calling', () => {
 
     await test.step('Verify 2 speakers are active in the call', async () => {
       const userACall = await userAPages.calling().maximizeCell();
-      await userBPages.calling().toggleMute();
       await userACall.toggleParticipantsList();
-      await expect(userACall.getCallParticipant(userA.fullName).activeSpeakerIcon).toBeVisible();
-      await expect(userACall.getCallParticipant(userB.fullName).activeSpeakerIcon).toBeVisible();
+
+      await userBPages.calling().maximizeCell();
+      await userBPages.calling().unmuteSelfInFullScreen();
+      await expect(userBPages.calling().getGridTile(userB.fullName).muteIcon).toBeHidden(); // Ensure active video state
+
+      await expect(userACall.getSidebarParticipant(userA.fullName).activeSpeakerIcon).toBeVisible();
+      await expect(userACall.getSidebarParticipant(userB.fullName).activeSpeakerIcon).toBeVisible();
     });
   });
 });
