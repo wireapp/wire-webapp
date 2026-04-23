@@ -17,7 +17,7 @@
  *
  */
 
-import axios, {AxiosRequestConfig} from 'axios';
+import axios, {AxiosHeaderValue, AxiosRequestConfig} from 'axios';
 import logdown from 'logdown';
 
 import {LogFactory} from '@wireapp/commons';
@@ -64,6 +64,14 @@ export interface AssetResponse {
   mimeType?: string;
 }
 
+function getHeaderStringOrUndefined(headerValue: AxiosHeaderValue | undefined): string | undefined {
+  if (typeof headerValue === 'string') {
+    return headerValue;
+  }
+
+  return undefined;
+}
+
 export class AssetAPI {
   private readonly logger: logdown.Logger;
 
@@ -105,7 +113,7 @@ export class AssetAPI {
         const response = await this.client.sendRequest<ArrayBuffer>(config);
         return {
           buffer: response.data,
-          mimeType: response.headers['content-type'],
+          mimeType: getHeaderStringOrUndefined(response.headers['content-type']),
         };
       } catch (error: unknown) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {

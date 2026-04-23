@@ -17,7 +17,7 @@
  *
  */
 
-import axios, {AxiosRequestConfig} from 'axios';
+import axios, {AxiosHeaderValue, AxiosRequestConfig} from 'axios';
 
 import {ArrayUtil} from '@wireapp/commons';
 
@@ -35,6 +35,14 @@ import {
 import {RequestCancellationError} from '../../user';
 import {MemberData, Members} from '../member/';
 import {TeamAPI} from '../team/teamApi';
+
+function getHeaderStringOrUndefined(headerValue: AxiosHeaderValue | undefined): string | undefined {
+  if (typeof headerValue === 'string') {
+    return headerValue;
+  }
+
+  return undefined;
+}
 
 export class MemberAPI {
   // Maximum 1600 due to "413 Request Entity Too Large" response
@@ -163,7 +171,7 @@ export class MemberAPI {
         const response = await this.client.sendRequest<ArrayBuffer>(config);
         return {
           buffer: response.data,
-          mimeType: response.headers['content-type'],
+          mimeType: getHeaderStringOrUndefined(response.headers['content-type']),
         };
       } catch (error: unknown) {
         if ((error as BackendError).message === SyntheticErrorLabel.REQUEST_CANCELLED) {
