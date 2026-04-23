@@ -14,7 +14,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^\\.github/workflows/e2e-tests\\.yml$"],
+      "managerFilePatterns": ["/^\\.github/workflows/e2e-tests\\.yml$/"],
       "matchStrings": ["image:\\s+mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)-noble"],
       "depNameTemplate": "mcr.microsoft.com/playwright",
       "datasourceTemplate": "docker"
