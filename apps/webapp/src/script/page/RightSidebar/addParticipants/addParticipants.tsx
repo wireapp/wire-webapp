@@ -50,6 +50,7 @@ import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/
 import {getManageServicesUrl} from '../../../externalRoute';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 
 const ENABLE_ADD_ACTIONS_LENGTH = 0;
 const ENABLE_IS_SEARCHING_LENGTH = 0;
@@ -102,7 +103,12 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     'isTeamOnly',
     'participating_user_ids',
   ]);
-  const {isTeam, teamMembers, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers', 'teamUsers']);
+  const {isTeam, teamMembers, teamUsers, isAppsEnabled} = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'teamMembers',
+    'teamUsers',
+    'isAppsEnabled',
+  ]);
   const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {services} = useKoSubscribableChildren(integrationRepository, ['services']);
@@ -149,7 +155,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const isService = !!firstUserEntity?.isService;
     const allowIntegrations = isGroupOrChannel || isService;
 
-    return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled;
+    // Don't allow new apps to be added if the feature has been disabled
+    const isAppFeatureEnabled = checkAppsFeatureAvailability({
+      protocol: activeConversation.protocol,
+      isAppsEnabled: isAppsEnabled,
+    });
+
+    return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled && isAppFeatureEnabled;
   }, [
     firstUserEntity?.isService,
     inTeam,
