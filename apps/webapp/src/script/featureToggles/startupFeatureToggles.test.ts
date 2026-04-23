@@ -25,7 +25,6 @@ import {
 import {
   applockRefactoredFeatureToggleName,
   collaboraNewDocumentCreationMenuFeatureToggleName,
-  countlyIncrementalBackoffRetryReportingFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
   startupFeatureToggleNames,
 } from './startupFeatureToggleNames';
@@ -33,7 +32,6 @@ import {
 const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
   collaboraNewDocumentCreationMenuFeatureToggleName,
-  countlyIncrementalBackoffRetryReportingFeatureToggleName,
   applockRefactoredFeatureToggleName,
 ] as const;
 
@@ -85,16 +83,6 @@ describe('startupFeatureToggles', function () {
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain('unknown-feature');
-  });
-
-  it('enables the countly incremental backoff retry reporting feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${countlyIncrementalBackoffRetryReportingFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(countlyIncrementalBackoffRetryReportingFeatureToggleName)).toBe(
-      true,
-    );
   });
 
   it('enables the applock refactored feature toggle when present in the query parameter', () => {
@@ -149,7 +137,6 @@ describe('startupFeatureToggles', function () {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
       collaboraNewDocumentCreationMenuFeatureToggleName,
-      countlyIncrementalBackoffRetryReportingFeatureToggleName,
       applockRefactoredFeatureToggleName,
     ]);
   });

@@ -99,7 +99,6 @@ export class EventTrackingRepository {
   constructor(
     private readonly messageRepository: MessageRepository,
     private readonly apiClient: APIClient,
-    private readonly isCountlyIncrementalBackoffRetryReportingEnabled: boolean,
     private readonly teamState = container.resolve(TeamState),
     private readonly userState = container.resolve(UserState),
   ) {
@@ -337,13 +336,11 @@ export class EventTrackingRepository {
       },
     );
 
-    if (this.isCountlyIncrementalBackoffRetryReportingEnabled) {
-      const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
-      const webSocketRetryReportingClient = this.apiClient.transport.ws as unknown as WebSocketRetryReportingClient;
+    const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
+    const webSocketRetryReportingClient = this.apiClient.transport.ws as unknown as WebSocketRetryReportingClient;
 
-      httpRetryReportingClient.on(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
-      webSocketRetryReportingClient.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningWebSocketRetry);
-    }
+    httpRetryReportingClient.on(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
+    webSocketRetryReportingClient.on(WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningWebSocketRetry);
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.SIGNED_OUT, this.stopProductReportingSession);
   }
@@ -437,16 +434,14 @@ export class EventTrackingRepository {
   private unsubscribeFromProductTrackingEvents(): void {
     this.logger.debug('Unsubscribing from product tracking events');
 
-    if (this.isCountlyIncrementalBackoffRetryReportingEnabled) {
-      const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
-      const webSocketRetryReportingClient = this.apiClient.transport.ws as unknown as WebSocketRetryReportingClient;
+    const httpRetryReportingClient = this.apiClient.transport.http as unknown as HttpRetryReportingClient;
+    const webSocketRetryReportingClient = this.apiClient.transport.ws as unknown as WebSocketRetryReportingClient;
 
-      httpRetryReportingClient.removeListener(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
-      webSocketRetryReportingClient.removeListener(
-        WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY,
-        this.onLongRunningWebSocketRetry,
-      );
-    }
+    httpRetryReportingClient.removeListener(HttpClient.TOPIC.ON_LONG_RUNNING_RETRY, this.onLongRunningRetry);
+    webSocketRetryReportingClient.removeListener(
+      WebSocketClient.TOPIC.ON_LONG_RUNNING_RETRY,
+      this.onLongRunningWebSocketRetry,
+    );
 
     amplify.unsubscribeAll(WebAppEvents.ANALYTICS.EVENT);
   }
