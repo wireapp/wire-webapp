@@ -19,7 +19,7 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, test, withConnectedUser, withConnectionRequest, withLogin} from 'test/e2e_tests/test.fixtures';
+import {expect, test, Team, withConnectedUser, withConnectionRequest, withLogin} from 'test/e2e_tests/test.fixtures';
 import {createGroup} from '../../utils/userActions';
 import {UserProfileModal} from '../../pageManager/webapp/modals/userProfile.modal';
 
@@ -76,56 +76,52 @@ async function verifyUserProfileModal(profileModal: UserProfileModal, user: User
 }
 
 test.describe('Deep Links', () => {
+  let team: Team;
+  let userA: User;
+  let userB: User;
+  let userC: User;
+  let userD: User;
+
+  const groupName = 'DeepLinksGroup';
+
+  test.beforeEach(async ({createUser}) => {
+    userC = await createUser();
+    userD = await createUser();
+  });
+
   const testCases = [
     {
       title: 'Opening profile deep links as a team member',
       tag: ['@TC-590', '@regression'],
-      setupUsers: async (createTeam: any, createUser: any, createPage: any) => {
-        const userB = await createUser();
-        const team = await createTeam('Test Team', {users: [userB]});
-        const userA = team.owner;
-        const userC = await createUser();
-        const userD = await createUser();
-
-        const [userAPage, userBPage, userCPage, userDPage] = await Promise.all([
-          createPage(withLogin(userA), withConnectedUser(userB), withConnectionRequest(userC)),
-          createPage(withLogin(userB), withConnectionRequest(userD)),
-          createPage(withLogin(userC)),
-          createPage(withLogin(userD)),
-        ]);
-
-        return {userA, userB, userC, userD, userAPage, userBPage, userCPage, userDPage};
-      },
+      isTeamMemberScenario: true,
     },
     {
       title: 'Opening profile deep links as a personal account',
       tag: ['@TC-591', '@regression'],
-      setupUsers: async (createTeam: any, createUser: any, createPage: any) => {
-        const userA = await createUser();
-        const team = await createTeam('Test Team', {users: [userA]});
-        const userB = team.owner;
-        const userC = await createUser();
-        const userD = await createUser();
-
-        const [userAPage, userBPage, userCPage, userDPage] = await Promise.all([
-          createPage(withLogin(userA), withConnectionRequest(userC)),
-          createPage(withLogin(userB), withConnectedUser(userA), withConnectionRequest(userD)),
-          createPage(withLogin(userC)),
-          createPage(withLogin(userD)),
-        ]);
-
-        return {userA, userB, userC, userD, userAPage, userBPage, userCPage, userDPage};
-      },
+      isTeamMemberScenario: false,
     },
   ];
 
   for (const testCase of testCases) {
     test(testCase.title, {tag: testCase.tag}, async ({createTeam, createUser, createPage}) => {
-      const {userA, userB, userC, userD, userAPage, userBPage, userCPage, userDPage} = await testCase.setupUsers(
-        createTeam,
-        createUser,
-        createPage,
-      );
+      if (testCase.isTeamMemberScenario) {
+        // Logic for TC-590
+        userB = await createUser();
+        team = await createTeam('Test Team', {users: [userB]});
+        userA = team.owner;
+      } else {
+        // Logic for TC-591
+        userA = await createUser();
+        team = await createTeam('Test Team', {users: [userA]});
+        userB = team.owner;
+      }
+
+      const [userAPage, userBPage, userCPage, userDPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectionRequest(userC)),
+        createPage(withLogin(userB), withConnectedUser(userA), withConnectionRequest(userD)),
+        createPage(withLogin(userC)),
+        createPage(withLogin(userD)),
+      ]);
 
       const userAPageManager = PageManager.from(userAPage);
       const userBPageManager = PageManager.from(userBPage);
@@ -136,8 +132,6 @@ test.describe('Deep Links', () => {
       const {pages: userBPages} = userBPageManager.webapp;
       const {pages: userCPages} = userCPageManager.webapp;
       const {pages: userDPages} = userDPageManager.webapp;
-
-      const groupName = 'DeepLinksGroup';
 
       await userCPages.conversationList().openPendingConnectionRequest();
       await userCPages.connectRequest().connectButton.click();
