@@ -19,8 +19,50 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const authorLabel: CSSObject = {
+export const panel = {
+  padding: '24px',
+} satisfies CSSObject;
+
+export const header = {
+  display: 'grid',
+  gridTemplateColumns: '96px auto',
+  alignItems: 'center',
+  gap: '16px',
+  marginBottom: '16px',
+
+  avatar: {
+    width: '96px',
+    height: '96px',
+  },
+
+  info: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+
+    name: {
+      fontWeight: 'var(--font-weight-semibold)',
+    },
+
+    subHeader: {
+      fontSize: 'var(--font-size-small)',
+      fontWeight: 'var(--font-weight-regular)',
+    },
+  },
+} satisfies CSSObject;
+
+export const authorLabel = {
   fontSize: 'var(--font-size-medium)',
   fontWeight: 'var(--font-weight-regular)',
-  marginBottom: '16px',
-};
+  marginBottom: '24px',
+} satisfies CSSObject;
+
+export const description = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+
+  headline: {
+    fontWeight: 'var(--font-weight-semibold)',
+  },
+} satisfies CSSObject;
