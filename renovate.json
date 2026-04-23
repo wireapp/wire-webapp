@@ -14,8 +14,10 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^\\.github/workflows/e2e-tests\\.yml$"],
-      "matchStrings": ["image:\\s+mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)-noble"],
+      "managerFilePatterns": ["/^\\.github/workflows/e2e-tests\\.yml$/"],
+      "matchStrings": [
+        "image:\\s+mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)-noble"
+      ],
       "depNameTemplate": "mcr.microsoft.com/playwright",
       "datasourceTemplate": "docker"
     }
@@ -38,7 +40,11 @@
       "groupName": "docker images"
     },
     {
-      "matchPackageNames": ["playwright", "@playwright/test", "mcr.microsoft.com/playwright"],
+      "matchPackageNames": [
+        "playwright",
+        "@playwright/test",
+        "mcr.microsoft.com/playwright"
+      ],
       "groupName": "playwright"
     },
     {
@@ -91,7 +97,12 @@
       "groupName": "test tooling"
     },
     {
-      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"],
+      "matchPackageNames": [
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
       "groupName": "react runtime and types"
     },
     {
