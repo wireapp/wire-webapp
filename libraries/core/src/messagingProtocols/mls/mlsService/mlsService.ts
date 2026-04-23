@@ -1043,7 +1043,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
     const doesConversationExist = await this.conversationExists(groupId);
     if (!doesConversationExist) {
-      this.logger.warn('Skipping pending proposals commit because local MLS conversation is missing', {
+      this.logger.info('Skipping pending proposals commit because local MLS conversation is missing', {
         groupId,
         shouldRetry,
       });
@@ -1092,7 +1092,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           pendingProposals.map(async ({groupId, firingDate}) => {
             const doesConversationExist = await this.conversationExists(groupId);
             if (!doesConversationExist) {
-              this.logger.warn('Pruning stale pending proposals task for missing local MLS conversation', {groupId});
+              this.logger.info('Pruning stale pending proposals task for missing local MLS conversation', {groupId});
               await this.cancelPendingProposalsTask(groupId);
               return;
             }
