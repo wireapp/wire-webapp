@@ -1,5 +1,8 @@
 ## Please refer to [Playwright doc](https://playwright.dev/docs/intro) for detailed overview of the framework, troubleshooting, and best practices.
 
+<!-- ToDo: remove this before merge -->
+Change to trigger running all e2e tests in CI
+
 ## Requirements beyond the base project
 
 ### Prerequisites
