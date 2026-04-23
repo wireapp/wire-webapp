@@ -1869,6 +1869,7 @@ declare module 'I18n/en-US.json' {
     'servicesRoomToggleInfoExtended': `Open this conversation to apps. You can always change it later.`;
     'servicesRoomToggleName': `Allow Apps`;
     'serviceDetailsAuthor': `Created by {author}`;
+    'serviceDetailsDescription': `Description`;
     'setEmail.button': `Set email`;
     'setEmail.emailPlaceholder': `Email`;
     'setEmail.headline': `Set email`;
