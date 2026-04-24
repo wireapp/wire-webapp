@@ -42,6 +42,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
@@ -50,7 +51,6 @@ import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/
 import {getManageServicesUrl} from '../../../externalRoute';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
-import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 
 const ENABLE_ADD_ACTIONS_LENGTH = 0;
 const ENABLE_IS_SEARCHING_LENGTH = 0;
