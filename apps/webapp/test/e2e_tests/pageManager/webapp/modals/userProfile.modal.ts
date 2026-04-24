@@ -42,8 +42,7 @@ export class UserProfileModal {
     this.startConversationButton = page.getByTestId('modal-user-profile').getByTestId('start-conversation');
     this.unblockButton = page.getByTestId('modal-user-profile').getByTestId('do-unblock');
     this.blockButton = page.getByRole('button', {name: 'Block…', exact: true});
-    this.openConversationButton = this.modal
-      .getByRole('button', {name: 'Open conversation', exact: true});
+    this.openConversationButton = this.modal.getByRole('button', {name: 'Open conversation', exact: true});
     this.guestChip = page.getByTestId('status-guest');
     this.connectWarning = page.getByText(/Get certainty about .*’s identity before connecting/);
     this.participantFullname = this.modal.getByTestId('status-label');
