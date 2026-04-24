@@ -21,6 +21,14 @@ original_home="${HOME}"
 original_path="${PATH}"
 
 if unshare --map-root-user -n true >/dev/null 2>&1; then
+  if command -v ip >/dev/null 2>&1; then
+    exec unshare --map-root-user -n bash -c '
+      set -euo pipefail
+      ip link set lo up
+      exec "$@"
+    ' bash "$@"
+  fi
+
   exec unshare --map-root-user -n "$@"
 fi
 
@@ -31,6 +39,14 @@ fi
 if command -v sudo >/dev/null 2>&1; then
   if sudo unshare -n true >/dev/null 2>&1; then
     if command -v runuser >/dev/null 2>&1; then
+      if command -v ip >/dev/null 2>&1; then
+        exec sudo unshare -n bash -c '
+          set -euo pipefail
+          ip link set lo up
+          exec runuser -u "$1" -- env HOME="$2" PATH="$3" "${@:4}"
+        ' bash "${original_user}" "${original_home}" "${original_path}" "$@"
+      fi
+
       exec sudo unshare -n runuser -u "${original_user}" -- env HOME="${original_home}" PATH="${original_path}" "$@"
     fi
 
