@@ -257,6 +257,9 @@ test.describe('Calling', () => {
       await expect(userAPages.calling().callCell).toBeVisible();
       await joinCall(userBPages);
 
+      // User A starts screen sharing
+      await userAPages.calling().clickToggleScreenShareButton();
+
       // // User C joins the ongoing call
       await userCPage.waitForTimeout(5000);
       await userCPages.conversationList().getConversation(groupName).joinCallButton.click();
@@ -266,7 +269,6 @@ test.describe('Calling', () => {
       await expect(userCPages.calling().gridTiles).toHaveCount(3);
 
       if (verifyScreenShare) {
-        await userAPages.calling().clickToggleScreenShareButton();
         const userCCall = await userCPages.calling().maximizeCell();
         await expect(userCCall.getGridTile(userA.fullName).videoElement).toBeVisible();
       }
@@ -469,14 +471,15 @@ test.describe('Calling', () => {
       }
 
       const allMembers = [userB, userC, ...extraMembers];
-      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
-      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const {pages: userAPages, modals: userAModals} = PageManager.from(
+        await createPage(withLogin(userA), withConnectedUser(userB)),
+      ).webapp;
 
       await createGroup(userAPages, groupName, allMembers);
       await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickCallButton();
 
-      await expect(userAPage.getByTestId('modal-without-title')).toContainText(
+      await expect(userAModals.withoutTitle().modalText).toContainText(
         `Are you sure you want to call ${allMembers.length} people?`,
       );
     },
@@ -628,6 +631,7 @@ test.describe('Calling', () => {
       description: 'I want to see video tiles ordered alphabetically by user names',
       tag: '@TC-2927',
       verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>, localUser: string) => {
+        await expect(callScreen.gridTiles).toHaveCount(6); // Ensure first grid page is full
         const displayedNames = await callScreen.gridTiles.getByTestId('call-participant-name').allInnerTexts();
         const listToVerify = displayedNames.filter(name => name !== localUser);
         const sortedNames = [...listToVerify].sort((a, b) => a.localeCompare(b));
@@ -637,8 +641,7 @@ test.describe('Calling', () => {
     },
   ].forEach(({description, tag, verify}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage, createUser}) => {
-      const userAPage = await createPage(withLogin(userA));
-      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const {pages: userAPages, modals: userAModals} = PageManager.from(await createPage(withLogin(userA))).webapp;
 
       const {groupMembers, memberPages} =
         await test.step('Setup: Create members and initialize all browser pages', async () => {
@@ -646,12 +649,10 @@ test.describe('Calling', () => {
           const extraMembers = await Promise.all(Array.from({length: 7}, () => createUser()));
           const groupMembers = [userB, userC, ...extraMembers];
 
+          await Promise.all(extraMembers.map(member => team.addTeamMember(member)));
+
           const memberPages = await Promise.all(
             groupMembers.map(async member => {
-              if (![userB, userC].includes(member)) {
-                await team.addTeamMember(member);
-              }
-
               const page = await createPage(withLogin(member));
               return PageManager.from(page).webapp.pages;
             }),
@@ -665,7 +666,7 @@ test.describe('Calling', () => {
         await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
         // Warning modal about large group call
-        await userAPage.getByTestId('modal-without-title').getByRole('button', {name: 'Call', exact: true}).click();
+        await userAModals.withoutTitle().clickAction();
         await expect(userAPages.calling().goFullScreen).toBeVisible();
       });
 
@@ -812,7 +813,8 @@ test.describe('Calling', () => {
     {tag: ['@TC-2936', '@regression']},
     async ({createPage}) => {
       test.setTimeout(390_000);
-      const userAPages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
+      const userAPage = await createPage(withLogin(userA));
+      const userAPages = PageManager.from(userAPage).webapp.pages;
 
       await createGroup(userAPages, groupName, [userB, userC]);
 
@@ -821,13 +823,12 @@ test.describe('Calling', () => {
       await userAPages.conversation().clickCallButton();
       await expect(userAPages.calling().callCell).toBeVisible();
 
+      await userAPage.waitForTimeout(300_000);
       await expect(
         userAPages
           .conversation()
           .systemMessages.filter({hasText: 'Your call was ended because no other participant joined.'}),
-      ).toBeVisible({
-        timeout: 302_000,
-      });
+      ).toBeVisible();
       await expect(userAPages.calling().callCell).not.toBeVisible();
     },
   );

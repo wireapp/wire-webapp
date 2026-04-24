@@ -75,6 +75,7 @@ import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
 import {CreateConversationModal} from './webapp/modals/createConversation';
 import {InviteModal} from './webapp/modals/invite.modal';
 import {JoinGuestLinkPasswordModal} from './webapp/modals/joinGuestLinkPassword.modal';
+import {WithoutTitle} from './webapp/modals/withoutTitle.modal';
 import {AboutPage} from './webapp/pages/about.page';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
@@ -225,6 +226,7 @@ export class PageManager {
       createConversation: () =>
         this.getOrCreate('webapp.modals.createConversation', () => CreateConversationModal(this.page)),
       invite: () => this.getOrCreate('webapp.modals.invite', () => InviteModal(this.page)),
+      withoutTitle: () => this.getOrCreate('webapp.modals.withoutTitle', () => new WithoutTitle(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),
