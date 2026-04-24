@@ -155,13 +155,13 @@ test.describe('User Blocking', () => {
       'Verify you still receive messages from blocked person in a group chat',
       {tag: ['@TC-141', '@regression']},
       async ({createPage}) => {
+        const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
         const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB)));
         const userAPages = userAPageManager.webapp.pages;
 
         const conversationName = 'GroupConversation';
 
         // Preconditions: User B accepts the connection request
-        const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
         await userBPages.connectRequest().clickConnectButton();
 
         await expect(userAPages.conversationList().getConversationLocator(userB.fullName)).toBeAttached();
