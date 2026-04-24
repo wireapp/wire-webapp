@@ -70,7 +70,10 @@ test.describe('AppLock', () => {
     ).forEach(({title, tag}) => {
       const shouldLock = tag === '@TC-2752';
 
-      test(title, {tag: [tag, '@regression']}, async ({createPage}) => {
+      test(title, {tag: [tag, '@regression']}, async ({createPage}, testInfo) => {
+        // Increase test timeout by 61s in case it needs to wait for the app to lock
+        if (shouldLock) test.setTimeout(testInfo.timeout + 61_000);
+
         const page = await createPage(withLogin(memberA));
         const pageManager = PageManager.from(page);
         await handleAppLockState(pageManager, appLockPassCode);
