@@ -162,6 +162,7 @@ test.describe('User Blocking', () => {
         const conversationName = 'GroupConversation';
 
         // Preconditions: User B accepts the connection request
+        await userBPages.conversationList().openPendingConnectionRequest();
         await userBPages.connectRequest().clickConnectButton();
 
         await expect(userAPages.conversationList().getConversationLocator(userB.fullName)).toBeAttached();
