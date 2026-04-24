@@ -26,6 +26,7 @@ import {mockStoreFactory} from '../util/test/mockStoreFactory';
 import {mountComponent} from '../util/test/TestUtil';
 import * as trackingUtil from '../util/trackingUtil';
 import * as urlUtil from '../util/urlUtil';
+import * as browserLocationModule from '../../navigation/browserLocation';
 
 jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
@@ -41,21 +42,19 @@ jest.mock('../component/AccountRegistrationLayout', () => ({
 }));
 
 describe('Success', () => {
+  let replaceLocationMock: jest.SpiedFunction<typeof browserLocationModule.replaceBrowserLocation>;
+
   beforeEach(() => {
     jest.spyOn(trackingUtil, 'trackTelemetryPageView').mockImplementation(jest.fn());
     jest.spyOn(trackingUtil, 'resetTelemetrySession').mockImplementation(jest.fn());
     jest.spyOn(urlUtil, 'pathWithParams').mockImplementation((url: string) => url);
-
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: {
-        ...window.location,
-        replace: jest.fn(),
-      },
-    });
+    replaceLocationMock = jest
+      .spyOn(browserLocationModule, 'replaceBrowserLocation')
+      .mockImplementation(() => undefined);
   });
 
   afterEach(() => {
+    replaceLocationMock.mockRestore();
     jest.clearAllMocks();
   });
 
@@ -82,13 +81,13 @@ describe('Success', () => {
     const {getAllByText} = renderComponent(<Success />);
     const downloadButton = getAllByText('success.downloadButton')[0];
     fireEvent.click(downloadButton);
-    expect(window.location.replace).toHaveBeenCalledWith('https://wire.com/app-download');
+    expect(replaceLocationMock).toHaveBeenCalledWith('https://wire.com/app-download');
   });
 
   it('navigates to webapp url when open webapp button is clicked', () => {
     const {getAllByText} = renderComponent(<Success />);
     const openWebAppButton = getAllByText('success.openWebAppText')[0];
     fireEvent.click(openWebAppButton);
-    expect(window.location.replace).toHaveBeenCalledWith(urlUtil.pathWithParams(expect.anything()));
+    expect(replaceLocationMock).toHaveBeenCalledWith(urlUtil.pathWithParams(expect.anything()));
   });
 });

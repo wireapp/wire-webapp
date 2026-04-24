@@ -19,6 +19,7 @@
 
 import {choosePipeline, detectCapabilities} from './capability';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import * as capabilityModule from './capability';
 
 describe('capability', () => {
   // Store original globals to restore after tests
@@ -351,26 +352,16 @@ describe('capability', () => {
     });
 
     it('selects passthrough when no capabilities and no document', () => {
-      const previousDescriptor = Object.getOwnPropertyDescriptor(global, 'document');
-      Object.defineProperty(global, 'document', {value: undefined, configurable: true});
-      try {
-        const caps: CapabilityInfo = {
-          offscreenCanvas: false,
-          worker: false,
-          webgl2: false,
-          requestVideoFrameCallback: false,
-        };
+      const caps: CapabilityInfo = {
+        offscreenCanvas: false,
+        worker: false,
+        webgl2: false,
+        requestVideoFrameCallback: false,
+      };
 
-        const pipeline = choosePipeline(caps, true);
+      const pipeline = capabilityModule.choosePipeline(caps, true, false);
 
-        expect(pipeline).toBe('passthrough');
-      } finally {
-        if (previousDescriptor) {
-          Object.defineProperty(global, 'document', previousDescriptor);
-        } else {
-          delete (global as any).document;
-        }
-      }
+      expect(pipeline).toBe('passthrough');
     });
 
     it('selects canvas2d when no webgl2 but document exists (jsdom environment)', () => {

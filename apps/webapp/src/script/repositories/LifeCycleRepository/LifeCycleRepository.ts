@@ -29,6 +29,7 @@ import type {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import type {StorageRepository} from 'Repositories/storage/StorageRepository';
 import type {UserRepository} from 'Repositories/user/UserRepository';
+import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
 import {getLogger, Logger} from 'Util/logger';
 import {includesString} from 'Util/stringUtil';
 import {appendParameter} from 'Util/urlUtil';
@@ -72,7 +73,7 @@ export const doSimpleRedirect = (signOutReason: SIGN_OUT_REASON): void => {
     url = appendParameter(url, `${URLParameter.REASON}=${signOutReason}`);
   }
 
-  window.location.replace(url);
+  replaceBrowserLocation(url);
 };
 
 export interface LifeCycleDependencies {
@@ -115,7 +116,7 @@ export class LifeCycleRepository {
     // Redirect temporary guests to main website instead of login page
     if (isTemporaryGuestSignOut && isTemporaryGuestUser && externalUrl.website) {
       this.logger.info('User is a temporary guest. Redirecting to main website instead of login page.');
-      return window.location.replace(externalUrl.website);
+      return replaceBrowserLocation(externalUrl.website);
     }
 
     this.logger.debug('Proceeding with simple redirect to login page.');

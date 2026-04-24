@@ -95,6 +95,10 @@ describe('E2EIHandler', () => {
   const selfClientId = 'clientId';
 
   const coreMock = container.resolve(Core);
+  const setWindowSearch = (search: string): void => {
+    const searchPrefix = search ? `?${search}` : '';
+    window.history.replaceState({}, '', `/${searchPrefix}`);
+  };
 
   beforeEach(() => {
     jest.spyOn(util, 'supportsMLS').mockReturnValue(true);
@@ -181,12 +185,7 @@ describe('E2EIHandler', () => {
     searchParams.append('session_state', 'SESSION_STATE');
     searchParams.append('state', 'STATE');
 
-    Object.defineProperty(window, 'location', {
-      value: {
-        search: searchParams.toString(),
-      },
-      writable: true,
-    });
+    setWindowSearch(searchParams.toString());
 
     const enrollPromise = E2EIHandler.getInstance().initialize(params);
     await waitFor(() => {
@@ -213,12 +212,7 @@ describe('E2EIHandler', () => {
     jest.spyOn(coreMock.service!.e2eIdentity!, 'isEnrollmentInProgress').mockResolvedValue(true);
 
     // mock window search params (code, session_state, state)
-    Object.defineProperty(window, 'location', {
-      value: {
-        search: '',
-      },
-      writable: true,
-    });
+    setWindowSearch('');
 
     const enrollPromise = E2EIHandler.getInstance().initialize(params);
 
@@ -258,12 +252,7 @@ describe('E2EIHandler', () => {
     searchParams.append('session_state', 'SESSION_STATE');
     searchParams.append('state', 'STATE');
 
-    Object.defineProperty(window, 'location', {
-      value: {
-        search: searchParams.toString(),
-      },
-      writable: true,
-    });
+    setWindowSearch(searchParams.toString());
 
     const enrollPromise = handler.initialize(params);
 
@@ -298,12 +287,7 @@ describe('E2EIHandler', () => {
     searchParams.append('session_state', 'SESSION_STATE');
     searchParams.append('state', 'STATE');
 
-    Object.defineProperty(window, 'location', {
-      value: {
-        search: searchParams.toString(),
-      },
-      writable: true,
-    });
+    setWindowSearch(searchParams.toString());
 
     const enrollPromise = handler.initialize(params);
 
