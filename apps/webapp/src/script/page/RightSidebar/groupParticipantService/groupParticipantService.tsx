@@ -110,10 +110,11 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   }, [integrationRepository, serviceEntity]);
 
   useEffect(() => {
-    if (!is.nullOrUndefined(serviceUser?.teamId)) {
-      teamRepository.getTeamNameById(serviceUser.teamId).then(name => serviceEntity.author(name));
+    // Set the author of the Service / App to the name of the team the user is in
+    if (!is.nullOrUndefined(selfUser.teamId)) {
+      teamRepository.getTeamNameById(selfUser.teamId).then(name => serviceEntity.author(name));
     }
-  }, [teamRepository, serviceUser?.teamId]);
+  }, [teamRepository, selfUser.teamId]);
 
   return (
     <div id="group-participant-service" className="panel__page group-participant">
