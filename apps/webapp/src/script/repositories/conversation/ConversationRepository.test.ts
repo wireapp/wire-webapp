@@ -2612,29 +2612,23 @@ describe('ConversationRepository', () => {
   });
 
   describe('checkForDeletedConversations', () => {
-    it('removes conversations that have been deleted on the backend', async () => {
-      const deletedGroup = _generateConversation();
-      const oldGroup = _generateConversation();
+    it('marks inaccessible conversations as past member', async () => {
+      const inaccessibleGroup = _generateConversation();
+      const activeGroup = _generateConversation();
       const conversationRepository = testFactory.conversation_repository!;
 
       jest.spyOn(testFactory.conversation_service!, 'getConversationByIds').mockResolvedValue({
-        not_found: [deletedGroup, oldGroup],
+        not_found: [inaccessibleGroup],
       });
-      jest
-        .spyOn(conversationRepository['conversationService'], 'getConversationById')
-        .mockImplementation(async conversationId => {
-          if (matchQualifiedIds(conversationId, deletedGroup.qualifiedId)) {
-            throw new BackendError('', BackendErrorLabel.NO_CONVERSATION);
-          }
-          return {} as any;
-        });
-      await conversationRepository['saveConversation'](deletedGroup);
-      await conversationRepository['saveConversation'](oldGroup);
+      await conversationRepository['saveConversation'](inaccessibleGroup);
+      await conversationRepository['saveConversation'](activeGroup);
 
       const currentNbConversations = conversationRepository['conversationState'].conversations().length;
       await testFactory.conversation_repository!.syncDeletedConversations();
 
-      expect(conversationRepository['conversationState'].conversations()).toHaveLength(currentNbConversations - 1);
+      expect(conversationRepository['conversationState'].conversations()).toHaveLength(currentNbConversations);
+      expect(inaccessibleGroup.status()).toBe(ConversationStatus.PAST_MEMBER);
+      expect(activeGroup.status()).toBe(ConversationStatus.CURRENT_MEMBER);
     });
   });
 
