@@ -999,7 +999,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     } catch (error: unknown) {
       // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
       // and instead log and return null so the event processing queue can continue safely.
-      this.logger.error('Failed to handle MLS message-add event after recovery; returning null', {error, event});
+      this.logger.error('Failed to handle MLS message-add event after recovery; returning null', {error});
       return null;
     }
   }
@@ -1040,7 +1040,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Always resolves to null; the effects are applied to local state.
    */
   private async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent): Promise<HandledEventPayload | null> {
-    this.logger.info('Handling MLS welcome message event (orchestrated)', {event});
+    this.logger.info('Handling MLS welcome message event (orchestrated)');
     await this.MLSRecoveryOrchestrator.execute({
       context: {
         operationName: OperationName.handleWelcome,

@@ -2398,7 +2398,7 @@ export class ConversationRepository {
    * @param connections Connections entities
    */
   private async mapConnections(connections: ConnectionEntity[]): Promise<void> {
-    this.logger.debug(`Mapping '${connections.length}' user connection(s) to conversations`, connections);
+    this.logger.debug(`Mapping '${connections.length}' user connection(s) to conversations`);
     for (const connection of connections) {
       try {
         await this.mapConnection(connection);
