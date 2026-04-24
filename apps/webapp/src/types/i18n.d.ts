@@ -326,6 +326,7 @@ declare module 'I18n/en-US.json' {
     'backupImportPasswordErrorSecondary': `Please verify your input and try again`;
     'backupImportProgressHeadline': `Preparing…`;
     'backupImportProgressSecondary': `Restoring history · {processed} of {total} — {progress}%`;
+    'backupImportRestoreHistory': `Restore history`;
     'backupImportSuccessHeadline': `History restored.`;
     'backupImportVersionErrorHeadline': `Incompatible backup`;
     'backupImportVersionErrorSecondary': `This backup was created by a newer or outdated version of {brandName} and cannot be restored here.`;
