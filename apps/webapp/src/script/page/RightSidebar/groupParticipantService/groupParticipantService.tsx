@@ -122,61 +122,70 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
       <FadingScrollbar className="panel__content panel__content--fill">
         <ServiceDetails service={serviceEntity} />
-
-        {showActions && canChatWithServices() && (
-          <div
-            role="button"
-            tabIndex={TabIndex.FOCUSABLE}
-            className="panel__action-item"
-            data-uie-name="go-conversation"
-            onClick={onOpen}
-            onKeyDown={event =>
-              handleKeyDown({
-                event,
-                callback: onOpen,
-                keys: [KEY.ENTER, KEY.SPACE],
-              })
-            }
-          >
-            <span className="panel__action-item__icon">
-              <Icon.MessageIcon />
-            </span>
-
-            <div className="panel__action-item__text">{t('groupParticipantActionOpenConversation')}</div>
-          </div>
-        )}
-
-        {showActions && enableRemove && (
-          <div
-            role="button"
-            tabIndex={TabIndex.FOCUSABLE}
-            className="panel__action-item"
-            data-uie-name="do-remove"
-            onClick={() => onRemove(serviceUser)}
-            onKeyDown={event =>
-              handleKeyDown({
-                event,
-                callback: () => onRemove(serviceUser),
-                keys: [KEY.ENTER, KEY.SPACE],
-              })
-            }
-          >
-            <span className="panel__action-item__icon">
-              <Icon.MinusIcon />
-            </span>
-
-            <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>
-          </div>
-        )}
       </FadingScrollbar>
 
-      {isAddMode && (
-        <div className="panel__footer">
-          <button className="button button-full" onClick={onAdd} data-uie-name="do-add-service" type="button">
+      <div className="panel__footer">
+        {showActions && (
+          <>
+            {canChatWithServices() && (
+              <div
+                role="button"
+                tabIndex={TabIndex.FOCUSABLE}
+                className="panel__action-item"
+                data-uie-name="go-conversation"
+                onClick={onOpen}
+                onKeyDown={event =>
+                  handleKeyDown({
+                    event,
+                    callback: onOpen,
+                    keys: [KEY.ENTER, KEY.SPACE],
+                  })
+                }
+              >
+                <span className="panel__action-item__icon">
+                  <Icon.MessageIcon />
+                </span>
+
+                <div className="panel__action-item__text">{t('groupParticipantActionOpenConversation')}</div>
+              </div>
+            )}
+
+            {enableRemove && (
+              <div
+                role="button"
+                tabIndex={TabIndex.FOCUSABLE}
+                className="panel__action-item"
+                data-uie-name="do-remove"
+                onClick={() => onRemove(serviceUser)}
+                onKeyDown={event =>
+                  handleKeyDown({
+                    event,
+                    callback: () => onRemove(serviceUser),
+                    keys: [KEY.ENTER, KEY.SPACE],
+                  })
+                }
+              >
+                <span className="panel__action-item__icon">
+                  <Icon.MinusIcon />
+                </span>
+
+                <div className="panel__action-item__text">{t('groupParticipantActionRemove')}</div>
+              </div>
+            )}
+          </>
+        )}
+
+        {isAddMode && (
+          <button
+            className="button button-full button-text"
+            onClick={onAdd}
+            data-uie-name="do-add-service"
+            type="button"
+          >
             <span>{t('addParticipantsConfirmLabel')}</span>
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
