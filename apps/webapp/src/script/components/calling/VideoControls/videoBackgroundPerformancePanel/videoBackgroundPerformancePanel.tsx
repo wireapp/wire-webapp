@@ -23,6 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
+import {areCapabilityInfosEqual} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
 import {
   buttonBaseStyles,
   buttonNeutralStyles,
@@ -92,27 +93,6 @@ const getCapabilityRows = (capabilityInfo: CapabilityInfo | null | undefined) =>
       {label: 'VideoFrameCallback', value: info.requestVideoFrameCallback ? '✔' : '✖'},
     ])
     .unwrapOr([]);
-};
-
-const areCapabilityInfosEqual = (
-  prev: CapabilityInfo | null | undefined,
-  current: CapabilityInfo | null | undefined,
-): boolean => {
-  if (prev == null || current == null) {
-    return prev === current;
-  }
-
-  return Maybe.of(prev)
-    .andThen(prevValue =>
-      Maybe.of(current).map(
-        currentValue =>
-          prevValue.webgl2 === currentValue.webgl2 &&
-          prevValue.worker === currentValue.worker &&
-          prevValue.offscreenCanvas === currentValue.offscreenCanvas &&
-          prevValue.requestVideoFrameCallback === currentValue.requestVideoFrameCallback,
-      ),
-    )
-    .unwrapOr(false);
 };
 
 type MetricRowProps = {
@@ -206,7 +186,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
 
     const syncCapabilities = () => {
       const current = backgroundEffectsHandler.getCapabilityInfo();
-      setCapabilityInfo(prev => (areCapabilityInfosEqual(prev, current) ? prev : current));
+      setCapabilityInfo(prev => (areCapabilityInfosEqual(Maybe.of(prev), Maybe.of(current)) ? prev : current));
     };
 
     syncCapabilities();

@@ -3418,6 +3418,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@enormora/objectory@npm:0.0.7":
+  version: 0.0.7
+  resolution: "@enormora/objectory@npm:0.0.7"
+  checksum: 10/ecf200672c95f26e2aae19788cffee701bd171d1b0cf00e99abf03d6868c1d421046665127093e57c525045946dbae1f0484dde15c482af2bdf2b7841cddf26b
+  languageName: node
+  linkType: hard
+
 "@epic-web/invariant@npm:^1.0.0":
   version: 1.0.0
   resolution: "@epic-web/invariant@npm:1.0.0"
@@ -27557,6 +27564,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "wire-webapp@workspace:."
   dependencies:
+    "@enormora/objectory": "npm:0.0.7"
     "@faker-js/faker": "npm:9.9.0"
     "@ls-lint/ls-lint": "npm:2.3.1"
     "@nx/jest": "npm:22.6.5"
