@@ -17,9 +17,15 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {Runtime} from '@wireapp/commons';
 
 import type {CapabilityInfo} from '../backgroundEffectsWorkerTypes';
+
+export function isDocumentAvailable(): boolean {
+  return is.undefined(document) === false;
+}
 
 /**
  * Detects browser capabilities required for background effects rendering.
@@ -51,14 +57,14 @@ export function detectCapabilities(): CapabilityInfo {
   const worker = typeof Worker !== 'undefined';
   // Check for requestVideoFrameCallback (better than requestAnimationFrame for video)
   const requestVideoFrameCallback =
-    typeof HTMLVideoElement !== 'undefined' && 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
+    is.undefined(HTMLVideoElement) === false && 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
   // Check for WebGL2 support (requires DOM for canvas creation)
   const webgl2 = (() => {
-    if (typeof document === 'undefined') {
+    if (isDocumentAvailable() === false) {
       return false;
     }
     const canvas = document.createElement('canvas');
-    return !!canvas.getContext('webgl2');
+    return is.nullOrUndefined(canvas.getContext('webgl2')) === false;
   })();
 
   return {
@@ -108,17 +114,24 @@ export function detectCapabilities(): CapabilityInfo {
 export function choosePipeline(
   cap: CapabilityInfo,
   preferWorker: boolean,
+  documentAvailable: boolean = isDocumentAvailable(),
 ): 'worker-webgl2' | 'main-webgl2' | 'canvas2d' | 'passthrough' {
   // Priority 1: Worker + OffscreenCanvas + WebGL2 (best performance)
-  if (cap.webgl2 && cap.worker && cap.offscreenCanvas && preferWorker && !Runtime.isFirefox()) {
+  if (
+    cap.webgl2 === true &&
+    cap.worker === true &&
+    cap.offscreenCanvas === true &&
+    preferWorker === true &&
+    Runtime.isFirefox() === false
+  ) {
     return 'worker-webgl2';
   }
   // Priority 2: Main-thread WebGL2 (GPU-accelerated, but blocks main thread)
-  if (cap.webgl2) {
+  if (cap.webgl2 === true) {
     return 'main-webgl2';
   }
   // Priority 3: Canvas2D (CPU-based, widely supported)
-  if (typeof document !== 'undefined') {
+  if (documentAvailable === true) {
     return 'canvas2d';
   }
   // Priority 4: Passthrough (no processing, last resort)

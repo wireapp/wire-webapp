@@ -38,6 +38,7 @@ import {URLParameter} from '../../auth/URLParameter';
 import {BaseError} from '../../error/BaseError';
 import {ClientError} from '../../error/ClientError';
 import {externalUrl} from '../../externalRoute';
+import * as browserLocationModule from '../../navigation/browserLocation';
 
 const createMockDependencies = (): LifeCycleDependencies => ({
   clientRepository: {
@@ -69,11 +70,14 @@ describe('LifeCycleRepository', () => {
   let mockDependencies: LifeCycleDependencies;
   let mockUser: any;
   let mockConversation: Partial<Conversation>;
+  let replaceLocationMock: jest.SpiedFunction<typeof browserLocationModule.replaceBrowserLocation>;
 
-  const originalLocation = window.location;
   const originalNavigator = window.navigator;
   const originalLocalStorage = window.localStorage;
   const originalAmplifyStore = amplify.store;
+  const setWindowLocation = (url: string): void => {
+    window.history.replaceState({}, '', url);
+  };
 
   beforeEach(() => {
     mockDependencies = createMockDependencies();
@@ -88,13 +92,10 @@ describe('LifeCycleRepository', () => {
       id: 'conversation-id',
     };
 
-    delete (window as any).location;
-    window.location = {
-      ...originalLocation,
-      search: '?param=value',
-      hash: '#/test',
-      replace: jest.fn(),
-    } as any;
+    setWindowLocation('/?param=value#/test');
+    replaceLocationMock = jest
+      .spyOn(browserLocationModule, 'replaceBrowserLocation')
+      .mockImplementation(() => undefined);
 
     Object.defineProperty(window, 'navigator', {
       writable: true,
@@ -115,10 +116,8 @@ describe('LifeCycleRepository', () => {
   });
 
   afterEach(() => {
-    Object.defineProperty(window, 'location', {
-      writable: true,
-      value: originalLocation,
-    });
+    replaceLocationMock.mockRestore();
+    setWindowLocation('/');
     Object.defineProperty(window, 'navigator', {
       writable: true,
       value: originalNavigator,
@@ -134,19 +133,15 @@ describe('LifeCycleRepository', () => {
 
   describe('redirectToLogin', () => {
     it('should call doSimpleRedirect for regular users', () => {
-      const mockReplace = jest.fn();
-      window.location.replace = mockReplace;
       (mockDependencies.userRepository as any).userState.self.mockReturnValue(mockUser);
 
       lifeCycleRepository.redirectToLogin(SIGN_OUT_REASON.USER_REQUESTED);
 
-      expect(mockReplace).toHaveBeenCalledWith('/auth/?param=value');
+      expect(replaceLocationMock).toHaveBeenCalledWith('/auth/?param=value');
     });
 
     it('should save redirect hash for user profiles when not signed in', () => {
-      const mockReplace = jest.fn();
-      window.location.replace = mockReplace;
-      window.location.hash = '#/user/123';
+      setWindowLocation('/?param=value#/user/123');
       (mockDependencies.userRepository as any).userState.self.mockReturnValue(mockUser);
 
       lifeCycleRepository.redirectToLogin(SIGN_OUT_REASON.NOT_SIGNED_IN);
@@ -155,25 +150,21 @@ describe('LifeCycleRepository', () => {
     });
 
     it('should add reason parameter for immediate sign out reasons', () => {
-      const mockReplace = jest.fn();
-      window.location.replace = mockReplace;
       (mockDependencies.userRepository as any).userState.self.mockReturnValue(mockUser);
 
       lifeCycleRepository.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
 
-      expect(mockReplace).toHaveBeenCalledWith(
+      expect(replaceLocationMock).toHaveBeenCalledWith(
         `/auth/?param=value&${URLParameter.REASON}=${SIGN_OUT_REASON.SESSION_EXPIRED}`,
       );
     });
 
     it('should not add reason parameter for non-immediate sign out reasons', () => {
-      const mockReplace = jest.fn();
-      window.location.replace = mockReplace;
       (mockDependencies.userRepository as any).userState.self.mockReturnValue(mockUser);
 
       lifeCycleRepository.redirectToLogin(SIGN_OUT_REASON.USER_REQUESTED);
 
-      expect(mockReplace).toHaveBeenCalledWith('/auth/?param=value');
+      expect(replaceLocationMock).toHaveBeenCalledWith('/auth/?param=value');
     });
   });
 
@@ -181,8 +172,6 @@ describe('LifeCycleRepository', () => {
     it('should redirect to website for temporary guest leaving', () => {
       const websiteUrl = 'https://wire.com';
       (externalUrl as any).website = websiteUrl;
-      const mockReplace = jest.fn();
-      window.location.replace = mockReplace;
 
       const guestUser = {
         ...mockUser,
@@ -192,13 +181,11 @@ describe('LifeCycleRepository', () => {
 
       lifeCycleRepository.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
 
-      expect(mockReplace).toHaveBeenCalledWith(websiteUrl);
+      expect(replaceLocationMock).toHaveBeenCalledWith(websiteUrl);
     });
 
     it('should use doSimpleRedirect if no website URL for guest', () => {
       (externalUrl as any).website = undefined;
-      const mockReplace = jest.fn();
-      window.location.replace = mockReplace;
 
       const guestUser = {
         ...mockUser,
@@ -208,24 +195,20 @@ describe('LifeCycleRepository', () => {
 
       lifeCycleRepository.redirectToLogin(SIGN_OUT_REASON.SESSION_EXPIRED);
 
-      expect(mockReplace).toHaveBeenCalledWith(
+      expect(replaceLocationMock).toHaveBeenCalledWith(
         `/auth/?param=value&${URLParameter.REASON}=${SIGN_OUT_REASON.SESSION_EXPIRED}`,
       );
     });
 
     it('should use doSimpleRedirect for non-guest users', () => {
-      const mockReplace = jest.fn();
-      window.location.replace = mockReplace;
       (mockDependencies.userRepository as any).userState.self.mockReturnValue(mockUser);
 
       lifeCycleRepository.redirectToLogin(SIGN_OUT_REASON.USER_REQUESTED);
 
-      expect(mockReplace).toHaveBeenCalledWith('/auth/?param=value');
+      expect(replaceLocationMock).toHaveBeenCalledWith('/auth/?param=value');
     });
 
     it('should use doSimpleRedirect for non-temporary guest reasons', () => {
-      const mockReplace = jest.fn();
-      window.location.replace = mockReplace;
       const guestUser = {
         ...mockUser,
         isTemporaryGuest: jest.fn().mockReturnValue(true),
@@ -234,7 +217,7 @@ describe('LifeCycleRepository', () => {
 
       lifeCycleRepository.redirectToLogin(SIGN_OUT_REASON.CLIENT_REMOVED);
 
-      expect(mockReplace).toHaveBeenCalledWith(
+      expect(replaceLocationMock).toHaveBeenCalledWith(
         `/auth/?param=value&${URLParameter.REASON}=${SIGN_OUT_REASON.CLIENT_REMOVED}`,
       );
     });
@@ -553,7 +536,7 @@ describe('LifeCycleRepository', () => {
       });
 
       it('should logout via backend when online for non-immediate reasons', async () => {
-        window.navigator = {...originalNavigator, onLine: true} as any;
+        Object.defineProperty(window.navigator, 'onLine', {configurable: true, value: true});
 
         await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
 
@@ -570,7 +553,7 @@ describe('LifeCycleRepository', () => {
       });
 
       it('should wait for online connectivity when offline', async () => {
-        window.navigator = {...originalNavigator, onLine: false} as any;
+        Object.defineProperty(window.navigator, 'onLine', {configurable: true, value: false});
         const addEventListenerSpy = jest.spyOn(window, 'addEventListener');
 
         await lifeCycleRepository.logout(SIGN_OUT_REASON.USER_REQUESTED, false);
@@ -624,54 +607,30 @@ describe('LifeCycleRepository', () => {
 
   describe('doSimpleRedirect function', () => {
     it('should redirect to auth with search params', () => {
-      const mockReplace = jest.fn();
-      Object.defineProperty(window, 'location', {
-        value: {
-          search: '?test=1',
-          hash: '',
-          replace: mockReplace,
-        },
-        writable: true,
-      });
+      setWindowLocation('/?test=1');
 
       doSimpleRedirect(SIGN_OUT_REASON.USER_REQUESTED);
 
-      expect(mockReplace).toHaveBeenCalledWith('/auth/?test=1');
+      expect(replaceLocationMock).toHaveBeenCalledWith('/auth/?test=1');
     });
 
     it('should save redirect hash for user profiles when not signed in', () => {
-      const mockReplace = jest.fn();
       const mockSetItem = jest.spyOn(Storage.prototype, 'setItem');
-      Object.defineProperty(window, 'location', {
-        value: {
-          search: '',
-          hash: '#/user/123',
-          replace: mockReplace,
-        },
-        writable: true,
-      });
+      setWindowLocation('/#/user/123');
 
       doSimpleRedirect(SIGN_OUT_REASON.NOT_SIGNED_IN);
 
       expect(mockSetItem).toHaveBeenCalledWith('LOGIN_REDIRECT_KEY', '#/user/123');
-      expect(mockReplace).toHaveBeenCalledWith('/auth/');
+      expect(replaceLocationMock).toHaveBeenCalledWith('/auth/');
       mockSetItem.mockRestore();
     });
 
     it('should add reason parameter for immediate sign out reasons', () => {
-      const mockReplace = jest.fn();
-      Object.defineProperty(window, 'location', {
-        value: {
-          search: '',
-          hash: '',
-          replace: mockReplace,
-        },
-        writable: true,
-      });
+      setWindowLocation('/');
 
       doSimpleRedirect(SIGN_OUT_REASON.SESSION_EXPIRED);
 
-      expect(mockReplace).toHaveBeenCalledWith('/auth/?reason=expired');
+      expect(replaceLocationMock).toHaveBeenCalledWith('/auth/?reason=expired');
     });
   });
 });
