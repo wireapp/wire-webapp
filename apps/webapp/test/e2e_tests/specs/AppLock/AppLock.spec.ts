@@ -21,7 +21,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {handleAppLockState, loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, withLogin} from '../../test.fixtures';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from '../../test.fixtures';
 
 test.describe('AppLock', () => {
   let owner: User;
@@ -185,7 +185,7 @@ test.describe('AppLock', () => {
         await loginUser(memberA, pageManager);
 
         // App lock setup modal should appear again (passcode was cleared on logout, session data is preserved)
-        await expect(modals.appLock().appLockModal).toBeVisible();
+        await expect(modals.appLock().appLockModal).toBeVisible({timeout: LOGIN_TIMEOUT});
         await expect(modals.appLock().lockPasscodeInput).toBeVisible();
 
         await expect.poll(() => page.evaluate(() => indexedDB.databases())).not.toHaveLength(0);
