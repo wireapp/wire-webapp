@@ -171,6 +171,8 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     isServicesRoom,
     isTeam,
     isTeamOnly,
+    activeConversation.protocol,
+    isAppsEnabled,
   ]);
 
   const manageServicesUrl = getManageServicesUrl('client_landing');
