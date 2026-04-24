@@ -394,7 +394,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       const clientEntities = recipients[userEntity.id];
       const tooManyClients = clientEntities.length > 8;
       if (tooManyClients) {
-        this.logger.debug(`Found '${clientEntities.length}' clients for '${userEntity.name()}'`);
+        this.logger.debug(`Found '${clientEntities.length}' clients for user`);
       }
       userEntity.devices(clientEntities);
     });
