@@ -94,13 +94,7 @@ describe('serviceOptions', () => {
     },
   ])(
     'should make toggle visibility $expectedToggleToBeVisible',
-    ({
-      protocol,
-      isAppsEnabled,
-      isServicesRoom,
-      isGuestAndServicesRoom,
-      expectedToggleToBeVisible,
-    }) => {
+    ({protocol, isAppsEnabled, isServicesRoom, isGuestAndServicesRoom, expectedToggleToBeVisible}) => {
       // Arrange
       const mockTeamState: Partial<TeamState> = {
         isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
