@@ -1860,6 +1860,8 @@ declare module 'I18n/en-US.json' {
     'selfNotSupportMLSMsgPart1': `You can\'t communicate with {selfUserName}, as your device doesn\'t support the suitable protocol.`;
     'selfNotSupportMLSMsgPart2': `to call, and send messages and files.`;
     'selfProfileImageAlt': `Your profile picture`;
+    'serviceDetailsAuthor': `Created by {author}`;
+    'serviceDetailsDescription': `Description`;
     'servicesNotEnabledBody': `To improve your workflow with apps, your team needs configuration. Please contact your team admin.`;
     'servicesNotEnabledNoteTitle': `Your team doesn\'t use apps yet`;
     'servicesOptionsTitle': `Apps`;

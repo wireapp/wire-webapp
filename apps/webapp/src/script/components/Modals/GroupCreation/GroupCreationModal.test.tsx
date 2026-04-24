@@ -16,7 +16,6 @@ import {TypeUtil} from '@wireapp/commons';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
-  hasWhitelistedServices: boolean;
   isMLSEnabled: boolean;
   defaultProtocol: CONVERSATION_PROTOCOL;
   expectedAppsEnabled: boolean;
@@ -27,37 +26,33 @@ describe('GroupCreationModal', () => {
     // PROTEUS
     {
       defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
-      isAppsEnabled: false,
-      hasWhitelistedServices: true,
+      isAppsEnabled: true,
       isMLSEnabled: false,
       expectedAppsEnabled: true,
     },
     {
       defaultProtocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
-      hasWhitelistedServices: false,
       isMLSEnabled: false,
-      expectedAppsEnabled: false,
+      expectedAppsEnabled: true,
     },
 
     // MLS
     {
       defaultProtocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: false,
-      hasWhitelistedServices: true,
       isMLSEnabled: true,
       expectedAppsEnabled: false,
     },
     {
       defaultProtocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: true,
-      hasWhitelistedServices: false,
       isMLSEnabled: true,
       expectedAppsEnabled: true,
     },
   ])(
     'should result in expectedAppsEnabled=$expectedAppsEnabled when { protocol: $defaultProtocol, appsEnabled: $isAppsEnabled, whitelisted: $hasWhitelistedServices, mlsEnabled: $isMLSEnabled }',
-    ({isAppsEnabled, hasWhitelistedServices, isMLSEnabled, defaultProtocol, expectedAppsEnabled}) => {
+    ({isAppsEnabled, isMLSEnabled, defaultProtocol, expectedAppsEnabled}) => {
       // Arrange
       const mockUser = new User('user-id', 'test-domain.wire.com');
 
@@ -71,7 +66,6 @@ describe('GroupCreationModal', () => {
       const mockTeamState: TypeUtil.RecursivePartial<TeamState> = {
         isMLSEnabled: ko.pureComputed(() => isMLSEnabled),
         isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
-        hasWhitelistedServices: ko.observable(hasWhitelistedServices),
         isTeam: ko.pureComputed(() => true),
         teamFeatures: ko.observable({
           mls: {

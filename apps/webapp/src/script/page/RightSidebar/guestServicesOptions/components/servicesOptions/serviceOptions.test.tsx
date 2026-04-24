@@ -27,7 +27,6 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 type TestData = {
   protocol: CONVERSATION_PROTOCOL;
   isAppsEnabled: boolean;
-  hasWhitelistedServices: boolean;
   isServicesRoom: boolean;
   isGuestAndServicesRoom: boolean;
   expectedToggleToBeVisible: boolean;
@@ -38,16 +37,7 @@ describe('serviceOptions', () => {
     // PROTEUS
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
-      isAppsEnabled: true,
-      hasWhitelistedServices: false,
-      isServicesRoom: false,
-      isGuestAndServicesRoom: false,
-      expectedToggleToBeVisible: false,
-    },
-    {
-      protocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
-      hasWhitelistedServices: false,
       isServicesRoom: true,
       isGuestAndServicesRoom: false,
       expectedToggleToBeVisible: true,
@@ -55,7 +45,6 @@ describe('serviceOptions', () => {
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
-      hasWhitelistedServices: false,
       isServicesRoom: false,
       isGuestAndServicesRoom: true,
       expectedToggleToBeVisible: true,
@@ -63,7 +52,6 @@ describe('serviceOptions', () => {
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
-      hasWhitelistedServices: true,
       isServicesRoom: false,
       isGuestAndServicesRoom: false,
       expectedToggleToBeVisible: true,
@@ -71,7 +59,6 @@ describe('serviceOptions', () => {
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
-      hasWhitelistedServices: true,
       isServicesRoom: true,
       isGuestAndServicesRoom: false,
       expectedToggleToBeVisible: true,
@@ -80,7 +67,6 @@ describe('serviceOptions', () => {
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: false,
-      hasWhitelistedServices: true,
       isServicesRoom: false,
       isGuestAndServicesRoom: false,
       expectedToggleToBeVisible: false,
@@ -88,7 +74,6 @@ describe('serviceOptions', () => {
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: false,
-      hasWhitelistedServices: false,
       isServicesRoom: true,
       isGuestAndServicesRoom: false,
       expectedToggleToBeVisible: true,
@@ -96,7 +81,6 @@ describe('serviceOptions', () => {
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: true,
-      hasWhitelistedServices: false,
       isServicesRoom: false,
       isGuestAndServicesRoom: false,
       expectedToggleToBeVisible: true,
@@ -104,24 +88,15 @@ describe('serviceOptions', () => {
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: true,
-      hasWhitelistedServices: false,
       isServicesRoom: true,
       isGuestAndServicesRoom: false,
       expectedToggleToBeVisible: true,
     },
   ])(
     'should make toggle visibility $expectedToggleToBeVisible',
-    ({
-      protocol,
-      isAppsEnabled,
-      hasWhitelistedServices,
-      isServicesRoom,
-      isGuestAndServicesRoom,
-      expectedToggleToBeVisible,
-    }) => {
+    ({protocol, isAppsEnabled, isServicesRoom, isGuestAndServicesRoom, expectedToggleToBeVisible}) => {
       // Arrange
       const mockTeamState: Partial<TeamState> = {
-        hasWhitelistedServices: ko.observable(hasWhitelistedServices),
         isAppsEnabled: ko.pureComputed(() => isAppsEnabled),
       };
 

@@ -281,6 +281,24 @@ describe('TitleBar', () => {
 
     expect(getByText('guestRoomConversationBadge')).toBeDefined();
   });
+
+  it.each([
+    {hasServices: false, hasApps: true},
+    {hasServices: true, hasApps: false},
+    {hasServices: true, hasApps: true},
+  ])(
+    "displays 'apps are active' badge when the conversation hasServices: $hasServices and hasApps: $hasApps",
+    ({hasServices, hasApps}) => {
+      const conversation = createConversationEntity({
+        hasService: ko.pureComputed(() => hasServices),
+        hasApps: ko.pureComputed(() => hasApps),
+      });
+
+      const {queryByText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
+
+      expect(queryByText('guestRoomConversationBadgeService')).toBeInTheDocument();
+    },
+  );
 });
 
 function createUser(activated: boolean = true) {

@@ -38,6 +38,7 @@ import {Text} from './message/Text';
 import {User} from './User';
 
 import {entities} from '../../../../test/api/payloads';
+import {UserType} from '@wireapp/api-client/lib/user';
 
 describe('Conversation', () => {
   let conversation_et: Conversation = null;
@@ -715,6 +716,23 @@ describe('Conversation', () => {
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
 
       expect(conversation_et.hasService()).toBe(true);
+    });
+  });
+
+  describe('hasApps', () => {
+    it('detects conversations with apps', () => {
+      const userEntity = new User(createUuid(), null);
+
+      conversation_et = new Conversation(createUuid());
+      conversation_et.participating_user_ets.push(userEntity);
+
+      expect(conversation_et.hasApps()).toBe(false);
+
+      const secondUserEntity = new User(createUuid(), null);
+      secondUserEntity.type = UserType.APP;
+      conversation_et.participating_user_ets.push(secondUserEntity);
+
+      expect(conversation_et.hasApps()).toBe(true);
     });
   });
 

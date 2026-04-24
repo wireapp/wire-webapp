@@ -17,40 +17,53 @@
  *
  */
 
+import {useId} from 'react';
+
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {authorLabel, description, header, panel} from 'Components/panel/ServiceDetails.styles';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 interface ServiceDetailsProps {
   service: ServiceEntity;
 }
 
 const ServiceDetails = ({service}: ServiceDetailsProps) => {
-  const {providerName, name} = useKoSubscribableChildren(service, ['providerName', 'name']);
+  const {providerName, name, author} = useKoSubscribableChildren(service, ['providerName', 'name', 'author']);
+
+  const descriptionId = useId();
 
   return (
-    <div className="panel-participant">
-      <div className="panel-participant__name" data-uie-name="status-service-name">
-        {name}
+    <div css={panel}>
+      <div css={header}>
+        <Avatar
+          css={header.avatar}
+          participant={service}
+          avatarSize={AVATAR_SIZE.X_LARGE}
+          data-uie-name="status-profile-picture"
+        />
+
+        <div css={header.info}>
+          <div css={header.info.name} data-uie-name="status-service-name">
+            {name}
+          </div>
+          <div css={header.info.subHeader} data-uie-name="status-service-provider">
+            {providerName}
+          </div>
+        </div>
       </div>
 
-      <div className="panel-participant__provider-name" data-uie-name="status-service-provider">
-        {providerName}
+      <p css={authorLabel}>{t('serviceDetailsAuthor', {author})}</p>
+
+      <div css={description}>
+        <div id={descriptionId} css={description.headline}>
+          {t('serviceDetailsDescription')}
+        </div>
+        <p aria-labelledby={descriptionId} data-uie-name="status-service-description">
+          {service.description}
+        </p>
       </div>
-
-      <Avatar
-        className="panel-participant__avatar"
-        participant={service}
-        avatarSize={AVATAR_SIZE.X_LARGE}
-        data-uie-name="status-profile-picture"
-      />
-
-      <p
-        className="panel-participant__service-description panel__info-text--margin"
-        data-uie-name="status-service-description"
-      >
-        {service.description}
-      </p>
     </div>
   );
 };

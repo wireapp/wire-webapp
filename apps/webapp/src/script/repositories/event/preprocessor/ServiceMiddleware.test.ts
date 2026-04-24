@@ -25,6 +25,7 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {createUuid} from 'Util/uuid';
 
 import {ServiceMiddleware} from './ServiceMiddleware';
+import {UserType} from '@wireapp/api-client/lib/user';
 
 function buildServiceMiddleware() {
   const selfUser = new User(createUuid());
@@ -42,12 +43,14 @@ describe('ServiceMiddleware', () => {
 
   describe('processEvent', () => {
     describe('conversation.member-join events', () => {
-      it('adds meta when services are present in the event', async () => {
+      it.each(['services', 'apps'] as const)('adds meta when %s are present in the event', async serviceType => {
         const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
         const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
 
         const service = new User();
-        service.isService = true;
+        if (serviceType === 'services') service.isService = true;
+        else service.type = UserType.APP;
+
         const userEntities = [new User(), service];
         userRepository.getUsersById.mockResolvedValue(userEntities);
 
@@ -94,12 +97,14 @@ describe('ServiceMiddleware', () => {
     });
 
     describe('conversation.one2one-creation events', () => {
-      it('adds meta when services are present in the event', async () => {
+      it.each(['services', 'apps'] as const)('adds meta when %s are present in the event', async serviceType => {
         const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
         const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
 
         const service = new User();
-        service.isService = true;
+        if (serviceType === 'services') service.isService = true;
+        else if (serviceType === 'apps') service.type = UserType.APP;
+
         const userEntities = [new User(), service];
         userRepository.getUsersById.mockResolvedValue(userEntities);
 
