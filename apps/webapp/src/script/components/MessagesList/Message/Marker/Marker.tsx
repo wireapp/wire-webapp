@@ -21,6 +21,8 @@ import {useLayoutEffect, useRef} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {ScrollToElement} from 'Components/MessagesList/Message/types';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {t} from 'Util/localizerUtil';
@@ -31,7 +33,6 @@ import {getMessagesGroupLabel} from './Marker.utils';
 import {Config} from '../../../../Config';
 import {Marker} from '../../utils/messagesGroup';
 import {MessageTime} from '../MessageTime';
-import {TabIndex} from '@wireapp/react-ui-kit';
 
 const markerStyles: Partial<Record<Marker['type'], SerializedStyles>> = {
   day: dayMarkerStyle,
