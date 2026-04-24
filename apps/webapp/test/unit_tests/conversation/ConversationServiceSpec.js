@@ -21,11 +21,9 @@ import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 
 import {TestFactory} from '../../helper/TestFactory';
-import sinon from 'sinon';
 
 describe('ConversationService', () => {
   let conversation_service = null;
-  let server = null;
   let storage_service = null;
   const testFactory = new TestFactory();
   const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
@@ -34,13 +32,11 @@ describe('ConversationService', () => {
     return testFactory.exposeConversationActors().then(() => {
       conversation_service = testFactory.conversation_service;
       storage_service = testFactory.storage_service;
-      server = sinon.fakeServer.create();
     });
   });
 
   afterEach(() => {
     storage_service.clearStores();
-    server.restore();
   });
 
   describe('save_conversation_in_db', () => {

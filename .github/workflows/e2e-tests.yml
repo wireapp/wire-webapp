@@ -80,6 +80,7 @@ jobs:
           cache: 'yarn'
 
       - run: yarn --immutable
+
       - run: yarn playwright install --only-shell --with-deps chromium
       - uses: 1password/install-cli-action@8d006a0d0a4fd505af7f7ce589e7f768385ff5e4
 
@@ -126,7 +127,12 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - run: yarn --immutable
+      - name: Install dependencies
+        run: yarn --immutable
+        env:
+          # Installation from cache is preferred to avoid hitting rate limits from npm
+          YARN_ENABLE_OFFLINE_MODE: 1
+
       - name: Install 1Password CLI
         run: |
           curl --fail --silent --show-error --location \

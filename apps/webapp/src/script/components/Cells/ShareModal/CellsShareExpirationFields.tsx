@@ -20,7 +20,6 @@
 import {useEffect, useMemo, useState} from 'react';
 
 import {DateValue, getLocalTimeZone, today} from '@internationalized/date';
-import {I18nProvider} from '@react-aria/i18n';
 import {
   Button,
   Calendar,
@@ -35,6 +34,7 @@ import {
   Dialog,
   Group,
   Heading,
+  I18nProvider,
   Popover,
 } from 'react-aria-components';
 
