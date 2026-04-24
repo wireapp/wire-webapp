@@ -443,9 +443,20 @@ export class BackgroundEffectsController {
   }
 
   private async initPipeline(type: PipelineType): Promise<void> {
+    if (this.pipelineInitialized || this.pipelineInitializing) {
+      this.logger.warn('initPipeline called more than once; ignoring subsequent call', {
+        requested: type,
+        active: this.pipeline,
+      });
+      return;
+    }
+
+    this.pipelineInitializing = true;
+
     if (!this.outputCanvas) {
       return;
     }
+
     this.detachWebGLContextHandlers();
     this.pipelineImpl?.stop();
     this.pipelineImpl = createPipeline(type);
@@ -484,13 +495,16 @@ export class BackgroundEffectsController {
 
     try {
       await this.pipelineImpl.init(initArgs);
+      this.pipelineInitialized = true;
     } catch (error) {
       this.logger.warn('BackgroundEffectsRenderingPipeline init failed, falling back to passthrough', error);
       this.pipelineImpl?.stop();
       this.pipelineImpl = new PassthroughPipeline();
       this.pipeline = 'passthrough';
-
       await this.pipelineImpl.init(initArgs);
+      this.pipelineInitialized = true;
+    } finally {
+      this.pipelineInitializing = false;
     }
 
     if (this.pipeline === 'main-webgl2') {
