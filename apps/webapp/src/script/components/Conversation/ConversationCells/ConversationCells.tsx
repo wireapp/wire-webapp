@@ -17,7 +17,7 @@
  *
  */
 
-import {memo} from 'react';
+import {memo, useEffect, useRef} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
@@ -47,10 +47,19 @@ interface ConversationCellsProps {
   userRepository: UserRepository;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
+  isSearchViewOpen: boolean;
+  onOpenSearchView: () => void;
 }
 
 export const ConversationCells = memo(
-  ({cellsRepository, userRepository, activeConversation, conversationRepository}: ConversationCellsProps) => {
+  ({
+    cellsRepository,
+    userRepository,
+    activeConversation,
+    conversationRepository,
+    isSearchViewOpen,
+    onOpenSearchView,
+  }: ConversationCellsProps) => {
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
     const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
@@ -87,11 +96,19 @@ export const ConversationCells = memo(
     });
 
     const isSearchActive = !!searchValue;
+    const wasSearchViewOpen = useRef(isSearchViewOpen);
 
     const handleClearSearch = () => {
       clearSearch();
       void refresh();
     };
+
+    useEffect(() => {
+      if (wasSearchViewOpen.current && !isSearchViewOpen && searchValue) {
+        handleClearSearch();
+      }
+      wasSearchViewOpen.current = isSearchViewOpen;
+    }, [isSearchViewOpen, searchValue]);
 
     // When search is active, refresh should trigger search reload
     const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
@@ -125,9 +142,11 @@ export const ConversationCells = memo(
       <div css={wrapperStyles}>
         <CellsHeader
           onRefresh={handleRefresh}
-          conversationQualifiedId={conversationQualifiedId}
           conversationName={name}
+          conversationQualifiedId={conversationQualifiedId}
           cellsRepository={cellsRepository}
+          isSearchViewOpen={isSearchViewOpen}
+          onOpenSearchView={onOpenSearchView}
           searchValue={searchValue}
           onSearchChange={handleSearch}
           onSearchClear={handleClearSearch}

@@ -19,19 +19,12 @@
 
 import {Breadcrumbs} from '@wireapp/react-ui-kit';
 
-import {wrapperStyles} from './CellsBreadcrumbs.styles';
-
 interface CellsBreadcrumbsProps {
   maxNotCombinedItems?: number;
   items: Array<{name: string; path: string}>;
-
   onItemClick: (item: {name: string}) => void;
 }
 
 export const CellsBreadcrumbs = ({maxNotCombinedItems, items, onItemClick}: CellsBreadcrumbsProps) => {
-  return (
-    <div css={wrapperStyles}>
-      <Breadcrumbs items={items} maxNotCombinedItems={maxNotCombinedItems} onItemClick={onItemClick} />
-    </div>
-  );
+  return <Breadcrumbs items={items} maxNotCombinedItems={maxNotCombinedItems} onItemClick={onItemClick} />;
 };

@@ -24,8 +24,9 @@ export const wrapperStyles: CSSObject = {
   justifyContent: 'space-between',
   alignItems: 'flex-start',
   flexDirection: 'column',
+  gap: '16px',
   marginBottom: '20px',
-  paddingRight: '8px',
+  padding: '0 16px',
   width: '100%',
 };
 
@@ -35,6 +36,15 @@ export const contentStyles: CSSObject = {
   justifyContent: 'space-between',
   gap: '8px',
   width: '100%',
+  minHeight: '32px',
+};
+
+export const breadcrumbsRowStyles: CSSObject = {
+  display: 'flex',
+  width: '100%',
+  height: '24px',
+  alignItems: 'center',
+  gap: '10px',
 };
 
 export const actionsStyles: CSSObject = {
@@ -44,21 +54,48 @@ export const actionsStyles: CSSObject = {
 };
 
 export const searchInputStyles: CSSObject = {
-  boxShadow: '0 0 0 0.667px transparent',
-  '.wireinput': {
-    padding: 0,
-    paddingLeft: '8px',
-    boxShadow: 'none',
-    '&:focus, &:hover, &:active': {
-      boxShadow: 'none',
-    },
-  },
+  display: 'flex',
+  width: '394px',
+  height: '32px',
+  padding: '7px 12px',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  flexShrink: 0,
+  gap: '8px',
+  borderRadius: '12px',
+  border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
+  background: 'var(--Background-Base-Primary, #FFF)',
+  boxSizing: 'border-box',
   '&:focus-within': {
-    boxShadow: '0 0 0 0.667px var(--Light-UI-Blue, #0667C8)',
+    border: '1px solid var(--Border-Accent-Color-Primary, #0667C8)',
   },
   'body.theme-dark &': {
+    border: '1px solid var(--Border-Base-Primary, #34373D)',
+    background: 'var(--Background-Base-Primary, #17181A)',
     '&:focus-within': {
-      boxShadow: '0 0 0 0.667px var(--Dark-UI-Blue, #54a6ff)',
+      border: '1px solid var(--Border-Accent-Color-Primary, #54A6FF)',
     },
+  },
+};
+
+export const searchIconStyles: CSSObject = {
+  flexShrink: 0,
+  width: '11.706px',
+  height: '12px',
+};
+
+export const searchNativeInputStyles: CSSObject = {
+  flex: 1,
+  minWidth: 0,
+  border: 'none',
+  outline: 'none',
+  background: 'transparent',
+  fontSize: '14px',
+  color: 'inherit',
+  boxShadow: 'none',
+  padding: 0,
+  '&:hover, &:focus, &:active': {
+    boxShadow: 'none',
+    outline: 'none',
   },
 };
