@@ -25,6 +25,11 @@ export const FullScreenCallPage = (page: Page) => {
   const component = page.locator('.video-calling-wrapper');
 
   const reactButton = component.getByTitle('Reactions');
+  const raiseHandButton = component.getByTestId('do-toggle-hand-raise');
+  const toggleParticipantsBtn = component.getByTestId('do-toggle-call-participants-list');
+  const selfVideoThumbnail = page.getByTestId('self-video-thumbnail-wrapper');
+  const participantListItems = component.getByTestId('list-call-ui-participants').getByRole('listitem');
+  const gridTiles = component.getByTestId('item-grid');
 
   /* Press the react button and click the given emoji within the opened toolbar */
   const sendReaction = async (emoji: '👍') => {
@@ -45,8 +50,46 @@ export const FullScreenCallPage = (page: Page) => {
     });
   };
 
+  const toggleHandRaise = async () => {
+    await raiseHandButton.click();
+  };
+
+  const toggleParticipantsList = async () => {
+    await toggleParticipantsBtn.click();
+  };
+
+  // Sidebar list of participants in the call
+  const getSidebarParticipant = (userName: string) => {
+    const participant = participantListItems.filter({hasText: userName});
+
+    return Object.assign(participant, {
+      muteIcon: participant.getByTestId('status-audio-off'),
+      guestIcon: participant.getByTestId('status-guest'),
+      // User is an active speaker
+      speakIcon: participant.getByTestId('status-active-speaking'),
+      videoIcon: participant.getByTestId('status-video'),
+      screenShareIcon: participant.getByTestId('status-screenshare'),
+    });
+  };
+
+  const getGridTile = (name: string) => {
+    const tile = gridTiles.filter({hasText: name});
+
+    return Object.assign(tile, {
+      /** Icon indicating that the given user is muted */
+      muteIcon: tile.getByTestId('mic-icon-off'),
+      videoElement: tile.locator('video'),
+    });
+  };
+
   return {
     sendReaction,
     getReaction,
+    toggleParticipantsBtn,
+    toggleHandRaise,
+    selfVideoThumbnail,
+    toggleParticipantsList,
+    getSidebarParticipant,
+    getGridTile,
   };
 };
