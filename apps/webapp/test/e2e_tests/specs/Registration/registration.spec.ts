@@ -46,12 +46,11 @@ test.describe('Registration', () => {
 
         await expect(pages.registration().termsLabel).toBeVisible();
 
-        const pagePromise = pageManager.page.context().waitForEvent('page');
+        const [newTab] = await Promise.all([
+          pageManager.page.waitForEvent('popup'),
+          pages.registration().termsLabel.click(),
+        ]);
 
-        await pages.registration().termsLabel.click();
-
-        const newTab = await pagePromise;
-        await newTab.waitForLoadState();
         await expect(newTab).toHaveURL(/legal#terms/);
       },
     );
