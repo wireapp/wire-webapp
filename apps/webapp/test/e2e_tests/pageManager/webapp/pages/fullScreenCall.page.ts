@@ -28,7 +28,7 @@ export const FullScreenCallPage = (page: Page) => {
   const raiseHandButton = component.getByTestId('do-toggle-hand-raise');
   const toggleParticipantsBtn = component.getByTestId('do-toggle-call-participants-list');
   const selfVideoThumbnail = page.getByTestId('self-video-thumbnail-wrapper');
-  const participantListItems = component.getByTestId('list-call-ui-participants').getByRole('listitem');
+  const callingParticipants = component.getByTestId('list-call-ui-participants').getByRole('listitem');
   const gridTiles = component.getByTestId('item-grid');
   const nextPageButton = component.getByRole('button', {name: 'Go to next page'});
   const previousPageButton = component.getByRole('button', {name: 'Go to previous page'});
@@ -69,8 +69,8 @@ export const FullScreenCallPage = (page: Page) => {
   };
 
   // Sidebar list of participants in the call
-  const getSidebarParticipant = (userName: string) => {
-    const participant = participantListItems.filter({hasText: userName});
+  const getCallingParticipant = (userName: string) => {
+    const participant = callingParticipants.filter({hasText: userName});
 
     return Object.assign(participant, {
       muteIcon: participant.getByTestId('status-audio-off'),
@@ -80,6 +80,15 @@ export const FullScreenCallPage = (page: Page) => {
       videoIcon: participant.getByTestId('status-video'),
       screenShareIcon: participant.getByTestId('status-screenshare'),
       menuButton: participant.getByTestId('participant-menu-icon'),
+      openContextMenu: async () => {
+        await participant.getByTestId('participant-menu-icon').click();
+        const contextMenu = page.getByRole('menu');
+
+        return Object.assign(contextMenu, {
+          muteButton: contextMenu.getByRole('button', {name: 'Mute', exact: true}),
+          muteOthersButton: contextMenu.getByRole('button', {name: 'Mute everyone else'}),
+        });
+      },
     });
   };
 
@@ -101,7 +110,7 @@ export const FullScreenCallPage = (page: Page) => {
     selfVideoThumbnail,
     gridTiles,
     toggleParticipantsList,
-    getSidebarParticipant,
+    getCallingParticipant,
     getGridTile,
     goToNextPage,
     goToPreviousPage,
