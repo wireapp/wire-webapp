@@ -341,4 +341,95 @@ test.describe('Reply', () => {
       await expect(pages.conversationDetails().conversationDetails).toBeVisible();
     },
   );
+
+  test('I want to edit my reply', {tag: ['@TC-3019', '@regression']}, async ({createPage}) => {
+    const [userAPageManager, userBPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+    ]);
+
+    const {pages: userAPages} = userAPageManager.webapp;
+    const conversationName = 'Group Conversation';
+
+    await test.step('Prerequisites: Setup group and open conversations', async () => {
+      await createGroup(userBPages, conversationName, [userA]);
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    });
+
+    await test.step('User B sends a message to User A', async () => {
+      await userBPages.conversation().sendMessage('Original Message');
+    });
+
+    await test.step('User B opens another conversation', async () => {
+      await userBPages.conversationList().openConversation(conversationName);
+    });
+
+    await test.step("User A replies to User B's message", async () => {
+      const messageToReplyTo = userAPages.conversation().getMessage({content: 'Original Message'});
+      await userAPages.conversation().replyToMessage(messageToReplyTo);
+      await userAPages.conversation().sendMessage('Reply');
+
+      const unreadReplyIndicator = userBPages
+        .conversationList()
+        .getConversationLocator(userA.fullName, {protocol: 'mls'}).unreadReplyIndicator;
+      await expect(unreadReplyIndicator).toBeVisible();
+    });
+
+    await test.step('User A edits the reply message', async () => {
+      const replyMessage = userAPages.conversation().getMessage({content: 'Reply'});
+      await userAPages.conversation().editMessage(replyMessage);
+      await expect(userAPages.conversation().replyQuoteBoxAboveMessageInputField).not.toBeVisible();
+      await userAPages.conversation().sendMessage('Edited Message');
+    });
+
+    await test.step('User B edits original message', async () => {
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      const originalMessage = userBPages.conversation().getMessage({content: 'Original Message', sender: userB});
+      await userBPages.conversation().editMessage(originalMessage);
+      await userBPages.conversation().sendMessage('Edited Original Message');
+
+      // Check that quote in reply by User A is reflecting the changes to original message
+      const replyFromUserA = userBPages.conversation().getMessage({content: 'Edited Message', sender: userA});
+      await expect(replyFromUserA.getByTestId('quote-item')).toContainText('Edited Original Message');
+    });
+
+    const originalLink = 'www.lidl.de';
+
+    await test.step('User B sends another message with text and url', async () => {
+      await userBPages.conversation().sendMessage(`Here is a great link: ${originalLink}`);
+    });
+
+    await test.step('User A replies to the new message', async () => {
+      const linkMessageFromUserB = userAPages
+        .conversation()
+        .getMessage({content: `Here is a great link: ${originalLink}`});
+      await userAPages.conversation().replyToMessage(linkMessageFromUserB);
+      await userAPages.conversation().sendMessage('Reply to the link message');
+    });
+
+    await test.step('User B edits the url in the original message', async () => {
+      const linkMessage = userBPages.conversation().getMessage({content: `Here is a great link: ${originalLink}`});
+      await userBPages.conversation().editMessage(linkMessage);
+      await userBPages.conversation().sendMessage('Here is another great link: www.kaufland.de');
+
+      const linkFromUserB = userAPages
+        .conversation()
+        .getMessage({content: 'Here is another great link: www.kaufland.de', sender: userB});
+      await expect(linkFromUserB).toBeVisible();
+    });
+
+    await test.step('User A clicks on the url in the quotes message', async () => {
+      const replyMessageToLink = userAPages
+        .conversation()
+        .getMessage({content: 'Reply to the link message', sender: userA});
+
+      const [newTab] = await Promise.all([
+        userAPageManager.page.waitForEvent('popup'),
+        replyMessageToLink.getByTestId('quote-item').getByRole('link').click(),
+      ]);
+
+      await expect(newTab).toHaveURL(/www.kaufland.de/);
+    });
+  });
 });
