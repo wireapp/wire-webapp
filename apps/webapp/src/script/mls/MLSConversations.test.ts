@@ -25,6 +25,7 @@ import {randomUUID} from 'crypto';
 import {Account} from '@wireapp/core';
 
 import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
+import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/CoreSingleton';
@@ -70,6 +71,21 @@ describe('MLSConversations', () => {
       for (const conversation of mlsConversations) {
         expect(joinSpy).toHaveBeenCalledWith(conversation.qualifiedId);
       }
+    });
+
+    it('does not join MLS groups for past member conversations', async () => {
+      const mlsConversation = createMLSConversation(CONVERSATION_TYPE.REGULAR, 1);
+      mlsConversation.status(ConversationStatus.PAST_MEMBER);
+
+      const conversationRepository = await testFactory.exposeConversationActors();
+      const repositoryCore = (conversationRepository as any).core as Core;
+
+      jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');
+
+      await initMLSGroupConversations([mlsConversation], conversationRepository, {core: repositoryCore});
+
+      expect(joinSpy).not.toHaveBeenCalled();
     });
   });
 
