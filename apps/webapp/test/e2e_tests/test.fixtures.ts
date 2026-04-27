@@ -71,19 +71,6 @@ export type Team = {
 export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
-  // Temporary workaround to add the test id as annotation instead of tag so Testiny can pick it up
-  // The following test suites need to be updated to be individual tests: AppLock, Connections, RegisterSpecs
-  _beforeEach: [
-    async ({}, use, testInfo) => {
-      const testid = testInfo.tags.find(tag => tag.startsWith('@TC'));
-      if (testid && !testInfo.annotations.some(annotation => annotation.type === 'testid')) {
-        testInfo.annotations.push({type: 'testid', description: testid.slice(1)});
-      }
-
-      await use();
-    },
-    {auto: true},
-  ],
   api: async ({}, use) => {
     // Create a new instance of ApiManager for each test
     await use(new ApiManagerE2E());
