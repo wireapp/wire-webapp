@@ -54,7 +54,7 @@ export function detectCapabilities(): CapabilityInfo {
   // Check for OffscreenCanvas support (enables worker-based rendering)
   const offscreenCanvas = typeof OffscreenCanvas !== 'undefined';
   // Check for Web Worker support (enables background thread processing)
-  const worker = typeof Worker !== 'undefined';
+  const worker = typeof Worker !== 'undefined' && Runtime.isFirefox() === false;
   // Check for requestVideoFrameCallback (better than requestAnimationFrame for video)
   const requestVideoFrameCallback =
     is.undefined(HTMLVideoElement) === false && 'requestVideoFrameCallback' in HTMLVideoElement.prototype;

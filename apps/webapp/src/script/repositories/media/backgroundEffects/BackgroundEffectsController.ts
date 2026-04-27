@@ -39,12 +39,11 @@ import {
   type Metrics,
   QualityMode,
   type QualityTier,
-  StartOptions,
 } from './backgroundEffectsWorkerTypes';
 import {detectCapabilities} from './helper/capability';
-import {defaultOpts, ProcessVideoTrackOptions} from './pipe/options';
+import {defaultOpts, ImageBackgroundSource, ProcessVideoTrackOptions} from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
-import {runSegmenter, SegmenterStats} from './pipe/segmenter';
+import {runSegmenter} from './pipe/segmenter';
 
 export class BackgroundEffectsController {
   private readonly logger: Logger;
@@ -77,9 +76,11 @@ export class BackgroundEffectsController {
 
   public async start(
     inputTrack: MediaStreamTrack,
-    options: StartOptions = {},
+    options: ProcessVideoTrackOptions,
   ): Promise<{outputTrack: MediaStreamTrack; stop: () => void}> {
     this.refcount++;
+
+    this.onMetrics = options.onMetrics;
 
     const trackCapabilities = inputTrack.getCapabilities();
     const trackSettings = inputTrack.getSettings();
@@ -137,13 +138,13 @@ export class BackgroundEffectsController {
       );
 
       this.worker.addEventListener('message', ({data}) => {
-        const {name, stats} = data as {name: string; stats: SegmenterStats};
+        const {name, stats} = data as {name: string; stats: Metrics};
         if (name === 'stats') {
-          this.onStats(stats);
+          this.onMetrics(stats);
         }
       });
     } else {
-      await runSegmenter(offscreen, readable, this.options, stats => this.onStats(stats));
+      await runSegmenter(offscreen, readable, this.options, stats => this.onMetrics(stats));
     }
 
     return {
@@ -153,10 +154,6 @@ export class BackgroundEffectsController {
   }
 
   private unloadBackground() {}
-
-  private onStats(stats: SegmenterStats) {
-    this.logger.info('onStats', stats);
-  }
 
   public stop(): void {}
 
@@ -177,7 +174,7 @@ export class BackgroundEffectsController {
   }
 
   /// --- interface
-  public setBackgroundSource(source: HTMLImageElement | HTMLVideoElement | ImageBitmap): void {
+  public setBackgroundSource(source: ImageBackgroundSource): void {
     this.logger.info('setBackgroundSource', source);
   }
 

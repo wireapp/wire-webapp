@@ -17,8 +17,10 @@
  *
  */
 
+import {Metrics} from 'Repositories/media/backgroundEffects';
+
 import {ProcessVideoTrackOptions} from './options';
-import {runSegmenter, options, SegmenterStats} from './segmenter';
+import {runSegmenter, options} from './segmenter';
 
 self.onmessage = ({data}) => {
   // console.log(`[virtual-background] worker onmessage`, data);
@@ -36,7 +38,7 @@ self.onmessage = ({data}) => {
       readable: ReadableStream;
       options: ProcessVideoTrackOptions;
     };
-    runSegmenter(canvas, readable, opts, (stats: SegmenterStats) => {
+    runSegmenter(canvas, readable, opts, (stats: Metrics) => {
       self.postMessage({name: 'stats', stats});
     }).catch((err: unknown) => {
       console.error(`[virtual-background] video error: ${(err as Error).message}`);

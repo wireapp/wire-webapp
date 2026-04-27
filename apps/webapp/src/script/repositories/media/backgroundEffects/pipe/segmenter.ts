@@ -23,6 +23,9 @@ import {VideoFilter} from './filter';
 import {ProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
+import type {Metrics} from '../backgroundEffectsWorkerTypes';
+import {createMetricsWindow, pushMetricsSample, buildMetrics} from '../helper/metrics';
+
 export let options = {} as ProcessVideoTrackOptions;
 
 async function createSegmenter(canvas: OffscreenCanvas) {
@@ -52,14 +55,17 @@ async function createSegmenter(canvas: OffscreenCanvas) {
 
 export type SegmenterStats = {
   fps: number;
-  delay: number;
+  totalMs: number;
+  segmentationMs: number;
+  gpuMs: number;
+  filterMs: number;
 };
 
 export async function runSegmenter(
   canvas: OffscreenCanvas,
   readable: ReadableStream,
   opts: ProcessVideoTrackOptions,
-  onStats: (stats: SegmenterStats) => void,
+  onMetrics: (metrics: Metrics) => void,
 ) {
   // console.log(`[virtual-background] runSegmenter`, {canvas, options, readable});
   options = opts;
@@ -69,10 +75,8 @@ export async function runSegmenter(
   function onContextLost(event: Event) {
     // console.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
     event.preventDefault();
-    if (webGLRenderer) {
-      webGLRenderer.close();
-      webGLRenderer = null;
-    }
+    webGLRenderer?.close();
+    webGLRenderer = null;
   }
 
   function onContextRestored() {
@@ -111,10 +115,31 @@ export async function runSegmenter(
   const videoFilter = new VideoFilter(effectsCanvas);
 
   const useSelfieModel = !!options.modelPath?.includes('selfie_segmenter');
-  let lastStatsTime = 0;
-  let segmenterDelayTotal = 0;
+
+  // Metrics
+  const metricsWindow = createMetricsWindow(60);
+
+  let lastStatsTime = performance.now();
+  let totalMsSum = 0;
+  let segmentationMsSum = 0;
+  let gpuMsSum = 0;
+  let filterMsSum = 0;
   let frames = 0;
   let totalFrames = 0;
+  const droppedFrames = 0;
+
+  function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number) {
+    pushMetricsSample(metricsWindow, {totalMs, segmentationMs, gpuMs});
+
+    onMetrics(
+      buildMetrics(
+        metricsWindow,
+        droppedFrames,
+        'superhigh', // falls du keine Tier-Logik hast
+        'GPU',
+      ),
+    );
+  }
 
   function close() {
     segmenter.close();
@@ -133,48 +158,93 @@ export async function runSegmenter(
           videoFrame.close();
           return;
         }
-        const start = performance.now();
-        if (options.enabled) {
-          if (options.enableFilters) {
-            videoFilter.render(videoFrame, options.blur, options.brightness, options.contrast, options.gamma);
-          }
-          await new Promise<void>(resolve => {
-            segmenter.segmentForVideo(options.enableFilters ? effectsCanvas : videoFrame, timestamp * 1000, result => {
-              try {
-                if (!result.categoryMask || !result.confidenceMasks || !result.confidenceMasks[0]) {
-                  console.warn('Skipping frame: Missing masks or WebGL data.');
-                  return;
-                }
-                const categoryMask = result.categoryMask;
-                const confidenceMask = result.confidenceMasks[0];
-                const categoryTextureMP = categoryMask.getAsWebGLTexture();
-                const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
-                webGLRenderer?.render(videoFrame, options, categoryTextureMP, confidenceTextureMP, useSelfieModel);
-                categoryMask.close();
-                confidenceMask.close();
-              } catch (e) {
-                console.error('Error in videoCallback:', e);
-              } finally {
-                resolve();
-              }
-            });
-          });
-        } else {
-          webGLRenderer?.render(videoFrame, options);
-        }
-        videoFrame.close();
 
-        // Stats report.
-        const now = performance.now();
-        segmenterDelayTotal += now - start;
+        // start to process the frame
+        const frameStart = performance.now();
+
+        let filterMs = 0;
+        let segmentationMs = 0;
+        let gpuMs = 0;
+
+        try {
+          if (options.enabled) {
+            if (options.enableFilters) {
+              const filterStart = performance.now();
+              videoFilter.render(videoFrame, options.blur, options.brightness, options.contrast, options.gamma);
+              filterMs = performance.now() - filterStart;
+            }
+
+            const segStart = performance.now();
+
+            await new Promise<void>(resolve => {
+              segmenter.segmentForVideo(
+                options.enableFilters ? effectsCanvas : videoFrame,
+                timestamp * 1000,
+                result => {
+                  segmentationMs = performance.now() - segStart;
+
+                  const categoryMask = result.categoryMask;
+                  const confidenceMask = result.confidenceMasks?.[0];
+
+                  try {
+                    if (!categoryMask || !confidenceMask) {
+                      console.warn('Skipping frame: Missing masks or WebGL data.');
+                      return;
+                    }
+
+                    const categoryTextureMP = categoryMask.getAsWebGLTexture();
+                    const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
+
+                    const gpuStart = performance.now();
+                    webGLRenderer?.render(videoFrame, options, categoryTextureMP, confidenceTextureMP, useSelfieModel);
+                    gpuMs = performance.now() - gpuStart;
+                  } catch (e) {
+                    console.error('Error in videoCallback:', e);
+                  } finally {
+                    categoryMask?.close();
+                    confidenceMask?.close();
+                    resolve();
+                  }
+                },
+              );
+            });
+          } else {
+            const gpuStart = performance.now();
+            webGLRenderer?.render(videoFrame, options);
+            gpuMs = performance.now() - gpuStart;
+          }
+        } finally {
+          videoFrame.close();
+        }
+
+        const totalMs = performance.now() - frameStart;
+
+        totalMsSum += totalMs;
+        segmentationMsSum += segmentationMs;
+        gpuMsSum += gpuMs;
+        filterMsSum += filterMs;
+
+        updateMetrics(totalMs, segmentationMs, gpuMs);
+
         frames++;
         totalFrames++;
+
+        const now = performance.now();
+
         if (now - lastStatsTime > 2000) {
-          const delay = segmenterDelayTotal / frames;
-          const fps = (1000 * frames) / (now - lastStatsTime);
-          onStats({delay, fps});
+          // onStats({
+          //   fps: (1000 * frames) / (now - lastStatsTime),
+          //   totalMs: totalMsSum / frames,
+          //   segmentationMs: segmentationMsSum / frames,
+          //   gpuMs: gpuMsSum / frames,
+          //   filterMs: filterMsSum / frames,
+          // });
+
           lastStatsTime = now;
-          segmenterDelayTotal = 0;
+          totalMsSum = 0;
+          segmentationMsSum = 0;
+          gpuMsSum = 0;
+          filterMsSum = 0;
           frames = 0;
         }
 
@@ -183,6 +253,7 @@ export async function runSegmenter(
           restartSegmenter();
         }
       },
+
       close() {
         // console.log('[virtual-background] runSegmenter close');
         close();

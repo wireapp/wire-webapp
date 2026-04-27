@@ -20,6 +20,7 @@
 import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/BackgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import {defaultOpts, ImageBackgroundSource} from 'Repositories/media/backgroundEffects/pipe/options';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -87,7 +88,7 @@ const parseStoredPreferredEffect = (stored: string | null): BackgroundEffectSele
 export class BackgroundEffectsHandler {
   private readonly logger: Logger = getLogger('BackgroundEffectsHandler');
   private readonly storage: Storage | undefined;
-  private customBackground: BackgroundSource | undefined = undefined;
+  private customBackground: ImageBackgroundSource | undefined = undefined;
   private saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private currentReleasableStream: ReleasableMediaStream | undefined = undefined;
 
@@ -149,12 +150,11 @@ export class BackgroundEffectsHandler {
 
     try {
       const {outputTrack, stop} = await this.controller.start(videoTrack, {
+        ...defaultOpts,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
         quality: 'auto',
-        targetFps: TARGET_FPS,
-        debugMode: 'off',
-        ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
+        // ...(isVirtual && backgroundSource ? {backgroundSource: backgroundSource} : null),
         onMetrics: this.onMetrics,
         onModelChange: this.onModelChange,
       });
@@ -243,7 +243,7 @@ export class BackgroundEffectsHandler {
     return this.controller.getCapabilityInfo();
   }
 
-  private async loadBackgroundSource(effect: BackgroundEffectSelection): Promise<BackgroundSource | undefined> {
+  private async loadBackgroundSource(effect: BackgroundEffectSelection): Promise<ImageBackgroundSource | undefined> {
     try {
       if (effect.type === 'virtual') {
         return await loadBackgroundSource(effect.backgroundId);

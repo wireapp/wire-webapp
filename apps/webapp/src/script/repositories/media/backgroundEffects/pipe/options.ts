@@ -1,21 +1,54 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+import {EffectMode, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
+
+export type ImageBackgroundSource = HTMLImageElement | ImageBitmap | ReadableStream;
+
 export type BackgroundSource = {
   type: string;
-  media?: ImageBitmap | ReadableStream;
+  media?: ImageBackgroundSource;
   url: string;
   video?: HTMLVideoElement;
   track?: MediaStreamTrack;
 };
 
 export type ProcessVideoTrackOptions = {
+  // MediaPipe options.
   wasmLoaderPath: string;
   wasmBinaryPath: string;
   modelPath: string;
   useWorker: boolean;
+
   // Virtual background options.
+  mode?: EffectMode; /** Effect mode ('blur', 'virtual', or 'passthrough'). Default: 'blur'. */
+  blurStrength: number;
   enabled: boolean;
-  backgroundUrl: string;
   backgroundSource?: BackgroundSource | null;
-  showStats: boolean;
+
+  // quality mode
+  quality: QualityMode;
+
+  // Metrics callback.
+  onMetrics: (metrics: Metrics) => void | null;
+  onModelChange: (model: string) => void | null;
+
   // Segmenter options.
   borderSmooth: number;
   smoothing: number;
@@ -24,6 +57,7 @@ export type ProcessVideoTrackOptions = {
   restartEvery: number;
   bgBlur: number;
   bgBlurRadius: number;
+
   // Filter options.
   enableFilters: boolean;
   blur: number;
@@ -36,13 +70,25 @@ export type ProcessVideoTrackOptions = {
  * Configuration options for the virtual background.
  */
 export const defaultOpts = {
+  // MediaPipe options.
   wasmLoaderPath: '/min/mediapipe/wasm/vision_wasm_internal.js',
   wasmBinaryPath: '/min/mediapipe/wasm/vision_wasm_internal.wasm',
   modelPath: '/assets/mediapipe-models/selfie_multiclass_256x256.tflite',
   useWorker: false,
+
+  // Virtual background options.
+  mode: 'blur',
+  blurStrength: 0,
   enabled: true,
-  backgroundUrl: '',
-  showStats: false,
+  backgroundSource: null,
+
+  // quality mode
+  quality: 'auto',
+
+  // Metrics callback.
+  onMetrics: null,
+  onModelChange: null,
+
   // Segmenter options.
   borderSmooth: 0.0,
   smoothing: 0.8,
@@ -51,6 +97,7 @@ export const defaultOpts = {
   restartEvery: 0,
   bgBlur: 0.0,
   bgBlurRadius: 30,
+
   // Filter options.
   enableFilters: false,
   blur: 0,
