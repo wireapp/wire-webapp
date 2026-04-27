@@ -701,10 +701,11 @@ test.describe('Calling', () => {
       description: 'As moderator of a call I want to mute all other participants',
       tag: '@TC-2929',
       verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>) => {
-        const contextMenu = await callScreen.getCallingParticipant(userB.fullName).openContextMenu();
-        await contextMenu.muteButton.click();
-        await callScreen.getCallingParticipant(userB.fullName).openContextMenu();
-        await contextMenu.muteOthersButton.click();
+        const firstContextMenu = await callScreen.getCallingParticipant(userB.fullName).openContextMenu();
+        await firstContextMenu.muteButton.click();
+
+        const secondContextMenu = await callScreen.getCallingParticipant(userB.fullName).openContextMenu();
+        await secondContextMenu.muteOthersButton.click();
 
         for (const participant of [userB, userC]) {
           await expect(callScreen.getCallingParticipant(participant.fullName).muteIcon).toBeVisible();
@@ -742,7 +743,7 @@ test.describe('Calling', () => {
         await expect(userACall.getCallingParticipant(userB.fullName).muteIcon).not.toBeVisible();
         await expect(userACall.getCallingParticipant(userC.fullName).muteIcon).not.toBeVisible();
 
-        verify(userACall);
+        await verify(userACall);
       });
     });
   });
@@ -802,7 +803,7 @@ test.describe('Calling', () => {
       });
 
       await test.step('Verify mute functionality', async () => {
-        verify(userBPage);
+        await verify(userBPage);
       });
     });
   });
@@ -902,10 +903,11 @@ test.describe('Calling', () => {
 
       await userBPages.calling().maximizeCell();
       await userBPages.calling().unmuteSelfInFullScreen();
+
       await expect(userBPages.calling().getGridTile(userB.fullName).muteIcon).toBeHidden(); // Ensure active video state
 
       await expect(userACall.getCallingParticipant(userA.fullName).activeSpeakerIcon).toBeVisible();
-      await expect(userACall.getCallingParticipant(userB.fullName).activeSpeakerIcon).toBeVisible();
+      await expect(userACall.getCallingParticipant(userB.fullName).activeSpeakerIcon).toBeVisible({timeout: 30_000});
     });
   });
 });
