@@ -24,14 +24,12 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
-  collaboraNewDocumentCreationMenuFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
   startupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
-  collaboraNewDocumentCreationMenuFeatureToggleName,
   applockRefactoredFeatureToggleName,
 ] as const;
 
@@ -66,14 +64,6 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
-  });
-
-  it('enables the collabora new document creation feature toggle when present in the query parameter', () => {
-    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
-      `?${startupFeatureToggleQueryParameterName}=${collaboraNewDocumentCreationMenuFeatureToggleName}`,
-    );
-
-    expect(startupFeatureToggles.isFeatureToggleEnabled(collaboraNewDocumentCreationMenuFeatureToggleName)).toBe(true);
   });
 
   it('keeps only whitelisted feature toggles when known and unknown values are mixed', () => {
@@ -136,7 +126,6 @@ describe('startupFeatureToggles', function () {
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
-      collaboraNewDocumentCreationMenuFeatureToggleName,
       applockRefactoredFeatureToggleName,
     ]);
   });
