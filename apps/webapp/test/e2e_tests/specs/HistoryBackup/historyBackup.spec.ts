@@ -357,6 +357,9 @@ test.describe('History Backup', () => {
         await userAPages.conversationDetails().deleteGroupButton.click();
         await expect(userAModals.confirm().modalTitle).toContainText('Delete group conversation?');
         await userAModals.confirm().clickAction();
+
+        // Verify conversation is gone before creating backup
+        await expect(userAPages.conversationList().getConversation(conversationName)).not.toBeVisible();
       });
 
       await test.step('User A creates History Backup', async () => {
