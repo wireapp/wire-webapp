@@ -51,4 +51,4 @@ jobs:
           jq 'walk(if type == "object" and .title and .tags then .title += ([.tags[]? | select(startswith("TC-")) | " @" + .] | join("")) else . end)' ./apps/webapp/playwright-report/report.json > ./apps/webapp/playwright-report/report-with-ids.json
 
           CURRENT_DATE=$(date +'%m/%d/%Y')
-          yarn dlx @testiny/cli testrun --project WEB --name "Regression $CURRENT_DATE" --testcases ignore --close --playwright ./apps/webapp/playwright-report/report-with-ids.json
+          yarn dlx @testiny/cli testrun -y --project WEB --name "Regression $CURRENT_DATE" --testcases ignore --close --playwright ./apps/webapp/playwright-report/report-with-ids.json
