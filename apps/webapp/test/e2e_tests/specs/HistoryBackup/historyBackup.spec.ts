@@ -27,6 +27,8 @@ import {RequestResetPasswordPage} from '../../pageManager/webapp/pages/requestRe
 test.describe('History Backup', () => {
   let userA: User;
   let userB: User;
+  const conversationName = 'Test group';
+
   test.beforeEach(async ({createTeam, createUser}) => {
     userB = await createUser();
     const team = await createTeam('Test Team', {users: [userB]});
@@ -45,7 +47,6 @@ test.describe('History Backup', () => {
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
-      const conversationName = 'Test group';
       await createGroup(userAPages, conversationName, [userB]);
 
       const messageUserA = 'Message from User A';
@@ -168,7 +169,6 @@ test.describe('History Backup', () => {
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
-      const conversationName = 'Test group';
       await createGroup(userBPages, conversationName, [userA]);
 
       const messageUserA = 'Message from User A';
@@ -228,7 +228,6 @@ test.describe('History Backup', () => {
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
-      const conversationName = 'Test group';
       await createGroup(userAPages, conversationName, [userB]);
 
       const messageUserA = 'Message from User A';
@@ -343,7 +342,6 @@ test.describe('History Backup', () => {
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
-      const conversationName = 'Test group';
       await createGroup(userAPages, conversationName, [userB]);
 
       const messageUserA = 'Message from User A';
@@ -377,6 +375,57 @@ test.describe('History Backup', () => {
       await test.step('Validate deleted group conversation is no longer visible', async () => {
         await userAComponents.conversationSidebar().allConversationsButton.click();
         await expect(userAPages.conversationList().getConversationLocator(conversationName)).not.toBeVisible();
+      });
+    },
+  );
+
+  test(
+    'I shouldn`t be able to send messages in the group conversation that I previously left after backup',
+    {tag: ['@TC-10549', '@regression']},
+    async ({createPage}, testInfo) => {
+      const [userAPageManager, userBPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userB))),
+      ]);
+      const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
+      const {pages: userBPages} = userBPageManager.webapp;
+
+      await createGroup(userBPages, conversationName, [userA]);
+
+      await test.step('User A and User B write messages to each other', async () => {
+        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversation().sendMessage('Message from User A');
+        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversation().sendMessage('Message from User B');
+        await expect(userAPages.conversation().messageItems).toHaveCount(2);
+      });
+
+      await test.step('User A leaves the group', async () => {
+        await userAPages.conversation().toggleGroupInformation();
+        await userAPages.conversation().leaveConversation();
+        await userAModals.leaveConversation().clickConfirm();
+        await expect(userAPages.conversation().systemMessages.filter({hasText: 'You left'})).toBeVisible();
+      });
+
+      const backupName = await test.step('User A creates History Backup', async () => {
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        return await createAndSaveBackup(testInfo, userAPageManager);
+      });
+
+      await test.step('User A restores backup', async () => {
+        await logOutUser(userAPageManager, true);
+        await loginUser(userA, userAPageManager);
+
+        await userAPages.historyInfo().clickConfirmButton();
+        await userAComponents.conversationSidebar().clickPreferencesButton();
+        await userAPages.account().backupFileInput.setInputFiles(backupName);
+      });
+
+      await test.step('Validate user A cannot send messages in the left group', async () => {
+        await userAComponents.conversationSidebar().allConversationsButton.click();
+        await userAPages.conversationList().openConversation(conversationName);
+        await expect(userAPages.conversation().systemMessages.filter({hasText: 'You left'})).toBeVisible();
+        await expect(userAPages.conversation().messageInput).toBeHidden();
       });
     },
   );
