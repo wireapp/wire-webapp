@@ -29,7 +29,6 @@
     "@types/jsdom": "21.1.7",
     "@types/node": "24.12.2",
     "@types/tough-cookie": "4.0.5",
-    "@types/uuid": "10.0.0",
     "@typescript-eslint/eslint-plugin": "8.59.0",
     "@typescript-eslint/parser": "8.59.0",
     "@wireapp/copy-config": "2.3.13",

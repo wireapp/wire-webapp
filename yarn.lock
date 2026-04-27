@@ -7658,15 +7658,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/axios@npm:0.14.4":
-  version: 0.14.4
-  resolution: "@types/axios@npm:0.14.4"
-  dependencies:
-    axios: "npm:*"
-  checksum: 10/51defed1e76e3fa7e63ae999c2e8c7c253be9b1a1fa3006f4413a0c461234a7e9e7e5df1bb2f64be221617fa94ed2272345ef19724dd550ad01a090510714275
-  languageName: node
-  linkType: hard
-
 "@types/babel__core@npm:^7.20.5":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -8100,15 +8091,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/libsodium-wrappers-sumo@npm:0.8.2":
-  version: 0.8.2
-  resolution: "@types/libsodium-wrappers-sumo@npm:0.8.2"
-  dependencies:
-    libsodium-wrappers-sumo: "npm:*"
-  checksum: 10/f70926d40f4e7301738ab66e8d7a8c72c12ab89ea30cd036e4b0a852315b0ed7e787940ded66b49788d96cbd8e60deab3b2274c7cf0c963b4ca455f3a9ecfbfe
-  languageName: node
-  linkType: hard
-
 "@types/libsodium-wrappers@npm:*":
   version: 0.7.14
   resolution: "@types/libsodium-wrappers@npm:0.7.14"
@@ -8127,15 +8109,6 @@ __metadata:
   version: 4.17.24
   resolution: "@types/lodash@npm:4.17.24"
   checksum: 10/0f2082565f60f9787eefc046edc38458054512be5a8b3584ef0bad5fd9e85d0ab55ec5a1fbfae1ed6ba015cf1f9e837d5fb4da1f99fc60b8f74b2a46146fb00f
-  languageName: node
-  linkType: hard
-
-"@types/long@npm:5.0.0":
-  version: 5.0.0
-  resolution: "@types/long@npm:5.0.0"
-  dependencies:
-    long: "npm:*"
-  checksum: 10/1483b703bd6257cff1c9921cdc80e36f83985bed1f7bf9a64919e29df0038c3eb5acc82b70cd0cf15e4fdd639f79976eed5f7f9053e8db152b21b9e5d202845c
   languageName: node
   linkType: hard
 
@@ -8463,13 +8436,6 @@ __metadata:
   version: 0.0.6
   resolution: "@types/use-sync-external-store@npm:0.0.6"
   checksum: 10/a95ce330668501ad9b1c5b7f2b14872ad201e552a0e567787b8f1588b22c7040c7c3d80f142cbb9f92d13c4ea41c46af57a20f2af4edf27f224d352abcfe4049
-  languageName: node
-  linkType: hard
-
-"@types/uuid@npm:10.0.0":
-  version: 10.0.0
-  resolution: "@types/uuid@npm:10.0.0"
-  checksum: 10/e3958f8b0fe551c86c14431f5940c3470127293280830684154b91dc7eb3514aeb79fe3216968833cf79d4d1c67f580f054b5be2cd562bebf4f728913e73e944
   languageName: node
   linkType: hard
 
@@ -9346,7 +9312,6 @@ __metadata:
     "@aws-sdk/lib-storage": "npm:3.1036.0"
     "@swc/core": "npm:1.15.30"
     "@swc/jest": "npm:0.2.39"
-    "@types/axios": "npm:0.14.4"
     "@types/jest": "npm:30.0.0"
     "@types/pako": "npm:2.0.4"
     "@types/spark-md5": "npm:3.0.5"
@@ -9451,7 +9416,6 @@ __metadata:
     "@swc/core": "npm:1.15.30"
     "@swc/jest": "npm:0.2.39"
     "@types/lodash": "npm:4.17.24"
-    "@types/long": "npm:5.0.0"
     "@wireapp/api-client": "npm:27.96.0"
     "@wireapp/core-crypto": "npm:9.3.3"
     "@wireapp/cryptobox": "npm:12.8.0"
@@ -9734,7 +9698,6 @@ __metadata:
     "@types/dexie-batch": "npm:0.4.7"
     "@types/js-cookie": "npm:3.0.6"
     "@types/keyboardjs": "npm:2.5.3"
-    "@types/libsodium-wrappers-sumo": "npm:0.8.2"
     "@types/linkify-it": "npm:5.0.0"
     "@types/markdown-it": "npm:14.1.2"
     "@types/open-graph": "npm:0.2.6"
@@ -18946,15 +18909,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libsodium-wrappers-sumo@npm:*":
-  version: 0.8.2
-  resolution: "libsodium-wrappers-sumo@npm:0.8.2"
-  dependencies:
-    libsodium-sumo: "npm:^0.8.0"
-  checksum: 10/fb7bffdabd01ddad70d0966235d1c3aee5ca7c1dc7922e8c28f59555b8fefc98d537076b03fe398ae5eaf22f53ceb144a976e03eb68b2f371e89d97758c6b8e5
-  languageName: node
-  linkType: hard
-
 "libsodium-wrappers-sumo@npm:0.7.9":
   version: 0.7.9
   resolution: "libsodium-wrappers-sumo@npm:0.7.9"
@@ -19220,17 +19174,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"long@npm:*, long@npm:5.3.2, long@npm:^5.0.0":
-  version: 5.3.2
-  resolution: "long@npm:5.3.2"
-  checksum: 10/b6b55ddae56fcce2864d37119d6b02fe28f6dd6d9e44fd22705f86a9254b9321bd69e9ffe35263b4846d54aba197c64882adcb8c543f2383c1e41284b321ea64
-  languageName: node
-  linkType: hard
-
 "long@npm:5.2.0":
   version: 5.2.0
   resolution: "long@npm:5.2.0"
   checksum: 10/9bb47091fea71634d9bf59f150ecc25180c44bead2e1408d78f3ff4ea68f16b38587be413b59acb46fb0bbe51e6823ec8547aa61aa8aef10cae4ff9a2538db3d
+  languageName: node
+  linkType: hard
+
+"long@npm:5.3.2, long@npm:^5.0.0":
+  version: 5.3.2
+  resolution: "long@npm:5.3.2"
+  checksum: 10/b6b55ddae56fcce2864d37119d6b02fe28f6dd6d9e44fd22705f86a9254b9321bd69e9ffe35263b4846d54aba197c64882adcb8c543f2383c1e41284b321ea64
   languageName: node
   linkType: hard
 
@@ -27357,7 +27311,6 @@ __metadata:
     "@types/jsdom": "npm:21.1.7"
     "@types/node": "npm:24.12.2"
     "@types/tough-cookie": "npm:4.0.5"
-    "@types/uuid": "npm:10.0.0"
     "@typescript-eslint/eslint-plugin": "npm:8.59.0"
     "@typescript-eslint/parser": "npm:8.59.0"
     "@wireapp/commons": "npm:5.4.13"
