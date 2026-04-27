@@ -17,10 +17,12 @@
  *
  */
 
-import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
+import type {QualifiedId, UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
+
+type ServiceType = 'Service' | 'App';
 
 export interface ServiceData {
   assets?: APIClientUserAsset[];
@@ -30,12 +32,17 @@ export interface ServiceData {
   name?: string;
   provider?: string;
   summary?: string;
+  category?: string;
+  author?: string;
   tags?: string[];
+  qualifiedId?: QualifiedId;
+  type?: ServiceType;
 }
 
 export class ServiceEntity {
   description: string;
   id: string;
+  qualifiedId?: QualifiedId;
   mediumPictureResource = ko.observable<AssetRemoteData>();
   name: ko.Observable<string>;
   previewPictureResource = ko.observable<AssetRemoteData>();
@@ -43,19 +50,26 @@ export class ServiceEntity {
   providerName: ko.Observable<string>;
   summary: string;
   tags: string[];
-  isService: boolean;
+  category?: string;
+  author?: ko.Observable<string>;
+  type: ServiceType;
+  get isService() {
+    return this.type === 'Service';
+  }
+  get isApp() {
+    return this.type === 'App';
+  }
 
   constructor(serviceData: ServiceData = {}) {
-    const {description = '', id = '', name = '', provider: providerId = '', summary = '', tags = []} = serviceData;
-
-    this.id = id;
-    this.description = description;
-    this.name = ko.observable(name);
-    this.providerId = providerId;
+    this.id = serviceData.id ?? '';
+    this.description = serviceData.description ?? '';
+    this.name = ko.observable(serviceData.name ?? '');
+    this.providerId = serviceData.provider ?? '';
     this.providerName = ko.observable(' ');
-    this.summary = summary;
-    this.tags = tags;
-
-    this.isService = true;
+    this.summary = serviceData.summary ?? '';
+    this.category = serviceData.category ?? '';
+    this.tags = serviceData.tags ?? [];
+    this.type = serviceData.type ?? 'Service';
+    this.author = ko.observable(serviceData.author ?? '');
   }
 }

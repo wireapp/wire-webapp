@@ -37,6 +37,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
+      - name: Install pinned package manager
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        run: corepack install
+
       - name: Install JS dependencies
         run: yarn --immutable
 
@@ -64,7 +69,7 @@ jobs:
         run: yarn nx run-many -t lint --all
 
       - name: Test
-        run: yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+        run: ./bin/run-with-network-isolation.sh yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
       - name: Upload webapp coverage to Codecov
         uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0

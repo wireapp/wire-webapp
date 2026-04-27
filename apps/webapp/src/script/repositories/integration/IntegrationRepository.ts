@@ -101,6 +101,10 @@ export class IntegrationRepository {
     return this.getServiceById(providerId, serviceId, entity.qualifiedId.domain);
   }
 
+  mapServiceFromUser(user: User): ServiceEntity {
+    return IntegrationMapper.mapServiceFromUser(user);
+  }
+
   /**
    * Add a service to an existing conversation.
    *

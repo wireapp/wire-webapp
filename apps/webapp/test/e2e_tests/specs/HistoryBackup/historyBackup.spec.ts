@@ -102,7 +102,7 @@ test.describe('History Backup', () => {
       await userAPages2.account().backupFileInput.setInputFiles(backupName);
 
       await test.step('Validate conversation is still visible with all messages after restoring backup', async () => {
-        await userAComponents2.conversationSidebar().allConverationsButton.click();
+        await userAComponents2.conversationSidebar().allConversationsButton.click();
         await userAPages2.conversationList().openConversation(conversationName);
         await expect(userAPages2.conversation().getMessage({sender: userB})).toContainText(messageUserB);
         await expect(userAPages2.conversation().getMessage({sender: userA})).toContainText(messageUserA);
@@ -188,7 +188,7 @@ test.describe('History Backup', () => {
       await test.step('User A creates History Backup', async () => {
         await userAComponents.conversationSidebar().clickPreferencesButton();
         backupName = await createAndSaveBackup(testInfo, userAPageManager);
-        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAComponents.conversationSidebar().allConversationsButton.click();
         await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       });
 
@@ -204,7 +204,7 @@ test.describe('History Backup', () => {
 
       await test.step('Validate User A sees renamed conversation and system message', async () => {
         // User A sees renamed conversation
-        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAComponents.conversationSidebar().allConversationsButton.click();
         await expect(userAPages.conversationList().getConversationLocator(renamedConversationName)).toBeVisible();
 
         // User A sees system message that User B had renamed the conversation
@@ -271,9 +271,11 @@ test.describe('History Backup', () => {
       });
 
       await test.step('Validate muted and archived state are the same', async () => {
-        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAComponents.conversationSidebar().allConversationsButton.click();
         await userAPages.conversationList().openConversation(conversationName);
-        await expect(await userAPages.conversationList().getMutedConversationBadge(conversationName)).toBeVisible();
+        await expect(
+          userAPages.conversationList().getConversationLocator(conversationName).mutedIndicator,
+        ).toBeVisible();
 
         await userAComponents.conversationSidebar().archiveButton.click();
         const archivedConversation = userAPages.conversationList().getConversationLocator(userB.fullName);
@@ -371,7 +373,7 @@ test.describe('History Backup', () => {
       });
 
       await test.step('Validate deleted group conversation is no longer visible', async () => {
-        await userAComponents.conversationSidebar().allConverationsButton.click();
+        await userAComponents.conversationSidebar().allConversationsButton.click();
         await expect(userAPages.conversationList().getConversationLocator(conversationName)).not.toBeVisible();
       });
     },

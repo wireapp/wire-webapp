@@ -17,7 +17,10 @@
  *
  */
 
+import {UserType} from '@wireapp/api-client/lib/user';
+
 import {mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
+import {User} from 'Repositories/entity/User';
 
 import {ProviderData, ProviderEntity} from './ProviderEntity';
 import {ServiceData, ServiceEntity} from './ServiceEntity';
@@ -84,6 +87,27 @@ export const IntegrationMapper = {
       if (tags) {
         serviceEntity.tags = tags;
       }
+    }
+
+    return serviceEntity;
+  },
+
+  mapServiceFromUser: (user: User) => {
+    const serviceEntity = new ServiceEntity();
+
+    if (user.type === UserType.APP) {
+      const {id, qualifiedId, name, description, category, previewPictureResource, mediumPictureResource} = user;
+
+      Object.assign(serviceEntity, {
+        id,
+        qualifiedId,
+        name,
+        description,
+        category,
+        previewPictureResource,
+        mediumPictureResource,
+      });
+      serviceEntity.type = 'App';
     }
 
     return serviceEntity;

@@ -51,6 +51,11 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
+      - name: Install pinned package manager
+        env:
+          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+        run: corepack install
+
       - run: yarn --immutable
       - run: yarn nx run webapp:configure
       - run: yarn nx run server:package
@@ -155,13 +160,21 @@ jobs:
 
   run_e2e_tests:
     name: Playwright Critical Flow (precommit)
-    if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ always() && github.repository == 'wireapp/wire-webapp' }}
     needs: [deploy_and_run_e2e]
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Report Status
-        run: echo "E2E tests completed with status - ${{ needs.deploy_and_run_e2e.result }}"
+        env:
+          DEPLOY_AND_RUN_E2E_RESULT: ${{ needs.deploy_and_run_e2e.result }}
+        run: |
+          echo "E2E tests completed with status - $DEPLOY_AND_RUN_E2E_RESULT"
+
+          if [ "$DEPLOY_AND_RUN_E2E_RESULT" != "success" ]; then
+            echo "Playwright Critical Flow failed because the upstream E2E workflow did not succeed."
+            exit 1
+          fi
 
   e2e-report:
     name: Generate test report

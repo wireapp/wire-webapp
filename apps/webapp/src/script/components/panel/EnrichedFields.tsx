@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useId, useState} from 'react';
 
 import type {RichInfoField} from '@wireapp/api-client/lib/user/richInfo';
 import {container} from 'tsyringe';
@@ -95,6 +95,7 @@ const EnrichedFields = ({
   );
 
   const {availability} = useKoSubscribableChildren(user, ['availability']);
+  const enrichedFieldsId = useId();
 
   if (fields?.length < 1 && !showAvailability) {
     return null;
@@ -124,10 +125,19 @@ const EnrichedFields = ({
       {fields?.length >= 1 &&
         fields.map(({type, value}) => (
           <div key={type} className="enriched-fields__entry">
-            <p className="enriched-fields__entry__key" data-uie-name="item-enriched-key">
+            <p
+              id={`${enrichedFieldsId}-${type}`}
+              className="enriched-fields__entry__key"
+              data-uie-name="item-enriched-key"
+            >
               {type}
             </p>
-            <p className="enriched-fields__entry__value" data-uie-name="item-enriched-value" data-uie-value={value}>
+            <p
+              aria-labelledby={`${enrichedFieldsId}-${type}`}
+              className="enriched-fields__entry__value"
+              data-uie-name="item-enriched-value"
+              data-uie-value={value}
+            >
               {value}
             </p>
           </div>

@@ -524,18 +524,19 @@ export class MLSService extends TypedEventEmitter<Events> {
   public async decryptMessage(
     conversationId: ConversationId,
     payload: Uint8Array,
+    qualifiedConversationId: QualifiedId,
   ): Promise<DecryptedMessage | undefined> {
     try {
       const start = Date.now();
-      this.logger.info('Decrypting message', {conversationId});
+      this.logger.info('Decrypting message', {qualifiedConversationId});
       const decryptedMessage = await this.coreCryptoClient.transaction(cx =>
         cx.decryptMessage(conversationId, payload),
       );
       this.dispatchNewCrlDistributionPoints(decryptedMessage.crlNewDistributionPoints);
-      this.logger.info('Message decrypted successfully', {conversationId, duration: Date.now() - start});
+      this.logger.info('Message decrypted successfully', {qualifiedConversationId, duration: Date.now() - start});
       return decryptedMessage;
     } catch (error: unknown) {
-      this.logger.warn('Failed to decrypt MLS message', {conversationId, error});
+      this.logger.warn('Failed to decrypt MLS message', {qualifiedConversationId, error});
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
       if (shouldMLSDecryptionErrorBeIgnored(error)) {
         return {
@@ -1039,6 +1040,17 @@ export class MLSService extends TypedEventEmitter<Events> {
    */
   public async commitPendingProposals(groupId: string, shouldRetry = true): Promise<void> {
     this.logger.info(`Committing pending proposals for groupId ${groupId}`, {shouldRetry});
+
+    const doesConversationExist = await this.conversationExists(groupId);
+    if (!doesConversationExist) {
+      this.logger.info('Skipping pending proposals commit because local MLS conversation is missing', {
+        groupId,
+        shouldRetry,
+      });
+      await this.cancelPendingProposalsTask(groupId);
+      return;
+    }
+
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     try {
@@ -1076,11 +1088,20 @@ export class MLSService extends TypedEventEmitter<Events> {
     try {
       const pendingProposals = await this.coreDatabase.getAll('pendingProposals');
       if (pendingProposals.length > 0) {
-        pendingProposals.forEach(({groupId, firingDate}) =>
-          TaskScheduler.addTask({
-            task: () => this.commitPendingProposals(groupId),
-            firingDate,
-            key: this.createPendingProposalsTaskKey(groupId),
+        await Promise.all(
+          pendingProposals.map(async ({groupId, firingDate}) => {
+            const doesConversationExist = await this.conversationExists(groupId);
+            if (!doesConversationExist) {
+              this.logger.info('Pruning stale pending proposals task for missing local MLS conversation', {groupId});
+              await this.cancelPendingProposalsTask(groupId);
+              return;
+            }
+
+            TaskScheduler.addTask({
+              task: () => this.commitPendingProposals(groupId),
+              firingDate,
+              key: this.createPendingProposalsTaskKey(groupId),
+            });
           }),
         );
       }
@@ -1124,7 +1145,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       );
     }
 
-    return handleMLSMessageAdd({event, mlsService: this, groupId});
+    return handleMLSMessageAdd({event, mlsService: this, groupId, qualifiedConversationId});
   }
 
   public async handleMLSWelcomeMessageEvent(event: ConversationMLSWelcomeEvent, clientId: string) {

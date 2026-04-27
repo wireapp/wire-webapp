@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {
   ADD_PERMISSION,
   Conversation as BackendConversation,
@@ -2365,15 +2366,10 @@ export class ConversationRepository {
     const conversationIds = this.conversationState.conversations().map(conversation => conversation.qualifiedId);
     const {not_found = []} = await this.conversationService.getConversationByIds(conversationIds);
     for (const inccessibleConversation of not_found) {
-      try {
-        // a conversation marked `not_found` could be either non existing on backend or it could mean the self user is not part of it
-        // We need to check if the conversation exists on backend
-        await this.conversationService.getConversationById(inccessibleConversation);
-      } catch (error: unknown) {
-        if (isBackendError(error) && error.label === BackendErrorLabel.NO_CONVERSATION) {
-          // Only if the conversation triggers a not found error, we delete it locally
-          await this.deleteConversationLocally(inccessibleConversation, true);
-        }
+      // a conversation marked `not_found` could be either non existing on backend or it could mean the self user is not part of it
+      const conversationEntity = this.conversationState.findConversation(inccessibleConversation);
+      if (!is.nullOrUndefined(conversationEntity)) {
+        conversationEntity.status(ConversationStatus.PAST_MEMBER);
       }
     }
   }
@@ -2398,7 +2394,7 @@ export class ConversationRepository {
    * @param connections Connections entities
    */
   private async mapConnections(connections: ConnectionEntity[]): Promise<void> {
-    this.logger.debug(`Mapping '${connections.length}' user connection(s) to conversations`, connections);
+    this.logger.debug(`Mapping '${connections.length}' user connection(s) to conversations`);
     for (const connection of connections) {
       try {
         await this.mapConnection(connection);
@@ -2641,7 +2637,7 @@ export class ConversationRepository {
    * @param userEntities Users to be added to the conversation
    * @returns Resolves when members were added
    */
-  async addUsers(conversation: Conversation, userEntities: User[]) {
+  async addUsers(conversation: Conversation, userEntities: Pick<User, 'qualifiedId'>[]) {
     /**
      * ToDo: Fetch all MLS Events from backend before doing anything else
      * Needs to be done to receive the latest epoch and avoid epoch mismatch errors

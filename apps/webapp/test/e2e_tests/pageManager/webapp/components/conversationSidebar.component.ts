@@ -28,7 +28,7 @@ export class ConversationSidebar {
   readonly personalStatusName: Locator;
   readonly personalUserName: Locator;
   readonly preferencesButton: Locator;
-  readonly allConverationsButton: Locator;
+  readonly allConversationsButton: Locator;
   readonly connectButton: Locator;
   readonly archiveButton: Locator;
   readonly manageTeamButton: Locator;
@@ -44,7 +44,7 @@ export class ConversationSidebar {
     this.personalStatusName = page.getByTestId('status-name');
     this.personalUserName = page.getByTestId('user-handle');
     this.preferencesButton = page.getByTestId('go-preferences');
-    this.allConverationsButton = page.getByTestId('go-recent-view');
+    this.allConversationsButton = page.getByTestId('go-recent-view');
     this.connectButton = page.getByTestId('go-people');
     this.archiveButton = page.getByTestId('go-archive');
     this.manageTeamButton = page.getByTestId('go-team-management');
@@ -57,7 +57,7 @@ export class ConversationSidebar {
   }
 
   async clickAllConversationsButton() {
-    await this.allConverationsButton.click();
+    await this.allConversationsButton.click();
   }
 
   async clickConnectButton() {

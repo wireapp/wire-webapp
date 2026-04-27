@@ -47,8 +47,11 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {BackgroundEffectSelection, DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
-import {DEFAULT_BACKGROUND_EFFECT} from 'Repositories/media/VideoBackgroundEffects';
+import {
+  BackgroundEffectSelection,
+  DEFAULT_BACKGROUND_EFFECT,
+  DEFAULT_BUILTIN_BACKGROUND_ID,
+} from 'Repositories/media/VideoBackgroundEffects';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -80,7 +83,7 @@ type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'se
 
 const BACKGROUND_OPTION_VALUES = new Set<string>(['none', 'blur-high', 'blur-low', 'virtual', 'settings']);
 
-const mapValueToEffect = (value: BackgroundOptionValue): BackgroundEffectSelection => {
+const mapValueToEffect = (value: BackgroundOptionValue, lastVirtualBackgroundId: string): BackgroundEffectSelection => {
   switch (value) {
     case 'none':
       return {type: 'none'};
@@ -89,7 +92,7 @@ const mapValueToEffect = (value: BackgroundOptionValue): BackgroundEffectSelecti
     case 'blur-low':
       return {type: 'blur', level: 'low'};
     case 'virtual':
-      return {type: 'virtual', backgroundId: DEFAULT_BUILTIN_BACKGROUND_ID};
+      return {type: 'virtual', backgroundId: lastVirtualBackgroundId ?? DEFAULT_BUILTIN_BACKGROUND_ID};
     default:
       return {type: 'none'};
   }
@@ -214,6 +217,8 @@ export const VideoControls = ({
 
   const selectedBackgroundEffect =
     useBackgroundEffectsStore(state => state.preferredEffect) ?? DEFAULT_BACKGROUND_EFFECT;
+  const lastVirtualBackgroundId =
+    useBackgroundEffectsStore(state => state.lastVirtualBackgroundId) ?? DEFAULT_BUILTIN_BACKGROUND_ID;
   const isVideoBackgroundEffectsFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
 
   const {participants} = useKoSubscribableChildren(call, ['participants']);
@@ -431,7 +436,7 @@ export const VideoControls = ({
       }
       if (value && BACKGROUND_OPTION_VALUES.has(value)) {
         setVideoOptionsOpen(false);
-        const effect = mapValueToEffect(value as BackgroundOptionValue);
+        const effect = mapValueToEffect(value as BackgroundOptionValue, lastVirtualBackgroundId);
         handleBackgroundSelect(effect);
         return;
       }
@@ -440,7 +445,7 @@ export const VideoControls = ({
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [onOpenBackgroundSettings, handleBackgroundSelect],
+    [onOpenBackgroundSettings, handleBackgroundSelect, lastVirtualBackgroundId],
   );
 
   const selectedBackgroundValue = mapEffectToValue(selectedBackgroundEffect);

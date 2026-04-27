@@ -19,28 +19,16 @@
 
 /* eslint-disable no-magic-numbers */
 
+import is from '@sindresorhus/is';
+import {once} from 'events';
 import {Server as WebSocketServer} from 'ws';
 
 import {AddressInfo} from 'net';
 
 import {PingMessage, ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
 
-const reservedPorts: number[] = [];
-
-function startEchoServer(): WebSocketServer {
-  const getWebsocketPort = () => {
-    const WEBSOCKET_START_PORT = 8087;
-    let currentPort = WEBSOCKET_START_PORT;
-    while (currentPort++) {
-      if (!reservedPorts.includes(currentPort)) {
-        reservedPorts.push(currentPort);
-        break;
-      }
-    }
-    return currentPort;
-  };
-  const PORT = getWebsocketPort();
-  const server = new WebSocketServer({port: PORT});
+async function startEchoServer(): Promise<WebSocketServer> {
+  const server = new WebSocketServer({host: '127.0.0.1', port: 0});
   server.on('connection', ws => {
     ws.on('message', message => {
       server.clients.forEach(client => {
@@ -63,6 +51,7 @@ function startEchoServer(): WebSocketServer {
   });
 
   server.on('error', error => console.error(`Echo WebSocket server error: "${error.message}"`));
+  await once(server, 'listening');
   return server;
 }
 
@@ -73,8 +62,11 @@ describe('ReconnectingWebsocket', () => {
   const activeConnections: ReconnectingWebsocket[] = [];
 
   const getServerAddress = () => {
-    if (server) {
-      const address: AddressInfo = server.address() as AddressInfo;
+    if (is.undefined(server) === false) {
+      const address = server.address();
+      if (is.nullOrUndefined(address) === true || is.string(address) === true) {
+        throw new Error('Server address is unavailable');
+      }
       return Promise.resolve(`ws://127.0.0.1:${address.port}`);
     }
     throw new Error('Server is undefined');
@@ -86,8 +78,8 @@ describe('ReconnectingWebsocket', () => {
     return rws;
   };
 
-  beforeEach(() => {
-    server = startEchoServer();
+  beforeEach(async () => {
+    server = await startEchoServer();
   });
 
   afterEach(done => {
@@ -101,7 +93,7 @@ describe('ReconnectingWebsocket', () => {
     });
     activeConnections.length = 0;
 
-    if (server) {
+    if (is.undefined(server) === false) {
       server.close(() => {
         server = undefined;
         done();

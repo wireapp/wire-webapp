@@ -83,6 +83,7 @@ export const TitleBar = ({
     hasExternal,
     hasDirectGuest,
     hasService,
+    hasApps,
     hasFederatedUsers,
     firstUserEntity,
     hasLegalHold,
@@ -95,6 +96,7 @@ export const TitleBar = ({
     'hasExternal',
     'hasDirectGuest',
     'hasService',
+    'hasApps',
     'hasFederatedUsers',
     'firstUserEntity',
     'hasLegalHold',
@@ -129,7 +131,7 @@ export const TitleBar = ({
       hasExternal,
       hasFederated: hasFederatedUsers,
       hasGuest: hasDirectGuest,
-      hasService,
+      hasService: hasService || hasApps,
     });
 
     if (translationKey) {
@@ -137,7 +139,7 @@ export const TitleBar = ({
     }
 
     return '';
-  }, [hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest]);
+  }, [hasDirectGuest, hasExternal, hasFederatedUsers, hasService, hasApps, is1to1, isRequest]);
 
   const hasCall = useMemo(() => {
     const hasEntities = !!joinedCall;

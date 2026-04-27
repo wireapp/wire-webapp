@@ -24,6 +24,7 @@ import {SuccessShield} from '@wireapp/react-ui-kit/lib/Images/SuccessShield';
 import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
+import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
 import {t} from 'Util/localizerUtil';
 
 import {Page} from './Page';
@@ -36,7 +37,7 @@ import {pathWithParams} from '../util/urlUtil';
 
 export const Success = () => {
   const secureOpen = (url: string) => {
-    window.location.replace(url);
+    replaceBrowserLocation(url);
   };
 
   useEffect(() => {

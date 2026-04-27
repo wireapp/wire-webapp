@@ -19,10 +19,12 @@
 
 import {FC, useMemo, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {UserType} from '@wireapp/api-client/lib/user';
 import cx from 'classnames';
 
-import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/Icon';
@@ -40,10 +42,11 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {UserState} from 'Repositories/user/UserState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
-import {sortUsersByPriority} from 'Util/stringUtil';
+import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/stringUtil';
 
 import {getManageServicesUrl} from '../../../externalRoute';
 import {PanelHeader} from '../panelHeader';
@@ -100,7 +103,12 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     'isTeamOnly',
     'participating_user_ids',
   ]);
-  const {isTeam, teamMembers, teamUsers} = useKoSubscribableChildren(teamState, ['isTeam', 'teamMembers', 'teamUsers']);
+  const {isTeam, teamMembers, teamUsers, isAppsEnabled} = useKoSubscribableChildren(teamState, [
+    'isTeam',
+    'teamMembers',
+    'teamUsers',
+    'isAppsEnabled',
+  ]);
   const {connectedUsers} = useKoSubscribableChildren(userState, ['connectedUsers']);
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
   const {services} = useKoSubscribableChildren(integrationRepository, ['services']);
@@ -123,6 +131,20 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     return connectedUsers;
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
 
+  const apps = useMemo(() => {
+    const normalizedQuery = searchInput.trim().toLowerCase();
+    return contacts
+      .filter(contact => contact.type === UserType.APP)
+      .map(contact => integrationRepository.mapServiceFromUser(contact))
+      .filter(contact => compareTransliteration(contact.name(), normalizedQuery))
+      .sort((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
+  }, [contacts, integrationRepository, searchInput]);
+
+  const servicesList = useMemo(() => {
+    const allApps = activeConversation.protocol === CONVERSATION_PROTOCOL.MLS ? apps : services;
+    return allApps.filter(app => !participatingUserIds.some(id => id.id === app.id)); // Make sure apps already added to the conversation don't show up again
+  }, [activeConversation.protocol, apps, services, participatingUserIds]);
+
   const enabledAddAction = selectedContacts.length > ENABLE_ADD_ACTIONS_LENGTH;
 
   const headerText = selectedContacts.length
@@ -134,14 +156,13 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     const isService = !!firstUserEntity?.isService;
     const allowIntegrations = isGroupOrChannel || isService;
 
-    return (
-      isTeam &&
-      allowIntegrations &&
-      inTeam &&
-      !isTeamOnly &&
-      isServicesEnabled &&
-      activeConversation.protocol !== CONVERSATION_PROTOCOL.MLS
-    );
+    // Don't allow new apps to be added if the feature has been disabled
+    const isAppFeatureEnabled = checkAppsFeatureAvailability({
+      protocol: activeConversation.protocol,
+      isAppsEnabled: isAppsEnabled,
+    });
+
+    return isTeam && allowIntegrations && inTeam && !isTeamOnly && isServicesEnabled && isAppFeatureEnabled;
   }, [
     firstUserEntity?.isService,
     inTeam,
@@ -150,6 +171,8 @@ const AddParticipants: FC<AddParticipantsProps> = ({
     isServicesRoom,
     isTeam,
     isTeamOnly,
+    activeConversation.protocol,
+    isAppsEnabled,
   ]);
 
   const manageServicesUrl = getManageServicesUrl('client_landing');
@@ -190,7 +213,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const onSearchInput = async (value: string) => {
     setSearchInput(value);
 
-    if (isAddServiceState) {
+    if (isAddServiceState && activeConversation.protocol === CONVERSATION_PROTOCOL.PROTEUS) {
       await searchServices(value);
     }
   };
@@ -273,7 +296,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
 
           {isAddServiceState && (
             <>
-              {!!services.length && (
+              {is.nonEmptyArray(servicesList) && (
                 <>
                   {canManageServices() && !!manageServicesUrl && (
                     <ul className="panel-manage-services left-list-items">
@@ -300,11 +323,11 @@ const AddParticipants: FC<AddParticipantsProps> = ({
                     </ul>
                   )}
 
-                  <ServiceList services={services} onServiceClick={onServiceSelect} isSearching={isSearching} />
+                  <ServiceList services={servicesList} onServiceClick={onServiceSelect} isSearching={isSearching} />
                 </>
               )}
 
-              {!services.length && !isInitialServiceSearch && (
+              {!servicesList.length && !isInitialServiceSearch && (
                 <div className="search__no-services">
                   <Icon.ServiceIcon className="search__no-services__icon" />
 

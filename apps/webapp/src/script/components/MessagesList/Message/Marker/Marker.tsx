@@ -21,8 +21,11 @@ import {useLayoutEffect, useRef} from 'react';
 
 import {SerializedStyles, css} from '@emotion/react';
 
+import {TabIndex} from '@wireapp/react-ui-kit';
+
 import {ScrollToElement} from 'Components/MessagesList/Message/types';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
+import {t} from 'Util/localizerUtil';
 
 import {dayMarkerStyle, baseMarkerStyle, notVirtualizedMarkerStyle} from './Marker.styles';
 import {getMessagesGroupLabel} from './Marker.utils';
@@ -71,7 +74,15 @@ export const MarkerComponent = ({marker, scrollTo, measureElement, index}: Props
       }}
     >
       <div className="message-header-icon">
-        {marker.type === 'unread' && <span className="message-unread-dot dot-md" />}
+        {marker.type === 'unread' && (
+          <span
+            className="message-unread-dot dot-md"
+            role="img"
+            aria-label={t('accessibility.unreadMessagesSeparator')}
+            tabIndex={TabIndex.FOCUSABLE}
+            title={t('accessibility.unreadMessagesSeparator')}
+          />
+        )}
       </div>
 
       <h3 className="message-header-label">

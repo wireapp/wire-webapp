@@ -68,6 +68,9 @@ test.describe('Connections', () => {
       });
 
       await test.step('A creates a group with B & C', async () => {
+        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).toBeAttached();
+        await expect(memberAPages.conversationList().getConversationLocator(memberC.fullName)).toBeAttached();
+
         await createGroup(memberAPages, 'Group', [memberB, memberC]);
       });
 
@@ -106,8 +109,8 @@ test.describe('Connections', () => {
     async ({createPage}) => {
       const {pages} = PageManager.from(await createPage(withLogin(memberA), withConnectionRequest(memberB))).webapp;
 
-      await pages.conversationList().clickConversationOptions(memberB.fullName);
-      await pages.conversationList().archiveConversation();
+      const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      await contextMenu.archiveButton.click();
 
       await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
     },

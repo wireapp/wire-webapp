@@ -171,7 +171,6 @@ export class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
-    private readonly isCountlyIncrementalBackoffRetryReportingEnabled: boolean = false,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -295,11 +294,7 @@ export class App {
       serverTimeHandler,
     );
 
-    repositories.eventTracker = new EventTrackingRepository(
-      repositories.message,
-      this.apiClient,
-      this.isCountlyIncrementalBackoffRetryReportingEnabled,
-    );
+    repositories.eventTracker = new EventTrackingRepository(repositories.message, this.apiClient);
 
     repositories.backup = new BackupRepository(new BackupService(), repositories.conversation);
 

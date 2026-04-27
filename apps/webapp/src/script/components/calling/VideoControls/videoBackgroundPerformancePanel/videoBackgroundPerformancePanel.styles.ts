@@ -27,21 +27,34 @@ export const performancePanelContainerStyles = css({
 });
 
 export const performancePanelStyles = css({
-  background: '#fff',
+  background: 'var(--app-bg-secondary)',
   borderRadius: 12,
   padding: 16,
   minWidth: 220,
   boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
 });
 
-export const performancePanelButtonStyles = css({
-  marginBottom: 8,
-});
-
-export const performancePanelSelectStyles = css({
-  width: '100%',
+export const performancePanelHeaderStyles = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 8,
   marginBottom: 12,
 });
+
+export const performancePanelTitleStyles = css({
+  margin: 0,
+  fontSize: 16,
+  fontWeight: 600,
+});
+
+export const performancePanelCloseButtonStyles = css({
+  minWidth: 0,
+});
+
+export const performancePanelResetButtonContainerStyles = css({display: 'flex', justifyContent: 'flex-end'});
+
+export const performancePanelResetButtonStyles = css({marginBottom: 0});
 
 export const buttonBaseStyles = css({
   display: 'flex',
@@ -64,47 +77,18 @@ export const buttonBaseStyles = css({
 });
 
 export const buttonNeutralStyles = css({
-  background: '#fff',
-  color: '#000',
+  background: 'var(--inactive-call-button-bg)',
+  color: 'var(--app-bg-primary)',
 
   '&:hover': {
-    background: '#f2f2f2',
+    background: 'var(--inactive-call-button-hover-bg)',
   },
-});
-
-export const buttonPrimaryStyles = css({
-  background: '#111',
-  color: '#fff',
-
-  '&:hover': {
-    background: '#000',
-  },
-});
-
-export const buttonDangerStyles = css({
-  background: '#e53935',
-  color: '#fff',
-
-  '&:hover': {
-    background: '#c62828',
-  },
-});
-
-export const buttonIconOnlyStyles = css({
-  width: 40,
-  padding: 0,
-});
-
-export const buttonRowStyles = css({
-  display: 'flex',
-  gap: 8, // Abstand zwischen Buttons
-  marginTop: 12,
 });
 
 export const metricsListStyles = css({
   marginTop: 12,
   padding: 12,
-  background: '#f7f7f7',
+  background: 'var(--inactive-call-button-bg)',
   borderRadius: 8,
   fontSize: 12,
 });

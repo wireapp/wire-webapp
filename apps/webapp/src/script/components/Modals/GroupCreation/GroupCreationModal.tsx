@@ -82,14 +82,12 @@ const GroupCreationModal = ({
     isProtocolToggleEnabledForUser,
     isCellsEnabled: isCellsEnabledForTeam,
     isAppsEnabled: isAppsEnabledForTeam,
-    hasWhitelistedServices: hasWhitelistedServicesInTeam,
   } = useKoSubscribableChildren(teamState, [
     'isTeam',
     'isMLSEnabled',
     'isProtocolToggleEnabledForUser',
     'isCellsEnabled',
     'isAppsEnabled',
-    'hasWhitelistedServices',
   ]);
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
 
@@ -130,7 +128,6 @@ const GroupCreationModal = ({
     checkAppsFeatureAvailability({
       protocol: selectedProtocol.value,
       isAppsEnabled: isAppsEnabledForTeam,
-      hasWhitelistedServices: hasWhitelistedServicesInTeam,
     });
 
   const [showContacts, setShowContacts] = useState<boolean>(false);
@@ -377,7 +374,6 @@ const GroupCreationModal = ({
     <ModalComponent
       id="group-creation-modal"
       className="group-creation__modal"
-      wrapperCSS={{overflow: 'unset', overflowY: 'unset'}}
       isShown={isShown}
       onOpened={onOpen}
       onClosed={onClose}

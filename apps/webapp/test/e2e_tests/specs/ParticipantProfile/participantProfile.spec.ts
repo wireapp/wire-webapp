@@ -99,6 +99,7 @@ test.describe('Participant Profile', () => {
       ]);
 
       await acceptConnectionRequest(userCPages);
+      await expect(userAPages.conversationList().getConversationLocator(userC.fullName)).toBeAttached();
 
       await test.step('User C is in group with User A and B. User C is not connected to user B', async () => {
         await createGroup(userAPages, groupName, [userB, userC]);
@@ -139,6 +140,7 @@ test.describe('Participant Profile', () => {
 
       const {pages, modals} = userAPageManager.webapp;
       await acceptConnectionRequest(userCPages);
+      await expect(pages.conversationList().getConversationLocator(userC.fullName)).toBeAttached();
 
       await createGroup(pages, groupName, [userB, userC]);
 

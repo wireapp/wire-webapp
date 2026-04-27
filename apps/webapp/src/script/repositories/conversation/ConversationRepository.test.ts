@@ -46,7 +46,6 @@ import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingPr
 import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
-import sinon from 'sinon';
 import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -98,6 +97,7 @@ import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/CoreSingleton';
 
@@ -170,7 +170,7 @@ describe('ConversationRepository', () => {
   let conversation_et = _generateConversation();
   const selfConversation = _generateConversation({type: CONVERSATION_TYPE.SELF});
   let self_user_et;
-  let server: sinon.SinonFakeServer;
+  let server: MockHttpServer;
   let storage_service: StorageService;
   const messageSenderId = createUuid();
 
@@ -179,7 +179,7 @@ describe('ConversationRepository', () => {
   };
 
   beforeAll(async () => {
-    server = sinon.fakeServer.create();
+    server = createMockHttpServer();
     server.autoRespond = true;
 
     const ping_url = `${Config.getConfig().BACKEND_REST}/conversations/${conversation_et.id}/knock`;
@@ -2612,29 +2612,23 @@ describe('ConversationRepository', () => {
   });
 
   describe('checkForDeletedConversations', () => {
-    it('removes conversations that have been deleted on the backend', async () => {
-      const deletedGroup = _generateConversation();
-      const oldGroup = _generateConversation();
+    it('marks inaccessible conversations as past member', async () => {
+      const inaccessibleGroup = _generateConversation();
+      const activeGroup = _generateConversation();
       const conversationRepository = testFactory.conversation_repository!;
 
       jest.spyOn(testFactory.conversation_service!, 'getConversationByIds').mockResolvedValue({
-        not_found: [deletedGroup, oldGroup],
+        not_found: [inaccessibleGroup],
       });
-      jest
-        .spyOn(conversationRepository['conversationService'], 'getConversationById')
-        .mockImplementation(async conversationId => {
-          if (matchQualifiedIds(conversationId, deletedGroup.qualifiedId)) {
-            throw new BackendError('', BackendErrorLabel.NO_CONVERSATION);
-          }
-          return {} as any;
-        });
-      await conversationRepository['saveConversation'](deletedGroup);
-      await conversationRepository['saveConversation'](oldGroup);
+      await conversationRepository['saveConversation'](inaccessibleGroup);
+      await conversationRepository['saveConversation'](activeGroup);
 
       const currentNbConversations = conversationRepository['conversationState'].conversations().length;
       await testFactory.conversation_repository!.syncDeletedConversations();
 
-      expect(conversationRepository['conversationState'].conversations()).toHaveLength(currentNbConversations - 1);
+      expect(conversationRepository['conversationState'].conversations()).toHaveLength(currentNbConversations);
+      expect(inaccessibleGroup.status()).toBe(ConversationStatus.PAST_MEMBER);
+      expect(activeGroup.status()).toBe(ConversationStatus.CURRENT_MEMBER);
     });
   });
 

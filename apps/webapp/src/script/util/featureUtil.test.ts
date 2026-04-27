@@ -27,25 +27,21 @@ describe('featureUtil', () => {
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
       isAppsEnabled: false,
-      hasWhitelistedServices: true,
       expected: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.PROTEUS,
-      isAppsEnabled: false,
-      hasWhitelistedServices: false,
-      expected: false,
+      isAppsEnabled: true,
+      expected: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: true,
-      hasWhitelistedServices: false,
       expected: true,
     },
     {
       protocol: CONVERSATION_PROTOCOL.MLS,
       isAppsEnabled: false,
-      hasWhitelistedServices: true,
       expected: false,
     },
   ])(

@@ -19,9 +19,9 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {handleAppLockState} from 'test/e2e_tests/utils/userActions';
+import {handleAppLockState, loginUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, withLogin} from '../../test.fixtures';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from '../../test.fixtures';
 
 test.describe('AppLock', () => {
   let owner: User;
@@ -70,7 +70,10 @@ test.describe('AppLock', () => {
     ).forEach(({title, tag}) => {
       const shouldLock = tag === '@TC-2752';
 
-      test(title, {tag: [tag, '@regression']}, async ({createPage}) => {
+      test(title, {tag: [tag, '@regression']}, async ({createPage}, testInfo) => {
+        // Increase test timeout by 61s in case it needs to wait for the app to lock
+        if (shouldLock) test.setTimeout(testInfo.timeout + 61_000);
+
         const page = await createPage(withLogin(memberA));
         const pageManager = PageManager.from(page);
         await handleAppLockState(pageManager, appLockPassCode);
@@ -149,9 +152,9 @@ test.describe('AppLock', () => {
 
         await page.reload();
         await modals.appLock().clickForgotPassphrase();
-        await modals.appLock().clickWipeDB();
+        await modals.appLock().clickProceedToLogout();
+        await modals.appLock().checkClearData();
         await modals.appLock().clickReset();
-        await modals.appLock().inputUserPassword(memberA.password);
 
         // After redirect to login page verify the whole indexDB was cleared
         await expect(pages.singleSignOn().ssoCodeEmailInput).toBeVisible();
@@ -160,23 +163,31 @@ test.describe('AppLock', () => {
     );
 
     test(
-      'Web: I should not be able to wipe database with wrong account password',
+      'Web: I should not wipe database if I logout without checking the clear data option and recover my session on next login',
       {tag: ['@TC-2763', '@regression']},
       async ({createPage}) => {
         const page = await createPage(withLogin(memberA));
         const pageManager = PageManager.from(page);
-        const {modals} = PageManager.from(page).webapp;
+        const {modals} = pageManager.webapp;
 
         await handleAppLockState(pageManager, appLockPassCode);
 
         await page.reload();
         await modals.appLock().clickForgotPassphrase();
-        await modals.appLock().clickWipeDB();
+        await modals.appLock().clickProceedToLogout();
+        // Intentionally do not check the clear data checkbox
         await modals.appLock().clickReset();
-        await modals.appLock().inputUserPassword('invalid');
 
-        // The modal should show an error for the invalid password and not wipe indexDB
-        await expect(modals.appLock().errorMessage).toContainText('Wrong password');
+        // The database should not be wiped when the checkbox was not checked
+        await expect.poll(() => page.evaluate(() => indexedDB.databases())).not.toHaveLength(0);
+
+        // Log back in with the same user and verify the existing session is intact
+        await loginUser(memberA, pageManager);
+
+        // App lock setup modal should appear again (passcode was cleared on logout, session data is preserved)
+        await expect(modals.appLock().appLockModal).toBeVisible({timeout: LOGIN_TIMEOUT});
+        await expect(modals.appLock().lockPasscodeInput).toBeVisible();
+
         await expect.poll(() => page.evaluate(() => indexedDB.databases())).not.toHaveLength(0);
       },
     );

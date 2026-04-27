@@ -94,13 +94,14 @@ test.describe('Calling', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
       await userAPages.conversation().clickCallButton();
 
-      await expect(userBPages.conversationList().joinCallButton).toBeVisible();
+      const {joinCallButton} = userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'});
+      await expect(joinCallButton).toBeVisible();
       await expect(userBPages.calling().acceptCallButton).toBeVisible();
 
-      await userBPages.conversationList().joinCallButton.click();
+      await joinCallButton.click();
       await expect(userBPages.calling().acceptCallButton).not.toBeVisible();
     },
   );

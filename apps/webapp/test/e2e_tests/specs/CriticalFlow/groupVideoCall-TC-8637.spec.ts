@@ -42,6 +42,7 @@ test('Group Video call', {tag: ['@TC-8637', '@crit-flow-web']}, async ({createTe
   await test.step('Guest user accepts connection request from owner', async () => {
     await guestPages.conversationList().openPendingConnectionRequest();
     await guestPages.connectRequest().clickConnectButton();
+    await expect(ownerPages.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
   });
 
   await test.step('Owner and team member are in a group conversation together', async () => {

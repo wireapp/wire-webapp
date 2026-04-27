@@ -57,6 +57,7 @@ const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) =
 const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => eventA.id.localeCompare(eventB.id);
 const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
   eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
+const MAX_INDEXED_DB_LIMIT = 0xffffffff; // 4_294_967_295
 
 /** Handles all databases interactions related to events */
 export class EventService {
@@ -240,7 +241,7 @@ export class EventService {
     conversationId: string,
     fromDate = new Date(0),
     toDate = new Date(),
-    limit = Number.MAX_SAFE_INTEGER,
+    limit = MAX_INDEXED_DB_LIMIT,
   ): Promise<DBEvents> {
     const includeParams = {
       includeFrom: true,
@@ -270,7 +271,7 @@ export class EventService {
   async loadFollowingEvents(
     conversationId: string,
     fromDate: Date,
-    limit = Number.MAX_SAFE_INTEGER,
+    limit = MAX_INDEXED_DB_LIMIT,
     includeFrom = true,
   ): Promise<DBEvents> {
     const includeParams = {

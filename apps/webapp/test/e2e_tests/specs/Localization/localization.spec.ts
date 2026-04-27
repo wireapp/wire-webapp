@@ -144,10 +144,14 @@ test.describe('Localization', () => {
       const messagePlaceholder = page.locator('[data-uie-name="input-placeholder"]');
       await expect(messagePlaceholder).toHaveText(deTranslations['tooltipConversationInputPlaceholder']);
 
-      await components.conversationSidebar().allConverationsButton.click();
-      await pages.conversationList().clickConversationOptions(userB.fullName);
+      await components.conversationSidebar().allConversationsButton.click();
+      await pages
+        .conversationList()
+        .getConversationLocator(userB.fullName)
+        .getByRole('button', {name: deTranslations['accessibility.conversationOptionsMenu']})
+        .click();
 
-      const menuList = page.getByTestId('conversation-list-options-menu');
+      const menuList = page.getByRole('menu').getByRole('menuitem');
 
       await expect
         .poll(async () => await menuList.allInnerTexts())

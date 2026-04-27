@@ -174,7 +174,7 @@ const ContextMenu = ({
       // context menu options such as 10 seconds etc begings with digit which is an invalid querySelector
       // param append btn- to avoid such errors
       const selectedButton = activeWindow.document.querySelector(
-        `#${getButtonId(labelWithoutQuotes!)}`,
+        `#${CSS.escape(getButtonId(labelWithoutQuotes!))}`,
       ) as HTMLButtonElement;
       selectedButton?.focus();
     }

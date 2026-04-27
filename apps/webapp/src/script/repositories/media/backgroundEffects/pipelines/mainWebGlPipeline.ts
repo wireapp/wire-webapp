@@ -203,7 +203,15 @@ export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
       if (frameIndex % qualityTier.segmentationCadence === 0) {
         this.segmenter.configure(qualityTier.segmentationWidth, qualityTier.segmentationHeight);
         const segStart = performance.now();
-        const timestampMs = timestamp * 1000;
+        const timestampMs = this.getMonotonicTimestampMs(timestamp);
+
+        if (timestampMs <= 0) {
+          this.logger.warn('Frame due to non-monotonic timestamp', {
+            timestampMs,
+            rawTimestamp: timestamp,
+          });
+        }
+
         const includeClassMask = this.config.debugMode === 'classOverlay' || this.config.debugMode === 'classOnly';
         const result = await this.segmenter.segment(frame, timestampMs, {includeClassMask});
         segmentationMs = performance.now() - segStart;
@@ -452,5 +460,15 @@ export class MainWebGlPipeline implements BackgroundEffectsRenderingPipeline {
 
   public getCurrentModelPath(): string | null {
     return '';
+  }
+
+  private getMonotonicTimestampMs(inputTimestamp: number): number {
+    if (Number.isFinite(inputTimestamp) && inputTimestamp > 0) {
+      const candidateMs = Math.floor(inputTimestamp * 1000);
+      if (candidateMs > 0) {
+        return candidateMs;
+      }
+    }
+    return Math.floor(performance.now());
   }
 }

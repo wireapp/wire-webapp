@@ -80,7 +80,7 @@ test.describe('Delete', () => {
       messageA = userAPages.conversation().getMessage({sender: userA});
       await expect(messageA).toContainText('Test Message');
 
-      messageB = userAPages.conversation().getMessage({sender: userA});
+      messageB = userBPages.conversation().getMessage({sender: userA});
       await expect(messageB).toContainText('Test Message');
     });
 
@@ -133,14 +133,14 @@ test.describe('Delete', () => {
       });
 
       await test.step('Archive conversation', async () => {
-        await pages.conversationList().openContextMenu(userB.fullName);
-        await pages.conversationList().archiveConversation();
+        const contextMenu = await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+        await contextMenu.archiveButton.click();
       });
 
       await test.step('Unarchive conversation', async () => {
         await components.conversationSidebar().clickArchive();
-        await pages.conversationList().clickConversationOptions(userB.fullName);
-        await pages.conversationList().unarchiveConversation();
+        const contextMenu = await pages.conversationList().getConversationLocator(userB.fullName).openContextMenu();
+        await contextMenu.unarchiveButton.click();
         await components.conversationSidebar().clickAllConversationsButton();
       });
 

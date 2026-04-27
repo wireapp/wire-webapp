@@ -241,6 +241,11 @@ export class ConversationPage {
     await new ConfirmModal(this.page).clickAction();
   }
 
+  async copyMessage(message: Locator) {
+    const menu = await this.openMessageOptions(message);
+    await menu.getByRole('button', {name: 'Copy'}).click();
+  }
+
   async reactOnMessage(message: Locator, emojiType: EmojiReaction) {
     await message.hover();
 

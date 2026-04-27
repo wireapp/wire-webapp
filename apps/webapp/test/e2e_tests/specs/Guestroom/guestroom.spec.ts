@@ -186,6 +186,7 @@ test.describe('Guestroom', () => {
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
+      await expect(ownerPages.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
 
       await test.step('Owner creates a group with guest', async () => {
         await createGroup(ownerPages, groupName, [guestUser]);
@@ -525,7 +526,7 @@ test.describe('Guestroom', () => {
 
       await guestPages.conversationJoin().joinAsMemberButton.click();
       await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-      await expect(guestPages.conversationList().list.filter({hasText: groupName})).toBeVisible();
+      await expect(guestPages.conversationList().getConversationLocator(groupName)).toBeVisible();
     },
   );
 
@@ -627,7 +628,7 @@ test.describe('Guestroom', () => {
         },
       );
 
-      await expect(guestPages.conversationList().list.filter({hasText: groupName})).toBeVisible();
+      await expect(guestPages.conversationList().getConversationLocator(groupName)).toBeVisible();
     },
   );
 });
