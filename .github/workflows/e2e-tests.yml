@@ -316,7 +316,7 @@ jobs:
             }
 
       - name: Update Testiny Run with results
-        if: ${{ inputs.testinyRunName }}
+        if: ${{ success() && inputs.testinyRunName }}
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
           TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}
