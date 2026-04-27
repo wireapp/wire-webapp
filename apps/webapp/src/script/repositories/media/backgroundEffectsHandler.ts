@@ -18,8 +18,8 @@
  */
 
 import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
+import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/BackgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/effects/backgroundEffectsController';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
