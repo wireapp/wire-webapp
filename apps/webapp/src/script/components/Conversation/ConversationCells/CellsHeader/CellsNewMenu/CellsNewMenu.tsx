@@ -24,8 +24,6 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {collaboraNewDocumentCreationMenuFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 
 import {CellsNewFileModal} from './CellsNewFileModal/CellsNewFileModal';
@@ -43,13 +41,9 @@ interface CellsNewMenuProps {
 export type CellsNewFileType = 'document' | 'spreadsheet' | 'presentation';
 
 export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefresh}: CellsNewMenuProps) => {
-  const {isFeatureToggleEnabled} = useApplicationContext();
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [isFileModalOpen, setIsFileModalOpen] = useState(false);
   const [fileType, setFileType] = useState<CellsNewFileType>('document');
-  const isCollaboraNewDocumentCreationMenuEnabled = isFeatureToggleEnabled(
-    collaboraNewDocumentCreationMenuFeatureToggleName,
-  );
 
   const openFolderModal = () => setIsFolderModalOpen(true);
 
@@ -75,22 +69,20 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
           <DropdownMenu.Item onClick={openFolderModal}>{t('cells.newItemMenu.folder')}</DropdownMenu.Item>
-          {isCollaboraNewDocumentCreationMenuEnabled && (
-            <DropdownMenu.Sub>
-              <DropdownMenu.SubTrigger>{t('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>
-              <DropdownMenu.SubContent>
-                <DropdownMenu.Item onClick={() => openFileModal('document')}>
-                  {t('cells.newItemMenu.document')}
-                </DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => openFileModal('spreadsheet')}>
-                  {t('cells.newItemMenu.spreadsheet')}
-                </DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => openFileModal('presentation')}>
-                  {t('cells.newItemMenu.presentation')}
-                </DropdownMenu.Item>
-              </DropdownMenu.SubContent>
-            </DropdownMenu.Sub>
-          )}
+          <DropdownMenu.Sub>
+            <DropdownMenu.SubTrigger>{t('cells.newItemMenu.file')}</DropdownMenu.SubTrigger>
+            <DropdownMenu.SubContent>
+              <DropdownMenu.Item onClick={() => openFileModal('document')}>
+                {t('cells.newItemMenu.document')}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => openFileModal('spreadsheet')}>
+                {t('cells.newItemMenu.spreadsheet')}
+              </DropdownMenu.Item>
+              <DropdownMenu.Item onClick={() => openFileModal('presentation')}>
+                {t('cells.newItemMenu.presentation')}
+              </DropdownMenu.Item>
+            </DropdownMenu.SubContent>
+          </DropdownMenu.Sub>
         </DropdownMenu.Content>
       </DropdownMenu>
       <CellsNewFolderModal
@@ -102,18 +94,16 @@ export const CellsNewMenu = ({cellsRepository, conversationQualifiedId, onRefres
           setIsFolderModalOpen(false);
         }}
       />
-      {isCollaboraNewDocumentCreationMenuEnabled && (
-        <CellsNewFileModal
-          {...commonProps}
-          isOpen={isFileModalOpen}
-          fileType={fileType}
-          onClose={() => setIsFileModalOpen(false)}
-          onSuccess={() => {
-            onRefresh();
-            setIsFileModalOpen(false);
-          }}
-        />
-      )}
+      <CellsNewFileModal
+        {...commonProps}
+        isOpen={isFileModalOpen}
+        fileType={fileType}
+        onClose={() => setIsFileModalOpen(false)}
+        onSuccess={() => {
+          onRefresh();
+          setIsFileModalOpen(false);
+        }}
+      />
     </>
   );
 };
