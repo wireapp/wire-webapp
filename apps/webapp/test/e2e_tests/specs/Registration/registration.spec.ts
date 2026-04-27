@@ -33,6 +33,30 @@ test.describe('Registration', () => {
     });
 
     test(
+      'I want to be informed about terms of personal account before registration',
+      {tag: ['@TC-1621', '@regression']},
+      async ({pageManager}) => {
+        const newUser = getUser();
+        const unregisteredEmail = newUser.email;
+
+        await pageManager.openMainPage();
+        const {pages} = pageManager.webapp;
+
+        await goToPersonalRegistration(pageManager, unregisteredEmail);
+
+        await expect(pages.registration().termsLabel).toBeVisible();
+
+        const pagePromise = pageManager.page.context().waitForEvent('page');
+
+        await pages.registration().termsLabel.click();
+
+        const newTab = await pagePromise;
+        await newTab.waitForLoadState();
+        await expect(newTab).toHaveURL(/legal#terms/);
+      },
+    );
+
+    test(
       'I want to be notified if the email address I entered during registration has already been registered',
       {tag: ['@TC-1623', '@TC-1640', '@regression']},
       async ({pageManager}) => {
