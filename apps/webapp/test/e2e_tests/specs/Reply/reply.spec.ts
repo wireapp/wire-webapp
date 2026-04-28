@@ -343,12 +343,14 @@ test.describe('Reply', () => {
   );
 
   test('I want to edit my reply', {tag: ['@TC-3019', '@regression']}, async ({createPage}) => {
-    const [userAPageManager, userBPages] = await Promise.all([
+    const [userAPageManager, userBPageManager] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))),
     ]);
 
     const {pages: userAPages} = userAPageManager.webapp;
+    const {pages: userBPages} = userBPageManager.webapp;
+
     const conversationName = 'Group Conversation';
 
     await test.step('Prerequisites: Setup group and open conversations', async () => {
@@ -380,17 +382,24 @@ test.describe('Reply', () => {
       const replyMessage = userAPages.conversation().getMessage({content: 'Reply'});
       await userAPages.conversation().editMessage(replyMessage);
       await expect(userAPages.conversation().replyQuoteBoxAboveMessageInputField).not.toBeVisible();
-      await userAPages.conversation().sendMessage('Edited Message');
+      await userAPages.conversation().sendMessage('Edited Reply');
     });
 
     await test.step('User B edits original message', async () => {
       await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      const originalMessage = userBPages.conversation().getMessage({content: 'Original Message', sender: userB});
+      const originalMessage = userBPages.conversation().getMessage({content: 'Original Message'}).first();
+      await expect(originalMessage).toBeVisible();
       await userBPages.conversation().editMessage(originalMessage);
       await userBPages.conversation().sendMessage('Edited Original Message');
+      await expect(userBPages.conversation().getMessage({content: 'Edited Original Message'}).first()).toBeVisible();
+      await expect(
+        userAPages.conversation().getMessage({content: 'Edited Original Message', sender: userB}),
+      ).toBeVisible();
 
       // Check that quote in reply by User A is reflecting the changes to original message
-      const replyFromUserA = userBPages.conversation().getMessage({content: 'Edited Message', sender: userA});
+      const replyFromUserA = userBPages.conversation().getMessage({content: 'Edited Reply', sender: userA});
+      // Wait for the transient "deleted" placeholder to disappear to prevent flakiness during the edit sync
+      await expect(replyFromUserA.getByTestId('quote-item')).not.toContainText('You cannot see this message');
       await expect(replyFromUserA.getByTestId('quote-item')).toContainText('Edited Original Message');
     });
 
