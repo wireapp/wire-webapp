@@ -19,7 +19,7 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, withConnectedUser, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {createAndSaveBackup, createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
 import {RequestResetPasswordPage} from '../../pageManager/webapp/pages/requestResetPassword.page';
@@ -417,7 +417,7 @@ test.describe('History Backup', () => {
         await loginUser(userA, userAPageManager);
 
         await userAPages.historyInfo().clickConfirmButton();
-        await userAComponents.conversationSidebar().clickPreferencesButton();
+        await userAComponents.conversationSidebar().preferencesButton.click({timeout: LOGIN_TIMEOUT});
         await userAPages.account().backupFileInput.setInputFiles(backupName);
       });
 
