@@ -43,12 +43,11 @@ jobs:
           artifact-ids: ${{ needs.e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
 
-      - name: Run Testiny CLI
+      - name: Upload report to Testiny
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
         run: |
-          # Create a modified version of the playwright json report where the test-ids e.g. @TC-1234 are appended to the test title so Testiny can pick them up
-          jq 'walk(if type == "object" and .title and .tags then .title += ([.tags[]? | select(startswith("TC-")) | " @" + .] | join("")) else . end)' ./apps/webapp/playwright-report/report.json > ./apps/webapp/playwright-report/report-with-ids.json
-
-          CURRENT_DATE=$(date +'%m/%d/%Y')
-          yarn dlx @testiny/cli testrun -y --project WEB --name "Regression $CURRENT_DATE" --testcases ignore --close --playwright ./apps/webapp/playwright-report/report-with-ids.json
+          node ./apps/webapp/test/e2e_tests/scripts/uploadTestReport.ts \
+          --runName="Regression $(date +'%m/%d/%Y')" \
+          --buildURL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          --reportPath="./apps/webapp/playwright-report/report.json"
