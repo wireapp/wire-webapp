@@ -47,12 +47,7 @@ const getTests = (suite: JSONReportSuite): (JSONReportTest & Pick<JSONReportSpec
 };
 
 type TestRun = {id: number};
-async function createTestRun(): Promise<TestRun> {
-  const description = `
-      <!--markdown-->
-      Build URL: [${args.buildURL}](${args.buildURL})
-      `;
-
+async function createTestRun(description?: string): Promise<TestRun> {
   const res = await fetch('https://app.testiny.io/api/v1/testrun', {
     method: 'POST',
     headers: {
@@ -156,7 +151,10 @@ async function main() {
   }
 
   const report: JSONReport = JSON.parse(fs.readFileSync(reportAbsPath, 'utf-8'));
-  const testRun = await createTestRun();
+  const testRun = await createTestRun(`
+    <!--markdown-->
+    Build URL: [${args.buildURL}](${args.buildURL})
+  `);
 
   try {
     const testResults = transformReportToTestinyMappings(report, testRun.id);
