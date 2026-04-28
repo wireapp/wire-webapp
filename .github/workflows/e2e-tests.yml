@@ -135,7 +135,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: ${{ needs.compute_shards.outputs.matrixShards }}
+        shard: ${{ fromJSON(needs.compute_shards.outputs.matrixShards) }}
 
     services:
       # Run the kalium testservice as service container of the current job
