@@ -1,6 +1,7 @@
 name: E2E Tests Nightly
 
 on:
+  workflow_dispatch:
   schedule:
     # we want to run this nightly on dev
     - cron: '0 02 * * 1-5'
