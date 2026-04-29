@@ -19,7 +19,8 @@
 
 import {PageManager} from 'test/e2e_tests/pageManager';
 
-import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
+import {sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test(
   '1:1 Video call with device switch and screenshare',
@@ -30,9 +31,10 @@ test(
     const [{owner: userA}, {owner: userB}] = await Promise.all([createTeam('User A Team'), createTeam('User B Team')]);
     const {id: callingServiceInstanceId} = await api.callingService.createInstance(userB.password, userB.email);
     const [userAPageManager, userBPageManager] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))),
+      PageManager.from(createPage(withLogin(userA))),
       PageManager.from(createPage(withLogin(userB, {confirmNewHistory: true}))),
     ]);
+    await sendConnectionRequest(userAPageManager, userB);
 
     await test.step('User B accepts connection request from User A', async () => {
       const {pages} = userBPageManager.webapp;
