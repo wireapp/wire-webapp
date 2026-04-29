@@ -52,18 +52,21 @@ const getTests = (suite: JSONReportSuite): (JSONReportTest & Pick<JSONReportSpec
 
 type TestRun = {id: number};
 async function createTestRun(options?: {testPlanId?: number; description?: string}): Promise<TestRun> {
+  const body = {
+    title: args.runName,
+    project_id: TESTINY_PROJECT_ID,
+    testplan_id: options?.testPlanId,
+    description: options?.description,
+  };
+  console.log(`Creating test run with title: ${body.title}`, body);
+
   const res = await fetch('https://app.testiny.io/api/v1/testrun', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${args.testinyApiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      title: args.runName,
-      project_id: TESTINY_PROJECT_ID,
-      testplan_id: options?.testPlanId,
-      description: options?.description,
-    }),
+    body: JSON.stringify(body),
   });
 
   if (!res.ok) {
@@ -161,14 +164,18 @@ async function main() {
     testPlanId: Number.isInteger(+args.testPlanId) ? +args.testPlanId : undefined,
     description: `<!--markdown-->\n${args.description}\n`,
   });
+  console.log(`Created test run with id: ${testRun.id}`);
 
   try {
     const testResults = transformReportToTestinyMappings(report, testRun.id);
-    await addTestResultsToRun(testResults);
-    await closeTestRun(testRun);
 
+    await addTestResultsToRun(testResults);
+    console.log(`Added ${testResults.length} test results to test run`);
+
+    await closeTestRun(testRun);
     console.log('Successfully imported test results');
   } catch (e) {
+    console.error('Failed to add test results to run, deleting test run');
     // In case adding the results failed delete the whole test run
     await deleteTestRun(testRun.id);
     throw e;
