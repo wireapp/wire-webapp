@@ -1,15 +1,7 @@
-import {
-  test,
-  expect,
-  withLogin,
-  withConnectedUser,
-  Team,
-  withGuestUser,
-  withConnectionRequest,
-} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, withConnectedUser, Team, withGuestUser} from 'test/e2e_tests/test.fixtures';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Mention', () => {
   let team: Team;
@@ -517,10 +509,10 @@ test.describe('Mention', () => {
       const otherUser = await createUser();
       const otherUserPages = await PageManager.from(createPage(withLogin(otherUser))).then(pm => pm.webapp.pages);
 
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(otherUser))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await sendConnectionRequest(userAPage, otherUser);
+
+      const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
 
       await otherUserPages.conversationList().pendingConnectionRequest.click();
       await otherUserPages.connectRequest().connectButton.click();
