@@ -53,9 +53,10 @@ test.describe('Link Preview', () => {
           url: 'https://www.youtube.com/watch?v=BMFsJiAcELY',
           iframeSelector: 'iframe.youtube',
           validate: async (frame: FrameLocator) => {
+            await expect(frame.getByLabel('Time elapsed')).not.toBeVisible();
             await frame.getByRole('button', {name: 'Play video', exact: true}).click();
             // Video player might take some time to load, so here we aren't checking for the pause button
-            await expect(frame.getByLabel('Time elapsed 0:00')).toBeVisible();
+            await expect(frame.getByLabel('Time elapsed')).toBeVisible();
           },
         },
         {
@@ -77,7 +78,7 @@ test.describe('Link Preview', () => {
       ];
 
       for (const link of linkConfigs) {
-        await userAPages.conversation().sendTypedMessage(link.url);
+        await userAPages.conversation().sendMessage(link.url);
 
         // Validating the link preview for both users
         for (const pages of [userAPages, userBPages]) {
