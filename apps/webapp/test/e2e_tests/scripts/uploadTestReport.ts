@@ -111,6 +111,14 @@ type TestinyTestCaseMapping = {
 };
 
 function transformReportToTestinyMappings(report: JSONReport, runId: number) {
+  // Mapping from playwrights status to the result expected by Testiny
+  const resultMap: Record<JSONReportTest['status'], TestinyTestCaseMapping['mapped']['result_status']> = {
+    expected: 'PASSED',
+    unexpected: 'FAILED',
+    flaky: 'PASSED',
+    skipped: 'SKIPPED',
+  };
+
   return report.suites
     .flatMap(suite => getTests(suite))
     .reduce<TestinyTestCaseMapping[]>((acc, test) => {
@@ -118,13 +126,6 @@ function transformReportToTestinyMappings(report: JSONReport, runId: number) {
         .filter(tag => tag.startsWith('TC-'))
         .map(tag => Number(tag.replace('TC-', '')))
         .filter(Number.isInteger);
-
-      const resultMap: Record<JSONReportTest['status'], TestinyTestCaseMapping['mapped']['result_status']> = {
-        expected: 'PASSED',
-        unexpected: 'FAILED',
-        flaky: 'PASSED',
-        skipped: 'SKIPPED',
-      };
 
       for (const testId of testIds) {
         acc.push({
