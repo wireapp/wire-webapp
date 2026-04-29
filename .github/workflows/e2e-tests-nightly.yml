@@ -47,8 +47,10 @@ jobs:
       - name: Upload report to Testiny
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+          DESCRIPTION: |
+            Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           node ./apps/webapp/test/e2e_tests/scripts/uploadTestReport.ts \
           --runName="Regression $(date +'%m/%d/%Y')" \
-          --buildURL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+          --description="$DESCRIPTION" \
           --reportPath="./apps/webapp/playwright-report/report.json"

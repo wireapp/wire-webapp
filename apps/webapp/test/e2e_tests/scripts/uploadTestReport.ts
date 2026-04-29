@@ -30,9 +30,9 @@ const {values: args} = parseArgs({
       alias: 'name',
       description: 'Name of the test run',
     },
-    buildURL: {
+    description: {
       type: 'string',
-      description: 'URL linking to the current run in github, this will be added to the run description',
+      description: 'Description to add to the run, supports markdown',
     },
   },
 });
@@ -59,7 +59,7 @@ async function createTestRun(description?: string): Promise<TestRun> {
     body: JSON.stringify({
       title: args.runName,
       project_id: TESTINY_PROJECT_ID,
-      description: args.buildURL ? description : undefined,
+      description: description,
     }),
   });
 
@@ -153,11 +153,7 @@ async function main() {
   }
 
   const report: JSONReport = JSON.parse(fs.readFileSync(reportAbsPath, 'utf-8'));
-  const testRun = await createTestRun(`
-    <!--markdown-->
-    
-    Build URL: [${args.buildURL}](${args.buildURL})
-  `);
+  const testRun = await createTestRun(`<!--markdown-->\n${args.description}\n`);
 
   try {
     const testResults = transformReportToTestinyMappings(report, testRun.id);
