@@ -2223,50 +2223,57 @@ export class ConversationRepository {
   public ensureConversationExists = async ({
     conversationId,
     groupId,
-    epoch,
     core = this.core,
-    retry = true,
   }: {
     conversationId: QualifiedId;
     groupId: string;
-    epoch: number;
     core?: Account;
-    retry?: boolean;
   }): Promise<void> => {
-    this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
-    if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
-      const coreCryptoEpochNumber = await core.service?.mls?.getEpoch(groupId);
-      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch, coreCryptoEpochNumber});
-      if (coreCryptoEpochNumber === 0) {
-        if (!retry) {
-          this.logger.error('Epoch is 0, but retry is false, not retrying again', {
-            conversationId,
-            groupId,
-            epoch,
-            coreCryptoEpochNumber,
-          });
-          return;
-        }
-        return this.recoverFromLocalUnestablishedMLSConversations({
-          conversationId,
-          groupId,
-          epoch: coreCryptoEpochNumber,
-          core,
-        });
-      }
+    const conversationExistsOnCoreCrypto = await this.conversationService.mlsGroupExistsLocally(groupId);
+    const coreCryptoEpochNumberResult = await core.service?.mls?.getSafeEpoch(groupId);
+    const coreCryptoEpochNumber = coreCryptoEpochNumberResult.isOk ? coreCryptoEpochNumberResult.value : undefined;
+
+    this.logger.info('Ensuring conversation exists', {
+      conversationId,
+      groupId,
+      coreCryptoEpochNumber,
+      conversationExistsOnCoreCrypto,
+    });
+
+    if (coreCryptoEpochNumberResult.isErr) {
+      this.logger.warn(
+        'A conversation exists on core crypto but there was an error when retrieving its epoch number',
+        coreCryptoEpochNumberResult.error,
+      );
+    }
+
+    if (conversationExistsOnCoreCrypto && coreCryptoEpochNumber > 0) {
+      this.logger.info('Conversation is established and epoch is greater than 0, no action needed');
+      // return early so we don't make unnecessary calls to the backend to fetch remote conversation
       return;
     }
 
-    // establish the conversation if epoch is 0
-    if (epoch === 0) {
-      this.logger.info('Establishing conversation as epoch is 0', {conversationId, groupId, epoch});
-      await this.establishMlsGroupConversation({conversationId, groupId, epoch, core});
+    if (conversationExistsOnCoreCrypto && coreCryptoEpochNumber === 0) {
+      this.logger.info('Conversation already exists locally but epoch is 0, wiping it');
+
+      // The conversation was created locally but the initial commit was never accepted by the backend
+      // Wipe the conversation locally and join by external commit
+      await core.service?.conversation?.wipeMLSConversation(groupId);
+    }
+
+    const remoteConversation = await this.conversationService.getConversationById(conversationId);
+    const remoteEpoch = remoteConversation.epoch;
+
+    // establish the conversation if remote epoch is 0
+    if (remoteEpoch === 0) {
+      this.logger.info('Establishing conversation as remote epoch is 0', {remoteEpoch});
+      await this.establishMlsGroupConversation({conversationId, groupId, epoch: remoteEpoch, core});
       return;
     }
 
     // join by external commit
-    this.logger.info('Joining conversation by external commit', {conversationId, epoch});
-    if (epoch && epoch > 0) {
+    if (remoteEpoch && remoteEpoch > 0) {
+      this.logger.info('Joining conversation by external commit', {remoteEpoch});
       await this.core.service?.conversation?.joinByExternalCommit(conversationId);
     }
   };
@@ -2308,55 +2315,6 @@ export class ConversationRepository {
       selfUserClientId,
       conversationId,
     );
-  };
-
-  /**
-   * Recovers from local unestablished MLS conversations by refetching metadata and re-establishing the conversation.
-   * This is typically needed when the local epoch is 0 but the epoch on backend is greater than 0
-   * indicating that the conversation has not been properly established.
-   * throws error in case both local and remote MLS group are at epoch 0 or remote epoch is not available
-   */
-  private recoverFromLocalUnestablishedMLSConversations = async ({
-    conversationId,
-    groupId,
-    epoch,
-    core = this.core,
-  }: {
-    conversationId: QualifiedId;
-    groupId: string;
-    epoch: number;
-    core?: Account;
-  }) => {
-    try {
-      this.logger.info('Epoch is 0, refetching conversation metadata and re-establishing', {
-        conversationId,
-        groupId,
-        epoch,
-      });
-      await core.service?.conversation?.wipeMLSConversation(groupId);
-      const remoteConversation = await this.conversationService.getConversationById(conversationId);
-      const remoteEpoch = remoteConversation.epoch;
-      if (!remoteEpoch) {
-        this.logger.error('Remote epoch is not available!', {remoteConversation});
-        throw new Error('Remote epoch is not available!');
-      }
-      if (remoteEpoch === epoch) {
-        const errorMessage =
-          'Cannot recover: both local and remote MLS group are at epoch 0, the conversation was never established on the backend';
-        this.logger.error(errorMessage, {remoteEpoch, epoch});
-        throw new Error(errorMessage);
-      }
-
-      return this.ensureConversationExists({conversationId, groupId, epoch: remoteEpoch, core, retry: false});
-    } catch (error: unknown) {
-      this.logger.error('Failed to recover from local unestablished MLS conversation', {
-        error,
-        conversationId,
-        groupId,
-        epoch,
-      });
-      throw error;
-    }
   };
 
   /**

@@ -28,6 +28,7 @@ import {
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Converter, Decoder, Encoder} from 'bazinga64';
+import {Task, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
@@ -464,9 +465,27 @@ export class MLSService extends TypedEventEmitter<Events> {
     return {keyPackages: coreCryptoKeyPackagesPayload, failures};
   }
 
+  /**
+   * @deprecated Use `getSafeEpoch` to receive a `Task` with explicit error handling.
+   */
   public getEpoch(groupId: string | Uint8Array) {
     const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
     return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
+  }
+
+  /**
+   * Safely reads the current MLS epoch for a conversation.
+   *
+   * Returns a `Task` so errors are modeled in the type instead of surfacing
+   * as an uncaught promise rejection.
+   *
+   * A common rejection reason is a core-crypto error equivalent to:
+   * `MlsErrorOther: Couldn't find conversation` (for example when the group is
+   * not present on core-crypto level).
+   */
+  public getSafeEpoch(groupId: string | Uint8Array): Task<number, unknown> {
+    const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
+    return task.fromPromise(this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes)));
   }
 
   public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
@@ -536,7 +555,15 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.logger.info('Message decrypted successfully', {qualifiedConversationId, duration: Date.now() - start});
       return decryptedMessage;
     } catch (error: unknown) {
-      this.logger.warn('Failed to decrypt MLS message', {qualifiedConversationId, error});
+      // This is safe (read-only) and helps correlate decryption failures with local epoch.
+      const coreCryptoEpochNumber = await task.fromPromise(this.coreCryptoClient.conversationEpoch(conversationId));
+      this.logger.warn('Failed to decrypt MLS message', {
+        qualifiedConversationId,
+        coreCryptoEpochNumber: coreCryptoEpochNumber.isOk
+          ? coreCryptoEpochNumber.value
+          : 'Error retrieving epoch number',
+        error,
+      });
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
       if (shouldMLSDecryptionErrorBeIgnored(error)) {
         return {
@@ -1010,6 +1037,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       await this.schedulePendingProposalsTask(groupId, firingDate);
     } else {
+      this.logger.info('Trying to commit pending proposals immediately', {groupId});
       await this.commitPendingProposals(groupId);
     }
   }
@@ -1018,7 +1046,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     await this.coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
 
     TaskScheduler.addTask({
-      task: () => this.commitPendingProposals(groupId),
+      task: () => {
+        this.logger.info('Trying to commit pending proposals from scheduled task', {groupId});
+        return this.commitPendingProposals(groupId);
+      },
       firingDate,
       key: this.createPendingProposalsTaskKey(groupId),
     });
@@ -1098,7 +1129,12 @@ export class MLSService extends TypedEventEmitter<Events> {
             }
 
             TaskScheduler.addTask({
-              task: () => this.commitPendingProposals(groupId),
+              task: () => {
+                this.logger.info('Trying to commit pending proposals from startup rehydration', {
+                  groupId,
+                });
+                return this.commitPendingProposals(groupId);
+              },
               firingDate,
               key: this.createPendingProposalsTaskKey(groupId),
             });

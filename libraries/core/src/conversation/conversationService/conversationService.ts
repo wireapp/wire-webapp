@@ -566,6 +566,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * The join operation itself is not automatically re-run by policy.
    */
   public async joinByExternalCommit(conversationId: QualifiedId): Promise<void> {
+    this.logger.info('Joining MLS conversation via external commit (orchestrated)', {conversationId});
     await this.MLSRecoveryOrchestrator.execute({
       context: {operationName: OperationName.joinExternalCommit, qualifiedConversationId: conversationId},
       callBack: () => this.performJoinByExternalCommitAPI(conversationId),
@@ -574,6 +575,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   // Low-level API call for joining via external commit (no recovery logic)
   private async performJoinByExternalCommitAPI(conversationId: QualifiedId): Promise<void> {
+    this.logger.info('Joining MLS conversation via external commit (low-level)', {conversationId});
     await this.mlsService.joinByExternalCommit(() => this.apiClient.api.conversation.getGroupInfo(conversationId));
   }
 

@@ -91,6 +91,10 @@ export async function initMLSGroupConversation(
     onError?: (conversation: Conversation, error: unknown) => void;
   },
 ): Promise<void> {
+  logger.info('Initialising MLS group conversation', {
+    conversationId: mlsConversation.qualifiedId,
+    groupId: mlsConversation.groupId,
+  });
   const {mls: mlsService, conversation: conversationService} = core.service || {};
   if (!mlsService || !conversationService) {
     throw new Error('MLS or Conversation service is not available!');
@@ -112,7 +116,6 @@ export async function initMLSGroupConversation(
     await conversationRepository.ensureConversationExists({
       groupId,
       conversationId: qualifiedId,
-      epoch: mlsConversation.epoch,
       core,
     });
 
@@ -138,6 +141,7 @@ export async function initialiseSelfAndTeamConversations(
   selfClientId: string,
   core: Account,
 ): Promise<void> {
+  logger.info('Initialising self and team conversations');
   const {mls: mlsService, conversation: conversationService} = core.service || {};
   if (!mlsService || !conversationService) {
     throw new Error('MLS or Conversation service is not available!');
@@ -169,17 +173,15 @@ export async function initialiseSelfAndTeamConversations(
         return Promise.resolve();
       }
 
-      logger.info('Conversation does not exist, ensuring establishment', {
+      logger.info('Conversation is not established, trying to establish', {
         conversationId: conversation.qualifiedId,
         groupId: conversation.groupId,
-        epoch: conversation.epoch,
       });
 
       // Otherwise, we need to ensure the conversation exists by establishing it or joining it by external commit.
       await conversationRepository.ensureConversationExists({
         conversationId: conversation.qualifiedId,
         groupId: conversation.groupId,
-        epoch: conversation.epoch,
         core,
       });
     }),
