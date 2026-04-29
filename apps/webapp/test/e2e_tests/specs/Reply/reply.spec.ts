@@ -360,7 +360,7 @@ test.describe('Reply', () => {
     });
 
     await test.step('User B sends a message to User A', async () => {
-      await userBPages.conversation().sendMessage('Original Message');
+      await userBPages.conversation().sendMessage('Papaya');
     });
 
     await test.step('User B opens another conversation', async () => {
@@ -368,7 +368,8 @@ test.describe('Reply', () => {
     });
 
     await test.step("User A replies to User B's message", async () => {
-      const messageToReplyTo = userAPages.conversation().getMessage({content: 'Original Message'});
+      const messageToReplyTo = userAPages.conversation().getMessage({content: 'Papaya', sender: userB});
+      await expect(messageToReplyTo).toBeVisible();
       await userAPages.conversation().replyToMessage(messageToReplyTo);
       await userAPages.conversation().sendMessage('Reply');
 
@@ -379,28 +380,30 @@ test.describe('Reply', () => {
     });
 
     await test.step('User A edits the reply message', async () => {
+      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
       const replyMessage = userAPages.conversation().getMessage({content: 'Reply'});
+      await expect(userBPages.conversation().getMessage({content: 'Reply', sender: userA})).toBeVisible();
       await userAPages.conversation().editMessage(replyMessage);
       await expect(userAPages.conversation().replyQuoteBoxAboveMessageInputField).not.toBeVisible();
+      await expect(userAPages.conversation().messageInput).toContainText('Reply');
       await userAPages.conversation().sendMessage('Edited Reply');
+      await expect(userBPages.conversation().getMessage({content: 'Edited Reply', sender: userA})).toBeVisible();
     });
 
     await test.step('User B edits original message', async () => {
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-      const originalMessage = userBPages.conversation().getMessage({content: 'Original Message'}).first();
+      const originalMessage = userBPages.conversation().getMessage({content: 'Papaya', sender: userB});
       await expect(originalMessage).toBeVisible();
       await userBPages.conversation().editMessage(originalMessage);
-      await userBPages.conversation().sendMessage('Edited Original Message');
-      await expect(userBPages.conversation().getMessage({content: 'Edited Original Message'}).first()).toBeVisible();
-      await expect(
-        userAPages.conversation().getMessage({content: 'Edited Original Message', sender: userB}),
-      ).toBeVisible();
+      await expect(userBPages.conversation().messageInput).toContainText('Papaya');
+      await userBPages.conversation().sendMessage('Guava');
+      await expect(userBPages.conversation().getMessage({content: 'Guava', sender: userB})).toBeVisible();
+      await expect(userAPages.conversation().getMessage({content: 'Guava', sender: userB})).toBeVisible();
 
       // Check that quote in reply by User A is reflecting the changes to original message
       const replyFromUserA = userBPages.conversation().getMessage({content: 'Edited Reply', sender: userA});
       // Wait for the transient "deleted" placeholder to disappear to prevent flakiness during the edit sync
       await expect(replyFromUserA.getByTestId('quote-item')).not.toContainText('You cannot see this message');
-      await expect(replyFromUserA.getByTestId('quote-item')).toContainText('Edited Original Message');
+      await expect(replyFromUserA.getByTestId('quote-item')).toContainText('Guava');
     });
 
     const originalLink = 'www.lidl.de';
@@ -420,6 +423,7 @@ test.describe('Reply', () => {
     await test.step('User B edits the url in the original message', async () => {
       const linkMessage = userBPages.conversation().getMessage({content: `Here is a great link: ${originalLink}`});
       await userBPages.conversation().editMessage(linkMessage);
+      await expect(userBPages.conversation().messageInput).toContainText(`Here is a great link: ${originalLink}`);
       await userBPages.conversation().sendMessage('Here is another great link: www.kaufland.de');
 
       const linkFromUserB = userAPages
@@ -432,6 +436,7 @@ test.describe('Reply', () => {
       const replyMessageToLink = userAPages
         .conversation()
         .getMessage({content: 'Reply to the link message', sender: userA});
+      await expect(replyMessageToLink.getByTestId('quote-item')).not.toContainText('You cannot see this message');
 
       const [newTab] = await Promise.all([
         userAPageManager.page.waitForEvent('popup'),
