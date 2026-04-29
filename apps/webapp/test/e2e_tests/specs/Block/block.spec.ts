@@ -19,9 +19,9 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectionRequest, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
 
-import {createGroup} from '../../utils/userActions';
+import {createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 /* ========== Block Utils ========== */
 /**
@@ -83,9 +83,9 @@ test.describe('User Blocking', () => {
       'I want to cancel blocking a 1:1 conversation from conversation list',
       {tag: ['@TC-137', '@regression']},
       async ({createPage}) => {
-        const userAPageManager = (await PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))))
-          .webapp;
-        const {pages: userAPages, modals: userAModals} = userAPageManager;
+        const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+        await sendConnectionRequest(userAPageManager, userB);
+        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
 
         // Preconditions: User B accepts the connection request
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
@@ -113,9 +113,9 @@ test.describe('User Blocking', () => {
       'Verify you can block a user who is not in your team',
       {tag: ['@TC-140', '@regression']},
       async ({createPage}) => {
-        const userAPageManager = (await PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB))))
-          .webapp;
-        const {pages: userAPages, modals: userAModals} = userAPageManager;
+        const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+        await sendConnectionRequest(userAPageManager, userB);
+        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
 
         // Preconditions: User B accepts the connection request
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
@@ -155,14 +155,18 @@ test.describe('User Blocking', () => {
       'Verify you still receive messages from blocked person in a group chat',
       {tag: ['@TC-141', '@regression']},
       async ({createPage}) => {
-        const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectionRequest(userB)));
-        const userAPages = userAPageManager.webapp.pages;
-
-        const conversationName = 'GroupConversation';
+        const [userAPageManager, userBPageManager] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA))),
+          PageManager.from(createPage(withLogin(userB))),
+        ]);
+        const [userAPages, userBPages] = [userAPageManager, userBPageManager].map(pm => pm.webapp.pages);
 
         // Preconditions: User B accepts the connection request
-        const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
+        await sendConnectionRequest(userAPageManager, userB);
+        await userBPages.conversationList().openPendingConnectionRequest();
         await userBPages.connectRequest().clickConnectButton();
+
+        const conversationName = 'GroupConversation';
 
         await expect(userAPages.conversationList().getConversationLocator(userB.fullName)).toBeAttached();
         await createGroup(userAPages, conversationName, [userB]);
@@ -195,11 +199,9 @@ test.describe('User Blocking', () => {
       {tag: ['@TC-142', '@regression']},
 
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(
-          createPage(withLogin(userA), withConnectionRequest(userB)),
-        );
-        const userAPageManager = userAPageManagerInstance.webapp;
-        const {pages: userAPages, modals: userAModals} = userAPageManager;
+        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
+        await sendConnectionRequest(userAPageManagerInstance, userB);
+        const {pages: userAPages, modals: userAModals} = userAPageManagerInstance.webapp;
 
         // Preconditions: User B accepts the connection request
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
@@ -236,11 +238,9 @@ test.describe('User Blocking', () => {
       'Verify you cannot add a person who blocked you to a group chat',
       {tag: ['@TC-143', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(
-          createPage(withLogin(userA), withConnectedUser(userC), withConnectionRequest(userB)),
-        );
-        const userAPageManager = userAPageManagerInstance.webapp;
-        const {pages: userAPages, modals: userAModals} = userAPageManager;
+        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userC)));
+        await sendConnectionRequest(userAPageManagerInstance, userB);
+        const {pages: userAPages, modals: userAModals} = userAPageManagerInstance.webapp;
 
         const conversationName = 'Group Conversation';
 
@@ -276,9 +276,8 @@ test.describe('User Blocking', () => {
       'Verify you can block a user you sent a connection request from conversation list',
       {tag: ['@TC-144', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(
-          createPage(withLogin(userA), withConnectionRequest(userB)),
-        );
+        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
+        await sendConnectionRequest(userAPageManagerInstance, userB);
 
         // Preconditions: User B does not accept connection request
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
@@ -294,11 +293,9 @@ test.describe('User Blocking', () => {
       'Verify you can unblock someone from conversation list options',
       {tag: ['@TC-148', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(
-          createPage(withLogin(userA), withConnectedUser(userC), withConnectionRequest(userB)),
-        );
-        const userAPageManager = userAPageManagerInstance.webapp;
-        const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager;
+        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userC)));
+        await sendConnectionRequest(userAPageManagerInstance, userB);
+        const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManagerInstance.webapp;
 
         // Preconditions: User B accepts the connection request
         const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
