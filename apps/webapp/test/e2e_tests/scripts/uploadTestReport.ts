@@ -30,6 +30,11 @@ const {values: args} = parseArgs({
       alias: 'name',
       description: 'Name of the test run',
     },
+    testPlanId: {
+      type: 'string',
+      alias: 'testPlan',
+      description: 'ID of the test plan this run should be associated with',
+    },
     description: {
       type: 'string',
       description: 'Description to add to the run, supports markdown',
@@ -49,7 +54,7 @@ const getTests = (suite: JSONReportSuite): (JSONReportTest & Pick<JSONReportSpec
 };
 
 type TestRun = {id: number};
-async function createTestRun(description?: string): Promise<TestRun> {
+async function createTestRun(options?: {testPlanId?: number; description?: string}): Promise<TestRun> {
   const res = await fetch('https://app.testiny.io/api/v1/testrun', {
     method: 'POST',
     headers: {
@@ -59,7 +64,8 @@ async function createTestRun(description?: string): Promise<TestRun> {
     body: JSON.stringify({
       title: args.runName,
       project_id: TESTINY_PROJECT_ID,
-      description: description,
+      testplan_id: options?.testPlanId,
+      description: options?.description,
     }),
   });
 
@@ -153,7 +159,10 @@ async function main() {
   }
 
   const report: JSONReport = JSON.parse(fs.readFileSync(reportAbsPath, 'utf-8'));
-  const testRun = await createTestRun(`<!--markdown-->\n${args.description}\n`);
+  const testRun = await createTestRun({
+    testPlanId: Number.isInteger(+args.testPlanId) ? +args.testPlanId : undefined,
+    description: `<!--markdown-->\n${args.description}\n`,
+  });
 
   try {
     const testResults = transformReportToTestinyMappings(report, testRun.id);

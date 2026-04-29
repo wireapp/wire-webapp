@@ -47,10 +47,12 @@ jobs:
       - name: Upload report to Testiny
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+          TESTINY_TEST_PLAN_ID: 105 # 105 is the id of the "Regression" test plan within Testiny
           DESCRIPTION: |
             Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           node ./apps/webapp/test/e2e_tests/scripts/uploadTestReport.ts \
           --runName="Regression $(date +'%m/%d/%Y')" \
+          --testPlan="$TESTINY_TEST_PLAN_ID" \
           --description="$DESCRIPTION" \
           --reportPath="./apps/webapp/playwright-report/report.json"
