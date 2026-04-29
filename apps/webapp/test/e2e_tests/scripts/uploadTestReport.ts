@@ -22,17 +22,14 @@ const {values: args} = parseArgs({
     },
     reportPath: {
       type: 'string',
-      alias: 'report',
       description: 'Path to the playright report in json format',
     },
     runName: {
       type: 'string',
-      alias: 'name',
       description: 'Name of the test run',
     },
     testPlanId: {
       type: 'string',
-      alias: 'testPlan',
       description: 'ID of the test plan this run should be associated with',
     },
     description: {

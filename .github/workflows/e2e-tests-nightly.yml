@@ -53,6 +53,6 @@ jobs:
         run: |
           node ./apps/webapp/test/e2e_tests/scripts/uploadTestReport.ts \
           --runName="Regression $(date +'%m/%d/%Y - %H:%M')" \
-          --testPlan="$TESTINY_TEST_PLAN_ID" \
+          --testPlanId="$TESTINY_TEST_PLAN_ID" \
           --description="$DESCRIPTION" \
           --reportPath="./apps/webapp/playwright-report/report.json"
