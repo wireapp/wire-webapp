@@ -19,8 +19,8 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, test, Team, withConnectedUser, withConnectionRequest, withLogin} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from '../../utils/userActions';
+import {expect, test, Team, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
+import {createGroup, sendConnectionRequest} from '../../utils/userActions';
 import {UserProfileModal} from '../../pageManager/webapp/modals/userProfile.modal';
 
 type ProfileModalOptions = {
@@ -117,11 +117,13 @@ test.describe('Deep Links', () => {
       }
 
       const [userAPage, userBPage, userCPage, userDPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectionRequest(userC)),
-        createPage(withLogin(userB), withConnectedUser(userA), withConnectionRequest(userD)),
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB), withConnectedUser(userA)),
         createPage(withLogin(userC)),
         createPage(withLogin(userD)),
       ]);
+      await sendConnectionRequest(userAPage, userC);
+      await sendConnectionRequest(userBPage, userD);
 
       const userAPageManager = PageManager.from(userAPage);
       const userBPageManager = PageManager.from(userBPage);
