@@ -21,7 +21,8 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {getVideoFilePath, getAudioFilePath, getTextFilePath, isAssetDownloaded} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath, getLocalQRCodeValue, getQRCodeValueFromScreenshot} from 'test/e2e_tests/utils/sendImage.util';
 
-import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
+import {sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 const imageFilePath = getImageFilePath();
 const videoFilePath = getVideoFilePath();
@@ -36,9 +37,11 @@ test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTea
 
   // Create page managers - User A sends connection request to User B
   const [memberAPage, memberBPage] = await Promise.all([
-    createPage(withLogin(memberA), withConnectionRequest(memberB)),
+    createPage(withLogin(memberA)),
     createPage(withLogin(memberB)),
   ]);
+  await sendConnectionRequest(memberAPage, memberB);
+
   const [memberAPageManager, memberBPageManager] = [PageManager.from(memberAPage), PageManager.from(memberBPage)];
 
   // Step 1-1: Preconditions
