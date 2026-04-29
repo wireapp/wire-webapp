@@ -10,6 +10,8 @@ import {parseArgs} from 'node:util';
 import * as fs from 'node:fs';
 import type {JSONReport, JSONReportSpec, JSONReportSuite, JSONReportTest} from '@playwright/test/reporter';
 
+const TESTINY_PROJECT_ID = 3; // 3 is the id of the WEB project in Testiny
+
 const {values: args} = parseArgs({
   args: process.argv.slice(2),
   options: {
@@ -56,7 +58,7 @@ async function createTestRun(description?: string): Promise<TestRun> {
     },
     body: JSON.stringify({
       title: args.runName,
-      project_id: 3, // The Webapp project in testiny is id 3
+      project_id: TESTINY_PROJECT_ID,
       description: args.buildURL ? description : undefined,
     }),
   });
