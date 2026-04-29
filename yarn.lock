@@ -9761,7 +9761,7 @@ __metadata:
     babel-jest: "npm:30.3.0"
     babel-loader: "npm:10.1.1"
     babel-plugin-transform-import-meta: "npm:2.3.3"
-    baseline-browser-mapping: "npm:2.10.22"
+    baseline-browser-mapping: "npm:2.10.23"
     beautiful-react-hooks: "npm:5.0.3"
     browserslist: "npm:4.28.2"
     classnames: "npm:2.5.1"
@@ -10965,12 +10965,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"baseline-browser-mapping@npm:2.10.22":
-  version: 2.10.22
-  resolution: "baseline-browser-mapping@npm:2.10.22"
+"baseline-browser-mapping@npm:2.10.23":
+  version: 2.10.23
+  resolution: "baseline-browser-mapping@npm:2.10.23"
   bin:
     baseline-browser-mapping: dist/cli.cjs
-  checksum: 10/2f798ebadf42a4c260400236e00e4b2bf2886781cf4557a11d3f06f0e9674c00b983f8806dc858e2ad28e073333240352771b85e918f9fdd0f90d8a12d9f531c
+  checksum: 10/54c21dbc86b79f53b1c15fc7577695f1ccf6e1dba0aaa9161ad818848330c45c5d6c5debdcac16807037d04371b828213976a25ea77cc4b30466d9b52bbc702c
   languageName: node
   linkType: hard
 
