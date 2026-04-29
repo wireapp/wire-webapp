@@ -161,6 +161,19 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     ).toBeVisible();
   });
 
+  await test.step('Personal user A opens About -> terms of use link in settings', async () => {
+    const {pages, components} = pageManagerA.webapp;
+
+    await components.conversationSidebar().clickPreferencesButton();
+    await pages.settings().clickAboutButton();
+
+    const [newTab] = await Promise.all([pageManagerA.page.waitForEvent('popup'), pages.about().clickTermsOfUseLink()]);
+
+    await expect(newTab).toHaveURL(/legal#terms/);
+
+    await newTab.close();
+  });
+
   await test.step('Personal User A deletes their account', async () => {
     const {pages, modals, components} = pageManagerA.webapp;
     await components.conversationSidebar().clickPreferencesButton();
