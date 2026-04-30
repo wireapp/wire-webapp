@@ -19,9 +19,9 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
-import {expect, test, withConnectedUser, withLogin} from '../../test.fixtures';
+import {expect, test, withLogin} from '../../test.fixtures';
 
 test.describe('Accessibility', () => {
   let userA: User;
@@ -86,7 +86,10 @@ test.describe('Accessibility', () => {
       'I should not lose a drafted message when switching between conversations in collapsed view',
       {tag: ['@TC-51', '@regression']},
       async ({createPage}) => {
-        const pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
+        const page = await createPage(withLogin(userA));
+        await connectWithUser(page, userB);
+
+        const {pages} = PageManager.from(page).webapp;
 
         await createGroup(pages, 'Test Group', [userB]);
         await pages.conversation().messageInput.fill('Draft Message');
