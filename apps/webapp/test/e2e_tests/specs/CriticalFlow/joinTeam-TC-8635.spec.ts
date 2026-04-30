@@ -18,9 +18,9 @@
  */
 
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, withLogin, withConnectedUser} from '../../test.fixtures';
+import {test, expect, withLogin} from '../../test.fixtures';
 
 test(
   'New person joins team and sets up device',
@@ -41,7 +41,9 @@ test(
       await team.addTeamMember(userA);
     });
 
-    const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(owner))).webapp.pages;
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, owner);
+    const userAPages = PageManager.from(userAPage).webapp.pages;
 
     await test.step('A sends text to owner', async () => {
       await userAPages.conversationList().getConversation(owner.fullName).open();
