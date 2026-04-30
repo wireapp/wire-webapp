@@ -37,12 +37,15 @@ export type BackgroundEffectSelection =
   | {type: 'virtual'; backgroundId: string}
   | {type: 'custom'};
 
-/**
- * Background source type for virtual background mode.
- *
- * Supports both HTMLImageElement (loaded images) and ImageBitmap (processed bitmaps).
- */
-export type BackgroundSource = HTMLImageElement | ImageBitmap;
+export type ImageBackgroundSource = HTMLImageElement | ImageBitmap | ReadableStream;
+
+export type BackgroundSource = {
+  type: 'image' | 'video' | 'stream';
+  media?: ImageBackgroundSource;
+  url: string;
+  video?: HTMLVideoElement;
+  track?: MediaStreamTrack;
+};
 
 /**
  * Default background effect selection (no effect applied).
@@ -265,13 +268,27 @@ export const loadBackgroundSource = async (backgroundId: string): Promise<Backgr
   }
   const cachedImage = getCachedImage(backgroundId);
   if (cachedImage) {
-    return cachedImage;
+    return {
+      type: 'image',
+      media: cachedImage,
+      url: background.imageUrl,
+    };
   }
   try {
     const image = await loadImage(background.imageUrl);
     setCachedImage(backgroundId, image);
-    return image;
+    return {
+      type: 'image',
+      media: image,
+      url: background.imageUrl,
+    };
   } catch (_error) {
-    return createGradientBitmap(background.previewColors);
+    return createGradientBitmap(background.previewColors).then(bitmap => {
+      return {
+        type: 'image',
+        media: bitmap,
+        url: background.imageUrl,
+      };
+    });
   }
 };

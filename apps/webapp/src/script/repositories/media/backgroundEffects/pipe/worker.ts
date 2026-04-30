@@ -19,15 +19,15 @@
 
 import {Metrics} from 'Repositories/media/backgroundEffects';
 
-import {ProcessVideoTrackOptions} from './options';
-import {runSegmenter, options} from './segmenter';
+import {WorkerProcessVideoTrackOptions} from './options';
+import {runSegmenter, globalOptions} from './segmenter';
 
 self.onmessage = ({data}) => {
   // console.log(`[virtual-background] worker onmessage`, data);
   const {name} = data as {name: string};
   if (name === 'options') {
-    const {options: opts} = data as {options: ProcessVideoTrackOptions};
-    Object.assign(options, opts);
+    const {options: opts} = data as {options: WorkerProcessVideoTrackOptions};
+    Object.assign(globalOptions, opts);
   } else if (name === 'runSegmenter') {
     const {
       canvas,
@@ -36,7 +36,7 @@ self.onmessage = ({data}) => {
     } = data as {
       canvas: OffscreenCanvas;
       readable: ReadableStream;
-      options: ProcessVideoTrackOptions;
+      options: WorkerProcessVideoTrackOptions;
     };
     runSegmenter(canvas, readable, opts, (stats: Metrics) => {
       self.postMessage({name: 'stats', stats});

@@ -20,16 +20,16 @@
 import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
 
 import {VideoFilter} from './filter';
-import {ProcessVideoTrackOptions} from './options';
+import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
 import type {Metrics} from '../backgroundEffectsWorkerTypes';
 import {createMetricsWindow, pushMetricsSample, buildMetrics} from '../helper/metrics';
 
-export let options = {} as ProcessVideoTrackOptions;
+export let globalOptions = {} as WorkerProcessVideoTrackOptions;
 
 async function createSegmenter(canvas: OffscreenCanvas) {
-  const {wasmLoaderPath, wasmBinaryPath, modelPath} = options;
+  const {wasmLoaderPath, wasmBinaryPath, modelPath} = globalOptions;
   const fileset =
     wasmLoaderPath && wasmBinaryPath
       ? {
@@ -53,22 +53,14 @@ async function createSegmenter(canvas: OffscreenCanvas) {
   return segmenter;
 }
 
-export type SegmenterStats = {
-  fps: number;
-  totalMs: number;
-  segmentationMs: number;
-  gpuMs: number;
-  filterMs: number;
-};
-
 export async function runSegmenter(
   canvas: OffscreenCanvas,
   readable: ReadableStream,
-  opts: ProcessVideoTrackOptions,
+  opts: WorkerProcessVideoTrackOptions,
   onMetrics: (metrics: Metrics) => void,
 ) {
   // console.log(`[virtual-background] runSegmenter`, {canvas, options, readable});
-  options = opts;
+  globalOptions = opts;
 
   let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
@@ -114,7 +106,7 @@ export async function runSegmenter(
   const effectsCanvas = new OffscreenCanvas(1, 1);
   const videoFilter = new VideoFilter(effectsCanvas);
 
-  const useSelfieModel = !!options.modelPath?.includes('selfie_segmenter');
+  const useSelfieModel = !!globalOptions.modelPath?.includes('selfie_segmenter');
 
   // Metrics
   const metricsWindow = createMetricsWindow(60);
@@ -167,10 +159,16 @@ export async function runSegmenter(
         let gpuMs = 0;
 
         try {
-          if (options.enabled) {
-            if (options.enableFilters) {
+          if (globalOptions.enabled) {
+            if (globalOptions.enableFilters) {
               const filterStart = performance.now();
-              videoFilter.render(videoFrame, options.blur, options.brightness, options.contrast, options.gamma);
+              videoFilter.render(
+                videoFrame,
+                globalOptions.blur,
+                globalOptions.brightness,
+                globalOptions.contrast,
+                globalOptions.gamma,
+              );
               filterMs = performance.now() - filterStart;
             }
 
@@ -178,7 +176,7 @@ export async function runSegmenter(
 
             await new Promise<void>(resolve => {
               segmenter.segmentForVideo(
-                options.enableFilters ? effectsCanvas : videoFrame,
+                globalOptions.enableFilters ? effectsCanvas : videoFrame,
                 timestamp * 1000,
                 result => {
                   segmentationMs = performance.now() - segStart;
@@ -194,9 +192,15 @@ export async function runSegmenter(
 
                     const categoryTextureMP = categoryMask.getAsWebGLTexture();
                     const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
-
                     const gpuStart = performance.now();
-                    webGLRenderer?.render(videoFrame, options, categoryTextureMP, confidenceTextureMP, useSelfieModel);
+                    console.log('############# segmenter', {...globalOptions});
+                    webGLRenderer?.render(
+                      videoFrame,
+                      globalOptions,
+                      categoryTextureMP,
+                      confidenceTextureMP,
+                      useSelfieModel,
+                    );
                     gpuMs = performance.now() - gpuStart;
                   } catch (e) {
                     console.error('Error in videoCallback:', e);
@@ -210,7 +214,7 @@ export async function runSegmenter(
             });
           } else {
             const gpuStart = performance.now();
-            webGLRenderer?.render(videoFrame, options);
+            webGLRenderer?.render(videoFrame, globalOptions);
             gpuMs = performance.now() - gpuStart;
           }
         } finally {
@@ -249,7 +253,7 @@ export async function runSegmenter(
         }
 
         // Restart segmenter to avoid memory leaks.
-        if (options.restartEvery && totalFrames % options.restartEvery === 0) {
+        if (globalOptions.restartEvery && totalFrames % globalOptions.restartEvery === 0) {
           restartSegmenter();
         }
       },

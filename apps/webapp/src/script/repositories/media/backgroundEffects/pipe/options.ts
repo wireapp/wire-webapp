@@ -17,17 +17,10 @@
  *
  */
 
+import {Runtime} from '@wireapp/commons';
+
 import {EffectMode, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
-
-export type ImageBackgroundSource = HTMLImageElement | ImageBitmap | ReadableStream;
-
-export type BackgroundSource = {
-  type: string;
-  media?: ImageBackgroundSource;
-  url: string;
-  video?: HTMLVideoElement;
-  track?: MediaStreamTrack;
-};
+import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 
 export type ProcessVideoTrackOptions = {
   // MediaPipe options.
@@ -40,7 +33,7 @@ export type ProcessVideoTrackOptions = {
   mode?: EffectMode; /** Effect mode ('blur', 'virtual', or 'passthrough'). Default: 'blur'. */
   blurStrength: number;
   enabled: boolean;
-  backgroundSource?: BackgroundSource | null;
+  backgroundSource: BackgroundSource | null;
 
   // quality mode
   quality: QualityMode;
@@ -58,12 +51,25 @@ export type ProcessVideoTrackOptions = {
   bgBlur: number;
   bgBlurRadius: number;
 
-  // Filter options.
+  // Filter options. please let disabled at the beginning because this will need extra render call and eats performance
   enableFilters: boolean;
   blur: number;
   brightness: number;
   contrast: number;
   gamma: number;
+};
+
+// Make options type serializable for worker
+export type WorkerBackgroundSource = {
+  type: 'image' | 'video' | 'stream';
+  media?: ImageBitmap;
+  url: string;
+};
+export type WorkerProcessVideoTrackOptions = Omit<
+  ProcessVideoTrackOptions,
+  'onMetrics' | 'onModelChange' | 'backgroundSource'
+> & {
+  backgroundSource: WorkerBackgroundSource | null;
 };
 
 /**
@@ -74,7 +80,7 @@ export const defaultOpts = {
   wasmLoaderPath: '/min/mediapipe/wasm/vision_wasm_internal.js',
   wasmBinaryPath: '/min/mediapipe/wasm/vision_wasm_internal.wasm',
   modelPath: '/assets/mediapipe-models/selfie_multiclass_256x256.tflite',
-  useWorker: false,
+  useWorker: !Runtime.isFirefox(),
 
   // Virtual background options.
   mode: 'blur',

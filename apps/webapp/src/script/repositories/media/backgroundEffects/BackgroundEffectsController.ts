@@ -17,20 +17,7 @@
  *
  */
 
-/**
- * Main controller for background effects processing pipeline.
- *
- * This class orchestrates the entire background effects system, managing:
- * - BackgroundEffectsRenderingPipeline selection (worker-webgl2, main-webgl2, canvas2d, passthrough)
- * - Frame processing and routing to appropriate pipeline
- * - Runtime configuration (mode, quality, blur strength, debug mode)
- * - Background source management (images and videos)
- * - Resource lifecycle (initialization, cleanup)
- *
- * The controller automatically selects the best available pipeline based on
- * browser capabilities and processes video frames through the selected pipeline
- * to produce an output MediaStreamTrack with effects applied.
- */
+import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/logger';
 
 import {
@@ -41,7 +28,12 @@ import {
   type QualityTier,
 } from './backgroundEffectsWorkerTypes';
 import {detectCapabilities} from './helper/capability';
-import {defaultOpts, ImageBackgroundSource, ProcessVideoTrackOptions} from './pipe/options';
+import {
+  defaultOpts,
+  ProcessVideoTrackOptions,
+  WorkerBackgroundSource,
+  WorkerProcessVideoTrackOptions,
+} from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
 import {runSegmenter} from './pipe/segmenter';
 
@@ -54,14 +46,14 @@ export class BackgroundEffectsController {
   private onMetrics: ((metrics: Metrics) => void) | null = null;
   private onModelChange: ((model: string) => void) | null = null;
 
-  private capabilityInfo: CapabilityInfo = {
+  private readonly capabilityInfo: CapabilityInfo = {
     offscreenCanvas: false,
     worker: false,
     webgl2: false,
     requestVideoFrameCallback: false,
   };
-  private maxQualityTier: QualityTier = 'superhigh';
 
+  private maxQualityTier: QualityTier = 'superhigh';
   private refcount = 0;
 
   /**
@@ -79,7 +71,6 @@ export class BackgroundEffectsController {
     options: ProcessVideoTrackOptions,
   ): Promise<{outputTrack: MediaStreamTrack; stop: () => void}> {
     this.refcount++;
-
     this.onMetrics = options.onMetrics;
 
     const trackCapabilities = inputTrack.getCapabilities();
@@ -98,7 +89,6 @@ export class BackgroundEffectsController {
     const canvas = document.createElement('canvas');
     const outputTrack = canvas.captureStream(frameRate).getVideoTracks()[0];
     const offscreen = canvas.transferControlToOffscreen();
-    // let graph: Graph | null = null;
 
     const outputTrackStop = outputTrack.stop.bind(outputTrack);
 
@@ -114,10 +104,6 @@ export class BackgroundEffectsController {
           this.worker = null;
         }
       }
-      // if (graph) {
-      //   graph.remove();
-      //   graph = null;
-      // }
     };
 
     outputTrack.getCapabilities = () => trackCapabilities;
@@ -130,6 +116,9 @@ export class BackgroundEffectsController {
         this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
       }
       const {options: workerOptions, transferables} = this.getWorkerOptions(this.options);
+
+      console.log('###### workerOptions', workerOptions, transferables);
+
       transferables.push(offscreen, readable);
 
       this.worker.postMessage(
@@ -144,7 +133,9 @@ export class BackgroundEffectsController {
         }
       });
     } else {
-      await runSegmenter(offscreen, readable, this.options, stats => this.onMetrics(stats));
+      console.log('### hhhhhworkerOptions');
+      const {options: workerOptions} = this.getWorkerOptions(this.options);
+      await runSegmenter(offscreen, readable, workerOptions, stats => this.onMetrics(stats));
     }
 
     return {
@@ -157,25 +148,77 @@ export class BackgroundEffectsController {
 
   public stop(): void {}
 
-  private getWorkerOptions(options: ProcessVideoTrackOptions) {
-    const opts = {...options};
+  private getWorkerOptions(options: ProcessVideoTrackOptions): {
+    options: WorkerProcessVideoTrackOptions;
+    transferables: Transferable[];
+  } {
+    const {onMetrics, onModelChange, backgroundSource, ...rest} = options;
+
     const transferables: Transferable[] = [];
-    if (opts.backgroundSource?.media) {
-      const {type, media, url} = opts.backgroundSource;
-      opts.backgroundSource = {type, media, url};
-      transferables.push(media);
-    } else {
-      delete opts.backgroundSource;
+
+    let workerBackgroundSource: WorkerBackgroundSource | null = null;
+
+    // Copy all sources
+    if (backgroundSource) {
+      const {type, media, url} = backgroundSource;
+
+      workerBackgroundSource = {
+        type,
+        media: null, // we remove media
+        url,
+      };
+
+      // Only push when the media is truly transferable and this is only the case for ImageBitmap
+      if (media instanceof ImageBitmap) {
+        workerBackgroundSource.media = media;
+        transferables.push(media);
+      }
     }
-    if (options.backgroundSource) {
-      options.backgroundSource.media = undefined;
-    }
-    return {options: opts, transferables};
+
+    console.log('###### workerBackgroundSource', workerBackgroundSource);
+
+    return {
+      options: {
+        ...rest,
+        backgroundSource: workerBackgroundSource,
+      },
+      transferables,
+    };
   }
 
-  /// --- interface
-  public setBackgroundSource(source: ImageBackgroundSource): void {
-    this.logger.info('setBackgroundSource', source);
+  public setBackgroundSource(source: BackgroundSource): void {
+    // if (source instanceof HTMLImageElement) {
+    //   createImageBitmap(source)
+    //     .then(bitmap => {
+    //
+    //       bitmap.
+    //     } else if (newSource.type === 'image') {
+    //
+    //     const {media, url} = newSource as {media: ImageBitmap; url: string};
+    //       const newSource = BackgroundSource {
+    //       type: 'image';
+    //       media: bitmap;
+    //       url: '----';
+    //     }
+    //
+    //
+    //       if (!this.pipelineImpl) {
+    //         bitmap.close();
+    //         return;
+    //       }
+    //
+    //
+    //       this.pipelineImpl.setBackgroundImage(bitmap, source.naturalWidth, source.naturalHeight);
+    //     })
+    //     .catch((error: unknown) => this.logger.warn('Failed to set background image', error));
+    //   return;
+    // }
+    //
+    // if (!this.pipelineImpl) {
+    //   source.close();
+    //   return;
+    // }
+    // this.pipelineImpl.setBackgroundImage(source, source.width, source.height);
   }
 
   public setMode(mode: EffectMode): void {
