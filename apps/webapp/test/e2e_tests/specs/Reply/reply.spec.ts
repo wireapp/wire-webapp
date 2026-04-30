@@ -19,10 +19,10 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Reply', () => {
   let userA: User;
@@ -35,7 +35,9 @@ test.describe('Reply', () => {
   });
 
   test('I should not be able to reply to a ping', {tag: ['@TC-8038', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
+    const pages = PageManager.from(page).webapp.pages;
 
     await pages.conversation().sendPing();
     const ping = pages.conversation().systemMessages.last();
@@ -46,7 +48,9 @@ test.describe('Reply', () => {
   });
 
   test('I should not be able to reply to timed messages', {tag: ['@TC-8039', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
+    const pages = PageManager.from(page).webapp.pages;
 
     await pages.conversation().enableSelfDeletingMessages();
     await pages.conversation().sendMessage('Gone in 10s');
@@ -60,10 +64,11 @@ test.describe('Reply', () => {
     'I want to see a placeholder text as quote when original message is not available anymore',
     {tag: ['@TC-2994', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -87,7 +92,10 @@ test.describe('Reply', () => {
     'I should not see the quoted message when searching for original message in collections',
     {tag: ['@TC-2996', '@regression']},
     async ({createPage}) => {
-      const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
+      const pages = PageManager.from(page).webapp.pages;
+
       await pages.conversation().sendMessage('Test');
 
       const messageToReplyTo = pages.conversation().getMessage({content: 'Test'});
@@ -110,7 +118,10 @@ test.describe('Reply', () => {
       const longMessage =
         'This is a very long message which should be truncated within the UI since it is as already stated very long.';
 
-      const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
+      const pages = PageManager.from(page).webapp.pages;
+
       await pages.conversation().sendMessage(longMessage);
 
       const messageToReplyTo = pages.conversation().getMessage({content: longMessage});
@@ -124,8 +135,10 @@ test.describe('Reply', () => {
   );
 
   test('I want to reply to a picture', {tag: ['@TC-3002', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
+
     await shareAssetHelper(getImageFilePath(), page, page.getByRole('button', {name: 'Add picture'}));
 
     const messageWithImage = pages.conversation().getMessage({sender: userA});
@@ -137,7 +150,8 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to an audio message', {tag: ['@TC-3003', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
 
     await shareAssetHelper(getAudioFilePath(), page, page.getByRole('button', {name: 'Add file'}));
@@ -151,8 +165,10 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a video message', {tag: ['@TC-3004', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
+
     await shareAssetHelper(getVideoFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
     const messageWithVideo = pages.conversation().getMessage({sender: userA});
@@ -164,7 +180,10 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a link', {tag: ['@TC-3005', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
+    const pages = PageManager.from(page).webapp.pages;
+
     await pages.conversation().sendMessage('https://www.lidl.de/');
 
     const messageWithLink = pages.conversation().getMessage({sender: userA});
@@ -176,8 +195,10 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a file', {tag: ['@TC-3006', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
     const pages = PageManager.from(page).webapp.pages;
+
     await shareAssetHelper(getTextFilePath(), page, page.getByRole('button', {name: 'Add file'}));
 
     const messageWithFile = pages.conversation().getMessage({sender: userA});
@@ -189,7 +210,10 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a reply', {tag: ['@TC-3007', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
+    const pages = PageManager.from(page).webapp.pages;
+
     await pages.conversation().sendMessage('Message');
 
     const message = pages.conversation().getMessage({content: 'Message'});
@@ -205,7 +229,10 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a link mixed with text', {tag: ['@TC-3008', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
+    const pages = PageManager.from(page).webapp.pages;
+
     await pages.conversation().sendMessage('Link: https://www.lidl.de/');
 
     const messageWithLink = pages.conversation().getMessage({sender: userA});
@@ -218,7 +245,9 @@ test.describe('Reply', () => {
   });
 
   test('I want to reply to a location share', {tag: ['@TC-3009', '@regression']}, async ({createPage, api}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
+    const pages = PageManager.from(page).webapp.pages;
 
     await test.step('Prerequisite: Send location via TestService', async () => {
       const {instanceId} = await api.testService.createInstance(
@@ -250,7 +279,10 @@ test.describe('Reply', () => {
     'I want to send a timed message as a reply to any type of a message',
     {tag: ['@TC-3011', '@regression']},
     async ({createPage}) => {
-      const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
+      const pages = PageManager.from(page).webapp.pages;
+
       await pages.conversation().sendMessage('Message');
 
       const message = pages.conversation().getMessage({sender: userA});
@@ -267,7 +299,10 @@ test.describe('Reply', () => {
     'I want to click the quoted message to jump to the original message',
     {tag: ['@TC-3013', '@regression']},
     async ({createPage}) => {
-      const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
+      const pages = PageManager.from(page).webapp.pages;
+
       await pages.conversation().sendMessage('Message');
       await pages.conversation().sendMessage('Line\n'.repeat(50)); // Send a message with a lot of lines to test the scrolling behavior
 
@@ -322,7 +357,9 @@ test.describe('Reply', () => {
     'I want to reply with mention and tap on the mention in the reply opens the user profile',
     {tag: ['@TC-3016', '@regression']},
     async ({createPage}) => {
-      const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
+      const pages = PageManager.from(page).webapp.pages;
 
       await pages.conversation().sendMessageWithUserMention(userB.fullName, 'Message');
       const message = pages.conversation().getMessage({content: 'Message'});
@@ -345,9 +382,10 @@ test.describe('Reply', () => {
   // TODO: flaky due to Bug-Ticket [WPB-25411]
   test.skip('I want to edit my reply', {tag: ['@TC-3019', '@regression']}, async ({createPage}) => {
     const [userAPageManager, userBPageManager] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+      PageManager.from(createPage(withLogin(userA))),
       PageManager.from(createPage(withLogin(userB))),
     ]);
+    await connectWithUser(userAPageManager, userB);
 
     const {pages: userAPages} = userAPageManager.webapp;
     const {pages: userBPages} = userBPageManager.webapp;
