@@ -484,8 +484,13 @@ export class MLSService extends TypedEventEmitter<Events> {
    * not present on core-crypto level).
    */
   public getSafeEpoch(groupId: string | Uint8Array): Task<number, unknown> {
-    const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
-    return task.fromPromise(this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes)));
+    return task.tryOrElse(
+      errorReason => `Failed to get safe epoch for group ${groupId}: ${errorReason}`,
+      () => {
+        const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
+        return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
+      },
+    );
   }
 
   public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
@@ -556,7 +561,12 @@ export class MLSService extends TypedEventEmitter<Events> {
       return decryptedMessage;
     } catch (error: unknown) {
       // This is safe (read-only) and helps correlate decryption failures with local epoch.
-      const coreCryptoEpochNumber = await task.fromPromise(this.coreCryptoClient.conversationEpoch(conversationId));
+      const coreCryptoEpochNumber = await task.tryOrElse(
+        errorReason => `Failed to collect epoch details for decryption failure: ${conversationId}: ${errorReason}`,
+        () => {
+          return this.coreCryptoClient.conversationEpoch(conversationId);
+        },
+      );
       this.logger.warn('Failed to decrypt MLS message', {
         qualifiedConversationId,
         coreCryptoEpochNumber: coreCryptoEpochNumber.isOk
