@@ -36,6 +36,7 @@ import {
 import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';
 import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
+import {CellsRootHomeIcon} from './CellsRootHomeIcon';
 
 import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
@@ -69,6 +70,7 @@ export const CellsHeader = ({
     baseCrumb: t('cells.breadcrumb.files', {conversationName}),
     currentPath: getCellsFilesPath(),
   });
+  const isRootLevel = breadcrumbs.length === 1;
 
   return (
     <div css={wrapperStyles}>
@@ -110,15 +112,19 @@ export const CellsHeader = ({
       </div>
       {!isSearchViewOpen && (
         <div css={breadcrumbsRowStyles}>
-          <CellsBreadcrumbs
-            items={breadcrumbs}
-            onItemClick={item =>
-              openBreadcrumb({
-                conversationQualifiedId,
-                path: breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '',
-              })
-            }
-          />
+          {isRootLevel ? (
+            <CellsRootHomeIcon />
+          ) : (
+            <CellsBreadcrumbs
+              items={breadcrumbs}
+              onItemClick={item =>
+                openBreadcrumb({
+                  conversationQualifiedId,
+                  path: breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '',
+                })
+              }
+            />
+          )}
         </div>
       )}
     </div>

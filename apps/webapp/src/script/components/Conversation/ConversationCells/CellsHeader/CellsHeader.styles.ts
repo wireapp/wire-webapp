@@ -47,6 +47,12 @@ export const breadcrumbsRowStyles: CSSObject = {
   gap: '10px',
 };
 
+export const rootHomeIconStyles: CSSObject = {
+  width: '14px',
+  height: '14px',
+  flexShrink: 0,
+};
+
 export const actionsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
