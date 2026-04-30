@@ -20,9 +20,9 @@
 import {AudioType} from 'Repositories/audio/audioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withConnectedUser, withLogin, expect, Team, withConnectionRequest} from 'test/e2e_tests/test.fixtures';
+import {test, withConnectedUser, withLogin, expect, Team} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Calling', () => {
   let userA: User;
@@ -477,13 +477,14 @@ test.describe('Calling', () => {
     {tag: ['@TC-2844', '@regression']},
     async ({createPage, createUser}) => {
       const guestUser = await createUser();
-      const [userAPages, userBPages, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectionRequest(guestUser))).then(
-          pm => pm.webapp.pages,
-        ),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(guestUser))).then(pm => pm.webapp.pages),
+      const [userAPage, userBPage, guestPage] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userB))),
+        PageManager.from(createPage(withLogin(guestUser))),
       ]);
+      await sendConnectionRequest(userAPage, guestUser);
+
+      const [userAPages, userBPages, guestPages] = [userAPage, userBPage, guestPage].map(pm => pm.webapp.pages);
 
       // --- Setup and Call Initialization ---
       await test.step('Setup: Accept connection and start group call', async () => {

@@ -19,17 +19,9 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {
-  test,
-  expect,
-  withConnectedUser,
-  withLogin,
-  Team,
-  withConnectionRequest,
-  LOGIN_TIMEOUT,
-} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withConnectedUser, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
-import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Conversations', () => {
   let team: Team;
@@ -135,20 +127,23 @@ test.describe('Conversations', () => {
     {tag: ['@TC-421', '@regression']},
     async ({createPage, createUser}) => {
       const guestUser = await createUser();
-      const [adminPage, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(guestUser))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(guestUser))).then(pm => pm.webapp.pages),
+      const [adminPage, guestPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(guestUser)),
       ]);
+      await sendConnectionRequest(adminPage, guestUser);
+
+      const [adminPages, guestPages] = [adminPage, guestPage].map(page => PageManager.from(page).webapp.pages);
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
-      await expect(adminPage.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
+      await expect(adminPages.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
 
-      await createGroup(adminPage, groupName, [userB, guestUser]);
+      await createGroup(adminPages, groupName, [userB, guestUser]);
 
-      await adminPage.conversationList().openConversation(groupName);
-      await adminPage.conversation().clickConversationInfoButton();
-      await expect(adminPage.conversationDetails().getUserRoleIcon(guestUser.fullName)).toHaveAttribute(
+      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversation().clickConversationInfoButton();
+      await expect(adminPages.conversationDetails().getUserRoleIcon(guestUser.fullName)).toHaveAttribute(
         'data-uie-name',
         'status-guest',
       );
@@ -161,21 +156,24 @@ test.describe('Conversations', () => {
     async ({createPage, createUser}) => {
       const guestUser = await createUser();
 
-      const [adminPage, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(guestUser))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(guestUser))).then(pm => pm.webapp.pages),
+      const [adminPage, guestPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(guestUser)),
       ]);
+      await sendConnectionRequest(adminPage, guestUser);
+
+      const [adminPages, guestPages] = [adminPage, guestPage].map(page => PageManager.from(page).webapp.pages);
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
-      await expect(adminPage.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
+      await expect(adminPages.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
 
-      await createGroup(adminPage, groupName, [userB, guestUser]);
+      await createGroup(adminPages, groupName, [userB, guestUser]);
 
-      await adminPage.conversationList().openConversation(groupName);
-      await adminPage.conversation().clickConversationInfoButton();
+      await adminPages.conversationList().openConversation(groupName);
+      await adminPages.conversation().clickConversationInfoButton();
 
-      await expect(adminPage.conversation().membersList.filter({hasText: guestUser.fullName})).toBeVisible();
+      await expect(adminPages.conversation().membersList.filter({hasText: guestUser.fullName})).toBeVisible();
     },
   );
 

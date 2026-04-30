@@ -1,16 +1,8 @@
 import {Page} from 'playwright/test';
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {
-  test,
-  expect,
-  withLogin,
-  Team,
-  LOGIN_TIMEOUT,
-  withGuestUser,
-  withConnectionRequest,
-} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from 'test/e2e_tests/test.fixtures';
+import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 /**
  * Navigates through the UI to generate a guest invitation link for a specific group.
@@ -177,12 +169,13 @@ test.describe('Guestroom', () => {
     'I should not see guests when adding people to existing conversation when guest toggle is OFF',
     {tag: ['@TC-3318', '@regression']},
     async ({createPage}) => {
-      const [ownerPages, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(guestUser))).then(
-          ({webapp}) => webapp.pages,
-        ),
-        PageManager.from(createPage(withLogin(guestUser))).then(({webapp}) => webapp.pages),
+      const [ownerPage, guestPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(guestUser)),
       ]);
+      await sendConnectionRequest(ownerPage, guestUser);
+
+      const [ownerPages, guestPages] = [ownerPage, guestPage].map(page => PageManager.from(page).webapp.pages);
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();

@@ -20,8 +20,8 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
-import {test, expect, withLogin, withConnectionRequest} from '../../test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {test, expect, withLogin} from '../../test.fixtures';
+import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Connections', () => {
   let memberA: User;
@@ -35,10 +35,11 @@ test.describe('Connections', () => {
     'Verify 1on1 conversation is not created on the second end after you ignore connection request',
     {tag: ['@TC-365', '@regression']},
     async ({createPage}) => {
-      const [memberBPages] = await Promise.all([
+      const [memberBPages, memberAPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(memberA), withConnectionRequest(memberB))),
+        PageManager.from(createPage(withLogin(memberA))),
       ]);
+      await sendConnectionRequest(memberAPageManager, memberB);
 
       await memberBPages.conversationList().pendingConnectionRequest.click();
       await memberBPages.conversation().clickIgnoreButton();
@@ -52,13 +53,17 @@ test.describe('Connections', () => {
     {tag: ['@TC-369', '@regression']},
     async ({createPage, createUser}) => {
       const memberC = await createUser();
-      const [memberAPages, memberBPages, memberCPages] = await Promise.all([
-        PageManager.from(
-          createPage(withLogin(memberA), withConnectionRequest(memberB), withConnectionRequest(memberC)),
-        ).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(memberC))).then(pm => pm.webapp.pages),
+      const [memberAPage, memberBPage, memberCPage] = await Promise.all([
+        PageManager.from(createPage(withLogin(memberA))),
+        PageManager.from(createPage(withLogin(memberB))),
+        PageManager.from(createPage(withLogin(memberC))),
       ]);
+      await sendConnectionRequest(memberAPage, memberB);
+      await sendConnectionRequest(memberAPage, memberC);
+
+      const [memberAPages, memberBPages, memberCPages] = [memberAPage, memberBPage, memberCPage].map(
+        page => page.webapp.pages,
+      );
 
       await test.step('B & C accept connection requests from A', async () => {
         for (const pages of [memberBPages, memberCPages]) {
@@ -91,10 +96,11 @@ test.describe('Connections', () => {
     'I want to cancel a pending request from conversation list',
     {tag: ['@TC-370', '@regression']},
     async ({createPage}) => {
-      const [memberBPages] = await Promise.all([
+      const [memberBPages, memberAPageManager] = await Promise.all([
         PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(memberA), withConnectionRequest(memberB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(memberA))),
       ]);
+      await sendConnectionRequest(memberAPageManager, memberB);
 
       await memberBPages.conversationList().pendingConnectionRequest.click();
       await memberBPages.conversation().ignoreButton.click();
@@ -107,8 +113,10 @@ test.describe('Connections', () => {
     'I want to archive a pending request from conversation list',
     {tag: ['@TC-371', '@regression']},
     async ({createPage}) => {
-      const {pages} = PageManager.from(await createPage(withLogin(memberA), withConnectionRequest(memberB))).webapp;
+      const pageManager = PageManager.from(await createPage(withLogin(memberA)));
+      await sendConnectionRequest(pageManager, memberB);
 
+      const {pages} = pageManager.webapp;
       const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
       await contextMenu.archiveButton.click();
 

@@ -17,7 +17,7 @@
  *
  */
 
-import {expect, TestInfo} from 'playwright/test';
+import {expect, Page, TestInfo} from 'playwright/test';
 
 import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
@@ -85,8 +85,8 @@ export const createGroup = async (
  * Opens the connections tab, searches for the given user and starts a conversation with him
  * Note: This util only works if both users are part of the same team.
  */
-export async function connectWithUser(senderPageManager: PageManager, receiver: Pick<User, 'username'>) {
-  const {pages, modals, components} = senderPageManager.webapp;
+export async function connectWithUser(sender: Page | PageManager, receiver: Pick<User, 'username'>) {
+  const {pages, modals, components} = ('webapp' in sender ? sender : PageManager.from(sender)).webapp;
   await components.conversationSidebar().clickConnectButton();
   await pages.startUI().searchInput.fill(receiver.username);
   await pages.startUI().selectUsers(receiver.username);
@@ -97,8 +97,8 @@ export async function connectWithUser(senderPageManager: PageManager, receiver: 
  * Opens the connections tab, searches for the given user and sends a connection request
  * Note: This util only works if both users are NOT in the same team
  */
-export async function sendConnectionRequest(senderPageManager: PageManager, receiver: User) {
-  const {pages, modals, components} = senderPageManager.webapp;
+export async function sendConnectionRequest(sender: Page | PageManager, receiver: User) {
+  const {pages, modals, components} = ('webapp' in sender ? sender : PageManager.from(sender)).webapp;
   await components.conversationSidebar().clickConnectButton();
   await pages.startUI().searchInput.fill(receiver.username);
   await pages.startUI().selectUsers(receiver.username);
