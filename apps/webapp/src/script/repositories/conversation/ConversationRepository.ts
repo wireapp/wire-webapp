@@ -2242,7 +2242,7 @@ export class ConversationRepository {
 
     if (coreCryptoEpochNumberResult.isErr) {
       this.logger.warn(
-        'A conversation exists on core crypto but there was an error when retrieving its epoch number',
+        'conversation existed on core crypto but there was an error when retrieving its epoch number',
         coreCryptoEpochNumberResult.error,
       );
     }
