@@ -102,7 +102,7 @@ test.describe('Ping', () => {
       await userAPages.conversation().sendPing();
 
       await expect(userAModals.confirm().modal).toBeVisible();
-      await expect(await userAModals.confirm().getModalTitle()).toContain('Are you sure you want to ping 5 people?');
+      await expect(userAModals.confirm().modalTitle).toContainText('Are you sure you want to ping 5 people?');
     },
   );
 });
