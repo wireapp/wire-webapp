@@ -49,7 +49,7 @@ test(
 
     await test.step('Owner starts call', async () => {
       const {pages, components} = ownerPageManager.webapp;
-      await pages.conversationList().openConversation(conversationName);
+      await pages.conversationList().getConversationLocator(conversationName).open();
       await pages.conversation().startCall();
 
       await expect(components.calling().callCell).toBeVisible();
@@ -57,7 +57,7 @@ test(
 
     await test.step('Member joins call and goes full screen', async () => {
       const {pages, components} = memberPageManager.webapp;
-      await pages.conversationList().openConversation(conversationName);
+      await pages.conversationList().getConversationLocator(conversationName).open();
       const memberCalling = components.calling();
       await expect(memberCalling.callCell).toBeVisible();
 

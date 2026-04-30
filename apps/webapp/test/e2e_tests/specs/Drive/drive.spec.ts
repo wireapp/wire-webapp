@@ -80,8 +80,8 @@ test.describe('Conversations', () => {
       });
 
       await test.step('User A sends an image to User B in a group conversation', async () => {
-        await userAPages.conversationList().openConversation(conversationName);
-        await userBPages.conversationList().openConversation(conversationName);
+        await userAPages.conversationList().getConversationLocator(conversationName).open();
+        await userBPages.conversationList().getConversationLocator(conversationName).open();
         await userAComponents.inputBarControls().clickShareFile(imageFilePath);
         await userAComponents.inputBarControls().clickSendMessage();
 
@@ -127,11 +127,11 @@ test.describe('Conversations', () => {
       });
 
       await test.step('User A sends a multipart message in a group conversation', async () => {
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversationList().getConversationLocator(conversationName).open();
         await userAComponents.inputBarControls().clickShareFile(imageFilePath);
         await userAComponents.inputBarControls().setMessageInput(initialMessageText);
         await userAComponents.inputBarControls().clickSendMessage();
-        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().getConversationLocator(conversationName).open();
 
         const multipartMessage = userBPages.conversation().getMessage({sender: userA});
         await expect(multipartMessage).toContainText(initialMessageText);
@@ -168,11 +168,11 @@ test.describe('Conversations', () => {
       });
 
       await test.step('User A sends a multipart message to User B in a group conversation', async () => {
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversationList().getConversationLocator(conversationName).open();
         await userAComponents.inputBarControls().clickShareFile(imageFilePath);
         await userAComponents.inputBarControls().setMessageInput(initialMessageText);
         await userAComponents.inputBarControls().clickSendMessage();
-        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().getConversationLocator(conversationName).open();
 
         const multipartMessage = userBPages.conversation().getMessage({sender: userA});
         await expect(multipartMessage).toContainText(initialMessageText);
@@ -208,11 +208,11 @@ test.describe('Conversations', () => {
       });
 
       await test.step('User A sends a message with assets in a group conversation', async () => {
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAPages.conversationList().getConversationLocator(conversationName).open();
         await userAComponents.inputBarControls().clickShareFile(imageFilePath);
         await userAComponents.inputBarControls().clickShareFile(videoFilePath);
         await userAComponents.inputBarControls().clickSendMessage();
-        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().getConversationLocator(conversationName).open();
 
         await expect(getImageInMultipartMessageLocator(userBPages.conversation(), userA)).toBeVisible();
         await expect(getVideoInMultipartMessageLocator(userBPages.conversation(), userA)).toBeVisible();

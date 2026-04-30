@@ -52,21 +52,22 @@ test(
 
     await test.step('User A mentions User B in the group', async () => {
       const {pages} = userAPageManager.webapp;
-      await pages.conversationList().openConversation(conversationName);
+      await pages.conversationList().getConversationLocator(conversationName).open();
       await pages.conversation().sendMessageWithUserMention(userB.fullName, messageText);
     });
 
     await test.step('User B should receive mention', async () => {
       const {pages} = userBPageManager.webapp;
-      await expect(pages.conversationList().getConversationLocator(conversationName).mentionIndicator).toBeVisible();
+      const conversation = pages.conversationList().getConversationLocator(conversationName);
+      await expect(conversation.mentionIndicator).toBeVisible();
 
-      await pages.conversationList().openConversation(conversationName);
+      await conversation.open();
       await expect(pages.conversation().getMessage({content: `@${userB.fullName} ${messageText}`})).toBeVisible();
     });
 
     await test.step('User A sends image', async () => {
       const {pages, components} = userAPageManager.webapp;
-      await pages.conversationList().openConversation(conversationName);
+      await pages.conversationList().getConversationLocator(conversationName).open();
       await components.inputBarControls().clickShareImage(imageFilePath);
 
       await expect(

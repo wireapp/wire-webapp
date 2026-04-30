@@ -60,7 +60,7 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({creat
   });
 
   await test.step('Team owner confirm member left', async () => {
-    await ownerPages.conversationList().openConversation(conversation1);
+    await ownerPages.conversationList().getConversationLocator(conversation1).open();
     await expect(ownerPages.conversation().systemMessages.filter({hasText: `${member.fullName} left`})).toBeVisible();
   });
 
@@ -76,7 +76,7 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({creat
   });
 
   await test.step('Team member confirms admin status', async () => {
-    await memberPages.conversationList().openConversation(conversation2);
+    await memberPages.conversationList().getConversationLocator(conversation2).open();
     await memberPages.conversation().toggleGroupInformation();
     await expect(memberPages.conversation().adminsList.filter({hasText: member.fullName})).toBeVisible();
   });
@@ -88,12 +88,12 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({creat
   });
 
   await test.step('Team member verifies they have been removed by the owner', async () => {
-    await memberPages.conversationList().openConversation(conversation2);
+    await memberPages.conversationList().getConversationLocator(conversation2).open();
     await expect(memberPages.conversation().messageInput).not.toBeAttached();
   });
 
   await test.step('Team owner add member back to the same conversation', async () => {
-    await ownerPages.conversationList().openConversation(conversation2);
+    await ownerPages.conversationList().getConversationLocator(conversation2).open();
     await expect(
       ownerPages.conversation().systemMessages.filter({hasText: `You removed ${member.fullName}`}),
     ).toBeVisible();
@@ -102,7 +102,7 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({creat
   });
 
   await test.step('Team member confirms they have been added back to the conversation', async () => {
-    await memberPages.conversationList().openConversation(conversation2);
+    await memberPages.conversationList().getConversationLocator(conversation2).open();
     await memberPages.conversation().toggleGroupInformation();
     await expect(
       memberPages.conversation().systemMessages.filter({hasText: `${owner.fullName} added you to the conversation`}),
@@ -110,12 +110,12 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({creat
   });
 
   await test.step('Team owner promote member to admin', async () => {
-    await ownerPages.conversationList().openConversation(conversation2);
+    await ownerPages.conversationList().getConversationLocator(conversation2).open();
     await ownerPages.conversation().makeUserAdmin(member.fullName);
   });
 
   await test.step('Team member confirms admin status', async () => {
-    await memberPages.conversationList().openConversation(conversation2);
+    await memberPages.conversationList().getConversationLocator(conversation2).open();
     await memberPages.conversation().toggleGroupInformation();
     await expect(memberPages.conversation().adminsList.filter({hasText: member.fullName})).toBeVisible();
   });

@@ -40,10 +40,12 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
     ...memberPages.map(page => PageManager.from(page)),
   ];
 
+  const conversation = ownerPageManager.webapp.pages.conversationList().getConversationLocator(conversationName);
+
   await test.step('Team owner creates a group with all the five members', async () => {
     const {pages} = ownerPageManager.webapp;
     await createGroup(pages, conversationName, members);
-    await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
+    await expect(conversation).toBeVisible();
   });
 
   await test.step('Team owner sends a message in the conversation', async () => {
@@ -64,7 +66,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
 
   await test.step('Team owner signed in to the application and verify messages', async () => {
     const {pages} = ownerPageManager.webapp;
-    await pages.conversationList().openConversation(conversationName);
+    await conversation.open();
     await Promise.all(
       members.map(async member => {
         const message = pages.conversation().getMessage({content: `Hello team! ${member.firstName} here.`});
@@ -90,14 +92,14 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
   await test.step('Team owner open searched conversation', async () => {
     const {pages} = ownerPageManager.webapp;
     await pages.conversationList().searchConversationsInput.fill(conversationName);
-    await pages.conversationList().openConversation(conversationName);
-    await expect(pages.conversationList().getConversationLocator(conversationName)).toBeVisible();
-    await pages.conversationList().openConversation(conversationName);
+    await conversation.open();
+    await expect(conversation).toBeVisible();
+    await conversation.open();
   });
 
   await test.step('Team owner leave conversation with clear history', async () => {
     const {pages, modals} = ownerPageManager.webapp;
-    const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
+    const contextMenu = await conversation.openContextMenu();
     await contextMenu.leaveConversationButton.click();
     await modals.leaveConversation().toggleCheckbox();
     await modals.leaveConversation().clickConfirm();

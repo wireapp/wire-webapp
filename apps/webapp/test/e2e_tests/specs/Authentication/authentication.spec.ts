@@ -162,7 +162,7 @@ test.describe('Authentication', () => {
         });
 
         await test.step('Send a message', async () => {
-          await pages.conversationList().openConversation(userB.fullName);
+          await pages.conversationList().getConversationLocator(userB.fullName).open();
           await pages.conversation().sendMessage('Before refresh');
         });
 
@@ -172,7 +172,7 @@ test.describe('Authentication', () => {
 
           await pageManager.refreshPage({waitUntil: 'load'});
 
-          await pages.conversationList().openConversation(userB.fullName);
+          await pages.conversationList().getConversationLocator(userB.fullName).open();
           await expect(message).toBeVisible();
         });
       },
@@ -213,7 +213,7 @@ test.describe('Authentication', () => {
 
       await test.step('Connect with and send message to userB', async () => {
         await connectWithUser(pageManager, userB);
-        await pages.conversationList().openConversation(userB.fullName);
+        await pages.conversationList().getConversationLocator(userB.fullName).open();
         await pages.conversation().sendMessage('Test message');
         await expect(pages.conversation().getMessage({content: 'Test message'})).toBeVisible();
       });
@@ -233,7 +233,7 @@ test.describe('Authentication', () => {
       });
 
       await test.step('Verify previously sent message is gone', async () => {
-        await pages.conversationList().openConversation(userB.fullName);
+        await pages.conversationList().getConversationLocator(userB.fullName).open();
         await expect(pages.conversation().getMessage({content: 'Test message'})).not.toBeAttached();
       });
     },

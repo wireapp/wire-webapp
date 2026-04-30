@@ -153,7 +153,7 @@ test.describe('Deep Links', () => {
       );
 
       await test.step('User B sends all profile links to User A', async () => {
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await userBPages.conversationList().getConversationLocator(userA.fullName).open();
 
         const userLabels = ['A', 'B', 'C', 'D'];
 
@@ -164,17 +164,17 @@ test.describe('Deep Links', () => {
 
       await test.step('User B creates group and sends conversation join link to User A', async () => {
         await createGroup(userBPages, groupName, []);
-        await userBPages.conversationList().openConversation(groupName);
+        await userBPages.conversationList().getConversationLocator(groupName).open();
         await userBPages.conversation().toggleGroupInformation();
         await userBPages.conversationDetails().openGuestOptions();
 
         const conversationJoinLink = await userBPages.guestOptions().createLink();
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
         await userBPages.conversation().sendMessage(`Group conversation: ${conversationJoinLink}`);
       });
 
       await test.step('User A verifies information for every user profile modal', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
 
         // Verify information for User A
         await userAPages.conversation().getMessage({content: 'User A:'}).getByRole('link').click();

@@ -53,13 +53,13 @@ test.describe('Calling', () => {
       ]);
 
       // User A has a call with user B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversationLocator(userB.fullName).open();
       await userAPages.conversation().clickCallButton();
       await userBPages.calling().clickAcceptCallButton();
       await expect(userBPages.calling().callCell).toBeVisible();
 
       // User A starts a call with user C while in a call with user B
-      await userAPages.conversationList().openConversation(userC.fullName);
+      await userAPages.conversationList().getConversationLocator(userC.fullName).open();
       await userAPages.conversation().clickCallButton();
 
       // A modal is shown prompting him to confirm before cancelling the ongoing call
@@ -83,7 +83,7 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // Establish group call; required precondition for hand-raise testing
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversationLocator(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userBPages.calling().callCell).toBeVisible();
@@ -114,7 +114,7 @@ test.describe('Calling', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversationList().getConversationLocator(userB.fullName).open();
     await userAPages.conversation().clickCallButton();
     await userBPages.calling().clickAcceptCallButton();
 
@@ -137,7 +137,7 @@ test.describe('Calling', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().clickCallButton();
 
       const {joinCallButton} = userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'});
@@ -174,10 +174,10 @@ test.describe('Calling', () => {
       const userBDevice2Pages = PageManager.from(userBPage2).webapp.pages;
 
       if (conversationType === '1on1') {
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().getConversationLocator(userB.fullName).open();
       } else {
         await createGroup(userAPages, 'Calling group', [userB]);
-        await userAPages.conversationList().openConversation('Calling group');
+        await userAPages.conversationList().getConversationLocator('Calling group').open();
       }
 
       // Ensure no audio is playing on both devices initially
@@ -211,7 +211,7 @@ test.describe('Calling', () => {
       ]);
 
       // User A calls user B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversationLocator(userB.fullName).open();
       await userAPages.conversation().clickCallButton();
 
       // User B declines the call
@@ -219,7 +219,7 @@ test.describe('Calling', () => {
       await expect(userBPages.calling().callCell).not.toBeVisible();
 
       // User B calls user C instead
-      await userBPages.conversationList().openConversation(userC.fullName);
+      await userBPages.conversationList().getConversationLocator(userC.fullName).open();
       await expect(userBPages.conversation().callButton).toBeEnabled();
       await userBPages.conversation().startCall();
       await expect(userBPages.calling().callCell).toBeVisible();
@@ -236,7 +236,7 @@ test.describe('Calling', () => {
     const userCPages = PageManager.from(userCPage).webapp.pages;
     await createGroup(userAPages, groupName, [userB, userC]);
 
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversationLocator(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -263,7 +263,7 @@ test.describe('Calling', () => {
 
     await createGroup(userAPages, groupName, [userB, userC]);
 
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversationLocator(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -286,7 +286,7 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // User A initiates the call
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversationLocator(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -315,7 +315,7 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // User A initiates the call
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversationLocator(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -343,7 +343,7 @@ test.describe('Calling', () => {
       await createGroup(userAPages, groupName, [userB]);
 
       await test.step('User A starts a call and User B joins', async () => {
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversationLocator(groupName).open();
         await userAPages.conversation().clickCallButton();
 
         await expect(userAPages.calling().callCell).toBeVisible();
@@ -354,7 +354,7 @@ test.describe('Calling', () => {
       });
 
       await test.step('User A joins then leaves the call from their second device', async () => {
-        await userADevice2Pages.conversationList().openConversation(groupName);
+        await userADevice2Pages.conversationList().getConversationLocator(groupName).open();
         await userADevice2Pages.conversation().clickCallButton();
         await expect(userADevice2Pages.calling().callCell).toBeVisible();
 
@@ -391,7 +391,7 @@ test.describe('Calling', () => {
       await createGroup(userAPages, groupName, [userB, userC]);
 
       // User A initiates the call
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversationLocator(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPages.calling().callCell).toBeVisible();
@@ -427,7 +427,7 @@ test.describe('Calling', () => {
       await createGroup(userAPages, groupName, [userB]);
 
       // User A initiates the call
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversationLocator(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPages.calling().callCell).toBeVisible();
@@ -463,7 +463,7 @@ test.describe('Calling', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
 
       await createGroup(userAPages, groupName, allMembers);
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversationLocator(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPage.getByTestId('modal-without-title')).toContainText(
@@ -493,7 +493,7 @@ test.describe('Calling', () => {
 
         await createGroup(userAPages, groupName, [userB, guestUser]);
 
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversationLocator(groupName).open();
         await userAPages.conversation().clickCallButton();
       });
 

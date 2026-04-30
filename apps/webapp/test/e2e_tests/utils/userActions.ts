@@ -59,7 +59,7 @@ export const sendTextMessageToConversation = async (
   message: string,
 ) => {
   const {pages} = pageManager.webapp;
-  await pages.conversationList().openConversation(conversation);
+  await pages.conversationList().getConversationLocator(conversation).open();
   await pages.conversation().sendMessage(message);
 };
 

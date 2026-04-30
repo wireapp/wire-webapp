@@ -56,7 +56,7 @@ test(
         const response = await api.callingService.createInstance(member.password, member.email);
         callingServiceInstanceId = response.id;
         await api.callingService.setAcceptNextCall(callingServiceInstanceId);
-        await pages.conversationList().openConversation(channelName);
+        await pages.conversationList().getConversationLocator(channelName).open();
         await pages.conversation().clickCallButton();
       } catch (error: unknown) {
         console.error('Error during call initiation:', error);
