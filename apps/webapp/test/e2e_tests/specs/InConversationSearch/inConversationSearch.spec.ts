@@ -331,6 +331,7 @@ test.describe('In Conversation Search', () => {
 
     await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
     await userAPages.conversation().sendMessage('User A message: Guava');
+    await expect(userBPages.conversation().messages).toHaveCount(2);
 
     const messageUserB = userBPages.conversation().getMessage({sender: userB});
     await userBPages.conversation().deleteMessage(messageUserB, 'Everyone');
