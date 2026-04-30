@@ -90,7 +90,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   await test.step('Personal user A sends a connection request to personal user B', async () => {
     const {pages, modals} = pageManagerA.webapp;
     await modals.userProfile().clickConnectButton();
-    await pages.conversationList().openConversation(userB.fullName);
+    await pages.conversationList().getConversation(userB.fullName).open();
     await expect(pages.outgoingConnection().uniqueUsernameOutgoing).toContainText(userB.username);
     await expect(pages.outgoingConnection().getPendingConnectionIconLocator(userB.fullName)).toBeVisible();
   });
@@ -98,17 +98,17 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   await test.step('Personal user B accepts request from A', async () => {
     await pageManagerB.webapp.pages.conversationList().openPendingConnectionRequest();
     await pageManagerB.webapp.pages.connectRequest().clickConnectButton();
-    await expect(pageManagerB.webapp.pages.conversationList().getConversationLocator(userA.fullName)).toBeVisible();
+    await expect(pageManagerB.webapp.pages.conversationList().getConversation(userA.fullName)).toBeVisible();
   });
 
   await test.step('Personal user A send message to personal user B', async () => {
     const {pages} = pageManagerA.webapp;
-    await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await pages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     await pages.conversation().sendMessage(`Hello! ${userA.firstName} here.`);
   });
 
   await test.step('Personal user B can see the message from user A', async () => {
-    await pageManagerB.webapp.pages.conversationList().openConversation(userA.fullName);
+    await pageManagerB.webapp.pages.conversationList().getConversation(userA.fullName).open();
     await expect(
       pageManagerB.webapp.pages.conversation().getMessage({content: `Hello! ${userA.firstName} here.`}),
     ).toBeVisible();
@@ -116,7 +116,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   await test.step('Personal user A blocks personal user B', async () => {
     const {pages, modals} = pageManagerA.webapp;
-    const conversation = pages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'});
+    const conversation = pages.conversationList().getConversation(userB.fullName, {protocol: 'mls'});
 
     await expect(conversation).not.toContainText('Blocked');
     const contextMenu = await conversation.openContextMenu();
@@ -135,7 +135,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     await pageManagerC.webapp.components.conversationSidebar().clickConnectButton();
     await pageManagerC.webapp.pages.startUI().selectUsers(userA.username);
     await pageManagerC.webapp.modals.userProfile().clickConnectButton();
-    await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName);
+    await pageManagerC.webapp.pages.conversationList().getConversation(userA.fullName).open();
     await expect(pageManagerC.webapp.pages.outgoingConnection().uniqueUsernameOutgoing).toContainText(userA.username);
     await expect(
       pageManagerC.webapp.pages.outgoingConnection().getPendingConnectionIconLocator(userA.fullName),
@@ -150,12 +150,12 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   await test.step('Personal user A send message to personal user C', async () => {
     const {pages} = pageManagerA.webapp;
-    await pages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
+    await pages.conversationList().getConversation(userC.fullName, {protocol: 'mls'}).open();
     await pages.conversation().sendMessage(`Hello! ${userA.firstName} here.`);
   });
 
   await test.step('Personal user C can see the message from user A', async () => {
-    await pageManagerC.webapp.pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await pageManagerC.webapp.pages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await expect(
       pageManagerC.webapp.pages.conversation().getMessage({content: `Hello! ${userA.firstName} here.`}),
     ).toBeVisible();

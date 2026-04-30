@@ -46,7 +46,7 @@ test(
       const {pages} = userAPageManager.webapp;
       await api.callingService.setAcceptNextCall(callingServiceInstanceId);
 
-      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversationList().getConversation(userB.fullName).open();
       await pages.conversation().clickConversationInfoButton();
       await pages.conversation().clickCallButton();
     });
