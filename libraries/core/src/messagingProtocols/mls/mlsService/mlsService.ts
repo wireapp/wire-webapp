@@ -561,7 +561,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       return decryptedMessage;
     } catch (error: unknown) {
       // This is safe (read-only) and helps correlate decryption failures with local epoch.
-      const coreCryptoEpochNumber = await task.tryOrElse(
+      const coreCryptoEpochNumber = await task.tryOrElse<number, unknown>(
         errorReason => `Failed to collect epoch details for decryption failure: ${conversationId}: ${errorReason}`,
         () => {
           return this.coreCryptoClient.conversationEpoch(conversationId);
@@ -569,7 +569,10 @@ export class MLSService extends TypedEventEmitter<Events> {
       );
       this.logger.warn('Failed to decrypt MLS message', {
         qualifiedConversationId,
-        coreCryptoEpochNumber: coreCryptoEpochNumber.isOk ? coreCryptoEpochNumber.value : coreCryptoEpochNumber.error,
+        coreCryptoEpochError: coreCryptoEpochNumber.match({
+          Ok: epoch => epoch,
+          Err: errorReason => errorReason,
+        }),
         error,
       });
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
