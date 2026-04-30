@@ -40,7 +40,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
     ...memberPages.map(page => PageManager.from(page)),
   ];
 
-  const conversation = ownerPageManager.webapp.pages.conversationList().getConversationLocator(conversationName);
+  const conversation = ownerPageManager.webapp.pages.conversationList().getConversation(conversationName);
 
   await test.step('Team owner creates a group with all the five members', async () => {
     const {pages} = ownerPageManager.webapp;

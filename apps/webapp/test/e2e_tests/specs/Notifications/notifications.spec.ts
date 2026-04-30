@@ -27,7 +27,7 @@ test.describe('Notifications', () => {
     const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
     // Send message from A to B in 1on1 conversation
-    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     await userAPages.conversation().sendMessageWithUserMention(userB.fullName, 'Hello');
 
     // Check the notifications B received to contain the message from A
@@ -61,13 +61,13 @@ test.describe('Notifications', () => {
       // Archive conversation for user B
       const conversation = await userBPages
         .conversationList()
-        .getConversationLocator(userA.fullName, {protocol: 'mls'})
+        .getConversation(userA.fullName, {protocol: 'mls'})
         .open();
       const contextMenu = await conversation.openContextMenu();
       await contextMenu.archiveButton.click();
 
       // Send message from A to B in 1on1 conversation
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Hello');
 
       // Open the archived conversation and ensure the message was received
@@ -86,7 +86,7 @@ test.describe('Notifications', () => {
     async ({createPage}) => {
       const pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
 
-      const conversation = await pages.conversationList().getConversationLocator(userB.fullName).open();
+      const conversation = await pages.conversationList().getConversation(userB.fullName).open();
       const contextMenu = await conversation.openContextMenu();
       await contextMenu.notificationsButton.click();
       await pages.conversationDetails().selectNotificationsLevel('Nothing');
@@ -100,7 +100,7 @@ test.describe('Notifications', () => {
     {tag: ['@TC-1438', '@regression']},
     async ({createPage}) => {
       const pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
-      const conversation = pages.conversationList().getConversationLocator(userB.fullName);
+      const conversation = pages.conversationList().getConversation(userB.fullName);
 
       await test.step('Mute conversation', async () => {
         const contextMenu = await conversation.openContextMenu();
@@ -139,7 +139,7 @@ test.describe('Notifications', () => {
         // Depending on the current test case mute either the group or the 1on1
         await userBPages
           .conversationList()
-          .getConversationLocator(conversationType === 'group' ? 'Test Group' : userA.fullName)
+          .getConversation(conversationType === 'group' ? 'Test Group' : userA.fullName)
           .open();
         await userBPages.conversation().clickConversationInfoButton();
         await expect(userBPages.conversationDetails().notificationsButton).toContainText('Everything');
@@ -154,7 +154,7 @@ test.describe('Notifications', () => {
         // User A sends a message to the muted conversation
         await userAPages
           .conversationList()
-          .getConversationLocator(conversationType === 'group' ? 'Test Group' : userB.fullName)
+          .getConversation(conversationType === 'group' ? 'Test Group' : userB.fullName)
           .open();
         await userAPages.conversation().sendMessage('Test Message');
         await expect.poll(() => getUserBNotifications()).toHaveLength(0);
@@ -174,14 +174,14 @@ test.describe('Notifications', () => {
       // User B mutes the conversation with User A
       const conversation = await userBPages
         .conversationList()
-        .getConversationLocator(userA.fullName, {protocol: 'mls'})
+        .getConversation(userA.fullName, {protocol: 'mls'})
         .open();
       const contextMenu = await conversation.openContextMenu();
       await contextMenu.notificationsButton.click();
       await userBPages.conversationDetails().selectNotificationsLevel('Nothing');
 
       // User A initiates a call to User B
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().clickCallButton();
 
       // Verify that User B sees a "Join" button on the muted conversation
@@ -203,11 +203,11 @@ test.describe('Notifications', () => {
       // Open 1on1 conversation between users
       const userAConversation = await userAPages
         .conversationList()
-        .getConversationLocator(userB.fullName, {protocol: 'mls'})
+        .getConversation(userB.fullName, {protocol: 'mls'})
         .open();
       const userBConversation = await userBPages
         .conversationList()
-        .getConversationLocator(userA.fullName, {protocol: 'mls'})
+        .getConversation(userA.fullName, {protocol: 'mls'})
         .open();
 
       // User B mutes the conversation with User A via recent view
@@ -217,7 +217,7 @@ test.describe('Notifications', () => {
 
       // Create group and open it for user B so the message won't be read immediately
       await createGroup(userAPages, 'Test Group', [userB]);
-      await userBPages.conversationList().getConversationLocator('Test Group').open();
+      await userBPages.conversationList().getConversation('Test Group').open();
 
       // Start intercepting notifications for User B
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
@@ -246,7 +246,7 @@ test.describe('Notifications', () => {
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
       // User A sends an ephemeral message
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().enableSelfDeletingMessages();
       await userAPages.conversation().sendMessage('Ephemeral Message');
 
@@ -351,10 +351,10 @@ test.describe('Notifications', () => {
       for (const conversation of ['1on1', 'group'] as const) {
         await test.step(`User A opens the ${conversation} conversation`, async () => {
           if (conversation === '1on1') {
-            await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+            await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
           } else {
             await createGroup(userAPages, 'Test Group', [userB]);
-            await userAPages.conversationList().getConversationLocator('Test Group').open();
+            await userAPages.conversationList().getConversation('Test Group').open();
           }
         });
 
@@ -392,13 +392,13 @@ test.describe('Notifications', () => {
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userBPages, 'Test Group', [userA]);
-      await userBPages.conversationList().getConversationLocator('Test Group').open();
+      await userBPages.conversationList().getConversation('Test Group').open();
 
       // Start intercepting notifications
       const {clickNotification} = await interceptNotifications(userBPage);
 
       // User A pings User B
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendPing();
 
       await clickNotification({title: userA.fullName, body: 'Pinged'});
@@ -420,12 +420,12 @@ test.describe('Notifications', () => {
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userBPages, 'Test Group', [userA]);
-      await userBPages.conversationList().getConversationLocator('Test Group').open();
+      await userBPages.conversationList().getConversation('Test Group').open();
 
       const {clickNotification} = await interceptNotifications(userBPage);
 
       // User A initiates a call to User B
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().clickCallButton();
 
       // Verify user B receives the call
@@ -451,13 +451,13 @@ test.describe('Notifications', () => {
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userAPages, 'Test Group', [userB]);
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       // Start intercepting notifications
       const {clickNotification} = await interceptNotifications(userBPage);
 
       // User A sends message in group
-      await userAPages.conversationList().getConversationLocator('Test Group').open();
+      await userAPages.conversationList().getConversation('Test Group').open();
       await userAPages.conversation().sendMessage('Test Message');
 
       await clickNotification({title: `${userA.fullName} in Test Group`, body: 'Test Message'});
@@ -477,7 +477,7 @@ test.describe('Notifications', () => {
       ]);
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       const {getNotifications} = await interceptNotifications(userBPage);
 
@@ -508,7 +508,7 @@ test.describe('Notifications', () => {
       ]);
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       // User A creates a group with User B
       const originalGroupName = 'Original Group Name';
@@ -519,7 +519,7 @@ test.describe('Notifications', () => {
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
       // User A opens ConversationDetailsPage and changes the group name
-      await userAPages.conversationList().getConversationLocator(originalGroupName).open();
+      await userAPages.conversationList().getConversation(originalGroupName).open();
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversationDetails().changeConversationName(newGroupName);
 
@@ -581,13 +581,13 @@ test.describe('Notifications', () => {
 
       const groupName = 'Image Group';
       await createGroup(userAPages, groupName, [userB]);
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       // Start intercepting notifications for User B
       const {getNotifications} = await interceptNotifications(userBPage);
 
       // User A sends an image to the group conversation
-      await userAPages.conversationList().getConversationLocator(groupName).open();
+      await userAPages.conversationList().getConversation(groupName).open();
       await shareAssetHelper(getImageFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add picture'}));
 
       await expect
@@ -615,12 +615,12 @@ test.describe('Notifications', () => {
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userAPages, 'Test Group', [userB]);
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       const {getNotifications} = await interceptNotifications(userBPage);
 
       // User A changes the conversation timer to 10 seconds
-      await userAPages.conversationList().getConversationLocator('Test Group').open();
+      await userAPages.conversationList().getConversation('Test Group').open();
       await userAPages.conversation().toggleGroupInformation();
       await userAPages.conversationDetails().setSelfDeletingMessages('10 seconds');
 

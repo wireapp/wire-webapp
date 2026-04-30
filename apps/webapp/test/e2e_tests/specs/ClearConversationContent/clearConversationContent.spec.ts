@@ -65,13 +65,13 @@ test.describe('Clear Conversation Content', () => {
         await createGroup(userAPages, conversationName, [userB, userC]);
 
         // Step 2: Write messages in the group conversation
-        const conversation = await userAPages.conversationList().getConversationLocator(conversationName).open();
+        const conversation = await userAPages.conversationList().getConversation(conversationName).open();
         await userAPages.conversation().sendMessage('Message from User A');
 
-        await userBPages.conversationList().getConversationLocator(conversationName).open();
+        await userBPages.conversationList().getConversation(conversationName).open();
         await userBPages.conversation().sendMessage('Message from User B');
 
-        await userCPages.conversationList().getConversationLocator(conversationName).open();
+        await userCPages.conversationList().getConversation(conversationName).open();
         await userCPages.conversation().sendMessage('Message from User C');
 
         await expect(userAPages.conversation().messages).toHaveCount(3);
@@ -116,13 +116,13 @@ test.describe('Clear Conversation Content', () => {
         // Step 1: Create a 1:1 conversation with User A and B
         const conversation = await userAPages
           .conversationList()
-          .getConversationLocator(userB.fullName, {protocol: 'mls'})
+          .getConversation(userB.fullName, {protocol: 'mls'})
           .open();
 
         // Step 2: Write messages in the conversation
         await userAPages.conversation().sendMessage('Message from User A');
 
-        await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+        await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
         await userBPages.conversation().sendMessage('Message from User B');
 
         await expect(userAPages.conversation().messages).toHaveCount(2);
@@ -172,14 +172,14 @@ test.describe('Clear Conversation Content', () => {
         // Step 1: Create a group conversation with User A, B and C
         const conversationName = conversationType === 'group' ? 'Group conversation' : userB.fullName;
 
-        let userAConversation: ReturnType<ConversationListPage['getConversationLocator']>;
+        let userAConversation: ReturnType<ConversationListPage['getConversation']>;
         if (conversationType === 'group') {
           await createGroup(userAPages, conversationName, [userB, userC]);
-          userAConversation = await userAPages.conversationList().getConversationLocator(conversationName).open();
+          userAConversation = await userAPages.conversationList().getConversation(conversationName).open();
         } else {
           userAConversation = await userAPages
             .conversationList()
-            .getConversationLocator(conversationName, {protocol: 'mls'})
+            .getConversation(conversationName, {protocol: 'mls'})
             .open();
         }
 
@@ -188,12 +188,12 @@ test.describe('Clear Conversation Content', () => {
 
         const userBConversation = await userBPages
           .conversationList()
-          .getConversationLocator(conversationType === 'group' ? conversationName : userA.fullName)
+          .getConversation(conversationType === 'group' ? conversationName : userA.fullName)
           .open();
         await userBPages.conversation().sendMessage('Message from User B');
 
         if (conversationType === 'group') {
-          await userCPages.conversationList().getConversationLocator(conversationName).open();
+          await userCPages.conversationList().getConversation(conversationName).open();
           await userCPages.conversation().sendMessage('Message from User C');
           await expect(userAPages.conversation().messages).toHaveCount(3);
         } else {
@@ -270,25 +270,25 @@ test.describe('Clear Conversation Content', () => {
         const userBPages = userBPageManager.webapp.pages;
 
         const conversationName = 'Group conversation';
-        let userAConversation: ReturnType<ConversationListPage['getConversationLocator']>;
+        let userAConversation: ReturnType<ConversationListPage['getConversation']>;
 
         if (conversationType === 'group') {
           await createGroup(userAPages, conversationName, [userB]);
           // Step 1: User A and B write in group conversation
-          userAConversation = await userAPages.conversationList().getConversationLocator(conversationName).open();
+          userAConversation = await userAPages.conversationList().getConversation(conversationName).open();
           await userAPages.conversation().sendMessage('Message from User A');
 
-          await userBPages.conversationList().getConversationLocator(conversationName).open();
+          await userBPages.conversationList().getConversation(conversationName).open();
           await userBPages.conversation().sendMessage('Message from User B');
         } else {
           // Step 1: User A and B write in conversation
           userAConversation = await userAPages
             .conversationList()
-            .getConversationLocator(userB.fullName, {protocol: 'mls'})
+            .getConversation(userB.fullName, {protocol: 'mls'})
             .open();
           await userAPages.conversation().sendMessage('Message from User A');
 
-          await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+          await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
           await userBPages.conversation().sendMessage('Message from User B');
         }
         await expect(userAPages.conversation().messages).toHaveCount(2);

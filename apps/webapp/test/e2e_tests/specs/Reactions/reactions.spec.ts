@@ -92,10 +92,10 @@ test.describe('Reactions', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await c.sendFromUserB(userBPage);
 
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       const messageFromUserB = userAPages.conversation().getMessage({sender: userB});
       await expect(messageFromUserB).toBeVisible();
 
@@ -127,7 +127,7 @@ test.describe('Reactions', () => {
       });
     });
 
-    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     const messageWithLink = userAPages.conversation().getMessage({sender: userB});
     await userAPages.conversation().reactOnMessage(messageWithLink, 'heart');
 
@@ -160,8 +160,8 @@ test.describe('Reactions', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userBPages.conversation().sendMessage('Message from User B');
 
     const messageUserB = userAPages.conversation().getMessage({sender: userB});
@@ -190,8 +190,8 @@ test.describe('Reactions', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('Message from User B');
 
       const messageUserB = userAPages.conversation().getMessage({sender: userB});
@@ -217,8 +217,8 @@ test.describe('Reactions', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Message to react to');
 
       const userBMessage = userBPages.conversation().getMessage({sender: userA});
@@ -241,8 +241,8 @@ test.describe('Reactions', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Message to react to');
 
       const userBMessage = userBPages.conversation().getMessage({sender: userA});
@@ -283,8 +283,8 @@ test.describe('Reactions', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('Message to react to');
 
       const messageInUserA = userAPages.conversation().getMessage({sender: userB});

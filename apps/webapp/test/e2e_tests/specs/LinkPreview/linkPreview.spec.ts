@@ -37,8 +37,8 @@ test.describe('Link Preview', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       const linkConfigs = [
         {

@@ -54,13 +54,13 @@ test(
 
     await test.step('User A mentions User B in the channel', async () => {
       const {pages} = userAPageManager.webapp;
-      await pages.conversationList().getConversationLocator(channelName).open();
+      await pages.conversationList().getConversation(channelName).open();
       await pages.conversation().sendMessageWithUserMention(userB.fullName, messageText);
     });
 
     await test.step('User B should receive mention', async () => {
       const {pages} = userBPageManager.webapp;
-      const conversation = pages.conversationList().getConversationLocator(channelName);
+      const conversation = pages.conversationList().getConversation(channelName);
       await expect(conversation.mentionIndicator).toBeVisible();
 
       await conversation.open();
@@ -69,7 +69,7 @@ test(
 
     await test.step('User A sends image', async () => {
       const {pages, components} = userAPageManager.webapp;
-      await pages.conversationList().getConversationLocator(channelName).open();
+      await pages.conversationList().getConversation(channelName).open();
       await components.inputBarControls().clickShareImage(imageFilePath);
 
       await expect(

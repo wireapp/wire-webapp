@@ -41,8 +41,8 @@ test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']
   const pageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
   const {pages, modals, components} = pageManager.webapp;
 
-  const userBConversation = pages.conversationList().getConversationLocator(userB.fullName);
-  const groupConversation = pages.conversationList().getConversationLocator(groupName);
+  const userBConversation = pages.conversationList().getConversation(userB.fullName);
+  const groupConversation = pages.conversationList().getConversation(groupName);
 
   await test.step('User generates data', async () => {
     await userBConversation.open();

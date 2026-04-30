@@ -41,7 +41,7 @@ test.describe('Group Conversation', () => {
     const userAPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
     await createGroup(userAPages, groupName, []);
-    await userAPages.conversationList().getConversationLocator(groupName).open();
+    await userAPages.conversationList().getConversation(groupName).open();
 
     await userAPages.conversation().sendMessage('Message');
     const message = userAPages.conversation().getMessage({content: 'Message'});
@@ -95,8 +95,8 @@ test.describe('Group Conversation', () => {
     const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await createGroup(userAPages, groupName, [userB, userC]);
-    const adminGroupLocator = await userAPages.conversationList().getConversationLocator(groupName).open();
-    const memberGroupLocator = userBPages.conversationList().getConversationLocator(groupName);
+    const adminGroupLocator = await userAPages.conversationList().getConversation(groupName).open();
+    const memberGroupLocator = userBPages.conversationList().getConversation(groupName);
 
     // Pre-condition: Ensure the member can see the group before the creator deletes it
     await expect(memberGroupLocator).toBeVisible();
@@ -136,7 +136,7 @@ test.describe('Group Conversation', () => {
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userAPages, groupName, [userB]);
-      await expect(userBPages.conversationList().getConversationLocator(groupName)).toBeVisible();
+      await expect(userBPages.conversationList().getConversation(groupName)).toBeVisible();
 
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
@@ -144,7 +144,7 @@ test.describe('Group Conversation', () => {
       await blankTab.goto('about:blank');
       await blankTab.bringToFront();
 
-      const userAConversation = await userAPages.conversationList().getConversationLocator(groupName).open();
+      const userAConversation = await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversationDetails().deleteGroupButton.click();
       await userAModals.confirm().actionButton.click();
@@ -188,11 +188,11 @@ test.describe('Group Conversation', () => {
     for (const group of groups) {
       const {pages, modals} = PageManager.from(group.owner).webapp;
 
-      await pages.conversationList().getConversationLocator(group.name).open();
+      await pages.conversationList().getConversation(group.name).open();
       await pages.conversation().clickConversationInfoButton();
       await pages.conversationDetails().deleteGroupButton.click();
       await modals.confirm().actionButton.click();
-      await expect(userCPages.conversationList().getConversationLocator(group.name)).not.toBeAttached({
+      await expect(userCPages.conversationList().getConversation(group.name)).not.toBeAttached({
         timeout: 20_000,
       });
 
@@ -212,10 +212,10 @@ test.describe('Group Conversation', () => {
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userBPages, groupName, [userA]);
-      await userBPages.conversationList().getConversationLocator(groupName).open();
+      await userBPages.conversationList().getConversation(groupName).open();
 
       // User A leaves conversation through options menu from conversation list
-      const contextMenu = await userAPages.conversationList().getConversationLocator(groupName).openContextMenu();
+      const contextMenu = await userAPages.conversationList().getConversation(groupName).openContextMenu();
       await contextMenu.leaveConversationButton.click();
       await userAModals.leaveConversation().confirmButton.click();
 
@@ -230,7 +230,7 @@ test.describe('Group Conversation', () => {
       const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(pages, groupName, [userB, userC]);
-      await pages.conversationList().getConversationLocator(groupName).open();
+      await pages.conversationList().getConversation(groupName).open();
       await pages.conversation().toggleGroupInformation();
 
       await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
@@ -252,7 +252,7 @@ test.describe('Group Conversation', () => {
       const pages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(pages, groupName, [userB]);
-      await pages.conversationList().getConversationLocator(groupName).open();
+      await pages.conversationList().getConversation(groupName).open();
       await pages.conversation().toggleGroupInformation();
 
       await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
@@ -271,7 +271,7 @@ test.describe('Group Conversation', () => {
       ]);
 
       await createGroup(userAPages, groupName, [userB]);
-      await userBPages.conversationList().getConversationLocator(groupName).open();
+      await userBPages.conversationList().getConversation(groupName).open();
       await userBPages.conversation().toggleGroupInformation();
 
       await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userA.fullName})).toBeVisible();
@@ -290,12 +290,12 @@ test.describe('Group Conversation', () => {
 
       await test.step('Setup: Create group and promote User B to Admin', async () => {
         await createGroup(userAPages, groupName, [userB, userC]);
-        await userAPages.conversationList().getConversationLocator(groupName).open();
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().toggleGroupInformation();
         await userAPages.conversation().makeUserAdmin(userB.fullName);
 
         // Verify User B is an admin
-        await userBPages.conversationList().getConversationLocator(groupName).open();
+        await userBPages.conversationList().getConversation(groupName).open();
         await userBPages.conversation().toggleGroupInformation();
         await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userB.fullName})).toBeVisible();
       });

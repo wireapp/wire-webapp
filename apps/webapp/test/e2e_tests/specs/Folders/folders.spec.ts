@@ -31,7 +31,7 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
  */
 async function createCustomFolder(pageManager: PageManager, conversationName: string, folderName: string) {
   const {pages, modals} = pageManager.webapp;
-  const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
+  const contextMenu = await pages.conversationList().getConversation(conversationName).openContextMenu();
   await contextMenu.moveToButton.click();
   await contextMenu.getByRole('button', {name: 'Create new folder'}).click();
 
@@ -47,7 +47,7 @@ async function createCustomFolder(pageManager: PageManager, conversationName: st
  */
 async function moveConversationToFolder(pageManager: PageManager, conversationName: string, folderName: string) {
   const pages = pageManager.webapp.pages;
-  const contextMenu = await pages.conversationList().getConversationLocator(conversationName).openContextMenu();
+  const contextMenu = await pages.conversationList().getConversation(conversationName).openContextMenu();
   await contextMenu.moveToButton.click();
   await contextMenu.getByRole('button', {name: folderName, exact: true}).click();
 }
@@ -72,7 +72,7 @@ test.describe('Folders', () => {
     const customFolderName = 'Custom-Folder';
 
     // Step 1: User A opens 1:1 conversation with User B
-    await userAPages.conversationList().getConversationLocator(userB.fullName).open();
+    await userAPages.conversationList().getConversation(userB.fullName).open();
     // Step 2: User A moves 1:1 conversation with User B into new custom folder
     await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
     // Step 3: 1:1 conversation with User B is in the custom folder
@@ -90,7 +90,7 @@ test.describe('Folders', () => {
     await createGroup(userAPages, conversationName, [userB]);
 
     // Step 1: User A opens group conversation with User B
-    await userAPages.conversationList().getConversationLocator(conversationName).open();
+    await userAPages.conversationList().getConversation(conversationName).open();
     // Step 2: User A moves group conversation with User B in new custom folder
     await createCustomFolder(userAPageManager, conversationName, customFolderName);
     // Step 3: Group conversation with User B is in the custom folder
@@ -157,7 +157,7 @@ test.describe('Folders', () => {
       const customFolderName = 'Custom-Folder';
 
       // Preconditions: Conversation is in custom folder
-      const conversation = await userAPages.conversationList().getConversationLocator(userB.fullName).open();
+      const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
       await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
 
       await test.step("User A clicks 'remove from custom folder' button", async () => {
@@ -182,7 +182,7 @@ test.describe('Folders', () => {
     const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
 
     // Step 1: User A opens 1:1 conversation with User B
-    const conversation = await userAPages.conversationList().getConversationLocator(userB.fullName).open();
+    const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
     // Step 2: User A wants to move 1:1 conversation with User B into custom folder
     const contextMenu = await conversation.openContextMenu();
     await contextMenu.moveToButton.click();
@@ -198,7 +198,7 @@ test.describe('Folders', () => {
     const customFolderName = 'Custom-Folder';
 
     // Preconditions: Conversation is in custom folder
-    const conversation = await userAPages.conversationList().getConversationLocator(userB.fullName).open();
+    const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
     await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
 
     await test.step('User A removes conversation with User B from custom folder', async () => {

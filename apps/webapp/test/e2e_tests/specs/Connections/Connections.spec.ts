@@ -73,14 +73,14 @@ test.describe('Connections', () => {
       });
 
       await test.step('A creates a group with B & C', async () => {
-        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).toBeAttached();
-        await expect(memberAPages.conversationList().getConversationLocator(memberC.fullName)).toBeAttached();
+        await expect(memberAPages.conversationList().getConversation(memberB.fullName)).toBeAttached();
+        await expect(memberAPages.conversationList().getConversation(memberC.fullName)).toBeAttached();
 
         await createGroup(memberAPages, 'Group', [memberB, memberC]);
       });
 
       await test.step('B sends a connection request to C via the group conversation', async () => {
-        await memberBPages.conversationList().getConversationLocator('Group').open();
+        await memberBPages.conversationList().getConversation('Group').open();
         await memberBPages.conversation().conversationInfoButton.click();
         await memberBPages.conversationDetails().openParticipantDetails(memberC.fullName);
         await memberBPages.participantDetails().sendConnectRequest();
@@ -105,7 +105,7 @@ test.describe('Connections', () => {
       await memberBPages.conversationList().pendingConnectionRequest.click();
       await memberBPages.conversation().ignoreButton.click();
 
-      await expect(memberBPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      await expect(memberBPages.conversationList().getConversation(memberB.fullName)).not.toBeVisible();
     },
   );
 
@@ -117,7 +117,7 @@ test.describe('Connections', () => {
       await sendConnectionRequest(pageManager, memberB);
 
       const {pages} = pageManager.webapp;
-      const conversation = pages.conversationList().getConversationLocator(memberB.fullName);
+      const conversation = pages.conversationList().getConversation(memberB.fullName);
       const contextMenu = await conversation.openContextMenu();
       await contextMenu.archiveButton.click();
 

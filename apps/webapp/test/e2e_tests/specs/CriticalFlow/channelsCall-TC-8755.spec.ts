@@ -48,7 +48,7 @@ test(
     await test.step('Team owner creates a channel with available member', async () => {
       await pages.conversationList().clickCreateGroup();
       await modals.createConversation().createChannel(channelName, {members: [member]});
-      await expect(pages.conversationList().getConversationLocator(channelName)).toBeVisible();
+      await expect(pages.conversationList().getConversation(channelName)).toBeVisible();
     });
 
     await test.step('Owner starts a call in channel', async () => {
@@ -56,7 +56,7 @@ test(
         const response = await api.callingService.createInstance(member.password, member.email);
         callingServiceInstanceId = response.id;
         await api.callingService.setAcceptNextCall(callingServiceInstanceId);
-        await pages.conversationList().getConversationLocator(channelName).open();
+        await pages.conversationList().getConversation(channelName).open();
         await pages.conversation().clickCallButton();
       } catch (error: unknown) {
         console.error('Error during call initiation:', error);

@@ -68,8 +68,8 @@ test.describe('Markdown', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendTypedMessage(message);
 
       for (const pages of [userAPages, userBPages]) {
@@ -88,7 +88,7 @@ test.describe('Markdown', () => {
       const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
       const {pages, modals} = userAPageManager.webapp;
 
-      await pages.conversationList().getConversationLocator(userB.fullName).open();
+      await pages.conversationList().getConversation(userB.fullName).open();
       await pages.conversation().sendTypedMessage(targetUrl);
 
       const message = pages.conversation().getMessage({sender: userA});
@@ -110,8 +110,8 @@ test.describe('Markdown', () => {
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
-    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
     const longCodeMessage = '```\nconst a = 5;\nconst b = 10;\nconsole.log(a + b);\n```';
     await userAPages.conversation().sendMessage(longCodeMessage);
@@ -129,8 +129,8 @@ test.describe('Markdown', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userAPages.conversation().sendTypedMessage('**Bold**, *Italic* and `Code`');
 
     for (const pages of [userAPages, userBPages]) {
@@ -148,8 +148,8 @@ test.describe('Markdown', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-    await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userAPages.conversation().sendTypedMessage('Start **Bold** Message');
 
     const sentMessageA = userAPages.conversation().getMessage({sender: userA});
@@ -179,8 +179,8 @@ test.describe('Markdown', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().getConversationLocator(userB.fullName, {protocol: 'mls'}).open();
-      await userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'}).open();
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       const linkText = 'Wire Website';
       const url = 'https://wire.com';
