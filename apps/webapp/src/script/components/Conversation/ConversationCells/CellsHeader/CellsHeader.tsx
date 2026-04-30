@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CloseIcon, SearchIcon} from '@wireapp/react-ui-kit';
+import {SearchIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
@@ -27,6 +27,7 @@ import {t} from 'Util/localizerUtil';
 import {
   actionsStyles,
   breadcrumbsRowStyles,
+  clearButtonStyles,
   contentStyles,
   searchIconStyles,
   searchInputStyles,
@@ -36,6 +37,7 @@ import {
 import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';
 import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
+import {CellsSearchClearIcon} from './CellsSearchClearIcon';
 import {CellsRootHomeIcon} from './CellsRootHomeIcon';
 
 import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
@@ -90,12 +92,15 @@ export const CellsHeader = ({
           />
 
           {searchValue && (
-            <CloseIcon
-              css={{cursor: 'pointer', flexShrink: 0}}
+            <button
+              type="button"
+              css={clearButtonStyles}
               data-uie-name="full-search-dismiss"
               aria-label={t('fullsearchCancelCloseBtn')}
               onClick={onSearchClear}
-            />
+            >
+              <CellsSearchClearIcon />
+            </button>
           )}
         </div>
         {!isSearchViewOpen && (

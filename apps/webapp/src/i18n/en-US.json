@@ -480,6 +480,8 @@
   "cells.restoreRootNodeModal.folder.description": "This folder {name} will be restored with all its contents and available again to everyone in this conversation.",
   "cells.restoreRootNodeModal.folder.headline": "Restore folder",
   "cells.search.closeButton": "Close",
+  "cells.search.idle.description": "Apply a search terms, or a filter to see results.",
+  "cells.search.idle.heading": "Searching within Shared Drive and all its folders",
   "cells.search.failed": "Something went wrong, please try again later.",
   "cells.search.placeholder": "Search files and folders",
   "cells.selfDeletingMessage.info": "The feature is not available for conversations with a shared Drive.",

@@ -105,3 +105,23 @@ export const searchNativeInputStyles: CSSObject = {
     outline: 'none',
   },
 };
+
+export const clearButtonStyles: CSSObject = {
+  border: 'none',
+  background: 'transparent',
+  padding: 0,
+  margin: 0,
+  lineHeight: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  cursor: 'pointer',
+  color: 'var(--main-color)',
+  flexShrink: 0,
+};
+
+export const clearIconStyles: CSSObject = {
+  width: '16px',
+  height: '16px',
+  flexShrink: 0,
+};
