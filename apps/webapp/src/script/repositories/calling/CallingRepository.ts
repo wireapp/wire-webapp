@@ -150,6 +150,24 @@ type SubconversationData = {
   members: SubconversationEpochInfoMember[];
 };
 
+type NetworkQualityInfo = {
+  quality: QUALITY;
+  rtt: number;
+  loss: {
+    tx: number;
+    rx: number;
+  };
+  jitter: {
+    audio: {tx: number; rx: number};
+    video: {tx: number; rx: number};
+  };
+  connection: {
+    candidate: 'Relay' | 'Host' | 'Srflx' | 'Prflx' | 'Unknown';
+    protocol: 'UDP' | 'TCP' | 'Unknown';
+  };
+  peer: 'Server' | 'User' | 'Unknown';
+};
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -619,8 +637,19 @@ export class CallingRepository {
     conversationId: SerializedConversationId,
     userId: string,
     clientId: string,
-    quality: number,
+    qualityInfoJson: string,
   ) => {
+    let qualityInfo: NetworkQualityInfo;
+
+    try {
+      qualityInfo = JSON.parse(qualityInfoJson) as NetworkQualityInfo;
+    } catch (error) {
+      this.logger.warn(`Invalid network quality info: ${qualityInfoJson}`, error);
+      return;
+    }
+
+    const {quality} = qualityInfo;
+
     const call = this.findCall(this.parseQualifiedId(conversationId));
     if (!call) {
       return;
@@ -637,7 +666,7 @@ export class CallingRepository {
     if (!isOldPoorCallQualityUser && quality !== QUALITY.NORMAL) {
       users = [...users, userId];
     }
-    if (users.length === call.participants.length - 1) {
+    if (users.length === call.participants().length - 1) {
       Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
       Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
@@ -665,6 +694,12 @@ export class CallingRepository {
       case QUALITY.NETWORK_PROBLEM: {
         this.logger.warn(
           `Network problem during call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.RECONNECTING: {
+        this.logger.warn(
+          `Reconnecting call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
         );
         break;
       }
