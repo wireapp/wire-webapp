@@ -177,11 +177,11 @@ test.describe('Sending Assets', () => {
 
   [
     {
-      tag: ['@TC-764', '@regression'],
+      tag: '@TC-764',
       conversationType: '1on1',
     } as const,
     {
-      tag: ['@TC-765', '@regression'],
+      tag: '@TC-765',
       conversationType: 'group',
     } as const,
   ].forEach(({tag, conversationType}) => {
