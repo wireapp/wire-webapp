@@ -54,7 +54,7 @@ export const handleMLSMessageAdd = async ({
   logger.info('Decrypting MLS message-add payload', {
     qualifiedConversationId,
     groupId,
-    coreCryptoEpochNumber: coreCryptoEpochNumber.isOk ? coreCryptoEpochNumber.value : 'Error retrieving epoch number',
+    coreCryptoEpochNumber: coreCryptoEpochNumber.isOk ? coreCryptoEpochNumber.value : coreCryptoEpochNumber.error,
     eventTime: event.time,
   });
 

@@ -569,9 +569,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       );
       this.logger.warn('Failed to decrypt MLS message', {
         qualifiedConversationId,
-        coreCryptoEpochNumber: coreCryptoEpochNumber.isOk
-          ? coreCryptoEpochNumber.value
-          : 'Error retrieving epoch number',
+        coreCryptoEpochNumber: coreCryptoEpochNumber.isOk ? coreCryptoEpochNumber.value : coreCryptoEpochNumber.error,
         error,
       });
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
