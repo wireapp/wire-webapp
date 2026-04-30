@@ -19,9 +19,9 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 
-import {createGroup, sendConnectionRequest} from '../../utils/userActions';
+import {connectWithUser, createGroup, sendConnectionRequest} from '../../utils/userActions';
 
 /* ========== Block Utils ========== */
 /**
@@ -245,8 +245,9 @@ test.describe('User Blocking', () => {
       'Verify you cannot add a person who blocked you to a group chat',
       {tag: ['@TC-143', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userC)));
+        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
         await sendConnectionRequest(userAPageManagerInstance, userB);
+        await connectWithUser(userAPageManagerInstance, userC);
         const {pages: userAPages, modals: userAModals} = userAPageManagerInstance.webapp;
 
         const conversationName = 'Group Conversation';
@@ -300,8 +301,9 @@ test.describe('User Blocking', () => {
       'Verify you can unblock someone from conversation list options',
       {tag: ['@TC-148', '@regression']},
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userC)));
+        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
         await sendConnectionRequest(userAPageManagerInstance, userB);
+        await connectWithUser(userAPageManagerInstance, userC);
         const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManagerInstance.webapp;
 
         // Preconditions: User B accepts the connection request
@@ -350,8 +352,9 @@ test.describe('User Blocking', () => {
     });
 
     test('Verify you can not block a user from your team', {tag: ['@TC-8778', '@regression']}, async ({createPage}) => {
-      const userAPageManager = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp;
-      const userAPages = userAPageManager.pages;
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
+      const userAPages = userAPageManager.webapp.pages;
 
       // Step 1: User A opens conversation with User B
       const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
