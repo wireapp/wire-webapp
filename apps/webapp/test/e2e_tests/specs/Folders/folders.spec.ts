@@ -73,12 +73,12 @@ test.describe('Folders', () => {
 
       const customFolderName = 'Custom-Folder';
 
-    // Step 1: User A opens 1:1 conversation with User B
-    await userAPages.conversationList().getConversation(userB.fullName).open();
-    // Step 2: User A moves 1:1 conversation with User B into new custom folder
-    await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
-    // Step 3: 1:1 conversation with User B is in the custom folder
-    const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+      // Step 1: User A opens 1:1 conversation with User B
+      await userAPages.conversationList().getConversation(userB.fullName).open();
+      // Step 2: User A moves 1:1 conversation with User B into new custom folder
+      await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
+      // Step 3: 1:1 conversation with User B is in the custom folder
+      const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
 
       await expect(actualTitle).toHaveText(customFolderName);
     },
@@ -96,12 +96,12 @@ test.describe('Folders', () => {
 
       await createGroup(userAPages, conversationName, [userB]);
 
-    // Step 1: User A opens group conversation with User B
-    await userAPages.conversationList().getConversation(conversationName).open();
-    // Step 2: User A moves group conversation with User B in new custom folder
-    await createCustomFolder(userAPageManager, conversationName, customFolderName);
-    // Step 3: Group conversation with User B is in the custom folder
-    const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+      // Step 1: User A opens group conversation with User B
+      await userAPages.conversationList().getConversation(conversationName).open();
+      // Step 2: User A moves group conversation with User B in new custom folder
+      await createCustomFolder(userAPageManager, conversationName, customFolderName);
+      // Step 3: Group conversation with User B is in the custom folder
+      const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
 
       await expect(actualTitle).toHaveText(customFolderName);
     },
@@ -196,12 +196,12 @@ test.describe('Folders', () => {
       const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
 
-    // Step 1: User A opens 1:1 conversation with User B
-    const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
-    // Step 2: User A wants to move 1:1 conversation with User B into custom folder
-    const contextMenu = await conversation.openContextMenu();
-    await contextMenu.moveToButton.click();
-    await contextMenu.getByRole('button', {name: 'Create new folder'}).click();
+      // Step 1: User A opens 1:1 conversation with User B
+      const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
+      // Step 2: User A wants to move 1:1 conversation with User B into custom folder
+      const contextMenu = await conversation.openContextMenu();
+      await contextMenu.moveToButton.click();
+      await contextMenu.getByRole('button', {name: 'Create new folder'}).click();
 
       // Step 3: 'Create Folder Modal' should still be visible after click on create
       await expect(userAModals.optionModal().actionButton).toBeDisabled();
@@ -217,20 +217,127 @@ test.describe('Folders', () => {
 
       const customFolderName = 'Custom-Folder';
 
-    // Preconditions: Conversation is in custom folder
-    const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
-    await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
+      // Preconditions: Conversation is in custom folder
+      const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
+      await createCustomFolder(userAPageManager, userB.fullName, customFolderName);
 
-    await test.step('User A removes conversation with User B from custom folder', async () => {
-      const contextMenu = await conversation.openContextMenu();
-      await contextMenu.getByRole('button', {name: `Remove from "${customFolderName}"`}).click();
-    });
+      await test.step('User A removes conversation with User B from custom folder', async () => {
+        const contextMenu = await conversation.openContextMenu();
+        await contextMenu.getByRole('button', {name: `Remove from "${customFolderName}"`}).click();
+      });
 
-    await test.step('User A tries to move conversation with User B back into the folder, custom folder name should no longer be visible in the folder menu', async () => {
-      await conversation.open();
-      const contextMenu = await conversation.openContextMenu();
-      await contextMenu.moveToButton.click();
-      await expect(contextMenu.getByRole('button', {name: customFolderName})).not.toBeVisible();
-    });
-  });
+      await test.step('User A tries to move conversation with User B back into the folder, custom folder name should no longer be visible in the folder menu', async () => {
+        await conversation.open();
+        const contextMenu = await conversation.openContextMenu();
+        await contextMenu.moveToButton.click();
+        await expect(contextMenu.getByRole('button', {name: customFolderName})).not.toBeVisible();
+      });
+    },
+  );
+
+  test(
+    'I want to see 1:1 and group conversations in Favorites folder',
+    {tag: ['@TC-742', '@regression']},
+    async ({createPage}) => {
+      const [userAPageManager, userBPageManager] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPageManager).webapp;
+      const userBPages = PageManager.from(userBPageManager).webapp.pages;
+
+      const groupName = 'Group Name';
+
+      // Preconditions: User A and User B are in a group conversation created by User B
+      await createGroup(userBPages, groupName, [userA]);
+
+      await test.step('User A adds group conversation with User B to Favorites', async () => {
+        const contextMenu = await userAPages.conversationList().getConversation(groupName).openContextMenu();
+        await contextMenu.addToFavoritesButton.click();
+
+        const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+        await expect(actualTitle).toHaveText('Favorites');
+
+        await userAComponents.conversationSidebar().clickAllConversationsButton();
+      });
+
+      await test.step('User A adds 1:1 with User B to Favorites', async () => {
+        const contextMenu = await userAPages.conversationList().getConversation(userB.fullName).openContextMenu();
+        await contextMenu.addToFavoritesButton.click();
+
+        const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+        await expect(actualTitle).toHaveText('Favorites');
+
+        await userAComponents.conversationSidebar().clickAllConversationsButton();
+        await userAPages.conversationList().getConversation(groupName).open();
+      });
+
+      await test.step('User B sends message in 1:1 conversation with User A', async () => {
+        await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
+        await userBPages.conversation().sendMessage('Direct');
+      });
+
+      await test.step('User A sees notification in Favorites and opens it', async () => {
+        await expect(userAComponents.conversationSidebar().favoritesButton.getByTestId('unread-badge')).toBeVisible();
+        await userAComponents.conversationSidebar().favoritesButton.click();
+        await expect(userAPages.conversationList().getConversation(userB.fullName).unreadIndicator).toBeVisible();
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+        await expect(userAPages.conversation().getMessage({content: 'Direct', sender: userB})).toBeVisible();
+      });
+
+      await test.step('User B sends message in group conversation with User A', async () => {
+        await userBPages.conversationList().getConversation(groupName).open();
+        await userBPages.conversation().sendMessage('Group');
+      });
+
+      await test.step('User A sees notification in Favorites and opens it', async () => {
+        await expect(userAComponents.conversationSidebar().favoritesButton.getByTestId('unread-badge')).toBeVisible();
+        await expect(userAPages.conversationList().getConversation(groupName).unreadIndicator).toBeVisible();
+        await userAPages.conversationList().getConversation(groupName).open();
+        await expect(userAPages.conversation().getMessage({content: 'Group', sender: userB})).toBeVisible();
+      });
+
+      await test.step('User B removes User A from group conversation', async () => {
+        await userBPages.conversationList().getConversation(groupName).open();
+        await userBPages.conversation().toggleGroupInformation();
+
+        await expect(userBPages.conversationDetails().groupMembers.filter({hasText: userA.fullName})).toBeVisible();
+
+        await userBPages.conversationDetails().openParticipantDetails(userA.fullName);
+        await userBPages.participantDetails().removeFromGroup();
+      });
+
+      await test.step('User A still sees group conversation in Favorites', async () => {
+        const actualTitle = userAPages.conversationList().conversationListHeaderTitle;
+        await expect(actualTitle).toHaveText('Favorites');
+        await expect(userAPages.conversationList().getConversation(groupName)).toBeVisible();
+      });
+
+      await test.step('User A removes 1:1 and group conversation with User B from Favorites', async () => {
+        const contextMenuDirectConversation = await userAPages
+          .conversationList()
+          .getConversation(userB.fullName)
+          .openContextMenu();
+        await contextMenuDirectConversation.getByRole('button', {name: 'Remove from favorites'}).click();
+
+        const contextMenuGroupConversation = await userAPages
+          .conversationList()
+          .getConversation(groupName)
+          .openContextMenu();
+        await contextMenuGroupConversation.getByRole('button', {name: 'Remove from favorites'}).click();
+      });
+
+      await test.step('User A sees empty Favorites folder', async () => {
+        await expect(userAPages.conversationList().getConversation(userB.fullName)).not.toBeVisible();
+        await expect(userAPages.conversationList().getConversation(groupName)).not.toBeVisible();
+      });
+
+      await test.step('User A sees 1:1 and group conversation with User B in All Conversation View', async () => {
+        await userAComponents.conversationSidebar().clickAllConversationsButton();
+        await expect(userAPages.conversationList().getConversation(userB.fullName)).toBeVisible();
+        await expect(userAPages.conversationList().getConversation(groupName)).toBeVisible();
+      });
+    },
+  );
 });
