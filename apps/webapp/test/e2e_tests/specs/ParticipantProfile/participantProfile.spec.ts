@@ -21,7 +21,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
 
 async function openParticipantDetailsFromGroup(
   pages: PageManager['webapp']['pages'],
@@ -93,9 +93,10 @@ test.describe('Participant Profile', () => {
       const userC = await createUser();
       const [userAPage, userBPage, userCPage] = await Promise.all([
         createPage(withLogin(userA)),
-        createPage(withLogin(userB), withConnectedUser(userA)),
+        createPage(withLogin(userB)),
         createPage(withLogin(userC)),
       ]);
+
       const [userAPages, userBPages, userCPages] = [userAPage, userBPage, userCPage].map(
         page => PageManager.from(page).webapp.pages,
       );
@@ -180,12 +181,12 @@ test.describe('Participant Profile', () => {
     'Verify big profile picture and username are shown on participant popover',
     {tag: ['@TC-1480', '@regression']},
     async ({createPage}) => {
-      const [adminPage, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      const [adminPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await createGroup(adminPage, groupName, [userB]);
+      await createGroup(adminPages, groupName, [userB]);
       await openParticipantDetailsFromGroup(userBPages, groupName, userA.fullName);
 
       await expect(userBPages.participantDetails().userPicture).toBeVisible();
@@ -201,12 +202,12 @@ test.describe('Participant Profile', () => {
       const externalUser = await createUser();
       await team.addTeamMember(externalUser, {role: 'EXTERNAL'});
 
-      const [adminPage, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(externalUser))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      const [adminPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await createGroup(adminPage, groupName, [userB, externalUser]);
+      await createGroup(adminPages, groupName, [userB, externalUser]);
       await openParticipantDetailsFromGroup(userBPages, groupName, externalUser.fullName);
 
       await expect(userBPages.participantDetails().userStatus).toContainText('External');
@@ -217,12 +218,12 @@ test.describe('Participant Profile', () => {
     'I want to see the group admin icon as a member seeing the group admin profile',
     {tag: ['@TC-1485', '@regression']},
     async ({createPage}) => {
-      const [adminPage, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+      const [adminPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await createGroup(adminPage, groupName, [userB]);
+      await createGroup(adminPages, groupName, [userB]);
       await openParticipantDetailsFromGroup(userBPages, groupName, userA.fullName);
 
       await expect(userBPages.participantDetails().userStatus).toContainText('Group Admin');
@@ -233,17 +234,15 @@ test.describe('Participant Profile', () => {
     'I want to see the group admin icon as an admin seeing the group admin profile',
     {tag: ['@TC-1486', '@regression']},
     async ({createPage}) => {
-      const adminPage = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(
-        pm => pm.webapp.pages,
-      );
+      const adminPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
-      await createGroup(adminPage, groupName, [userB]);
+      await createGroup(adminPages, groupName, [userB]);
 
-      await adminPage.conversationList().getConversation(groupName).open();
-      await adminPage.conversation().clickConversationInfoButton();
+      await adminPages.conversationList().getConversation(groupName).open();
+      await adminPages.conversation().clickConversationInfoButton();
 
-      await adminPage.conversation().makeUserAdmin(userB.fullName);
-      await expect(adminPage.participantDetails().userStatus).toContainText('Group Admin');
+      await adminPages.conversation().makeUserAdmin(userB.fullName);
+      await expect(adminPages.participantDetails().userStatus).toContainText('Group Admin');
     },
   );
 
@@ -251,14 +250,12 @@ test.describe('Participant Profile', () => {
     'I want to see Remove from group as an admin seeing a participants profile',
     {tag: ['@TC-1487', '@regression']},
     async ({createPage}) => {
-      const adminPage = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(
-        pm => pm.webapp.pages,
-      );
+      const adminPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
-      await createGroup(adminPage, groupName, [userB]);
-      await openParticipantDetailsFromGroup(adminPage, groupName, userB.fullName);
+      await createGroup(adminPages, groupName, [userB]);
+      await openParticipantDetailsFromGroup(adminPages, groupName, userB.fullName);
 
-      const removeFromGroup = adminPage.participantDetails().removeFromGroupButton;
+      const removeFromGroup = adminPages.participantDetails().removeFromGroupButton;
       await expect(removeFromGroup).toBeVisible();
       await expect(removeFromGroup).toHaveText('Remove from group…');
     },
@@ -270,12 +267,13 @@ test.describe('Participant Profile', () => {
     async ({createPage, createUser}) => {
       const userC = await createUser();
       await team.addTeamMember(userC);
-      const [adminPage, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
+
+      const [adminPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await createGroup(adminPage, groupName, [userB, userC]);
+      await createGroup(adminPages, groupName, [userB, userC]);
       await openParticipantDetailsFromGroup(userBPages, groupName, userC.fullName);
 
       await expect(userBPages.participantDetails().removeFromGroupButton).not.toBeVisible();
