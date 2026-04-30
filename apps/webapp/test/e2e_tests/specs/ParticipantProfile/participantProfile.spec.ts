@@ -103,6 +103,7 @@ test.describe('Participant Profile', () => {
       await sendConnectionRequest(userAPage, userC);
       await acceptConnectionRequest(userCPages);
       await expect(userAPages.conversationList().getConversation(userC.fullName)).toBeAttached();
+      await expect(userCPages.conversationList().getConversation(userA.fullName)).toBeAttached();
 
       await test.step('User C is in group with User A and B. User C is not connected to user B', async () => {
         await createGroup(userAPages, groupName, [userB, userC]);

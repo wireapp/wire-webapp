@@ -180,6 +180,7 @@ test.describe('Guestroom', () => {
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
       await expect(ownerPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+      await expect(guestPages.conversationList().getConversation(userA.fullName)).toBeAttached();
 
       await test.step('Owner creates a group with guest', async () => {
         await createGroup(ownerPages, groupName, [guestUser]);
