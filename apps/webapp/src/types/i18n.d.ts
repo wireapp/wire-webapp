@@ -528,6 +528,7 @@ declare module 'I18n/en-US.json' {
     'cells.tableRow.shared.truthyValue': `Yes`;
     'cells.tableRow.size': `Size`;
     'cells.tableRow.tags': `Tags`;
+    'cells.tagsFilter.searchPlaceholder': `Search tags`;
     'cells.tagsModal.apiError': `Something went wrong`;
     'cells.tagsModal.cancelButton': `Cancel`;
     'cells.tagsModal.createOptionLabel': `Create tag "{name}"`;

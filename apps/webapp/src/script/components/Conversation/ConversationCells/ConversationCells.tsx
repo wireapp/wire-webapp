@@ -17,18 +17,22 @@
  *
  */
 
-import {memo, useEffect, useRef} from 'react';
+import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
+import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
+import {createUuid} from 'Util/uuid';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
+import {FilterItem} from './CellsHeader/FilterPopover/FilterPopover';
 import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
@@ -120,6 +124,52 @@ export const ConversationCells = memo(
     // When search is active, refresh should trigger search reload
     const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
 
+    const MOCK_TAGS: FilterItem[] = [
+      {id: 'a-tag', label: 'A tag'},
+      {id: 'hello-tag', label: 'hello tag'},
+      {id: 'b-tag', label: 'B tag'},
+      {id: 'new-tag-1', label: 'New tag 1'},
+      {id: 'e-tag', label: 'E Tag'},
+    ];
+    const MOCK_CONVERSATIONS: FilterItem[] = [
+      {
+        id: 'a-tag',
+        label: 'A tag',
+        subLabel: 'A tag sub label',
+        startContent: <Avatar participant={new User(createUuid())} avatarSize={AVATAR_SIZE.SMALL} />,
+      },
+      {
+        id: 'hello-tag',
+        label: 'hello tag',
+        subLabel: 'A tag sub label',
+        startContent: <Avatar participant={new User(createUuid())} avatarSize={AVATAR_SIZE.SMALL} />,
+      },
+      {
+        id: 'b-tag',
+        label: 'B tag',
+        subLabel: 'A tag sub label',
+        startContent: <Avatar participant={new User(createUuid())} avatarSize={AVATAR_SIZE.SMALL} />,
+      },
+      {
+        id: 'new-tag-1',
+        label: 'New tag 1',
+        subLabel: 'A tag sub label',
+        startContent: <Avatar participant={new User(createUuid())} avatarSize={AVATAR_SIZE.SMALL} />,
+      },
+      {
+        id: 'e-tag',
+        label: 'E Tag',
+        subLabel: 'A tag sub label',
+        startContent: <Avatar participant={new User(createUuid())} avatarSize={AVATAR_SIZE.SMALL} />,
+      },
+    ];
+
+    const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
+    const handleTagSelectionChange = useCallback((ids: string[]) => setSelectedTagIds(ids), []);
+
+    const [selectedConversationIds, setSelectedConversationIds] = useState<string[]>([]);
+    const handleConversationSelectionChange = useCallback((ids: string[]) => setSelectedConversationIds(ids), []);
+
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
 
@@ -157,6 +207,12 @@ export const ConversationCells = memo(
           searchValue={searchValue}
           onSearchChange={handleSearch}
           onSearchClear={handleClearSearch}
+          tagsList={MOCK_TAGS}
+          conversations={MOCK_CONVERSATIONS}
+          selectedTagIds={selectedTagIds}
+          onTagSelectionChange={handleTagSelectionChange}
+          selectedConversationIds={selectedConversationIds}
+          onConversationSelectionChange={handleConversationSelectionChange}
         />
         {isTableVisible && (
           <CellsTable

@@ -39,6 +39,7 @@ import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 import {CellsRootHomeIcon} from './CellsRootHomeIcon';
 import {CellsSearchClearIcon} from './CellsSearchClearIcon';
+import {FilterItem, FilterPopover} from './FilterPopover/FilterPopover';
 
 import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
@@ -55,6 +56,12 @@ interface CellsHeaderProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
+  tagsList: FilterItem[];
+  conversations: FilterItem[];
+  selectedTagIds: string[];
+  selectedConversationIds: string[];
+  onTagSelectionChange: (ids: string[]) => void;
+  onConversationSelectionChange: (ids: string[]) => void;
 }
 
 export const CellsHeader = ({
@@ -67,6 +74,12 @@ export const CellsHeader = ({
   searchValue,
   onSearchChange,
   onSearchClear,
+  tagsList,
+  selectedTagIds,
+  selectedConversationIds,
+  conversations,
+  onTagSelectionChange,
+  onConversationSelectionChange,
 }: CellsHeaderProps) => {
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: t('cells.breadcrumb.files', {conversationName}),
@@ -103,6 +116,21 @@ export const CellsHeader = ({
             </button>
           )}
         </div>
+
+        <FilterPopover
+          triggerLabel="Tags"
+          items={tagsList}
+          selectedIds={selectedTagIds}
+          onSelectionChange={onTagSelectionChange}
+        />
+
+        <FilterPopover
+          triggerLabel="Conversations"
+          items={conversations}
+          selectedIds={selectedConversationIds}
+          onSelectionChange={onConversationSelectionChange}
+        />
+
         {!isSearchViewOpen && (
           <div css={actionsStyles}>
             <CellsNewMenu
