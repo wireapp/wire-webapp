@@ -425,10 +425,10 @@ export class WebGLRenderer {
           videoFrame.close();
         },
         close() {
-          console.log('[virtual-background] video background close');
+          console.error('[virtual-background] video background close');
         },
       });
-      media.pipeTo(writer).catch(err => {
+      media.pipeTo(writer).catch((err: unknown) => {
         console.error('media.pipeTo(writer) error', err);
       });
 
@@ -492,7 +492,7 @@ export class WebGLRenderer {
       this.canvas.height = height;
     }
 
-    console.log('#####  render', options.backgroundSource);
+    console.error('#####  render', options.backgroundSource);
     if (!categoryTexture || !confidenceTexture) {
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.useProgram(blendProgram);

@@ -24,12 +24,12 @@ import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
 import type {Metrics} from '../backgroundEffectsWorkerTypes';
-import {createMetricsWindow, pushMetricsSample, buildMetrics} from '../helper/metrics';
+import {buildMetrics, createMetricsWindow, pushMetricsSample} from '../helper/metrics';
 
-export let globalOptions = {} as WorkerProcessVideoTrackOptions;
+export let segmenterOptions = {} as WorkerProcessVideoTrackOptions;
 
 async function createSegmenter(canvas: OffscreenCanvas) {
-  const {wasmLoaderPath, wasmBinaryPath, modelPath} = globalOptions;
+  const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
   const fileset =
     wasmLoaderPath && wasmBinaryPath
       ? {
@@ -60,7 +60,7 @@ export async function runSegmenter(
   onMetrics: (metrics: Metrics) => void,
 ) {
   // console.log(`[virtual-background] runSegmenter`, {canvas, options, readable});
-  globalOptions = opts;
+  segmenterOptions = opts;
 
   let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
@@ -106,7 +106,7 @@ export async function runSegmenter(
   const effectsCanvas = new OffscreenCanvas(1, 1);
   const videoFilter = new VideoFilter(effectsCanvas);
 
-  const useSelfieModel = !!globalOptions.modelPath?.includes('selfie_segmenter');
+  const useSelfieModel = !!segmenterOptions.modelPath?.includes('selfie_segmenter');
 
   // Metrics
   const metricsWindow = createMetricsWindow(60);
@@ -123,14 +123,10 @@ export async function runSegmenter(
   function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number) {
     pushMetricsSample(metricsWindow, {totalMs, segmentationMs, gpuMs});
 
-    onMetrics(
-      buildMetrics(
-        metricsWindow,
-        droppedFrames,
-        'superhigh', // falls du keine Tier-Logik hast
-        'GPU',
-      ),
-    );
+    const quality = segmenterOptions.quality ?? 'auto';
+    const tier = quality === 'auto' ? 'superhigh' : quality;
+
+    onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, 'GPU'));
   }
 
   function close() {
@@ -159,15 +155,15 @@ export async function runSegmenter(
         let gpuMs = 0;
 
         try {
-          if (globalOptions.enabled) {
-            if (globalOptions.enableFilters) {
+          if (segmenterOptions.enabled && segmenterOptions.quality !== 'bypass') {
+            if (segmenterOptions.enableFilters) {
               const filterStart = performance.now();
               videoFilter.render(
                 videoFrame,
-                globalOptions.blur,
-                globalOptions.brightness,
-                globalOptions.contrast,
-                globalOptions.gamma,
+                segmenterOptions.blur,
+                segmenterOptions.brightness,
+                segmenterOptions.contrast,
+                segmenterOptions.gamma,
               );
               filterMs = performance.now() - filterStart;
             }
@@ -176,7 +172,7 @@ export async function runSegmenter(
 
             await new Promise<void>(resolve => {
               segmenter.segmentForVideo(
-                globalOptions.enableFilters ? effectsCanvas : videoFrame,
+                segmenterOptions.enableFilters ? effectsCanvas : videoFrame,
                 timestamp * 1000,
                 result => {
                   segmentationMs = performance.now() - segStart;
@@ -193,10 +189,9 @@ export async function runSegmenter(
                     const categoryTextureMP = categoryMask.getAsWebGLTexture();
                     const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
                     const gpuStart = performance.now();
-                    console.log('############# segmenter', {...globalOptions});
                     webGLRenderer?.render(
                       videoFrame,
-                      globalOptions,
+                      segmenterOptions,
                       categoryTextureMP,
                       confidenceTextureMP,
                       useSelfieModel,
@@ -214,7 +209,7 @@ export async function runSegmenter(
             });
           } else {
             const gpuStart = performance.now();
-            webGLRenderer?.render(videoFrame, globalOptions);
+            webGLRenderer?.render(videoFrame, segmenterOptions);
             gpuMs = performance.now() - gpuStart;
           }
         } finally {
@@ -253,7 +248,7 @@ export async function runSegmenter(
         }
 
         // Restart segmenter to avoid memory leaks.
-        if (globalOptions.restartEvery && totalFrames % globalOptions.restartEvery === 0) {
+        if (segmenterOptions.restartEvery && totalFrames % segmenterOptions.restartEvery === 0) {
           restartSegmenter();
         }
       },

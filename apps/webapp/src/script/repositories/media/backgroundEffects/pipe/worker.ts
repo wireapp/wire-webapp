@@ -20,14 +20,14 @@
 import {Metrics} from 'Repositories/media/backgroundEffects';
 
 import {WorkerProcessVideoTrackOptions} from './options';
-import {runSegmenter, globalOptions} from './segmenter';
+import {runSegmenter, segmenterOptions} from './segmenter';
 
 self.onmessage = ({data}) => {
   // console.log(`[virtual-background] worker onmessage`, data);
   const {name} = data as {name: string};
   if (name === 'options') {
     const {options: opts} = data as {options: WorkerProcessVideoTrackOptions};
-    Object.assign(globalOptions, opts);
+    Object.assign(segmenterOptions, opts);
   } else if (name === 'runSegmenter') {
     const {
       canvas,

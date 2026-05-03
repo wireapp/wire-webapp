@@ -35,7 +35,12 @@ import {
   WorkerProcessVideoTrackOptions,
 } from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
-import {runSegmenter} from './pipe/segmenter';
+import {runSegmenter, segmenterOptions} from './pipe/segmenter';
+
+// Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
+// The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
+// visually useful blur.  Multiply by this factor to get from the 0–1 range.
+const BLUR_SIGMA_SCALE = 15;
 
 export class BackgroundEffectsController {
   private readonly logger: Logger;
@@ -44,7 +49,6 @@ export class BackgroundEffectsController {
   private options: ProcessVideoTrackOptions = defaultOpts;
 
   private onMetrics: ((metrics: Metrics) => void) | null = null;
-  private onModelChange: ((model: string) => void) | null = null;
 
   private readonly capabilityInfo: CapabilityInfo = {
     offscreenCanvas: false,
@@ -71,6 +75,8 @@ export class BackgroundEffectsController {
     options: ProcessVideoTrackOptions,
   ): Promise<{outputTrack: MediaStreamTrack; stop: () => void}> {
     this.refcount++;
+    const resolved = await resolveOptions(options);
+    this.options = withoutBitmap(resolved);
     this.onMetrics = options.onMetrics;
 
     const trackCapabilities = inputTrack.getCapabilities();
@@ -95,10 +101,9 @@ export class BackgroundEffectsController {
     outputTrack.stop = () => {
       this.logger.info('start: outputTrack stop');
       outputTrackStop();
-      inputTrack.stop();
+
       this.refcount--;
       if (!this.refcount) {
-        this.unloadBackground();
         if (this.worker !== null) {
           this.worker.terminate();
           this.worker = null;
@@ -111,13 +116,11 @@ export class BackgroundEffectsController {
     outputTrack.getConstraints = () => trackConstraints;
     inputTrack.addEventListener('ended', () => outputTrack.stop());
 
-    if (this.options.useWorker) {
+    if (resolved.useWorker) {
       if (this.worker === null) {
         this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
       }
-      const {options: workerOptions, transferables} = this.getWorkerOptions(this.options);
-
-      console.log('###### workerOptions', workerOptions, transferables);
+      const {options: workerOptions, transferables} = getWorkerOptions(resolved);
 
       transferables.push(offscreen, readable);
 
@@ -128,14 +131,13 @@ export class BackgroundEffectsController {
 
       this.worker.addEventListener('message', ({data}) => {
         const {name, stats} = data as {name: string; stats: Metrics};
-        if (name === 'stats') {
+        if (name === 'stats' && this.onMetrics) {
           this.onMetrics(stats);
         }
       });
     } else {
-      console.log('### hhhhhworkerOptions');
-      const {options: workerOptions} = this.getWorkerOptions(this.options);
-      await runSegmenter(offscreen, readable, workerOptions, stats => this.onMetrics(stats));
+      const {options: workerOptions} = getWorkerOptions(resolved);
+      await runSegmenter(offscreen, readable, workerOptions, stats => this.onMetrics?.(stats));
     }
 
     return {
@@ -144,96 +146,52 @@ export class BackgroundEffectsController {
     };
   }
 
-  private unloadBackground() {}
-
   public stop(): void {}
-
-  private getWorkerOptions(options: ProcessVideoTrackOptions): {
-    options: WorkerProcessVideoTrackOptions;
-    transferables: Transferable[];
-  } {
-    const {onMetrics, onModelChange, backgroundSource, ...rest} = options;
-
-    const transferables: Transferable[] = [];
-
-    let workerBackgroundSource: WorkerBackgroundSource | null = null;
-
-    // Copy all sources
-    if (backgroundSource) {
-      const {type, media, url} = backgroundSource;
-
-      workerBackgroundSource = {
-        type,
-        media: null, // we remove media
-        url,
-      };
-
-      // Only push when the media is truly transferable and this is only the case for ImageBitmap
-      if (media instanceof ImageBitmap) {
-        workerBackgroundSource.media = media;
-        transferables.push(media);
-      }
-    }
-
-    console.log('###### workerBackgroundSource', workerBackgroundSource);
-
-    return {
-      options: {
-        ...rest,
-        backgroundSource: workerBackgroundSource,
-      },
-      transferables,
-    };
-  }
-
-  public setBackgroundSource(source: BackgroundSource): void {
-    // if (source instanceof HTMLImageElement) {
-    //   createImageBitmap(source)
-    //     .then(bitmap => {
-    //
-    //       bitmap.
-    //     } else if (newSource.type === 'image') {
-    //
-    //     const {media, url} = newSource as {media: ImageBitmap; url: string};
-    //       const newSource = BackgroundSource {
-    //       type: 'image';
-    //       media: bitmap;
-    //       url: '----';
-    //     }
-    //
-    //
-    //       if (!this.pipelineImpl) {
-    //         bitmap.close();
-    //         return;
-    //       }
-    //
-    //
-    //       this.pipelineImpl.setBackgroundImage(bitmap, source.naturalWidth, source.naturalHeight);
-    //     })
-    //     .catch((error: unknown) => this.logger.warn('Failed to set background image', error));
-    //   return;
-    // }
-    //
-    // if (!this.pipelineImpl) {
-    //   source.close();
-    //   return;
-    // }
-    // this.pipelineImpl.setBackgroundImage(source, source.width, source.height);
-  }
 
   public setMode(mode: EffectMode): void {
     this.logger.info('Background effects mode', mode);
+    const renderFlags = modeToRenderFlags(mode, this.options.blurStrength, this.options.bgBlurRadius);
+    this.options = {...this.options, mode, ...renderFlags};
+    this.pushOptionsUpdate();
   }
 
-  public setBlurStrength(value: number): void {}
+  public setBlurStrength(value: number): void {
+    this.options = {
+      ...this.options,
+      blurStrength: value,
+      // Only raise bgBlur when in blur mode; virtual/passthrough use bgBlur=0.
+      bgBlur: this.options.mode === 'blur' ? blurStrengthToBgBlur(value) : this.options.bgBlur,
+    };
+    this.pushOptionsUpdate();
+  }
 
-  setQuality(quality: QualityMode) {
+  public setBackgroundSource(source: BackgroundSource): void {
+    if (source.type !== 'image') {
+      return;
+    }
+
+    const {media, url} = source;
+
+    if (media instanceof HTMLImageElement) {
+      createImageBitmap(media)
+        .then(bitmap => this.applyImageBitmap(bitmap, url))
+        .catch((error: unknown) => this.logger.warn('Failed to set background image', error));
+      return;
+    }
+
+    if (media instanceof ImageBitmap) {
+      this.applyImageBitmap(media, url);
+    }
+  }
+
+  public setQuality(quality: QualityMode): void {
     this.logger.info('setQuality', quality);
+    this.options = {...this.options, quality};
+    this.pushOptionsUpdate();
   }
 
-  getQuality(): QualityMode {
-    this.logger.info('getQuality');
-    return 'auto';
+  public getQuality(): QualityMode {
+    return this.options.quality;
   }
 
   public isProcessing(): boolean {
@@ -251,4 +209,124 @@ export class BackgroundEffectsController {
   public getMaxQualityTier(): QualityTier {
     return this.maxQualityTier;
   }
+
+  private applyImageBitmap(bitmap: ImageBitmap, url: string): void {
+    const workerSource: WorkerBackgroundSource = {type: 'image', media: bitmap, url};
+    // Record the url without the bitmap so the options object remains serialisable.
+    this.options = {...this.options, backgroundSource: {type: 'image', url}};
+    this.pushOptionsUpdate(workerSource, [bitmap]);
+  }
+
+  /**
+   * Sends the current options to the worker (or updates globalOptions directly
+   * for the non-worker path).  An optional pre-built WorkerBackgroundSource with
+   * its transferable ImageBitmap can be supplied for setBackgroundSource calls.
+   */
+  private pushOptionsUpdate(workerSource?: WorkerBackgroundSource, transferables: Transferable[] = []): void {
+    if (!this.refcount) {
+      return;
+    }
+
+    const {options: workerOptions} = getWorkerOptions(this.options);
+    const finalOptions: WorkerProcessVideoTrackOptions = workerSource
+      ? {...workerOptions, backgroundSource: workerSource}
+      : workerOptions;
+
+    if (this.options.useWorker && this.worker) {
+      this.worker.postMessage({name: 'options', options: finalOptions}, transferables);
+    } else {
+      Object.assign(segmenterOptions, finalOptions);
+    }
+  }
 }
+
+// ---------------------------------------------------------------------------
+// Module-level pure helpers
+// ---------------------------------------------------------------------------
+
+const blurStrengthToBgBlur = (strength: number): number => Math.max(strength * BLUR_SIGMA_SCALE, 1);
+
+const modeToRenderFlags = (
+  mode: EffectMode,
+  blurStrength: number,
+  bgBlurRadius: number,
+): Pick<ProcessVideoTrackOptions, 'enabled' | 'bgBlur' | 'bgBlurRadius'> => {
+  switch (mode) {
+    case 'blur':
+      return {enabled: true, bgBlur: blurStrengthToBgBlur(blurStrength), bgBlurRadius};
+    case 'virtual':
+      return {enabled: true, bgBlur: 0, bgBlurRadius};
+    case 'passthrough':
+    default:
+      return {enabled: false, bgBlur: 0, bgBlurRadius};
+  }
+};
+
+const withoutBitmap = (options: ProcessVideoTrackOptions): ProcessVideoTrackOptions => {
+  if (!(options.backgroundSource?.media instanceof ImageBitmap)) {
+    return options;
+  }
+  return {
+    ...options,
+    backgroundSource: {type: options.backgroundSource.type, url: options.backgroundSource.url},
+  };
+};
+
+const resolveOptions = async (options: ProcessVideoTrackOptions): Promise<ProcessVideoTrackOptions> => {
+  const renderFlags = modeToRenderFlags(options.mode ?? 'blur', options.blurStrength, options.bgBlurRadius);
+  const resolved = {...options, ...renderFlags};
+
+  if (resolved.backgroundSource?.media instanceof HTMLImageElement) {
+    const bitmap = await createImageBitmap(resolved.backgroundSource.media);
+    resolved.backgroundSource = {
+      type: resolved.backgroundSource.type,
+      media: bitmap,
+      url: resolved.backgroundSource.url,
+    };
+  }
+
+  return resolved;
+};
+
+const getWorkerOptions = (
+  options: ProcessVideoTrackOptions,
+): {options: WorkerProcessVideoTrackOptions; transferables: Transferable[]} => {
+  const transferables: Transferable[] = [];
+  let workerBackgroundSource: WorkerBackgroundSource | null = null;
+
+  if (options.backgroundSource) {
+    const {type, media, url} = options.backgroundSource;
+    workerBackgroundSource = {type, media: undefined, url};
+
+    if (media instanceof ImageBitmap) {
+      workerBackgroundSource.media = media;
+      transferables.push(media);
+    }
+  }
+
+  const workerOptions: WorkerProcessVideoTrackOptions = {
+    wasmLoaderPath: options.wasmLoaderPath,
+    wasmBinaryPath: options.wasmBinaryPath,
+    modelPath: options.modelPath,
+    useWorker: options.useWorker,
+    mode: options.mode,
+    blurStrength: options.blurStrength,
+    enabled: options.enabled,
+    quality: options.quality,
+    borderSmooth: options.borderSmooth,
+    smoothing: options.smoothing,
+    smoothstepMin: options.smoothstepMin,
+    smoothstepMax: options.smoothstepMax,
+    restartEvery: options.restartEvery,
+    bgBlur: options.bgBlur,
+    bgBlurRadius: options.bgBlurRadius,
+    enableFilters: options.enableFilters,
+    blur: options.blur,
+    brightness: options.brightness,
+    contrast: options.contrast,
+    gamma: options.gamma,
+    backgroundSource: workerBackgroundSource,
+  };
+
+  return {options: workerOptions, transferables: transferables};
+};
