@@ -26,7 +26,7 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 @singleton()
 export class UserState {
-  public readonly self = ko.observable<User | undefined>();
+  public readonly self = ko.observable<User>(new User('', ''));
   /** All the users we know of (connected users, conversation users, team members, users we have searched for...) */
   public readonly users = ko.observableArray<User>([]);
   /** All the users that are directly connect to the self user (do not include users that are connected through conversations) */

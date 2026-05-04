@@ -65,7 +65,9 @@ export const validateCharacter = (character: string): boolean => {
  * Appends random digits from 1 to 9 to the end of the string.
  */
 export const appendRandomDigits = (handle: string, additionalNumbers?: number): string => {
-  const randomDigits = Array.from({length: additionalNumbers}, () => getRandomNumber(1, 8));
+  const randomDigits = Array.from({length: additionalNumbers ?? 0}, () => {
+    return getRandomNumber(1, 8);
+  });
   return `${handle}${randomDigits.join('')}`;
 };
 

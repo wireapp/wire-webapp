@@ -60,7 +60,7 @@ const SetHandleComponent = ({
   name,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<unknown>(null);
   const [handle, setHandle] = useState('');
   const {state} = useLocation();
   const isNewAccount = state?.isNewAccount ?? false;
@@ -78,7 +78,7 @@ const SetHandleComponent = ({
     (async () => {
       doGetConsents();
       try {
-        const suggestions = createSuggestions(name);
+        const suggestions = createSuggestions(name ?? '');
         const handle = await checkHandles(suggestions);
         setHandle(handle);
       } catch (error: unknown) {
@@ -159,7 +159,7 @@ const SetHandleComponent = ({
               {t('chooseHandle.submitButton')}
             </Button>
           </Form>
-          {error && parseError(error)}
+          {error !== null ? parseError(error) : null}
         </ContainerXS>
         {!isFetching && hasUnsetMarketingConsent && (
           <AcceptNewsModal onConfirm={handleAcceptNewletterConsent} onDecline={handleDeclineNewletterConsent} />

@@ -78,6 +78,10 @@ const ConversationParticipants: FC<ConversationParticipantsProps> = ({
     return users;
   }, [participatingUserEts, isSelfUserRemoved, selfUser]);
 
+  if (selfUser === undefined) {
+    return null;
+  }
+
   return (
     <div id="conversation-participants" className="panel__page conversation-participants">
       <PanelHeader

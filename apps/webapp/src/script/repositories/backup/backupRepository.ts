@@ -162,7 +162,7 @@ export class BackupRepository {
     // encode header
     const backupCoder = new BackUpHeader(user.id, password);
     const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch((error: unknown) => {
-      throw new Error('Backup error:', error);
+      throw new Error('Backup error', {cause: error});
     });
 
     // Encrypt the ZIP archive using the provided password

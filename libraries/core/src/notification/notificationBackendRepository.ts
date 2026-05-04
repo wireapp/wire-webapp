@@ -17,7 +17,7 @@
  *
  */
 
-import {Notification} from '@wireapp/api-client/lib/notification/';
+import {Notification} from '@wireapp/api-client/lib/notification';
 
 import {APIClient} from '@wireapp/api-client';
 

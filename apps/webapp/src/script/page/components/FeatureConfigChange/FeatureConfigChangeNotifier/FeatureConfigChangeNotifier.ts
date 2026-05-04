@@ -117,7 +117,7 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
         status: FEATURE_STATUS | undefined,
       ) => undefined | {htmlMessage: string; title: Title; primaryAction?: ButtonAction} = status => {
         if (newConfig && 'config' in newConfig) {
-          localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
+          localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation ?? '');
           amplify.publish(
             WebAppEvents.TEAM.DOWNLOAD_PATH_UPDATE,
             newConfig.status === FEATURE_STATUS.ENABLED ? newConfig.config.enforcedDownloadLocation : undefined,
@@ -169,11 +169,11 @@ const featureNotifications: Record<string, (oldConfig: any, newConfig: any) => F
         if (!status) {
           return undefined;
         }
-        if (!configStatus) {
+        if (configStatus === undefined) {
           return undefined;
         }
 
-        localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation);
+        localStorage.setItem('enforcedDownloadLocation', newConfig.config.enforcedDownloadLocation ?? '');
         return handleDlPathChange(status);
       }
       return undefined;

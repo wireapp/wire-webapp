@@ -55,9 +55,10 @@ export class QuoteEntity {
   }
 
   toProto(): Quote {
+    const quotedMessageSha256 = this.hash !== undefined ? new Uint8Array(this.hash) : new Uint8Array();
     return new Quote({
       quotedMessageId: this.messageId,
-      quotedMessageSha256: new Uint8Array(this.hash),
+      quotedMessageSha256,
     });
   }
 }

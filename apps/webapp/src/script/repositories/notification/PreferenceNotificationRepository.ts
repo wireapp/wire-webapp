@@ -68,7 +68,7 @@ export class PreferenceNotificationRepository {
   /**
    * @param selfUser an observable that contains the self user
    */
-  constructor(selfUser: ko.Subscribable<User>) {
+  constructor(selfUser: ko.Subscribable<User | undefined>) {
     const notificationsStorageKey = PreferenceNotificationRepository.CONFIG.STORAGE_KEY;
     const storedNotifications = loadValue<string>(notificationsStorageKey);
     this.notifications = ko.observableArray(storedNotifications ? JSON.parse(storedNotifications) : []);
@@ -79,17 +79,30 @@ export class PreferenceNotificationRepository {
     });
 
     amplify.subscribe(WebAppEvents.USER.CLIENT_ADDED, (user: QualifiedId, clientEntity?: ClientEntity) => {
-      if (clientEntity && !clientEntity.isLegalHold() && matchQualifiedIds(user, selfUser())) {
+      const currentSelfUser = selfUser();
+      const shouldNotifyClientAdded =
+        clientEntity !== undefined &&
+        clientEntity.isLegalHold() === false &&
+        currentSelfUser !== undefined &&
+        matchQualifiedIds(user, currentSelfUser);
+      if (shouldNotifyClientAdded) {
         const {id, domain, type, time, model} = clientEntity;
         this.notifications.push({
-          data: {domain, id, model, time, type},
+          data: {
+            domain: domain ?? undefined,
+            id: id ?? '',
+            model: model ?? '',
+            time: time ?? '',
+            type: type ?? ClientType.PERMANENT,
+          },
           type: PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT,
         });
       }
     });
     amplify.subscribe(WebAppEvents.USER.CLIENT_REMOVED, (user: QualifiedId, clientId: string) => {
-      if (matchQualifiedIds(user, selfUser())) {
-        this.onClientRemove(user.id, clientId, user.domain);
+      const currentSelfUser = selfUser();
+      if (currentSelfUser !== undefined && matchQualifiedIds(user, currentSelfUser)) {
+        this.onClientRemove(user.id, clientId, user.domain ?? null);
       }
     });
     amplify.subscribe(WebAppEvents.USER.EVENT_FROM_BACKEND, this.onUserEvent);
@@ -114,7 +127,7 @@ export class PreferenceNotificationRepository {
         return false;
       }
       const isExpectedId = matchQualifiedIds(
-        {domain: clientEntity.domain, id: clientEntity.id},
+        {domain: clientEntity.domain ?? null, id: clientEntity.id},
         {domain, id: clientId},
       );
       return isExpectedId && clientEntity.type === ClientType.PERMANENT;

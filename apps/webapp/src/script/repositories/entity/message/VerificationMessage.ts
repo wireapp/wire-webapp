@@ -32,7 +32,7 @@ import type {User} from '../User';
 export class VerificationMessage extends Message {
   public readonly userEntities: ko.ObservableArray<User>;
   public userIds: ko.ObservableArray<QualifiedUserId>;
-  public verificationMessageType: ko.Observable<VerificationMessageType>;
+  public verificationMessageType: ko.Observable<VerificationMessageType | undefined>;
   public readonly isSelfClient: ko.PureComputed<boolean>;
 
   constructor() {
@@ -47,8 +47,8 @@ export class VerificationMessage extends Message {
     this.userEntities = ko.observableArray();
 
     this.isSelfClient = ko.pureComputed(() => {
-      const messageUserId = this.userIds()?.length === 1 && this.userIds()[0];
-      return matchQualifiedIds(messageUserId, this.user().qualifiedId);
+      const messageUserId = this.userIds().length === 1 ? this.userIds()[0] : undefined;
+      return messageUserId !== undefined && matchQualifiedIds(messageUserId, this.user().qualifiedId);
     });
   }
 }

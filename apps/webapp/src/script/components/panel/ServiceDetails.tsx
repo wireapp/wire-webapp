@@ -54,7 +54,7 @@ const ServiceDetails = ({service}: ServiceDetailsProps) => {
         </div>
       </div>
 
-      <p css={authorLabel}>{t('serviceDetailsAuthor', {author})}</p>
+      <p css={authorLabel}>{t('serviceDetailsAuthor', {author: author ?? ''})}</p>
 
       <div css={description}>
         <div id={descriptionId} css={description.headline}>

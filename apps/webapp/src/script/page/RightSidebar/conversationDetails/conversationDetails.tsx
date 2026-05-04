@@ -224,6 +224,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const showService = async (entity: ServiceEntity) => {
       if (entity.isService) {
         const serviceEntity = await integrationRepository.getServiceFromUser(entity);
+        if (serviceEntity === undefined) {
+          return;
+        }
         togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
         return;
       }

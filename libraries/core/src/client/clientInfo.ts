@@ -17,7 +17,7 @@
  *
  */
 
-import {ClientClassification, Location} from '@wireapp/api-client/lib/client/';
+import {ClientClassification, Location} from '@wireapp/api-client/lib/client';
 
 export interface ClientInfo {
   classification: ClientClassification.DESKTOP | ClientClassification.PHONE | ClientClassification.TABLET;

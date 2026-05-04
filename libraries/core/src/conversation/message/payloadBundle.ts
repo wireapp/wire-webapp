@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-client/lib/event/';
+import {ConversationEventData, TeamEventData, UserEventData} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Message} from './message';

@@ -301,7 +301,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   async getSelfMember(teamId: string): Promise<TeamMemberEntity> {
     const memberEntity = await this.getTeamMember(teamId, this.userState.self().id);
-    this.updateUserRole(this.userState.self(), memberEntity.permissions);
+    if (memberEntity.permissions !== undefined) {
+      this.updateUserRole(this.userState.self(), memberEntity.permissions);
+    }
     return memberEntity;
   }
 
@@ -311,7 +313,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   private getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
     const selfTeamId = this.userState.self().teamId;
-    if (!selfTeamId) {
+    if (selfTeamId === undefined || selfTeamId === '') {
       return;
     }
     const knownMemberIds = this.teamState.teamMembers().map(member => member.id);
@@ -354,18 +356,25 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   async filterExternals(users: User[]): Promise<User[]> {
     const teamId = this.teamState.team()?.id;
-    if (!teamId) {
+    if (teamId === undefined || teamId === '') {
       return users;
     }
     const userIds = users.map(({id}) => id);
     const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
     return members
       .filter(member => roleFromTeamPermissions(member.permissions) !== ROLE.PARTNER)
-      .map(({user}) => users.find(({id}) => id === user));
+      .map(({user}) => users.find(({id}) => id === user))
+      .filter((user): user is User => {
+        return user !== undefined;
+      });
   }
 
   getTeamConversationRoles(): Promise<ConversationRolesList> {
-    return this.teamService.getTeamConversationRoles(this.teamState.team().id);
+    const teamId = this.teamState.team()?.id;
+    if (teamId === undefined) {
+      return Promise.reject(new Error('Team id is not available'));
+    }
+    return this.teamService.getTeamConversationRoles(teamId);
   }
 
   async getWhitelistedServices(teamId: string, domain: string): Promise<ServiceEntity[]> {
