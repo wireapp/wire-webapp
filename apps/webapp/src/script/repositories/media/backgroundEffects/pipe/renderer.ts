@@ -492,7 +492,6 @@ export class WebGLRenderer {
       this.canvas.height = height;
     }
 
-    console.error('#####  render', options.backgroundSource);
     if (!categoryTexture || !confidenceTexture) {
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.useProgram(blendProgram);
@@ -530,7 +529,6 @@ export class WebGLRenderer {
     const prevStateTexture = storedStateTextures[readStateIndex];
     const newStateTexture = storedStateTextures[writeStateIndex];
 
-    //console.log('#####  render', options.backgroundSource);
     this.updateBackgroundIfNeeded(options.backgroundSource);
 
     // --- 1. State Update Pass (Calculates Moving Average) ---
