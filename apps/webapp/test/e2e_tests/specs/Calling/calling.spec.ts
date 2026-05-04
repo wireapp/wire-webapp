@@ -490,6 +490,8 @@ test.describe('Calling', () => {
       await test.step('Setup: Accept connection and start group call', async () => {
         await guestPages.conversationList().openPendingConnectionRequest();
         await guestPages.connectRequest().clickConnectButton();
+        await expect(userAPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+        await expect(guestPages.conversationList().getConversation(userA.fullName)).toBeAttached();
 
         await createGroup(userAPages, groupName, [userB, guestUser]);
 

@@ -113,12 +113,14 @@ test.describe('User Blocking', () => {
       'Verify you can block a user who is not in your team',
       {tag: ['@TC-140', '@regression']},
       async ({createPage}) => {
-        const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
-        await sendConnectionRequest(userAPageManager, userB);
-        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
+        const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+        await sendConnectionRequest(userAPage, userB);
+
+        const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+        const {pages: userBPages} = PageManager.from(userBPage).webapp;
 
         // Preconditions: User B accepts the connection request
-        const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
+        await userBPages.conversationList().openPendingConnectionRequest();
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A and B have a 1:1 conversation
@@ -169,6 +171,7 @@ test.describe('User Blocking', () => {
         const conversationName = 'GroupConversation';
 
         await expect(userAPages.conversationList().getConversation(userB.fullName)).toBeAttached();
+        await expect(userBPages.conversationList().getConversation(userA.fullName)).toBeAttached();
         await createGroup(userAPages, conversationName, [userB]);
 
         await test.step('Step 1: User B sends message to group chat with User A', async () => {
@@ -199,12 +202,17 @@ test.describe('User Blocking', () => {
       {tag: ['@TC-142', '@regression']},
 
       async ({createPage}) => {
-        const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
+        const [userAPageManagerInstance, userBPageManagerInstance] = await Promise.all([
+          PageManager.from(createPage(withLogin(userA))),
+          PageManager.from(createPage(withLogin(userB))),
+        ]);
         await sendConnectionRequest(userAPageManagerInstance, userB);
+
         const {pages: userAPages, modals: userAModals} = userAPageManagerInstance.webapp;
+        const {pages: userBPages} = userBPageManagerInstance.webapp;
 
         // Preconditions: User B accepts the connection request
-        const userBPages = (await PageManager.from(createPage(withLogin(userB)))).webapp.pages;
+        await userBPages.conversationList().openPendingConnectionRequest();
         await userBPages.connectRequest().clickConnectButton();
 
         // Step 1: User A and B have a 1:1 conversation
