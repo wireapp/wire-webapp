@@ -101,7 +101,7 @@ test.describe('User Blocking', () => {
         // Step 3: User A opens modal and clicks 'Block' button
         await contextMenu.blockButton.click();
         // Step 4: User A clicks 'Cancel' button
-        await userAModals.blockWarning().clickCancel();
+        await userAModals.blockWarning().cancelButton.click();
         // Step 5: Conversation is still present, and User A can open it
         await conversation.open();
         // Step 6: User A still can send message to User B
