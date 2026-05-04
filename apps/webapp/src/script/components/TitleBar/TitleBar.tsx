@@ -61,6 +61,8 @@ interface TitleBarProps {
   callState?: CallState;
   isReadOnlyConversation?: boolean;
   withBottomDivider: boolean;
+  isSharedDriveSearchViewOpen?: boolean;
+  onCloseSharedDriveSearchView?: () => void;
 }
 
 export const TitleBar = ({
@@ -74,6 +76,8 @@ export const TitleBar = ({
   teamState = container.resolve(TeamState),
   isReadOnlyConversation = false,
   withBottomDivider,
+  isSharedDriveSearchViewOpen = false,
+  onCloseSharedDriveSearchView,
 }: TitleBarProps) => {
   const {
     is1to1,
@@ -266,7 +270,20 @@ export const TitleBar = ({
           />
         )}
 
-        {isActivatedAccount && !mdBreakpoint && (
+        {isSharedDriveSearchViewOpen && (
+          <button
+            className="conversation-title-bar-icon conversation-title-bar-icon--borderless"
+            type="button"
+            title={t('fullsearchCancelLabel')}
+            aria-label={t('fullsearchCancelLabel')}
+            onClick={onCloseSharedDriveSearchView}
+            data-uie-name="do-close-shared-drive-search"
+          >
+            <Icon.CloseIcon />
+          </button>
+        )}
+
+        {isActivatedAccount && !mdBreakpoint && !isSharedDriveSearchViewOpen && (
           <button
             className="conversation-title-bar-icon icon-search"
             type="button"
@@ -320,59 +337,63 @@ export const TitleBar = ({
       </li>
 
       <li className="conversation-title-bar-icons">
-        {showCallControls && !mdBreakpoint && (
-          <button
-            type="button"
-            className="conversation-title-bar-icon"
-            title={t('tooltipConversationCall')}
-            aria-label={t('tooltipConversationCall')}
-            onClick={event => {
-              currentFocusedElementRef.current = event.target as HTMLButtonElement;
-              startCallAndShowAlert();
-            }}
-            data-uie-name="do-call"
-            disabled={isCallButtonDisabled}
-          >
-            <CallIcon />
-          </button>
-        )}
-
-        {mdBreakpoint ? (
+        {!isSharedDriveSearchViewOpen && (
           <>
-            <IconButton
-              className="icon-search"
-              css={{marginBottom: 0}}
-              title={t('tooltipConversationSearch')}
-              aria-label={t('tooltipConversationSearch')}
-              onClick={onClickCollectionButton}
-              data-uie-name="do-collections"
-            >
-              <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
-            </IconButton>
-            {showCallControls && (
-              <IconButton
+            {showCallControls && !mdBreakpoint && (
+              <button
+                type="button"
+                className="conversation-title-bar-icon"
                 title={t('tooltipConversationCall')}
                 aria-label={t('tooltipConversationCall')}
-                css={{marginBottom: 0}}
-                onClick={onClickStartAudio}
+                onClick={event => {
+                  currentFocusedElementRef.current = event.currentTarget;
+                  startCallAndShowAlert();
+                }}
                 data-uie-name="do-call"
                 disabled={isCallButtonDisabled}
               >
                 <CallIcon />
-              </IconButton>
+              </button>
+            )}
+
+            {mdBreakpoint ? (
+              <>
+                <IconButton
+                  className="icon-search"
+                  css={{marginBottom: 0}}
+                  title={t('tooltipConversationSearch')}
+                  aria-label={t('tooltipConversationSearch')}
+                  onClick={onClickCollectionButton}
+                  data-uie-name="do-collections"
+                >
+                  <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
+                </IconButton>
+                {showCallControls && (
+                  <IconButton
+                    title={t('tooltipConversationCall')}
+                    aria-label={t('tooltipConversationCall')}
+                    css={{marginBottom: 0}}
+                    onClick={onClickStartAudio}
+                    data-uie-name="do-call"
+                    disabled={isCallButtonDisabled}
+                  >
+                    <CallIcon />
+                  </IconButton>
+                )}
+              </>
+            ) : (
+              <button
+                type="button"
+                title={t('tooltipConversationInfo')}
+                aria-label={t('tooltipConversationInfo')}
+                onClick={onClickDetails}
+                className={cx('conversation-title-bar-icon', {active: isRightSidebarOpen})}
+                data-uie-name="do-open-info"
+              >
+                <Icon.InfoIcon />
+              </button>
             )}
           </>
-        ) : (
-          <button
-            type="button"
-            title={t('tooltipConversationInfo')}
-            aria-label={t('tooltipConversationInfo')}
-            onClick={onClickDetails}
-            className={cx('conversation-title-bar-icon', {active: isRightSidebarOpen})}
-            data-uie-name="do-open-info"
-          >
-            <Icon.InfoIcon />
-          </button>
         )}
       </li>
 

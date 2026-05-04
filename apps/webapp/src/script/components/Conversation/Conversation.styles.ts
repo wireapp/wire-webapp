@@ -19,6 +19,34 @@
 
 import {CSSObject} from '@emotion/react';
 
-export const wrapperStyles: CSSObject = {
-  padding: '0 8px',
+export const tabsWrapperStyles: CSSObject = {
+  position: 'relative',
+};
+
+export const tabsHiddenStyles: CSSObject = {
+  visibility: 'hidden',
+};
+
+export const searchResultsOverlayStyles: CSSObject = {
+  position: 'absolute',
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+  display: 'flex',
+  alignItems: 'flex-end',
+  paddingLeft: '16px',
+  paddingBottom: '8px',
+};
+
+export const searchResultsHeadingStyles: CSSObject = {
+  margin: 0,
+  fontSize: 'var(--font-size-medium)',
+  fontStyle: 'normal',
+  fontWeight: 'var(--font-weight-semibold)',
+  lineHeight: 'var(--line-height-md)',
+  color: 'var(--Backgrounds-On-Background-Variant, #000)',
+  'body.theme-dark &': {
+    color: 'var(--Backgrounds-On-Background-Variant, #FFF)',
+  },
 };
