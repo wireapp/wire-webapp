@@ -58,11 +58,11 @@ export class ConnectionMapper {
     } = connectionData;
 
     connectionEntity.status(status);
-    connectionEntity.conversationId = qualified_conversation || {domain: '', id: conversation};
-    connectionEntity.userId = qualified_to || {domain: '', id: remoteUserId};
+    connectionEntity.conversationId = qualified_conversation ?? {domain: '', id: conversation ?? ''};
+    connectionEntity.userId = qualified_to ?? {domain: '', id: remoteUserId ?? ''};
     connectionEntity.from = from;
-    connectionEntity.lastUpdate = last_update;
-    connectionEntity.message = message;
+    connectionEntity.lastUpdate = last_update ?? '';
+    connectionEntity.message = message ?? '';
 
     return connectionEntity;
   }

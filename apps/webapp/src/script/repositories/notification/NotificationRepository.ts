@@ -328,6 +328,9 @@ export class NotificationRepository {
 
     if (messageEntity.hasAsset()) {
       const assetEntity = messageEntity.getFirstAsset();
+      if (assetEntity === undefined) {
+        return undefined;
+      }
 
       if (assetEntity.isAudio()) {
         return t('notificationSharedAudio');

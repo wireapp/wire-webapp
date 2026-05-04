@@ -25,7 +25,7 @@ import {
   TeamChunkData,
   TeamData,
   UpdateTeamData,
-} from '@wireapp/api-client/lib/team/';
+} from '@wireapp/api-client/lib/team';
 
 import {APIClient} from '@wireapp/api-client';
 

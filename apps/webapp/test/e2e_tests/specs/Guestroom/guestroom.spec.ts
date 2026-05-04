@@ -1,16 +1,8 @@
 import {Page} from 'playwright/test';
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {
-  test,
-  expect,
-  withLogin,
-  Team,
-  LOGIN_TIMEOUT,
-  withGuestUser,
-  withConnectionRequest,
-} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {test, expect, withLogin, Team, LOGIN_TIMEOUT, withGuestUser} from 'test/e2e_tests/test.fixtures';
+import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 /**
  * Navigates through the UI to generate a guest invitation link for a specific group.
@@ -22,7 +14,7 @@ import {createGroup} from 'test/e2e_tests/utils/userActions';
  */
 
 const generateGroupGuestsLink = async (pages: PageManager['webapp']['pages'], groupName: string, password?: string) => {
-  await pages.conversationList().openConversation(groupName);
+  await pages.conversationList().getConversation(groupName).open();
   await pages.conversation().toggleGroupInformation();
   await pages.conversationDetails().openGuestOptions();
 
@@ -63,8 +55,12 @@ test.describe('Guestroom', () => {
         await guestPages.conversationJoin().joinBrowserButton.click();
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
-        await guestPages.login().login(guestUser);
-        await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible({timeout: LOGIN_TIMEOUT});
+        // Allow the login to be retried if the modal doesn't show up automatically, this is a workaround since the login mask for guest links is out of our control
+        await expect(async () => {
+          await guestPages.login().login(guestUser);
+          await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
+        }).toPass({timeout: LOGIN_TIMEOUT});
+
         await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
         await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
           'Password is incorrect, please try again.',
@@ -83,7 +79,7 @@ test.describe('Guestroom', () => {
     const {pages, modals} = PageManager.from(userAPage).webapp;
 
     await createGroup(pages, groupName, []);
-    await pages.conversationList().openConversation(groupName);
+    await pages.conversationList().getConversation(groupName).open();
 
     await test.step('User A sees an error message when trying to create a password secured link with a weak password', async () => {
       await pages.conversation().toggleGroupInformation();
@@ -177,20 +173,22 @@ test.describe('Guestroom', () => {
     'I should not see guests when adding people to existing conversation when guest toggle is OFF',
     {tag: ['@TC-3318', '@regression']},
     async ({createPage}) => {
-      const [ownerPages, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(guestUser))).then(
-          ({webapp}) => webapp.pages,
-        ),
-        PageManager.from(createPage(withLogin(guestUser))).then(({webapp}) => webapp.pages),
+      const [ownerPage, guestPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(guestUser)),
       ]);
+      await sendConnectionRequest(ownerPage, guestUser);
+
+      const [ownerPages, guestPages] = [ownerPage, guestPage].map(page => PageManager.from(page).webapp.pages);
 
       await guestPages.conversationList().openPendingConnectionRequest();
       await guestPages.connectRequest().clickConnectButton();
-      await expect(ownerPages.conversationList().getConversationLocator(guestUser.fullName)).toBeAttached();
+      await expect(ownerPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+      await expect(guestPages.conversationList().getConversation(userA.fullName)).toBeAttached();
 
       await test.step('Owner creates a group with guest', async () => {
         await createGroup(ownerPages, groupName, [guestUser]);
-        await ownerPages.conversationList().openConversation(groupName);
+        await ownerPages.conversationList().getConversation(groupName).open();
         await ownerPages.conversation().toggleGroupInformation();
         await expect(ownerPages.conversationDetails().groupMembers.filter({hasText: guestUser.fullName})).toBeVisible();
       });
@@ -221,7 +219,7 @@ test.describe('Guestroom', () => {
       const ownerPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(ownerPages, groupName, []);
-      await ownerPages.conversationList().openConversation(groupName);
+      await ownerPages.conversationList().getConversation(groupName).open();
 
       // Owner creates a guest link
       await ownerPages.conversation().toggleGroupInformation();
@@ -250,7 +248,7 @@ test.describe('Guestroom', () => {
       const ownerPages = PageManager.from(ownerPage).webapp.pages;
 
       await createGroup(ownerPages, groupName, []);
-      await ownerPages.conversationList().openConversation(groupName);
+      await ownerPages.conversationList().getConversation(groupName).open();
       await ownerPages.conversation().toggleGroupInformation();
 
       await ownerPages.conversationDetails().openGuestOptions();
@@ -283,7 +281,7 @@ test.describe('Guestroom', () => {
       await ownerPages.groupCreation().setGroupName(groupName);
       await ownerPages.groupCreation().clickCreateGroupButton();
 
-      await ownerPages.conversationList().openConversation(groupName);
+      await ownerPages.conversationList().getConversation(groupName).open();
       await ownerPages.conversation().toggleGroupInformation();
 
       // UserA sees guest options label shows ON in conversation details
@@ -351,7 +349,7 @@ test.describe('Guestroom', () => {
       const ownerPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
       await createGroup(ownerPages, groupName, []);
-      await ownerPages.conversationList().openConversation(groupName);
+      await ownerPages.conversationList().getConversation(groupName).open();
 
       await verify(ownerPages);
       await ownerPages.conversation().invitePeopleButton.click();
@@ -526,7 +524,7 @@ test.describe('Guestroom', () => {
 
       await guestPages.conversationJoin().joinAsMemberButton.click();
       await guestPages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-      await expect(guestPages.conversationList().getConversationLocator(groupName)).toBeVisible();
+      await expect(guestPages.conversationList().getConversation(groupName)).toBeVisible();
     },
   );
 
@@ -628,7 +626,7 @@ test.describe('Guestroom', () => {
         },
       );
 
-      await expect(guestPages.conversationList().getConversationLocator(groupName)).toBeVisible();
+      await expect(guestPages.conversationList().getConversation(groupName)).toBeVisible();
     },
   );
 });

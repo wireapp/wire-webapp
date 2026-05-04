@@ -87,10 +87,10 @@ export class Message {
 
   constructor(id: string = '0', super_type?: SuperType) {
     this.id = id;
-    this.super_type = super_type;
+    this.super_type = super_type ?? SuperType.SYSTEM;
     this.ephemeralCaption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime ? `${formatDurationCaption(remainingTime)} ${t('ephemeralRemaining')}` : '';
+      return remainingTime > 0 ? `${formatDurationCaption(remainingTime)} ${t('ephemeralRemaining')}` : '';
     });
     this.ephemeral_remaining = ko.observable(0);
     this.ephemeral_expires = ko.observable(false);
@@ -130,7 +130,7 @@ export class Message {
     this.primary_key = undefined;
     this.status = ko.observable(StatusType.UNSPECIFIED);
     this.type = '';
-    this.user = ko.observable(new User('', null));
+    this.user = ko.observable(new User('', ''));
     this.version = 1;
     this.visible = ko.observable(true);
 
@@ -198,7 +198,12 @@ export class Message {
   }
 
   hasMultipartAsset(): this is ContentMessage {
-    return this.isContent() ? this.assets().some(assetEntity => assetEntity.type === AssetType.MULTIPART) : false;
+    const contentMessageCandidate = this as unknown as {assets?: () => Array<{type: AssetType}>};
+    const hasAssetsFunction =
+      Object.prototype.hasOwnProperty.call(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
+    return this.isContent() && hasAssetsFunction
+      ? this.assets().some(assetEntity => assetEntity.type === AssetType.MULTIPART)
+      : false;
   }
 
   getMultipartAssets() {

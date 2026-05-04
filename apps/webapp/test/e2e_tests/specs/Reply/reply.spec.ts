@@ -65,8 +65,8 @@ test.describe('Reply', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Test');
 
       const messageToReplyTo = userBPages.conversation().getMessage({content: 'Test'});
@@ -299,8 +299,8 @@ test.describe('Reply', () => {
       await createGroup(userAPages, 'Test Group', [userB]);
 
       await Promise.all([
-        userAPages.conversationList().openConversation('Test Group'),
-        userBPages.conversationList().openConversation('Test Group'),
+        userAPages.conversationList().getConversation('Test Group').open(),
+        userBPages.conversationList().getConversation('Test Group').open(),
       ]);
 
       await userAPages.conversation().sendMessage('Message');

@@ -763,6 +763,9 @@ export class App {
       }
     }
 
+    if (this.core.storage === undefined) {
+      throw new Error('Cannot initialize self user before core storage is available');
+    }
     container.resolve(StorageService).init(this.core.storage);
     this.repository.client.init(selfUser);
     await this.repository.properties.init(selfUser);

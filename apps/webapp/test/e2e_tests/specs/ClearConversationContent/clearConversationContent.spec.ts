@@ -24,6 +24,7 @@ import {test, withLogin, withConnectedUser, expect} from 'test/e2e_tests/test.fi
 import {getTextFilePath, shareAssetHelper} from '../../utils/asset.util';
 import {getImageFilePath} from '../../utils/sendImage.util';
 import {createGroup} from '../../utils/userActions';
+import {ConversationListPage} from 'test/e2e_tests/pageManager/webapp/pages/conversationList.page';
 
 test.describe('Clear Conversation Content', () => {
   let userA: User;
@@ -64,22 +65,19 @@ test.describe('Clear Conversation Content', () => {
         await createGroup(userAPages, conversationName, [userB, userC]);
 
         // Step 2: Write messages in the group conversation
-        await userAPages.conversationList().openConversation(conversationName);
+        const conversation = await userAPages.conversationList().getConversation(conversationName).open();
         await userAPages.conversation().sendMessage('Message from User A');
 
-        await userBPages.conversationList().openConversation(conversationName);
+        await userBPages.conversationList().getConversation(conversationName).open();
         await userBPages.conversation().sendMessage('Message from User B');
 
-        await userCPages.conversationList().openConversation(conversationName);
+        await userCPages.conversationList().getConversation(conversationName).open();
         await userCPages.conversation().sendMessage('Message from User C');
 
         await expect(userAPages.conversation().messages).toHaveCount(3);
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-        const contextMenu = await userAPages
-          .conversationList()
-          .getConversationLocator(conversationName)
-          .openContextMenu();
+        const contextMenu = await conversation.openContextMenu();
         await contextMenu.clearContentButton.click();
         // Step 4: Warning Popup should open
         await expect(userAModals.optionModal().modal).toBeVisible();
@@ -88,13 +86,13 @@ test.describe('Clear Conversation Content', () => {
           // Step 5: User A clicks 'Clear'
           await userAModals.optionModal().clickAction();
           // Step 6: Verify that the conversation does not contain any past messages
-          await userAPages.conversationList().openConversation(conversationName);
+          await conversation.open();
           await expect(userAPages.conversation().messages).toHaveCount(0);
         } else {
           // Step 5: User A clicks 'Cancel'
           await userAModals.optionModal().clickCancel();
           // Step 6: Verify that the conversation still contains any past messages
-          await userAPages.conversationList().openConversation(conversationName);
+          await conversation.open();
           await expect(userAPages.conversation().messages).toHaveCount(3);
         }
       },
@@ -116,21 +114,21 @@ test.describe('Clear Conversation Content', () => {
         const userBPages = userBPageManager.webapp.pages;
 
         // Step 1: Create a 1:1 conversation with User A and B
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        const conversation = await userAPages
+          .conversationList()
+          .getConversation(userB.fullName, {protocol: 'mls'})
+          .open();
 
         // Step 2: Write messages in the conversation
         await userAPages.conversation().sendMessage('Message from User A');
 
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
         await userBPages.conversation().sendMessage('Message from User B');
 
         await expect(userAPages.conversation().messages).toHaveCount(2);
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-        const contextMenu = await userAPages
-          .conversationList()
-          .getConversationLocator(userB.fullName, {protocol: 'mls'})
-          .openContextMenu();
+        const contextMenu = await conversation.openContextMenu();
         await contextMenu.clearContentButton.click();
         // Step 4: Warning Popup should open
         await expect(userAModals.confirm().modal).toBeVisible();
@@ -139,7 +137,7 @@ test.describe('Clear Conversation Content', () => {
           // Step 5: User A clicks 'Clear'
           await userAModals.confirm().clickAction();
           // Step 6: Verify that the conversation does not contain any past messages
-          await userAPages.conversationList().openConversation(userB.fullName);
+          await conversation.open();
           await expect(userAPages.conversation().messages).toHaveCount(0);
         } else {
           // Step 5: User A clicks 'Cancel'
@@ -174,23 +172,28 @@ test.describe('Clear Conversation Content', () => {
         // Step 1: Create a group conversation with User A, B and C
         const conversationName = conversationType === 'group' ? 'Group conversation' : userB.fullName;
 
+        let userAConversation: ReturnType<ConversationListPage['getConversation']>;
         if (conversationType === 'group') {
           await createGroup(userAPages, conversationName, [userB, userC]);
+          userAConversation = await userAPages.conversationList().getConversation(conversationName).open();
         } else {
-          await userAPages.conversationList().openConversation(conversationName, {protocol: 'mls'});
+          userAConversation = await userAPages
+            .conversationList()
+            .getConversation(conversationName, {protocol: 'mls'})
+            .open();
         }
 
         // Step 2: Write messages in the conversation
-        await userAPages.conversationList().openConversation(conversationName);
         await userAPages.conversation().sendMessage('Message from User A');
 
-        const conversationPartnerForUserB = conversationType === 'group' ? conversationName : userA.fullName;
-
-        await userBPages.conversationList().openConversation(conversationPartnerForUserB);
+        const userBConversation = await userBPages
+          .conversationList()
+          .getConversation(conversationType === 'group' ? conversationName : userA.fullName)
+          .open();
         await userBPages.conversation().sendMessage('Message from User B');
 
         if (conversationType === 'group') {
-          await userCPages.conversationList().openConversation(conversationName);
+          await userCPages.conversationList().getConversation(conversationName).open();
           await userCPages.conversation().sendMessage('Message from User C');
           await expect(userAPages.conversation().messages).toHaveCount(3);
         } else {
@@ -198,10 +201,7 @@ test.describe('Clear Conversation Content', () => {
         }
 
         // Step 3: User A selects 'Clear Conversation' option from the Conversation List Context Menu
-        const contextMenu = await userAPages
-          .conversationList()
-          .getConversationLocator(conversationName, {protocol: conversationType === '1:1' ? 'mls' : undefined})
-          .openContextMenu();
+        const contextMenu = await userAConversation.openContextMenu();
         await contextMenu.clearContentButton.click();
 
         // Step 4: Warning Popup should open and User A clicks 'Clear'
@@ -217,15 +217,15 @@ test.describe('Clear Conversation Content', () => {
 
         // Step 5: Verify you can receive incoming new messages, pings, calls, pictures, and files
         // 5.1 Messages
-        await userBPages.conversationList().openConversation(conversationPartnerForUserB);
+        await userBConversation.open();
         await userBPages.conversation().sendMessage('Message from User B after Clear');
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAConversation.open();
         await expect(userAPages.conversation().messages).toHaveCount(1);
 
         // 5.2 Pings
-        await userBPages.conversationList().openConversation(conversationPartnerForUserB);
+        await userBConversation.open();
         await userBPages.conversation().sendPing();
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAConversation.open();
         await expect(userAPages.conversation().getPing()).toBeVisible();
 
         // 5.3 Pictures
@@ -238,7 +238,7 @@ test.describe('Clear Conversation Content', () => {
         await expect(messageWithImage).toBeVisible();
 
         // 5.4 Files
-        await userAPages.conversationList().openConversation(conversationName);
+        await userAConversation.open();
         await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
         const messageWithFile = userAPages
           .conversation()
@@ -247,8 +247,8 @@ test.describe('Clear Conversation Content', () => {
         await expect(messageWithFile).toBeVisible();
 
         // 5.5 Calls
-        await userAPages.conversationList().openConversation(conversationName);
-        await userBPages.conversationList().openConversation(conversationPartnerForUserB);
+        await userAConversation.open();
+        await userBConversation.open();
         await userBPages.conversation().startCall();
         await expect(userAPages.calling().acceptCallButton).toBeVisible();
       },
@@ -270,20 +270,25 @@ test.describe('Clear Conversation Content', () => {
         const userBPages = userBPageManager.webapp.pages;
 
         const conversationName = 'Group conversation';
+        let userAConversation: ReturnType<ConversationListPage['getConversation']>;
+
         if (conversationType === 'group') {
           await createGroup(userAPages, conversationName, [userB]);
           // Step 1: User A and B write in group conversation
-          await userAPages.conversationList().openConversation(conversationName);
+          userAConversation = await userAPages.conversationList().getConversation(conversationName).open();
           await userAPages.conversation().sendMessage('Message from User A');
 
-          await userBPages.conversationList().openConversation(conversationName);
+          await userBPages.conversationList().getConversation(conversationName).open();
           await userBPages.conversation().sendMessage('Message from User B');
         } else {
           // Step 1: User A and B write in conversation
-          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          userAConversation = await userAPages
+            .conversationList()
+            .getConversation(userB.fullName, {protocol: 'mls'})
+            .open();
           await userAPages.conversation().sendMessage('Message from User A');
 
-          await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+          await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
           await userBPages.conversation().sendMessage('Message from User B');
         }
         await expect(userAPages.conversation().messages).toHaveCount(2);
@@ -299,14 +304,14 @@ test.describe('Clear Conversation Content', () => {
           // Step 5: User A clicks 'Clear'
           await userAModals.optionModal().clickAction();
           // Step 6: Verify that the conversation does not contain any past messages
-          await userAPages.conversationList().openConversation(conversationName);
+          await userAConversation.open();
         } else {
           // Step 4: Clear Conversation Content Modal appears
           await expect(userAModals.confirm().modal).toBeVisible();
           // Step 5: User A clicks 'Clear'
           await userAModals.confirm().clickAction();
           // Step 6: Verify that the conversation does not contain any past messages
-          await userAPages.conversationList().openConversation(userB.fullName);
+          await userAConversation.open();
         }
         await expect(userAPages.conversation().messages).toHaveCount(0);
       },

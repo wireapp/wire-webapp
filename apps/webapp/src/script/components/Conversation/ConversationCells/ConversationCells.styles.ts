@@ -25,3 +25,34 @@ export const wrapperStyles: CSSObject = {
   flexDirection: 'column',
   height: '100%',
 };
+
+export const searchIdleStateStyles: CSSObject = {
+  display: 'flex',
+  width: '405px',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '16px',
+  margin: '64px auto 0',
+};
+
+export const searchIdleHeadingStyles: CSSObject = {
+  color: 'var(--main-color)',
+  textAlign: 'center',
+  fontSize: 'var(--font-size-base, 16px)',
+  fontStyle: 'normal',
+  fontWeight: 'var(--font-weight-bold, 700)',
+  lineHeight: 'var(--line-height-lg, 24px)',
+  letterSpacing: '0.05px',
+  margin: 0,
+};
+
+export const searchIdleDescriptionStyles: CSSObject = {
+  color: 'var(--main-color)',
+  textAlign: 'center',
+  fontSize: 'var(--font-size-base, 16px)',
+  fontStyle: 'normal',
+  fontWeight: 'var(--font-weight-regular, 400)',
+  lineHeight: 'var(--line-height-lg, 24px)',
+  letterSpacing: '0.05px',
+  margin: 0,
+};

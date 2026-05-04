@@ -18,13 +18,13 @@
  */
 
 export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
-export const collaboraNewDocumentCreationMenuFeatureToggleName = 'collabora-new-document-creation-menu';
 export const applockRefactoredFeatureToggleName = 'applock-refactored';
+export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
 
 export const startupFeatureToggleNames = [
   reliableWebsocketConnectionFeatureToggleName,
-  collaboraNewDocumentCreationMenuFeatureToggleName,
   applockRefactoredFeatureToggleName,
+  sharedDriveSearchAndFiltersFeatureToggleName,
 ] as const;
 
 export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];

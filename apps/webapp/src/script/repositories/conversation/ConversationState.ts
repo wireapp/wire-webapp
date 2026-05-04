@@ -129,14 +129,16 @@ export class ConversationState {
     });
 
     this.connectedUsers = ko.pureComputed(() => {
-      const inviterId = this.teamState.memberInviters()[this.userState.self()?.id];
-      const inviter = inviterId ? this.userState.users().find(({id}) => id === inviterId) : null;
-      const connectedUsers = inviter ? [inviter] : [];
-      const selfTeamId = this.userState.self()?.teamId;
+      const selfUser = this.userState.self();
+      const selfUserId = selfUser?.id;
+      const inviterId = selfUserId !== undefined ? this.teamState.memberInviters()[selfUserId] : undefined;
+      const inviter = inviterId !== undefined ? this.userState.users().find(({id}) => id === inviterId) : undefined;
+      const connectedUsers = inviter !== undefined ? [inviter] : [];
+      const selfTeamId = selfUser?.teamId;
       for (const conversation of this.conversations()) {
         for (const user of conversation.participating_user_ets()) {
-          const isNotService = !user.isService;
-          const isNotIncluded = !connectedUsers.includes(user);
+          const isNotService = user.isService === false;
+          const isNotIncluded = connectedUsers.includes(user) === false;
           if (isNotService && isNotIncluded && (user.teamId === selfTeamId || user.isConnected())) {
             connectedUsers.push(user);
           }
@@ -154,12 +156,14 @@ export class ConversationState {
   getSelfConversations(includeMLS: boolean): Conversation[] {
     const baseConversations = [this.selfProteusConversation()];
     const selfConversations = includeMLS ? baseConversations.concat(this.selfMLSConversation()) : baseConversations;
-    return selfConversations.filter((conversation): conversation is Conversation => !!conversation);
+    return selfConversations.filter((conversation): conversation is Conversation => {
+      return conversation !== undefined;
+    });
   }
 
   getSelfProteusConversation(): Conversation {
     const proteusConversation = this.selfProteusConversation();
-    if (!proteusConversation) {
+    if (proteusConversation === undefined) {
       throw new Error('No proteus self conversation');
     }
     return proteusConversation;
@@ -167,7 +171,7 @@ export class ConversationState {
 
   getSelfMLSConversation(): MLSConversation {
     const mlsConversation = this.selfMLSConversation();
-    if (!mlsConversation) {
+    if (mlsConversation === undefined) {
       throw new Error('No MLS self conversation');
     }
     return mlsConversation;

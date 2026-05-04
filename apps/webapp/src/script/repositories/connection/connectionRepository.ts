@@ -435,7 +435,7 @@ export class ConnectionRepository {
   private async sendNotification(
     connectionEntity: ConnectionEntity,
     source: EventSource,
-    previousStatus: ConnectionStatus,
+    previousStatus: ConnectionStatus | undefined,
   ): Promise<void> {
     // We accepted the connection request or unblocked the user
     const expectedPreviousStatus = [
@@ -443,7 +443,7 @@ export class ConnectionRepository {
       ConnectionStatus.BLOCKED,
       ConnectionStatus.PENDING,
     ];
-    const wasExpectedPreviousStatus = expectedPreviousStatus.includes(previousStatus);
+    const wasExpectedPreviousStatus = previousStatus !== undefined && expectedPreviousStatus.includes(previousStatus);
     const selfUserAccepted = connectionEntity.isConnected() && wasExpectedPreviousStatus;
     const isWebSocketEvent = source === EventRepository.SOURCE.WEB_SOCKET;
 

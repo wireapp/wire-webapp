@@ -75,6 +75,7 @@ import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
 import {CreateConversationModal} from './webapp/modals/createConversation';
 import {InviteModal} from './webapp/modals/invite.modal';
 import {JoinGuestLinkPasswordModal} from './webapp/modals/joinGuestLinkPassword.modal';
+import {AboutPage} from './webapp/pages/about.page';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
@@ -173,6 +174,7 @@ export class PageManager {
       options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
       audioVideoSettings: () =>
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
+      about: () => this.getOrCreate('webapp.pages.about', () => new AboutPage(this.page)),
       outgoingConnection: () =>
         this.getOrCreate('webapp.pages.outgoingConnection', () => new OutgoingConnectionPage(this.page)),
       guestOptions: () => this.getOrCreate('webapp.pages.guestOptions', () => GuestOptionsPage(this.page)),

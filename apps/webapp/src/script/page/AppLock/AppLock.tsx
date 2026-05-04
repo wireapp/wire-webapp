@@ -198,7 +198,11 @@ const AppLock = ({
   const startScheduledTimeout = () => {
     if (isScheduledAppLockEnabled()) {
       window.clearTimeout(scheduledTimeoutId);
-      setScheduledTimeoutId(window.setTimeout(showAppLock, getScheduledAppLockTimeoutInSeconds() * 1000));
+      const scheduledAppLockTimeoutInSeconds = getScheduledAppLockTimeoutInSeconds();
+      if (scheduledAppLockTimeoutInSeconds === null) {
+        return;
+      }
+      setScheduledTimeoutId(window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * 1000));
     }
   };
 

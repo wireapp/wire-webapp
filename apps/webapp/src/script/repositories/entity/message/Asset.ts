@@ -37,6 +37,7 @@ export class Asset {
   constructor(id?: string) {
     this.id = id;
     this.key = '';
+    this.size = '';
     this.type = '';
     this.text = '';
   }

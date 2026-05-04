@@ -60,7 +60,7 @@ export async function initMLSGroupConversations(
 
   const mlsGroupConversations = conversations.filter(
     (conversation): conversation is MLSCapableConversation =>
-      conversation.isGroupOrChannel() && isMLSCapableConversation(conversation),
+      conversation.isGroupOrChannel() && isMLSCapableConversation(conversation) && !conversation.isSelfUserRemoved(),
   );
 
   for (const mlsConversation of mlsGroupConversations) {

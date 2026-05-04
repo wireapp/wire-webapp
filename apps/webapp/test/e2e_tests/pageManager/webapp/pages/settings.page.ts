@@ -24,12 +24,18 @@ export class SettingsPage {
   readonly devicesButton: Locator;
   readonly optionsButton: Locator;
   readonly audioVideoButton: Locator;
+  readonly aboutButton: Locator;
+  readonly copyProfileLinkButton: Locator;
+  readonly profileLink: Locator;
 
   constructor(page: Page) {
     this.accountButton = page.getByRole('button', {name: 'Account'});
     this.devicesButton = page.getByRole('button', {name: 'Devices'});
     this.optionsButton = page.getByRole('button', {name: 'Options'});
     this.audioVideoButton = page.getByRole('button', {name: 'Audio / Video'});
+    this.aboutButton = page.getByRole('button', {name: 'About'});
+    this.copyProfileLinkButton = page.getByRole('button', {name: 'Copy Profile Link'});
+    this.profileLink = page.getByTestId('element-profile-link');
   }
 
   async clickAudioVideoSettingsButton() {
@@ -42,5 +48,9 @@ export class SettingsPage {
 
   async clickOptionsButton() {
     await this.optionsButton.click();
+  }
+
+  async clickAboutButton() {
+    await this.aboutButton.click();
   }
 }

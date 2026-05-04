@@ -77,7 +77,9 @@ export class StorageService {
     try {
       if (this.hasHookSupport) {
         this.db = this.engine['db'];
-        this._initCrudHooks(this.db);
+        if (this.db !== undefined) {
+          this._initCrudHooks(this.db);
+        }
       }
       return this.dbName;
     } catch (error: unknown) {
@@ -115,7 +117,7 @@ export class StorageService {
       db.table(table).hook(
         DEXIE_CRUD_EVENT.DELETING,
         function (primaryKey: string, obj: Object, transaction: Transaction): void {
-          this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, undefined, transaction);
+          this.onsuccess = (): void => callListener(table, DEXIE_CRUD_EVENT.DELETING, obj, {}, transaction);
         },
       );
     });
@@ -244,7 +246,8 @@ export class StorageService {
     if (!this.db) {
       return [];
     }
-    return tableNames.map(tableName => this.db.table(tableName));
+    const database = this.db;
+    return tableNames.map(tableName => database.table(tableName));
   }
 
   /**
@@ -330,6 +333,9 @@ export class StorageService {
   async update<T extends Record<string, any>>(storeName: string, primaryKey: string, changes: T): Promise<number> {
     try {
       if (this.hasHookSupport) {
+        if (this.db === undefined) {
+          return 0;
+        }
         const numberOfUpdates = await this.db.table(storeName).update(primaryKey, changes);
         const logMessage = `Updated ${numberOfUpdates} record(s) with key '${primaryKey}' in store '${storeName}'`;
         this.logger.log(logMessage);

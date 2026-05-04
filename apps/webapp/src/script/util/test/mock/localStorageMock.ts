@@ -28,7 +28,7 @@ class LocalStorageMock {
     this.store = {};
   };
   removeItem = (key: string) => {
-    this.store[key] = null;
+    delete this.store[key];
   };
 }
 Object.defineProperty(window, 'localStorage', {value: new LocalStorageMock()});

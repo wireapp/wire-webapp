@@ -100,6 +100,26 @@ body.theme-dark {
   * > {
     display: flex;
   }
+
+  &--borderless {
+    border: 1px solid transparent;
+    background-color: transparent;
+
+    &:hover {
+      border-color: transparent;
+      background-color: transparent;
+    }
+
+    body.theme-dark & {
+      border: 1px solid transparent;
+      background-color: transparent;
+
+      &:hover {
+        border-color: transparent;
+        background-color: transparent;
+      }
+    }
+  }
 }
 
 .conversation-title-bar-name-label {

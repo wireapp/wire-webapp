@@ -36,7 +36,11 @@ export const usePausableInterval = (callback: () => void, timer: number) => {
 
   useEffect(() => {
     const fn = () => {
-      intervalIdRef.current();
+      const intervalCallback = intervalIdRef.current;
+      if (intervalCallback === undefined) {
+        return;
+      }
+      intervalCallback();
     };
 
     if (timer !== null) {
