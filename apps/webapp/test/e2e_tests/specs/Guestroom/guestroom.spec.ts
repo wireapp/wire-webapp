@@ -55,8 +55,12 @@ test.describe('Guestroom', () => {
         await guestPages.conversationJoin().joinBrowserButton.click();
         await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
 
-        await guestPages.login().login(guestUser);
-        await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible({timeout: LOGIN_TIMEOUT});
+        // Allow the login to be retried if the modal doesn't show up automatically, this is a workaround since the login mask for guest links is out of our control
+        await expect(async () => {
+          await guestPages.login().login(guestUser);
+          await expect(guestBModals.joinGuestLinkPassword().joinForm).toBeVisible();
+        }).toPass({timeout: LOGIN_TIMEOUT});
+
         await guestBModals.joinGuestLinkPassword().joinConversation('WrongPassword');
         await expect(guestBModals.joinGuestLinkPassword().joinForm).toContainText(
           'Password is incorrect, please try again.',
