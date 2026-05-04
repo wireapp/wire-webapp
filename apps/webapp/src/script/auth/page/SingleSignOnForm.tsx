@@ -72,11 +72,11 @@ const SingleSignOnFormComponent = ({
   pushAccountRegistrationData,
   account,
 }: SingleSignOnFormProps & ConnectedProps & DispatchProps) => {
-  const codeOrMailInput = useRef<HTMLInputElement>();
-  const [codeOrMail, setCodeOrMail] = useState(account.email || '');
+  const codeOrMailInput = useRef<HTMLInputElement>(null);
+  const [codeOrMail, setCodeOrMail] = useState(account.email ?? '');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
-  const [clientType, setClientType] = useState<ClientType | null>(null);
+  const [clientType, setClientType] = useState<ClientType>(ClientType.PERMANENT);
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
   const [validationError, setValidationError] = useState<any>();
@@ -230,7 +230,7 @@ const SingleSignOnFormComponent = ({
           const welcomeUrl = pathWithParams(
             path,
             {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
-            null,
+            undefined,
             query,
           );
 

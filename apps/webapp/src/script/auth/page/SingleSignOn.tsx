@@ -66,7 +66,7 @@ type Props = React.HTMLAttributes<HTMLDivElement>;
 const logger = getLogger('SingleSignOn');
 
 const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
-  const ssoWindowRef = useRef<Window>();
+  const ssoWindowRef = useRef<Window | null>(null);
   const params = useParams<{code?: string}>();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
@@ -78,14 +78,18 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
     const SSO_WINDOW_CLOSE_POLLING_INTERVAL = 1000;
 
     return new Promise<void>((resolve, reject) => {
-      let timerId: number = undefined;
-      let onReceiveChildWindowMessage: (event: MessageEvent) => void = undefined;
-      let onParentWindowClose: (event: Event) => void = undefined;
+      let timerId: number | undefined = undefined;
+      let onReceiveChildWindowMessage: ((event: MessageEvent) => void) | undefined = undefined;
+      let onParentWindowClose: ((event: Event) => void) | undefined = undefined;
 
       const onChildWindowClose = () => {
         clearInterval(timerId);
-        window.removeEventListener('message', onReceiveChildWindowMessage);
-        window.removeEventListener('unload', onParentWindowClose);
+        if (onReceiveChildWindowMessage) {
+          window.removeEventListener('message', onReceiveChildWindowMessage);
+        }
+        if (onParentWindowClose) {
+          window.removeEventListener('unload', onParentWindowClose);
+        }
         setIsOverlayOpen(false);
       };
 

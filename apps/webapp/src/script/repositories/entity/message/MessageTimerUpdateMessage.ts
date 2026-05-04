@@ -28,7 +28,7 @@ import {SystemMessage} from './SystemMessage';
 import {SystemMessageType} from '../../../message/SystemMessageType';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
-  public readonly message_timer: number;
+  public readonly message_timer: number | null;
 
   constructor(messageTimer: number | null) {
     super();
@@ -42,7 +42,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
   }
 }
 
-const getCaption = (messageTimer: number, isSelfUser: boolean) => {
+const getCaption = (messageTimer: number | null, isSelfUser: boolean) => {
   if (messageTimer) {
     const timeString = formatDuration(messageTimer).text;
     return isSelfUser

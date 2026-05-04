@@ -17,7 +17,7 @@
  *
  */
 
-import {RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {CRUDEngine} from '@wireapp/store-engine';

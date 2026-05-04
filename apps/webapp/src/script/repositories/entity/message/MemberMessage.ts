@@ -34,7 +34,7 @@ import {SystemMessageType} from '../../../message/SystemMessageType';
 import {User} from '../User';
 
 export class MemberMessage extends SystemMessage {
-  public allTeamMembers: User[];
+  public allTeamMembers: User[] | undefined;
   public readonly hasUsers: ko.PureComputed<boolean>;
   public readonly userIds: ko.ObservableArray<QualifiedId>;
   public readonly userEntities: ko.ObservableArray<User>;
@@ -57,11 +57,13 @@ export class MemberMessage extends SystemMessage {
     this.super_type = SuperType.MEMBER;
     this.memberMessageType = SystemMessageType.NORMAL;
 
-    this.userEntities = ko.observableArray();
+    this.userEntities = ko.observableArray<User>([]);
     this.userIds = ko.observableArray();
     this.name = ko.observable('');
 
-    this.hasUsers = ko.pureComputed(() => !!this.userEntities().length);
+    this.hasUsers = ko.pureComputed(() => {
+      return this.userEntities().length > 0;
+    });
     this.allTeamMembers = undefined;
     this.showServicesWarning = false;
 
@@ -71,12 +73,16 @@ export class MemberMessage extends SystemMessage {
     });
 
     this.targetedUsers = ko.pureComputed(() => {
-      return this.userEntities().filter(userEntity => !matchQualifiedIds(this.user(), userEntity));
+      return this.userEntities().filter(userEntity => {
+        return matchQualifiedIds(this.user(), userEntity) === false;
+      });
     });
 
     // Users joined the conversation without self
     this.remoteUserEntities = ko.pureComputed(() => {
-      return this.userEntities().filter(userEntity => !userEntity.isMe);
+      return this.userEntities().filter(userEntity => {
+        return userEntity.isMe === false;
+      });
     });
 
     this.senderName = ko.pureComputed(() => {
@@ -84,9 +90,13 @@ export class MemberMessage extends SystemMessage {
       return isTeamMemberLeave ? this.name() : getUserName(this.user(), Declension.NOMINATIVE, true);
     });
 
-    this.showNamedCreation = ko.pureComputed(() => this.isConversationCreate() && this.name().length > 0);
+    this.showNamedCreation = ko.pureComputed(() => {
+      return this.isConversationCreate() && this.name().length > 0;
+    });
 
-    this.otherUser = ko.pureComputed(() => (this.hasUsers() ? this.userEntities()[0] : new User('', null)));
+    this.otherUser = ko.pureComputed(() => {
+      return this.hasUsers() ? this.userEntities()[0] : new User('', '');
+    });
 
     this.htmlGroupCreationHeader = ko.pureComputed(() => {
       if (this.showNamedCreation()) {

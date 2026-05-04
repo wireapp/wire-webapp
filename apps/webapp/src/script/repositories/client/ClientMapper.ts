@@ -55,10 +55,15 @@ export class ClientMapper {
     }
 
     if (isClientRecord(clientPayload)) {
-      const {userId} = parseClientId(clientPayload.meta.primary_key);
+      clientEntity.meta.isVerified?.(clientPayload.meta.is_verified === true);
 
-      clientEntity.meta.isVerified?.(!!clientPayload.meta.is_verified);
-      clientEntity.meta.primaryKey = clientPayload.meta.primary_key;
+      const primaryKey = clientPayload.meta.primary_key;
+      if (primaryKey === undefined) {
+        return clientEntity;
+      }
+      const {userId} = parseClientId(primaryKey);
+
+      clientEntity.meta.primaryKey = primaryKey;
       clientEntity.meta.userId = userId;
     }
 
@@ -79,7 +84,7 @@ export class ClientMapper {
   static mapClients(
     clientRecords: ClientRecord[] | PublicClient[] | RegisteredClient[],
     isSelfClient: boolean,
-    domain: string | null = null,
+    domain: string | undefined = undefined,
   ): ClientEntity[] {
     return clientRecords.map(clientRecord => ClientMapper.mapClient(clientRecord, isSelfClient, domain));
   }
@@ -102,7 +107,7 @@ export class ClientMapper {
 
       if (isDataChange) {
         containsUpdate = true;
-        clientData[member] = updatePayload[member];
+        (clientData as unknown as Record<string, unknown>)[member] = updatePayload[member];
       }
     }
 

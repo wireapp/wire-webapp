@@ -22,6 +22,9 @@ import type {ThunkAction} from '../reducer';
 export class NotificationAction {
   setLastEventDate = (lastEventDate: Date): ThunkAction => {
     return async (dispatch, getState, {core}) => {
+      if (core.service === undefined) {
+        throw new Error('Cannot update notification state before core service is available');
+      }
       await core.service.notification.setLastEventDate(lastEventDate);
     };
   };

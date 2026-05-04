@@ -49,14 +49,20 @@ type DexieCollection = Dexie.Collection<any, any>;
 type DBEvents = DexieCollection | EventRecord[];
 export type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
 
-const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
+const eventTimeToDate = (time: string) => {
+  return new Date(time);
+};
 
-const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) =>
-  eventA.conversation.localeCompare(eventB.conversation);
+const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) => {
+  return (eventA.conversation ?? '').localeCompare(eventB.conversation ?? '');
+};
 
-const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => eventA.id.localeCompare(eventB.id);
-const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
-  eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
+const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => {
+  return (eventA.id ?? '').localeCompare(eventB.id ?? '');
+};
+const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) => {
+  return eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
+};
 const MAX_INDEXED_DB_LIMIT = 0xffffffff; // 4_294_967_295
 
 /** Handles all databases interactions related to events */
@@ -86,7 +92,7 @@ export class EventService {
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
-        .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
+        .filter(record => record.conversation === conversationId && eventIds.includes(record.id ?? ''))
         .sort(compareEventsById);
     } catch (error: unknown) {
       const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
@@ -357,7 +363,7 @@ export class EventService {
     };
     const savedEvent: EventRecord = {
       ...categorizedEvent,
-      primary_key: await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, categorizedEvent),
+      primary_key: await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, '', categorizedEvent),
     } as EventRecord;
     return savedEvent;
   }

@@ -176,7 +176,7 @@ export class ConversationMapper {
 
     if (muted_timestamp) {
       conversationEntity.setTimestamp(muted_timestamp, Conversation.TIMESTAMP_TYPE.MUTED);
-      conversationEntity.mutedState(selfState.muted_state);
+      conversationEntity.mutedState(selfState.muted_state ?? NOTIFICATION_STATE.EVERYTHING);
     }
 
     if (status !== undefined) {
@@ -199,13 +199,13 @@ export class ConversationMapper {
     const {otr_archived, otr_muted_status: mutedState} = selfState;
 
     if (otr_archived !== undefined) {
-      const archivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
+      const archivedTimestamp = new Date(selfState.otr_archived_ref ?? 0).getTime();
       conversationEntity.setTimestamp(archivedTimestamp, Conversation.TIMESTAMP_TYPE.ARCHIVED);
       conversationEntity.archivedState(otr_archived);
     }
 
     if (mutedState !== undefined) {
-      const mutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
+      const mutedTimestamp = new Date(selfState.otr_muted_ref ?? 0).getTime();
       conversationEntity.setTimestamp(mutedTimestamp, Conversation.TIMESTAMP_TYPE.MUTED);
       conversationEntity.mutedState(mutedState);
     }
@@ -425,7 +425,7 @@ export class ConversationMapper {
       add_permission,
       cells_state,
     } = remoteConversationData;
-    const {others: othersStates, self: selfState} = members;
+    const {others: othersStates = [], self: selfState} = members;
 
     const updates: Partial<ConversationDatabaseData> = {
       accessModes: access,
@@ -440,7 +440,7 @@ export class ConversationMapper {
       protocol,
       receipt_mode,
       roles: {},
-      status: (selfState as any).status,
+      status: (selfState as Partial<{status: number}> | undefined)?.status,
       team_id: team,
       type,
       group_conv_type,
@@ -448,7 +448,9 @@ export class ConversationMapper {
       cells_state,
     };
 
-    const qualified_others = othersStates?.filter(other => !!other.qualified_id).map(({qualified_id}) => qualified_id);
+    const qualified_others = othersStates
+      .map(({qualified_id}) => qualified_id)
+      .filter((qualifiedId): qualifiedId is QualifiedId => qualifiedId !== undefined);
 
     if (qualified_others.length) {
       updates.qualified_others = qualified_others;
@@ -459,16 +461,18 @@ export class ConversationMapper {
     }
 
     // Add roles for self
-    if (selfState.conversation_role && !(selfState.id in updates.roles)) {
-      updates.roles[selfState.id] = selfState.conversation_role;
+    const roles = updates.roles ?? {};
+    if (selfState?.conversation_role !== undefined && selfState.id !== undefined && !(selfState.id in roles)) {
+      roles[selfState.id] = selfState.conversation_role;
     }
 
     // Add roles for others
     othersStates.map(other => {
-      if (other.conversation_role && !(other.conversation_role in updates.roles)) {
-        updates.roles[other.id] = other.conversation_role;
+      if (other.conversation_role !== undefined && other.id !== undefined && !(other.conversation_role in roles)) {
+        roles[other.id] = other.conversation_role;
       }
     });
+    updates.roles = roles;
 
     const mergedConversation: ConversationDatabaseData = {...localConversationData, ...updates};
 
@@ -498,20 +502,20 @@ export class ConversationMapper {
     // Some archived timestamp were not properly stored in the database.
     // To fix this we check if the remote one is newer and update our local timestamp.
     const {archived_state: archivedState, archived_timestamp: archivedTimestamp} = localConversationData;
-    const remoteArchivedTimestamp = new Date(selfState.otr_archived_ref).getTime();
+    const remoteArchivedTimestamp = new Date(selfState?.otr_archived_ref ?? 0).getTime();
     const isRemoteArchivedTimestampNewer = isRemoteTimestampNewer(archivedTimestamp, remoteArchivedTimestamp);
 
     if (isRemoteArchivedTimestampNewer || archivedState === undefined) {
-      mergedConversation.archived_state = selfState.otr_archived;
+      mergedConversation.archived_state = selfState?.otr_archived ?? false;
       mergedConversation.archived_timestamp = remoteArchivedTimestamp;
     }
 
     const {muted_state: mutedState, muted_timestamp: mutedTimestamp} = localConversationData;
-    const remoteMutedTimestamp = new Date(selfState.otr_muted_ref).getTime();
+    const remoteMutedTimestamp = new Date(selfState?.otr_muted_ref ?? 0).getTime();
     const isRemoteMutedTimestampNewer = isRemoteTimestampNewer(mutedTimestamp, remoteMutedTimestamp);
 
     if (isRemoteMutedTimestampNewer || mutedState === undefined) {
-      const remoteMutedState = selfState.otr_muted_status;
+      const remoteMutedState = selfState?.otr_muted_status ?? NOTIFICATION_STATE.EVERYTHING;
       mergedConversation.muted_state = remoteMutedState;
       mergedConversation.muted_timestamp = remoteMutedTimestamp;
     }

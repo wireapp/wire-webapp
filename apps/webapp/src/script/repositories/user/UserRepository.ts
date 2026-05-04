@@ -384,7 +384,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     const recipients = await this.clientRepository.getAllClientsFromDb();
     const userIds: QualifiedId[] = Object.entries(recipients).map(([userId, clientEntities]) => {
       return {
-        domain: clientEntities[0].domain,
+        domain: clientEntities[0]?.domain ?? '',
         id: userId,
       };
     });

@@ -145,10 +145,12 @@ export const Conversations = ({
   const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
   const favoriteLabel = conversationLabelRepository.getFavoriteLabel();
 
-  const favoriteConversations = useMemo(
-    () => conversationLabelRepository.getLabelConversations(favoriteLabel, conversations),
-    [conversationLabelRepository, conversations, favoriteLabel],
-  );
+  const favoriteConversations = useMemo(() => {
+    if (favoriteLabel === undefined) {
+      return [];
+    }
+    return conversationLabelRepository.getLabelConversations(favoriteLabel, conversations);
+  }, [conversationLabelRepository, conversations, favoriteLabel]);
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
   const isCells = currentTab === SidebarTabs.CELLS;

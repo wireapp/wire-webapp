@@ -118,7 +118,7 @@ export const MessageWrapper = ({
         messageId,
         attachments: [],
       });
-    } else if (file) {
+    } else if (file !== undefined && firstAsset !== undefined) {
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };

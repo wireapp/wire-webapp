@@ -80,7 +80,13 @@ export const checkIndexedDb = (): Promise<void> => {
 export const loadDataUrl = (file: Blob): Promise<string | ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => {
+      if (reader.result !== null) {
+        resolve(reader.result);
+      } else {
+        reject(new Error('File reader result is empty'));
+      }
+    };
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -98,7 +104,7 @@ const loadUrlBuffer = (
     xhr.onload = () => {
       const isStatusOK = xhr.status === HTTP_STATUS.OK;
       return isStatusOK
-        ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')})
+        ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type') ?? ''})
         : reject(new Error(xhr.status.toString(10)));
     };
 
@@ -217,7 +223,7 @@ export const formatBytes = (bytes: number, decimals: number = 1): string => {
 };
 
 export const getContentTypeFromDataUrl = (dataUrl: string): string => {
-  return dataUrl.match(/^.*:(.*);.*,/)[1];
+  return dataUrl.match(/^.*:(.*);.*,/)?.[1] ?? '';
 };
 
 export const stripDataUri = (string: string): string => string.replace(/^data:.*,/, '');
@@ -354,8 +360,9 @@ export const preventFocusOutside = (
   }
   event.preventDefault();
   const parent = targetDocument.getElementById(parentId);
-  const focusableContent = parent ? [...parent.querySelectorAll(focusableElementsSelector)] : [];
-  const focusedItemIndex = focusableContent.indexOf(targetDocument.activeElement);
+  const focusableContent = parent !== null ? [...parent.querySelectorAll(focusableElementsSelector)] : [];
+  const activeElement = targetDocument.activeElement;
+  const focusedItemIndex = activeElement !== null ? focusableContent.indexOf(activeElement) : -1;
   if (event.shiftKey && focusedItemIndex != 0) {
     (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();
     return;

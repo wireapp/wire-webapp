@@ -89,7 +89,7 @@ export class AppLockRepository {
 
   handlePassphraseStorageEvent = ({key, oldValue}: StorageEvent): void => {
     const storageKey = this.getPassphraseStorageKey();
-    if (key === storageKey) {
+    if (key === storageKey && oldValue !== null) {
       window.localStorage.setItem(storageKey, oldValue);
     }
   };

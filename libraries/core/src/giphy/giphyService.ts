@@ -17,7 +17,7 @@
  *
  */
 
-import {GiphySearchOptions, GiphyMultipleResult, GiphyResult, GIPHY_RATING} from '@wireapp/api-client/lib/giphy/';
+import {GiphySearchOptions, GiphyMultipleResult, GiphyResult, GIPHY_RATING} from '@wireapp/api-client/lib/giphy';
 
 import {APIClient} from '@wireapp/api-client';
 

@@ -287,7 +287,12 @@ export class CallingViewModel {
         this.callingRepository.rejectCall(conversation.qualifiedId);
       },
       startAudio: async (conversationEntity: Conversation) => {
-        if (conversationEntity.isGroupOrChannel() && !this.teamState.isConferenceCallingEnabled()) {
+        const conferenceCallingEnabledState = this.teamState.isConferenceCallingEnabled;
+        const isConferenceCallingEnabled =
+          typeof conferenceCallingEnabledState === 'function'
+            ? conferenceCallingEnabledState()
+            : conferenceCallingEnabledState;
+        if (conversationEntity.isGroupOrChannel() && isConferenceCallingEnabled === false) {
           this.showRestrictedConferenceCallingModal();
         } else {
           await handleCallAction(conversationEntity);
@@ -307,7 +312,9 @@ export class CallingViewModel {
         this.callingRepository.muteCall(call, muteState);
       },
       toggleScreenshare: async (call, desktopScreenShareMenu): Promise<void> => {
-        if (call.getSelfParticipant().sharesScreen()) {
+        const selfParticipant = call.getSelfParticipant();
+        const hasSelfParticipant = selfParticipant !== undefined;
+        if (hasSelfParticipant && selfParticipant.sharesScreen()) {
           return this.callingRepository.toggleScreenshare(call);
         }
         const showScreenSelection = (): Promise<void> => {

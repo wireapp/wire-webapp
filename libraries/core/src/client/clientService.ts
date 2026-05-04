@@ -17,14 +17,14 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/lib/auth/';
+import {LoginData} from '@wireapp/api-client/lib/auth';
 import {
   ClientCapability,
   ClientCapabilityData,
   ClientType,
   CreateClientPayload,
   RegisteredClient,
-} from '@wireapp/api-client/lib/client/';
+} from '@wireapp/api-client/lib/client';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import axios from 'axios';
 import {StatusCodes} from 'http-status-codes';

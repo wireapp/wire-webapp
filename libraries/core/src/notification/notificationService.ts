@@ -18,7 +18,7 @@
  */
 
 import {BackendEvent} from '@wireapp/api-client/lib/event';
-import {Notification} from '@wireapp/api-client/lib/notification/';
+import {Notification} from '@wireapp/api-client/lib/notification';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';

@@ -190,6 +190,9 @@ const _getStateDefault = {
 const _getStateGroupActivity = {
   description: (conversationEntity: Conversation): string => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
+    if (lastMessageEntity === undefined) {
+      return '';
+    }
 
     if (lastMessageEntity.isMember()) {
       const userCount = (lastMessageEntity as MemberMessage).userEntities().length;
@@ -207,6 +210,9 @@ const _getStateGroupActivity = {
             }
 
             const [remoteUserEntity] = (lastMessageEntity as MemberMessage).remoteUserEntities();
+            if (remoteUserEntity === undefined) {
+              return '';
+            }
             const userSelfJoined = lastMessageEntity.user().id === remoteUserEntity.id;
             const string = userSelfJoined
               ? t('conversationsSecondaryLinePersonAddedSelf', {user: remoteUserEntity.name()})
@@ -224,7 +230,7 @@ const _getStateGroupActivity = {
 
             if (remoteUserEntity) {
               if ((lastMessageEntity as MemberMessage).isTeamMemberLeave()) {
-                const name = (lastMessageEntity as MemberMessage).name() || remoteUserEntity.name();
+                const name = (lastMessageEntity as MemberMessage).name() ?? remoteUserEntity.name();
                 return t('conversationsSecondaryLinePersonRemovedTeam', {user: name});
               }
 
@@ -290,14 +296,16 @@ const _getStateMuted = {
 const _getStateRemoved = {
   description: (conversationEntity: Conversation) => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
-    const selfUserId = conversationEntity.selfUser().id;
+    const selfUser = conversationEntity.selfUser();
+    if (selfUser === undefined) {
+      return '';
+    }
+    const selfUserId = selfUser.id;
 
     const isMemberRemoval = lastMessageEntity && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
     const wasSelfRemoved =
       isMemberRemoval &&
-      !!(lastMessageEntity as MemberMessage)
-        .userIds()
-        .find(userId => matchQualifiedIds(userId, conversationEntity.selfUser()));
+      !!(lastMessageEntity as MemberMessage).userIds().find(userId => matchQualifiedIds(userId, selfUser));
     if (wasSelfRemoved) {
       const selfLeft = lastMessageEntity.user().id === selfUserId;
       return selfLeft ? t('conversationsSecondaryLineYouLeft') : t('conversationsSecondaryLineYouWereRemoved');
@@ -323,13 +331,16 @@ const _getStateUnreadMessage = {
       if (messageEntity.isPing()) {
         string = t('notificationPing');
       } else if (messageEntity.isContent() && messageEntity.hasAssetText()) {
-        const assetText = messageEntity.getFirstAsset().text;
-        string = getRenderedTextContent(assetText);
+        const assetEntity = messageEntity.getFirstAsset();
+        if (assetEntity !== undefined) {
+          string = getRenderedTextContent(assetEntity.text);
+        }
       } else if (messageEntity.isContent() && messageEntity.hasAsset()) {
         const assetEntity = messageEntity.getFirstAsset();
-        const isUploaded = (assetEntity as FileAsset).status() === AssetTransferState.UPLOADED;
+        const isUploaded =
+          assetEntity !== undefined && (assetEntity as FileAsset).status() === AssetTransferState.UPLOADED;
 
-        if (isUploaded) {
+        if (isUploaded && assetEntity !== undefined) {
           if (assetEntity.isAudio()) {
             string = t('notificationSharedAudio');
           } else if (assetEntity.isVideo()) {
@@ -388,7 +399,7 @@ const _getStateUserName = {
     const lastMessageEntity = conversationEntity.getNewestMessage();
     const isMemberJoin =
       lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberJoin();
-    const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin;
+    const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin === true;
 
     return conversationEntity.isRequest() || isEmpty1to1Conversation;
   },

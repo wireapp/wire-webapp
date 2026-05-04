@@ -381,16 +381,21 @@ export class CallingRepository {
 
     // let's check if background should be disabled, then let's do it and go back to the original video
     if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+      const originalVideoStream = selfParticipant.videoStream();
+      if (originalVideoStream === undefined) {
+        return undefined;
+      }
       selfParticipant.releaseProcessedVideoStream();
       if (hasActiveVideo && changeAvsSendingMediaSource) {
         // So let's switch back to the original video source
         this.logger.info('Disable background effects.');
-        this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+        this.changeMediaSource(originalVideoStream, MediaType.VIDEO, false);
       }
-      return selfParticipant.videoStream();
+      return originalVideoStream;
     }
 
-    if (!hasActiveVideo) {
+    const videoStream = selfParticipant.videoStream();
+    if (hasActiveVideo === false || videoStream === undefined) {
       // no Video nothing to change!!
       this.logger.warn('No video exists to apply apply background effects');
       return;
@@ -399,7 +404,7 @@ export class CallingRepository {
     // Hold a reference to the old stream so we can release it AFTER the new one is assigned,
     const previousStream = selfParticipant.processedVideoStream();
 
-    const {applied, media} = await this.backgroundEffectsHandler.applyBackgroundEffect(selfParticipant.videoStream());
+    const {applied, media} = await this.backgroundEffectsHandler.applyBackgroundEffect(videoStream);
 
     // The BackgroundEffectsHandler decide not to change the video stream, so we're going on with the original video.
     if (!applied) {
@@ -407,9 +412,9 @@ export class CallingRepository {
       selfParticipant.processedVideoStream(undefined);
       if (changeAvsSendingMediaSource) {
         this.logger.info('Background effect could not applied! Switch back to original video stream!');
-        this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+        this.changeMediaSource(videoStream, MediaType.VIDEO, false);
       }
-      return selfParticipant.videoStream();
+      return videoStream;
     }
 
     // Assign new stream first, then release old.

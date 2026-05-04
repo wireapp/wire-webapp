@@ -54,7 +54,7 @@ export function hasURLParameter(parameterName: string): boolean {
     .includes(parameterName);
 }
 
-export function openTab(url: string): Window {
+export function openTab(url: string): Window | null {
   const newWindow = window.open(url);
   if (newWindow) {
     newWindow.opener = null;

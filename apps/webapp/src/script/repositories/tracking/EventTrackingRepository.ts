@@ -159,9 +159,13 @@ export class EventTrackingRepository {
       EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_SYNCED_AT_LEAST_ONCE_LOCAL_STORAGE_KEY,
     );
 
-    if (unsyncedTelemetryDeviceId) {
+    if (
+      unsyncedTelemetryDeviceId !== undefined &&
+      unsyncedTelemetryDeviceId !== null &&
+      unsyncedTelemetryDeviceId !== ''
+    ) {
       try {
-        await this.messageRepository.sendCountlySync(this.telemetryDeviceId);
+        await this.messageRepository.sendCountlySync(this.telemetryDeviceId ?? '');
         resetStoreValue(EventTrackingRepository.CONFIG.USER_ANALYTICS.COUNTLY_UNSYNCED_DEVICE_ID_LOCAL_STORAGE_KEY);
       } catch (error: unknown) {
         this.telemetryLogger.warn(`Failed to send new telemetry tracking id to other devices ${error}`);
