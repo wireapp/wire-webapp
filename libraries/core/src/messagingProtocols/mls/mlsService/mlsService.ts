@@ -581,6 +581,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
+  public async updateKeyingMaterialForConversation(groupId: string) {
+    await this.coreCryptoClient.transaction(context => this.updateKeyingMaterial(groupId, context));
+  }
+
   /**
    * Will create an empty conversation inside of coreCrypto.
    * @param groupId the id of the group to create inside of coreCrypto

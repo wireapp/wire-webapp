@@ -1582,6 +1582,7 @@ export class ConversationRepository {
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
+              await this.joinMLSConversationViaInviteLink(conversationEntity);
               amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
             } catch (error: unknown) {
               if (!isBackendError(error)) {
@@ -1633,6 +1634,31 @@ export class ConversationRepository {
         }
       }
     }
+  };
+
+  private readonly joinMLSConversationViaInviteLink = async (conversationEntity: Conversation): Promise<void> => {
+    if (!isMLSConversation(conversationEntity)) {
+      return;
+    }
+
+    const selfUserQualifiedId = this.userState.self()?.qualifiedId;
+
+    if (!selfUserQualifiedId) {
+      this.logger.error('Self user qualified ID is not available for MLS invite-link join');
+      throw new Error('Self user qualified ID is not available for MLS invite-link join');
+    }
+
+    await this.ensureConversationExists({
+      conversationId: conversationEntity.qualifiedId,
+      groupId: conversationEntity.groupId,
+      epoch: conversationEntity.epoch,
+    });
+
+    await this.core.service?.conversation?.addSelfUserToMLSConversationAfterExternalCommit({
+      conversationId: conversationEntity.qualifiedId,
+      groupId: conversationEntity.groupId,
+      qualifiedUsers: [selfUserQualifiedId],
+    });
   };
 
   private readonly getProtocolFor1to1Conversation = async (

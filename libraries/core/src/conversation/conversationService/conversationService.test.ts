@@ -153,6 +153,7 @@ describe('ConversationService', () => {
       getClientIdsInGroup: jest.fn(),
       getKeyPackagesPayload: jest.fn(),
       addUsersToExistingConversation: jest.fn(),
+      updateKeyingMaterialForConversation: jest.fn(),
       removeClientsFromConversation: jest.fn(),
       resetKeyMaterialRenewal: jest.fn(),
       handleMLSWelcomeMessageEvent: jest.fn(),
@@ -1104,6 +1105,69 @@ describe('ConversationService', () => {
 
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
       expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('addSelfUserToMLSConversationAfterExternalCommit', () => {
+    it('commits pending proposals before claiming self key packages and adding them to the group', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+
+      const mockGroupId = 'groupId';
+      const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+      const selfUserToAdd = {id: 'self-user-id', domain: 'local.wire.com'};
+      const keyPackages = [new Uint8Array([1, 2, 3])];
+      const existingClientIds = ['self-client-id'];
+
+      jest.spyOn(mlsService, 'commitPendingProposals').mockResolvedValueOnce(undefined);
+      jest.spyOn(mlsService, 'getClientIdsInGroup').mockResolvedValueOnce(existingClientIds);
+      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages, failures: []});
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        epoch: 1,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.addSelfUserToMLSConversationAfterExternalCommit({
+        qualifiedUsers: [selfUserToAdd],
+        groupId: mockGroupId,
+        conversationId: mockConversationId,
+      });
+
+      expect(mlsService.commitPendingProposals).toHaveBeenCalledWith(mockGroupId, true);
+      expect(mlsService.getKeyPackagesPayload).toHaveBeenCalledWith([selfUserToAdd], existingClientIds);
+      expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledWith(mockGroupId, keyPackages);
+      expect(mlsService.updateKeyingMaterialForConversation).not.toHaveBeenCalled();
+      expect(mlsService.resetKeyMaterialRenewal).toHaveBeenCalledWith(mockGroupId);
+    });
+
+    it('updates keying material when self has no key packages to add', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+
+      const mockGroupId = 'groupId';
+      const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+      const selfUserToAdd = {id: 'self-user-id', domain: 'local.wire.com'};
+
+      jest.spyOn(mlsService, 'commitPendingProposals').mockResolvedValueOnce(undefined);
+      jest.spyOn(mlsService, 'getClientIdsInGroup').mockResolvedValueOnce([]);
+      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages: [], failures: []});
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        epoch: 1,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.addSelfUserToMLSConversationAfterExternalCommit({
+        qualifiedUsers: [selfUserToAdd],
+        groupId: mockGroupId,
+        conversationId: mockConversationId,
+      });
+
+      expect(mlsService.commitPendingProposals).toHaveBeenCalledWith(mockGroupId, true);
+      expect(mlsService.addUsersToExistingConversation).not.toHaveBeenCalled();
+      expect(mlsService.updateKeyingMaterialForConversation).toHaveBeenCalledWith(mockGroupId);
+      expect(mlsService.resetKeyMaterialRenewal).toHaveBeenCalledWith(mockGroupId);
     });
   });
 

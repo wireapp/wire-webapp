@@ -493,6 +493,18 @@ export class ConversationService extends TypedEventEmitter<Events> {
     });
   }
 
+  public async addSelfUserToMLSConversationAfterExternalCommit({
+    qualifiedUsers,
+    groupId,
+    conversationId,
+  }: Required<AddUsersParams>): Promise<BaseCreateConversationResponse> {
+    return this.MLSRecoveryOrchestrator.execute({
+      context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
+      callBack: () =>
+        this.performAddSelfUserToMLSConversationAfterExternalCommitAPI({qualifiedUsers, groupId, conversationId}),
+    });
+  }
+
   // Low-level API to add users without any recovery logic; used by orchestrator and direct callers
   private async performAddUsersToMLSConversationAPI({
     qualifiedUsers,
@@ -500,12 +512,12 @@ export class ConversationService extends TypedEventEmitter<Events> {
     conversationId,
   }: Required<AddUsersParams>): Promise<BaseCreateConversationResponse> {
     this.logger.info(`Adding users to MLS conversation`, {groupId, conversationId, qualifiedUsers});
-    const exisitingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
+    const existingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
     const conversation = await this.getConversation(conversationId);
 
     const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(
       qualifiedUsers,
-      exisitingClientIdsInGroup,
+      existingClientIdsInGroup,
     );
 
     // We had cases where did not get any key packages, but still used core-crypto to call the backend (which results in failure).
@@ -515,6 +527,41 @@ export class ConversationService extends TypedEventEmitter<Events> {
       // We store the info when user was added (and key material was created), so we will know when to renew it
       await this.mlsService.resetKeyMaterialRenewal(groupId);
     }
+
+    return {
+      conversation,
+      failedToAdd: keysClaimingFailures,
+    };
+  }
+
+  private async performAddSelfUserToMLSConversationAfterExternalCommitAPI({
+    qualifiedUsers,
+    groupId,
+    conversationId,
+  }: Required<AddUsersParams>): Promise<BaseCreateConversationResponse> {
+    this.logger.info(`Adding self user to MLS conversation after external commit`, {
+      groupId,
+      conversationId,
+      qualifiedUsers,
+    });
+
+    await this.mlsService.commitPendingProposals(groupId, true);
+
+    const existingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
+    const conversation = await this.getConversation(conversationId);
+
+    const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(
+      qualifiedUsers,
+      existingClientIdsInGroup,
+    );
+
+    if (keyPackages.length > 0) {
+      await this.mlsService.addUsersToExistingConversation(groupId, keyPackages);
+    } else {
+      await this.mlsService.updateKeyingMaterialForConversation(groupId);
+    }
+
+    await this.mlsService.resetKeyMaterialRenewal(groupId);
 
     return {
       conversation,
