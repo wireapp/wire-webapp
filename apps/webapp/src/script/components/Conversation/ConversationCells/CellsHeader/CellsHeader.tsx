@@ -37,8 +37,8 @@ import {
 import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';
 import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
-import {CellsSearchClearIcon} from './CellsSearchClearIcon';
 import {CellsRootHomeIcon} from './CellsRootHomeIcon';
+import {CellsSearchClearIcon} from './CellsSearchClearIcon';
 
 import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
