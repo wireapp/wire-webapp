@@ -17,6 +17,8 @@
  *
  */
 
+import {useId} from 'react';
+
 import {VerificationBadges} from 'Components/Badge';
 import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
@@ -31,14 +33,18 @@ interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getDeviceIdentity
 }
 
 export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: ProteusDeviceDetailsProps) => {
+  const proteusLabelId = useId();
+
   return (
     <div className="preferences-proteus-details">
       <h4>{t('proteusDeviceDetails')}</h4>
 
       <div>
-        <p className="label preferences-label preferences-devices-fingerprint-label">{t('proteusID')}</p>
+        <p id={proteusLabelId} className="label preferences-label preferences-devices-fingerprint-label">
+          {t('proteusID')}
+        </p>
 
-        <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
+        <p className="preferences-devices-fingerprint" css={{width: '230px'}} aria-labelledby={proteusLabelId}>
           <FormattedId idSlices={splitFingerprint(device.id)} />
         </p>
       </div>

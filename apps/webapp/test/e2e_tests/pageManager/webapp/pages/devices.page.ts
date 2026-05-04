@@ -24,8 +24,7 @@ export class DevicesPage {
   readonly activeDevices: Locator;
 
   constructor(page: Page) {
-    // The id is not using any label or similar but just multiple paragraphs beneath each other
-    this.proteusId = page.locator("p:text('Proteus ID') + p");
+    this.proteusId = page.getByLabel('Proteus ID');
     this.activeDevices = page.getByRole('group', {name: 'Active'}).getByRole('button', {name: /device details/});
   }
 }
