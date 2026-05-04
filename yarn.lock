@@ -9866,7 +9866,7 @@ __metadata:
     webpack-hot-middleware: "npm:2.26.1"
     webrtc-adapter: "npm:9.0.5"
     workbox-webpack-plugin: "npm:7.4.0"
-    xstate: "npm:5.30.0"
+    xstate: "npm:5.31.0"
     zustand: "npm:4.5.7"
   languageName: unknown
   linkType: soft
@@ -27937,10 +27937,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xstate@npm:5.30.0":
-  version: 5.30.0
-  resolution: "xstate@npm:5.30.0"
-  checksum: 10/6c12d9f76502538bb35cad56a52ba1192a1a53f68f28bd4e8661a4ffedc83d913c289ecce0ac06c242d355b708477f5f3227380f9e038c3ac4bf091f0edc3e4d
+"xstate@npm:5.31.0":
+  version: 5.31.0
+  resolution: "xstate@npm:5.31.0"
+  checksum: 10/4097e4efe1350150102dc486ba4721b46e058058640805f1948ce89797d810ffa5e69e2238dbaa0ca26eca9528e8a36bd3208749f1abc50c36e83992e85bce4c
   languageName: node
   linkType: hard
 
