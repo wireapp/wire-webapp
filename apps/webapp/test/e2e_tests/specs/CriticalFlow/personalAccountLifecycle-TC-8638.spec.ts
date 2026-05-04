@@ -127,7 +127,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
       `${userB.fullName} won’t be able to contact you or add you to group conversations.`,
     );
 
-    await modals.blockWarning().clickBlock();
+    await modals.blockWarning().actionButton.click();
     await expect(conversation).toContainText('Blocked');
   });
 
