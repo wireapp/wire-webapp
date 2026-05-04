@@ -50,6 +50,7 @@ import {Participant} from './Participant';
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/TestUtil';
 import {Core} from '../../service/CoreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
+import {z} from 'zod';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -562,9 +563,27 @@ describe('CallingRepository', () => {
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidJsonString);
 
       expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
-        `Invalid network quality info: ${invalidJsonString}`,
+        'Invalid network quality info JSON',
         expect.any(Error),
       );
+    });
+
+    it('logs warning when network quality info schema validation fails', () => {
+      spyOn(callingRepository['logger'], 'warn');
+
+      const invalidQualityInfo = JSON.stringify({
+        quality: 'invalid-quality',
+      });
+
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidQualityInfo);
+
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
+        'Invalid network quality info schema',
+        expect.any(z.ZodError),
+      );
+
+      expect(Warnings.showWarning).not.toHaveBeenCalled();
+      expect(Warnings.hideWarning).not.toHaveBeenCalled();
     });
 
     it('handles partially missing fields in qualityInfo JSON', () => {
