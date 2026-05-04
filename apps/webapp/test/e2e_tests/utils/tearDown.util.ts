@@ -42,10 +42,3 @@ export const removeCreatedUser = async (api: ApiManagerE2E, user: User) => {
   await api.user.deleteUser(user.password, token);
   createdUsers.delete(user.id);
 };
-
-export const removeAllUser = async (api: ApiManagerE2E) => {
-  for (const [, user] of createdUsers.entries()) {
-    await removeCreatedUser(api, user);
-  }
-  createdUsers.clear();
-};
