@@ -29,8 +29,4 @@ export class BlockWarningModal extends ConfirmModal {
   async clickCancel() {
     await this.cancelButton.click();
   }
-
-  async clickBlock() {
-    await this.clickAction();
-  }
 }
