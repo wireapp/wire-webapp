@@ -19,16 +19,22 @@
 
 import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
 
+import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
+import {
+  buildMetrics,
+  createMetricsWindow,
+  pushMetricsSample,
+} from 'Repositories/media/backgroundEffects/helper/metrics';
+
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
-import type {Metrics} from '../backgroundEffectsWorkerTypes';
-import {buildMetrics, createMetricsWindow, pushMetricsSample} from '../helper/metrics';
-
 export let segmenterOptions = {} as WorkerProcessVideoTrackOptions;
 
 async function createSegmenter(canvas: OffscreenCanvas) {
+  const logger = getSafeLogger('segmenter:createSegmenter');
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
   const fileset =
     wasmLoaderPath && wasmBinaryPath
@@ -37,7 +43,7 @@ async function createSegmenter(canvas: OffscreenCanvas) {
           wasmBinaryPath,
         }
       : await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm');
-  // console.log(`[virtual-background] createSegmenter`, {canvas});
+  logger.log(`[virtual-background] createSegmenter`);
   const segmenter = await ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
       modelAssetPath:
@@ -59,20 +65,21 @@ export async function runSegmenter(
   opts: WorkerProcessVideoTrackOptions,
   onMetrics: (metrics: Metrics) => void,
 ) {
-  // console.log(`[virtual-background] runSegmenter`, {canvas, options, readable});
+  const logger = getSafeLogger('segmenter:runSegmenter');
+  logger.log(`[virtual-background] runSegmenter`);
   segmenterOptions = opts;
 
   let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
   function onContextLost(event: Event) {
-    // console.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
+    logger.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
     event.preventDefault();
     webGLRenderer?.close();
     webGLRenderer = null;
   }
 
   function onContextRestored() {
-    // console.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
+    logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
     if (!webGLRenderer) {
       setTimeout(() => {
         webGLRenderer = new WebGLRenderer(canvas);
@@ -98,7 +105,7 @@ export async function runSegmenter(
         oldSegmenter.close();
       })
       .catch((e: unknown) => {
-        console.error('Error restarting segmenter:', e);
+        logger.error('Error restarting segmenter:', e);
       });
   }
 
@@ -153,6 +160,7 @@ export async function runSegmenter(
         let filterMs = 0;
         let segmentationMs = 0;
         let gpuMs = 0;
+        const logger = getSafeLogger('segmenter:WritableStream::write');
 
         try {
           if (segmenterOptions.enabled && segmenterOptions.quality !== 'bypass') {
@@ -182,7 +190,7 @@ export async function runSegmenter(
 
                   try {
                     if (!categoryMask || !confidenceMask) {
-                      console.warn('Skipping frame: Missing masks or WebGL data.');
+                      logger.warn('Skipping frame: Missing masks or WebGL data.');
                       return;
                     }
 
@@ -198,7 +206,7 @@ export async function runSegmenter(
                     );
                     gpuMs = performance.now() - gpuStart;
                   } catch (e) {
-                    console.error('Error in videoCallback:', e);
+                    logger.error('Error in videoCallback:', e);
                   } finally {
                     categoryMask?.close();
                     confidenceMask?.close();
@@ -231,14 +239,6 @@ export async function runSegmenter(
         const now = performance.now();
 
         if (now - lastStatsTime > 2000) {
-          // onStats({
-          //   fps: (1000 * frames) / (now - lastStatsTime),
-          //   totalMs: totalMsSum / frames,
-          //   segmentationMs: segmentationMsSum / frames,
-          //   gpuMs: gpuMsSum / frames,
-          //   filterMs: filterMsSum / frames,
-          // });
-
           lastStatsTime = now;
           totalMsSum = 0;
           segmentationMsSum = 0;
@@ -254,11 +254,11 @@ export async function runSegmenter(
       },
 
       close() {
-        // console.log('[virtual-background] runSegmenter close');
+        logger.log('[virtual-background] runSegmenter close');
         close();
       },
       abort(reason) {
-        // console.log('[virtual-background] runSegmenter abort', reason);
+        logger.log('[virtual-background] runSegmenter abort', reason);
         close();
       },
     },
@@ -266,6 +266,6 @@ export async function runSegmenter(
   );
 
   readable.pipeTo(writer).catch((err: unknown) => {
-    console.error(`[virtual-background] video error: ${(err as Error).message}`);
+    logger.error(`[virtual-background] video error: ${(err as Error).message}`);
   });
 }

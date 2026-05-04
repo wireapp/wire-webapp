@@ -17,6 +17,7 @@
  *
  */
 
+import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 
 export type ImageTexture = {texture: WebGLTexture; width: number; height: number; url: string};
@@ -46,6 +47,7 @@ type ColorInfo = {
 type BackgroundRenderInfo = ImageInfo | VideoInfo | ColorInfo;
 
 export class WebGLRenderer {
+  readonly logger = getSafeLogger('WebGLRenderer');
   readonly canvas: OffscreenCanvas;
   readonly gl: WebGL2RenderingContext;
   readonly blendProgram: WebGLProgram;
@@ -314,7 +316,7 @@ export class WebGLRenderer {
     this.gl.attachShader(prog, fs);
     this.gl.linkProgram(prog);
     if (!this.gl.getProgramParameter(prog, this.gl.LINK_STATUS)) {
-      console.error('Program link error:', this.gl.getProgramInfoLog(prog));
+      this.logger.error('Program link error:', this.gl.getProgramInfoLog(prog));
       this.gl.deleteProgram(prog);
       throw new Error('Link fail');
     }
@@ -333,7 +335,7 @@ export class WebGLRenderer {
     this.gl.shaderSource(shader, source);
     this.gl.compileShader(shader);
     if (!this.gl.getShaderParameter(shader, this.gl.COMPILE_STATUS)) {
-      console.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
+      this.logger.error('Shader compile error:', this.gl.getShaderInfoLog(shader));
       this.gl.deleteShader(shader);
       throw new Error('Failed to compile shader');
     }
@@ -417,6 +419,7 @@ export class WebGLRenderer {
 
       const canvas = new OffscreenCanvas(1, 1);
       const ctx = canvas.getContext('2d');
+      const logger = getSafeLogger('virtual-background');
       const writer = new WritableStream({
         write(videoFrame: VideoFrame) {
           canvas.width = videoFrame.codedWidth;
@@ -425,11 +428,11 @@ export class WebGLRenderer {
           videoFrame.close();
         },
         close() {
-          console.error('[virtual-background] video background close');
+          logger.error('[virtual-background] video background close');
         },
       });
       media.pipeTo(writer).catch((err: unknown) => {
-        console.error('media.pipeTo(writer) error', err);
+        this.logger.error('media.pipeTo(writer) error', err);
       });
 
       const texture = this.gl.createTexture();
@@ -454,7 +457,7 @@ export class WebGLRenderer {
     }
 
     if (!this.backgroundRenderInfo) {
-      console.error('Critical: backgroundRenderInfo is null after processing new source. Setting default color.');
+      this.logger.error('Critical: backgroundRenderInfo is null after processing new source. Setting default color.');
       const [r, g, b, a] = WebGLRenderer.DEFAULT_BG_COLOR;
       const colorTexData = this.createColorTexture(r, g, b, a);
       this.backgroundRenderInfo = {
@@ -621,7 +624,7 @@ export class WebGLRenderer {
       gl.uniform2f(blendLocations.bgImageDimensions, bgWidth > 0 ? bgWidth : 1, bgHeight > 0 ? bgHeight : 1);
       gl.uniform2f(blendLocations.canvasDimensions, width, height);
     } else {
-      console.warn('backgroundRenderInfo is null in render loop. Background may not render correctly.');
+      this.logger.warn('backgroundRenderInfo is null in render loop. Background may not render correctly.');
     }
 
     // Set vertex attributes

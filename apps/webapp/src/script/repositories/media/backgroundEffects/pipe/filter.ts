@@ -17,6 +17,8 @@
  *
  */
 
+import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
+
 type QuadBuffers = {
   positionBuffer: WebGLBuffer;
   texCoordBuffer: WebGLBuffer;
@@ -74,6 +76,7 @@ function createAndLinkProgram(
 }
 
 export class VideoFilter {
+  readonly logger = getSafeLogger('VideoFilter');
   readonly canvas: OffscreenCanvas | HTMLCanvasElement;
   readonly gl: WebGL2RenderingContext;
   private blurProgram: WebGLProgram;
@@ -319,7 +322,7 @@ export class VideoFilter {
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
     if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
-      console.error('Framebuffer incomplete for blur filter');
+      this.logger.error('Framebuffer incomplete for blur filter');
     }
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     return fbo;
@@ -342,7 +345,7 @@ export class VideoFilter {
     if (blur > 0) {
       this.ensureTextures(outputWidth, outputHeight);
       if (!this.fbo1 || !this.texture1 || !this.fbo2 || !this.texture2) {
-        console.error('Blur filter FBOs not initialized');
+        this.logger.error('Blur filter FBOs not initialized');
         return sourceTexture; // Or null if strict error handling
       }
 
@@ -381,7 +384,7 @@ export class VideoFilter {
     if (needsColorAdjust) {
       this.ensureTextures(outputWidth, outputHeight); // Ensure FBOs are ready if not already from blur
       if (!this.fbo1 || !this.texture1 || !this.fbo2 || !this.texture2) {
-        console.error('Color adjust FBOs not initialized');
+        this.logger.error('Color adjust FBOs not initialized');
         return currentTexture; // Return whatever we have so far
       }
 

@@ -18,12 +18,15 @@
  */
 
 import {Metrics} from 'Repositories/media/backgroundEffects';
+import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
 import {WorkerProcessVideoTrackOptions} from './options';
 import {runSegmenter, segmenterOptions} from './segmenter';
 
+const workerLogger = getSafeLogger('virtual-background-worker');
+
 self.onmessage = ({data}) => {
-  // console.log(`[virtual-background] worker onmessage`, data);
+  workerLogger.log(`[virtual-background] worker onmessage`, data);
   const {name} = data as {name: string};
   if (name === 'options') {
     const {options: opts} = data as {options: WorkerProcessVideoTrackOptions};
@@ -41,7 +44,7 @@ self.onmessage = ({data}) => {
     runSegmenter(canvas, readable, opts, (stats: Metrics) => {
       self.postMessage({name: 'stats', stats});
     }).catch((err: unknown) => {
-      console.error(`[virtual-background] video error: ${(err as Error).message}`);
+      workerLogger.error(`[virtual-background] video error: ${(err as Error).message}`);
     });
   }
 };

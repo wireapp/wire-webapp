@@ -39,8 +39,8 @@ export type ProcessVideoTrackOptions = {
   quality: QualityMode;
 
   // Metrics callback.
-  onMetrics: (metrics: Metrics) => void | null;
-  onModelChange: (model: string) => void | null;
+  onMetrics: ((metrics: Metrics) => void) | null;
+  onModelChange: ((model: string) => void) | null;
 
   // Segmenter options.
   borderSmooth: number;

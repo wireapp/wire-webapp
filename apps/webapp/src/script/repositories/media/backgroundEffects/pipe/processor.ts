@@ -19,6 +19,8 @@
 
 import {setTimeout} from 'worker-timers';
 
+import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
+
 interface MediaStreamTrackProcessor {
   readable: ReadableStream;
 }
@@ -30,6 +32,7 @@ declare global {
 }
 
 class FallbackProcessor implements MediaStreamTrackProcessor {
+  readonly logger = getSafeLogger('FallbackProcessor');
   readonly readable: ReadableStream;
 
   constructor({track}: {track: MediaStreamTrack}) {
@@ -62,7 +65,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         await Promise.all([video.play(), new Promise(r => video.addEventListener('loadeddata', r, {once: true}))]);
         frameDuration = 1000 / (track.getSettings().frameRate || 30);
         timestamp = performance.now();
-        // console.log(`[virtual-background] processor start frameDuration=${frameDuration}`);
+        this.logger.log(`[virtual-background] processor start frameDuration=${frameDuration}`);
       },
       pull: async controller => {
         if (!running) {
@@ -81,7 +84,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
         controller.enqueue(new VideoFrame(canvas, {timestamp}));
       },
       cancel: reason => {
-        // console.log(`[virtual-background] video processor cancelled: ${reason}`);
+        this.logger.log(`[virtual-background] video processor cancelled: ${reason}`);
         running = false;
         close();
       },
