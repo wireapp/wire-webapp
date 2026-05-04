@@ -167,31 +167,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:3.1040.0":
-  version: 3.1040.0
-  resolution: "@aws-sdk/client-s3@npm:3.1040.0"
+"@aws-sdk/client-s3@npm:3.1041.0":
+  version: 3.1041.0
+  resolution: "@aws-sdk/client-s3@npm:3.1041.0"
   dependencies:
     "@aws-crypto/sha1-browser": "npm:5.2.0"
     "@aws-crypto/sha256-browser": "npm:5.2.0"
     "@aws-crypto/sha256-js": "npm:5.2.0"
-    "@aws-sdk/core": "npm:^3.974.7"
-    "@aws-sdk/credential-provider-node": "npm:^3.972.38"
+    "@aws-sdk/core": "npm:^3.974.8"
+    "@aws-sdk/credential-provider-node": "npm:^3.972.39"
     "@aws-sdk/middleware-bucket-endpoint": "npm:^3.972.10"
     "@aws-sdk/middleware-expect-continue": "npm:^3.972.10"
-    "@aws-sdk/middleware-flexible-checksums": "npm:^3.974.15"
+    "@aws-sdk/middleware-flexible-checksums": "npm:^3.974.16"
     "@aws-sdk/middleware-host-header": "npm:^3.972.10"
     "@aws-sdk/middleware-location-constraint": "npm:^3.972.10"
     "@aws-sdk/middleware-logger": "npm:^3.972.10"
     "@aws-sdk/middleware-recursion-detection": "npm:^3.972.11"
-    "@aws-sdk/middleware-sdk-s3": "npm:^3.972.36"
+    "@aws-sdk/middleware-sdk-s3": "npm:^3.972.37"
     "@aws-sdk/middleware-ssec": "npm:^3.972.10"
-    "@aws-sdk/middleware-user-agent": "npm:^3.972.37"
+    "@aws-sdk/middleware-user-agent": "npm:^3.972.38"
     "@aws-sdk/region-config-resolver": "npm:^3.972.13"
-    "@aws-sdk/signature-v4-multi-region": "npm:^3.996.24"
+    "@aws-sdk/signature-v4-multi-region": "npm:^3.996.25"
     "@aws-sdk/types": "npm:^3.973.8"
     "@aws-sdk/util-endpoints": "npm:^3.996.8"
     "@aws-sdk/util-user-agent-browser": "npm:^3.972.10"
-    "@aws-sdk/util-user-agent-node": "npm:^3.973.23"
+    "@aws-sdk/util-user-agent-node": "npm:^3.973.24"
     "@smithy/config-resolver": "npm:^4.4.17"
     "@smithy/core": "npm:^3.23.17"
     "@smithy/eventstream-serde-browser": "npm:^4.2.14"
@@ -226,11 +226,11 @@ __metadata:
     "@smithy/util-utf8": "npm:^4.2.2"
     "@smithy/util-waiter": "npm:^4.3.0"
     tslib: "npm:^2.6.2"
-  checksum: 10/dc61b819554d44d56c23878b0bedd20bd7db8103a7281acd28ab9e1f7773f47e0eb8a9ead5084862c3890e9c51d8d6fcfeb4f4b2af2f99dd3b8c6f337519787d
+  checksum: 10/b69317395810dd2afe1ff7b8f749fcce93745bc1031c5be82b3833f98e7abf227176b022f15530c3c1fd1af6787a2dc92e99cdc0837d856b49fff91158eb75bd
   languageName: node
   linkType: hard
 
-"@aws-sdk/core@npm:^3.974.7, @aws-sdk/core@npm:^3.974.8":
+"@aws-sdk/core@npm:^3.974.8":
   version: 3.974.8
   resolution: "@aws-sdk/core@npm:3.974.8"
   dependencies:
@@ -331,7 +331,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/credential-provider-node@npm:^3.972.38":
+"@aws-sdk/credential-provider-node@npm:^3.972.39":
   version: 3.972.39
   resolution: "@aws-sdk/credential-provider-node@npm:3.972.39"
   dependencies:
@@ -396,9 +396,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.1040.0":
-  version: 3.1040.0
-  resolution: "@aws-sdk/lib-storage@npm:3.1040.0"
+"@aws-sdk/lib-storage@npm:3.1041.0":
+  version: 3.1041.0
+  resolution: "@aws-sdk/lib-storage@npm:3.1041.0"
   dependencies:
     "@smithy/middleware-endpoint": "npm:^4.4.32"
     "@smithy/protocol-http": "npm:^5.3.14"
@@ -409,8 +409,8 @@ __metadata:
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.1040.0
-  checksum: 10/c680da7cbff4de0949bf5a634c8eee0c3248dfcbc0ab06dbdae3b0bbd7442d9aa6efc331e7f62d805542b834b7bd2fb5202c05ac9306a4b9dfc2467e04128d32
+    "@aws-sdk/client-s3": ^3.1041.0
+  checksum: 10/0ea4076845d3f3c1d50e350d2a3a7bd00b8f9b088b2ca0097c691e1df23af8918e3256520fe6032758af63bd338279b596cf3f5b586d357bcefedf6300e0b9f7
   languageName: node
   linkType: hard
 
@@ -441,7 +441,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/middleware-flexible-checksums@npm:^3.974.15":
+"@aws-sdk/middleware-flexible-checksums@npm:^3.974.16":
   version: 3.974.16
   resolution: "@aws-sdk/middleware-flexible-checksums@npm:3.974.16"
   dependencies:
@@ -510,7 +510,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/middleware-sdk-s3@npm:^3.972.36, @aws-sdk/middleware-sdk-s3@npm:^3.972.37":
+"@aws-sdk/middleware-sdk-s3@npm:^3.972.37":
   version: 3.972.37
   resolution: "@aws-sdk/middleware-sdk-s3@npm:3.972.37"
   dependencies:
@@ -543,7 +543,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/middleware-user-agent@npm:^3.972.37, @aws-sdk/middleware-user-agent@npm:^3.972.38":
+"@aws-sdk/middleware-user-agent@npm:^3.972.38":
   version: 3.972.38
   resolution: "@aws-sdk/middleware-user-agent@npm:3.972.38"
   dependencies:
@@ -619,7 +619,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/signature-v4-multi-region@npm:^3.996.24, @aws-sdk/signature-v4-multi-region@npm:^3.996.25":
+"@aws-sdk/signature-v4-multi-region@npm:^3.996.25":
   version: 3.996.25
   resolution: "@aws-sdk/signature-v4-multi-region@npm:3.996.25"
   dependencies:
@@ -711,7 +711,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/util-user-agent-node@npm:^3.973.23, @aws-sdk/util-user-agent-node@npm:^3.973.24":
+"@aws-sdk/util-user-agent-node@npm:^3.973.24":
   version: 3.973.24
   resolution: "@aws-sdk/util-user-agent-node@npm:3.973.24"
   dependencies:
@@ -9360,8 +9360,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
-    "@aws-sdk/client-s3": "npm:3.1040.0"
-    "@aws-sdk/lib-storage": "npm:3.1040.0"
+    "@aws-sdk/client-s3": "npm:3.1041.0"
+    "@aws-sdk/lib-storage": "npm:3.1041.0"
     "@swc/core": "npm:1.15.32"
     "@swc/jest": "npm:0.2.39"
     "@types/jest": "npm:30.0.0"
