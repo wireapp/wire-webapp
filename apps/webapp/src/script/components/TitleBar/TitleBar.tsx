@@ -346,7 +346,7 @@ export const TitleBar = ({
                 title={t('tooltipConversationCall')}
                 aria-label={t('tooltipConversationCall')}
                 onClick={event => {
-                  currentFocusedElementRef.current = event.target as HTMLButtonElement;
+                  currentFocusedElementRef.current = event.currentTarget;
                   startCallAndShowAlert();
                 }}
                 data-uie-name="do-call"

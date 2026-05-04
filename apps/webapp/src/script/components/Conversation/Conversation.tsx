@@ -574,7 +574,7 @@ export const Conversation = ({
               <div css={tabsWrapperStyles}>
                 <div
                   aria-hidden={isSharedDriveSearchViewOpen || undefined}
-                  css={isSharedDriveSearchViewOpen ? tabsHiddenStyles : undefined}
+                  css={isSharedDriveSearchViewOpen && tabsHiddenStyles}
                 >
                   <ConversationTabs
                     activeTabIndex={activeTabIndex}
