@@ -19,19 +19,11 @@
 
 import {getUser} from 'test/e2e_tests/data/user';
 import {completeRegistrationForm, goToPersonalRegistration} from 'test/e2e_tests/utils/registration.util';
-import {addCreatedUser, removeCreatedUser} from 'test/e2e_tests/utils/tearDown.util';
 
 import {test, expect} from '../../test.fixtures';
 
 test.describe('Registration', () => {
   test.describe('email registration used', () => {
-    const userA = getUser();
-
-    test.beforeAll(async ({api}) => {
-      await api.createPersonalUser(userA);
-      addCreatedUser(userA);
-    });
-
     test(
       'I want to be informed about terms of personal account before registration',
       {tag: ['@TC-1621', '@regression']},
@@ -58,7 +50,9 @@ test.describe('Registration', () => {
     test(
       'I want to be notified if the email address I entered during registration has already been registered',
       {tag: ['@TC-1623', '@TC-1640', '@regression']},
-      async ({pageManager}) => {
+      async ({pageManager, createUser}) => {
+        const userA = await createUser();
+
         await pageManager.openMainPage();
         const {pages} = pageManager.webapp;
 
@@ -69,15 +63,11 @@ test.describe('Registration', () => {
           'This email address has already been registered. Learn more',
         );
 
-        expect(pageManager.webapp.pages.registration().passwordPolicy).toHaveText(
+        await expect(pages.registration().passwordPolicy).toHaveText(
           'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
         );
       },
     );
-
-    test.afterAll(async ({api}) => {
-      await removeCreatedUser(api, userA);
-    });
   });
 
   test(
