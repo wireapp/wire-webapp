@@ -59,6 +59,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {NetworkQualityInfo, NetworkQualityInfoSchema} from 'Repositories/calling/calling.schema';
 import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -148,24 +149,6 @@ type SubconversationData = {
   epoch: number;
   secretKey: string;
   members: SubconversationEpochInfoMember[];
-};
-
-type NetworkQualityInfo = {
-  quality: QUALITY;
-  rtt: number;
-  loss: {
-    tx: number;
-    rx: number;
-  };
-  jitter: {
-    audio: {tx: number; rx: number};
-    video: {tx: number; rx: number};
-  };
-  connection: {
-    candidate: 'Relay' | 'Host' | 'Srflx' | 'Prflx' | 'Unknown';
-    protocol: 'UDP' | 'TCP' | 'Unknown';
-  };
-  peer: 'Server' | 'User' | 'Unknown';
 };
 
 export class CallingRepository {
@@ -642,7 +625,8 @@ export class CallingRepository {
     let qualityInfo: NetworkQualityInfo;
 
     try {
-      qualityInfo = JSON.parse(qualityInfoJson) as NetworkQualityInfo;
+      const parsedQualityInfo = JSON.parse(qualityInfoJson);
+      qualityInfo = NetworkQualityInfoSchema.parse(parsedQualityInfo);
     } catch (error) {
       this.logger.warn(`Invalid network quality info: ${qualityInfoJson}`, error);
       return;
