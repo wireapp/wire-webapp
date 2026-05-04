@@ -18,7 +18,7 @@
  */
 
 import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/BackgroundEffectsController';
+import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {defaultOpts} from 'Repositories/media/backgroundEffects/pipe/options';
 import {
@@ -88,7 +88,7 @@ const parseStoredPreferredEffect = (stored: string | null): BackgroundEffectSele
 export class BackgroundEffectsHandler {
   private readonly logger: Logger = getLogger('BackgroundEffectsHandler');
   private readonly storage: Storage | undefined;
-  private customBackground: BackgroundSource | undefined = undefined;
+  private customBackground: BackgroundSource | null = null;
   private saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private currentReleasableStream: ReleasableMediaStream | undefined = undefined;
 
@@ -173,7 +173,10 @@ export class BackgroundEffectsHandler {
     }
   }
 
-  public setPreferredBackgroundEffect(effect: BackgroundEffectSelection, customBackground?: BackgroundSource): void {
+  public setPreferredBackgroundEffect(
+    effect: BackgroundEffectSelection,
+    customBackground: BackgroundSource | null = null,
+  ): void {
     if (effect.type === 'custom' && !customBackground) {
       backgroundEffectsStore
         .getState()
@@ -243,7 +246,7 @@ export class BackgroundEffectsHandler {
     return this.controller.getCapabilityInfo();
   }
 
-  private async loadBackgroundSource(effect: BackgroundEffectSelection): Promise<BackgroundSource | undefined> {
+  private async loadBackgroundSource(effect: BackgroundEffectSelection): Promise<BackgroundSource | null> {
     try {
       if (effect.type === 'virtual') {
         return await loadBackgroundSource(effect.backgroundId);
@@ -256,10 +259,10 @@ export class BackgroundEffectsHandler {
         return this.customBackground;
       }
 
-      return undefined;
+      return null;
     } catch (error) {
       this.logger.warn('Failed to load background source', error);
-      return undefined;
+      return null;
     }
   }
 
