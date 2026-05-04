@@ -100,7 +100,10 @@ export class BackupService {
     }
 
     for (const entity of entities) {
-      const key = generatePrimaryKey ? generatePrimaryKey(entity) : undefined;
+      const key = generatePrimaryKey?.(entity) ?? generateId?.(entity);
+      if (key === undefined) {
+        throw new Error(`Cannot import entity into '${tableName}' without a primary key`);
+      }
       await this.storageService.save(tableName, key, entity);
     }
     return entities.length;

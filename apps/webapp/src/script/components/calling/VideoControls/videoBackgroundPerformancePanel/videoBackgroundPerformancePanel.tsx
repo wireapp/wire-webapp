@@ -23,6 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
+import {areCapabilityInfosEqual} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
 import {
   buttonBaseStyles,
   buttonNeutralStyles,
@@ -116,7 +117,7 @@ const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
   const renderMetrics = useBackgroundEffectsStore(state => state.metrics);
   const model = useBackgroundEffectsStore(state => state.model);
 
-  const metricRows = getMetricRows(renderMetrics);
+  const metricRows = renderMetrics ? getMetricRows(renderMetrics) : [];
 
   const capabilityRows = getCapabilityRows(capabilityInfo);
 
@@ -133,6 +134,11 @@ const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
   );
 };
 
+const qualitySelectOptions = QUALITY_OPTIONS.map(option => ({
+  label: option,
+  value: option,
+}));
+
 export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
   const isFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
 
@@ -140,33 +146,57 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [capabilityInfo, setCapabilityInfo] = useState<CapabilityInfo | null>(null);
 
-  const qualitySelectOptions = useMemo(
-    () =>
-      QUALITY_OPTIONS.map(option => ({
-        label: option,
-        value: option,
-      })),
-    [],
-  );
-
   const selectedOption = useMemo(
     () => qualitySelectOptions.find(option => option.value === selectedQuality) ?? null,
-    [qualitySelectOptions, selectedQuality],
+    [selectedQuality],
   );
 
   useEffect(() => {
+    if (!isFeatureEnabled || !isPanelOpen) {
+      setCapabilityInfo(null);
+      return;
+    }
+
     setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
-  }, [backgroundEffectsHandler]);
+  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
 
   // Quality polling (fallback for non-reactive quality)
-  useEffect(() => {
+  useEffect((): void | (() => void) => {
+    if (!isFeatureEnabled || !isPanelOpen) {
+      return;
+    }
+
     const interval = setInterval(() => {
       const current = backgroundEffectsHandler.getQuality();
+
       setSelectedQuality(prev => (prev !== current ? current : prev));
     }, POLLING_INTERVAL);
 
-    return () => clearInterval(interval);
-  }, [backgroundEffectsHandler]);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
+
+  // Capability polling (controller updates these after pipeline start)
+  useEffect((): void | (() => void) => {
+    if (!isFeatureEnabled || !isPanelOpen) {
+      setCapabilityInfo(null);
+      return;
+    }
+
+    const syncCapabilities = () => {
+      const current = backgroundEffectsHandler.getCapabilityInfo();
+      setCapabilityInfo(prev => (areCapabilityInfosEqual(Maybe.of(prev), Maybe.of(current)) ? prev : current));
+    };
+
+    syncCapabilities();
+
+    const interval = setInterval(syncCapabilities, POLLING_INTERVAL);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
 
   // Auto close if disabled
   useEffect(() => {
@@ -175,21 +205,9 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     }
   }, [isFeatureEnabled, isPanelOpen]);
 
-  const handleOpenPanel = useCallback(() => {
-    setIsPanelOpen(true);
-  }, []);
-
-  const handleClosePanel = useCallback(() => {
-    setIsPanelOpen(false);
-  }, []);
-
-  const togglePerformancePanel = useCallback(() => {
-    if (isPanelOpen) {
-      handleClosePanel();
-    } else {
-      handleOpenPanel();
-    }
-  }, [handleClosePanel, handleOpenPanel, isPanelOpen]);
+  const togglePerformancePanel = () => {
+    setIsPanelOpen(prev => !prev);
+  };
 
   const handleQualityChange = useCallback(
     (quality: Option) => {
@@ -234,7 +252,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
               type="button"
               className="icon-button"
               css={performancePanelCloseButtonStyles}
-              onClick={handleClosePanel}
+              onClick={togglePerformancePanel}
               aria-label={t('modalCloseButton')}
             >
               <CloseIcon width={12} height={12} />
@@ -263,7 +281,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
             </Button>
           </div>
 
-          <MetricsDisplay capabilityInfo={capabilityInfo} />
+          {capabilityInfo && <MetricsDisplay capabilityInfo={capabilityInfo} />}
         </div>
       )}
     </div>

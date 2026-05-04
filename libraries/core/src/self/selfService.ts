@@ -17,7 +17,7 @@
  *
  */
 
-import {Self} from '@wireapp/api-client/lib/self/';
+import {Self} from '@wireapp/api-client/lib/self';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {APIClient} from '@wireapp/api-client';

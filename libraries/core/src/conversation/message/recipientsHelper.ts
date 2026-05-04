@@ -17,7 +17,7 @@
  *
  */
 
-import {OTRClientMap, OTRRecipients} from '@wireapp/api-client/lib/conversation/';
+import {OTRClientMap, OTRRecipients} from '@wireapp/api-client/lib/conversation';
 import {Encoder} from 'bazinga64';
 
 export function recipientsToBase64(recipients: OTRRecipients<Uint8Array>): OTRRecipients<string> {

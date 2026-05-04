@@ -30,8 +30,10 @@ export function copyText(text: string): Promise<void> {
 
     let selectedRange;
 
-    if (window.getSelection) {
-      selectedRange = window.getSelection().rangeCount ? window.getSelection().getRangeAt(0) : undefined;
+    if (window.getSelection !== undefined) {
+      const currentSelection = window.getSelection();
+      selectedRange =
+        currentSelection !== null && currentSelection.rangeCount > 0 ? currentSelection.getRangeAt(0) : undefined;
     }
 
     document.body.appendChild(fallbackSource);
@@ -39,10 +41,12 @@ export function copyText(text: string): Promise<void> {
     document.execCommand('copy');
     document.body.removeChild(fallbackSource);
 
-    if (window.getSelection && selectedRange) {
+    if (window.getSelection !== undefined && selectedRange !== undefined) {
       const currentSelection = window.getSelection();
-      currentSelection.removeAllRanges();
-      currentSelection.addRange(selectedRange);
+      if (currentSelection !== null) {
+        currentSelection.removeAllRanges();
+        currentSelection.addRange(selectedRange);
+      }
     }
 
     return Promise.resolve();

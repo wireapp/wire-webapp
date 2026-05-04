@@ -17,7 +17,7 @@
  *
  */
 
-import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '@wireapp/api-client/lib/client/';
+import {CreateClientPayload, RegisteredClient, UpdateClientPayload} from '@wireapp/api-client/lib/client';
 
 import {APIClient} from '@wireapp/api-client';
 

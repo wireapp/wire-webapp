@@ -228,7 +228,7 @@ export class AuthAction {
         if (statusCode === HTTP_STATUS.NOT_FOUND) {
           return new BackendError('', BackendErrorLabel.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
         }
-        if (statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
+        if (statusCode !== undefined && statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
           return new BackendError('', BackendErrorLabel.SERVER_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
         return new BackendError('', SyntheticErrorLabel.SSO_GENERIC_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
@@ -283,7 +283,7 @@ export class AuthAction {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
       registration.name = registration.name.trim();
-      registration.email = registration.email.trim();
+      registration.email = registration.email?.trim() ?? '';
 
       dispatch(AuthActionCreator.startRegisterPersonal());
       try {

@@ -25,12 +25,14 @@ import {
 import {
   applockRefactoredFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
+  sharedDriveSearchAndFiltersFeatureToggleName,
   startupFeatureToggleNames,
 } from './startupFeatureToggleNames';
 
 const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
   applockRefactoredFeatureToggleName,
+  sharedDriveSearchAndFiltersFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -83,6 +85,14 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
   });
 
+  it('enables the shared drive search and filters feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${sharedDriveSearchAndFiltersFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName)).toBe(true);
+  });
+
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${reliableWebsocketConnectionFeatureToggleName} `,
@@ -127,6 +137,7 @@ describe('startupFeatureToggles', function () {
     expect(allowedStartupFeatureToggleNames).toEqual([
       reliableWebsocketConnectionFeatureToggleName,
       applockRefactoredFeatureToggleName,
+      sharedDriveSearchAndFiltersFeatureToggleName,
     ]);
   });
 

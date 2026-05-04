@@ -473,12 +473,13 @@ export class DebugUtil {
 
   /** Used by QA test automation. */
   isSendingMessage(): boolean {
-    return this.core.service!.conversation.isSendingMessage();
+    const coreService = this.core.service;
+    return coreService !== undefined ? coreService.conversation.isSendingMessage() : false;
   }
 
   async getLastMessagesFromDatabase(
     amount = 10,
-    conversationId = this.conversationState.activeConversation().id,
+    conversationId = this.conversationState.activeConversation()?.id ?? '',
   ): Promise<EventRecord[]> {
     if (this.storageRepository.storageService.db) {
       const records = await this.storageRepository.storageService.db.events.toArray();
@@ -490,7 +491,7 @@ export class DebugUtil {
 
   async haveISentThisMessageToMyOtherClients(
     messageId: string,
-    conversationId: string = this.conversationState.activeConversation().id,
+    conversationId: string = this.conversationState.activeConversation()?.id ?? '',
   ): Promise<void> {
     const clientId = this.clientState.currentClient?.id;
     const userId = this.userState.self().id;
@@ -532,8 +533,9 @@ export class DebugUtil {
   async getEventInfo(
     event: ConversationEvent,
   ): Promise<{conversation: Conversation; event: ConversationEvent; user: User}> {
-    const conversation = await this.conversationRepository.getConversationById(event.qualified_conversation);
-    const user = await this.userRepository.getUserById(event.qualified_from || {domain: '', id: event.from});
+    const conversationId = event.qualified_conversation ?? {domain: '', id: event.conversation};
+    const conversation = await this.conversationRepository.getConversationById(conversationId);
+    const user = await this.userRepository.getUserById(event.qualified_from ?? {domain: '', id: event.from});
 
     const debugInformation = {
       conversation,
@@ -610,6 +612,9 @@ export class DebugUtil {
       canvas.height = height;
       canvas.width = width;
       const ctx = canvas.getContext('2d');
+      if (ctx === null) {
+        return [];
+      }
       setInterval(() => {
         ctx.fillStyle = `#${color}`;
         ctx.fillRect(0, 0, width, height);
@@ -621,13 +626,19 @@ export class DebugUtil {
       return stream.getVideoTracks();
     }
 
-    navigator.mediaDevices.ondevicechange(null);
+    const deviceChangeHandler = navigator.mediaDevices.ondevicechange;
+    if (deviceChangeHandler !== null) {
+      deviceChangeHandler.call(navigator.mediaDevices, new Event('devicechange'));
+    }
   }
 
   injectLegalHoldLeaveEvent(includeSelf = false, maxUsers = Infinity) {
     const conversation = this.conversationState.activeConversation();
+    if (conversation === undefined) {
+      return Promise.resolve();
+    }
     let users = [];
-    if (includeSelf) {
+    if (includeSelf === true) {
       users.push(this.userState.self().qualifiedId);
     }
     users.push(...conversation.participating_user_ids());
@@ -652,6 +663,9 @@ export class DebugUtil {
 
   blockUserForLegalHold(userId: string) {
     const conversation = this.conversationState.activeConversation();
+    if (conversation === undefined) {
+      return Promise.resolve();
+    }
     return this.eventRepository['handleEvent'](
       {
         event: {

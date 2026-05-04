@@ -96,11 +96,39 @@ jobs:
           TEST_SERVICE_URL: http://localhost:8080
         run: yarn playwright test -c apps/webapp/playwright.config.ts apps/webapp/test/e2e_tests/specs/CriticalFlow/startupHasNoConsoleErrors.spec.ts
 
+  # Since not always all e2e tests are run the number of shards to start up is computed dynamically from the amount of tests which will run
+  compute_shards:
+    name: Compute number of shards to use
+    runs-on: ubuntu-24.04
+
+    outputs:
+      matrixShards: ${{ steps.computeShards.outputs.matrixShards }}
+
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+      - run: yarn --immutable
+
+      - name: Compute shards
+        id: computeShards
+        env:
+          GREP: ${{ inputs.grep }}
+        run: |
+          NUMBER_OF_TESTS=$(yarn nx run webapp:e2e --list --grep=\"$GREP\" | grep 'Total:' | awk '{print $2}')
+          NUMBER_OF_SHARDS=$(( $NUMBER_OF_TESTS > 64 ? 64 : $NUMBER_OF_TESTS )) # Limit the number of shards to 64
+          MATRIX_SHARDS=$(jq -nc --argjson len "$NUMBER_OF_SHARDS" '[range(1; $len + 1)]')
+          echo "matrixShards=$MATRIX_SHARDS" >> $GITHUB_OUTPUT
+          echo "$NUMBER_OF_TESTS tests will be run across $NUMBER_OF_SHARDS shards"
+
   test:
     name: Run E2E Tests
     runs-on: ubuntu-24.04
     timeout-minutes: 45
-    needs: [bootstrap_smoke_test]
+    needs: [bootstrap_smoke_test, compute_shards]
     container:
       image: mcr.microsoft.com/playwright:v1.59.1-noble
       options: --ipc=host
@@ -108,8 +136,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # prettier-ignore
-        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+        shard: ${{ fromJSON(needs.compute_shards.outputs.matrixShards) }}
 
     services:
       # Run the kalium testservice as service container of the current job
@@ -194,43 +221,14 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
 
-      - name: Check for blob reports
-        id: check_blob_reports
-        run: |
-          if [ -d "${{ env.PLAYWRIGHT_REPORT_PATH }}/blob-reports" ]; then
-            echo "has_blob_reports=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_blob_reports=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      # Merge reports and delete blob reports and zip archives for traces, only keep resources to include within the artifact
       - name: Merge playwright reports
-        if: ${{ steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
         working-directory: apps/webapp
         run: |
           yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
           rm -rf playwright-report/blob-reports
 
-      - name: Delete trace artifacts
-        if: ${{ !inputs.keep_traces && steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
-        working-directory: apps/webapp
-        run: |
-          if [ -d "playwright-report/html/data" ]; then
-            DELETED_COUNT=$(find playwright-report/html/data -name "*.zip" -type f -delete -print)
-            echo "Deleted $DELETED_COUNT trace archive files"
-          else
-            echo "Trace data directory not found, skipping trace cleanup"
-          fi
-
-      - name: Delete blob report artifacts
-        if: ${{ always() && steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
-        uses: geekyeggo/delete-artifact@d79b2442431e4adbc383d29a28e630374eceb303
-        with:
-          name: blob-report-*
-
       - name: Upload test report
         id: upload_playwright_report
-        if: ${{ steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report
@@ -244,7 +242,6 @@ jobs:
 
       - name: Extract test results
         id: test-results
-        if: ${{ steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
         run: |
           REPORT="${{ env.PLAYWRIGHT_REPORT_PATH }}/report.json"
           if [ ! -f "$REPORT" ]; then
@@ -289,7 +286,7 @@ jobs:
             }
 
       - name: Update Testiny Run with results
-        if: ${{ inputs.testinyRunName }}
+        if: ${{ success() && inputs.testinyRunName }}
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
           TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}

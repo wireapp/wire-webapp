@@ -42,10 +42,14 @@ const SaveCallLogs = ({callingRepository, userState = container.resolve(UserStat
   const brandName = Config.getConfig().BRAND_NAME;
   const saveCallLogs = () => {
     const messageLog = callingRepository.getCallLog();
-    if (messageLog) {
+    if (messageLog !== undefined) {
+      const selfUser = userState.self();
+      if (selfUser === undefined) {
+        return;
+      }
       const callLog = [messageLog.join('\r\n')];
       const blob = new Blob(callLog, {type: 'text/plain;charset=utf-8'});
-      const truncatedId = userState.self().id.slice(0, OBFUSCATION_TRUNCATE_TO);
+      const truncatedId = selfUser.id.slice(0, OBFUSCATION_TRUNCATE_TO);
       const sanitizedBrandName = brandName.replace(/[^A-Za-z0-9_]/g, '');
       const filename = `${sanitizedBrandName}-${truncatedId}-Calling_${getCurrentDate()}.log`;
 

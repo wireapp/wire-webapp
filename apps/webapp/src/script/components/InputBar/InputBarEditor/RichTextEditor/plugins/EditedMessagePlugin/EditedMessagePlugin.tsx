@@ -56,7 +56,11 @@ export function EditedMessagePlugin({message, showMarkdownPreview}: Props): null
             return;
           }
 
-          const messageContent = message.getFirstAsset().text;
+          const firstAsset = message.getFirstAsset();
+          if (firstAsset === undefined) {
+            return;
+          }
+          const messageContent = firstAsset.text;
 
           const mentionNodes = getMentionNodesFromMessage(message);
 

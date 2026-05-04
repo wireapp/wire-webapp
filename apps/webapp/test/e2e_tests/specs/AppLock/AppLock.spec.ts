@@ -211,7 +211,7 @@ test.describe('AppLock', () => {
       },
     );
 
-    test('I want to switch off app lock', {tag: ['@TC-2771', '@TC-2772', '@regression']}, async ({api, createPage}) => {
+    test('I want to switch off app lock', {tag: ['@TC-2771', '@regression']}, async ({api, createPage}) => {
       await api.brig.toggleAppLock(owner.teamId, 'enabled', false);
 
       const page = await createPage(withLogin(memberA));

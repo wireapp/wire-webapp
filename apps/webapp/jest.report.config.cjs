@@ -41,7 +41,7 @@ module.exports = {
   },
   testPathIgnorePatterns: ['<rootDir>/server', '<rootDir>/.yalc', '<rootDir>/test/e2e_tests'],
   testRunner: 'jest-jasmine2',
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|noop-esm|uuid)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|noop-esm|uuid|@enormora/objectory)/)'],
   transform: {
     '^.+\\.[tj]sx?$': 'babel-jest',
   },

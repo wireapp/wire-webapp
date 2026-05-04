@@ -66,12 +66,12 @@ export type SegmentationModelByTier = Partial<Record<QualityTier, string>>;
 /**
  * Browser capability information detected at runtime.
  */
-export interface CapabilityInfo {
+export type CapabilityInfo = {
   offscreenCanvas: boolean;
   worker: boolean;
   webgl2: boolean;
   requestVideoFrameCallback: boolean;
-}
+};
 
 export type QualityPolicyMode = 'auto' | 'conservative' | 'aggressive';
 

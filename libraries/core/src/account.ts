@@ -27,18 +27,18 @@ import {
   LoginData,
   PreKey,
 } from '@wireapp/api-client/lib/auth';
-import {ClientCapability, ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client/';
+import {ClientCapability, ClientClassification, ClientType, RegisteredClient} from '@wireapp/api-client/lib/client';
 import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
 import * as Events from '@wireapp/api-client/lib/event';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
-import {Notification} from '@wireapp/api-client/lib/notification/';
+import {Notification} from '@wireapp/api-client/lib/notification';
 import {
   ConsumableEvent,
   ConsumableNotification,
   ConsumableNotificationEvent,
   ConsumableNotificationSynchronization,
 } from '@wireapp/api-client/lib/notification/consumableNotification';
-import {WebSocketClient} from '@wireapp/api-client/lib/tcp/';
+import {WebSocketClient} from '@wireapp/api-client/lib/tcp';
 import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket';
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';

@@ -1,6 +1,7 @@
 name: E2E Tests Nightly
 
 on:
+  workflow_dispatch:
   schedule:
     # we want to run this nightly on dev
     - cron: '0 02 * * 1-5'
@@ -43,8 +44,15 @@ jobs:
           artifact-ids: ${{ needs.e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
 
-      - name: Run Testiny CLI
+      - name: Upload report to Testiny
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
+          TESTINY_TEST_PLAN_ID: 105 # 105 is the id of the "Regression" test plan within Testiny
+          DESCRIPTION: |
+            Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          yarn dlx @testiny/cli automation --project WEB --source "github" --playwright ./apps/webapp/playwright-report/report.json
+          node ./apps/webapp/test/e2e_tests/scripts/uploadTestReport.ts \
+          --runName="Regression $(date +'%m/%d/%Y - %H:%M')" \
+          --testPlanId="$TESTINY_TEST_PLAN_ID" \
+          --description="$DESCRIPTION" \
+          --reportPath="./apps/webapp/playwright-report/report.json"

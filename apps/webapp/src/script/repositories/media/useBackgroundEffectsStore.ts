@@ -80,7 +80,7 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
 
     setModel: model =>
       set(state => {
-        state.model = model;
+        state.model = model ?? 'unknown';
       }),
   })),
 );

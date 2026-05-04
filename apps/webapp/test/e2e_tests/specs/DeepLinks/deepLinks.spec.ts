@@ -19,8 +19,8 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {expect, test, Team, withConnectedUser, withConnectionRequest, withLogin} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from '../../utils/userActions';
+import {expect, test, Team, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
+import {createGroup, sendConnectionRequest} from '../../utils/userActions';
 import {UserProfileModal} from '../../pageManager/webapp/modals/userProfile.modal';
 
 type ProfileModalOptions = {
@@ -117,11 +117,13 @@ test.describe('Deep Links', () => {
       }
 
       const [userAPage, userBPage, userCPage, userDPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectionRequest(userC)),
-        createPage(withLogin(userB), withConnectedUser(userA), withConnectionRequest(userD)),
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB), withConnectedUser(userA)),
         createPage(withLogin(userC)),
         createPage(withLogin(userD)),
       ]);
+      await sendConnectionRequest(userAPage, userC);
+      await sendConnectionRequest(userBPage, userD);
 
       const userAPageManager = PageManager.from(userAPage);
       const userBPageManager = PageManager.from(userBPage);
@@ -151,7 +153,7 @@ test.describe('Deep Links', () => {
       );
 
       await test.step('User B sends all profile links to User A', async () => {
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await userBPages.conversationList().getConversation(userA.fullName).open();
 
         const userLabels = ['A', 'B', 'C', 'D'];
 
@@ -162,17 +164,17 @@ test.describe('Deep Links', () => {
 
       await test.step('User B creates group and sends conversation join link to User A', async () => {
         await createGroup(userBPages, groupName, []);
-        await userBPages.conversationList().openConversation(groupName);
+        await userBPages.conversationList().getConversation(groupName).open();
         await userBPages.conversation().toggleGroupInformation();
         await userBPages.conversationDetails().openGuestOptions();
 
         const conversationJoinLink = await userBPages.guestOptions().createLink();
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
         await userBPages.conversation().sendMessage(`Group conversation: ${conversationJoinLink}`);
       });
 
       await test.step('User A verifies information for every user profile modal', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
 
         // Verify information for User A
         await userAPages.conversation().getMessage({content: 'User A:'}).getByRole('link').click();
@@ -217,7 +219,7 @@ test.describe('Deep Links', () => {
         await expect(userAModals.confirm().modal).toBeVisible();
         await expect(userAModals.confirm().actionButton).toContainText('Join Conversation');
         await userAModals.confirm().actionButton.click();
-        await expect(userAPages.conversationList().getConversationLocator(groupName)).toBeVisible();
+        await expect(userAPages.conversationList().getConversation(groupName)).toBeVisible();
       });
     });
   }

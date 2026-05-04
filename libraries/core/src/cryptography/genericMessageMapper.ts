@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event/';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 
 import {LogFactory} from '@wireapp/commons';
 

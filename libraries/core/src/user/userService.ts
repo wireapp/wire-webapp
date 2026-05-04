@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId, User} from '@wireapp/api-client/lib/user/';
+import {QualifiedId, User} from '@wireapp/api-client/lib/user';
 
 import {APIClient} from '@wireapp/api-client';
 

@@ -56,7 +56,9 @@ export class MediaParser {
   readonly renderMediaEmbeds = (message: string, themeColor?: string): string => {
     if (this.showEmbed) {
       getLinksFromHtml<HTMLAnchorElement>(message).forEach(link => {
-        this.embeds.forEach(embed => (message = embed(link, message, themeColor)));
+        this.embeds.forEach(embed => {
+          message = embed(link, message, themeColor ?? '');
+        });
       });
     }
     return message;

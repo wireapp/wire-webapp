@@ -20,9 +20,9 @@
 import {AudioType} from 'Repositories/audio/audioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withConnectedUser, withLogin, expect, Team, withConnectionRequest} from 'test/e2e_tests/test.fixtures';
+import {test, withConnectedUser, withLogin, expect, Team} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Calling', () => {
   let userA: User;
@@ -53,13 +53,13 @@ test.describe('Calling', () => {
       ]);
 
       // User A has a call with user B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversation(userB.fullName).open();
       await userAPages.conversation().clickCallButton();
       await userBPages.calling().clickAcceptCallButton();
       await expect(userBPages.calling().callCell).toBeVisible();
 
       // User A starts a call with user C while in a call with user B
-      await userAPages.conversationList().openConversation(userC.fullName);
+      await userAPages.conversationList().getConversation(userC.fullName).open();
       await userAPages.conversation().clickCallButton();
 
       // A modal is shown prompting him to confirm before cancelling the ongoing call
@@ -83,7 +83,7 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // Establish group call; required precondition for hand-raise testing
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userBPages.calling().callCell).toBeVisible();
@@ -114,7 +114,7 @@ test.describe('Calling', () => {
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
-    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversationList().getConversation(userB.fullName).open();
     await userAPages.conversation().clickCallButton();
     await userBPages.calling().clickAcceptCallButton();
 
@@ -137,10 +137,10 @@ test.describe('Calling', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().clickCallButton();
 
-      const {joinCallButton} = userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'});
+      const {joinCallButton} = userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'});
       await expect(joinCallButton).toBeVisible();
       await expect(userBPages.calling().acceptCallButton).toBeVisible();
 
@@ -174,10 +174,10 @@ test.describe('Calling', () => {
       const userBDevice2Pages = PageManager.from(userBPage2).webapp.pages;
 
       if (conversationType === '1on1') {
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().getConversation(userB.fullName).open();
       } else {
         await createGroup(userAPages, 'Calling group', [userB]);
-        await userAPages.conversationList().openConversation('Calling group');
+        await userAPages.conversationList().getConversation('Calling group').open();
       }
 
       // Ensure no audio is playing on both devices initially
@@ -211,7 +211,7 @@ test.describe('Calling', () => {
       ]);
 
       // User A calls user B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversation(userB.fullName).open();
       await userAPages.conversation().clickCallButton();
 
       // User B declines the call
@@ -219,7 +219,7 @@ test.describe('Calling', () => {
       await expect(userBPages.calling().callCell).not.toBeVisible();
 
       // User B calls user C instead
-      await userBPages.conversationList().openConversation(userC.fullName);
+      await userBPages.conversationList().getConversation(userC.fullName).open();
       await expect(userBPages.conversation().callButton).toBeEnabled();
       await userBPages.conversation().startCall();
       await expect(userBPages.calling().callCell).toBeVisible();
@@ -236,7 +236,7 @@ test.describe('Calling', () => {
     const userCPages = PageManager.from(userCPage).webapp.pages;
     await createGroup(userAPages, groupName, [userB, userC]);
 
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -248,7 +248,7 @@ test.describe('Calling', () => {
 
     // // User C joins the ongoing call
     await userCPage.waitForTimeout(5000);
-    await userCPages.conversationList().getConversationLocator(groupName).joinCallButton.click();
+    await userCPages.conversationList().getConversation(groupName).joinCallButton.click();
 
     // Confirm that user C joined the call
     await expect(userCPages.calling().goFullScreen).toBeVisible();
@@ -263,7 +263,7 @@ test.describe('Calling', () => {
 
     await createGroup(userAPages, groupName, [userB, userC]);
 
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -286,7 +286,7 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // User A initiates the call
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -301,7 +301,7 @@ test.describe('Calling', () => {
     await expect(userBPages.calling().callCell).toBeHidden();
 
     // User B re-joins the ongoing call from the conversation list
-    await userBPages.conversationList().getConversationLocator(groupName).joinCallButton.click({timeout: 30_000});
+    await userBPages.conversationList().getConversation(groupName).joinCallButton.click({timeout: 30_000});
 
     await expect(userBPages.calling().goFullScreen).toBeVisible();
   });
@@ -315,7 +315,7 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // User A initiates the call
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -343,7 +343,7 @@ test.describe('Calling', () => {
       await createGroup(userAPages, groupName, [userB]);
 
       await test.step('User A starts a call and User B joins', async () => {
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
 
         await expect(userAPages.calling().callCell).toBeVisible();
@@ -354,7 +354,7 @@ test.describe('Calling', () => {
       });
 
       await test.step('User A joins then leaves the call from their second device', async () => {
-        await userADevice2Pages.conversationList().openConversation(groupName);
+        await userADevice2Pages.conversationList().getConversation(groupName).open();
         await userADevice2Pages.conversation().clickCallButton();
         await expect(userADevice2Pages.calling().callCell).toBeVisible();
 
@@ -371,7 +371,7 @@ test.describe('Calling', () => {
         await userAPages.calling().clickLeaveCallButton();
         await expect(userAPages.calling().callCell).not.toBeAttached();
         // Verify the call is still "joinable" (User B is still there)
-        await expect(userAPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible({
+        await expect(userAPages.conversationList().getConversation(groupName).joinCallButton).toBeVisible({
           timeout: 30_000,
         });
       });
@@ -391,7 +391,7 @@ test.describe('Calling', () => {
       await createGroup(userAPages, groupName, [userB, userC]);
 
       // User A initiates the call
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPages.calling().callCell).toBeVisible();
@@ -427,12 +427,12 @@ test.describe('Calling', () => {
       await createGroup(userAPages, groupName, [userB]);
 
       // User A initiates the call
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPages.calling().callCell).toBeVisible();
       await expect(userBPages.calling().callCell).toBeVisible();
-      await expect(userBPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible();
+      await expect(userBPages.conversationList().getConversation(groupName).joinCallButton).toBeVisible();
 
       // User A removes User B from the group
       await userAPages.conversation().toggleGroupInformation();
@@ -443,7 +443,7 @@ test.describe('Calling', () => {
 
       // User B cannot join the group call
       await expect(userBPages.calling().callCell).not.toBeAttached();
-      await expect(userBPages.conversationList().getConversationLocator(groupName).joinCallButton).not.toBeAttached();
+      await expect(userBPages.conversationList().getConversation(groupName).joinCallButton).not.toBeAttached();
     },
   );
 
@@ -463,7 +463,7 @@ test.describe('Calling', () => {
       const userAPages = PageManager.from(userAPage).webapp.pages;
 
       await createGroup(userAPages, groupName, allMembers);
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPage.getByTestId('modal-without-title')).toContainText(
@@ -477,22 +477,25 @@ test.describe('Calling', () => {
     {tag: ['@TC-2844', '@regression']},
     async ({createPage, createUser}) => {
       const guestUser = await createUser();
-      const [userAPages, userBPages, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectionRequest(guestUser))).then(
-          pm => pm.webapp.pages,
-        ),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(guestUser))).then(pm => pm.webapp.pages),
+      const [userAPage, userBPage, guestPage] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userB))),
+        PageManager.from(createPage(withLogin(guestUser))),
       ]);
+      await sendConnectionRequest(userAPage, guestUser);
+
+      const [userAPages, userBPages, guestPages] = [userAPage, userBPage, guestPage].map(pm => pm.webapp.pages);
 
       // --- Setup and Call Initialization ---
       await test.step('Setup: Accept connection and start group call', async () => {
         await guestPages.conversationList().openPendingConnectionRequest();
         await guestPages.connectRequest().clickConnectButton();
+        await expect(userAPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+        await expect(guestPages.conversationList().getConversation(userA.fullName)).toBeAttached();
 
         await createGroup(userAPages, groupName, [userB, guestUser]);
 
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
       });
 
