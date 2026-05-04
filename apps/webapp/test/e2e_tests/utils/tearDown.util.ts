@@ -22,7 +22,6 @@ import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from '../data/user';
 
 const createdUsers: Map<User['id'], User> = new Map();
-const createdTeams: Map<User, string> = new Map();
 
 // Utility functions to manage created personal users for cleanup
 export const addCreatedUser = (user: User) => {
@@ -30,18 +29,6 @@ export const addCreatedUser = (user: User) => {
     throw new Error('User must have an ID to be added to createdUsers');
   }
   createdUsers.set(user.id, user);
-};
-
-export const removeCreatedTeam = async (api: ApiManagerE2E, user: User) => {
-  if (!user.id) {
-    throw new Error('User must have an ID to be removed from createdTeams');
-  }
-  const teamId = createdTeams.get(user);
-  if (!teamId) {
-    throw new Error(`No team found for user ${user.id}`);
-  }
-  await api.team.deleteTeam(user, teamId);
-  createdTeams.delete(user);
 };
 
 export const removeCreatedUser = async (api: ApiManagerE2E, user: User) => {
