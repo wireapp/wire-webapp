@@ -56,17 +56,6 @@ export const removeCreatedUser = async (api: ApiManagerE2E, user: User) => {
   createdUsers.delete(user.id);
 };
 
-// Function to tear down created users and teams
-// This function should be called after tests to clean up the created data
-export const tearDownAll = async (api: ApiManagerE2E) => {
-  for (const [user] of createdTeams.entries()) {
-    await removeCreatedTeam(api, user);
-  }
-  createdTeams.clear();
-
-  await removeAllUser(api);
-};
-
 export const removeAllUser = async (api: ApiManagerE2E) => {
   for (const [, user] of createdUsers.entries()) {
     await removeCreatedUser(api, user);
