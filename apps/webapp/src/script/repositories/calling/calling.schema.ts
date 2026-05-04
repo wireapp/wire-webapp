@@ -21,10 +21,25 @@ import {z} from 'zod';
 
 import {QUALITY} from '@wireapp/avs';
 
-const CandidateEnum = z.enum(['Relay', 'Host', 'Srflx', 'Prflx', 'Unknown']);
-const ProtocolEnum = z.enum(['UDP', 'TCP', 'Unknown']);
-const PeerEnum = z.enum(['Server', 'User', 'Unknown']);
-const QualityEnum = z.nativeEnum(QUALITY);
+const stringLiteralUnknown = z.literal('Unknown');
+
+const CandidateSchema = z.union([
+  z.literal('Relay'),
+  z.literal('Host'),
+  z.literal('Srflx'),
+  z.literal('Prflx'),
+  stringLiteralUnknown,
+]);
+const ProtocolSchema = z.union([z.literal('UDP'), z.literal('TCP'), stringLiteralUnknown]);
+const PeerSchema = z.union([z.literal('Server'), z.literal('User'), stringLiteralUnknown]);
+
+const QualitySchema = z.union([
+  z.literal(QUALITY.NORMAL),
+  z.literal(QUALITY.MEDIUM),
+  z.literal(QUALITY.POOR),
+  z.literal(QUALITY.NETWORK_PROBLEM),
+  z.literal(QUALITY.RECONNECTING),
+]);
 
 const NetworkMetricSchema = z.object({
   tx: z.number(),
@@ -32,7 +47,7 @@ const NetworkMetricSchema = z.object({
 });
 
 export const NetworkQualityInfoSchema = z.object({
-  quality: QualityEnum,
+  quality: QualitySchema,
   rtt: z.number().optional(),
   loss: NetworkMetricSchema.optional(),
   jitter: z
@@ -43,11 +58,11 @@ export const NetworkQualityInfoSchema = z.object({
     .optional(),
   connection: z
     .object({
-      candidate: CandidateEnum,
-      protocol: ProtocolEnum,
+      candidate: CandidateSchema,
+      protocol: ProtocolSchema,
     })
     .optional(),
-  peer: PeerEnum.optional(),
+  peer: PeerSchema.optional(),
 });
 
 export type NetworkQualityInfo = z.infer<typeof NetworkQualityInfoSchema>;

@@ -32,6 +32,7 @@ import axios from 'axios';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
+import {z} from 'zod';
 
 import {
   AUDIO_STATE,
@@ -628,7 +629,12 @@ export class CallingRepository {
       const parsedQualityInfo = JSON.parse(qualityInfoJson);
       qualityInfo = NetworkQualityInfoSchema.parse(parsedQualityInfo);
     } catch (error) {
-      this.logger.warn(`Invalid network quality info: ${qualityInfoJson}`, error);
+      if (error instanceof z.ZodError) {
+        this.logger.warn('Invalid network quality info schema', error);
+      } else {
+        this.logger.warn('Invalid network quality info JSON', error);
+      }
+
       return;
     }
 
