@@ -59,7 +59,7 @@
     "jest-environment-jsdom": "30.3.0",
     "js-yaml": "4.1.1",
     "jsdom": "29.1.1",
-    "nock": "14.0.13",
+    "nock": "14.0.14",
     "nx": "22.7.0",
     "playwright": "1.59.1",
     "prettier": "3.8.3",
