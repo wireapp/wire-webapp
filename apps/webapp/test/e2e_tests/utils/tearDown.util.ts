@@ -32,14 +32,6 @@ export const addCreatedUser = (user: User) => {
   createdUsers.set(user.id, user);
 };
 
-// Utility functions to manage created teams for cleanup (no need to pass user, as teams are associated with users)
-export const addCreatedTeam = (user: User, teamId: string) => {
-  if (!user.id) {
-    throw new Error('User must have an ID to be added to createdTeams');
-  }
-  createdTeams.set(user, teamId);
-};
-
 export const removeCreatedTeam = async (api: ApiManagerE2E, user: User) => {
   if (!user.id) {
     throw new Error('User must have an ID to be removed from createdTeams');
