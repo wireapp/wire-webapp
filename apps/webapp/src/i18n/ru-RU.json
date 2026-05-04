@@ -481,6 +481,8 @@
   "cells.restoreRootNodeModal.folder.headline": "Восстановить папку",
   "cells.search.closeButton": "Закрыть",
   "cells.search.failed": "Что-то пошло не так. Пожалуйста, попробуйте еще раз позже",
+  "cells.search.idle.description": "Введите поисковые слова или примените фильтр, чтобы увидеть результаты.",
+  "cells.search.idle.heading": "Поиск в общем диске и всех его папках",
   "cells.search.placeholder": "Поиск файлов и папок",
   "cells.selfDeletingMessage.info": "Функция недоступна для бесед с общим диском.",
   "cells.shareModal.changePassword": "Смена пароля",
