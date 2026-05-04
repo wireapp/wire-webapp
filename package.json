@@ -16,7 +16,7 @@
     "@enormora/objectory": "0.0.7",
     "@faker-js/faker": "9.9.0",
     "@ls-lint/ls-lint": "2.3.1",
-    "@nx/jest": "22.7.0",
+    "@nx/jest": "22.7.1",
     "@nx/node": "22.7.0",
     "@nx/workspace": "22.7.0",
     "@stylistic/eslint-plugin": "5.10.0",
