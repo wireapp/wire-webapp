@@ -51,7 +51,7 @@ export class ConversationSidebar {
     this.manageTeamButton = page.getByTestId('go-team-management');
     this.sidebar = page.locator(`.conversations-sidebar-items`);
     this.supportButton = page.getByRole('link', {name: 'Support'});
-    this.favoritesButton = page.getByTestId('go-favorites-view');
+    this.favoritesButton = page.getByRole('tab', {name: 'Favorites'});
   }
 
   async clickPreferencesButton() {
