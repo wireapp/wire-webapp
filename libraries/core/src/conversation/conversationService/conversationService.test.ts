@@ -1108,7 +1108,7 @@ describe('ConversationService', () => {
     });
   });
 
-  describe('addSelfUserToMLSConversationAfterExternalCommit', () => {
+  describe('addOtherSelfUserClientToMLSConversationAfterExternalCommit', () => {
     it('commits pending proposals before claiming self key packages and adding them to the group', async () => {
       const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
@@ -1128,7 +1128,7 @@ describe('ConversationService', () => {
         group_id: mockGroupId,
       } as unknown as Conversation);
 
-      await conversationService.addSelfUserToMLSConversationAfterExternalCommit({
+      await conversationService.addOtherSelfUserClientToMLSConversationAfterExternalCommit({
         qualifiedUsers: [selfUserToAdd],
         groupId: mockGroupId,
         conversationId: mockConversationId,
@@ -1158,7 +1158,7 @@ describe('ConversationService', () => {
         group_id: mockGroupId,
       } as unknown as Conversation);
 
-      await conversationService.addSelfUserToMLSConversationAfterExternalCommit({
+      await conversationService.addOtherSelfUserClientToMLSConversationAfterExternalCommit({
         qualifiedUsers: [selfUserToAdd],
         groupId: mockGroupId,
         conversationId: mockConversationId,

@@ -1654,7 +1654,7 @@ export class ConversationRepository {
       epoch: conversationEntity.epoch,
     });
 
-    await this.core.service?.conversation?.addSelfUserToMLSConversationAfterExternalCommit({
+    await this.core.service?.conversation?.addOtherSelfUserClientToMLSConversationAfterExternalCommit({
       conversationId: conversationEntity.qualifiedId,
       groupId: conversationEntity.groupId,
       qualifiedUsers: [selfUserQualifiedId],
