@@ -45,7 +45,7 @@ function createAndLinkProgram(
   fsSource: string,
   customVertexShader?: WebGLShader,
 ): WebGLProgram {
-  const vs = customVertexShader ? customVertexShader : createShader(gl, gl.VERTEX_SHADER, vsSource);
+  const vs = customVertexShader ?? createShader(gl, gl.VERTEX_SHADER, vsSource);
   const fs = createShader(gl, gl.FRAGMENT_SHADER, fsSource);
 
   const program = gl.createProgram();
@@ -79,7 +79,7 @@ export class VideoFilter {
   readonly logger = getSafeLogger('VideoFilter');
   readonly canvas: OffscreenCanvas | HTMLCanvasElement;
   readonly gl: WebGL2RenderingContext;
-  private blurProgram: WebGLProgram;
+  private readonly blurProgram: WebGLProgram;
   private blurLocations: {
     position: number;
     texCoord: number;
@@ -95,7 +95,7 @@ export class VideoFilter {
   private texture2: WebGLTexture | null = null;
   private currentWidth: number = 0;
   private currentHeight: number = 0;
-  private quadBuffers: QuadBuffers;
+  private readonly quadBuffers: QuadBuffers;
 
   private readonly vertexShaderSource = `#version 300 es
         // Use 'in' for attributes, 'out' for varying to fragment shader
@@ -182,8 +182,8 @@ export class VideoFilter {
         }
     `;
 
-  private colorAdjustProgram: WebGLProgram;
-  private colorAdjustLocations: {
+  private readonly colorAdjustProgram: WebGLProgram;
+  private readonly colorAdjustLocations: {
     position: number;
     texCoord: number;
     inputTexture: WebGLUniformLocation | null;
@@ -228,18 +228,18 @@ export class VideoFilter {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([
-        -1.0,
-        1.0, // Top-left
-        -1.0,
-        -1.0, // Bottom-left
-        1.0,
-        1.0, // Top-right
-        1.0,
-        -1.0, // Bottom-right
-        1.0,
-        1.0, // Top-right (again for 2nd triangle)
-        -1.0,
-        -1.0, // Bottom-left (again for 2nd triangle)
+        -1,
+        1, // Top-left
+        -1,
+        -1, // Bottom-left
+        1,
+        1, // Top-right
+        1,
+        -1, // Bottom-right
+        1,
+        1, // Top-right (again for 2nd triangle)
+        -1,
+        -1, // Bottom-left (again for 2nd triangle)
       ]),
       gl.STATIC_DRAW,
     );
@@ -252,18 +252,18 @@ export class VideoFilter {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([
-        0.0,
-        1.0, // Top-left
-        0.0,
-        0.0, // Bottom-left
-        1.0,
-        1.0, // Top-right
-        1.0,
-        0.0, // Bottom-right
-        1.0,
-        1.0, // Top-right (again for 2nd triangle)
-        0.0,
-        0.0, // Bottom-left (again for 2nd triangle)
+        0,
+        1, // Top-left
+        0,
+        0, // Bottom-left
+        1,
+        1, // Top-right
+        1,
+        0, // Bottom-right
+        1,
+        1, // Top-right (again for 2nd triangle)
+        0,
+        0, // Bottom-left (again for 2nd triangle)
       ]),
       gl.STATIC_DRAW,
     );
@@ -333,9 +333,9 @@ export class VideoFilter {
     outputWidth: number,
     outputHeight: number,
     blur: number,
-    brightness: number = 0.0,
-    contrast: number = 1.0,
-    gamma: number = 1.0,
+    brightness: number = 0,
+    contrast: number = 1,
+    gamma: number = 1,
   ): WebGLTexture | null {
     const gl = this.gl;
     let currentTexture = sourceTexture;
@@ -363,24 +363,23 @@ export class VideoFilter {
 
       // Horizontal Pass (sourceTexture -> FBO1/Texture1)
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo1);
-      gl.uniform2f(this.blurLocations.direction, 1.0, 0.0);
+      gl.uniform2f(this.blurLocations.direction, 1, 0);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, sourceTexture); // Initial source
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
       // Vertical Pass (FBO1/Texture1 -> FBO2/Texture2)
       gl.bindFramebuffer(gl.FRAMEBUFFER, this.fbo2);
-      gl.uniform2f(this.blurLocations.direction, 0.0, 1.0);
+      gl.uniform2f(this.blurLocations.direction, 0, 1);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.texture1);
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
       currentTexture = this.texture2; // Blurred result is in texture2
-      finalPassOutputToTexture1 = false;
     }
 
     // --- Color Adjustment Pass (if needed) ---
-    const needsColorAdjust = brightness !== 0.0 || contrast !== 1.0 || gamma !== 1.0;
+    const needsColorAdjust = brightness !== 0 || contrast !== 1 || gamma !== 1;
     if (needsColorAdjust) {
       this.ensureTextures(outputWidth, outputHeight); // Ensure FBOs are ready if not already from blur
       if (!this.fbo1 || !this.texture1 || !this.fbo2 || !this.texture2) {
@@ -471,13 +470,7 @@ export class VideoFilter {
     }
   }
 
-  public render(
-    videoFrame: VideoFrame,
-    blur: number,
-    brightness: number = 0.0,
-    contrast: number = 1.0,
-    gamma: number = 1.0,
-  ) {
+  public render(videoFrame: VideoFrame, blur: number, brightness: number = 0, contrast: number = 1, gamma: number = 1) {
     const {canvas, gl} = this;
     const frameWidth = videoFrame.codedWidth;
     const frameHeight = videoFrame.codedHeight;
@@ -534,19 +527,11 @@ export class VideoFilter {
 
     const pBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, pBuf);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0]),
-      gl.STATIC_DRAW,
-    );
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, 1, -1, -1, 1, 1, 1, -1, 1, 1, -1, -1]), gl.STATIC_DRAW);
 
     const tcBuf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tcBuf);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0]),
-      gl.STATIC_DRAW,
-    );
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0]), gl.STATIC_DRAW);
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, frameWidth, frameHeight);

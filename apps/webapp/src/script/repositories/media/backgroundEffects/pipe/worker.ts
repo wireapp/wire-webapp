@@ -25,7 +25,7 @@ import {runSegmenter, segmenterOptions} from './segmenter';
 
 const workerLogger = getSafeLogger('virtual-background-worker');
 
-self.onmessage = ({data}) => {
+globalThis.onmessage = ({data}) => {
   workerLogger.log(`[virtual-background] worker onmessage`, data);
   const {name} = data as {name: string};
   if (name === 'options') {
@@ -42,7 +42,7 @@ self.onmessage = ({data}) => {
       options: WorkerProcessVideoTrackOptions;
     };
     runSegmenter(canvas, readable, opts, (stats: Metrics) => {
-      self.postMessage({name: 'stats', stats});
+      globalThis.postMessage({name: 'stats', stats});
     }).catch((err: unknown) => {
       workerLogger.error(`[virtual-background] video error: ${(err as Error).message}`);
     });
