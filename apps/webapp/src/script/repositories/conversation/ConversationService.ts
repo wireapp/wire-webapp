@@ -199,7 +199,7 @@ export class ConversationService {
    */
   updateConversationMessageTimer(
     conversationId: QualifiedId,
-    message_timer: number,
+    message_timer: number | null,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     return this.apiClient.api.conversation.putConversationMessageTimer(conversationId, {message_timer});
   }
