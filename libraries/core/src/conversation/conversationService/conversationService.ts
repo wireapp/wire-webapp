@@ -486,10 +486,19 @@ export class ConversationService extends TypedEventEmitter<Events> {
     qualifiedUsers,
     groupId,
     conversationId,
-  }: Required<AddUsersParams> & {shouldRetry?: boolean}): Promise<BaseCreateConversationResponse> {
+    commitPendingFirst = false,
+    updateKeyingMaterialIfEmpty = false,
+  }: AddUsersParams): Promise<BaseCreateConversationResponse> {
     return this.MLSRecoveryOrchestrator.execute({
       context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
-      callBack: () => this.performAddUsersToMLSConversationAPI({qualifiedUsers, groupId, conversationId}),
+      callBack: () =>
+        this.performAddUsersToMLSConversationAPI({
+          qualifiedUsers,
+          groupId,
+          conversationId,
+          commitPendingFirst,
+          updateKeyingMaterialIfEmpty,
+        }),
     });
   }
 
@@ -498,21 +507,32 @@ export class ConversationService extends TypedEventEmitter<Events> {
     qualifiedUsers,
     groupId,
     conversationId,
-  }: Required<AddUsersParams>): Promise<BaseCreateConversationResponse> {
+    commitPendingFirst = false,
+    updateKeyingMaterialIfEmpty = false,
+  }: AddUsersParams): Promise<BaseCreateConversationResponse> {
     this.logger.info(`Adding users to MLS conversation`, {groupId, conversationId, qualifiedUsers});
-    const exisitingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
+
+    if (commitPendingFirst) {
+      await this.mlsService.commitPendingProposals(groupId, true);
+    }
+
+    const existingClientIdsInGroup = await this.mlsService.getClientIdsInGroup(groupId);
     const conversation = await this.getConversation(conversationId);
 
     const {keyPackages, failures: keysClaimingFailures} = await this.mlsService.getKeyPackagesPayload(
       qualifiedUsers,
-      exisitingClientIdsInGroup,
+      existingClientIdsInGroup,
     );
 
     // We had cases where did not get any key packages, but still used core-crypto to call the backend (which results in failure).
-    if (keyPackages && keyPackages?.length > 0) {
+    if (keyPackages.length > 0) {
       await this.mlsService.addUsersToExistingConversation(groupId, keyPackages);
-
       // We store the info when user was added (and key material was created), so we will know when to renew it
+      await this.mlsService.resetKeyMaterialRenewal(groupId);
+    } else if (updateKeyingMaterialIfEmpty) {
+      // After an external commit the self client must publish fresh keying material
+      // even when no peer key packages were claimed.
+      await this.mlsService.updateKeyingMaterialForConversation(groupId);
       await this.mlsService.resetKeyMaterialRenewal(groupId);
     }
 
