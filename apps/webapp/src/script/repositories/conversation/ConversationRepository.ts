@@ -1582,7 +1582,7 @@ export class ConversationRepository {
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
-              await this.joinMLSConversationViaInviteLink(conversationEntity);
+              await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
               amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
             } catch (error: unknown) {
               if (!isBackendError(error)) {
@@ -1636,7 +1636,9 @@ export class ConversationRepository {
     }
   };
 
-  private readonly joinMLSConversationViaInviteLink = async (conversationEntity: Conversation): Promise<void> => {
+  private readonly addOtherSelfUserClientsToMLSConversation = async (
+    conversationEntity: Conversation,
+  ): Promise<void> => {
     if (!isMLSConversation(conversationEntity)) {
       return;
     }
@@ -1648,16 +1650,12 @@ export class ConversationRepository {
       throw new Error('Self user qualified ID is not available for MLS invite-link join');
     }
 
-    await this.ensureConversationExists({
-      conversationId: conversationEntity.qualifiedId,
-      groupId: conversationEntity.groupId,
-      epoch: conversationEntity.epoch,
-    });
-
-    await this.core.service?.conversation?.addOtherSelfUserClientToMLSConversationAfterExternalCommit({
+    await this.core.service?.conversation?.addUsersToMLSConversation({
       conversationId: conversationEntity.qualifiedId,
       groupId: conversationEntity.groupId,
       qualifiedUsers: [selfUserQualifiedId],
+      commitPendingFirst: true,
+      updateKeyingMaterialIfEmpty: true,
     });
   };
 

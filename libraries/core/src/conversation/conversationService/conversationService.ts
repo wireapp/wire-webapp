@@ -486,36 +486,30 @@ export class ConversationService extends TypedEventEmitter<Events> {
     qualifiedUsers,
     groupId,
     conversationId,
-  }: Required<AddUsersParams> & {shouldRetry?: boolean}): Promise<BaseCreateConversationResponse> {
-    return this.MLSRecoveryOrchestrator.execute({
-      context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
-      callBack: () => this.performAddUsersToMLSConversationAPI({qualifiedUsers, groupId, conversationId}),
-    });
-  }
-
-  public async addOtherSelfUserClientToMLSConversationAfterExternalCommit({
-    qualifiedUsers,
-    groupId,
-    conversationId,
-  }: Required<AddUsersParams>): Promise<BaseCreateConversationResponse> {
+    commitPendingFirst = false,
+    updateKeyingMaterialIfEmpty = false,
+  }: AddUsersParams): Promise<BaseCreateConversationResponse> {
     return this.MLSRecoveryOrchestrator.execute({
       context: {operationName: OperationName.addUsers, qualifiedConversationId: conversationId, groupId},
       callBack: () =>
-        this.performAddUsersToMLSConversationAPI(
-          {qualifiedUsers, groupId, conversationId},
-          {commitPendingFirst: true, updateKeyingMaterialIfEmpty: true},
-        ),
+        this.performAddUsersToMLSConversationAPI({
+          qualifiedUsers,
+          groupId,
+          conversationId,
+          commitPendingFirst,
+          updateKeyingMaterialIfEmpty,
+        }),
     });
   }
 
   // Low-level API to add users without any recovery logic; used by orchestrator and direct callers
-  private async performAddUsersToMLSConversationAPI(
-    {qualifiedUsers, groupId, conversationId}: Required<AddUsersParams>,
-    {
-      commitPendingFirst = false,
-      updateKeyingMaterialIfEmpty = false,
-    }: {commitPendingFirst?: boolean; updateKeyingMaterialIfEmpty?: boolean} = {},
-  ): Promise<BaseCreateConversationResponse> {
+  private async performAddUsersToMLSConversationAPI({
+    qualifiedUsers,
+    groupId,
+    conversationId,
+    commitPendingFirst = false,
+    updateKeyingMaterialIfEmpty = false,
+  }: AddUsersParams): Promise<BaseCreateConversationResponse> {
     this.logger.info(`Adding users to MLS conversation`, {groupId, conversationId, qualifiedUsers});
 
     if (commitPendingFirst) {
