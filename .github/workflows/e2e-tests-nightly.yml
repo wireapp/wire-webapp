@@ -22,8 +22,8 @@ jobs:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       WIRE_E2E_TEST_BOT_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
 
-  report-to-testiny:
-    name: Upload test report to Testiny
+  report:
+    name: Report test results
     if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     needs: e2e_tests
@@ -44,7 +44,27 @@ jobs:
           artifact-ids: ${{ needs.e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
 
+      - name: Extract test results
+        id: test-results
+        run: |
+          REPORT="apps/webapp/playwright-report/report.json"
+          if [ ! -f "$REPORT" ]; then
+            echo "::error::Report file not found at $REPORT"
+            exit 1
+          fi
+          PASSED=$(jq '.stats.expected' "$REPORT")
+          FAILED=$(jq '.stats.unexpected' "$REPORT")
+          SKIPPED=$(jq '.stats.skipped' "$REPORT")
+          FLAKY=$(jq '.stats.flaky' "$REPORT")
+          TOTAL=$((PASSED + FAILED + SKIPPED + FLAKY))
+          echo "passed=$PASSED" >> $GITHUB_OUTPUT
+          echo "failed=$FAILED" >> $GITHUB_OUTPUT
+          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
+          echo "flaky=$FLAKY" >> $GITHUB_OUTPUT
+          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+
       - name: Upload report to Testiny
+        continue-on-error: true
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
           TESTINY_TEST_PLAN_ID: 105 # 105 is the id of the "Regression" test plan within Testiny
@@ -56,3 +76,16 @@ jobs:
           --testPlanId="$TESTINY_TEST_PLAN_ID" \
           --description="$DESCRIPTION" \
           --reportPath="./apps/webapp/playwright-report/report.json"
+
+      - name: Notify on Wire about failed tests
+        if: ${{ !cancelled() && steps.test-results.outputs.failed > 0 }}
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
+        with:
+          status: custom
+          custom_payload: |
+            {
+              "text": "❌ Web E2E Tests failed ❌\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*Report:* ${{ needs.e2e_tests.outputs.reportUrl }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
