@@ -269,6 +269,7 @@ describe('EventRepository', () => {
 
       mockAccount = {
         listen: jest.fn().mockResolvedValue(jest.fn()),
+        isWebsocketHealthy: jest.fn().mockResolvedValue(true),
       };
 
       // Mock window event listeners
@@ -304,14 +305,68 @@ describe('EventRepository', () => {
     });
 
     it('should setup visibilitychange listener in browser', async () => {
-      const originalIsElectron = (window as any).isElectron;
-      (window as any).isElectron = undefined;
+      const originalIsElectron = Reflect.get(window, 'isElectron');
+      Reflect.set(window, 'isElectron', undefined);
 
       await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
 
       expect(document.addEventListener).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
 
-      (window as any).isElectron = originalIsElectron;
+      Reflect.set(window, 'isElectron', originalIsElectron);
+    });
+
+    it('should reconnect when visible and websocket is open but unhealthy', async () => {
+      const originalIsElectron = Reflect.get(window, 'isElectron');
+      Reflect.set(window, 'isElectron', undefined);
+      jest.spyOn(eventRepository, 'notificationHandlingState').mockReturnValue(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      mockAccount.isWebsocketHealthy.mockResolvedValueOnce(false);
+
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      const visibilityHandler = (document.addEventListener as jest.Mock).mock.calls.find(
+        ([eventName]) => eventName === 'visibilitychange',
+      )?.[1] as (() => void) | undefined;
+
+      Object.defineProperty(document, 'visibilityState', {
+        value: 'visible',
+        configurable: true,
+      });
+
+      expect(visibilityHandler).toBeDefined();
+      visibilityHandler?.();
+      await Promise.resolve();
+
+      expect(mockAccount.isWebsocketHealthy).toHaveBeenCalled();
+      expect(mockAccount.listen).toHaveBeenCalledTimes(2);
+
+      Reflect.set(window, 'isElectron', originalIsElectron);
+    });
+
+    it('should not reconnect when visible and websocket is open and healthy', async () => {
+      const originalIsElectron = Reflect.get(window, 'isElectron');
+      Reflect.set(window, 'isElectron', undefined);
+      jest.spyOn(eventRepository, 'notificationHandlingState').mockReturnValue(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
+      mockAccount.isWebsocketHealthy.mockResolvedValueOnce(true);
+
+      await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+
+      const visibilityHandler = (document.addEventListener as jest.Mock).mock.calls.find(
+        ([eventName]) => eventName === 'visibilitychange',
+      )?.[1] as (() => void) | undefined;
+
+      Object.defineProperty(document, 'visibilityState', {
+        value: 'visible',
+        configurable: true,
+      });
+
+      expect(visibilityHandler).toBeDefined();
+      visibilityHandler?.();
+      await Promise.resolve();
+
+      expect(mockAccount.isWebsocketHealthy).toHaveBeenCalled();
+      expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+
+      Reflect.set(window, 'isElectron', originalIsElectron);
     });
 
     it('should call account.listen with correct parameters', async () => {

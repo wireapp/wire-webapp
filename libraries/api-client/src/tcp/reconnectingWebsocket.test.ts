@@ -117,6 +117,45 @@ describe('ReconnectingWebsocket', () => {
     RWS.connect();
   });
 
+  it('closes an existing active socket before reconnecting', () => {
+    const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+    const RWS = createRWS(onReconnect);
+
+    const firstSocket = {
+      readyState: WEBSOCKET_STATE.OPEN,
+      close: jest.fn(),
+      send: jest.fn(),
+      reconnect: jest.fn(),
+      onmessage: undefined,
+      onerror: undefined,
+      onopen: undefined,
+      onclose: undefined,
+    };
+
+    const secondSocket = {
+      readyState: WEBSOCKET_STATE.CONNECTING,
+      close: jest.fn(),
+      send: jest.fn(),
+      reconnect: jest.fn(),
+      onmessage: undefined,
+      onerror: undefined,
+      onopen: undefined,
+      onclose: undefined,
+    };
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const getSocketSpy = jest.spyOn(RWS, 'getReconnectingWebsocket');
+    getSocketSpy.mockReturnValueOnce(firstSocket).mockReturnValueOnce(secondSocket);
+
+    RWS.connect();
+    RWS.connect();
+
+    expect(firstSocket.close).toHaveBeenCalledWith(1000, 'Reinitializing WebSocket connection');
+    expect(RWS['socket']).toBe(secondSocket);
+
+    RWS.disconnect();
+  });
+
   /**
    * Note that on a real interruption of the connection the ReconnectingWebsocket will not call "onClose" and "onOpen" again
    * but it will call "onReconnect" again. So this test checks at least the second call of "onReconnect".
@@ -178,7 +217,7 @@ describe('ReconnectingWebsocket', () => {
       RWS.setOnOpen(async () => {
         // Mock the socket to respond with pong
         const originalSend = RWS.send.bind(RWS);
-        RWS.send = jest.fn((message: any) => {
+        RWS.send = jest.fn((message: string | Uint8Array) => {
           originalSend(message);
           if (message === PingMessage.PING) {
             // Simulate pong response
@@ -249,7 +288,7 @@ describe('ReconnectingWebsocket', () => {
 
       RWS.setOnOpen(async () => {
         const originalSend = RWS.send.bind(RWS);
-        RWS.send = jest.fn((message: any) => {
+        RWS.send = jest.fn((message: string | Uint8Array) => {
           originalSend(message);
           if (message === PingMessage.PING) {
             // Simulate pong response after 200ms
@@ -285,7 +324,7 @@ describe('ReconnectingWebsocket', () => {
         const originalSend = RWS.send.bind(RWS);
         const clearTimeoutSpy = jest.spyOn(global, 'clearTimeout');
 
-        RWS.send = jest.fn((message: any) => {
+        RWS.send = jest.fn((message: string | Uint8Array) => {
           originalSend(message);
           if (message === PingMessage.PING) {
             setTimeout(() => {
@@ -700,7 +739,7 @@ describe('ReconnectingWebsocket', () => {
     it('cleans up resources even when socket does not exist', () => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect);
-      const cleanupSpy = jest.spyOn(RWS as any, 'cleanup');
+      const cleanupSpy = jest.spyOn(RWS, 'cleanup');
 
       RWS.disconnect();
 
@@ -753,17 +792,21 @@ describe('ReconnectingWebsocket', () => {
       RWS.connect();
     }, 2000);
 
-    it('closes socket after unanswered ping timeout', done => {
+    it('triggers reconnect after unanswered ping timeout', done => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect, {pingInterval: 100});
 
       RWS.setOnOpen(() => {
+        const reconnectSpy = jest.spyOn(RWS['socket']!, 'reconnect');
         RWS['hasUnansweredPing'] = true;
-        setTimeout(() => RWS['sendPing'](), 50);
+        setTimeout(() => {
+          RWS['sendPing']();
+          expect(reconnectSpy).toHaveBeenCalledTimes(1);
+          RWS.disconnect();
+        }, 50);
       });
 
-      RWS.setOnClose(event => {
-        expect(event.reason).toBe('Ping timeout');
+      RWS.setOnClose(() => {
         done();
       });
 

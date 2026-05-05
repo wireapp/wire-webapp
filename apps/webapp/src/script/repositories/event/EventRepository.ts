@@ -212,6 +212,7 @@ export class EventRepository {
     const cleanupHandlers: Array<() => void> = [];
     let actualDisconnect: () => void = () => {};
     let connectionInProgress = false;
+    let healthCheckInProgress = false;
 
     const connect = async () => {
       if (connectionInProgress) {
@@ -248,6 +249,38 @@ export class EventRepository {
       void connect();
     };
 
+    const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
+      if (!navigator.onLine) {
+        return;
+      }
+
+      const currentState = this.notificationHandlingState();
+      if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
+        this.logger.info(`${reason}: Connection is closed and app is online, attempting reconnection...`);
+        void connect();
+        return;
+      }
+
+      if (healthCheckInProgress) {
+        this.logger.info(`${reason}: Connection health check already in progress, skipping...`);
+        return;
+      }
+
+      healthCheckInProgress = true;
+      try {
+        const isHealthy = await account.isWebsocketHealthy();
+        if (!isHealthy) {
+          this.logger.warn(`${reason}: WebSocket appears unhealthy, reconnecting...`);
+          void connect();
+        }
+      } catch {
+        this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
+        void connect();
+      } finally {
+        healthCheckInProgress = false;
+      }
+    };
+
     const handleOffline = () => {
       this.logger.warn('Internet connection lost');
       actualDisconnect();
@@ -259,10 +292,7 @@ export class EventRepository {
       const handleFocus = () => {
         if (navigator.onLine) {
           this.logger.info('Window focused, verifying connection...');
-          const currentState = this.notificationHandlingState();
-          if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
-            handleOnline();
-          }
+          void verifyConnectionHealthAndReconnect('Focus');
         }
       };
 
@@ -273,10 +303,7 @@ export class EventRepository {
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible' && navigator.onLine) {
           this.logger.info('Tab became visible, verifying connection...');
-          const currentState = this.notificationHandlingState();
-          if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
-            handleOnline();
-          }
+          void verifyConnectionHealthAndReconnect('Visibility');
         }
       };
 
@@ -297,11 +324,7 @@ export class EventRepository {
 
     // Heartbeat to check connection state every 30 seconds
     const heartbeatInterval = window.setInterval(() => {
-      const currentState = this.notificationHandlingState();
-      if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED && navigator.onLine) {
-        this.logger.info('Heartbeat: Connection is closed and app is online, attempting reconnection...');
-        handleOnline();
-      }
+      void verifyConnectionHealthAndReconnect('Heartbeat');
     }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
 
     cleanupHandlers.push(() => {
