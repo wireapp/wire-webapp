@@ -50,10 +50,6 @@ export class DeleteAccountModal {
     return await this.deleteButton.isVisible();
   }
 
-  async clickCancel() {
-    await this.cancelButton.click();
-  }
-
   async clickDelete() {
     await this.deleteButton.click();
   }
