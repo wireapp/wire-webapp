@@ -53,7 +53,7 @@ test.describe('Authentication', () => {
       const pageManager = await PageManager.from(createPage(withLogin(createUser({disableTelemetry: false}))));
       const {modals} = pageManager.webapp;
 
-      await expect(modals.dataShareConsent().modalTitle).toBeVisible();
+      await expect(modals.confirm().modalTitle).toBeVisible();
     },
   );
 
