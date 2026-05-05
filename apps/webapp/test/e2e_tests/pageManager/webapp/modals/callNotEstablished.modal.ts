@@ -25,8 +25,4 @@ export class CallNotEstablishedModal extends AcknowledgeModal {
   constructor(page: Page) {
     super(page);
   }
-
-  async clickOk() {
-    await this.clickAction();
-  }
 }
