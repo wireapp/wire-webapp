@@ -33,8 +33,4 @@ export class DeleteAccountModal {
     this.deleteButton = this.modal.locator("[data-uie-name='do-action']");
     this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
   }
-
-  async clickDelete() {
-    await this.deleteButton.click();
-  }
 }
