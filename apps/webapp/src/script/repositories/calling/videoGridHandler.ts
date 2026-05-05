@@ -50,7 +50,7 @@ export function getGrid(call: Call | undefined) {
 }
 
 export function updateVideoGrid(call: Call | undefined, setGrid: Dispatch<SetStateAction<Grid>>) {
-  if (!call) {
+  if (call === undefined) {
     return;
   }
 
