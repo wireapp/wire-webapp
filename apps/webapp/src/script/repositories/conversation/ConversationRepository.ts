@@ -3097,9 +3097,6 @@ export class ConversationRepository {
     messageTimer: number | null,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
-    if (messageTimer === null) {
-      messageTimer = 0;
-    }
 
     const response = await this.conversationService.updateConversationMessageTimer(
       conversationEntity.qualifiedId,
