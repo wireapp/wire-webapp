@@ -117,7 +117,7 @@ jobs:
     with:
       env_name: ${{ needs.build.outputs.env_name }}
       backendUrl: https://staging-nginz-https.zinfra.io/
-      grep: '@crit-flow-web'
+      grep: ${{ case(github.base_ref == "master", "", "@crit-flow-web") }} # Run all E2E tests when attempting to merge to master
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
