@@ -46,10 +46,6 @@ export class DeleteAccountModal {
     return (await this.modalText.textContent()) ?? '';
   }
 
-  async isDeleteButtonVisible() {
-    return await this.deleteButton.isVisible();
-  }
-
   async clickDelete() {
     await this.deleteButton.click();
   }
