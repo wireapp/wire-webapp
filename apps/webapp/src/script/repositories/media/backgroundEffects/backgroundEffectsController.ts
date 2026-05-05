@@ -142,10 +142,16 @@ export class BackgroundEffectsController {
 
     return {
       outputTrack: outputTrack,
-      stop: async () => await this.stop(),
+      stop: async () => this.stop(),
     };
   }
 
+  /**
+   * In the old version, ending the effect was done centrally in the calling repository. Now we've tied ending the
+   * effect directly to the video track. This method is therefore no longer necessary. However, I'm leaving this
+   * method in to resolve any potential About errors. Sometimes the effect is started twice, in which case one needs
+   * to be stopped before starting again.
+   */
   public stop(): void {}
 
   public setMode(mode: EffectMode): void {
