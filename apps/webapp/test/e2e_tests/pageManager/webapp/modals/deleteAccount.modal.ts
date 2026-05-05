@@ -34,10 +34,6 @@ export class DeleteAccountModal {
     this.cancelButton = this.modal.locator("[data-uie-name='do-secondary']");
   }
 
-  async isModalPresent() {
-    return await this.modal.isVisible();
-  }
-
   async clickDelete() {
     await this.deleteButton.click();
   }
