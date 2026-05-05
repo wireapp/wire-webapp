@@ -184,7 +184,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
       'We will send you an email. Follow the link to delete your account permanently.',
     );
 
-    await modals.deleteAccount().clickDelete();
+    await modals.confirm().actionButton.click();
     const url = await api.inbucket.getAccountDeletionURL(userA.email);
 
     await pageManagerA.openNewTab(url, async tab => {
