@@ -43,6 +43,7 @@ jobs:
         with:
           artifact-ids: ${{ needs.e2e_tests.outputs.reportArtifactId }}
           path: apps/webapp/playwright-report
+          pattern: '**/report.json'
 
       - name: Extract test results
         id: test-results
