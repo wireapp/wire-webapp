@@ -327,7 +327,6 @@ test.describe('History Backup', () => {
     },
   );
 
-  // TODO: unskip this test once https://github.com/wireapp/wire-server/pull/5205 is merged
   // This test is currently broken due to the backend taking more than 10s to delete the conversation
   test.skip(
     'I should not see the deleted group after restore from the backup',
