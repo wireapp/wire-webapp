@@ -118,6 +118,10 @@ export class CallingPage {
 
   // ─── Mute Controls ──────────────────────────────────────────────────────
 
+  async toggleMute() {
+    await this.toggleMuteButton.click();
+  }
+
   async muteSelfInFullScreen() {
     return await this.fullScreenMuteButton.click();
   }
