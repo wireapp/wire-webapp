@@ -1640,6 +1640,9 @@ export class ConversationRepository {
     conversationEntity: Conversation,
   ): Promise<void> => {
     if (!isMLSConversation(conversationEntity)) {
+      this.logger.warn('Can not add other self user clients to non-MLS conversation', {
+        conversationId: conversationEntity.qualifiedId,
+      });
       return;
     }
 
@@ -1649,6 +1652,12 @@ export class ConversationRepository {
       this.logger.error('Self user qualified ID is not available for MLS invite-link join');
       throw new Error('Self user qualified ID is not available for MLS invite-link join');
     }
+
+    this.logger.info('Adding other self user clients to MLS conversation', {
+      conversationId: conversationEntity.qualifiedId,
+      groupId: conversationEntity.groupId,
+      qualifiedUsers: [selfUserQualifiedId],
+    });
 
     await this.core.service?.conversation?.addUsersToMLSConversation({
       conversationId: conversationEntity.qualifiedId,
