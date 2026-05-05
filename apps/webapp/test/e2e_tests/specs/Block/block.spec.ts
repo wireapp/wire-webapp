@@ -35,7 +35,7 @@ export async function blockUserFromConversationList(pageManager: PageManager, us
   const conversation = await pages.conversationList().getConversation(userToBlock.fullName).open();
   const contextMenu = await conversation.openContextMenu();
   await contextMenu.blockButton.click();
-  await modals.blockWarning().actionButton.click();
+  await modals.confirm().actionButton.click();
 }
 
 /**
@@ -47,7 +47,7 @@ export async function blockUserFromProfileView(pageManager: PageManager) {
   const {pages, modals} = pageManager.webapp;
   await pages.conversation().clickConversationInfoButton();
   await pages.participantDetails().blockUser();
-  await modals.blockWarning().actionButton.click();
+  await modals.confirm().actionButton.click();
 }
 
 /**
@@ -61,7 +61,7 @@ export async function blockUserFromOpenGroupProfileView(pageManager: PageManager
   await pages.conversation().clickConversationTitle();
   await pages.conversationDetails().openParticipantDetails(userToBlock.fullName);
   await pages.participantDetails().blockUser();
-  await modals.blockWarning().actionButton.click();
+  await modals.confirm().actionButton.click();
 }
 
 /* ==================================== */
@@ -101,7 +101,7 @@ test.describe('User Blocking', () => {
         // Step 3: User A opens modal and clicks 'Block' button
         await contextMenu.blockButton.click();
         // Step 4: User A clicks 'Cancel' button
-        await userAModals.blockWarning().cancelButton.click();
+        await userAModals.confirm().cancelButton.click();
         // Step 5: Conversation is still present, and User A can open it
         await conversation.open();
         // Step 6: User A still can send message to User B
@@ -135,7 +135,7 @@ test.describe('User Blocking', () => {
         // Step 3: User A clicks 'Block conversation' button
         await userAPages.conversationDetails().clickBlockConversationButton();
         // Step 4: User A clicks 'Confirm' button
-        await userAModals.blockWarning().actionButton.click();
+        await userAModals.confirm().actionButton.click();
         // Step 5: User A cannot send message to User B
         await conversation.open();
         await expect(userAPages.conversation().messageInput).not.toBeVisible();

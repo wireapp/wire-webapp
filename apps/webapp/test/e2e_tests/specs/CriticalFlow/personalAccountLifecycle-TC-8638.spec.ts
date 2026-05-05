@@ -121,13 +121,13 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     await expect(conversation).not.toContainText('Blocked');
     const contextMenu = await conversation.openContextMenu();
     await contextMenu.blockButton.click();
-    await expect(modals.blockWarning().modal).toBeVisible();
-    await expect(modals.blockWarning().modalTitle).toContainText(`Block ${userB.fullName}`);
-    await expect(modals.blockWarning().modalText).toContainText(
+    await expect(modals.confirm().modal).toBeVisible();
+    await expect(modals.confirm().modalTitle).toContainText(`Block ${userB.fullName}`);
+    await expect(modals.confirm().modalText).toContainText(
       `${userB.fullName} won’t be able to contact you or add you to group conversations.`,
     );
 
-    await modals.blockWarning().actionButton.click();
+    await modals.confirm().actionButton.click();
     await expect(conversation).toContainText('Blocked');
   });
 

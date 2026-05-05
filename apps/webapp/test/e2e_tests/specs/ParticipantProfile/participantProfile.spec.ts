@@ -152,7 +152,7 @@ test.describe('Participant Profile', () => {
       await test.step('User A blocks User C', async () => {
         await openParticipantDetailsFromGroup(pages, groupName, userC.fullName);
         await pages.participantDetails().blockUser();
-        await modals.blockWarning().actionButton.click();
+        await modals.confirm().actionButton.click();
       });
 
       await test.step('User C opens people popover', async () => {
