@@ -19,6 +19,7 @@
 
 import {CONVERSATION_TYPE, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
@@ -118,7 +119,7 @@ const createConversation = (
 const mockSafeEpoch = (core: Core) => {
   (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
     .fn()
-    .mockResolvedValue({isOk: false, isErr: true, error: new Error('mocked getSafeEpoch error')});
+    .mockResolvedValue(task.fromResult(result.ok(1)));
 };
 
 describe('joinConversationsAfterMigrationFinalisation', () => {

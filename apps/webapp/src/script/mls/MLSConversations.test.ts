@@ -48,8 +48,10 @@ function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYP
   return Array.from(new Array(nbConversations)).map(() => createMLSConversation(type));
 }
 
-function mockSafeEpoch(core: Account) {
-  core.service!.mls!.getSafeEpoch = jest.fn().mockResolvedValue(task.fromResult(result.ok(1)));
+function mockSafeEpoch(core: {service?: Core['service']}) {
+  (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
+    .fn()
+    .mockResolvedValue(task.fromResult(result.ok(1)));
 }
 
 describe('MLSConversations', () => {
