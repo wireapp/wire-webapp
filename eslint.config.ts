@@ -165,6 +165,7 @@ const config: Linter.Config[] = [
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/strict-boolean-expressions': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -214,6 +215,12 @@ const config: Linter.Config[] = [
     rules: {
       'no-magic-numbers': 'off',
       'id-length': 'off',
+    },
+  },
+  {
+    files: ['apps/webapp/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': 'off',
     },
   },
 ];

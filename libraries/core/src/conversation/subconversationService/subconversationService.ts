@@ -131,7 +131,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     this.logger.info('Leaving conference subconversation', {conversationId});
     const subconversationGroupId = await this.getSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
 
-    if (!subconversationGroupId) {
+    if (subconversationGroupId === undefined || subconversationGroupId.length === 0) {
       this.logger.warn('No subconversation groupId found when leaving conference subconversation', {conversationId});
       return;
     }
@@ -202,7 +202,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     );
 
     // this method should not be called if the subconversation (and its parent conversation) is not established
-    if (!subconversationGroupId) {
+    if (subconversationGroupId === undefined || subconversationGroupId.length === 0) {
       this.logger.error('Could not obtain epoch info for conference subconversation: missing groupId', {
         parentConversationId,
       });
@@ -333,7 +333,7 @@ export class SubconversationService extends TypedEventEmitter<Events> {
     });
     const subconversationGroupId = await this.getSubconversationGroupId(conversationId, SUBCONVERSATION_ID.CONFERENCE);
 
-    if (!subconversationGroupId) {
+    if (subconversationGroupId === undefined || subconversationGroupId.length === 0) {
       this.logger.warn('Cannot remove client: subconversation groupId missing', {conversationId});
       return;
     }

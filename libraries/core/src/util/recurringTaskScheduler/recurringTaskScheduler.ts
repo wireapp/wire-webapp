@@ -44,7 +44,7 @@ export class RecurringTaskScheduler {
     key,
     addTaskOnWindowFocusEvent = false,
   }: TaskParams): Promise<void> => {
-    const firingDate = (await this.storage.get(key)) || Date.now() + every;
+    const firingDate = (await this.storage.get(key)) ?? Date.now() + every;
     await this.storage.set(key, firingDate);
 
     const taskConfig = {
@@ -70,7 +70,7 @@ export class RecurringTaskScheduler {
 
     // If the task should be added on window focus event, we add it here
 
-    if (addTaskOnWindowFocusEvent && typeof window !== 'undefined') {
+    if (addTaskOnWindowFocusEvent === true && typeof window !== 'undefined') {
       window.addEventListener('focus', taskConfig.task);
     }
   };
@@ -82,6 +82,6 @@ export class RecurringTaskScheduler {
   };
 
   public readonly hasTask = async (taskKey: string): Promise<boolean> => {
-    return !!(await this.storage.get(taskKey));
+    return (await this.storage.get(taskKey)) !== undefined;
   };
 }

@@ -217,7 +217,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       switch (mlsDeviceStatus) {
         case MLSDeviceStatus.REGISTERED:
-          if (!skipInitIdentity) {
+          if (skipInitIdentity !== true) {
             await this.verifyRemoteMLSKeyPackagesAmount(client.id);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
@@ -228,7 +228,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           this.emit(MLSServiceEvents.MLS_CLIENT_MISMATCH);
           break;
         case MLSDeviceStatus.FRESH:
-          if (!skipInitIdentity) {
+          if (skipInitIdentity !== true) {
             await this.uploadMLSPublicKeys(client);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
@@ -379,7 +379,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const clientIdParts = fullClientId?.split(':');
       const groupClientId = clientIdParts?.[1];
 
-      if (groupClientId) {
+      if (groupClientId !== undefined && groupClientId.length > 0) {
         currentClientIdsInGroup.push(groupClientId);
       }
     }
@@ -483,7 +483,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
 
       this.logger.info('welcome bundle after joining via external commit');
-      if (welcomeBundle.id) {
+      if (welcomeBundle.id !== undefined) {
         //after we've successfully joined via external commit, we schedule periodic key material renewal
         const groupIdStr = Encoder.toBase64(welcomeBundle.id.copyBytes()).asString;
         const newEpoch = await this.getEpoch(groupIdStr);
@@ -600,7 +600,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     let externalSenders: ExternalSenderKey[] = [];
-    if (parentGroupId) {
+    if (parentGroupId !== undefined && parentGroupId.length > 0) {
       const parentGroupIdBytes = Decoder.fromBase64(parentGroupId).asBytes;
       externalSenders = [
         new ExternalSenderKey(await this.coreCryptoClient.getExternalSender(new ConversationId(parentGroupIdBytes))),
@@ -609,7 +609,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const ciphersuiteSignature = getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite);
       const removalKeyForSignature =
         removalKeyFor1to1Signature?.[ciphersuiteSignature] ?? mlsPublicRemovalKeys[ciphersuiteSignature];
-      if (!removalKeyForSignature) {
+      if (removalKeyForSignature === undefined || removalKeyForSignature.length === 0) {
         throw new Error(
           `Cannot create conversation: No backend removal key found for the signature ${ciphersuiteSignature}`,
         );
@@ -943,7 +943,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private async getCCClientSignatureString(): Promise<string> {
     const credentialType = await this.getCredentialType();
     const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.defaultCiphersuite, credentialType);
-    if (!publicKey) {
+    if (publicKey === undefined) {
       throw new Error('No public key found for client');
     }
     return btoa(Converter.arrayBufferViewToBaselineString(publicKey));
@@ -1143,9 +1143,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupId = await groupIdFromConversationId(qualifiedConversationId, event.subconv);
 
     // We should not receive a message for a group the client is not aware of
-    if (!groupId) {
+    if (groupId === undefined || groupId.length === 0) {
       throw new Error(
-        `Could not find a group_id for conversation ${qualifiedConversationId.id}@${qualifiedConversationId.domain}${event.subconv ? `/subconversation:${event.subconv}` : ''}`,
+        `Could not find a group_id for conversation ${qualifiedConversationId.id}@${qualifiedConversationId.domain}${
+          event.subconv !== undefined ? `/subconversation:${event.subconv}` : ''
+        }`,
       );
     }
 

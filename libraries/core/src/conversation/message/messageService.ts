@@ -77,11 +77,12 @@ export class MessageService {
     try {
       return await send(encryptionResults);
     } catch (error: unknown) {
-      if (!this.isClientMismatchError(error)) {
+      if (this.isClientMismatchError(error) === false) {
         throw error;
       }
       const mismatch = error.response!.data as MessageSendingStatus;
-      const shouldStopSending = options.onClientMismatch && (await options.onClientMismatch(mismatch)) === false;
+      const shouldStopSending =
+        options.onClientMismatch !== undefined && (await options.onClientMismatch(mismatch)) === false;
       if (shouldStopSending) {
         return {...mismatch, canceled: true};
       }
@@ -132,11 +133,11 @@ export class MessageService {
       nativePush: options.nativePush,
     });
 
-    if (options.assetData) {
+    if (options.assetData !== undefined) {
       protoMessage.blob = options.assetData;
     }
 
-    if (options.reportMissing) {
+    if (options.reportMissing !== undefined && options.reportMissing !== false) {
       if (isQualifiedIdArray(options.reportMissing)) {
         protoMessage.reportOnly = {userIds: options.reportMissing};
       } else {
@@ -146,7 +147,7 @@ export class MessageService {
       protoMessage.ignoreAll = true;
     }
 
-    if (!options.conversationId) {
+    if (options.conversationId === undefined) {
       return this.apiClient.api.broadcast.postBroadcastMessage(sendingClientId, protoMessage);
     }
 

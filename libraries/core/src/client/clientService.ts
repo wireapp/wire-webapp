@@ -74,7 +74,7 @@ export class ClientService {
    * @param password? Password of the owning user. Can be omitted for temporary devices
    */
   public async deleteClient(clientId: string, password?: string): Promise<unknown> {
-    const userId: QualifiedId = {id: this.apiClient.userId as string, domain: this.apiClient.domain || ''};
+    const userId: QualifiedId = {id: this.apiClient.userId as string, domain: this.apiClient.domain ?? ''};
     await this.backend.deleteClient(clientId, password);
     return this.database.deleteClient(this.proteusService.constructSessionId(userId, clientId));
   }
@@ -85,7 +85,7 @@ export class ClientService {
    */
   public async deleteLocalClient(password?: string): Promise<string> {
     const localClientId = this.apiClient.context?.clientId;
-    if (!localClientId) {
+    if (localClientId === undefined || localClientId.length === 0) {
       // No client in context -> there's nothing to delete on backend, just drop local state
       this.logger.warn('No local client id in context; deleting local client data from DB only.');
       return this.database.deleteLocalClient();
@@ -117,7 +117,7 @@ export class ClientService {
   public async loadClient(): Promise<MetaClient | undefined> {
     const loadedClient = await this.getLocalClient();
 
-    if (!loadedClient) {
+    if (loadedClient === undefined) {
       return undefined;
     }
 
@@ -126,7 +126,7 @@ export class ClientService {
       return this.database.updateLocalClient(remoteClient);
     } catch (error: unknown) {
       const notFoundOnBackend = axios.isAxiosError(error) ? error.response?.status === StatusCodes.NOT_FOUND : false;
-      if (notFoundOnBackend && this.storeEngine) {
+      if (notFoundOnBackend && this.storeEngine !== undefined) {
         const shouldDeleteWholeDatabase = loadedClient.type === ClientType.TEMPORARY;
         await this.proteusService.wipe();
         if (shouldDeleteWholeDatabase) {
@@ -188,7 +188,7 @@ export class ClientService {
       lastkey: lastPrekey,
       location: clientInfo.location,
       model: clientInfo.model,
-      password: loginData.password ? String(loginData.password) : undefined,
+      password: loginData.password !== undefined ? String(loginData.password) : undefined,
       verification_code: loginData.verificationCode,
       prekeys: prekeys,
       type: loginData.clientType,

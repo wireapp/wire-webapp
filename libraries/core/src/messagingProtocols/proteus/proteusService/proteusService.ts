@@ -97,7 +97,7 @@ export class ProteusService {
   }
 
   public async initClient(context: Context) {
-    if (context.domain) {
+    if (context.domain !== undefined && context.domain.length > 0) {
       // We want sessions to be fully qualified from now on
       if (!cryptoMigrationStore.qualifiedSessions.isReady(this.dbName)) {
         this.logger.info(`Migrating existing session ids to qualified ids.`);
@@ -267,7 +267,7 @@ export class ProteusService {
       onClientMismatch: mismatch => onClientMismatch?.(mismatch, false),
     });
 
-    if (!response.canceled) {
+    if (response.canceled !== true) {
       if (!isClearFromMismatch(response)) {
         // We warn the consumer that there is a mismatch that did not prevent message sending
         await onClientMismatch?.(response, true);
@@ -275,10 +275,10 @@ export class ProteusService {
       this.logger.log(`Successfully sent Proteus message to conversation '${conversationId.id}'`);
     }
 
-    const sendingState = response.canceled ? MessageSendingState.CANCELED : MessageSendingState.OUTGOING_SENT;
+    const sendingState = response.canceled === true ? MessageSendingState.CANCELED : MessageSendingState.OUTGOING_SENT;
 
     const failedToSend =
-      response.failed || Object.keys(response.failed_to_confirm_clients ?? {}).length > 0
+      response.failed !== undefined || Object.keys(response.failed_to_confirm_clients ?? {}).length > 0
         ? {
             queued: response.failed_to_confirm_clients,
             failed: response.failed,

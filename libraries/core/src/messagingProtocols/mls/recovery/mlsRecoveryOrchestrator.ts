@@ -196,7 +196,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
       const policy = this.getPolicyFor(normalizedError, context);
       this.logger.info(`Resolved recovery policy: action=${policy.action}`, {policy});
 
-      if (policy.action === 'Unknown' || !retry) {
+      if (policy.action === 'Unknown' || retry === false) {
         this.logger.info('No recovery action configured or retry disabled, re-throwing original error');
         throw rawError;
       }
@@ -205,7 +205,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
       await this.performRecovery(context, normalizedError, policy, key);
       await this.maybeDelay(policy.retryConfig);
 
-      if (policy.retryConfig.reRunOriginalOperation) {
+      if (policy.retryConfig.reRunOriginalOperation === true) {
         this.logger.info(`Re-running original operation after recovery for key ${key}`);
         return this.execute({context, callBack, retry: false});
       }
@@ -260,10 +260,10 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
       case 'AddMissingUsers': {
         const groupId = context.groupId;
         const missing = err.context?.missingUsers;
-        if (!missing || missing.length === 0) {
+        if (missing === undefined || missing.length === 0) {
           throw new Error('No missing users reported in error context for AddMissingUsers');
         }
-        if (!groupId) {
+        if (groupId === undefined || groupId.length === 0) {
           throw new Error('Missing groupId for AddMissingUsers');
         }
         await this.runOnceWithKey(recoveryKey, () => this.deps.addMissingUsers(id, groupId, missing));
@@ -272,7 +272,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
       case 'WipeAndReprocessWelcome': {
         // We rely on either the operation context groupId (preferred) or any mapped error context
         const groupId = context.groupId ?? err.context?.groupId;
-        if (!groupId) {
+        if (groupId === undefined || groupId.length === 0) {
           this.logger.warn('Could not determine groupId for WipeAndReprocessWelcome; skipping wipe');
           break;
         }
@@ -320,7 +320,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
 
   /** Optionally wait before re-invoking the original operation. */
   private async maybeDelay(retry: RetryPolicy): Promise<void> {
-    if (retry.delayMs) {
+    if (retry.delayMs !== undefined && retry.delayMs > 0) {
       this.logger.info(`Waiting for ${retry.delayMs}ms before retrying original operation`);
       await this.sleep(retry.delayMs);
     }

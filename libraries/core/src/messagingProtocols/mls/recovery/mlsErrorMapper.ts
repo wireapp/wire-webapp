@@ -112,7 +112,7 @@ export class ChainedMlsErrorMapper implements MlsErrorMapper {
     for (const handler of this.handlers) {
       if (handler.canHandle(error, context)) {
         const mapped = handler.map(error, context);
-        if (mapped) {
+        if (mapped !== undefined) {
           return mapped;
         }
       }
@@ -241,7 +241,7 @@ function tryExtractGroupIdFromCoreCryptoError(err: ConversationAlreadyExistsErro
   try {
     // core-crypto error.context?.context?.conversationId is a byte array (number[])
     const conversationIdArray = err?.context?.context?.conversationId;
-    if (!conversationIdArray) {
+    if (conversationIdArray === undefined) {
       return undefined;
     }
     return Encoder.toBase64(new Uint8Array(conversationIdArray)).asString;

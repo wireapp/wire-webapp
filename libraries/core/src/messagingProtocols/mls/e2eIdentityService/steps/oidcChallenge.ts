@@ -39,14 +39,14 @@ export const doWireOidcChallenge = async ({
   oAuthIdToken,
 }: DoWireOidcChallengeParams) => {
   const {oidcChallenge} = authData.authorization;
-  if (!oidcChallenge) {
+  if (oidcChallenge === undefined) {
     throw new Error('No wireOIDCChallenge defined');
   }
 
   const reqBody = await identity.newOidcChallengeRequest(oAuthIdToken, nonce);
 
   const oidcChallengeResponse = await connection.validateOidcChallenge(oidcChallenge.url, reqBody);
-  if (!oidcChallengeResponse) {
+  if (oidcChallengeResponse === undefined) {
     throw new Error('No response received while validating OIDC challenge');
   }
   await identity.newOidcChallengeResponse(

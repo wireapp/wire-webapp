@@ -287,7 +287,7 @@ export class Account extends TypedEventEmitter<Events> {
       throw new Error('Client has not been initialized - please login first');
     }
 
-    if (!this.service?.mls?.isEnabled || !this.service?.e2eIdentity) {
+    if (this.service?.mls?.isEnabled !== true || this.service?.e2eIdentity === undefined) {
       throw new Error('MLS not initialized, unable to enroll E2EI');
     }
 
@@ -446,7 +446,7 @@ export class Account extends TypedEventEmitter<Events> {
       },
     };
 
-    if (this.options.coreCryptoConfig?.enabled) {
+    if (this.options.coreCryptoConfig?.enabled === true) {
       const {buildClient} = await import('./messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper');
       const client = await buildClient(
         storeEngine,
@@ -572,9 +572,9 @@ export class Account extends TypedEventEmitter<Events> {
     this.db?.close();
     this.encryptedDb?.close();
 
-    if (data?.clearAllData) {
+    if (data?.clearAllData === true) {
       await this.wipeAllData();
-    } else if (data?.clearCryptoData) {
+    } else if (data?.clearCryptoData === true) {
       await this.wipeCryptoData();
     }
 
@@ -648,7 +648,7 @@ export class Account extends TypedEventEmitter<Events> {
    * return true if the current user has a MLS device that is initialized and ready to use
    */
   public get hasMLSDevice(): boolean {
-    return !!this.service?.mls?.isEnabled;
+    return this.service?.mls?.isEnabled === true;
   }
 
   /**
@@ -867,7 +867,7 @@ export class Account extends TypedEventEmitter<Events> {
             this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`);
             this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
-            if (notificationTime) {
+            if (notificationTime !== null && notificationTime.length > 0) {
               onNotificationStreamProgress(notificationTime);
             }
 
@@ -976,7 +976,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       const firstEventPayload = notification.data.event.payload[0];
       const notificationTime = firstEventPayload ? this.getNotificationEventTime(firstEventPayload) : null;
-      if (this.connectionState !== ConnectionState.LIVE && notificationTime) {
+      if (this.connectionState !== ConnectionState.LIVE && notificationTime !== null && notificationTime.length > 0) {
         onNotificationStreamProgress(notificationTime);
       }
 
@@ -1140,7 +1140,7 @@ export class Account extends TypedEventEmitter<Events> {
         }
       }
 
-      if (connectionState) {
+      if (connectionState !== undefined) {
         onConnectionStateChanged(connectionState);
       }
     });
@@ -1172,7 +1172,7 @@ export class Account extends TypedEventEmitter<Events> {
     const localStorageKey = 'has_missing_notification';
 
     // First-time handling: set flag and reload to trigger full re-fetch of state.
-    if (!AccountLocalStorageStore.has(localStorageKey)) {
+    if (AccountLocalStorageStore.has(localStorageKey) === false) {
       this.logger.info('First missed notification detected, reloading to recover state');
       AccountLocalStorageStore.add(localStorageKey, 'true');
       window.location.reload();
@@ -1241,7 +1241,7 @@ export class Account extends TypedEventEmitter<Events> {
     conversationId: QualifiedId,
     subconversationId?: SUBCONVERSATION_ID,
   ): Promise<string | undefined> => {
-    if (!subconversationId) {
+    if (subconversationId === undefined) {
       return this.coreCallbacks?.groupIdFromConversationId(conversationId);
     }
 
@@ -1250,7 +1250,7 @@ export class Account extends TypedEventEmitter<Events> {
 
   public isMLSActiveForClient = async (): Promise<boolean> => {
     // Check for CoreCrypto library, it is required for MLS
-    if (!this.options.coreCryptoConfig?.enabled) {
+    if (this.options.coreCryptoConfig?.enabled !== true) {
       return false;
     }
 

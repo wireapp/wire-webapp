@@ -97,7 +97,7 @@ export class ReconnectingWebsocket {
   ) {
     this.logger = LogFactory.getLogger('@wireapp/api-client/tcp/ReconnectingWebsocket');
 
-    if (options.pingInterval) {
+    if (options.pingInterval !== undefined) {
       this.PING_INTERVAL = options.pingInterval;
     }
 
