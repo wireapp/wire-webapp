@@ -249,43 +249,34 @@ export class EventRepository {
       void connect();
     };
 
-    const isNetworkAvailable = (): boolean => navigator.onLine;
-
-    const isConnectionClosed = (): boolean => this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED;
-
-    const shouldSkipHealthCheck = (): boolean => healthCheckInProgress;
-
-    const probeWebSocketHealth = async (reason: 'Focus' | 'Visibility' | 'Heartbeat'): Promise<boolean> => {
-      try {
-        return await account.isWebsocketHealthy();
-      } catch {
-        this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
-        return false;
-      }
-    };
-
     const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
-      if (!isNetworkAvailable()) {
+      if (!navigator.onLine) {
         return;
       }
 
-      if (isConnectionClosed()) {
+      if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED) {
         this.logger.info(`${reason}: Connection is closed and app is online, attempting reconnection...`);
-        void connect();
+        await connect();
         return;
       }
 
-      if (shouldSkipHealthCheck()) {
+      if (healthCheckInProgress) {
         this.logger.info(`${reason}: Connection health check already in progress, skipping...`);
         return;
       }
 
       healthCheckInProgress = true;
       try {
-        const isHealthy = await probeWebSocketHealth(reason);
+        let isHealthy: boolean;
+        try {
+          isHealthy = await account.isWebsocketHealthy();
+        } catch {
+          this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
+          isHealthy = false;
+        }
         if (!isHealthy) {
           this.logger.warn(`${reason}: WebSocket appears unhealthy, reconnecting...`);
-          void connect();
+          await connect();
         }
       } finally {
         healthCheckInProgress = false;
