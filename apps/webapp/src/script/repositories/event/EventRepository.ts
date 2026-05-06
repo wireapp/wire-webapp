@@ -213,6 +213,7 @@ export class EventRepository {
     let actualDisconnect: () => void = () => {};
     let connectionInProgress = false;
     let healthCheckInProgress = false;
+    let currentConnectionState: ConnectionState | undefined;
 
     const connect = async () => {
       if (connectionInProgress) {
@@ -226,6 +227,7 @@ export class EventRepository {
         actualDisconnect = await account.listen({
           useLegacy,
           onConnectionStateChanged: connectionState => {
+            currentConnectionState = connectionState;
             this.updateConnectivityStatus(connectionState);
           },
           onEvent: this.handleIncomingEvent,
@@ -251,6 +253,19 @@ export class EventRepository {
 
     const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
       if (!navigator.onLine) {
+        return;
+      }
+
+      if (connectionInProgress) {
+        this.logger.info(`${reason}: Reconnection already in progress, skipping health verification...`);
+        return;
+      }
+
+      const isTransitioningConnectionState =
+        currentConnectionState === ConnectionState.CONNECTING ||
+        currentConnectionState === ConnectionState.PROCESSING_NOTIFICATIONS;
+      if (isTransitioningConnectionState) {
+        this.logger.info(`${reason}: Connection is transitioning, skipping health verification...`);
         return;
       }
 

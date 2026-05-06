@@ -286,7 +286,17 @@ export class ReconnectingWebsocket {
    */
   public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * 10): Promise<boolean> {
     const state = this.getState();
-    if (!this.socket || state !== WEBSOCKET_STATE.OPEN) {
+    if (is.undefined(this.socket)) {
+      this.logger.debug('Health check failed — socket instance does not exist');
+      return Promise.resolve(false);
+    }
+
+    if (state === WEBSOCKET_STATE.CONNECTING || state === WEBSOCKET_STATE.CLOSING) {
+      this.logger.debug(`Health check skipped — socket is transitioning (state: ${WEBSOCKET_STATE[state]})`);
+      return Promise.resolve(true);
+    }
+
+    if (state !== WEBSOCKET_STATE.OPEN) {
       this.logger.debug(`Health check skipped — socket not OPEN (state: ${WEBSOCKET_STATE[state]})`);
       return Promise.resolve(false);
     }
