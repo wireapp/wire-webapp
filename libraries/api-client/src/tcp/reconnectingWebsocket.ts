@@ -221,23 +221,46 @@ export class ReconnectingWebsocket {
     this.logger.info('Initializing WebSocket connection');
     this.resetLongRunningRetrySequence();
 
-    if (this.socket && this.socket.readyState !== WEBSOCKET_STATE.CLOSED) {
+    if (!is.undefined(this.socket) && this.socket.readyState !== WEBSOCKET_STATE.CLOSED) {
       this.logger.warn(
         `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[this.socket.readyState]} (${this.socket.readyState}); closing it before reconnecting`,
       );
+      const oldSocket = this.socket;
+      // Detach all handlers from the old socket before closing to prevent stale async events
+      // from triggering handlers on the new socket instance
+      oldSocket.onmessage = null;
+      oldSocket.onerror = null;
+      oldSocket.onopen = null;
+      oldSocket.onclose = null;
       try {
-        this.socket.close(CloseEventCode.NORMAL_CLOSURE, 'Reinitializing WebSocket connection');
+        oldSocket.close(CloseEventCode.NORMAL_CLOSURE, 'Reinitializing WebSocket connection');
       } catch (error) {
         this.logger.warn('Failed to close existing WebSocket instance before reconnecting', error);
       }
     }
 
     this.stopPinging();
-    this.socket = this.getReconnectingWebsocket();
-    this.socket.onmessage = this.internalOnMessage;
-    this.socket.onerror = this.internalOnError;
-    this.socket.onopen = this.internalOnOpen;
-    this.socket.onclose = this.internalOnClose;
+    const nextSocket = this.getReconnectingWebsocket();
+    this.socket = nextSocket;
+    this.bindSocketHandlers(nextSocket);
+  }
+
+  private bindSocketHandlers(socket: RWS): void {
+    socket.onmessage = this.runIfActiveSocket(socket, this.internalOnMessage);
+    socket.onerror = this.runIfActiveSocket(socket, this.internalOnError);
+    socket.onopen = this.runIfActiveSocket(socket, this.internalOnOpen);
+    socket.onclose = this.runIfActiveSocket(socket, this.internalOnClose);
+  }
+
+  // Ignore late async events emitted by a previously replaced socket instance.
+  // This prevents stale callbacks from mutating state that now belongs to a newer socket.
+  private runIfActiveSocket<T>(socket: RWS, handler: (event: T) => void): (event: T) => void {
+    return event => {
+      if (this.socket !== socket) {
+        return;
+      }
+      handler(event);
+    };
   }
 
   public send(message: any): void {

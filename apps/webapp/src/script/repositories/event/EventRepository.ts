@@ -249,33 +249,44 @@ export class EventRepository {
       void connect();
     };
 
+    const isNetworkAvailable = (): boolean => navigator.onLine;
+
+    const isConnectionClosed = (): boolean => this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED;
+
+    const shouldSkipHealthCheck = (): boolean => healthCheckInProgress;
+
+    const probeWebSocketHealth = async (reason: 'Focus' | 'Visibility' | 'Heartbeat'): Promise<boolean> => {
+      try {
+        return await account.isWebsocketHealthy();
+      } catch {
+        this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
+        return false;
+      }
+    };
+
     const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
-      if (!navigator.onLine) {
+      if (!isNetworkAvailable()) {
         return;
       }
 
-      const currentState = this.notificationHandlingState();
-      if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
+      if (isConnectionClosed()) {
         this.logger.info(`${reason}: Connection is closed and app is online, attempting reconnection...`);
         void connect();
         return;
       }
 
-      if (healthCheckInProgress) {
+      if (shouldSkipHealthCheck()) {
         this.logger.info(`${reason}: Connection health check already in progress, skipping...`);
         return;
       }
 
       healthCheckInProgress = true;
       try {
-        const isHealthy = await account.isWebsocketHealthy();
+        const isHealthy = await probeWebSocketHealth(reason);
         if (!isHealthy) {
           this.logger.warn(`${reason}: WebSocket appears unhealthy, reconnecting...`);
           void connect();
         }
-      } catch {
-        this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
-        void connect();
       } finally {
         healthCheckInProgress = false;
       }
@@ -322,7 +333,8 @@ export class EventRepository {
       window.removeEventListener('offline', handleOffline);
     });
 
-    // Heartbeat to check connection state every 30 seconds
+    // Heartbeat intentionally verifies connection health while online, even when the
+    // connection is not CLOSED, to detect stale "open-but-unhealthy" websocket states.
     const heartbeatInterval = window.setInterval(() => {
       void verifyConnectionHealthAndReconnect('Heartbeat');
     }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);

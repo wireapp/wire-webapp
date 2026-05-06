@@ -21,6 +21,7 @@ import {BackendEvent, CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/
 import {ConnectionState} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
+import {Runtime} from '@wireapp/commons';
 
 import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
 import {Warnings} from '../../view_model/WarningsContainer';
@@ -305,19 +306,15 @@ describe('EventRepository', () => {
     });
 
     it('should setup visibilitychange listener in browser', async () => {
-      const originalIsElectron = Reflect.get(window, 'isElectron');
-      Reflect.set(window, 'isElectron', undefined);
+      jest.spyOn(Runtime, 'isElectron').mockReturnValue(false);
 
       await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
 
       expect(document.addEventListener).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
-
-      Reflect.set(window, 'isElectron', originalIsElectron);
     });
 
     it('should reconnect when visible and websocket is open but unhealthy', async () => {
-      const originalIsElectron = Reflect.get(window, 'isElectron');
-      Reflect.set(window, 'isElectron', undefined);
+      jest.spyOn(Runtime, 'isElectron').mockReturnValue(false);
       jest.spyOn(eventRepository, 'notificationHandlingState').mockReturnValue(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       mockAccount.isWebsocketHealthy.mockResolvedValueOnce(false);
 
@@ -337,14 +334,11 @@ describe('EventRepository', () => {
       await Promise.resolve();
 
       expect(mockAccount.isWebsocketHealthy).toHaveBeenCalled();
-      expect(mockAccount.listen).toHaveBeenCalledTimes(2);
-
-      Reflect.set(window, 'isElectron', originalIsElectron);
+      expect(mockAccount.listen).toHaveBeenCalledTimes(1);
     });
 
     it('should not reconnect when visible and websocket is open and healthy', async () => {
-      const originalIsElectron = Reflect.get(window, 'isElectron');
-      Reflect.set(window, 'isElectron', undefined);
+      jest.spyOn(Runtime, 'isElectron').mockReturnValue(false);
       jest.spyOn(eventRepository, 'notificationHandlingState').mockReturnValue(NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
       mockAccount.isWebsocketHealthy.mockResolvedValueOnce(true);
 
@@ -365,8 +359,6 @@ describe('EventRepository', () => {
 
       expect(mockAccount.isWebsocketHealthy).toHaveBeenCalled();
       expect(mockAccount.listen).toHaveBeenCalledTimes(1);
-
-      Reflect.set(window, 'isElectron', originalIsElectron);
     });
 
     it('should call account.listen with correct parameters', async () => {
