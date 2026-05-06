@@ -2267,6 +2267,16 @@ export class ConversationRepository {
     }
   };
 
+  private readonly getMLSService = (core: Account) => {
+    const mlsService = core.service?.mls;
+    if (!mlsService) {
+      const errorMessage = 'MLS service is not available!';
+      this.logger.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+    return mlsService;
+  };
+
   /**
    * Ensures that a conversation exists by checking its group ID and conversation ID.
    * If the conversation does not exist, it will try to establish it or join it by external commit.
@@ -2284,22 +2294,26 @@ export class ConversationRepository {
     core?: Account;
   }): Promise<void> => {
     const conversationExistsOnCoreCrypto = await this.conversationService.mlsGroupExistsLocally(groupId);
-    const coreCryptoEpochNumberResult = await core.service?.mls?.getSafeEpoch(groupId);
-    const coreCryptoEpochNumber = coreCryptoEpochNumberResult.isOk ? coreCryptoEpochNumberResult.value : undefined;
-
+    const coreCryptoEpochNumberResult = await this.getMLSService(core).getSafeEpoch(groupId);
     this.logger.info('Ensuring conversation exists', {
       conversationId,
       groupId,
-      coreCryptoEpochNumber,
+      coreCryptoEpochNumber: coreCryptoEpochNumberResult.mapOrElse(
+        error => error,
+        epoch => epoch,
+      ),
       conversationExistsOnCoreCrypto,
     });
 
-    if (coreCryptoEpochNumberResult.isErr) {
-      this.logger.warn(
-        'conversation existed on core crypto but there was an error when retrieving its epoch number',
-        coreCryptoEpochNumberResult.error,
-      );
-    }
+    const coreCryptoEpochNumber = coreCryptoEpochNumberResult.match({
+      Ok: epoch => {
+        return epoch;
+      },
+      Err: error => {
+        this.logger.warn('There was an error when retrieving the epoch number for the conversation', error);
+        throw new Error('Failed to get epoch number for conversation');
+      },
+    });
 
     if (conversationExistsOnCoreCrypto && coreCryptoEpochNumber > 0) {
       this.logger.info('Conversation is established and epoch is greater than 0, no action needed');
@@ -2318,6 +2332,12 @@ export class ConversationRepository {
     const remoteConversation = await this.conversationService.getConversationById(conversationId);
     const remoteEpoch = remoteConversation.epoch;
 
+    if (typeof remoteEpoch !== 'number') {
+      const errorMessage = 'Remote epoch is not a number';
+      this.logger.error(errorMessage, {remoteEpoch, remoteConversation});
+      throw new Error(errorMessage);
+    }
+
     // establish the conversation if remote epoch is 0
     if (remoteEpoch === 0) {
       this.logger.info('Establishing conversation as remote epoch is 0', {remoteEpoch});
@@ -2326,7 +2346,7 @@ export class ConversationRepository {
     }
 
     // join by external commit
-    if (remoteEpoch && remoteEpoch > 0) {
+    if (remoteEpoch > 0) {
       this.logger.info('Joining conversation by external commit', {remoteEpoch});
       await this.core.service?.conversation?.joinByExternalCommit(conversationId);
     }

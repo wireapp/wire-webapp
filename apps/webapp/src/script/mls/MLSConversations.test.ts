@@ -70,7 +70,11 @@ describe('MLSConversations', () => {
       const repositoryCore = (conversationRepository as any).core as Core;
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest
-        .spyOn((conversationRepository as any).conversationService, 'getConversationById')
+        .spyOn(
+          (conversationRepository as unknown as {conversationService: {getConversationById: jest.Mock}})
+            .conversationService,
+          'getConversationById',
+        )
         .mockResolvedValue({epoch: 1});
       mockSafeEpoch(repositoryCore);
       const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');

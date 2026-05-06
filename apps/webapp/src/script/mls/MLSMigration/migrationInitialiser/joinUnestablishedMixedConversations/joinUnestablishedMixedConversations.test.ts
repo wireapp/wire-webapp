@@ -60,7 +60,9 @@ describe('joinUnestablishedMixedConversations', () => {
       return Promise.resolve(!groupId.includes('unestablished'));
     });
 
-    (repositoryCore.service!.mls! as any).getSafeEpoch = jest.fn().mockResolvedValue({isOk: true, error: null});
+    (repositoryCore.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
+      .fn()
+      .mockResolvedValue({isOk: true, error: null});
 
     // Spy on joinByExternalCommit of the repository's core instance
     const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');

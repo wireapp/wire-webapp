@@ -116,7 +116,7 @@ const createConversation = (
 };
 
 const mockSafeEpoch = (core: Core) => {
-  (core.service!.mls! as any).getSafeEpoch = jest
+  (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
     .fn()
     .mockResolvedValue({isOk: false, isErr: true, error: new Error('mocked getSafeEpoch error')});
 };
