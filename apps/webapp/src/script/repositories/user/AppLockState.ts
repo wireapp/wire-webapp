@@ -43,19 +43,22 @@ export class AppLockState {
       () => teamState.isTeam() && teamState.teamFeatures()?.appLock?.status !== FEATURE_STATUS.ENABLED,
     );
 
-    this.isAppLockAvailable = ko.pureComputed(() =>
-      teamState.isTeam() ? teamState.teamFeatures()?.appLock?.status === FEATURE_STATUS.ENABLED : defaultEnabled,
-    );
+    this.isAppLockAvailable = ko.pureComputed(() => {
+      return teamState.isTeam() ? teamState.teamFeatures()?.appLock?.status === FEATURE_STATUS.ENABLED : defaultEnabled;
+    });
 
-    this.isAppLockEnforced = ko.pureComputed(
-      () =>
-        this.isAppLockAvailable() &&
-        (teamState.isTeam() ? teamState.teamFeatures()?.appLock?.config?.enforceAppLock : defaultEnforced),
-    );
+    this.isAppLockEnforced = ko.pureComputed(() => {
+      const appLockEnforced = teamState.isTeam()
+        ? (teamState.teamFeatures()?.appLock?.config?.enforceAppLock ?? false)
+        : defaultEnforced;
+      return this.isAppLockAvailable() && appLockEnforced;
+    });
 
-    this.appLockInactivityTimeoutSecs = ko.pureComputed(() =>
-      teamState.isTeam() ? teamState.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs : defaultTimeoutSecs,
-    );
+    this.appLockInactivityTimeoutSecs = ko.pureComputed(() => {
+      return teamState.isTeam()
+        ? (teamState.teamFeatures()?.appLock?.config?.inactivityTimeoutSecs ?? defaultTimeoutSecs)
+        : defaultTimeoutSecs;
+    });
 
     this.isAppLockActivated = ko.pureComputed(() => this.isAppLockEnabled() && this.hasPassphrase());
     this.hasPassphrase = ko.observable(false);

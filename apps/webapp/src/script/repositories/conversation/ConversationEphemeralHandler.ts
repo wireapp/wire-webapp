@@ -58,7 +58,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     };
   }
 
-  static validateTimer(messageTimer: number | null): number {
+  static validateTimer(messageTimer: number | null): number | null {
     const TIMER_RANGE = ConversationEphemeralHandler.CONFIG.TIMER_RANGE;
     const isTimerReset = messageTimer === null;
     return isTimerReset ? messageTimer : clamp(messageTimer, TIMER_RANGE.MIN, TIMER_RANGE.MAX);
@@ -82,8 +82,8 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     let updateIntervalId: number | null = null;
 
     this.timedMessagesSubscription = this.timedMessages.subscribe(messageEntities => {
-      const shouldClearInterval = messageEntities.length === 0 && updateIntervalId;
-      if (shouldClearInterval) {
+      const shouldClearInterval = messageEntities.length === 0;
+      if (shouldClearInterval && updateIntervalId !== null) {
         window.clearInterval(updateIntervalId);
         updateIntervalId = null;
         return this.logger.info('Cleared ephemeral message check interval');
@@ -129,7 +129,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
           ephemeral_started: Number(messageEntity.ephemeral_started()),
         };
 
-        this.eventService.updateEvent(messageEntity.primary_key, changes);
+        if (messageEntity.primary_key !== undefined) {
+          this.eventService.updateEvent(messageEntity.primary_key, changes);
+        }
         break;
       }
     }
@@ -170,6 +172,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
     messageEntity.ephemeral_expires(true);
 
     const assetEntity = messageEntity.getFirstAsset();
+    if (assetEntity === undefined) {
+      return;
+    }
     const changes: Pick<Partial<EventRecord>, 'data' | 'ephemeral_expires'> = {
       data: {
         content_type: assetEntity.file_type,
@@ -178,7 +183,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       ephemeral_expires: true,
     };
 
-    this.eventService.updateEvent(messageEntity.primary_key, changes);
+    if (messageEntity.primary_key !== undefined) {
+      this.eventService.updateEvent(messageEntity.primary_key, changes);
+    }
     this.logger.info(`Obfuscated asset message '${messageEntity.id}'`);
   }
 
@@ -197,7 +204,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       ephemeral_expires: true,
     };
 
-    this.eventService.updateEvent(messageEntity.primary_key, changes);
+    if (messageEntity.primary_key !== undefined) {
+      this.eventService.updateEvent(messageEntity.primary_key, changes);
+    }
     this.logger.info(`Obfuscated image message '${messageEntity.id}'`);
   }
 
@@ -245,7 +254,9 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
       ephemeral_expires: true,
     };
 
-    this.eventService.updateEvent(messageEntity.primary_key, changes);
+    if (messageEntity.primary_key !== undefined) {
+      this.eventService.updateEvent(messageEntity.primary_key, changes);
+    }
     this.logger.info(`Obfuscated text message '${messageEntity.id}'`);
   }
 

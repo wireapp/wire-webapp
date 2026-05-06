@@ -24,16 +24,20 @@ import {MessageCategory} from '../../../../message/MessageCategory';
 export type Category = 'images' | 'links' | 'files' | 'audio';
 
 export const isOfCategory = (category: Category, message: ContentMessage) => {
+  const messageCategory = message.category;
+  if (messageCategory === undefined) {
+    return false;
+  }
   switch (category) {
     case 'images':
-      return message.category & MessageCategory.IMAGE && !(message.category & MessageCategory.GIF);
+      return messageCategory & MessageCategory.IMAGE && !(messageCategory & MessageCategory.GIF);
     case 'links':
-      return message.category & MessageCategory.LINK_PREVIEW;
+      return messageCategory & MessageCategory.LINK_PREVIEW;
     case 'audio':
-      return message.category & MessageCategory.FILE && message.getFirstAsset()?.isAudio();
+      return messageCategory & MessageCategory.FILE && message.getFirstAsset()?.isAudio();
     case 'files':
       return (
-        message.category & MessageCategory.FILE &&
+        messageCategory & MessageCategory.FILE &&
         (message.getFirstAsset()?.isFile() || message.getFirstAsset()?.isVideo())
       );
     default:

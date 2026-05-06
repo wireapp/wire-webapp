@@ -37,7 +37,7 @@ export const serverTimeHandler = {
   },
 
   logger: getLogger('serverTimeHandler'),
-  timeOffset: ko.observable(undefined) as ko.Observable<number>,
+  timeOffset: ko.observable(undefined) as unknown as ko.Observable<number>,
 
   /**
    * Converts a server timestamp to a local timestamp.

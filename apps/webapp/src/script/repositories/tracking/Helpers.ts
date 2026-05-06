@@ -54,7 +54,8 @@ export function getGuestAttributes(conversationEntity: Conversation): GuestAttri
   if (isTeamConversation) {
     const isAllowGuests = !conversationEntity.isTeamOnly();
     const _getUserType = (_conversationEntity: Conversation) => {
-      if (_conversationEntity.selfUser().isTemporaryGuest()) {
+      const selfUser = _conversationEntity.selfUser();
+      if (selfUser !== undefined && selfUser.isTemporaryGuest()) {
         return UserType.TEMPORARY_GUEST;
       }
 

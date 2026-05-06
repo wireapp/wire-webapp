@@ -75,9 +75,11 @@ export class GiphyRepository {
       ...options,
     };
 
-    const hasReachedRetryLimit = retry >= options.maxRetries;
+    const maximumRetries = options.maxRetries ?? GiphyRepository.CONFIG.MAX_RETRIES;
+    const maximumSize = options.maxSize ?? GiphyRepository.CONFIG.MAX_SIZE;
+    const hasReachedRetryLimit = retry >= maximumRetries;
     if (hasReachedRetryLimit) {
-      throw new Error(`Unable to fetch a proper GIF within ${options.maxRetries} retries`);
+      throw new Error(`Unable to fetch a proper GIF within ${maximumRetries} retries`);
     }
 
     const {data: randomGif} = await this.giphyService.getRandom(options.tag);
@@ -89,7 +91,7 @@ export class GiphyRepository {
     } = await this.giphyService.getById(randomGif.id);
     const staticGif = images.fixed_width_still;
     const animatedGif = images.downsized;
-    const exceedsMaxSize = window.parseInt(animatedGif.size, 10) > options.maxSize;
+    const exceedsMaxSize = window.parseInt(animatedGif.size, 10) > maximumSize;
 
     if (exceedsMaxSize) {
       this.logger.info(`Gif size (${animatedGif.size}) is over maximum size (${animatedGif.size})`);

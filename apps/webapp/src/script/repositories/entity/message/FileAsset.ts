@@ -52,7 +52,7 @@ export class FileAsset extends Asset {
     this.logger = getLogger('FileAsset');
 
     // AssetTransferState
-    this.status = ko.observable();
+    this.status = ko.observable<AssetTransferState>() as ko.Observable<AssetTransferState>;
 
     this.file_name = '';
     this.file_size = 0;
@@ -62,8 +62,8 @@ export class FileAsset extends Asset {
     this.meta = {};
 
     // asset URL, instance of an OTR asset this has to be decrypted
-    this.original_resource = ko.observable();
-    this.preview_resource = ko.observable();
+    this.original_resource = ko.observable<AssetRemoteData>() as ko.Observable<AssetRemoteData>;
+    this.preview_resource = ko.observable<AssetRemoteData>() as ko.Observable<AssetRemoteData>;
 
     this.downloadProgress = ko.pureComputed(() => {
       if (this.original_resource()) {
@@ -79,7 +79,7 @@ export class FileAsset extends Asset {
       }
     };
 
-    this.upload_failed_reason = ko.observable();
+    this.upload_failed_reason = ko.observable<ProtobufAsset.NotUploaded>() as ko.Observable<ProtobufAsset.NotUploaded>;
   }
 
   reload(): void {

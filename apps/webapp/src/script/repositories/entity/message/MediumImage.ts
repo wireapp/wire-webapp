@@ -39,7 +39,7 @@ export class MediumImage extends FileAsset {
     this.width = '0px';
     this.height = '0px';
 
-    this.resource = ko.observable();
+    this.resource = ko.observable<AssetRemoteData>() as ko.Observable<AssetRemoteData>;
     this.logger = getLogger('MediumImage');
   }
 

@@ -105,7 +105,8 @@ export const iterateItem = <T>(array: T[], currentItem: T, reverse = false): T |
 
     // If item could not be found
     const isNegativeIndex = currentIndex === -1;
-    return isNegativeIndex ? undefined : array[iterateIndex(array, currentIndex, reverse)];
+    const nextIndex = iterateIndex(array, currentIndex, reverse);
+    return isNegativeIndex || nextIndex === undefined ? undefined : array[nextIndex];
   }
   return undefined;
 };

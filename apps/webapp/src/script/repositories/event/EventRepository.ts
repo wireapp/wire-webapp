@@ -173,7 +173,8 @@ export class EventRepository {
         await this.handleEvent(payload, source);
       } catch (error: unknown) {
         if (source === EventSource.NOTIFICATION_STREAM) {
-          this.logger.warn(`Failed to handle event of type "${event.type}": ${toError(error).message}`, error);
+          const eventType = (payload as {event?: {type?: string}}).event?.type ?? 'unknown';
+          this.logger.warn(`Failed to handle event of type "${eventType}": ${toError(error).message}`, error);
         } else {
           throw error;
         }
@@ -394,7 +395,7 @@ export class EventRepository {
    * @returns Resolves when the last event date was stored
    */
   private updateLastEventDate(eventDate: string): Promise<string> | void {
-    const didDateIncrease = eventDate > this.lastEventDate();
+    const didDateIncrease = eventDate > (this.lastEventDate() ?? '');
     if (didDateIncrease) {
       this.lastEventDate(eventDate);
       return this.notificationService.saveLastEventDateToDb(eventDate);

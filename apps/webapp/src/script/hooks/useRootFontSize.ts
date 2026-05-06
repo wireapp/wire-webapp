@@ -42,7 +42,7 @@ export const useRootFontSize = (
   rootFontSize: RootFontSize = RootFontSize.M,
 ): [RootFontSize, React.Dispatch<React.SetStateAction<RootFontSize>>] => {
   const [storedRootFontSize, setStoredRootFontSize] = useLocalStorage<RootFontSize>(ROOT_FONT_SIZE_KEY, rootFontSize);
-  const [currentRootFontSize, setCurrentRootFontSize] = useState<RootFontSize>(storedRootFontSize);
+  const [currentRootFontSize, setCurrentRootFontSize] = useState<RootFontSize>(storedRootFontSize ?? rootFontSize);
 
   useEffect(() => {
     setStoredRootFontSize(currentRootFontSize);
@@ -55,6 +55,6 @@ export const useRootFontSize = (
 export const useInitializeRootFontSize = () => {
   const [storedRootFontSize] = useLocalStorage<RootFontSize>(ROOT_FONT_SIZE_KEY, RootFontSize.M);
   useEffect(() => {
-    setFontSizeToRoot(storedRootFontSize);
+    setFontSizeToRoot(storedRootFontSize ?? RootFontSize.M);
   }, []);
 };

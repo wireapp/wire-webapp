@@ -19,16 +19,16 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, withConnectedUser, withLogin, withConnectionRequest, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
 
 async function openParticipantDetailsFromGroup(
   pages: PageManager['webapp']['pages'],
   groupName: string,
   participantName: string,
 ) {
-  await pages.conversationList().openConversation(groupName);
+  await pages.conversationList().getConversation(groupName).open();
   await pages.conversation().clickConversationInfoButton();
   await pages.conversationDetails().openParticipantDetails(participantName);
 }
@@ -56,15 +56,14 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1474', '@regression']},
     async ({createPage, createUser}) => {
       const userC = await createUser();
-      const [userAPages, userCPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(userC))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userCPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userC))]);
+      const [userAPages, userCPages] = [userAPage, userCPage].map(page => PageManager.from(page).webapp.pages);
 
+      await sendConnectionRequest(userAPage, userC);
       await acceptConnectionRequest(userCPages);
 
       await test.step('Go to any 1:1 conversation', async () => {
-        await userAPages.conversationList().openConversation(userC.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userC.fullName, {protocol: 'mls'}).open();
       });
 
       await test.step('Open People popover', async () => {
@@ -92,14 +91,19 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1477', '@regression']},
     async ({createPage, createUser}) => {
       const userC = await createUser();
-      const [userAPages, userBPages, userCPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(userC))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      const [userAPage, userBPage, userCPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB), withConnectedUser(userA)),
+        createPage(withLogin(userC)),
       ]);
+      const [userAPages, userBPages, userCPages] = [userAPage, userBPage, userCPage].map(
+        page => PageManager.from(page).webapp.pages,
+      );
 
+      await sendConnectionRequest(userAPage, userC);
       await acceptConnectionRequest(userCPages);
-      await expect(userAPages.conversationList().getConversationLocator(userC.fullName)).toBeAttached();
+      await expect(userAPages.conversationList().getConversation(userC.fullName)).toBeAttached();
+      await expect(userCPages.conversationList().getConversation(userA.fullName)).toBeAttached();
 
       await test.step('User C is in group with User A and B. User C is not connected to user B', async () => {
         await createGroup(userAPages, groupName, [userB, userC]);
@@ -133,14 +137,15 @@ test.describe('Participant Profile', () => {
     {tag: ['@TC-1479', '@regression']},
     async ({createPage, createUser}) => {
       const userC = await createUser();
-      const [userAPageManager, userCPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectionRequest(userC))),
-        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      const [userAPageManager, userCPageManager] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        PageManager.from(createPage(withLogin(userC))),
       ]);
-
       const {pages, modals} = userAPageManager.webapp;
-      await acceptConnectionRequest(userCPages);
-      await expect(pages.conversationList().getConversationLocator(userC.fullName)).toBeAttached();
+
+      await sendConnectionRequest(userAPageManager, userC);
+      await acceptConnectionRequest(userCPageManager.webapp.pages);
+      await expect(pages.conversationList().getConversation(userC.fullName)).toBeAttached();
 
       await createGroup(pages, groupName, [userB, userC]);
 
@@ -151,7 +156,7 @@ test.describe('Participant Profile', () => {
       });
 
       await test.step('User C opens people popover', async () => {
-        await pages.conversationList().openConversation(groupName);
+        await pages.conversationList().getConversation(groupName).open();
         await pages.conversation().clickConversationTitle();
       });
 
@@ -234,7 +239,7 @@ test.describe('Participant Profile', () => {
 
       await createGroup(adminPage, groupName, [userB]);
 
-      await adminPage.conversationList().openConversation(groupName);
+      await adminPage.conversationList().getConversation(groupName).open();
       await adminPage.conversation().clickConversationInfoButton();
 
       await adminPage.conversation().makeUserAdmin(userB.fullName);

@@ -28,11 +28,16 @@ const THEMES_CLASS_PREFIX = 'theme-';
 export type Theme = WebappProperties['settings']['interface']['theme'];
 
 function setTheme(theme: Theme) {
-  const classes = document.body.className
-    .split(' ')
-    .filter(elementClass => !elementClass.startsWith(THEMES_CLASS_PREFIX))
-    .concat(`${THEMES_CLASS_PREFIX}${theme}`);
-  document.body.className = classes.join(' ');
+  const bodyClassList = document.body.classList;
+  const themeClasses = Array.from(bodyClassList).filter(existingClassName => {
+    return existingClassName.startsWith(THEMES_CLASS_PREFIX);
+  });
+
+  themeClasses.forEach(existingThemeClass => {
+    bodyClassList.remove(existingThemeClass);
+  });
+
+  bodyClassList.add(`${THEMES_CLASS_PREFIX}${theme}`);
 }
 
 export function useTheme(getTheme: () => Theme) {

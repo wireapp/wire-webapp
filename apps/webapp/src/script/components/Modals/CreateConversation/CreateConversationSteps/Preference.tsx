@@ -55,7 +55,7 @@ export const Preference = () => {
   const isCellsOptionEnabled = isCellsEnabledForEnvironment && isCellsEnabledForTeam;
 
   const defaultProtocol = isMLSEnabled
-    ? teamState.teamFeatures()?.mls?.config.defaultProtocol
+    ? (teamState.teamFeatures()?.mls?.config.defaultProtocol ?? CONVERSATION_PROTOCOL.PROTEUS)
     : CONVERSATION_PROTOCOL.PROTEUS;
 
   // Read receipts are temorarily disabled for MLS groups and channels until it is supported

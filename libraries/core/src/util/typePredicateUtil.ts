@@ -17,9 +17,9 @@
  *
  */
 
-import {Conversation, MLSConversation, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation/';
+import {Conversation, MLSConversation, QualifiedUserClients, UserClients} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 export function isStringArray(obj: any): obj is string[] {
   return Array.isArray(obj) && (obj.length === 0 || typeof obj[0] === 'string');

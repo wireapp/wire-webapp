@@ -37,7 +37,7 @@ export class InvitationAction {
       dispatch(InvitationActionCreator.startAddInvite());
       const state = getState();
       const inviteList = InviteSelector.getInvites(state);
-      const invitationEmail = invitation.email?.toLowerCase();
+      const invitationEmail = invitation.email.toLowerCase();
       const alreadyInvited = inviteList.find(inviteItem => inviteItem.email.toLowerCase() === invitationEmail);
       if (alreadyInvited) {
         const error = new BackendError(
@@ -51,15 +51,15 @@ export class InvitationAction {
 
       const newInvite: NewTeamInvitation = {
         email: invitationEmail,
-        inviter_name: selfSelector.getSelfName(state),
+        inviter_name: selfSelector.getSelfName(state) ?? '',
         locale: languageSelector.getLanguage(state),
         role: Role.MEMBER,
       };
 
-      const teamId = selfSelector.getSelfTeamId(state);
-
       try {
-        const createdInvite = await apiClient.api.teams.invitation.postInvitation(teamId, newInvite);
+        const teamId = selfSelector.getSelfTeamId(state);
+        const ensuredTeamId = teamId ?? '';
+        const createdInvite = await apiClient.api.teams.invitation.postInvitation(ensuredTeamId, newInvite);
         dispatch(InvitationActionCreator.successfulAddInvite(createdInvite));
       } catch (error: unknown) {
         dispatch(InvitationActionCreator.failedAddInvite(toError(error)));

@@ -115,7 +115,7 @@ export class ClientAction {
     }
     return {
       classification: ClientClassification.DESKTOP,
-      cookieLabel: undefined,
+      cookieLabel: '',
       label: deviceLabel,
       model: deviceModel,
     };

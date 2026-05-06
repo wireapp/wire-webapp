@@ -17,8 +17,12 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {Page} from '@playwright/test';
 
-export const wrapperStyles: CSSObject = {
-  padding: '0 8px',
-};
+import {BaseModal} from './base.modal';
+
+export class WithoutTitle extends BaseModal {
+  constructor(page: Page) {
+    super(page, 'modal-without-title');
+  }
+}

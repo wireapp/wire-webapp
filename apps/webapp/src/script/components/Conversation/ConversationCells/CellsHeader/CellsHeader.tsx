@@ -17,19 +17,28 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
-
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
+import {SearchIcon} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
-import {actionsStyles, contentStyles, searchInputStyles, wrapperStyles} from './CellsHeader.styles';
+import {
+  actionsStyles,
+  breadcrumbsRowStyles,
+  clearButtonStyles,
+  contentStyles,
+  searchIconStyles,
+  searchInputStyles,
+  searchNativeInputStyles,
+  wrapperStyles,
+} from './CellsHeader.styles';
 import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';
 import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
+import {CellsRootHomeIcon} from './CellsRootHomeIcon';
+import {CellsSearchClearIcon} from './CellsSearchClearIcon';
 
 import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
@@ -41,6 +50,8 @@ interface CellsHeaderProps {
   conversationName: string;
   conversationQualifiedId: QualifiedId;
   cellsRepository: CellsRepository;
+  isSearchViewOpen: boolean;
+  onOpenSearchView: () => void;
   searchValue: string;
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
@@ -48,94 +59,79 @@ interface CellsHeaderProps {
 
 export const CellsHeader = ({
   onRefresh,
-  conversationQualifiedId,
   conversationName,
+  conversationQualifiedId,
   cellsRepository,
+  isSearchViewOpen,
+  onOpenSearchView,
   searchValue,
   onSearchChange,
   onSearchClear,
 }: CellsHeaderProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: t('cells.breadcrumb.files', {conversationName}),
     currentPath: getCellsFilesPath(),
   });
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  const isRootLevel = breadcrumbs.length === 1;
 
   return (
     <div css={wrapperStyles}>
       <div css={contentStyles}>
-        <CellsBreadcrumbs
-          items={breadcrumbs}
-          onItemClick={item =>
-            openBreadcrumb({
-              conversationQualifiedId,
-              path: breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '',
-            })
-          }
-        />
-        <div css={actionsStyles}>
-          <CellsNewMenu
-            cellsRepository={cellsRepository}
-            conversationQualifiedId={conversationQualifiedId}
-            onRefresh={onRefresh}
+        <div css={searchInputStyles}>
+          <SearchIcon css={searchIconStyles} />
+
+          <input
+            css={searchNativeInputStyles}
+            type="text"
+            value={searchValue}
+            aria-label={t('cells.search.placeholder')}
+            placeholder={t('cells.search.placeholder')}
+            onFocus={onOpenSearchView}
+            onChange={event => onSearchChange(event.currentTarget.value)}
+            data-uie-name="full-search-header-input"
           />
-          <CellsRefresh onRefresh={onRefresh} />
-          <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
+
+          {searchValue && (
+            <button
+              type="button"
+              css={clearButtonStyles}
+              data-uie-name="full-search-dismiss"
+              aria-label={t('fullsearchCancelCloseBtn')}
+              onClick={onSearchClear}
+            >
+              <CellsSearchClearIcon />
+            </button>
+          )}
         </div>
-      </div>
-      <InputSubmitCombo
-        css={{
-          ...searchInputStyles,
-          marginLeft: '8px',
-          marginTop: '24px',
-          width: '288px',
-          height: '32px',
-          borderRadius: '8px',
-          paddingLeft: '10px',
-        }}
-      >
-        <SearchIcon />
-
-        <Input
-          wrapperCSS={{
-            marginBottom: 0,
-            width: '100%',
-            '> div': {width: '100%'},
-            input: {
-              fontSize: '14px',
-              height: '32px',
-              '&:hover': {
-                boxShadow: 'none',
-              },
-              '&:focus': {
-                outline: 'none',
-                boxShadow: 'none',
-              },
-            },
-          }}
-          type="text"
-          value={searchValue}
-          ref={inputRef}
-          aria-label={t('cells.search.placeholder')}
-          placeholder={t('cells.search.placeholder')}
-          onChange={event => onSearchChange(event.currentTarget.value)}
-          data-uie-name="full-search-header-input"
-        />
-
-        {searchValue && (
-          <CloseIcon
-            css={{cursor: 'pointer'}}
-            data-uie-name="full-search-dismiss"
-            aria-label={t('fullsearchCancelCloseBtn')}
-            onClick={onSearchClear}
-          />
+        {!isSearchViewOpen && (
+          <div css={actionsStyles}>
+            <CellsNewMenu
+              cellsRepository={cellsRepository}
+              conversationQualifiedId={conversationQualifiedId}
+              onRefresh={onRefresh}
+            />
+            <CellsRefresh onRefresh={onRefresh} />
+            <CellsMoreMenu conversationQualifiedId={conversationQualifiedId} />
+          </div>
         )}
-      </InputSubmitCombo>
+      </div>
+      {!isSearchViewOpen && (
+        <div css={breadcrumbsRowStyles}>
+          {isRootLevel ? (
+            <CellsRootHomeIcon />
+          ) : (
+            <CellsBreadcrumbs
+              items={breadcrumbs}
+              onItemClick={item =>
+                openBreadcrumb({
+                  conversationQualifiedId,
+                  path: breadcrumbs.find(crumb => crumb.name === item.name)?.path ?? '',
+                })
+              }
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };

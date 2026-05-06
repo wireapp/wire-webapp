@@ -41,8 +41,8 @@ test.describe('Self Deleting Messages', () => {
     const userAPages = PageManager.from(userAPage).webapp.pages;
     const userBPages = PageManager.from(userBPage).webapp.pages;
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
     await userAPages.conversation().enableSelfDeletingMessages();
     await userAPages.conversation().sendMessage('Gone in 10s');
@@ -59,7 +59,7 @@ test.describe('Self Deleting Messages', () => {
     const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await createGroup(userAPages, 'Test Group', [userB]);
-    await userBPages.conversationList().openConversation('Test Group');
+    await userBPages.conversationList().getConversation('Test Group').open();
 
     await userAPages.conversation().enableSelfDeletingMessages();
     await userAPages.conversation().sendMessage('Gone in 10s');
@@ -115,7 +115,7 @@ test.describe('Self Deleting Messages', () => {
       // Re-open page reusing the same context so the login is not happening on a new device
       page = await createPage(context, withLogin(userA));
       pages = PageManager.from(page).webapp.pages;
-      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversationList().getConversation(userB.fullName).open();
 
       const selfDeletingMessage = pages.conversation().getMessage({sender: userA});
       await expect(selfDeletingMessage).toBeVisible();
@@ -134,8 +134,8 @@ test.describe('Self Deleting Messages', () => {
       const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
       await createGroup(userAPages, 'Test Group', [userB]);
 
-      await userAPages.conversationList().openConversation('Test Group');
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'}); // User B should not read the message sent into the group immediately
+      await userAPages.conversationList().getConversation('Test Group').open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open(); // User B should not read the message sent into the group immediately
 
       await userAPages.conversation().enableSelfDeletingMessages();
       await userAPages.conversation().sendMessage('Test Message');
@@ -143,7 +143,7 @@ test.describe('Self Deleting Messages', () => {
 
       await userBPage.waitForTimeout(10_000); // Wait 10s before user B opens the group chat
 
-      await userBPages.conversationList().openConversation('Test Group');
+      await userBPages.conversationList().getConversation('Test Group').open();
       await expect(userBPages.conversation().getMessage({content: 'Test Message'})).toBeVisible();
     },
   );
@@ -159,8 +159,8 @@ test.describe('Self Deleting Messages', () => {
       ]);
       await createGroup(userAPages, 'Test Group', [userB]);
 
-      await userAPages.conversationList().openConversation('Test Group');
-      await userBPages.conversationList().openConversation('Test Group');
+      await userAPages.conversationList().getConversation('Test Group').open();
+      await userBPages.conversationList().getConversation('Test Group').open();
 
       await userAPages.conversation().toggleGroupInformation();
       await userAPages.conversationDetails().setSelfDeletingMessages('10 seconds');
@@ -220,8 +220,8 @@ test.describe('Self Deleting Messages', () => {
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       await userAPages.conversation().enableSelfDeletingMessages();
       await userAPages.conversation().sendMessage('Test');

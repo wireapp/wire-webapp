@@ -777,7 +777,12 @@ export class MessageRepository {
         }
       : undefined;
 
-    const retention = this.assetRepository.getAssetRetention(this.userState.self(), conversation);
+    const selfUser = this.userState.self();
+    if (selfUser === undefined) {
+      throw new Error('Self user is not available');
+    }
+
+    const retention = this.assetRepository.getAssetRetention(selfUser, conversation);
     const options = {
       legalHoldStatus: conversation.legalHoldStatus(),
       public: true,
@@ -1381,15 +1386,24 @@ export class MessageRepository {
       .connectedUsers()
       // For the moment, we do not want to send status in federated env
       // we can remove the filter when we actually want this feature in federated env (and we will need to implement federation for the core broadcastService)
-      .filter(user => !user.isFederated)
+      .filter(user => {
+        return user.isFederated === false;
+      })
       .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => this.teamState.isInTeam(user));
-    const users = [this.userState.self(), ...members, ...other].slice(
-      0,
-      UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST,
-    );
+    const selfUser = this.userState.self();
+    if (selfUser === undefined) {
+      throw new Error('Self user is not available');
+    }
 
-    await this.core.service!.broadcast.broadcastGenericMessage(
+    const users = [selfUser, ...members, ...other].slice(0, UserRepository.CONFIG.MAXIMUM_TEAM_SIZE_BROADCAST);
+
+    const coreService = this.core.service;
+    if (coreService === undefined) {
+      throw new Error('Core service is not available');
+    }
+
+    await coreService.broadcast.broadcastGenericMessage(
       genericMessage,
       this.createRecipients(users),
       this.onClientMismatch,
@@ -1701,13 +1715,15 @@ export class MessageRepository {
       default:
         break;
     }
-    if (actionType) {
-      const selfUserTeamId = this.userState.self().teamId;
+    if (actionType !== undefined) {
+      const selfUserTeamId = this.userState.self()?.teamId;
       const participants = conversationEntity.participating_user_ets();
       const guests = participants.filter(user => user.isGuest()).length;
       const guestsWireless = participants.filter(user => user.isTemporaryGuest()).length;
       // guests that are from a different team
-      const guestsPro = participants.filter(user => !!user.teamId && user.teamId !== selfUserTeamId).length;
+      const guestsPro = participants.filter(user => {
+        return user.teamId !== undefined && user.teamId !== '' && user.teamId !== selfUserTeamId;
+      }).length;
       const services = participants.filter(user => user.isService).length;
 
       let segmentations: ContributedSegmentations = {

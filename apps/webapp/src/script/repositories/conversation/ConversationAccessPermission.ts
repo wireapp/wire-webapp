@@ -83,9 +83,13 @@ export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_
   if (prevState === current) {
     return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
   }
-  const [featureName, featureBitmask] = Object.entries(ACCESS).find(
+  const featureEntry = Object.entries(ACCESS).find(
     ([, bitmask]) => bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
   );
+  if (featureEntry === undefined) {
+    return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
+  }
+  const [featureName, featureBitmask] = featureEntry;
   const featString = CONVERSATION_ACCESS_ROLE[featureName as keyof typeof CONVERSATION_ACCESS_ROLE];
   return {
     feature: featString,

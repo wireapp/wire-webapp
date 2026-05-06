@@ -39,12 +39,12 @@ export class ConnectionEntity {
   userId: QualifiedId;
 
   constructor() {
-    this.conversationId = null;
-    this.from = null;
-    this.lastUpdate = null;
-    this.message = null;
+    this.conversationId = {domain: '', id: ''};
+    this.from = '';
+    this.lastUpdate = '';
+    this.message = '';
     this.status = ko.observable(ConnectionStatus.UNKNOWN);
-    this.userId = null;
+    this.userId = {domain: '', id: ''};
 
     this.isBlocked = ko.pureComputed(() => this.status() === ConnectionStatus.BLOCKED);
     this.isMissingLegalHoldConsent = ko.pureComputed(

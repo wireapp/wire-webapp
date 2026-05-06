@@ -485,6 +485,8 @@ declare module 'I18n/en-US.json' {
     'cells.restoreRootNodeModal.folder.headline': `Restore folder`;
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
+    'cells.search.idle.description': `Apply a search terms, or a filter to see results.`;
+    'cells.search.idle.heading': `Searching within Shared Drive and all its folders`;
     'cells.search.placeholder': `Search files and folders`;
     'cells.selfDeletingMessage.info': `The feature is not available for conversations with a shared Drive.`;
     'cells.shareModal.changePassword': `Change Password`;

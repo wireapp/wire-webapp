@@ -38,8 +38,8 @@ interface AvatarImageProps {
   borderRadius?: string;
   devicePixelRatio?: number;
   isGrey?: boolean;
-  mediumPicture: AssetRemoteData;
-  previewPicture: AssetRemoteData;
+  mediumPicture: AssetRemoteData | undefined;
+  previewPicture: AssetRemoteData | undefined;
 }
 
 const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
@@ -64,10 +64,12 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
       const isSmall = ![AVATAR_SIZE.LARGE, AVATAR_SIZE.X_LARGE].includes(avatarSize);
       const loadHiRes = !isSmall && devicePixelRatio > 1;
-      const pictureResource: AssetRemoteData = loadHiRes ? (mediumPicture ?? previewPicture) : previewPicture;
+      const pictureResource: AssetRemoteData | undefined = loadHiRes
+        ? (mediumPicture ?? previewPicture)
+        : previewPicture;
 
       (async () => {
-        if (pictureResource) {
+        if (pictureResource !== undefined) {
           const isCached = pictureResource.downloadProgress === 100;
           setShowTransition(!isCached && !isSmall);
           try {

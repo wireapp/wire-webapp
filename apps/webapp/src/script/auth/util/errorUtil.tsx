@@ -43,7 +43,7 @@ export function parseError(error: any): JSX.Element | null {
 }
 
 export function parseValidationErrors(errors: any | any[]): JSX.Element[] {
-  const errorMessages = [].concat(errors || []);
+  const errorMessages: any[] = ([] as any[]).concat(errors ?? []);
   return errorMessages.map(error => (
     <ErrorMessage data-uie-name="error-message" data-uie-value={error.label} key={error.label}>
       {validationErrorStrings.hasOwnProperty(error.label) ? (
