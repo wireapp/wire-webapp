@@ -119,7 +119,7 @@ const createConversation = (
 const mockSafeEpoch = (core: Core) => {
   (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
     .fn()
-    .mockResolvedValue(task.fromResult(result.ok(1)));
+    .mockResolvedValue(task.resolve(1));
 };
 
 describe('joinConversationsAfterMigrationFinalisation', () => {
