@@ -347,14 +347,8 @@ export class CallingRepository {
     await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
   }
 
-  public allowSuperhighQualityTier(event: boolean) {
-    if (this.isSuperhighQualityTierAllowed()) {
-      this.backgroundEffectsHandler.enableSuperhighQualityTier(event);
-    }
-  }
-
-  public isSuperhighQualityTierAllowed() {
-    return this.backgroundEffectsHandler.isSuperhighQualityTierAllowed();
+  public allowSuperhighQualityTier(enable: boolean) {
+    this.backgroundEffectsHandler.enableSuperhighQualityTier(enable);
   }
 
   public getBackgroundEffectsHandler(): BackgroundEffectsHandler {

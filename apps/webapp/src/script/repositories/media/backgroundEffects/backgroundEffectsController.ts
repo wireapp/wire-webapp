@@ -216,6 +216,11 @@ export class BackgroundEffectsController {
     return this.maxQualityTier;
   }
 
+  public setModelPath(path: string): void {
+    this.options = {...this.options, modelPath: path};
+    this.pushOptionsUpdate();
+  }
+
   private applyImageBitmap(bitmap: ImageBitmap, url: string): void {
     const workerSource: WorkerBackgroundSource = {type: 'image', media: bitmap, url};
     // Record the url without the bitmap so the options object remains serialisable.

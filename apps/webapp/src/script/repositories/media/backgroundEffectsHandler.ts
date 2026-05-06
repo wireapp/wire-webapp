@@ -20,7 +20,11 @@
 import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {defaultOpts} from 'Repositories/media/backgroundEffects/pipe/options';
+import {
+  defaultOpts,
+  SELFIE_MULTICLASS_MODEL_PATH,
+  SELFIE_SEGMENTER_MODEL_PATH,
+} from 'Repositories/media/backgroundEffects/pipe/options';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -235,7 +239,8 @@ export class BackgroundEffectsHandler {
   }
 
   public enableSuperhighQualityTier(enable: boolean): void {
-    this.controller.setMaxQualityTier(enable ? 'superhigh' : 'high');
+    this.controller.setModelPath(enable ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH);
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(enable);
   }
 
   public isSuperhighQualityTierAllowed(): boolean {

@@ -157,7 +157,6 @@ export const VideoBackgroundSettings = ({
 
         <div>
           <Checkbox
-            disabled={true}
             id="enable-high-quality-blur"
             checked={highQualityBlurAllowed}
             data-uie-name="enable-high-quality-blur"

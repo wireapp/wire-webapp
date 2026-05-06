@@ -96,24 +96,29 @@ export async function runSegmenter(
   attachCanvasEvents();
 
   let segmenter = await createSegmenter(canvas);
+  let currentModelPath = segmenterOptions.modelPath;
+  let restartPending = false;
 
   function restartSegmenter() {
+    restartPending = true;
+    const targetModelPath = segmenterOptions.modelPath;
     createSegmenter(canvas)
       .then(newSegmenter => {
         const oldSegmenter = segmenter;
         segmenter = newSegmenter;
+        currentModelPath = targetModelPath;
+        restartPending = false;
         oldSegmenter.close();
       })
       .catch((e: unknown) => {
         logger.error('Error restarting segmenter:', e);
+        restartPending = false;
       });
   }
 
   // Filters.
   const effectsCanvas = new OffscreenCanvas(1, 1);
   const videoFilter = new VideoFilter(effectsCanvas);
-
-  const useSelfieModel = !!segmenterOptions.modelPath?.includes('selfie_segmenter');
 
   // Metrics
   const metricsWindow = createMetricsWindow(60);
@@ -153,6 +158,16 @@ export async function runSegmenter(
           videoFrame.close();
           return;
         }
+
+        if (
+          restartPending === false &&
+          segmenterOptions.modelPath !== undefined &&
+          segmenterOptions.modelPath !== currentModelPath
+        ) {
+          restartSegmenter();
+        }
+
+        const useSelfieModel = currentModelPath?.includes('selfie_segmenter');
 
         // start to process the frame
         const frameStart = performance.now();
