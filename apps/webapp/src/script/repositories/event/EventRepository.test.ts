@@ -331,10 +331,13 @@ describe('EventRepository', () => {
 
       expect(visibilityHandler).toBeDefined();
       visibilityHandler?.();
-      await Promise.resolve();
+      // Use setTimeout-based flush to resolve the full async chain:
+      // tick 1: isWebsocketHealthy resolves → tick 2: connect() calls account.listen
+      await new Promise<void>(resolve => setTimeout(resolve, 0));
 
       expect(mockAccount.isWebsocketHealthy).toHaveBeenCalled();
-      expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+      // Initial connect + reconnect after unhealthy check = 2 calls
+      expect(mockAccount.listen).toHaveBeenCalledTimes(2);
     });
 
     it('should not reconnect when visible and websocket is open and healthy', async () => {
@@ -417,6 +420,200 @@ describe('EventRepository', () => {
 
       // Should only be called once despite potential multiple triggers
       expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+    });
+
+    describe('WebSocket reconnection logic', () => {
+      // Flushes all pending microtasks and macrotasks so async closures settle
+      const flushPromises = () => new Promise<void>(resolve => setTimeout(resolve, 0));
+
+      const getVisibilityHandler = () =>
+        (document.addEventListener as jest.Mock).mock.calls.find(
+          ([name]: [string]) => name === 'visibilitychange',
+        )?.[1] as () => void;
+
+      const triggerVisibility = () => {
+        Object.defineProperty(document, 'visibilityState', {value: 'visible', configurable: true});
+        getVisibilityHandler()();
+      };
+
+      // Calls connectWebSocket, captures the onConnectionStateChanged callback,
+      // transitions to LIVE, and clears mock call counts ready for assertions.
+      const setup = async () => {
+        let stateCallback!: (state: ConnectionState) => void;
+        mockAccount.listen.mockImplementation(({onConnectionStateChanged}: any) => {
+          stateCallback = onConnectionStateChanged;
+          return Promise.resolve(jest.fn());
+        });
+        jest.spyOn(Runtime, 'isElectron').mockReturnValue(false);
+        await eventRepository.connectWebSocket(mockAccount, false, jest.fn());
+        stateCallback(ConnectionState.LIVE);
+        mockAccount.listen.mockClear();
+        mockAccount.isWebsocketHealthy.mockClear();
+        return stateCallback;
+      };
+
+      describe('reconnect decision by socket state (CLOSED vs CONNECTING/OPEN)', () => {
+        it('reconnects directly when CLOSED, skipping health check', async () => {
+          const setState = await setup();
+          setState(ConnectionState.CLOSED);
+
+          triggerVisibility();
+          await flushPromises();
+
+          expect(mockAccount.isWebsocketHealthy).not.toHaveBeenCalled();
+          expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+        });
+
+        it('skips entirely when CONNECTING', async () => {
+          const setState = await setup();
+          setState(ConnectionState.CONNECTING);
+
+          triggerVisibility();
+          await flushPromises();
+
+          expect(mockAccount.isWebsocketHealthy).not.toHaveBeenCalled();
+          expect(mockAccount.listen).not.toHaveBeenCalled();
+        });
+
+        it('skips entirely when PROCESSING_NOTIFICATIONS', async () => {
+          const setState = await setup();
+          setState(ConnectionState.PROCESSING_NOTIFICATIONS);
+
+          triggerVisibility();
+          await flushPromises();
+
+          expect(mockAccount.isWebsocketHealthy).not.toHaveBeenCalled();
+          expect(mockAccount.listen).not.toHaveBeenCalled();
+        });
+
+        it('performs health check when LIVE (socket open)', async () => {
+          await setup(); // already LIVE; isWebsocketHealthy defaults to true
+
+          triggerVisibility();
+          await flushPromises();
+
+          expect(mockAccount.isWebsocketHealthy).toHaveBeenCalledTimes(1);
+          expect(mockAccount.listen).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('unhealthy check => reconnect', () => {
+        it('reconnects when health check returns unhealthy', async () => {
+          await setup();
+          mockAccount.isWebsocketHealthy.mockResolvedValue(false);
+
+          triggerVisibility();
+          await flushPromises();
+
+          expect(mockAccount.isWebsocketHealthy).toHaveBeenCalledTimes(1);
+          expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+        });
+
+        it('reconnects when health check throws', async () => {
+          await setup();
+          mockAccount.isWebsocketHealthy.mockRejectedValue(new Error('Health check timeout'));
+
+          triggerVisibility();
+          await flushPromises();
+
+          expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      describe('healthy check => no reconnect', () => {
+        it('does not reconnect when health check returns healthy', async () => {
+          await setup();
+          mockAccount.isWebsocketHealthy.mockResolvedValue(true);
+
+          triggerVisibility();
+          await flushPromises();
+
+          expect(mockAccount.isWebsocketHealthy).toHaveBeenCalledTimes(1);
+          expect(mockAccount.listen).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('no reconnect storm on concurrent focus/visibility/heartbeat triggers', () => {
+        it('drops concurrent health checks when healthCheckInProgress', async () => {
+          await setup();
+          let resolveHealth!: (check: boolean) => void;
+          mockAccount.isWebsocketHealthy.mockReturnValue(
+            new Promise<boolean>(resolve => {
+              resolveHealth = resolve;
+            }),
+          );
+
+          // Fire three visibility events before the first health check resolves
+          triggerVisibility();
+          triggerVisibility();
+          triggerVisibility();
+
+          resolveHealth(false);
+          await flushPromises();
+
+          // Only one health check despite three concurrent triggers
+          expect(mockAccount.isWebsocketHealthy).toHaveBeenCalledTimes(1);
+          expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+        });
+
+        it('drops health check when connectionInProgress is true', async () => {
+          await setup();
+          let resolveConnect!: (fn: jest.Mock) => void;
+          // Make the next listen call hang so connectionInProgress stays true
+          mockAccount.listen.mockReturnValueOnce(
+            new Promise<jest.Mock>(resolve => {
+              resolveConnect = resolve;
+            }),
+          );
+
+          // online → handleOnline → connect() sets connectionInProgress = true synchronously
+          const onlineHandler = (window.addEventListener as jest.Mock).mock.calls.find(
+            ([name]: [string]) => name === 'online',
+          )?.[1] as () => void;
+          onlineHandler();
+
+          // connectionInProgress is now true; visibility trigger should be skipped
+          triggerVisibility();
+          await flushPromises();
+
+          expect(mockAccount.isWebsocketHealthy).not.toHaveBeenCalled();
+
+          resolveConnect(jest.fn()); // cleanup
+        });
+
+        it('deduplicates concurrent visibility and heartbeat triggers', async () => {
+          let heartbeatCb!: () => void;
+          // Capture the heartbeat callback before connectWebSocket registers it
+          (window.setInterval as jest.Mock).mockImplementationOnce((cb: TimerHandler) => {
+            heartbeatCb = cb as () => void;
+            return 999 as any;
+          });
+
+          const setState = await setup();
+          setState(ConnectionState.LIVE);
+          mockAccount.listen.mockClear();
+          mockAccount.isWebsocketHealthy.mockClear();
+
+          let resolveHealth!: (v: boolean) => void;
+          mockAccount.isWebsocketHealthy.mockReturnValue(
+            new Promise<boolean>(resolve => {
+              resolveHealth = resolve;
+            }),
+          );
+
+          // Fire all three concurrently: visibility, heartbeat, visibility again
+          triggerVisibility();
+          heartbeatCb?.();
+          triggerVisibility();
+
+          resolveHealth(false);
+          await flushPromises();
+
+          // Despite 3 triggers, health check runs once and reconnect fires once
+          expect(mockAccount.isWebsocketHealthy).toHaveBeenCalledTimes(1);
+          expect(mockAccount.listen).toHaveBeenCalledTimes(1);
+        });
+      });
     });
   });
 

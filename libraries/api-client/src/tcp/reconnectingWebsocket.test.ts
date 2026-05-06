@@ -196,18 +196,71 @@ describe('ReconnectingWebsocket', () => {
       RWS.disconnect();
     });
 
-    it('returns false when socket is not in OPEN state', async () => {
+    it('returns false when socket is in CLOSED state', async () => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect);
 
-      RWS.connect();
+      // Inject a mock socket in CLOSED state (distinct from CONNECTING/CLOSING which return true)
+      RWS['socket'] = {
+        readyState: WEBSOCKET_STATE.CLOSED,
+        close: jest.fn(),
+        send: jest.fn(),
+        reconnect: jest.fn(),
+        onmessage: undefined,
+        onerror: undefined,
+        onopen: undefined,
+        onclose: undefined,
+      } as any;
 
-      // Check health while connecting (before open)
       const result = await RWS.checkHealth();
 
       expect(result).toBe(false);
+    });
 
-      RWS.disconnect();
+    it('returns true and skips ping when socket is CONNECTING (transitioning guard)', async () => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+      const sendSpy = jest.spyOn(RWS, 'send');
+
+      // Inject a mock socket in CONNECTING state
+      RWS['socket'] = {
+        readyState: WEBSOCKET_STATE.CONNECTING,
+        close: jest.fn(),
+        send: jest.fn(),
+        reconnect: jest.fn(),
+        onmessage: undefined,
+        onerror: undefined,
+        onopen: undefined,
+        onclose: undefined,
+      } as any;
+
+      const result = await RWS.checkHealth();
+
+      expect(result).toBe(true);
+      expect(sendSpy).not.toHaveBeenCalled();
+    });
+
+    it('returns true and skips ping when socket is CLOSING (transitioning guard)', async () => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+      const sendSpy = jest.spyOn(RWS, 'send');
+
+      // Inject a mock socket in CLOSING state
+      RWS['socket'] = {
+        readyState: WEBSOCKET_STATE.CLOSING,
+        close: jest.fn(),
+        send: jest.fn(),
+        reconnect: jest.fn(),
+        onmessage: undefined,
+        onerror: undefined,
+        onopen: undefined,
+        onclose: undefined,
+      } as any;
+
+      const result = await RWS.checkHealth();
+
+      expect(result).toBe(true);
+      expect(sendSpy).not.toHaveBeenCalled();
     });
 
     it('returns true when pong is received before timeout', done => {
