@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {Dispatch, SetStateAction, useEffect, useState} from 'react';
 
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -29,7 +29,14 @@ export interface Grid {
   thumbnail: Participant | null;
 }
 
-export function getGrid(call: Call) {
+export function getGrid(call: Call | undefined) {
+  if (call === undefined) {
+    return {
+      grid: [],
+      thumbnail: null,
+    };
+  }
+
   if (call.participants()?.length === 2) {
     return {
       grid: call.getRemoteParticipants(),
@@ -42,15 +49,21 @@ export function getGrid(call: Call) {
   };
 }
 
+export function updateVideoGrid(call: Call | undefined, setGrid: Dispatch<SetStateAction<Grid>>) {
+  if (call === undefined) {
+    return;
+  }
+
+  call.updatePages();
+  setGrid(getGrid(call));
+}
+
 export const useVideoGrid = (call: Call): Grid => {
   const [grid, setGrid] = useState<Grid>(() => getGrid(call));
   const {participants, currentPage, pages} = useKoSubscribableChildren(call, ['participants', 'currentPage', 'pages']);
 
   useEffect(() => {
-    const updateGrid = () => {
-      call.updatePages();
-      setGrid(getGrid(call));
-    };
+    const updateGrid = () => updateVideoGrid(call, setGrid);
     updateGrid();
     const nameSubscriptions = participants?.map(p => p.user.name.subscribe(updateGrid));
     const videoSubscriptions = participants?.map(p => p.isSendingVideo.subscribe(updateGrid));
