@@ -212,6 +212,8 @@ export class EventRepository {
     const cleanupHandlers: Array<() => void> = [];
     let actualDisconnect: () => void = () => {};
     let connectionInProgress = false;
+    let healthCheckInProgress = false;
+    let currentConnectionState: ConnectionState | undefined;
 
     const connect = async () => {
       if (connectionInProgress) {
@@ -225,6 +227,7 @@ export class EventRepository {
         actualDisconnect = await account.listen({
           useLegacy,
           onConnectionStateChanged: connectionState => {
+            currentConnectionState = connectionState;
             this.updateConnectivityStatus(connectionState);
           },
           onEvent: this.handleIncomingEvent,
@@ -248,6 +251,53 @@ export class EventRepository {
       void connect();
     };
 
+    const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
+      if (!navigator.onLine) {
+        return;
+      }
+
+      if (connectionInProgress) {
+        this.logger.info(`${reason}: Reconnection already in progress, skipping health verification...`);
+        return;
+      }
+
+      const isTransitioningConnectionState =
+        currentConnectionState === ConnectionState.CONNECTING ||
+        currentConnectionState === ConnectionState.PROCESSING_NOTIFICATIONS;
+      if (isTransitioningConnectionState) {
+        this.logger.info(`${reason}: Connection is transitioning, skipping health verification...`);
+        return;
+      }
+
+      if (this.notificationHandlingState() === NOTIFICATION_HANDLING_STATE.CLOSED) {
+        this.logger.info(`${reason}: Connection is closed and app is online, attempting reconnection...`);
+        await connect();
+        return;
+      }
+
+      if (healthCheckInProgress) {
+        this.logger.info(`${reason}: Connection health check already in progress, skipping...`);
+        return;
+      }
+
+      healthCheckInProgress = true;
+      try {
+        let isHealthy: boolean;
+        try {
+          isHealthy = await account.isWebsocketHealthy();
+        } catch {
+          this.logger.warn(`${reason}: Failed to verify WebSocket health, reconnecting...`);
+          isHealthy = false;
+        }
+        if (!isHealthy) {
+          this.logger.warn(`${reason}: WebSocket appears unhealthy, reconnecting...`);
+          await connect();
+        }
+      } finally {
+        healthCheckInProgress = false;
+      }
+    };
+
     const handleOffline = () => {
       this.logger.warn('Internet connection lost');
       actualDisconnect();
@@ -259,10 +309,7 @@ export class EventRepository {
       const handleFocus = () => {
         if (navigator.onLine) {
           this.logger.info('Window focused, verifying connection...');
-          const currentState = this.notificationHandlingState();
-          if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
-            handleOnline();
-          }
+          void verifyConnectionHealthAndReconnect('Focus');
         }
       };
 
@@ -273,10 +320,7 @@ export class EventRepository {
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible' && navigator.onLine) {
           this.logger.info('Tab became visible, verifying connection...');
-          const currentState = this.notificationHandlingState();
-          if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED) {
-            handleOnline();
-          }
+          void verifyConnectionHealthAndReconnect('Visibility');
         }
       };
 
@@ -295,13 +339,10 @@ export class EventRepository {
       window.removeEventListener('offline', handleOffline);
     });
 
-    // Heartbeat to check connection state every 30 seconds
+    // Heartbeat intentionally verifies connection health while online, even when the
+    // connection is not CLOSED, to detect stale "open-but-unhealthy" websocket states.
     const heartbeatInterval = window.setInterval(() => {
-      const currentState = this.notificationHandlingState();
-      if (currentState === NOTIFICATION_HANDLING_STATE.CLOSED && navigator.onLine) {
-        this.logger.info('Heartbeat: Connection is closed and app is online, attempting reconnection...');
-        handleOnline();
-      }
+      void verifyConnectionHealthAndReconnect('Heartbeat');
     }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
 
     cleanupHandlers.push(() => {

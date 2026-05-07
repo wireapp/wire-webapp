@@ -117,10 +117,14 @@ export class ReconnectingWebsocket {
           this.logger.debug('WebSocket instance does not exist, skipping reconnect after sleep');
           return;
         }
-        this.logger.debug('Back from sleep, reconnecting WebSocket');
+        const state = this.getState();
+        this.logger.info(
+          `Back from sleep detected, WebSocket state: ${WEBSOCKET_STATE[state]} (${state}), forcing reconnect`,
+        );
         // Force reconnect even if the browser keeps the socket in OPEN state after sleep.
         this.socket.reconnect();
       },
+      isDisconnected: () => this.getState() === WEBSOCKET_STATE.CLOSED,
     });
   }
 
@@ -132,8 +136,6 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnMessage = (event: MessageEvent) => {
-    this.logger.debug('Incoming message');
-
     const data = buffer.bufferToString(event.data);
 
     if (data === PingMessage.PONG) {
@@ -144,12 +146,13 @@ export class ReconnectingWebsocket {
       return;
     }
 
+    this.logger.debug('Incoming message');
     this.lastMessageTimestamp = Date.now();
     this.onMessage?.(data);
   };
 
   private readonly internalOnOpen = (event: Event) => {
-    this.logger.debug('WebSocket opened');
+    this.logger.info(`WebSocket opened (reconnect attempt #${this.reconnectAttemptCount})`);
     this.resetLongRunningRetrySequence();
     if (this.socket) {
       this.socket.binaryType = 'arraybuffer';
@@ -160,18 +163,22 @@ export class ReconnectingWebsocket {
   };
 
   private readonly internalOnReconnect = async (): Promise<string> => {
-    this.logger.debug('Connecting to WebSocket');
+    const attempt = this.reconnectAttemptCount + 1;
+    this.logger.info(`Connecting to WebSocket (attempt #${attempt})`);
     this.recordReconnectAttempt(Date.now());
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
     if (this.isPingingEnabled) {
       this.startPinging();
+      this.logger.debug(`Ping started (interval: ${this.PING_INTERVAL}ms)`);
     }
     return this.onReconnect();
   };
 
   private readonly internalOnClose = (event: CloseEvent) => {
-    this.logger.debug(`WebSocket closed with code: ${event?.code}${event?.reason ? `Reason: ${event?.reason}` : ''}`);
+    this.logger.info(
+      `WebSocket closed — code: ${event?.code}, reason: "${event?.reason || 'none'}", wasClean: ${event?.wasClean ?? 'unknown'}`,
+    );
     this.stopPinging();
     this.resolvePendingHealthChecks(false);
     if (this.onClose) {
@@ -198,24 +205,62 @@ export class ReconnectingWebsocket {
     }
 
     if (this.hasUnansweredPing) {
-      this.logger.warn('Ping interval check failed');
+      this.logger.warn(
+        `Ping timeout — no pong received within ${this.PING_INTERVAL}ms, WebSocket state: ${WEBSOCKET_STATE[this.getState()]} (${this.getState()}), forcing reconnect`,
+      );
       this.stopPinging();
-      // Closing here intentionally triggers reconnecting-websocket's retry loop; it will call
-      // internalOnReconnect to build a fresh URL and re-open the socket.
-      this.socket.close(CloseEventCode.NORMAL_CLOSURE, 'Ping timeout');
+      this.socket.reconnect();
       return;
     }
+    this.logger.debug('Sending ping');
     this.hasUnansweredPing = true;
     this.send(PingMessage.PING);
   };
 
   public connect(): void {
+    this.logger.info('Initializing WebSocket connection');
     this.resetLongRunningRetrySequence();
-    this.socket = this.getReconnectingWebsocket();
-    this.socket.onmessage = this.internalOnMessage;
-    this.socket.onerror = this.internalOnError;
-    this.socket.onopen = this.internalOnOpen;
-    this.socket.onclose = this.internalOnClose;
+
+    if (!is.undefined(this.socket) && this.socket.readyState !== WEBSOCKET_STATE.CLOSED) {
+      this.logger.warn(
+        `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[this.socket.readyState]} (${this.socket.readyState}); closing it before reconnecting`,
+      );
+      const oldSocket = this.socket;
+      // Detach all handlers from the old socket before closing to prevent stale async events
+      // from triggering handlers on the new socket instance
+      oldSocket.onmessage = null;
+      oldSocket.onerror = null;
+      oldSocket.onopen = null;
+      oldSocket.onclose = null;
+      try {
+        oldSocket.close(CloseEventCode.NORMAL_CLOSURE, 'Reinitializing WebSocket connection');
+      } catch (error) {
+        this.logger.warn('Failed to close existing WebSocket instance before reconnecting', error);
+      }
+    }
+
+    this.stopPinging();
+    const nextSocket = this.getReconnectingWebsocket();
+    this.socket = nextSocket;
+    this.bindSocketHandlers(nextSocket);
+  }
+
+  private bindSocketHandlers(socket: RWS): void {
+    socket.onmessage = this.runIfActiveSocket(socket, this.internalOnMessage);
+    socket.onerror = this.runIfActiveSocket(socket, this.internalOnError);
+    socket.onopen = this.runIfActiveSocket(socket, this.internalOnOpen);
+    socket.onclose = this.runIfActiveSocket(socket, this.internalOnClose);
+  }
+
+  // Ignore late async events emitted by a previously replaced socket instance.
+  // This prevents stale callbacks from mutating state that now belongs to a newer socket.
+  private runIfActiveSocket<T>(socket: RWS, handler: (event: T) => void): (event: T) => void {
+    return event => {
+      if (this.socket !== socket) {
+        return;
+      }
+      handler(event);
+    };
   }
 
   public send(message: any): void {
@@ -240,7 +285,19 @@ export class ReconnectingWebsocket {
    * Does not close or reconnect the socket; callers can decide how to react to failures.
    */
   public checkHealth(timeoutMs = TimeUtil.TimeInMillis.SECOND * 10): Promise<boolean> {
-    if (!this.socket || this.getState() !== WEBSOCKET_STATE.OPEN) {
+    const state = this.getState();
+    if (is.undefined(this.socket)) {
+      this.logger.debug('Health check failed — socket instance does not exist');
+      return Promise.resolve(false);
+    }
+
+    if (state === WEBSOCKET_STATE.CONNECTING || state === WEBSOCKET_STATE.CLOSING) {
+      this.logger.debug(`Health check skipped — socket is transitioning (state: ${WEBSOCKET_STATE[state]})`);
+      return Promise.resolve(true);
+    }
+
+    if (state !== WEBSOCKET_STATE.OPEN) {
+      this.logger.debug(`Health check skipped — socket not OPEN (state: ${WEBSOCKET_STATE[state]})`);
       return Promise.resolve(false);
     }
 
@@ -336,8 +393,13 @@ export class ReconnectingWebsocket {
     this.reconnectAttemptCount += 1;
 
     if (this.reconnectAttemptCount === 1) {
+      this.logger.info('WebSocket initial connection attempt');
       return;
     }
+
+    this.logger.warn(
+      `WebSocket reconnect attempt #${this.reconnectAttemptCount} (sequence retry #${this.reconnectSequenceRetryCount + 1})`,
+    );
 
     if (this.reconnectSequenceStartTimestamp.isNothing) {
       this.reconnectSequenceStartTimestamp = Maybe.just(nowInMilliseconds);
@@ -365,6 +427,9 @@ export class ReconnectingWebsocket {
     }
 
     this.hasReportedLongRunningRetry = true;
+    this.logger.warn(
+      `Long-running reconnect detected — retries: ${this.reconnectSequenceRetryCount}, duration: ${retryDurationInMilliseconds}ms`,
+    );
     this.onLongRunningRetry?.({
       retryCount: this.reconnectSequenceRetryCount,
       retryDurationInMilliseconds,
