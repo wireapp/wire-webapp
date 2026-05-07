@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
@@ -60,19 +61,21 @@ export const CellsGlobalView = ({
   const isFetchingMore = nodesStatus === 'fetchingMore';
   const isError = nodesStatus === 'error';
   const isSuccess = nodesStatus === 'success';
-  const hasFiles = !!nodes.length;
-  const emptySearchResults = searchValue && nodesStatus === 'success' && !nodes.length;
+  const hasFiles = nodes.length > 0;
+  const emptySearchResults = is.nonEmptyString(searchValue) && nodesStatus === 'success' && nodes.length === 0;
 
-  const showTable = (isSuccess || (pagination && isFetchingMore)) && !emptySearchResults;
+  const showTable =
+    (isSuccess || (pagination !== undefined && pagination !== null && isFetchingMore)) && !emptySearchResults;
   const showNoFiles = !isLoading && !isFetchingMore && !isError && !hasFiles && !emptySearchResults;
-  const showLoader = isFetchingMore && nodes && nodes.length > 0;
+  const showLoader = isFetchingMore && nodes.length > 0;
 
   const showLoadMore =
     !isLoading &&
     !isFetchingMore &&
     !emptySearchResults &&
     isSuccess &&
-    pagination &&
+    pagination !== undefined &&
+    pagination !== null &&
     pagination.currentPage < pagination.totalPages;
 
   return (

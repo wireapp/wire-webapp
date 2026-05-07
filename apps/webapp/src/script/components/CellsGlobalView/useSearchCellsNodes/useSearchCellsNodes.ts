@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -61,7 +62,7 @@ export const useSearchCellsNodes = ({
       try {
         setStatus(status);
 
-        const shouldSort = !query || query === FETCH_ALL_QUERY;
+        const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
 
         const result = await cellsRepository.searchNodes({
           query,
@@ -74,26 +75,26 @@ export const useSearchCellsNodes = ({
         });
 
         const users = await getUsersFromNodes({
-          nodes: result.Nodes || [],
+          nodes: result.Nodes ?? [],
           userRepository,
         });
 
         const conversations = await getConversationsFromNodes({
-          nodes: result.Nodes || [],
+          nodes: result.Nodes ?? [],
           conversationRepository,
         });
 
         // filter out draft nodes from results
-        const filteredNodes = result.Nodes?.filter(node => !node.IsDraft);
+        const filteredNodes = result.Nodes?.filter(node => node.IsDraft !== true) ?? [];
 
         const transformedNodes = transformCellsNodes({
-          nodes: filteredNodes || [],
+          nodes: filteredNodes,
           users,
           conversations,
         });
 
         setNodes(transformedNodes);
-        if (result.Pagination) {
+        if (result.Pagination !== undefined) {
           setPagination(transformCellsPagination(result.Pagination));
         } else {
           setPagination(null);
@@ -130,7 +131,7 @@ export const useSearchCellsNodes = ({
   }, DEBOUNCE_TIME);
 
   const handleSearch = (value: string) => {
-    if (!value) {
+    if (!is.nonEmptyString(value)) {
       void handleClearSearch();
       return;
     }
@@ -149,7 +150,7 @@ export const useSearchCellsNodes = ({
   const handleReload = async () => {
     setStatus('loading');
     clearAll();
-    await searchNodes({query: searchQuery || FETCH_ALL_QUERY, status: 'loading'});
+    await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, status: 'loading'});
   };
 
   const increasePageSize = useCallback(async () => {
@@ -157,7 +158,7 @@ export const useSearchCellsNodes = ({
     setStatus('fetchingMore');
     setPageSize(pageSize + PAGE_SIZE_INCREMENT);
     await searchNodes({
-      query: searchQuery || FETCH_ALL_QUERY,
+      query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY,
       status: 'fetchingMore',
       limit: pageSize + PAGE_SIZE_INCREMENT,
     });
@@ -166,7 +167,7 @@ export const useSearchCellsNodes = ({
 
   useEffect(() => {
     if (isInitialLoad.current || shouldPerformFullReload.current) {
-      void searchNodes({query: searchQuery || FETCH_ALL_QUERY, status: 'loading'});
+      void searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, status: 'loading'});
     }
   }, [searchNodes, searchQuery]);
 

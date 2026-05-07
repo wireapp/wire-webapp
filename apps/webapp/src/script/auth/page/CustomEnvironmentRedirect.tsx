@@ -19,6 +19,7 @@
 
 import {useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {connect} from 'react-redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
@@ -48,7 +49,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
 
   useEffect(() => {
     let redirectTimeoutId: number;
-    if (destinationUrl) {
+    if (is.nonEmptyString(destinationUrl)) {
       redirectTimeoutId = window.setTimeout(() => {
         if (Runtime.isDesktopApp()) {
           doSendNavigationEvent(destinationUrl).catch(console.error);

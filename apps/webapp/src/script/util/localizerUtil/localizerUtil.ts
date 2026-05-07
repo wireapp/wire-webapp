@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {escape} from 'underscore';
 
 import en from 'I18n/en-US.json';
@@ -74,9 +75,12 @@ const replaceSubstituteEscaped = <Id extends StringIdentifer>(
   if (isStringOrNumber(substitutes)) {
     return string.replace(regex, escape(substitutes.toString()));
   }
-  return string.replace(regex, (found: string, content: Id | string): string =>
-    substitutes?.hasOwnProperty(content) ? escape(substitutes[content] as string) : found,
-  );
+  return string.replace(regex, (found: string, content: Id | string): string => {
+    if (substitutes !== undefined && Object.hasOwn(substitutes, content)) {
+      return escape(substitutes[content] as string);
+    }
+    return found;
+  });
 };
 
 const replaceSubstitute = <Id extends StringIdentifer>(
@@ -88,7 +92,10 @@ const replaceSubstitute = <Id extends StringIdentifer>(
     return string.replace(regex, substitutes.toString());
   }
   return string.replace(regex, (found: string, content: Id | string) => {
-    return substitutes?.hasOwnProperty(content) ? (substitutes[content] as string) : found;
+    if (substitutes !== undefined && Object.hasOwn(substitutes, content)) {
+      return substitutes[content] as string;
+    }
+    return found;
   });
 };
 
@@ -129,12 +136,12 @@ export const LocalizerUtil = {
       ? [substitutions?: undefined, dangerousSubstitutions?: Record<string, string>, skipEscape?: boolean]
       : [substitutions?: Substitutions<Id>, dangerousSubstitutions?: Record<string, string>, skipEscape?: boolean]
   ): string => {
-    const localeValue = strings[locale] && strings[locale][identifier];
+    const localeValue = strings[locale]?.[identifier];
     const defaultValue =
-      strings[DEFAULT_LOCALE] && strings[DEFAULT_LOCALE].hasOwnProperty(identifier)
+      strings[DEFAULT_LOCALE] !== undefined && Object.hasOwn(strings[DEFAULT_LOCALE], identifier)
         ? strings[DEFAULT_LOCALE][identifier]
         : identifier;
-    const value = localeValue || defaultValue;
+    const value = is.string(localeValue) ? localeValue : defaultValue;
 
     const [substitutions, dangerousSubstitutions, skipEscape] = args;
 
@@ -146,9 +153,10 @@ export const LocalizerUtil = {
       ...dangerousSubstitutions,
     };
 
-    const substitutedEscaped = skipEscape
-      ? replaceSubstitute(value, /{(.+?)}/g, substitutions)
-      : replaceSubstituteEscaped(value, /{(.+?)}/g, substitutions);
+    const substitutedEscaped =
+      skipEscape === true
+        ? replaceSubstitute(value, /{(.+?)}/g, substitutions)
+        : replaceSubstituteEscaped(value, /{(.+?)}/g, substitutions);
 
     return replaceSubstitute(substitutedEscaped, /\[(.+?)\]/g, replaceDangerously);
   },

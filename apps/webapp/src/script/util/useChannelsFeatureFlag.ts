@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
@@ -48,9 +49,14 @@ const useCanCreateChannels = () => {
   const {selfRole} = useKoSubscribableChildren(teamState, ['selfRole']);
   const channelFeature = useChannelFeature();
   const allowedAccessType = channelFeature?.config?.allowed_to_create_channels;
-  const allowedRoles = allowedAccessType ? getAccessTypeRoleMap()[allowedAccessType] : undefined;
+  const allowedRoles = is.string(allowedAccessType) ? getAccessTypeRoleMap()[allowedAccessType] : undefined;
 
-  if (channelFeature?.status === FEATURE_STATUS.ENABLED && selfRole && allowedRoles?.includes(selfRole)) {
+  if (
+    channelFeature?.status === FEATURE_STATUS.ENABLED &&
+    is.string(selfRole) &&
+    allowedRoles !== undefined &&
+    allowedRoles.includes(selfRole as Role)
+  ) {
     return true;
   }
 
@@ -62,9 +68,14 @@ const useCanCreatePublicChannels = () => {
   const {selfRole} = useKoSubscribableChildren(teamState, ['selfRole']);
   const channelFeature = useChannelFeature();
   const allowedAccessType = channelFeature?.config?.allowed_to_open_channels;
-  const allowedRoles = allowedAccessType ? getAccessTypeRoleMap()[allowedAccessType] : undefined;
+  const allowedRoles = is.string(allowedAccessType) ? getAccessTypeRoleMap()[allowedAccessType] : undefined;
 
-  if (channelFeature && selfRole && allowedRoles?.includes(selfRole)) {
+  if (
+    channelFeature !== null &&
+    is.string(selfRole) &&
+    allowedRoles !== undefined &&
+    allowedRoles.includes(selfRole as Role)
+  ) {
     return true;
   }
 

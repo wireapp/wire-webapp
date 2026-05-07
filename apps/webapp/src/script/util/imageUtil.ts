@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {Maybe} from 'true-myth';
 
 export const stripImageExifData = async (image: Blob): Promise<Blob> => {
@@ -60,7 +61,7 @@ const drawImageOnCanvas = (img: HTMLImageElement): HTMLCanvasElement => {
 };
 
 const canvasToBlob = (canvas: HTMLCanvasElement, type: string): Promise<Blob> => {
-  const validType = type || 'image/png';
+  const validType = is.nonEmptyString(type) ? type : 'image/png';
   return new Promise((resolve, reject) => {
     canvas.toBlob(blob => {
       if (blob) {
@@ -173,13 +174,13 @@ export const isPreviewableImage = ({
   extension?: string;
 }): boolean => {
   const normalizedMimeType = mimeType?.toLowerCase();
-  if (normalizedMimeType && PREVIEWABLE_IMAGE_MIME_TYPES.has(normalizedMimeType)) {
+  if (is.nonEmptyString(normalizedMimeType) && PREVIEWABLE_IMAGE_MIME_TYPES.has(normalizedMimeType)) {
     return true;
   }
 
   const normalizedExtension = extension?.toLowerCase() ?? fileName?.split('.').pop()?.toLowerCase();
 
-  return !!normalizedExtension && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
+  return is.nonEmptyString(normalizedExtension) && PREVIEWABLE_IMAGE_EXTENSIONS.has(normalizedExtension);
 };
 
 type GetBestPreviewSourceOptions = {

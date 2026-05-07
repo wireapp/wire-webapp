@@ -32,9 +32,9 @@ interface UsePaginationProps {
 export const useCellsPagination = ({pagination, conversationId, setOffset, currentNodesCount}: UsePaginationProps) => {
   const {clearAll, pageSize, setPageSize} = useCellsStore();
 
-  const currentPage = pagination?.currentPage || 0;
-  const totalPages = pagination?.totalPages || 1;
-  const totalRows = pagination?.total || currentNodesCount;
+  const currentPage = pagination?.currentPage ?? 0;
+  const totalPages = pagination?.totalPages ?? 1;
+  const totalRows = pagination?.total ?? currentNodesCount;
 
   const goToPage = useCallback(
     (page: number) => {
@@ -61,9 +61,9 @@ export const useCellsPagination = ({pagination, conversationId, setOffset, curre
   const getPaginationProps = () => {
     if (totalPages > 1) {
       return {
-        currentPage: currentPage ? currentPage - 1 : 0,
-        numberOfPages: pagination?.totalPages,
-        totalRows: pagination?.total,
+        currentPage: currentPage > 0 ? currentPage - 1 : 0,
+        numberOfPages: pagination?.totalPages ?? 1,
+        totalRows: pagination?.total ?? totalRows,
         firstRow: (currentPage - 1) * pageSize + 1,
         lastRow: Math.min(currentPage * pageSize, totalRows),
         pageSize,

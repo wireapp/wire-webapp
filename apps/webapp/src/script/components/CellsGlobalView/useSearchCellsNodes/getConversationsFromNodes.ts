@@ -29,13 +29,13 @@ export const getConversationsFromNodes = async ({
   nodes?: RestNode[];
   conversationRepository: ConversationRepository;
 }) => {
-  if (!nodes?.length) {
+  if (nodes === undefined || nodes.length === 0) {
     return [];
   }
 
-  return Promise.all(
-    nodes
-      .map(node => conversationRepository.getConversationById(parseQualifiedId(node.ContextWorkspace?.Uuid || '')))
-      .filter(Boolean),
-  );
+  const conversationRequests = nodes.map(node => {
+    return conversationRepository.getConversationById(parseQualifiedId(node.ContextWorkspace?.Uuid ?? ''));
+  });
+
+  return Promise.all(conversationRequests);
 };

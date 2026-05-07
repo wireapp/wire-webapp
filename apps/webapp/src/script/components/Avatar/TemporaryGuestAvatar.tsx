@@ -78,7 +78,7 @@ const TemporaryGuestAvatar: React.FunctionComponent<TemporaryGuestAvatarProps> =
         initials={participant.initials()}
         isResponsive
       />
-      {!noBadge && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
+      {noBadge !== true && shouldShowBadge(avatarSize, state) && <AvatarBadge state={state} />}
       <AvatarBorder />
       <svg
         aria-hidden="true"

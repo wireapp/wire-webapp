@@ -62,13 +62,13 @@ const _accumulateSummary = (conversationEntity: Conversation, prioritizeMentionA
   const hasSingleAlert = alertCount === 1;
   const hasOnlyReplies = activities[ACTIVITY_TYPE.REPLY] > 0 && alertCount === activities[ACTIVITY_TYPE.REPLY];
 
-  if (prioritizeMentionAndReply && (hasSingleAlert || hasOnlyReplies)) {
+  if (prioritizeMentionAndReply === true && (hasSingleAlert || hasOnlyReplies)) {
     const hasSingleMention = activities[ACTIVITY_TYPE.MENTION] === 1;
 
     if (hasSingleMention || hasOnlyReplies) {
       const [mentionMessageEntity] = unreadSelfMentions;
       const [replyMessageEntity] = unreadSelfReplies;
-      const messageEntity = mentionMessageEntity || replyMessageEntity;
+      const messageEntity = mentionMessageEntity ?? replyMessageEntity;
 
       if (messageEntity.isEphemeral()) {
         let summary;
@@ -137,7 +137,9 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>):
         }
       }
     })
-    .filter(activityString => !!activityString)
+    .filter((activityString): activityString is string => {
+      return typeof activityString === 'string' && activityString.length > 0;
+    })
     .join(', ');
 };
 
@@ -228,7 +230,7 @@ const _getStateGroupActivity = {
           if (userCountIsOne) {
             const [remoteUserEntity] = (lastMessageEntity as MemberMessage).remoteUserEntities();
 
-            if (remoteUserEntity) {
+            if (remoteUserEntity !== undefined) {
               if ((lastMessageEntity as MemberMessage).isTeamMemberLeave()) {
                 const name = (lastMessageEntity as MemberMessage).name() ?? remoteUserEntity.name();
                 return t('conversationsSecondaryLinePersonRemovedTeam', {user: name});
@@ -302,10 +304,11 @@ const _getStateRemoved = {
     }
     const selfUserId = selfUser.id;
 
-    const isMemberRemoval = lastMessageEntity && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
+    const isMemberRemoval =
+      lastMessageEntity !== undefined && lastMessageEntity.isMember() && lastMessageEntity.isMemberRemoval();
     const wasSelfRemoved =
       isMemberRemoval &&
-      !!(lastMessageEntity as MemberMessage).userIds().find(userId => matchQualifiedIds(userId, selfUser));
+      (lastMessageEntity as MemberMessage).userIds().some(userId => matchQualifiedIds(userId, selfUser));
     if (wasSelfRemoved) {
       const selfLeft = lastMessageEntity.user().id === selfUserId;
       return selfLeft ? t('conversationsSecondaryLineYouLeft') : t('conversationsSecondaryLineYouWereRemoved');
@@ -326,14 +329,14 @@ const _getStateUnreadMessage = {
     const allUnread = [...allMessages, ...systemMessages];
 
     for (const messageEntity of allUnread) {
-      let string;
+      let conversationPreviewText = '';
 
       if (messageEntity.isPing()) {
-        string = t('notificationPing');
+        conversationPreviewText = t('notificationPing');
       } else if (messageEntity.isContent() && messageEntity.hasAssetText()) {
         const assetEntity = messageEntity.getFirstAsset();
         if (assetEntity !== undefined) {
-          string = getRenderedTextContent(assetEntity.text);
+          conversationPreviewText = getRenderedTextContent(assetEntity.text);
         }
       } else if (messageEntity.isContent() && messageEntity.hasAsset()) {
         const assetEntity = messageEntity.getFirstAsset();
@@ -342,27 +345,27 @@ const _getStateUnreadMessage = {
 
         if (isUploaded && assetEntity !== undefined) {
           if (assetEntity.isAudio()) {
-            string = t('notificationSharedAudio');
+            conversationPreviewText = t('notificationSharedAudio');
           } else if (assetEntity.isVideo()) {
-            string = t('notificationSharedVideo');
+            conversationPreviewText = t('notificationSharedVideo');
           } else {
-            string = t('notificationSharedFile');
+            conversationPreviewText = t('notificationSharedFile');
           }
         }
       } else if (messageEntity.hasAssetLocation()) {
-        string = t('notificationSharedLocation');
+        conversationPreviewText = t('notificationSharedLocation');
       } else if (messageEntity.hasAssetImage()) {
-        string = t('notificationAssetAdd');
+        conversationPreviewText = t('notificationAssetAdd');
       } else if (messageEntity.isE2EIVerification()) {
-        string =
+        conversationPreviewText =
           messageEntity.messageType === E2EIVerificationMessageType.VERIFIED
             ? t('conversation.AllE2EIDevicesVerifiedShort')
             : t('conversation.E2EIVerificationDegraded');
       } else if (messageEntity.isVerification()) {
-        string = t('conversation.AllDevicesVerified');
+        conversationPreviewText = t('conversation.AllDevicesVerified');
       }
 
-      if (!!string) {
+      if (conversationPreviewText.length > 0) {
         if (messageEntity.isEphemeral()) {
           return conversationEntity.isGroupOrChannel()
             ? t('conversationsSecondaryLineEphemeralMessageGroup')
@@ -370,8 +373,8 @@ const _getStateUnreadMessage = {
         }
 
         return conversationEntity.isGroupOrChannel() && !messageEntity.isE2EIVerification()
-          ? `${messageEntity.unsafeSenderName()}: ${string}`
-          : string;
+          ? `${messageEntity.unsafeSenderName()}: ${conversationPreviewText}`
+          : conversationPreviewText;
       }
     }
     return '';
@@ -387,7 +390,7 @@ const _getStateUnreadMessage = {
 const _getStateUserName = {
   description: (conversationEntity: Conversation): string => {
     const [userEntity] = conversationEntity.participating_user_ets();
-    const hasHandle = userEntity && userEntity.username();
+    const hasHandle = userEntity !== undefined && userEntity.username() !== undefined;
     return hasHandle ? userEntity.handle : '';
   },
   icon: (conversationEntity: Conversation): ConversationStatusIcon.PENDING_CONNECTION | void => {
@@ -398,7 +401,9 @@ const _getStateUserName = {
   match: (conversationEntity: Conversation): boolean => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
     const isMemberJoin =
-      lastMessageEntity && lastMessageEntity.isMember() && (lastMessageEntity as MemberMessage).isMemberJoin();
+      lastMessageEntity !== undefined &&
+      lastMessageEntity.isMember() &&
+      (lastMessageEntity as MemberMessage).isMemberJoin();
     const isEmpty1to1Conversation = conversationEntity.is1to1() && isMemberJoin === true;
 
     return conversationEntity.isRequest() || isEmpty1to1Conversation;

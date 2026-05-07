@@ -134,7 +134,7 @@ const AccountTypeOption = ({action, buttonText, description, heading, features, 
           data-uie-name="select-account-type-button"
           onClick={action}
           css={styles.optionButton}
-          variant={isPrimary ? ButtonVariant.PRIMARY : ButtonVariant.SECONDARY}
+          variant={isPrimary === true ? ButtonVariant.PRIMARY : ButtonVariant.SECONDARY}
         >
           {buttonText}
         </Button>
