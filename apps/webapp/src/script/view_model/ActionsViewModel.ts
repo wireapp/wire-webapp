@@ -60,16 +60,16 @@ export class ActionsViewModel {
     return this.connectionRepository.acceptRequest(userEntity);
   };
 
-  readonly archiveConversation = (conversationEntity: Conversation): Promise<void> => {
-    if (!conversationEntity) {
+  readonly archiveConversation = (conversationEntity?: Conversation): Promise<void> => {
+    if (conversationEntity === undefined) {
       return Promise.reject();
     }
 
     return this.conversationRepository.archiveConversation(conversationEntity);
   };
 
-  readonly unarchiveConversation = (conversationEntity: Conversation): void => {
-    if (!conversationEntity) {
+  readonly unarchiveConversation = (conversationEntity?: Conversation): void => {
+    if (conversationEntity === undefined) {
       return;
     }
 
@@ -108,11 +108,11 @@ export class ActionsViewModel {
    * @returns Resolves when the connection request was canceled
    */
   readonly cancelConnectionRequest = (
-    userEntity: User,
+    userEntity?: User,
     hideConversation?: boolean,
     nextConversationEntity?: Conversation,
   ): Promise<void> => {
-    if (!userEntity) {
+    if (userEntity === undefined) {
       return Promise.reject();
     }
 
@@ -148,8 +148,8 @@ export class ActionsViewModel {
     }
   };
 
-  readonly clearConversation = (conversationEntity: Conversation): void => {
-    if (conversationEntity) {
+  readonly clearConversation = (conversationEntity?: Conversation): void => {
+    if (conversationEntity !== undefined) {
       const modalType = conversationEntity.isLeavable() ? PrimaryModal.type.OPTION : PrimaryModal.type.CONFIRM;
 
       PrimaryModal.show(modalType, {
@@ -226,8 +226,8 @@ export class ActionsViewModel {
     });
   };
 
-  readonly deleteMessage = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
-    if (conversationEntity && messageEntity) {
+  readonly deleteMessage = (conversationEntity?: Conversation, messageEntity?: Message): Promise<void> => {
+    if (conversationEntity !== undefined && messageEntity !== undefined) {
       return new Promise(resolve => {
         PrimaryModal.show(PrimaryModal.type.CONFIRM, {
           primaryAction: {
@@ -249,8 +249,8 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
-  readonly deleteMessageEveryone = (conversationEntity: Conversation, messageEntity: Message): Promise<void> => {
-    if (conversationEntity && messageEntity) {
+  readonly deleteMessageEveryone = (conversationEntity?: Conversation, messageEntity?: Message): Promise<void> => {
+    if (conversationEntity !== undefined && messageEntity !== undefined) {
       const cellsAssets = this.messageRepository.getCellsAssetAttachmentIds(messageEntity);
 
       const deleteMessage = async () => {
@@ -281,15 +281,15 @@ export class ActionsViewModel {
     return Promise.reject();
   };
 
-  readonly ignoreConnectionRequest = (userEntity: User): Promise<void> => {
-    if (!userEntity) {
+  readonly ignoreConnectionRequest = (userEntity?: User): Promise<void> => {
+    if (userEntity === undefined) {
       return Promise.reject();
     }
     return this.connectionRepository.ignoreRequest(userEntity);
   };
 
-  readonly leaveConversation = (conversation: Conversation): Promise<void> => {
-    if (!conversation) {
+  readonly leaveConversation = (conversation?: Conversation): Promise<void> => {
+    if (conversation === undefined) {
       return Promise.reject();
     }
 
@@ -366,8 +366,8 @@ export class ActionsViewModel {
     return this.openConversation(conversationEntity);
   };
 
-  readonly open1to1ConversationWithService = async (serviceEntity: ServiceEntity): Promise<void> => {
-    if (!serviceEntity) {
+  readonly open1to1ConversationWithService = async (serviceEntity?: ServiceEntity): Promise<void> => {
+    if (serviceEntity === undefined) {
       throw new Error();
     }
 
@@ -399,8 +399,8 @@ export class ActionsViewModel {
     amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
   };
 
-  removeFromConversation = async (conversationEntity: Conversation, userEntity: User): Promise<void> => {
-    if (conversationEntity && userEntity) {
+  removeFromConversation = async (conversationEntity?: Conversation, userEntity?: User): Promise<void> => {
+    if (conversationEntity !== undefined && userEntity !== undefined) {
       if (userEntity.isService) {
         await this.integrationRepository.removeService(conversationEntity, userEntity);
         return;
@@ -446,8 +446,8 @@ export class ActionsViewModel {
     return this.connectionRepository.createConnection(userEntity);
   };
 
-  readonly toggleMuteConversation = async (conversationEntity: Conversation): Promise<void> => {
-    if (conversationEntity) {
+  readonly toggleMuteConversation = async (conversationEntity?: Conversation): Promise<void> => {
+    if (conversationEntity !== undefined) {
       const notificationState = conversationEntity.showNotificationsEverything()
         ? NOTIFICATION_STATE.NOTHING
         : NOTIFICATION_STATE.EVERYTHING;

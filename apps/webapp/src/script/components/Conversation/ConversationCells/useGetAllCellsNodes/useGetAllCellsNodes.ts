@@ -61,7 +61,7 @@ export const useGetAllCellsNodes = ({
         deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
       });
 
-      if (!result.Nodes?.length) {
+      if (result.Nodes === undefined || result.Nodes.length === 0) {
         setStatus('success');
         setPagination({conversationId: id, pagination: null});
         return;
@@ -70,12 +70,12 @@ export const useGetAllCellsNodes = ({
       const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
       // filter out draft nodes from results
-      const filteredNodes = result.Nodes.filter(node => !node.IsDraft);
+      const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
 
       const transformedNodes = transformDataToCellsNodes({nodes: filteredNodes, users});
       setNodes({conversationId: id, nodes: transformedNodes});
 
-      const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;
+      const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
       setPagination({conversationId: id, pagination});
 
       setStatus('success');
@@ -90,7 +90,7 @@ export const useGetAllCellsNodes = ({
   }, [setNodes, setStatus, setError, id, offset, pageSize, setPagination]);
 
   const handleHashChange = useCallback(() => {
-    if (!enabled) {
+    if (enabled !== true) {
       return;
     }
     clearAll({conversationId: id});
@@ -99,7 +99,7 @@ export const useGetAllCellsNodes = ({
   }, [fetchNodes, setOffset, clearAll, id, enabled]);
 
   useEffect(() => {
-    if (!enabled) {
+    if (enabled !== true) {
       return;
     }
 

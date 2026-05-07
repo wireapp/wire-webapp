@@ -144,7 +144,7 @@ export function generateUsers(nbUsers: number, domain: string) {
 export function generateUserClients(users: User[]): QualifiedUserClients {
   const userClients: QualifiedUserClients = {};
   users.forEach(user => {
-    const domainUsers = userClients[user.qualifiedId.domain] || {};
+    const domainUsers = userClients[user.qualifiedId.domain] ?? {};
     domainUsers[user.qualifiedId.id] = [];
     userClients[user.qualifiedId.domain] = domainUsers;
   });

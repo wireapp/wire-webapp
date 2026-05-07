@@ -37,20 +37,29 @@ const unsetSelf: Self = {
   type: UserType.REGULAR,
 };
 
-export const getConsents = (state: RootState) => state.selfState.consents || {};
-export const getSelf = (state: RootState) => state.selfState.self || unsetSelf;
+export const getConsents = (state: RootState) => state.selfState.consents ?? {};
+export const getSelf = (state: RootState) => state.selfState.self ?? unsetSelf;
 export const getSelfError = (state: RootState) => state.selfState.error;
 export const getSelfHandle = (state: RootState): string | undefined => getSelf(state).handle;
 export const getSelfEmail = (state: RootState): string | undefined => getSelf(state).email;
 export const getSelfName = (state: RootState): string | undefined => getSelf(state).name;
 export const getSelfTeamId = (state: RootState): string | undefined => getSelf(state).team;
-export const hasSelfHandle = (state: RootState) => !!getSelfHandle(state);
-export const hasSelfEmail = (state: RootState) => !!getSelfEmail(state);
-export const hasSelfPassword = (state: RootState) => !!state.selfState.hasPassword;
+export const hasSelfHandle = (state: RootState) => {
+  const selfHandle = getSelfHandle(state);
+  return selfHandle !== undefined && selfHandle.length > 0;
+};
+export const hasSelfEmail = (state: RootState) => {
+  const selfEmail = getSelfEmail(state);
+  return selfEmail !== undefined && selfEmail.length > 0;
+};
+export const hasSelfPassword = (state: RootState) => state.selfState.hasPassword === true;
 export const isFetching = (state: RootState) => state.selfState.fetching;
-export const isSSOUser = (state: RootState) => !!getSelf(state).sso_id;
-export const isNoPasswordSSO = (state: RootState) => !!getSelf(state).sso_id?.subject;
-export const isTemporaryGuest = (state: RootState) => !!getSelf(state).expires_at;
+export const isSSOUser = (state: RootState) => getSelf(state).sso_id !== undefined;
+export const isNoPasswordSSO = (state: RootState) => {
+  const subject = getSelf(state).sso_id?.subject;
+  return subject !== undefined && subject.length > 0;
+};
+export const isTemporaryGuest = (state: RootState) => getSelf(state).expires_at !== undefined;
 const getConsent = (state: RootState, consentType: number) => getConsents(state)[consentType];
 export const hasUnsetConsent = (state: RootState, consentType: number) =>
   !Config.getConfig().FEATURE.CHECK_CONSENT ? false : getConsent(state, consentType) === undefined;

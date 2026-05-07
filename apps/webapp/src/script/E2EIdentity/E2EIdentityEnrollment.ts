@@ -83,7 +83,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private get enrollmentStore() {
     const selfUserId = this.userState.self()?.qualifiedId;
 
-    if (!selfUserId) {
+    if (selfUserId === undefined) {
       throw new Error('Self user not found');
     }
 
@@ -94,7 +94,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   private createOIDCService() {
     const key = this.core.key;
     const targetURL = OIDCServiceStore.get.targetURL();
-    if (!key || !targetURL) {
+    if (key === undefined || !is.nonEmptyString(targetURL)) {
       throw new Error('encryption key or targetURL not set');
     }
     return new OIDCService(key, targetURL);
@@ -131,7 +131,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
    * @returns
    */
   public isE2EIEnabled() {
-    return !!this.#config;
+    return this.#config !== undefined;
   }
 
   /** will initialize the e2ei enrollment handler eventually triggering an enrollment flow if the device is a fresh new one */
@@ -168,7 +168,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
 
     const {state, session_state, code} = new SigninResponse(searchParams);
 
-    return !!state && !!session_state && !!code;
+    return is.nonEmptyString(state) && is.nonEmptyString(session_state) && is.nonEmptyString(code);
   }
 
   public async hasGracePeriodStartedForSelfClient(): Promise<boolean> {
@@ -293,7 +293,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       const handle = this.userState.self()?.username();
       const teamId = this.userState.self()?.teamId;
       // If the user has no username or handle, we cannot enroll
-      if (!displayName || !handle || !teamId) {
+      if (!is.nonEmptyString(displayName) || !is.nonEmptyString(handle) || !is.nonEmptyString(teamId)) {
         throw new Error('Username, handle or teamId not found');
       }
 
@@ -307,7 +307,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           // We can fix this condition when the plugin is enabled on keycloak
           const silent = false && isCertificateRenewal;
           const userData = await this.getUserData(silent, authenticationChallenge);
-          if (!userData) {
+          if (userData === undefined || userData === null) {
             throw new Error('No user data received');
           }
           return userData.id_token;

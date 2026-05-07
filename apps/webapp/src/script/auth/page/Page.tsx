@@ -19,6 +19,7 @@
 
 import React from 'react';
 
+import is from '@sindresorhus/is';
 import {TeamData} from '@wireapp/api-client/lib/team';
 import {connect} from 'react-redux';
 import {Navigate} from 'react-router-dom';
@@ -36,9 +37,13 @@ interface Props extends React.HTMLProps<HTMLDivElement> {
   withSideBar?: boolean;
 }
 
-const hasInvalidAccountData = (account: RegistrationDataState) => !account.name || !account.email || !account.password;
+const hasInvalidAccountData = (account: RegistrationDataState) => {
+  return !is.nonEmptyString(account.name) || !is.nonEmptyString(account.email) || !is.nonEmptyString(account.password);
+};
 
-const hasInvalidTeamData = ({team}: {team?: TeamData}) => !team || !team.name;
+const hasInvalidTeamData = ({team}: {team?: TeamData}) => {
+  return team === undefined || !is.nonEmptyString(team.name);
+};
 
 const PageComponent = ({
   hasAccountData,
@@ -50,14 +55,14 @@ const PageComponent = ({
   withSideBar,
 }: Props & ConnectedProps) => {
   if (
-    (hasAccountData && hasInvalidAccountData(account) && !isStateAuthenticated) ||
-    (hasTeamData && hasInvalidTeamData(account) && !isStateAuthenticated) ||
-    (isAuthenticated && !isStateAuthenticated)
+    (hasAccountData === true && hasInvalidAccountData(account) && isStateAuthenticated !== true) ||
+    (hasTeamData === true && hasInvalidTeamData(account) && isStateAuthenticated !== true) ||
+    (isAuthenticated === true && isStateAuthenticated !== true)
   ) {
     return <Navigate to={ROUTE.CREATE_ACCOUNT} replace />;
   }
 
-  if (withSideBar) {
+  if (withSideBar === true) {
     return <Layout>{children}</Layout>;
   }
 

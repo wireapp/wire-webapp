@@ -19,6 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
@@ -79,7 +80,7 @@ const SingleSignOnFormComponent = ({
   const [clientType, setClientType] = useState<ClientType>(ClientType.PERMANENT);
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
-  const [validationError, setValidationError] = useState<any>();
+  const [validationError, setValidationError] = useState<unknown>();
   const [logoutReason, setLogoutReason] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -90,8 +91,10 @@ const SingleSignOnFormComponent = ({
   const [shouldAutoLogin, setShouldAutoLogin] = useState(false);
 
   const [isLinkPasswordModalOpen, setIsLinkPasswordModalOpen] = useState<boolean>(
-    !!conversationInfo?.has_password ||
-      (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+    conversationInfo?.has_password === true ||
+      (conversationError !== undefined &&
+        conversationError !== null &&
+        conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
   );
   const isEnterpriseLoginV2Enabled = getEnterpriseLoginV2FF();
 
@@ -101,7 +104,7 @@ const SingleSignOnFormComponent = ({
     await validateSSOCode(strippedCode);
     await doLogin(strippedCode);
     await doFinalizeSSOLogin({clientType});
-    const hasKeyAndCode = conversationKey && conversationCode;
+    const hasKeyAndCode = is.nonEmptyString(conversationKey) && is.nonEmptyString(conversationCode);
     if (hasKeyAndCode) {
       await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
     }
@@ -115,14 +118,16 @@ const SingleSignOnFormComponent = ({
 
   useEffect(() => {
     setIsLinkPasswordModalOpen(
-      !!conversationInfo?.has_password ||
-        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
+      conversationInfo?.has_password === true ||
+        (conversationError !== undefined &&
+          conversationError !== null &&
+          conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD),
     );
   }, [conversationError, conversationInfo?.has_password]);
 
   useEffect(() => {
     const queryAutoLogin = UrlUtil.hasURLParameter(QUERY_KEY.SSO_AUTO_LOGIN);
-    if (queryAutoLogin === true && initialCode) {
+    if (queryAutoLogin === true && is.nonEmptyString(initialCode)) {
       setShouldAutoLogin(true);
     }
   }, []);
@@ -138,7 +143,7 @@ const SingleSignOnFormComponent = ({
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    if (queryLogoutReason) {
+    if (is.nonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
   }, []);
@@ -147,7 +152,7 @@ const SingleSignOnFormComponent = ({
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
     const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
-    const keyAndCodeExistent = queryConversationKey && queryConversationCode;
+    const keyAndCodeExistent = is.nonEmptyString(queryConversationKey) && is.nonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
@@ -164,14 +169,14 @@ const SingleSignOnFormComponent = ({
   }, []);
 
   useEffect(() => {
-    if (initialCode && initialCode !== codeOrMail) {
+    if (is.nonEmptyString(initialCode) && initialCode !== codeOrMail) {
       setCodeOrMail(initialCode);
       setDisableInput(true);
     }
   }, [initialCode]);
 
   useEffect(() => {
-    if (shouldAutoLogin && clientType && initialCode && initialCode === codeOrMail) {
+    if (shouldAutoLogin && is.nonEmptyString(initialCode) && initialCode === codeOrMail) {
       handleSubmit();
     }
   }, [shouldAutoLogin, clientType, initialCode, codeOrMail]);
@@ -188,14 +193,16 @@ const SingleSignOnFormComponent = ({
 
     resetAuthError();
 
-    if (isFetching || !codeOrMailInput.current) {
+    if (isFetching || codeOrMailInput.current === null) {
       return;
     }
 
     if (
-      !isLinkPasswordModalOpen &&
-      (!!conversationInfo?.has_password ||
-        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+      isLinkPasswordModalOpen !== true &&
+      (conversationInfo?.has_password === true ||
+        (conversationError !== undefined &&
+          conversationError !== null &&
+          conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
     ) {
       setIsLinkPasswordModalOpen(true);
       return;
@@ -272,7 +279,7 @@ const SingleSignOnFormComponent = ({
           default: {
             setSsoError(error);
             const isValidationError = Object.values(ValidationError.ERROR).some(
-              errorType => error.label && error.label.endsWith(errorType),
+              errorType => is.nonEmptyString(error.label) && error.label.endsWith(errorType),
             );
             if (!isValidationError) {
               console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
@@ -284,8 +291,9 @@ const SingleSignOnFormComponent = ({
     }
   };
 
-  const stripPrefix = (prefixedCode: string) =>
-    prefixedCode && prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
+  const stripPrefix = (prefixedCode: string) => {
+    return prefixedCode.trim().toLowerCase().replace(SSO_CODE_PREFIX, '');
+  };
 
   const enableDomainDiscovery = Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY;
 
@@ -343,7 +351,7 @@ const SingleSignOnFormComponent = ({
         <Button
           block
           type="submit"
-          disabled={isFetching || !codeOrMail}
+          disabled={isFetching || !is.nonEmptyString(codeOrMail)}
           formNoValidate
           onClick={handleSubmit}
           aria-label={t('login.headline')}
@@ -351,13 +359,13 @@ const SingleSignOnFormComponent = ({
         >
           {t('login.headline')}
         </Button>
-        {validationError
+        {validationError !== null && validationError !== undefined
           ? parseValidationErrors([validationError])
-          : authError
+          : authError !== null && authError !== undefined
             ? parseError(authError)
-            : ssoError
+            : ssoError !== null
               ? parseError(ssoError)
-              : logoutReason && (
+              : is.nonEmptyString(logoutReason) && (
                   <ErrorMessage data-uie-name="status-logout-reason">
                     <FormattedMessage
                       id={logoutReasonStrings[logoutReason]}

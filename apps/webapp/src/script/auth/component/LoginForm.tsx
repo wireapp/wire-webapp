@@ -19,6 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {useSelector} from 'react-redux';
 
@@ -45,7 +46,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
   const [validPasswordInput, setValidPasswordInput] = useState(true);
   const {email: defaultEmail} = useSelector((state: RootState) => AuthSelector.getAccount(state));
 
-  const [email, setEmail] = useState(defaultEmail || '');
+  const [email, setEmail] = useState(defaultEmail ?? '');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (event: React.FormEvent): Promise<void> => {
@@ -101,13 +102,13 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
 
   useAutoFocus({
     elementRef: passwordInput,
-    shouldFocus: !!defaultEmail,
+    shouldFocus: is.nonEmptyString(defaultEmail),
   });
 
   return (
     <div>
       <Input
-        disabled={!!defaultEmail}
+        disabled={is.nonEmptyString(defaultEmail)}
         id="email"
         name="email"
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -150,7 +151,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         <Button
           block
           type="submit"
-          disabled={!email || !password}
+          disabled={!is.nonEmptyString(email) || !is.nonEmptyString(password)}
           formNoValidate
           onClick={handleSubmit}
           aria-label={t('login.headline')}

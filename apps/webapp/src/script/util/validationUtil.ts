@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {ValidationError} from '../auth/module/action/ValidationError';
 
 export class ValidationUtilError extends Error {
@@ -75,7 +77,7 @@ export const legacyAsset = (assetId: string, conversationId: string): true => {
 export const assetRetentionPolicy = (policyId: number): boolean => policyId > 0 && policyId < 6;
 
 export const isValidAsset = (assetKey: string, assetToken?: string): true => {
-  if (!assetKey) {
+  if (!is.nonEmptyString(assetKey)) {
     throw new ValidationUtilError('Asset key not defined');
   }
 
@@ -88,7 +90,7 @@ export const isValidAsset = (assetKey: string, assetToken?: string): true => {
   if (!isUUID(uuid.join(SEPARATOR))) {
     throw new ValidationUtilError('Invalid asset key (UUID)');
   }
-  if (assetToken && !isBearerToken(assetToken)) {
+  if (is.nonEmptyString(assetToken) && !isBearerToken(assetToken)) {
     throw new ValidationUtilError('Invalid asset token');
   }
   return true;

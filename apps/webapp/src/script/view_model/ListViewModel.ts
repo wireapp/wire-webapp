@@ -223,7 +223,7 @@ export class ListViewModel {
       return this.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
     }
 
-    if (nextItem) {
+    if (nextItem !== undefined) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem, {});
     }
   };
@@ -239,7 +239,7 @@ export class ListViewModel {
 
     const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as ContentState;
 
-    if (nextPreference) {
+    if (nextPreference !== undefined) {
       this.contentViewModel.switchContent(nextPreference);
     }
   };
@@ -433,8 +433,8 @@ export class ListViewModel {
 
     if (!conversationEntity.isGroupOrChannel()) {
       const userEntity = conversationEntity.firstUserEntity();
-      const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
-      const canUnblock = userEntity && userEntity.isBlocked();
+      const canBlock = userEntity !== undefined && (userEntity.isConnected() || userEntity.isRequest());
+      const canUnblock = userEntity !== undefined && userEntity.isBlocked();
 
       if (canBlock) {
         entries.push({

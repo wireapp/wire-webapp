@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage} from '@wireapp/react-ui-kit';
@@ -24,9 +25,41 @@ import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {errorHandlerStrings} from 'Util/errorUtil';
 import {validationErrorStrings} from 'Util/validationUtil';
 
-export function parseError(error: any): JSX.Element | null {
-  if (error) {
-    if (errorHandlerStrings.hasOwnProperty(error.label)) {
+type LabelledErrorValue = {
+  label: string;
+};
+
+type MessageInterpolationValue = string | number | boolean | Date | JSX.Element | null | undefined;
+type MessageInterpolationValues = Record<string, MessageInterpolationValue>;
+
+const hasLabel = (value: unknown): value is LabelledErrorValue => {
+  return is.object(value) && 'label' in value && is.string((value as LabelledErrorValue).label);
+};
+
+const toMessageInterpolationValues = (value: unknown): MessageInterpolationValues | undefined => {
+  if (!is.object(value)) {
+    return undefined;
+  }
+
+  const entries = Object.entries(value).filter((entry): entry is [string, MessageInterpolationValue] => {
+    const [entryKey, entryValue] = entry;
+    return (
+      is.nonEmptyString(entryKey) &&
+      (entryValue === null ||
+        entryValue === undefined ||
+        is.string(entryValue) ||
+        is.number(entryValue) ||
+        is.boolean(entryValue) ||
+        is.date(entryValue))
+    );
+  });
+
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+};
+
+export function parseError(error: unknown): JSX.Element | null {
+  if (error !== null && error !== undefined) {
+    if (hasLabel(error) && Object.hasOwn(errorHandlerStrings, error.label)) {
       return (
         <ErrorMessage data-uie-name="error-message" data-uie-value={error.label}>
           <FormattedMessage id={errorHandlerStrings[error.label]} />
@@ -35,21 +68,25 @@ export function parseError(error: any): JSX.Element | null {
     }
     return (
       <ErrorMessage data-uie-name="error-message" data-uie-value={'unexpected-error'}>
-        <FormattedMessage id="BackendError.unexpected" values={error} />
+        <FormattedMessage id="BackendError.unexpected" values={toMessageInterpolationValues(error)} />
       </ErrorMessage>
     );
   }
   return null;
 }
 
-export function parseValidationErrors(errors: any | any[]): JSX.Element[] {
-  const errorMessages: any[] = ([] as any[]).concat(errors ?? []);
+export function parseValidationErrors(errors: unknown | unknown[]): JSX.Element[] {
+  const errorMessages: unknown[] = ([] as unknown[]).concat(errors ?? []);
   return errorMessages.map(error => (
-    <ErrorMessage data-uie-name="error-message" data-uie-value={error.label} key={error.label}>
-      {validationErrorStrings.hasOwnProperty(error.label) ? (
+    <ErrorMessage
+      data-uie-name="error-message"
+      data-uie-value={hasLabel(error) ? error.label : 'unexpected-error'}
+      key={hasLabel(error) ? error.label : 'unexpected-error'}
+    >
+      {hasLabel(error) && Object.hasOwn(validationErrorStrings, error.label) ? (
         <FormattedMessage id={validationErrorStrings[error.label]} />
       ) : (
-        <FormattedMessage id="BackendError.unexpected" values={error} />
+        <FormattedMessage id="BackendError.unexpected" values={toMessageInterpolationValues(error)} />
       )}
     </ErrorMessage>
   ));

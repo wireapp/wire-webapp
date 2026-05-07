@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useDebouncedCallback} from 'use-debounce';
 
@@ -63,7 +64,7 @@ export const useConversationSearchFiles = ({
       try {
         setStatus('loading');
 
-        const shouldSort = !query || query === FETCH_ALL_QUERY;
+        const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
 
         const result = await cellsRepository.searchNodes({
           query,
@@ -73,7 +74,7 @@ export const useConversationSearchFiles = ({
           type: 'file',
         });
 
-        if (!result.Nodes?.length) {
+        if (result.Nodes === undefined || result.Nodes.length === 0) {
           setNodes({conversationId: id, nodes: []});
           setPagination({conversationId: id, pagination: null});
           setStatus('success');
@@ -83,7 +84,7 @@ export const useConversationSearchFiles = ({
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
         // filter out draft nodes from results
-        const filteredNodes = result.Nodes.filter(node => !node.IsDraft);
+        const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
 
         const transformedNodes = transformDataToCellsNodes({
           nodes: filteredNodes,
@@ -92,7 +93,7 @@ export const useConversationSearchFiles = ({
 
         setNodes({conversationId: id, nodes: transformedNodes});
 
-        const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;
+        const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
         setPagination({conversationId: id, pagination});
 
         if (isInitialLoad.current) {
@@ -120,7 +121,7 @@ export const useConversationSearchFiles = ({
 
   const handleSearch = (value: string) => {
     setSearchValue(value);
-    if (!value) {
+    if (!is.nonEmptyString(value)) {
       searchNodesDebounced.cancel();
       handleClearSearch();
       onClear?.();
@@ -140,15 +141,15 @@ export const useConversationSearchFiles = ({
   const handleReload = async () => {
     setStatus('loading');
     clearAll({conversationId: id});
-    await searchNodes({query: searchQuery || FETCH_ALL_QUERY});
+    await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
   };
 
   useEffect(() => {
-    if (!enabled || !shouldPerformSearch.current) {
+    if (enabled !== true || shouldPerformSearch.current !== true) {
       return;
     }
 
-    void searchNodes({query: searchQuery || FETCH_ALL_QUERY});
+    void searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
   }, [searchNodes, searchQuery, enabled]);
 
   return {

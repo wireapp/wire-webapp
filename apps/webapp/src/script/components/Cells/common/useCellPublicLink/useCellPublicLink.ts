@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -46,8 +47,8 @@ export const useCellPublicLink = ({
   setStatusOnPublicLinkUrl = false,
   includeNodePublicLinkInCallbacks = false,
 }: UseCellPublicLinkParams) => {
-  const [isEnabled, setIsEnabled] = useState(!!node?.publicLink?.alreadyShared || false);
-  const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink ? 'success' : 'idle');
+  const [isEnabled, setIsEnabled] = useState(node?.publicLink?.alreadyShared === true);
+  const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink !== undefined ? 'success' : 'idle');
   const [linkData, setLinkData] = useState<RestShareLink | null>(null);
   const fetchedLinkId = useRef<string | null>(null);
   // Track created link UUID to handle immediate disable scenario
@@ -59,12 +60,12 @@ export const useCellPublicLink = ({
       const link = await cellsRepository.createPublicLink({
         uuid,
         link: {
-          Label: node?.name || '',
+          Label: node?.name ?? '',
           Permissions: ['Preview', 'Download'],
         },
       });
 
-      if (!link.LinkUrl || !link.Uuid) {
+      if (!is.nonEmptyString(link.LinkUrl) || !is.nonEmptyString(link.Uuid)) {
         throw new Error('Link not found');
       }
 
@@ -74,7 +75,7 @@ export const useCellPublicLink = ({
       setPublicLink(newLink);
       setLinkData(link);
       setStatus('success');
-    } catch (err: unknown) {
+    } catch {
       setStatus('error');
       setPublicLink(undefined);
       createdLinkUuid.current = null;
@@ -86,7 +87,7 @@ export const useCellPublicLink = ({
   const getPublicLink = useCallback(async () => {
     const linkId = node?.publicLink?.uuid;
 
-    if (!linkId || fetchedLinkId.current === linkId) {
+    if (!is.nonEmptyString(linkId) || fetchedLinkId.current === linkId) {
       return;
     }
 
@@ -95,7 +96,7 @@ export const useCellPublicLink = ({
 
       const link = await cellsRepository.getPublicLink({uuid: linkId});
 
-      if (!link.LinkUrl || !link.Uuid) {
+      if (!is.nonEmptyString(link.LinkUrl) || !is.nonEmptyString(link.Uuid)) {
         throw new Error('Link not found');
       }
 
@@ -105,7 +106,7 @@ export const useCellPublicLink = ({
       setLinkData(link);
       fetchedLinkId.current = linkId;
       setStatus('success');
-    } catch (err: unknown) {
+    } catch {
       setStatus('error');
       setPublicLink(undefined);
     }
@@ -119,9 +120,9 @@ export const useCellPublicLink = ({
   ]);
 
   const deletePublicLink = useCallback(async () => {
-    const linkUuid = createdLinkUuid.current || node?.publicLink?.uuid;
+    const linkUuid = createdLinkUuid.current ?? node?.publicLink?.uuid;
 
-    if (!linkUuid) {
+    if (!is.nonEmptyString(linkUuid)) {
       return;
     }
 
@@ -129,7 +130,7 @@ export const useCellPublicLink = ({
       await cellsRepository.deletePublicLink({uuid: linkUuid});
       setPublicLink(undefined);
       createdLinkUuid.current = null; // Clear after successful deletion
-    } catch (err: unknown) {
+    } catch {
       setStatus('error');
     }
     // cellsRepository is not a dependency because it's a singleton
@@ -151,7 +152,7 @@ export const useCellPublicLink = ({
       passwordEnabled?: boolean;
       accessEnd?: string | null;
     }) => {
-      if (!node?.publicLink?.uuid) {
+      if (!is.nonEmptyString(node?.publicLink?.uuid)) {
         throw new Error('No public link to update');
       }
 
@@ -161,7 +162,7 @@ export const useCellPublicLink = ({
         const currentLink = await cellsRepository.getPublicLink({uuid: node.publicLink.uuid});
 
         const hasExistingPassword = currentLink.PasswordRequired === true;
-        const isSettingPassword = passwordEnabled && password;
+        const shouldSetPassword = passwordEnabled === true && is.nonEmptyString(password);
 
         const updatedLink: typeof currentLink = {
           ...currentLink,
@@ -179,19 +180,20 @@ export const useCellPublicLink = ({
           linkUuid: node.publicLink.uuid,
           link: updatedLink,
           // Use createPassword if no password exists, updatePassword if it does
-          ...(isSettingPassword ? (hasExistingPassword ? {updatePassword: password} : {createPassword: password}) : {}),
+          ...(shouldSetPassword ? (hasExistingPassword ? {updatePassword: password} : {createPassword: password}) : {}),
           passwordEnabled,
         });
 
         // Update linkData with the new values so the UI doesn't reset
-        setLinkData(prevData => {
-          if (!prevData) {
-            return prevData;
+        setLinkData(previousLinkData => {
+          if (previousLinkData === null) {
+            return previousLinkData;
           }
           return {
-            ...prevData,
+            ...previousLinkData,
             PasswordRequired: passwordEnabled,
-            AccessEnd: accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : prevData.AccessEnd,
+            AccessEnd:
+              accessEnd === null ? undefined : accessEnd !== undefined ? accessEnd : previousLinkData.AccessEnd,
           };
         });
 
@@ -212,13 +214,15 @@ export const useCellPublicLink = ({
   );
 
   const togglePublicLink = useCallback(() => {
-    setIsEnabled(prev => !prev);
+    setIsEnabled(previousIsEnabled => {
+      return !previousIsEnabled;
+    });
   }, []);
 
   useEffect(() => {
-    const shouldDeleteLink = !isEnabled && node?.publicLink?.url;
-    const shouldCreateNewLink = isEnabled && !node?.publicLink?.alreadyShared;
-    const shouldGetLink = isEnabled && node?.publicLink?.alreadyShared;
+    const shouldDeleteLink = isEnabled === false && is.nonEmptyString(node?.publicLink?.url);
+    const shouldCreateNewLink = isEnabled === true && node?.publicLink?.alreadyShared !== true;
+    const shouldGetLink = isEnabled === true && node?.publicLink?.alreadyShared === true;
 
     if (shouldGetLink) {
       void getPublicLink();
@@ -240,7 +244,7 @@ export const useCellPublicLink = ({
       return;
     }
 
-    if (node?.publicLink?.url) {
+    if (is.nonEmptyString(node?.publicLink?.url)) {
       setStatus('success');
     }
   }, [node?.publicLink?.url, setStatusOnPublicLinkUrl]);

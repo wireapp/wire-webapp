@@ -55,7 +55,7 @@ export class AbstractConversationEventHandler {
    */
   handleConversationEvent(conversationEntity: Conversation, eventJson: ConversationEventPayload): Promise<void> {
     const handler = this.eventHandlingConfig[eventJson.type];
-    if (!handler) {
+    if (handler === undefined) {
       return Promise.resolve();
     }
     return Promise.resolve(handler.call(this, conversationEntity, eventJson)).then((): void => undefined);

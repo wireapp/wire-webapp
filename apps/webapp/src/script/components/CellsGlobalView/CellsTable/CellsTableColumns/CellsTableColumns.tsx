@@ -65,7 +65,7 @@ export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsR
   }),
   columnHelper.accessor('publicLink', {
     header: t('cells.tableRow.publicLink'),
-    cell: info => <CellsTableSharedColumn isShared={!!info.getValue()?.alreadyShared} />,
+    cell: info => <CellsTableSharedColumn isShared={info.getValue()?.alreadyShared === true} />,
     size: 60,
   }),
   columnHelper.accessor('id', {

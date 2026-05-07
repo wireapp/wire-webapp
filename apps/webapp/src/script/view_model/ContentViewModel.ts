@@ -158,10 +158,10 @@ export class ContentViewModel {
     return this.switchContent(ContentState.CONNECTION_REQUESTS);
   }
 
-  private isConversationOpen(conversationEntity: Conversation, isActiveConversation: boolean): boolean {
+  private isConversationOpen(isActiveConversation: boolean): boolean {
     const {contentState} = useAppState.getState();
     const isConversationState = contentState === ContentState.CONVERSATION;
-    return conversationEntity && isActiveConversation && isConversationState;
+    return isActiveConversation && isConversationState;
   }
 
   private switchToNotificationSettingsIfApplicable(
@@ -281,7 +281,7 @@ export class ContentViewModel {
         this.closeRightSidebar();
       }
 
-      const isOpenedConversation = this.isConversationOpen(conversationEntity, isActiveConversation);
+      const isOpenedConversation = this.isConversationOpen(isActiveConversation);
       this.handleConversationState(isOpenedConversation, openNotificationSettings, conversationEntity);
       if (!isActiveConversation) {
         this.conversationState.activeConversation(conversationEntity);

@@ -67,12 +67,12 @@ function mapUserIdentities(
 
 export async function getUsersIdentities(groupId: string, userIds: QualifiedId[]) {
   const userVerifications = await getE2EIdentityService().getUsersIdentities(groupId, userIds);
-  return userVerifications && mapUserIdentities(userVerifications);
+  return userVerifications !== undefined ? mapUserIdentities(userVerifications) : userVerifications;
 }
 
 export async function getAllGroupUsersIdentities(groupId: string) {
   const userVerifications = await getE2EIdentityService().getAllGroupUsersIdentities(groupId);
-  return userVerifications && mapUserIdentities(userVerifications);
+  return userVerifications !== undefined ? mapUserIdentities(userVerifications) : userVerifications;
 }
 
 export async function getConversationVerificationState(groupId: string) {
@@ -102,7 +102,7 @@ const getSelfDeviceIdentity = async (): Promise<WireIdentity | undefined> => {
   const currentClientId = core.clientId;
   const userId = {id: core.userId, domain: core.backendFeatures.domain};
 
-  if (userId && currentClientId) {
+  if (currentClientId !== undefined) {
     const identity = userIdentities
       .get(stringifyQualifiedId(userId))
       ?.find(identity => identity.deviceId === currentClientId);

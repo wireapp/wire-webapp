@@ -199,8 +199,7 @@ export class Message {
 
   hasMultipartAsset(): this is ContentMessage {
     const contentMessageCandidate = this as unknown as {assets?: () => Array<{type: AssetType}>};
-    const hasAssetsFunction =
-      Object.prototype.hasOwnProperty.call(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
+    const hasAssetsFunction = Object.hasOwn(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
     return this.isContent() && hasAssetsFunction
       ? this.assets().some(assetEntity => assetEntity.type === AssetType.MULTIPART)
       : false;

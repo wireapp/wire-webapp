@@ -101,7 +101,7 @@ export class CallingViewModel {
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
         const {conversation} = call;
-        if (!conversation || conversation.isSelfUserRemoved()) {
+        if (conversation.isSelfUserRemoved()) {
           return false;
         }
 
@@ -132,7 +132,7 @@ export class CallingViewModel {
       };
       const initialCallState = call.state();
       const soundId = sounds[initialCallState];
-      if (!soundId || typeof call.reason() !== 'undefined') {
+      if (soundId === undefined || typeof call.reason() !== 'undefined') {
         return;
       }
 
