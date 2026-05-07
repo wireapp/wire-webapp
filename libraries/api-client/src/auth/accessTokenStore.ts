@@ -85,7 +85,11 @@ export class AccessTokenStore extends EventEmitter {
   };
 
   public getAccessToken = (): string | undefined => {
-    if (this.accessTokenData && this.tokenExpirationDate && this.tokenExpirationDate > Date.now()) {
+    if (
+      this.accessTokenData !== undefined &&
+      this.tokenExpirationDate !== undefined &&
+      this.tokenExpirationDate > Date.now()
+    ) {
       return this.accessTokenData.access_token;
     }
     this.logger.warn('Access token is not set or has expired');

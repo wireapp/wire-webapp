@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 /**
  * This error means we are trying to add users that are parts of 2 backends that are not federating with each other to a new conversation.
  */
@@ -28,5 +30,10 @@ export class NonFederatingBackendsError extends Error {
 }
 
 export function isNonFederatingBackendsError(error: unknown): error is NonFederatingBackendsError {
-  return !!error && typeof error === 'object' && 'name' in error && error.name === 'NonFederatingBackendError';
+  if (typeof error !== 'object' || error === null || 'name' in error === false) {
+    return false;
+  }
+
+  const errorName = (error as {name: unknown}).name;
+  return is.string(errorName) && errorName === 'NonFederatingBackendError';
 }

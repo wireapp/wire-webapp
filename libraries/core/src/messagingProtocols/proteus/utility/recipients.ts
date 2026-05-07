@@ -49,7 +49,7 @@ const getRecipientsForConversation = async ({
     return userIds;
   }
 
-  const hasTargetUsers = userIds && Object.keys(userIds).length > 0;
+  const hasTargetUsers = userIds !== undefined && Object.keys(userIds).length > 0;
   const recipientIds = hasTargetUsers
     ? userIds
     : await getConversationQualifiedMembers({apiClient: apiClient, conversationId});

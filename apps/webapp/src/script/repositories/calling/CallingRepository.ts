@@ -551,7 +551,13 @@ export class CallingRepository {
       this.videoStateChanged, // `vstateh`,
     );
     const tenSeconds = 10;
-    wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
+    wCall.setNetworkQualityHandler(
+      wUser,
+      (conversationId, userId, clientId, quality) => {
+        this.updateCallQuality(conversationId, userId, clientId, JSON.stringify({quality}));
+      },
+      tenSeconds,
+    );
     wCall.setMuteHandler(wUser, this.updateMuteState);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
@@ -643,12 +649,11 @@ export class CallingRepository {
       return;
     }
 
-    const {quality} = qualityInfo;
-
     const call = this.findCall(this.parseQualifiedId(conversationId));
     if (!call) {
       return;
     }
+    const {quality} = qualityInfo;
     if (!this.poorCallQualityUsers[conversationId]) {
       this.poorCallQualityUsers[conversationId] = [];
     }

@@ -118,7 +118,7 @@ export class HttpClient extends EventEmitter {
       retryDelay: exponentialDelay,
       retryCondition: (error: AxiosError) => {
         const {response, request} = error;
-        const isNetworkError = !response && request && !Object.keys(request).length;
+        const isNetworkError = response === undefined && request !== undefined && Object.keys(request).length === 0;
         if (isNetworkError) {
           this.logger.warn('Disconnected from backend');
           this.updateConnectionState(ConnectionState.DISCONNECTED);
@@ -238,7 +238,10 @@ export class HttpClient extends EventEmitter {
         ...config,
         signal: abortController?.signal,
         // We want to prefix all urls, except for the "access" endpoint
-        url: config.url?.startsWith(AuthAPI.URL.ACCESS) ? config.url : `${this.versionPrefix}${config.url}`,
+        url:
+          config.url !== undefined && config.url.startsWith(AuthAPI.URL.ACCESS)
+            ? config.url
+            : `${this.versionPrefix}${config.url}`,
         maxBodyLength: FILE_SIZE_100_MB,
         maxContentLength: FILE_SIZE_100_MB,
       });
@@ -256,7 +259,7 @@ export class HttpClient extends EventEmitter {
         return this._sendRequest<T>({config, isFirstTry: false, abortController});
       };
 
-      const hasAccessToken = !!this.accessTokenStore?.accessTokenData;
+      const hasAccessToken = this.accessTokenStore?.accessTokenData !== undefined;
 
       if (axios.isAxiosError(error) && error.response?.status === StatusCode.UNAUTHORIZED) {
         return retryWithTokenRefresh();
@@ -300,9 +303,9 @@ export class HttpClient extends EventEmitter {
   }
 
   static isBackendError(errorCandidate: any): errorCandidate is AxiosError<BackendError> & {response: BackendError} {
-    if (errorCandidate.response) {
+    if (errorCandidate.response !== undefined) {
       const {data} = errorCandidate.response;
-      return !!data?.code && !!data?.label && !!data?.message;
+      return data?.code !== undefined && data?.label !== undefined && data?.message !== undefined;
     }
     return false;
   }
@@ -312,7 +315,7 @@ export class HttpClient extends EventEmitter {
    * @param  {number} errorMargin - Since the expiration date is subject to time shift between client and server, an error margin can be used. Defaults to 10s
    */
   public hasValidAccessToken(errorMargin: number = 10000): boolean {
-    if (this.accessTokenStore.tokenExpirationDate) {
+    if (this.accessTokenStore.tokenExpirationDate !== undefined) {
       const now = Date.now();
       const expirationDate = this.accessTokenStore.tokenExpirationDate;
       return expirationDate - errorMargin >= now;
@@ -322,7 +325,10 @@ export class HttpClient extends EventEmitter {
 
   public async refreshAccessToken(): Promise<AccessTokenData> {
     let expiredAccessToken: AccessTokenData | undefined;
-    if (this.accessTokenStore.accessTokenData?.access_token) {
+    if (
+      this.accessTokenStore.accessTokenData?.access_token !== undefined &&
+      this.accessTokenStore.accessTokenData.access_token.length > 0
+    ) {
       expiredAccessToken = this.accessTokenStore.accessTokenData;
     }
 
@@ -340,9 +346,13 @@ export class HttpClient extends EventEmitter {
       method: 'post',
       url: `${AuthAPI.URL.ACCESS}`,
       withCredentials: true,
-      params: clientId && {client_id: clientId},
+      params: clientId !== undefined && clientId.length > 0 ? {client_id: clientId} : undefined,
     };
-    if (expiredAccessToken?.access_token && config?.headers) {
+    if (
+      expiredAccessToken?.access_token !== undefined &&
+      expiredAccessToken.access_token.length > 0 &&
+      config.headers !== undefined
+    ) {
       config.headers = new AxiosHeaders(config.headers as AxiosHeaders);
       config.headers.set(
         'Authorization',
@@ -412,7 +422,7 @@ export class HttpClient extends EventEmitter {
     const shouldGzipData =
       this.enableGzip &&
       process.env.NODE_ENV !== 'test' &&
-      !!config.data &&
+      config.data !== undefined &&
       ['post', 'put', 'patch'].includes(config.method?.toLowerCase() ?? '');
 
     if (shouldGzipData) {

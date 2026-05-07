@@ -110,7 +110,7 @@ export class CryptoboxWrapper implements CryptoClient {
 
   async sessionExists(sessionId: string) {
     try {
-      return !!(await this.cryptobox.session_load(sessionId));
+      return (await this.cryptobox.session_load(sessionId)) !== undefined;
     } catch {
       return false;
     }

@@ -208,7 +208,7 @@ export class WebSocketClient extends EventEmitter {
   }
 
   public disconnect(reason?: string): void {
-    if (this.socket) {
+    if (this.socket !== undefined) {
       this.socket.disconnect(reason);
     }
   }
@@ -247,9 +247,9 @@ export class WebSocketClient extends EventEmitter {
       accessTokenStore: {getAccessToken, getNextMarkerToken},
     } = this.client;
     const accessToken = getAccessToken?.() ?? '';
-    const markerToken = getNextMarkerToken?.();
+    const markerToken = getNextMarkerToken?.() ?? '';
 
-    if (!accessToken) {
+    if (accessToken.length === 0) {
       this.logger.warn('Reconnecting WebSocket with unset token');
     }
 
@@ -261,7 +261,7 @@ export class WebSocketClient extends EventEmitter {
       access_token: accessToken,
     });
 
-    if (markerToken && !this.useLegacySocket) {
+    if (markerToken.length > 0 && !this.useLegacySocket) {
       queryParams.append('sync_marker', markerToken);
     }
 
@@ -269,7 +269,7 @@ export class WebSocketClient extends EventEmitter {
      * @note If no client ID is given, then the WebSocket connection
      * will receive all notifications for all clients of the connected user
      */
-    if (this.clientId) {
+    if (this.clientId !== undefined && this.clientId.length > 0) {
       queryParams.append('client', this.clientId);
     }
 

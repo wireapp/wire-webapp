@@ -87,7 +87,7 @@ const migrateOnceAndGetKey = async (
   // We retrieve the new key if it exists or generate a new one
   const keyNew = await getKey(generateSecretKey, coreCryptoNewKeyId, 32);
 
-  if (!keyNew || !keyOld) {
+  if (keyNew === undefined || keyOld === undefined) {
     // If we dont retreive any key, we throw an error
     // This should not happen since we generate a new key if it does not exist
     throw new Error('Key not found and could not be generated');
@@ -99,7 +99,7 @@ const migrateOnceAndGetKey = async (
    * - If `keyNew` is freshly generated and `keyOld` is not freshly generated:
    *     - Migrate data from `keyOld` to `keyNew`
    */
-  if (keyNew.freshlyGenerated && !keyOld.freshlyGenerated) {
+  if (keyNew.freshlyGenerated === true && keyOld.freshlyGenerated === false) {
     const databaseKey = new DatabaseKey(keyNew.key);
     await migrateDatabaseKeyTypeToBytes(coreCryptoDbName, Encoder.toBase64(keyOld.key).asString, databaseKey);
   }
@@ -202,7 +202,7 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   init(nbInitialPrekeys?: number) {
-    if (nbInitialPrekeys) {
+    if (nbInitialPrekeys !== undefined) {
       this.prekeyTracker.setInitialState(nbInitialPrekeys);
     }
     return this.coreCrypto.transaction(cx => cx.proteusInit());

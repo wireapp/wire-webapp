@@ -331,7 +331,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     const {group_id: groupId, qualified_id: qualifiedId} = newConversation;
 
-    if (!groupId) {
+    if (groupId === undefined || groupId.length === 0) {
       throw new Error('No group_id found in response which is required for creating MLS conversations.');
     }
 
@@ -355,7 +355,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     const {
       conversation: {group_id: newGroupId},
     } = await this.resetMLSConversation(conversationId);
-    if (!newGroupId) {
+    if (newGroupId === undefined || newGroupId.length === 0) {
       const errorMessage = 'Tried to reset MLS conversation but no group_id found in response';
       this.logger.error(errorMessage, {conversationId});
       throw new Error(errorMessage);
@@ -600,8 +600,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
   private async refreshGroupIdConversationMap(): Promise<void> {
     const conversations = await this.apiClient.api.conversation.getConversationList();
     this.groupIdConversationMap.clear();
-    for (const conversation of conversations.found || []) {
-      if (conversation.group_id) {
+    for (const conversation of conversations.found ?? []) {
+      if (conversation.group_id !== undefined && conversation.group_id.length > 0) {
         this.groupIdConversationMap.set(conversation.group_id, conversation);
       }
     }
@@ -657,7 +657,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     );
     const {validatedClientId: clientId, userId, domain: selfUserDomain} = this.apiClient;
 
-    if (!selfUserDomain) {
+    if (selfUserDomain === undefined || selfUserDomain.length === 0) {
       const errorMessage = 'Could not find domain of the self user';
       this.logger.error(errorMessage, {conversationId});
       throw new Error(errorMessage);
@@ -673,7 +673,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     this.validateDomainMatch(selfUserDomain, conversationDomain);
 
-    if (!groupId || !epoch) {
+    if (groupId === undefined || groupId.length === 0 || epoch === undefined) {
       const errorMessage = 'Could not find group id or epoch for the conversation';
       this.logger.error(errorMessage, {conversationId});
       throw new Error(errorMessage);
@@ -686,7 +686,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
       groupId,
     });
 
-    if (!userId || !selfUserDomain) {
+    if (userId === undefined || userId.length === 0 || selfUserDomain.length === 0) {
       const errorMessage = 'Could not find userId or domain of the self user';
       this.logger.error(errorMessage, {conversationId});
       throw new Error(errorMessage);
@@ -702,11 +702,11 @@ export class ConversationService extends TypedEventEmitter<Events> {
       newGroupId,
     });
 
-    if (!newGroupId || !clientId) {
+    if (newGroupId === undefined || newGroupId.length === 0 || clientId.length === 0) {
       throw new Error(`Failed to recover MLS conversation: missing groupId (${newGroupId}), or clientId (${clientId})`);
     }
 
-    const usersToReAdd = members.others.map(member => member.qualified_id).filter(userId => !!userId);
+    const usersToReAdd = members.others.map(member => member.qualified_id).filter(userId => userId !== undefined);
 
     // STEP 5: Re-establish the conversation by re-adding all members
     return await this.establishMLSGroupConversation(
@@ -1026,14 +1026,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
   private async recoverMLSGroupFromEpochMismatch(conversationId: QualifiedId, subconversationId?: SUBCONVERSATION_ID) {
     this.logger.info(`Recovering MLS group from epoch mismatch`, {conversationId, subconversationId});
-    if (subconversationId) {
+    if (subconversationId !== undefined) {
       const parentGroupId = await this.groupIdFromConversationId(conversationId);
       const subconversation = await this.apiClient.api.conversation.getSubconversation(
         conversationId,
         subconversationId,
       );
 
-      if (!parentGroupId) {
+      if (parentGroupId === undefined || parentGroupId.length === 0) {
         throw new Error('Could not find parent group id for the subconversation');
       }
       return this.handleSubconversationEpochMismatch(subconversation, parentGroupId);

@@ -30,7 +30,7 @@ export class SelfService {
 
   public async checkUsername(username: string): Promise<boolean> {
     const [availableUsername] = await this.checkUsernames([username]);
-    return !!availableUsername;
+    return availableUsername !== undefined;
   }
 
   public checkUsernames(usernames: string[]): Promise<string[]> {
@@ -72,7 +72,11 @@ export class SelfService {
       return;
     }
 
-    if (!supportedProtocols || supportedProtocols.length === 0) {
+    if (supportedProtocols === undefined) {
+      throw new Error('Supported protocols must be a non-empty protocols list');
+    }
+
+    if (supportedProtocols.length === 0) {
       throw new Error('Supported protocols must be a non-empty protocols list');
     }
 

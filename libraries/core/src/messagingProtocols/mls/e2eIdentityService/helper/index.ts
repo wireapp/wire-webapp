@@ -77,7 +77,12 @@ export const getMLSDeviceStatus = (
   const signatureAlogrithm = getSignatureAlgorithmForCiphersuite(ciphersuite);
   const signature = mls_public_keys[signatureAlogrithm];
 
-  if (!signature || !existingClientSignature) {
+  if (
+    signature === undefined ||
+    signature.length === 0 ||
+    existingClientSignature === undefined ||
+    existingClientSignature.length === 0
+  ) {
     return MLSDeviceStatus.FRESH;
   }
   if (signature !== existingClientSignature) {
@@ -86,4 +91,5 @@ export const getMLSDeviceStatus = (
   return MLSDeviceStatus.REGISTERED;
 };
 
-export const isResponseStatusValid = (status: string | undefined) => status && status === 'valid';
+export const isResponseStatusValid = (status: string | undefined) =>
+  status !== undefined && status.length > 0 && status === 'valid';

@@ -81,9 +81,14 @@ export class S3Service implements CellsStorage {
       abortController,
     });
 
-    if (progressCallback) {
+    if (progressCallback !== undefined) {
       upload.on('httpUploadProgress', progress => {
-        if (!progress?.loaded || !progress?.total) {
+        if (
+          progress?.loaded === undefined ||
+          progress?.loaded <= 0 ||
+          progress?.total === undefined ||
+          progress?.total <= 0
+        ) {
           return;
         }
         progressCallback(progress.loaded / progress.total);
@@ -109,7 +114,7 @@ export class S3Service implements CellsStorage {
   }
 
   private getS3Client(): S3Client {
-    if (this.config.apiKey) {
+    if (this.config.apiKey !== undefined && this.config.apiKey.length > 0) {
       return this.client;
     }
 
@@ -118,7 +123,7 @@ export class S3Service implements CellsStorage {
 
     // Recreate the client if the access token has changed or expired
     const shouldRecreate =
-      this.currentAccessToken !== currentAccessToken || !tokenExpiration || tokenExpiration <= Date.now();
+      this.currentAccessToken !== currentAccessToken || tokenExpiration === undefined || tokenExpiration <= Date.now();
 
     if (shouldRecreate) {
       const newClient = this.createS3Client({accessToken: currentAccessToken});
@@ -136,14 +141,14 @@ export class S3Service implements CellsStorage {
       forcePathStyle: true,
       region: this.config.region,
       credentials: async () => {
-        if (this.config.apiKey) {
+        if (this.config.apiKey !== undefined && this.config.apiKey.length > 0) {
           return {
             accessKeyId: this.config.apiKey,
             secretAccessKey: 'gatewaysecret',
           };
         }
 
-        if (!accessToken) {
+        if (accessToken === undefined || accessToken.length === 0) {
           throw new Error('No access token available for S3 authentication');
         }
 

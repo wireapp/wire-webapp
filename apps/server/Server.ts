@@ -109,7 +109,7 @@ class Server {
     } else {
       this.app.use((req, res, next) => {
         // If the user agent adds a v param, it means that its requesting a particular version of the file and that could be cached forever since the file will never change.
-        const hasCacheVersionParam = req.query.v && typeof req.query.v === 'string';
+        const hasCacheVersionParam = typeof req.query.v === 'string';
         const oneYear = 31536000;
         const maxAge = hasCacheVersionParam ? oneYear : this.config.CACHE_DURATION_SECONDS;
         const milliSeconds = 1000;
@@ -122,7 +122,7 @@ class Server {
 
   private initForceSSL(): void {
     const SSLMiddleware: express.RequestHandler = (req, res, next) => {
-      const shouldEnforceHTTPS = !this.config.ENFORCE_HTTPS || req.url.match(/_health\/?/);
+      const shouldEnforceHTTPS = !this.config.ENFORCE_HTTPS || req.url.match(/_health\/?/) !== null;
       const isInsecure = !req.secure || req.get('X-Forwarded-Proto') !== 'https';
 
       if (isInsecure && !shouldEnforceHTTPS) {

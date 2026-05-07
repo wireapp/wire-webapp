@@ -63,7 +63,7 @@ type UsersReponse = {
   not_found?: QualifiedId[];
 };
 function isUsersResponse(object: any): object is UsersReponse {
-  return object.found || object.failed || object.not_found;
+  return object.found !== undefined || object.failed !== undefined || object.not_found !== undefined;
 }
 
 const apiBreakpoint = {
@@ -290,10 +290,10 @@ export class UserAPI {
       url: `/${UserAPI.URL.SEARCH}/${UserAPI.URL.CONTACTS}`,
     };
 
-    if (domain) {
+    if (domain !== undefined && domain.length > 0) {
       config.params.domain = domain;
     }
-    if (limit) {
+    if (limit !== undefined && limit > 0) {
       config.params.size = limit;
     }
 

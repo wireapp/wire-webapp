@@ -34,7 +34,7 @@ export const constructFullyQualifiedClientId = (
 export const parseFullQualifiedClientId = (qualifiedId: string): ParsedFullyQualifiedId => {
   const regexp = /([a-zA-Z0-9\-]+):([a-zA-Z0-9\-]+)@([a-zA-Z0-9\-.]+)/;
   const [, user, client, domain] = qualifiedId.match(regexp) ?? [];
-  if (!user || !client || !domain) {
+  if (user === undefined || client === undefined || domain === undefined) {
     throw new Error(`given client fully qualified ID is corrupted (${qualifiedId})`);
   }
   return {user, client, domain};

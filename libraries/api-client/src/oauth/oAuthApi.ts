@@ -55,7 +55,7 @@ export class OAuthAPI {
    */
   public async deleteApplication(applicationId: string, password?: string): Promise<void> {
     const config: AxiosRequestConfig = {
-      ...(password && {data: {password}}),
+      ...(password !== undefined && password.length > 0 && {data: {password}}),
       method: 'delete',
       url: `${OAuthAPI.URL.OAUTH}/${OAuthAPI.URL.APPLICATIONS}/${applicationId}/sessions`,
     };
