@@ -45,6 +45,7 @@ import type {
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
+import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
@@ -136,9 +137,27 @@ export class ConversationService {
   /**
    * Get a conversation by ID.
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/conversation
+   *
+   * @deprecated Use {@link getSafeConversationById} instead. This method rejects on any
+   * fetch failure, leaking errors out of the caller's data model. Prefer the `Task`-returning
+   * variant so failures become a first-class case the type-checker can enforce handling for.
    */
   getConversationById({id, domain}: QualifiedId): Promise<BackendConversation> {
     return this.apiClient.api.conversation.getConversation({domain, id});
+  }
+
+  /**
+   * Get a conversation by ID with explicit error handling.
+   *
+   * Returns a `Task` so failures (network errors, 4xx/5xx, malformed responses) are
+   * modeled in the type instead of surfacing as an uncaught promise rejection.
+   * Mirrors the convention established by `MLSService.getSafeEpoch`.
+   */
+  getSafeConversationById(conversationId: QualifiedId): Task<BackendConversation, unknown> {
+    return task.tryOrElse(
+      error => error,
+      () => this.apiClient.api.conversation.getConversation(conversationId),
+    );
   }
 
   public async blacklistConversation(conversationId: QualifiedId): Promise<void> {
