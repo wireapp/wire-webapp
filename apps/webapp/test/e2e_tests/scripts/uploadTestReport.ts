@@ -39,10 +39,6 @@ const {values: args} = parseArgs({
   },
 });
 
-if (!args.testinyApiKey) throw new Error('Missing required arg testinyApiKey');
-if (!args.reportPath) throw new Error('Missing required arg reportPath');
-if (!args.runName) throw new Error('Missing required arg runName');
-
 const getTests = (suite: JSONReportSuite): (JSONReportTest & Pick<JSONReportSpec, 'tags'>)[] => {
   return [
     ...(suite.specs.flatMap(spec => spec.tests.map(test => ({...test, tags: spec.tags}))) ?? []),
@@ -154,6 +150,10 @@ async function addTestResultsToRun(testCaseMappings: TestinyTestCaseMapping[]) {
 }
 
 async function main() {
+  if (!args.testinyApiKey) throw new Error('Missing required arg testinyApiKey');
+  if (!args.reportPath) throw new Error('Missing required arg reportPath');
+  if (!args.runName) throw new Error('Missing required arg runName');
+
   const reportAbsPath = path.resolve(args.reportPath);
   if (!fs.existsSync(reportAbsPath)) {
     throw new Error(`Report file not found: ${reportAbsPath}`);
@@ -161,7 +161,7 @@ async function main() {
 
   const report: JSONReport = JSON.parse(fs.readFileSync(reportAbsPath, 'utf-8'));
   const testRun = await createTestRun({
-    testPlanId: Number.isInteger(+args.testPlanId) ? +args.testPlanId : undefined,
+    testPlanId: args.testPlanId !== undefined && Number.isInteger(+args.testPlanId) ? +args.testPlanId : undefined,
     description: `<!--markdown-->\n${args.description}\n`,
   });
   console.log(`Created test run with id: ${testRun.id}`);
