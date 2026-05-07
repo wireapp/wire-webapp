@@ -17,11 +17,11 @@
  *
  */
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {CellsFiltersBar} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/CellsFiltersBar';
+import type {FilterConfig} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
 import {t} from 'Util/localizerUtil';
 
-import {CellsFilters} from './CellsFilters/CellsFilters';
-import {contentStyles, headingStyles, searchWrapperStyles, wrapperStyles} from './CellsHeader.styles';
+import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './CellsHeader.styles';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 import {CellsSearch} from './CellsSearch/CellsSeach';
 
@@ -33,7 +33,7 @@ interface CellsHeaderProps {
   onClearSearch: () => void;
   onRefresh: () => void;
   searchStatus: 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
-  cellsRepository: CellsRepository;
+  filters: FilterConfig[];
 }
 
 export const CellsHeader = ({
@@ -42,19 +42,19 @@ export const CellsHeader = ({
   onClearSearch,
   onRefresh,
   searchStatus,
-  cellsRepository,
+  filters,
 }: CellsHeaderProps) => {
   return (
     <header css={wrapperStyles}>
-      <h2 css={headingStyles}>{t('cells.heading')}</h2>
-      <div css={contentStyles}>
-        <div css={searchWrapperStyles}>
-          <CellsSearch searchValue={searchValue} onSearch={onSearch} onClearSearch={onClearSearch} />
-          <CellsFilters cellsRepository={cellsRepository} />
-          {searchStatus === 'loading' && <CellsTableLoader />}
-          {searchStatus === 'error' && <p>{t('cells.search.failed')}</p>}
-        </div>
+      <div css={titleRowStyles}>
+        <h2 css={headingStyles}>{t('cells.heading')}</h2>
         <CellsRefresh onRefresh={onRefresh} />
+      </div>
+      <div css={contentStyles}>
+        <CellsSearch searchValue={searchValue} onSearch={onSearch} onClearSearch={onClearSearch} />
+        <CellsFiltersBar filters={filters} />
+        {searchStatus === 'loading' && <CellsTableLoader />}
+        {searchStatus === 'error' && <p>{t('cells.search.failed')}</p>}
       </div>
     </header>
   );

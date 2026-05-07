@@ -32,6 +32,7 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
+import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDriveFilters';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
@@ -53,6 +54,8 @@ export const CellsGlobalView = ({
     userRepository,
     conversationRepository,
   });
+
+  const {filters} = useGlobalDriveFilters();
 
   useOnPresignedUrlExpired({refreshCallback: handleReload});
 
@@ -83,7 +86,7 @@ export const CellsGlobalView = ({
         onClearSearch={handleClearSearch}
         onRefresh={handleReload}
         searchStatus={nodesStatus}
-        cellsRepository={cellsRepository}
+        filters={filters}
       />
       {emptySearchResults && (
         <CellsStateInfo

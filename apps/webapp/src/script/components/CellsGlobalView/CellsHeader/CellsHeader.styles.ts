@@ -28,23 +28,23 @@ export const wrapperStyles: CSSObject = {
   width: '100%',
 };
 
+export const titleRowStyles: CSSObject = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: '100%',
+  marginBottom: '8px',
+};
+
 export const headingStyles: CSSObject = {
   color: 'var(--main-color)',
   fontWeight: 'var(--font-weight-semibold)',
   fontSize: 'var(--font-size-medium)',
-  marginBottom: '8px',
-};
-
-export const searchWrapperStyles: CSSObject = {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '16px',
 };
 
 export const contentStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: '8px',
   width: '100%',
 };
