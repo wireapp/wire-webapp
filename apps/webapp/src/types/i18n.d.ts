@@ -402,6 +402,9 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.tags.noTagsFound': `No tags created yet.`;
     'cells.filtersModal.tags.placeholder': `Select a tag`;
     'cells.filtersModal.title': `Filters`;
+    'cells.filterPopover.search.clearButton': `Clear search`;
+    'cells.filterPopover.search.placeholder': `Search {filterName}`;
+    'cells.filterPopover.selectedCount': `{count} selected`;
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `Files`;
     'cells.imageFullScreenModal.closeButton': `Close`;
