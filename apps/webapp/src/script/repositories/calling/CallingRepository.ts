@@ -554,7 +554,7 @@ export class CallingRepository {
     wCall.setNetworkQualityHandler(
       wUser,
       (conversationId, userId, clientId, quality) => {
-        this.updateCallQuality(conversationId, userId, clientId, JSON.stringify({quality}));
+        this.updateCallQuality(conversationId, userId, clientId, quality);
       },
       tenSeconds,
     );
@@ -637,10 +637,7 @@ export class CallingRepository {
     let qualityInfo: NetworkQualityInfo;
 
     try {
-      // This is a temporary hack to make the schema work with the current version of AVS. In the next AVS version we
-      // will fix this issue and remove this hack.
-      const tmp = JSON.parse(qualityInfoJson);
-      const parsedQualityInfo = JSON.parse(tmp.quality);
+      const parsedQualityInfo = JSON.parse(qualityInfoJson);
       qualityInfo = NetworkQualityInfoSchema.parse(parsedQualityInfo);
     } catch (error) {
       if (error instanceof z.ZodError) {
