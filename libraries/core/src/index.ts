@@ -22,6 +22,11 @@ export * as auth from './auth/';
 export * from './conversation/';
 export {CoreError} from './coreError';
 export * from './cryptography/';
+export {
+  createFireAndForgetInvoker,
+  type FireAndForgetInvoker,
+  type FireAndForgetInvokerDependencies,
+} from './taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 export * from './util';
 export * as MessageBuilder from './conversation/message/messageBuilder';
 export * from './errors';
