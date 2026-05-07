@@ -63,7 +63,7 @@ function createMLSConversations(nbConversations: number, type?: CONVERSATION_TYP
 function mockSafeEpoch(core: {service?: Core['service']}) {
   (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
     .fn()
-    .mockResolvedValue(task.fromResult(result.ok(1)));
+    .mockResolvedValue(task.resolve(1));
 }
 
 describe('MLSConversations', () => {
