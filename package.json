@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@enormora/objectory": "0.0.7",
-    "@faker-js/faker": "9.9.0",
+    "@faker-js/faker": "10.4.0",
     "@ls-lint/ls-lint": "2.3.1",
     "@nx/jest": "22.7.1",
     "@nx/node": "22.7.1",
