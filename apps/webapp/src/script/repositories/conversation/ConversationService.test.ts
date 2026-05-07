@@ -17,6 +17,9 @@
  *
  */
 
+import type {Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation';
+import type {QualifiedId} from '@wireapp/api-client/lib/user';
+
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventService} from 'Repositories/event/EventService';
 import type {EventRecord, StorageService} from 'Repositories/storage';
@@ -95,6 +98,53 @@ describe('ConversationService', () => {
       );
       expect(await conversationService.searchInConversation('conversation-id', 'caption')).toEqual([compositeEvent]);
       expect(await conversationService.searchInConversation('conversation-id', 'unrelated')).toEqual([]);
+    });
+  });
+
+  describe('getSafeConversationById', () => {
+    const conversationId: QualifiedId = {id: 'conv-id', domain: 'wire.com'};
+
+    const makeService = (getConversation: jest.Mock) => {
+      const apiClient = {
+        api: {conversation: {getConversation}},
+      } as unknown as APIClient;
+      return new ConversationService(
+        {} as unknown as EventService,
+        {} as unknown as StorageService,
+        apiClient,
+        {} as unknown as Core,
+      );
+    };
+
+    it('resolves to Ok carrying the backend response when the fetch succeeds', async () => {
+      const conversation = {epoch: 3} as unknown as BackendConversation;
+      const getConversation = jest.fn().mockResolvedValue(conversation);
+      const service = makeService(getConversation);
+
+      const task = service.getSafeConversationById(conversationId);
+      const settled = await task;
+
+      expect(settled.isOk).toBe(true);
+      expect(settled.match({Ok: c => c, Err: () => null})).toEqual(conversation);
+      expect(getConversation).toHaveBeenCalledWith(conversationId);
+    });
+
+    it('resolves to Err carrying the original error when the fetch rejects', async () => {
+      const error = new Error('network');
+      const getConversation = jest.fn().mockRejectedValue(error);
+      const service = makeService(getConversation);
+
+      const settled = await service.getSafeConversationById(conversationId);
+
+      expect(settled.isErr).toBe(true);
+      expect(settled.match({Ok: () => null, Err: e => e})).toBe(error);
+    });
+
+    it('does not throw on rejection (the failure stays in the data model)', async () => {
+      const getConversation = jest.fn().mockRejectedValue(new Error('boom'));
+      const service = makeService(getConversation);
+
+      await expect(service.getSafeConversationById(conversationId)).resolves.toBeDefined();
     });
   });
 });

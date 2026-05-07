@@ -26312,6 +26312,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ts-pattern@npm:5.9.0":
+  version: 5.9.0
+  resolution: "ts-pattern@npm:5.9.0"
+  checksum: 10/0df8cc63d731a596f3541a305eff10f055c9a761d1a8b3776781dc6d6430c6bd8be8cd333fac62138c5d88e1209b4d8dccf1f40041091b634e5018908281417b
+  languageName: node
+  linkType: hard
+
 "tsc-watch@npm:7.2.0":
   version: 7.2.0
   resolution: "tsc-watch@npm:7.2.0"
@@ -27764,6 +27771,7 @@ __metadata:
     stylelint: "npm:17.10.0"
     stylelint-config-idiomatic-order: "npm:10.0.0"
     ts-node: "npm:10.9.2"
+    ts-pattern: "npm:5.9.0"
     tsc-watch: "npm:7.2.0"
     tslib: "npm:2.8.1"
     typescript: "npm:5.9.3"

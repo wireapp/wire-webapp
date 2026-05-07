@@ -169,7 +169,7 @@ import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../../message/MessageCategory';
 import {SystemMessageType} from '../../message/SystemMessageType';
-import {initMLSGroupConversation} from '../../mls';
+import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/CoreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 
@@ -2267,16 +2267,6 @@ export class ConversationRepository {
     }
   };
 
-  private readonly getMLSService = (core: Account) => {
-    const mlsService = core.service?.mls;
-    if (!mlsService) {
-      const errorMessage = 'MLS service is not available!';
-      this.logger.error(errorMessage);
-      throw new Error(errorMessage);
-    }
-    return mlsService;
-  };
-
   /**
    * Ensures that a conversation exists by checking its group ID and conversation ID.
    * If the conversation does not exist, it will try to establish it or join it by external commit.
@@ -2293,102 +2283,12 @@ export class ConversationRepository {
     groupId: string;
     core?: Account;
   }): Promise<void> => {
-    const conversationExistsOnCoreCrypto = await this.conversationService.mlsGroupExistsLocally(groupId);
-    const coreCryptoEpochNumberResult = await this.getMLSService(core).getSafeEpoch(groupId);
-    this.logger.info('Ensuring conversation exists', {
-      conversationId,
-      groupId,
-      coreCryptoEpochNumber: coreCryptoEpochNumberResult.mapOrElse(
-        error => error,
-        epoch => epoch,
-      ),
-      conversationExistsOnCoreCrypto,
+    return ensureMLSGroupIsEstablished(groupId, conversationId, {
+      core,
+      conversationService: this.conversationService,
+      userState: this.userState,
+      conversationState: this.conversationState,
     });
-
-    const coreCryptoEpochNumber = coreCryptoEpochNumberResult.match({
-      Ok: epoch => {
-        return epoch;
-      },
-      Err: error => {
-        this.logger.warn('There was an error when retrieving the epoch number for the conversation', error);
-        throw new Error('Failed to get epoch number for conversation');
-      },
-    });
-
-    if (conversationExistsOnCoreCrypto && coreCryptoEpochNumber > 0) {
-      this.logger.info('Conversation is established and epoch is greater than 0, no action needed');
-      // return early so we don't make unnecessary calls to the backend to fetch remote conversation
-      return;
-    }
-
-    if (conversationExistsOnCoreCrypto && coreCryptoEpochNumber === 0) {
-      this.logger.info('Conversation already exists locally but epoch is 0, wiping it');
-
-      // The conversation was created locally but the initial commit was never accepted by the backend
-      // Wipe the conversation locally and join by external commit
-      await core.service?.conversation?.wipeMLSConversation(groupId);
-    }
-
-    const remoteConversation = await this.conversationService.getConversationById(conversationId);
-    const remoteEpoch = remoteConversation.epoch;
-
-    if (typeof remoteEpoch !== 'number') {
-      const errorMessage = 'Remote epoch is not a number';
-      this.logger.error(errorMessage, {remoteEpoch, remoteConversation});
-      throw new Error(errorMessage);
-    }
-
-    // establish the conversation if remote epoch is 0
-    if (remoteEpoch === 0) {
-      this.logger.info('Establishing conversation as remote epoch is 0', {remoteEpoch});
-      await this.establishMlsGroupConversation({conversationId, groupId, epoch: remoteEpoch, core});
-      return;
-    }
-
-    // join by external commit
-    if (remoteEpoch > 0) {
-      this.logger.info('Joining conversation by external commit', {remoteEpoch});
-      await this.core.service?.conversation?.joinByExternalCommit(conversationId);
-    }
-  };
-
-  /**
-   * Establishes a MLS group conversation.
-   */
-  private establishMlsGroupConversation = async ({
-    conversationId,
-    groupId,
-    epoch,
-    core = this.core,
-  }: {
-    conversationId: QualifiedId;
-    groupId: string;
-    epoch: number;
-    core?: Account;
-  }) => {
-    this.logger.info('Establishing conversation', {conversationId, groupId, epoch});
-    const selfUser = this.userState.self();
-    const conversation = this.conversationState.findConversation(conversationId);
-
-    if (!selfUser || !conversation) {
-      this.logger.error('Self user or conversation is not available!', {selfUser, conversation});
-      throw new Error('Self user or conversation is not available!');
-    }
-
-    const selfUserClientId = selfUser.localClient?.id;
-    if (!selfUserClientId) {
-      this.logger.error('Self user client id is not available!', {selfUserClientId});
-      throw new Error('Self user client id is not available!');
-    }
-
-    const members = conversation.participating_user_ids();
-    await core.service?.conversation?.establishMLSGroupConversation(
-      groupId,
-      members,
-      selfUser.qualifiedId,
-      selfUserClientId,
-      conversationId,
-    );
   };
 
   /**
