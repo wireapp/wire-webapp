@@ -393,6 +393,9 @@ declare module 'I18n/en-US.json' {
     'cells.error.description': `The list of files couldn\'t be loaded. Please try again.`;
     'cells.error.heading': `Something went wrong loading`;
     'cells.filePreviewButton.ariaLabel': `Preview for {name}`;
+    'cells.filterPopover.search.clearButton': `Clear search`;
+    'cells.filterPopover.search.placeholder': `Search {filterName}`;
+    'cells.filterPopover.selectedCount': `{count} selected`;
     'cells.filtersModal.accordion.tags': `Tags`;
     'cells.filtersModal.closeButton': `Close`;
     'cells.filtersModal.primaryAction': `Apply`;
@@ -402,9 +405,6 @@ declare module 'I18n/en-US.json' {
     'cells.filtersModal.tags.noTagsFound': `No tags created yet.`;
     'cells.filtersModal.tags.placeholder': `Select a tag`;
     'cells.filtersModal.title': `Filters`;
-    'cells.filterPopover.search.clearButton': `Clear search`;
-    'cells.filterPopover.search.placeholder': `Search {filterName}`;
-    'cells.filterPopover.selectedCount': `{count} selected`;
     'cells.folderBreadcrumbCombained': `Show more`;
     'cells.heading': `Files`;
     'cells.imageFullScreenModal.closeButton': `Close`;
