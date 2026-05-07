@@ -54,7 +54,7 @@ export const isFetchingSSOSettings = (state: RootState) => state.authState.fetch
 export const getDefaultSSOCode = (state: RootState) => state.authState.ssoSettings?.default_sso_code;
 export const hasDefaultSSOCode = (state: RootState) => {
   const defaultSSOCode = state.authState.ssoSettings?.default_sso_code;
-  return defaultSSOCode !== undefined && defaultSSOCode.length > 0;
+  return defaultSSOCode !== undefined && defaultSSOCode !== null && defaultSSOCode.length > 0;
 };
 export const getError = (state: RootState) => state.authState.error;
 export const getLoginData = (state: RootState) => state.authState.loginData;
