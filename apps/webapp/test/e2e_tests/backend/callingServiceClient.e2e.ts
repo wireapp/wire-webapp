@@ -92,6 +92,14 @@ export class CallingServiceClientE2E {
     });
   }
 
+  async getPackets(instanceId: string) {
+    const response = await this.axiosInstance.get(`/api/v1/instance/${instanceId}/packets`);
+    return {
+      src: response.data?.src?.split(' ') as undefined | string[],
+      dst: response.data?.dst?.split(' ') as undefined | string[],
+    };
+  }
+
   async getFlows(instanceId: string) {
     const response = await this.axiosInstance.get(`/api/v1/instance/${instanceId}/flows`);
     return response.data[0] as Flow;
