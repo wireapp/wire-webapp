@@ -1603,6 +1603,7 @@ export class ConversationRepository {
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
               }
+              await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
               amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
             } catch (error: unknown) {
               if (!isBackendError(error)) {
@@ -1654,6 +1655,38 @@ export class ConversationRepository {
         }
       }
     }
+  };
+
+  private readonly addOtherSelfUserClientsToMLSConversation = async (
+    conversationEntity: Conversation,
+  ): Promise<void> => {
+    if (!isMLSConversation(conversationEntity)) {
+      this.logger.warn('Can not add other self user clients to non-MLS conversation', {
+        conversationId: conversationEntity.qualifiedId,
+      });
+      return;
+    }
+
+    const selfUserQualifiedId = this.userState.self()?.qualifiedId;
+
+    if (!selfUserQualifiedId) {
+      this.logger.error('Self user qualified ID is not available for MLS invite-link join');
+      throw new Error('Self user qualified ID is not available for MLS invite-link join');
+    }
+
+    this.logger.info('Adding other self user clients to MLS conversation', {
+      conversationId: conversationEntity.qualifiedId,
+      groupId: conversationEntity.groupId,
+      qualifiedUsers: [selfUserQualifiedId],
+    });
+
+    await this.core.service?.conversation?.addUsersToMLSConversation({
+      conversationId: conversationEntity.qualifiedId,
+      groupId: conversationEntity.groupId,
+      qualifiedUsers: [selfUserQualifiedId],
+      commitPendingFirst: true,
+      updateKeyingMaterialIfEmpty: true,
+    });
   };
 
   private readonly getProtocolFor1to1Conversation = async (
@@ -3097,9 +3130,6 @@ export class ConversationRepository {
     messageTimer: number | null,
   ): Promise<ConversationMessageTimerUpdateEvent> {
     messageTimer = ConversationEphemeralHandler.validateTimer(messageTimer);
-    if (messageTimer === null) {
-      messageTimer = 0;
-    }
 
     const response = await this.conversationService.updateConversationMessageTimer(
       conversationEntity.qualifiedId,

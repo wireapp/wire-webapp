@@ -22,12 +22,13 @@ import {AxiosProgressEvent} from 'axios';
 export type ProgressCallback = (progress: number) => void;
 
 export const handleProgressEvent = (progressCallback?: ProgressCallback) => {
-  return (
-    progressCallback &&
-    ((progressEvent: AxiosProgressEvent) => {
-      if (progressEvent.total) {
-        progressCallback(progressEvent.loaded / progressEvent.total);
-      }
-    })
-  );
+  if (progressCallback === undefined) {
+    return undefined;
+  }
+
+  return (progressEvent: AxiosProgressEvent) => {
+    if (progressEvent.total !== undefined && progressEvent.total > 0) {
+      progressCallback(progressEvent.loaded / progressEvent.total);
+    }
+  };
 };

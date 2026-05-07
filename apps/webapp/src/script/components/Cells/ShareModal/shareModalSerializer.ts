@@ -101,19 +101,19 @@ const getPasswordValidationResult = ({
     };
   }
 
-  if (hasExistingPassword && !isEditingPassword) {
+  if (hasExistingPassword === true && isEditingPassword === false) {
     return {isPasswordValid: true, updatePassword: undefined};
   }
 
-  if (hasExistingPassword && isEditingPassword && !hasPasswordInput) {
+  if (hasExistingPassword === true && isEditingPassword === true && !hasPasswordInput) {
     return {isPasswordValid: true, updatePassword: undefined};
   }
 
-  if (hasExistingPassword && isEditingPassword && hasPasswordInput) {
+  if (hasExistingPassword === true && isEditingPassword === true && hasPasswordInput) {
     return {isPasswordValid: true, updatePassword: trimmedPassword};
   }
 
-  if (!hasExistingPassword && hasPasswordInput) {
+  if (hasExistingPassword === false && hasPasswordInput) {
     return {isPasswordValid: true, updatePassword: trimmedPassword};
   }
 

@@ -19,6 +19,8 @@
 
 import type {KeyboardEvent as ReactKeyboardEvent, SyntheticEvent as ReactEvent} from 'react';
 
+import is from '@sindresorhus/is';
+
 import {Runtime} from '@wireapp/commons';
 
 export const KEY = {
@@ -39,8 +41,8 @@ export const KEY = {
 
 export const isOneOfKeys = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent, expectedKeys: string[] = []) => {
   expectedKeys = expectedKeys.map(key => key.toLowerCase());
-  const eventKey = keyboardEvent.key?.toLowerCase() || '';
-  return !!expectedKeys.find(key => key === eventKey);
+  const eventKey = keyboardEvent.key?.toLowerCase() ?? '';
+  return expectedKeys.some(key => key === eventKey);
 };
 
 export const isArrowKey = (keyboardEvent: KeyboardEvent): boolean =>
@@ -50,7 +52,7 @@ export const isPageUpDownKey = (keyboardEvent: KeyboardEvent): boolean =>
   isOneOfKeys(keyboardEvent, [KEY.PAGE_UP, KEY.PAGE_DOWN]);
 
 export const isKey = (keyboardEvent?: KeyboardEvent | ReactKeyboardEvent, expectedKey = '') => {
-  const eventKey = keyboardEvent?.key?.toLowerCase() || '';
+  const eventKey = keyboardEvent?.key?.toLowerCase() ?? '';
   return eventKey === expectedKey.toLowerCase();
 };
 
@@ -74,7 +76,9 @@ export const isFunctionKey = (keyboardEvent: KeyboardEvent | ReactKeyboardEvent)
 
 /** On macOS the meta key is '⌘', which represents 'Ctrl' in the Windows world: https://www.oreilly.com/library/view/switching-to-the/9781449372927/ch01s08.html */
 export const isMetaKey = (keyboardEvent: KeyboardEvent): boolean =>
-  keyboardEvent.metaKey || keyboardEvent.ctrlKey || keyboardEvent.key?.toLowerCase() === 'control';
+  keyboardEvent.metaKey ||
+  keyboardEvent.ctrlKey ||
+  (is.string(keyboardEvent.key) && keyboardEvent.key.toLowerCase() === 'control');
 
 export const isPasteAction = (keyboardEvent: KeyboardEvent): boolean =>
   isMetaKey(keyboardEvent) && isKey(keyboardEvent, KEY.KEY_V);
@@ -111,7 +115,7 @@ export const handleEnterDown = (event: ReactKeyboardEvent<HTMLElement> | Keyboar
 };
 
 export const handleEscDown = (event: ReactKeyboardEvent<Element> | KeyboardEvent, callback: () => void): void => {
-  if (event?.key === KEY.ESC) {
+  if (event.key === KEY.ESC) {
     callback();
   }
 };

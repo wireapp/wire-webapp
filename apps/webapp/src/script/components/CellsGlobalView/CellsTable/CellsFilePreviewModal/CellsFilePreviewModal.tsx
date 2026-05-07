@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
@@ -27,7 +29,7 @@ import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/C
 export const CellsFilePreviewModal = () => {
   const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
 
-  if (!selectedFile) {
+  if (selectedFile === null) {
     return null;
   }
 
@@ -44,19 +46,25 @@ export const CellsFilePreviewModal = () => {
       return undefined;
     }
 
-    return previewPdfUrl || previewImageUrl;
+    if (is.nonEmptyString(previewPdfUrl)) {
+      return previewPdfUrl;
+    }
+    if (is.nonEmptyString(previewImageUrl)) {
+      return previewImageUrl;
+    }
+    return undefined;
   };
 
   return (
     <FileFullscreenModal
       id={selectedFile.id}
-      isOpen={!!selectedFile}
+      isOpen={selectedFile !== null}
       onClose={handleCloseFile}
       filePreviewUrl={getFileUrl()}
       fileUrl={url}
       fileName={name}
       fileExtension={extension}
-      status={!getFileUrl() ? 'unavailable' : 'success'}
+      status={getFileUrl() === undefined ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
       badges={tags}

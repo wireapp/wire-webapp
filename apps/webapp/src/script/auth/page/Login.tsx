@@ -19,6 +19,7 @@
 
 import React, {useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {LoginData} from '@wireapp/api-client/lib/auth';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
 import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
@@ -143,7 +144,9 @@ const LoginComponent = ({
     ENABLE_SSO: isSSOEnabled,
   } = Config.getConfig().FEATURE;
 
-  const showBackButton = !embedded && (isDomainDiscoveryEnabled || isSSOEnabled || isAccountRegistrationEnabled);
+  const showBackButton =
+    embedded !== true &&
+    (isDomainDiscoveryEnabled === true || isSSOEnabled === true || isAccountRegistrationEnabled === true);
 
   const [showEntropyForm, setShowEntropyForm] = useState(false);
   const onEntropyGenerated = useRef<((entropy: Uint8Array) => void) | undefined>();
@@ -173,7 +176,7 @@ const LoginComponent = ({
 
   useEffect(() => {
     // Redirect to prefilled SSO login if default SSO code is set on backend unless we're following the guest link flow
-    if (defaultSSOCode && !embedded) {
+    if (is.nonEmptyString(defaultSSOCode) && embedded !== true) {
       navigate(`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`);
     }
   }, [defaultSSOCode, embedded, navigate]);
@@ -182,7 +185,7 @@ const LoginComponent = ({
     const queryConversationCode = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_CODE) || null;
     const queryConversationKey = UrlUtil.getURLParameter(QUERY_KEY.CONVERSATION_KEY) || null;
 
-    const keyAndCodeExistent = queryConversationKey && queryConversationCode;
+    const keyAndCodeExistent = is.nonEmptyString(queryConversationKey) && is.nonEmptyString(queryConversationCode);
     if (keyAndCodeExistent) {
       setConversationCode(queryConversationCode);
       setConversationKey(queryConversationKey);
@@ -200,7 +203,7 @@ const LoginComponent = ({
     const isImmediateLogin = UrlUtil.hasURLParameter(QUERY_KEY.IMMEDIATE_LOGIN);
     const is2FAEntropy = UrlUtil.hasURLParameter(QUERY_KEY.TWO_FACTOR) && isEntropyRequired;
 
-    if ((isImmediateLogin && !is2FAEntropy) || isOauth) {
+    if ((isImmediateLogin === true && is2FAEntropy !== true) || isOauth === true) {
       immediateLogin();
     }
     return () => {
@@ -233,9 +236,11 @@ const LoginComponent = ({
     setValidationErrors(validationErrors);
 
     if (
-      !isLinkPasswordModalOpen &&
-      (!!conversationInfo?.has_password ||
-        (!!conversationError && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
+      isLinkPasswordModalOpen !== true &&
+      (conversationInfo?.has_password === true ||
+        (conversationError !== undefined &&
+          conversationError !== null &&
+          conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
     ) {
       setConversationSubmitData(formLoginData);
       setIsLinkPasswordModalOpen(true);
@@ -248,7 +253,7 @@ const LoginComponent = ({
         throw validationErrors[0];
       }
 
-      const hasKeyAndCode = conversationKey && conversationCode;
+      const hasKeyAndCode = is.nonEmptyString(conversationKey) && is.nonEmptyString(conversationCode);
       if (hasKeyAndCode) {
         try {
           await doLoginAndJoin(login, conversationKey, conversationCode, undefined, getEntropy, conversationPassword);
@@ -271,7 +276,7 @@ const LoginComponent = ({
         return navigate(`${ROUTE.AUTHORIZE}/${queryString}`);
       }
 
-      if (shouldDisplayWarning) {
+      if (shouldDisplayWarning === true) {
         setIsAccountAlreadyExistsModalOpen(true);
         return;
       }
@@ -287,10 +292,10 @@ const LoginComponent = ({
           }
           case BackendErrorLabel.TOO_MANY_CLIENTS: {
             await resetAuthError();
-            if (formLoginData?.verificationCode) {
+            if (is.nonEmptyString(formLoginData.verificationCode)) {
               await doSetLocalStorage(QUERY_KEY.CONVERSATION_CODE, formLoginData.verificationCode);
             }
-            if (entropy.current) {
+            if (entropy.current !== undefined) {
               await pushEntropyData(entropy.current);
             }
             navigate(ROUTE.CLIENTS);
@@ -300,8 +305,13 @@ const LoginComponent = ({
           case BackendErrorLabel.CODE_AUTHENTICATION_REQUIRED: {
             await resetAuthError();
             const login: LoginData = {...formLoginData, clientType: loginData.clientType};
-            if (login.email || login.handle) {
-              await doSendTwoFactorCode(login.email || login.handle || '');
+            const twoFactorTarget = is.nonEmptyString(login.email)
+              ? login.email
+              : is.nonEmptyString(login.handle)
+                ? login.handle
+                : undefined;
+            if (twoFactorTarget !== undefined) {
+              await doSendTwoFactorCode(twoFactorTarget);
               setTwoFactorLoginData(login);
               setRouteAction('verify');
               await doSetLocalStorage(QUERY_KEY.JOIN_EXPIRES, Date.now() + 1000 * 60 * 10);
@@ -339,7 +349,7 @@ const LoginComponent = ({
   const resendTwoFactorCode = async () => {
     try {
       const email = twoFactorLoginData?.email;
-      if (email) {
+      if (is.nonEmptyString(email)) {
         await doSendTwoFactorCode(email);
       }
     } catch (error: unknown) {
@@ -363,7 +373,7 @@ const LoginComponent = ({
   };
 
   const submitJoinCodeWithPassword = async (password: string) => {
-    if (!conversationSubmitData) {
+    if (conversationSubmitData === null) {
       setIsLinkPasswordModalOpen(false);
       return;
     }
@@ -376,7 +386,7 @@ const LoginComponent = ({
   };
 
   return (
-    <Page withSideBar={isEnterpriseLoginV2Enabled && !embedded}>
+    <Page withSideBar={isEnterpriseLoginV2Enabled && embedded !== true}>
       {isAccountAlreadyExistsModalOpen && <AccountAlreadyExistsModal onClose={hideAccountAlreadyExistsModal} />}
       {showBackButton && (
         <IsMobile>
@@ -385,7 +395,7 @@ const LoginComponent = ({
           </div>
         </IsMobile>
       )}
-      {isEntropyRequired && showEntropyForm ? (
+      {isEntropyRequired === true && showEntropyForm === true ? (
         <EntropyContainer onSetEntropy={storeEntropy} />
       ) : (
         <Container centerText verticalCenter style={{width: '100%'}}>
@@ -398,7 +408,7 @@ const LoginComponent = ({
               data-uie-name="ui-wire-logo"
             />
           )}
-          {!embedded && <AppAlreadyOpen />}
+          {embedded !== true && <AppAlreadyOpen />}
           {isLinkPasswordModalOpen && (
             <JoinGuestLinkPasswordModal
               onClose={() => {
@@ -413,7 +423,7 @@ const LoginComponent = ({
             />
           )}
           <Columns>
-            {!embedded && (
+            {embedded !== true && (
               <IsMobile not>
                 <Column style={{display: 'flex'}}>
                   {showBackButton && (
@@ -452,7 +462,7 @@ const LoginComponent = ({
                         }}
                       />
                     </Text>
-                    <Label markInvalid={!!twoFactorSubmitError}>
+                    <Label markInvalid={twoFactorSubmitError !== ''}>
                       <CodeInput
                         disabled={isFetching}
                         style={{marginTop: '1rem'}}
@@ -463,7 +473,7 @@ const LoginComponent = ({
                       />
                     </Label>
                     <div style={{display: 'flex', justifyContent: 'center', marginTop: 10}}>
-                      {!!twoFactorSubmitError && parseError(twoFactorSubmitError)}
+                      {twoFactorSubmitError !== '' && parseError(twoFactorSubmitError)}
                     </div>
                     <div style={{marginTop: '1rem'}}>
                       {isSendingTwoFactorCode ? (
@@ -480,7 +490,7 @@ const LoginComponent = ({
                     </div>
                     <FlexBox justify="center">
                       <Button
-                        disabled={!!twoFactorSubmitError || isFetching}
+                        disabled={twoFactorSubmitError !== '' || isFetching}
                         type="submit"
                         css={{marginTop: '1rem'}}
                         onClick={() => handleSubmit({...twoFactorLoginData, verificationCode}, [])}
@@ -503,16 +513,16 @@ const LoginComponent = ({
                           {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
                         </div>
                       ) : (
-                        <Heading level={embedded ? '2' : '1'} center data-page-title tabIndex={-1}>
+                        <Heading level={embedded === true ? '2' : '1'} center data-page-title tabIndex={-1}>
                           {t('login.headline')}
                         </Heading>
                       )}
                       <Text>{isEnterpriseLoginV2Enabled ? t('login.subheadsso') : t('login.subhead')}</Text>
                       <Form style={{marginTop: 30}} data-uie-name="login">
                         <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
-                        {validationErrors.length
+                        {validationErrors.length > 0
                           ? parseValidationErrors(validationErrors)
-                          : authError && <Exception errors={[authError]} />}
+                          : authError !== null && authError !== undefined && <Exception errors={[authError]} />}
 
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
@@ -542,7 +552,7 @@ const LoginComponent = ({
                     >
                       {t('login.forgotPassword')}
                     </Link>
-                    {embedded && (isDomainDiscoveryEnabled || isSSOEnabled) && (
+                    {embedded === true && (isDomainDiscoveryEnabled === true || isSSOEnabled === true) && (
                       <Button
                         type="button"
                         variant={ButtonVariant.SECONDARY}
@@ -553,7 +563,7 @@ const LoginComponent = ({
                         {t(isDomainDiscoveryEnabled ? 'index.enterprise' : 'index.ssoLogin')}
                       </Button>
                     )}
-                    {isEnterpriseLoginV2Enabled && accountCreationEnabled && (
+                    {isEnterpriseLoginV2Enabled && accountCreationEnabled === true && (
                       <>
                         <div css={separator}>
                           <span>{t('index.or')}</span>
@@ -578,7 +588,7 @@ const LoginComponent = ({
                 )}
               </ContainerXS>
             </Column>
-            {!embedded && <Column />}
+            {embedded !== true && <Column />}
           </Columns>
         </Container>
       )}

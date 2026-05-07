@@ -27,15 +27,19 @@ export class MessageTimer {
   }
 
   public getConversationLevelTimer(conversationId: string): number {
-    return this.conversationLevelTimers.get(conversationId) || 0;
+    return this.conversationLevelTimers.get(conversationId) ?? 0;
   }
 
   public getMessageLevelTimer(conversationId: string): number {
-    return this.messageLevelTimers.get(conversationId) || 0;
+    return this.messageLevelTimers.get(conversationId) ?? 0;
   }
 
   public getMessageTimer(conversationId: string): number {
-    return this.getConversationLevelTimer(conversationId) || this.getMessageLevelTimer(conversationId);
+    const conversationLevelTimer = this.getConversationLevelTimer(conversationId);
+    if (conversationLevelTimer > 0) {
+      return conversationLevelTimer;
+    }
+    return this.getMessageLevelTimer(conversationId);
   }
 
   public setConversationLevelTimer(conversationId: string, messageTimer: number): void {

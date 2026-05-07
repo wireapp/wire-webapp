@@ -19,6 +19,7 @@
 
 import React, {useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -67,7 +68,7 @@ const AccountFormComponent = ({
 }: Props & ConnectedProps & DispatchProps) => {
   const [registrationData, setRegistrationData] = useState({
     accent_id: AccentColor.STRONG_BLUE.id,
-    email: account.email || '',
+    email: account.email ?? '',
     name: account.name,
     password: account.password,
     termsAccepted: account.termsAccepted,
@@ -132,11 +133,13 @@ const AccountFormComponent = ({
         throw errors[0];
       }
 
-      await (beforeSubmit && beforeSubmit());
+      if (beforeSubmit !== undefined) {
+        await beforeSubmit();
+      }
       await pushAccountRegistrationData({...registrationData});
       await doSendActivationCode(registrationData.email);
 
-      if (registrationData.privacyPolicyAccepted) {
+      if (registrationData.privacyPolicyAccepted === true) {
         initializeTelemetry();
         trackTelemetryEvent(EventName.ACCOUNT_SETUP_SCREEN_1, {
           [Segmentation.MULTIPLE_PASSWORD_TRIES]: hasMultiplePasswordEntries,
@@ -148,7 +151,7 @@ const AccountFormComponent = ({
       return onSubmit();
     } catch (error: unknown) {
       const label = (error as BackendError)?.label;
-      if (label) {
+      if (is.nonEmptyString(label)) {
         switch (label) {
           case BackendErrorLabel.BLACKLISTED_EMAIL:
           case BackendErrorLabel.DOMAIN_BLOCKED_FOR_REGISTRATION:
@@ -178,14 +181,14 @@ const AccountFormComponent = ({
     }
   };
 
-  const isSubmitDisabled =
-    !(
-      registrationData.email &&
-      registrationData.name &&
-      registrationData.password &&
-      registrationData.termsAccepted &&
-      registrationData.confirmPassword
-    ) || isFetching;
+  const hasRequiredRegistrationData =
+    is.nonEmptyString(registrationData.email) &&
+    is.nonEmptyString(registrationData.name) &&
+    is.nonEmptyString(registrationData.password) &&
+    registrationData.termsAccepted === true &&
+    is.nonEmptyString(registrationData.confirmPassword);
+
+  const isSubmitDisabled = !hasRequiredRegistrationData || isFetching;
 
   return (
     <Form onSubmit={handleSubmit} css={styles.form}>

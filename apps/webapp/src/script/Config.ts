@@ -113,7 +113,7 @@ const Config = {
     (config.FEATURE as unknown) = newConfigFeatures;
   },
   getDesktopConfig: () => {
-    if (!Runtime.isDesktopApp) {
+    if (!Runtime.isDesktopApp()) {
       return undefined;
     }
 

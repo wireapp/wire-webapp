@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {Config, Configuration} from '../Config';
 
 const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
@@ -25,7 +27,7 @@ let isDataDogInitialized = false;
 
 export const isDataDogEnabled = () => {
   const config = Config.getConfig();
-  return !!(config.dataDog?.applicationId && config.dataDog?.clientToken);
+  return is.nonEmptyString(config.dataDog?.applicationId) && is.nonEmptyString(config.dataDog?.clientToken);
 };
 
 export async function initializeDataDog(config: Configuration, user: {id?: string; domain: string}) {
@@ -38,7 +40,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
   const applicationId = config.dataDog?.applicationId;
   const clientToken = config.dataDog?.clientToken;
 
-  if (!applicationId || !clientToken) {
+  if (!is.nonEmptyString(applicationId) || !is.nonEmptyString(clientToken)) {
     return;
   }
 
@@ -47,7 +49,8 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
   const replacer = (_match: string, p1: string) => `${p1}***`;
   const truncateDomain = (value: string) => `${value.substring(0, 3)}***`;
   const replaceAllStrings = (string: string) => string.replaceAll(uuidRegex, replacer);
-  const replaceDomains = (string: string) => (domain ? string.replaceAll(domain, truncateDomain(domain)) : string);
+  const replaceDomains = (string: string) =>
+    is.nonEmptyString(domain) ? string.replaceAll(domain, truncateDomain(domain)) : string;
   const removeColors = (string: string) =>
     string.replaceAll(/%c/g, '').replaceAll(/color:[^;]+; font-weight:[^;]+; /g, '');
   const removeTimestamp = (string: string) => string.replaceAll(/\[\d+-\d+-\d+ \d+:\d+:\d+\] /g, '');
@@ -56,7 +59,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     clientToken,
     site: 'datadoghq.eu',
     service: 'web-internal',
-    env: config.FEATURE?.DATADOG_ENVIRONMENT || config.ENVIRONMENT,
+    env: config.FEATURE?.DATADOG_ENVIRONMENT ?? config.ENVIRONMENT,
     version: config.VERSION,
   };
 
@@ -105,7 +108,7 @@ export async function initializeDataDog(config: Configuration, user: {id?: strin
     },
   });
 
-  if (userId) {
+  if (is.nonEmptyString(userId)) {
     const id = userId.substring(0, 8);
     datadogRum.setUser({id});
     datadogLogs.setUser({id});

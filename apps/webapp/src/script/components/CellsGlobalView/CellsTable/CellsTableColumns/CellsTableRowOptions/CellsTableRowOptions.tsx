@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
@@ -58,7 +60,7 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
         <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
           {t('cells.options.share')}
         </DropdownMenu.Item>
-        {!!url && (
+        {is.nonEmptyString(url) && (
           <DropdownMenu.Item
             onClick={() =>
               forcedDownloadFile({

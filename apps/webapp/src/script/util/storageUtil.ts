@@ -31,7 +31,7 @@ export function resetStoreValue(key: string): void {
 }
 
 export function storeValue(key: string, value: any, secondsToExpire?: number): void {
-  const config = secondsToExpire ? {expires: secondsToExpire * TIME_IN_MILLIS.SECOND} : undefined;
+  const config = secondsToExpire !== undefined ? {expires: secondsToExpire * TIME_IN_MILLIS.SECOND} : undefined;
   return amplify.store(key, value, config);
 }
 

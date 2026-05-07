@@ -45,7 +45,7 @@ const WirelessContainer = ({showCookiePolicyBanner, onCookiePolicyBannerClose, c
         width: '100%',
       }}
     >
-      {showCookiePolicyBanner && (
+      {showCookiePolicyBanner === true && (
         <Header
           style={{
             backgroundColor: 'rgba(254, 191, 2, 0.2)',

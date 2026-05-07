@@ -66,7 +66,7 @@ const HistoryInfoComponent = ({
    */
   const shouldShowHistoryInfo =
     isNewCurrentSelfClient &&
-    (clients.length > 1 || (currentSelfClient && currentSelfClient.type === ClientType.TEMPORARY));
+    (clients.length > 1 || (currentSelfClient !== null && currentSelfClient?.type === ClientType.TEMPORARY));
 
   if (shouldLoadClients) {
     return null;

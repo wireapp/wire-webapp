@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import type {ConversationJoinData} from '@wireapp/api-client/lib/conversation/data/conversationJoinData';
 import type {ConversationEvent} from '@wireapp/api-client/lib/event/';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
@@ -61,7 +62,7 @@ export class ConversationAction {
           received: password-invalid.
           we have to dispatch conversation info with has_password field in order to handle error message in JoinGuestLinkPasswordModal properly.
         */
-        if (isBackendError(error) && !password && error.code === HTTP_STATUS.FORBIDDEN) {
+        if (isBackendError(error) && !is.nonEmptyString(password) && error.code === HTTP_STATUS.FORBIDDEN) {
           dispatch(
             ConversationActionCreator.successfulConversationCodeGetInfo({
               has_password: true,

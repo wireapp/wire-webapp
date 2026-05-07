@@ -126,25 +126,25 @@ const Avatar = ({
     return <PlaceholderAvatar {...props} avatarSize={avatarSize} onClick={() => onAvatarClick?.(participant)} />;
   }
 
-  const isMe = participant?.isMe;
+  const isMe = participant.isMe;
 
   let avatarState = STATE.NONE;
 
-  if (isMe) {
+  if (isMe === true) {
     avatarState = STATE.SELF;
-  } else if (isTeamMember) {
+  } else if (isTeamMember === true) {
     avatarState = STATE.NONE;
-  } else if (isBlocked) {
+  } else if (isBlocked === true) {
     avatarState = STATE.BLOCKED;
-  } else if (isRequest) {
+  } else if (isRequest === true) {
     avatarState = STATE.PENDING;
-  } else if (isIgnored) {
+  } else if (isIgnored === true) {
     avatarState = STATE.IGNORED;
-  } else if (isCanceled || isUnknown) {
+  } else if (isCanceled === true || isUnknown === true) {
     avatarState = STATE.UNKNOWN;
   }
 
-  if (isTemporaryGuest) {
+  if (isTemporaryGuest === true) {
     return (
       <TemporaryGuestAvatar
         avatarSize={avatarSize}

@@ -122,7 +122,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 
   const previousToken = tokens[idx - 1];
   const isPreviousTokenList =
-    previousToken &&
+    previousToken !== undefined &&
     (previousToken.type === 'bullet_list_close' ||
       previousToken.type === 'ordered_list_close' ||
       previousToken.type === 'blockquote_close');
@@ -139,7 +139,7 @@ const renderMention = (mentionData: MentionText) => {
   let elementAttributes = mentionData.isSelfMentioned
     ? ' data-uie-name="label-self-mention" role="button"'
     : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}" role="button"`;
-  if (!mentionData.isSelfMentioned && mentionData.domain) {
+  if (!mentionData.isSelfMentioned && mentionData.domain !== null && mentionData.domain !== undefined) {
     elementAttributes += ` data-user-domain="${escape(mentionData.domain)}"`;
   }
 
@@ -215,7 +215,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
         return escape(code);
       }
 
-      if (lang && languages[lang]) {
+      if (typeof lang === 'string' && lang in languages) {
         return highlightCode({code, grammar: languages[lang], lang});
       }
 
@@ -249,7 +249,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
     link.attrSet('href', href);
     if (!isWireDeepLink && !['autolink', 'linkify'].includes(link.markup)) {
       const title = link.attrGet('title');
-      if (title) {
+      if (title !== null && title !== undefined) {
         link.attrSet('title', removeMentionsHashes(title));
       }
       link.attrPush(['data-md-link', 'true']);

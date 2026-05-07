@@ -80,14 +80,14 @@ export const useCellsStore = create<CellsState>((set, get) => ({
                   publicLink: data,
                 }
               : node,
-          ) || [],
+          ) ?? [],
       },
     })),
   removeNode: ({conversationId, nodeId}) =>
     set(state => ({
       nodesByConversation: {
         ...state.nodesByConversation,
-        [conversationId]: state.nodesByConversation[conversationId]?.filter(node => node.id !== nodeId) || [],
+        [conversationId]: state.nodesByConversation[conversationId]?.filter(node => node.id !== nodeId) ?? [],
       },
     })),
   clearAll: ({conversationId}) => {
@@ -98,10 +98,10 @@ export const useCellsStore = create<CellsState>((set, get) => ({
   },
   getNodes: ({conversationId}) => {
     const state = get().nodesByConversation;
-    return state[conversationId] || [];
+    return state[conversationId] ?? [];
   },
   getPagination: ({conversationId}) => {
     const state = get().paginationByConversation;
-    return state[conversationId] || [];
+    return state[conversationId] ?? null;
   },
 }));

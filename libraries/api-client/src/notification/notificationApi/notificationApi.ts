@@ -116,7 +116,10 @@ export class NotificationAPI {
         const isAxiosError = axios.isAxiosError(error);
 
         //error with response body (before v3 API)
-        const isErrorWithNotifications = isAxiosError && error.response?.data?.notifications;
+        const isErrorWithNotifications =
+          isAxiosError &&
+          Array.isArray(error.response?.data?.notifications) &&
+          error.response.data.notifications.length > 0;
 
         //uuid parsing error
         const isBadRequestError = isAxiosError && error.response?.status === StatusCode.BAD_REQUEST;

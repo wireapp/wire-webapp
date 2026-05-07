@@ -30,19 +30,24 @@ const tolerance = 0.8;
 
 const onIntersect: IntersectionObserverCallback = entries => {
   entries.forEach(({intersectionRatio, isIntersecting, target: element, rootBounds}) => {
-    const {onVisible, onVisibilityChange, requireFullyInView, allowBiggerThanViewport} =
-      observedElements.get(element) || {};
+    const observedElement = observedElements.get(element);
+
+    if (observedElement === undefined) {
+      return;
+    }
+
+    const {onVisible, onVisibilityChange, requireFullyInView, allowBiggerThanViewport} = observedElement;
     const isFullyInView = intersectionRatio >= tolerance;
 
     const isBiggerThanRoot = () => {
       return (
-        allowBiggerThanViewport &&
-        !!rootBounds &&
+        allowBiggerThanViewport === true &&
+        rootBounds !== null &&
         (element.clientHeight > rootBounds.height || element.clientWidth > rootBounds.width)
       );
     };
 
-    const isVisible = isIntersecting && (!requireFullyInView || isFullyInView || isBiggerThanRoot());
+    const isVisible = isIntersecting && (requireFullyInView !== true || isFullyInView || isBiggerThanRoot());
 
     if (onVisibilityChange) {
       onVisibilityChange(!!isVisible, isIntersecting);
@@ -91,21 +96,17 @@ const trackElement = (
   requireFullyInView = false,
   allowBiggerThanViewport = false,
 ): void => {
-  if (element) {
-    observedElements.set(element, {
-      allowBiggerThanViewport,
-      onVisibilityChange,
-      requireFullyInView,
-    });
-    return observer.observe(element);
-  }
+  observedElements.set(element, {
+    allowBiggerThanViewport,
+    onVisibilityChange,
+    requireFullyInView,
+  });
+  return observer.observe(element);
 };
 
 const removeElement = (element: Element) => {
-  if (element) {
-    observedElements.delete(element);
-    observer.unobserve(element);
-  }
+  observedElements.delete(element);
+  observer.unobserve(element);
 };
 
 export const viewportObserver = {

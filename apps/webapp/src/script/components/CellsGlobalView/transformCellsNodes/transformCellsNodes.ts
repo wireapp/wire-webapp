@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
 
@@ -43,24 +44,26 @@ export const transformCellsNodes = ({
     const name = getName(node.Path);
     const sizeMb = getFileSize(node);
     const uploadedAtTimestamp = getUploadedAtTimestamp(node);
+    const firstShare = node.Shares?.[0];
+    const firstShareUuid = firstShare?.Uuid;
     const publicLink: CellNode['publicLink'] = {
-      alreadyShared: !!node.Shares?.[0].Uuid,
-      uuid: node.Shares?.[0].Uuid || '',
+      alreadyShared: is.nonEmptyString(firstShareUuid),
+      uuid: firstShareUuid ?? '',
       url: undefined,
     };
-    const conversationName = node.ContextWorkspace?.Label || '';
+    const conversationName = node.ContextWorkspace?.Label ?? '';
     const path = node.Path;
     const url = node.PreSignedGET?.Url;
     const tags = getTags(node);
-    const presignedUrlExpiresAt = node.PreSignedGET?.ExpiresAt
-      ? new Date(Number(node.PreSignedGET?.ExpiresAt) * TIME_IN_MILLIS.SECOND)
-      : null;
+    const presignedGetExpiresAt = node.PreSignedGET?.ExpiresAt;
+    const presignedUrlExpiresAt =
+      presignedGetExpiresAt !== undefined ? new Date(Number(presignedGetExpiresAt) * TIME_IN_MILLIS.SECOND) : null;
 
-    const conversationQualifiedId = parseQualifiedId(node.ContextWorkspace?.Uuid || '');
+    const conversationQualifiedId = parseQualifiedId(node.ContextWorkspace?.Uuid ?? '');
     const conversation = conversations.find(conversation => conversation.qualifiedId.id === conversationQualifiedId.id);
 
     const userQualifiedId = getUserQualifiedIdFromNode(node);
-    const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) || null;
+    const user = users.find(user => user.qualifiedId.id === userQualifiedId?.id) ?? null;
 
     if (node.Type === 'COLLECTION') {
       return {
@@ -106,11 +109,11 @@ export const transformCellsNodes = ({
 };
 
 const getPreviewImageUrl = (node: RestNode): string | undefined => {
-  return node.Previews?.find(preview => preview.ContentType?.startsWith('image/'))?.PreSignedGET?.Url;
+  return node.Previews?.find(preview => preview.ContentType?.startsWith('image/') === true)?.PreSignedGET?.Url;
 };
 
 const getPreviewPdfUrl = (node: RestNode): string | undefined => {
-  return node.Previews?.find(preview => preview.ContentType?.startsWith('application/pdf'))?.PreSignedGET?.Url;
+  return node.Previews?.find(preview => preview.ContentType?.startsWith('application/pdf') === true)?.PreSignedGET?.Url;
 };
 
 const getUploadedAtTimestamp = (node: RestNode): number => {
@@ -118,18 +121,18 @@ const getUploadedAtTimestamp = (node: RestNode): number => {
 };
 
 const getFileSize = (node: RestNode): string => {
-  return node.Size ? formatBytes(node.Size as unknown as number) : '-';
+  return node.Size !== undefined ? formatBytes(node.Size as unknown as number) : '-';
 };
 
 const getOwner = (node: RestNode): string => {
   const name = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-owner')?.JsonValue;
-  return name ? JSON.parse(name) : '';
+  return is.nonEmptyString(name) ? JSON.parse(name) : '';
 };
 
 const getTags = (node: RestNode): string[] => {
   const tags = node.UserMetadata?.find(meta => meta.Namespace === 'usermeta-tags')?.JsonValue;
 
-  if (!tags) {
+  if (!is.nonEmptyString(tags)) {
     return [];
   }
 

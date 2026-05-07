@@ -89,7 +89,7 @@ export class ConversationEphemeralHandler extends AbstractConversationEventHandl
         return this.logger.info('Cleared ephemeral message check interval');
       }
 
-      const shouldSetInterval = messageEntities.length !== 0 && !updateIntervalId;
+      const shouldSetInterval = messageEntities.length !== 0 && updateIntervalId === null;
       if (shouldSetInterval) {
         const INTERVAL_TIME = ConversationEphemeralHandler.CONFIG.INTERVAL_TIME;
         updateIntervalId = window.setInterval(() => this._updateTimedMessages(), INTERVAL_TIME);

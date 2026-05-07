@@ -19,8 +19,9 @@
 
 export function waitFor<T>(condition: () => T, timeout: number = 5000, interval: number = 100): Promise<T | undefined> {
   return new Promise(resolve => {
-    if (condition()) {
-      return resolve(condition());
+    const initialResult = condition();
+    if (Boolean(initialResult)) {
+      return resolve(initialResult);
     }
 
     const timeoutId = setTimeout(() => {
@@ -30,7 +31,7 @@ export function waitFor<T>(condition: () => T, timeout: number = 5000, interval:
 
     const intervalId = setInterval(() => {
       const result = condition();
-      if (result) {
+      if (Boolean(result)) {
         clearTimeout(timeoutId);
         clearInterval(intervalId);
         resolve(result);

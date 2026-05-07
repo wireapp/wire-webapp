@@ -19,6 +19,7 @@
 
 import {ChangeEvent, FormEvent, HTMLProps, useEffect, useRef, useState, MouseEvent, KeyboardEvent} from 'react';
 
+import is from '@sindresorhus/is';
 import {RegisteredClient} from '@wireapp/api-client/lib/client/index';
 
 import {
@@ -125,12 +126,15 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
       : '?';
 
   const formatName = (model: string, clazz: string): string | JSX.Element =>
-    model || (
+    is.nonEmptyString(model) ? (
+      model
+    ) : is.nonEmptyString(clazz) ? (
       <Text bold textTransform={'capitalize'}>
         {clazz}
       </Text>
-    ) ||
-    '?';
+    ) : (
+      '?'
+    );
 
   const resetState = () => {
     setAnimationStep(selected ? CONFIG.animationSteps : 0);
@@ -178,7 +182,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
     setValidationError(localValidationError);
     return Promise.resolve(localValidationError)
       .then(error => {
-        if (error) {
+        if (error !== null) {
           throw error;
         }
       })
@@ -258,7 +262,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
               <DeviceIcon color="#323639" />
             </div>
             <div style={{flexGrow: 1, marginTop: isOpen ? smoothMarginTop : 0}}>
-              {client.model && (
+              {client.model !== undefined && client.model.length > 0 && (
                 <Text bold block color="#323639" data-uie-name="device-header-model">
                   {formatName(client.model, client.class)}
                 </Text>
@@ -320,7 +324,7 @@ const ClientItem = ({selected, onClientRemoval, onClick, client, clientError, re
                 <IconButton
                   aria-label={t('modalAccountRemoveDeviceAction')}
                   data-uie-name="do-remove-device"
-                  disabled={!password || !isValidPassword}
+                  disabled={!is.nonEmptyString(password) || isValidPassword !== true}
                   formNoValidate
                   css={{margin: `0 ${animatedCardSpacing.xs}px`}}
                   onClick={handleSubmit}

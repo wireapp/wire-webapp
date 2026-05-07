@@ -82,8 +82,8 @@ interface CancelLowPrecisionTaskParams {
 }
 
 const cancelTask = ({intervalDelay, key}: CancelLowPrecisionTaskParams) => {
-  if (intervals[intervalDelay]) {
-    const tasks = intervals[intervalDelay].tasks || {};
+  if (intervals[intervalDelay] !== undefined) {
+    const tasks = intervals[intervalDelay].tasks ?? {};
 
     const newTasks = {...tasks};
     delete newTasks[key];

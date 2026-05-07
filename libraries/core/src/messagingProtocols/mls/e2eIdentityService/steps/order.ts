@@ -44,7 +44,7 @@ export const createNewOrder = async ({
 }: CreateNewOrderParams): Promise<CreateNewOrderReturnValue> => {
   const reqBody = await identity.newOrderRequest(nonce);
   const {data, nonce: responseNonce, location} = await connection.createNewOrder(directory.newOrder, reqBody);
-  if (!location) {
+  if (location === undefined || location.length === 0) {
     throw new Error('No location header from API received for order creation');
   }
   return {
@@ -65,12 +65,16 @@ export const finalizeOrder = async ({identity, nonce, orderUrl, connection}: Fin
   const statusReqBody = await identity.checkOrderRequest(orderUrl, nonce);
   const statusResponse = await connection.checkStatusOfOrder(orderUrl, statusReqBody);
 
-  if (statusResponse?.data && !!statusResponse.data.status.length && !!statusResponse.nonce.length) {
+  if (statusResponse?.data !== undefined && statusResponse.data.status.length > 0 && statusResponse.nonce.length > 0) {
     const finalizeUrl = await identity.checkOrderResponse(jsonToByteArray(statusResponse.data));
     const finalizeReqBody = await identity.finalizeRequest(statusResponse.nonce);
     const finalizeResponse = await connection.finalizeOrder(finalizeUrl, finalizeReqBody);
 
-    if (finalizeResponse?.data && !!finalizeResponse.data.status.length && !!finalizeResponse.nonce.length) {
+    if (
+      finalizeResponse?.data !== undefined &&
+      finalizeResponse.data.status.length > 0 &&
+      finalizeResponse.nonce.length > 0
+    ) {
       const certificateUrl = await identity.finalizeResponse(jsonToByteArray(finalizeResponse.data));
 
       return {

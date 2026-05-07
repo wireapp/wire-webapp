@@ -52,10 +52,13 @@ export const isFetching = (state: RootState) => state.authState.fetching;
 export const isSendingTwoFactorCode = (state: RootState) => state.authState.isSendingTwoFactorCode;
 export const isFetchingSSOSettings = (state: RootState) => state.authState.fetchingSSOSettings;
 export const getDefaultSSOCode = (state: RootState) => state.authState.ssoSettings?.default_sso_code;
-export const hasDefaultSSOCode = (state: RootState) => !!state.authState.ssoSettings?.default_sso_code;
+export const hasDefaultSSOCode = (state: RootState) => {
+  const defaultSSOCode = state.authState.ssoSettings?.default_sso_code;
+  return defaultSSOCode !== undefined && defaultSSOCode.length > 0;
+};
 export const getError = (state: RootState) => state.authState.error;
 export const getLoginData = (state: RootState) => state.authState.loginData;
 export const getEntropy = (state: RootState) => state.authState.entropy;
-export const getAccount = (state: RootState): RegistrationDataState => state.authState.account || unsetRegistrationData;
-export const getAccountTeam = (state: RootState) => getAccount(state).team || unsetTeam;
+export const getAccount = (state: RootState): RegistrationDataState => state.authState.account ?? unsetRegistrationData;
+export const getAccountTeam = (state: RootState) => getAccount(state).team ?? unsetTeam;
 export const getAccountTeamName = (state: RootState) => getAccountTeam(state).name;

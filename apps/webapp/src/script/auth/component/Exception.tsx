@@ -19,6 +19,7 @@
 
 import {Fragment} from 'react';
 
+import is from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 
 import {ErrorMessage, Link} from '@wireapp/react-ui-kit';
@@ -29,26 +30,47 @@ import {validationErrorStrings} from 'Util/validationUtil';
 import {Config} from '../../Config';
 
 interface ExceptionProps {
-  errors: any[];
+  errors: unknown[];
 }
+
+type MessageInterpolationValue = string | number | boolean | Date | JSX.Element | null | undefined;
+type MessageInterpolationValues = Record<string, MessageInterpolationValue>;
+
+const toMessageInterpolationValues = (value: unknown): MessageInterpolationValues | undefined => {
+  if (!is.object(value)) {
+    return undefined;
+  }
+
+  const entries = Object.entries(value).filter((entry): entry is [string, MessageInterpolationValue] => {
+    const [entryKey, entryValue] = entry;
+    return (
+      is.nonEmptyString(entryKey) &&
+      (entryValue === null ||
+        entryValue === undefined ||
+        is.string(entryValue) ||
+        is.number(entryValue) ||
+        is.boolean(entryValue) ||
+        is.date(entryValue))
+    );
+  });
+
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+};
 
 const Exception = ({errors = []}: ExceptionProps) => {
   return (
     <Fragment>
       {errors.map(error => {
         const translatedErrors = {...validationErrorStrings, ...errorHandlerStrings};
-        if (!error) {
+        if (!is.object(error) || !('label' in error)) {
           return null;
         }
+        const errorLabel = is.string(error.label) ? error.label : 'unexpected-error';
         return (
-          <ErrorMessage
-            data-uie-name="error-message"
-            data-uie-value={error.label || 'unexpected-error'}
-            key={error.label || 'unexpected-error'}
-          >
-            {translatedErrors.hasOwnProperty(error.label) ? (
+          <ErrorMessage data-uie-name="error-message" data-uie-value={errorLabel} key={errorLabel}>
+            {Object.hasOwn(translatedErrors, errorLabel) ? (
               <FormattedMessage
-                id={translatedErrors[error.label]}
+                id={translatedErrors[errorLabel]}
                 values={{
                   minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH,
                   supportEmailExistsLink: (
@@ -64,7 +86,7 @@ const Exception = ({errors = []}: ExceptionProps) => {
                 }}
               />
             ) : (
-              <FormattedMessage id="BackendError.unexpected" values={error} />
+              <FormattedMessage id="BackendError.unexpected" values={toMessageInterpolationValues(error)} />
             )}
           </ErrorMessage>
         );

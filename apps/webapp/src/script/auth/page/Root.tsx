@@ -19,6 +19,7 @@
 
 import {FC, ReactNode, useEffect} from 'react';
 
+import is from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
@@ -113,19 +114,21 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
-  const isAuthenticatedCheck = (page: ReactNode): ReactNode =>
-    page ? (isAuthenticated ? page : navigate('/auth')) : null;
+  const isAuthenticatedCheck = (page: ReactNode): ReactNode => {
+    return isAuthenticated ? page : navigate('/auth');
+  };
 
   const isOAuthCheck = (page: ReactNode): ReactNode => {
-    if (page) {
-      if (isAuthenticated) {
-        return page;
-      }
-
-      const queryString = getOAuthQueryString(window.location);
-      return queryString ? <Navigate to={`${ROUTE.LOGIN}/${queryString}`} /> : <Navigate to={ROUTE.LOGIN} />;
+    if (isAuthenticated) {
+      return page;
     }
-    return null;
+
+    const queryString = getOAuthQueryString(window.location);
+    return is.nonEmptyString(queryString) ? (
+      <Navigate to={`${ROUTE.LOGIN}/${queryString}`} />
+    ) : (
+      <Navigate to={ROUTE.LOGIN} />
+    );
   };
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);

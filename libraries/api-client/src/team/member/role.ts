@@ -82,19 +82,19 @@ export const permissionsToRole = (permissions: PermissionsData): Role | undefine
 };
 
 export const isPartner = (permissions: PermissionsData): boolean => {
-  return !!(permissions && permissionsToRole(permissions) === Role.EXTERNAL);
+  return permissions !== undefined && permissionsToRole(permissions) === Role.EXTERNAL;
 };
 
 export const isMember = (permissions: PermissionsData): boolean => {
-  return !!(permissions && permissionsToRole(permissions) === Role.MEMBER);
+  return permissions !== undefined && permissionsToRole(permissions) === Role.MEMBER;
 };
 
 export const isAdmin = (permissions: PermissionsData): boolean => {
-  return !!(permissions && permissionsToRole(permissions) === Role.ADMIN);
+  return permissions !== undefined && permissionsToRole(permissions) === Role.ADMIN;
 };
 
 export const isOwner = (permissions: PermissionsData): boolean => {
-  return !!(permissions && permissionsToRole(permissions) === Role.OWNER);
+  return permissions !== undefined && permissionsToRole(permissions) === Role.OWNER;
 };
 
 export const isAtLeastPartner = (permissions: PermissionsData): boolean => {

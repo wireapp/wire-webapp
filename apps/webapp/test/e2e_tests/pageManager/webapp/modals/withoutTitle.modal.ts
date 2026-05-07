@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2026 Wire Swiss GmbH
+ * Copyright (C) 2025 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,12 @@
  *
  */
 
-export interface RequestVersionGate {
-  next: () => number;
-  invalidate: () => void;
-  isStale: (requestId: number) => boolean;
+import {Page} from '@playwright/test';
+
+import {BaseModal} from './base.modal';
+
+export class WithoutTitle extends BaseModal {
+  constructor(page: Page) {
+    super(page, 'modal-without-title');
+  }
 }
-
-export const createRequestVersionGate = (): RequestVersionGate => {
-  let currentRequestId = 0;
-
-  return {
-    next(): number {
-      currentRequestId += 1;
-      return currentRequestId;
-    },
-    invalidate(): void {
-      currentRequestId += 1;
-    },
-    isStale(requestId: number): boolean {
-      return requestId !== currentRequestId;
-    },
-  };
-};

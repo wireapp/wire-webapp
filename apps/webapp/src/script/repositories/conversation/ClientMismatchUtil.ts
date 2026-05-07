@@ -106,7 +106,8 @@ type Recipients = UserClients | QualifiedUserClients;
 export function findDeletedClients<T extends Recipients>(referenceRecipients: T, localRecipients: T): Recipients {
   const filterKnownClients = (clients: UserClients, knownClients: UserClients) => {
     return Object.entries(clients).reduce<UserClients>((missing, [userId, clients]) => {
-      const missingClients = difference(knownClients[userId] || [], clients);
+      const knownUserClients = knownClients[userId] ?? [];
+      const missingClients = difference(knownUserClients, clients);
       return missingClients.length ? {...missing, [userId]: missingClients} : missing;
     }, {});
   };

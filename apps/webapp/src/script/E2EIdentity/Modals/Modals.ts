@@ -106,7 +106,7 @@ export const getModalOptions = ({
       options = {
         text: {
           closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: extraParams?.isGracePeriodOver ? gracePeriodOverParagraph : settingsChangedParagraph,
+          htmlMessage: extraParams?.isGracePeriodOver === true ? gracePeriodOverParagraph : settingsChangedParagraph,
           title: t('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
@@ -120,16 +120,19 @@ export const getModalOptions = ({
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+        hideSecondary === true || secondaryActionFn === undefined
+          ? PrimaryModal.type.ACKNOWLEDGE
+          : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.CERTIFICATE_RENEWAL:
       options = {
         text: {
           closeBtnLabel: t('acme.renewCertificate.button.close'),
-          htmlMessage: extraParams?.isGracePeriodOver
-            ? t('acme.renewCertificate.gracePeriodOver.paragraph', {url: supportUrl})
-            : t('acme.renewCertificate.paragraph', {url: supportUrl}),
+          htmlMessage:
+            extraParams?.isGracePeriodOver === true
+              ? t('acme.renewCertificate.gracePeriodOver.paragraph', {url: supportUrl})
+              : t('acme.renewCertificate.paragraph', {url: supportUrl}),
           title: t('acme.renewCertificate.headline.alt'),
         },
         primaryAction: {
@@ -143,7 +146,9 @@ export const getModalOptions = ({
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+        hideSecondary === true || secondaryActionFn === undefined
+          ? PrimaryModal.type.ACKNOWLEDGE
+          : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.SELF_CERTIFICATE_REVOKED:
@@ -180,16 +185,19 @@ export const getModalOptions = ({
         ...hideCloseBtn,
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+        hideSecondary === true || secondaryActionFn === undefined
+          ? PrimaryModal.type.ACKNOWLEDGE
+          : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.ERROR:
       options = {
         text: {
           closeBtnLabel: t('acme.error.button.close'),
-          htmlMessage: extraParams?.isGracePeriodOver
-            ? t('acme.error.gracePeriod.paragraph', undefined, {br: '<br>'})
-            : t('acme.error.paragraph', undefined, {br: '<br>'}),
+          htmlMessage:
+            extraParams?.isGracePeriodOver === true
+              ? t('acme.error.gracePeriod.paragraph', undefined, {br: '<br>'})
+              : t('acme.error.paragraph', undefined, {br: '<br>'}),
           title: t('acme.error.headline'),
         },
         primaryAction: {
@@ -202,13 +210,16 @@ export const getModalOptions = ({
         },
       };
       modalType =
-        hideSecondary || secondaryActionFn === undefined ? PrimaryModal.type.ACKNOWLEDGE : PrimaryModal.type.CONFIRM;
+        hideSecondary === true || secondaryActionFn === undefined
+          ? PrimaryModal.type.ACKNOWLEDGE
+          : PrimaryModal.type.CONFIRM;
       break;
 
     case ModalType.LOADING:
       options = {
         text: {
-          title: extraParams?.isRenewal ? t('acme.renewal.inProgress.headline') : t('acme.inProgress.headline'),
+          title:
+            extraParams?.isRenewal === true ? t('acme.renewal.inProgress.headline') : t('acme.inProgress.headline'),
         },
         ...hideCloseBtn,
       };
@@ -221,11 +232,11 @@ export const getModalOptions = ({
         text: {
           closeBtnLabel: t('acme.done.button.close'),
           htmlMessage: `<div style="text-align: center">${svgHtml}${
-            extraParams?.isRenewal
+            extraParams?.isRenewal === true
               ? t('acme.renewal.done.paragraph', {url: supportUrl})
               : t('acme.done.paragraph', {url: supportUrl})
           }</div>`,
-          title: extraParams?.isRenewal ? t('acme.renewal.done.headline') : t('acme.done.headline'),
+          title: extraParams?.isRenewal === true ? t('acme.renewal.done.headline') : t('acme.done.headline'),
         },
         primaryAction: {
           action: primaryActionFn,
@@ -268,7 +279,7 @@ export const getModalOptions = ({
     };
   }
 
-  if (hideSecondary || secondaryActionFn === undefined) {
+  if (hideSecondary === true || secondaryActionFn === undefined) {
     delete options.secondaryAction;
     options = {
       ...options,
@@ -276,7 +287,7 @@ export const getModalOptions = ({
     };
   }
 
-  if (hidePrimary) {
+  if (hidePrimary === true) {
     delete options.primaryAction;
   }
 

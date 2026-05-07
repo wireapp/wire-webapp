@@ -29,7 +29,7 @@ interface EntropyFrame {
 export function shannonEntropy(entropyData: Uint8Array): number {
   const len = entropyData.length;
   const frequencies = entropyData.reduce((freq: Map<number, number>, c: number) => {
-    freq.set(c, (freq.get(c) || 0) + 1);
+    freq.set(c, (freq.get(c) ?? 0) + 1);
     return freq;
   }, new Map<number, number>());
   let sum = 0;
