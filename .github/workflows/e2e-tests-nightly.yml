@@ -45,41 +45,67 @@ jobs:
           path: apps/webapp/playwright-report
           pattern: '**/report.json'
 
-      - name: Extract test results
-        id: test-results
+      - name: Generate report description
+        id: generate-description
         run: |
-          REPORT="apps/webapp/playwright-report/report.json"
-          if [ ! -f "$REPORT" ]; then
-            echo "::error::Report file not found at $REPORT"
-            exit 1
+          REPORT_FILE="apps/webapp/playwright-report/report.json"
+          if [ ! -f "$REPORT_FILE" ]; then
+              echo "Error: File '$REPORT_FILE' not found!"
+              exit 1
           fi
-          PASSED=$(jq '.stats.expected' "$REPORT")
-          FAILED=$(jq '.stats.unexpected' "$REPORT")
-          SKIPPED=$(jq '.stats.skipped' "$REPORT")
-          FLAKY=$(jq '.stats.flaky' "$REPORT")
-          TOTAL=$((PASSED + FAILED + SKIPPED + FLAKY))
-          echo "passed=$PASSED" >> $GITHUB_OUTPUT
-          echo "failed=$FAILED" >> $GITHUB_OUTPUT
-          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
-          echo "flaky=$FLAKY" >> $GITHUB_OUTPUT
-          echo "total=$TOTAL" >> $GITHUB_OUTPUT
+
+          FAILED=$(jq '.stats.unexpected' "$REPORT_FILE")
+          MESSAGE=$(jq -c '
+            # Recursively find all objects that have a non-empty "specs" array
+            # Capture the suite title and prepend it to the test title
+            [.. | objects | select(has("specs") and (.specs | length > 0)) | .title as $suite | .specs[] | .title as $title | .tests[] | {title: ($suite + " > " + $title), status: .status}] as $tests |
+            
+            # Calculate aggregates
+            ($tests | length) as $total |
+            ($tests | map(select(.status == "expected")) | length) as $passed |
+            ($tests | map(select(.status == "unexpected")) | length) as $failed |
+            ($tests | map(select(.status == "flaky")) | length) as $flaky |
+            ($tests | map(select(.status == "skipped")) | length) as $skipped |
+            
+            # Generate unique lists for failed and flaky tests
+            ($tests | map(select(.status == "unexpected")) | map("  ❌ " + .title) | unique | join("\n")) as $failed_list |
+            ($tests | map(select(.status == "flaky")) | map("  ⚠️ " + .title) | unique | join("\n")) as $flaky_list |
+            
+            # Construct the final formatted message
+            "📋 **Playwright Test Run Summary**\n" +
+            "Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" +
+            "======================================\n" +
+            "**Total Tests:** \($total)\n" +
+            "✅ **Passed:** \($passed)\n" +
+            "❌ **Failed:** \($failed)\n" +
+            "⚠️ **Flaky:** \($flaky)\n" +
+            (if $skipped > 0 then "⏭️ **Skipped:** \($skipped)\n" else "" end) +
+            "======================================\n" +
+            (if $failed > 0 then "\n❌ **Failed Tests:**\n\($failed_list)\n" else "" end) +
+            (if $flaky > 0 then "\n⚠️ **Flaky Tests:**\n\($flaky_list)\n" else "" end)
+          ' $REPORT_FILE)
+
+          echo "failed_tests=$FAILED" >> $GITHUB_OUTPUT
+          echo "report_message=$MESSAGE" >> $GITHUB_OUTPUT
 
       - name: Upload report to Testiny
         continue-on-error: true
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
           TESTINY_TEST_PLAN_ID: 105 # 105 is the id of the "Regression" test plan within Testiny
-          DESCRIPTION: |
-            Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          DESCRIPTION: ${{ steps.generate-description.outputs.report_message }}
         run: |
+          # Extract description from json format so it can be quoted correctly
+          RAW_DESCRIPTION=$(echo "$DESCRIPTION" | jq -r '.')
+
           node ./apps/webapp/test/e2e_tests/scripts/uploadTestReport.ts \
           --runName="Regression $(date +'%m/%d/%Y - %H:%M')" \
           --testPlanId="$TESTINY_TEST_PLAN_ID" \
-          --description="$DESCRIPTION" \
+          --description="$RAW_DESCRIPTION" \
           --reportPath="./apps/webapp/playwright-report/report.json"
 
       - name: Notify on Wire about failed tests
-        if: ${{ !cancelled() && steps.test-results.outputs.failed > 0 }}
+        if: ${{ !cancelled() && steps.generate-description.outputs.failed_tests > 0 }}
         uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
         continue-on-error: true
         env:
@@ -88,5 +114,5 @@ jobs:
           status: custom
           custom_payload: |
             {
-              "text": "❌ Web E2E Tests failed ❌\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*Report:* ${{ needs.e2e_tests.outputs.reportUrl }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              "text": ${{ steps.generate-description.outputs.report_message }},
             }
