@@ -637,7 +637,10 @@ export class CallingRepository {
     let qualityInfo: NetworkQualityInfo;
 
     try {
-      const parsedQualityInfo = JSON.parse(qualityInfoJson);
+      // This is a temporary hack to make the schema work with the current version of AVS. In the next AVS version we
+      // will fix this issue and remove this hack.
+      const tmp = JSON.parse(qualityInfoJson);
+      const parsedQualityInfo = JSON.parse(tmp.quality);
       qualityInfo = NetworkQualityInfoSchema.parse(parsedQualityInfo);
     } catch (error) {
       if (error instanceof z.ZodError) {
