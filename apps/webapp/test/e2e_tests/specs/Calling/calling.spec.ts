@@ -913,24 +913,37 @@ test.describe('Calling', () => {
     });
   });
 
-  test(
-    'I want to have 1:1 CBR audio call when the caller turned it on',
-    {tag: ['@TC-2908', '@regression']},
-    async ({createPage}) => {
+  [
+    {id: '@TC-2908', title: 'I want to have 1:1 CBR audio call when the caller turned it on'} as const,
+    {id: '@TC-2909', title: 'I want to have 1:1 CBR audio call when the receiver turned it on'} as const,
+  ].forEach(({id, title}) => {
+    test(title, {tag: [id, '@regression']}, async ({createPage}) => {
       const [userAPage, userBPage] = await Promise.all([
         createPage(withLogin(userA)),
         createPage(withLogin(userB), withConnectedUser(userA)),
       ]);
 
-      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
+      const {pages: userAPages} = PageManager.from(userAPage).webapp;
       const {pages: userBPages} = PageManager.from(userBPage).webapp;
 
-      await test.step('Caller enables CBR', async () => {
-        await userAComponents.conversationSidebar().preferencesButton.click();
-        await userAPages.settings().audioVideoButton.click();
-        await userAPages.audioVideoSettings().variableBitrateCheckbox.click();
-        await userAComponents.conversationSidebar().allConversationsButton.click();
-      });
+      if (id === '@TC-2908') {
+        await test.step('Caller enables CBR', async () => {
+          const {pages: callerPages, components: callerComponents} = PageManager.from(userAPage).webapp;
+          await callerComponents.conversationSidebar().preferencesButton.click();
+          await callerPages.settings().audioVideoButton.click();
+          await callerPages.audioVideoSettings().variableBitrateCheckbox.click();
+          await callerComponents.conversationSidebar().allConversationsButton.click();
+        });
+      }
+      if (id === '@TC-2909') {
+        await test.step('Receiver enables CBR', async () => {
+          const {pages: receiverPages, components: receiverComponents} = PageManager.from(userBPage).webapp;
+          await receiverComponents.conversationSidebar().preferencesButton.click();
+          await receiverPages.settings().audioVideoButton.click();
+          await receiverPages.audioVideoSettings().variableBitrateCheckbox.click();
+          await receiverComponents.conversationSidebar().allConversationsButton.click();
+        });
+      }
 
       await test.step('UserA calls userB', async () => {
         await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
@@ -942,6 +955,6 @@ test.describe('Calling', () => {
         await expect(userAPages.calling().callCell).toContainText('CBR');
         await expect(userBPages.calling().callCell).toContainText('CBR');
       });
-    },
-  );
+    });
+  });
 });
