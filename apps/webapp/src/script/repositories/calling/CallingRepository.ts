@@ -554,7 +554,7 @@ export class CallingRepository {
     wCall.setNetworkQualityHandler(
       wUser,
       (conversationId, userId, clientId, quality) => {
-        this.updateCallQuality(conversationId, userId, clientId, JSON.stringify({quality}));
+        this.updateCallQuality(conversationId, userId, clientId, quality);
       },
       tenSeconds,
     );
