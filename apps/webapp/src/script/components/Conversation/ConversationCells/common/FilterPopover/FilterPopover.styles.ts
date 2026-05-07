@@ -28,23 +28,35 @@ export const triggerButtonStyles: CSSObject = {
   borderRadius: '12px',
   border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
   background: 'var(--Background-Base-Primary, #FFF)',
-  fontSize: '14px',
-  fontWeight: 400,
-  color: 'inherit',
+  fontSize: 'var(--font-size-small)',
+  fontWeight: 'var(--font-weight-semibold)',
+  lineHeight: 'var(--line-height-small-plus)',
+  letterSpacing: '0.25px',
+  color: 'var(--main-color)',
   cursor: 'pointer',
   flexShrink: 0,
   whiteSpace: 'nowrap',
   '&[data-pressed]': {
-    border: '1px solid var(--Border-Accent-Color-Primary, #0667C8)',
+    border: '1px solid var(--accent-color-500)',
   },
   '&[data-hovered]': {
-    border: '1px solid var(--Border-Accent-Color-Primary, #0667C8)',
+    border: '1px solid var(--accent-color-500)',
+  },
+  '&[data-active="true"]': {
+    border: '1px solid var(--accent-color-500)',
+    background: 'var(--accent-color-highlight)',
+    color: 'var(--accent-color-500)',
   },
   'body.theme-dark &': {
     border: '1px solid var(--Border-Base-Primary, #34373D)',
     background: 'var(--Background-Base-Primary, #17181A)',
     '&[data-pressed], &[data-hovered]': {
-      border: '1px solid var(--Border-Accent-Color-Primary, #54A6FF)',
+      border: '1px solid var(--accent-color-500)',
+    },
+    '&[data-active="true"]': {
+      border: '1px solid var(--accent-color-500)',
+      background: 'var(--accent-color-highlight)',
+      color: 'var(--accent-color-500)',
     },
   },
 };
@@ -56,11 +68,11 @@ export const badgeStyles: CSSObject = {
   minWidth: '18px',
   height: '18px',
   padding: '0 5px',
-  borderRadius: '9px',
-  background: 'var(--accent-color, #0667C8)',
+  borderRadius: '6px',
+  background: 'var(--accent-color-500)',
   color: '#FFF',
-  fontSize: '12px',
-  fontWeight: 600,
+  fontSize: 'var(--font-size-small)',
+  fontWeight: 'var(--font-weight-semibold)',
   lineHeight: 1,
 };
 
@@ -94,13 +106,36 @@ export const dialogStyles: CSSObject = {
 
 export const searchRowStyles: CSSObject = {
   display: 'flex',
+  height: '32px',
+  padding: '0 12px',
   alignItems: 'center',
   gap: '8px',
-  padding: '10px 12px',
-  borderBottom: '1px solid var(--Border-Base-Primary, #DCE0E3)',
-  'body.theme-dark &': {
-    borderBottom: '1px solid var(--Border-Base-Primary, #34373D)',
+  margin: '8px 12px',
+  borderRadius: '8px',
+  border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
+  boxSizing: 'border-box',
+  '&:focus-within': {
+    border: '1px solid var(--accent-color-500)',
   },
+  'body.theme-dark &': {
+    border: '1px solid var(--Border-Base-Primary, #34373D)',
+    '&:focus-within': {
+      border: '1px solid var(--accent-color-500)',
+    },
+  },
+};
+
+export const searchClearButtonStyles: CSSObject = {
+  border: 'none',
+  background: 'none',
+  padding: 0,
+  margin: 0,
+  cursor: 'pointer',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  color: 'var(--main-color)',
 };
 
 export const searchIconStyles: CSSObject = {
@@ -133,17 +168,30 @@ export const itemListStyles: CSSObject = {
 };
 
 export const itemRowHoverStyles: CSSObject = {
+  position: 'relative',
+  '&:not(:last-child)::after': {
+    content: '""',
+    display: 'block',
+    position: 'absolute',
+    bottom: 0,
+    left: '12px',
+    right: '12px',
+    height: '1px',
+    background: 'var(--Border-Base-Primary, #DCE0E3)',
+  },
   '&:hover': {
     background: 'var(--Background-Base-Secondary, #F5F6F7)',
   },
   'body.theme-dark &': {
+    '&:not(:last-child)::after': {
+      background: 'var(--Border-Base-Primary, #34373D)',
+    },
     '&:hover': {
       background: 'var(--Background-Base-Secondary, #212326)',
     },
   },
 };
 
-// Shared layout for both checkbox wrapper and single-select button rows
 const sharedRowLayout: CSSObject = {
   display: 'flex',
   alignItems: 'center',
@@ -159,13 +207,6 @@ export const checkboxWrapperStyles: CSSObject = {
   justifyContent: 'space-between',
 };
 
-export const singleSelectRowStyles: CSSObject = {
-  ...sharedRowLayout,
-  border: 'none',
-  background: 'transparent',
-  textAlign: 'left',
-  color: 'inherit',
-};
 
 export const startContentStyles: CSSObject = {
   flexShrink: 0,
@@ -188,19 +229,10 @@ export const checkboxLabelStyles: CSSObject = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  fontSize: '14px',
-  cursor: 'pointer',
+  fontSize: 'var(--font-size-medium)',
   lineHeight: '18px',
 };
 
-export const subLabelStyles: CSSObject = {
-  fontSize: '12px',
-  color: 'var(--foreground-secondary, #71767B)',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  lineHeight: '16px',
-};
 
 export const footerStyles: CSSObject = {
   display: 'flex',
