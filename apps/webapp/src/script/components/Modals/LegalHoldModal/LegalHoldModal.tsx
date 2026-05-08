@@ -141,7 +141,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setIsSendingApprove(true);
 
     try {
-      if (!selfUser.teamId) {
+      if (selfUser.teamId === undefined || selfUser.teamId === '') {
         return;
       }
 
@@ -191,13 +191,13 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       setModalParams(true);
     }
 
-    if (!selfUser.teamId) {
+    if (selfUser.teamId === undefined || selfUser.teamId === '') {
       setModalParams(false);
 
       return;
     }
 
-    if (!fingerprint && selfUser.teamId) {
+    if ((fingerprint === undefined || fingerprint === '') && selfUser.teamId !== undefined && selfUser.teamId !== '') {
       const response = await teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
       if (response.status === LegalHoldMemberStatus.PENDING) {
         const newFingerprint = await cryptographyRepository.getRemoteFingerprint(
@@ -230,7 +230,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   ]);
 
   const checkLegalHoldState = useCallback(async () => {
-    if (!selfUser.teamId) {
+    if (selfUser.teamId === undefined || selfUser.teamId === '') {
       return;
     }
 
@@ -244,7 +244,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   }, [selfUser.id, selfUser.teamId, teamRepository.teamService]);
 
   useEffect(() => {
-    if (type) {
+    if (type !== null) {
       checkLegalHoldState();
     }
   }, [type, checkLegalHoldState]);
@@ -270,7 +270,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       const allUsers = await conversationRepository.getAllUsersInConversation(currentConversation);
       const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
 
-      if (!legalHoldUsers.length) {
+      if (legalHoldUsers.length === 0) {
         setIsModalOpen(false);
 
         return;

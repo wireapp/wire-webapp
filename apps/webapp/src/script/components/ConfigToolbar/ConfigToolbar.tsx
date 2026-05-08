@@ -34,17 +34,19 @@ import {wrapperStyles} from './ConfigToolbar.styles';
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
-  const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() || false);
+  const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
   const messageCountRef = useRef<number>(0);
   const [prefix, setPrefix] = useState('Message -');
   const [messageDelaySec, setMessageDelaySec] = useState<number>(0);
   const wrapperRef = useRef(null);
-  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger());
-  const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsRustSFT());
+  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(
+    window.wire?.app?.debug?.isEnabledAvsDebugger() ?? false,
+  );
+  const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(window.wire?.app?.debug?.isEnabledAvsRustSFT() ?? false);
   const [videoBackgroundEffectsFeatureEnabled, setVideoBackgroundEffectsFeatureEnabled] = useState(
-    !!window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled(),
+    window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled() ?? false,
   );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
 
@@ -186,7 +188,7 @@ export function ConfigToolbar() {
   useClickOutside(wrapperRef, () => setShowConfig(false));
 
   const handleAvsEnable = (isChecked: boolean) => {
-    setAvsDebuggerEnabled(!!window.wire?.app?.debug?.enableAvsDebugger(isChecked));
+    setAvsDebuggerEnabled(window.wire?.app?.debug?.enableAvsDebugger(isChecked) === true);
   };
 
   const renderAvsSwitch = () => {
@@ -205,7 +207,7 @@ export function ConfigToolbar() {
   };
 
   const handleAvsRustSftEnable = (isChecked: boolean) => {
-    setAvsRustSftEnabled(!!window.wire?.app?.debug?.enableAvsRustSFT(isChecked));
+    setAvsRustSftEnabled(window.wire?.app?.debug?.enableAvsRustSFT(isChecked) === true);
   };
   const renderAvsRustSftSwitch = () => {
     return (
@@ -223,7 +225,9 @@ export function ConfigToolbar() {
   };
 
   const handleBackgroundEffectsFeature = (isChecked: boolean) => {
-    setVideoBackgroundEffectsFeatureEnabled(!!window.wire?.app?.debug?.enableVideoBackgroundEffectsFeature(isChecked));
+    setVideoBackgroundEffectsFeatureEnabled(
+      window.wire?.app?.debug?.enableVideoBackgroundEffectsFeature(isChecked) === true,
+    );
   };
   const renderBackgroundEffectsFeatureSelect = () => {
     return (

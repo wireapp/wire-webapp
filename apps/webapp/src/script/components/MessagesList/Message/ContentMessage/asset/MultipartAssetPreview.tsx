@@ -50,39 +50,41 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const firstAsset = cellAssets[0];
-  const modalId = `multipart-preview-${firstAsset?.uuid || 'unknown'}`;
+  const modalId = `multipart-preview-${firstAsset?.uuid ?? 'unknown'}`;
 
-  const extension = firstAsset?.initialName ? getFileExtension(firstAsset.initialName) : '';
-  const isImage = firstAsset?.contentType?.startsWith('image');
-  const isVideo = firstAsset?.contentType?.startsWith('video');
+  const extension = firstAsset?.initialName != null ? getFileExtension(firstAsset.initialName) : '';
+  const isImage = firstAsset?.contentType?.startsWith('image') === true;
+  const isVideo = firstAsset?.contentType?.startsWith('video') === true;
 
   const {src, imagePreviewUrl, isLoading} = useGetMultipartAsset({
-    uuid: firstAsset?.uuid || '',
+    uuid: firstAsset?.uuid ?? '',
     cellsRepository,
-    isEnabled: !!firstAsset?.uuid,
+    isEnabled: firstAsset?.uuid !== undefined && firstAsset.uuid !== '',
     retryPreviewUntilSuccess: false,
   });
 
-  if (!cellAssets || cellAssets.length === 0) {
+  if (cellAssets.length === 0) {
     return null;
   }
 
-  const canPreviewImage = isPreviewableImage({mimeType: firstAsset?.contentType, extension}) || !!imagePreviewUrl;
-  const hasPreview = ((isImage && canPreviewImage) || isVideo) && !!firstAsset?.uuid;
-  const previewUrl = isVideo ? imagePreviewUrl : imagePreviewUrl || src;
+  const canPreviewImage =
+    isPreviewableImage({mimeType: firstAsset?.contentType, extension}) || imagePreviewUrl !== undefined;
+  const hasPreview = ((isImage && canPreviewImage) || isVideo) && firstAsset?.uuid !== undefined;
+  const previewUrl = isVideo ? imagePreviewUrl : (imagePreviewUrl ?? src);
 
   // Show loading state or preview for images/videos
-  const shouldDisplayImagePreview = hasPreview && (previewUrl || isLoading);
+  const shouldDisplayImagePreview = hasPreview && (previewUrl !== undefined || isLoading);
   const hasMultipleFiles = cellAssets.length > 1;
 
   // Only show text if no preview OR if there are multiple files
   const showText = !shouldDisplayImagePreview || hasMultipleFiles;
 
   // Get file extension for FileTypeIcon - use initialName if available, fallback to contentType
-  const fileExtension = extension || firstAsset?.contentType?.split('/').pop() || '';
+  const contentTypeExtension = firstAsset?.contentType?.split('/').pop();
+  const fileExtension = extension !== '' ? extension : (contentTypeExtension ?? '');
 
   // Get the file name to display for single files
-  const fileName = firstAsset?.initialName ? getName(firstAsset.initialName) : '';
+  const fileName = firstAsset?.initialName != null ? getName(firstAsset.initialName) : '';
 
   // Determine what text to show: file name for single file, count for multiple files
   const displayText = hasMultipleFiles ? attachmentsCountCopy : fileName;
@@ -104,10 +106,10 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
               }
             }}
           >
-            {previewUrl ? (
+            {previewUrl !== undefined ? (
               <>
                 <img src={previewUrl} alt="" />
-                {isVideo && (
+                {isVideo === true && (
                   <div className="message-quote__preview-overlay" aria-hidden="true">
                     <PlayIcon width={16} height={16} />
                   </div>
@@ -123,12 +125,12 @@ export const MultipartAssetPreview: FC<MultipartAssetPreviewProps> = ({
           <span
             className="message-quote__filetype-icon"
             role="img"
-            aria-label={fileExtension ? `${fileExtension.toUpperCase()} file` : 'File attachment'}
+            aria-label={fileExtension !== '' ? `${fileExtension.toUpperCase()} file` : 'File attachment'}
           >
             <FileTypeIcon extension={fileExtension} size={16} />
           </span>
         )}
-        {showText && <span>{displayText}</span>}
+        {showText === true && <span>{displayText}</span>}
       </div>
 
       {shouldDisplayImagePreview && (

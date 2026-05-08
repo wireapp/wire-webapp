@@ -148,7 +148,13 @@ const UserModal = ({
   } = useKoSubscribableChildren(selfUser, ['is_trusted', 'isActivatedAccount', 'isTemporaryGuest']);
   const isFederated = core.backendFeatures?.isFederated;
 
-  const isSameTeam = user && user.teamId && selfUser.teamId && user.teamId === selfUser.teamId;
+  const isSameTeam =
+    user !== null &&
+    user.teamId !== undefined &&
+    user.teamId !== '' &&
+    selfUser.teamId !== undefined &&
+    selfUser.teamId !== '' &&
+    user.teamId === selfUser.teamId;
 
   useEffect(() => {
     if (userId) {
@@ -217,7 +223,7 @@ const UserModal = ({
               showAvailability={isTeam && !isTemporaryGuest && teamState.isInTeam(user)}
             />
 
-            {!isTrusted && !isSameTeam && <UnverifiedUserWarning user={user} />}
+            {isTrusted === false && !isSameTeam && <UnverifiedUserWarning user={user} />}
 
             <UserModalUserActionsSection
               user={user}

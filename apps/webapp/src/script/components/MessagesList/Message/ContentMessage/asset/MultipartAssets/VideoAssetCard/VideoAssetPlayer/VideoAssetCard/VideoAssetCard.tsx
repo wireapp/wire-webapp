@@ -43,14 +43,14 @@ interface VideoAssetCardProps {
 export const VideoAssetCard = forwardRef<HTMLDivElement, VideoAssetCardProps>(
   ({extension, name, size, isError, children, src, senderName, timestamp, id}, ref) => {
     const [isOpen, setIsOpen] = useState(false);
-    const formattedName = isError ? t('cells.unavailableFile') : name;
+    const formattedName = isError === true ? t('cells.unavailableFile') : name;
 
     return (
       <FileCard.Root variant="large" extension={extension} name={formattedName} size={size}>
         <FileCard.Header>
-          <FileCard.Icon type={isError ? 'unavailable' : 'file'} />
-          {!isError && <FileCard.Type />}
-          <FileCard.Name variant={isError ? 'secondary' : 'primary'} />
+          <FileCard.Icon type={isError === true ? 'unavailable' : 'file'} />
+          {isError !== true && <FileCard.Type />}
+          <FileCard.Name variant={isError === true ? 'secondary' : 'primary'} />
           <FileAssetOptions id={id} src={src} name={name} extension={extension} onOpen={() => setIsOpen(true)} />
         </FileCard.Header>
         <FileCard.Content>

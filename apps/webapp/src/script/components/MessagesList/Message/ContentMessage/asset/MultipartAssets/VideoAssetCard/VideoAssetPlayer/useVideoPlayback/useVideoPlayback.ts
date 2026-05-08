@@ -44,7 +44,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
   }, [videoElement]);
 
   const getPlayabilityStatus = useCallback(async (url?: string): Promise<PlayabilityStatus> => {
-    if (!url) {
+    if (url === undefined || url === '') {
       return 'unplayable';
     }
 
@@ -78,7 +78,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
   }, [videoElement]);
 
   const handlePlay = useCallback(async (): Promise<void> => {
-    if (!isEnabled || !url || !videoElement) {
+    if (!isEnabled || url === undefined || url === '' || !videoElement) {
       return;
     }
 

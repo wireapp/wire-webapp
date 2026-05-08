@@ -75,7 +75,7 @@ export const useGetMultipartAsset = ({
 
   const fetchData = useCallback(
     async (forceRefetch = false) => {
-      if (!forceRefetch && (!isMounted.current || status === 'success')) {
+      if (!forceRefetch && (isMounted.current === false || status === 'success')) {
         return;
       }
 
@@ -86,12 +86,16 @@ export const useGetMultipartAsset = ({
           return;
         }
 
-        const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/'));
-        const pdfPreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('application/pdf'));
-        setHasPreview(!!imagePreview || !!pdfPreview);
+        const imagePreview = asset.Previews?.find(preview => preview?.ContentType?.startsWith('image/') === true);
+        const pdfPreview = asset.Previews?.find(
+          preview => preview?.ContentType?.startsWith('application/pdf') === true,
+        );
+        setHasPreview(imagePreview !== undefined || pdfPreview !== undefined);
 
         const shouldReturnImmediately =
-          !retryPreviewUntilSuccess || (!imagePreview && !pdfPreview) || (imagePreview?.Error && pdfPreview?.Error);
+          !retryPreviewUntilSuccess ||
+          (imagePreview === undefined && pdfPreview === undefined) ||
+          (imagePreview?.Error === true && pdfPreview?.Error === true);
 
         if (shouldReturnImmediately) {
           setSrc(asset.PreSignedGET?.Url);
@@ -104,7 +108,8 @@ export const useGetMultipartAsset = ({
           return;
         }
 
-        const shouldRetry = (imagePreview?.Processing || pdfPreview?.Processing) && attemptRef.current < maxRetries;
+        const shouldRetry =
+          (imagePreview?.Processing === true || pdfPreview?.Processing === true) && attemptRef.current < maxRetries;
 
         if (shouldRetry) {
           attemptRef.current += 1;
@@ -135,14 +140,14 @@ export const useGetMultipartAsset = ({
 
     return () => {
       isMounted.current = false;
-      if (timeoutRef.current) {
+      if (timeoutRef.current !== undefined) {
         clearTimeout(timeoutRef.current);
       }
     };
   }, []);
 
   useEffect(() => {
-    if (!isEnabled || status === 'success' || hasStartedFetchRef.current) {
+    if (!isEnabled || status === 'success' || hasStartedFetchRef.current === true) {
       return;
     }
 
@@ -160,7 +165,7 @@ export const useGetMultipartAsset = ({
     }, retryDelay);
 
     return () => {
-      if (timeoutRef.current) {
+      if (timeoutRef.current !== undefined) {
         clearTimeout(timeoutRef.current);
       }
     };

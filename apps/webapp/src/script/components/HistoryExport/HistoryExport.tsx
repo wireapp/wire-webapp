@@ -102,7 +102,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     [ExportState.COMPRESSING]: t('backupExportProgressCompressing'),
   };
 
-  const loadingMessage = historyMessages?.[historyState] || '';
+  const loadingMessage = historyMessages[historyState] ?? '';
 
   const dismissExport = () => {
     switchContent(ContentState.PREFERENCES_ACCOUNT);

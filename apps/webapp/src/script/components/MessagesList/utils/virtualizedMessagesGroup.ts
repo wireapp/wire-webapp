@@ -142,7 +142,7 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
         message.timestamp(),
       );
 
-    if (shouldGroup) {
+    if (shouldGroup === true) {
       lastMessageInfo.lastMessageTimestamp = message.timestamp();
 
       acc.push({

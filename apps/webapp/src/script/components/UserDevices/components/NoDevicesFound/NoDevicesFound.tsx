@@ -34,11 +34,9 @@ export const NoDevicesFound = ({user, noPadding}: NoDevicesFoundProps) => {
   return (
     <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
       <p className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
-        {user
-          ? t('participantDevicesNoClients', {
-              user: userName,
-            })
-          : ''}
+        {t('participantDevicesNoClients', {
+          user: userName,
+        })}
       </p>
     </div>
   );

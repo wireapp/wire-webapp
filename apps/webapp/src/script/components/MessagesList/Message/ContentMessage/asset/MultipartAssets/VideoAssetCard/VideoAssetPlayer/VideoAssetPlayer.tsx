@@ -102,7 +102,7 @@ export const VideoAssetPlayer = ({
     );
   }
 
-  if (isLoading || !url) {
+  if (isLoading || url === undefined || url === '') {
     return (
       <VideoAssetCard
         id={id}

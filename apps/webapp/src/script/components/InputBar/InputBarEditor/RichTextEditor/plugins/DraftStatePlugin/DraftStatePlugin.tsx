@@ -33,7 +33,7 @@ export function DraftStatePlugin({loadDraftState}: DraftStatePluginProps): null 
   const getDraftState = useCallback(async () => {
     const draftState: DraftState = await loadDraftState();
 
-    if (draftState.editorState) {
+    if (draftState.editorState != null && draftState.editorState !== '') {
       const initialEditorState = editor.parseEditorState(draftState.editorState);
 
       if (!initialEditorState.isEmpty()) {

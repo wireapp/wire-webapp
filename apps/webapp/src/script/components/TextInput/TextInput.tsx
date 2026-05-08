@@ -19,6 +19,8 @@
 
 import React, {forwardRef, useEffect} from 'react';
 
+import is from '@sindresorhus/is';
+
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -74,10 +76,10 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
     },
     textInputRef,
   ) => {
-    const isFilled = Boolean(value);
+    const isFilled = is.nonEmptyString(value);
 
     useEffect(() => {
-      if (isSuccess && onSuccessDismissed) {
+      if (isSuccess === true && onSuccessDismissed !== undefined) {
         setTimeout(() => {
           onSuccessDismissed();
         }, SUCCESS_DISMISS_TIMEOUT);
@@ -85,16 +87,16 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
     }, [isSuccess, onSuccessDismissed]);
 
     let changedColor = undefined;
-    if (isError) {
+    if (isError === true) {
       changedColor = 'var(--text-input-alert) !important';
     }
-    if (isSuccess) {
+    if (isSuccess === true) {
       changedColor = 'var(--text-input-success) !important';
     }
 
     return (
       <div css={containerCSS} ref={inputWrapperRef}>
-        {isError && errorMessage && (
+        {isError === true && is.nonEmptyString(errorMessage) && (
           <span className="label" css={errorMessageCSS} data-uie-name={errorUieName}>
             {errorMessage}
           </span>
@@ -121,7 +123,7 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
           {label}
         </label>
 
-        {isFilled && !isSuccess && !isError && (
+        {isFilled && isSuccess !== true && isError !== true && (
           <button
             type="button"
             css={cancelButtonCSS}
@@ -145,8 +147,8 @@ const TextInput = forwardRef<HTMLInputElement, UserInputProps>(
             <Icon.CloseIcon css={{fill: 'var(--text-input-background)', height: 8, width: 8}} />
           </button>
         )}
-        {isSuccess && !isError && <CheckIcon css={getIconCSS(changedColor)} color={COLOR.TEXT} />}
-        {isError && <Icon.ExclamationMark css={getIconCSS(changedColor)} color={COLOR.TEXT} />}
+        {isSuccess === true && isError !== true && <CheckIcon css={getIconCSS(changedColor)} color={COLOR.TEXT} />}
+        {isError === true && <Icon.ExclamationMark css={getIconCSS(changedColor)} color={COLOR.TEXT} />}
       </div>
     );
   },

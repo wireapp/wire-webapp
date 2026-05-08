@@ -22,6 +22,7 @@ import {useCallback, useEffect} from 'react';
 import {$createLinkNode, $isLinkNode, LinkNode} from '@lexical/link';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$findMatchingParent} from '@lexical/utils';
+import is from '@sindresorhus/is';
 import {
   $getSelection,
   $isRangeSelection,
@@ -119,7 +120,9 @@ export const useLinkState = () => {
           }
 
           const newLinkNode = $createLinkNode(sanitizedUrl);
-          const newTextNode = $createTextNode(text || editingLink.node.getTextContent());
+          const existingText = editingLink.node.getTextContent();
+          const nextText = is.nonEmptyString(text) ? text : existingText;
+          const newTextNode = $createTextNode(nextText);
           newLinkNode.append(newTextNode);
           editingLink.node.replace(newLinkNode);
 

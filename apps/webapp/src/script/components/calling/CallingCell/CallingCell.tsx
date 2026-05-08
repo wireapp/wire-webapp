@@ -138,7 +138,10 @@ export const CallingCell = ({
   const isMuted = muteState !== MuteState.NOT_MUTED;
   const isCurrentlyMuted = useCallback(() => muteState === MuteState.SELF_MUTED, [muteState]);
 
-  const isDeclined = !!reason && [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
+  const isDeclined =
+    reason !== undefined &&
+    reason !== null &&
+    [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
 
   const isOutgoing = state === CALL_STATE.OUTGOING;
   const isIncoming = state === CALL_STATE.INCOMING;
@@ -170,7 +173,7 @@ export const CallingCell = ({
 
   const currentCallStatus = callStatus[state];
 
-  const showNoCameraPreview = !hasAccessToCamera && isVideoCall && !isOngoing;
+  const showNoCameraPreview = hasAccessToCamera !== true && isVideoCall && !isOngoing;
 
   const videoGrid = useVideoGrid(call);
 
@@ -184,11 +187,13 @@ export const CallingCell = ({
     [call, callActions],
   );
 
-  const isPressSpaceToUnmuteEnabled =
+  const isPressSpaceToUnmutePreferenceEnabled =
     useUserPropertyValue(
       () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
       WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
-    ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
+    ) === true;
+  const isPressSpaceToUnmuteEnabled =
+    isPressSpaceToUnmutePreferenceEnabled && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
 
   usePressSpaceToUnmute({
     callState,
@@ -339,7 +344,7 @@ export const CallingCell = ({
         </p>
       )}
 
-      {(!isDeclined || isTemporaryUser) && (
+      {(!isDeclined || isTemporaryUser === true) && (
         <div
           className="conversation-list-calling-cell-background"
           data-uie-name="item-call"
@@ -360,7 +365,7 @@ export const CallingCell = ({
             conversationUrl={conversationUrl}
             callStartedAlert={isGroupOrChannel ? callGroupStartedAlert : call1To1StartedAlert}
             ongoingCallAlert={isGroupOrChannel ? onGoingGroupCallAlert : onGoingCallAlert}
-            isTemporaryUser={!!isTemporaryUser}
+            isTemporaryUser={isTemporaryUser === true}
             conversationParticipants={conversationParticipants}
             conversationName={conversationName}
             currentCallStatus={currentCallStatus}

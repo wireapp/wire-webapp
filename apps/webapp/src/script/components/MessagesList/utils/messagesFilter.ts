@@ -68,10 +68,7 @@ const filterDuplicatedSystemMessages = (messages: MessageEntity[]) => {
         );
 
         if (uniqUpdateMessages.length > 0) {
-          const prevMessage = uniqUpdateMessages?.[uniqUpdateMessages.length - 1];
-          if (!prevMessage) {
-            return [...uniqMessages, currentMessage];
-          }
+          const prevMessage = uniqUpdateMessages[uniqUpdateMessages.length - 1];
 
           if (prevMessage.isConversationRename() && currentMessage.isConversationRename()) {
             // for rename messages, only name changes are relevant, caption stays the same

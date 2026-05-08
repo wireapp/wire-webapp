@@ -108,9 +108,6 @@ const TextMessage: FC<TextMessageRendererProps> = ({
    */
   const handleInteraction = (event: React.MouseEvent | React.KeyboardEvent) => {
     const target = event.target as HTMLElement;
-    if (!target) {
-      return;
-    }
     const emailElement = target.closest('[data-email-link]');
     const markdownLinkElement = target.closest('[data-md-link]');
     const mentionElement = target.closest('.message-mention');

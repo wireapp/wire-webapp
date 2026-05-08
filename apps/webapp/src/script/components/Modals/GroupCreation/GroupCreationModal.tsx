@@ -150,9 +150,7 @@ const GroupCreationModal = ({
       setIsShown(true);
       setGroupCreationState(GroupCreationModalState.PREFERENCES);
 
-      if (userEntity) {
-        setSelectedContacts([...selectedContacts, userEntity]);
-      }
+      setSelectedContacts([...selectedContacts, userEntity]);
     };
 
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
@@ -435,7 +433,7 @@ const GroupCreationModal = ({
                 enabled: isInputValid,
               })}
               css={{marginBottom: 0}}
-              disabled={!isInputValid}
+              disabled={isInputValid !== true}
               type="button"
               onClick={clickOnNext}
               aria-label={t('groupCreationPreferencesAction')}
@@ -458,7 +456,7 @@ const GroupCreationModal = ({
           />
         )}
 
-        {stateIsParticipants && selfUser && (
+        {stateIsParticipants && (
           <FadingScrollbar className="group-creation__list">
             <UserSearchableList
               selfUser={selfUser}

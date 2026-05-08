@@ -83,6 +83,9 @@ export const CallingControls = ({
   ]);
 
   const {showAlert, clearShowAlert} = useCallAlertState();
+  const isFullUiEnabled = isFullUi === true;
+  const isMutedEnabled = isMuted === true;
+  const isConnectingEnabled = isConnecting === true;
 
   const isVideoUnsupported = !selfSharesCamera && !supportsVideoCall;
   const showVideoButton = isVideoCallingEnabled && (isVideoCall || isOngoing);
@@ -91,21 +94,25 @@ export const CallingControls = ({
   return (
     <div css={cellControlsWrapper}>
       <ul css={cellControlsList}>
-        {isFullUi && (
+        {isFullUiEnabled && (
           <>
             <li>
               <button
-                className={cx('call-ui__button', {'call-ui__button--active': !isMuted})}
-                onClick={() => callActions.toggleMute(call, !isMuted)}
+                className={cx('call-ui__button', {'call-ui__button--active': !isMutedEnabled})}
+                onClick={() => callActions.toggleMute(call, !isMutedEnabled)}
                 data-uie-name="do-toggle-mute"
-                data-uie-value={isMuted ? 'active' : 'inactive'}
+                data-uie-value={isMutedEnabled ? 'active' : 'inactive'}
                 title={t('videoCallOverlayMicrophone')}
                 type="button"
                 role="switch"
-                aria-checked={!isMuted}
-                disabled={isConnecting}
+                aria-checked={!isMutedEnabled}
+                disabled={isConnectingEnabled}
               >
-                {isMuted ? <Icon.MicOffIcon className="small-icon" /> : <Icon.MicOnIcon className="small-icon" />}
+                {isMutedEnabled ? (
+                  <Icon.MicOffIcon className="small-icon" />
+                ) : (
+                  <Icon.MicOnIcon className="small-icon" />
+                )}
               </button>
             </li>
 
@@ -212,7 +219,7 @@ export const CallingControls = ({
           </li>
         )}
 
-        {(isConnecting || isOngoing) && (
+        {(isConnectingEnabled || isOngoing) && (
           <li>
             <button
               className="call-ui__button call-ui__button--red"

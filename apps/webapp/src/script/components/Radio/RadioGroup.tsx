@@ -19,6 +19,8 @@
 
 import {useId} from 'react';
 
+import is from '@sindresorhus/is';
+
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {
@@ -62,7 +64,7 @@ const RadioGroup = <T extends string | number>({
     <div
       aria-labelledby={ariaLabelledBy}
       data-uie-name={uieName}
-      css={horizontal && radioOptionHorizontalStyles}
+      css={horizontal === true ? radioOptionHorizontalStyles : undefined}
       role="radiogroup"
     >
       {options.map(({value, label, detailLabel, isDisabled = false, optionUeiName = `${uieName}-${value}`}) => {
@@ -87,7 +89,7 @@ const RadioGroup = <T extends string | number>({
             <label css={radioLabelStyles(isDisabled || disabled)} htmlFor={currentId}>
               <span>{label}</span>
 
-              {detailLabel && isChecked && <span css={radioHintStyles}>{` · ${detailLabel}`}</span>}
+              {is.nonEmptyString(detailLabel) && isChecked && <span css={radioHintStyles}>{` · ${detailLabel}`}</span>}
             </label>
           </div>
         );

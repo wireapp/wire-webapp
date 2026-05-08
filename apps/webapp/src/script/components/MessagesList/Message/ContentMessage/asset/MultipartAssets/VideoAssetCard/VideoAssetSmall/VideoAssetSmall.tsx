@@ -50,11 +50,12 @@ export const VideoAssetSmall = ({
   id,
 }: VideoAssetSmallProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const hasSource = src !== undefined && src !== '';
 
   return (
     <>
       <MediaFilePreviewCard
-        label={src ? t('conversationFileVideoPreviewLabel', {src}) : ''}
+        label={hasSource ? t('conversationFileVideoPreviewLabel', {src}) : ''}
         isLoading={isLoading}
         isError={isError}
       >

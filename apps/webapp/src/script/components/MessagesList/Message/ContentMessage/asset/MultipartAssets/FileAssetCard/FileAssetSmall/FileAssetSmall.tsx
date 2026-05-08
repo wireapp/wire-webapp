@@ -58,7 +58,7 @@ export const FileAssetSmall = ({
 
   const showModal = (isEditMode?: boolean) => {
     setIsOpen(true);
-    setIsInEditMode(!!isEditMode);
+    setIsInEditMode(isEditMode === true);
   };
 
   const hideModal = () => {

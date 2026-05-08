@@ -26,8 +26,9 @@ import {useCellsFilePreviewModal} from '../common/CellsFilePreviewModalContext/C
 // TODO: Abstract when it starts to grow / feels right
 export const CellsFilePreviewModal = () => {
   const {selectedFile, handleCloseFile, isEditMode} = useCellsFilePreviewModal();
+  const isModalOpen = selectedFile !== null;
 
-  if (!selectedFile) {
+  if (!isModalOpen) {
     return null;
   }
 
@@ -44,19 +45,21 @@ export const CellsFilePreviewModal = () => {
       return undefined;
     }
 
-    return previewPdfUrl || previewImageUrl;
+    return previewPdfUrl ?? previewImageUrl;
   };
+
+  const filePreviewUrl = getFileUrl();
 
   return (
     <FileFullscreenModal
       id={selectedFile.id}
-      isOpen={!!selectedFile}
+      isOpen={isModalOpen}
       onClose={handleCloseFile}
-      filePreviewUrl={getFileUrl()}
+      filePreviewUrl={filePreviewUrl}
       fileName={name}
       fileExtension={extension}
       fileUrl={url}
-      status={!getFileUrl() ? 'unavailable' : 'success'}
+      status={filePreviewUrl === undefined ? 'unavailable' : 'success'}
       senderName={owner}
       timestamp={uploadedAtTimestamp}
       badges={tags}

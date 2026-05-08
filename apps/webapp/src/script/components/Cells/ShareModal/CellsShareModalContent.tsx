@@ -20,6 +20,7 @@
 import {ComponentProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 
 import {ValidationUtil} from '@wireapp/commons';
 import {
@@ -185,8 +186,9 @@ export const CellsShareModalContent = ({
   switchColors,
 }: CellsShareModalContentProps) => {
   const resolvedLabels = {...getDefaultLabels(), ...labels};
-  const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && publicLink.link;
-  const areDependentTogglesDisabled = !publicLink.isEnabled;
+  const hasPublicLink = is.nonEmptyString(publicLink.link);
+  const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && hasPublicLink;
+  const areDependentTogglesDisabled = publicLink.isEnabled !== true;
   const publicLinkColors = switchColors?.publicLink ?? DEFAULT_SWITCH_COLORS;
   const passwordColors = switchColors?.password ?? DEFAULT_SWITCH_COLORS;
   const expirationColors = switchColors?.expiration ?? DEFAULT_SWITCH_COLORS;
@@ -227,14 +229,14 @@ export const CellsShareModalContent = ({
           <Switch
             id="switch-password"
             aria-describedby="switch-password-description"
-            checked={publicLink.isEnabled && password.isEnabled}
+            checked={publicLink.isEnabled && password.isEnabled === true}
             onToggle={password.onToggle}
             disabled={areDependentTogglesDisabled}
             {...passwordColors}
           />
         </div>
       </div>
-      {password.isEnabled && password.hasExistingPassword && !password.isEditingPassword && (
+      {password.isEnabled && password.hasExistingPassword === true && password.isEditingPassword === false && (
         <div css={styles.toggleContentStyles} data-uie-name="cells-share-password-view-mode">
           <div css={styles.passwordActionButtonStyles}>
             <Button
@@ -248,7 +250,7 @@ export const CellsShareModalContent = ({
           </div>
         </div>
       )}
-      {password.isEnabled && (password.isEditingPassword || !password.hasExistingPassword) && (
+      {password.isEnabled && (password.isEditingPassword === true || password.hasExistingPassword === false) && (
         <div css={styles.toggleContentStyles} data-uie-name="cells-share-password-content">
           <div css={styles.passwordContentStyles}>
             <div css={styles.passwordActionButtonStyles}>
@@ -280,7 +282,7 @@ export const CellsShareModalContent = ({
                   textToCopy={password.value}
                   displayText={resolvedLabels.passwordCopy}
                   copySuccessText={resolvedLabels.passwordCopied}
-                  disabled={!password.value}
+                  disabled={password.value.length === 0}
                 />
               </div>
             </div>
@@ -300,7 +302,7 @@ export const CellsShareModalContent = ({
           <Switch
             id="switch-expiration"
             aria-describedby="switch-expiration-description"
-            checked={publicLink.isEnabled && expiration.isEnabled}
+            checked={publicLink.isEnabled && expiration.isEnabled === true}
             onToggle={expiration.onToggle}
             disabled={areDependentTogglesDisabled}
             {...expirationColors}
@@ -337,7 +339,7 @@ export const CellsShareModalContent = ({
             readOnly
           />
           <CopyToClipboardButton
-            textToCopy={publicLink.link || ''}
+            textToCopy={publicLink.link ?? ''}
             displayText={resolvedLabels.copyLink}
             copySuccessText={resolvedLabels.linkCopied}
           />

@@ -87,20 +87,22 @@ export const loadDraftState = async (
   let messageReply = null;
 
   const loadMessage = async (messageId: string) => {
+    const messageFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const message =
-      (await messageRepository.getMessageInConversationById(conversation, messageId)) ||
-      (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
+      messageFromId ?? (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
     return messageRepository.ensureMessageSender(message);
   };
 
-  if (replyMessageId) {
+  if (typeof replyMessageId === 'string' && replyMessageId !== '') {
     messageReply = await loadMessage(replyMessageId);
   }
 
   let editedMessage = null;
-  if (editedMessageId) {
+  if (typeof editedMessageId === 'string' && editedMessageId !== '') {
     editedMessage = await loadMessage(editedMessageId);
   }
 
-  return {...storageValue, messageReply, editedMessage, plainMessage: storageValue?.plainMessage || ''};
+  const plainMessage = typeof storageValue?.plainMessage === 'string' ? storageValue.plainMessage : '';
+
+  return {...storageValue, messageReply, editedMessage, plainMessage};
 };

@@ -81,24 +81,25 @@ const ControlButtons = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: ControlButtonsProps) => {
-  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsFeatureEnabled;
+  const isCellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsFeatureEnabled === true;
   const isCellsConversation = isCellsEnabled && conversation.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+  const isFilesharingEnabled = disableFilesharing !== true;
 
-  if (isEditing) {
+  if (isEditing === true) {
     return (
       <>
-        {showFormatButton && (
+        {showFormatButton === true && (
           <li>
             <FormatTextButton isActive={isFormatActive} isEditing onClick={onFormatClick} />
           </li>
         )}
 
-        {showEmojiButton && (
+        {showEmojiButton === true && (
           <li>
             <EmojiButton isActive={isEmojiActive} isEditing onClick={onEmojiClick} />
           </li>
         )}
-        {(showFormatButton || showEmojiButton) && (
+        {(showFormatButton === true || showEmojiButton === true) && (
           <li aria-hidden="true">
             <FormatSeparator isEditing />
           </li>
@@ -124,7 +125,7 @@ const ControlButtons = ({
             <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
           </li>
         )}
-        {!disableFilesharing && (
+        {isFilesharingEnabled && (
           <>
             <li>
               {isCellsConversation ? (
@@ -153,7 +154,7 @@ const ControlButtons = ({
           <FormatSeparator />
         </li>
         <li>
-          <PingButton isDisabled={!!disablePing} onClick={onClickPing} />
+          <PingButton isDisabled={disablePing === true} onClick={onClickPing} />
         </li>
         {!isCellsConversation && (
           <li>
@@ -166,24 +167,24 @@ const ControlButtons = ({
 
   return (
     <>
-      {showGiphyButton && !disableFilesharing && (
+      {showGiphyButton === true && isFilesharingEnabled && (
         <>
-          {showFormatButton && (
+          {showFormatButton === true && (
             <li>
               <FormatTextButton isActive={isFormatActive} onClick={onFormatClick} />
             </li>
           )}
-          {showEmojiButton && (
+          {showEmojiButton === true && (
             <li>
               <EmojiButton isActive={isEmojiActive} onClick={onEmojiClick} />
             </li>
           )}
-          {!disableFilesharing && isCellsEnabled && (
+          {isFilesharingEnabled && isCellsEnabled && (
             <li>
               <CellImageUploadButton onClick={onCellImageUpload} />
             </li>
           )}
-          {!disableFilesharing && isCellsEnabled && (
+          {isFilesharingEnabled && isCellsEnabled && (
             <li>
               <CellAssetUploadButton onClick={onCellAssetUpload} />
             </li>

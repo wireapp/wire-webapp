@@ -170,9 +170,9 @@ const UserActions = ({
   const leaveConversation: MenuItem | undefined =
     user.isMe &&
     isSelfActivated &&
-    conversation?.isGroupOrChannel() &&
+    conversation?.isGroupOrChannel() === true &&
     !conversation.isSelfUserRemoved() &&
-    conversationRoleRepository?.canLeaveGroup(conversation)
+    conversationRoleRepository?.canLeaveGroup(conversation) === true
       ? {
           click: async () => {
             await actionsViewModel.leaveConversation(conversation);
@@ -333,7 +333,7 @@ const UserActions = ({
     conversation &&
     !conversation.isSelfUserRemoved() &&
     conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
-    conversationRoleRepository?.canRemoveParticipants(conversation)
+    conversationRoleRepository?.canRemoveParticipants(conversation) === true
       ? {
           click: async () => {
             await actionsViewModel.removeFromConversation(conversation, user);
