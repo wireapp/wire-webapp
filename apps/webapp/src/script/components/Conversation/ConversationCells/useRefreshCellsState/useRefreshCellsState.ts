@@ -57,7 +57,7 @@ export const useRefreshCellsState = ({
       return undefined;
     }
 
-    if (intervalRef.current) {
+    if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
@@ -83,7 +83,7 @@ export const useRefreshCellsState = ({
     }, REFRESH_INTERVAL_MS);
 
     return () => {
-      if (intervalRef.current) {
+      if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }

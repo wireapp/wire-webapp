@@ -157,7 +157,11 @@ export const Conversation = ({
 
   const uploadImages = useCallback(
     (images: File[]) => {
-      if (!activeConversation || isHittingUploadLimit(images, repositories.asset)) {
+      if (
+        activeConversation === null ||
+        activeConversation === undefined ||
+        isHittingUploadLimit(images, repositories.asset)
+      ) {
         return;
       }
 
@@ -183,7 +187,7 @@ export const Conversation = ({
 
   const uploadFiles = useCallback(
     (files: File[]) => {
-      if (!activeConversation) {
+      if (activeConversation === null || activeConversation === undefined) {
         return;
       }
 
@@ -259,7 +263,7 @@ export const Conversation = ({
   };
 
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
-    if (activeConversation) {
+    if (activeConversation !== null && activeConversation !== undefined) {
       const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
       mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
     }
@@ -271,7 +275,8 @@ export const Conversation = ({
     const isUserEntity = !isServiceEntity(userEntity);
 
     if (
-      activeConversation &&
+      activeConversation !== null &&
+      activeConversation !== undefined &&
       isUserEntity &&
       (userEntity.isDeleted || (isSingleModeConversation && !userEntity.isMe))
     ) {
@@ -290,7 +295,7 @@ export const Conversation = ({
   };
 
   const showParticipants = (participants: User[]) => {
-    if (activeConversation) {
+    if (activeConversation !== null && activeConversation !== undefined) {
       openRightSidebar(PanelState.CONVERSATION_PARTICIPANTS, {entity: activeConversation, highlighted: participants});
     }
   };
@@ -437,7 +442,12 @@ export const Conversation = ({
     };
 
     try {
-      if (messageEntity.fromDomain !== undefined && messageEntity.fromDomain.length > 0 && activeConversation) {
+      if (
+        messageEntity.fromDomain !== undefined &&
+        messageEntity.fromDomain.length > 0 &&
+        activeConversation !== null &&
+        activeConversation !== undefined
+      ) {
         await repositories.message.resetSession(
           {domain: messageEntity.fromDomain, id: messageEntity.from},
           messageEntity.clientId,
@@ -457,7 +467,7 @@ export const Conversation = ({
     const needsUpdate = conversationLastRead < lastKnownTimestamp;
 
     // if no message provided it means we need to jump to the last message
-    if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
+    if (needsUpdate && (messageEntity === undefined || isLastReceivedMessage(messageEntity, conversationEntity))) {
       conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
       repositories.message.markAsRead(conversationEntity);
     }
@@ -558,7 +568,7 @@ export const Conversation = ({
       rootProps={getRootProps()}
       inputProps={getInputProps()}
     >
-      {activeConversation && (
+      {activeConversation !== null && activeConversation !== undefined && (
         <>
           <TitleBar
             repositories={repositories}
@@ -697,7 +707,7 @@ export const Conversation = ({
         </>
       )}
 
-      {isGiphyModalOpen && inputValue && (
+      {isGiphyModalOpen && inputValue.length > 0 && (
         <Giphy giphyRepository={repositories.giphy} inputValue={inputValue} onClose={closeGiphy} />
       )}
     </ConversationFileDropzone>

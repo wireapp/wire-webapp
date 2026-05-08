@@ -14,6 +14,7 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import headerPlugin, {HeaderOptions, HeaderRuleConfig} from '@tony.ganchev/eslint-plugin-header';
 import globals from 'globals';
 import type {Linter} from 'eslint';
+import {strictBooleanExpressionComponentFiles} from './eslint.strict-boolean-components';
 
 const year = new Date().getFullYear();
 const runtimeGlobals = {
@@ -227,6 +228,25 @@ const config: Linter.Config[] = [
     files: ['apps/webapp/src/script/components/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': 'error',
+    },
+  },
+  {
+    files: [...strictBooleanExpressionComponentFiles],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': [
+        'error',
+        {
+          allowString: false,
+          allowNumber: false,
+          allowNullableObject: false,
+          allowNullableBoolean: false,
+          allowNullableString: false,
+          allowNullableNumber: false,
+          allowNullableEnum: false,
+          allowAny: false,
+          allowRuleToRunWithoutStrictNullChecksIKnowWhatIAmDoing: false,
+        },
+      ],
     },
   },
 ];

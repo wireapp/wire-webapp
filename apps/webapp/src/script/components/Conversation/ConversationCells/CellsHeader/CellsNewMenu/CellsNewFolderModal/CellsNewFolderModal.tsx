@@ -71,7 +71,7 @@ export const CellsNewFolderModal = ({
         <CellsModal.SecondaryButton onClick={onClose}>
           {t('cells.newItemMenuModal.secondaryAction')}
         </CellsModal.SecondaryButton>
-        <CellsModal.PrimaryButton onClick={handleSubmit} isDisabled={isSubmitting || !name}>
+        <CellsModal.PrimaryButton onClick={handleSubmit} isDisabled={isSubmitting || name.length === 0}>
           {t('cells.newItemMenuModal.primaryAction')}
         </CellsModal.PrimaryButton>
       </CellsModal.Actions>

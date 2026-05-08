@@ -98,7 +98,7 @@ export const Message = (props: MessageParams) => {
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocused);
 
   useLayoutEffect(() => {
-    if (!messageElementRef.current) {
+    if (messageElementRef.current === null) {
       return;
     }
     if (isHighlighted) {
@@ -110,7 +110,7 @@ export const Message = (props: MessageParams) => {
   const handleDivKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     // when a message is focused set its elements focusable
     if (!event.shiftKey && isTabKey(event)) {
-      if (!messageElementRef.current) {
+      if (messageElementRef.current === null) {
         return;
       }
       setMsgElementsFocusable(true);
@@ -133,7 +133,7 @@ export const Message = (props: MessageParams) => {
   // set message elements focus for non content type mesages
   // some non content type message has interactive element like invite people for member message
   useEffect(() => {
-    if (!messageElementRef.current || message.isContent()) {
+    if (messageElementRef.current === null || message.isContent()) {
       return;
     }
     const interactiveMsgElements = getAllFocusableElements(messageElementRef.current);

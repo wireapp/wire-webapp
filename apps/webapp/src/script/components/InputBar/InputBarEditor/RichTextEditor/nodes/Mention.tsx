@@ -71,7 +71,8 @@ export const Mention = (props: MentionComponentProps) => {
       classes.push(classNameFocused);
     }
 
-    return classes.join(' ').trim() || undefined;
+    const classNames = classes.join(' ').trim();
+    return classNames.length > 0 ? classNames : undefined;
   }, [className, classNameFocused, isFocused]);
 
   const deleteMention = useCallback(
@@ -81,7 +82,7 @@ export const Mention = (props: MentionComponentProps) => {
 
       let shouldSelectNode = false;
       const selectedNodes = rangeSelection?.getNodes();
-      const selectedNode = selectedNodes?.length === 1 ? selectedNodes[0] : null;
+      const selectedNode = selectedNodes !== undefined && selectedNodes.length === 1 ? selectedNodes[0] : null;
       if (selectedNode !== null) {
         const isCurrentNode = nodeKey === selectedNode?.getKey();
         if (event.key === KEY.BACKSPACE) {
@@ -130,7 +131,7 @@ export const Mention = (props: MentionComponentProps) => {
   const moveCursor = useCallback(
     (event: KeyboardEvent) => {
       const node = $getNodeByKey(nodeKey);
-      if (!node || !node.isSelected()) {
+      if (node === null || node === undefined || node.isSelected() === false) {
         return false;
       }
 

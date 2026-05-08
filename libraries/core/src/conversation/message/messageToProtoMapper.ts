@@ -35,16 +35,18 @@ export class MessageToProtoMapper {
         urlOffset: linkPreview.urlOffset,
       });
 
-      if (linkPreview.tweet) {
+      const tweetData = linkPreview.tweet;
+      if (tweetData !== undefined && tweetData !== null) {
         linkPreviewMessage.tweet = Tweet.create({
-          author: linkPreview.tweet.author,
-          username: linkPreview.tweet.username,
+          author: tweetData.author,
+          username: tweetData.username,
         });
         linkPreviewMessage.metaData = 'tweet';
       }
 
-      if (linkPreview.imageUploaded) {
-        const {asset, image} = linkPreview.imageUploaded;
+      const uploadedImageData = linkPreview.imageUploaded;
+      if (uploadedImageData !== undefined && uploadedImageData !== null) {
+        const {asset, image} = uploadedImageData;
 
         const imageMetadata = Asset.ImageMetaData.create({
           height: image.height,
@@ -103,7 +105,7 @@ export class MessageToProtoMapper {
       textMessage.mentions = mentions.map(mention => Mention.create(mention));
     }
 
-    if (quote) {
+    if (quote !== undefined) {
       textMessage.quote = Quote.create({
         quotedMessageId: quote.quotedMessageId,
         quotedMessageSha256: quote.quotedMessageSha256,

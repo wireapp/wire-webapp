@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {Converter} from 'bazinga64';
 
 import {DoWireDpopChallengeParams, GetClientNonceParams} from './dpopChallenge.types';
@@ -24,7 +25,7 @@ import {DoWireDpopChallengeParams, GetClientNonceParams} from './dpopChallenge.t
 const getClientNonce = async ({apiClient, clientId}: GetClientNonceParams) => {
   try {
     const nonce = await apiClient.api.client.getNonce(clientId);
-    if (nonce) {
+    if (is.nonEmptyString(nonce)) {
       return nonce;
     }
     throw new Error('No client-nonce received');

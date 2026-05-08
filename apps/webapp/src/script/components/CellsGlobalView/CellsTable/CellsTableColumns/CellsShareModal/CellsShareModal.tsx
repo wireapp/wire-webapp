@@ -71,7 +71,7 @@ export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) 
       primaryAction: {
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
-          if (submitHandler) {
+          if (submitHandler !== undefined) {
             void submitHandler();
           }
         },
@@ -114,7 +114,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
 
   // Initialize toggles and values based on existing link data
   useEffect(() => {
-    if (!isEnabled) {
+    if (isEnabled === false) {
       initializedLinkIdRef.current = null;
       return;
     }
@@ -188,7 +188,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   useEffect(() => {
     submitHandlers.set(modalId, async () => {
       if (
-        !isEnabled ||
+        isEnabled === false ||
         status !== 'success' ||
         node?.publicLink?.uuid === undefined ||
         node.publicLink.uuid.length === 0

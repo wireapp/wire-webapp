@@ -161,10 +161,17 @@ export const InputBar = ({
     },
   });
 
-  const inputPlaceholder = messageTimer ? t('tooltipConversationEphemeral') : t('tooltipConversationInputPlaceholder');
+  const inputPlaceholder =
+    messageTimer !== null && messageTimer !== undefined
+      ? t('tooltipConversationEphemeral')
+      : t('tooltipConversationInputPlaceholder');
 
   const isConnectionRequest = isOutgoingRequest || isIncomingRequest;
-  const hasLocalEphemeralTimer = isSelfDeletingMessagesEnabled && !!localMessageTimer && !hasGlobalMessageTimer;
+  const hasLocalEphemeralTimer =
+    isSelfDeletingMessagesEnabled &&
+    localMessageTimer !== null &&
+    localMessageTimer !== undefined &&
+    !hasGlobalMessageTimer;
   const isTypingRef = useRef(false);
 
   const shouldReplaceEmoji = useUserPropertyValue<boolean>(
@@ -234,7 +241,7 @@ export const InputBar = ({
     sendPastedFile: fileHandling.sendPastedFile,
   });
 
-  if (fileHandling.pastedFile && !!isCellsEnabled) {
+  if (fileHandling.pastedFile !== null && fileHandling.pastedFile !== undefined && isCellsEnabled) {
     uploadPastedFiles(fileHandling.pastedFile);
     fileHandling.clearPastedFile();
   }
@@ -263,18 +270,18 @@ export const InputBar = ({
     void sendMessage();
   }, [isSendingDisabled, sendMessage]);
 
-  const showAvatar = !!messageContent.text.length;
+  const showAvatar = messageContent.text.length > 0;
 
   return (
     <div ref={wrapperRef}>
       <InputBarContainer>
         {isTypingIndicatorEnabled && <TypingIndicator conversationId={conversation.id} />}
 
-        {classifiedDomains && !isConnectionRequest && (
+        {classifiedDomains !== null && classifiedDomains !== undefined && !isConnectionRequest && (
           <ConversationClassifiedBar conversation={conversation} classifiedDomains={classifiedDomains} />
         )}
 
-        {isReplying && !isEditing && replyMessageEntity && (
+        {isReplying && !isEditing && replyMessageEntity !== null && replyMessageEntity !== undefined && (
           <ReplyBar replyMessageEntity={replyMessageEntity} onCancel={() => cancelMessageReply(false)} />
         )}
 
@@ -282,7 +289,7 @@ export const InputBar = ({
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
             'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
-            'input-bar-container--with-files': !!files.length,
+            'input-bar-container--with-files': files.length > 0,
           })}
         >
           {!isOutgoingRequest && (
@@ -297,7 +304,7 @@ export const InputBar = ({
                   />
                 )}
               </div>
-              {!isSelfUserRemoved && !fileHandling.pastedFile && (
+              {!isSelfUserRemoved && (fileHandling.pastedFile === null || fileHandling.pastedFile === undefined) && (
                 <InputBarEditor
                   editorRef={editorRef}
                   editedMessage={editedMessage}
@@ -323,7 +330,9 @@ export const InputBar = ({
                   loadDraftState={draftState.load}
                   replaceEmojis={shouldReplaceEmoji}
                 >
-                  {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
+                  {files.length > 0 && (
+                    <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />
+                  )}
                   <InputBarControls
                     conversation={conversation}
                     isCellsFeatureEnabled={isCellsEnabled}
@@ -351,7 +360,7 @@ export const InputBar = ({
             </>
           )}
 
-          {fileHandling.pastedFile && !isCellsEnabled && (
+          {fileHandling.pastedFile !== null && fileHandling.pastedFile !== undefined && !isCellsEnabled && (
             <PastedFileControls
               pastedFile={fileHandling.pastedFile}
               onClear={fileHandling.clearPastedFile}

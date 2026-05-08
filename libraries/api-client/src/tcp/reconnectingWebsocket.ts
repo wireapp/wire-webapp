@@ -113,7 +113,7 @@ export class ReconnectingWebsocket {
      * **/
     this.stopBackFromSleepHandler = onBackFromSleep({
       callback: () => {
-        if (!this.socket) {
+        if (this.socket === undefined) {
           this.logger.debug('WebSocket instance does not exist, skipping reconnect after sleep');
           return;
         }
@@ -130,7 +130,7 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnError = (error: ErrorEvent) => {
     this.logger.warn('WebSocket connection error', error);
-    if (this.onError) {
+    if (this.onError !== undefined) {
       this.onError(error);
     }
   };
@@ -154,10 +154,10 @@ export class ReconnectingWebsocket {
   private readonly internalOnOpen = (event: Event) => {
     this.logger.info(`WebSocket opened (reconnect attempt #${this.reconnectAttemptCount})`);
     this.resetLongRunningRetrySequence();
-    if (this.socket) {
+    if (this.socket !== undefined) {
       this.socket.binaryType = 'arraybuffer';
     }
-    if (this.onOpen) {
+    if (this.onOpen !== undefined) {
       this.onOpen(event);
     }
   };
@@ -177,11 +177,11 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnClose = (event: CloseEvent) => {
     this.logger.info(
-      `WebSocket closed — code: ${event?.code}, reason: "${event?.reason || 'none'}", wasClean: ${event?.wasClean ?? 'unknown'}`,
+      `WebSocket closed — code: ${event?.code}, reason: "${event?.reason ?? 'none'}", wasClean: ${event?.wasClean ?? 'unknown'}`,
     );
     this.stopPinging();
     this.resolvePendingHealthChecks(false);
-    if (this.onClose) {
+    if (this.onClose !== undefined) {
       this.onClose(event);
     }
   };
@@ -193,13 +193,13 @@ export class ReconnectingWebsocket {
   }
 
   private stopPinging(): void {
-    if (this.pingerId) {
+    if (this.pingerId !== undefined) {
       clearInterval(this.pingerId);
     }
   }
 
   private readonly sendPing = (): void => {
-    if (!this.socket) {
+    if (this.socket === undefined) {
       this.logger.debug('WebSocket instance does not exist, skipping ping');
       return;
     }
@@ -268,7 +268,7 @@ export class ReconnectingWebsocket {
   }
 
   public getState(): WEBSOCKET_STATE {
-    return this.socket ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
+    return this.socket !== undefined ? this.socket.readyState : WEBSOCKET_STATE.CLOSED;
   }
 
   /**
@@ -333,7 +333,7 @@ export class ReconnectingWebsocket {
 
   public disconnect(reason = 'Closed by client'): void {
     this.resetLongRunningRetrySequence();
-    if (this.socket) {
+    if (this.socket !== undefined) {
       this.logger.info(`Disconnecting from WebSocket (reason: "${reason}")`);
       this.socket.close(CloseEventCode.NORMAL_CLOSURE, reason);
     }

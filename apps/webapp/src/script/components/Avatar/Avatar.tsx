@@ -95,7 +95,7 @@ const Avatar = ({
     event: ReactMouseEvent<HTMLDivElement, MouseEvent> | ReactKeyBoardEvent<HTMLDivElement>,
   ) => {
     const parentNode = event.currentTarget.parentNode;
-    if (parentNode) {
+    if (parentNode !== null) {
       if (isKeyboardEvent(event)) {
         handleKeyDown({event, callback: () => onAvatarClick?.(participant), keys: [KEY.ENTER, KEY.SPACE]});
         return;

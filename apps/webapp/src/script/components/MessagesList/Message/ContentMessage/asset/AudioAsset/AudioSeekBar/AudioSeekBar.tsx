@@ -48,7 +48,7 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
   useEffect(() => {
     const loudness = asset.meta?.loudness;
 
-    if (loudness) {
+    if (loudness !== undefined) {
       setLoudness(Array.from(loudness).map(level => level / 256));
     }
   }, [asset]);
@@ -65,7 +65,7 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
   useEffect(() => updateSvgWidth(), [svgNode.current]);
 
   useEffect(() => {
-    if (!svgWidth) {
+    if (svgWidth === 0) {
       return setPath('');
     }
 
@@ -86,7 +86,7 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
   const updateSvgWidth = () => setSvgWidth(svgNode.current?.clientWidth ?? 0);
 
   const onLevelClick = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    if (!svgNode.current) {
+    if (svgNode.current === null) {
       return;
     }
 
@@ -100,7 +100,7 @@ const AudioSeekBar = ({asset, audioElement, disabled}: AudioSeekBarProps) => {
   const onAudioEnded = () => setPosition(0);
 
   const onTimeUpdate = () => {
-    if (audioElement.duration) {
+    if (audioElement.duration > 0) {
       setPosition(audioElement.currentTime / audioElement.duration);
     }
   };

@@ -57,7 +57,12 @@ export const ConnectRequests = ({
     const user1Connection = user1.connection();
     const user2Connection = user2.connection();
 
-    if (!user1Connection || !user2Connection) {
+    if (
+      user1Connection === undefined ||
+      user1Connection === null ||
+      user2Connection === undefined ||
+      user2Connection === null
+    ) {
       return 0;
     }
 
@@ -72,7 +77,7 @@ export const ConnectRequests = ({
   const {setCurrentTab: setCurrentSidebarTab} = useSidebarStore();
 
   const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
-    if (connectRequestsRefEnd.current) {
+    if (connectRequestsRefEnd.current !== null) {
       connectRequestsRefEnd.current.scrollIntoView({behavior});
     }
   };
@@ -140,7 +145,7 @@ export const ConnectRequests = ({
 
               <div className="connect-request-username label-username">{connectRequest.handle}</div>
 
-              {classifiedDomains && (
+              {classifiedDomains !== null && classifiedDomains !== undefined && (
                 <UserClassifiedBar users={[connectRequest]} classifiedDomains={classifiedDomains} />
               )}
 

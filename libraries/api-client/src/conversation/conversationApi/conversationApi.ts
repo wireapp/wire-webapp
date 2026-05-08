@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {chunk} from '@wireapp/commons/lib/util/ArrayUtil';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosRequestConfig, isAxiosError} from 'axios';
@@ -128,7 +129,7 @@ export class ConversationAPI {
   ) {}
 
   private generateBaseConversationUrl(conversationId: QualifiedId, supportsQualifiedEndpoint: boolean = true): string {
-    return supportsQualifiedEndpoint && conversationId.domain
+    return supportsQualifiedEndpoint && is.nonEmptyString(conversationId.domain)
       ? `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.domain}/${conversationId.id}`
       : `/${ConversationAPI.URL.CONVERSATIONS}/${conversationId.id}`;
   }

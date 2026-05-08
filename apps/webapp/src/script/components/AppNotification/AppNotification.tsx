@@ -81,7 +81,7 @@ let roots: Record<string, Root> = {};
 export const useAppNotification = (props?: AppNotificationOptions) => {
   const notificationId = useRef<string | number | null>(null);
 
-  const activeWindow = props?.activeWindow || window;
+  const activeWindow = props?.activeWindow ?? window;
 
   useEffect(() => {
     setTimeout(() => {
@@ -135,7 +135,7 @@ const injectToaster = (activeWindow: Window) => {
 
   const container = activeWindow.document.querySelector(APP_NOTIFICATION_SELECTOR);
 
-  if (!container) {
+  if (container === null) {
     throw new Error('Notification container not found!');
   }
 

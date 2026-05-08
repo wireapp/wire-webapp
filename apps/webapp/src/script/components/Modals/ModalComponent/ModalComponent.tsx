@@ -20,6 +20,7 @@
 import React, {useEffect, useId, useRef, useState, HTMLProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 import {createPortal} from 'react-dom';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
@@ -71,7 +72,9 @@ const ModalComponent = ({
 
   useEffect(() => {
     // Get the correct document based on the container
-    const targetDocument = container ? ((container as HTMLElement).ownerDocument ?? document) : document;
+    const targetDocument = !is.nullOrUndefined(container)
+      ? ((container as HTMLElement).ownerDocument ?? document)
+      : document;
 
     const trapFocus = (event: KeyboardEvent) => preventFocusOutside(event, trapId, targetDocument);
 
@@ -135,14 +138,14 @@ const ModalComponent = ({
               onClick={event => event.stopPropagation()}
               role="button"
               tabIndex={TabIndex.UNFOCUSABLE}
-              onKeyDown={event => (onKeyDown ? onKeyDown(event) : event.stopPropagation())}
+              onKeyDown={event => (onKeyDown !== undefined ? onKeyDown(event) : event.stopPropagation())}
               css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}
             >
               {hasVisibleClass ? children : null}
             </div>
           )}
         </div>,
-        container || document.body,
+        container ?? document.body,
       )}
     </>
   );

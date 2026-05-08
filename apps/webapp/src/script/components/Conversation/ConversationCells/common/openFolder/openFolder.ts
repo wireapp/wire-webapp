@@ -34,7 +34,7 @@ interface OpenFolderParams {
 
 export const openFolder = ({conversationQualifiedId, name, event}: OpenFolderParams) => {
   const currentPath = getCellsFilesPath();
-  const pathSegments = currentPath ? currentPath.split('/') : [];
+  const pathSegments = currentPath.length > 0 ? currentPath.split('/') : [];
   const encodedSegments = [...pathSegments, name].map(segment => encodeURIComponent(segment));
   const newPath = encodedSegments.join('/');
 

@@ -254,7 +254,7 @@ export class E2EIServiceInternal {
       orderUrl: enrollmentData.orderUrl,
     });
 
-    if (!finalizeOrderData.certificateUrl) {
+    if (finalizeOrderData.certificateUrl === undefined || finalizeOrderData.certificateUrl.length === 0) {
       throw new Error('Error while trying to continue OAuth flow. No certificateUrl received');
     }
 
@@ -266,7 +266,7 @@ export class E2EIServiceInternal {
       identity,
     });
 
-    if (!certificate) {
+    if (certificate === undefined || certificate.length === 0) {
       throw new Error('Error while trying to continue OAuth flow. No certificate received');
     }
 

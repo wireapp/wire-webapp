@@ -32,7 +32,7 @@ interface CellsConversationColumnProps {
 }
 
 export const CellsConversationColumn = ({conversation, name}: CellsConversationColumnProps) => {
-  if (!conversation) {
+  if (conversation === undefined) {
     return <span css={textStyles}>{name}</span>;
   }
 

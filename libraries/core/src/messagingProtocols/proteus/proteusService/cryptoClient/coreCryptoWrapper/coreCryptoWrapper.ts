@@ -209,7 +209,7 @@ export class CoreCryptoWrapper implements CryptoClient {
   }
 
   async create(nbPrekeys: number, entropy?: Uint8Array) {
-    if (entropy) {
+    if (entropy !== undefined) {
       await this.coreCrypto.reseedRng(entropy);
     }
     await this.init();

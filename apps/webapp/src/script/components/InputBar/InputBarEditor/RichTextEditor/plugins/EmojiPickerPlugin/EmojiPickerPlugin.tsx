@@ -77,13 +77,13 @@ export class EmojiOption extends MenuOption {
     super(title + options.keywords?.join('_'));
     this.title = title.replace(/_/g, ' ');
     this.emoji = emoji;
-    this.keywords = options.keywords || [];
+    this.keywords = options.keywords ?? [];
   }
 }
 
-const emojiUsageCount: Record<string, number> = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) || {};
+const emojiUsageCount: Record<string, number> = loadValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT) ?? {};
 
-const getUsageCount = (emojiName: string): number => emojiUsageCount[emojiName] || 0;
+const getUsageCount = (emojiName: string): number => emojiUsageCount[emojiName] ?? 0;
 
 const MAX_EMOJI_SUGGESTION_COUNT = 5;
 
@@ -158,7 +158,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   const getPosition = () => {
     const nativeSelection = window.getSelection();
 
-    if (!rootElement || !nativeSelection) {
+    if (rootElement === null || nativeSelection === null) {
       return {bottom: 0, left: 0};
     }
 
@@ -174,7 +174,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
     anchorElementRef,
     {selectedIndex, selectOptionAndCleanUp, setHighlightedIndex},
   ) => {
-    if (!anchorElementRef.current || !options.length) {
+    if (anchorElementRef.current === null || options.length === 0) {
       return null;
     }
 

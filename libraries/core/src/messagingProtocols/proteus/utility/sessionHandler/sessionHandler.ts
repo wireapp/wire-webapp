@@ -68,7 +68,7 @@ const parseSessionId = (sessionId: string): SessionId => {
   // see https://regex101.com/r/c8FtCw/1
   const regex = /((?<domain>.+)@)?(?<userId>.+)@(?<clientId>.+)$/g;
   const match = regex.exec(sessionId);
-  if (!match || !isSessionId(match.groups)) {
+  if (match === null || !isSessionId(match.groups)) {
     throw new Error(`given session id "${sessionId}" has wrong format`);
   }
   return match.groups;
@@ -92,9 +92,10 @@ const initSession = async (
   {userId, clientId, initialPrekey}: {userId: QualifiedId; clientId: string; initialPrekey?: PreKey},
   {cryptoClient, apiClient}: {apiClient: APIClient; cryptoClient: CryptoClient},
 ): Promise<string> => {
-  const recipients = initialPrekey
-    ? {[userId.domain]: {[userId.id]: {[clientId]: initialPrekey}}}
-    : {[userId.domain]: {[userId.id]: [clientId]}};
+  const recipients =
+    initialPrekey !== undefined
+      ? {[userId.domain]: {[userId.id]: {[clientId]: initialPrekey}}}
+      : {[userId.domain]: {[userId.id]: [clientId]}};
   const {sessions} = await initSessions({
     recipients,
     apiClient,
@@ -241,7 +242,7 @@ const createSessionsFromPreKeys = async ({
         const sessionId = constructSessionId({userId: {id: userId, domain}, clientId});
         const prekey = userClients[clientId];
 
-        if (!prekey) {
+        if (prekey === null || prekey === undefined) {
           const domainUnknowns = unknowns[domain] ?? {};
           domainUnknowns[userId] = domainUnknowns[userId] ?? [];
           domainUnknowns[userId].push(clientId);

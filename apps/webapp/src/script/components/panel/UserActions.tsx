@@ -89,7 +89,7 @@ interface UserActionsProps {
 function createPlaceholder1to1Conversation(user: User, selfUser: User) {
   const userConnection = user.connection();
 
-  if (!userConnection) {
+  if (userConnection === undefined || userConnection === null) {
     throw new Error(`There's no connection with user ${user.qualifiedId.id}.`);
   }
 
@@ -272,7 +272,7 @@ const UserActions = ({
           click: async () => {
             const connectionData = await actionsViewModel.sendConnectionRequest(user);
 
-            if (!connectionData) {
+            if (connectionData === undefined || connectionData === null) {
               // Sending the connection failed, there is nothing more to do
               return;
             }
@@ -287,7 +287,7 @@ const UserActions = ({
                 : await actionsViewModel.getConversationById(conversationId);
 
             const savedConversation = await actionsViewModel.saveConversation(connectionConversation);
-            if (!conversation) {
+            if (conversation === undefined) {
               // Only open the new conversation if we aren't currently in a conversation context
               await actionsViewModel.open1to1Conversation(savedConversation);
             }
@@ -319,7 +319,7 @@ const UserActions = ({
       ? {
           click: async () => {
             await actionsViewModel.unblockUser(user);
-            await create1to1Conversation(user, !conversation);
+            await create1to1Conversation(user, conversation === undefined);
             onAction(Actions.UNBLOCK);
           },
           Icon: Icon.BlockIcon,
@@ -330,7 +330,7 @@ const UserActions = ({
 
   const removeUserFromConversation: MenuItem | undefined =
     isNotMe &&
-    conversation &&
+    conversation !== undefined &&
     !conversation.isSelfUserRemoved() &&
     conversation.participating_user_ids().some(userId => matchQualifiedIds(userId, user)) &&
     conversationRoleRepository?.canRemoveParticipants(conversation) === true
@@ -357,7 +357,7 @@ const UserActions = ({
     blockUser,
     unblockUser,
     removeUserFromConversation,
-  ].filter((item): item is MenuItem => !!item);
+  ].filter((item): item is MenuItem => item !== undefined);
 
   return items.length === 1 && isModal ? (
     <SingleAction

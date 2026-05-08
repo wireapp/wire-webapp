@@ -83,7 +83,7 @@ const useConversationVerificationState = (conversation: Conversation) => {
 };
 
 const getMLSStatuses = ({identities, user}: {identities?: WireIdentity[]; user?: User}): MLSStatuses[] | undefined => {
-  if (!identities || !user) {
+  if (identities === undefined || user === undefined) {
     return undefined;
   }
 
@@ -116,7 +116,11 @@ export const UserVerificationBadges = ({
   });
 
   let status: MLSStatuses | undefined = undefined;
-  if (mlsStatuses && mlsStatuses.length > 0 && mlsStatuses.every(status => status === MLSStatuses.VALID)) {
+  if (
+    mlsStatuses !== undefined &&
+    mlsStatuses.length > 0 &&
+    mlsStatuses.every(status => status === MLSStatuses.VALID)
+  ) {
     status = MLSStatuses.VALID;
   }
 
@@ -145,7 +149,7 @@ export const DeviceVerificationBadges = ({
     };
 
     async function loadUser() {
-      if (!identity) {
+      if (identity === undefined) {
         return;
       }
       const userEntity = await waitFor(() =>
@@ -161,7 +165,7 @@ export const DeviceVerificationBadges = ({
   }, [identity]);
 
   let status: MLSStatuses | undefined = undefined;
-  if (isE2EIEnabled && identity && user) {
+  if (isE2EIEnabled && identity !== undefined && user !== undefined) {
     const mlsStatuses = getMLSStatuses({identities: [identity], user});
     status = mlsStatuses?.[0];
   }

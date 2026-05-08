@@ -144,7 +144,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
 
     dismissExport();
 
-    if (archiveBlob) {
+    if (archiveBlob !== null) {
       downloadBlob(archiveBlob, filename, 'application/octet-stream');
     }
   };
@@ -200,7 +200,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
       setNumberOfRecords(numberOfRecords);
       setNumberOfProcessedRecords(0);
 
-      if (clientState.currentClient) {
+      if (clientState.currentClient !== undefined) {
         const archiveBlob = await backupRepository.generateHistory(
           user,
           clientState.currentClient.id,
@@ -210,7 +210,9 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
         amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.HISTORY.BACKUP_CREATED, {
           // converting to seconds
           [Segmentation.BACKUP_CREATION.CREATION_DURATION]: Math.ceil((Date.now() - startTime) / 1000),
-          [Segmentation.BACKUP_CREATION.PASSWORD]: password ? Segmentation.GENERAL.YES : Segmentation.GENERAL.NO,
+          [Segmentation.BACKUP_CREATION.PASSWORD]: is.nonEmptyString(password)
+            ? Segmentation.GENERAL.YES
+            : Segmentation.GENERAL.NO,
           [Segmentation.BACKUP_CREATION.PASSWORD_MULTIPLE_ATTEMPTS]: hasMultipleAttempts
             ? Segmentation.GENERAL.YES
             : Segmentation.GENERAL.NO,

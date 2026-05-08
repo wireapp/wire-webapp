@@ -43,6 +43,8 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state, iconSize
   const color: Record<string, string> = {
     [STATE.BLOCKED]: 'var(--gray-70)',
   };
+  const hasBackgroundColor = Object.hasOwn(backgroundColor, state);
+  const hasColor = Object.hasOwn(color, state);
 
   return (
     <div
@@ -52,9 +54,9 @@ const AvatarBadge: React.FunctionComponent<AvatarBadgeProps> = ({state, iconSize
         '&::before': {
           ...CSS_ICON(icons[state], iconSize),
         },
-        backgroundColor: backgroundColor[state] || defaultBackgroundColor,
+        backgroundColor: hasBackgroundColor ? backgroundColor[state] : defaultBackgroundColor,
         borderRadius: '50%',
-        color: color[state] || defaultColor,
+        color: hasColor ? color[state] : defaultColor,
       }}
       data-uie-name="element-avatar-user-badge-icon"
       data-uie-value={state}

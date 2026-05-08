@@ -60,12 +60,12 @@ const MediaButton = ({
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isFocusable);
 
   useEffect(() => {
-    if (mediaElement) {
+    if (mediaElement !== undefined) {
       mediaElement.addEventListener('playing', onPlay);
       mediaElement.addEventListener('pause', onPause);
     }
     return () => {
-      if (mediaElement) {
+      if (mediaElement !== undefined) {
         mediaElement.removeEventListener('playing', onPlay);
         mediaElement.removeEventListener('pause', onPause);
       }
@@ -82,7 +82,7 @@ const MediaButton = ({
         'media-button-lg': large,
       })}
     >
-      {isUploaded && !isPlaying && mediaElement && (
+      {isUploaded && !isPlaying && mediaElement !== undefined && (
         <button
           type="button"
           className="button-reset-default media-button media-button-play icon-play"

@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {proteus as ProtobufOTR} from '@wireapp/protocol-messaging/web/otr';
 import {AxiosRequestConfig} from 'axios';
 
@@ -42,7 +43,7 @@ export class BroadcastAPI {
     sendingClientId: string,
     messageData: ProtobufOTR.QualifiedNewOtrMessage,
   ): Promise<MessageSendingStatus> {
-    if (!sendingClientId) {
+    if (!is.nonEmptyString(sendingClientId)) {
       throw new ValidationError('Unable to send OTR message without client ID.');
     }
 

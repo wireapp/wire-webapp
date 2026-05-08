@@ -44,7 +44,7 @@ export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKep
   const clearPastedFile = () => setPastedFile(null);
 
   const sendPastedFile = () => {
-    if (pastedFile) {
+    if (pastedFile !== null) {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
@@ -57,7 +57,7 @@ export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKep
   };
 
   useEffect(() => {
-    if (!pastedFile) {
+    if (pastedFile === null) {
       return () => undefined;
     }
 

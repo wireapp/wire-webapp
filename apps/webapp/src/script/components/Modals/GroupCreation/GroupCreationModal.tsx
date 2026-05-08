@@ -315,7 +315,7 @@ const GroupCreationModal = ({
 
     const trimmedNameInput = value.trim();
     const nameTooLong = trimmedNameInput.length > maxNameLength;
-    const nameTooShort = !trimmedNameInput.length;
+    const nameTooShort = trimmedNameInput.length === 0;
 
     setGroupName(value);
     if (nameTooLong) {
@@ -350,7 +350,7 @@ const GroupCreationModal = ({
   const clickOnNext = (): void => {
     const nameTooLong = groupNameLength > maxNameLength;
 
-    if (groupNameLength && !nameTooLong) {
+    if (groupNameLength > 0 && !nameTooLong) {
       setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
     }
   };
@@ -365,10 +365,9 @@ const GroupCreationModal = ({
     setGroupCreationState(GroupCreationModalState.PREFERENCES);
   };
 
-  const participantsActionText = selectedContacts.length
-    ? t('groupCreationParticipantsActionCreate')
-    : t('groupCreationParticipantsActionSkip');
-  const isInputValid = groupNameLength && !nameError.length;
+  const participantsActionText =
+    selectedContacts.length > 0 ? t('groupCreationParticipantsActionCreate') : t('groupCreationParticipantsActionSkip');
+  const isInputValid = groupNameLength > 0 && nameError.length === 0;
 
   return (
     <ModalComponent
@@ -394,7 +393,7 @@ const GroupCreationModal = ({
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
-              {selectedContacts.length
+              {selectedContacts.length > 0
                 ? t('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
                 : t('groupCreationParticipantsHeader')}
             </h2>

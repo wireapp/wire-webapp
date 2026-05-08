@@ -70,21 +70,17 @@ export const getChatHistorySharingUnitOptions = (historySharingQuantity: number)
     {
       value: HistorySharingUnit.Days,
       label:
-        historySharingQuantity && historySharingQuantity > 1
-          ? t('conversationHistoryModalOptionDays')
-          : t('conversationHistoryModalOptionDay'),
+        historySharingQuantity > 1 ? t('conversationHistoryModalOptionDays') : t('conversationHistoryModalOptionDay'),
     },
     {
       value: HistorySharingUnit.Weeks,
       label:
-        historySharingQuantity && historySharingQuantity > 1
-          ? t('conversationHistoryModalOptionWeeks')
-          : t('conversationHistoryModalOptionWeek'),
+        historySharingQuantity > 1 ? t('conversationHistoryModalOptionWeeks') : t('conversationHistoryModalOptionWeek'),
     },
     {
       value: HistorySharingUnit.Months,
       label:
-        historySharingQuantity && historySharingQuantity > 1
+        historySharingQuantity > 1
           ? t('conversationHistoryModalOptionMonths')
           : t('conversationHistoryModalOptionMonth'),
     },
@@ -129,7 +125,11 @@ export const getChatHistoryOptions = (
   if (enableCustomHistory === true || teamState.isConferenceCallingEnabled()) {
     chatHistoryOptions.push({
       value: ChatHistory.Custom,
-      label: `${t('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,
+      label: `${t('conversationHistoryOptionCustom')}${
+        chatHistory === ChatHistory.Custom && historySharingQuantity > 0
+          ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})`
+          : ''
+      }`,
     });
   }
 

@@ -113,7 +113,7 @@ export const PrimaryModalComponent: FC = () => {
   };
 
   const isPasswordOptional = () => {
-    const skipValidation = passwordOptional && !passwordInput.trim().length;
+    const skipValidation = passwordOptional && passwordInput.trim().length === 0;
     if (skipValidation) {
       return true;
     }
@@ -131,12 +131,12 @@ export const PrimaryModalComponent: FC = () => {
     ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH),
   );
   const actionEnabled = isPasswordRequired ? isPasswordOptional() : true;
-  const inputActionEnabled = !isInput || !!inputValue.trim().length;
+  const inputActionEnabled = !isInput || inputValue.trim().length > 0;
 
   const areGuestLinkPasswordsValid = checkGuestLinkPassword(passwordValue, passwordConfirmationValue);
 
   const passwordGuestLinkActionEnabled =
-    (!isGuestLinkPassword || !!passwordValue.trim().length) && areGuestLinkPasswordsValid;
+    (!isGuestLinkPassword || passwordValue.trim().length > 0) && areGuestLinkPasswordsValid;
 
   const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
     if (disabled === true) {
@@ -181,7 +181,7 @@ export const PrimaryModalComponent: FC = () => {
 
   const confirm = () => {
     const action = content?.primaryAction?.action;
-    if (!action) {
+    if (action === undefined) {
       return;
     }
     const actions = {
@@ -202,7 +202,7 @@ export const PrimaryModalComponent: FC = () => {
 
   const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
     updateOptionChecked(event.target.checked);
-    if (primaryActionButtonRef.current) {
+    if (primaryActionButtonRef.current !== null) {
       primaryActionButtonRef.current.focus();
     }
   };
@@ -228,9 +228,9 @@ export const PrimaryModalComponent: FC = () => {
       const targetElement = primaryBtnFirst ? primaryActionButtonRef.current : closeButtonRef.current;
       const fallbackElement = primaryBtnFirst ? closeButtonRef.current : primaryActionButtonRef.current;
 
-      if (targetElement) {
+      if (targetElement !== null) {
         targetElement.focus();
-      } else if (fallbackElement) {
+      } else if (fallbackElement !== null) {
         fallbackElement.focus();
       }
     }, 0);
@@ -245,9 +245,14 @@ export const PrimaryModalComponent: FC = () => {
         closeAction();
       }
 
-      if (isEnterKey(event) && primaryAction?.runActionOnEnterClick) {
+      if (
+        isEnterKey(event) &&
+        primaryAction !== undefined &&
+        primaryAction !== null &&
+        primaryAction.runActionOnEnterClick === true
+      ) {
         event.preventDefault();
-        primaryAction?.action?.();
+        primaryAction.action?.();
         removeCurrentModal();
       }
     },

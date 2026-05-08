@@ -19,6 +19,8 @@
 
 import {FC, ReactNode, useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
+
 import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
 import {User} from 'Repositories/entity/User';
 
@@ -53,7 +55,7 @@ export const AppLoader: FC<AppLoaderProps> = ({init, children}) => {
     }).then(user => setSelfUser(user));
   }, []);
 
-  if (selfUser) {
+  if (!is.nullOrUndefined(selfUser)) {
     return children(selfUser);
   }
 

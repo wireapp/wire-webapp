@@ -28,7 +28,7 @@ export const NODE_NAME_MAX_LENGTH = 64;
 const INVALID_NODE_NAME_PATTERN = /[\\/"]/u;
 
 export const getNameValidationError = (name: string): Maybe<string> => {
-  if (!name) {
+  if (name.length === 0) {
     return Maybe.just(t('cells.newItemMenuModalForm.nameRequired'));
   }
 

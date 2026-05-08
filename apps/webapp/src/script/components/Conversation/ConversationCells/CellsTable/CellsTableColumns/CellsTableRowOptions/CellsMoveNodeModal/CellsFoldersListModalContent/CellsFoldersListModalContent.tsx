@@ -47,7 +47,7 @@ export const CellsFoldersListModalContent = ({
 }: CellsFoldersListModalContentProps) => {
   const breadcrumbs = getBreadcrumbsFromPath({baseCrumb: `${conversationName} files`, currentPath});
 
-  const shouldDisplayEmptyItems = status === 'success' && !items.length;
+  const shouldDisplayEmptyItems = status === 'success' && items.length === 0;
 
   const handleFolderNavigate = (path: string) => {
     const newPath = path.split('/').slice(1).join('/');

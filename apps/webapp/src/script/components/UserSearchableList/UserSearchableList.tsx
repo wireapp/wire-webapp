@@ -19,6 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
@@ -74,7 +75,11 @@ export const UserSearchableList = ({
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
 
-  const filteredSelectedUsers = selectedUsers ? searchRepository.searchUserInSet(filter, selectedUsers) : undefined;
+  const sanitizedSelectedUsers =
+    selectedUsers?.filter((user): user is User => {
+      return !is.nullOrUndefined(user);
+    }) ?? [];
+  const filteredSelectedUsers = searchRepository.searchUserInSet(filter, sanitizedSelectedUsers);
 
   const selfInTeam = teamState.isInTeam(selfUser);
 
@@ -131,7 +136,7 @@ export const UserSearchableList = ({
   }, [filter, users.length]);
 
   const foundUserEntities = () => {
-    if (!remoteTeamMembers.length) {
+    if (remoteTeamMembers.length === 0) {
       return filteredUsers;
     }
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
@@ -140,15 +145,16 @@ export const UserSearchableList = ({
     );
   };
 
-  const toggleUserSelection = selectedUsers
-    ? (user: User) => {
-        if (selectedUsers.find(selectedUser => selectedUser.id === user.id)) {
-          onUpdateSelectedUsers?.([...selectedUsers].filter(selectedUser => selectedUser.id !== user.id));
-        } else {
-          onUpdateSelectedUsers?.([...selectedUsers, user]);
+  const toggleUserSelection =
+    selectedUsers !== undefined
+      ? (user: User) => {
+          if (sanitizedSelectedUsers.find(selectedUser => selectedUser.id === user.id) !== undefined) {
+            onUpdateSelectedUsers?.([...sanitizedSelectedUsers].filter(selectedUser => selectedUser.id !== user.id));
+          } else {
+            onUpdateSelectedUsers?.([...sanitizedSelectedUsers, user]);
+          }
         }
-      }
-    : undefined;
+      : undefined;
 
   const userList = foundUserEntities().filter(
     user =>

@@ -72,7 +72,7 @@ export const showShareModal = ({type, uuid, conversationId, cellsRepository}: Sh
       primaryAction: {
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
-          if (submitHandler) {
+          if (submitHandler !== undefined) {
             void submitHandler();
           }
         },
@@ -151,7 +151,7 @@ const CellShareModalContent = ({
   };
 
   useEffect(() => {
-    if (!isEnabled) {
+    if (isEnabled === false) {
       initializedLinkIdRef.current = null;
       return;
     }
@@ -202,7 +202,7 @@ const CellShareModalContent = ({
   useEffect(() => {
     submitHandlers.set(modalId, async () => {
       if (
-        !isEnabled ||
+        isEnabled === false ||
         status !== 'success' ||
         node?.publicLink?.uuid === undefined ||
         node.publicLink.uuid.length === 0

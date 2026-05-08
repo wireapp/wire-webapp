@@ -59,11 +59,11 @@ const TextMessage: FC<TextMessageRendererProps> = ({
   useEffect(() => {
     const element = containerRef.current;
 
-    if (element && collapse) {
+    if (element !== null && collapse) {
       const preNode = element.querySelector('pre');
-      const collapsedHeight = collapsedHeightRef.current || element.clientHeight;
-      const width = Math.max(element.scrollWidth, preNode ? preNode.scrollWidth : 0);
-      const height = Math.max(element.scrollHeight, preNode ? preNode.scrollHeight : 0);
+      const collapsedHeight = collapsedHeightRef.current > 0 ? collapsedHeightRef.current : element.clientHeight;
+      const width = Math.max(element.scrollWidth, preNode !== null ? preNode.scrollWidth : 0);
+      const height = Math.max(element.scrollHeight, preNode !== null ? preNode.scrollHeight : 0);
       const isWider = width > element.clientWidth;
       const isHigher = height > collapsedHeight;
       collapsedHeightRef.current = collapsedHeight;
@@ -74,7 +74,7 @@ const TextMessage: FC<TextMessageRendererProps> = ({
   useEffect(() => {
     const element = containerRef.current;
 
-    if (!element) {
+    if (element === null) {
       return;
     }
 
@@ -112,19 +112,19 @@ const TextMessage: FC<TextMessageRendererProps> = ({
     const markdownLinkElement = target.closest('[data-md-link]');
     const mentionElement = target.closest('.message-mention');
 
-    if (markdownLinkElement) {
+    if (markdownLinkElement !== null) {
       const href = (markdownLinkElement as HTMLAnchorElement).href;
       const markdownLinkDetails = {
         href: href,
       };
       forwardEvent(event.nativeEvent, 'markdownLink', markdownLinkDetails);
-    } else if (emailElement) {
+    } else if (emailElement !== null) {
       const href = (emailElement as HTMLAnchorElement).href;
       const markdownLinkDetails = {
         href: href,
       };
       forwardEvent(event.nativeEvent, 'email', markdownLinkDetails);
-    } else if (mentionElement) {
+    } else if (mentionElement !== null) {
       const mentionMsgDetails = {
         userId: target.dataset.userId,
         userDomain: target.dataset.userDomain,

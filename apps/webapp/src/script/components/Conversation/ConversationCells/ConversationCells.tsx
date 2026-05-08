@@ -102,8 +102,8 @@ export const ConversationCells = memo(
     });
 
     const trimmedSearchValue = searchValue.trim();
-    const isSearchActive = !!trimmedSearchValue;
-    const isSearchViewIdle = isSearchViewOpen && !trimmedSearchValue;
+    const isSearchActive = trimmedSearchValue.length > 0;
+    const isSearchViewIdle = isSearchViewOpen && trimmedSearchValue.length === 0;
     const wasSearchViewOpen = useRef(isSearchViewOpen);
 
     const handleClearSearch = () => {
@@ -112,7 +112,7 @@ export const ConversationCells = memo(
     };
 
     useEffect(() => {
-      if (wasSearchViewOpen.current && !isSearchViewOpen && searchValue) {
+      if (wasSearchViewOpen.current && !isSearchViewOpen && searchValue.length > 0) {
         handleClearSearch();
       }
       wasSearchViewOpen.current = isSearchViewOpen;
@@ -139,7 +139,7 @@ export const ConversationCells = memo(
     const isError = nodesStatus === 'error';
     const isSuccess = nodesStatus === 'success';
 
-    const hasNodes = !!nodes.length;
+    const hasNodes = nodes.length > 0;
     const emptyView = !isError && !hasNodes && isCellsStateReady;
 
     const isTableVisible = (isSuccess || isLoading) && isCellsStateReady && !isSearchViewIdle;

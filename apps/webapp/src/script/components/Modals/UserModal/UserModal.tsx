@@ -106,7 +106,9 @@ export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
     <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
       <Icon.InfoIcon css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
       <p css={{fontSize: 'var(--font-size-medium)'}}>
-        {user ? t('userNotVerified', {user: user.name()}) : t('conversationConnectionVerificationWarning')}
+        {user !== undefined
+          ? t('userNotVerified', {user: user.name()})
+          : t('conversationConnectionVerificationWarning')}
         <Link
           css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
           variant={LinkVariant.PRIMARY}
@@ -157,7 +159,7 @@ const UserModal = ({
     user.teamId === selfUser.teamId;
 
   useEffect(() => {
-    if (userId) {
+    if (userId !== null) {
       userRepository
         // We want to get the fresh version of the user from backend (in case the user was deleted)
         .refreshUser(userId)
@@ -185,7 +187,7 @@ const UserModal = ({
       onClosed={onModalClosed}
       className="user-modal"
       css={userModalStyle}
-      data-uie-name={user ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
+      data-uie-name={user !== null ? 'modal-user-profile' : userNotFound ? 'modal-cannot-open-profile' : ''}
       wrapperCSS={userModalWrapperStyle}
     >
       <div className="modal__header">
@@ -211,9 +213,9 @@ const UserModal = ({
       </div>
 
       <FadingScrollbar
-        className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': !user && !userNotFound})}
+        className={cx('modal__body user-modal__wrapper', {'user-modal__wrapper--max': user === null && !userNotFound})}
       >
-        {user && (
+        {user !== null && (
           <>
             <UserDetails participant={user} classifiedDomains={classifiedDomains} />
 
@@ -233,7 +235,7 @@ const UserModal = ({
             />
           </>
         )}
-        {isShown && !user && !userNotFound && (
+        {isShown && user === null && !userNotFound && (
           <div className="loading-wrapper">
             <Icon.LoadingIcon aria-hidden="true" />
           </div>

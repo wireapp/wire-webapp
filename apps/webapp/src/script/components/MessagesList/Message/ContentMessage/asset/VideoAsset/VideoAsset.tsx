@@ -124,7 +124,7 @@ const VideoAsset = ({
     if (isFileSharingReceivingEnabled) {
       setDisplaySmall(false);
 
-      if (videoSrc && videoElement) {
+      if (videoSrc !== undefined && videoElement !== undefined) {
         videoElement.play();
       } else {
         asset.status(AssetTransferState.DOWNLOADING);
@@ -166,14 +166,14 @@ const VideoAsset = ({
   };
 
   const onVideoPlaying = (): void => {
-    if (!videoElement) {
+    if (videoElement === undefined) {
       return;
     }
     videoElement.style.backgroundColor = '#000';
   };
 
   useEffect(() => {
-    if (videoSrc && videoElement) {
+    if (videoSrc !== undefined && videoElement !== undefined) {
       const playPromise = videoElement.play();
 
       playPromise?.catch((error: unknown) => {
@@ -183,7 +183,7 @@ const VideoAsset = ({
   }, [videoElement, videoSrc]);
 
   const syncVideoTimeRest = () => {
-    if (videoElement) {
+    if (videoElement !== undefined) {
       setVideoTimeRest(videoElement.duration - videoElement.currentTime);
     }
   };
@@ -225,7 +225,7 @@ const VideoAsset = ({
               onTimeUpdate={syncVideoTimeRest}
               onLoadedMetadata={syncVideoTimeRest}
               className={cx({hidden: isUploading})}
-              style={{backgroundColor: videoPreview ? '#000' : ''}}
+              style={{backgroundColor: videoPreview !== undefined ? '#000' : ''}}
               tabIndex={TabIndex.UNFOCUSABLE}
             />
             {videoPlaybackError ? (
@@ -259,7 +259,7 @@ const VideoAsset = ({
                       />
                     </div>
 
-                    {isVideoLoaded && videoElement && (
+                    {isVideoLoaded && videoElement !== undefined && (
                       <div className="video-asset__controls__bottom">
                         <SeekBar
                           className="video-asset__controls__bottom__seekbar"

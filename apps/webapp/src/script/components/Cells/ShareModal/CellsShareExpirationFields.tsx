@@ -93,10 +93,10 @@ export interface CellsShareExpirationSelection {
 
 const parseTimeLabel = (value: string | number) => {
   const [timePart, periodPart] = `${value}`.trim().split(' ');
-  const [hourPart, minutePart] = (timePart || '').split(':');
+  const [hourPart, minutePart] = (timePart ?? '').split(':');
   const hour = Number(hourPart);
   const minutes = Number(minutePart);
-  const isPm = (periodPart || '').toUpperCase() === 'PM';
+  const isPm = (periodPart ?? '').toUpperCase() === 'PM';
   const hour24 = Number.isFinite(hour) ? (isPm ? (hour % 12) + 12 : hour % 12) : 0;
   const safeMinutes = Number.isFinite(minutes) ? minutes : 0;
 
@@ -166,7 +166,7 @@ export const CellsShareExpirationFields = ({
     return new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour24, minutes, 0, 0);
   }, [selectedDate, selectedTime]);
   const isExpirationInvalid = useMemo(
-    () => Boolean(selectedDateTime && selectedDateTime.getTime() < Date.now()),
+    () => selectedDateTime !== null && selectedDateTime.getTime() < Date.now(),
     [selectedDateTime],
   );
   const dateGroupStyles = isExpirationInvalid
@@ -248,7 +248,7 @@ export const CellsShareExpirationFields = ({
               placement="top start"
               shouldFlip={false}
               offset={8}
-              {...(portalContainer ? {portalContainer} : {})}
+              {...(portalContainer !== undefined ? {portalContainer} : {})}
             >
               <Dialog>
                 <Calendar>
@@ -286,9 +286,9 @@ export const CellsShareExpirationFields = ({
             menuCSS={timeSelectMenuStyles}
             menuPlacement="top"
             maxMenuHeight={menuMaxHeight}
-            {...(portalContainer && {menuPortalTarget: portalContainer})}
+            {...(portalContainer !== undefined && {menuPortalTarget: portalContainer})}
             onChange={option => {
-              if (option) {
+              if (option !== null) {
                 setSelectedTime(option as Option);
               }
             }}

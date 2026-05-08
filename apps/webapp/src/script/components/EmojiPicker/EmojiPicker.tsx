@@ -57,9 +57,9 @@ export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties 
     function updateSize() {
       const emojiPickerWidth = 350;
       const reactionMenuOpenerButtonHeight = 40;
-      const left = mainElement && posX - emojiPickerWidth;
+      const left = mainElement !== null ? posX - emojiPickerWidth : 0;
       const top = Math.max(
-        mainElement && window.innerHeight - posY < mainElement.clientHeight
+        mainElement !== null && window.innerHeight - posY < mainElement.clientHeight
           ? posY - mainElement.offsetHeight + reactionMenuOpenerButtonHeight
           : posY,
         0,

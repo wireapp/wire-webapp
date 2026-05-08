@@ -100,7 +100,7 @@ export const EmojiPill = ({
       );
     }
 
-    return t('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] || ''}, {}, true);
+    return t('conversationLikesCaptionSingular', {userName: reactingUserNames?.[0] ?? ''}, {}, true);
   };
 
   const caption = conversationReactionCaption();
@@ -127,7 +127,7 @@ export const EmojiPill = ({
   ]);
 
   return (
-    !!emojiCount && (
+    emojiCount > 0 && (
       <Tooltip
         body={
           <div css={messageReactionButtonTooltip}>

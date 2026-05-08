@@ -35,7 +35,7 @@ export const openBreadcrumb = ({conversationQualifiedId, path, event}: OpenBread
     generateConversationUrl({
       id: conversationQualifiedId.id,
       domain: conversationQualifiedId.domain,
-      filePath: path ? `files/${encodeURIComponent(path)}` : 'files',
+      filePath: path.length > 0 ? `files/${encodeURIComponent(path)}` : 'files',
     }),
   )(event);
 };

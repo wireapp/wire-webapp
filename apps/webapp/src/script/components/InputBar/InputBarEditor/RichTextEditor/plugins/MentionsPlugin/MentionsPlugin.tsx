@@ -128,7 +128,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const insertMention = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {
       editor.update(() => {
-        if (nodeToReplace) {
+        if (nodeToReplace !== null) {
           const mentionNode = $createMentionNode(TRIGGER, selectedOption.value);
           nodeToReplace.replace(mentionNode);
           mentionNode.insertAfter($createTextNode(' '));
@@ -142,7 +142,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const checkForMentionMatch = useCallback((text: string) => {
     // Don't show the menu if the next character is a word character
     const info = getSelectionInfo([TRIGGER]);
-    if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
+    if (info === undefined || (info.isTextNode && info.wordCharAfterCursor)) {
       return null;
     }
     return checkForMentions(text);
@@ -151,7 +151,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   const rootElement = editor.getRootElement();
 
   const getPosition = () => {
-    if (!rootElement) {
+    if (rootElement === null) {
       return {bottom: 0, left: 0};
     }
 
@@ -161,7 +161,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
   };
 
   const menuRenderFn: MenuRenderFn<MenuOption> = (anchorElementRef, params) => {
-    if (!anchorElementRef.current || !options.length) {
+    if (anchorElementRef.current === null || options.length === 0) {
       return null;
     }
 

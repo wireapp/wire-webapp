@@ -172,11 +172,11 @@ export class MLSService extends TypedEventEmitter<Events> {
    * return true if the MLS service if configured and ready to be used
    */
   get isEnabled() {
-    return !!this._config;
+    return this._config !== undefined;
   }
 
   get config() {
-    if (!this._config) {
+    if (this._config === undefined) {
       throw new Error('mls config is not set, did you forget to call initClient?');
     }
     return this._config;
@@ -262,12 +262,12 @@ export class MLSService extends TypedEventEmitter<Events> {
     const bundlePayload = new Uint8Array([
       ...commit,
       ...groupInfo.payload.copyBytes(),
-      ...(welcome?.copyBytes() || []),
+      ...(welcome?.copyBytes() ?? []),
     ]);
     try {
       const response = await this.apiClient.api.conversation.postMlsCommitBundle(bundlePayload);
 
-      if (response.failed_to_send) {
+      if (response.failed_to_send !== undefined) {
         this.logger.warn(`Failed to send commit bundle to backend`);
         return 'retry';
       }
@@ -532,7 +532,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   private dispatchNewCrlDistributionPoints(crlNewDistributionPoints: NewCrlDistributionPoints) {
-    if (crlNewDistributionPoints && crlNewDistributionPoints.length > 0) {
+    if (crlNewDistributionPoints !== undefined && crlNewDistributionPoints.length > 0) {
       this.emit(MLSServiceEvents.NEW_CRL_DISTRIBUTION_POINTS, crlNewDistributionPoints);
     }
   }

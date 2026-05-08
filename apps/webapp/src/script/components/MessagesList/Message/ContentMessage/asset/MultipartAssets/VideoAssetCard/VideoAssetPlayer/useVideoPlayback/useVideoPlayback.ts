@@ -37,7 +37,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
   const playabilityStatusRef = useRef<PlayabilityStatus>('not-checked');
 
   const handleTimeUpdate = useCallback(() => {
-    if (!videoElement) {
+    if (videoElement === undefined) {
       return;
     }
     setCurrentTime(videoElement.currentTime);
@@ -50,7 +50,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
 
     const playable = await isVideoPlayable(url);
 
-    if (!playable) {
+    if (playable === false) {
       const status = 'unplayable';
 
       // Todo: This needs to be revisited
@@ -68,7 +68,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
   }, []);
 
   const play = useCallback(async () => {
-    if (!videoElement) {
+    if (videoElement === undefined) {
       return;
     }
 
@@ -78,7 +78,7 @@ export const useVideoPlayback = ({url, videoElement, isEnabled}: UseVideoPlaybac
   }, [videoElement]);
 
   const handlePlay = useCallback(async (): Promise<void> => {
-    if (!isEnabled || url === undefined || url === '' || !videoElement) {
+    if (isEnabled === false || url === undefined || url === '' || videoElement === undefined) {
       return;
     }
 

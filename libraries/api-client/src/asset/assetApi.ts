@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import axios, {AxiosHeaderValue, AxiosRequestConfig} from 'axios';
 import logdown from 'logdown';
 
@@ -104,7 +105,7 @@ export class AssetAPI {
       config.params.asset_token = token;
     }
 
-    if (forceCaching) {
+    if (forceCaching === true) {
       config.params.forceCaching = forceCaching;
     }
 
@@ -150,7 +151,7 @@ export class AssetAPI {
       domain: options?.domain,
     };
 
-    if (options?.auditData) {
+    if (options?.auditData !== undefined) {
       metadataObject.convId = options.auditData.conversationId;
       metadataObject.filename = options.auditData.filename;
       metadataObject.filetype = options.auditData.filetype;
@@ -221,8 +222,9 @@ export class AssetAPI {
       throw new TypeError(`Expected asset ID "${assetId}" to only contain alphanumeric values and dashes.`);
     }
 
-    const isValidDomain = (domain: string) =>
-      !!domain && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+    const isValidDomain = (domain: string): boolean => {
+      return is.nonEmptyString(domain) && /^([a-zA-Z0-9]+(-[a-zA-Z0-9]+)*\.)+[a-zA-Z]{2,}$/.test(domain);
+    };
 
     if (!isValidDomain(assetDomain)) {
       throw new TypeError(`Invalid asset domain ${assetDomain}`);

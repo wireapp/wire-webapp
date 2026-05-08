@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {APIClient} from '@wireapp/api-client/lib/apiClient';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
@@ -56,7 +57,7 @@ const getGenericMessageParams = async ({
   apiClient,
 }: GetGenericMessageParamsParams): GetGenericMessageParamsReturnType => {
   const plainText = GenericMessage.encode(genericMessage).finish();
-  if (targetMode !== MessageTargetMode.NONE && !userIds) {
+  if (targetMode !== MessageTargetMode.NONE && is.nullOrUndefined(userIds)) {
     throw new Error('Cannot send targetted message when no userIds are given');
   }
 

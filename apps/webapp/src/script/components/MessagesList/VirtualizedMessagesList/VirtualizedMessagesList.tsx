@@ -130,7 +130,7 @@ export const VirtualizedMessagesList = ({
         return element.getBoundingClientRect().height;
       }
 
-      return cachedMeasurement || element.getBoundingClientRect().height;
+      return cachedMeasurement ?? element.getBoundingClientRect().height;
     },
     getItemKey,
   });
@@ -194,7 +194,7 @@ export const VirtualizedMessagesList = ({
 
     const messageIsLoaded = conversation.getMessage(messageId);
 
-    if (!messageIsLoaded) {
+    if (messageIsLoaded === undefined || messageIsLoaded === null) {
       const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
       conversation.removeMessages();
       void conversationRepository.getMessagesWithOffset(conversation, messageEntity);
@@ -295,7 +295,7 @@ export const VirtualizedMessagesList = ({
                 position: 'absolute',
                 width: '100%',
                 ...(isLast &&
-                  !currentConversationProcessQueue?.length && {
+                  currentConversationProcessQueue.length === 0 && {
                     '.message': {
                       paddingBottom: '40px',
                     },
@@ -344,7 +344,7 @@ export const VirtualizedMessagesList = ({
           );
         })}
 
-        {currentConversationProcessQueue?.length > 0 && (
+        {currentConversationProcessQueue.length > 0 && (
           <div
             key={`upload-assets-${conversation.id}`}
             ref={virtualizer.measureElement}

@@ -215,7 +215,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
   /** Resolve the effective policy for the mapped error and operation. Supports per-operation policies. */
   private getPolicyFor = (err: DomainMlsError, ctx: OperationContext): RecoveryPolicy => {
     const entry = this.policies[err.type];
-    if (!entry) {
+    if (entry === undefined) {
       return {action: RecoveryActionKind.Unknown, retryConfig: {maxAttempts: 0}};
     }
 
@@ -238,7 +238,7 @@ export class MlsRecoveryOrchestratorImpl implements MlsRecoveryOrchestrator {
     recoveryKey: string,
   ) {
     const id = context.qualifiedConversationId;
-    if (!id) {
+    if (id === undefined) {
       const errorMessage = `Missing conversationId for recovery action ${policy.action}`;
       this.logger.error(errorMessage);
       throw new Error(errorMessage);

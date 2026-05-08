@@ -80,11 +80,11 @@ function getContent(message: MemberMessageEntity) {
 
   switch (message.memberMessageType) {
     case SystemMessageType.CONVERSATION_CREATE: {
-      if (message.name().length) {
+      if (message.name().length > 0) {
         const exceedsMaxTeam = targetedUsers.length > CONFIG.MAX_WHOLE_TEAM_USERS_VISIBLE;
-        if (message.allTeamMembers && exceedsMaxTeam) {
+        if (message.allTeamMembers !== undefined && exceedsMaxTeam) {
           const guestCount = targetedUsers.filter(userEntity => userEntity.isGuest()).length;
-          if (!guestCount) {
+          if (guestCount === 0) {
             return t('conversationCreateTeam');
           }
 
@@ -181,7 +181,7 @@ function getContent(message: MemberMessageEntity) {
       }
 
       const allUsers = generateNames(targetedUsers);
-      if (!actor.id) {
+      if (actor.id === '') {
         return t('conversationMemberWereRemoved', {users: allUsers}, {}, true);
       }
       return actor.isMe

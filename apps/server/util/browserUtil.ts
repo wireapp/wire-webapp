@@ -73,7 +73,7 @@ function parseUserAgent(userAgent?: string): ParsedUserAgent | null {
 
   userAgent = userAgent.toLowerCase();
 
-  const getVersion = (app: string): string | undefined => (userAgent.match(new RegExp(`${app}/(.*)`, 'i')) || [])[0];
+  const getVersion = (app: string): string | undefined => (userAgent.match(new RegExp(`${app}/(.*)`, 'i')) ?? [])[0];
 
   const electronVersion = getVersion('Electron');
   const wireVersion = getVersion('Wire');

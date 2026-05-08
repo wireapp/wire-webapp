@@ -34,7 +34,7 @@ export const getCellsApiPath = ({
   // When there’re no files/folders in the bin, the api returns 404.
   // It’s because, we pass “recycle_bin” as a path for the api, but the folder itself doesn’t exist on the backend yet - it’s being created when a file/folder is deleted.
   // That's why if the current path (in the url) is the recycle bin, we don't want to add it to the path. We use the "deleted" flag instead (in useGetAllCellsNodes).
-  const path = currentPath && currentPath !== RECYCLE_BIN_PATH ? `/${currentPath}` : '';
+  const path = currentPath.length > 0 && currentPath !== RECYCLE_BIN_PATH ? `/${currentPath}` : '';
 
   return `${id}@${domain}${path}`;
 };

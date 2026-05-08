@@ -55,7 +55,7 @@ interface Props {
 export const QualityFeedbackModal = ({callingRepository}: Props) => {
   const userState = container.resolve(UserState);
   const {conversationId} = useCallAlertState();
-  const call = conversationId && callingRepository.findCall(conversationId);
+  const call = conversationId !== undefined ? callingRepository.findCall(conversationId) : undefined;
   const [isChecked, setIsChecked] = useState(false);
   const {setQualityFeedbackModalShown, qualityFeedbackModalShown, setConversationId} = useCallAlertState();
   const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
@@ -68,7 +68,7 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
     return null;
   }
 
-  if (!call) {
+  if (call === undefined) {
     logger.warn('Call not found for conversationId', conversationId);
     setQualityFeedbackModalShown(false);
     return null;
@@ -117,7 +117,7 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
         <ul css={ratingList}>
           {ratingListItems.map(ratingItem => (
             <li key={ratingItem.value}>
-              {ratingItem?.headingTranslationKey && (
+              {ratingItem.headingTranslationKey !== undefined && (
                 // headingTranslationKey has to broad type to specify it
                 // TODO: narrow down the type
                 <div css={ratingItemHeading}>{t(ratingItem.headingTranslationKey)}</div>

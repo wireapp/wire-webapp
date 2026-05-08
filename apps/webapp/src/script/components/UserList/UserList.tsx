@@ -104,6 +104,9 @@ export const UserList = ({
   );
 
   const [expandedFolders, setExpandedFolders] = useState<UserListSections[]>([UserListSections.CONTACTS]);
+  const sanitizedSelectedUsers = selectedUsers.filter((selectedUser): selectedUser is User => {
+    return selectedUser !== undefined && selectedUser !== null;
+  });
 
   const hasMoreUsers = !truncate && filteredUsers.length > maxShownUsers;
 
@@ -131,7 +134,7 @@ export const UserList = ({
   const renderListItem = useCallback(
     (user: User, isLastItem: boolean = false) => {
       const isSelected = (userEntity: User): boolean =>
-        isSelectable && selectedUsers.some(user => user.id === userEntity.id);
+        isSelectable && sanitizedSelectedUsers.some(user => user.id === userEntity.id);
 
       return (
         <li key={user.id}>
@@ -154,14 +157,14 @@ export const UserList = ({
         </li>
       );
     },
-    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, teamState],
+    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, sanitizedSelectedUsers, teamState],
   );
 
   const adminsHeaderId = useId();
   const membersHeaderId = useId();
   let content;
 
-  const showRoles = !!conversation;
+  const showRoles = conversation !== undefined && conversation !== null;
   if (showRoles) {
     let members: User[] = [];
     let admins: User[] = [];
@@ -232,9 +235,9 @@ export const UserList = ({
   } else {
     const truncatedUsers = truncate ? filteredUsers.slice(0, reducedUserCount) : filteredUsers;
     const isSelected = (userEntity: User): boolean =>
-      isSelectable && !!selectedUsers?.some(user => user.id === userEntity.id);
+      isSelectable && sanitizedSelectedUsers.some(user => user.id === userEntity.id);
 
-    const selectedUsersCount = selectedUsers.length;
+    const selectedUsersCount = sanitizedSelectedUsers.length;
     const hasSelectedUsers = selectedUsersCount > 0;
 
     const toggleFolder = (folderName: UserListSections) => {
@@ -268,7 +271,7 @@ export const UserList = ({
               className={cx('search-list', cssClasses)}
             >
               {isSelectedContactsOpen &&
-                selectedUsers.map((user, index) => {
+                sanitizedSelectedUsers.map((user, index) => {
                   const isLastItem = index === selectedUsersCount - 1;
 
                   return renderListItem(user, isLastItem);

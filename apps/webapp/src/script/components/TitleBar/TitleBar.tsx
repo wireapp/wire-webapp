@@ -138,7 +138,7 @@ export const TitleBar = ({
       hasService: hasService || hasApps,
     });
 
-    if (translationKey) {
+    if (translationKey !== '') {
       return t(translationKey);
     }
 
@@ -146,7 +146,7 @@ export const TitleBar = ({
   }, [hasDirectGuest, hasExternal, hasFederatedUsers, hasService, hasApps, is1to1, isRequest]);
 
   const hasCall = useMemo(() => {
-    const hasEntities = !!joinedCall;
+    const hasEntities = joinedCall !== undefined;
     return hasEntities && matchQualifiedIds(conversation.qualifiedId, joinedCall.conversation.qualifiedId);
   }, [conversation, joinedCall]);
 
@@ -243,7 +243,7 @@ export const TitleBar = ({
   };
 
   useEffect(() => {
-    if (!activeCalls.length && currentFocusedElementRef.current) {
+    if (activeCalls.length === 0 && currentFocusedElementRef.current !== null) {
       currentFocusedElementRef.current.focus();
       currentFocusedElementRef.current = null;
     }
@@ -332,7 +332,9 @@ export const TitleBar = ({
             <ConversationVerificationBadges conversation={conversation} />
           </div>
 
-          {conversationSubtitle && <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>}
+          {conversationSubtitle.length > 0 && (
+            <div className="conversation-title-bar-name--subtitle">{conversationSubtitle}</div>
+          )}
         </div>
       </li>
 
@@ -397,7 +399,7 @@ export const TitleBar = ({
         )}
       </li>
 
-      {badgeLabelCopy && (
+      {badgeLabelCopy.length > 0 && (
         <li
           className="conversation-title-bar-indication-badge"
           data-uie-name="status-indication-badge"

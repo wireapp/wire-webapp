@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {AcmeService} from '../connection';
 import {E2eiEnrollment, Nonce} from '../e2eiService.types';
 
@@ -31,7 +33,7 @@ export const getCertificate = async ({certificateUrl, connection, identity, nonc
 
   const certificateResponse = await connection.getCertificate(certificateUrl, reqBody);
 
-  if (certificateResponse?.data) {
+  if (is.nonEmptyString(certificateResponse?.data)) {
     return {
       certificate: certificateResponse.data,
       nonce: certificateResponse.nonce,

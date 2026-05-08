@@ -51,7 +51,7 @@ function getMessageMarkerType(
   lastReadTimestamp: number,
   previousMessage?: Message,
 ): Marker['type'] | undefined {
-  if (!previousMessage || message.isCall()) {
+  if (previousMessage === undefined || message.isCall()) {
     return undefined;
   }
 
@@ -71,8 +71,13 @@ function getMessageMarkerType(
   return undefined;
 }
 
-export function isMarker(object: any): object is Marker {
-  return object?.messageType === 'marker';
+export function isMarker(object: unknown): object is Marker {
+  if (typeof object !== 'object' || object === null) {
+    return false;
+  }
+
+  const candidate = object as Partial<Marker>;
+  return candidate.messageType === 'marker';
 }
 
 /**
@@ -117,7 +122,7 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
 
     const markerMessage = getMessageMarkerType(message, lastReadTimestamp, previousMessage);
 
-    if (markerMessage) {
+    if (markerMessage !== undefined) {
       acc.push({
         messageType: 'marker',
         type: markerMessage,
@@ -130,11 +135,11 @@ export function groupMessagesBySenderAndTime(messages: Message[], lastReadTimest
     const lastItem = acc[acc.length - 1];
     const lastMessageInfo = isMarker(lastItem) ? undefined : lastItem;
 
-    const areContentMessages = message.isContent() && previousMessage?.isContent();
+    const areContentMessages = message.isContent() && previousMessage?.isContent() === true;
 
     const shouldGroup =
       areContentMessages &&
-      lastMessageInfo &&
+      lastMessageInfo !== undefined &&
       lastMessageInfo.sender === message.from &&
       shouldGroupMessagesByTimestamp(
         lastMessageInfo.firstMessageTimestamp,

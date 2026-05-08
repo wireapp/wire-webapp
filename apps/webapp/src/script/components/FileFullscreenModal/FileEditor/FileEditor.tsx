@@ -107,7 +107,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
   }, [node, fetchNode]);
 
   useEffect(() => {
-    if (isLoading || isRecycled || (!isError && node)) {
+    if (isLoading || isRecycled || (isError === false && node !== null)) {
       return;
     }
 
@@ -134,7 +134,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
   }, [handleRetry, isError, isLoading, isRecycled, node]);
 
   useEffect(() => {
-    if (!isLoading && !isError && node && !isRecycled) {
+    if (isLoading === false && isError === false && node !== null && isRecycled === false) {
       hasShownErrorModal.current = false;
     }
   }, [isError, isLoading, isRecycled, node]);

@@ -73,7 +73,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   // If we have a handle in the local storage, we are in the enrollment process (this handle is saved before oauth redirect)
   public async isEnrollmentInProgress(): Promise<boolean> {
     const data = await this.enrollmentStorage.getPendingEnrollmentData();
-    return !!data;
+    return data !== undefined;
   }
 
   public clearAllProgress() {
@@ -138,7 +138,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
     const mappedUserIdentities = new Map<StringifiedQualifiedId, DeviceIdentity[]>();
     for (const userId of userIds) {
-      const identities = (userIdentities.get(userId.id) || []).map(identity => ({
+      const identities = (userIdentities.get(userId.id) ?? []).map(identity => ({
         ...identity,
         deviceId: parseFullQualifiedClientId(identity.clientId).client,
         qualifiedUserId: userId,
@@ -205,7 +205,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
   public async isFreshMLSSelfClient(): Promise<boolean> {
     const client = await this.clientService.loadClient();
-    return !client || !this.mlsService.isInitializedMLSClient(client);
+    return client === undefined || !this.mlsService.isInitializedMLSClient(client);
   }
 
   private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {
@@ -233,7 +233,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   private get acmeService(): AcmeService {
-    if (!this._acmeService) {
+    if (this._acmeService === undefined) {
       throw new Error('AcmeService not initialized');
     }
     return this._acmeService;
@@ -263,7 +263,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     const isRootRegistered = await this.coreCryptoClient.transaction(cx => cx.e2eiIsPKIEnvSetup());
 
     // Register root certificate if not already registered
-    if (!isRootRegistered) {
+    if (isRootRegistered === false) {
       await this.registerLocalCertificateRoot(this.acmeService);
     }
 

@@ -62,7 +62,7 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
 
   useEffect(() => {
     const dialog = dialogRef.current;
-    if (!dialog) {
+    if (dialog === null) {
       return undefined;
     }
 
@@ -70,8 +70,8 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
     const isDetachedWindow = callState.viewMode() === CallingViewMode.DETACHED_WINDOW;
 
     const focusContext = captureModalFocusContext({
-      targetDocument: isDetachedWindow && detachedWindow ? detachedWindow.document : undefined,
-      container: isDetachedWindow && detachedWindow ? detachedWindow.document.body : undefined,
+      targetDocument: isDetachedWindow && detachedWindow !== null ? detachedWindow.document : undefined,
+      container: isDetachedWindow && detachedWindow !== null ? detachedWindow.document.body : undefined,
     });
 
     restoreFocusRef.current = focusContext.createFocusRestorationCallback();
@@ -114,7 +114,7 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
     // Prevent focus from getting out of the dialog
     const handleFocusOut = (event: FocusEvent) => {
       const relatedTarget = event.relatedTarget as HTMLElement | null;
-      if (!relatedTarget || !dialog.contains(relatedTarget)) {
+      if (relatedTarget === null || !dialog.contains(relatedTarget)) {
         event.preventDefault();
         const elements = getFocusableElements();
         elements.at(0)?.focus();

@@ -20,6 +20,7 @@
 import React, {useEffect, useState} from 'react';
 
 import {CSSObject} from '@emotion/serialize';
+import is from '@sindresorhus/is';
 import {Transition} from 'react-transition-group';
 import {container} from 'tsyringe';
 
@@ -74,7 +75,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
           setShowTransition(!isCached && !isSmall);
           try {
             const url = await assetRepository.getObjectUrl(pictureResource);
-            if (url) {
+            if (is.nonEmptyString(url)) {
               setAvatarImage(url);
             }
             setAvatarLoadingBlocked(false);
@@ -95,7 +96,7 @@ const AvatarImage: React.FunctionComponent<AvatarImageProps> = ({
 
   return (
     <InViewport onVisible={() => setIsVisible(true)}>
-      <Transition in={!!avatarImage} timeout={showTransition ? 700 : 0}>
+      <Transition in={avatarImage.length > 0} timeout={showTransition ? 700 : 0}>
         {(state: string) => {
           return (
             <img
