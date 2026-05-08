@@ -936,18 +936,16 @@ export class Account extends TypedEventEmitter<Events> {
   };
 
   /**
-   * Loads persisted MLS pending-proposals schedules from storage and re-arms them on the
-   * boundary between catch-up and LIVE: call this immediately before
-   * {@link resumeProposalProcessing} so timers are not running while the notification
-   * stream is still draining.
+   * Persistence-backed MLS pending-proposals timers: {@link MLSService.initialisePendingProposalsTasks}.
+   * Call only at the catch-up → LIVE hand-off, immediately before {@link resumeProposalProcessing}.
    *
-   * Doing this from {@link Account.initClient} is too early: persisted tasks often have
-   * past firing times and schedule immediately, so auto-commit work runs while ordered
-   * catch-up is still replaying notifications. Commits in that window tend to fail or
-   * conflict (for example stale-message / mis-stale style errors) rather than being conflict (for example stale-message / mis-stale style errors) rather than being
-   * a reliable way to "catch up". "Wrong Epoch" is more plausibly tied to recovery or rejoin
-   * paths than to proposal commits alone; deferring rehydration still keeps MLS side effects
-   * aligned with a session that has finished its replay phase.
+   * **Why defer:** rehydrating during {@link Account.initClient} or while notifications are still
+   * replaying is unsafe. Persisted `firingDate` values are often in the past, so {@link TaskScheduler}
+   * fires auto-commits on the next tick while the backlog is still being applied. That usually surfaces
+   * as failing or conflicting commits (for example `mls-stale-message` / delivery rejection), not as a
+   * dependable way to “catch up”. “Wrong epoch” skew during replay is not uniquely attributable to
+   * proposal commits (recovery / rejoin paths matter too); this method exists to keep **all**
+   * rehydrated pending-proposal side effects aligned with a session that has finished ordered replay.
    */
   private readonly rehydrateMlsPendingProposalsTasksOnLiveTransition = async (): Promise<void> => {
     if (this.hasMLSDevice && this.service?.mls) {
