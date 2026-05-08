@@ -12,14 +12,11 @@ on:
         options:
           - https://wire-webapp-dev.zinfra.io/
           - https://wire-webapp-master.zinfra.io/
-          - https://wire-webapp-edge.wire.com/
-          - https://wire-webapp-staging.wire.com/
       backendUrl:
         type: choice
-        description: Define which backend should be used (make sure this matches the one used by the stage set for webappUrl)
+        description: Define which backend should be used
         options:
           - https://staging-nginz-https.zinfra.io/
-          - https://prod-nginz-https.wire.com/
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -239,51 +236,6 @@ jobs:
         run: |
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
-
-      - name: Extract test results
-        id: test-results
-        run: |
-          REPORT="${{ env.PLAYWRIGHT_REPORT_PATH }}/report.json"
-          if [ ! -f "$REPORT" ]; then
-            echo "::error::Report file not found at $REPORT"
-            exit 1
-          fi
-          PASSED=$(jq '.stats.expected' "$REPORT")
-          FAILED=$(jq '.stats.unexpected' "$REPORT")
-          SKIPPED=$(jq '.stats.skipped' "$REPORT")
-          FLAKY=$(jq '.stats.flaky' "$REPORT")
-          TOTAL=$((PASSED + FAILED + SKIPPED + FLAKY))
-          echo "passed=$PASSED" >> $GITHUB_OUTPUT
-          echo "failed=$FAILED" >> $GITHUB_OUTPUT
-          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
-          echo "flaky=$FLAKY" >> $GITHUB_OUTPUT
-          echo "total=$TOTAL" >> $GITHUB_OUTPUT
-
-      - name: Notify on Wire if succeeded
-        if: needs.test.result == 'success' && env.SLACK_WEBHOOK_URL != ''
-        continue-on-error: true
-        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
-        with:
-          status: custom
-          custom_payload: |
-            {
-              "text": "✅ Web E2E Tests succeeded ✅\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*Triggered by:* ${{ github.triggering_actor }}\n*Report:* ${{ steps.upload_playwright_report.outputs.artifact-url }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
-
-      - name: Notify on Wire if failed
-        if: needs.test.result == 'failure' && env.SLACK_WEBHOOK_URL != ''
-        continue-on-error: true
-        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
-        with:
-          status: custom
-          custom_payload: |
-            {
-              "text": "❌ Web E2E Tests failed ❌\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*Triggered by:* ${{ github.triggering_actor }}\n*Report:* ${{ steps.upload_playwright_report.outputs.artifact-url }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
 
       - name: Update Testiny Run with results
         if: ${{ success() && inputs.testinyRunName }}
