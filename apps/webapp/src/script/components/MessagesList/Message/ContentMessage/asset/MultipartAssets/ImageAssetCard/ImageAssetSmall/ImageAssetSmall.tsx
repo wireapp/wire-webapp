@@ -53,6 +53,7 @@ export const ImageAssetSmall = ({
   const [hasLoadError, setHasLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const isUnavailable = isError || hasLoadError;
+  const hasFilePreviewUrl = filePreviewUrl !== undefined && filePreviewUrl !== '';
 
   return (
     <>
@@ -69,11 +70,11 @@ export const ImageAssetSmall = ({
         disabled={isUnavailable}
       >
         <MediaFilePreviewCard
-          label={filePreviewUrl ? t('conversationFileImagePreviewLabel', {src: filePreviewUrl}) : ''}
+          label={hasFilePreviewUrl ? t('conversationFileImagePreviewLabel', {src: filePreviewUrl}) : ''}
           isLoading={!isLoaded}
           isError={isUnavailable}
         >
-          {!isLoading && !isUnavailable && filePreviewUrl && (
+          {!isLoading && !isUnavailable && hasFilePreviewUrl && (
             <img
               src={filePreviewUrl}
               alt=""

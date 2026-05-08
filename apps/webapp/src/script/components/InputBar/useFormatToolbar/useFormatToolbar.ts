@@ -33,7 +33,7 @@ export const useFormatToolbar = () => {
     const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
     const storageValue = loadValue<boolean>(StorageKey.INPUT.SHOW_FORMATTING);
 
-    if (storageValue && messageFormatButtonsEnabled) {
+    if (storageValue === true && messageFormatButtonsEnabled === true) {
       return storageValue;
     }
 

@@ -69,7 +69,7 @@ export const useGetCellsFolders = ({
         type: 'folder',
       });
 
-      if (!result.Nodes?.length) {
+      if (result.Nodes === undefined || result.Nodes.length === 0) {
         setStatus('success');
         setFolders([]);
         return;

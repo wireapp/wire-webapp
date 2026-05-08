@@ -32,7 +32,7 @@ interface DeleteMessageProps {
 }
 
 const DeleteMessage = ({message, onClickAvatar = () => {}}: DeleteMessageProps) => {
-  const deletedTimeStamp = message.deleted_timestamp || 0;
+  const deletedTimeStamp = message.deleted_timestamp ?? 0;
 
   const formattedDeletionTime = t('conversationDeleteTimestamp', {
     date: formatTimeShort(fromUnixTime(deletedTimeStamp / TIME_IN_MILLIS.SECOND)),

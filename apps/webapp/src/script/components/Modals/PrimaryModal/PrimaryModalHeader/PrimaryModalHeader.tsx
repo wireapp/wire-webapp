@@ -37,7 +37,7 @@ export const PrimaryModalHeader = forwardRef<HTMLButtonElement, ModalHeaderProps
         <h2 className="modal__header__title" id="modal-title">
           {titleText}
         </h2>
-        {!hideCloseBtn && (
+        {hideCloseBtn !== true && (
           <button
             ref={ref}
             type="button"

@@ -77,11 +77,9 @@ export const DeviceDetails = ({
 
   useEffect(() => {
     setFingerprintRemote(undefined);
-    if (device) {
-      void cryptographyRepository
-        .getRemoteFingerprint(user.qualifiedId, device.id)
-        .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
-    }
+    void cryptographyRepository
+      .getRemoteFingerprint(user.qualifiedId, device.id)
+      .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
   }, [device]);
 
   const clickToToggleDeviceVerification = () => {
@@ -106,7 +104,7 @@ export const DeviceDetails = ({
   };
 
   const activeConversation = conversationState.activeConversation();
-  const isConversationMLS = activeConversation && isMLSConversation(activeConversation);
+  const isConversationMLS = activeConversation != null ? isMLSConversation(activeConversation) : false;
 
   const deviceIdentity = getDeviceIdentity?.(device.id);
 
@@ -122,7 +120,7 @@ export const DeviceDetails = ({
         <p className="panel__info-text">
           <span
             dangerouslySetInnerHTML={{
-              __html: user ? t('participantDevicesDetailHeadline', {user: userName}) : '',
+              __html: t('participantDevicesDetailHeadline', {user: userName}),
             }}
           />
 
@@ -136,7 +134,7 @@ export const DeviceDetails = ({
           </a>
         </p>
 
-        {fingerprintRemote && (
+        {fingerprintRemote !== undefined && fingerprintRemote !== '' && (
           <>
             <p className="label-2 preferences-label preferences-devices-fingerprint-label">
               {t('participantDevicesProteusKeyFingerprint')}
@@ -174,7 +172,7 @@ export const DeviceDetails = ({
           {t('preferencesDeviceDetailsFingerprintNotMatch')}
         </p>
 
-        {!isConversationMLS && (
+        {isConversationMLS !== true && (
           <Button
             variant={ButtonVariant.TERTIARY}
             showLoading={isResettingSession}

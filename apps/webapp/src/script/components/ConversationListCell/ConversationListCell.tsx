@@ -210,7 +210,7 @@ export const ConversationListCell = ({
             (isChannelsEnabled ? (
               <ChannelAvatar
                 conversationID={conversation.id}
-                isLocked={!conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK)}
+                isLocked={conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK) !== true}
                 className="conversation-list-cell-avatar-arrow"
               />
             ) : (
@@ -219,7 +219,7 @@ export const ConversationListCell = ({
 
           {isGroup && <GroupAvatar conversationID={conversation.id} className="conversation-list-cell-avatar-arrow" />}
 
-          {!isGroupOrChannel && !!users.length && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
+          {!isGroupOrChannel && users.length > 0 && <Avatar participant={users[0]} avatarSize={AVATAR_SIZE.SMALL} />}
         </div>
 
         <div className="conversation-list-cell-center">

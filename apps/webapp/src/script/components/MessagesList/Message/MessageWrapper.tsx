@@ -86,10 +86,10 @@ export const MessageWrapper = ({
   isMsgElementsFocusable,
 }: MessageParams) => {
   const findMessage = async (conversation: Conversation, messageId: string) => {
+    const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const event =
-      (await messageRepository.getMessageInConversationById(conversation, messageId)) ||
-      (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
-    return await messageRepository.ensureMessageSender(event);
+      eventFromId ?? (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
+    return messageRepository.ensureMessageSender(event);
   };
   const clickButton = async (message: CompositeMessage, buttonId: string) => {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {

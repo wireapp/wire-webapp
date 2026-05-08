@@ -59,7 +59,7 @@ export const ConversationProtocolDetails = ({protocol, cipherSuite}: Conversatio
         {protocol.toUpperCase()}
       </p>
 
-      {protocol === CONVERSATION_PROTOCOL.MLS && cipherSuite && (
+      {protocol === CONVERSATION_PROTOCOL.MLS && cipherSuite != null && (
         <>
           <div css={titleStyles}>Cipher Suite</div>
           <p css={subTitleStyles} data-uie-name="cipher-suite">

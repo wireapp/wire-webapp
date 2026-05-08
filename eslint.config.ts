@@ -223,6 +223,12 @@ const config: Linter.Config[] = [
       '@typescript-eslint/strict-boolean-expressions': 'off',
     },
   },
+  {
+    files: ['apps/webapp/src/script/components/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': 'error',
+    },
+  },
 ];
 
 export default config;

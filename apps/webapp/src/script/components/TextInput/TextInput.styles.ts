@@ -53,13 +53,13 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
     color: 'var(--text-input-placeholder)',
   },
   '&:hover': {
-    borderColor: !disabled ? 'var(--text-input-border-hover)' : undefined,
+    borderColor: disabled !== true ? 'var(--text-input-border-hover)' : undefined,
   },
   '&:focus, &:focus-visible, &:active': {
     '& + label': {
-      color: !disabled ? 'var(--accent-color-500)' : undefined,
+      color: disabled !== true ? 'var(--accent-color-500)' : undefined,
     },
-    borderColor: !disabled ? 'var(--accent-color-500)' : undefined,
+    borderColor: disabled !== true ? 'var(--accent-color-500)' : undefined,
   },
   ':-ms-input-placeholder': {
     // Internet Explorer 10-11
@@ -74,9 +74,9 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
     color: 'var(--text-input-placeholder)',
     opacity: 1, // Firefox
   },
-  background: disabled ? 'var(--text-input-disabled)' : 'var(--text-input-background)',
+  background: disabled === true ? 'var(--text-input-disabled)' : 'var(--text-input-background)',
   border: '1px solid',
-  borderColor: borderColor || 'var(--text-input-border)',
+  borderColor: borderColor ?? 'var(--text-input-border)',
   borderRadius: 12,
   color: 'var(--text-input-color)',
   outline: 'none',
@@ -85,7 +85,7 @@ export const getInputCSS = (disabled?: boolean, borderColor?: string): CSSObject
 });
 
 export const getLabelCSS = (color?: string): CSSObject => ({
-  color: color || 'var(--text-input-color)',
+  color: color ?? 'var(--text-input-color)',
   fontWeight: 'var(--font-weight-semibold)',
   display: 'flex',
   flexDirection: 'column',

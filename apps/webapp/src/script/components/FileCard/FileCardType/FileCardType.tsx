@@ -26,7 +26,7 @@ export const FileCardType = () => {
   return (
     <p css={wrapperStyles}>
       <span css={categoryStyles}>{extension}</span>
-      {size && ` (${size})`}
+      {size !== undefined && size.length > 0 ? ` (${size})` : null}
     </p>
   );
 };

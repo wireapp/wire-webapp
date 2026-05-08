@@ -44,7 +44,7 @@ export const CopyToClipboardButton = ({
   const [isCopying, setIsCopying] = useState<boolean>(false);
 
   const copyToClipboard = async () => {
-    if (disabled) {
+    if (disabled === true) {
       return;
     }
     if (!isCopying) {

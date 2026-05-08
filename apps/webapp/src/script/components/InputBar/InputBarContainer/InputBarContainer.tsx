@@ -33,7 +33,7 @@ export const InputBarContainer = ({children}: InputBarContainerProps) => {
   const {rightSidebar} = useAppMainState.getState();
   const lastItem = rightSidebar.history.length - 1;
   const currentState = rightSidebar.history[lastItem];
-  const isRightSidebarOpen = !!currentState;
+  const isRightSidebarOpen = currentState !== undefined;
 
   return (
     <IgnoreOutsideClickWrapper

@@ -55,7 +55,7 @@ export const FilePreviewModal = ({
       return fileUrl;
     }
 
-    return filePdfPreviewUrl || fileImagePreviewUrl;
+    return filePdfPreviewUrl ?? fileImagePreviewUrl;
   };
 
   const getStatus = () => {
@@ -63,7 +63,7 @@ export const FilePreviewModal = ({
       return 'loading';
     }
 
-    if (isError || (!getFileUrl() && !isLoading)) {
+    if (isError || ((getFileUrl() === undefined || getFileUrl() === '') && !isLoading)) {
       return 'unavailable';
     }
 

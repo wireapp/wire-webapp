@@ -51,17 +51,17 @@ export const DetachedCallingCell = ({
     viewMode,
     detachedWindow,
   } = useKoSubscribableChildren(callState, ['joinedCall', 'viewMode', 'detachedWindow']);
-  const {self: selfUser} = useKoSubscribableChildren(userState, ['self']);
+  useKoSubscribableChildren(userState, ['self']);
 
   const isDetachedWindow = viewMode === CallingViewMode.DETACHED_WINDOW;
 
-  if (!activeCall || !isDetachedWindow || !selfUser) {
+  if (activeCall == null || !isDetachedWindow) {
     return null;
   }
 
   return (
     <DetachedWindow callState={callState}>
-      <WindowContextProvider value={detachedWindow || window}>
+      <WindowContextProvider value={detachedWindow ?? window}>
         <CallingContainer
           propertiesRepository={propertiesRepository}
           callingRepository={callingRepository}

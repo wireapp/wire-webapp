@@ -47,7 +47,10 @@ export const CellDescription = ({conversation, mutedState, isActive, isRequest, 
   const draftMessage = store?.data?.plainMessage;
   const currentConversationDraftMessage = isActive ? '' : draftMessage;
 
-  if (!cellState.description && !currentConversationDraftMessage) {
+  if (
+    cellState.description.length === 0 &&
+    (currentConversationDraftMessage === undefined || currentConversationDraftMessage.length === 0)
+  ) {
     return null;
   }
 
@@ -58,8 +61,10 @@ export const CellDescription = ({conversation, mutedState, isActive, isRequest, 
       })}
       data-uie-name="secondary-line"
     >
-      {!cellState.description && currentConversationDraftMessage && <Icon.DraftMessageIcon css={iconStyle} />}
-      {cellState.description || currentConversationDraftMessage}
+      {cellState.description.length === 0 &&
+        currentConversationDraftMessage !== undefined &&
+        currentConversationDraftMessage.length > 0 && <Icon.DraftMessageIcon css={iconStyle} />}
+      {cellState.description.length > 0 ? cellState.description : currentConversationDraftMessage}
     </span>
   );
 };

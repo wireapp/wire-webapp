@@ -85,7 +85,7 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
           <DeviceVerificationBadges device={clientEntity} getIdentity={getDeviceIdentity} />
         </div>
 
-        {deviceIdentity?.thumbprint && (
+        {deviceIdentity?.thumbprint !== undefined && deviceIdentity.thumbprint !== '' && (
           <p className="text-background device-card__id">
             <span>{t('preferencesMLSThumbprint')}</span>
 

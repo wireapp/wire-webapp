@@ -56,7 +56,7 @@ export const FileAssetOptions = ({id, onOpen, src, name, extension}: FileAssetOp
             </DropdownMenu.Item>
           </>
         )}
-        {!!src && (
+        {src !== undefined && src !== '' && (
           <DropdownMenu.Item onClick={() => forcedDownloadFile({url: src, name: fileNameWithExtension})}>
             {t('cells.options.download')}
           </DropdownMenu.Item>

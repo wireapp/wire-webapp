@@ -30,7 +30,7 @@ const configureStore = (thunkArguments: object = {}) => {
   const store = createStore(combineReducers(reducers), undefined, createMiddleware(thunkArguments));
 
   if (process.env.NODE_ENV !== 'production') {
-    if (module.hot) {
+    if (module.hot !== undefined) {
       module.hot.accept('./module/reducer/index.ts', () => {
         store.replaceReducer(combineReducers(require('./module/reducer/index.ts').default) as any);
       });

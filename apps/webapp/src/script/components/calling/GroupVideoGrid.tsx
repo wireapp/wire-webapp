@@ -194,7 +194,7 @@ const GroupVideoGrid = ({
     }) => {
       if (isShort) {
         // Special case: use different layout for 2 participants when in short mode
-        if (grid.thumbnail && limits.WITH_THUMBNAIL) {
+        if (grid.thumbnail && limits.WITH_THUMBNAIL != null) {
           return call.setNumberOfParticipantsInOnePage(limits.WITH_THUMBNAIL);
         }
         return call.setNumberOfParticipantsInOnePage(limits.SHORT);
@@ -272,7 +272,7 @@ const GroupVideoGrid = ({
           />
         ))}
       </div>
-      {thumbnail.videoStream && !maximizedParticipant && (
+      {thumbnail.videoStream != null && maximizedParticipant === null && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <Video
             className="group-video__thumbnail-video"
@@ -294,14 +294,14 @@ const GroupVideoGrid = ({
               <Icon.MicOffIcon data-uie-name="mic-icon-off" />
             </span>
           )}
-          {selfHandRaisedAt && !minimized && (
+          {selfHandRaisedAt != null && !minimized && (
             <span className="group-video-grid__element__label__hand_icon small" data-uie-name="status-call-audio-muted">
               ✋
             </span>
           )}
         </GroupVideoThumbnailWrapper>
       )}
-      {!!grid.thumbnail && !thumbnail.hasActiveVideo && !!selfParticipant && (
+      {grid.thumbnail && !thumbnail.hasActiveVideo && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <div
             css={{
@@ -317,7 +317,7 @@ const GroupVideoGrid = ({
                 <Icon.MicOffIcon data-uie-name="mic-icon-off" />
               </span>
             )}
-            {selfHandRaisedAt && !minimized && (
+            {selfHandRaisedAt != null && !minimized && (
               <span
                 className="group-video-grid__element__label__hand_icon small"
                 data-uie-name="status-call-audio-muted"

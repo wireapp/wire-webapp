@@ -60,10 +60,10 @@ export const CellsTableNameColumn = ({node, conversationQualifiedId}: CellsTable
 const FileNameColumn = ({file}: {file: CellFile}) => {
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
-  const isImage = file.mimeType?.startsWith('image');
-  const isVideo = file.mimeType?.startsWith('video');
+  const isImage = file.mimeType?.startsWith('image') === true;
+  const isVideo = file.mimeType?.startsWith('video') === true;
 
-  const shouldDisplayImagePreview = (isImage || isVideo) && file?.previewImageUrl;
+  const shouldDisplayImagePreview = (isImage || isVideo) && file.previewImageUrl !== undefined;
 
   const {previewImageUrl, name} = file;
 
@@ -72,7 +72,7 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
       {shouldDisplayImagePreview ? (
         <div css={imagePreviewWrapperStyles}>
           <img src={previewImageUrl} alt="" width={24} height={24} css={imagePreviewStyles} />
-          {isVideo && <PlayIcon css={playIconStyles} width={16} height={16} />}
+          {isVideo === true && <PlayIcon css={playIconStyles} width={16} height={16} />}
         </div>
       ) : (
         <FileTypeIcon extension={getFileExtension(name)} size={24} />
@@ -82,7 +82,7 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
         css={desktopNameStyles}
         onClick={() => handleOpenFile(file)}
         aria-controls={id}
-        aria-expanded={!!selectedFile}
+        aria-expanded={selectedFile !== undefined}
         aria-haspopup="dialog"
       >
         {name}

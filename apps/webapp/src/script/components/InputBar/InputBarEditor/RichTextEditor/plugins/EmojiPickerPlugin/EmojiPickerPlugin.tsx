@@ -106,7 +106,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   const [queryString, setQueryString] = useState<string | null>(null);
 
   const increaseUsageCount = (emojiName: string | null): void => {
-    if (emojiName) {
+    if (emojiName !== null && emojiName !== '') {
       emojiUsageCount[emojiName] = getUsageCount(emojiName) + 1;
       storeValue(StorageKey.CONVERSATION.EMOJI_USAGE_COUNT, emojiUsageCount);
     }
@@ -115,7 +115,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
   const checkForEmojiPickerMatch = (text: string) => {
     const info = getSelectionInfo([TRIGGER]);
 
-    if (!info || (info.isTextNode && info.wordCharAfterCursor)) {
+    if (info === undefined || (info.isTextNode && info.wordCharAfterCursor)) {
       // Don't show the menu if the next character is a word character
       return null;
     }
@@ -139,7 +139,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
 
         const sameUsageCount = usageCountA === usageCountB;
         return sameUsageCount
-          ? sortByPriority(emojiA.title, emojiB.title, queryString || '')
+          ? sortByPriority(emojiA.title, emojiB.title, queryString ?? '')
           : usageCountB - usageCountA;
       })
       .slice(0, MAX_EMOJI_SUGGESTION_COUNT);
