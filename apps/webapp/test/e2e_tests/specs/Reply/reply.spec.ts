@@ -355,8 +355,8 @@ test.describe('Reply', () => {
 
     await test.step('Prerequisites: Setup group and open conversations', async () => {
       await createGroup(userBPages, conversationName, [userA]);
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     });
 
     await test.step('User B sends a message to User A', async () => {
@@ -364,7 +364,7 @@ test.describe('Reply', () => {
     });
 
     await test.step('User B opens another conversation', async () => {
-      await userBPages.conversationList().openConversation(conversationName);
+      await userBPages.conversationList().getConversation(conversationName).open();
     });
 
     await test.step("User A replies to User B's message", async () => {
@@ -375,12 +375,12 @@ test.describe('Reply', () => {
 
       const unreadReplyIndicator = userBPages
         .conversationList()
-        .getConversationLocator(userA.fullName, {protocol: 'mls'}).unreadReplyIndicator;
+        .getConversation(userA.fullName, {protocol: 'mls'}).unreadReplyIndicator;
       await expect(unreadReplyIndicator).toBeVisible();
     });
 
     await test.step('User A edits the reply message', async () => {
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       const replyMessage = userAPages.conversation().getMessage({content: 'Reply'});
       await expect(userBPages.conversation().getMessage({content: 'Reply', sender: userA})).toBeVisible();
       await userAPages.conversation().editMessage(replyMessage);
