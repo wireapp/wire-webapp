@@ -417,8 +417,6 @@ export class Account extends TypedEventEmitter<Events> {
     if ((await this.isMLSActiveForClient()) && this.service.mls && mlsConfig) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
-      // initialize schedulers for pending mls proposals once client is initialized
-      await this.service.mls.initialisePendingProposalsTasks();
 
       // initialize scheduler for syncing key packages with backend
       await this.service.mls.schedulePeriodicKeyPackagesBackendSync(client.id);
@@ -957,6 +955,15 @@ export class Account extends TypedEventEmitter<Events> {
      * if the marker ID matches the current marker ID.
      */
     if (markerId === currentMarkerId) {
+      // Rehydrate persisted MLS pending-proposals timers now, on the LIVE transition.
+      // Doing this earlier (e.g. in initClient) races with the notification catch-up:
+      // persisted firingDates from the previous session are often already in the past,
+      // so the underlying TaskScheduler timers fire "on next tick" and advance the local
+      // MLS epoch while we are still replaying old application messages from the stream,
+      // producing "Wrong Epoch" / "MessageEpochTooOld" decryption failures.
+      if (this.hasMLSDevice && this.service?.mls) {
+        await this.service.mls.initialisePendingProposalsTasks();
+      }
       resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
@@ -1067,6 +1074,15 @@ export class Account extends TypedEventEmitter<Events> {
       void this.notificationProcessingQueue
         .push(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
+          // Rehydrate persisted MLS pending-proposals timers now, on the LIVE transition.
+          // Doing this earlier (e.g. in initClient) races with the notification catch-up:
+          // persisted firingDates from the previous session are often already in the past,
+          // so the underlying TaskScheduler timers fire "on next tick" and advance the local
+          // MLS epoch while we are still replaying old application messages from the stream,
+          // producing "Wrong Epoch" / "MessageEpochTooOld" decryption failures.
+          if (this.hasMLSDevice && this.service?.mls) {
+            await this.service.mls.initialisePendingProposalsTasks();
+          }
           resumeProposalProcessing();
           resumeMessageSending();
           resumeRejoiningMLSConversations();
