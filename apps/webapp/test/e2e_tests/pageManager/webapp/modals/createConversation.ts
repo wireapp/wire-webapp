@@ -25,7 +25,7 @@ export const CreateConversationModal = (page: Page) => {
 
     await nextButton.click();
 
-    if (options.members) {
+    if (options?.members !== undefined) {
       await addMembers(options.members);
     }
 
@@ -40,7 +40,7 @@ export const CreateConversationModal = (page: Page) => {
     await nextButton.click();
     await nextButton.click();
 
-    if (options.members) {
+    if (options?.members !== undefined) {
       await addMembers(options.members);
     }
 

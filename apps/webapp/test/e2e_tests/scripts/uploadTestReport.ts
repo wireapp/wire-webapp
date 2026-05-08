@@ -150,9 +150,9 @@ async function addTestResultsToRun(testCaseMappings: TestinyTestCaseMapping[]) {
 }
 
 async function main() {
-  if (!args.testinyApiKey) throw new Error('Missing required arg testinyApiKey');
-  if (!args.reportPath) throw new Error('Missing required arg reportPath');
-  if (!args.runName) throw new Error('Missing required arg runName');
+  if (args.testinyApiKey === undefined) throw new Error('Missing required arg testinyApiKey');
+  if (args.reportPath === undefined) throw new Error('Missing required arg reportPath');
+  if (args.runName === undefined) throw new Error('Missing required arg runName');
 
   const reportAbsPath = path.resolve(args.reportPath);
   if (!fs.existsSync(reportAbsPath)) {
