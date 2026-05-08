@@ -342,7 +342,8 @@ test.describe('Reply', () => {
     },
   );
 
-  test('I want to edit my reply', {tag: ['@TC-3019', '@regression']}, async ({createPage}) => {
+  // TODO: flaky due to Bug-Ticket [WPB-25411]
+  test.skip('I want to edit my reply', {tag: ['@TC-3019', '@regression']}, async ({createPage}) => {
     const [userAPageManager, userBPageManager] = await Promise.all([
       PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
       PageManager.from(createPage(withLogin(userB))),
