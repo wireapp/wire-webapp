@@ -19,10 +19,25 @@
 
 import {useCallback, useState} from 'react';
 
+import {
+  ArchiveFileIcon,
+  AudioFileIcon,
+  CodeFileIcon,
+  DocumentFileIcon,
+  FolderIcon,
+  ImageFileIcon,
+  OtherFileIcon,
+  PdfFileIcon,
+  PresentationFileIcon,
+  SpreadsheetFileIcon,
+  VideoFileIcon,
+} from '@wireapp/react-ui-kit';
+
 import type {
   FilterConfig,
   FilterItem,
 } from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
+import {t} from 'Util/localizerUtil';
 
 // ---------------------------------------------------------------------------
 // Mock data — replace each array with an API call in the integration sprint.
@@ -34,17 +49,6 @@ const MOCK_TAGS: FilterItem[] = [
   {id: 'b-tag', label: 'B tag'},
   {id: 'new-tag-1', label: 'New tag 1'},
   {id: 'e-tag', label: 'E Tag'},
-];
-
-const MOCK_FILE_TYPES: FilterItem[] = [
-  {id: 'document', label: 'Document'},
-  {id: 'spreadsheet', label: 'Spreadsheet'},
-  {id: 'presentation', label: 'Presentation'},
-  {id: 'image', label: 'Image'},
-  {id: 'video', label: 'Video'},
-  {id: 'audio', label: 'Audio'},
-  {id: 'pdf', label: 'PDF'},
-  {id: 'other', label: 'Other'},
 ];
 
 const MOCK_CONVERSATIONS: FilterItem[] = [
@@ -70,11 +74,25 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
 
   const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
 
+  const fileTypes: FilterItem[] = [
+    {id: 'pictures', label: t('cells.fileType.pictures'), startContent: <ImageFileIcon />},
+    {id: 'spreadsheets', label: t('cells.fileType.spreadsheets'), startContent: <SpreadsheetFileIcon />},
+    {id: 'presentations', label: t('cells.fileType.presentations'), startContent: <PresentationFileIcon />},
+    {id: 'documents', label: t('cells.fileType.documents'), startContent: <DocumentFileIcon />},
+    {id: 'pdfs', label: t('cells.fileType.pdfs'), startContent: <PdfFileIcon />},
+    {id: 'audio', label: t('cells.fileType.audio'), startContent: <AudioFileIcon />},
+    {id: 'videos', label: t('cells.fileType.videos'), startContent: <VideoFileIcon />},
+    {id: 'archives', label: t('cells.fileType.archives'), startContent: <ArchiveFileIcon />},
+    {id: 'code', label: t('cells.fileType.code'), startContent: <CodeFileIcon />},
+    {id: 'others', label: t('cells.fileType.others'), startContent: <OtherFileIcon />},
+    {id: 'folders', label: t('cells.fileType.folders'), startContent: <FolderIcon />},
+  ];
+
   const filters: FilterConfig[] = [
     {
       type: 'popover',
       id: 'tags',
-      label: 'Tags',
+      label: t('cells.filter.tags'),
       items: MOCK_TAGS,
       selectedIds: selectedTagIds,
       onSelectionChange: setSelectedTagIds,
@@ -82,15 +100,15 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
     {
       type: 'popover',
       id: 'fileType',
-      label: 'File type',
-      items: MOCK_FILE_TYPES,
+      label: t('cells.filter.fileType'),
+      items: fileTypes,
       selectedIds: selectedFileTypeIds,
       onSelectionChange: setSelectedFileTypeIds,
     },
     {
       type: 'popover',
       id: 'conversation',
-      label: 'Conversation',
+      label: t('cells.filter.conversation'),
       items: MOCK_CONVERSATIONS,
       selectedIds: selectedConversationIds,
       onSelectionChange: setSelectedConversationIds,
@@ -98,7 +116,7 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
     {
       type: 'popover',
       id: 'createdBy',
-      label: 'Created by',
+      label: t('cells.filter.createdBy'),
       items: MOCK_CREATORS,
       selectedIds: selectedCreatorIds,
       onSelectionChange: setSelectedCreatorIds,
@@ -106,7 +124,7 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
     {
       type: 'toggle',
       id: 'sharedViaLink',
-      label: 'Shared via link',
+      label: t('cells.filter.sharedViaLink'),
       isActive: isSharedViaLink,
       onToggle: toggleSharedViaLink,
     },

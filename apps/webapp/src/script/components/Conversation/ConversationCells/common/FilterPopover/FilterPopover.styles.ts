@@ -162,9 +162,10 @@ export const searchInputStyles: CSSObject = {
 export const itemListStyles: CSSObject = {
   listStyle: 'none',
   margin: 0,
-  padding: '4px 0',
+  padding: 0,
   maxHeight: '260px',
   overflowY: 'auto',
+  scrollbarGutter: 'stable',
 };
 
 export const itemRowHoverStyles: CSSObject = {
@@ -196,7 +197,7 @@ const sharedRowLayout: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  padding: '8px 12px',
+  padding: '10px 6px',
   gap: '10px',
   cursor: 'pointer',
 };
@@ -204,16 +205,29 @@ const sharedRowLayout: CSSObject = {
 export const checkboxWrapperStyles: CSSObject = {
   ...sharedRowLayout,
   margin: 0,
+  left: '0',
   justifyContent: 'space-between',
+  '& .wireinput + label::before': {
+    minWidth: '18px',
+    height: '18px',
+  },
+  '& .wireinput + label > svg': {
+    width: '12px',
+    height: '11px',
+  },
 };
 
 export const startContentStyles: CSSObject = {
   flexShrink: 0,
   display: 'flex',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   justifyContent: 'center',
   width: '28px',
   height: '28px',
+  '& svg': {
+    width: '18px',
+    height: '22px',
+  },
 };
 
 export const labelGroupStyles: CSSObject = {
