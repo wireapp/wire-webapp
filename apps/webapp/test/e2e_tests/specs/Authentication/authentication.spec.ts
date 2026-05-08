@@ -87,13 +87,14 @@ test.describe('Authentication', () => {
         await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       });
 
-      let proteusId: string;
-      await test.step('Open device settings and get current proteus id', async () => {
+      const proteusId = await test.step('Open device settings and get current proteus id', async () => {
         await components.conversationSidebar().clickPreferencesButton();
         await pages.settings().devicesButton.click();
 
-        proteusId = (await pages.devices().proteusId.textContent()) ?? '';
-        expect(proteusId).toBeTruthy();
+        const proteusId = (await pages.devices().proteusId.textContent()) ?? '';
+        expect(proteusId).toBeDefined();
+
+        return proteusId;
       });
 
       await test.step('Log out of public computer', async () => {
