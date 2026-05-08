@@ -207,7 +207,6 @@ export const checkboxWrapperStyles: CSSObject = {
   justifyContent: 'space-between',
 };
 
-
 export const startContentStyles: CSSObject = {
   flexShrink: 0,
   display: 'flex',
@@ -232,7 +231,6 @@ export const checkboxLabelStyles: CSSObject = {
   fontSize: 'var(--font-size-medium)',
   lineHeight: '18px',
 };
-
 
 export const footerStyles: CSSObject = {
   display: 'flex',
