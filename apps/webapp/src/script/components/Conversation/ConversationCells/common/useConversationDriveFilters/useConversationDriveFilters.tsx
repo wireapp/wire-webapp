@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 
 import {
   ArchiveFileIcon,
@@ -77,53 +77,59 @@ export const useConversationDriveFilters = (): UseConversationDriveFiltersResult
 
   const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
 
-  const fileTypes: FilterItem[] = [
-    {id: 'pictures', label: t('cells.fileType.pictures'), startContent: <ImageFileIcon />},
-    {id: 'spreadsheets', label: t('cells.fileType.spreadsheets'), startContent: <SpreadsheetFileIcon />},
-    {id: 'presentations', label: t('cells.fileType.presentations'), startContent: <PresentationFileIcon />},
-    {id: 'documents', label: t('cells.fileType.documents'), startContent: <DocumentFileIcon />},
-    {id: 'pdfs', label: t('cells.fileType.pdfs'), startContent: <PdfFileIcon />},
-    {id: 'audio', label: t('cells.fileType.audio'), startContent: <AudioFileIcon />},
-    {id: 'videos', label: t('cells.fileType.videos'), startContent: <VideoFileIcon />},
-    {id: 'archives', label: t('cells.fileType.archives'), startContent: <ArchiveFileIcon />},
-    {id: 'code', label: t('cells.fileType.code'), startContent: <CodeFileIcon />},
-    {id: 'others', label: t('cells.fileType.others'), startContent: <OtherFileIcon />},
-    {id: 'folders', label: t('cells.fileType.folders'), startContent: <FolderIcon />},
-  ];
+  const fileTypes = useMemo<FilterItem[]>(
+    () => [
+      {id: 'pictures', label: t('cells.fileType.pictures'), startContent: <ImageFileIcon />},
+      {id: 'spreadsheets', label: t('cells.fileType.spreadsheets'), startContent: <SpreadsheetFileIcon />},
+      {id: 'presentations', label: t('cells.fileType.presentations'), startContent: <PresentationFileIcon />},
+      {id: 'documents', label: t('cells.fileType.documents'), startContent: <DocumentFileIcon />},
+      {id: 'pdfs', label: t('cells.fileType.pdfs'), startContent: <PdfFileIcon />},
+      {id: 'audio', label: t('cells.fileType.audio'), startContent: <AudioFileIcon />},
+      {id: 'videos', label: t('cells.fileType.videos'), startContent: <VideoFileIcon />},
+      {id: 'archives', label: t('cells.fileType.archives'), startContent: <ArchiveFileIcon />},
+      {id: 'code', label: t('cells.fileType.code'), startContent: <CodeFileIcon />},
+      {id: 'others', label: t('cells.fileType.others'), startContent: <OtherFileIcon />},
+      {id: 'folders', label: t('cells.fileType.folders'), startContent: <FolderIcon />},
+    ],
+    [],
+  );
 
-  const filters: FilterConfig[] = [
-    {
-      type: 'popover',
-      id: 'tags',
-      label: t('cells.filter.tags'),
-      items: MOCK_TAGS,
-      selectedIds: selectedTagIds,
-      onSelectionChange: setSelectedTagIds,
-    },
-    {
-      type: 'popover',
-      id: 'fileType',
-      label: t('cells.filter.fileType'),
-      items: fileTypes,
-      selectedIds: selectedFileTypeIds,
-      onSelectionChange: setSelectedFileTypeIds,
-    },
-    {
-      type: 'popover',
-      id: 'createdBy',
-      label: t('cells.filter.createdBy'),
-      items: MOCK_CREATORS,
-      selectedIds: selectedCreatorIds,
-      onSelectionChange: setSelectedCreatorIds,
-    },
-    {
-      type: 'toggle',
-      id: 'sharedViaLink',
-      label: t('cells.filter.sharedViaLink'),
-      isActive: isSharedViaLink,
-      onToggle: toggleSharedViaLink,
-    },
-  ];
+  const filters = useMemo<FilterConfig[]>(
+    () => [
+      {
+        type: 'popover',
+        id: 'tags',
+        label: t('cells.filter.tags'),
+        items: MOCK_TAGS,
+        selectedIds: selectedTagIds,
+        onSelectionChange: setSelectedTagIds,
+      },
+      {
+        type: 'popover',
+        id: 'fileType',
+        label: t('cells.filter.fileType'),
+        items: fileTypes,
+        selectedIds: selectedFileTypeIds,
+        onSelectionChange: setSelectedFileTypeIds,
+      },
+      {
+        type: 'popover',
+        id: 'createdBy',
+        label: t('cells.filter.createdBy'),
+        items: MOCK_CREATORS,
+        selectedIds: selectedCreatorIds,
+        onSelectionChange: setSelectedCreatorIds,
+      },
+      {
+        type: 'toggle',
+        id: 'sharedViaLink',
+        label: t('cells.filter.sharedViaLink'),
+        isActive: isSharedViaLink,
+        onToggle: toggleSharedViaLink,
+      },
+    ],
+    [fileTypes, selectedTagIds, selectedFileTypeIds, selectedCreatorIds, isSharedViaLink, toggleSharedViaLink],
+  );
 
   return {
     filters,
