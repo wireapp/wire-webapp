@@ -23,7 +23,7 @@ import {createDeterministicWallClock} from '../clock/deterministicWallClock';
 import {createApplicationServices} from './createApplicationServices';
 
 describe('createApplicationServices', () => {
-  it('creates wall clock through injected dependency', () => {
+  it('creates wall clock and fire-and-forget invoker through injected dependencies', () => {
     const deterministicWallClock = createDeterministicWallClock();
     const fireAndForgetInvoker = {
       fireAndForget: jest.fn(),
