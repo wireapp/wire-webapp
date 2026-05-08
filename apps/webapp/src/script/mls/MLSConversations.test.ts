@@ -85,11 +85,11 @@ describe('MLSConversations', () => {
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest
         .spyOn(
-          (conversationRepository as unknown as {conversationService: {getConversationById: jest.Mock}})
+          (conversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
             .conversationService,
-          'getConversationById',
+          'getSafeConversationById',
         )
-        .mockResolvedValue({epoch: 1});
+        .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
       mockSafeEpoch(repositoryCore);
       const joinSpy = jest.spyOn(repositoryCore.service!.conversation, 'joinByExternalCommit');
 
@@ -203,8 +203,12 @@ describe('MLSConversations', () => {
       jest.spyOn(repositoryCore.service!.mls!, 'isConversationEstablished').mockResolvedValue(false);
       jest.spyOn(repositoryCore.service!.conversation!, 'mlsGroupExistsLocally').mockResolvedValue(false);
       jest
-        .spyOn((conversationRepository as any).conversationService, 'getConversationById')
-        .mockResolvedValue({epoch: 1});
+        .spyOn(
+          (conversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
+            .conversationService,
+          'getSafeConversationById',
+        )
+        .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
 
       const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');
       await initialiseSelfAndTeamConversations(
