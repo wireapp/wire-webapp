@@ -178,13 +178,13 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
     const {pages, modals, components} = pageManagerA.webapp;
     await components.conversationSidebar().clickPreferencesButton();
     await pages.account().clickDeleteAccountButton();
-    await expect(modals.deleteAccount().modal).toBeVisible();
-    await expect(modals.deleteAccount().modalTitle).toContainText('Delete account');
-    await expect(modals.deleteAccount().modalText).toContainText(
+    await expect(modals.confirm().modal).toBeVisible();
+    await expect(modals.confirm().modalTitle).toContainText('Delete account');
+    await expect(modals.confirm().modalText).toContainText(
       'We will send you an email. Follow the link to delete your account permanently.',
     );
 
-    await modals.deleteAccount().clickDelete();
+    await modals.confirm().actionButton.click();
     const url = await api.inbucket.getAccountDeletionURL(userA.email);
 
     await pageManagerA.openNewTab(url, async tab => {
