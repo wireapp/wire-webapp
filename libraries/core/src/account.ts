@@ -935,6 +935,26 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient.transport.ws.acknowledgeConsumableNotificationSynchronization(notification);
   };
 
+  /**
+   * Loads persisted MLS pending-proposals schedules from storage and re-arms them on the
+   * boundary between catch-up and LIVE: call this immediately before
+   * {@link resumeProposalProcessing} so timers are not running while the notification
+   * stream is still draining.
+   *
+   * Doing this from {@link Account.initClient} is too early: persisted tasks often have
+   * past firing times and schedule immediately, so auto-commit work runs while ordered
+   * catch-up is still replaying notifications. Commits in that window tend to fail or
+   * conflict (for example stale-message / mis-stale style errors) rather than being conflict (for example stale-message / mis-stale style errors) rather than being
+   * a reliable way to "catch up". "Wrong Epoch" is more plausibly tied to recovery or rejoin
+   * paths than to proposal commits alone; deferring rehydration still keeps MLS side effects
+   * aligned with a session that has finished its replay phase.
+   */
+  private readonly rehydrateMlsPendingProposalsTasksOnLiveTransition = async (): Promise<void> => {
+    if (this.hasMLSDevice && this.service?.mls) {
+      await this.service.mls.initialisePendingProposalsTasks();
+    }
+  };
+
   private readonly handleSynchronizationNotification = async (
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
@@ -955,15 +975,7 @@ export class Account extends TypedEventEmitter<Events> {
      * if the marker ID matches the current marker ID.
      */
     if (markerId === currentMarkerId) {
-      // Rehydrate persisted MLS pending-proposals timers now, on the LIVE transition.
-      // Doing this earlier (e.g. in initClient) races with the notification catch-up:
-      // persisted firingDates from the previous session are often already in the past,
-      // so the underlying TaskScheduler timers fire "on next tick" and advance the local
-      // MLS epoch while we are still replaying old application messages from the stream,
-      // producing "Wrong Epoch" / "MessageEpochTooOld" decryption failures.
-      if (this.hasMLSDevice && this.service?.mls) {
-        await this.service.mls.initialisePendingProposalsTasks();
-      }
+      await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
       resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
@@ -1074,15 +1086,7 @@ export class Account extends TypedEventEmitter<Events> {
       void this.notificationProcessingQueue
         .push(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
-          // Rehydrate persisted MLS pending-proposals timers now, on the LIVE transition.
-          // Doing this earlier (e.g. in initClient) races with the notification catch-up:
-          // persisted firingDates from the previous session are often already in the past,
-          // so the underlying TaskScheduler timers fire "on next tick" and advance the local
-          // MLS epoch while we are still replaying old application messages from the stream,
-          // producing "Wrong Epoch" / "MessageEpochTooOld" decryption failures.
-          if (this.hasMLSDevice && this.service?.mls) {
-            await this.service.mls.initialisePendingProposalsTasks();
-          }
+          await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
           resumeProposalProcessing();
           resumeMessageSending();
           resumeRejoiningMLSConversations();

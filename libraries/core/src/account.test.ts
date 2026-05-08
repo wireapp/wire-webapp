@@ -525,14 +525,9 @@ describe('Account', () => {
   });
 
   describe('MLS pending-proposals rehydration is deferred to the LIVE transition', () => {
-    // Regression guard: rehydrating persisted MLS pending-proposals timers must NOT
-    // happen during initClient (or any time before the catch-up notification stream is
-    // drained). If it does, those timers fire mid-catch-up and advance the local MLS
-    // epoch while we are still replaying old application messages, producing
-    // "Wrong Epoch" / "MessageEpochTooOld" decryption failures.
-    //
-    // We invoke the private legacy notification stream processor directly to avoid the
-    // websocket/login machinery used by the surrounding describe block.
+    // Regression guard for rehydrateMlsPendingProposalsTasksOnLiveTransition (account.ts):
+    // persisted timers must not be rehydrated during initClient. We drive the legacy
+    // notification stream processor directly to avoid websocket/login setup in this file.
 
     type MlsServiceStub = {
       isEnabled: boolean;
