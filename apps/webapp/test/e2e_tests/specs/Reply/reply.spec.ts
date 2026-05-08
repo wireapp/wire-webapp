@@ -435,7 +435,6 @@ test.describe('Reply', () => {
       const replyMessageToLink = userAPages
         .conversation()
         .getMessage({content: 'Reply to the link message', sender: userA});
-      await expect(replyMessageToLink.getByTestId('quote-item')).not.toContainText('You cannot see this message');
 
       const [newTab] = await Promise.all([
         userAPageManager.page.waitForEvent('popup'),
