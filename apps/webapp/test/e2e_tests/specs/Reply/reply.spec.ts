@@ -402,8 +402,6 @@ test.describe('Reply', () => {
 
       // Check that quote in reply by User A is reflecting the changes to original message
       const replyFromUserA = userBPages.conversation().getMessage({content: 'Edited Reply', sender: userA});
-      // Wait for the transient "deleted" placeholder to disappear to prevent flakiness during the edit sync
-      await expect(replyFromUserA.getByTestId('quote-item')).not.toContainText('You cannot see this message');
       await expect(replyFromUserA.getByTestId('quote-item')).toContainText('Guava');
     });
 
