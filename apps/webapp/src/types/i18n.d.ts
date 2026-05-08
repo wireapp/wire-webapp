@@ -393,11 +393,6 @@ declare module 'I18n/en-US.json' {
     'cells.error.description': `The list of files couldn\'t be loaded. Please try again.`;
     'cells.error.heading': `Something went wrong loading`;
     'cells.filePreviewButton.ariaLabel': `Preview for {name}`;
-    'cells.filter.conversation': `Conversation`;
-    'cells.filter.createdBy': `Created by`;
-    'cells.filter.fileType': `File type`;
-    'cells.filter.sharedViaLink': `Shared via link`;
-    'cells.filter.tags': `Tags`;
     'cells.fileType.archives': `Archives`;
     'cells.fileType.audio': `Audio`;
     'cells.fileType.code': `Code`;
@@ -409,6 +404,11 @@ declare module 'I18n/en-US.json' {
     'cells.fileType.presentations': `Presentations`;
     'cells.fileType.spreadsheets': `Spreadsheets`;
     'cells.fileType.videos': `Videos`;
+    'cells.filter.conversation': `Conversation`;
+    'cells.filter.createdBy': `Created by`;
+    'cells.filter.fileType': `File type`;
+    'cells.filter.sharedViaLink': `Shared via link`;
+    'cells.filter.tags': `Tags`;
     'cells.filterPopover.search.clearButton': `Clear search`;
     'cells.filterPopover.search.placeholder': `Search {filterName}`;
     'cells.filterPopover.selectedCount': `{count} selected`;
