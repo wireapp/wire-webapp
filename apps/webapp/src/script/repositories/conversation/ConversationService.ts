@@ -156,8 +156,7 @@ export class ConversationService {
   getSafeConversationById(conversationId: QualifiedId): Task<BackendConversation, unknown> {
     return task.tryOrElse(
       error => error,
-      // eslint-disable-next-line @typescript-eslint/no-deprecated -- intentional: this safe variant exists to wrap the deprecated method.
-      () => this.getConversationById(conversationId),
+      () => this.apiClient.api.conversation.getConversation(conversationId),
     );
   }
 
