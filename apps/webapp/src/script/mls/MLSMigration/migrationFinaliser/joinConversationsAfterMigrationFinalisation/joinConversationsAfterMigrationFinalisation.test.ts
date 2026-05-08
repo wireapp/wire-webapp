@@ -19,6 +19,7 @@
 
 import {CONVERSATION_TYPE, CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 
 import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
@@ -115,6 +116,12 @@ const createConversation = (
   return conversation;
 };
 
+const mockSafeEpoch = (core: Core) => {
+  (core.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
+    .fn()
+    .mockResolvedValue(task.resolve(1));
+};
+
 describe('joinConversationsAfterMigrationFinalisation', () => {
   const testFactory = new TestFactory();
 
@@ -124,6 +131,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
   it('Should join MLS groups of group conversations and call onSuccess callback after successful join', async () => {
     const mockCore = container.resolve(Core);
+    mockSafeEpoch(mockCore);
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
 
@@ -144,6 +152,14 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
     const onSuccess = jest.fn();
     const conversationRepository = await testFactory.exposeConversationActors();
+    jest
+      .spyOn(
+        (conversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
+          .conversationService,
+        'getSafeConversationById',
+      )
+      .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
+
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
       conversationRepository,
@@ -161,6 +177,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
   it('Should ignore other type of conversations (e.g. 1:1)', async () => {
     const mockCore = container.resolve(Core);
+    mockSafeEpoch(mockCore);
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
 
@@ -197,6 +214,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
   it('Should not join MLS conversation that was already MLS in the store', async () => {
     const mockCore = container.resolve(Core);
+    mockSafeEpoch(mockCore);
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
 
@@ -233,6 +251,7 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
 
   it('Should not join MLS conversation if conversation was not migrated', async () => {
     const mockCore = container.resolve(Core);
+    mockSafeEpoch(mockCore);
 
     jest.spyOn(mockCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(false);
 

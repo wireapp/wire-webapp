@@ -97,11 +97,10 @@ export const useLoadMessages = (
         return;
       }
 
-      const [firstItem] = [...virtualItems];
-
-      if (!firstItem) {
+      if (virtualItems.length === 0) {
         return;
       }
+      const [firstItem] = [...virtualItems];
 
       if (firstItem.index === 0) {
         void loadPrecedingMessages();
@@ -122,11 +121,10 @@ export const useLoadMessages = (
         return;
       }
 
-      const [lastItem] = [...virtualItems].reverse();
-
-      if (!lastItem) {
+      if (virtualItems.length === 0) {
         return;
       }
+      const [lastItem] = [...virtualItems].reverse();
 
       if (lastItem.index >= itemsLength - 1) {
         void loadFollowingMessages();

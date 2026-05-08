@@ -28,12 +28,10 @@ import {ConversationSidebar} from './webapp/components/conversationSidebar.compo
 import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AcknowledgeModal} from './webapp/modals/acknowledge.modal';
 import {AppLockModal} from './webapp/modals/appLock.modal';
-import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
 import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {ConfirmModal} from './webapp/modals/confirm.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
 import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
-import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {DetailViewModal} from './webapp/modals/detailView.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {OptionModal} from './webapp/modals/option.modal';
@@ -201,10 +199,8 @@ export class PageManager {
         this.getOrCreate('webapp.modals.dataShareConsent', () => new DataShareConsentModal(this.page)),
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
       userProfile: () => this.getOrCreate('webapp.modals.userProfile', () => new UserProfileModal(this.page)),
-      blockWarning: () => this.getOrCreate('webapp.modals.blockWarning', () => new BlockWarningModal(this.page)),
       callNotEstablished: () =>
         this.getOrCreate('webapp.modals.callNotEstablished', () => new CallNotEstablishedModal(this.page)),
-      deleteAccount: () => this.getOrCreate('webapp.modals.deleteAccount', () => new DeleteAccountModal(this.page)),
       confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
       leaveConversation: () =>
         this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),

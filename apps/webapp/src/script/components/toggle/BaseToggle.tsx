@@ -84,7 +84,7 @@ const BaseToggle = ({
         </div>
       </div>
       <p className="info-toggle__details" data-uie-name={`status-${toggleId}`}>
-        {extendedInfo ? extendedInfoText : infoText}
+        {extendedInfo === true ? extendedInfoText : infoText}
       </p>
     </div>
   );

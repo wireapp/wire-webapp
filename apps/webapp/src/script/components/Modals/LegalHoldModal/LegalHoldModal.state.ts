@@ -80,11 +80,12 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
   isOpen: false,
   isSelfInfo: false,
   setFingerprint: fingerprint => {
-    const formattedFingerprint = fingerprint
-      ? splitFingerprint(fingerprint)
-          .map(part => `<span>${part} </span>`)
-          .join('')
-      : '';
+    const formattedFingerprint =
+      fingerprint !== undefined && fingerprint !== ''
+        ? splitFingerprint(fingerprint)
+            .map(part => `<span>${part} </span>`)
+            .join('')
+        : '';
 
     return set(state => ({
       ...state,
@@ -113,11 +114,12 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
       users,
     })),
   showRequestModal: (initialize = false, showLoading = false, fingerprint) => {
-    const formattedFingerprint = fingerprint
-      ? splitFingerprint(fingerprint)
-          .map(part => `<span>${part} </span>`)
-          .join('')
-      : '';
+    const formattedFingerprint =
+      fingerprint !== undefined && fingerprint !== ''
+        ? splitFingerprint(fingerprint)
+            .map(part => `<span>${part} </span>`)
+            .join('')
+        : '';
 
     return set(state => ({
       ...state,
@@ -132,11 +134,11 @@ const useLegalHoldModalState = create<LegalHoldModalState>((set, get) => ({
     set(state => ({
       ...state,
       conversation,
-      conversationId: conversation?.id || 'self',
+      conversationId: conversation?.id ?? 'self',
       isInitialized: initialize,
       isLoading: true,
       isOpen: true,
-      isSelfInfo: !conversation,
+      isSelfInfo: conversation === null || conversation === undefined,
       type: LegalHoldModalType.USERS,
     })),
   type: null,

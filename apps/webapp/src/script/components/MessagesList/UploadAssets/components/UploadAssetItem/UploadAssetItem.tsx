@@ -55,7 +55,7 @@ export const UploadAssetItem = ({assetRepository, message, scrollToEnd}: Props) 
   return (
     <div data-uie-name="upload-asset-item" data-uie-value={message.messageId}>
       <span css={uploadingProgressText}>
-        {t('conversationAssetUploading')} {message.asset?.original?.name || ''} - {Math.trunc(uploadProgress)}%
+        {t('conversationAssetUploading')} {message.asset?.original?.name ?? ''} - {Math.trunc(uploadProgress)}%
       </span>
 
       <ProgressBar className="uploading-asset" progress={uploadProgress} centerText={false} />

@@ -167,9 +167,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:3.1041.0":
-  version: 3.1041.0
-  resolution: "@aws-sdk/client-s3@npm:3.1041.0"
+"@aws-sdk/client-s3@npm:3.1042.0":
+  version: 3.1042.0
+  resolution: "@aws-sdk/client-s3@npm:3.1042.0"
   dependencies:
     "@aws-crypto/sha1-browser": "npm:5.2.0"
     "@aws-crypto/sha256-browser": "npm:5.2.0"
@@ -226,7 +226,7 @@ __metadata:
     "@smithy/util-utf8": "npm:^4.2.2"
     "@smithy/util-waiter": "npm:^4.3.0"
     tslib: "npm:^2.6.2"
-  checksum: 10/b69317395810dd2afe1ff7b8f749fcce93745bc1031c5be82b3833f98e7abf227176b022f15530c3c1fd1af6787a2dc92e99cdc0837d856b49fff91158eb75bd
+  checksum: 10/69bf9d5bd169343d30c6b692723ea0a4beef843bd28ae1897940a76936901f8c16fc2d50cad6385ed53af65935b42e92a450d2d293c77791f7ce5140d35e075e
   languageName: node
   linkType: hard
 
@@ -396,9 +396,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.1041.0":
-  version: 3.1041.0
-  resolution: "@aws-sdk/lib-storage@npm:3.1041.0"
+"@aws-sdk/lib-storage@npm:3.1042.0":
+  version: 3.1042.0
+  resolution: "@aws-sdk/lib-storage@npm:3.1042.0"
   dependencies:
     "@smithy/middleware-endpoint": "npm:^4.4.32"
     "@smithy/protocol-http": "npm:^5.3.14"
@@ -409,8 +409,8 @@ __metadata:
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.1041.0
-  checksum: 10/0ea4076845d3f3c1d50e350d2a3a7bd00b8f9b088b2ca0097c691e1df23af8918e3256520fe6032758af63bd338279b596cf3f5b586d357bcefedf6300e0b9f7
+    "@aws-sdk/client-s3": ^3.1042.0
+  checksum: 10/7cda6fc8e688262318f5ffb5bde6d081ae36103a36b199a8951bc364e00c2f591c8452052a24391dfe106832fa8db51597b838ddb9f70cef2e849511fde5dd5b
   languageName: node
   linkType: hard
 
@@ -8266,7 +8266,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsdom@npm:21.1.7, @types/jsdom@npm:^21.1.7":
+"@types/jsdom@npm:28.0.1":
+  version: 28.0.1
+  resolution: "@types/jsdom@npm:28.0.1"
+  dependencies:
+    "@types/node": "npm:*"
+    "@types/tough-cookie": "npm:*"
+    parse5: "npm:^7.0.0"
+    undici-types: "npm:^7.21.0"
+  checksum: 10/5761f89fb00567bce87ec81f9c926cff9a400e2989615368093a0eed81da122329710f39e13d8388cdde8f6a24d49cde4a94bd194e6d94c61727aeaae694f6bb
+  languageName: node
+  linkType: hard
+
+"@types/jsdom@npm:^21.1.7":
   version: 21.1.7
   resolution: "@types/jsdom@npm:21.1.7"
   dependencies:
@@ -9533,8 +9545,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
-    "@aws-sdk/client-s3": "npm:3.1041.0"
-    "@aws-sdk/lib-storage": "npm:3.1041.0"
+    "@aws-sdk/client-s3": "npm:3.1042.0"
+    "@aws-sdk/lib-storage": "npm:3.1042.0"
     "@swc/core": "npm:1.15.33"
     "@swc/jest": "npm:0.2.39"
     "@types/jest": "npm:30.0.0"
@@ -9575,10 +9587,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:10.3.19":
-  version: 10.3.19
-  resolution: "@wireapp/avs@npm:10.3.19"
-  checksum: 10/0310f8c6cb7cbb663b36f3eda57e471661a32258b833a35f8cdf41834b73c86f21642f61c2841d2eab966a70506a287d72406f5fcf9619310dd2c22607bc9e19
+"@wireapp/avs@npm:10.3.22":
+  version: 10.3.22
+  resolution: "@wireapp/avs@npm:10.3.22"
+  checksum: 10/4d3250939233022b66535fb287ff038f6de6863230d266a32d57463b5c2a5cabd04ed8073e92b8fec374b7c2675d6b8d305d486e005f9d66ae16e71f84e852f6
   languageName: node
   linkType: hard
 
@@ -9939,7 +9951,7 @@ __metadata:
     "@types/webpack-bundle-analyzer": "npm:4.7.0"
     "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:2023.10.7"
-    "@wireapp/avs": "npm:10.3.19"
+    "@wireapp/avs": "npm:10.3.22"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/config": "workspace:^"
     "@wireapp/core": "workspace:^"
@@ -9971,7 +9983,7 @@ __metadata:
     emoji-picker-react: "npm:4.16.1"
     html-webpack-plugin: "npm:5.6.7"
     i18next-scanner: "npm:4.6.0"
-    immer: "npm:11.1.4"
+    immer: "npm:11.1.6"
     intersection-observer: "npm:0.12.2"
     jest-canvas-mock: "npm:2.5.2"
     jest-jasmine2: "npm:30.3.0"
@@ -16744,10 +16756,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immer@npm:11.1.4":
-  version: 11.1.4
-  resolution: "immer@npm:11.1.4"
-  checksum: 10/7b60a56f8375bbe1b3fdbeec322614ab7925dde6480cc5da66a5204f44ccbce522b2b2ccda3bef3a9e71e5746b28dcf4ae174443a49df1155e983e88b0aa0ed5
+"immer@npm:11.1.6":
+  version: 11.1.6
+  resolution: "immer@npm:11.1.6"
+  checksum: 10/c933a126d5ca688d304627108135079a6819c3b571c98700cd2828ac5f9762e05e290e7463202df07f4ff5a7be504986bb17439385c7c8b4cdfe4f0a96d934a1
   languageName: node
   linkType: hard
 
@@ -26342,6 +26354,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ts-pattern@npm:5.9.0":
+  version: 5.9.0
+  resolution: "ts-pattern@npm:5.9.0"
+  checksum: 10/0df8cc63d731a596f3541a305eff10f055c9a761d1a8b3776781dc6d6430c6bd8be8cd333fac62138c5d88e1209b4d8dccf1f40041091b634e5018908281417b
+  languageName: node
+  linkType: hard
+
 "tsc-watch@npm:7.2.0":
   version: 7.2.0
   resolution: "tsc-watch@npm:7.2.0"
@@ -26671,6 +26690,13 @@ __metadata:
   version: 1.13.7
   resolution: "underscore@npm:1.13.7"
   checksum: 10/1ce3368dbe73d1e99678fa5d341a9682bd27316032ad2de7883901918f0f5d50e80320ccc543f53c1862ab057a818abc560462b5f83578afe2dd8dd7f779766c
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:^7.21.0":
+  version: 7.25.0
+  resolution: "undici-types@npm:7.25.0"
+  checksum: 10/66f3a460cbc9e83e73c11c3a1869c32eef6c92b32450cc9dc677c671d958b9d1bb8635ff36a421019e4b1114dfc79d187aecf4dc75cf167a85535e03559b9250
   languageName: node
   linkType: hard
 
@@ -27745,7 +27771,7 @@ __metadata:
     "@types/generate-changelog": "npm:1.8.3"
     "@types/jest": "npm:30.0.0"
     "@types/js-yaml": "npm:4.0.9"
-    "@types/jsdom": "npm:21.1.7"
+    "@types/jsdom": "npm:28.0.1"
     "@types/node": "npm:24.12.2"
     "@types/tough-cookie": "npm:4.0.5"
     "@typescript-eslint/eslint-plugin": "npm:8.59.2"
@@ -27794,6 +27820,7 @@ __metadata:
     stylelint: "npm:17.10.0"
     stylelint-config-idiomatic-order: "npm:10.0.0"
     ts-node: "npm:10.9.2"
+    ts-pattern: "npm:5.9.0"
     tsc-watch: "npm:7.2.0"
     tslib: "npm:2.8.1"
     typescript: "npm:5.9.3"

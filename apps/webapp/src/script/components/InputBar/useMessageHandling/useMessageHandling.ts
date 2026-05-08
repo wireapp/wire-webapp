@@ -79,12 +79,12 @@ export const useMessageHandling = ({
     onLoad: draftState => {
       const reply = draftState.messageReply;
 
-      if (reply?.isReplyable()) {
+      if (reply?.isReplyable() === true) {
         replyMessageCallback(reply);
       }
 
       const editedMessage = draftState.editedMessage;
-      if (editedMessage) {
+      if (editedMessage !== undefined) {
         editMessageCallback(editedMessage);
       }
     },
@@ -136,13 +136,13 @@ export const useMessageHandling = ({
 
   const editMessage = useCallback(
     (messageEntity?: ContentMessage) => {
-      if (messageEntity?.isEditable() && messageEntity !== editedMessage) {
+      if (messageEntity?.isEditable() === true && messageEntity !== editedMessage) {
         cancelMessageReply();
         cancelMesssageEditingWithDraftReset();
         editMessageCallback(messageEntity);
 
         const quote = messageEntity.quote();
-        if (quote && conversation) {
+        if (quote != null) {
           void messageRepository
             .getMessageInConversationById(conversation, quote.messageId)
             .then(quotedMessage => replyMessageCallback(quotedMessage));
@@ -162,7 +162,7 @@ export const useMessageHandling = ({
 
   const replyMessage = useCallback(
     (messageEntity: ContentMessage) => {
-      if (messageEntity?.isReplyable() && messageEntity !== replyMessageEntity) {
+      if (messageEntity.isReplyable() && messageEntity !== replyMessageEntity) {
         cancelMessageReply(false);
         cancelMessageEditing(() => {
           if (isEditing) {

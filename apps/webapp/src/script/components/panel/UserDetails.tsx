@@ -90,7 +90,7 @@ const UserDetailsComponent = ({
         hideAvailabilityStatus
       />
 
-      {badge && (
+      {badge != null && badge !== '' && (
         <div className="panel-participant__label panel-participant__label--external" data-uie-name="status-external">
           <Icon.ExternalIcon />
           <span>{badge}</span>
@@ -123,7 +123,7 @@ const UserDetailsComponent = ({
         </div>
       )}
 
-      {isGroupAdmin && (
+      {isGroupAdmin === true && (
         <div className="panel-participant__label" data-uie-name="status-admin">
           <Icon.GroupAdminIcon />
           <span>{t('conversationDetailsGroupAdmin')}</span>

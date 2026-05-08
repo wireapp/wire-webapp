@@ -73,7 +73,9 @@ export const AccountRegistrationLayout = ({children}: {children: ReactNode}) => 
             <Text css={registrationLayoutSubHeaderCss}>{t('registrationLayout.footer')}</Text>
           </div>
         </div>
-        <WavesPattern />
+        <span aria-hidden="true">
+          <WavesPattern />
+        </span>
       </div>
 
       <div css={contentContainerCss}>{children}</div>

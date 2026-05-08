@@ -66,7 +66,7 @@ const VideoAsset = ({
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
-  const [displaySmall, setDisplaySmall] = useState(!!isQuote);
+  const [displaySmall, setDisplaySmall] = useState(isQuote === true);
   const {transferState, isUploading, isPendingUpload, uploadProgress, cancelUpload, getAssetUrl, downloadAsset} =
     useAssetTransfer(message);
 
@@ -75,7 +75,7 @@ const VideoAsset = ({
   const {removeTimeout, startTimeout} = useTimeout(hideControlsCallback, 2000);
 
   useEffect(() => {
-    if (assetPreviewResource && isFileSharingReceivingEnabled) {
+    if (assetPreviewResource !== undefined && isFileSharingReceivingEnabled) {
       getAssetUrl(assetPreviewResource).then(setVideoPreview);
     }
 
@@ -192,7 +192,7 @@ const VideoAsset = ({
     return null;
   }
 
-  if (!isVideoMimeTypeSupported(asset.file_type || '')) {
+  if (!isVideoMimeTypeSupported(asset.file_type ?? '')) {
     return <FileAsset message={message} isFocusable={isFocusable} />;
   }
 

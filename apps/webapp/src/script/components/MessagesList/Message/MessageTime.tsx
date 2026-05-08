@@ -49,7 +49,7 @@ const MessageTime = ({timestamp, children, ...props}: MessageTimeProps) => {
       data-tooltip={formattedDate}
       {...props}
     >
-      {children ? children : formattedTime}
+      {children !== undefined && children !== null ? children : formattedTime}
     </time>
   );
 };

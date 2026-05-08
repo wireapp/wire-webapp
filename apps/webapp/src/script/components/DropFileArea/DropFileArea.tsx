@@ -32,9 +32,7 @@ export const DropFileArea = forwardRef<HTMLDivElement, DropFileAreaProps>(
       (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
 
-        const {dataTransfer} = event;
-        const eventDataTransfer: Partial<DataTransfer> = dataTransfer || {};
-        const files = eventDataTransfer.files || new FileList();
+        const files = event.dataTransfer.files;
 
         if (files.length > 0) {
           onFileDropped(Array.from(files));

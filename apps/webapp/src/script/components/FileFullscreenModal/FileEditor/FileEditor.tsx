@@ -55,7 +55,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
       setIsError(false);
       const fetchedNode = await cellsRepository.getNode({uuid: id, flags: ['WithEditorURLs']});
 
-      if (fetchedNode.IsRecycled) {
+      if (fetchedNode.IsRecycled === true) {
         setIsRecycled(true);
         setNode(null);
         return false;
@@ -89,7 +89,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
   // Auto-refresh mechanism before expiry
   useEffect(() => {
-    if (!node?.EditorURLs?.collabora.ExpiresAt) {
+    if (node?.EditorURLs?.collabora.ExpiresAt === undefined || node.EditorURLs.collabora.ExpiresAt.length === 0) {
       return undefined;
     }
 

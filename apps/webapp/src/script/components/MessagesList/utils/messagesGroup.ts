@@ -65,8 +65,13 @@ function getMessageMarkerType(
   return undefined;
 }
 
-export function isMarker(object: any): object is Marker {
-  return object && object.type && object.timestamp;
+export function isMarker(object: unknown): object is Marker {
+  if (typeof object !== 'object' || object === null) {
+    return false;
+  }
+
+  const candidate = object as Partial<Marker>;
+  return typeof candidate.type === 'string' && typeof candidate.timestamp === 'number';
 }
 
 /**

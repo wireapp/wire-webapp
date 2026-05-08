@@ -434,13 +434,13 @@ export const VideoControls = ({
         onOpenBackgroundSettings?.();
         return;
       }
-      if (value && BACKGROUND_OPTION_VALUES.has(value)) {
+      if (value != null && value !== '' && BACKGROUND_OPTION_VALUES.has(value)) {
         setVideoOptionsOpen(false);
         const effect = mapValueToEffect(value as BackgroundOptionValue, lastVirtualBackgroundId);
         handleBackgroundSelect(effect);
         return;
       }
-      if (value) {
+      if (value != null && value !== '') {
         updateCameraOptions(value);
       }
     },
@@ -461,7 +461,10 @@ export const VideoControls = ({
     }
     const handlePointerDown = (event: MouseEvent) => {
       const target = event.target as Node;
-      if (videoOptionsMenuRef.current?.contains(target) || videoOptionsSheetRef.current?.contains(target)) {
+      if (
+        videoOptionsMenuRef.current?.contains(target) === true ||
+        videoOptionsSheetRef.current?.contains(target) === true
+      ) {
         return;
       }
       setVideoOptionsOpen(false);
@@ -545,11 +548,12 @@ export const VideoControls = ({
     });
   };
 
-  const isPressSpaceToUnmuteEnabled =
+  const isPressSpaceToUnmutePreferenceEnabled =
     useUserPropertyValue(
       () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
       WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
-    ) && isPressSpaceToUnmuteEnable;
+    ) === true;
+  const isPressSpaceToUnmuteEnabled = isPressSpaceToUnmutePreferenceEnabled && isPressSpaceToUnmuteEnable;
 
   const isMoreInteractionsMenuActive = isParticipantsListOpen || showEmojisBar || isSelfHandRaised;
 

@@ -262,15 +262,15 @@ export const VerificationBadges = ({
 }: VerificationBadgesProps) => {
   const id = useRef(new Date().getTime());
 
-  if (!MLSStatus && !isProteusVerified) {
+  if (MLSStatus === undefined && isProteusVerified === false) {
     return null;
   }
 
-  const conversationHasProtocol = !!conversationProtocol;
+  const conversationHasProtocol = conversationProtocol !== undefined;
 
   const showMLSBadge = conversationHasProtocol
-    ? conversationProtocol === CONVERSATION_PROTOCOL.MLS && !!MLSStatus
-    : !!MLSStatus;
+    ? conversationProtocol === CONVERSATION_PROTOCOL.MLS && MLSStatus !== undefined
+    : MLSStatus !== undefined;
 
   const showProteusBadge = conversationHasProtocol
     ? conversationProtocol === CONVERSATION_PROTOCOL.PROTEUS && isProteusVerified

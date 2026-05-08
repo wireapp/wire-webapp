@@ -19,6 +19,8 @@
 
 import {useCallback, useEffect, useRef, useState, FormEvent} from 'react';
 
+import is from '@sindresorhus/is';
+
 import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -70,6 +72,8 @@ export const LinkDialog = ({
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const textInputRef = useRef<HTMLInputElement>(null);
+  const hasTextError = is.nonEmptyString(errors.text);
+  const hasUrlError = is.nonEmptyString(errors.url);
 
   const resetForm = useCallback(() => {
     setFormData({url: initialUrl, text: initialText});
@@ -141,17 +145,17 @@ export const LinkDialog = ({
           type="text"
           label={t('richTextLinkDialogTextLabel')}
           value={formData.text}
-          markInvalid={isSubmitted && !!errors.text}
+          markInvalid={isSubmitted && hasTextError}
           onChange={event => handleInputChange({event, field: 'text'})}
-          error={!!isSubmitted && !!errors.text ? <ErrorMessage>{errors.text}</ErrorMessage> : undefined}
+          error={isSubmitted && hasTextError ? <ErrorMessage>{errors.text}</ErrorMessage> : undefined}
         />
         <Input
           type="text"
           label={t('richTextLinkDialogLinkLabel')}
           value={formData.url}
-          markInvalid={isSubmitted && !!errors.url}
+          markInvalid={isSubmitted && hasUrlError}
           onChange={event => handleInputChange({event, field: 'url'})}
-          error={!!isSubmitted && !!errors.url ? <ErrorMessage>{errors.url}</ErrorMessage> : undefined}
+          error={isSubmitted && hasUrlError ? <ErrorMessage>{errors.url}</ErrorMessage> : undefined}
         />
         <div css={buttonGroupStyles}>
           <Button type="button" onClick={onClose} variant={ButtonVariant.SECONDARY} css={buttonStyles}>

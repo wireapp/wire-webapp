@@ -89,7 +89,7 @@ async function runApp() {
 
   render(Root);
   setAppLocale();
-  if (module.hot) {
+  if (module.hot !== undefined) {
     module.hot.accept('./page/Root', () => {
       render(require('./page/Root').Root);
     });

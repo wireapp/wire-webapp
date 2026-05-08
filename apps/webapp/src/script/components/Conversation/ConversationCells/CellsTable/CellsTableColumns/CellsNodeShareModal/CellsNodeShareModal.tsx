@@ -156,10 +156,10 @@ const CellShareModalContent = ({
       return;
     }
 
-    if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
-      setIsPasswordEnabled(!!linkData.PasswordRequired);
+    if (linkData !== null && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
+      setIsPasswordEnabled(linkData.PasswordRequired === true);
 
-      if (linkData.AccessEnd) {
+      if (linkData.AccessEnd !== undefined && linkData.AccessEnd.length > 0) {
         setIsExpirationEnabled(true);
         const expirationDate = new Date(parseInt(linkData.AccessEnd) * 1000);
         setExpirationDateTime(expirationDate);
@@ -168,7 +168,7 @@ const CellShareModalContent = ({
         setExpirationDateTime(null);
       }
 
-      if (linkData?.Uuid) {
+      if (linkData.Uuid !== undefined && linkData.Uuid.length > 0) {
         initializedLinkIdRef.current = linkData.Uuid;
       }
     }
@@ -201,7 +201,12 @@ const CellShareModalContent = ({
 
   useEffect(() => {
     submitHandlers.set(modalId, async () => {
-      if (!isEnabled || status !== 'success' || !node?.publicLink?.uuid) {
+      if (
+        !isEnabled ||
+        status !== 'success' ||
+        node?.publicLink?.uuid === undefined ||
+        node.publicLink.uuid.length === 0
+      ) {
         return;
       }
 

@@ -113,9 +113,9 @@ const MultipartAsset = ({
       retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
     });
 
-  const name = path ? getName(path) : getName(initialName!);
-  const canPreviewImage = isPreviewableImage({mimeType: contentType, extension}) || !!imagePreviewUrl;
-  const imageSrc = imagePreviewUrl || src;
+  const name = path !== undefined && path !== '' ? getName(path) : getName(initialName!);
+  const canPreviewImage = isPreviewableImage({mimeType: contentType, extension}) || imagePreviewUrl !== undefined;
+  const imageSrc = imagePreviewUrl ?? src;
   const hasFilePreview = hasPreview ?? false;
   const fileVariant = isSingleAsset && hasFilePreview ? 'large' : 'small';
 
@@ -136,7 +136,7 @@ const MultipartAsset = ({
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, [fetchData, conversationId]);
 
-  if (isRecycled) {
+  if (isRecycled === true) {
     return (
       <li ref={elementRef} css={fileCardStyles}>
         <MediaFilePreviewCard isLoading={false} isError label={t('cells.unavailableFile')} />

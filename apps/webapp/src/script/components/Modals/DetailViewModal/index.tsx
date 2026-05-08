@@ -98,7 +98,7 @@ export const DetailViewModal = ({
     // The event above will make react to render the conversation view,
     // so we need to wait for the text input to be ready before inserting the reply.
     const isTextInputReady = await waitFor(() => conversation.isTextInputReady());
-    if (isTextInputReady) {
+    if (isTextInputReady === true) {
       amplify.publish(WebAppEvents.CONVERSATION.MESSAGE.REPLY, message);
     }
 
@@ -136,11 +136,9 @@ export const DetailViewModal = ({
 
     const newMessageEntity = items[nextIndex];
 
-    if (newMessageEntity) {
-      currentMessageEntityId.current = newMessageEntity.id;
-      loadImage(newMessageEntity);
-      setMessageEntity(newMessageEntity);
-    }
+    currentMessageEntityId.current = newMessageEntity.id;
+    loadImage(newMessageEntity);
+    setMessageEntity(newMessageEntity);
   };
 
   const clickOnShowNext = (event: MouseEvent | KeyboardEvent) => {
@@ -190,7 +188,7 @@ export const DetailViewModal = ({
 
   const messageAdded = (message: ContentMessage) => {
     const isCurrentConversation = conversationEntity?.id === message.conversation_id;
-    const isImage = isOfCategory('images', message);
+    const isImage = isOfCategory('images', message) === true;
 
     if (isCurrentConversation && isImage) {
       setItems(prevState => [...prevState, message]);
@@ -201,9 +199,9 @@ export const DetailViewModal = ({
 
   const getAllImages = async (conversation: Conversation) => {
     const conversationItems = await conversationRepository.getEventsForCategory(conversation, MessageCategory.IMAGE);
-    const filteredImages = conversationItems.filter(
-      message => isContentMessage(message) && isOfCategory('images', message),
-    );
+    const filteredImages = conversationItems.filter(message => {
+      return isContentMessage(message) && isOfCategory('images', message) === true;
+    });
 
     const contentMessages = filteredImages.reduce<ContentMessage[]>(
       (contentMessages, message) => (isContentMessage(message) ? [...contentMessages, message] : contentMessages),
@@ -237,7 +235,7 @@ export const DetailViewModal = ({
     const conversationId = currentMessageEntity.conversation_id;
     const isExpectedId = conversationEntity ? conversationId === conversationEntity.id : false;
 
-    if (!isExpectedId && conversationRepository) {
+    if (!isExpectedId) {
       conversationRepository.getConversationById({domain: '', id: conversationId}).then(conversation => {
         setConversationEntity(conversation);
         getAllImages(conversation);

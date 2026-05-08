@@ -31,7 +31,7 @@ interface AssetLoaderProps {
 }
 
 const AssetLoader = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
-  const elementScale = large ? 2 : 1;
+  const elementScale = large === true ? 2 : 1;
   const progress = `${loadProgress * elementScale} ${100 * elementScale}`;
   const viewBoxSize = 32 * elementScale;
   const viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;

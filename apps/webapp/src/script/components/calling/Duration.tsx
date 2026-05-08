@@ -30,7 +30,7 @@ const Duration = ({startedAt}: DurationProps) => {
 
   useEffect(() => {
     let durationUpdateInterval: number;
-    if (startedAt) {
+    if (startedAt != null) {
       const updateTimer = () => {
         const time = Math.floor((Date.now() - startedAt) / 1000);
         setDuration(formatSeconds(time));

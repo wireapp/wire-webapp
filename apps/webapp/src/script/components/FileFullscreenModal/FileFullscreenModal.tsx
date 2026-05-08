@@ -139,11 +139,11 @@ const ModalContent = ({
   timestamp,
   status,
 }: ModalContentProps) => {
-  if (status === 'loading' && !filePreviewUrl) {
+  if (status === 'loading' && (filePreviewUrl === undefined || filePreviewUrl.length === 0)) {
     return <FileLoader />;
   }
 
-  if (status === 'unavailable' || !filePreviewUrl) {
+  if (status === 'unavailable' || filePreviewUrl === undefined || filePreviewUrl.length === 0) {
     return <NoPreviewAvailable fileUrl={fileUrl} fileName={fileName} fileExtension={fileExtension} />;
   }
 

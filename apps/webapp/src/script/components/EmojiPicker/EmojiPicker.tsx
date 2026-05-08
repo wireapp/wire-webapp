@@ -53,7 +53,7 @@ export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties 
   let isKeyboardEvent = false;
 
   useEffect(() => {
-    const mainElement = emojiRef && emojiRef.current;
+    const mainElement = emojiRef.current;
     function updateSize() {
       const emojiPickerWidth = 350;
       const reactionMenuOpenerButtonHeight = 40;
@@ -94,7 +94,8 @@ export const EmojiPicker: FunctionComponent<EmojiPickerProperties> = properties 
 
   function getSkinTone() {
     const currentSkinTone = localStorage.getItem('activeSkinTone');
-    const skinTone = currentSkinTone ? (currentSkinTone as SkinTones) : SkinTones.NEUTRAL;
+    const skinTone =
+      currentSkinTone !== null && currentSkinTone.length > 0 ? (currentSkinTone as SkinTones) : SkinTones.NEUTRAL;
     return skinTone;
   }
   return (

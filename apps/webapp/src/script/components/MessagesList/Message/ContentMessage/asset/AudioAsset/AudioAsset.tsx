@@ -63,14 +63,18 @@ export const AudioAsset = ({
   const {isFileSharingReceivingEnabled} = useKoSubscribableChildren(teamState, ['isFileSharingReceivingEnabled']);
   const {isObfuscated} = useKoSubscribableChildren(message, ['isObfuscated']);
   const {transferState, uploadProgress, cancelUpload, getAssetUrl} = useAssetTransfer(message);
-  const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration || 0);
+  const [audioTime, setAudioTime] = useState<number>(asset?.meta?.duration ?? 0);
   const [audioSrc, setAudioSrc] = useState<AssetUrl>();
-  const onTimeupdate = () => audioElement && setAudioTime(audioElement.currentTime);
-  const showLoudnessPreview = !!(asset.meta?.loudness?.length ?? 0 > 0);
+  const onTimeupdate = () => {
+    if (audioElement !== undefined) {
+      setAudioTime(audioElement.currentTime);
+    }
+  };
+  const showLoudnessPreview = (asset.meta?.loudness?.length ?? 0) > 0;
   const onPauseButtonClicked = () => audioElement?.pause();
 
   const onPlayButtonClicked = async () => {
-    if (audioSrc) {
+    if (audioSrc !== undefined) {
       audioElement?.play();
     } else {
       asset.status(AssetTransferState.DOWNLOADING);

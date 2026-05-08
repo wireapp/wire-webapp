@@ -157,7 +157,7 @@ export const CellsShareExpirationFields = ({
   const popoverStyle = {zIndex: 10000020};
   const labelId = 'cells-share-expiration-label';
   const selectedDateTime = useMemo(() => {
-    if (!selectedDate || !selectedTime?.value) {
+    if (selectedDate === null || typeof selectedTime.value !== 'string' || selectedTime.value.length === 0) {
       return null;
     }
 

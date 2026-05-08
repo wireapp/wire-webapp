@@ -109,7 +109,7 @@ export class InbucketClientE2E {
       timeout++;
     }
 
-    if (this.isValidURL(matchingUrl) === false) {
+    if (matchingUrl === undefined || this.isValidURL(matchingUrl) === false) {
       throw new Error('Matching URL not found in the email body');
     }
 

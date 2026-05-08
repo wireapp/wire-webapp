@@ -165,7 +165,7 @@ const GroupVideoGridTile = ({
         </span>
       )}
 
-      {!minimized && handRaisedAt && <span className="group-video-grid__element__label__hand_icon">✋</span>}
+      {!minimized && handRaisedAt != null && <span className="group-video-grid__element__label__hand_icon">✋</span>}
 
       {isMaximized && (
         <div className="group-video-grid__element__overlay">

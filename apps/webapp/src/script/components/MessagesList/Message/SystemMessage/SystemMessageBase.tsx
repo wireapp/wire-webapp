@@ -35,11 +35,13 @@ export const SystemMessageBase = ({message, isSenderNameVisible = false, icon}: 
 
   return (
     <div className="message-header" data-uie-name="element-message-system">
-      {icon && <div className="message-header-icon message-header-icon--svg text-foreground">{icon}</div>}
+      {icon !== undefined && icon !== null && (
+        <div className="message-header-icon message-header-icon--svg text-foreground">{icon}</div>
+      )}
       <p className="message-header-label">
         <span className="message-header-label__multiline">
           {isSenderNameVisible && <span className="message-header-sender-name">{unsafeSenderName}</span>}
-          {message.caption && (
+          {message.caption !== undefined && message.caption !== '' && (
             <span className="system-message-caption ellipsis" dangerouslySetInnerHTML={{__html: message.caption}} />
           )}
         </span>

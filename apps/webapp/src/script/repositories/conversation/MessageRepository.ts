@@ -1008,10 +1008,10 @@ export class MessageRepository {
 
     try {
       if (isMLSConversation(conversation)) {
+        this.logger.info('Sending message to a MLS conversation, ensuring conversation exists');
         await this.conversationRepositoryProvider().ensureConversationExists({
           conversationId: conversation.qualifiedId,
           groupId: conversation.groupId,
-          epoch: conversation.epoch,
         });
       }
       const result = await this.conversationService.send(sendOptions);

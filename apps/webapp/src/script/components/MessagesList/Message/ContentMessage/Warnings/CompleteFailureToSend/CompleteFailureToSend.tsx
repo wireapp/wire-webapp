@@ -37,7 +37,7 @@ export const CompleteFailureToSendWarning = ({isMessageFocused, onRetry, unreach
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
   return (
     <div css={wrapper}>
-      {unreachableDomain ? (
+      {unreachableDomain !== undefined && unreachableDomain !== '' ? (
         <p>
           <span
             css={warning}

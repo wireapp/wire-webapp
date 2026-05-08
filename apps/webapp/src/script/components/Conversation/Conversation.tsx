@@ -282,9 +282,11 @@ export const Conversation = ({
 
     const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    const serviceEntity = userEntity.isService && (await repositories.integration.getServiceFromUser(userEntity));
+    const serviceEntity = userEntity.isService
+      ? await repositories.integration.getServiceFromUser(userEntity)
+      : undefined;
 
-    openRightSidebar(panelId, {entity: serviceEntity || userEntity}, true);
+    openRightSidebar(panelId, {entity: serviceEntity ?? userEntity}, true);
   };
 
   const showParticipants = (participants: User[]) => {
@@ -369,10 +371,10 @@ export const Conversation = ({
     const userId = messageDetails.userId;
     const domain = messageDetails.userDomain;
 
-    if (userId) {
+    if (userId !== undefined && userId.length > 0) {
       (async () => {
         try {
-          const userEntity = await repositories.user.getUserById({domain: domain || '', id: userId});
+          const userEntity = await repositories.user.getUserById({domain: domain ?? '', id: userId});
           showUserDetails(userEntity);
         } catch (error: unknown) {
           if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
@@ -435,7 +437,7 @@ export const Conversation = ({
     };
 
     try {
-      if (messageEntity.fromDomain && activeConversation) {
+      if (messageEntity.fromDomain !== undefined && messageEntity.fromDomain.length > 0 && activeConversation) {
         await repositories.message.resetSession(
           {domain: messageEntity.fromDomain, id: messageEntity.from},
           messageEntity.clientId,

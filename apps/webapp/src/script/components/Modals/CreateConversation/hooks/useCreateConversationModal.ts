@@ -121,7 +121,7 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
       manager: access === ConversationAccess.Public ? ADD_PERMISSION.EVERYONE : state.moderator,
     })),
   setModerator: (moderator: ADD_PERMISSION) => set({moderator}),
-  setChatHistory: (history?: ChatHistory) => set({chatHistory: history || ChatHistory.Off}),
+  setChatHistory: (history?: ChatHistory) => set({chatHistory: history ?? ChatHistory.Off}),
   setConversationType: (conversationType: ConversationType) => set({conversationType}),
   setConversationCreationStep: (step: ConversationCreationStep) => set({conversationCreationStep: step}),
   gotoNextStep: () => set(state => ({...state, conversationCreationStep: state.conversationCreationStep + 1})),

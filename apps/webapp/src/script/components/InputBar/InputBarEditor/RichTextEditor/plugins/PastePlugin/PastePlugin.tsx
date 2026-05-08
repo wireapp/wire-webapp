@@ -105,7 +105,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
       lexicalMentions.forEach(mention => {
         const {isValid, username} = validateMention(mention, availableUsers);
 
-        if (!username) {
+        if (username === null || username === '') {
           return;
         }
 
@@ -141,7 +141,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
    */
   const handleFormattedContent = useCallback(
     (doc: Document, selection: Selection): boolean => {
-      if (!selection) {
+      if (selection === null) {
         return false;
       }
 
@@ -167,7 +167,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
       const href = link.getAttribute('href');
       const linkText = link.textContent?.trim();
 
-      if (!href || !linkText) {
+      if (href === null || href === '' || linkText === undefined || linkText === '') {
         return processedText;
       }
 
@@ -185,13 +185,13 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
    */
   const processMentions = useCallback(
     (selection: Selection, mentions: NodeListOf<Element>, availableUsers: User[]) => {
-      if (!selection) {
+      if (selection === null) {
         return;
       }
 
       mentions.forEach(mention => {
         const {isValid, username} = validateMention(mention, availableUsers);
-        if (!username || !isValid) {
+        if (username == null || username === '' || isValid === false) {
           return;
         }
 
@@ -201,7 +201,7 @@ export const PastePlugin = ({getMentionCandidates, isPreviewMode}: PastePluginPr
 
         if (startOffset !== -1 && $isRangeSelection(selection)) {
           const node = selection.anchor.getNode();
-          if (!node || !$isTextNode(node)) {
+          if (!$isTextNode(node)) {
             return;
           }
           selection.setTextNodeRange(node, startOffset, node, startOffset + mentionText.length);

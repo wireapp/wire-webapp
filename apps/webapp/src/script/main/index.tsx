@@ -27,10 +27,12 @@ import {createRoot} from 'react-dom/client';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
+import {createFireAndForgetInvoker} from '@wireapp/core';
 
 import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
+import {getLogger} from 'Util/logger';
 import {enableLogging} from 'Util/loggerUtil';
 import {loadValue} from 'Util/storageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
@@ -73,7 +75,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
+  const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const applicationServices = createApplicationServices({
+    createFireAndForgetInvoker: () => {
+      return createFireAndForgetInvoker({logger: fireAndForgetInvokerLogger});
+    },
     createWallClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;

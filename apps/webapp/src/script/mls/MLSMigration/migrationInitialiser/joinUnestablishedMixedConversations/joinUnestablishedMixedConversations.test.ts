@@ -19,6 +19,7 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {result, task} from 'true-myth';
 
 import {MixedConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -60,8 +61,19 @@ describe('joinUnestablishedMixedConversations', () => {
       return Promise.resolve(!groupId.includes('unestablished'));
     });
 
+    (repositoryCore.service?.mls as unknown as {getSafeEpoch: jest.Mock}).getSafeEpoch = jest
+      .fn()
+      .mockResolvedValue(task.fromResult(result.ok(1)));
+
     // Spy on joinByExternalCommit of the repository's core instance
     const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');
+    jest
+      .spyOn(
+        (mockedConversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
+          .conversationService,
+        'getSafeConversationById',
+      )
+      .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
 
     await joinUnestablishedMixedConversations(
       [mixedConversation1, mixedConversation2, mixedConversation3, mixedConversation4],
