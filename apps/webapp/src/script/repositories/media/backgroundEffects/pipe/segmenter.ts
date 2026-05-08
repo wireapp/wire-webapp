@@ -59,6 +59,21 @@ async function createSegmenter(canvas: OffscreenCanvas) {
   return segmenter;
 }
 
+export function getSegmenterModelUpdatedOptions(
+  targetModelPath: string | undefined,
+  currentModelPath: string | undefined,
+) {
+  if (targetModelPath === currentModelPath) {
+    return null;
+  }
+
+  return {
+    baseOptions: {
+      modelAssetPath: targetModelPath,
+    },
+  };
+}
+
 export async function runSegmenter(
   canvas: OffscreenCanvas,
   readable: ReadableStream,
@@ -82,6 +97,7 @@ export async function runSegmenter(
     logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
     if (!webGLRenderer) {
       setTimeout(() => {
+        logger.log('[virtual-background] restart segmenter onContextRestored');
         webGLRenderer = new WebGLRenderer(canvas);
         restartSegmenter();
         attachCanvasEvents();
@@ -97,23 +113,36 @@ export async function runSegmenter(
 
   let segmenter = await createSegmenter(canvas);
   let currentModelPath = segmenterOptions.modelPath;
-  let restartPending = false;
 
   function restartSegmenter() {
-    restartPending = true;
     const targetModelPath = segmenterOptions.modelPath;
     createSegmenter(canvas)
       .then(newSegmenter => {
         const oldSegmenter = segmenter;
         segmenter = newSegmenter;
         currentModelPath = targetModelPath;
-        restartPending = false;
         oldSegmenter.close();
       })
-      .catch((e: unknown) => {
-        logger.error('Error restarting segmenter:', e);
-        restartPending = false;
+      .catch((error: unknown) => {
+        logger.error('Error restarting segmenter:', error);
       });
+  }
+
+  async function updateSegmenterModel() {
+    const targetModelPath = segmenterOptions.modelPath;
+    const nextOptions = getSegmenterModelUpdatedOptions(targetModelPath, currentModelPath);
+
+    if (nextOptions === null) {
+      return;
+    }
+
+    try {
+      logger.log(`[virtual-background] model is changed to ${nextOptions.baseOptions.modelAssetPath}`);
+      await segmenter.setOptions(nextOptions);
+      currentModelPath = targetModelPath;
+    } catch (error: unknown) {
+      logger.error('[virtual-background] Error updating segmenter model:', error);
+    }
   }
 
   // Filters.
@@ -159,13 +188,7 @@ export async function runSegmenter(
           return;
         }
 
-        if (
-          restartPending === false &&
-          segmenterOptions.modelPath !== undefined &&
-          segmenterOptions.modelPath !== currentModelPath
-        ) {
-          restartSegmenter();
-        }
+        await updateSegmenterModel();
 
         const useSelfieModel = currentModelPath?.includes('selfie_segmenter');
 
@@ -264,6 +287,7 @@ export async function runSegmenter(
 
         // Restart segmenter to avoid memory leaks.
         if (segmenterOptions.restartEvery && totalFrames % segmenterOptions.restartEvery === 0) {
+          logger.log('[virtual-background] restart segmenter to avoid memory leaks');
           restartSegmenter();
         }
       },
