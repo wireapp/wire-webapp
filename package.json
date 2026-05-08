@@ -8,6 +8,7 @@
     "http-status-codes": "2.3.0",
     "logdown": "3.3.1",
     "long": "5.3.2",
+    "ts-pattern": "5.9.0",
     "tslib": "2.8.1",
     "uuid": "14.0.0",
     "zod": "3.25.76"
