@@ -25,6 +25,7 @@ import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles'
 import {createDeterministicWallClock} from '../clock/deterministicWallClock';
 import {reliableWebsocketConnectionFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {MainViewModel} from '../view_model/MainViewModel';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';
 import {RootContext, RootContextValue, RootProvider, useApplicationContext, useMainViewModel} from './RootProvider';
 
 interface WrapperProperties {
@@ -35,6 +36,7 @@ interface RootProviderWrapper {
   wrapper: (properties: WrapperProperties) => ReactNode;
   isFeatureToggleEnabled: jest.Mock<boolean, [StartupFeatureToggleName]>;
   deterministicWallClock: ReturnType<typeof createDeterministicWallClock>;
+  rootContextValue: RootContextValue;
 }
 
 function createRootProviderWrapper(
@@ -50,25 +52,15 @@ function createRootProviderWrapper(
   }
 
   const isFeatureToggleEnabled = jest.fn(isFeatureToggleEnabledForTest);
+  const rootContextValue = createRootContextValueForTest({
+    doesApplicationNeedForceReload,
+    isFeatureToggleEnabled,
+    mainViewModel,
+    wallClock: deterministicWallClock,
+  });
+  const wrapper = createRootProviderWrapperForTest(rootContextValue);
 
-  function wrapper(properties: WrapperProperties): ReactNode {
-    const wrappedChildren = (
-      <RootProvider
-        value={{
-          mainViewModel,
-          wallClock: deterministicWallClock,
-          doesApplicationNeedForceReload,
-          isFeatureToggleEnabled,
-        }}
-      >
-        {properties.children}
-      </RootProvider>
-    );
-
-    return wrappedChildren;
-  }
-
-  return {wrapper, deterministicWallClock, isFeatureToggleEnabled};
+  return {wrapper, deterministicWallClock, isFeatureToggleEnabled, rootContextValue};
 }
 
 function getRootContextValue(): RootContextValue | null {
@@ -81,11 +73,12 @@ describe('RootProvider', () => {
   const mainViewModel = {} as MainViewModel;
 
   it('provides the injected wall clock through context', () => {
-    const {wrapper, deterministicWallClock} = createRootProviderWrapper(mainViewModel, 1_234, false);
+    const {wrapper, deterministicWallClock, rootContextValue} = createRootProviderWrapper(mainViewModel, 1_234, false);
 
     const {result} = renderHook(getRootContextValue, {wrapper});
 
     expect(result.current?.mainViewModel).toBe(mainViewModel);
+    expect(result.current?.fireAndForgetInvoker).toBe(rootContextValue.fireAndForgetInvoker);
     expect(result.current?.wallClock).toBe(deterministicWallClock);
     expect(result.current?.wallClock.currentTimestampInMilliseconds).toBe(1_234);
     expect(result.current?.doesApplicationNeedForceReload).toBe(false);
