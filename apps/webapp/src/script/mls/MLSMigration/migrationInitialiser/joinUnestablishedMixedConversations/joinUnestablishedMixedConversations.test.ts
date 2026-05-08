@@ -68,8 +68,12 @@ describe('joinUnestablishedMixedConversations', () => {
     // Spy on joinByExternalCommit of the repository's core instance
     const joinSpy = jest.spyOn(repositoryCore.service!.conversation!, 'joinByExternalCommit');
     jest
-      .spyOn((mockedConversationRepository as any).conversationService, 'getConversationById')
-      .mockResolvedValue({epoch: 1});
+      .spyOn(
+        (mockedConversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
+          .conversationService,
+        'getSafeConversationById',
+      )
+      .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
 
     await joinUnestablishedMixedConversations(
       [mixedConversation1, mixedConversation2, mixedConversation3, mixedConversation4],

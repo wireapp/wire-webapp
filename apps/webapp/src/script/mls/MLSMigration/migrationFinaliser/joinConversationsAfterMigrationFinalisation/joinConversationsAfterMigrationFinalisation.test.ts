@@ -153,8 +153,12 @@ describe('joinConversationsAfterMigrationFinalisation', () => {
     const onSuccess = jest.fn();
     const conversationRepository = await testFactory.exposeConversationActors();
     jest
-      .spyOn((conversationRepository as any).conversationService, 'getConversationById')
-      .mockResolvedValue({epoch: 1});
+      .spyOn(
+        (conversationRepository as unknown as {conversationService: {getSafeConversationById: jest.Mock}})
+          .conversationService,
+        'getSafeConversationById',
+      )
+      .mockReturnValue(task.fromResult(result.ok({epoch: 1})));
 
     await joinConversationsAfterMigrationFinalisation({
       conversations: [mockedConversation],
