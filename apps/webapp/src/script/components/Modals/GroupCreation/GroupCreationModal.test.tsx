@@ -13,6 +13,8 @@ import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
 import {t} from 'Util/localizerUtil';
 import {TypeUtil} from '@wireapp/commons';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
@@ -92,10 +94,14 @@ describe('GroupCreationModal', () => {
           },
         },
       } as RootContextValue;
+      const rootContextValue = createRootContextValueForTest({
+        mainViewModel: mockRootContext.mainViewModel,
+        wallClock: createDeterministicWallClock(),
+      });
 
       // Act
       const {getByTestId} = mountComponent(
-        <RootContext.Provider value={mockRootContext}>
+        <RootContext.Provider value={rootContextValue}>
           <GroupCreationModal userState={mockUserState} teamState={mockTeamState as TeamState} />
         </RootContext.Provider>,
         mockStoreFactory()({

@@ -28,6 +28,7 @@ import {MainContent} from './MainContent';
 import {withTheme} from '../../auth/util/test/TestUtil';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {createDeterministicWallClock} from '../../clock/deterministicWallClock';
+import {createRootContextValueForTest} from '../testSupport/rootContextTestSupport';
 import {RootProvider} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
@@ -80,12 +81,11 @@ describe('Preferences', () => {
     render(
       withTheme(
         <RootProvider
-          value={{
+          value={createRootContextValueForTest({
+            isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
             mainViewModel,
             wallClock,
-            doesApplicationNeedForceReload: false,
-            isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
-          }}
+          })}
         >
           <MainContent {...defaultParams} />
         </RootProvider>,

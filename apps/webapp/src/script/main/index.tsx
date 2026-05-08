@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     createWallClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {wallClock} = applicationServices;
+  const {fireAndForgetInvoker, wallClock} = applicationServices;
   const apiClient = createAPIClient();
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <AppContainer
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
+      fireAndForgetInvoker={fireAndForgetInvoker}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
       wallClock={wallClock}
     />,
