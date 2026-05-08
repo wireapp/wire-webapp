@@ -29,13 +29,13 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {CellsHeader} from './CellsHeader/CellsHeader';
-import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
 import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
+import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
 import {
   searchIdleDescriptionStyles,
   searchIdleHeadingStyles,
