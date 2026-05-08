@@ -17,21 +17,33 @@
  *
  */
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {createDeterministicWallClock} from '../clock/deterministicWallClock';
 import {createApplicationServices} from './createApplicationServices';
 
 describe('createApplicationServices', () => {
   it('creates wall clock through injected dependency', () => {
     const deterministicWallClock = createDeterministicWallClock();
+    const fireAndForgetInvoker = {
+      fireAndForget: jest.fn(),
+      waitUntilAllSettled: jest.fn(async () => {}),
+    } as FireAndForgetInvoker;
+    const createFireAndForgetInvoker = jest.fn(() => {
+      return fireAndForgetInvoker;
+    });
     const createWallClock = jest.fn(() => {
       return deterministicWallClock;
     });
 
     const applicationServices = createApplicationServices({
+      createFireAndForgetInvoker,
       createWallClock,
     });
 
+    expect(applicationServices.fireAndForgetInvoker).toBe(fireAndForgetInvoker);
     expect(applicationServices.wallClock).toBe(deterministicWallClock);
+    expect(createFireAndForgetInvoker).toHaveBeenCalledTimes(1);
     expect(createWallClock).toHaveBeenCalledTimes(1);
   });
 });

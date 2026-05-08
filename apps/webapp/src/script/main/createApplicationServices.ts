@@ -17,20 +17,25 @@
  *
  */
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {WallClock} from '../clock/wallClock';
 
 export type ApplicationServices = {
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly wallClock: WallClock;
 };
 
 type CreateApplicationServicesDependencies = {
+  readonly createFireAndForgetInvoker: () => FireAndForgetInvoker;
   readonly createWallClock: () => WallClock;
 };
 
 export function createApplicationServices(dependencies: CreateApplicationServicesDependencies): ApplicationServices {
-  const {createWallClock} = dependencies;
+  const {createFireAndForgetInvoker, createWallClock} = dependencies;
 
   return {
+    fireAndForgetInvoker: createFireAndForgetInvoker(),
     wallClock: createWallClock(),
   };
 }
