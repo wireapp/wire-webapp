@@ -18,6 +18,7 @@
  */
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
+import {Maybe} from 'true-myth';
 import {match, P} from 'ts-pattern';
 
 import {Account, MLSService} from '@wireapp/core';
@@ -194,16 +195,6 @@ export async function initialiseSelfAndTeamConversations(
   );
 }
 
-function getMLSService(core: Account): MLSService {
-  const mlsService = core.service?.mls;
-  if (!mlsService) {
-    const errorMessage = 'MLS service is not available!';
-    logger.error(errorMessage);
-    throw new Error(errorMessage);
-  }
-  return mlsService;
-}
-
 /**
  * Result of reading an MLS epoch from a source.
  * Lifts the read failure (whether `Result.Err` from CoreCrypto or a thrown error
@@ -283,11 +274,20 @@ export async function fetchRemoteEpoch(
 ): Promise<EpochReading> {
   const result = await conversationService.getSafeConversationById(conversationId);
   return result.match<EpochReading>({
-    Ok: ({epoch}) =>
-      typeof epoch === 'number' && Number.isFinite(epoch) && epoch >= 0
-        ? {kind: 'epoch', value: epoch}
-        : {kind: 'unreadable', error: new Error(`Remote epoch is not a non-negative finite number: ${String(epoch)}`)},
-    Err: error => ({kind: 'unreadable', error}),
+    Ok: ({epoch}) => {
+      if (typeof epoch === 'number' && Number.isFinite(epoch) && epoch >= 0) {
+        return {kind: 'epoch', value: epoch};
+      }
+
+      return {
+        kind: 'unreadable',
+        error: new Error(`Remote epoch is not a non-negative finite number: ${String(epoch)}`),
+      };
+    },
+    Err: error => {
+      logger.warn('Failed to read remote MLS epoch', {error});
+      return {kind: 'unreadable', error};
+    },
   });
 }
 
@@ -306,9 +306,14 @@ export async function ensureMLSGroupIsEstablished(
   },
 ): Promise<void> {
   const {core, conversationService, userState, conversationState} = dependencies;
-  const mlsService = getMLSService(core);
+  const mlsService = Maybe.of(core.service?.mls);
 
-  const localState = await readLocalMLSState(groupId, conversationService, mlsService);
+  if (mlsService.isNothing) {
+    logger.error('MLS service is not available!');
+    return;
+  }
+
+  const localState = await readLocalMLSState(groupId, conversationService, mlsService.value);
   const localDecision = classifyLocal(localState);
 
   logger.info('Ensuring MLS group is established', {
