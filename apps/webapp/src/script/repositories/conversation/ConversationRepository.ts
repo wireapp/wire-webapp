@@ -1602,9 +1602,9 @@ export class ConversationRepository {
               });
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
+                await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
+                amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
               }
-              await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
-              amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
             } catch (error: unknown) {
               if (!isBackendError(error)) {
                 throw error;
@@ -1678,6 +1678,11 @@ export class ConversationRepository {
       conversationId: conversationEntity.qualifiedId,
       groupId: conversationEntity.groupId,
       qualifiedUsers: [selfUserQualifiedId],
+    });
+
+    await this.ensureConversationExists({
+      conversationId: conversationEntity.qualifiedId,
+      groupId: conversationEntity.groupId,
     });
 
     await this.core.service?.conversation?.addUsersToMLSConversation({
