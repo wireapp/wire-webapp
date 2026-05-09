@@ -49,6 +49,7 @@ interface InputBarEditorProps {
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editorState: string, plainMessage: string, replyId?: string) => void;
   loadDraftState: () => Promise<DraftState>;
+  disableMessagePreprocessing: boolean;
   replaceEmojis: boolean;
   children: React.ReactNode;
 }
@@ -70,6 +71,7 @@ export const InputBarEditor = ({
   getMentionCandidates,
   saveDraftState,
   loadDraftState,
+  disableMessagePreprocessing,
   replaceEmojis,
   children,
 }: InputBarEditorProps) => {
@@ -83,6 +85,7 @@ export const InputBarEditor = ({
       onEscape={onEscape}
       onArrowUp={onArrowUp}
       getMentionCandidates={getMentionCandidates}
+      disableMessagePreprocessing={disableMessagePreprocessing}
       replaceEmojis={replaceEmojis}
       placeholder={inputPlaceholder}
       onUpdate={onUpdate}

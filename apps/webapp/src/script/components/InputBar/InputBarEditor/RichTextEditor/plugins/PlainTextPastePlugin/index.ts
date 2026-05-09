@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,4 @@
  *
  */
 
-import {$getRoot} from 'lexical';
-
-import {findAndTransformEmoji} from '../plugins/InlineEmojiReplacementPlugin';
-
-export const transformMessage = ({replaceEmojis, markdown}: {replaceEmojis: boolean; markdown: string}) => {
-  return replaceEmojis ? findAndTransformEmoji(markdown) : markdown;
-};
-
-export const getRawMessageText = () => {
-  return $getRoot()
-    .getChildren()
-    .map(node => node.getTextContent())
-    .join('\n');
-};
+export * from './PlainTextPastePlugin';

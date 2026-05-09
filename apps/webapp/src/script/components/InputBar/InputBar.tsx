@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -45,6 +45,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/EventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {DISABLE_MESSAGE_PREPROCESSING_EVENT, isMessagePreprocessingDisabled} from 'Util/debugMessagePreprocessingUtil';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -148,6 +149,7 @@ export const InputBar = ({
    * It's directly derived from the editor state
    */
   const [messageContent, setMessageContent] = useState<MessageContent>({text: ''});
+  const [disableMessagePreprocessing, setDisableMessagePreprocessing] = useState(isMessagePreprocessingDisabled);
 
   const formatToolbar = useFormatToolbar();
 
@@ -206,6 +208,19 @@ export const InputBar = ({
     () => propertiesRepository.getPreference(PROPERTIES_TYPE.INTERFACE.MARKDOWN_PREVIEW),
     WebAppEvents.PROPERTIES.UPDATE.INTERFACE.MARKDOWN_PREVIEW,
   );
+  const effectiveShowMarkdownPreview = showMarkdownPreview && !disableMessagePreprocessing;
+
+  useEffect(() => {
+    const handleMessagePreprocessingChange = (event: Event) => {
+      setDisableMessagePreprocessing((event as CustomEvent<boolean>).detail ?? isMessagePreprocessingDisabled());
+    };
+
+    window.addEventListener(DISABLE_MESSAGE_PREPROCESSING_EVENT, handleMessagePreprocessingChange);
+
+    return () => {
+      window.removeEventListener(DISABLE_MESSAGE_PREPROCESSING_EVENT, handleMessagePreprocessingChange);
+    };
+  }, []);
 
   const {
     editedMessage,
@@ -232,6 +247,7 @@ export const InputBar = ({
     editorRef,
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
+    disableMessagePreprocessing,
   });
 
   if (fileHandling.pastedFile && !!isCellsEnabled) {
@@ -281,7 +297,7 @@ export const InputBar = ({
         <div
           className={cx(`conversation-input-bar__input input-bar-container`, {
             [`conversation-input-bar__input--editing`]: isEditing,
-            'input-bar-container--with-toolbar': formatToolbar.open && showMarkdownPreview,
+            'input-bar-container--with-toolbar': formatToolbar.open && effectiveShowMarkdownPreview,
             'input-bar-container--with-files': !!files.length,
           })}
         >
@@ -303,7 +319,7 @@ export const InputBar = ({
                   editedMessage={editedMessage}
                   inputPlaceholder={inputPlaceholder}
                   hasLocalEphemeralTimer={hasLocalEphemeralTimer}
-                  showMarkdownPreview={showMarkdownPreview}
+                  showMarkdownPreview={effectiveShowMarkdownPreview}
                   formatToolbar={formatToolbar}
                   onSetup={editor => {
                     editorRef.current = editor;
@@ -321,6 +337,7 @@ export const InputBar = ({
                   getMentionCandidates={getMentionCandidates}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
+                  disableMessagePreprocessing={disableMessagePreprocessing}
                   replaceEmojis={shouldReplaceEmoji}
                 >
                   {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
@@ -332,7 +349,7 @@ export const InputBar = ({
                     messageContent={messageContent}
                     isEditing={isEditing}
                     isSendingDisabled={isSendingDisabled}
-                    showMarkdownPreview={showMarkdownPreview}
+                    showMarkdownPreview={effectiveShowMarkdownPreview}
                     showGiphyButton={giphy.showGiphyButton}
                     formatToolbar={formatToolbar}
                     emojiPicker={emojiPicker}

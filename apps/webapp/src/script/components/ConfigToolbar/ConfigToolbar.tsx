@@ -48,6 +48,9 @@ export function ConfigToolbar() {
   const [videoBackgroundEffectsFeatureEnabled, setVideoBackgroundEffectsFeatureEnabled] = useState(
     window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled() ?? false,
   );
+  const [isMessagePreprocessingDisabled, setIsMessagePreprocessingDisabled] = useState(
+    window.wire?.app?.debug?.isMessagePreprocessingDisabled() ?? false,
+  );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
@@ -264,6 +267,23 @@ export function ConfigToolbar() {
     );
   };
 
+  const renderMessagePreprocessingSwitch = () => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="message-preprocessing-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          DISABLE MESSAGE PREPROCESSING
+        </label>
+        <Switch
+          id="message-preprocessing-checkbox"
+          checked={isMessagePreprocessingDisabled}
+          onToggle={isChecked => {
+            setIsMessagePreprocessingDisabled(window.wire?.app?.debug?.disableMessagePreprocessing(isChecked) === true);
+          }}
+        />
+      </div>
+    );
+  };
+
   const renderCoreCryptoLogLevelSelect = () => {
     const options: Array<{label: string; value: CoreCryptoLogLevel}> = [
       {label: 'Off', value: CoreCryptoLogLevel.Off},
@@ -348,6 +368,10 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderGzipSwitch()}</div>
+
+      <hr />
+
+      <div>{renderMessagePreprocessingSwitch()}</div>
 
       <hr />
 

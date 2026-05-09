@@ -51,6 +51,7 @@ interface UseMessageHandlingProps {
   editorRef: React.RefObject<LexicalEditor>;
   pastedFile: File | null;
   sendPastedFile: () => void;
+  disableMessagePreprocessing: boolean;
 }
 
 export const useMessageHandling = ({
@@ -64,6 +65,7 @@ export const useMessageHandling = ({
   editorRef,
   pastedFile,
   sendPastedFile,
+  disableMessagePreprocessing,
 }: UseMessageHandlingProps) => {
   const {isEditing, editedMessage, editMessage: editMessageCallback, cancelMessageEditing} = useMessageEditing();
 
@@ -132,6 +134,7 @@ export const useMessageHandling = ({
     pastedFile,
     sendPastedFile,
     messageContent,
+    disableMessagePreprocessing,
   });
 
   const editMessage = useCallback(
