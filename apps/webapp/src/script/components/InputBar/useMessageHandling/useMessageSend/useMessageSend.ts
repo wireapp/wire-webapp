@@ -63,6 +63,7 @@ interface UseMessageSendProps {
   sendPastedFile: () => void;
   messageContent: MessageContent;
   translate: RootContextValue['translate'];
+  disableMessagePreprocessing: boolean;
 }
 
 export const useMessageSend = ({
@@ -82,6 +83,7 @@ export const useMessageSend = ({
   sendPastedFile,
   messageContent,
   translate,
+  disableMessagePreprocessing,
 }: UseMessageSendProps) => {
   const {getFiles, clearAll} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
@@ -214,8 +216,7 @@ export const useMessageSend = ({
     const text = messageContent.text;
     const mentions = messageContent.mentions ?? [];
 
-    const messageTrimmedStart = text.trimStart();
-    const messageText = messageTrimmedStart.trimEnd();
+    const messageText = disableMessagePreprocessing ? text : text.trimStart().trimEnd();
 
     const config = Config.getConfig();
 
@@ -255,6 +256,7 @@ export const useMessageSend = ({
     sendFiles,
     clearFiles,
     translate,
+    disableMessagePreprocessing,
   ]);
 
   const handleSendMessage = useCallback(async () => {

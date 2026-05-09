@@ -53,6 +53,7 @@ interface UseMessageHandlingProps {
   pastedFile: File | null;
   sendPastedFile: () => void;
   translate: RootContextValue['translate'];
+  disableMessagePreprocessing: boolean;
 }
 
 export const useMessageHandling = ({
@@ -67,6 +68,7 @@ export const useMessageHandling = ({
   pastedFile,
   sendPastedFile,
   translate,
+  disableMessagePreprocessing,
 }: UseMessageHandlingProps) => {
   const {isEditing, editedMessage, editMessage: editMessageCallback, cancelMessageEditing} = useMessageEditing();
 
@@ -136,6 +138,7 @@ export const useMessageHandling = ({
     sendPastedFile,
     messageContent,
     translate,
+    disableMessagePreprocessing,
   });
 
   const editMessage = useCallback(
