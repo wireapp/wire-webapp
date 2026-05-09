@@ -46,3 +46,4 @@ lib/
 storybook-static/
 
 plans/
+/.codex/

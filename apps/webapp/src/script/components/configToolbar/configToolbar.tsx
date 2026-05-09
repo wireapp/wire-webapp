@@ -79,6 +79,9 @@ export function ConfigToolbar() {
   const [isPerformancePanelEnabled, setIsPerformancePanelEnabled] = useState(
     window.wire?.app?.debug?.isPerformancePanelEnabled() ?? false,
   );
+  const [isMessagePreprocessingDisabled, setIsMessagePreprocessingDisabled] = useState(
+    window.wire?.app?.debug?.isMessagePreprocessingDisabled() ?? false,
+  );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
   const [notificationDumpFrom, setNotificationDumpFrom] = useState(() => toDateInputValue(getStartOfToday()));
   const [notificationDumpToMode, setNotificationDumpToMode] = useState<NotificationDumpToMode>('now');
@@ -301,6 +304,23 @@ export function ConfigToolbar() {
               window.wire?.app?.debug?.toggleGzipping(!previousIsGzipEnabled);
               return !previousIsGzipEnabled;
             });
+          }}
+        />
+      </div>
+    );
+  };
+
+  const renderMessagePreprocessingSwitch = () => {
+    return (
+      <div style={{marginBottom: '10px'}}>
+        <label htmlFor="message-preprocessing-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
+          DISABLE MESSAGE PREPROCESSING
+        </label>
+        <Switch
+          id="message-preprocessing-checkbox"
+          checked={isMessagePreprocessingDisabled}
+          onToggle={isChecked => {
+            setIsMessagePreprocessingDisabled(window.wire?.app?.debug?.disableMessagePreprocessing(isChecked) === true);
           }}
         />
       </div>
@@ -546,6 +566,10 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderGzipSwitch()}</div>
+
+      <hr />
+
+      <div>{renderMessagePreprocessingSwitch()}</div>
 
       <hr />
 
