@@ -22,7 +22,6 @@ import {useCallback, useEffect} from 'react';
 import {amplify} from 'amplify';
 import {LexicalEditor} from 'lexical';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -39,6 +38,7 @@ import {useMessageReply} from './useMessageReply/useMessageReply';
 import {useMessageSend} from './useMessageSend/useMessageSend';
 import {useOutsideInputClick} from './useOutsideInputClick/useOutsideInputClick';
 
+import {useApplicationContext} from '../../../page/RootProvider';
 import {MessageContent} from '../common/messageContent/messageContent';
 
 interface UseMessageHandlingProps {
@@ -52,7 +52,6 @@ interface UseMessageHandlingProps {
   editorRef: React.RefObject<LexicalEditor>;
   pastedFile: File | null;
   sendPastedFile: () => void;
-  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useMessageHandling = ({
@@ -66,8 +65,8 @@ export const useMessageHandling = ({
   editorRef,
   pastedFile,
   sendPastedFile,
-  fireAndForgetInvoker,
 }: UseMessageHandlingProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {isEditing, editedMessage, editMessage: editMessageCallback, cancelMessageEditing} = useMessageEditing();
 
   const {isReplying, replyMessage: replyMessageCallback, replyMessageEntity} = useMessageReply();
@@ -77,7 +76,6 @@ export const useMessageHandling = ({
     storageRepository,
     messageRepository,
     editorRef,
-    fireAndForgetInvoker,
     editedMessageId: editedMessage?.id,
     replyMessageEntityId: replyMessageEntity?.id,
     onLoad: draftState => {
@@ -138,7 +136,6 @@ export const useMessageHandling = ({
     pastedFile,
     sendPastedFile,
     messageContent,
-    fireAndForgetInvoker,
   });
 
   const editMessage = useCallback(

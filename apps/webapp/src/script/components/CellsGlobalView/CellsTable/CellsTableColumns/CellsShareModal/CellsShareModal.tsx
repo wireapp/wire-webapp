@@ -51,6 +51,7 @@ import {
 } from './CellsShareModal.styles';
 import {useCellGlobalPublicLink} from './useCellGlobalPublicLink';
 
+import {useApplicationContext} from '../../../../../page/RootProvider';
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface ShareModalParams {
@@ -59,7 +60,7 @@ interface ShareModalParams {
   cellsRepository: CellsRepository;
 }
 
-const submitHandlers = new Map<string, () => Promise<void> | void>();
+const submitHandlers = new Map<string, () => void>();
 
 export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) => {
   const modalId = createUuid();
@@ -72,7 +73,7 @@ export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) 
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
           if (submitHandler) {
-            void submitHandler();
+            submitHandler();
           }
         },
         text: t('cells.shareModal.primaryAction'),
@@ -87,6 +88,7 @@ export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) 
 };
 
 const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParams & {modalId: string}) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellGlobalPublicLink({
     uuid,
     cellsRepository,
@@ -186,7 +188,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   }, [isPasswordEnabled]);
 
   useEffect(() => {
-    submitHandlers.set(modalId, async () => {
+    submitHandlers.set(modalId, () => {
       if (
         !isEnabled ||
         status !== 'success' ||
@@ -211,10 +213,12 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
       }
 
       try {
-        await updatePublicLink({
-          password: serialized.updatePassword,
-          passwordEnabled: serialized.passwordEnabled,
-          accessEnd: serialized.accessEnd,
+        fireAndForgetInvoker.fireAndForget(async () => {
+          await updatePublicLink({
+            password: serialized.updatePassword,
+            passwordEnabled: serialized.passwordEnabled,
+            accessEnd: serialized.accessEnd,
+          });
         });
       } catch {
         // Keep the modal open if the update fails.
@@ -238,6 +242,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
     updatePublicLink,
     hasExistingPassword,
     isEditingPassword,
+    fireAndForgetInvoker,
   ]);
 
   return (

@@ -26,6 +26,8 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import type {CellNode} from 'src/script/types/cellNode';
 
+import {useApplicationContext} from '../../../../page/RootProvider';
+
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
 interface UseCellPublicLinkParams {
@@ -47,6 +49,7 @@ export const useCellPublicLink = ({
   setStatusOnPublicLinkUrl = false,
   includeNodePublicLinkInCallbacks = false,
 }: UseCellPublicLinkParams) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [isEnabled, setIsEnabled] = useState(node?.publicLink?.alreadyShared === true);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink !== undefined ? 'success' : 'idle');
   const [linkData, setLinkData] = useState<RestShareLink | null>(null);
@@ -225,19 +228,25 @@ export const useCellPublicLink = ({
     const shouldGetLink = isEnabled === true && node?.publicLink?.alreadyShared === true;
 
     if (shouldGetLink) {
-      void getPublicLink();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await getPublicLink();
+      });
       return;
     }
 
     if (shouldDeleteLink) {
-      void deletePublicLink();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await deletePublicLink();
+      });
       return;
     }
 
     if (shouldCreateNewLink) {
-      void createPublicLink();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await createPublicLink();
+      });
     }
-  }, [isEnabled, node?.publicLink, createPublicLink, deletePublicLink, getPublicLink]);
+  }, [isEnabled, node?.publicLink, createPublicLink, deletePublicLink, fireAndForgetInvoker, getPublicLink]);
 
   useEffect(() => {
     if (!setStatusOnPublicLinkUrl) {

@@ -21,8 +21,6 @@ import {useAutoAnimate} from '@formkit/auto-animate/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
-
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {isAudio, isVideo, isImage} from 'Repositories/assets/assetMetaDataBuilder';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -38,21 +36,15 @@ import {VideoPreviewCard} from './VideoPreviewCard/VideoPreviewCard';
 interface FilePreviewsProps {
   files: FileWithPreview[];
   conversationQualifiedId: QualifiedId;
-  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
-export const FilePreviews = ({files, conversationQualifiedId, fireAndForgetInvoker}: FilePreviewsProps) => {
+export const FilePreviews = ({files, conversationQualifiedId}: FilePreviewsProps) => {
   const [wrapperRef] = useAutoAnimate();
 
   return (
     <div ref={wrapperRef} css={wrapperStyles}>
       {files.map(file => (
-        <FilePreview
-          key={file.id}
-          file={file}
-          conversationQualifiedId={conversationQualifiedId}
-          fireAndForgetInvoker={fireAndForgetInvoker}
-        />
+        <FilePreview key={file.id} file={file} conversationQualifiedId={conversationQualifiedId} />
       ))}
     </div>
   );
@@ -62,20 +54,17 @@ interface FilePreviewProps {
   file: FileWithPreview;
   cellsRepository?: CellsRepository;
   conversationQualifiedId: QualifiedId;
-  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 const FilePreview = ({
   file,
   cellsRepository = container.resolve(CellsRepository),
   conversationQualifiedId,
-  fireAndForgetInvoker,
 }: FilePreviewProps) => {
   const {name, extension, size, isError, handleDelete, handleRetry} = useFilePreview({
     file,
     cellsRepository,
     conversationQualifiedId,
-    fireAndForgetInvoker,
   });
 
   if (isImage(file) && isPreviewableImage({mimeType: file.type, fileName: file.name})) {

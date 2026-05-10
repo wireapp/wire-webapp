@@ -21,13 +21,12 @@ import {useCallback} from 'react';
 
 import {LexicalEditor, CLEAR_EDITOR_COMMAND} from 'lexical';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
-
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageRepository} from 'Repositories/storage';
 import {sanitizeMarkdown} from 'Util/markdownUtil';
 
+import {useApplicationContext} from '../../../../page/RootProvider';
 import {DraftState, loadDraftState, saveDraftState} from '../../common/draftState/draftState';
 
 interface UseDraftStateProps {
@@ -35,7 +34,6 @@ interface UseDraftStateProps {
   storageRepository: StorageRepository;
   messageRepository: MessageRepository;
   editorRef: React.RefObject<LexicalEditor>;
-  fireAndForgetInvoker: FireAndForgetInvoker;
   onLoad?: (draftState: DraftState) => void;
   editedMessageId?: string;
   replyMessageEntityId?: string;
@@ -46,11 +44,11 @@ export const useDraftState = ({
   storageRepository,
   messageRepository,
   editorRef,
-  fireAndForgetInvoker,
   onLoad,
   editedMessageId,
   replyMessageEntityId,
 }: UseDraftStateProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const reset = useCallback(() => {
     editorRef.current?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
   }, [editorRef]);

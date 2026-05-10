@@ -24,6 +24,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 
+import {useApplicationContext} from '../../../../page/RootProvider';
+
 const REFRESH_INTERVAL_MS = 10000;
 const MAX_REFRESH_COUNT = 5;
 
@@ -38,6 +40,7 @@ export const useRefreshCellsState = ({
   conversationRepository: ConversationRepository;
   conversationQualifiedId: QualifiedId;
 }) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [cellsState, setCellsState] = useState(initialCellState);
   const [isRefreshing, setIsRefreshing] = useState(cellsState === CONVERSATION_CELLS_STATE.PENDING);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -52,7 +55,9 @@ export const useRefreshCellsState = ({
 
   useEffect(() => {
     if (isInitialMount.current) {
-      void refreshCellsState();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await refreshCellsState();
+      });
       isInitialMount.current = false;
       return undefined;
     }
@@ -79,7 +84,9 @@ export const useRefreshCellsState = ({
         setIsRefreshing(false);
         return;
       }
-      void refreshCellsState();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await refreshCellsState();
+      });
     }, REFRESH_INTERVAL_MS);
 
     return () => {
@@ -88,7 +95,7 @@ export const useRefreshCellsState = ({
         intervalRef.current = null;
       }
     };
-  }, [cellsState, refreshCellsState]);
+  }, [cellsState, fireAndForgetInvoker, refreshCellsState]);
 
   return {cellsState, isRefreshing};
 };

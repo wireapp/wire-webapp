@@ -27,6 +27,7 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
 
+import {useApplicationContext} from '../../../../page/RootProvider';
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
@@ -45,6 +46,7 @@ export const useGetAllCellsNodes = ({
   conversationQualifiedId,
   enabled,
 }: UseGetAllCellsNodesProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
 
@@ -95,16 +97,20 @@ export const useGetAllCellsNodes = ({
     }
     clearAll({conversationId: id});
     setOffset(0);
-    void fetchNodes();
-  }, [fetchNodes, setOffset, clearAll, id, enabled]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await fetchNodes();
+    });
+  }, [fetchNodes, fireAndForgetInvoker, setOffset, clearAll, id, enabled]);
 
   useEffect(() => {
     if (enabled !== true) {
       return;
     }
 
-    void fetchNodes();
-  }, [fetchNodes, enabled]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await fetchNodes();
+    });
+  }, [fetchNodes, fireAndForgetInvoker, enabled]);
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHashChange);

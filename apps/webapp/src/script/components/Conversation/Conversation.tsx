@@ -703,7 +703,6 @@ export const Conversation = ({
                   eventRepository={repositories.event}
                   messageRepository={repositories.message}
                   openGiphy={openGiphy}
-                  fireAndForgetInvoker={fireAndForgetInvoker}
                   propertiesRepository={repositories.properties}
                   searchRepository={repositories.search}
                   storageRepository={repositories.storage}

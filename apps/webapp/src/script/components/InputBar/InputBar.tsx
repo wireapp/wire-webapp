@@ -24,7 +24,6 @@ import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
@@ -66,6 +65,7 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/RootProvider';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -86,7 +86,6 @@ interface InputBarProps {
   readonly teamState: TeamState;
   readonly selfUser: User;
   readonly isCellsEnabled: boolean;
-  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   onShiftTab: () => void;
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
@@ -109,7 +108,6 @@ export const InputBar = ({
   selfUser,
   teamState = container.resolve(TeamState),
   isCellsEnabled,
-  fireAndForgetInvoker,
   onShiftTab,
   uploadDroppedFiles,
   uploadImages,
@@ -118,6 +116,7 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -239,7 +238,6 @@ export const InputBar = ({
     editorRef,
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
-    fireAndForgetInvoker,
   });
 
   if (fileHandling.pastedFile && !!isCellsEnabled) {
@@ -251,7 +249,6 @@ export const InputBar = ({
     conversation,
     messageRepository,
     is1to1,
-    fireAndForgetInvoker,
   });
 
   const giphy = useGiphy({
@@ -262,7 +259,6 @@ export const InputBar = ({
     messageRepository,
     conversation,
     cancelMesssageEditing,
-    fireAndForgetInvoker,
   });
 
   const handleSendMessage = useCallback(() => {
@@ -333,16 +329,9 @@ export const InputBar = ({
                   getMentionCandidates={getMentionCandidates}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
-                  fireAndForgetInvoker={fireAndForgetInvoker}
                   replaceEmojis={shouldReplaceEmoji}
                 >
-                  {!!files.length && (
-                    <FilePreviews
-                      files={files}
-                      conversationQualifiedId={conversation.qualifiedId}
-                      fireAndForgetInvoker={fireAndForgetInvoker}
-                    />
-                  )}
+                  {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
                   <InputBarControls
                     conversation={conversation}
                     isCellsFeatureEnabled={isCellsEnabled}

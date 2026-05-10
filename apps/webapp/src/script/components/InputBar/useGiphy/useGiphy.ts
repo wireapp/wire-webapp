@@ -21,12 +21,13 @@ import {useCallback, useEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
+
+import {useApplicationContext} from '../../../page/RootProvider';
 
 interface UseGiphyProps {
   text: string;
@@ -36,7 +37,6 @@ interface UseGiphyProps {
   messageRepository: MessageRepository;
   conversation: Conversation;
   cancelMesssageEditing: () => void;
-  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useGiphy = ({
@@ -47,8 +47,8 @@ export const useGiphy = ({
   messageRepository,
   conversation,
   cancelMesssageEditing,
-  fireAndForgetInvoker,
 }: UseGiphyProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
   const showGiphyButton = useMemo(() => {

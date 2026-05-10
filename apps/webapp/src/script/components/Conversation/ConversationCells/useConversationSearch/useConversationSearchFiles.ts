@@ -26,6 +26,7 @@ import {useDebouncedCallback} from 'use-debounce';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 
+import {useApplicationContext} from '../../../../page/RootProvider';
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
@@ -49,6 +50,7 @@ export const useConversationSearchFiles = ({
   enabled,
   onClear,
 }: UseConversationSearchFilesProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -128,7 +130,9 @@ export const useConversationSearchFiles = ({
       return;
     }
     shouldPerformSearch.current = true;
-    void searchNodesDebounced(value);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await searchNodesDebounced(value);
+    });
   };
 
   const handleClearSearch = () => {
@@ -149,8 +153,10 @@ export const useConversationSearchFiles = ({
       return;
     }
 
-    void searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
-  }, [searchNodes, searchQuery, enabled]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
+    });
+  }, [fireAndForgetInvoker, searchNodes, searchQuery, enabled]);
 
   return {
     searchValue,

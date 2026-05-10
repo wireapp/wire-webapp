@@ -19,26 +19,21 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
-
 import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 
+import {useApplicationContext} from '../../../../page/RootProvider';
+
 interface FilePreviewParams {
   file: FileWithPreview;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
-  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
-export const useFilePreview = ({
-  file,
-  cellsRepository,
-  conversationQualifiedId,
-  fireAndForgetInvoker,
-}: FilePreviewParams) => {
+export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}: FilePreviewParams) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {deleteFile, updateFile} = useFileUploadState();
 
   const name = trimFileExtension(file.name);

@@ -29,6 +29,7 @@ import {UserRepository} from 'Repositories/user/UserRepository';
 import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';
 
+import {useApplicationContext} from '../../../page/RootProvider';
 import {useCellsStore, Status} from '../common/useCellsStore/useCellsStore';
 import {transformCellsNodes} from '../transformCellsNodes/transformCellsNodes';
 import {transformCellsPagination} from '../transformCellsPagination/transformCellsPagination';
@@ -49,6 +50,7 @@ export const useSearchCellsNodes = ({
   userRepository,
   conversationRepository,
 }: UseSearchCellsNodesProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -132,12 +134,16 @@ export const useSearchCellsNodes = ({
 
   const handleSearch = (value: string) => {
     if (!is.nonEmptyString(value)) {
-      void handleClearSearch();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await handleClearSearch();
+      });
       return;
     }
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
-    void searchNodesDebounced(value);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await searchNodesDebounced(value);
+    });
   };
 
   const handleClearSearch = async () => {
@@ -167,9 +173,11 @@ export const useSearchCellsNodes = ({
 
   useEffect(() => {
     if (isInitialLoad.current || shouldPerformFullReload.current) {
-      void searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, status: 'loading'});
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, status: 'loading'});
+      });
     }
-  }, [searchNodes, searchQuery]);
+  }, [fireAndForgetInvoker, searchNodes, searchQuery]);
 
   return {
     searchValue,

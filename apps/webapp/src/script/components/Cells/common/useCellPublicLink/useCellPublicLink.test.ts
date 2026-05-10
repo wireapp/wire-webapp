@@ -17,9 +17,14 @@
  *
  */
 
+import {createElement} from 'react';
+
 import {act, renderHook, waitFor} from '@testing-library/react';
+import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {RootProvider} from '../../../../page/RootProvider';
+import {createRootContextValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';
@@ -54,6 +59,15 @@ describe('useCellPublicLink', () => {
     ...overrides,
   });
 
+  function createExecutingFireAndForgetInvokerForTest(): FireAndForgetInvoker {
+    return {
+      fireAndForget: promiseFactory => {
+        promiseFactory().catch(() => undefined);
+      },
+      waitUntilAllSettled: jest.fn(async () => {}),
+    } as FireAndForgetInvoker;
+  }
+
   const renderPublicLinkHook = (options?: {
     node?: CellNode;
     refreshLinkDataAfterUpdate?: boolean;
@@ -65,6 +79,12 @@ describe('useCellPublicLink', () => {
       setStatusOnPublicLinkUrl: options?.setStatusOnPublicLinkUrl ?? false,
     };
 
+    const rootContextValue = createRootContextValueForTest({
+      fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+      mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+      wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+    });
+
     const hook = renderHook(
       ({node, refreshLinkDataAfterUpdate, setStatusOnPublicLinkUrl}) =>
         useCellPublicLink({
@@ -75,7 +95,10 @@ describe('useCellPublicLink', () => {
           refreshLinkDataAfterUpdate,
           setStatusOnPublicLinkUrl,
         }),
-      {initialProps},
+      {
+        initialProps,
+        wrapper: properties => createElement(RootProvider, {value: rootContextValue}, properties.children),
+      },
     );
 
     const rerenderWith = (props: Partial<typeof initialProps>) =>

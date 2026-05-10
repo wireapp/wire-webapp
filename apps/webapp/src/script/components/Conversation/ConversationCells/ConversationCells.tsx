@@ -47,6 +47,8 @@ import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 
+import {useApplicationContext} from '../../../page/RootProvider';
+
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;
   userRepository: UserRepository;
@@ -65,6 +67,7 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
   }: ConversationCellsProps) => {
+    const {fireAndForgetInvoker} = useApplicationContext();
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
     const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
@@ -107,7 +110,9 @@ export const ConversationCells = memo(
 
     const handleClearSearch = () => {
       clearSearch();
-      void refresh();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await refresh();
+      });
     };
 
     useEffect(() => {

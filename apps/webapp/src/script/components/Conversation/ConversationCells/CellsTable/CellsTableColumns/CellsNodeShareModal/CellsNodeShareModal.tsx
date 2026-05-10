@@ -51,6 +51,7 @@ import {
 } from './CellsNodeShareModal.styles';
 import {useCellConversationPublicLink} from './useCellConversationPublicLink';
 
+import {useApplicationContext} from '../../../../../../page/RootProvider';
 import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 
 interface ShareModalParams {
@@ -60,7 +61,7 @@ interface ShareModalParams {
   cellsRepository: CellsRepository;
 }
 
-const submitHandlers = new Map<string, () => Promise<void> | void>();
+const submitHandlers = new Map<string, () => void>();
 
 export const showShareModal = ({type, uuid, conversationId, cellsRepository}: ShareModalParams) => {
   const modalId = createUuid();
@@ -73,7 +74,7 @@ export const showShareModal = ({type, uuid, conversationId, cellsRepository}: Sh
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
           if (submitHandler) {
-            void submitHandler();
+            submitHandler();
           }
         },
         text: t('cells.shareModal.primaryAction'),
@@ -102,6 +103,7 @@ const CellShareModalContent = ({
   cellsRepository,
   modalId,
 }: ShareModalParams & {modalId: string}) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellConversationPublicLink({
     uuid,
     conversationId,
@@ -200,7 +202,7 @@ const CellShareModalContent = ({
   }, [isPasswordEnabled]);
 
   useEffect(() => {
-    submitHandlers.set(modalId, async () => {
+    submitHandlers.set(modalId, () => {
       if (
         !isEnabled ||
         status !== 'success' ||
@@ -225,10 +227,12 @@ const CellShareModalContent = ({
       }
 
       try {
-        await updatePublicLink({
-          password: serialized.updatePassword,
-          passwordEnabled: serialized.passwordEnabled,
-          accessEnd: serialized.accessEnd,
+        fireAndForgetInvoker.fireAndForget(async () => {
+          await updatePublicLink({
+            password: serialized.updatePassword,
+            passwordEnabled: serialized.passwordEnabled,
+            accessEnd: serialized.accessEnd,
+          });
         });
       } catch {
         // Keep the modal open if the update fails.
@@ -252,6 +256,7 @@ const CellShareModalContent = ({
     updatePublicLink,
     hasExistingPassword,
     isEditingPassword,
+    fireAndForgetInvoker,
   ]);
 
   return (

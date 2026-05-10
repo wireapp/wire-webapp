@@ -27,6 +27,8 @@ import {CellNode} from 'src/script/types/cellNode';
 
 import {transformNodesToCellsFolders} from './transformNodesToCellsFolders';
 
+import {useApplicationContext} from '../../../../../../../../page/RootProvider';
+
 interface UseGetCellsFoldersProps {
   currentPath: string;
   nodeToMove: CellNode;
@@ -52,6 +54,7 @@ export const useGetCellsFolders = ({
   currentPath,
   enabled,
 }: UseGetCellsFoldersProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [folders, setFolders] = useState<Array<Folder>>([]);
   const [status, setStatus] = useState<Status>('idle');
   const [shouldShowLoadingSpinner, setShouldShowLoadingSpinner] = useState(true);
@@ -90,8 +93,10 @@ export const useGetCellsFolders = ({
   }, [setFolders, setStatus, conversationQualifiedId, enabled, currentPath, nodeToMove]);
 
   useEffect(() => {
-    void fetchFolders();
-  }, [fetchFolders]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await fetchFolders();
+    });
+  }, [fetchFolders, fireAndForgetInvoker]);
 
   useEffect(() => {
     if (!['loading', 'idle'].includes(status)) {

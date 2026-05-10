@@ -21,7 +21,6 @@ import {useCallback, useMemo} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
 import {IAttachment} from '@wireapp/protocol-messaging';
 
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
@@ -45,6 +44,8 @@ import {t} from 'Util/localizerUtil';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';
 
+import {useApplicationContext} from '../../../../page/RootProvider';
+
 interface UseMessageSendProps {
   replyMessageEntity: ContentMessage | null;
   eventRepository: EventRepository;
@@ -63,7 +64,6 @@ interface UseMessageSendProps {
   pastedFile: File | null;
   sendPastedFile: () => void;
   messageContent: MessageContent;
-  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useMessageSend = ({
@@ -82,8 +82,8 @@ export const useMessageSend = ({
   pastedFile,
   sendPastedFile,
   messageContent,
-  fireAndForgetInvoker,
 }: UseMessageSendProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {getFiles, clearAll} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
 

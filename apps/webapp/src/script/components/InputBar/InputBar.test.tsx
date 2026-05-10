@@ -38,6 +38,7 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
+import {RootContextValue, RootProvider} from '../../page/RootProvider';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
@@ -77,7 +78,7 @@ beforeAll(async () => {
 
 describe('InputBar', () => {
   let propertiesRepository: PropertiesRepository;
-  let fireAndForgetInvoker: FireAndForgetInvoker;
+  let mockFireAndForgetInvoker: FireAndForgetInvoker;
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
@@ -104,14 +105,31 @@ describe('InputBar', () => {
     uploadFiles: jest.fn(),
     onCellImageUpload: jest.fn(),
     onCellAssetUpload: jest.fn(),
-    fireAndForgetInvoker,
   });
+
+  const renderInputBar = (props: ReturnType<typeof getDefaultProps>) => {
+    const rootContextValue = {
+      doesApplicationNeedForceReload: false,
+      fireAndForgetInvoker: mockFireAndForgetInvoker,
+      isFeatureToggleEnabled: () => false,
+      mainViewModel: {} as RootContextValue['mainViewModel'],
+      wallClock: {} as RootContextValue['wallClock'],
+    };
+
+    return render(
+      withTheme(
+        <RootProvider value={rootContextValue}>
+          <InputBar {...props} />
+        </RootProvider>,
+      ),
+    );
+  };
 
   beforeEach(() => {
     const propertiesService = new PropertiesService();
     const selfService = new SelfService();
     propertiesRepository = new PropertiesRepository(propertiesService, selfService);
-    fireAndForgetInvoker = {
+    mockFireAndForgetInvoker = {
       fireAndForget: promiseFactory => {
         promiseFactory().catch(() => undefined);
       },
@@ -128,7 +146,7 @@ describe('InputBar', () => {
 
   it('has passed value', async () => {
     const props = getDefaultProps();
-    const {getByTestId} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId} = renderInputBar(props);
 
     await new Promise(resolve => setTimeout(resolve));
     const inputBar = getByTestId('input-message');
@@ -145,7 +163,7 @@ describe('InputBar', () => {
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
     const props = getDefaultProps();
-    const {getByTestId, container} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId, container} = renderInputBar(props);
     const inputBar = getByTestId('input-message');
 
     fireEvent.keyDown(container, {key: 'Enter', code: 'Enter'});
@@ -167,7 +185,7 @@ describe('InputBar', () => {
 
   it('typing request is not sent when user is typing but the typing indicator mode is disabled', async () => {
     const props = getDefaultProps();
-    const {getByTestId} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId} = renderInputBar(props);
     const inputBar = getByTestId('input-message');
     const property = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
     const defaultValue = property.defaultValue;
@@ -192,7 +210,7 @@ describe('InputBar', () => {
   it('has pasted image', async () => {
     const promise = Promise.resolve();
     const props = getDefaultProps();
-    const {getByTestId, queryByTestId} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId, queryByTestId} = renderInputBar(props);
     await promise;
 
     const textArea = getByTestId('input-message');

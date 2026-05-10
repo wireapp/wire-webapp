@@ -20,8 +20,12 @@
 import {render, screen} from '@testing-library/react';
 
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {createFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {
+  createFireAndForgetInvokerForTest,
+  createRootContextValueForTest,
+} from '../../../page/testSupport/rootContextTestSupport';
+import {RootProvider} from '../../../page/RootProvider';
 
 import {FilePreviews} from './FilePreviews';
 
@@ -35,7 +39,21 @@ jest.mock('./FilePreviewCard/FilePreviewCard', () => ({
 
 describe('FilePreviews', () => {
   const conversationQualifiedId = {id: 'conv-id', domain: 'example.com'};
-  const fireAndForgetInvoker = createFireAndForgetInvokerForTest();
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvokerForTest(),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
+  const renderFilePreviews = (files: FileWithPreview[]) => {
+    return render(
+      withTheme(
+        <RootProvider value={rootContextValue}>
+          <FilePreviews files={files} conversationQualifiedId={conversationQualifiedId} />
+        </RootProvider>,
+      ),
+    );
+  };
 
   const createFileWithPreview = (file: File): FileWithPreview =>
     Object.assign(file, {
@@ -50,15 +68,7 @@ describe('FilePreviews', () => {
   it('renders a file preview card for HEIC images', () => {
     const heicFile = createFileWithPreview(new File(['heic'], 'photo.heic', {type: 'image/heic'}));
 
-    render(
-      withTheme(
-        <FilePreviews
-          files={[heicFile]}
-          conversationQualifiedId={conversationQualifiedId}
-          fireAndForgetInvoker={fireAndForgetInvoker}
-        />,
-      ),
-    );
+    renderFilePreviews([heicFile]);
 
     expect(screen.getByTestId('file-preview-card')).toBeInTheDocument();
     expect(screen.queryByTestId('image-preview-card')).not.toBeInTheDocument();
@@ -67,15 +77,7 @@ describe('FilePreviews', () => {
   it('renders an image preview card for PNG images', () => {
     const pngFile = createFileWithPreview(new File(['png'], 'photo.png', {type: 'image/png'}));
 
-    render(
-      withTheme(
-        <FilePreviews
-          files={[pngFile]}
-          conversationQualifiedId={conversationQualifiedId}
-          fireAndForgetInvoker={fireAndForgetInvoker}
-        />,
-      ),
-    );
+    renderFilePreviews([pngFile]);
 
     expect(screen.getByTestId('image-preview-card')).toBeInTheDocument();
     expect(screen.queryByTestId('file-preview-card')).not.toBeInTheDocument();

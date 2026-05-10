@@ -33,6 +33,8 @@ import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/Cells
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 
+import {useApplicationContext} from '../../../../../../../page/RootProvider';
+
 interface CellsMoveNodeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -50,6 +52,7 @@ export const CellsMoveNodeModal = ({
   conversationQualifiedId,
   conversationName,
 }: CellsMoveNodeModalProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [currentPath, setCurrentPath] = useState(() => getCellsFilesPath());
   const [activeModalContent, setActiveModalContent] = useState<'move' | 'create'>('move');
 
@@ -84,7 +87,9 @@ export const CellsMoveNodeModal = ({
     cellsRepository,
     conversationQualifiedId,
     onSuccess: () => {
-      void refresh();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await refresh();
+      });
       setActiveModalContent('move');
     },
     currentPath,

@@ -21,16 +21,16 @@ import {useCallback, useEffect, useRef} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 
-import {FireAndForgetInvoker} from '@wireapp/core';
-
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
+
+import {useApplicationContext} from '../../../../../../page/RootProvider';
 
 interface DraftStatePluginProps {
   loadDraftState: () => Promise<any>;
-  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
-export function DraftStatePlugin({loadDraftState, fireAndForgetInvoker}: DraftStatePluginProps): null {
+export function DraftStatePlugin({loadDraftState}: DraftStatePluginProps): null {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [editor] = useLexicalComposerContext();
   const hasLoadedDraftState = useRef(false);
 

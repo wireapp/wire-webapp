@@ -21,6 +21,8 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
+import {useApplicationContext} from '../../../../../../../../../page/RootProvider';
+
 export const useGetAllTags = ({
   cellsRepository,
   enabled,
@@ -30,6 +32,7 @@ export const useGetAllTags = ({
   enabled: boolean;
   onSuccess: (tags: string[]) => void;
 }) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [tags, setTags] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -55,8 +58,10 @@ export const useGetAllTags = ({
       return;
     }
 
-    void fetchTags();
-  }, [enabled, fetchTags]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await fetchTags();
+    });
+  }, [enabled, fetchTags, fireAndForgetInvoker]);
 
   return {tags, isLoading, error};
 };
