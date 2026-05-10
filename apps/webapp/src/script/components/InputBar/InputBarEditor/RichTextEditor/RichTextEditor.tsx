@@ -31,6 +31,8 @@ import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {LexicalEditor, EditorState} from 'lexical';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
@@ -72,6 +74,7 @@ interface RichTextEditorProps {
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editor: string, plainMessage: string, replyId?: string) => void;
   loadDraftState: () => Promise<DraftState>;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   onUpdate: (content: MessageContent) => void;
   onArrowUp: () => void;
   onEscape: () => void;
@@ -92,6 +95,7 @@ export const RichTextEditor = ({
   onUpdate,
   saveDraftState,
   loadDraftState,
+  fireAndForgetInvoker,
   onEscape,
   onArrowUp,
   getMentionCandidates,
@@ -143,7 +147,7 @@ export const RichTextEditor = ({
               onSetup(editor!);
             }}
           />
-          <DraftStatePlugin loadDraftState={loadDraftState} />
+          <DraftStatePlugin loadDraftState={loadDraftState} fireAndForgetInvoker={fireAndForgetInvoker} />
           <EditedMessagePlugin message={editedMessage} showMarkdownPreview={showMarkdownPreview} />
           <EmojiPickerPlugin openStateRef={emojiPickerOpen} />
           <HistoryPlugin />

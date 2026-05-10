@@ -21,6 +21,7 @@ import {useCallback, useMemo} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {IAttachment} from '@wireapp/protocol-messaging';
 
 import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
@@ -62,6 +63,7 @@ interface UseMessageSendProps {
   pastedFile: File | null;
   sendPastedFile: () => void;
   messageContent: MessageContent;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useMessageSend = ({
@@ -80,6 +82,7 @@ export const useMessageSend = ({
   pastedFile,
   sendPastedFile,
   messageContent,
+  fireAndForgetInvoker,
 }: UseMessageSendProps) => {
   const {getFiles, clearAll} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
@@ -168,8 +171,9 @@ export const useMessageSend = ({
 
       const mentionEntities = mentions.slice(0);
 
-      void generateQuote().then(quoteEntity => {
-        void messageRepository.sendTextWithLinkPreview({
+      fireAndForgetInvoker.fireAndForget(async () => {
+        const quoteEntity = await generateQuote();
+        await messageRepository.sendTextWithLinkPreview({
           conversation,
           textMessage: messageText,
           mentions: mentionEntities,
@@ -179,7 +183,15 @@ export const useMessageSend = ({
         cancelMessageReply();
       });
     },
-    [cancelMessageReply, conversation, generateQuote, messageRepository, getCellAssets, cellsEnabled],
+    [
+      cancelMessageReply,
+      conversation,
+      fireAndForgetInvoker,
+      generateQuote,
+      messageRepository,
+      getCellAssets,
+      cellsEnabled,
+    ],
   );
 
   const isSendingDisabled = useMemo(() => {
@@ -200,7 +212,8 @@ export const useMessageSend = ({
     }
 
     if (pastedFile) {
-      return void sendPastedFile();
+      sendPastedFile();
+      return;
     }
 
     const text = messageContent.text;
@@ -256,7 +269,9 @@ export const useMessageSend = ({
         secondaryAction: {
           action: () => {
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-            void sendMessage();
+            fireAndForgetInvoker.fireAndForget(async () => {
+              await sendMessage();
+            });
           },
           text: t('conversation.E2EISendAnyway'),
         },
@@ -270,9 +285,11 @@ export const useMessageSend = ({
         },
       });
     } else {
-      void sendMessage();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await sendMessage();
+      });
     }
-  }, [conversation, conversationRepository, sendMessage]);
+  }, [conversation, conversationRepository, fireAndForgetInvoker, sendMessage]);
 
   return {
     sendMessage: handleSendMessage,

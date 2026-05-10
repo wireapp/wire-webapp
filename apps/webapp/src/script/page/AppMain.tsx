@@ -111,8 +111,10 @@ export const AppMain = (properties: AppMainProps) => {
   const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
   const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
-    void runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
-  }, [clientVersion]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await runClientVersionCheck({ky, clientVersion, setDoesApplicationNeedForceReload});
+    });
+  }, [clientVersion, fireAndForgetInvoker]);
   const apiContext = app.getAPIContext();
 
   useEffect(() => {
@@ -213,7 +215,9 @@ export const AppMain = (properties: AppMainProps) => {
     }
 
     const showConversationMessages = (conversationId: string, domain = apiContext.domain ?? '') => {
-      void mainView.content.showConversation({id: conversationId, domain});
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await mainView.content.showConversation({id: conversationId, domain});
+      });
     };
 
     const showConversationFiles = async (

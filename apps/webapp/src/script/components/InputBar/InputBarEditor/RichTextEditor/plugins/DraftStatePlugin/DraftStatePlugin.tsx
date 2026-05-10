@@ -17,18 +17,22 @@
  *
  */
 
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+
+import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {DraftState} from 'Components/InputBar/common/draftState/draftState';
 
 interface DraftStatePluginProps {
   loadDraftState: () => Promise<any>;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
-export function DraftStatePlugin({loadDraftState}: DraftStatePluginProps): null {
+export function DraftStatePlugin({loadDraftState, fireAndForgetInvoker}: DraftStatePluginProps): null {
   const [editor] = useLexicalComposerContext();
+  const hasLoadedDraftState = useRef(false);
 
   const getDraftState = useCallback(async () => {
     const draftState: DraftState = await loadDraftState();
@@ -43,8 +47,15 @@ export function DraftStatePlugin({loadDraftState}: DraftStatePluginProps): null 
   }, [editor, loadDraftState]);
 
   useEffect(() => {
-    void getDraftState();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    if (hasLoadedDraftState.current) {
+      return;
+    }
+
+    hasLoadedDraftState.current = true;
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await getDraftState();
+    });
+  }, [fireAndForgetInvoker, getDraftState]);
 
   return null;
 }

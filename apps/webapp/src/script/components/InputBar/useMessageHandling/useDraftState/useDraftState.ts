@@ -21,6 +21,8 @@ import {useCallback} from 'react';
 
 import {LexicalEditor, CLEAR_EDITOR_COMMAND} from 'lexical';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageRepository} from 'Repositories/storage';
@@ -33,6 +35,7 @@ interface UseDraftStateProps {
   storageRepository: StorageRepository;
   messageRepository: MessageRepository;
   editorRef: React.RefObject<LexicalEditor>;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   onLoad?: (draftState: DraftState) => void;
   editedMessageId?: string;
   replyMessageEntityId?: string;
@@ -43,6 +46,7 @@ export const useDraftState = ({
   storageRepository,
   messageRepository,
   editorRef,
+  fireAndForgetInvoker,
   onLoad,
   editedMessageId,
   replyMessageEntityId,
@@ -58,13 +62,15 @@ export const useDraftState = ({
   }, [conversation, messageRepository, onLoad, storageRepository]);
 
   const save = async (editorState: string, text: string, replyId = '') => {
-    void saveDraftState({
-      storageRepository,
-      conversation,
-      editorState,
-      plainMessage: sanitizeMarkdown(text),
-      replyId: replyId ?? replyMessageEntityId,
-      editedMessageId,
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await saveDraftState({
+        storageRepository,
+        conversation,
+        editorState,
+        plainMessage: sanitizeMarkdown(text),
+        replyId: replyId ?? replyMessageEntityId,
+        editedMessageId,
+      });
     });
   };
 

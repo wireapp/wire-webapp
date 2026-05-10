@@ -20,6 +20,7 @@
 import {render, screen} from '@testing-library/react';
 
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
+import {createFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {FilePreviews} from './FilePreviews';
@@ -34,6 +35,7 @@ jest.mock('./FilePreviewCard/FilePreviewCard', () => ({
 
 describe('FilePreviews', () => {
   const conversationQualifiedId = {id: 'conv-id', domain: 'example.com'};
+  const fireAndForgetInvoker = createFireAndForgetInvokerForTest();
 
   const createFileWithPreview = (file: File): FileWithPreview =>
     Object.assign(file, {
@@ -48,7 +50,15 @@ describe('FilePreviews', () => {
   it('renders a file preview card for HEIC images', () => {
     const heicFile = createFileWithPreview(new File(['heic'], 'photo.heic', {type: 'image/heic'}));
 
-    render(withTheme(<FilePreviews files={[heicFile]} conversationQualifiedId={conversationQualifiedId} />));
+    render(
+      withTheme(
+        <FilePreviews
+          files={[heicFile]}
+          conversationQualifiedId={conversationQualifiedId}
+          fireAndForgetInvoker={fireAndForgetInvoker}
+        />,
+      ),
+    );
 
     expect(screen.getByTestId('file-preview-card')).toBeInTheDocument();
     expect(screen.queryByTestId('image-preview-card')).not.toBeInTheDocument();
@@ -57,7 +67,15 @@ describe('FilePreviews', () => {
   it('renders an image preview card for PNG images', () => {
     const pngFile = createFileWithPreview(new File(['png'], 'photo.png', {type: 'image/png'}));
 
-    render(withTheme(<FilePreviews files={[pngFile]} conversationQualifiedId={conversationQualifiedId} />));
+    render(
+      withTheme(
+        <FilePreviews
+          files={[pngFile]}
+          conversationQualifiedId={conversationQualifiedId}
+          fireAndForgetInvoker={fireAndForgetInvoker}
+        />,
+      ),
+    );
 
     expect(screen.getByTestId('image-preview-card')).toBeInTheDocument();
     expect(screen.queryByTestId('file-preview-card')).not.toBeInTheDocument();

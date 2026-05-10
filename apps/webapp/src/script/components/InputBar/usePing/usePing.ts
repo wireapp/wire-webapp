@@ -19,6 +19,8 @@
 
 import {useState} from 'react';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -30,9 +32,10 @@ interface UsePingProps {
   conversation: Conversation;
   messageRepository: MessageRepository;
   is1to1: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
-export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps) => {
+export const usePing = ({conversation, messageRepository, is1to1, fireAndForgetInvoker}: UsePingProps) => {
   const [isPingDisabled, setIsPingDisabled] = useState(false);
 
   const maxUsersWithoutAlert = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
@@ -40,7 +43,8 @@ export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps)
 
   const pingConversation = () => {
     setIsPingDisabled(true);
-    void messageRepository.sendPing(conversation).then(() => {
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await messageRepository.sendPing(conversation);
       window.setTimeout(() => setIsPingDisabled(false), TIME_IN_MILLIS.SECOND * 2);
     });
   };

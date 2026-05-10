@@ -24,6 +24,7 @@ import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
 import {container} from 'tsyringe';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
@@ -85,6 +86,7 @@ interface InputBarProps {
   readonly teamState: TeamState;
   readonly selfUser: User;
   readonly isCellsEnabled: boolean;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   onShiftTab: () => void;
   uploadDroppedFiles: (droppedFiles: File[]) => void;
   uploadImages: (images: File[]) => void;
@@ -107,6 +109,7 @@ export const InputBar = ({
   selfUser,
   teamState = container.resolve(TeamState),
   isCellsEnabled,
+  fireAndForgetInvoker,
   onShiftTab,
   uploadDroppedFiles,
   uploadImages,
@@ -187,12 +190,16 @@ export const InputBar = ({
       isTyping => {
         isTypingRef.current = isTyping;
         if (isTyping) {
-          void conversationRepository.sendTypingStart(conversation);
+          fireAndForgetInvoker.fireAndForget(async () => {
+            await conversationRepository.sendTypingStart(conversation);
+          });
         } else {
-          void conversationRepository.sendTypingStop(conversation);
+          fireAndForgetInvoker.fireAndForget(async () => {
+            await conversationRepository.sendTypingStop(conversation);
+          });
         }
       },
-      [conversationRepository, conversation],
+      [conversationRepository, conversation, fireAndForgetInvoker],
     ),
   });
 
@@ -232,6 +239,7 @@ export const InputBar = ({
     editorRef,
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
+    fireAndForgetInvoker,
   });
 
   if (fileHandling.pastedFile && !!isCellsEnabled) {
@@ -243,6 +251,7 @@ export const InputBar = ({
     conversation,
     messageRepository,
     is1to1,
+    fireAndForgetInvoker,
   });
 
   const giphy = useGiphy({
@@ -253,6 +262,7 @@ export const InputBar = ({
     messageRepository,
     conversation,
     cancelMesssageEditing,
+    fireAndForgetInvoker,
   });
 
   const handleSendMessage = useCallback(() => {
@@ -260,8 +270,10 @@ export const InputBar = ({
       return;
     }
 
-    void sendMessage();
-  }, [isSendingDisabled, sendMessage]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await sendMessage();
+    });
+  }, [fireAndForgetInvoker, isSendingDisabled, sendMessage]);
 
   const showAvatar = !!messageContent.text.length;
 
@@ -321,9 +333,16 @@ export const InputBar = ({
                   getMentionCandidates={getMentionCandidates}
                   saveDraftState={draftState.save}
                   loadDraftState={draftState.load}
+                  fireAndForgetInvoker={fireAndForgetInvoker}
                   replaceEmojis={shouldReplaceEmoji}
                 >
-                  {!!files.length && <FilePreviews files={files} conversationQualifiedId={conversation.qualifiedId} />}
+                  {!!files.length && (
+                    <FilePreviews
+                      files={files}
+                      conversationQualifiedId={conversation.qualifiedId}
+                      fireAndForgetInvoker={fireAndForgetInvoker}
+                    />
+                  )}
                   <InputBarControls
                     conversation={conversation}
                     isCellsFeatureEnabled={isCellsEnabled}

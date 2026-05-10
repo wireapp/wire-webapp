@@ -21,6 +21,8 @@ import {MutableRefObject} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
 
@@ -49,6 +51,7 @@ interface InputBarEditorProps {
   getMentionCandidates: (search?: string | null) => User[];
   saveDraftState: (editorState: string, plainMessage: string, replyId?: string) => void;
   loadDraftState: () => Promise<DraftState>;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   replaceEmojis: boolean;
   children: React.ReactNode;
 }
@@ -70,6 +73,7 @@ export const InputBarEditor = ({
   getMentionCandidates,
   saveDraftState,
   loadDraftState,
+  fireAndForgetInvoker,
   replaceEmojis,
   children,
 }: InputBarEditorProps) => {
@@ -91,6 +95,7 @@ export const InputBarEditor = ({
       showMarkdownPreview={showMarkdownPreview}
       saveDraftState={saveDraftState}
       loadDraftState={loadDraftState}
+      fireAndForgetInvoker={fireAndForgetInvoker}
       onShiftTab={onShiftTab}
       onSend={onSend}
       onBlur={onBlur}

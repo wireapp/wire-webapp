@@ -19,6 +19,8 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {InputBar} from 'Components/InputBar/index';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
@@ -75,6 +77,7 @@ beforeAll(async () => {
 
 describe('InputBar', () => {
   let propertiesRepository: PropertiesRepository;
+  let fireAndForgetInvoker: FireAndForgetInvoker;
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
@@ -101,12 +104,19 @@ describe('InputBar', () => {
     uploadFiles: jest.fn(),
     onCellImageUpload: jest.fn(),
     onCellAssetUpload: jest.fn(),
+    fireAndForgetInvoker,
   });
 
   beforeEach(() => {
     const propertiesService = new PropertiesService();
     const selfService = new SelfService();
     propertiesRepository = new PropertiesRepository(propertiesService, selfService);
+    fireAndForgetInvoker = {
+      fireAndForget: promiseFactory => {
+        promiseFactory().catch(() => undefined);
+      },
+      waitUntilAllSettled: jest.fn().mockResolvedValue(undefined),
+    };
   });
 
   afterEach(() => {

@@ -21,6 +21,7 @@ import {useCallback, useEffect, useMemo} from 'react';
 
 import {amplify} from 'amplify';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
@@ -35,6 +36,7 @@ interface UseGiphyProps {
   messageRepository: MessageRepository;
   conversation: Conversation;
   cancelMesssageEditing: () => void;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useGiphy = ({
@@ -45,6 +47,7 @@ export const useGiphy = ({
   messageRepository,
   conversation,
   cancelMesssageEditing,
+  fireAndForgetInvoker,
 }: UseGiphyProps) => {
   const isMessageFormatButtonsFlagEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
 
@@ -59,12 +62,13 @@ export const useGiphy = ({
 
   const sendGiphy = useCallback(
     (gifUrl: string, tag: string): void => {
-      void generateQuote().then(quoteEntity => {
-        void messageRepository.sendGif(conversation, gifUrl, tag, quoteEntity);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        const quoteEntity = await generateQuote();
+        await messageRepository.sendGif(conversation, gifUrl, tag, quoteEntity);
         cancelMesssageEditing();
       });
     },
-    [cancelMesssageEditing, conversation, generateQuote, messageRepository],
+    [cancelMesssageEditing, conversation, fireAndForgetInvoker, generateQuote, messageRepository],
   );
 
   useEffect(() => {

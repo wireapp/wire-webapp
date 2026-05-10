@@ -103,7 +103,7 @@ export const Conversation = ({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {isFeatureToggleEnabled} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
@@ -192,12 +192,14 @@ export const Conversation = ({
       if (!allowsAllFiles()) {
         for (const file of fileArray) {
           if (!hasAllowedExtension(file.name)) {
-            conversationRepository.injectFileTypeRestrictedMessage(
-              activeConversation,
-              selfUser,
-              false,
-              getFileExtensionOrName(file.name),
-            );
+            fireAndForgetInvoker.fireAndForget(async () => {
+              await conversationRepository.injectFileTypeRestrictedMessage(
+                activeConversation,
+                selfUser,
+                false,
+                getFileExtensionOrName(file.name),
+              );
+            });
 
             return;
           }
@@ -221,7 +223,15 @@ export const Conversation = ({
         repositories.message.uploadFiles(activeConversation, files);
       }
     },
-    [activeConversation, conversationRepository, inTeam, repositories.asset, repositories.message, selfUser],
+    [
+      activeConversation,
+      conversationRepository,
+      fireAndForgetInvoker,
+      inTeam,
+      repositories.asset,
+      repositories.message,
+      selfUser,
+    ],
   );
 
   const uploadDroppedFiles = useCallback(
@@ -261,7 +271,9 @@ export const Conversation = ({
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
     if (activeConversation) {
       const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
-      mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
+      });
     }
   };
 
@@ -335,7 +347,9 @@ export const Conversation = ({
 
     if (parsed?.type === 'user-profile') {
       event.preventDefault();
-      void openUserProfile(parsed.id, parsed.domain);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await openUserProfile(parsed.id, parsed.domain);
+      });
       return false;
     }
 
@@ -372,16 +386,16 @@ export const Conversation = ({
     const domain = messageDetails.userDomain;
 
     if (userId !== undefined && userId.length > 0) {
-      (async () => {
+      fireAndForgetInvoker.fireAndForget(async () => {
         try {
           const userEntity = await repositories.user.getUserById({domain: domain ?? '', id: userId});
-          showUserDetails(userEntity);
+          await showUserDetails(userEntity);
         } catch (error: unknown) {
           if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
         }
-      })();
+      });
     }
   };
 
@@ -451,17 +465,22 @@ export const Conversation = ({
     }
   };
 
-  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
-    const conversationLastRead = conversationEntity.last_read_timestamp();
-    const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
-    const needsUpdate = conversationLastRead < lastKnownTimestamp;
+  const updateConversationLastRead = useCallback(
+    (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
+      const conversationLastRead = conversationEntity.last_read_timestamp();
+      const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
+      const needsUpdate = conversationLastRead < lastKnownTimestamp;
 
-    // if no message provided it means we need to jump to the last message
-    if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
-      conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
-      repositories.message.markAsRead(conversationEntity);
-    }
-  };
+      // if no message provided it means we need to jump to the last message
+      if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
+        conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
+        fireAndForgetInvoker.fireAndForget(async () => {
+          await repositories.message.markAsRead(conversationEntity);
+        });
+      }
+    },
+    [fireAndForgetInvoker, repositories.message, repositories.serverTime],
+  );
 
   const getInViewportCallback = useCallback(
     (conversationEntity: ConversationEntity, messageEntity: Message) => {
@@ -472,7 +491,9 @@ export const Conversation = ({
       if (!messageEntity.isEphemeral()) {
         const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
         if (conversationEntity.is1to1() && isCreationMessage) {
-          repositories.integration.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
+          fireAndForgetInvoker.fireAndForget(async () => {
+            await repositories.integration.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
+          });
         }
       }
 
@@ -480,9 +501,11 @@ export const Conversation = ({
         conversationEntity.setTimestamp(messageEntity.timestamp(), ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
       };
 
-      const startTimer = async () => {
+      const startTimer = () => {
         if (messageEntity.conversation_id === conversationEntity.id) {
-          repositories.conversation.checkMessageTimer(messageEntity as ContentMessage);
+          fireAndForgetInvoker.fireAndForget(async () => {
+            await repositories.conversation.checkMessageTimer(messageEntity as ContentMessage);
+          });
         }
       };
 
@@ -525,7 +548,13 @@ export const Conversation = ({
         return document.hasFocus() ? trigger() : window.addEventListener('focus', () => trigger(), {once: true});
       };
     },
-    [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
+    [
+      addReadReceiptToBatch,
+      fireAndForgetInvoker,
+      repositories.conversation,
+      repositories.integration,
+      updateConversationLastRead,
+    ],
   );
 
   const isFileTabActive = activeTabIndex === 1;
@@ -674,6 +703,7 @@ export const Conversation = ({
                   eventRepository={repositories.event}
                   messageRepository={repositories.message}
                   openGiphy={openGiphy}
+                  fireAndForgetInvoker={fireAndForgetInvoker}
                   propertiesRepository={repositories.properties}
                   searchRepository={repositories.search}
                   storageRepository={repositories.storage}

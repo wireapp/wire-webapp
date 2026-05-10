@@ -22,6 +22,7 @@ import {useCallback, useEffect} from 'react';
 import {amplify} from 'amplify';
 import {LexicalEditor} from 'lexical';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -51,6 +52,7 @@ interface UseMessageHandlingProps {
   editorRef: React.RefObject<LexicalEditor>;
   pastedFile: File | null;
   sendPastedFile: () => void;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useMessageHandling = ({
@@ -64,6 +66,7 @@ export const useMessageHandling = ({
   editorRef,
   pastedFile,
   sendPastedFile,
+  fireAndForgetInvoker,
 }: UseMessageHandlingProps) => {
   const {isEditing, editedMessage, editMessage: editMessageCallback, cancelMessageEditing} = useMessageEditing();
 
@@ -74,6 +77,7 @@ export const useMessageHandling = ({
     storageRepository,
     messageRepository,
     editorRef,
+    fireAndForgetInvoker,
     editedMessageId: editedMessage?.id,
     replyMessageEntityId: replyMessageEntity?.id,
     onLoad: draftState => {
@@ -100,13 +104,15 @@ export const useMessageHandling = ({
   const cancelMessageReply = useCallback(
     (resetDraft = true) => {
       replyMessageCallback(null);
-      void handleSaveDraft();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await handleSaveDraft();
+      });
 
       if (resetDraft) {
         draftState.reset();
       }
     },
-    [draftState, handleSaveDraft, replyMessageCallback],
+    [draftState, fireAndForgetInvoker, handleSaveDraft, replyMessageCallback],
   );
 
   const cancelMesssageEditingWithDraftReset = useCallback(() => {
@@ -132,6 +138,7 @@ export const useMessageHandling = ({
     pastedFile,
     sendPastedFile,
     messageContent,
+    fireAndForgetInvoker,
   });
 
   const editMessage = useCallback(
@@ -143,9 +150,10 @@ export const useMessageHandling = ({
 
         const quote = messageEntity.quote();
         if (quote != null) {
-          void messageRepository
-            .getMessageInConversationById(conversation, quote.messageId)
-            .then(quotedMessage => replyMessageCallback(quotedMessage));
+          fireAndForgetInvoker.fireAndForget(async () => {
+            const quotedMessage = await messageRepository.getMessageInConversationById(conversation, quote.messageId);
+            replyMessageCallback(quotedMessage);
+          });
         }
       }
     },
@@ -156,6 +164,7 @@ export const useMessageHandling = ({
       editMessageCallback,
       editedMessage,
       messageRepository,
+      fireAndForgetInvoker,
       replyMessageCallback,
     ],
   );
@@ -171,7 +180,9 @@ export const useMessageHandling = ({
         });
 
         replyMessageCallback(messageEntity);
-        void handleSaveDraft(messageEntity.id);
+        fireAndForgetInvoker.fireAndForget(async () => {
+          await handleSaveDraft(messageEntity.id);
+        });
 
         editorRef.current?.focus();
       }
@@ -181,6 +192,7 @@ export const useMessageHandling = ({
       cancelMessageReply,
       draftState,
       editorRef,
+      fireAndForgetInvoker,
       handleSaveDraft,
       isEditing,
       replyMessageCallback,
