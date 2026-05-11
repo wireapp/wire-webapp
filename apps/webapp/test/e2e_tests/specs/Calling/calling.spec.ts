@@ -836,9 +836,11 @@ test.describe('Calling', () => {
   );
 
   test(
-    'I want to see a group call timing out after 30s if I`m the last one left in the call',
+    'I want to see a group call timing out after 90s if I`m the last one left in the call',
     {tag: ['@TC-2937', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 95_000);
+
       const [userAPages, userBPages, userCPages] = await Promise.all([
         PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
@@ -867,8 +869,8 @@ test.describe('Calling', () => {
         }
       });
 
-      await test.step('Verify call ends for User A after 30s of being the last one in the call', async () => {
-        await expect(userAPages.calling().goFullScreen).toBeHidden({timeout: 35_000});
+      await test.step('Verify call ends for User A after 90s of being the last one in the call', async () => {
+        await expect(userAPages.calling().goFullScreen).toBeHidden({timeout: 95_000});
         await expect(
           userAPages
             .conversation()
