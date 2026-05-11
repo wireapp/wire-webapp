@@ -97,12 +97,12 @@ export const defaultOpts = {
 
   // Segmenter options.
   borderSmooth: 0,
-  smoothing: 0.8,
+  smoothing: 1,
   smoothstepMin: 0.6,
   smoothstepMax: 0.9,
   restartEvery: 0,
   bgBlur: 0,
-  bgBlurRadius: 30,
+  bgBlurRadius: 5,
 
   // Filter options.
   enableFilters: false,
