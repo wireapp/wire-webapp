@@ -856,7 +856,7 @@ export class Account extends TypedEventEmitter<Events> {
     onNotificationStreamProgress: (currentProcessingNotificationTimestamp: string) => void,
   ) => {
     return async (notification: Notification, source: NotificationSource): Promise<void> => {
-      void this.notificationProcessingQueue
+      this.notificationProcessingQueue
         .push(async () => {
           try {
             const start = Date.now();
@@ -1013,7 +1013,7 @@ export class Account extends TypedEventEmitter<Events> {
   ) => {
     return async (notificationId: string) => {
       if (this.hasMLSDevice) {
-        void queueConversationRejoin('all-conversations', () =>
+        queueConversationRejoin('all-conversations', () =>
           this.service!.conversation.handleConversationsEpochMismatch(),
         );
       }
@@ -1064,7 +1064,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       // We need to wait for the notification stream to be fully handled before releasing the message sending queue.
       // This is due to the nature of how message are encrypted, any change in mls epoch needs to happen before we start encrypting any kind of messages
-      void this.notificationProcessingQueue
+      this.notificationProcessingQueue
         .push(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
           resumeProposalProcessing();
@@ -1118,10 +1118,10 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_MESSAGE, notification => {
       this.logger.info('Received new notification from backend');
       if (Account.checkIsConsumable(notification)) {
-        void handleNotification(notification, NotificationSource.WEBSOCKET);
+        handleNotification(notification, NotificationSource.WEBSOCKET);
         return;
       }
-      void handleLegacyNotification(notification, NotificationSource.WEBSOCKET);
+      handleLegacyNotification(notification, NotificationSource.WEBSOCKET);
     });
 
     this.apiClient.transport.ws.on(WebSocketClient.TOPIC.ON_STATE_CHANGE, wsState => {

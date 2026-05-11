@@ -74,13 +74,14 @@ describe('useGetAssetUrl', () => {
     let result: Result;
 
     await act(async () => {
-      const rendered = renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrl,
-          onSuccess: mockOnSuccess,
-        }),
+      const rendered = renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrl,
+            onSuccess: mockOnSuccess,
+          }),
         {wrapper},
       );
       result = rendered.result;
@@ -97,12 +98,13 @@ describe('useGetAssetUrl', () => {
 
   it('does not fetch when disabled', async () => {
     await act(async () => {
-      renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: false,
-          getAssetUrl: mockGetAssetUrl,
-        }),
+      renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: false,
+            getAssetUrl: mockGetAssetUrl,
+          }),
         {wrapper},
       );
       await Promise.resolve();
@@ -118,13 +120,14 @@ describe('useGetAssetUrl', () => {
     let result: Result;
 
     await act(async () => {
-      const rendered = renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrlWithError,
-          onError: mockOnError,
-        }),
+      const rendered = renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrlWithError,
+            onError: mockOnError,
+          }),
         {wrapper},
       );
       result = rendered.result;
@@ -144,13 +147,14 @@ describe('useGetAssetUrl', () => {
     let result: Result;
 
     await act(async () => {
-      const rendered = renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrlWithCancel,
-          onError: mockOnError,
-        }),
+      const rendered = renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrlWithCancel,
+            onError: mockOnError,
+          }),
         {wrapper},
       );
       result = rendered.result;
@@ -165,12 +169,13 @@ describe('useGetAssetUrl', () => {
     let rerender: () => void;
 
     await act(async () => {
-      const rendered = renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrl,
-        }),
+      const rendered = renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrl,
+          }),
         {wrapper},
       );
 
@@ -190,12 +195,13 @@ describe('useGetAssetUrl', () => {
 
   it('updates asset status correctly through the lifecycle', async () => {
     await act(async () => {
-      renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrl,
-        }),
+      renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrl,
+          }),
         {wrapper},
       );
 
@@ -238,13 +244,14 @@ describe('useGetAssetUrl', () => {
     const mockOnSuccess = jest.fn();
 
     await act(async () => {
-      renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrl,
-          onSuccess: mockOnSuccess,
-        }),
+      renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrl,
+            onSuccess: mockOnSuccess,
+          }),
         {wrapper},
       );
       await Promise.resolve();
@@ -260,13 +267,14 @@ describe('useGetAssetUrl', () => {
     const mockOnError = jest.fn();
 
     await act(async () => {
-      renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrlWithError,
-          onError: mockOnError,
-        }),
+      renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrlWithError,
+            onError: mockOnError,
+          }),
         {wrapper},
       );
       await Promise.resolve();
@@ -283,13 +291,14 @@ describe('useGetAssetUrl', () => {
     const mockOnError = jest.fn();
 
     await act(async () => {
-      renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrlWithCancel,
-          onError: mockOnError,
-        }),
+      renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrlWithCancel,
+            onError: mockOnError,
+          }),
         {wrapper},
       );
       await Promise.resolve();
@@ -306,12 +315,13 @@ describe('useGetAssetUrl', () => {
       return mockAssetUrl;
     });
 
-    const {result} = renderHook(() =>
-      useGetAssetUrl({
-        asset: mockAsset,
-        isEnabled: true,
-        getAssetUrl: mockGetAssetUrlSlow,
-      }),
+    const {result} = renderHook(
+      () =>
+        useGetAssetUrl({
+          asset: mockAsset,
+          isEnabled: true,
+          getAssetUrl: mockGetAssetUrlSlow,
+        }),
       {wrapper},
     );
 
@@ -335,12 +345,13 @@ describe('useGetAssetUrl', () => {
     const mockGetAssetUrlWithError = jest.fn().mockRejectedValue(mockError);
 
     await act(async () => {
-      renderHook(() =>
-        useGetAssetUrl({
-          asset: mockAsset,
-          isEnabled: true,
-          getAssetUrl: mockGetAssetUrlWithError,
-        }),
+      renderHook(
+        () =>
+          useGetAssetUrl({
+            asset: mockAsset,
+            isEnabled: true,
+            getAssetUrl: mockGetAssetUrlWithError,
+          }),
         {wrapper},
       );
       await Promise.resolve();

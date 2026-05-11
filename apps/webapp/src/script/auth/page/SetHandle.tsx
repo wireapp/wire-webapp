@@ -68,7 +68,7 @@ const SetHandleComponent = ({
 
   useEffect(() => {
     if (hasSelfHandle) {
-      void removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
+      removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
       if (isNewAccount !== true) {
         window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
       }
@@ -116,12 +116,12 @@ const SetHandleComponent = ({
   };
 
   const handleAcceptNewletterConsent = () => {
-    void updateConsent(ConsentType.MARKETING, 1);
+    updateConsent(ConsentType.MARKETING, 1);
     storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, true);
   };
 
   const handleDeclineNewletterConsent = () => {
-    void updateConsent(ConsentType.MARKETING, 0);
+    updateConsent(ConsentType.MARKETING, 0);
     storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, false);
   };
 

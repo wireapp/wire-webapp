@@ -113,7 +113,7 @@ export class EventTrackingRepository {
     if (type === ClientEvent.USER.DATA_TRANSFER && this.teamState.isTeam()) {
       this.telemetryLogger.info('Received data transfer event with new telemetry tracking id', eventJson.data);
       if (!!eventJson.data.trackingIdentifier && eventJson.data.trackingIdentifier !== this.telemetryDeviceId) {
-        void this.migrateDeviceId(eventJson.data.trackingIdentifier);
+        this.migrateDeviceId(eventJson.data.trackingIdentifier);
       }
     }
   };

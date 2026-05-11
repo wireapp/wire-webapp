@@ -22,6 +22,8 @@ import React from 'react';
 import {fireEvent, render} from '@testing-library/react';
 
 import {UserList} from 'Components/UserList/UserList';
+import {RootProvider} from '../../page/RootProvider';
+import {createRootContextValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 
@@ -30,6 +32,14 @@ import {withTheme} from '../../auth/util/test/TestUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
+const rootContextValue = createRootContextValueForTest({
+  mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+  wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+});
+
+function renderWithRootProvider(element: React.ReactElement) {
+  return render(withTheme(<RootProvider value={rootContextValue}>{element}</RootProvider>));
+}
 
 beforeAll(() => {
   testFactory.exposeConversationActors().then(factory => {
@@ -53,7 +63,7 @@ describe('UserList', () => {
       isSelectable: true,
     };
 
-    const {getByTestId} = render(withTheme(<UserList {...props} />));
+    const {getByTestId} = renderWithRootProvider(<UserList {...props} />);
     const selectedSearchList = getByTestId('selected-search-list');
     expect(selectedSearchList.getAttribute('data-uie-value')).toEqual('4');
   });
@@ -80,7 +90,7 @@ describe('UserList', () => {
       isSelectable: true,
     };
 
-    const {getAllByTestId} = render(withTheme(<UserList {...props} />));
+    const {getAllByTestId} = renderWithRootProvider(<UserList {...props} />);
     const contactsList = getAllByTestId('item-user');
 
     expect(contactsList).toHaveLength(4);

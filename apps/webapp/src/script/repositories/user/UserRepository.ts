@@ -761,7 +761,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
 
     if (shouldRefreshUser && localUser) {
       // Trigger a refresh of the supported protocols in the background. No need to await for this one.
-      void this.refreshUserSupportedProtocols(localUser);
+      this.refreshUserSupportedProtocols(localUser);
     }
 
     if (localSupportedProtocols) {
@@ -873,7 +873,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
    */
   public readonly refreshAllKnownUsers = async (): Promise<void> => {
     const userIds = this.userState.users().map(user => user.qualifiedId);
-    void this.refreshUsers(userIds);
+    this.refreshUsers(userIds);
   };
 
   /**

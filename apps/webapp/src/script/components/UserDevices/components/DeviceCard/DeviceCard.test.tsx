@@ -21,6 +21,8 @@ import {render} from '@testing-library/react';
 import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
+import {RootProvider} from '../../../../page/RootProvider';
+import {createRootContextValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 
 import {DeviceCard} from './DeviceCard';
@@ -36,6 +38,15 @@ function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
   return device as ClientEntity;
 }
 
+const rootContextValue = createRootContextValueForTest({
+  mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+  wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+});
+
+function renderWithRootProvider(element: React.ReactElement) {
+  return render(<RootProvider value={rootContextValue}>{element}</RootProvider>);
+}
+
 describe('DeviceCard', () => {
   it('shows disclose icon when component is clickable', async () => {
     const props = {
@@ -49,7 +60,7 @@ describe('DeviceCard', () => {
       showIcon: true,
     };
 
-    const {getByTestId} = render(<DeviceCard {...props} />);
+    const {getByTestId} = renderWithRootProvider(<DeviceCard {...props} />);
     expect(getByTestId('disclose-icon')).not.toBeNull();
   });
 });

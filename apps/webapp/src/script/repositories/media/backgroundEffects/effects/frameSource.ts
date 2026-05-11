@@ -147,7 +147,7 @@ export class FrameSource {
     const reader = readable.getReader();
     this.processorReader = reader;
 
-    void (async () => {
+    (async () => {
       try {
         while (this.running && !abortController.signal.aborted) {
           const result = await reader.read();

@@ -115,7 +115,7 @@ export class MediaDevicesHandler {
       );
     });
 
-    void this.initializeMediaDevices(false);
+    this.initializeMediaDevices(false);
   }
 
   private initializeDeviceState = (supportsUserMedia: boolean) => {

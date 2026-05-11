@@ -203,7 +203,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     ) {
       this.updatePersistedSupportedProtocols();
       this.showReloadAppModal();
-      void this.scheduleReloadAppModal();
+      this.scheduleReloadAppModal();
     }
 
     return {

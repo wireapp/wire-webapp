@@ -168,7 +168,7 @@ export class WebSocketClient extends EventEmitter {
       this.onOpen();
       if (onConnect) {
         this.abortHandler = new AbortController();
-        void onConnect(this.abortHandler);
+        onConnect(this.abortHandler);
       }
     });
     this.socket.setOnClose(this.onClose);

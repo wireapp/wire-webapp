@@ -17,8 +17,12 @@
  *
  */
 
-import {render, screen, fireEvent} from '@testing-library/react';
+import {render, screen, fireEvent, waitFor} from '@testing-library/react';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import noop from 'noop-esm';
 
+import {RootProvider} from '../../../../page/RootProvider';
+import {createRootContextValueForTest} from '../../../../page/testSupport/rootContextTestSupport';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {FileHistoryContent} from './FileHistoryContent';
@@ -36,6 +40,12 @@ jest.mock('Util/localizerUtil', () => ({
     return key;
   },
 }));
+
+const rootContextValue = createRootContextValueForTest({
+  fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+  mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+  wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+});
 
 describe('FileHistoryContent', () => {
   const mockHandleDownload = jest.fn().mockResolvedValue(undefined);
@@ -73,31 +83,29 @@ describe('FileHistoryContent', () => {
     jest.clearAllMocks();
   });
 
-  it('should render file version groups by date', () => {
-    render(
+  function renderFileHistoryContent(fileVersions: Record<string, FileVersion[]> = mockFileVersions) {
+    return render(
       withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
+        <RootProvider value={rootContextValue}>
+          <FileHistoryContent
+            fileVersions={fileVersions}
+            handleDownload={mockHandleDownload}
+            handleRestore={mockHandleRestore}
+          />
+        </RootProvider>,
       ),
     );
+  }
+
+  it('should render file version groups by date', () => {
+    renderFileHistoryContent();
 
     expect(screen.getByText('8 Dec 2023')).toBeInTheDocument();
     expect(screen.getByText('7 Dec 2023')).toBeInTheDocument();
   });
 
   it('should render all versions with correct information', () => {
-    render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    renderFileHistoryContent();
 
     expect(screen.getByText(/10:30 AM/)).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -108,15 +116,7 @@ describe('FileHistoryContent', () => {
   });
 
   it('should mark the first version as current', () => {
-    render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    renderFileHistoryContent();
 
     // Check that 'current' label appears - text is split by whitespace so use partial matching
     const currentLabel = screen.getByText((content, element) => {
@@ -126,30 +126,14 @@ describe('FileHistoryContent', () => {
   });
 
   it('should render download buttons for all versions', () => {
-    render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    renderFileHistoryContent();
 
     const downloadButtons = screen.getAllByText('cells.versionHistory.download');
     expect(downloadButtons).toHaveLength(3);
   });
 
   it('should render restore buttons for non-current versions', () => {
-    render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    renderFileHistoryContent();
 
     const restoreButtons = screen.getAllByText('cells.versionHistory.restore');
     // Should have 2 restore buttons (excluding the current version)
@@ -157,15 +141,7 @@ describe('FileHistoryContent', () => {
   });
 
   it('should not render restore button for current version', () => {
-    render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    renderFileHistoryContent();
 
     // All versions should have download buttons
     const downloadButtons = screen.getAllByText('cells.versionHistory.download');
@@ -177,32 +153,18 @@ describe('FileHistoryContent', () => {
   });
 
   it('should call handleDownload when download button is clicked', () => {
-    render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    renderFileHistoryContent();
 
-    const downloadButtons = screen.getAllByText('cells.versionHistory.download');
+    const downloadButtons = screen.getAllByLabelText(/cells\.versionHistory\.downloadAriaLabel/);
     fireEvent.click(downloadButtons[0]);
 
-    expect(mockHandleDownload).toHaveBeenCalledWith('https://example.com/download/version-1');
+    return waitFor(() => {
+      expect(mockHandleDownload).toHaveBeenCalledWith('https://example.com/download/version-1');
+    });
   });
 
   it('should call handleRestore when restore button is clicked', () => {
-    render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    renderFileHistoryContent();
 
     const restoreButtons = screen.getAllByText('cells.versionHistory.restore');
     fireEvent.click(restoreButtons[0]);
@@ -211,26 +173,14 @@ describe('FileHistoryContent', () => {
   });
 
   it('should render empty state when no versions are provided', () => {
-    const {container} = render(
-      withTheme(
-        <FileHistoryContent fileVersions={{}} handleDownload={mockHandleDownload} handleRestore={mockHandleRestore} />,
-      ),
-    );
+    const {container} = renderFileHistoryContent({});
 
     const dateHeadings = container.querySelectorAll('h3');
     expect(dateHeadings).toHaveLength(0);
   });
 
   it('should have proper aria labels for download buttons', () => {
-    const {container} = render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    const {container} = renderFileHistoryContent();
 
     // Check that download buttons have aria-labels
     const downloadButtons = container.querySelectorAll('[aria-label*="downloadAriaLabel"]');
@@ -245,15 +195,7 @@ describe('FileHistoryContent', () => {
   });
 
   it('should have proper aria labels for restore buttons', () => {
-    const {container} = render(
-      withTheme(
-        <FileHistoryContent
-          fileVersions={mockFileVersions}
-          handleDownload={mockHandleDownload}
-          handleRestore={mockHandleRestore}
-        />,
-      ),
-    );
+    const {container} = renderFileHistoryContent();
 
     // Check that restore buttons have aria-labels
     const restoreButtons = container.querySelectorAll('[aria-label*="restoreAriaLabel"]');

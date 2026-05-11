@@ -256,9 +256,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     }, [activeConversation, conversationRepository, fireAndForgetInvoker]);
 
     useEffect(() => {
-      if (team.id && isSingleUserMode) {
+      const teamId = team.id;
+      const firstParticipantId = firstParticipant?.id;
+      if (teamId && isSingleUserMode && firstParticipantId) {
         fireAndForgetInvoker.fireAndForget(async () => {
-          await teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
+          await teamRepository.updateTeamMembersByIds(teamId, [firstParticipantId], true);
         });
       }
     }, [firstParticipant, fireAndForgetInvoker, isSingleUserMode, team, teamRepository]);

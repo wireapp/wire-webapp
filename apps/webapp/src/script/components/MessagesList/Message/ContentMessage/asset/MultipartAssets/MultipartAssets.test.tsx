@@ -62,11 +62,7 @@ describe('MultipartAssets', () => {
   });
 
   function renderWithRootContext(element: ReactElement) {
-    return render(
-      <RootProvider value={rootContextValue}>
-        {element}
-      </RootProvider>,
-    );
+    return render(<RootProvider value={rootContextValue}>{element}</RootProvider>);
   }
 
   let mockCellsRepository: jest.Mocked<CellsRepository>;

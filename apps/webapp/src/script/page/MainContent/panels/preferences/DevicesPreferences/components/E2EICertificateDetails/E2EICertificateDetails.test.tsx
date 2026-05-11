@@ -144,9 +144,7 @@ describe('E2EICertificateDetails', () => {
     ])('for %s certificate', async (_label, status) => {
       const identity = generateIdentity(status);
 
-      const {getByText} = renderE2EICertificateDetails(
-        <E2EICertificateDetails identity={identity} isCurrentDevice />,
-      );
+      const {getByText} = renderE2EICertificateDetails(<E2EICertificateDetails identity={identity} isCurrentDevice />);
 
       await waitFor(() => {
         const updateCertificateButton = getByText('E2EI.updateCertificate');
@@ -163,9 +161,7 @@ describe('E2EICertificateDetails', () => {
     it('shows get certificate button when certificate is not activated', async () => {
       const identity = generateIdentity(MLSStatuses.NOT_ACTIVATED);
 
-      const {getByText} = renderE2EICertificateDetails(
-        <E2EICertificateDetails identity={identity} isCurrentDevice />,
-      );
+      const {getByText} = renderE2EICertificateDetails(<E2EICertificateDetails identity={identity} isCurrentDevice />);
 
       const getCertificateButton = getByText('E2EI.getCertificate');
       expect(getCertificateButton).toBeDefined();

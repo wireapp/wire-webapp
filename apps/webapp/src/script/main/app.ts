@@ -207,7 +207,7 @@ export class App {
     const selfService = new SelfService();
     const teamService = new TeamService();
     // Initialize permissions
-    void initializePermissions();
+    initializePermissions();
 
     const mediaConstraintsHandler = new MediaConstraintsHandler();
 
@@ -451,7 +451,7 @@ export class App {
       }
       this.core.on(CoreEvents.NEW_SESSION, ({userId, clientId}) => {
         const newClient = {class: ClientClassification.UNKNOWN, id: clientId};
-        void userRepository.addClientToUser(userId, newClient, true);
+        userRepository.addClientToUser(userId, newClient, true);
       });
 
       this.core.service?.mls?.on(
@@ -634,7 +634,7 @@ export class App {
       const clientEntities = await clientRepository.updateClientsForSelf();
 
       // We unblock the lock screen by loading this code asynchronously, to make it appear to the user that the app is done loading earlier.
-      void eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
+      eventTrackerRepository.init(propertiesRepository.getUserConsentStatus().isTelemetryConsentGiven);
 
       eventLogger.log(AppInitializationStep.ClientsUpdated, {count: clientEntities.length});
       telemetry.addStatistic(AppInitStatisticsValue.CLIENTS, clientEntities.length);
@@ -885,7 +885,9 @@ export class App {
   private readonly showClientCertificateRevokedWarning = async () => {
     const {modalOptions, modalType} = getModalOptions({
       type: ModalType.SELF_CERTIFICATE_REVOKED,
-      primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
+      primaryActionFn: () => {
+        this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false);
+      },
     });
 
     PrimaryModal.show(modalType, modalOptions);

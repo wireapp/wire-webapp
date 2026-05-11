@@ -248,7 +248,7 @@ export class EventRepository {
       }
 
       this.logger.info('Internet connection regained. Re-establishing WebSocket connection...');
-      void connect();
+      connect();
     };
 
     const verifyConnectionHealthAndReconnect = async (reason: 'Focus' | 'Visibility' | 'Heartbeat') => {
@@ -309,7 +309,7 @@ export class EventRepository {
       const handleFocus = () => {
         if (navigator.onLine) {
           this.logger.info('Window focused, verifying connection...');
-          void verifyConnectionHealthAndReconnect('Focus');
+          verifyConnectionHealthAndReconnect('Focus');
         }
       };
 
@@ -320,7 +320,7 @@ export class EventRepository {
       const handleVisibilityChange = () => {
         if (document.visibilityState === 'visible' && navigator.onLine) {
           this.logger.info('Tab became visible, verifying connection...');
-          void verifyConnectionHealthAndReconnect('Visibility');
+          verifyConnectionHealthAndReconnect('Visibility');
         }
       };
 
@@ -342,7 +342,7 @@ export class EventRepository {
     // Heartbeat intentionally verifies connection health while online, even when the
     // connection is not CLOSED, to detect stale "open-but-unhealthy" websocket states.
     const heartbeatInterval = window.setInterval(() => {
-      void verifyConnectionHealthAndReconnect('Heartbeat');
+      verifyConnectionHealthAndReconnect('Heartbeat');
     }, EventRepository.CONFIG.HEARTBEAT_INTERVAL);
 
     cleanupHandlers.push(() => {

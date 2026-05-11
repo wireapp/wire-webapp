@@ -75,7 +75,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
 
   useEffect(() => {
     if (Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN) {
-      void immediateLogin();
+      immediateLogin();
     }
   }, [immediateLogin]);
 

@@ -77,7 +77,7 @@ export const DeviceDetails = ({
 
   useEffect(() => {
     setFingerprintRemote(undefined);
-    void cryptographyRepository
+    cryptographyRepository
       .getRemoteFingerprint(user.qualifiedId, device.id)
       .then(remoteFingerprint => setFingerprintRemote(remoteFingerprint));
   }, [device]);

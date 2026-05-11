@@ -246,7 +246,7 @@ export class PropertiesRepository {
         ? this.savePreferenceTemporaryGuestAccount(propertiesType, updatedPreference)
         : this.savePreferenceActivatedAccount(propertiesType, updatedPreference);
 
-      void savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
+      savePromise.then(() => this.publishPropertyUpdate(propertiesType, updatedPreference));
     }
   }
 

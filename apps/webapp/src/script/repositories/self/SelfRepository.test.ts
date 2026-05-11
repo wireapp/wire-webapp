@@ -73,7 +73,7 @@ describe('SelfRepository', () => {
         name: 'test-name',
       });
 
-      void selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
+      selfRepository.initialisePeriodicSelfSupportedProtocolsCheck();
 
       await waitFor(() => {
         expect(selfUser.supportedProtocols()).toEqual(evaluatedProtocols);

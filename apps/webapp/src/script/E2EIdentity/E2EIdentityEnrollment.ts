@@ -218,7 +218,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     if (firingDate <= Date.now()) {
       // We want to automatically trigger the enrollment modal if it's a devices in team that just activated e2eidentity
       // Or if the timer is supposed to fire now
-      void task(isSnoozable);
+      task(isSnoozable);
     } else {
       LowPrecisionTaskScheduler.addTask({
         key: timerKey,

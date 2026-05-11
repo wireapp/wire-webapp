@@ -49,7 +49,7 @@ export class DexieDatabase extends Dexie {
     super(dbName);
     this.logger = getLogger(`Dexie (${dbName})`);
 
-    void this.initDbSchema();
+    this.initDbSchema();
 
     this.amplify = this.table(StorageSchemata.OBJECT_STORE.AMPLIFY);
     this.clients = this.table(StorageSchemata.OBJECT_STORE.CLIENTS);

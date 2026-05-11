@@ -519,7 +519,7 @@ export class BackgroundEffectsController {
       this.handleWebGLContextLost();
     };
     this.webglContextRestoreHandler = () => {
-      void this.handleWebGLContextRestored();
+      this.handleWebGLContextRestored();
     };
     this.outputCanvas.addEventListener('webglcontextlost', this.webglContextLossHandler as EventListener, {
       passive: false,
@@ -544,7 +544,7 @@ export class BackgroundEffectsController {
     this.webglContextLost = true;
     this.webglRestorePipeline = this.pipeline;
     this.logger.warn('WebGL context lost; falling back to passthrough');
-    void this.initPipeline('passthrough');
+    this.initPipeline('passthrough');
   }
 
   private async handleWebGLContextRestored(): Promise<void> {
@@ -579,7 +579,7 @@ export class BackgroundEffectsController {
       return;
     }
     this.logger.warn('Worker WebGL context lost; falling back to passthrough');
-    void this.initPipeline('passthrough');
+    this.initPipeline('passthrough');
   }
 
   /**

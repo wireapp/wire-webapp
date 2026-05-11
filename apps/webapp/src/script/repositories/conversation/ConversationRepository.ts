@@ -3824,7 +3824,7 @@ export class ConversationRepository {
       conversation,
       currentTimestamp,
     );
-    return void this.eventRepository.injectEvent(joinedAfterMLSMigrationFinalisationEvent);
+    this.eventRepository.injectEvent(joinedAfterMLSMigrationFinalisationEvent);
   };
 
   private readonly injectMLSMigrationFinalisationOngoingCallMessage = (conversation: Conversation): void => {
@@ -3834,7 +3834,7 @@ export class ConversationRepository {
       currentTimestamp,
     );
 
-    return void this.eventRepository.injectEvent(mlsMigrationFinalisationOngoingCallEvent);
+    this.eventRepository.injectEvent(mlsMigrationFinalisationOngoingCallEvent);
   };
 
   /**
@@ -3850,7 +3850,7 @@ export class ConversationRepository {
 
     const event = EventBuilder.buildMLSConversationRecovered(conversation, currentTimestamp);
 
-    void this.eventRepository.injectEvent(event);
+    this.eventRepository.injectEvent(event);
   };
 
   /**

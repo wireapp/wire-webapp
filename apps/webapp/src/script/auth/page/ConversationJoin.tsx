@@ -190,7 +190,7 @@ const ConversationJoinComponent = ({
               error.label.endsWith(errorType),
             );
             if (!isValidationError) {
-              void doLogout();
+              doLogout();
               console.warn('Unable to create wireless account', error);
               setShowEntropyForm(false);
             }

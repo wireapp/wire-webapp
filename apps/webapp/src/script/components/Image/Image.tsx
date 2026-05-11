@@ -82,7 +82,7 @@ export const Image = ({
 
   useEffect(() => {
     if (!imageUrl && isInViewport && isFileSharingReceivingEnabled) {
-      void (async () => {
+      (async () => {
         try {
           const allowedImageTypes = [
             'application/octet-stream', // Octet-stream is required to paste images from clipboard

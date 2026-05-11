@@ -153,7 +153,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         lastSyncTimestamp: Date.now(),
         version: (parsedStoredData?.version ?? 0) + 1,
       };
-      void this.propertiesService.putPropertiesByKey(propertiesKey, conversationLabelJson);
+      this.propertiesService.putPropertiesByKey(propertiesKey, conversationLabelJson);
       this.persistValues(conversationLabelJson);
     }
   };
@@ -198,7 +198,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
             lastSyncTimestamp: Date.now(),
             version: (localData.version ?? 0) + 1,
           };
-          void this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
+          this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
           this.persistValues(updatedData);
           return;
         }
@@ -216,7 +216,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
           lastSyncTimestamp: Date.now(),
           version: (localData.version ?? 0) + 1,
         };
-        void this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
+        this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
         this.persistValues(updatedData);
       }
       // If both are null, labels remain empty (default state)

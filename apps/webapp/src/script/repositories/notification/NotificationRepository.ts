@@ -764,12 +764,12 @@ export class NotificationRepository {
     if (shouldPlaySound) {
       switch (messageEntity.super_type) {
         case SuperType.CONTENT: {
-          void this.audioRepository.play(AudioType.NEW_MESSAGE);
+          this.audioRepository.play(AudioType.NEW_MESSAGE);
           break;
         }
 
         case SuperType.PING: {
-          void this.audioRepository.play(AudioType.INCOMING_PING);
+          this.audioRepository.play(AudioType.INCOMING_PING);
           break;
         }
       }
@@ -868,7 +868,7 @@ export class NotificationRepository {
     notification.onclick = () => {
       amplify.publish(WebAppEvents.NOTIFICATION.CLICK);
       window.focus();
-      void this.callingRepository.setViewModeMinimized();
+      this.callingRepository.setViewModeMinimized();
       notificationContent.trigger();
 
       this.logger.info(`Notification for ${messageInfo} in '${conversationId?.id || conversationId}' closed by click.`);

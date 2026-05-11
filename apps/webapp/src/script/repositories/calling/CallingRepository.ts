@@ -464,11 +464,11 @@ export class CallingRepository {
     const selfParticipant = activeCall.getSelfParticipant();
 
     if (!selfParticipant.isMuted()) {
-      void this.refreshAudioInput();
+      this.refreshAudioInput();
     }
 
     if (selfParticipant.isSendingVideo()) {
-      void this.refreshVideoInput();
+      this.refreshVideoInput();
     }
   };
 
@@ -1136,7 +1136,7 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation): Promise<void | Call> {
-    void this.setViewModeMinimized();
+    this.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
         `Calling repository is not initialized correctly \n ${JSON.stringify({
@@ -1444,7 +1444,7 @@ export class CallingRepository {
     if (joinedCall && isSharingScreen && isScreenSharingSourceFromDetachedWindow) {
       window.dispatchEvent(new CustomEvent(WebAppEvents.CALL.SCREEN_SHARING_ENDED));
       this.callState.isScreenSharingSourceFromDetachedWindow(false);
-      void this.toggleOnlyScreenshare(joinedCall);
+      this.toggleOnlyScreenshare(joinedCall);
     }
   };
 
@@ -1518,7 +1518,7 @@ export class CallingRepository {
   }
 
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
-    void this.setViewModeMinimized();
+    this.setViewModeMinimized();
 
     // Temporary feature to toggle Rust SFT
     this.setSetupSftConfig(call);
@@ -2172,7 +2172,8 @@ export class CallingRepository {
      * rejected a call and to stop ringing.
      */
     if (typeof payload === 'string' && isMLSConversation(conversation) && myClientsOnly) {
-      return void this.messageRepository.sendCallingMessageToSelfMLSConversation(payload, conversation.qualifiedId);
+      await this.messageRepository.sendCallingMessageToSelfMLSConversation(payload, conversation.qualifiedId);
+      return;
     }
 
     const message = await this.messageRepository.sendCallingMessage(conversation, content, options);
@@ -2194,18 +2195,18 @@ export class CallingRepository {
   };
 
   readonly sendInCallEmoji = async (emojis: string, call: Call) => {
-    void this.messageRepository.sendInCallEmoji(call.conversation, {
+    this.messageRepository.sendInCallEmoji(call.conversation, {
       [emojis]: 1,
     });
   };
 
   readonly sendInCallHandRaised = async (isHandUp: boolean, call: Call) => {
-    void this.messageRepository.sendInCallHandRaised(call.conversation, isHandUp);
+    this.messageRepository.sendInCallHandRaised(call.conversation, isHandUp);
   };
 
   readonly sendModeratorMute = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    void this.sendCallingMessage(
+    this.sendCallingMessage(
       conversationId,
       {type: CALL_MESSAGE_TYPE.REMOTE_MUTE, data: {targets: recipients}},
       {nativePush: true, recipients},
@@ -2214,7 +2215,7 @@ export class CallingRepository {
 
   readonly sendModeratorKick = (conversationId: QualifiedId, participants: Participant[]) => {
     const recipients = this.convertParticipantsToCallingMessageRecepients(participants);
-    void this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
+    this.sendCallingMessage(conversationId, {type: CALL_MESSAGE_TYPE.REMOTE_KICK}, {nativePush: true, recipients});
   };
 
   private readonly sendSFTRequest = (
@@ -2278,7 +2279,7 @@ export class CallingRepository {
         },
       )
     ) {
-      void this.setViewModeMinimized();
+      this.setViewModeMinimized();
     }
 
     // There's nothing we need to do for non-mls calls
@@ -2587,7 +2588,7 @@ export class CallingRepository {
     if (isCurrentlyEstablished && newEstablishedStatus === AUDIO_STATE.CONNECTING) {
       call.epochCache.clean();
       call.epochCache.disable();
-      void this.leave1on1MLSConference(conversationId);
+      this.leave1on1MLSConference(conversationId);
     }
   };
 

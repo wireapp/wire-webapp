@@ -256,7 +256,7 @@ export class MessageRepository {
       legalHoldStatus: conversation.legalHoldStatus(),
     });
 
-    void this.audioRepository.play(AudioType.OUTGOING_PING);
+    this.audioRepository.play(AudioType.OUTGOING_PING);
     return this.sendAndInjectMessage(ping, conversation, {enableEphemeral: true});
   }
 

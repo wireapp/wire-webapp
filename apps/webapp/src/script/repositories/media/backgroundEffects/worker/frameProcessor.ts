@@ -251,7 +251,7 @@ function ensureSegmenterForTier(tier: QualityTier): void {
     state.pendingModelPath = null;
   })();
 
-  void state.segmenterInitPromise.finally(() => {
+  state.segmenterInitPromise.finally(() => {
     if (initId === currentInitId) {
       state.segmenterInitPromise = null;
     }

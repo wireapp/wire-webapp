@@ -164,8 +164,8 @@ export class MLSService extends TypedEventEmitter<Events> {
       },
     };
 
-    void this.coreCryptoClient.registerEpochObserver(epochObserver);
-    void this.coreCryptoClient.provideTransport(mlsTransport);
+    this.coreCryptoClient.registerEpochObserver(epochObserver);
+    this.coreCryptoClient.provideTransport(mlsTransport);
   }
 
   /**

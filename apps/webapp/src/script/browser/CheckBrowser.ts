@@ -124,7 +124,7 @@ const checkBrowser = (): void => {
     redirectUnsupportedBrowser("This browser doesn't support RTC to run the Wire app!");
     return;
   }
-  void supportsIndexDB()
+  supportsIndexDB()
     .catch(() => false)
     .then(res => {
       if (!res) {

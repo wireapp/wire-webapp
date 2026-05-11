@@ -105,7 +105,7 @@ export class CryptoboxWrapper implements CryptoClient {
   }
 
   async sessionFromPrekey(sessionId: string, prekey: Uint8Array): Promise<void> {
-    return void (await this.cryptobox.session_from_prekey(sessionId, toArrayBuffer(prekey.buffer)));
+    await this.cryptobox.session_from_prekey(sessionId, toArrayBuffer(prekey.buffer));
   }
 
   async sessionExists(sessionId: string) {

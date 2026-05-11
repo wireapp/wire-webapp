@@ -350,7 +350,7 @@ export class LifeCycleRepository {
     this.logger.info('Initiating persistent storage cleanup: clearing cache and deleting database.');
 
     // Clear cache storage, not a blocking operation therefore not awaited
-    void CacheRepository.clearCacheStorage();
+    CacheRepository.clearCacheStorage();
 
     // Delete database with error handling
     try {

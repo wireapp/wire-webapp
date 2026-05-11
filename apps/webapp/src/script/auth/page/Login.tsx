@@ -364,7 +364,7 @@ const LoginComponent = ({
     setTwoFactorSubmitError('');
     // Do not auto submit if already failed once
     if (!twoFactorSubmitFailedOnce) {
-      void handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
+      handleSubmit({...twoFactorLoginData, verificationCode: code}, []);
     }
   };
 
@@ -413,7 +413,7 @@ const LoginComponent = ({
             <JoinGuestLinkPasswordModal
               onClose={() => {
                 setIsLinkPasswordModalOpen(false);
-                void resetAuthError();
+                resetAuthError();
                 setValidationErrors([]);
               }}
               error={conversationError}
@@ -527,7 +527,7 @@ const LoginComponent = ({
                         {!Runtime.isDesktopApp() && (
                           <Checkbox
                             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                              void pushLoginData({
+                              pushLoginData({
                                 clientType: event.target.checked ? ClientType.TEMPORARY : ClientType.PERMANENT,
                               });
                             }}

@@ -84,7 +84,7 @@ export const SearchInput = ({
             onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
               if (isEnterKey(event.nativeEvent)) {
                 event.preventDefault();
-                void onEnter?.(event);
+                onEnter?.(event);
               }
               return true;
             }}
