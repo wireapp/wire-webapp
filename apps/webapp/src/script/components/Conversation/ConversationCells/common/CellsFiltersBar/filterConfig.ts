@@ -17,17 +17,25 @@
  *
  */
 
-import {clearIconStyles} from './CellsHeader.styles';
+import {FilterItem} from '../FilterPopover/FilterPopover';
 
-export const CellsSearchClearIcon = () => {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" css={clearIconStyles} aria-hidden="true">
-      <path
-        fillRule="evenodd"
-        clipRule="evenodd"
-        d="M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16ZM8 9.41421L4.75736 12.6569L3.34315 11.2426L6.58579 8L3.34315 4.75736L4.75736 3.34315L8 6.58579L11.2426 3.34315L12.6569 4.75736L9.41421 8L12.6569 11.2426L11.2426 12.6569L8 9.41421Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
+export type {FilterItem};
+
+export type PopoverFilterConfig = {
+  type: 'popover';
+  id: string;
+  label: string;
+  items: FilterItem[];
+  selectedIds: string[];
+  onSelectionChange: (ids: string[]) => void;
 };
+
+export type ToggleFilterConfig = {
+  type: 'toggle';
+  id: string;
+  label: string;
+  isActive: boolean;
+  onToggle: () => void;
+};
+
+export type FilterConfig = PopoverFilterConfig | ToggleFilterConfig;

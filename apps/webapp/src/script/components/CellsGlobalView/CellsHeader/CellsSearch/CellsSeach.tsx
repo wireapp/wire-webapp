@@ -17,20 +17,10 @@
  *
  */
 
-import {FormEvent} from 'react';
-
-import {CircleCloseIcon, Input, SearchIcon} from '@wireapp/react-ui-kit';
-
+import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
 import {t} from 'Util/localizerUtil';
 
-import {
-  closeButtonStyles,
-  closeIconStyles,
-  inputStyles,
-  inputWrapperStyles,
-  searchIconStyles,
-  wrapperStyles,
-} from './CellsSearch.styles';
+import {wrapperStyles} from './CellsSearch.styles';
 
 interface CellsSearchProps {
   searchValue: string;
@@ -38,45 +28,15 @@ interface CellsSearchProps {
   onClearSearch: () => void;
 }
 
-export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchProps) => {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const searchValue = formData.get('cells-global-view-search') as string;
-
-    if (!searchValue) {
-      return;
-    }
-
-    onSearch(searchValue);
-  };
-
-  return (
-    <form css={wrapperStyles} onSubmit={handleSubmit}>
-      <Input
-        value={searchValue}
-        placeholder={t('cells.search.placeholder')}
-        aria-label={t('cells.search.placeholder')}
-        name="cells-global-view-search"
-        onChange={event => onSearch(event.currentTarget.value)}
-        startContent={<SearchIcon width={14} height={14} css={searchIconStyles} />}
-        endContent={
-          <>
-            {searchValue && (
-              <button
-                type="button"
-                onClick={onClearSearch}
-                css={closeButtonStyles}
-                aria-label={t('cells.search.closeButton')}
-              >
-                <CircleCloseIcon className="cursor-pointer" css={closeIconStyles} />
-              </button>
-            )}
-          </>
-        }
-        inputCSS={inputStyles}
-        wrapperCSS={inputWrapperStyles}
-      />
-    </form>
-  );
-};
+export const CellsSearch = ({searchValue, onSearch, onClearSearch}: CellsSearchProps) => (
+  <div css={wrapperStyles}>
+    <CellsSearchInput
+      value={searchValue}
+      placeholder={t('cells.search.placeholder')}
+      onChange={onSearch}
+      onClear={onClearSearch}
+      clearAriaLabel={t('cells.search.closeButton')}
+      uieName="cells-search-input"
+    />
+  </div>
+);
