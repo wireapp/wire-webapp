@@ -72,6 +72,9 @@ export type WorkerProcessVideoTrackOptions = Omit<
   backgroundSource: WorkerBackgroundSource | null;
 };
 
+export const SELFIE_MULTICLASS_MODEL_PATH = '/assets/mediapipe-models/selfie_multiclass_256x256.tflite';
+export const SELFIE_SEGMENTER_MODEL_PATH = '/assets/mediapipe-models/selfie_segmenter_landscape.tflite';
+
 /**
  * Configuration options for the virtual background.
  */
@@ -79,7 +82,7 @@ export const defaultOpts = {
   // MediaPipe options.
   wasmLoaderPath: '/min/mediapipe/wasm/vision_wasm_internal.js',
   wasmBinaryPath: '/min/mediapipe/wasm/vision_wasm_internal.wasm',
-  modelPath: '/assets/mediapipe-models/selfie_multiclass_256x256.tflite',
+  modelPath: SELFIE_MULTICLASS_MODEL_PATH,
   useWorker: !Runtime.isFirefox(),
 
   // Virtual background options.
