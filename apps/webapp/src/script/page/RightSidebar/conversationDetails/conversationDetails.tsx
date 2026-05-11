@@ -54,6 +54,7 @@ import {isServiceEntity} from '../../../guards/Service';
 import {Shortcut} from '../../../ui/Shortcut';
 import {ShortcutType} from '../../../ui/ShortcutType';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {useApplicationContext} from '../../RootProvider';
 import {PanelHeader} from '../panelHeader';
 import {PanelEntity, PanelState} from '../RightSidebar';
 
@@ -91,6 +92,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     },
     ref,
   ) => {
+    const {fireAndForgetInvoker} = useApplicationContext();
     const [selectedService, setSelectedService] = useState<ServiceEntity>();
 
     const roleRepository = conversationRepository.conversationRoleRepository;
@@ -248,14 +250,18 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const isServiceMode = isSingleUserMode && firstParticipant!.isService;
 
     useEffect(() => {
-      void conversationRepository.refreshUnavailableParticipants(activeConversation);
-    }, [activeConversation, conversationRepository]);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await conversationRepository.refreshUnavailableParticipants(activeConversation);
+      });
+    }, [activeConversation, conversationRepository, fireAndForgetInvoker]);
 
     useEffect(() => {
       if (team.id && isSingleUserMode) {
-        void teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
+        fireAndForgetInvoker.fireAndForget(async () => {
+          await teamRepository.updateTeamMembersByIds(team.id, [firstParticipant!.id], true);
+        });
       }
-    }, [firstParticipant, isSingleUserMode, team, teamRepository]);
+    }, [firstParticipant, fireAndForgetInvoker, isSingleUserMode, team, teamRepository]);
 
     useEffect(() => {
       const getService = async () => {
@@ -269,8 +275,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         }
       };
 
-      void getService();
-    }, [firstParticipant, integrationRepository]);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await getService();
+      });
+    }, [firstParticipant, fireAndForgetInvoker, integrationRepository]);
 
     return (
       <div
@@ -376,6 +384,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
             timedMessagesText={timedMessagesText}
             updateConversationReceiptMode={updateConversationReceiptMode}
             isChannelPublic={isChannelPublic}
+            fireAndForgetInvoker={fireAndForgetInvoker}
           />
 
           <ConversationProtocolDetails

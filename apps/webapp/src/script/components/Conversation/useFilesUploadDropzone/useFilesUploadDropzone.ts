@@ -32,6 +32,7 @@ import {validateFiles, ValidationResult} from './fileValidation/fileValidation';
 import {showFileDropzoneErrorModal} from './showFileDropzoneErrorModal/showFileDropzoneErrorModal';
 import {transformAcceptedFiles} from './transformAcceptedFiles/transformAcceptedFiles';
 
+import {useApplicationContext} from '../../../page/RootProvider';
 import {FileWithPreview, useFileUploadState} from '../useFilesUploadState/useFilesUploadState';
 import {checkFileSharingPermission} from '../utils/checkFileSharingPermission';
 
@@ -57,6 +58,7 @@ export const useFilesUploadDropzone = ({
   cellsRepository,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
 }: UseFilesUploadDropzoneParams) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {addFiles, getFiles, updateFile} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
 
@@ -73,11 +75,13 @@ export const useFilesUploadDropzone = ({
     disabled: isDisabled,
     accept,
     onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
-        (error: unknown) => {
-          logger.error('Processing incoming files failed', error);
-        },
-      );
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
+          (error: unknown) => {
+            logger.error('Processing incoming files failed', error);
+          },
+        );
+      });
     }),
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);

@@ -19,6 +19,7 @@
 
 import {amplify} from 'amplify';
 
+import type {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -39,6 +40,7 @@ interface GetConversationActionsParams {
   isServiceMode?: boolean;
   isTeam?: boolean;
   isParticipantBlocked?: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 const getConversationActions = ({
@@ -49,6 +51,7 @@ const getConversationActions = ({
   isServiceMode = false,
   isTeam = false,
   isParticipantBlocked = false,
+  fireAndForgetInvoker,
 }: GetConversationActionsParams): MenuItem[] => {
   if (!conversationEntity) {
     return [];
@@ -98,7 +101,9 @@ const getConversationActions = ({
           if (!userEntity) {
             return;
           }
-          void actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation());
+          fireAndForgetInvoker.fireAndForget(async () => {
+            await actionsViewModel.cancelConnectionRequest(userEntity, true, getNextConversation());
+          });
         },
         Icon: Icon.CloseIcon,
         identifier: 'do-cancel-request',
@@ -121,7 +126,9 @@ const getConversationActions = ({
           if (!userEntity) {
             return;
           }
-          void actionsViewModel.blockUser(userEntity);
+          fireAndForgetInvoker.fireAndForget(async () => {
+            await actionsViewModel.blockUser(userEntity);
+          });
         },
         Icon: Icon.BlockIcon,
         identifier: 'do-block',
@@ -135,7 +142,9 @@ const getConversationActions = ({
           if (!userEntity) {
             return;
           }
-          void actionsViewModel.unblockUser(userEntity);
+          fireAndForgetInvoker.fireAndForget(async () => {
+            await actionsViewModel.unblockUser(userEntity);
+          });
         },
         Icon: Icon.BlockIcon,
         identifier: 'do-unblock',

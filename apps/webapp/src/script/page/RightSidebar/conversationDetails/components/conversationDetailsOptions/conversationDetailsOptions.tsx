@@ -21,6 +21,7 @@ import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/';
 import {amplify} from 'amplify';
 
+import type {FireAndForgetInvoker} from '@wireapp/core';
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -59,6 +60,7 @@ interface ConversationDetailsOptionsProps {
   teamState: TeamState;
   updateConversationReceiptMode: (receiptMode: RECEIPT_MODE) => void;
   isChannelPublic?: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 const ConversationDetailsOptions = ({
@@ -75,6 +77,7 @@ const ConversationDetailsOptions = ({
   teamState,
   updateConversationReceiptMode,
   isChannelPublic,
+  fireAndForgetInvoker,
 }: ConversationDetailsOptionsProps) => {
   const {
     isMutable,
@@ -118,6 +121,7 @@ const ConversationDetailsOptions = ({
     isServiceMode,
     isTeam,
     isParticipantBlocked,
+    fireAndForgetInvoker,
   });
 
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;

@@ -19,6 +19,9 @@
 
 import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import {noop} from 'noop-esm';
+import {ComponentProps} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
@@ -40,6 +43,8 @@ import {createUuid} from 'Util/uuid';
 import {ConversationDetails} from './conversationDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {RootProvider} from '../../RootProvider';
+import {createRootContextValueForTest} from '../../testSupport/rootContextTestSupport';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
 
@@ -115,6 +120,20 @@ const getDefaultParams = () => {
 };
 
 describe('ConversationDetails', () => {
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
+  function renderConversationDetails(properties: ComponentProps<typeof ConversationDetails>) {
+    return render(
+      <RootProvider value={rootContextValue}>
+        <ConversationDetails {...properties} />
+      </RootProvider>,
+    );
+  }
+
   it("returns the right actions depending on the conversation's type for non group creators", () => {
     const conversation = new Conversation();
     const otherUser = new User('other-user');
@@ -124,7 +143,7 @@ describe('ConversationDetails', () => {
 
     const defaultProps = getDefaultParams();
 
-    const {rerender, getByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+    const {rerender, getByTestId} = renderConversationDetails({...defaultProps, activeConversation: conversation});
 
     const tests = [
       {
@@ -154,7 +173,11 @@ describe('ConversationDetails', () => {
         conversation.type(conversationType);
       });
 
-      rerender(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+      rerender(
+        <RootProvider value={rootContextValue}>
+          <ConversationDetails {...defaultProps} activeConversation={conversation} />
+        </RootProvider>,
+      );
 
       expected.forEach(action => {
         const actionItem = getByTestId(action);
