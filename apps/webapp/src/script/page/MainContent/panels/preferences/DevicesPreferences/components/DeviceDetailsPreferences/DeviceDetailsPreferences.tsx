@@ -28,6 +28,7 @@ import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../../../../Config';
 import {MotionDuration} from '../../../../../../../motion/MotionDuration';
+import {useApplicationContext} from '../../../../../../RootProvider';
 import {contentStyle} from '../../../components/PreferencesPage.styles';
 import {DetailedDevice} from '../DetailedDevice';
 
@@ -56,6 +57,7 @@ export const DeviceDetailsPreferences = ({
   onClose,
   onResetSession,
 }: DevicesPreferencesProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
   const [resetState, setResetState] = useState<SessionResetState>(SessionResetState.RESET);
   const [fingerprint, setFingerprint] = useState<string | undefined>();
@@ -69,8 +71,10 @@ export const DeviceDetailsPreferences = ({
   };
 
   useEffect(() => {
-    void getFingerprint(device).then(setFingerprint);
-  }, [device, getFingerprint]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      setFingerprint(await getFingerprint(device));
+    });
+  }, [device, fireAndForgetInvoker, getFingerprint]);
 
   return (
     <div

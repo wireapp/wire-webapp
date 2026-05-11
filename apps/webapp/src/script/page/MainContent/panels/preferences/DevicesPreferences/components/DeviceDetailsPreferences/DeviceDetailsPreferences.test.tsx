@@ -18,11 +18,15 @@
  */
 
 import {act, render, waitFor} from '@testing-library/react';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import {noop} from 'noop-esm';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {createUuid} from 'Util/uuid';
 
+import {RootProvider} from '../../../../../../RootProvider';
+import {createRootContextValueForTest} from '../../../../../../testSupport/rootContextTestSupport';
 import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 
 describe('DeviceDetailsPreferences', () => {
@@ -38,15 +42,31 @@ describe('DeviceDetailsPreferences', () => {
     onResetSession: jest.fn().mockResolvedValue(undefined),
     onVerify: jest.fn((_, isVerified) => device.meta?.isVerified(isVerified)),
   };
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
+  function renderDeviceDetailsPreferences() {
+    return render(
+      withTheme(
+        <RootProvider value={rootContextValue}>
+          <DeviceDetailsPreferences {...defaultParams} />
+        </RootProvider>,
+      ),
+    );
+  }
+
   it('shows device details', async () => {
-    const {getByText, getAllByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
+    const {getByText, getAllByText} = renderDeviceDetailsPreferences();
     await waitFor(() => getAllByText('00'));
 
     expect(getByText(device.model)).toBeDefined();
   });
 
   it('resets session with device', async () => {
-    const {getByText, getAllByText, queryByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
+    const {getByText, getAllByText, queryByText} = renderDeviceDetailsPreferences();
     await waitFor(() => getAllByText('00'));
     jest.useFakeTimers();
     act(() => {
@@ -71,7 +91,7 @@ describe('DeviceDetailsPreferences', () => {
   });
 
   it('toggles verification', async () => {
-    const {getByText, getAllByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
+    const {getByText, getAllByText} = renderDeviceDetailsPreferences();
     await waitFor(() => getAllByText('00'));
 
     act(() => {
