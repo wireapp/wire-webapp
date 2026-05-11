@@ -57,6 +57,7 @@ jest.mock('./conversation', () => {
 });
 
 import {Account, ConnectionState} from './account';
+import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
 
 const BASE_URL = 'mock-backend.wire.com';
@@ -548,7 +549,7 @@ describe('Account', () => {
 
       // Override the (heavy) real MLS service with a minimal stub. We only care about
       // whether/when initialisePendingProposalsTasks is invoked, not what it does.
-      Reflect.set(account.service, 'mls', mlsService);
+      account.service.mls = mlsService as unknown as MLSService;
 
       // Drain the legacy notification stream synchronously with no notifications.
       jest
