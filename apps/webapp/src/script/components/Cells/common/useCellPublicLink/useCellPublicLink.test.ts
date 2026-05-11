@@ -20,7 +20,8 @@
 import {createElement} from 'react';
 
 import {act, renderHook, waitFor} from '@testing-library/react';
-import {FireAndForgetInvoker} from '@wireapp/core';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import {noop} from 'noop-esm';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {RootProvider} from '../../../../page/RootProvider';
@@ -59,15 +60,6 @@ describe('useCellPublicLink', () => {
     ...overrides,
   });
 
-  function createExecutingFireAndForgetInvokerForTest(): FireAndForgetInvoker {
-    return {
-      fireAndForget: promiseFactory => {
-        promiseFactory().catch(() => undefined);
-      },
-      waitUntilAllSettled: jest.fn(async () => {}),
-    } as FireAndForgetInvoker;
-  }
-
   const renderPublicLinkHook = (options?: {
     node?: CellNode;
     refreshLinkDataAfterUpdate?: boolean;
@@ -80,7 +72,7 @@ describe('useCellPublicLink', () => {
     };
 
     const rootContextValue = createRootContextValueForTest({
-      fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+      fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
       mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
       wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
     });

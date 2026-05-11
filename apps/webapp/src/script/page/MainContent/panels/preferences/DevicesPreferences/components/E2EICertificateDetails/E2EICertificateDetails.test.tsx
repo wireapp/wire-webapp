@@ -17,9 +17,13 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conversation';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {User} from 'Repositories/entity/User';
@@ -28,6 +32,9 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
 import {Core} from 'src/script/service/CoreSingleton';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
+
+import {RootProvider} from '../../../../../../RootProvider';
+import {createRootContextValueForTest} from '../../../../../../testSupport/rootContextTestSupport';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
 
@@ -57,6 +64,16 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
 const core = container.resolve(Core);
 
 describe('E2EICertificateDetails', () => {
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
+  function renderE2EICertificateDetails(element: ReactElement) {
+    return render(withTheme(<RootProvider value={rootContextValue}>{element}</RootProvider>));
+  }
+
   beforeAll(async () => {
     jest.spyOn(core.service?.conversation!, 'getMLSSelfConversation').mockResolvedValue(
       generateAPIConversation({
@@ -75,7 +92,7 @@ describe('E2EICertificateDetails', () => {
 
   describe('idicates the state of the e2ei identity', () => {
     it('is e2ei identity not downloaded', async () => {
-      const {getByTestId} = render(withTheme(<E2EICertificateDetails />));
+      const {getByTestId} = renderE2EICertificateDetails(<E2EICertificateDetails />);
 
       const E2EIdentityStatus = getByTestId('e2ei-identity-status');
       expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
@@ -84,7 +101,7 @@ describe('E2EICertificateDetails', () => {
     it('is e2ei identity not downloaded for basic MLS device', async () => {
       const identity = generateIdentity(MLSStatuses.VALID, CredentialType.Basic);
 
-      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+      const {getByTestId} = renderE2EICertificateDetails(<E2EICertificateDetails identity={identity} />);
 
       const E2EIdentityStatus = getByTestId('e2ei-identity-status');
       expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.NOT_ACTIVATED);
@@ -93,7 +110,7 @@ describe('E2EICertificateDetails', () => {
     it('is e2ei identity expired', async () => {
       const identity = generateIdentity(MLSStatuses.EXPIRED);
 
-      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+      const {getByTestId} = renderE2EICertificateDetails(<E2EICertificateDetails identity={identity} />);
 
       const E2EIdentityStatus = getByTestId('e2ei-identity-status');
       expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.EXPIRED);
@@ -102,7 +119,7 @@ describe('E2EICertificateDetails', () => {
     it('is e2ei identity revoked', async () => {
       const identity = generateIdentity(MLSStatuses.REVOKED);
 
-      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+      const {getByTestId} = renderE2EICertificateDetails(<E2EICertificateDetails identity={identity} />);
 
       const E2EIdentityStatus = getByTestId('e2ei-identity-status');
       expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.REVOKED);
@@ -111,7 +128,7 @@ describe('E2EICertificateDetails', () => {
     it('is e2ei identity verified', async () => {
       const identity = generateIdentity(MLSStatuses.VALID);
 
-      const {getByTestId} = render(withTheme(<E2EICertificateDetails identity={identity} />));
+      const {getByTestId} = renderE2EICertificateDetails(<E2EICertificateDetails identity={identity} />);
 
       const E2EIdentityStatus = getByTestId('e2ei-identity-status');
       expect(E2EIdentityStatus.getAttribute('data-uie-value')).toEqual(MLSStatuses.VALID);
@@ -127,7 +144,9 @@ describe('E2EICertificateDetails', () => {
     ])('for %s certificate', async (_label, status) => {
       const identity = generateIdentity(status);
 
-      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
+      const {getByText} = renderE2EICertificateDetails(
+        <E2EICertificateDetails identity={identity} isCurrentDevice />,
+      );
 
       await waitFor(() => {
         const updateCertificateButton = getByText('E2EI.updateCertificate');
@@ -136,7 +155,7 @@ describe('E2EICertificateDetails', () => {
     });
 
     it('does not show update certificate button when certificate is not activated', async () => {
-      const {queryByText} = render(withTheme(<E2EICertificateDetails isCurrentDevice />));
+      const {queryByText} = renderE2EICertificateDetails(<E2EICertificateDetails isCurrentDevice />);
 
       expect(queryByText('E2EI.updateCertificate')).toBeNull();
     });
@@ -144,7 +163,9 @@ describe('E2EICertificateDetails', () => {
     it('shows get certificate button when certificate is not activated', async () => {
       const identity = generateIdentity(MLSStatuses.NOT_ACTIVATED);
 
-      const {getByText} = render(withTheme(<E2EICertificateDetails identity={identity} isCurrentDevice />));
+      const {getByText} = renderE2EICertificateDetails(
+        <E2EICertificateDetails identity={identity} isCurrentDevice />,
+      );
 
       const getCertificateButton = getByText('E2EI.getCertificate');
       expect(getCertificateButton).toBeDefined();
