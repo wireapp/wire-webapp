@@ -20,6 +20,8 @@
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 
+import {DEFAULT_BACKGROUND_COLOR} from './options';
+
 export type ImageTexture = {texture: WebGLTexture; width: number; height: number; url: string};
 
 type ImageInfo = {
@@ -74,7 +76,12 @@ export class WebGLRenderer {
   readonly fbo: WebGLFramebuffer | null;
 
   private running = false;
-  private static readonly DEFAULT_BG_COLOR: readonly [number, number, number, number] = [33, 150, 243, 255];
+  private static readonly DEFAULT_BG_COLOR = [
+    DEFAULT_BACKGROUND_COLOR.red,
+    DEFAULT_BACKGROUND_COLOR.green,
+    DEFAULT_BACKGROUND_COLOR.blue,
+    DEFAULT_BACKGROUND_COLOR.alpha,
+  ] as const;
   private currentStateIndex = 0;
   private backgroundRenderInfo: BackgroundRenderInfo | null = null;
   private activeBackgroundSourceIdentifier: string | null = null;

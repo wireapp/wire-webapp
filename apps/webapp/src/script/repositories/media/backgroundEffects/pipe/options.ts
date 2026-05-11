@@ -74,6 +74,8 @@ export type WorkerProcessVideoTrackOptions = Omit<
 export const SELFIE_MULTICLASS_MODEL_PATH = '/assets/mediapipe-models/selfie_multiclass_256x256.tflite';
 export const SELFIE_SEGMENTER_MODEL_PATH = '/assets/mediapipe-models/selfie_segmenter_landscape.tflite';
 
+export const DEFAULT_BACKGROUND_COLOR = {red: 33, green: 150, blue: 243, alpha: 255} as const;
+
 /**
  * Configuration options for the virtual background.
  */

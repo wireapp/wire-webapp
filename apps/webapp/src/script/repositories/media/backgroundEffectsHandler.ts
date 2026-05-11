@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
@@ -102,6 +104,14 @@ export class BackgroundEffectsHandler {
     backgroundEffectsStore.getState().setPreferredEffect(this.readPreferredBackgroundEffectFromStore());
     backgroundEffectsStore.getState().setLastVirtualBackgroundId(this.readLastVirtualBackgroundIdFromStore());
 
+    // On CPU-only devices (no WebGL2) default to the lighter model
+    if (
+      !is.nullOrUndefined(controller.getCapabilityInfo) &&
+      is.nullOrUndefined(controller.getCapabilityInfo().webgl2)
+    ) {
+      backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
+    }
+
     backgroundEffectsStore.subscribe((state, prevState) => {
       if (state.preferredEffect !== prevState.preferredEffect) {
         if (this.saveDebounceTimer) {
@@ -153,8 +163,13 @@ export class BackgroundEffectsHandler {
     }
 
     try {
+      const modelPath = backgroundEffectsStore.getState().isHighQualityBlurEnabled
+        ? SELFIE_MULTICLASS_MODEL_PATH
+        : SELFIE_SEGMENTER_MODEL_PATH;
+
       const outputTrack = await this.controller.start(videoTrack, {
         ...defaultOpts,
+        modelPath,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
         quality: 'auto',

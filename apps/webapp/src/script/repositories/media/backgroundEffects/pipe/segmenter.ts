@@ -18,6 +18,7 @@
  */
 
 import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
+import is from '@sindresorhus/is';
 
 import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
@@ -28,6 +29,7 @@ import {
 } from 'Repositories/media/backgroundEffects/helper/metrics';
 import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
 
+import {Canvas2DRenderer, createCanvas2DRenderer} from './canvas2DRenderer';
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
@@ -41,28 +43,29 @@ export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
   Object.assign(segmenterOptions, opts);
 }
 
+let useGPU = true;
+
 async function createSegmenter(canvas: OffscreenCanvas) {
   const logger = getSafeLogger('segmenter:createSegmenter');
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
   const fileset =
     wasmLoaderPath && wasmBinaryPath
-      ? {
-          wasmLoaderPath,
-          wasmBinaryPath,
-        }
+      ? {wasmLoaderPath, wasmBinaryPath}
       : await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm');
-  logger.log(`[virtual-background] createSegmenter`);
+  logger.log(`[virtual-background] createSegmenter (gpu=${useGPU})`);
+
   const segmenter = await ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
       modelAssetPath:
         modelPath ||
         'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
-      delegate: 'GPU',
+      delegate: useGPU ? 'GPU' : 'CPU',
     },
     runningMode: 'VIDEO',
     outputCategoryMask: true,
     outputConfidenceMasks: true,
-    canvas,
+    // Only share the canvas when using GPU — it is needed for getAsWebGLTexture().
+    ...(useGPU ? {canvas} : {}),
   });
   return segmenter;
 }
@@ -92,7 +95,19 @@ export async function runSegmenter(
   logger.log(`[virtual-background] runSegmenter`);
   segmenterOptions = opts;
 
-  let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
+  // Try WebGL first; fall back to 2D Canvas if unavailable.
+  let webGLRenderer: WebGLRenderer | null = null;
+  let canvas2DRenderer: Canvas2DRenderer | null = null;
+
+  try {
+    logger.log('[virtual-background] initializing WebGL2 with GPU pipeline');
+    webGLRenderer = new WebGLRenderer(canvas);
+    useGPU = true;
+  } catch {
+    logger.log('[virtual-background] WebGL2 unavailable — falling back to 2D Canvas CPU pipeline');
+    canvas2DRenderer = createCanvas2DRenderer(canvas);
+    useGPU = false;
+  }
 
   function onContextLost(event: Event) {
     logger.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
@@ -103,7 +118,7 @@ export async function runSegmenter(
 
   function onContextRestored() {
     logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
-    if (!webGLRenderer) {
+    if (webGLRenderer === null) {
       const timer = createWallClock();
       timer.setTimeout(() => {
         logger.log('[virtual-background] restart segmenter onContextRestored');
@@ -118,7 +133,10 @@ export async function runSegmenter(
     canvas.addEventListener('webglcontextlost', onContextLost, {once: true});
     canvas.addEventListener('webglcontextrestored', onContextRestored, {once: true});
   }
-  attachCanvasEvents();
+
+  if (useGPU) {
+    attachCanvasEvents();
+  }
 
   let segmenter = await createSegmenter(canvas);
   let currentModelPath = segmenterOptions.modelPath;
@@ -179,13 +197,15 @@ export async function runSegmenter(
     const quality = segmenterOptions.quality ?? 'auto';
     const tier = quality === 'auto' ? 'superhigh' : quality;
 
-    onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, 'GPU'));
+    onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, useGPU ? 'GPU' : 'CPU'));
   }
 
   function close() {
     segmenter.close();
     webGLRenderer?.close();
     webGLRenderer = null;
+    canvas2DRenderer?.close();
+    canvas2DRenderer = null;
     videoFilter?.destroy();
     canvas.removeEventListener('webglcontextlost', onContextLost);
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
@@ -195,7 +215,7 @@ export async function runSegmenter(
     {
       async write(videoFrame: VideoFrame) {
         const {codedWidth, codedHeight, timestamp} = videoFrame;
-        if (!codedWidth || !codedHeight) {
+        if (codedWidth === 0 || codedHeight === 0) {
           videoFrame.close();
           return;
         }
@@ -210,7 +230,7 @@ export async function runSegmenter(
         let filterMs = 0;
         let segmentationMs = 0;
         let gpuMs = 0;
-        const logger = getSafeLogger('segmenter:WritableStream::write');
+        const writableStreamLogger = getSafeLogger('segmenter:WritableStream::write');
 
         try {
           if (segmenterOptions.enabled && segmenterOptions.quality !== 'bypass') {
@@ -239,24 +259,38 @@ export async function runSegmenter(
                   const confidenceMask = result.confidenceMasks?.[0];
 
                   try {
-                    if (!categoryMask || !confidenceMask) {
-                      logger.warn('Skipping frame: Missing masks or WebGL data.');
+                    if (is.nullOrUndefined(categoryMask) || is.nullOrUndefined(confidenceMask)) {
+                      writableStreamLogger.warn('[virtual-background] Skipping frame: Missing masks.');
                       return;
                     }
 
-                    const categoryTextureMP = categoryMask.getAsWebGLTexture();
-                    const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
                     const gpuStart = performance.now();
-                    webGLRenderer?.render(
-                      videoFrame,
-                      segmenterOptions,
-                      categoryTextureMP,
-                      confidenceTextureMP,
-                      useSelfieModel,
-                    );
+
+                    if (useGPU && !is.nullOrUndefined(webGLRenderer)) {
+                      const categoryTexture = categoryMask.getAsWebGLTexture();
+                      const confidenceTexture = confidenceMask.getAsWebGLTexture();
+                      webGLRenderer.render(
+                        videoFrame,
+                        segmenterOptions,
+                        categoryTexture,
+                        confidenceTexture,
+                        useSelfieModel,
+                      );
+                    } else if (!is.nullOrUndefined(canvas2DRenderer)) {
+                      const categoryData = categoryMask.getAsFloat32Array();
+                      const confidenceData = confidenceMask.getAsFloat32Array();
+                      canvas2DRenderer.render(
+                        videoFrame,
+                        segmenterOptions,
+                        categoryData,
+                        confidenceData,
+                        useSelfieModel,
+                      );
+                    }
+
                     gpuMs = performance.now() - gpuStart;
-                  } catch (e) {
-                    logger.error('Error in videoCallback:', e);
+                  } catch (error) {
+                    writableStreamLogger.error('[virtual-background] Error in videoCallback:', error);
                   } finally {
                     categoryMask?.close();
                     confidenceMask?.close();
@@ -267,7 +301,11 @@ export async function runSegmenter(
             });
           } else {
             const gpuStart = performance.now();
-            webGLRenderer?.render(videoFrame, segmenterOptions);
+            if (useGPU) {
+              webGLRenderer?.render(videoFrame, segmenterOptions);
+            } else {
+              canvas2DRenderer?.render(videoFrame, segmenterOptions);
+            }
             gpuMs = performance.now() - gpuStart;
           }
         } finally {
