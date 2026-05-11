@@ -31,7 +31,10 @@ import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 
+import {useApplicationContext} from '../../page/RootProvider';
+
 export function ConfigToolbar() {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
@@ -106,7 +109,9 @@ export function ConfigToolbar() {
       }
     };
 
-    void sendMessage();
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await sendMessage();
+    });
 
     return () => {
       isActive = false;
@@ -114,7 +119,7 @@ export function ConfigToolbar() {
         clearTimeout(timeoutId);
       }
     };
-  }, [isMessageSendingActive, prefix, messageDelaySec]);
+  }, [isMessageSendingActive, prefix, messageDelaySec, fireAndForgetInvoker]);
 
   const startSendingMessages = () => {
     messageCountRef.current = 0;
@@ -285,7 +290,9 @@ export function ConfigToolbar() {
           onChange={event => {
             const val = Number(event.currentTarget.value) as CoreCryptoLogLevel;
             setCoreCryptoLevel(val);
-            void window.wire?.app?.debug?.setCoreCryptoMaxLogLevel(val);
+            fireAndForgetInvoker.fireAndForget(async () => {
+              await window.wire?.app?.debug?.setCoreCryptoMaxLogLevel(val);
+            });
           }}
           style={{padding: '6px 8px'}}
         >

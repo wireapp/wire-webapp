@@ -65,6 +65,7 @@ import {Config} from '../../../../Config';
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {useApplicationContext} from '../../../RootProvider';
 import {ListWrapper} from '../ListWrapper';
 import {StartUI} from '../StartUI';
 
@@ -99,6 +100,7 @@ export const Conversations = ({
   userState = container.resolve(UserState),
   selfUser,
 }: ConversationsProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [conversationListRef, setConversationListRef] = useState<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -300,7 +302,9 @@ export const Conversations = ({
 
       if (nextTab === SidebarTabs.ARCHIVES) {
         // will eventually load missing events from the db
-        void conversationRepository.updateArchivedConversations();
+        fireAndForgetInvoker.fireAndForget(async () => {
+          await conversationRepository.updateArchivedConversations();
+        });
       }
 
       if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(nextTab)) {
@@ -316,6 +320,7 @@ export const Conversations = ({
       setCurrentTab(nextTab);
     },
     [
+      fireAndForgetInvoker,
       conversationRepository,
       closeFolder,
       onExitPreferences,

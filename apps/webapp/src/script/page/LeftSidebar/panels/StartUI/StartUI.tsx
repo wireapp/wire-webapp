@@ -46,6 +46,7 @@ import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';
 
 import {Config} from '../../../../Config';
+import {useApplicationContext} from '../../../RootProvider';
 import {ListWrapper} from '../ListWrapper';
 
 type StartUIProps = {
@@ -80,13 +81,16 @@ const StartUI = ({
   isFederated,
   selfUser,
 }: StartUIProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const brandName = Config.getConfig().BRAND_NAME;
   const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
     generatePermissionHelpers(selfUser.teamRole());
 
   useEffect(() => {
-    void conversationRepository.loadMissingConversations();
-  }, [conversationRepository]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await conversationRepository.loadMissingConversations();
+    });
+  }, [conversationRepository, fireAndForgetInvoker]);
 
   const actions = mainViewModel.actions;
   const isTeam = teamState.isTeam();

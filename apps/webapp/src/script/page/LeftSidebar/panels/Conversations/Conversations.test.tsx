@@ -20,7 +20,9 @@
 import React from 'react';
 
 import {act, render} from '@testing-library/react';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {observable} from 'knockout';
+import {noop} from 'noop-esm';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
@@ -31,6 +33,8 @@ import {ListState} from 'src/script/page/useAppState';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations} from './';
+import {RootProvider} from '../../../RootProvider';
+import {createRootContextValueForTest} from '../../../testSupport/rootContextTestSupport';
 
 jest.mock('./ConversationSidebar/ConversationSidebar', () => ({
   ConversationSidebar: ({onClickPreferences}: {onClickPreferences: (contentState: number) => void}) => {
@@ -67,6 +71,12 @@ const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversat
 };
 
 describe('Conversations', () => {
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
   let conversationRepository: ConversationRepository;
   let searchRepository: SearchRepository;
 
@@ -79,11 +89,13 @@ describe('Conversations', () => {
   it('Opens preferences when clicked', () => {
     const {getByTitle} = render(
       withTheme(
-        <Conversations
-          {...defaultParams}
-          searchRepository={searchRepository}
-          conversationRepository={conversationRepository}
-        />,
+        <RootProvider value={rootContextValue}>
+          <Conversations
+            {...defaultParams}
+            searchRepository={searchRepository}
+            conversationRepository={conversationRepository}
+          />
+        </RootProvider>,
       ),
     );
     const openPrefButton = getByTitle('preferencesHeadline');

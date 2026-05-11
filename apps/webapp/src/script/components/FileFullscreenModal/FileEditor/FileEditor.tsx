@@ -33,6 +33,7 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import * as styles from './FileEditor.styles';
 import {validateCollaboraUrl} from './validateCollaboraUrl';
 
+import {useApplicationContext} from '../../../page/RootProvider';
 import {FileLoader} from '../FileLoader/FileLoader';
 
 const REFRESH_BUFFER_SECONDS = 10; // Refresh 10 seconds before expiry for safety
@@ -42,6 +43,7 @@ interface FileEditorProps {
 }
 
 export const FileEditor = ({id}: FileEditorProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const cellsRepository = container.resolve(CellsRepository);
   const [node, setNode] = useState<Node | null>(null);
   const [isRecycled, setIsRecycled] = useState(false);
@@ -64,7 +66,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
       setIsRecycled(false);
       setNode(fetchedNode);
       return true;
-    } catch (err: unknown) {
+    } catch {
       setIsError(true);
       return false;
     } finally {
@@ -74,18 +76,20 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
   const handleRetry = useCallback(() => {
     hasShownErrorModal.current = false;
-    void (async () => {
+    fireAndForgetInvoker.fireAndForget(async () => {
       const isSuccessful = await fetchNode();
       if (isSuccessful) {
         removeCurrentModal();
       }
-    })();
-  }, [fetchNode]);
+    });
+  }, [fetchNode, fireAndForgetInvoker]);
 
   // Initial fetch
   useEffect(() => {
-    void fetchNode();
-  }, [id, cellsRepository, fetchNode]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await fetchNode();
+    });
+  }, [cellsRepository, fetchNode, fireAndForgetInvoker, id]);
 
   // Auto-refresh mechanism before expiry
   useEffect(() => {
@@ -98,13 +102,15 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
     // Set timeout to refresh before expiry
     const timeoutId = setTimeout(() => {
-      void fetchNode();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await fetchNode();
+      });
     }, refreshInSeconds * TIME_IN_MILLIS.SECOND);
 
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [node, fetchNode]);
+  }, [node, fetchNode, fireAndForgetInvoker]);
 
   useEffect(() => {
     if (isLoading || isRecycled || (!isError && node)) {

@@ -57,6 +57,7 @@ import {PreferencesSection} from './components/PreferencesSection';
 
 import {Config} from '../../../../Config';
 import {AccentColorPicker} from '../../../AccentColorPicker';
+import {useApplicationContext} from '../../../RootProvider';
 
 interface AccountPreferencesProps {
   importFile: (file: File) => void;
@@ -88,6 +89,7 @@ export const AccountPreferences = ({
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
 }: AccountPreferencesProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const core = container.resolve(Core);
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
@@ -119,7 +121,9 @@ export const AccountPreferences = ({
           action: async (): Promise<void> => {
             try {
               await conversationRepository.leaveGuestRoom();
-              void clientRepository.logoutClient();
+              fireAndForgetInvoker.fireAndForget(async () => {
+                await clientRepository.logoutClient();
+              });
             } catch (error: unknown) {
               logger.warn('Error while leaving room', error);
             }

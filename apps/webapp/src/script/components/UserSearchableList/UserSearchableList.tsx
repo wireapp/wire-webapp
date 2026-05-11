@@ -34,6 +34,8 @@ import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortByPriority} from 'Util/stringUtil';
 
+import {useApplicationContext} from '../../page/RootProvider';
+
 export type UserListProps = React.ComponentProps<typeof UserList> & {
   conversationState?: ConversationState;
   highlightedUsers?: User[];
@@ -68,6 +70,7 @@ export const UserSearchableList = ({
   teamState = container.resolve(TeamState),
   ...props
 }: UserListProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
   const {conversationState = container.resolve(ConversationState)} = props;
 
@@ -119,7 +122,9 @@ export const UserSearchableList = ({
     }
 
     if (selfFirst !== true) {
-      void setUsers(results);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await setUsers(results);
+      });
       return;
     }
 
@@ -127,8 +132,10 @@ export const UserSearchableList = ({
     const [selfUser, otherUsers] = partition(results, user => user.isMe);
 
     const concatUsers = selfUser.concat(otherUsers);
-    void setUsers(concatUsers);
-  }, [filter, users.length]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await setUsers(concatUsers);
+    });
+  }, [filter, users.length, fireAndForgetInvoker]);
 
   const foundUserEntities = () => {
     if (!remoteTeamMembers.length) {
