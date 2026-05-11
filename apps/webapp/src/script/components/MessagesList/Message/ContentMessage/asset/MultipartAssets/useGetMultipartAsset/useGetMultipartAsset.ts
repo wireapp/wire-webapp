@@ -21,6 +21,8 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
+import {useApplicationContext} from '../../../../../../../page/RootProvider';
+
 type Status = 'idle' | 'loading' | 'success' | 'error' | 'retrying';
 
 interface UseGetMultipartAssetPreviewProps {
@@ -55,6 +57,7 @@ export const useGetMultipartAsset = ({
   maxRetries = DEFAULT_MAX_RETRIES,
   retryDelay = DEFAULT_RETRY_DELAY,
 }: UseGetMultipartAssetPreviewProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const uuidRef = useRef(uuid);
   const [path, setPath] = useState<string | undefined>(undefined);
   const [src, setSrc] = useState<string | undefined>(undefined);
@@ -152,8 +155,10 @@ export const useGetMultipartAsset = ({
     }
 
     hasStartedFetchRef.current = true;
-    void fetchData();
-  }, [isEnabled, fetchData, status]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await fetchData();
+    });
+  }, [isEnabled, fetchData, fireAndForgetInvoker, status]);
 
   useEffect(() => {
     if (status !== 'retrying') {
@@ -161,7 +166,9 @@ export const useGetMultipartAsset = ({
     }
 
     timeoutRef.current = window.setTimeout(() => {
-      void fetchData();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await fetchData();
+      });
     }, retryDelay);
 
     return () => {
@@ -169,7 +176,7 @@ export const useGetMultipartAsset = ({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [status, fetchData, retryDelay]);
+  }, [status, fetchData, fireAndForgetInvoker, retryDelay]);
 
   return {
     fetchData,

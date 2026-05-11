@@ -18,12 +18,17 @@
  */
 
 import {render, screen, waitFor, act} from '@testing-library/react';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {RestNode} from 'cells-sdk-ts';
+import {noop} from 'noop-esm';
+import {ReactElement} from 'react';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {RootProvider} from '../../../../../../page/RootProvider';
+import {createRootContextValueForTest} from '../../../../../../page/testSupport/rootContextTestSupport';
 
 import {MultipartAssets} from './MultipartAssets';
 
@@ -50,6 +55,20 @@ const mockRecycledNode: RestNode = {
 };
 
 describe('MultipartAssets', () => {
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
+  function renderWithRootContext(element: ReactElement) {
+    return render(
+      <RootProvider value={rootContextValue}>
+        {element}
+      </RootProvider>,
+    );
+  }
+
   let mockCellsRepository: jest.Mocked<CellsRepository>;
 
   beforeEach(() => {
@@ -72,7 +91,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -94,7 +113,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -118,7 +137,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/zip', 'archive.zip')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -149,7 +168,7 @@ describe('MultipartAssets', () => {
         createMockAsset('uuid-3', 'application/pdf', 'file3.pdf'),
       ];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -179,7 +198,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -213,7 +232,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -246,7 +265,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -279,7 +298,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -325,7 +344,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      const {unmount} = render(
+      const {unmount} = renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -366,7 +385,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -400,7 +419,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -439,7 +458,7 @@ describe('MultipartAssets', () => {
         },
       ];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -461,7 +480,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'video/mp4', 'test.mp4')];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -488,7 +507,7 @@ describe('MultipartAssets', () => {
         },
       ];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}
@@ -529,7 +548,7 @@ describe('MultipartAssets', () => {
         },
       ];
 
-      render(
+      renderWithRootContext(
         withTheme(
           <MultipartAssets
             assets={assets}

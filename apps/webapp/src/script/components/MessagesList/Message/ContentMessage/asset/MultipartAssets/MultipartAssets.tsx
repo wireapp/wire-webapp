@@ -42,6 +42,8 @@ import {
 import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset';
 import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
 
+import {useApplicationContext} from '../../../../../../page/RootProvider';
+
 interface MultipartAssetsProps {
   assets: ICellAsset[];
   cellsRepository?: CellsRepository;
@@ -94,6 +96,7 @@ const MultipartAsset = ({
   senderName,
   timestamp,
 }: MultipartAssetProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
@@ -129,12 +132,14 @@ const MultipartAsset = ({
     const handleHashChange = () => {
       const currentPath = window.location.hash;
       if (currentPath.includes(conversationId) && !currentPath.endsWith('/files')) {
-        void fetchData(true);
+        fireAndForgetInvoker.fireAndForget(async () => {
+          await fetchData(true);
+        });
       }
     };
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [fetchData, conversationId]);
+  }, [fetchData, conversationId, fireAndForgetInvoker]);
 
   if (isRecycled === true) {
     return (

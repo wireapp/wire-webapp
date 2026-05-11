@@ -37,6 +37,8 @@ import {
   versionTimeTextCss,
 } from './FileHistoryModal.styles';
 
+import {useApplicationContext} from '../../../page/RootProvider';
+
 interface FileVersionItemProps {
   version: {
     versionId: string;
@@ -58,6 +60,7 @@ export const FileVersionItem = ({
   onDownload,
   onRestore,
 }: FileVersionItemProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const versionDetailsTitle = `${version.ownerName} ${version.size}`.trim();
 
   return (
@@ -77,7 +80,11 @@ export const FileVersionItem = ({
         <Button
           variant={ButtonVariant.SECONDARY}
           css={versionButtonCss}
-          onClick={() => void onDownload(version.downloadUrl)}
+          onClick={() => {
+            fireAndForgetInvoker.fireAndForget(async () => {
+              await onDownload(version.downloadUrl);
+            });
+          }}
           aria-label={t('cells.versionHistory.downloadAriaLabel', {time: version.time})}
         >
           <DownloadIcon css={iconMarginRightCss} /> {t('cells.versionHistory.download')}

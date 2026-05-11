@@ -26,6 +26,7 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
+import {useApplicationContext} from '../../../../../page/RootProvider';
 import {FileInfo, FileVersion} from '../types';
 import {groupVersionsByDate} from '../utils/fileVersionUtils';
 
@@ -33,6 +34,7 @@ import {groupVersionsByDate} from '../utils/fileVersionUtils';
  * Hook to fetch and manage file versions for a given node UUID.
  */
 export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onRestore?: () => void) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [fileInfo, setFileInfo] = useState<FileInfo>();
   const [fileVersions, setFileVersions] = useState<Record<string, FileVersion[]>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -82,8 +84,10 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
       }
     };
 
-    void loadFileVersions();
-  }, [hasValidNodeUuid, nodeUuid]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await loadFileVersions();
+    });
+  }, [fireAndForgetInvoker, hasValidNodeUuid, nodeUuid]);
 
   const reset = useCallback(() => {
     setFileInfo(undefined);

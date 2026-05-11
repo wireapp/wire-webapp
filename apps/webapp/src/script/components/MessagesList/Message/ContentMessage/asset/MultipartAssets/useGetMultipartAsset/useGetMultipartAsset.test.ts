@@ -18,9 +18,15 @@
  */
 
 import {act, renderHook, waitFor} from '@testing-library/react';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
 import {RestNode} from 'cells-sdk-ts';
+import {noop} from 'noop-esm';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from '../../../../../../../page/testSupport/rootContextTestSupport';
 
 import {useGetMultipartAsset} from './useGetMultipartAsset';
 
@@ -49,6 +55,20 @@ const mockRecycledNode: RestNode = {
 };
 
 describe('useGetMultipartAsset', () => {
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+  const wrapper = createRootProviderWrapperForTest(rootContextValue);
+
+  function renderHookWithRootContext<Result, Props>(
+    renderHookCallback: (properties: Props) => Result,
+    options?: {initialProps?: Props},
+  ) {
+    return renderHook(renderHookCallback, {wrapper, ...options});
+  }
+
   let mockCellsRepository: jest.Mocked<CellsRepository>;
 
   beforeEach(() => {
@@ -68,7 +88,7 @@ describe('useGetMultipartAsset', () => {
     it('should set isRecycled to false for non-recycled files', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -88,7 +108,7 @@ describe('useGetMultipartAsset', () => {
     it('should set isRecycled to true for recycled files', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockRecycledNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -109,7 +129,7 @@ describe('useGetMultipartAsset', () => {
       // Start with non-recycled node
       mockCellsRepository.getNode.mockResolvedValueOnce(mockNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -139,7 +159,7 @@ describe('useGetMultipartAsset', () => {
     it('should refetch data when forceRefetch is true even if already successful', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -165,7 +185,7 @@ describe('useGetMultipartAsset', () => {
     it('should not refetch when forceRefetch is false and status is success', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -210,7 +230,7 @@ describe('useGetMultipartAsset', () => {
 
       mockCellsRepository.getNode.mockResolvedValueOnce(mockNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -242,7 +262,7 @@ describe('useGetMultipartAsset', () => {
     it('should not fetch data when isEnabled is false', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      renderHook(() =>
+      renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -263,7 +283,7 @@ describe('useGetMultipartAsset', () => {
     it('should set error state when fetch fails', async () => {
       mockCellsRepository.getNode.mockRejectedValue(new Error('Network error'));
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -282,7 +302,7 @@ describe('useGetMultipartAsset', () => {
     it('should allow retry after error with forceRefetch', async () => {
       mockCellsRepository.getNode.mockRejectedValueOnce(new Error('Network error'));
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -313,7 +333,7 @@ describe('useGetMultipartAsset', () => {
     it('should set hasPreview to true when previews are available', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -337,7 +357,7 @@ describe('useGetMultipartAsset', () => {
 
       mockCellsRepository.getNode.mockResolvedValue(noPreviewNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -370,7 +390,7 @@ describe('useGetMultipartAsset', () => {
 
       mockCellsRepository.getNode.mockResolvedValue(processingNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
@@ -419,7 +439,7 @@ describe('useGetMultipartAsset', () => {
 
       mockCellsRepository.getNode.mockResolvedValueOnce(processingNode).mockResolvedValueOnce(readyNode);
 
-      const {result} = renderHook(() =>
+      const {result} = renderHookWithRootContext(() =>
         useGetMultipartAsset({
           uuid: 'test-uuid',
           cellsRepository: mockCellsRepository,
