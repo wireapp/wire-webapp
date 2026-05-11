@@ -919,4 +919,49 @@ test.describe('Calling', () => {
       await expect(userACall.getCallingParticipant(userB.fullName).activeSpeakerIcon).toBeVisible({timeout: 30_000});
     });
   });
+
+  [
+    {id: '@TC-2908', title: 'I want to have 1:1 CBR audio call when the caller turned it on'} as const,
+    {id: '@TC-2909', title: 'I want to have 1:1 CBR audio call when the receiver turned it on'} as const,
+  ].forEach(({id, title}) => {
+    test(title, {tag: [id, '@regression']}, async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB), withConnectedUser(userA)),
+      ]);
+
+      const {pages: userAPages} = PageManager.from(userAPage).webapp;
+      const {pages: userBPages} = PageManager.from(userBPage).webapp;
+
+      if (id === '@TC-2908') {
+        await test.step('Caller enables CBR', async () => {
+          const {pages: callerPages, components: callerComponents} = PageManager.from(userAPage).webapp;
+          await callerComponents.conversationSidebar().preferencesButton.click();
+          await callerPages.settings().audioVideoButton.click();
+          await callerPages.audioVideoSettings().variableBitrateCheckbox.click();
+          await callerComponents.conversationSidebar().allConversationsButton.click();
+        });
+      }
+      if (id === '@TC-2909') {
+        await test.step('Receiver enables CBR', async () => {
+          const {pages: receiverPages, components: receiverComponents} = PageManager.from(userBPage).webapp;
+          await receiverComponents.conversationSidebar().preferencesButton.click();
+          await receiverPages.settings().audioVideoButton.click();
+          await receiverPages.audioVideoSettings().variableBitrateCheckbox.click();
+          await receiverComponents.conversationSidebar().allConversationsButton.click();
+        });
+      }
+
+      await test.step('UserA calls userB', async () => {
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+        await userAPages.conversation().callButton.click();
+        await userBPages.calling().acceptCallButton.click();
+      });
+
+      await test.step('Caller and receiver see CBR text in call window', async () => {
+        await expect(userAPages.calling().callCell).toContainText('CBR');
+        await expect(userBPages.calling().callCell).toContainText('CBR');
+      });
+    });
+  });
 });

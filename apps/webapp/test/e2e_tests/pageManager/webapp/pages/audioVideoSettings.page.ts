@@ -25,13 +25,15 @@ export class AudioVideoSettingsPage {
   readonly microphoneDropdown: Locator;
   readonly speakerDropdown: Locator;
   readonly cameraDropdown: Locator;
+  readonly variableBitrateCheckbox: Locator;
 
   constructor(page: Page) {
     this.page = page;
 
-    this.microphoneDropdown = page.locator('[data-uie-name="enter-microphone"]');
-    this.speakerDropdown = page.locator('[data-uie-name="enter-speaker"]');
-    this.cameraDropdown = page.locator('[data-uie-name="enter-camera"]');
+    this.microphoneDropdown = page.getByTestId('enter-microphone');
+    this.speakerDropdown = page.getByTestId('enter-speaker');
+    this.cameraDropdown = page.getByTestId('enter-camera');
+    this.variableBitrateCheckbox = page.getByText('Variable Bit Rate Encoding');
   }
 
   async selectMicrophone(microphoneName: string) {
