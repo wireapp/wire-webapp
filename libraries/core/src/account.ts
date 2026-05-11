@@ -948,7 +948,7 @@ export class Account extends TypedEventEmitter<Events> {
    * rehydrated pending-proposal side effects aligned with a session that has finished ordered replay.
    */
   private readonly rehydrateMlsPendingProposalsTasksOnLiveTransition = async (): Promise<void> => {
-    if (this.hasMLSDevice && this.service?.mls) {
+    if (this.hasMLSDevice && this.service?.mls !== undefined) {
       await this.service.mls.initialisePendingProposalsTasks();
     }
   };
