@@ -79,6 +79,8 @@ import {
 } from './VideoControls.styles';
 import {VideoControlsSelect} from './VideoControlsSelect/VideoControlsSelect';
 
+import {useApplicationContext} from '../../../page/RootProvider';
+
 type BackgroundOptionValue = 'none' | 'blur-high' | 'blur-low' | 'virtual' | 'settings';
 
 const BACKGROUND_OPTION_VALUES = new Set<string>(['none', 'blur-high', 'blur-low', 'virtual', 'settings']);
@@ -199,6 +201,7 @@ export const VideoControls = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: VideoControlsProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const selfParticipant = call.getSelfParticipant();
   const {
     sharesScreen: selfSharesScreen,
@@ -418,12 +421,14 @@ export const VideoControls = ({
 
   const handleBackgroundSelect = useCallback(
     (effect: BackgroundEffectSelection) => {
-      void switchVideoBackgroundEffect(effect);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await switchVideoBackgroundEffect(effect);
+      });
       if (isMobile) {
         setVideoOptionsOpen(false);
       }
     },
-    [isMobile, switchVideoBackgroundEffect],
+    [fireAndForgetInvoker, isMobile, switchVideoBackgroundEffect],
   );
 
   const handleVideoSelectChange = useCallback(

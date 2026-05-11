@@ -36,6 +36,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {ChooseScreen} from './ChooseScreen';
 import {FullscreenVideoCall} from './FullscreenVideoCall';
 
+import {useApplicationContext} from '../../page/RootProvider';
 import {CallViewTab} from '../../view_model/CallingViewModel';
 
 interface CallingContainerProps {
@@ -51,6 +52,7 @@ const CallingContainer = ({
   callState = container.resolve(CallState),
   toggleScreenshare,
 }: CallingContainerProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
   const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} =
     useKoSubscribableChildren(callState, [
@@ -73,9 +75,11 @@ const CallingContainer = ({
 
   useEffect(() => {
     if (currentCallState === undefined) {
-      void callingRepository.setViewModeMinimized();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await callingRepository.setViewModeMinimized();
+      });
     }
-  }, [currentCallState]);
+  }, [callingRepository, currentCallState, fireAndForgetInvoker]);
 
   const videoGrid = useVideoGrid(joinedCall!);
 
@@ -124,11 +128,15 @@ const CallingContainer = ({
   };
 
   const sendEmoji = (emoji: string, call: Call) => {
-    void callingRepository.sendInCallEmoji(emoji, call);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await callingRepository.sendInCallEmoji(emoji, call);
+    });
   };
 
   const sendHandRaised = (isHandUp: boolean, call: Call) => {
-    void callingRepository.sendInCallHandRaised(isHandUp, call);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await callingRepository.sendInCallHandRaised(isHandUp, call);
+    });
   };
 
   const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);

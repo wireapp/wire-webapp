@@ -78,6 +78,7 @@ import {Pagination} from './Pagination/Pagination';
 import {VideoBackgroundSettings} from './VideoControls/VideoBackgroundSettings/VideoBackgroundSettings';
 import {VideoControls} from './VideoControls/VideoControls';
 
+import {useApplicationContext} from '../../page/RootProvider';
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {CONFIG, TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
@@ -142,6 +143,7 @@ const FullscreenVideoCall = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
@@ -189,9 +191,15 @@ const FullscreenVideoCall = ({
       return;
     }
 
-    callingRepository.setViewModeMinimized();
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await callingRepository.setViewModeMinimized();
+    });
   };
-  const openPopup = () => callingRepository.setViewModeDetached();
+  const openPopup = () => {
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await callingRepository.setViewModeDetached();
+    });
+  };
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
@@ -287,7 +295,9 @@ const FullscreenVideoCall = ({
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
-    void switchVideoBackgroundEffect(effect);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await switchVideoBackgroundEffect(effect);
+    });
   };
 
   const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {

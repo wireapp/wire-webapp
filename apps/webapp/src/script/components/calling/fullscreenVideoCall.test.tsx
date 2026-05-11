@@ -20,6 +20,8 @@
 import {act, render, waitFor} from '@testing-library/react';
 
 import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import {noop} from 'noop-esm';
 
 import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
@@ -31,6 +33,8 @@ import {PropertiesService} from 'Repositories/properties/PropertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
 
+import {RootProvider} from '../../page/RootProvider';
+import {createRootContextValueForTest} from '../../page/testSupport/rootContextTestSupport';
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
@@ -41,6 +45,22 @@ jest.mock('@wireapp/react-ui-kit', () => ({
 }));
 
 describe('fullscreenVideoCall', () => {
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
+  function renderFullscreenVideoCall(properties: FullscreenVideoCallProps) {
+    return render(
+      withTheme(
+        <RootProvider value={rootContextValue}>
+          <FullscreenVideoCall {...properties} />
+        </RootProvider>,
+      ),
+    );
+  }
+
   const createProps = (): FullscreenVideoCallProps => {
     const conversation = new Conversation();
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
@@ -77,7 +97,7 @@ describe('fullscreenVideoCall', () => {
   it('shows the calling timer', async () => {
     const props = createProps();
 
-    const {getByText} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)));
+    const {getByText} = renderFullscreenVideoCall(props);
     const now = Date.now();
 
     jest.setSystemTime(now);
@@ -96,7 +116,7 @@ describe('fullscreenVideoCall', () => {
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
     const props = createProps();
-    const {queryByTestId} = render(withTheme(<FullscreenVideoCall {...props} />));
+    const {queryByTestId} = renderFullscreenVideoCall(props);
 
     expect(queryByTestId('do-call-controls-video-call-view')).toBeNull();
   });
@@ -112,7 +132,7 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('c'), 'd'));
     props.call.addParticipant(new Participant(new User('e'), 'f'));
 
-    const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
+    const {getByTestId, getByText} = renderFullscreenVideoCall(props);
     const callViewToggleButton = getByTestId('do-call-controls-video-call-view');
 
     act(() => {

@@ -21,6 +21,8 @@ import {render, waitFor} from '@testing-library/react';
 import {act} from 'react';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import {noop} from 'noop-esm';
 
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -32,6 +34,8 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
 
+import {RootProvider} from '../../../page/RootProvider';
+import {createRootContextValueForTest} from '../../../page/testSupport/rootContextTestSupport';
 import {CallingCell, CallingCellProps} from './CallingCell';
 
 import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
@@ -84,10 +88,24 @@ const createProps = async () => {
 };
 
 describe('ConversationListCallingCell', () => {
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
+  function renderCallingCell(properties: CallingCellProps) {
+    return render(
+      <RootProvider value={rootContextValue}>
+        <CallingCell {...properties} />
+      </RootProvider>,
+    );
+  }
+
   it('displays an incoming ringing call', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.INCOMING);
-    const {container} = render(<CallingCell {...props} />);
+    const {container} = renderCallingCell(props);
 
     const acceptButton = container.querySelector('[data-uie-name="do-call-controls-call-accept"]');
     const declineButton = container.querySelector('[data-uie-name="do-call-controls-call-decline"]');
@@ -100,7 +118,7 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.OUTGOING);
 
-    const {getByTestId} = render(<CallingCell {...props} />);
+    const {getByTestId} = renderCallingCell(props);
 
     expect(getByTestId('call-label-outgoing')).not.toBeNull();
   });
@@ -109,7 +127,7 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.ANSWERED);
 
-    const {container} = render(<CallingCell {...props} />);
+    const {container} = renderCallingCell(props);
 
     const connectingLabel = container.querySelector('[data-uie-name="call-label-connecting"]');
     expect(connectingLabel).not.toBeNull();
@@ -119,14 +137,18 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.MEDIA_ESTAB);
 
-    const {getByText, rerender, container} = render(<CallingCell {...props} />);
+    const {getByText, rerender, container} = renderCallingCell(props);
 
     jest.useFakeTimers();
     const now = Date.now();
     jest.setSystemTime(now);
     act(() => {
       props.call.startedAt(now);
-      rerender(<CallingCell {...props} />);
+      rerender(
+        <RootProvider value={rootContextValue}>
+          <CallingCell {...props} />
+        </RootProvider>,
+      );
     });
 
     await waitFor(() => getByText('00:00'));

@@ -52,6 +52,7 @@ import {t} from 'Util/localizerUtil';
 
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
+import {useApplicationContext} from '../../../page/RootProvider';
 import {generateConversationUrl} from '../../../router/routeGenerator';
 import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
 
@@ -89,6 +90,7 @@ export const CallingCell = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: CallingCellProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {conversation} = call;
   const {reason, state, isCbrEnabled, startedAt, maximizedParticipant, muteState} = useKoSubscribableChildren(call, [
     'reason',
@@ -225,18 +227,22 @@ export const CallingCell = ({
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        void callingRepository.setViewModeFullScreen();
+        fireAndForgetInvoker.fireAndForget(async () => {
+          await callingRepository.setViewModeFullScreen();
+        });
       }
     },
-    [isOngoing, callingRepository],
+    [callingRepository, fireAndForgetInvoker, isOngoing],
   );
 
   const handleMaximizeClick = useCallback(() => {
     if (!isOngoing) {
       return;
     }
-    void callingRepository.setViewModeFullScreen();
-  }, [isOngoing, callingRepository]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await callingRepository.setViewModeFullScreen();
+    });
+  }, [callingRepository, fireAndForgetInvoker, isOngoing]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
@@ -326,10 +332,14 @@ export const CallingCell = ({
 
   const toggleDetachedWindow = () => {
     if (isDetachedWindow) {
-      void callingRepository.setViewModeMinimized();
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await callingRepository.setViewModeMinimized();
+      });
       return;
     }
-    void callingRepository.setViewModeDetached();
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await callingRepository.setViewModeDetached();
+    });
   };
 
   if (isFullScreen) {
