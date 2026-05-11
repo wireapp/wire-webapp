@@ -17,6 +17,8 @@
  *
  */
 
+import {useId} from 'react';
+
 import {CSSObject} from '@emotion/react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -48,25 +50,34 @@ const wrapperStyles: CSSObject = {
   paddingTop: 4,
 };
 
-export const ConversationProtocolDetails = ({protocol, cipherSuite}: ConversationProtocolDetailsProps) => (
-  <div>
-    <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
+export const ConversationProtocolDetails = ({protocol, cipherSuite}: ConversationProtocolDetailsProps) => {
+  const protocolLabelId = useId();
+  const cipherSuiteLabelId = useId();
 
-    <div css={wrapperStyles}>
-      <div css={titleStyles}>Protocol</div>
+  return (
+    <div>
+      <h3 className="conversation-details__list-head">{t('conversationDetailsProtocolDetails')}</h3>
 
-      <p css={subTitleStyles} data-uie-name="protocol-name">
-        {protocol.toUpperCase()}
-      </p>
+      <div css={wrapperStyles}>
+        <div id={protocolLabelId} css={titleStyles}>
+          Protocol
+        </div>
 
-      {protocol === CONVERSATION_PROTOCOL.MLS && cipherSuite != null && (
-        <>
-          <div css={titleStyles}>Cipher Suite</div>
-          <p css={subTitleStyles} data-uie-name="cipher-suite">
-            {Ciphersuite[cipherSuite]}
-          </p>
-        </>
-      )}
+        <div aria-labelledby={protocolLabelId} css={subTitleStyles} data-uie-name="protocol-name">
+          {protocol.toUpperCase()}
+        </div>
+
+        {protocol === CONVERSATION_PROTOCOL.MLS && cipherSuite != null && (
+          <>
+            <div id={cipherSuiteLabelId} css={titleStyles}>
+              Cipher Suite
+            </div>
+            <div aria-labelledby={cipherSuiteLabelId} css={subTitleStyles} data-uie-name="cipher-suite">
+              {Ciphersuite[cipherSuite]}
+            </div>
+          </>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
