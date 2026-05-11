@@ -182,6 +182,7 @@ const config: Linter.Config[] = [
       'jest/no-jasmine-globals': 'off',
       'jsx-a11y/media-has-caption': 'off',
       'no-empty': 'error',
+      'no-void': 'error',
     },
     settings: {
       'import/resolver': {
