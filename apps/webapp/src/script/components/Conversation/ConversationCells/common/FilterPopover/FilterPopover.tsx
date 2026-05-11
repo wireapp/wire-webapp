@@ -171,7 +171,9 @@ export const FilterPopover = ({triggerLabel, items, selectedIds, onSelectionChan
                       <span css={labelGroupStyles}>
                         <CheckboxLabel css={checkboxLabelStyles}>{item.label}</CheckboxLabel>
                       </span>
-                      {item.startContent && <span css={startContentStyles}>{item.startContent}</span>}
+                      {item.startContent !== undefined && item.startContent !== null && (
+                        <span css={startContentStyles}>{item.startContent}</span>
+                      )}
                     </Checkbox>
                   </li>
                 );
