@@ -3,7 +3,8 @@ import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Encryption', () => {
-  test(
+  // Test is skipped due to the unread messages being lost during migration (See: WPB-25346)
+  test.skip(
     'Migrate 1:1 conversations',
     {tag: ['@TC-8736', '@regression']},
     async ({createTeam, createUser, createPage, api}) => {
