@@ -41,6 +41,7 @@ export class AccountPage {
   readonly resetPasswordButton: Locator;
   readonly receiveNewsletterCheckbox: Locator;
   readonly typingIndicator: Locator;
+  readonly readReceiptsCheckbox: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -64,6 +65,7 @@ export class AccountPage {
     this.resetPasswordButton = page.getByTestId('do-reset-password');
     this.receiveNewsletterCheckbox = page.locator("[data-uie-name='status-preference-marketing']+label");
     this.typingIndicator = page.locator("[data-uie-name='status-preference-typing-indicator']+label");
+    this.readReceiptsCheckbox = page.locator("[data-uie-name='status-preference-read-receipts']+label");
   }
 
   /** Locator for the privacy section within the account settings, including utils for the options inside it */

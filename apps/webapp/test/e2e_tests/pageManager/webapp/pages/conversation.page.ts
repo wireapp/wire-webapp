@@ -363,4 +363,9 @@ export class ConversationPage {
   getPing(): Locator {
     return this.messageItems.getByTestId('element-message-ping');
   }
+
+  async getMessageReadReceipt(message: Locator) {
+    await message.hover();
+    return message.getByTestId('status-message-read-receipts');
+  }
 }
