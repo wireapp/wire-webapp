@@ -18,12 +18,18 @@
  */
 
 import {act, renderHook} from '@testing-library/react';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import {noop} from 'noop-esm';
 
 import {AssetError} from 'Repositories/assets/assetError';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from '../../../../../../../page/testSupport/rootContextTestSupport';
 import {useGetAssetUrl} from './useGetAssetUrl';
 
 jest.mock('Util/logger', () => ({
@@ -39,6 +45,13 @@ describe('useGetAssetUrl', () => {
   const mockGetAssetUrl = jest.fn().mockResolvedValue(mockAssetUrl);
   const mockOnSuccess = jest.fn();
   const mockOnError = jest.fn();
+  const wrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({
+      fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+      mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+      wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+    }),
+  );
 
   const mockAsset: FileAsset = {
     id: 'mock-asset-id',
@@ -68,6 +81,7 @@ describe('useGetAssetUrl', () => {
           getAssetUrl: mockGetAssetUrl,
           onSuccess: mockOnSuccess,
         }),
+        {wrapper},
       );
       result = rendered.result;
       await Promise.resolve();
@@ -89,6 +103,7 @@ describe('useGetAssetUrl', () => {
           isEnabled: false,
           getAssetUrl: mockGetAssetUrl,
         }),
+        {wrapper},
       );
       await Promise.resolve();
     });
@@ -110,6 +125,7 @@ describe('useGetAssetUrl', () => {
           getAssetUrl: mockGetAssetUrlWithError,
           onError: mockOnError,
         }),
+        {wrapper},
       );
       result = rendered.result;
       await Promise.resolve();
@@ -135,6 +151,7 @@ describe('useGetAssetUrl', () => {
           getAssetUrl: mockGetAssetUrlWithCancel,
           onError: mockOnError,
         }),
+        {wrapper},
       );
       result = rendered.result;
       await Promise.resolve();
@@ -154,6 +171,7 @@ describe('useGetAssetUrl', () => {
           isEnabled: true,
           getAssetUrl: mockGetAssetUrl,
         }),
+        {wrapper},
       );
 
       rerender = rendered.rerender;
@@ -178,6 +196,7 @@ describe('useGetAssetUrl', () => {
           isEnabled: true,
           getAssetUrl: mockGetAssetUrl,
         }),
+        {wrapper},
       );
 
       await Promise.resolve();
@@ -199,7 +218,7 @@ describe('useGetAssetUrl', () => {
             isEnabled,
             getAssetUrl: mockGetAssetUrl,
           }),
-        {initialProps: {isEnabled: false}},
+        {initialProps: {isEnabled: false}, wrapper},
       );
       rerender = rendered.rerender;
       await Promise.resolve();
@@ -226,6 +245,7 @@ describe('useGetAssetUrl', () => {
           getAssetUrl: mockGetAssetUrl,
           onSuccess: mockOnSuccess,
         }),
+        {wrapper},
       );
       await Promise.resolve();
     });
@@ -247,6 +267,7 @@ describe('useGetAssetUrl', () => {
           getAssetUrl: mockGetAssetUrlWithError,
           onError: mockOnError,
         }),
+        {wrapper},
       );
       await Promise.resolve();
     });
@@ -269,6 +290,7 @@ describe('useGetAssetUrl', () => {
           getAssetUrl: mockGetAssetUrlWithCancel,
           onError: mockOnError,
         }),
+        {wrapper},
       );
       await Promise.resolve();
     });
@@ -290,6 +312,7 @@ describe('useGetAssetUrl', () => {
         isEnabled: true,
         getAssetUrl: mockGetAssetUrlSlow,
       }),
+      {wrapper},
     );
 
     // Immediately check loading state after render
@@ -318,6 +341,7 @@ describe('useGetAssetUrl', () => {
           isEnabled: true,
           getAssetUrl: mockGetAssetUrlWithError,
         }),
+        {wrapper},
       );
       await Promise.resolve();
     });

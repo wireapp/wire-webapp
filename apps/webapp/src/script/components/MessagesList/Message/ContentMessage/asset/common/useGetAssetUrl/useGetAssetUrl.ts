@@ -25,6 +25,7 @@ import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {getLogger} from 'Util/logger';
 
+import {useApplicationContext} from '../../../../../../../page/RootProvider';
 import {AssetUrl} from '../useAssetTransfer/useAssetTransfer';
 
 const logger = getLogger('useGetAssetUrl');
@@ -38,6 +39,7 @@ interface UseGetAssetUrlProps {
 }
 
 export const useGetAssetUrl = ({asset, isEnabled, getAssetUrl, onError, onSuccess}: UseGetAssetUrlProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [url, setUrl] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -67,8 +69,10 @@ export const useGetAssetUrl = ({asset, isEnabled, getAssetUrl, onError, onSucces
   }, [url, isEnabled, asset, getAssetUrl, onSuccess, onError]);
 
   useEffect(() => {
-    void fetchAssetUrl();
-  }, [fetchAssetUrl]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await fetchAssetUrl();
+    });
+  }, [fetchAssetUrl, fireAndForgetInvoker]);
 
   return {
     url,
