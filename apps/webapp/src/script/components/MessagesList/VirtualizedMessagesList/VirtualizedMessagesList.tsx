@@ -36,6 +36,7 @@ import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList
 import {useRoveFocus} from 'Hooks/useRoveFocus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
+import {useApplicationContext} from '../../../page/RootProvider';
 import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';
 
 const ESTIMATED_ELEMENT_SIZE = 70;
@@ -72,6 +73,7 @@ export const VirtualizedMessagesList = ({
   onLoading,
   isConversationLoaded,
 }: Props) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {
     messages: allMessages,
     lastDeliveredMessage,
@@ -197,7 +199,9 @@ export const VirtualizedMessagesList = ({
     if (!messageIsLoaded) {
       const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
       conversation.removeMessages();
-      void conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+      fireAndForgetInvoker.fireAndForget(async () => {
+        await conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+      });
     }
   };
 

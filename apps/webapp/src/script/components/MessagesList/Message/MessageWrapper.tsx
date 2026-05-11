@@ -52,6 +52,7 @@ import {PingMessage} from './PingMessage';
 import {SystemMessage} from './SystemMessage';
 import {VerificationMessage} from './VerificationMessage';
 
+import {useApplicationContext} from '../../../page/RootProvider';
 import {ContextMenuEntry} from '../../../ui/ContextMenu';
 
 import {MessageParams} from './index';
@@ -85,6 +86,7 @@ export const MessageWrapper = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const findMessage = async (conversation: Conversation, messageId: string) => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const event =
@@ -193,7 +195,9 @@ export const MessageWrapper = ({
     if (!message.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversation, message, reaction, selfId);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await messageRepository.toggleReaction(conversation, message, reaction, selfId);
+    });
   };
   if (message.isContent()) {
     return (

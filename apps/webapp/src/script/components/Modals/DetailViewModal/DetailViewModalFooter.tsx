@@ -40,6 +40,8 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isTabKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
+import {useApplicationContext} from '../../../page/RootProvider';
+
 interface DetailViewModalFooterProps {
   messageEntity: ContentMessage;
   conversationEntity: Conversation;
@@ -60,6 +62,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   messageRepository,
   selfId,
 }) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {isSelfUserRemoved} = useKoSubscribableChildren(conversationEntity, ['isSelfUserRemoved']);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -68,7 +71,9 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
     if (!messageEntity.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
+    });
   };
   const {handleMenuOpen} = useMessageActionsState();
   const resetActionMenuStates = useCallback(() => {

@@ -23,6 +23,8 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 
+import {useApplicationContext} from '../../../page/RootProvider';
+
 interface Props {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
@@ -36,6 +38,7 @@ export const useLoadConversation = ({
   conversationLastReadTimestamp,
   onLoading,
 }: Props) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const loadConversation = async (conversationToLoad: Conversation): Promise<MessageEntity[]> => {
     onLoading(true);
     try {
@@ -53,13 +56,15 @@ export const useLoadConversation = ({
   };
 
   useEffect(() => {
-    void loadConversation(conversation);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await loadConversation(conversation);
+    });
 
     return () => {
       conversation.release();
       onLoading(true);
     };
-  }, [conversation]);
+  }, [conversation, fireAndForgetInvoker]);
 
   return {loadConversation};
 };
