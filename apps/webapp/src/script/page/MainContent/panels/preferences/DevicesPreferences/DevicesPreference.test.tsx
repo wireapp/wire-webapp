@@ -20,6 +20,8 @@
 import {render, waitFor} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {createFireAndForgetInvoker} from '@wireapp/core/lib/taskExecution/fireAndForgetInvoker/fireAndForgetInvoker';
+import {noop} from 'noop-esm';
 import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
@@ -33,6 +35,9 @@ import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Core} from 'src/script/service/CoreSingleton';
 import {createUuid} from 'Util/uuid';
+
+import {RootProvider} from '../../../../RootProvider';
+import {createRootContextValueForTest} from '../../../../testSupport/rootContextTestSupport';
 
 import {DevicesPreferences} from './DevicesPreference';
 
@@ -83,8 +88,24 @@ describe('DevicesPreferences', () => {
 
   defaultParams.conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
 
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createFireAndForgetInvoker({logger: {error: noop}}),
+    mainViewModel: {} as Parameters<typeof createRootContextValueForTest>[0]['mainViewModel'],
+    wallClock: {} as Parameters<typeof createRootContextValueForTest>[0]['wallClock'],
+  });
+
+  function renderDevicesPreferences() {
+    return render(
+      withTheme(
+        <RootProvider value={rootContextValue}>
+          <DevicesPreferences {...defaultParams} />
+        </RootProvider>,
+      ),
+    );
+  }
+
   it('displays all devices', async () => {
-    const {getByText, getAllByText} = render(withTheme(<DevicesPreferences {...defaultParams} />));
+    const {getByText, getAllByText} = renderDevicesPreferences();
 
     await waitFor(() => getByText('preferencesDevicesCurrent'));
     expect(getByText('preferencesDevicesCurrent')).toBeDefined();

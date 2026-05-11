@@ -24,9 +24,11 @@ import {stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
 import {E2EIHandler, getUsersIdentities, MLSStatuses, WireIdentity} from '../E2EIdentity';
+import {useApplicationContext} from '../page/RootProvider';
 import {Core} from '../service/CoreSingleton';
 
 export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAfterEnrollment?: boolean) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const core = container.resolve(Core);
   const [deviceIdentities, setDeviceIdentities] = useState<WireIdentity[] | undefined>();
   const getDeviceIdentity = (deviceId: string) => {
@@ -47,8 +49,10 @@ export const useUserIdentity = (userId: QualifiedId, groupId?: string, updateAft
   }, [groupId, userId.id, userId.domain]);
 
   useEffect(() => {
-    void refreshDeviceIdentities();
-  }, [refreshDeviceIdentities]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      await refreshDeviceIdentities();
+    });
+  }, [fireAndForgetInvoker, refreshDeviceIdentities]);
 
   useEffect(() => {
     if (!updateAfterEnrollment) {

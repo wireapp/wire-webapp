@@ -36,6 +36,7 @@ import {DetailedDevice} from './components/DetailedDevice';
 import {Device} from './components/Device';
 import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
 
+import {useApplicationContext} from '../../../../RootProvider';
 import {PreferencesPage} from '../components/PreferencesPage';
 
 interface DevicesPreferencesProps {
@@ -57,6 +58,7 @@ export const DevicesPreferences = ({
   verifyDevice,
   resetSession,
 }: DevicesPreferencesProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [selectedDevice, setSelectedDevice] = useState<ClientEntity | undefined>();
   const [localFingerprint, setLocalFingerprint] = useState('');
 
@@ -73,8 +75,10 @@ export const DevicesPreferences = ({
     cryptographyRepository.getRemoteFingerprint(selfUser.qualifiedId, device.id);
 
   useEffect(() => {
-    void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
-  }, [cryptographyRepository]);
+    fireAndForgetInvoker.fireAndForget(async () => {
+      setLocalFingerprint(await cryptographyRepository.getLocalFingerprint());
+    });
+  }, [cryptographyRepository, fireAndForgetInvoker]);
 
   if (selectedDevice) {
     return (
