@@ -165,4 +165,43 @@ test.describe('Read Receipts', () => {
     const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
     await expect(await userAPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
   });
+
+  test(
+    'I want to see read receipts for assets: link preview',
+    {tag: ['@TC-3557', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
+      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
+
+      // Preconditions: User A and User B have read receipts turned on
+      await userAComponents.conversationSidebar().preferencesButton.click();
+      await userAPages.account().readReceiptsCheckbox.click();
+      await userAComponents.conversationSidebar().allConversationsButton.click();
+
+      await userBComponents.conversationSidebar().preferencesButton.click();
+      await userBPages.account().readReceiptsCheckbox.click();
+      await userBComponents.conversationSidebar().allConversationsButton.click();
+
+      const conversationName = 'Group Conversation';
+      await createGroup(userAPages, conversationName, [userB]);
+      await userAPages.conversationList().getConversation(conversationName).open();
+
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
+      await userBPages
+        .conversation()
+        .sendMessage('Message with Link Preview: https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      const messageWithLinkPreview = userAPages.conversation().getMessage({sender: userB});
+      await expect(messageWithLinkPreview).toBeVisible();
+
+      const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
+      await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
+    },
+  );
 });
