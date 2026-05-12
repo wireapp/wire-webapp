@@ -597,6 +597,29 @@ describe('Account', () => {
       expect(rehydrateOrder).toBeLessThan(liveOrder);
     });
 
+    it('rehydrates pending-proposals only once when the legacy stream processor runs multiple times', async () => {
+      const mlsService = buildMlsServiceStub();
+      const {account} = await setup(mlsService);
+
+      const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
+      const liveTransitionCount = () =>
+        onConnectionStateChanged.mock.calls.filter(([state]) => state === ConnectionState.LIVE).length;
+
+      const processStream = account['createLegacyNotificationStreamProcessor']({
+        handleLegacyNotification: jest.fn().mockResolvedValue(undefined),
+        handleMissedNotifications: jest.fn().mockResolvedValue(undefined),
+        onConnectionStateChanged,
+      });
+
+      await processStream();
+      await waitFor(() => expect(liveTransitionCount()).toBe(1));
+      expect(mlsService.initialisePendingProposalsTasks).toHaveBeenCalledTimes(1);
+
+      await processStream();
+      await waitFor(() => expect(liveTransitionCount()).toBe(2));
+      expect(mlsService.initialisePendingProposalsTasks).toHaveBeenCalledTimes(1);
+    });
+
     it('does NOT rehydrate pending-proposals when MLS is not enabled for the client', async () => {
       const mlsService: MlsServiceStub = {...buildMlsServiceStub(), isEnabled: false};
       const {account} = await setup(mlsService);
