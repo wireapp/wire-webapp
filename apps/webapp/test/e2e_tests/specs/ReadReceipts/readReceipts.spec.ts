@@ -299,4 +299,40 @@ test.describe('Read Receipts', () => {
       await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
     },
   );
+
+  test(
+    'I want to see a popup when I toggled read receipts on and off from another device',
+    {tag: ['@TC-3567', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const userAPage2 = await createPage(withLogin(userA, {confirmNewHistory: true}));
+
+      const {pages: userAPages, modals: userAModals, components: userAComponents} = PageManager.from(userAPage).webapp;
+      const {pages: userAPages2, components: userAComponents2} = PageManager.from(userAPage2).webapp;
+      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
+
+      // Preconditions: User B has read receipts turned on
+      await userBComponents.conversationSidebar().preferencesButton.click();
+      await userBPages.account().readReceiptsCheckbox.click();
+      await userBComponents.conversationSidebar().allConversationsButton.click();
+
+      // User A turns on read receipts on second device
+      await userAComponents2.conversationSidebar().preferencesButton.click();
+      await userAPages2.account().readReceiptsCheckbox.click();
+      await userAComponents2.conversationSidebar().allConversationsButton.click();
+
+      // User A sees the modal about read receipts being enabled
+      await userAComponents.conversationSidebar().preferencesButton.click();
+      await expect(userAModals.newDevice().modal).toBeVisible();
+      await userAModals.newDevice().actionButton.click();
+
+      // to see the enabled read receipt modal, User A needs to switch to another settings tab
+      await userAPages.settings().devicesButton.click();
+      await expect(userAModals.readReceipt().modal).toBeVisible();
+    },
+  );
 });
