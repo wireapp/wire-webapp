@@ -22,7 +22,6 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
-import {connectWithUser} from './utils/userActions';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
@@ -229,17 +228,6 @@ export const withLogin =
     await pageManager.webapp.components
       .conversationSidebar()
       .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-  };
-
-/**
- * PagePlugin to connect with the given user
- * Note: This plugin only works if the users are in the same team
- */
-export const withConnectedUser =
-  (user: User | Promise<User>): PagePlugin =>
-  async page => {
-    const pageManager = PageManager.from(page);
-    await connectWithUser(pageManager, await user);
   };
 
 /** PagePlugin to open a guest user link and join the group chat as temporary member */

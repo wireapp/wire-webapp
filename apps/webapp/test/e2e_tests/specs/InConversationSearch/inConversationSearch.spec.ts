@@ -19,10 +19,10 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {createGroup} from '../../utils/userActions';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 
 test.describe('In Conversation Search', () => {
   let userA: User;
@@ -39,8 +39,8 @@ test.describe('In Conversation Search', () => {
     'Verify main overview shows media from all categories',
     {tag: ['@TC-352', '@regression']},
     async ({createPage}) => {
-      const userBPage = await createPage(withLogin(userB));
-      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
@@ -69,10 +69,8 @@ test.describe('In Conversation Search', () => {
     "Verify ephemeral messages aren't shown in collection after timeout",
     {tag: ['@TC-354', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
@@ -98,10 +96,8 @@ test.describe('In Conversation Search', () => {
     'Verify ephemeral messages show in collection before timeout',
     {tag: ['@TC-355', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
@@ -127,10 +123,8 @@ test.describe('In Conversation Search', () => {
     'Verify opening overview of all pictures from sender and receiver in group',
     {tag: ['@TC-356', '@regression']},
     async ({createPage}) => {
-      const [pageA, pageB] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [pageA, pageB] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(pageA, userB);
 
       const userAPages = PageManager.from(pageA).webapp.pages;
       const userBPages = PageManager.from(pageB).webapp.pages;
@@ -159,10 +153,8 @@ test.describe('In Conversation Search', () => {
     'Verify opening single picture from all shared media overview',
     {tag: ['@TC-357', '@regression']},
     async ({createPage}) => {
-      const [pageA, pageB] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [pageA, pageB] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(pageA, userB);
 
       const {pages: userAPages, modals: userAModals} = PageManager.from(pageA).webapp;
       const userBPages = PageManager.from(pageB).webapp.pages;
@@ -181,10 +173,11 @@ test.describe('In Conversation Search', () => {
 
   // TODO: links are not shown to the collection - this part of the test is blocked by [WPB-22484]
   test.skip('Verify opening overview of all links', {tag: ['@TC-358', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     // Step: User B sends several links
@@ -197,10 +190,8 @@ test.describe('In Conversation Search', () => {
   });
 
   test('Verify opening overview of all files', {tag: ['@TC-359', '@regression']}, async ({createPage}) => {
-    const [pageA, pageB] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
+    const [pageA, pageB] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(pageA, userB);
 
     const userAPages = PageManager.from(pageA).webapp.pages;
     const userBPages = PageManager.from(pageB).webapp.pages;
@@ -224,10 +215,8 @@ test.describe('In Conversation Search', () => {
     "Verify deleted media isn't in collection on other side",
     {tag: ['@TC-360', '@regression']},
     async ({createPage}) => {
-      const [pageA, pageB] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [pageA, pageB] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(pageA, userB);
 
       const userAPages = PageManager.from(pageA).webapp.pages;
       const userBPages = PageManager.from(pageB).webapp.pages;
@@ -250,10 +239,11 @@ test.describe('In Conversation Search', () => {
 
   // TODO: [WPB-23814] - search behavior is broken
   test.skip('Verify I can search my own message', {tag: ['@TC-385', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userBPages.conversation().sendMessage('User B message');
@@ -278,10 +268,11 @@ test.describe('In Conversation Search', () => {
     'Verify I can search for text mixed with a link preview',
     {tag: ['@TC-388', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('User B message');
@@ -299,10 +290,11 @@ test.describe('In Conversation Search', () => {
   );
 
   test('Verify I can search for links without preview', {tag: ['@TC-391', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userBPages.conversation().sendMessage('User B message');
@@ -321,10 +313,11 @@ test.describe('In Conversation Search', () => {
   });
 
   test('Verify I can not search for a deleted message', {tag: ['@TC-392', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userBPages.conversation().sendMessage('User B message: Papaya');
@@ -346,10 +339,11 @@ test.describe('In Conversation Search', () => {
     'Verify results are sorted - latest message on top of list',
     {tag: ['@TC-398', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       // User B sends the first (older) message
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -372,10 +366,11 @@ test.describe('In Conversation Search', () => {
   );
 
   test('Verify I can find a message with special letters', {tag: ['@TC-403', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     const specialWord = 'Crème brûlée';
 
@@ -393,10 +388,11 @@ test.describe('In Conversation Search', () => {
   });
 
   test('Verify invisible characters in search are trimmed', {tag: ['@TC-405', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
@@ -415,10 +411,11 @@ test.describe('In Conversation Search', () => {
     'I want to see message is scrolled into view when tapping on search result',
     {tag: ['@TC-408', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('Papaya');
