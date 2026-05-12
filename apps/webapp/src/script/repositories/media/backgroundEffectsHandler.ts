@@ -243,10 +243,6 @@ export class BackgroundEffectsHandler {
     backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(enable);
   }
 
-  public isSuperhighQualityTierAllowed(): boolean {
-    return this.controller.getMaxQualityTier() === 'superhigh';
-  }
-
   public getCapabilityInfo(): CapabilityInfo {
     return this.controller.getCapabilityInfo();
   }

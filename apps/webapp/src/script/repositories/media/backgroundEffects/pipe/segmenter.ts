@@ -165,7 +165,7 @@ export async function runSegmenter(
     pushMetricsSample(metricsWindow, {totalMs, segmentationMs, gpuMs});
 
     const quality = segmenterOptions.quality ?? 'auto';
-    const tier = quality === 'auto' ? 'superhigh' : quality;
+    const tier = quality === 'auto' ? 'fhd' : quality;
 
     onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, 'GPU'));
   }
