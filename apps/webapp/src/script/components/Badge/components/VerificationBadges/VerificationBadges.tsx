@@ -42,6 +42,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/UserState';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {waitFor} from 'Util/waitFor';
@@ -133,13 +134,14 @@ export const DeviceVerificationBadges = ({
   isE2EIEnabled?: boolean;
 }) => {
   const userState = useRef(container.resolve(UserState));
+  const {fireAndForgetInvoker} = useApplicationContext();
   const identity = useMemo(() => getIdentity?.(device.id), [device, getIdentity]);
   const [user, setUser] = useState<User | undefined>(undefined);
 
   useEffect(() => {
     // using active flag in combination with the cleanup to prevent race conditions
     let active = true;
-    void loadUser();
+    fireAndForgetInvoker.fireAndForget(loadUser);
     return () => {
       active = false;
     };
@@ -158,7 +160,7 @@ export const DeviceVerificationBadges = ({
       }
       setUser(userEntity);
     }
-  }, [identity]);
+  }, [fireAndForgetInvoker, identity]);
 
   let status: MLSStatuses | undefined = undefined;
   if (isE2EIEnabled && identity && user) {

@@ -22,6 +22,7 @@ import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from '
 import {amplify} from 'amplify';
 import cx from 'classnames';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ZoomableImage} from 'Components/ZoomableImage';
@@ -48,6 +49,7 @@ import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';
 interface DetailViewModalProps {
   readonly assetRepository: AssetRepository;
   readonly conversationRepository: ConversationRepository;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly messageRepository: MessageRepository;
   currentMessageEntity: ContentMessage;
   onClose?: () => void;
@@ -57,6 +59,7 @@ interface DetailViewModalProps {
 export const DetailViewModal = ({
   assetRepository,
   conversationRepository,
+  fireAndForgetInvoker,
   messageRepository,
   currentMessageEntity,
   onClose,
@@ -279,6 +282,7 @@ export const DetailViewModal = ({
             messageEntity={messageEntity}
             conversationEntity={conversationEntity}
             messageRepository={messageRepository}
+            fireAndForgetInvoker={fireAndForgetInvoker}
             onReplyClick={onReplyClick}
             onDownloadClick={onDownloadClick}
             selfId={selfUser.qualifiedId}

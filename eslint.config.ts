@@ -229,6 +229,27 @@ const config: Linter.Config[] = [
       '@typescript-eslint/strict-boolean-expressions': 'error',
     },
   },
+  {
+    files: [
+      'apps/webapp/src/script/components/Badge/components/VerificationBadges/VerificationBadges.tsx',
+      'apps/webapp/src/script/components/Cells/common/useCellPublicLink/useCellPublicLink.ts',
+      'apps/webapp/src/script/components/ConfigToolbar/ConfigToolbar.tsx',
+      'apps/webapp/src/script/components/Conversation/Conversation.tsx',
+      'apps/webapp/src/script/components/InputBar/InputBar.tsx',
+      'apps/webapp/src/script/components/InputBar/usePing/usePing.ts',
+      'apps/webapp/src/script/components/MessagesList/Message/MessageWrapper.tsx',
+      'apps/webapp/src/script/components/MessagesList/utils/useLoadConversation.ts',
+      'apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx',
+      'apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx',
+      'apps/webapp/src/script/components/calling/CallingCell/CallingCell.tsx',
+      'apps/webapp/src/script/components/calling/CallingOverlayContainer.tsx',
+      'apps/webapp/src/script/components/calling/FullscreenVideoCall.tsx',
+    ],
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'error',
+      'no-void': 'error',
+    },
+  },
 ];
 
 export default config;

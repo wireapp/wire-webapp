@@ -20,6 +20,11 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {
+  createExecutingFireAndForgetInvokerForTest,
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';
@@ -36,6 +41,10 @@ describe('useCellPublicLink', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let mockNode: CellNode | undefined;
   const mockSetPublicLink = jest.fn();
+  const rootContextValue = createRootContextValueForTest({
+    fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+  });
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   const createMockNode = (overrides: Partial<CellNode> = {}): CellNode => ({
     id: 'test-uuid',
@@ -75,7 +84,7 @@ describe('useCellPublicLink', () => {
           refreshLinkDataAfterUpdate,
           setStatusOnPublicLinkUrl,
         }),
-      {initialProps},
+      {initialProps, wrapper: rootProviderWrapper},
     );
 
     const rerenderWith = (props: Partial<typeof initialProps>) =>
@@ -397,7 +406,7 @@ describe('useCellPublicLink', () => {
       mockCellsRepository.createPublicLink.mockResolvedValue({
         Uuid: undefined,
         LinkUrl: undefined,
-      } as any);
+      } as unknown as Awaited<ReturnType<CellsRepository['createPublicLink']>>);
 
       const {result} = renderPublicLinkHook();
 
@@ -456,7 +465,9 @@ describe('useCellPublicLink', () => {
       };
 
       mockCellsRepository.getPublicLink.mockResolvedValue(existingLink);
-      mockCellsRepository.updatePublicLink.mockResolvedValue({} as any);
+      mockCellsRepository.updatePublicLink.mockResolvedValue(
+        {} as unknown as Awaited<ReturnType<CellsRepository['updatePublicLink']>>,
+      );
 
       const {result} = renderPublicLinkHook({node: mockNode, refreshLinkDataAfterUpdate: true});
 

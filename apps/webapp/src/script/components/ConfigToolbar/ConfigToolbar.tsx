@@ -27,11 +27,13 @@ import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 
 export function ConfigToolbar() {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
@@ -106,7 +108,7 @@ export function ConfigToolbar() {
       }
     };
 
-    void sendMessage();
+    fireAndForgetInvoker.fireAndForget(sendMessage);
 
     return () => {
       isActive = false;
@@ -114,7 +116,7 @@ export function ConfigToolbar() {
         clearTimeout(timeoutId);
       }
     };
-  }, [isMessageSendingActive, prefix, messageDelaySec]);
+  }, [fireAndForgetInvoker, isMessageSendingActive, prefix, messageDelaySec]);
 
   const startSendingMessages = () => {
     messageCountRef.current = 0;
@@ -285,7 +287,9 @@ export function ConfigToolbar() {
           onChange={event => {
             const val = Number(event.currentTarget.value) as CoreCryptoLogLevel;
             setCoreCryptoLevel(val);
-            void window.wire?.app?.debug?.setCoreCryptoMaxLogLevel(val);
+            fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+              await window.wire?.app?.debug?.setCoreCryptoMaxLogLevel(val);
+            });
           }}
           style={{padding: '6px 8px'}}
         >
