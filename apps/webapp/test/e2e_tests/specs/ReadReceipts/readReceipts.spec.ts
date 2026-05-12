@@ -64,7 +64,7 @@ test.describe('Read Receipts', () => {
     await expect(messageWithImage).toBeVisible();
 
     const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-    await expect(await userAPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
+    await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
   });
 
   test('I want to see read receipts for assets: audio', {tag: ['@TC-3553', '@regression']}, async ({createPage}) => {
@@ -97,7 +97,7 @@ test.describe('Read Receipts', () => {
     await expect(messageWithAudio).toBeVisible();
 
     const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-    await expect(await userAPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
+    await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
   });
 
   test('I want to see read receipts for assets: video', {tag: ['@TC-3554', '@regression']}, async ({createPage}) => {
@@ -130,7 +130,7 @@ test.describe('Read Receipts', () => {
     await expect(messageWithVideo).toBeVisible();
 
     const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-    await expect(await userAPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
+    await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
   });
 
   test('I want to see read receipts for assets: file', {tag: ['@TC-3555', '@regression']}, async ({createPage}) => {
@@ -163,7 +163,7 @@ test.describe('Read Receipts', () => {
     await expect(messageWithFile).toBeVisible();
 
     const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-    await expect(await userAPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
+    await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
   });
 
   test(
