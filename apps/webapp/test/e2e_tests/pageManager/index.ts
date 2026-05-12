@@ -30,7 +30,6 @@ import {AcknowledgeModal} from './webapp/modals/acknowledge.modal';
 import {AppLockModal} from './webapp/modals/appLock.modal';
 import {ConfirmModal} from './webapp/modals/confirm.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
-import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {DetailViewModal} from './webapp/modals/detailView.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {OptionModal} from './webapp/modals/option.modal';
