@@ -34,137 +34,73 @@ test.describe('Read Receipts', () => {
     userA = team.owner;
   });
 
-  test('I want to see read receipts for assets: picture', {tag: ['@TC-3552', '@regression']}, async ({createPage}) => {
-    const [userAPage, userBPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
+  const assetTestCases = [
+    {description: 'assets: picture', tag: '@TC-3552'},
+    {description: 'assets: audio', tag: '@TC-3553'},
+    {description: 'assets: video', tag: '@TC-3554'},
+    {description: 'assets: file', tag: '@TC-3555'},
+    {description: 'assets: link preview', tag: '@TC-3557'},
+    {description: 'ephemeral message', tag: '@TC-3562'},
+  ];
 
-    const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-    const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
+  for (const {description, tag} of assetTestCases) {
+    test(`I want to see read receipts for ${description}`, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
 
-    // Preconditions: User A and User B have read receipts turned on
-    await userAComponents.conversationSidebar().preferencesButton.click();
-    await userAPages.account().readReceiptsCheckbox.click();
-    await userAComponents.conversationSidebar().allConversationsButton.click();
+      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
+      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
 
-    await userBComponents.conversationSidebar().preferencesButton.click();
-    await userBPages.account().readReceiptsCheckbox.click();
-    await userBComponents.conversationSidebar().allConversationsButton.click();
+      // Preconditions: User A and User B have read receipts turned on
+      await userAComponents.conversationSidebar().preferencesButton.click();
+      await userAPages.account().readReceiptsCheckbox.click();
+      await userAComponents.conversationSidebar().allConversationsButton.click();
 
-    const conversationName = 'Group Conversation';
-    await createGroup(userAPages, conversationName, [userB]);
-    await userAPages.conversationList().getConversation(conversationName).open();
+      await userBComponents.conversationSidebar().preferencesButton.click();
+      await userBPages.account().readReceiptsCheckbox.click();
+      await userBComponents.conversationSidebar().allConversationsButton.click();
 
-    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
-    await shareAssetHelper(getImageFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add picture'}));
+      const conversationName = 'Group Conversation';
+      await createGroup(userAPages, conversationName, [userB]);
+      await userAPages.conversationList().getConversation(conversationName).open();
 
-    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
-    const messageWithImage = userAPages.conversation().getMessage({sender: userB});
-    await expect(messageWithImage).toBeVisible();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
-    const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-    await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
-  });
+      switch (tag) {
+        case '@TC-3552':
+          await shareAssetHelper(getImageFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add picture'}));
+          break;
+        case '@TC-3553':
+          await shareAssetHelper(getAudioFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
+          break;
+        case '@TC-3554':
+          await shareAssetHelper(getVideoFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
+          break;
+        case '@TC-3555':
+          await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
+          break;
+        case '@TC-3557':
+          await userBPages
+            .conversation()
+            .sendMessage('Message with Link Preview: https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+          break;
+        case '@TC-3562':
+          await userBPages.conversation().enableSelfDeletingMessages();
+          await userBPages.conversation().sendMessage('Ephemeral Message');
+          break;
+      }
 
-  test('I want to see read receipts for assets: audio', {tag: ['@TC-3553', '@regression']}, async ({createPage}) => {
-    const [userAPage, userBPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
 
-    const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-    const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
+      const receivedMessage = userAPages.conversation().getMessage({sender: userB});
+      await expect(receivedMessage).toBeVisible();
 
-    // Preconditions: User A and User B have read receipts turned on
-    await userAComponents.conversationSidebar().preferencesButton.click();
-    await userAPages.account().readReceiptsCheckbox.click();
-    await userAComponents.conversationSidebar().allConversationsButton.click();
-
-    await userBComponents.conversationSidebar().preferencesButton.click();
-    await userBPages.account().readReceiptsCheckbox.click();
-    await userBComponents.conversationSidebar().allConversationsButton.click();
-
-    const conversationName = 'Group Conversation';
-    await createGroup(userAPages, conversationName, [userB]);
-    await userAPages.conversationList().getConversation(conversationName).open();
-
-    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
-    await shareAssetHelper(getAudioFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
-
-    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
-    const messageWithAudio = userAPages.conversation().getMessage({sender: userB});
-    await expect(messageWithAudio).toBeVisible();
-
-    const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-    await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
-  });
-
-  test('I want to see read receipts for assets: video', {tag: ['@TC-3554', '@regression']}, async ({createPage}) => {
-    const [userAPage, userBPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
-
-    const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-    const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
-
-    // Preconditions: User A and User B have read receipts turned on
-    await userAComponents.conversationSidebar().preferencesButton.click();
-    await userAPages.account().readReceiptsCheckbox.click();
-    await userAComponents.conversationSidebar().allConversationsButton.click();
-
-    await userBComponents.conversationSidebar().preferencesButton.click();
-    await userBPages.account().readReceiptsCheckbox.click();
-    await userBComponents.conversationSidebar().allConversationsButton.click();
-
-    const conversationName = 'Group Conversation';
-    await createGroup(userAPages, conversationName, [userB]);
-    await userAPages.conversationList().getConversation(conversationName).open();
-
-    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
-    await shareAssetHelper(getVideoFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
-
-    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
-    const messageWithVideo = userAPages.conversation().getMessage({sender: userB});
-    await expect(messageWithVideo).toBeVisible();
-
-    const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-    await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
-  });
-
-  test('I want to see read receipts for assets: file', {tag: ['@TC-3555', '@regression']}, async ({createPage}) => {
-    const [userAPage, userBPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
-
-    const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-    const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
-
-    // Preconditions: User A and User B have read receipts turned on
-    await userAComponents.conversationSidebar().preferencesButton.click();
-    await userAPages.account().readReceiptsCheckbox.click();
-    await userAComponents.conversationSidebar().allConversationsButton.click();
-
-    await userBComponents.conversationSidebar().preferencesButton.click();
-    await userBPages.account().readReceiptsCheckbox.click();
-    await userBComponents.conversationSidebar().allConversationsButton.click();
-
-    const conversationName = 'Group Conversation';
-    await createGroup(userAPages, conversationName, [userB]);
-    await userAPages.conversationList().getConversation(conversationName).open();
-
-    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
-    await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
-
-    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
-    const messageWithFile = userAPages.conversation().getMessage({sender: userB});
-    await expect(messageWithFile).toBeVisible();
-
-    const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-    await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
-  });
+      const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
+      await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
+    });
+  }
 
   // TODO: [WPB-25618] read receipt is not visible on location share
   // TODO: unskip this test when Bug Ticket [WPB-25618] is resolved
@@ -218,83 +154,6 @@ test.describe('Read Receipts', () => {
 
       const messageWithLocationShare = userAPages.conversation().getMessage({sender: userB});
       await expect(messageWithLocationShare).toBeVisible();
-
-      const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-      await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
-    },
-  );
-
-  test(
-    'I want to see read receipts for assets: link preview',
-    {tag: ['@TC-3557', '@regression']},
-    async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
-
-      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
-
-      // Preconditions: User A and User B have read receipts turned on
-      await userAComponents.conversationSidebar().preferencesButton.click();
-      await userAPages.account().readReceiptsCheckbox.click();
-      await userAComponents.conversationSidebar().allConversationsButton.click();
-
-      await userBComponents.conversationSidebar().preferencesButton.click();
-      await userBPages.account().readReceiptsCheckbox.click();
-      await userBComponents.conversationSidebar().allConversationsButton.click();
-
-      const conversationName = 'Group Conversation';
-      await createGroup(userAPages, conversationName, [userB]);
-      await userAPages.conversationList().getConversation(conversationName).open();
-
-      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
-      await userBPages
-        .conversation()
-        .sendMessage('Message with Link Preview: https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-
-      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
-      const messageWithLinkPreview = userAPages.conversation().getMessage({sender: userB});
-      await expect(messageWithLinkPreview).toBeVisible();
-
-      const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-      await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
-    },
-  );
-
-  test(
-    'I want to see read receipts for ephemeral message',
-    {tag: ['@TC-3562', '@regression']},
-    async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
-
-      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
-
-      // Preconditions: User A and User B have read receipts turned on
-      await userAComponents.conversationSidebar().preferencesButton.click();
-      await userAPages.account().readReceiptsCheckbox.click();
-      await userAComponents.conversationSidebar().allConversationsButton.click();
-
-      await userBComponents.conversationSidebar().preferencesButton.click();
-      await userBPages.account().readReceiptsCheckbox.click();
-      await userBComponents.conversationSidebar().allConversationsButton.click();
-
-      const conversationName = 'Group Conversation';
-      await createGroup(userAPages, conversationName, [userB]);
-      await userAPages.conversationList().getConversation(conversationName).open();
-
-      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
-      await userBPages.conversation().enableSelfDeletingMessages();
-      await userBPages.conversation().sendMessage('Ephemeral Message');
-
-      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
-      const ephemeralMessage = userAPages.conversation().getMessage({sender: userB});
-      await expect(ephemeralMessage).toBeVisible();
 
       const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
       await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
