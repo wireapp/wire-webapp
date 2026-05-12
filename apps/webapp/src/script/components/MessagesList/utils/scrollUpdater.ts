@@ -45,7 +45,7 @@ export function updateScroll(
     const elementPosition = element.getBoundingClientRect();
     const containerPosition = container.getBoundingClientRect();
     const scrollBy = container.scrollTop + elementPosition.top - containerPosition.top;
-    container.scrollTo?.({top: scrollBy - (center ? container.offsetHeight / 2 : 0)});
+    container.scrollTo?.({top: scrollBy - (center === true ? container.offsetHeight / 2 : 0)});
   } else if (container.scrollTop === 0 && container.scrollHeight > prevScrollHeight) {
     // If we hit the top and new messages were loaded, we keep the scroll position stable
     container.scrollTop = container.scrollHeight - prevScrollHeight;
@@ -58,7 +58,11 @@ export function updateScroll(
       // Simple content update, we just scroll to bottom if we are in the stick to bottom threshold
       container.scrollTo?.({behavior, top: container.scrollHeight});
     }
-  } else if (lastMessage && lastMessage.status() === StatusType.SENDING && lastMessage.user().id === selfUserId) {
+  } else if (
+    lastMessage !== undefined &&
+    lastMessage.status() === StatusType.SENDING &&
+    lastMessage.user().id === selfUserId
+  ) {
     // The self user just sent a message, we scroll straight to the bottom
     container.scrollTo?.({behavior: 'smooth', top: container.scrollHeight});
   }

@@ -145,12 +145,12 @@ const GroupCreationModal = ({
   const rootContext = useContext(RootContext);
 
   useEffect(() => {
-    const showCreateGroup = (_: string, userEntity: User) => {
+    const showCreateGroup = (_: string, userEntity?: User) => {
       setEnableReadReceipts(isTeam);
       setIsShown(true);
       setGroupCreationState(GroupCreationModalState.PREFERENCES);
 
-      if (userEntity) {
+      if (userEntity !== undefined) {
         setSelectedContacts([...selectedContacts, userEntity]);
       }
     };
@@ -435,7 +435,7 @@ const GroupCreationModal = ({
                 enabled: isInputValid,
               })}
               css={{marginBottom: 0}}
-              disabled={!isInputValid}
+              disabled={isInputValid !== true}
               type="button"
               onClick={clickOnNext}
               aria-label={t('groupCreationPreferencesAction')}
@@ -458,7 +458,7 @@ const GroupCreationModal = ({
           />
         )}
 
-        {stateIsParticipants && selfUser && (
+        {stateIsParticipants && (
           <FadingScrollbar className="group-creation__list">
             <UserSearchableList
               selfUser={selfUser}

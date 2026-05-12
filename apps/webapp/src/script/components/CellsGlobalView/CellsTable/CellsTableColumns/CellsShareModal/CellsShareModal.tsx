@@ -110,7 +110,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   const initializedLinkIdRef = useRef<string | null>(null);
 
   // Derive hasExistingPassword from linkData
-  const hasExistingPassword = Boolean(linkData?.PasswordRequired);
+  const hasExistingPassword = linkData?.PasswordRequired === true;
 
   // Initialize toggles and values based on existing link data
   useEffect(() => {
@@ -119,11 +119,11 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
       return;
     }
 
-    if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
-      setIsPasswordEnabled(!!linkData.PasswordRequired);
+    if (linkData !== null && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
+      setIsPasswordEnabled(linkData.PasswordRequired === true);
 
       // Always sync expiration toggle and date with linkData state
-      if (linkData.AccessEnd) {
+      if (linkData.AccessEnd !== undefined && linkData.AccessEnd.length > 0) {
         setIsExpirationEnabled(true);
         // Convert Unix timestamp (in seconds) to Date
         const expirationDate = new Date(parseInt(linkData.AccessEnd) * 1000);
@@ -132,7 +132,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
         setIsExpirationEnabled(false);
         setExpirationDateTime(null);
       }
-      if (linkData?.Uuid) {
+      if (linkData.Uuid !== undefined && linkData.Uuid.length > 0) {
         initializedLinkIdRef.current = linkData.Uuid;
       }
     }
@@ -187,7 +187,12 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
 
   useEffect(() => {
     submitHandlers.set(modalId, async () => {
-      if (!isEnabled || status !== 'success' || !node?.publicLink?.uuid) {
+      if (
+        !isEnabled ||
+        status !== 'success' ||
+        node?.publicLink?.uuid === undefined ||
+        node.publicLink.uuid.length === 0
+      ) {
         return;
       }
 

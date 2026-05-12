@@ -21,11 +21,11 @@ import {Page} from 'playwright/test';
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 enum UserStatus {
   Away = 'Away',
@@ -224,10 +224,9 @@ test.describe('Status', () => {
 
   for (const config of notificationConfigs) {
     test(config.title, {tag: config.tag}, async ({createPage, api}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB), withConnectedUser(userC)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+      await connectWithUser(userBPage, userC);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
       const userBPageManager = PageManager.from(userBPage).webapp;
@@ -352,10 +351,8 @@ test.describe('Status', () => {
     'When I am available or have unset status, I want to get notifications for every message in non-muted conversations',
     {tag: ['@TC-3626', '@regression']},
     async ({createPage, api}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
       const userBPageManager = PageManager.from(userBPage).webapp;
@@ -425,13 +422,11 @@ test.describe('Status', () => {
   );
 
   test('I want to set my status on profile page', {tag: ['@TC-1766', '@regression']}, async ({createPage}) => {
-    const [userAPageManager, userBPageManager] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA))),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
 
-    const {pages, components, modals} = userAPageManager.webapp;
-    const userBPages = userBPageManager.webapp.pages;
+    const {pages, components, modals} = PageManager.from(userAPage).webapp;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     // User B verify no status is set in conversation list
     const conversation = await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();

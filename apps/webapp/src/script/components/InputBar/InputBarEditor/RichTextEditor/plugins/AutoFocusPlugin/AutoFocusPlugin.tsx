@@ -33,14 +33,15 @@ import {
 } from 'Util/keyboardUtil';
 
 const hasInputAlreadyFocused = () => {
-  return document.activeElement && ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+  const activeElement = document.activeElement;
+  return activeElement !== null && ['INPUT', 'TEXTAREA'].includes(activeElement.tagName);
 };
 
 const useTextAreaFocus = (callback: () => void) => {
   const handleFocusTextarea = (event: KeyboardEvent) => {
     const detailViewModal = document.querySelector('#detail-view');
 
-    if (detailViewModal?.classList.contains('modal-show')) {
+    if (detailViewModal?.classList.contains('modal-show') === true) {
       return;
     }
 
@@ -65,7 +66,7 @@ const useTextAreaFocus = (callback: () => void) => {
   useEffect(() => {
     window.addEventListener('keydown', handleFocusTextarea);
 
-    if (!hasInputAlreadyFocused()) {
+    if (hasInputAlreadyFocused() === false) {
       // Focus on the first render if no other input is focused
       setTimeout(callback);
     }

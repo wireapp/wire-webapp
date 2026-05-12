@@ -33,12 +33,12 @@ interface SelectTextProps {
 
 export const SelectText = ({text, className = '', dataUieName = 'select-text'}: SelectTextProps) => {
   const onClick = ({currentTarget}: React.UIEvent) => {
-    if (window.getSelection) {
+    if (typeof window.getSelection === 'function') {
       const selectionRange = document.createRange();
       selectionRange.selectNode(currentTarget);
       const selection = window.getSelection();
 
-      if (selection) {
+      if (selection !== null) {
         selection.removeAllRanges();
         selection.addRange(selectionRange);
       }

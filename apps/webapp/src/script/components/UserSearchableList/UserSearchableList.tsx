@@ -114,11 +114,11 @@ export const UserSearchableList = ({
           user.username() === normalizedQuery,
       );
 
-    if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch) {
+    if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch === true) {
       fetchMembersFromBackend(filter, results);
     }
 
-    if (!selfFirst) {
+    if (selfFirst !== true) {
       void setUsers(results);
       return;
     }
@@ -152,7 +152,7 @@ export const UserSearchableList = ({
 
   const userList = foundUserEntities().filter(
     user =>
-      !props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)) &&
+      props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)) !== true &&
       user.type === UserType.REGULAR,
   );
   const isEmptyUserList = userList.length === 0;

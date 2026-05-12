@@ -89,7 +89,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         setCurrentMsgAction('');
-      } else if (selectedMsgActionName) {
+      } else if (selectedMsgActionName !== undefined && selectedMsgActionName !== '') {
         setCurrentMsgAction(selectedMsgActionName);
       }
     },

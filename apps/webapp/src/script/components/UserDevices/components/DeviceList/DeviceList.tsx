@@ -43,7 +43,7 @@ export const DeviceList = ({user, getDeviceIdentity, noPadding, clients, clickOn
     <>
       <div className={cx('participant-devices__header', {'participant-devices__header--padding': !noPadding})}>
         <p className="participant-devices__text-block panel__info-text" data-uie-name="status-devices-headline">
-          {user ? t('participantDevicesHeadline', {brandName: Config.getConfig().BRAND_NAME, user: userName}) : ''}
+          {t('participantDevicesHeadline', {brandName: Config.getConfig().BRAND_NAME, user: userName})}
         </p>
 
         <a

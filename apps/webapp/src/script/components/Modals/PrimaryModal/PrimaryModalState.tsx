@@ -101,7 +101,7 @@ const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modal
     return showNextModalInQueue();
   }
   const newModal = {id: modalId, options, type};
-  const found = modalId && existsInQueue(newModal);
+  const found = modalId !== '' && existsInQueue(newModal);
   if (found) {
     replaceInQueue(newModal);
   } else {
@@ -113,7 +113,7 @@ const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modal
 
 const showNextModalInQueue = (): void => {
   const {queue, currentModalId, removeFirstItemInQueue} = usePrimaryModalState.getState();
-  if (currentModalId) {
+  if (currentModalId !== null && currentModalId !== undefined && currentModalId !== '') {
     // we already have a modal open which is awaiting a manual user action
     return;
   }
@@ -202,26 +202,27 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     }
     case PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
       content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-      content.titleText = data
-        ? t('modalAccountReadReceiptsChangedOnHeadline')
-        : t('modalAccountReadReceiptsChangedOffHeadline');
+      content.titleText =
+        data !== undefined && data !== null
+          ? t('modalAccountReadReceiptsChangedOnHeadline')
+          : t('modalAccountReadReceiptsChangedOffHeadline');
       content.message = t('modalAccountReadReceiptsChangedMessage');
       break;
     }
     case PrimaryModalType.ACKNOWLEDGE: {
       content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
-      content.titleText = text.title || t('modalAcknowledgeHeadline');
-      content.message = (!text.htmlMessage && text.message) || '';
+      content.titleText = text.title ?? t('modalAcknowledgeHeadline');
+      content.message = text.htmlMessage === undefined || text.htmlMessage === '' ? (text.message ?? '') : '';
       break;
     }
     case PrimaryModalType.WITHOUT_TITLE: {
       content.primaryAction = {...primaryAction};
-      content.message = (!text.htmlMessage && text.message) || '';
+      content.message = text.htmlMessage === undefined || text.htmlMessage === '' ? (text.message ?? '') : '';
       break;
     }
     case PrimaryModalType.CONFIRM: {
       content.secondaryAction = {
-        text: content.confirmCancelBtnLabel || t('modalConfirmSecondary'),
+        text: content.confirmCancelBtnLabel ?? t('modalConfirmSecondary'),
         ...content.secondaryAction,
       };
       break;
@@ -229,7 +230,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.INPUT:
     case PrimaryModalType.PASSWORD:
     case PrimaryModalType.OPTION: {
-      if (!hideSecondary) {
+      if (hideSecondary !== true) {
         content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
         content.modalUie = PrimaryModalType.OPTION;
       }

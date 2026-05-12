@@ -19,7 +19,8 @@
 
 import {FrameLocator} from 'playwright/test';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, expect, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Link Preview', () => {
   test(
@@ -27,15 +28,14 @@ test.describe('Link Preview', () => {
     {tag: ['@TC-1264', '@regression']},
     async ({createPage, createUser, createTeam}) => {
       const userB = await createUser();
-      const team = await createTeam('Test Team', {
-        users: [userB],
-      });
+      const team = await createTeam('Test Team', {users: [userB]});
       const userA = team.owner;
 
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();

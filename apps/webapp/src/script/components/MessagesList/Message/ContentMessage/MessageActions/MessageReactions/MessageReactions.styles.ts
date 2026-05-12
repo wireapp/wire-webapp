@@ -101,13 +101,13 @@ export const userBoldStyle: CSSObject = {fontWeight: 700};
 
 export const messageReactionCount = (isActive?: boolean): CSSObject => {
   return {
-    color: isActive ? 'var(--accent-color)' : 'var(--message-reactions-count)',
+    color: isActive === true ? 'var(--accent-color)' : 'var(--message-reactions-count)',
     fontSize: 'var(--font-size-small)',
     letterSpacing: '0.031rem',
   };
 };
 export const getReactionsButtonCSS = (isActive?: boolean, isDisabled?: boolean): CSSObject => {
-  if (isActive) {
+  if (isActive === true) {
     return {
       border: '1px solid var(--message-reactions-active-border)',
       backgroundColor: 'var(--message-reactions-active-background)',
@@ -120,7 +120,7 @@ export const getReactionsButtonCSS = (isActive?: boolean, isDisabled?: boolean):
       },
     };
   }
-  if (isDisabled) {
+  if (isDisabled === true) {
     return {
       border: '1px solid var(--gray-40)',
       backgroundColor: 'var(--gray-20)',

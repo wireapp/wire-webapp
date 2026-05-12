@@ -75,15 +75,10 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
   }
 
   const handleCloseModal = ({skipNotification = false} = {}) => {
-    if (!selfUser) {
-      setQualityFeedbackModalShown(false);
-      setConversationId();
-      return;
-    }
-
     try {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
-      const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
+      const currentStorageData =
+        qualityFeedbackStorage !== null && qualityFeedbackStorage !== '' ? JSON.parse(qualityFeedbackStorage) : {};
       const currentDate = new Date();
       const dateUntilShowModal = new Date(currentDate.getTime() + CALL_SURVEY_MUTE_INTERVAL);
 

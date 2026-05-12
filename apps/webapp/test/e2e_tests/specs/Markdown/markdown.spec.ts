@@ -20,7 +20,8 @@
 import {Locator} from 'playwright-core';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Markdown', () => {
   let userA: User;
@@ -63,10 +64,11 @@ test.describe('Markdown', () => {
     },
   ].forEach(({description, tag, message, getSelector, expectedText}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -85,7 +87,9 @@ test.describe('Markdown', () => {
     {tag: ['@TC-9482', '@regression']},
     async ({createPage}) => {
       const targetUrl = 'https://example.com/test_path_with_underscores';
-      const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
+      const userAPageManager = PageManager.from(await createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
+
       const {pages, modals} = userAPageManager.webapp;
 
       await pages.conversationList().getConversation(userB.fullName).open();
@@ -106,10 +110,12 @@ test.describe('Markdown', () => {
   );
 
   test('I want to write a long code message', {tag: ['@TC-1316', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
     await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
@@ -124,10 +130,11 @@ test.describe('Markdown', () => {
   });
 
   test('I want to write a mixed markdown message', {tag: ['@TC-1317', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -143,10 +150,11 @@ test.describe('Markdown', () => {
   });
 
   test('I want to edit a markdown message', {tag: ['@TC-1318', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -174,10 +182,11 @@ test.describe('Markdown', () => {
     'I want to write a url with markdown (Mixed with text)',
     {tag: ['@TC-1319', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();

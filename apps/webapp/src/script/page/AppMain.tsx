@@ -25,6 +25,7 @@ import ky from 'ky';
 import {ErrorBoundary} from 'react-error-boundary';
 import {container} from 'tsyringe';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {QUERY, StyledApp, THEME_ID, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -84,6 +85,7 @@ export type RightSidebarParams = {
 
 type AppMainProps = {
   readonly app: App;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly selfUser: User;
   readonly mainView: MainViewModel;
@@ -94,16 +96,18 @@ type AppMainProps = {
   readonly locked: boolean;
 };
 
-export const AppMain = ({
-  app,
-  isFeatureToggleEnabled,
-  mainView,
-  selfUser,
-  conversationState = container.resolve(ConversationState),
-  callState = container.resolve(CallState),
-  wallClock,
-  locked,
-}: AppMainProps) => {
+export const AppMain = (properties: AppMainProps) => {
+  const {
+    app,
+    fireAndForgetInvoker,
+    isFeatureToggleEnabled,
+    mainView,
+    selfUser,
+    conversationState = container.resolve(ConversationState),
+    callState = container.resolve(CallState),
+    wallClock,
+    locked,
+  } = properties;
   const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
   const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
@@ -312,6 +316,7 @@ export const AppMain = ({
       {!locked && <WindowTitleUpdater />}
       <RootProvider
         value={{
+          fireAndForgetInvoker,
           mainViewModel: mainView,
           wallClock,
           doesApplicationNeedForceReload,

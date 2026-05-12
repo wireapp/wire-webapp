@@ -49,7 +49,8 @@ export const useEnrichedFields = (
   const {email} = useKoSubscribableChildren(user, ['email']);
   useEffect(() => {
     let cancel = false;
-    const returnFields: RichInfoField[] = addEmail && email ? [{type: t('userProfileEmail'), value: email}] : [];
+    const returnFields: RichInfoField[] =
+      addEmail && email != null && email !== '' ? [{type: t('userProfileEmail'), value: email}] : [];
 
     if (addDomain && user.domain) {
       returnFields.push({

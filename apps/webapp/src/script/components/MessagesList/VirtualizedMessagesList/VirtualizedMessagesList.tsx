@@ -202,7 +202,7 @@ export const VirtualizedMessagesList = ({
   };
 
   useLayoutEffect(() => {
-    if (highlightedMessage && !scrolledToHighlightedMessage.current) {
+    if (highlightedMessage !== undefined && highlightedMessage !== '' && !scrolledToHighlightedMessage.current) {
       const highlightedMessageIndex = groupedMessages.findIndex(
         msg => !isMarker(msg) && msg.message.id === highlightedMessage,
       );
@@ -314,7 +314,11 @@ export const VirtualizedMessagesList = ({
                   conversation={conversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={lastDeliveredMessage?.id === item.message.id}
-                  isHighlighted={!!highlightedMessage && highlightedMessage === item.message.id}
+                  isHighlighted={
+                    highlightedMessage !== undefined &&
+                    highlightedMessage !== '' &&
+                    highlightedMessage === item.message.id
+                  }
                   isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                   messageRepository={messageRepository}
                   onClickAvatar={showUserDetails}
@@ -329,7 +333,7 @@ export const VirtualizedMessagesList = ({
                   onClickTimestamp={onTimestampClick}
                   selfId={selfUser.qualifiedId}
                   shouldShowInvitePeople={shouldShowInvitePeople}
-                  isFocused={!!focusedId && focusedId === item.message.id}
+                  isFocused={focusedId !== undefined && focusedId !== '' && focusedId === item.message.id}
                   handleFocus={setFocusedId}
                   handleArrowKeyDown={handleKeyDown}
                   isMsgElementsFocusable={isMsgElementsFocusable}

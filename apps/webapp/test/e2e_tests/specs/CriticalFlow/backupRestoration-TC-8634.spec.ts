@@ -17,10 +17,16 @@
  *
  */
 
-import {createAndSaveBackup, createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {
+  connectWithUser,
+  createAndSaveBackup,
+  createGroup,
+  loginUser,
+  logOutUser,
+} from 'test/e2e_tests/utils/userActions';
 
 import {User} from '../../data/user';
-import {test, expect, withLogin, withConnectedUser, LOGIN_TIMEOUT} from '../../test.fixtures';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from '../../test.fixtures';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
 const groupName = 'Critical Group';
@@ -38,7 +44,8 @@ test.beforeEach(async ({createTeam, createUser}) => {
 });
 
 test('Setting up new device with a backup', {tag: ['@TC-8634', '@crit-flow-web']}, async ({createPage}, testInfo) => {
-  const pageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
+  const pageManager = PageManager.from(await createPage(withLogin(userA)));
+  await connectWithUser(pageManager, userB);
   const {pages, modals, components} = pageManager.webapp;
 
   const userBConversation = pages.conversationList().getConversation(userB.fullName);

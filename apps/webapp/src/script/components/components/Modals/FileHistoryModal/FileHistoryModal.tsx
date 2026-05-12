@@ -39,17 +39,18 @@ export const FileHistoryModal = () => {
     setToBeRestoredVersionId,
     handleRestore,
   } = useFileVersions(nodeUuid, hideModal, onRestore);
+  const isRestoreFlowOpen = toBeRestoredVersionId !== undefined;
 
   return (
     <ModalComponent
       id="file-history-modal"
-      wrapperCSS={toBeRestoredVersionId ? fileVersionRestoreModalWrapperCss : fileHistoryModalWrapperCss}
+      wrapperCSS={isRestoreFlowOpen ? fileVersionRestoreModalWrapperCss : fileHistoryModalWrapperCss}
       isShown={isOpen}
       onClosed={hideModal}
       data-uie-name="file-history-modal"
       onKeyDown={event => handleEscDown(event, hideModal)}
     >
-      {toBeRestoredVersionId ? (
+      {isRestoreFlowOpen ? (
         <FileRestoreConfirmContent
           isLoading={isLoading}
           onClose={() => setToBeRestoredVersionId(undefined)}

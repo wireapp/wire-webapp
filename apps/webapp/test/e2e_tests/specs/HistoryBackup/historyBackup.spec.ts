@@ -19,8 +19,14 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
-import {createAndSaveBackup, createGroup, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {test, expect, withLogin, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
+import {
+  connectWithUser,
+  createAndSaveBackup,
+  createGroup,
+  loginUser,
+  logOutUser,
+} from 'test/e2e_tests/utils/userActions';
 import {generateSecurePassword, generateWireEmail} from '../../utils/userDataGenerator';
 import {RequestResetPasswordPage} from '../../pageManager/webapp/pages/requestResetPassword.page';
 
@@ -40,9 +46,10 @@ test.describe('History Backup', () => {
     {tag: ['@TC-118', '@regression']},
     async ({createPage, api}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
 
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -116,9 +123,10 @@ test.describe('History Backup', () => {
     {tag: ['@TC-125', '@regression']},
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
 
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages, components: userBComponents} = userBPageManager.webapp;
@@ -163,9 +171,11 @@ test.describe('History Backup', () => {
     {tag: ['@TC-131', '@regression']},
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
+
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
@@ -222,9 +232,11 @@ test.describe('History Backup', () => {
     {tag: ['@TC-133', '@regression']},
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
+
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
@@ -286,9 +298,10 @@ test.describe('History Backup', () => {
     {tag: ['@TC-135', '@regression']},
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
 
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -327,16 +340,17 @@ test.describe('History Backup', () => {
     },
   );
 
-  // TODO: unskip this test once https://github.com/wireapp/wire-server/pull/5205 is merged
   // This test is currently broken due to the backend taking more than 10s to delete the conversation
   test.skip(
     'I should not see the deleted group after restore from the backup',
     {tag: ['@TC-1097', '@regression']},
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
+
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 
@@ -357,6 +371,9 @@ test.describe('History Backup', () => {
         await userAPages.conversationDetails().deleteGroupButton.click();
         await expect(userAModals.confirm().modalTitle).toContainText('Delete group conversation?');
         await userAModals.confirm().clickAction();
+
+        // Verify conversation is gone before creating backup
+        await expect(userAPages.conversationList().getConversation(conversationName)).not.toBeVisible();
       });
 
       await test.step('User A creates History Backup', async () => {
@@ -382,9 +399,11 @@ test.describe('History Backup', () => {
     {tag: ['@TC-10549', '@regression']},
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
+
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
 

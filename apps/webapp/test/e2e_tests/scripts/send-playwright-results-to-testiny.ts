@@ -137,6 +137,8 @@ const PROJECT = process.env.TESTINY_PROJECT ?? '3';
 const projectField = Number.isNaN(Number(PROJECT)) ? {project_key: PROJECT} : {project_id: Number(PROJECT)};
 
 async function testinyRequest<T>(method: string, endpoint: string, body?: Body): Promise<T> {
+  if (API_KEY === undefined) throw new Error("Can't make request to Testiny without TESTINY_API_KEY");
+
   const res = await fetch(`${BASE_URL}${endpoint}`, {
     method,
     headers: {'Content-Type': 'application/json', 'X-Api-Key': API_KEY},

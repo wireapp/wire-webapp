@@ -172,7 +172,7 @@ export const UserList = ({
       if (userEntity.isService) {
         return;
       }
-      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
+      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity) === true) {
         admins.push(userEntity);
       } else {
         members.push(userEntity);

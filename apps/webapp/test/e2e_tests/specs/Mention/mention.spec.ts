@@ -1,7 +1,7 @@
-import {test, expect, withLogin, withConnectedUser, Team, withGuestUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, Team, withGuestUser} from 'test/e2e_tests/test.fixtures';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Mention', () => {
   let team: Team;
@@ -117,10 +117,11 @@ test.describe('Mention', () => {
   );
 
   test('I want to be able to write a mention in a 1:1', {tag: ['@TC-3490', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -138,10 +139,9 @@ test.describe('Mention', () => {
     'I want to send an ephemeral message with a mention',
     {tag: ['@TC-3491', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
@@ -169,10 +169,11 @@ test.describe('Mention', () => {
     'I want to mention the same person twice in the same message',
     {tag: ['@TC-3492', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -198,7 +199,10 @@ test.describe('Mention', () => {
     'I want mention to be shown as a full name even if I searched by username',
     {tag: ['@TC-3493', '@regression']},
     async ({createPage}) => {
-      const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
       await userAPages.conversationList().getConversation(userB.fullName).open();
 
       const conversationPageA = userAPages.conversation();
@@ -219,10 +223,12 @@ test.describe('Mention', () => {
     'I want to see the mentions in my profile color in the input field',
     {tag: ['@TC-3494', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)).then(page => PageManager.from(page).webapp.pages),
-        createPage(withLogin(userB)).then(page => PageManager.from(page).webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
@@ -252,7 +258,10 @@ test.describe('Mention', () => {
     'I should not loose drafted text or mentions in input field',
     {tag: ['@TC-3498', '@regression']},
     async ({createPage}) => {
-      const userAPages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
       await createGroup(userAPages, 'Draft Group', [userB]);
 
       const conversationPageA = userAPages.conversation();
@@ -283,10 +292,11 @@ test.describe('Mention', () => {
   );
 
   test('I want to receive a message containing a mention', {tag: ['@TC-3521', '@regression']}, async ({createPage}) => {
-    const userBPages = await PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages);
-    const userAPages = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(
-      pm => pm.webapp.pages,
-    );
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -306,10 +316,11 @@ test.describe('Mention', () => {
     'I want to see a subtitle in the conversation list when there is one or more unread mentions in the conversation',
     {tag: ['@TC-3528', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       // Create and open a group conversation for userB to ensure the message from A won't be read immediately
       await createGroup(userBPages, 'Distraction Group', [userC]);
@@ -330,10 +341,11 @@ test.describe('Mention', () => {
     'I want to see mention icon when I have unread mention, messages, pings and calls in a conversation',
     {tag: ['@TC-3529', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await test.step('Create and open a distraction group conversation for User B', async () => {
         // userA creates the group, userB opens it. This is the distraction.
@@ -371,10 +383,11 @@ test.describe('Mention', () => {
     'I should not see mention indicator in the conversation list if the sender recalls the mention message to me',
     {tag: ['@TC-3530', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userAPages, 'Test Group', [userB]);
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
@@ -393,10 +406,11 @@ test.describe('Mention', () => {
     'I want to see normal text message (without mention link) when I did not select someone from mention suggestion',
     {tag: ['@TC-3531', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -414,7 +428,10 @@ test.describe('Mention', () => {
     'I should not see mentions suggestion if I type @ with characters in front',
     {tag: ['@TC-3532', '@regression']},
     async ({createPage}) => {
-      const {pages} = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp;
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
+
+      const {pages} = PageManager.from(page).webapp;
       await pages.conversationList().getConversation(userB.fullName).open();
 
       await pages.conversation().messageInput.pressSequentially(`test@${userB.firstName}`);

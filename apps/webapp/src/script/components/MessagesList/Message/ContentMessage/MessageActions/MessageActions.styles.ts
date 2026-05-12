@@ -78,7 +78,7 @@ export const getIconCSS: CSSObject = {
 };
 
 export const getActionsMenuCSS = (isActive?: boolean): CSSObject => {
-  if (isActive) {
+  if (isActive === true) {
     return {
       border: '1px solid var(--message-actions-active-border)',
       backgroundColor: 'var(--message-actions-active-background)',
