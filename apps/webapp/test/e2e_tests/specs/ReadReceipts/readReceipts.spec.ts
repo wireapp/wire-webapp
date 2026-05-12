@@ -166,7 +166,8 @@ test.describe('Read Receipts', () => {
     await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
   });
 
-  // TODO: Read Receipt is not shown on location share
+  // TODO: [WPB-25618] read receipt is not visible on location share
+  // TODO: unskip this test when Bug Ticket [WPB-25618] is resolved
   test.skip(
     'I want to see read receipts for assets: location',
     {tag: ['@TC-3556', '@regression']},
