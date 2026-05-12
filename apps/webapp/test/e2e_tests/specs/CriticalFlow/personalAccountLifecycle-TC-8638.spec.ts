@@ -68,7 +68,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   await test.step('Personal user A declines sending anonymous usage data', async () => {
     const {modals} = pageManagerA.webapp;
-    await modals.dataShareConsent().clickDecline();
+    await modals.confirm().cancelButton.click();
   });
 
   await test.step('Personal user A checks that username was set correctly', async () => {
