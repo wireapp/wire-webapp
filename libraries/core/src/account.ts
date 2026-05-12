@@ -172,7 +172,7 @@ export class Account extends TypedEventEmitter<Events> {
    * {@link resetContext} (login / logout) so each logged-in session runs it at most once after MLS
    * is available on the first catch-up → LIVE hand-off.
    */
-  private initialisePendingProposalsTasksOnce!: () => Promise<void>;
+  private initialisePendingProposalsTasksOnce: () => Promise<void>;
 
   private readonly notificationProcessingQueue = new PromiseQueue({
     name: 'notification-processing-queue',
