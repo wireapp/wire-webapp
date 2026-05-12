@@ -166,6 +166,63 @@ test.describe('Read Receipts', () => {
     await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
   });
 
+  // TODO: Read Receipt is not shown on location share
+  test.skip(
+    'I want to see read receipts for assets: location',
+    {tag: ['@TC-3556', '@regression']},
+    async ({createPage, api}) => {
+      const [userAPage, userBPage] = await Promise.all([
+        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userB)),
+      ]);
+
+      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
+      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
+
+      // Preconditions: User A and User B have read receipts turned on
+      await userAComponents.conversationSidebar().preferencesButton.click();
+      await userAPages.account().readReceiptsCheckbox.click();
+      await userAComponents.conversationSidebar().allConversationsButton.click();
+
+      await userBComponents.conversationSidebar().preferencesButton.click();
+      await userBPages.account().readReceiptsCheckbox.click();
+      await userBComponents.conversationSidebar().allConversationsButton.click();
+
+      const conversationName = 'Group Conversation';
+      await createGroup(userAPages, conversationName, [userB]);
+      await userAPages.conversationList().getConversation(conversationName).open();
+
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
+
+      await test.step('Prerequisite: Send location via TestService', async () => {
+        const {instanceId} = await api.testService.createInstance(
+          userB.password,
+          userB.email,
+          'Test Service Device',
+          false,
+        );
+        const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!);
+        if (conversationId === undefined) throw new Error("Couldn't find conversation of userA with userB");
+        await api.testService.sendLocation(instanceId, conversationId, {
+          locationName: 'Test Location',
+          latitude: 52.5170365,
+          longitude: 13.404954,
+          zoom: 42,
+        });
+      });
+
+      const conversationWithUserB = userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'});
+      await expect(conversationWithUserB.unreadIndicator).toBeVisible();
+      await conversationWithUserB.open();
+
+      const messageWithLocationShare = userAPages.conversation().getMessage({sender: userB});
+      await expect(messageWithLocationShare).toBeVisible();
+
+      const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
+      await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
+    },
+  );
+
   test(
     'I want to see read receipts for assets: link preview',
     {tag: ['@TC-3557', '@regression']},
