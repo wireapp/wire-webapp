@@ -20,7 +20,7 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
-import {getAudioFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
+import {getAudioFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {createGroup} from '../../utils/userActions';
 
@@ -95,6 +95,39 @@ test.describe('Read Receipts', () => {
     await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     const messageWithAudio = userAPages.conversation().getMessage({sender: userB});
     await expect(messageWithAudio).toBeVisible();
+
+    const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
+    await expect(await userAPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
+  });
+
+  test('I want to see read receipts for assets: video', {tag: ['@TC-3554', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([
+      createPage(withLogin(userA), withConnectedUser(userB)),
+      createPage(withLogin(userB)),
+    ]);
+
+    const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
+    const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
+
+    // Preconditions: User A and User B have read receipts turned on
+    await userAComponents.conversationSidebar().preferencesButton.click();
+    await userAPages.account().readReceiptsCheckbox.click();
+    await userAComponents.conversationSidebar().allConversationsButton.click();
+
+    await userBComponents.conversationSidebar().preferencesButton.click();
+    await userBPages.account().readReceiptsCheckbox.click();
+    await userBComponents.conversationSidebar().allConversationsButton.click();
+
+    const conversationName = 'Group Conversation';
+    await createGroup(userAPages, conversationName, [userB]);
+    await userAPages.conversationList().getConversation(conversationName).open();
+
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
+    await shareAssetHelper(getVideoFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
+
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    const messageWithVideo = userAPages.conversation().getMessage({sender: userB});
+    await expect(messageWithVideo).toBeVisible();
 
     const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
     await expect(await userAPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
