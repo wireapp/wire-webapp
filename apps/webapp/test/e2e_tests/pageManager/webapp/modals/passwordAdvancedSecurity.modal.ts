@@ -32,10 +32,6 @@ export class PasswordAdvancedSecurityModal extends BaseModal {
     this.passwordInput = this.modal.getByRole('textbox');
   }
 
-  async isTitleVisible() {
-    await this.modalTitle.waitFor({state: 'visible'});
-  }
-
   async isTitleHidden() {
     await this.modalTitle.waitFor({state: 'hidden'});
   }
