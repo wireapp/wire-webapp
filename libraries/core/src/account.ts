@@ -43,6 +43,7 @@ import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {once} from 'lodash';
 import logdown from 'logdown';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
@@ -166,6 +167,13 @@ export class Account extends TypedEventEmitter<Events> {
   private coreCallbacks?: CoreCallbacks;
   private connectionState: ConnectionState = ConnectionState.CLOSED;
 
+  /**
+   * {@link once}-wrapped {@link MLSService.initialisePendingProposalsTasks}; recreated in
+   * {@link resetContext} (login / logout) so each logged-in session runs it at most once after MLS
+   * is available on the first catch-up → LIVE hand-off.
+   */
+  private initialisePendingProposalsTasksOnce: () => Promise<void>;
+
   private readonly notificationProcessingQueue = new PromiseQueue({
     name: 'notification-processing-queue',
     paused: true,
@@ -232,6 +240,18 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     this.logger = LogFactory.getLogger('@wireapp/core/Account');
+    this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
+  }
+
+  private createInitialisePendingProposalsTasksOnce(): () => Promise<void> {
+    return once(async () => {
+      if (this.service?.mls === undefined) {
+        const errorMessage = 'Failed to initialise pending proposals tasks: MLS service is not set';
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      await this.service.mls.initialisePendingProposalsTasks();
+    });
   }
 
   /**
@@ -417,8 +437,6 @@ export class Account extends TypedEventEmitter<Events> {
     if ((await this.isMLSActiveForClient()) && this.service.mls && mlsConfig) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
-      // initialize schedulers for pending mls proposals once client is initialized
-      await this.service.mls.initialisePendingProposalsTasks();
 
       // initialize scheduler for syncing key packages with backend
       await this.service.mls.schedulePeriodicKeyPackagesBackendSync(client.id);
@@ -560,6 +578,7 @@ export class Account extends TypedEventEmitter<Events> {
 
   private readonly resetContext = (): void => {
     this.currentClient = undefined;
+    this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
     delete this.apiClient.context;
     delete this.service;
   };
@@ -937,6 +956,27 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient.transport.ws.acknowledgeConsumableNotificationSynchronization(notification);
   };
 
+  /**
+   * Persistence-backed MLS pending-proposals timers: {@link MLSService.initialisePendingProposalsTasks}.
+   * Call only at the catch-up → LIVE hand-off, immediately before {@link resumeProposalProcessing}.
+   * The MLS call is wrapped with lodash `once` ({@link initialisePendingProposalsTasksOnce}), recreated
+   * in {@link resetContext}, so it runs at most once per logged-in session after MLS is available—matching
+   * the historical single call from {@link initClient} while keeping the unsafe work off the cold-start path.
+   *
+   * **Why defer:** rehydrating during {@link Account.initClient} or while notifications are still
+   * replaying is unsafe. Persisted `firingDate` values are often in the past, so {@link TaskScheduler}
+   * fires auto-commits on the next tick while the backlog is still being applied. That usually surfaces
+   * as failing or conflicting commits (for example `mls-stale-message` / delivery rejection), not as a
+   * dependable way to “catch up”. “Wrong epoch” skew during replay is not uniquely attributable to
+   * proposal commits (recovery / rejoin paths matter too); this method exists to keep **all**
+   * rehydrated pending-proposal side effects aligned with a session that has finished ordered replay.
+   */
+  private readonly rehydrateMlsPendingProposalsTasksOnLiveTransition = async (): Promise<void> => {
+    if (this.hasMLSDevice && this.service?.mls !== undefined) {
+      await this.initialisePendingProposalsTasksOnce();
+    }
+  };
+
   private readonly handleSynchronizationNotification = async (
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
@@ -957,6 +997,7 @@ export class Account extends TypedEventEmitter<Events> {
      * if the marker ID matches the current marker ID.
      */
     if (markerId === currentMarkerId) {
+      await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
       resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
@@ -1067,6 +1108,7 @@ export class Account extends TypedEventEmitter<Events> {
       void this.notificationProcessingQueue
         .push(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
+          await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
           resumeProposalProcessing();
           resumeMessageSending();
           resumeRejoiningMLSConversations();

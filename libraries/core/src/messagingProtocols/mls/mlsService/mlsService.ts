@@ -1126,9 +1126,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   /**
-   * Get all pending proposals from the database and schedule them
-   * Function must only be called once, after application start
-   *
+   * Reads persisted pending proposals from the database and registers matching {@link TaskScheduler} tasks.
+   * {@link Account} invokes this at most once per logged-in session (via lodash `once`), on the first catch-up → LIVE
+   * transition (not during app startup), so timers are not armed while the notification backlog is replaying.
    */
   public async initialisePendingProposalsTasks() {
     try {
