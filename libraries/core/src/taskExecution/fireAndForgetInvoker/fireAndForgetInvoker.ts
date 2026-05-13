@@ -43,9 +43,13 @@ export function createFireAndForgetInvoker(dependencies: FireAndForgetInvokerDep
     }
   }
 
+  function logUnexpectedObservationError(error: unknown): void {
+    logger.error(fireAndForgetErrorMessage, error);
+  }
+
   function trackPromise(trackedPromise: Promise<unknown>): void {
     activePromises.add(trackedPromise);
-    observePromise(trackedPromise);
+    observePromise(trackedPromise).catch(logUnexpectedObservationError);
   }
 
   function fireAndForget(asyncAction: () => Promise<unknown>): void {

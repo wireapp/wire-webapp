@@ -31,6 +31,7 @@ import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ChooseScreen} from './ChooseScreen';
@@ -51,6 +52,7 @@ const CallingContainer = ({
   callState = container.resolve(CallState),
   toggleScreenshare,
 }: CallingContainerProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
   const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} =
     useKoSubscribableChildren(callState, [
@@ -73,9 +75,11 @@ const CallingContainer = ({
 
   useEffect(() => {
     if (currentCallState === undefined) {
-      void callingRepository.setViewModeMinimized();
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await callingRepository.setViewModeMinimized();
+      });
     }
-  }, [currentCallState]);
+  }, [callingRepository, currentCallState, fireAndForgetInvoker]);
 
   const videoGrid = useVideoGrid(joinedCall!);
 
@@ -110,12 +114,16 @@ const CallingContainer = ({
 
   const switchCameraInput = (deviceId: string) => {
     setVideoInputDeviceId(deviceId);
-    callingRepository.refreshVideoInput();
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await callingRepository.refreshVideoInput();
+    });
   };
 
   const switchMicrophoneInput = (deviceId: string) => {
     setAudioInputDeviceId(deviceId);
-    callingRepository.refreshAudioInput();
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await callingRepository.refreshAudioInput();
+    });
   };
 
   const switchSpeakerOutput = (deviceId: string) => {
@@ -124,11 +132,15 @@ const CallingContainer = ({
   };
 
   const sendEmoji = (emoji: string, call: Call) => {
-    void callingRepository.sendInCallEmoji(emoji, call);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await callingRepository.sendInCallEmoji(emoji, call);
+    });
   };
 
   const sendHandRaised = (isHandUp: boolean, call: Call) => {
-    void callingRepository.sendInCallHandRaised(isHandUp, call);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await callingRepository.sendInCallHandRaised(isHandUp, call);
+    });
   };
 
   const toggleCamera = (call: Call) => callingRepository.toggleCamera(call);

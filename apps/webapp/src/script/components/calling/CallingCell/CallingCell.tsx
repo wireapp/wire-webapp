@@ -45,6 +45,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
@@ -89,6 +90,7 @@ export const CallingCell = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: CallingCellProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {conversation} = call;
   const {reason, state, isCbrEnabled, startedAt, maximizedParticipant, muteState} = useKoSubscribableChildren(call, [
     'reason',
@@ -225,18 +227,22 @@ export const CallingCell = ({
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        void callingRepository.setViewModeFullScreen();
+        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+          await callingRepository.setViewModeFullScreen();
+        });
       }
     },
-    [isOngoing, callingRepository],
+    [callingRepository, fireAndForgetInvoker, isOngoing],
   );
 
   const handleMaximizeClick = useCallback(() => {
     if (!isOngoing) {
       return;
     }
-    void callingRepository.setViewModeFullScreen();
-  }, [isOngoing, callingRepository]);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await callingRepository.setViewModeFullScreen();
+    });
+  }, [callingRepository, fireAndForgetInvoker, isOngoing]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
@@ -326,10 +332,14 @@ export const CallingCell = ({
 
   const toggleDetachedWindow = () => {
     if (isDetachedWindow) {
-      void callingRepository.setViewModeMinimized();
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await callingRepository.setViewModeMinimized();
+      });
       return;
     }
-    void callingRepository.setViewModeDetached();
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await callingRepository.setViewModeDetached();
+    });
   };
 
   if (isFullScreen) {

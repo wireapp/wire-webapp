@@ -29,6 +29,7 @@ import type {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -68,6 +69,7 @@ export const UserSearchableList = ({
   teamState = container.resolve(TeamState),
   ...props
 }: UserListProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
   const {conversationState = container.resolve(ConversationState)} = props;
 
@@ -115,11 +117,15 @@ export const UserSearchableList = ({
       );
 
     if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch === true) {
-      fetchMembersFromBackend(filter, results);
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await fetchMembersFromBackend(filter, results);
+      });
     }
 
     if (selfFirst !== true) {
-      void setUsers(results);
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await setUsers(results);
+      });
       return;
     }
 
@@ -127,8 +133,10 @@ export const UserSearchableList = ({
     const [selfUser, otherUsers] = partition(results, user => user.isMe);
 
     const concatUsers = selfUser.concat(otherUsers);
-    void setUsers(concatUsers);
-  }, [filter, users.length]);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await setUsers(concatUsers);
+    });
+  }, [filter, fireAndForgetInvoker, users.length]);
 
   const foundUserEntities = () => {
     if (!remoteTeamMembers.length) {

@@ -21,11 +21,17 @@ import {act, render, waitFor} from '@testing-library/react';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
 
 describe('DeviceDetailsPreferences', () => {
+  const rootContextValue = createRootContextValueForTest({});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
   const device = new ClientEntity(true, '', createUuid());
   device.model = 'test';
   device.time = new Date().toISOString();
@@ -38,15 +44,21 @@ describe('DeviceDetailsPreferences', () => {
     onResetSession: jest.fn().mockResolvedValue(undefined),
     onVerify: jest.fn((_, isVerified) => device.meta?.isVerified(isVerified)),
   };
+  function renderDeviceDetailsPreferences(): ReturnType<typeof render> {
+    return render(withTheme(<DeviceDetailsPreferences {...defaultParams} />), {
+      wrapper: rootProviderWrapper,
+    });
+  }
+
   it('shows device details', async () => {
-    const {getByText, getAllByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
+    const {getByText, getAllByText} = renderDeviceDetailsPreferences();
     await waitFor(() => getAllByText('00'));
 
     expect(getByText(device.model)).toBeDefined();
   });
 
   it('resets session with device', async () => {
-    const {getByText, getAllByText, queryByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
+    const {getByText, getAllByText, queryByText} = renderDeviceDetailsPreferences();
     await waitFor(() => getAllByText('00'));
     jest.useFakeTimers();
     act(() => {
@@ -71,7 +83,7 @@ describe('DeviceDetailsPreferences', () => {
   });
 
   it('toggles verification', async () => {
-    const {getByText, getAllByText} = render(withTheme(<DeviceDetailsPreferences {...defaultParams} />));
+    const {getByText, getAllByText} = renderDeviceDetailsPreferences();
     await waitFor(() => getAllByText('00'));
 
     act(() => {

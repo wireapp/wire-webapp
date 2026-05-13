@@ -55,6 +55,7 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -142,6 +143,7 @@ const FullscreenVideoCall = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
@@ -287,7 +289,9 @@ const FullscreenVideoCall = ({
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
-    void switchVideoBackgroundEffect(effect);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await switchVideoBackgroundEffect(effect);
+    });
   };
 
   const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {

@@ -22,6 +22,10 @@ import {ClientClassification} from '@wireapp/api-client/lib/client/';
 import ko from 'knockout';
 
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {DeviceCard} from './DeviceCard';
 
@@ -37,6 +41,9 @@ function createClientEntity(clientEntity: Partial<ClientEntity>): ClientEntity {
 }
 
 describe('DeviceCard', () => {
+  const rootContextValue = createRootContextValueForTest({});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
   it('shows disclose icon when component is clickable', async () => {
     const props = {
       click: jest.fn(),
@@ -49,7 +56,7 @@ describe('DeviceCard', () => {
       showIcon: true,
     };
 
-    const {getByTestId} = render(<DeviceCard {...props} />);
+    const {getByTestId} = render(<DeviceCard {...props} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('disclose-icon')).not.toBeNull();
   });
 });

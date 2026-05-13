@@ -22,6 +22,7 @@ import {FC, useCallback, useRef, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {ReactionType} from '@wireapp/core/lib/conversation';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DownloadButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/DownloadButton';
@@ -47,6 +48,7 @@ interface DetailViewModalFooterProps {
   onDownloadClick: (message: ContentMessage) => void;
   messageRepository: MessageRepository;
   selfId: QualifiedId;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 const MESSAGE_REPLY_ID = 'do-reply-fullscreen-picture';
@@ -59,6 +61,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   onDownloadClick,
   messageRepository,
   selfId,
+  fireAndForgetInvoker,
 }) => {
   const {isSelfUserRemoved} = useKoSubscribableChildren(conversationEntity, ['isSelfUserRemoved']);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
@@ -68,7 +71,9 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
     if (!messageEntity.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await messageRepository.toggleReaction(conversationEntity, messageEntity, reaction, selfId);
+    });
   };
   const {handleMenuOpen} = useMessageActionsState();
   const resetActionMenuStates = useCallback(() => {
