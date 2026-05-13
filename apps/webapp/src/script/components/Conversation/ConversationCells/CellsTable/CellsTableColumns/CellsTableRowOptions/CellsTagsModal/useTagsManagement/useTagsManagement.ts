@@ -17,16 +17,16 @@
  *
  */
 
-import {useCallback, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
-import {useGetAllTags} from './useGetAllTags/useGetAllTags';
+
+import {useAllCellsTagsStore} from '../../../../../common/useAllCellsTagsStore/useAllCellsTagsStore';
 
 interface UseTagsManagementProps {
   cellsRepository: CellsRepository;
@@ -41,24 +41,34 @@ export const useTagsManagement = ({
   initialSelectedTags,
   onSuccess,
 }: UseTagsManagementProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
-  const [allTags, setAllTags] = useState<ComboboxSelectOption[]>([]);
+  const tagNames = useAllCellsTagsStore(state => state.tags);
+  const isLoadingAllTags = useAllCellsTagsStore(state => state.isLoading);
+  const apiError = useAllCellsTagsStore(state => state.error);
+  const hasFetchedTags = useAllCellsTagsStore(state => state.hasFetched);
+  const fetchAllTags = useAllCellsTagsStore(state => state.fetch);
+
+  const [createdTags, setCreatedTags] = useState<string[]>([]);
   const [selectedTags, setSelectedTags] = useState<ComboboxSelectOption[]>(
     initialSelectedTags.map(transformTagToSelectOption),
   );
   const [isUpdatingTags, setIsUpdatingTags] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const handleSetAllTags = useCallback((tags: string[]) => {
-    setAllTags(tags.map(transformTagToSelectOption));
-  }, []);
+  useEffect(() => {
+    if (!fetchTagsEnabled || hasFetchedTags) {
+      return;
+    }
 
-  const {isLoading: isLoadingAllTags, error: apiError} = useGetAllTags({
-    cellsRepository,
-    enabled: fetchTagsEnabled,
-    fireAndForgetInvoker,
-    onSuccess: handleSetAllTags,
-  });
+    void fetchAllTags(cellsRepository);
+    // cellsRepository is a singleton
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchAllTags, fetchTagsEnabled, hasFetchedTags]);
+
+  const allTags = useMemo(() => {
+    const allTagNames = [...tagNames, ...createdTags];
+    const uniqueTagNames = Array.from(new Set(allTagNames));
+    return uniqueTagNames.map(transformTagToSelectOption);
+  }, [createdTags, tagNames]);
 
   const handleCreateOption = (inputValue: string) => {
     if (inputValue.trim() === '') {
@@ -73,7 +83,7 @@ export const useTagsManagement = ({
     setValidationError(null);
 
     const newOption = transformTagToSelectOption(inputValue);
-    setAllTags(prev => [...prev, newOption]);
+    setCreatedTags(prev => [...prev, inputValue]);
     setSelectedTags(prev => [...prev, newOption]);
   };
 
@@ -88,6 +98,8 @@ export const useTagsManagement = ({
       uuid,
       tags: selectedTags.map(option => option.value as string).filter(Boolean),
     });
+    // Invalidate the centralized tags cache so the filter bar (and other views) pick up new tags.
+    void useAllCellsTagsStore.getState().fetch(cellsRepository);
     onSuccess?.();
     setIsUpdatingTags(false);
   };

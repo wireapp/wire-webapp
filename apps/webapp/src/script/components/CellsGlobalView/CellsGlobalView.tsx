@@ -63,7 +63,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     fireAndForgetInvoker,
   });
 
-  const {filters} = useGlobalDriveFilters();
+  const {filters} = useGlobalDriveFilters({cellsRepository});
 
   useOnPresignedUrlExpired({refreshCallback: handleReload});
 

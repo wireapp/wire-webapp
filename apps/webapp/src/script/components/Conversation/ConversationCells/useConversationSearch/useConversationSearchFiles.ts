@@ -39,6 +39,7 @@ interface UseConversationSearchFilesProps {
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
   fireAndForgetInvoker: FireAndForgetInvoker;
+  tags: string[];
   onClear?: () => void;
 }
 
@@ -51,6 +52,7 @@ export const useConversationSearchFiles = ({
   conversationQualifiedId,
   enabled,
   fireAndForgetInvoker,
+  tags,
   onClear,
 }: UseConversationSearchFilesProps) => {
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
@@ -60,12 +62,13 @@ export const useConversationSearchFiles = ({
   const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
   const trimmedSearchQuery = searchQuery.trim();
+  const wasTagFilterActiveRef = useRef(tags.length > 0);
 
   const {id} = conversationQualifiedId;
   const conversationPath = getCellsApiPath({conversationQualifiedId});
 
   const searchNodes = useCallback(
-    async ({query}: {query: string}) => {
+    async ({query, tags: tagsParam}: {query: string; tags: string[]}) => {
       try {
         setStatus('loading');
 
@@ -77,6 +80,7 @@ export const useConversationSearchFiles = ({
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
           type: 'file',
+          tags: tagsParam.length > 0 ? tagsParam : undefined,
         });
 
         if (result.Nodes === undefined || result.Nodes.length === 0) {
@@ -120,7 +124,7 @@ export const useConversationSearchFiles = ({
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
     shouldPerformSearch.current = false;
     setSearchQuery(value);
-    await searchNodes({query: value});
+    await searchNodes({query: value, tags});
     shouldPerformSearch.current = true;
   }, DEBOUNCE_TIME);
 
@@ -129,7 +133,6 @@ export const useConversationSearchFiles = ({
     if (!is.nonEmptyString(value)) {
       searchNodesDebounced.cancel();
       handleClearSearch();
-      onClear?.();
       return;
     }
     shouldPerformSearch.current = true;
@@ -138,28 +141,51 @@ export const useConversationSearchFiles = ({
     });
   };
 
-  const handleClearSearch = (): void => {
+  const handleClearSearch = ({preserveFilters = true}: {preserveFilters?: boolean} = {}) => {
     searchNodesDebounced.cancel();
     setSearchValue('');
     setSearchQuery('');
     shouldPerformSearch.current = false;
+
+    if (preserveFilters && tags.length > 0) {
+      void searchNodes({query: FETCH_ALL_QUERY, tags});
+      return;
+    }
+
+    onClear?.();
   };
 
   const handleReload = async (): Promise<void> => {
     setStatus('loading');
     clearAll({conversationId: id});
-    await searchNodes({query: trimmedSearchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
+    await searchNodes({query: trimmedSearchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, tags});
   };
 
   useEffect(() => {
-    if (enabled !== true || shouldPerformSearch.current !== true) {
+    if (!enabled) {
+      return;
+    }
+
+    // Re-run search whenever typing has triggered it, a query is present, or tags are active.
+    const hasActiveFilters = trimmedSearchQuery.length > 0 || tags.length > 0;
+    if (!shouldPerformSearch.current && !hasActiveFilters) {
       return;
     }
 
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodes({query: trimmedSearchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
+      await searchNodes({query: trimmedSearchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, tags});
     });
-  }, [enabled, fireAndForgetInvoker, searchNodes, searchQuery, trimmedSearchQuery]);
+  }, [enabled, fireAndForgetInvoker, searchNodes, searchQuery, tags, trimmedSearchQuery]);
+
+  // When the last tag filter is removed with no search query active,
+  // restore the default unfiltered file list.
+  useEffect(() => {
+    const isTagFilterActive = tags.length > 0;
+    if (wasTagFilterActiveRef.current && !isTagFilterActive && !searchValue) {
+      onClear?.();
+    }
+    wasTagFilterActiveRef.current = isTagFilterActive;
+  }, [tags, searchValue, onClear]);
 
   return {
     searchValue,
