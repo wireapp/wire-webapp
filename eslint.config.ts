@@ -233,6 +233,12 @@ const config: Linter.Config[] = [
     files: [
       'apps/webapp/src/script/components/Badge/components/VerificationBadges/VerificationBadges.tsx',
       'apps/webapp/src/script/components/Cells/common/useCellPublicLink/useCellPublicLink.ts',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsGlobalView.tsx',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsHeader/CellsFilters/CellsFiltersMenu/CellsFiltersMenu.tsx',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsHeader/CellsFilters/CellsFiltersMenu/useGetAllTags/useGetAllTags.ts',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsTable/CellsTableColumns/CellsShareModal/CellsShareModal.tsx',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTableRowOptions.tsx',
+      'apps/webapp/src/script/components/CellsGlobalView/useSearchCellsNodes/useSearchCellsNodes.ts',
       'apps/webapp/src/script/components/ConfigToolbar/ConfigToolbar.tsx',
       'apps/webapp/src/script/components/Conversation/Conversation.tsx',
       'apps/webapp/src/script/components/Conversation/ConversationCells/ConversationCells.tsx',

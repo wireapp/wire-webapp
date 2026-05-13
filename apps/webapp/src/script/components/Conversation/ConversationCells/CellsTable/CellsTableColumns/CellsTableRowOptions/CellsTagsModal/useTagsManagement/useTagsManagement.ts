@@ -22,12 +22,11 @@ import {useCallback, useState} from 'react';
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';
-
-import {useApplicationContext} from '../../../../../../../../page/RootProvider';
 
 interface UseTagsManagementProps {
   cellsRepository: CellsRepository;

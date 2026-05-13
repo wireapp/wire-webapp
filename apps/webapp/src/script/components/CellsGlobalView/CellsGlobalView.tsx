@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
@@ -37,23 +39,28 @@ import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDri
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
+import {useApplicationContext} from '../../page/RootProvider';
+
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
   userRepository?: UserRepository;
   conversationRepository?: ConversationRepository;
 }
 
-export const CellsGlobalView = ({
-  cellsRepository = container.resolve(CellsRepository),
-  userRepository = container.resolve(UserRepository),
-  conversationRepository = container.resolve(ConversationRepository),
-}: CellsGlobalViewProps) => {
+export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement => {
+  const {
+    cellsRepository = container.resolve(CellsRepository),
+    userRepository = container.resolve(UserRepository),
+    conversationRepository = container.resolve(ConversationRepository),
+  } = properties;
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
     userRepository,
     conversationRepository,
+    fireAndForgetInvoker,
   });
 
   const {filters} = useGlobalDriveFilters();
