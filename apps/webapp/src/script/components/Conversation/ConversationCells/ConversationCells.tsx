@@ -35,6 +35,7 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
+import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
 import {
   searchIdleDescriptionStyles,
   searchIdleHeadingStyles,
@@ -120,6 +121,8 @@ export const ConversationCells = memo(
     // When search is active, refresh should trigger search reload
     const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
 
+    const {filters} = useConversationDriveFilters();
+
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
 
@@ -157,6 +160,7 @@ export const ConversationCells = memo(
           searchValue={searchValue}
           onSearchChange={handleSearch}
           onSearchClear={handleClearSearch}
+          filters={filters}
         />
         {isTableVisible && (
           <CellsTable

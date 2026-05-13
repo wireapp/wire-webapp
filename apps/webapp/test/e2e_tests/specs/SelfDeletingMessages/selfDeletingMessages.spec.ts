@@ -20,8 +20,8 @@
 import {Locator} from '@playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Self Deleting Messages', () => {
   let userA: User;
@@ -34,10 +34,9 @@ test.describe('Self Deleting Messages', () => {
   });
 
   test('Verify sending ephemeral text message in 1:1', {tag: ['@TC-657', '@regression']}, async ({createPage}) => {
-    const [userAPage, userBPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
     const userAPages = PageManager.from(userAPage).webapp.pages;
     const userBPages = PageManager.from(userBPage).webapp.pages;
 
@@ -74,7 +73,8 @@ test.describe('Self Deleting Messages', () => {
     'Verify timer is applied to all messages until turning it off in 1:1',
     {tag: ['@TC-662', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(userA), withConnectedUser(userB));
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
       const pages = PageManager.from(page).webapp.pages;
 
       await pages.conversation().enableSelfDeletingMessages();
@@ -102,7 +102,8 @@ test.describe('Self Deleting Messages', () => {
     'Verify that message with previous timer are deleted on start-up when the timeout passed in 1:1',
     {tag: ['@TC-664', '@regression']},
     async ({context, createPage}) => {
-      let page = await createPage(context, withLogin(userA), withConnectedUser(userB));
+      let page = await createPage(context, withLogin(userA));
+      await connectWithUser(page, userB);
       let pages = PageManager.from(page).webapp.pages;
 
       await pages.conversation().enableSelfDeletingMessages();
@@ -127,10 +128,9 @@ test.describe('Self Deleting Messages', () => {
     "Verify the message is not deleted for users that didn't read the message",
     {tag: ['@TC-675', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
       const [userAPages, userBPages] = [userAPage, userBPage].map(page => PageManager.from(page).webapp.pages);
       await createGroup(userAPages, 'Test Group', [userB]);
 
@@ -215,10 +215,11 @@ test.describe('Self Deleting Messages', () => {
     let searchResults: Locator;
 
     test.beforeEach(async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();

@@ -21,10 +21,10 @@ import {Locator, Page} from 'playwright/test';
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Delete', () => {
   let userA: User;
@@ -40,9 +40,14 @@ test.describe('Delete', () => {
     'I can delete my message in 1:1 and from second device',
     {tag: ['@TC-569', '@regression']},
     async ({createPage}) => {
-      const deviceA = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const deviceAPage = await createPage(withLogin(userA));
+      const deviceBPage = await createPage(withLogin(userA, {confirmNewHistory: true}));
+      await connectWithUser(deviceAPage, userB);
 
-      const deviceB = (await PageManager.from(createPage(withLogin(userA, {confirmNewHistory: true})))).webapp.pages;
+      const deviceA = PageManager.from(deviceAPage).webapp.pages;
+      const deviceB = PageManager.from(deviceBPage).webapp.pages;
+
+      await deviceA.conversationList().getConversation(userB.fullName).open();
       await deviceB.conversationList().getConversation(userB.fullName).open();
 
       await deviceA.conversation().sendMessage('Test Message');
@@ -60,10 +65,11 @@ test.describe('Delete', () => {
   );
 
   test('I can delete messages in group from me and others', {tag: ['@TC-570', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     await test.step('Create test group', async () => {
       await createGroup(userAPages, 'Test Group', [userB]);
@@ -96,10 +102,11 @@ test.describe('Delete', () => {
     'I cannot delete certain types of messages (system messages)',
     {tag: ['@TC-571', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userAPages, 'Test Group', [userB]);
       await userBPages.conversationList().getConversation('Test Group').open();
@@ -117,8 +124,10 @@ test.describe('Delete', () => {
     'Deleted messages remain deleted after I archive and unarchive the conversation',
     {tag: ['@TC-572', '@regression']},
     async ({createPage}) => {
-      const {components, pages} = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))))
-        .webapp;
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
+
+      const {components, pages} = PageManager.from(page).webapp;
       const conversation = await pages.conversationList().getConversation(userB.fullName).open();
 
       let message: Locator;
@@ -156,9 +165,11 @@ test.describe('Delete', () => {
     {tag: ['@TC-573', '@regression']},
     async ({context, createPage}) => {
       const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
+        createPage(withLogin(userA)),
         createPage(context, withLogin(userB)),
       ]);
+      await connectWithUser(userAPage, userB);
+
       const userAPages = PageManager.from(userAPage).webapp.pages;
       let userBPages = PageManager.from(userBPage).webapp.pages;
 
@@ -189,10 +200,11 @@ test.describe('Delete', () => {
     'I see "Deleted" status message if other user deletes their message "For Everyone" (1:1)',
     {tag: ['@TC-576', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -217,10 +229,11 @@ test.describe('Delete', () => {
     'I see "Deleted" status message if other user deletes their message "For Everyone" (group)',
     {tag: ['@TC-577', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await test.step('Create test group', async () => {
         await createGroup(userAPages, 'Test Group', [userB]);
@@ -321,8 +334,8 @@ test.describe('Delete', () => {
 
   testCases.forEach(({name, tc, sendAction}) => {
     test(`Delete "For Everyone" works for ${name}`, {tag: [tc, '@regression']}, async ({createPage, api}) => {
-      const pageB = await createPage(withLogin(userB));
-      const pageA = await createPage(withLogin(userA), withConnectedUser(userB));
+      const [pageA, pageB] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(pageA, userB);
 
       const userAPages = PageManager.from(pageA).webapp.pages;
       const userBPages = PageManager.from(pageB).webapp.pages;
@@ -359,10 +372,11 @@ test.describe('Delete', () => {
     'I see no unread count if a message was deleted from someone in a conversation',
     {tag: ['@TC-587', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await test.step('Create group as second conversation', async () => {
         // We need to create a second conversation in order to switch to it to ensure the unread marker can be shown on the not open conversation

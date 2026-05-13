@@ -19,8 +19,8 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {withLogin, withConnectedUser, test, expect} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {withLogin, test, expect} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 /* ===== Helper Functions ===== */
 /**
@@ -68,7 +68,8 @@ test.describe('Folders', () => {
     'I want to move a 1:1 conversation to a new custom folder',
     {tag: ['@TC-545', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
       const userAPages = userAPageManager.webapp.pages;
 
       const customFolderName = 'Custom-Folder';
@@ -88,7 +89,8 @@ test.describe('Folders', () => {
     'I want to move a group conversation to a new custom folder',
     {tag: ['@TC-546', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
       const userAPages = userAPageManager.webapp.pages;
 
       const customFolderName = 'Custom-Folder';
@@ -111,7 +113,8 @@ test.describe('Folders', () => {
     'I want to move a 1:1 conversation to an existing custom folder',
     {tag: ['@TC-547', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
 
       const customFolderName = 'Custom-Folder';
@@ -136,7 +139,8 @@ test.describe('Folders', () => {
     'I want to move a group conversation to an existing custom folder',
     {tag: ['@TC-548', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
 
       const customFolderName = 'Custom-Folder';
@@ -162,7 +166,8 @@ test.describe('Folders', () => {
     'I want to see custom folder removed when last conversation is removed',
     {tag: ['@TC-553', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
       const userAPages = userAPageManager.webapp.pages;
 
       const customFolderName = 'Custom-Folder';
@@ -193,7 +198,8 @@ test.describe('Folders', () => {
     'I should not be able to create a custom folder without a name',
     {tag: ['@TC-560', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
       const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
 
       // Step 1: User A opens 1:1 conversation with User B
@@ -212,7 +218,8 @@ test.describe('Folders', () => {
     'I should not see any traces of a deleted custom folder',
     {tag: ['@TC-568', '@regression']},
     async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)));
+      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+      await connectWithUser(userAPageManager, userB);
       const userAPages = userAPageManager.webapp.pages;
 
       const customFolderName = 'Custom-Folder';
@@ -239,13 +246,11 @@ test.describe('Folders', () => {
     'I want to see 1:1 and group conversations in Favorites folder',
     {tag: ['@TC-742', '@regression']},
     async ({createPage}) => {
-      const [userAPageManager, userBPageManager] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
-      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPageManager).webapp;
-      const userBPages = PageManager.from(userBPageManager).webapp.pages;
+      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       const groupName = 'Group Name';
 

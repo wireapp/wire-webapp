@@ -19,7 +19,7 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
 import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
@@ -57,10 +57,11 @@ test.describe('Conversations', () => {
     'I want to see a system message with all group members mentioned when someone else created a group',
     {tag: ['@TC-2966', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await createGroup(userAPages, groupName, [userB, userC]);
       userBPages.conversationList().getConversation(groupName).open();
@@ -77,9 +78,10 @@ test.describe('Conversations', () => {
     'I want to see "No matching results. Try entering a different name." when I search for non existent users',
     {tag: ['@TC-2987', '@regression']},
     async ({createPage}) => {
-      const userAPages = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(
-        pm => pm.webapp.pages,
-      );
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
 
       const noResultsMessage = 'No matching results. Try entering a different name.';
 
@@ -107,9 +109,10 @@ test.describe('Conversations', () => {
     'Verify the name of the group conversation can be edited',
     {tag: ['@TC-418', '@regression']},
     async ({createPage}) => {
-      const userAPages = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(
-        pm => pm.webapp.pages,
-      );
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
 
       await createGroup(userAPages, groupName, [userB, userC]);
 
@@ -263,16 +266,14 @@ test.describe('Conversations', () => {
       const externalUser = await createUser();
       await team.addTeamMember(externalUser, {role: 'EXTERNAL'});
 
-      const adminPage = await PageManager.from(createPage(withLogin(userA), withConnectedUser(externalUser))).then(
-        pm => pm.webapp.pages,
-      );
+      const adminPages = PageManager.from(await createPage(withLogin(userA))).webapp.pages;
 
-      await createGroup(adminPage, groupName, [userB, externalUser]);
+      await createGroup(adminPages, groupName, [userB, externalUser]);
 
-      await adminPage.conversationList().getConversation(groupName).open();
-      await adminPage.conversation().clickConversationInfoButton();
-      await expect(adminPage.conversation().membersList).toBeVisible();
-      await expect(adminPage.conversationDetails().getUserRoleIcon(externalUser.fullName)).toHaveAttribute(
+      await adminPages.conversationList().getConversation(groupName).open();
+      await adminPages.conversation().clickConversationInfoButton();
+      await expect(adminPages.conversation().membersList).toBeVisible();
+      await expect(adminPages.conversationDetails().getUserRoleIcon(externalUser.fullName)).toHaveAttribute(
         'data-uie-name',
         'status-external',
       );
@@ -307,12 +308,13 @@ test.describe('Conversations', () => {
     'Verify conversation scrolls to first unread message when opening',
     {tag: ['@TC-487', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userA), withConnectedUser(userC))),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userBPage, userA);
+      await connectWithUser(userBPage, userC);
 
-      const {pages, components} = userBPageManager.webapp;
+      const {pages: userAPages} = PageManager.from(userAPage).webapp;
+      const {pages, components} = PageManager.from(userBPage).webapp;
+
       const totalMessages = 20;
 
       await test.step('User B opens conversation with User A to mark previous history as read', async () => {
@@ -453,10 +455,10 @@ test.describe('Conversations', () => {
   );
 
   test('Verify emoji autocomplete', {tag: ['@TC-495', '@regression']}, async ({createPage}) => {
-    const userAPages = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(
-      pm => pm.webapp.pages,
-    );
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
 
+    const userAPages = PageManager.from(userAPage).webapp.pages;
     await userAPages.conversationList().getConversation(userB.fullName).open();
 
     await userAPages.conversation().messageInput.pressSequentially(':) ', {delay: 100});
@@ -489,10 +491,8 @@ test.describe('Conversations', () => {
     'I should not see a (push) notification when the role of another person has changed',
     {tag: ['@TC-503', '@regression']},
     async ({createPage}) => {
-      const [adminPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [adminPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(adminPage, userB);
 
       const adminPages = PageManager.from(adminPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;

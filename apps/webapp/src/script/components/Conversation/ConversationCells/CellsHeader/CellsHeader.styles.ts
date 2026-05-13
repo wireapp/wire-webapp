@@ -21,7 +21,6 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   display: 'flex',
-  justifyContent: 'space-between',
   alignItems: 'flex-start',
   flexDirection: 'column',
   gap: '16px',
@@ -33,7 +32,6 @@ export const wrapperStyles: CSSObject = {
 export const contentStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: '8px',
   width: '100%',
   minHeight: '32px',
@@ -57,71 +55,10 @@ export const actionsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
+  marginLeft: 'auto',
 };
 
-export const searchInputStyles: CSSObject = {
-  display: 'flex',
-  width: '394px',
-  height: '32px',
-  padding: '7px 12px',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  flexShrink: 0,
-  gap: '8px',
-  borderRadius: '12px',
-  border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
-  background: 'var(--Background-Base-Primary, #FFF)',
-  boxSizing: 'border-box',
-  '&:focus-within': {
-    border: '1px solid var(--Border-Accent-Color-Primary, #0667C8)',
-  },
-  'body.theme-dark &': {
-    border: '1px solid var(--Border-Base-Primary, #34373D)',
-    background: 'var(--Background-Base-Primary, #17181A)',
-    '&:focus-within': {
-      border: '1px solid var(--Border-Accent-Color-Primary, #54A6FF)',
-    },
-  },
-};
-
-export const searchIconStyles: CSSObject = {
-  flexShrink: 0,
-  width: '11.706px',
-  height: '12px',
-};
-
-export const searchNativeInputStyles: CSSObject = {
-  flex: 1,
-  minWidth: 0,
-  border: 'none',
-  outline: 'none',
-  background: 'transparent',
-  fontSize: '14px',
-  color: 'inherit',
-  boxShadow: 'none',
-  padding: 0,
-  '&:hover, &:focus, &:active': {
-    boxShadow: 'none',
-    outline: 'none',
-  },
-};
-
-export const clearButtonStyles: CSSObject = {
-  border: 'none',
-  background: 'transparent',
-  padding: 0,
-  margin: 0,
-  lineHeight: 0,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-  color: 'var(--main-color)',
-  flexShrink: 0,
-};
-
-export const clearIconStyles: CSSObject = {
-  width: '16px',
-  height: '16px',
-  flexShrink: 0,
+export const searchWrapperStyles: CSSObject = {
+  flex: '0 1 328px',
+  minWidth: '160px',
 };

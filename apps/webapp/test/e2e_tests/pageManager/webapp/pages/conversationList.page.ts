@@ -70,6 +70,7 @@ export class ConversationListPage {
       unreadIndicator: conversation.getByTitle('Unread message'),
       mutedIndicator: conversation.getByTitle('Muted conversation'),
       mentionIndicator: conversation.getByTitle('Unread mention'),
+      unreadReplyIndicator: conversation.getByTitle('Unread reply'),
       blockedIndicator: conversation.locator(`span[data-uie-name="status-label"] + span`),
       joinCallButton: conversation.getByRole('button', {name: 'Join'}),
 

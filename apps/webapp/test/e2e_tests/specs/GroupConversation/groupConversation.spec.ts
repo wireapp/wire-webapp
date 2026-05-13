@@ -19,9 +19,9 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Group Conversation', () => {
   let team: Team;
@@ -71,9 +71,11 @@ test.describe('Group Conversation', () => {
     'I see count of participants increase and decrease when I select or unselect',
     {tag: ['@TC-516', '@regression']},
     async ({createPage}) => {
-      const userAPages = PageManager.from(
-        await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC)),
-      ).webapp.pages;
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
+      await connectWithUser(userAPage, userC);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
 
       await userAPages.conversationList().clickCreateGroup();
       await userAPages.groupCreation().setGroupName(groupName);
@@ -133,10 +135,8 @@ test.describe('Group Conversation', () => {
     'I want to be notified about the group deletion when app is in background',
     {tag: ['@TC-1093', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
       const userBPages = PageManager.from(userBPage).webapp.pages;
@@ -179,8 +179,9 @@ test.describe('Group Conversation', () => {
       const [userAPageManager, userBPageManager, userCPageManager] = await Promise.all([
         createPage(withLogin(userA)),
         createPage(withLogin(userB)),
-        createPage(withLogin(userC), withConnectedUser(userA)),
+        createPage(withLogin(userC)),
       ]);
+      await connectWithUser(userCPageManager, userA);
 
       const userAPages = PageManager.from(userAPageManager).webapp.pages;
       const userBPages = PageManager.from(userBPageManager).webapp.pages;

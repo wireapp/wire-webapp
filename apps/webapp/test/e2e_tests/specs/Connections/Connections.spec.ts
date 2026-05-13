@@ -58,23 +58,28 @@ test.describe('Connections', () => {
         PageManager.from(createPage(withLogin(memberB))),
         PageManager.from(createPage(withLogin(memberC))),
       ]);
-      await sendConnectionRequest(memberAPage, memberB);
-      await sendConnectionRequest(memberAPage, memberC);
 
       const [memberAPages, memberBPages, memberCPages] = [memberAPage, memberBPage, memberCPage].map(
         page => page.webapp.pages,
       );
 
       await test.step('B & C accept connection requests from A', async () => {
-        for (const pages of [memberBPages, memberCPages]) {
-          await pages.conversationList().pendingConnectionRequest.click();
-          await pages.connectRequest().connectButton.click();
-        }
+        await sendConnectionRequest(memberAPage, memberB);
+        await memberBPages.conversationList().pendingConnectionRequest.click();
+        await memberBPages.connectRequest().connectButton.click();
+
+        await sendConnectionRequest(memberAPage, memberC);
+        await memberCPages.conversationList().pendingConnectionRequest.click();
+        await memberCPages.connectRequest().connectButton.click();
       });
 
       await test.step('A creates a group with B & C', async () => {
-        await expect(memberAPages.conversationList().getConversation(memberB.fullName)).toBeAttached();
-        await expect(memberAPages.conversationList().getConversation(memberC.fullName)).toBeAttached();
+        await expect(
+          memberAPages.conversationList().getConversation(memberB.fullName, {protocol: 'mls'}),
+        ).toBeAttached();
+        await expect(
+          memberAPages.conversationList().getConversation(memberC.fullName, {protocol: 'mls'}),
+        ).toBeAttached();
 
         await createGroup(memberAPages, 'Group', [memberB, memberC]);
       });

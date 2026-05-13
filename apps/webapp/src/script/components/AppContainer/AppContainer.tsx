@@ -23,6 +23,7 @@ import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -53,11 +54,13 @@ import {AppLoader} from '../AppLoader';
 type AppProps = {
   readonly config: Configuration;
   readonly clientType: ClientType;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly wallClock: WallClock;
 };
 
-export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallClock}: AppProps) => {
+export const AppContainer = (properties: AppProps) => {
+  const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, wallClock} = properties;
   setAppLocale();
   const app = useMemo(() => {
     return new App(container.resolve(Core), container.resolve(APIClient), config);
@@ -123,6 +126,7 @@ export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallCl
               selfUser={selfUser}
               mainView={mainView}
               locked={softLockEnabled}
+              fireAndForgetInvoker={fireAndForgetInvoker}
               wallClock={wallClock}
             />
           );
