@@ -245,7 +245,7 @@ export class Account extends TypedEventEmitter<Events> {
 
   private createInitialisePendingProposalsTasksOnce(): () => Promise<void> {
     return once(async () => {
-      if (!this.service?.mls) {
+      if (this.service?.mls === undefined) {
         const errorMessage = 'Failed to initialise pending proposals tasks: MLS service is not set';
         this.logger.error(errorMessage);
         throw new Error(errorMessage);
