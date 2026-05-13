@@ -102,18 +102,49 @@ interface UnverifiedUserWarningProps {
 }
 
 export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
+  const learnMoreHref = Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS;
+
+  if (user) {
+    return (
+      <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
+        <Icon.InfoIcon css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
+        <p css={{fontSize: 'var(--font-size-medium)'}}>
+          {t('userNotVerified', {user: user.name()})}
+          <Link
+            css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
+            variant={LinkVariant.PRIMARY}
+            targetBlank
+            href={learnMoreHref}
+          >
+            {t('modalUserLearnMore')}
+          </Link>
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
-      <Icon.InfoIcon css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
+    <div css={{color: 'var(--danger-color)', margin: '1em 0', textAlign: 'center'}}>
       <p css={{fontSize: 'var(--font-size-medium)'}}>
-        {user ? t('userNotVerified', {user: user.name()}) : t('conversationConnectionVerificationWarning')}
+        {t('conversationConnectionVerificationWarning')}
         <Link
           css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
           variant={LinkVariant.PRIMARY}
           targetBlank
-          href={Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS}
+          href={learnMoreHref}
         >
           {t('modalUserLearnMore')}
+        </Link>
+      </p>
+      <p css={{fontSize: 'var(--font-size-medium)'}}>
+        {t('conversationConnectionSupportWarning')}
+        <Link
+          css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
+          variant={LinkVariant.PRIMARY}
+          targetBlank
+          href={learnMoreHref}
+        >
+          {t('conversationConnectionReportMisuse')}
         </Link>
       </p>
     </div>

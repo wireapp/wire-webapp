@@ -657,6 +657,8 @@ declare module 'I18n/en-US.json' {
     'conversationConnectionAccepted': `Connected`;
     'conversationConnectionBlocked': `Blocked`;
     'conversationConnectionCancelRequest': `Cancel connection request`;
+    'conversationConnectionReportMisuse': `Report misuse`;
+    'conversationConnectionSupportWarning': `Wire\'s Support team will never reach out to you in the app.`;
     'conversationConnectionVerificationWarning': `Please verify the person\'s identity before sharing any sensitive information.`;
     'conversationContextMenuCopy': `Copy`;
     'conversationContextMenuDelete': `Delete for Me…`;
