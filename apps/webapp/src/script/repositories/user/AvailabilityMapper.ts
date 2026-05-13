@@ -19,8 +19,8 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {BaseError} from '../../error/BaseError';
-import {UserError} from '../../error/UserError';
+import {BaseError} from '../../error/baseError';
+import {UserError} from '../../error/userError';
 
 const AVAILABILITY_VALUES: Record<keyof typeof Availability.Type, string> = {
   AVAILABLE: 'available',

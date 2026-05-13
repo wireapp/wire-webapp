@@ -82,7 +82,7 @@ import {
   MultipartMessageAddEvent,
 } from './EventBuilder';
 
-import {ConversationError} from '../../error/ConversationError';
+import {ConversationError} from '../../error/conversationError';
 import {isContentMessage} from '../../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {MentionEntity} from '../../message/MentionEntity';

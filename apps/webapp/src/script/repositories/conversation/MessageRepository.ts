@@ -107,7 +107,7 @@ import {EventMapper} from './EventMapper';
 import {getLinkPreviewFromString} from './linkPreviews';
 
 import {Config} from '../../Config';
-import {ConversationError} from '../../error/ConversationError';
+import {ConversationError} from '../../error/conversationError';
 import {showLegalHoldWarningModal} from '../../legal-hold/LegalHoldWarning';
 import {MentionEntity} from '../../message/MentionEntity';
 import {QuoteEntity} from '../../message/QuoteEntity';

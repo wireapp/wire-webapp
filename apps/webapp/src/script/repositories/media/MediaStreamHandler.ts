@@ -34,9 +34,9 @@ import {MEDIA_STREAM_ERROR} from './MediaStreamError';
 import {isMediaStreamReadDeviceError, MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
 import {MediaType} from './MediaType';
 
-import {MediaError} from '../../error/MediaError';
-import {NoAudioInputError} from '../../error/NoAudioInputError';
-import {PermissionError} from '../../error/PermissionError';
+import {MediaError} from '../../error/mediaError';
+import {NoAudioInputError} from '../../error/noAudioInputError';
+import {PermissionError} from '../../error/permissionError';
 import {Warnings} from '../../view_model/WarningsContainer';
 
 export class MediaStreamHandler {

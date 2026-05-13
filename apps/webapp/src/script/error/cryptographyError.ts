@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError} from './baseError';
 
 enum CRYPTOGRAPHY_ERROR_TYPE {
   BROKEN_EXTERNAL = 'BROKEN_EXTERNAL',

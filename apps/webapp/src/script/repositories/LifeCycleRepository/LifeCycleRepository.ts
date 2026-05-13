@@ -36,8 +36,8 @@ import {appendParameter} from 'Util/urlUtil';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {URLParameter} from '../../auth/URLParameter';
-import {BaseError} from '../../error/BaseError';
-import {ClientError} from '../../error/ClientError';
+import {BaseError} from '../../error/baseError';
+import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import type {Core} from '../../service/coreSingleton';
 

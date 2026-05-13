@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError, BASE_ERROR_TYPE} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './baseError';
 
 export enum CLIENT_ERROR_TYPE {
   CLIENT_NOT_SET = 'CLIENT_NOT_SET',

@@ -35,7 +35,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {Config} from 'src/script/Config';
-import {ConversationError} from 'src/script/error/ConversationError';
+import {ConversationError} from 'src/script/error/conversationError';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';

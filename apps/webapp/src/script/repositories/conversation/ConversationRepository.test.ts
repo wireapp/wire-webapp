@@ -70,7 +70,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {Config} from 'src/script/Config';
-import {ConversationError} from 'src/script/error/ConversationError';
+import {ConversationError} from 'src/script/error/conversationError';
 import {
   generateConversation as _generateConversation,
   generateAPIConversation,

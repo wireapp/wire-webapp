@@ -41,7 +41,7 @@ import {isConversationEntity} from 'Util/typePredicateUtil';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Config} from '../Config';
-import {ConversationError} from '../error/ConversationError';
+import {ConversationError} from '../error/conversationError';
 import '../page/LeftSidebar';
 import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import '../page/MainContent';

@@ -24,7 +24,7 @@ import {Runtime} from '@wireapp/commons';
 
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
-import {ClientError} from 'src/script/error/ClientError';
+import {ClientError} from 'src/script/error/clientError';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 

@@ -30,7 +30,7 @@ import {toError} from 'Util/toError';
 import {DexieDatabase} from './DexieDatabase';
 import {StorageSchemata} from './StorageSchemata';
 
-import {StorageError} from '../../error/StorageError';
+import {StorageError} from '../../error/storageError';
 
 interface DatabaseListener {
   callback: DatabaseListenerCallback;

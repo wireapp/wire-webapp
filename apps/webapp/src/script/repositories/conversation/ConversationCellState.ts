@@ -29,7 +29,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {ConversationStatusIcon} from './ConversationStatusIcon';
 
-import {ConversationError} from '../../error/ConversationError';
+import {ConversationError} from '../../error/conversationError';
 import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
 
 enum ACTIVITY_TYPE {

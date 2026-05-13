@@ -105,7 +105,7 @@ import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
 
 import {Config} from '../../Config';
-import {NoAudioInputError} from '../../error/NoAudioInputError';
+import {NoAudioInputError} from '../../error/noAudioInputError';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';

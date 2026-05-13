@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError} from './baseError';
 
 enum PERMISSION_ERROR_TYPE {
   DENIED = 'DENIED',

@@ -65,7 +65,7 @@ import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
-import {CryptographyError} from '../../error/CryptographyError';
+import {CryptographyError} from '../../error/cryptographyError';
 import {StatusType} from '../../message/StatusType';
 import {Core} from '../../service/coreSingleton';
 
