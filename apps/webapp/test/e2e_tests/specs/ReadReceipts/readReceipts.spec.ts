@@ -63,7 +63,7 @@ test.describe('Read Receipts', () => {
       await userBComponents.conversationSidebar().allConversationsButton.click();
 
       const conversationName = 'Group Conversation';
-      await createGroup(userAPages, conversationName, [userB]);
+      await createGroup(userAPages, conversationName, []);
       await userAPages.conversationList().getConversation(conversationName).open();
 
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
