@@ -44,7 +44,7 @@ import {
   SidebarTabs,
   useSidebarStore,
 } from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';

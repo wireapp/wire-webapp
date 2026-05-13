@@ -21,4 +21,4 @@ import '../message/MessageCategorization';
 import '../message/MessageCategory';
 import '../repositories/event/Client';
 import '../repositories/storage/StorageSchemata';
-import '../service/BackendEnvironment';
+import '../service/backendEnvironment';

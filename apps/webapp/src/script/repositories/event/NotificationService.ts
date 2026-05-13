@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {StorageSchemata, StorageService} from 'Repositories/storage/';
 
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 export class NotificationService {
   private readonly AMPLIFY_STORE_NAME: string;

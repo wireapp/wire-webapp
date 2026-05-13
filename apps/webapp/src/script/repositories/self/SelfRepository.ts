@@ -40,7 +40,7 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {SelfService} from './SelfService';
 import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
 
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 
 type Events = {selfSupportedProtocolsUpdated: CONVERSATION_PROTOCOL[]};
 

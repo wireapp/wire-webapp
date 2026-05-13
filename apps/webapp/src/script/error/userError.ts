@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError} from './baseError';
 
 enum USER_ERROR_TYPE {
   INVALID_UPDATE = 'INVALID_UPDATE',

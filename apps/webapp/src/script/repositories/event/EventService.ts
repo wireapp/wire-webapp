@@ -38,9 +38,9 @@ import {toError} from 'Util/toError';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
-import {BaseError, BASE_ERROR_TYPE} from '../../error/BaseError';
-import {ConversationError} from '../../error/ConversationError';
-import {StorageError} from '../../error/StorageError';
+import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
+import {ConversationError} from '../../error/conversationError';
+import {StorageError} from '../../error/storageError';
 import {categoryFromEvent} from '../../message/MessageCategorization';
 import {MessageCategory} from '../../message/MessageCategory';
 

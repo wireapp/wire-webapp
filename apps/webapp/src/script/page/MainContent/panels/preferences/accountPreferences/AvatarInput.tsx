@@ -36,7 +36,7 @@ import {validateProfileImageResolution} from 'Util/util';
 import {FileInput} from './FileInput';
 
 import {Config} from '../../../../../Config';
-import {UserError} from '../../../../../error/UserError';
+import {UserError} from '../../../../../error/userError';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;

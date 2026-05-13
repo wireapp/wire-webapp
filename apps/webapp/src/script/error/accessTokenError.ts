@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError, BASE_ERROR_TYPE} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './baseError';
 
 enum ACCESS_TOKEN_ERROR_TYPE {
   NOT_FOUND_IN_CACHE = 'NOT_FOUND_IN_CACHE',

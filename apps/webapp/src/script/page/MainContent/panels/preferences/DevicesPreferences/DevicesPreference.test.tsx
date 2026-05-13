@@ -35,7 +35,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreference';

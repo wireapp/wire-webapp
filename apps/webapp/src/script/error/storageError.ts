@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError} from './baseError';
 
 enum STORAGE_ERROR_TYPE {
   FAILED_TO_OPEN = 'FAILED_TO_OPEN',

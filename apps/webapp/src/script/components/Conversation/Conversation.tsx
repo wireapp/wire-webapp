@@ -72,7 +72,7 @@ import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
-import {UserError} from '../../error/UserError';
+import {UserError} from '../../error/userError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';

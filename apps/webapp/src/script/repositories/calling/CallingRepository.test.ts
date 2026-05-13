@@ -48,7 +48,7 @@ import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/TestUtil';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
 

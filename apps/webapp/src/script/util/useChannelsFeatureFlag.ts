@@ -26,7 +26,7 @@ import {ConversationState} from 'src/script/repositories/conversation/Conversati
 import {TeamState} from 'src/script/repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {Core} from '../service/CoreSingleton';
+import {Core} from '../service/coreSingleton';
 
 const getAccessTypeRoleMap = (): Partial<Record<string, Role[]>> => {
   return {

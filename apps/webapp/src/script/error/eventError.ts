@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError} from './baseError';
 
 enum EVENT_ERROR_TYPE {
   DATABASE_FAILURE = 'DATABASE_FAILURE',

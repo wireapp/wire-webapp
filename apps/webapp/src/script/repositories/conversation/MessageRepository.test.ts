@@ -45,7 +45,7 @@ import {ReactionMap} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {ConversationError} from 'src/script/error/ConversationError';
+import {ConversationError} from 'src/script/error/conversationError';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 

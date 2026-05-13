@@ -32,8 +32,8 @@ import {
   transliterationIndex,
 } from 'Util/stringUtil';
 
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 
 const CONFIG = {
   MAX_DIRECTORY_RESULTS: 30,

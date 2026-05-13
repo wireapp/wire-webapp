@@ -28,7 +28,7 @@ import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
 
-import {UserError} from '../../../../../error/UserError';
+import {UserError} from '../../../../../error/userError';
 
 enum UserNameState {
   AVAILABLE = 'AVAILABLE',

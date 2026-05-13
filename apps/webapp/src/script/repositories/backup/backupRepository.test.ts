@@ -40,7 +40,7 @@ import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './e
 import {createMetaData} from './legacyBackup.helper';
 import {handleZipEvent} from './zipWorker';
 
-import {DatabaseTypes, createStorageEngine} from '../../service/StoreEngineProvider';
+import {DatabaseTypes, createStorageEngine} from '../../service/storeEngineProvider';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 

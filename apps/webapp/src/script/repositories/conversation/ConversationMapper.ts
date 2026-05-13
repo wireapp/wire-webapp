@@ -44,8 +44,8 @@ import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
-import {BaseError, BASE_ERROR_TYPE} from '../../error/BaseError';
-import {ConversationError} from '../../error/ConversationError';
+import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
+import {ConversationError} from '../../error/conversationError';
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {

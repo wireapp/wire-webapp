@@ -53,8 +53,8 @@ import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
 import type {NotificationService} from './NotificationService';
 import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
 
-import {CryptographyError} from '../../error/CryptographyError';
-import {EventError} from '../../error/EventError';
+import {CryptographyError} from '../../error/cryptographyError';
+import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 

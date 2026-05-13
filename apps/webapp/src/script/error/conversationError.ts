@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError, BASE_ERROR_TYPE} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './baseError';
 
 enum CONVERSATION_ERROR_TYPE {
   CONVERSATION_NOT_FOUND = 'CONVERSATION_NOT_FOUND',

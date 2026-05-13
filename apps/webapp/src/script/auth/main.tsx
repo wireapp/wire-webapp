@@ -42,9 +42,9 @@ import {Root} from './page/Root';
 import {Config} from '../Config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
-import {createAPIClient} from '../service/createAPIClient';
+import {APIClient} from '../service/apiClientSingleton';
+import {Core} from '../service/coreSingleton';
+import {createAPIClient} from '../service/createApiClient';
 
 exposeWrapperGlobals();
 

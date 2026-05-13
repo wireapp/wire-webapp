@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError, BASE_ERROR_TYPE} from './BaseError';
+import {BaseError, BASE_ERROR_TYPE} from './baseError';
 
 enum AUTH_ERROR_TYPE {
   COOKIES_DISABLED = 'COOKIES_DISABLED',

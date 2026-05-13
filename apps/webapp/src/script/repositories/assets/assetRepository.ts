@@ -39,7 +39,7 @@ import {AssetRemoteData} from './assetRemoteData';
 import {AssetTransferState} from './assetTransferState';
 import {getAssetUrl, setAssetUrl} from './assetUrlCache';
 
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 
 interface CompressedImage {
   compressedBytes: Uint8Array;

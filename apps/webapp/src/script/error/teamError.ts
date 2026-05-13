@@ -17,7 +17,7 @@
  *
  */
 
-import {BaseError} from './BaseError';
+import {BaseError} from './baseError';
 
 enum TEAM_ERROR_TYPE {
   NO_APP_CONFIG = 'NO_APP_CONFIG',

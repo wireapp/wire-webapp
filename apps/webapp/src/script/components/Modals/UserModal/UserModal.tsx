@@ -43,7 +43,7 @@ import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {RootContext} from '../../../page/RootProvider';
-import {Core} from '../../../service/CoreSingleton';
+import {Core} from '../../../service/coreSingleton';
 
 export interface UserModalProps {
   userRepository: UserRepository;

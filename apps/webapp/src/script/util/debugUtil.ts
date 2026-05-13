@@ -67,8 +67,8 @@ import {createUuid} from './uuid';
 
 import {E2EIHandler} from '../E2EIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
+import {APIClient} from '../service/apiClientSingleton';
+import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 export enum CoreCryptoLogLevel {

@@ -162,15 +162,15 @@ import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {Config} from '../../Config';
-import {BASE_ERROR_TYPE, BaseError} from '../../error/BaseError';
-import {ConversationError} from '../../error/ConversationError';
+import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
+import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
 import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../../message/MessageCategory';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};

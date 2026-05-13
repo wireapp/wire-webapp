@@ -77,7 +77,7 @@ import {UserState} from './UserState';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {Config} from '../../Config';
-import {UserError} from '../../error/UserError';
+import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 
 type GetUserOptions = {

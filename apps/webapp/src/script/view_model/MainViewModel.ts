@@ -51,7 +51,7 @@ import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import {Core} from '../service/CoreSingleton';
+import {Core} from '../service/coreSingleton';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
 export interface ViewModelRepositories {

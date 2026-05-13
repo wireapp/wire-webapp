@@ -29,7 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {UserState} from 'Repositories/user/UserState';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {getLogger} from 'Util/logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {removeUrlParameters} from 'Util/urlUtil';

@@ -62,7 +62,7 @@ import {TeamState} from './TeamState';
 
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 

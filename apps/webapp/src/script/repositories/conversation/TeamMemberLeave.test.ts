@@ -38,7 +38,7 @@ import type {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import type {MessageRepository} from './MessageRepository';
 
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 function buildConversationRepository() {
