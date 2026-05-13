@@ -112,8 +112,8 @@ import {initialiseSelfAndTeamConversations, initMLSGroupConversations} from '../
 import {joinConversationsAfterMigrationFinalisation} from '../mls/MLSMigration/migrationFinaliser';
 import {configureDownloadPath} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/downloadPath';
 import {configureE2EI} from '../page/components/FeatureConfigChange/FeatureConfigChangeHandler/Features/E2EIdentity';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
+import {APIClient} from '../service/apiClientSingleton';
+import {Core} from '../service/coreSingleton';
 import {AppInitStatisticsValue} from '../telemetry/app_init/AppInitStatisticsValue';
 import {AppInitTelemetry} from '../telemetry/app_init/AppInitTelemetry';
 import {AppInitTimingsStep} from '../telemetry/app_init/AppInitTimingsStep';

@@ -24,7 +24,7 @@ import {result, task} from 'true-myth';
 import {MixedConversation} from 'Repositories/conversation/ConversationSelectors';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 

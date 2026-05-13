@@ -23,8 +23,8 @@ import {Account} from '@wireapp/core';
 
 import {supportsMLS} from 'Util/util';
 
-import {APIClient} from './APIClientSingleton';
-import {createStorageEngine, DatabaseTypes} from './StoreEngineProvider';
+import {APIClient} from './apiClientSingleton';
+import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
 import {Config} from '../Config';

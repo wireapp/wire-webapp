@@ -26,8 +26,8 @@ import type {EventRecord, StorageService} from 'Repositories/storage';
 import {StatusType} from 'src/script/message/StatusType';
 
 import {MessageCategory} from '../../message/MessageCategory';
-import type {APIClient} from '../../service/APIClientSingleton';
-import type {Core} from '../../service/CoreSingleton';
+import type {APIClient} from '../../service/apiClientSingleton';
+import type {Core} from '../../service/coreSingleton';
 import {ConversationService} from './ConversationService';
 
 type EventServiceLike = Pick<EventService, 'loadEventsWithCategory'>;

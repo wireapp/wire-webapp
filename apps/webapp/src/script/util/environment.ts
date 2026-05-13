@@ -22,7 +22,7 @@ import is from '@sindresorhus/is';
 import {Runtime} from '@wireapp/commons';
 
 import {Config} from '../Config';
-import {BackendEnvironment} from '../service/BackendEnvironment';
+import {BackendEnvironment} from '../service/backendEnvironment';
 
 const APP_ENV = {
   LOCALHOST: 'localhost',

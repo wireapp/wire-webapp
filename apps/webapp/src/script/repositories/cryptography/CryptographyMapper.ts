@@ -67,7 +67,7 @@ import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
 import {CryptographyError} from '../../error/CryptographyError';
 import {StatusType} from '../../message/StatusType';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 
 export interface MappedText {
   data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};

@@ -25,7 +25,7 @@ import {useNavigate} from 'react-router';
 import {UnknownAction} from 'redux';
 import {container} from 'tsyringe';
 
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RegistrationDataState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';

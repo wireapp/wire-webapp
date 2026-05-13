@@ -99,7 +99,7 @@ import {entities, payload} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
 import {generateUser} from '../../../../test/helper/UserGenerator';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 
 function buildConversationRepository() {
   const teamState = new TeamState();

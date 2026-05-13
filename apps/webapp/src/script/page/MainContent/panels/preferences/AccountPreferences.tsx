@@ -35,7 +35,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import type {UserRepository} from 'Repositories/user/UserRepository';
 import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
 import {ContentState} from 'src/script/page/useAppState';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';

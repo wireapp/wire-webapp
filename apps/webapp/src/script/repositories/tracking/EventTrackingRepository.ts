@@ -47,7 +47,7 @@ import {UserData} from './UserData';
 
 import {URLParameter} from '../../auth/URLParameter';
 import {Config} from '../../Config';
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;
 

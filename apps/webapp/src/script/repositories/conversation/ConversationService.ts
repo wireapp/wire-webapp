@@ -60,8 +60,8 @@ import {getLogger} from 'Util/logger';
 import {MLSCapableConversation} from './ConversationSelectors';
 
 import {MessageCategory} from '../../message/MessageCategory';
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 
 const logger = getLogger('ConversationService');
 

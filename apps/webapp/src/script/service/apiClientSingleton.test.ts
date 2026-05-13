@@ -16,11 +16,26 @@
  * along with this program. If not, see http://www.gnu.org/licenses/.
  *
  */
-import {createAPIClient} from './createAPIClient';
 
-describe('createAPIClient', () => {
-  it('creates an api client with incremental http retry backoff support', () => {
-    const apiClient = createAPIClient();
+import {Config} from '../Config';
+import {APIClient} from './apiClientSingleton';
+
+describe('APIClientSingleton', () => {
+  it('configures wire client metadata headers for backend requests', () => {
+    const apiClient = new APIClient();
+
+    try {
+      expect(apiClient.config.headers).toEqual({
+        'Wire-Client': 'Web',
+        'Wire-Client-Version': Config.getConfig().VERSION,
+      });
+    } finally {
+      apiClient.disconnect();
+    }
+  });
+
+  it('uses the incremental http retry backoff http client by default', () => {
+    const apiClient = new APIClient();
 
     try {
       expect(apiClient.transport.http['incrementalRetryBackoffRunner']).toBeDefined();

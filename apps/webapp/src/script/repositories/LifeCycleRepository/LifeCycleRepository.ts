@@ -39,7 +39,7 @@ import {URLParameter} from '../../auth/URLParameter';
 import {BaseError} from '../../error/BaseError';
 import {ClientError} from '../../error/ClientError';
 import {externalUrl} from '../../externalRoute';
-import type {Core} from '../../service/CoreSingleton';
+import type {Core} from '../../service/coreSingleton';
 
 const LogoutConfig = {
   LOGIN_REDIRECT_STORAGE_KEY: 'LOGIN_REDIRECT_KEY',

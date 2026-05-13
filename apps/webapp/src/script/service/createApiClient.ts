@@ -17,7 +17,7 @@
  *
  */
 
-import {APIClient} from './APIClientSingleton';
+import {APIClient} from './apiClientSingleton';
 
 export function createAPIClient(): APIClient {
   return new APIClient();

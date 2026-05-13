@@ -26,8 +26,8 @@ import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
 import {StorageService} from 'Repositories/storage/StorageService';
 import {constructUserPrimaryKey} from 'Util/storageUtil';
 
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 
 export class UserService {
   private readonly USER_STORE_NAME: string;

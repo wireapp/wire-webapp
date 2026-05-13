@@ -50,7 +50,7 @@ import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {ClientError} from '../../error/ClientError';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
