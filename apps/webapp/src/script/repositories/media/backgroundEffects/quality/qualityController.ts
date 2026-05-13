@@ -17,6 +17,7 @@
  *
  */
 
+import type {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 import {
   QualityTier,
   QualityTierParams,
@@ -24,7 +25,6 @@ import {
 } from 'Repositories/media/backgroundEffects/quality/definitions';
 import {getLogger} from 'Util/logger';
 
-import type {PerformanceSample} from './samples';
 import {DEFAULT_TUNING} from './tuning';
 
 import type {Mode} from '../backgroundEffectsWorkerTypes';
@@ -429,6 +429,10 @@ export class QualityController {
     }
     // Never auto-downgrade to bypass; low is the minimum allowed tier for privacy reasons.
     return QUALITY_TIERS.MIN_ALLOWED_TIER;
+  }
+
+  public getCurrentTier(): QualityTier {
+    return this.tier;
   }
 
   /**

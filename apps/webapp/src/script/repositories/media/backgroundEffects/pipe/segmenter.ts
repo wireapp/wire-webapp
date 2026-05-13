@@ -19,13 +19,14 @@
 
 import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
-import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import type {Metrics, Mode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 import {
   buildMetrics,
   createMetricsWindow,
   pushMetricsSample,
 } from 'Repositories/media/backgroundEffects/helper/metrics';
+import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
@@ -82,6 +83,7 @@ export async function runSegmenter(
   readable: ReadableStream,
   opts: WorkerProcessVideoTrackOptions,
   onMetrics: (metrics: Metrics) => void,
+  onPerformanceSample: (sample: PerformanceSample, mode: Mode) => void,
 ) {
   const logger = getSafeLogger('segmenter:runSegmenter');
   logger.log(`[virtual-background] runSegmenter`);
@@ -171,6 +173,10 @@ export async function runSegmenter(
     const tier = quality === 'auto' ? 'fhd' : quality;
 
     onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, 'GPU'));
+
+    const mode: Mode =
+      segmenterOptions.mode === 'passthrough' || segmenterOptions.mode === undefined ? 'blur' : segmenterOptions.mode;
+    onPerformanceSample({totalMs: segmentationMs + gpuMs, segmentationMs, gpuMs}, mode);
   }
 
   function close() {

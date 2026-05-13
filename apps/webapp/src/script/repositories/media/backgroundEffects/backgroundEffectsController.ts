@@ -17,6 +17,7 @@
  *
  */
 
+import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 import {
   getBestMatchingQualityTier,
   QualityMode,
@@ -25,11 +26,11 @@ import {
   resolutionIsGreaterThanOrEqualTo,
   TIER_DEFINITIONS,
 } from 'Repositories/media/backgroundEffects/quality/definitions';
-import {QUALITY_TIERS} from 'Repositories/media/backgroundEffects/quality/qualityController';
+import {QUALITY_TIERS, QualityController} from 'Repositories/media/backgroundEffects/quality/qualityController';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/logger';
 
-import {type CapabilityInfo, type EffectMode, type Metrics} from './backgroundEffectsWorkerTypes';
+import {type CapabilityInfo, type EffectMode, type Metrics, Mode} from './backgroundEffectsWorkerTypes';
 import {detectCapabilities} from './helper/capability';
 import {
   defaultOpts,
@@ -63,6 +64,8 @@ export class BackgroundEffectsController {
     requestVideoFrameCallback: false,
   };
 
+  private qualityController: QualityController | null = null;
+  private qualitySampleQueue = Promise.resolve();
   private maxResolution: Resolution = TIER_DEFINITIONS.hd.resolution;
   private maxQualityTier: QualityTier = 'hd';
   private refcount = 0;
@@ -101,6 +104,7 @@ export class BackgroundEffectsController {
     }
     this.maxResolution = {width, height};
     this.maxQualityTier = getBestMatchingQualityTier(this.maxResolution).tier;
+    this.qualityController = new QualityController(frameRate, this.maxQualityTier);
 
     this.inputTrack = inputTrack;
     this.logger.info(`start: ${width}x${height} ${frameRate}fps`, {
@@ -149,14 +153,27 @@ export class BackgroundEffectsController {
       );
 
       this.worker.addEventListener('message', ({data}) => {
-        const {name, stats} = data as {name: string; stats: Metrics};
+        const {name} = data as {name: string};
         if (name === 'stats' && this.onMetrics) {
+          const {stats} = data as {stats: Metrics};
           this.onMetrics(stats);
+        }
+        if (name === 'performanceSample' && this.qualityController !== null) {
+          const {sample, mode} = data as {sample: PerformanceSample; mode: Mode};
+          this.enqueuePerformanceSample(sample, mode);
         }
       });
     } else {
       const {options: workerOptions} = getWorkerOptions(resolved);
-      await runSegmenter(offscreen, readable, workerOptions, stats => this.onMetrics?.(stats));
+      await runSegmenter(
+        offscreen,
+        readable,
+        workerOptions,
+        stats => this.onMetrics?.(stats),
+        (sample: PerformanceSample, mode: Mode) => {
+          this.enqueuePerformanceSample(sample, mode);
+        },
+      );
     }
 
     return {
@@ -276,7 +293,7 @@ export class BackgroundEffectsController {
   }
 
   private async changeResolution(quality: QualityMode): Promise<QualityMode> {
-    if (!this.inputTrack || quality === 'auto') {
+    if (!this.inputTrack || quality === 'auto' ) {
       return quality;
     }
 
@@ -310,6 +327,27 @@ export class BackgroundEffectsController {
       this.logger.warn('Failed to change resolution', error);
       return this.maxQualityTier;
     }
+  }
+
+  private enqueuePerformanceSample(sample: PerformanceSample, mode: Mode): void {
+    this.qualitySampleQueue = this.qualitySampleQueue
+      .then(() => this.onPerformanceSample(sample, mode))
+      .catch((error: unknown) => {
+        this.logger?.error?.('onPerformanceSample failed', {error});
+      });
+  }
+
+  private async onPerformanceSample(sample: PerformanceSample, mode: Mode): Promise<void> {
+    if (this.qualityController === null) {
+      this.logger.warn('onPerformanceSample: qualityController is null');
+      return;
+    }
+    const tier = this.qualityController.update(sample, mode);
+
+    if (tier.tier === this.qualityController.getCurrentTier()) {
+      return;
+    }
+    return this.setQuality(tier.tier);
   }
 }
 
