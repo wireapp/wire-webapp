@@ -293,7 +293,7 @@ export class BackgroundEffectsController {
   }
 
   private async changeResolution(quality: QualityMode): Promise<QualityMode> {
-    if (!this.inputTrack || quality === 'auto' ) {
+    if (!this.inputTrack || quality === 'auto') {
       return quality;
     }
 
