@@ -17,7 +17,7 @@
  *
  */
 
-import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
+import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
 import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
@@ -36,19 +36,22 @@ export let segmenterOptions = {} as WorkerProcessVideoTrackOptions;
 async function createSegmenter(canvas: OffscreenCanvas) {
   const logger = getSafeLogger('segmenter:createSegmenter');
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
-  const fileset =
-    wasmLoaderPath && wasmBinaryPath
-      ? {
-          wasmLoaderPath,
-          wasmBinaryPath,
-        }
-      : await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm');
+  if (!wasmLoaderPath || !wasmBinaryPath) {
+    logger.error('wasmLoaderPath and wasmBinaryPath must be provided');
+    throw new Error('wasmLoaderPath and wasmBinaryPath must be provided');
+  }
+
+  const fileset = {wasmLoaderPath, wasmBinaryPath};
   logger.log(`[virtual-background] createSegmenter`);
+
+  if (!modelPath) {
+    logger.error('Model path must be provided');
+    throw new Error('Model path must be provided');
+  }
+
   const segmenter = await ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
-      modelAssetPath:
-        modelPath ||
-        'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
+      modelAssetPath: modelPath,
       delegate: 'GPU',
     },
     runningMode: 'VIDEO',

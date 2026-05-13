@@ -17,16 +17,19 @@
  *
  */
 
+import {
+  getBestMatchingQualityTier,
+  QualityMode,
+  QualityTier,
+  Resolution,
+  resolutionIsGreaterThanOrEqualTo,
+  TIER_DEFINITIONS,
+} from 'Repositories/media/backgroundEffects/quality/definitions';
+import {QUALITY_TIERS} from 'Repositories/media/backgroundEffects/quality/qualityController';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/logger';
 
-import {
-  type CapabilityInfo,
-  type EffectMode,
-  type Metrics,
-  QualityMode,
-  type QualityTier,
-} from './backgroundEffectsWorkerTypes';
+import {type CapabilityInfo, type EffectMode, type Metrics} from './backgroundEffectsWorkerTypes';
 import {detectCapabilities} from './helper/capability';
 import {
   defaultOpts,
@@ -41,9 +44,12 @@ import {runSegmenter, segmenterOptions} from './pipe/segmenter';
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
 // visually useful blur.  Multiply by this factor to get from the 0–1 range.
 const BLUR_SIGMA_SCALE = 15;
+const DEFAULT_FRAME_RATE = 15;
 
 export class BackgroundEffectsController {
   private readonly logger: Logger;
+
+  private inputTrack: MediaStreamTrack | null = null;
 
   private worker: Worker | null = null;
   private options: ProcessVideoTrackOptions = defaultOpts;
@@ -57,7 +63,8 @@ export class BackgroundEffectsController {
     requestVideoFrameCallback: false,
   };
 
-  private maxQualityTier: QualityTier = 'superhigh';
+  private maxResolution: Resolution = TIER_DEFINITIONS.hd.resolution;
+  private maxQualityTier: QualityTier = 'hd';
   private refcount = 0;
 
   /**
@@ -82,8 +89,20 @@ export class BackgroundEffectsController {
     const trackCapabilities = inputTrack.getCapabilities();
     const trackSettings = inputTrack.getSettings();
     const trackConstraints = inputTrack.getConstraints();
-    const {width, height, frameRate} = trackSettings;
+    let {width, height, frameRate} = trackSettings;
+    if (!width) {
+      width = TIER_DEFINITIONS[QUALITY_TIERS.HD].resolution.width;
+    }
+    if (!height) {
+      height = TIER_DEFINITIONS[QUALITY_TIERS.HD].resolution.height;
+    }
+    if (!frameRate) {
+      frameRate = DEFAULT_FRAME_RATE;
+    }
+    this.maxResolution = {width, height};
+    this.maxQualityTier = getBestMatchingQualityTier(this.maxResolution).tier;
 
+    this.inputTrack = inputTrack;
     this.logger.info(`start: ${width}x${height} ${frameRate}fps`, {
       trackCapabilities,
       trackSettings,
@@ -190,9 +209,15 @@ export class BackgroundEffectsController {
     }
   }
 
-  public setQuality(quality: QualityMode): void {
+  public async setQuality(quality: QualityMode): Promise<void> {
     this.logger.info('setQuality', quality);
-    this.options = {...this.options, quality};
+
+    let requestedQuality = quality;
+    if (quality !== 'auto') {
+      requestedQuality = await this.changeResolution(quality);
+    }
+
+    this.options = {...this.options, quality: requestedQuality};
     this.pushOptionsUpdate();
   }
 
@@ -247,6 +272,43 @@ export class BackgroundEffectsController {
       this.worker.postMessage({name: 'options', options: finalOptions}, transferables);
     } else {
       Object.assign(segmenterOptions, finalOptions);
+    }
+  }
+
+  private async changeResolution(quality: QualityMode): Promise<QualityMode> {
+    if (!this.inputTrack || quality === 'auto') {
+      return quality;
+    }
+
+    const mediaConstraints = this.inputTrack.getConstraints();
+
+    let newResolution: Resolution;
+    let newQualityTier: QualityTier;
+
+    if (quality === 'bypass') {
+      newResolution = this.maxResolution;
+      newQualityTier = quality;
+    } else {
+      const requestedResolution = TIER_DEFINITIONS[quality].resolution;
+
+      if (this.maxResolution === null || resolutionIsGreaterThanOrEqualTo(this.maxResolution, requestedResolution)) {
+        newResolution = requestedResolution;
+        newQualityTier = quality;
+      } else {
+        newResolution = this.maxResolution;
+        newQualityTier = this.maxQualityTier;
+      }
+    }
+
+    mediaConstraints.width = {ideal: newResolution.width};
+    mediaConstraints.height = {ideal: newResolution.height};
+
+    try {
+      await this.inputTrack.applyConstraints(mediaConstraints);
+      return newQualityTier;
+    } catch (error: unknown) {
+      this.logger.warn('Failed to change resolution', error);
+      return this.maxQualityTier;
     }
   }
 }
