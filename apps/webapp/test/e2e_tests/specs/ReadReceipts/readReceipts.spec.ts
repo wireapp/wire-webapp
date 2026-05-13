@@ -185,7 +185,7 @@ test.describe('Read Receipts', () => {
       await userAPages2.account().readReceiptsCheckbox.click();
       await userAComponents2.conversationSidebar().allConversationsButton.click();
 
-      // User A sees the modal about read receipts being enabled
+      // User A sees the modal about new device being added
       await userAComponents.conversationSidebar().preferencesButton.click();
       await expect(userAModals.newDevice().modal).toBeVisible();
       await userAModals.newDevice().actionButton.click();
