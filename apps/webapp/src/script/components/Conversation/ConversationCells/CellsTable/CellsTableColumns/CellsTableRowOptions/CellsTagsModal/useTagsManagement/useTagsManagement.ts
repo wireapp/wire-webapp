@@ -27,6 +27,8 @@ import {t} from 'Util/localizerUtil';
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';
 
+import {useApplicationContext} from '../../../../../../../../page/RootProvider';
+
 interface UseTagsManagementProps {
   cellsRepository: CellsRepository;
   fetchTagsEnabled: boolean;
@@ -40,6 +42,7 @@ export const useTagsManagement = ({
   initialSelectedTags,
   onSuccess,
 }: UseTagsManagementProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [allTags, setAllTags] = useState<ComboboxSelectOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<ComboboxSelectOption[]>(
     initialSelectedTags.map(transformTagToSelectOption),
@@ -54,6 +57,7 @@ export const useTagsManagement = ({
   const {isLoading: isLoadingAllTags, error: apiError} = useGetAllTags({
     cellsRepository,
     enabled: fetchTagsEnabled,
+    fireAndForgetInvoker,
     onSuccess: handleSetAllTags,
   });
 

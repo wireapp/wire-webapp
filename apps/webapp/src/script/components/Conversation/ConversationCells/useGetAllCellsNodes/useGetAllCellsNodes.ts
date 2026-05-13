@@ -21,6 +21,8 @@ import {useEffect, useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 
@@ -37,6 +39,7 @@ interface UseGetAllCellsNodesProps {
   userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useGetAllCellsNodes = ({
@@ -44,6 +47,7 @@ export const useGetAllCellsNodes = ({
   userRepository,
   conversationQualifiedId,
   enabled,
+  fireAndForgetInvoker,
 }: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
@@ -89,22 +93,22 @@ export const useGetAllCellsNodes = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setNodes, setStatus, setError, id, offset, pageSize, setPagination]);
 
-  const handleHashChange = useCallback(() => {
+  const handleHashChange = useCallback((): void => {
     if (enabled !== true) {
       return;
     }
     clearAll({conversationId: id});
     setOffset(0);
-    void fetchNodes();
-  }, [fetchNodes, setOffset, clearAll, id, enabled]);
+    fireAndForgetInvoker.fireAndForget(fetchNodes);
+  }, [clearAll, enabled, fetchNodes, fireAndForgetInvoker, id, setOffset]);
 
   useEffect(() => {
     if (enabled !== true) {
       return;
     }
 
-    void fetchNodes();
-  }, [fetchNodes, enabled]);
+    fireAndForgetInvoker.fireAndForget(fetchNodes);
+  }, [enabled, fetchNodes, fireAndForgetInvoker]);
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHashChange);

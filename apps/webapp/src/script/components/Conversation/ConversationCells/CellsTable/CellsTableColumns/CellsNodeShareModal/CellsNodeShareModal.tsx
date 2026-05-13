@@ -19,6 +19,8 @@
 
 import {useEffect, useRef, useState} from 'react';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModalContent';
 import {serializeShareModalInput} from 'Components/Cells/ShareModal/shareModalSerializer';
 import {useCellExpirationToggle} from 'Components/Cells/ShareModal/useCellExpirationToggle';
@@ -58,11 +60,18 @@ interface ShareModalParams {
   uuid: string;
   conversationId: string;
   cellsRepository: CellsRepository;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 const submitHandlers = new Map<string, () => Promise<void> | void>();
 
-export const showShareModal = ({type, uuid, conversationId, cellsRepository}: ShareModalParams) => {
+export const showShareModal = ({
+  type,
+  uuid,
+  conversationId,
+  cellsRepository,
+  fireAndForgetInvoker,
+}: ShareModalParams) => {
   const modalId = createUuid();
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
@@ -73,7 +82,9 @@ export const showShareModal = ({type, uuid, conversationId, cellsRepository}: Sh
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
           if (submitHandler) {
-            void submitHandler();
+            fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+              await submitHandler();
+            });
           }
         },
         text: t('cells.shareModal.primaryAction'),
@@ -101,7 +112,7 @@ const CellShareModalContent = ({
   conversationId,
   cellsRepository,
   modalId,
-}: ShareModalParams & {modalId: string}) => {
+}: Omit<ShareModalParams, 'fireAndForgetInvoker'> & {modalId: string}) => {
   const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellConversationPublicLink({
     uuid,
     conversationId,

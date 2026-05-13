@@ -23,6 +23,8 @@ import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useDebouncedCallback} from 'use-debounce';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/UserRepository';
 
@@ -36,6 +38,7 @@ interface UseConversationSearchFilesProps {
   userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   onClear?: () => void;
 }
 
@@ -47,6 +50,7 @@ export const useConversationSearchFiles = ({
   userRepository,
   conversationQualifiedId,
   enabled,
+  fireAndForgetInvoker,
   onClear,
 }: UseConversationSearchFilesProps) => {
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
@@ -101,7 +105,7 @@ export const useConversationSearchFiles = ({
         }
 
         setStatus('success');
-      } catch (error: unknown) {
+      } catch {
         setStatus('error');
         setNodes({conversationId: id, nodes: []});
         setPagination({conversationId: id, pagination: null});
@@ -119,7 +123,7 @@ export const useConversationSearchFiles = ({
     shouldPerformSearch.current = true;
   }, DEBOUNCE_TIME);
 
-  const handleSearch = (value: string) => {
+  const handleSearch = (value: string): void => {
     setSearchValue(value);
     if (!is.nonEmptyString(value)) {
       searchNodesDebounced.cancel();
@@ -128,17 +132,19 @@ export const useConversationSearchFiles = ({
       return;
     }
     shouldPerformSearch.current = true;
-    void searchNodesDebounced(value);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await searchNodesDebounced(value);
+    });
   };
 
-  const handleClearSearch = () => {
+  const handleClearSearch = (): void => {
     searchNodesDebounced.cancel();
     setSearchValue('');
     setSearchQuery('');
     shouldPerformSearch.current = false;
   };
 
-  const handleReload = async () => {
+  const handleReload = async (): Promise<void> => {
     setStatus('loading');
     clearAll({conversationId: id});
     await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
@@ -149,8 +155,10 @@ export const useConversationSearchFiles = ({
       return;
     }
 
-    void searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
-  }, [searchNodes, searchQuery, enabled]);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
+    });
+  }, [enabled, fireAndForgetInvoker, searchNodes, searchQuery]);
 
   return {
     searchValue,
