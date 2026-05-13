@@ -171,7 +171,7 @@ test.describe('Read Receipts', () => {
 
       const userAPage2 = await createPage(withLogin(userA, {confirmNewHistory: true}));
 
-      const {pages: userAPages, modals: userAModals, components: userAComponents} = PageManager.from(userAPage).webapp;
+      const {modals: userAModals, components: userAComponents} = PageManager.from(userAPage).webapp;
       const {pages: userAPages2, components: userAComponents2} = PageManager.from(userAPage2).webapp;
       const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
 
@@ -180,18 +180,21 @@ test.describe('Read Receipts', () => {
       await userBPages.account().readReceiptsCheckbox.click();
       await userBComponents.conversationSidebar().allConversationsButton.click();
 
+      // User A clicks on settings and sees new device modal
+      await expect(userAComponents.conversationSidebar().preferencesNotificationBadge).toBeVisible();
+      await userAComponents.conversationSidebar().preferencesButton.click();
+      await expect(userAModals.newDevice().modal).toBeVisible();
+      await userAModals.newDevice().actionButton.click();
+      await userAComponents.conversationSidebar().allConversationsButton.click();
+
       // User A turns on read receipts on second device
       await userAComponents2.conversationSidebar().preferencesButton.click();
       await userAPages2.account().readReceiptsCheckbox.click();
       await userAComponents2.conversationSidebar().allConversationsButton.click();
 
-      // User A sees the modal about new device being added
+      // User A sees modal that read receipts were turned on from another device
+      await expect(userAComponents.conversationSidebar().preferencesNotificationBadge).toBeVisible();
       await userAComponents.conversationSidebar().preferencesButton.click();
-      await expect(userAModals.newDevice().modal).toBeVisible();
-      await userAModals.newDevice().actionButton.click();
-
-      // to see the enabled read receipt modal, User A needs to switch to another settings tab
-      await userAPages.settings().devicesButton.click();
       await expect(userAModals.readReceipt().modal).toBeVisible();
     },
   );
