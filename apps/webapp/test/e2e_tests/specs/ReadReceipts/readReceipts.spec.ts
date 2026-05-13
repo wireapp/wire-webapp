@@ -23,6 +23,16 @@ import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fi
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
 import {createGroup} from '../../utils/userActions';
+import {Page} from '@playwright/test';
+import {ApiManagerE2E} from '../../backend/apiManager.e2e';
+
+type SendActionContext = {
+  userBPage: Page;
+  userBPages: PageManager['webapp']['pages'];
+  api: ApiManagerE2E;
+  userA: User;
+  userB: User;
+};
 
 test.describe('Read Receipts', () => {
   let userA: User;
@@ -35,79 +45,80 @@ test.describe('Read Receipts', () => {
   });
 
   const assetTestCases = [
-    {description: 'assets: picture', tag: '@TC-3552'},
-    {description: 'assets: audio', tag: '@TC-3553'},
-    {description: 'assets: video', tag: '@TC-3554'},
-    {description: 'assets: file', tag: '@TC-3555'},
-    {description: 'assets: link preview', tag: '@TC-3557'},
-    {description: 'ephemeral message', tag: '@TC-3562'},
+    {
+      description: 'assets: picture',
+      tag: '@TC-3552',
+      sendAction: async ({userBPage}: SendActionContext) => {
+        await shareAssetHelper(getImageFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add picture'}));
+      },
+    },
+    {
+      description: 'assets: audio',
+      tag: '@TC-3553',
+      sendAction: async ({userBPage}: SendActionContext) => {
+        await shareAssetHelper(getAudioFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
+      },
+    },
+    {
+      description: 'assets: video',
+      tag: '@TC-3554',
+      sendAction: async ({userBPage}: SendActionContext) => {
+        await shareAssetHelper(getVideoFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
+      },
+    },
+    {
+      description: 'assets: file',
+      tag: '@TC-3555',
+      sendAction: async ({userBPage}: SendActionContext) => {
+        await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
+      },
+    },
+    {
+      description: 'assets: link preview',
+      tag: '@TC-3557',
+      sendAction: async ({userBPages}: SendActionContext) => {
+        await userBPages
+          .conversation()
+          .sendMessage('Message with Link Preview: https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+      },
+    },
+    {
+      description: 'ephemeral message',
+      tag: '@TC-3562',
+      sendAction: async ({userBPages}: SendActionContext) => {
+        await userBPages.conversation().enableSelfDeletingMessages();
+        await userBPages.conversation().sendMessage('Ephemeral Message');
+      },
+    },
+    {
+      description: 'assets: location',
+      tag: '@TC-3556',
+      sendAction: async ({api, userA, userB}: SendActionContext) => {
+        await test.step('Prerequisite: Send location via TestService', async () => {
+          const {instanceId} = await api.testService.createInstance(
+            userB.password,
+            userB.email,
+            'Test Service Device',
+            false,
+          );
+          const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!);
+          if (conversationId === undefined) throw new Error("Couldn't find conversation of userA with userB");
+          await api.testService.sendLocation(instanceId, conversationId, {
+            locationName: 'Test Location',
+            latitude: 52.5170365,
+            longitude: 13.404954,
+            zoom: 42,
+          });
+        });
+      },
+    },
   ];
 
-  for (const {description, tag} of assetTestCases) {
-    test(`I want to see read receipts for ${description}`, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+  for (const {description, tag, sendAction} of assetTestCases) {
+    test(`I want to see read receipts for ${description}`, {tag: [tag, '@regression']}, async ({createPage, api}) => {
+      // TODO: remove this line when [WPB-25618] is resolved
+      test.skip(tag === '@TC-3556', 'TODO: [WPB-25618] read receipt is not visible on location share');
 
-      const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
-      const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
-
-      // Preconditions: User A and User B have read receipts turned on
-      await userAComponents.conversationSidebar().preferencesButton.click();
-      await userAPages.account().readReceiptsCheckbox.click();
-      await userAComponents.conversationSidebar().allConversationsButton.click();
-
-      await userBComponents.conversationSidebar().preferencesButton.click();
-      await userBPages.account().readReceiptsCheckbox.click();
-      await userBComponents.conversationSidebar().allConversationsButton.click();
-
-      const conversationName = 'Group Conversation';
-      await createGroup(userAPages, conversationName, []);
-      await userAPages.conversationList().getConversation(conversationName).open();
-
-      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
-
-      switch (tag) {
-        case '@TC-3552':
-          await shareAssetHelper(getImageFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add picture'}));
-          break;
-        case '@TC-3553':
-          await shareAssetHelper(getAudioFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
-          break;
-        case '@TC-3554':
-          await shareAssetHelper(getVideoFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
-          break;
-        case '@TC-3555':
-          await shareAssetHelper(getTextFilePath(), userBPage, userBPage.getByRole('button', {name: 'Add file'}));
-          break;
-        case '@TC-3557':
-          await userBPages
-            .conversation()
-            .sendMessage('Message with Link Preview: https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-          break;
-        case '@TC-3562':
-          await userBPages.conversation().enableSelfDeletingMessages();
-          await userBPages.conversation().sendMessage('Ephemeral Message');
-          break;
-      }
-
-      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
-
-      const receivedMessage = userAPages.conversation().getMessage({sender: userB});
-      await expect(receivedMessage).toBeVisible();
-
-      const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
-      await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
-    });
-  }
-
-  // TODO: [WPB-25618] read receipt is not visible on location share
-  // TODO: unskip this test when Bug Ticket [WPB-25618] is resolved
-  test.skip(
-    'I want to see read receipts for assets: location',
-    {tag: ['@TC-3556', '@regression']},
-    async ({createPage, api}) => {
       const [userAPage, userBPage] = await Promise.all([
         createPage(withLogin(userA), withConnectedUser(userB)),
         createPage(withLogin(userB)),
@@ -131,34 +142,19 @@ test.describe('Read Receipts', () => {
 
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
-      await test.step('Prerequisite: Send location via TestService', async () => {
-        const {instanceId} = await api.testService.createInstance(
-          userB.password,
-          userB.email,
-          'Test Service Device',
-          false,
-        );
-        const conversationId = await api.conversation.getConversationWithUser(userB.token, userA.id!);
-        if (conversationId === undefined) throw new Error("Couldn't find conversation of userA with userB");
-        await api.testService.sendLocation(instanceId, conversationId, {
-          locationName: 'Test Location',
-          latitude: 52.5170365,
-          longitude: 13.404954,
-          zoom: 42,
-        });
-      });
+      await sendAction({userBPage, userBPages, api, userA, userB});
 
       const conversationWithUserB = userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'});
       await expect(conversationWithUserB.unreadIndicator).toBeVisible();
       await conversationWithUserB.open();
 
-      const messageWithLocationShare = userAPages.conversation().getMessage({sender: userB});
-      await expect(messageWithLocationShare).toBeVisible();
+      const receivedMessage = userAPages.conversation().getMessage({sender: userB});
+      await expect(receivedMessage).toBeVisible();
 
       const messageWithReadReceipt = userBPages.conversation().getMessage({sender: userB});
       await expect(await userBPages.conversation().getMessageReadReceipt(messageWithReadReceipt)).toBeVisible();
-    },
-  );
+    });
+  }
 
   test(
     'I want to see a popup when I toggled read receipts on and off from another device',
