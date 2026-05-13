@@ -17,7 +17,44 @@
  *
  */
 
-export const supportedLocales: string[] = [
+export type SupportedLocale =
+  | 'ar-SA'
+  | 'cs-CZ'
+  | 'da-DK'
+  | 'de-DE'
+  | 'el-GR'
+  | 'en-US'
+  | 'es-ES'
+  | 'et-EE'
+  | 'fa-IR'
+  | 'fi-FI'
+  | 'fr-FR'
+  | 'hi-IN'
+  | 'hr-HR'
+  | 'hu-HU'
+  | 'id-ID'
+  | 'it-IT'
+  | 'ja-JP'
+  | 'lt-LT'
+  | 'lv-LV'
+  | 'nl-NL'
+  | 'no-NO'
+  | 'pl-PL'
+  | 'pt-PT'
+  | 'pt-BR'
+  | 'ro-RO'
+  | 'ru-RU'
+  | 'si-LK'
+  | 'sk-SK'
+  | 'sl-SI'
+  | 'sr-SP'
+  | 'sv-SE'
+  | 'tr-TR'
+  | 'uk-UA'
+  | 'zh-CN'
+  | 'zh-TW';
+
+export const Locales: readonly SupportedLocale[] = [
   'ar-SA',
   'cs-CZ',
   'da-DK',
