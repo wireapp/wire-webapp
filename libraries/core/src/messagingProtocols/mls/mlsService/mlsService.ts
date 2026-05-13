@@ -918,18 +918,6 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   /**
-   * Get all keying material last update dates and schedule tasks for renewal
-   * Function must only be called once, after application start
-   */
-  public schedulePeriodicKeyMaterialRenewals(groupIds: string[]) {
-    try {
-      groupIds.forEach(groupId => this.scheduleKeyMaterialRenewal(groupId));
-    } catch (error: unknown) {
-      this.logger.error('Could not get last key material update dates', error);
-    }
-  }
-
-  /**
    * Schedules a task to periodically (every 24h) check if new key packages should be generated and uploaded to backend.
    * Function must only be called once, after application start
    * @param clientId id of the client
