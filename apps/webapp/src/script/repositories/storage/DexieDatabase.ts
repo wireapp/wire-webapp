@@ -26,6 +26,15 @@ import {ClientRecord} from './record/ClientRecord';
 import {GroupIdRecord} from './record/GroupIdRecord';
 import {StorageSchemata} from './StorageSchemata';
 
+import type {
+  AiReportRecord,
+  AiConversationSubReportRecord,
+  AiFinalReportEntryRecord,
+  AiConversationSettingsRecord,
+  AiSettingsRecord,
+  AiPromptTemplateRecord,
+} from '../../ai/storage/records';
+
 /**
  * TypeScript representation of local IndexedDB schema managed with Dexie.
  * @see https://dexie.org/docs/Typescript#create-a-subclass
@@ -42,6 +51,13 @@ export class DexieDatabase extends Dexie {
   sessions: Table<CryptoboxRecord, string>;
   users: Table<UserRecord, string>;
   groupIds: Table<GroupIdRecord, string>;
+  // AI feature tables — local-only, not encrypted at rest
+  ai_reports: Table<AiReportRecord, string>;
+  ai_conversation_sub_reports: Table<AiConversationSubReportRecord, number>;
+  ai_final_report_entries: Table<AiFinalReportEntryRecord, number>;
+  ai_conversation_settings: Table<AiConversationSettingsRecord, string>;
+  ai_settings: Table<AiSettingsRecord, string>;
+  ai_prompt_templates: Table<AiPromptTemplateRecord, string>;
 
   private readonly logger: Logger;
 
@@ -61,6 +77,12 @@ export class DexieDatabase extends Dexie {
     this.sessions = this.table(StorageSchemata.OBJECT_STORE.SESSIONS);
     this.users = this.table(StorageSchemata.OBJECT_STORE.USERS);
     this.groupIds = this.table(StorageSchemata.OBJECT_STORE.GROUP_IDS);
+    this.ai_reports = this.table(StorageSchemata.OBJECT_STORE.AI_REPORTS);
+    this.ai_conversation_sub_reports = this.table(StorageSchemata.OBJECT_STORE.AI_CONVERSATION_SUB_REPORTS);
+    this.ai_final_report_entries = this.table(StorageSchemata.OBJECT_STORE.AI_FINAL_REPORT_ENTRIES);
+    this.ai_conversation_settings = this.table(StorageSchemata.OBJECT_STORE.AI_CONVERSATION_SETTINGS);
+    this.ai_settings = this.table(StorageSchemata.OBJECT_STORE.AI_SETTINGS);
+    this.ai_prompt_templates = this.table(StorageSchemata.OBJECT_STORE.AI_PROMPT_TEMPLATES);
   }
 
   private readonly initDbSchema = async (): Promise<void> => {

@@ -281,6 +281,12 @@ export class ListViewModel {
     return this.contentViewModel.switchContent(ContentState.PREFERENCES_OPTIONS);
   };
 
+  readonly openPreferencesAi = (): void => {
+    this.switchListAndSetTab(ListState.PREFERENCES, SidebarTabs.PREFERENCES);
+
+    return this.contentViewModel.switchContent(ContentState.PREFERENCES_AI);
+  };
+
   readonly openStartUI = (): void => {
     this.switchList(ListState.START_UI);
   };

@@ -243,6 +243,20 @@ export const AppMain = (properties: AppMainProps) => {
       showUserModal({domain, id: userId}, () => navigate('/'));
     };
 
+    const showReportsList = (): void => {
+      const {setContentState, setActiveReportId} = useAppState.getState();
+      setActiveReportId(null);
+      setContentState(ContentState.AI_REPORTS_LIST);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_REPORT);
+    };
+
+    const showReportDetail = (reportId: string): void => {
+      const {setContentState, setActiveReportId} = useAppState.getState();
+      setActiveReportId(reportId);
+      setContentState(ContentState.AI_REPORT_DETAIL);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_REPORT);
+    };
+
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId/:domain': showConversationMessages,
@@ -251,11 +265,14 @@ export const AppMain = (properties: AppMainProps) => {
       '/conversation/:conversationId/files': showConversationFiles,
       '/conversation/:conversationId/:domain/files/*path': showConversationFiles,
       '/conversation/:conversationId/files/*path': showConversationFiles,
+      '/reports': showReportsList,
+      '/report/:reportId': showReportDetail,
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
+      '/preferences/ai': () => mainView.list.openPreferencesAi(),
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,

@@ -62,7 +62,8 @@ import {useFolderStore} from './useFoldersStore';
 import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 import {Config} from '../../../../Config';
-import {generateConversationUrl} from '../../../../router/routeGenerator';
+import {generateConversationUrl, generateReportsListUrl} from '../../../../router/routeGenerator';
+import {navigate} from '../../../../router/Router';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../ListWrapper';
@@ -154,6 +155,7 @@ export const Conversations = ({
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
   const isCells = currentTab === SidebarTabs.CELLS;
+  const isAiReport = currentTab === SidebarTabs.AI_REPORT;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
@@ -303,13 +305,18 @@ export const Conversations = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(nextTab)) {
+      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.AI_REPORT].includes(nextTab)) {
         onExitPreferences();
       }
 
       if (nextTab === SidebarTabs.CELLS) {
         switchList(ListState.CELLS);
         switchContent(ContentState.CELLS);
+      }
+
+      if (nextTab === SidebarTabs.AI_REPORT) {
+        switchList(ListState.CONVERSATIONS);
+        navigate(generateReportsListUrl());
       }
 
       clearConversationFilter();
@@ -438,7 +445,7 @@ export const Conversations = ({
           />
         }
       >
-        {isCells ? null : isPreferences ? (
+        {isCells || isAiReport ? null : isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}

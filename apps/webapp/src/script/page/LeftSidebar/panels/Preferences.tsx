@@ -22,7 +22,7 @@ import React, {useEffect} from 'react';
 import {amplify} from 'amplify';
 
 import {Runtime} from '@wireapp/commons';
-import {TabIndex} from '@wireapp/react-ui-kit';
+import {StarIcon, TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import * as Icon from 'Components/Icon';
@@ -165,6 +165,12 @@ const Preferences = ({
       id: ContentState.PREFERENCES_ABOUT,
       label: t('preferencesAbout'),
       uieName: 'go-about',
+    },
+    {
+      IconComponent: StarIcon,
+      id: ContentState.PREFERENCES_AI,
+      label: 'AI',
+      uieName: 'go-ai-preferences',
     },
   ];
 

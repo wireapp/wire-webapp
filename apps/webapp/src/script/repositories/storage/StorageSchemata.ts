@@ -46,6 +46,13 @@ export class StorageSchemata {
       PRE_KEYS: 'prekeys',
       SESSIONS: 'sessions',
       USERS: 'users',
+      // AI feature tables (v22) — local-only, not encrypted at rest
+      AI_REPORTS: 'ai_reports',
+      AI_CONVERSATION_SUB_REPORTS: 'ai_conversation_sub_reports',
+      AI_FINAL_REPORT_ENTRIES: 'ai_final_report_entries',
+      AI_CONVERSATION_SETTINGS: 'ai_conversation_settings',
+      AI_SETTINGS: 'ai_settings',
+      AI_PROMPT_TEMPLATES: 'ai_prompt_templates',
     } as const;
   }
 
@@ -431,6 +438,19 @@ export class StorageSchemata {
         // This version enables DB encryption at rest
         schema: {},
         version: 21,
+      },
+      {
+        schema: {
+          [StorageSchemata.OBJECT_STORE.AI_REPORTS]: 'id, status, created_at',
+          [StorageSchemata.OBJECT_STORE.AI_CONVERSATION_SUB_REPORTS]:
+            '++primary_key, id, report_id, conversation_id, status, [report_id+status], [report_id+conversation_id]',
+          [StorageSchemata.OBJECT_STORE.AI_FINAL_REPORT_ENTRIES]:
+            '++primary_key, id, report_id, type, [report_id+type]',
+          [StorageSchemata.OBJECT_STORE.AI_CONVERSATION_SETTINGS]: 'conversation_id',
+          [StorageSchemata.OBJECT_STORE.AI_SETTINGS]: 'key',
+          [StorageSchemata.OBJECT_STORE.AI_PROMPT_TEMPLATES]: 'template_id',
+        },
+        version: 22,
       },
     ];
   }

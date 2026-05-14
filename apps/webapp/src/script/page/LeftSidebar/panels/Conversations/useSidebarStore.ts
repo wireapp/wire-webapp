@@ -36,6 +36,7 @@ export enum SidebarTabs {
   CONNECT,
   PREFERENCES,
   CELLS,
+  AI_REPORT,
 }
 
 /**
@@ -136,7 +137,9 @@ const useSidebarStore = create<SidebarStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         status: state.status,
-        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS].includes(state.currentTab)
+        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS, SidebarTabs.AI_REPORT].includes(
+          state.currentTab,
+        )
           ? SidebarTabs.RECENT
           : state.currentTab,
         visibleTabs: state.visibleTabs,

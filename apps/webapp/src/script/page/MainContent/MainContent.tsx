@@ -38,6 +38,9 @@ import {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
+import {AiPreferences} from 'src/script/ai/ui/AiPreferences/AiPreferences';
+import {ReportDetailPage} from 'src/script/ai/ui/ReportDetailPage/ReportDetailPage';
+import {ReportsListPage} from 'src/script/ai/ui/ReportsListPage/ReportsListPage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
@@ -237,6 +240,8 @@ const MainContent = ({
               </div>
             )}
 
+            {contentState === ContentState.PREFERENCES_AI && <AiPreferences />}
+
             {contentState === ContentState.WATERMARK && (
               <div className="watermark">
                 <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
@@ -279,6 +284,9 @@ const MainContent = ({
                 conversationRepository={repositories.conversation}
               />
             )}
+
+            {contentState === ContentState.AI_REPORTS_LIST && <ReportsListPage />}
+            {contentState === ContentState.AI_REPORT_DETAIL && <ReportDetailPage />}
           </>
         </Animated>
       </SwitchTransition>

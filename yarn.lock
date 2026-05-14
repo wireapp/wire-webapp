@@ -9972,8 +9972,12 @@ __metadata:
     dexie: "npm:4.4.2"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
+    dexie-react-hooks: "npm:4.4.0"
     dotenv-extended: "npm:2.9.0"
     emoji-picker-react: "npm:4.16.1"
+    fake-indexeddb: "npm:6.2.5"
+    gpt-tokenizer: "npm:3.4.0"
+    handlebars: "npm:4.7.9"
     html-webpack-plugin: "npm:5.6.7"
     i18next-scanner: "npm:4.6.0"
     immer: "npm:11.1.8"
@@ -10046,6 +10050,7 @@ __metadata:
     webrtc-adapter: "npm:9.0.5"
     workbox-webpack-plugin: "npm:7.4.1"
     xstate: "npm:5.31.1"
+    zod-to-json-schema: "npm:3.25.2"
     zustand: "npm:4.5.7"
   languageName: unknown
   linkType: soft
@@ -13219,6 +13224,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dexie-react-hooks@npm:4.4.0":
+  version: 4.4.0
+  resolution: "dexie-react-hooks@npm:4.4.0"
+  peerDependencies:
+    dexie: ">=4.2.0-alpha.1 <5.0.0"
+    react: ">=16"
+  checksum: 10/f82e3c7ee97896b79467e8b9139a98bb6847b868e9403117f2b3dd0d6fa8ce21a36688f303bc3398acf8fed0f74bd5750b47d7a4c7441aed66dea467ccaed115
+  languageName: node
+  linkType: hard
+
 "dexie@npm:4.4.2":
   version: 4.4.2
   resolution: "dexie@npm:4.4.2"
@@ -16066,6 +16081,13 @@ __metadata:
   version: 1.2.0
   resolution: "gopd@npm:1.2.0"
   checksum: 10/94e296d69f92dc1c0768fcfeecfb3855582ab59a7c75e969d5f96ce50c3d201fd86d5a2857c22565764d5bb8a816c7b1e58f133ec318cd56274da36c5e3fb1a1
+  languageName: node
+  linkType: hard
+
+"gpt-tokenizer@npm:3.4.0":
+  version: 3.4.0
+  resolution: "gpt-tokenizer@npm:3.4.0"
+  checksum: 10/c893910b6c629d77dae10ddedd9f50c6d91d2548228ddb4eee8037f0a20419fbaffaba75206615b6ce93d5e5efb98b0f202fac9a4d7364b480f6c52b5a5e30bc
   languageName: node
   linkType: hard
 
@@ -28296,6 +28318,15 @@ __metadata:
     compress-commons: "npm:^6.0.2"
     readable-stream: "npm:^4.0.0"
   checksum: 10/aa5abd6a89590eadeba040afbc375f53337f12637e5e98330012a12d9886cde7a3ccc28bd91aafab50576035bbb1de39a9a316eecf2411c8b9009c9f94f0db27
+  languageName: node
+  linkType: hard
+
+"zod-to-json-schema@npm:3.25.2":
+  version: 3.25.2
+  resolution: "zod-to-json-schema@npm:3.25.2"
+  peerDependencies:
+    zod: ^3.25.28 || ^4
+  checksum: 10/7035328654113f1a0b8e4c2d34a06f918c93650ef8a50d4fb30ad8f22e47d5762c163af9c82494756b34776bae3c41c26cfc6945105b0eee7dceb528cc07e665
   languageName: node
   linkType: hard
 

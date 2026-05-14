@@ -25,6 +25,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 process.env.TZ = 'UTC';
+// Ensure Babel uses its test preset regardless of the shell's NODE_ENV.
+process.env.NODE_ENV = 'test';
 
 const config: Config = {
   displayName: 'webapp',

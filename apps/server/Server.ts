@@ -21,12 +21,14 @@ import express, {Router} from 'express';
 import expressSitemapXml from 'express-sitemap-xml';
 import hbs from 'hbs';
 import helmet from 'helmet';
+import {createProxyMiddleware} from 'http-proxy-middleware';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import nocache from 'nocache';
 
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
+import net from 'net';
 import path from 'path';
 
 import type {ClientConfig, ServerConfig} from '@wireapp/config';
@@ -45,6 +47,7 @@ import {replaceHostnameInObject} from './util/hostnameReplacer';
 class Server {
   private readonly app: express.Express;
   private server?: http.Server | https.Server;
+  private wsProxyUpgrade?: (req: http.IncomingMessage, socket: net.Socket, head: Buffer) => void;
 
   constructor(
     private readonly config: ServerConfig,
@@ -77,6 +80,7 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
+    this.initProxy();
 
     this.app.use(
       createClientVersionCheckRoute({
@@ -88,6 +92,44 @@ class Server {
     );
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
+  }
+
+  private initProxy(): void {
+    const restUpstream = process.env.BACKEND_REST_UPSTREAM;
+    const wsUpstream = process.env.BACKEND_WS_UPSTREAM;
+
+    if (restUpstream !== undefined && restUpstream !== '') {
+      this.app.use(
+        '/proxy/api',
+        createProxyMiddleware({
+          target: restUpstream,
+          changeOrigin: true,
+          pathRewrite: {'^/proxy/api': ''},
+          on: {
+            proxyRes: proxyRes => {
+              const cookies = proxyRes.headers['set-cookie'];
+              if (cookies) {
+                proxyRes.headers['set-cookie'] = cookies.map(cookie =>
+                  cookie.replace(/;\s*Domain=[^;]*/i, '').replace(/;\s*Path=[^;]*/i, '; Path=/'),
+                );
+              }
+            },
+          },
+        }),
+      );
+    }
+
+    if (wsUpstream !== undefined && wsUpstream !== '') {
+      const wsProxy = createProxyMiddleware({
+        target: wsUpstream,
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {'^/proxy/ws': ''},
+      });
+      this.app.use('/proxy/ws', wsProxy);
+      // Stored for attachment to the HTTP server after it is created in start().
+      this.wsProxyUpgrade = wsProxy.upgrade;
+    }
   }
 
   private initWebpack() {
@@ -203,7 +245,7 @@ class Server {
   }
 
   public initLatestBrowserRequired() {
-    this.app.use((req, res, next) => {
+    this.app.use((req, _res, next) => {
       const fileExtensionRegx = /\.[^/]+$/;
       const ignoredPath =
         fileExtensionRegx.test(req.path) ||
@@ -267,6 +309,9 @@ class Server {
             .listen(this.config.PORT_HTTP, '0.0.0.0', () => resolve(this.config.PORT_HTTP));
         } else {
           this.server = this.app.listen(this.config.PORT_HTTP, '0.0.0.0', () => resolve(this.config.PORT_HTTP));
+        }
+        if (this.wsProxyUpgrade) {
+          this.server.on('upgrade', this.wsProxyUpgrade);
         }
       } else {
         reject('Server port not specified.');

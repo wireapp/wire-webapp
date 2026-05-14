@@ -20,7 +20,6 @@
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
-const WorkboxPlugin = require('workbox-webpack-plugin');
 const dotenv = require('dotenv-extended');
 const {execSync} = require('child_process');
 
@@ -218,11 +217,6 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
     }),
-    new WorkboxPlugin.InjectManifest({
-      maximumFileSizeToCacheInBytes: process.env.NODE_ENV !== 'production' ? 10 * 1024 * 1024 : undefined,
-      swDest: path.resolve(dist, 'sw.js'),
-      swSrc: path.resolve(SRC_PATH, 'sw.js'),
-    }),
     /* All wasm files will be ignored from webpack and copied over to the destination folder, they don't need any webpack processing */
     new CopyPlugin({
       patterns: [
@@ -270,6 +264,18 @@ module.exports = {
       templateParameters,
     }),
   ],
+  ignoreWarnings: [
+    /* mediapipe's vision_bundle uses a dynamic require() expression internally — not our code */
+    {module: /@mediapipe\/tasks-vision/, message: /Critical dependency/},
+  ],
+  snapshot: {
+    /* Exclude @wireapp local symlinked packages from managed (immutable) paths so that
+       webpack uses file timestamps instead of package version for cache invalidation.
+       Without this, rebuilding a local @wireapp library does not bust the webpack cache
+       because the version string stays the same, leaving stale "not found" entries. */
+    managedPaths: [/^(.+?[\\/]node_modules[\\/](?!@wireapp))/],
+    immutablePaths: [],
+  },
   resolve: {
     alias: {
       Components: path.resolve(srcScript, 'components'),

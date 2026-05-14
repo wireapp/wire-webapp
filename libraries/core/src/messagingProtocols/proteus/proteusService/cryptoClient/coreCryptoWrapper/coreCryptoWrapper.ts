@@ -123,7 +123,7 @@ export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> =
     await coreCryptoInstance?.close();
     await deleteDB(coreCryptoDbName);
     logger.log('info', 'CoreCrypto DB wiped successfully');
-  } catch (error: unknown) {
+  } catch (_error: unknown) {
     logger.error('error', 'Failed to wipe CoreCrypto DB');
   }
 };

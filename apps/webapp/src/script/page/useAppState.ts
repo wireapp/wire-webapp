@@ -53,6 +53,9 @@ export enum ContentState {
   PREFERENCES_OPTIONS = 'ContentState.PREFERENCES_OPTIONS',
   WATERMARK = 'ContentState.WATERMARK',
   CELLS = 'ContentState.CELLS',
+  AI_REPORTS_LIST = 'ContentState.AI_REPORTS_LIST',
+  AI_REPORT_DETAIL = 'ContentState.AI_REPORT_DETAIL',
+  PREFERENCES_AI = 'ContentState.PREFERENCES_AI',
 }
 
 export enum ListState {
@@ -72,6 +75,8 @@ type AppState = {
   previousContentState: ContentState | null;
   unreadMessagesCount: number;
   setUnreadMessagesCount: (unreadMessagesCount: number) => void;
+  activeReportId: string | null;
+  setActiveReportId: (id: string | null) => void;
   /**
    * returns true if the current active content could display a conversation
    */
@@ -84,6 +89,8 @@ const useAppState = create<AppState>((set, get) => ({
   contentState: ContentState.WATERMARK,
   listState: ListState.CONVERSATIONS,
   previousContentState: null,
+  activeReportId: null,
+  setActiveReportId: id => set(state => ({...state, activeReportId: id})),
   setContentState: (contentState: ContentState) => {
     const previousContentState = get().contentState;
     set(state => ({

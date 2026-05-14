@@ -32,3 +32,9 @@ export const generateConversationUrl = ({id, domain, filePath}: QualifiedId & {f
 
   return baseUrl;
 };
+
+export const generateReportsListUrl = (): string => '/reports';
+
+export const generateReportDetailUrl = (reportId: string): string => `/report/${reportId}`;
+
+export const generatePreferencesAiUrl = (): string => '/preferences/ai';

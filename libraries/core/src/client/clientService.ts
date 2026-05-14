@@ -101,7 +101,7 @@ export class ClientService {
   private async getLocalClient(): Promise<MetaClient | undefined> {
     try {
       return await this.database.getLocalClient();
-    } catch (error: unknown) {
+    } catch (_error: unknown) {
       return undefined;
     }
   }

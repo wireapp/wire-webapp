@@ -285,7 +285,7 @@ export class E2EIServiceInternal {
             if (conversationExists) {
               await cx.e2eiRotate(conversationId);
             }
-          } catch (error) {
+          } catch (error: unknown) {
             // Log error but don't fail the entire enrollment if one conversation fails
             this.logger.warn('Failed to rotate conversation', {groupId: conversation.group_id, error});
           }

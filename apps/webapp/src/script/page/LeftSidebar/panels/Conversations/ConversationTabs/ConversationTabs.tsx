@@ -316,6 +316,23 @@ export const ConversationTabs = ({
             />
           </>
         )}
+
+        <div className="conversations-sidebar-divider" />
+
+        <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+          AI
+        </div>
+
+        <ConversationTab
+          title="Reports"
+          label="Reports"
+          type={SidebarTabs.AI_REPORT}
+          Icon={<StarIcon />}
+          onChangeTab={onChangeTab}
+          conversationTabIndex={visibleConversationTabs.length + 3}
+          dataUieName="go-ai-report"
+          isActive={currentTab === SidebarTabs.AI_REPORT}
+        />
       </div>
 
       <div

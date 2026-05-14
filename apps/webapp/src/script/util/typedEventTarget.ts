@@ -22,8 +22,18 @@ export class TypedEventTarget<EventDef extends {type: any}> extends EventTarget 
     return this.dispatchEvent(new Event(event.type));
   }
 
-  public addEventListener<T extends EventDef['type']>(type: T, listener: ((e: Event & EventDef) => void) | null) {
-    super.addEventListener(type, listener);
+  public addEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions,
+  ): void;
+  public addEventListener<T extends EventDef['type']>(type: T, listener: ((e: Event & EventDef) => void) | null): void;
+  public addEventListener<T extends EventDef['type']>(
+    type: T | string,
+    listener: ((e: Event & EventDef) => void) | EventListenerOrEventListenerObject | null,
+    options?: boolean | AddEventListenerOptions,
+  ): void {
+    super.addEventListener(type, listener as EventListenerOrEventListenerObject | null, options);
   }
 
   public removeEventListener(type: EventDef['type'], listener: (e: Event & EventDef) => void) {
