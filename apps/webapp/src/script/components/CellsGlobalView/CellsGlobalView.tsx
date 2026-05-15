@@ -56,14 +56,15 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
   const {fireAndForgetInvoker} = useApplicationContext();
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
+  const {filters, filterState} = useGlobalDriveFilters({cellsRepository});
+
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
     userRepository,
     conversationRepository,
     fireAndForgetInvoker,
+    filters: filterState,
   });
-
-  const {filters} = useGlobalDriveFilters({cellsRepository});
 
   useOnPresignedUrlExpired({refreshCallback: handleReload});
 

@@ -37,11 +37,10 @@ import type {
   FilterConfig,
   FilterItem,
 } from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
+import {GlobalDriveFiltersState} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
-
-import {useCellsStore} from '../useCellsStore/useCellsStore';
 
 // ---------------------------------------------------------------------------
 // Mock data — replace each array with an API call in the integration sprint.
@@ -65,16 +64,26 @@ export const useGlobalDriveFilters = ({
   cellsRepository,
 }: {
   cellsRepository: CellsRepository;
-}): {filters: FilterConfig[]} => {
-  const {filters: cellsFilters} = useCellsStore();
+}): {filters: FilterConfig[]; filterState: GlobalDriveFiltersState} => {
   const {tags: allTags} = useGetAllTags({cellsRepository});
 
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedFileTypeIds, setSelectedFileTypeIds] = useState<string[]>([]);
   const [selectedConversationIds, setSelectedConversationIds] = useState<string[]>([]);
   const [selectedCreatorIds, setSelectedCreatorIds] = useState<string[]>([]);
   const [isSharedViaLink, setIsSharedViaLink] = useState(false);
 
   const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
+  const filterState = useMemo<GlobalDriveFiltersState>(
+    () => ({
+      selectedTagIds,
+      selectedFileTypeIds,
+      selectedCreatorIds,
+      selectedConversationIds,
+      isSharedViaLink,
+    }),
+    [isSharedViaLink, selectedConversationIds, selectedCreatorIds, selectedFileTypeIds, selectedTagIds],
+  );
 
   const tagItems = useMemo<FilterItem[]>(() => allTags.map(tag => ({id: tag, label: tag})), [allTags]);
 
@@ -102,8 +111,8 @@ export const useGlobalDriveFilters = ({
         id: 'tags',
         label: t('cells.filter.tags'),
         items: tagItems,
-        selectedIds: cellsFilters.tags,
-        onSelectionChange: cellsFilters.setTags,
+        selectedIds: selectedTagIds,
+        onSelectionChange: setSelectedTagIds,
       },
       {
         type: 'popover',
@@ -140,8 +149,7 @@ export const useGlobalDriveFilters = ({
     [
       fileTypes,
       tagItems,
-      cellsFilters.tags,
-      cellsFilters.setTags,
+      selectedTagIds,
       selectedFileTypeIds,
       selectedConversationIds,
       selectedCreatorIds,
@@ -150,5 +158,5 @@ export const useGlobalDriveFilters = ({
     ],
   );
 
-  return {filters};
+  return {filters, filterState};
 };

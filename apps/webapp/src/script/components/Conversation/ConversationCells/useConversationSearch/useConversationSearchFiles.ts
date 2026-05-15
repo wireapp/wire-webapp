@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
@@ -28,6 +28,11 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 
+import {
+  ConversationDriveFiltersState,
+  hasActiveSearchParams,
+  toConversationDriveSearchParams,
+} from '../common/driveFilters/driveFilters';
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
@@ -39,7 +44,7 @@ interface UseConversationSearchFilesProps {
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
   fireAndForgetInvoker: FireAndForgetInvoker;
-  tags: string[];
+  filters: ConversationDriveFiltersState;
   onClear?: () => void;
 }
 
@@ -52,7 +57,7 @@ export const useConversationSearchFiles = ({
   conversationQualifiedId,
   enabled,
   fireAndForgetInvoker,
-  tags,
+  filters,
   onClear,
 }: UseConversationSearchFilesProps) => {
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
@@ -61,18 +66,21 @@ export const useConversationSearchFiles = ({
   const [searchQuery, setSearchQuery] = useState('');
   const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
-  const trimmedSearchQuery = searchQuery.trim();
-  const wasTagFilterActiveRef = useRef(tags.length > 0);
+
+  const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
+  const hasActiveParams = hasActiveSearchParams(searchParams);
+  const hadActiveSearchParamsRef = useRef(hasActiveParams);
 
   const {id} = conversationQualifiedId;
   const conversationPath = getCellsApiPath({conversationQualifiedId});
 
   const searchNodes = useCallback(
-    async ({query, tags: tagsParam}: {query: string; tags: string[]}) => {
+    async ({query, filters: filtersParam}: {query: string; filters: ConversationDriveFiltersState}) => {
       try {
         setStatus('loading');
 
         const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
+        const searchParams = toConversationDriveSearchParams(filtersParam);
 
         const result = await cellsRepository.searchNodes({
           query,
@@ -80,7 +88,7 @@ export const useConversationSearchFiles = ({
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
           type: 'file',
-          tags: tagsParam.length > 0 ? tagsParam : undefined,
+          ...searchParams,
         });
 
         if (result.Nodes === undefined || result.Nodes.length === 0) {
@@ -124,7 +132,7 @@ export const useConversationSearchFiles = ({
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
     shouldPerformSearch.current = false;
     setSearchQuery(value);
-    await searchNodes({query: value, tags});
+    await searchNodes({query: value, filters});
     shouldPerformSearch.current = true;
   }, DEBOUNCE_TIME);
 
@@ -147,8 +155,8 @@ export const useConversationSearchFiles = ({
     setSearchQuery('');
     shouldPerformSearch.current = false;
 
-    if (preserveFilters && tags.length > 0) {
-      void searchNodes({query: FETCH_ALL_QUERY, tags});
+    if (preserveFilters && hasActiveParams) {
+      void searchNodes({query: FETCH_ALL_QUERY, filters});
       return;
     }
 
@@ -158,7 +166,7 @@ export const useConversationSearchFiles = ({
   const handleReload = async (): Promise<void> => {
     setStatus('loading');
     clearAll({conversationId: id});
-    await searchNodes({query: trimmedSearchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, tags});
+    await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
   };
 
   useEffect(() => {
@@ -166,26 +174,26 @@ export const useConversationSearchFiles = ({
       return;
     }
 
-    // Re-run search whenever typing has triggered it, a query is present, or tags are active.
-    const hasActiveFilters = trimmedSearchQuery.length > 0 || tags.length > 0;
-    if (!shouldPerformSearch.current && !hasActiveFilters) {
+    // Re-run search whenever typing has triggered it, a query is present,
+    // or the mapped search params carry any filter.
+    const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
+    if (!shouldPerformSearch.current && !hasSearchOrActiveParams) {
       return;
     }
 
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodes({query: trimmedSearchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, tags});
+      await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
     });
-  }, [enabled, fireAndForgetInvoker, searchNodes, searchQuery, tags, trimmedSearchQuery]);
+  }, [searchNodes, searchQuery, enabled, filters, hasActiveParams, fireAndForgetInvoker]);
 
-  // When the last tag filter is removed with no search query active,
+  // When the search params transition from "active" to "none" with no search query,
   // restore the default unfiltered file list.
   useEffect(() => {
-    const isTagFilterActive = tags.length > 0;
-    if (wasTagFilterActiveRef.current && !isTagFilterActive && !searchValue) {
+    if (hadActiveSearchParamsRef.current && !hasActiveParams && !searchValue) {
       onClear?.();
     }
-    wasTagFilterActiveRef.current = isTagFilterActive;
-  }, [tags, searchValue, onClear]);
+    hadActiveSearchParamsRef.current = hasActiveParams;
+  }, [hasActiveParams, searchValue, onClear]);
 
   return {
     searchValue,

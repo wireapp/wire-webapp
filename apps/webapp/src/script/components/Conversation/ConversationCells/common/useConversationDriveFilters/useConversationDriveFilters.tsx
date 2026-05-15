@@ -37,6 +37,7 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
 import type {FilterConfig, FilterItem} from '../CellsFiltersBar/filterConfig';
+import {ConversationDriveFiltersState} from '../driveFilters/driveFilters';
 import {useGetAllTags} from '../useGetAllTags/useGetAllTags';
 
 // ---------------------------------------------------------------------------
@@ -50,13 +51,6 @@ const MOCK_CREATORS: FilterItem[] = [
 ];
 
 // ---------------------------------------------------------------------------
-
-export interface ConversationDriveFiltersState {
-  selectedTagIds: string[];
-  selectedFileTypeIds: string[];
-  selectedCreatorIds: string[];
-  isSharedViaLink: boolean;
-}
 
 export interface UseConversationDriveFiltersResult {
   filters: FilterConfig[];
@@ -77,6 +71,15 @@ export const useConversationDriveFilters = ({
   const [isSharedViaLink, setIsSharedViaLink] = useState(false);
 
   const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
+  const filterState = useMemo<ConversationDriveFiltersState>(
+    () => ({
+      selectedTagIds,
+      selectedFileTypeIds,
+      selectedCreatorIds,
+      isSharedViaLink,
+    }),
+    [isSharedViaLink, selectedCreatorIds, selectedFileTypeIds, selectedTagIds],
+  );
   const clearAllFilters = useCallback(() => {
     setSelectedTagIds([]);
     setSelectedFileTypeIds([]);
@@ -150,7 +153,7 @@ export const useConversationDriveFilters = ({
 
   return {
     filters,
-    filterState: {selectedTagIds, selectedFileTypeIds, selectedCreatorIds, isSharedViaLink},
+    filterState,
     clearAllFilters,
   };
 };

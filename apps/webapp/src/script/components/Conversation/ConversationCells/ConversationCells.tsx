@@ -33,6 +33,7 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
+import {hasActiveConversationDriveFilters} from './common/driveFilters/driveFilters';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
@@ -95,11 +96,7 @@ export const ConversationCells = memo(
     });
 
     const {filters, filterState, clearAllFilters} = useConversationDriveFilters({cellsRepository});
-    const hasActiveFilters =
-      filterState.selectedTagIds.length > 0 ||
-      filterState.selectedFileTypeIds.length > 0 ||
-      filterState.selectedCreatorIds.length > 0 ||
-      filterState.isSharedViaLink;
+    const hasActiveFilters = hasActiveConversationDriveFilters(filterState);
 
     const {
       searchValue,
@@ -111,7 +108,7 @@ export const ConversationCells = memo(
       enabled: isCellsStateReady && isSearchViewOpen,
       fireAndForgetInvoker,
       userRepository,
-      tags: filterState.selectedTagIds,
+      filters: filterState,
       onClear: refresh,
     });
 
