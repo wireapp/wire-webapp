@@ -83,14 +83,21 @@ const render = (Component: FC): void => {
 
 const config = Config.getConfig();
 
+type HotReloadCapableModule = NodeJS.Module & {
+  hot?: {
+    accept: (dependencyPath: string, callback: () => void) => void;
+  };
+};
+
 async function runApp() {
   const {domain} = await updateApiVersion();
   await initializeDataDog(config, {domain: domain});
+  const hotReloadCapableModule = module as HotReloadCapableModule;
 
   render(Root);
   setAppLocale();
-  if (module.hot !== undefined) {
-    module.hot.accept('./page/Root', () => {
+  if (hotReloadCapableModule.hot !== undefined) {
+    hotReloadCapableModule.hot.accept('./page/Root', () => {
       render(require('./page/Root').Root);
     });
   }
