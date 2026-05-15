@@ -31,8 +31,4 @@ export class LeaveConversationModal extends OptionModal {
   async toggleCheckbox() {
     await this.modalCheckbox.click();
   }
-
-  async clickConfirm() {
-    await this.actionButton.click();
-  }
 }
