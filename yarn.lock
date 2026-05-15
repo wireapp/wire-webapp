@@ -8281,15 +8281,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsdom@npm:28.0.2":
-  version: 28.0.2
-  resolution: "@types/jsdom@npm:28.0.2"
+"@types/jsdom@npm:28.0.3":
+  version: 28.0.3
+  resolution: "@types/jsdom@npm:28.0.3"
   dependencies:
     "@types/node": "npm:*"
     "@types/tough-cookie": "npm:*"
     parse5: "npm:^8.0.0"
     undici-types: "npm:^7.21.0"
-  checksum: 10/4af0e22c5bf1bef8f4bb70117a050cf6c8eb1330456f51a470724bd3873fb2bdbc36a4b45e260cf9c367178cd7870a5272bad012c49d4c4d8bd8eac9a127b47e
+  checksum: 10/a98a86449245372a1c02fee45299bef8eae9bdebe22863e02f785f05fd1f27c51c381aefe72054247994612f94ee0f45520a6eaa32c5d91d36639d208b578e87
   languageName: node
   linkType: hard
 
@@ -27831,7 +27831,7 @@ __metadata:
     "@types/generate-changelog": "npm:1.8.3"
     "@types/jest": "npm:30.0.0"
     "@types/js-yaml": "npm:4.0.9"
-    "@types/jsdom": "npm:28.0.2"
+    "@types/jsdom": "npm:28.0.3"
     "@types/node": "npm:24.12.4"
     "@types/tough-cookie": "npm:4.0.5"
     "@typescript-eslint/eslint-plugin": "npm:8.59.3"
