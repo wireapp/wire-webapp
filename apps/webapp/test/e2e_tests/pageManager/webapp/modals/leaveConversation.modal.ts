@@ -18,18 +18,14 @@
  */
 
 import {Page, Locator} from '@playwright/test';
+import {OptionModal} from './option.modal';
 
-export class LeaveConversationModal {
-  readonly modal: Locator;
+export class LeaveConversationModal extends OptionModal {
   readonly modalCheckbox: Locator;
-  readonly cancelButton: Locator;
-  readonly confirmButton: Locator;
 
   constructor(page: Page) {
-    this.modal = page.getByTestId('modal-template-option');
+    super(page);
     this.modalCheckbox = this.modal.getByText('clear the content');
-    this.cancelButton = this.modal.getByTestId('do-secondary');
-    this.confirmButton = this.modal.getByTestId('do-action');
   }
 
   async toggleCheckbox() {
@@ -37,6 +33,6 @@ export class LeaveConversationModal {
   }
 
   async clickConfirm() {
-    await this.confirmButton.click();
+    await this.actionButton.click();
   }
 }
