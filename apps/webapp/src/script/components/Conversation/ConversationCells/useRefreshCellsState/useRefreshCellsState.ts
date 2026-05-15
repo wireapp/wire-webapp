@@ -22,6 +22,8 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 
 const REFRESH_INTERVAL_MS = 10000;
@@ -33,10 +35,12 @@ export const useRefreshCellsState = ({
   initialCellState,
   conversationRepository,
   conversationQualifiedId,
+  fireAndForgetInvoker,
 }: {
   initialCellState: CONVERSATION_CELLS_STATE;
   conversationRepository: ConversationRepository;
   conversationQualifiedId: QualifiedId;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }) => {
   const [cellsState, setCellsState] = useState(initialCellState);
   const [isRefreshing, setIsRefreshing] = useState(cellsState === CONVERSATION_CELLS_STATE.PENDING);
@@ -52,7 +56,7 @@ export const useRefreshCellsState = ({
 
   useEffect(() => {
     if (isInitialMount.current) {
-      void refreshCellsState();
+      fireAndForgetInvoker.fireAndForget(refreshCellsState);
       isInitialMount.current = false;
       return undefined;
     }
@@ -79,7 +83,7 @@ export const useRefreshCellsState = ({
         setIsRefreshing(false);
         return;
       }
-      void refreshCellsState();
+      fireAndForgetInvoker.fireAndForget(refreshCellsState);
     }, REFRESH_INTERVAL_MS);
 
     return () => {
@@ -88,7 +92,7 @@ export const useRefreshCellsState = ({
         intervalRef.current = null;
       }
     };
-  }, [cellsState, refreshCellsState]);
+  }, [cellsState, fireAndForgetInvoker, refreshCellsState]);
 
   return {cellsState, isRefreshing};
 };
