@@ -59,6 +59,7 @@ export const useConversationSearchFiles = ({
   const [searchQuery, setSearchQuery] = useState('');
   const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
+  const trimmedSearchQuery = searchQuery.trim();
 
   const {id} = conversationQualifiedId;
   const conversationPath = getCellsApiPath({conversationQualifiedId});
@@ -147,7 +148,7 @@ export const useConversationSearchFiles = ({
   const handleReload = async (): Promise<void> => {
     setStatus('loading');
     clearAll({conversationId: id});
-    await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
+    await searchNodes({query: trimmedSearchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
   };
 
   useEffect(() => {
@@ -156,9 +157,9 @@ export const useConversationSearchFiles = ({
     }
 
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
+      await searchNodes({query: trimmedSearchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY});
     });
-  }, [enabled, fireAndForgetInvoker, searchNodes, searchQuery]);
+  }, [enabled, fireAndForgetInvoker, searchNodes, searchQuery, trimmedSearchQuery]);
 
   return {
     searchValue,
