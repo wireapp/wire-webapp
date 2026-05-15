@@ -42,10 +42,6 @@ export abstract class BaseModal {
     return (await this.modalTitle.textContent()) ?? '';
   }
 
-  async getModalText() {
-    return (await this.modalText.textContent()) ?? '';
-  }
-
   async clickCancel() {
     await this.cancelButton.click();
   }
