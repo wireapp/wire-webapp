@@ -46,10 +46,6 @@ export abstract class BaseModal {
     return (await this.modalText.textContent()) ?? '';
   }
 
-  async isActionButtonVisible() {
-    return await this.actionButton.isVisible();
-  }
-
   async clickCancel() {
     await this.cancelButton.click();
   }
