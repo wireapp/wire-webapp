@@ -169,7 +169,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
     const [newTab] = await Promise.all([pageManagerA.page.waitForEvent('popup'), pages.about().clickTermsOfUseLink()]);
 
-    await expect(newTab).toHaveURL(/legal#terms/);
+    await expect(newTab).toHaveURL(/wire\.com\/en\/legal/);
 
     await newTab.close();
   });

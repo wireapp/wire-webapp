@@ -48,7 +48,7 @@ const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: 
 
   const termsOfUseUrl = useMemo(() => {
     if (selfUser) {
-      return inTeam ? externalUrl.termsOfUseTeam : externalUrl.termsOfUsePersonnal;
+      return externalUrl.termsOfUse;
     }
     return '';
   }, [selfUser, inTeam]);
