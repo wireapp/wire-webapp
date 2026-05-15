@@ -27,8 +27,4 @@ export class LeaveConversationModal extends OptionModal {
     super(page);
     this.modalCheckbox = this.modal.getByText('clear the content');
   }
-
-  async toggleCheckbox() {
-    await this.modalCheckbox.click();
-  }
 }
