@@ -49,7 +49,7 @@ test.describe('Link Preview', () => {
             await expect(frame.getByRole('application', {name: 'Pause', exact: true})).toBeVisible();
           },
         },
-        // YouTube has implemented some anti-bot checks on embedded videos so this test is currently disabled [WPB-25663]
+        // YouTube has implemented some anti-bot checks on embedded videos so this part of the test is currently disabled [WPB-25663]
         // {
         //   url: 'https://www.youtube.com/watch?v=BMFsJiAcELY',
         //   iframeSelector: 'iframe.youtube',
