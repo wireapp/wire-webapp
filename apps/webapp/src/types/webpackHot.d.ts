@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,27 +17,16 @@
  *
  */
 
-import {amplify} from 'amplify';
-
-import {WireModule} from './Wire.types';
-
-interface Connection {
-  // See https://developer.mozilla.org/en-US/docs/Web/API/NetworkInformation/effectiveType
-  effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
-  addEventListener: (type: 'change', listener: () => void) => void;
-  removeEventListener: (type: 'change', listener: () => void) => void;
+interface WebpackHotModule {
+  accept(dependencyPath: string, callback: () => void): void;
 }
 
 declare global {
-  interface Window {
-    wire: WireModule;
-    amplify: amplify.Static;
-    showOpenFilePicker: () => Promise<FileSystemFileHandle[]>;
-    z: any;
-  }
-
-  interface Navigator {
-    // TODO: Remove once the type is available in TS native types
-    connection?: Connection;
+  namespace NodeJS {
+    interface Module {
+      hot?: WebpackHotModule;
+    }
   }
 }
+
+declare const module: NodeJS.Module;
