@@ -420,7 +420,7 @@ test.describe('History Backup', () => {
       await test.step('User A leaves the group', async () => {
         await userAPages.conversation().toggleGroupInformation();
         await userAPages.conversation().leaveConversation();
-        await userAModals.leaveConversation().clickConfirm();
+        await userAModals.leaveConversation().actionButton.click();
         await expect(userAPages.conversation().systemMessages.filter({hasText: 'You left'})).toBeVisible();
       });
 

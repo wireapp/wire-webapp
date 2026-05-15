@@ -55,7 +55,7 @@ test('Channels Management', {tag: ['@TC-8752', '@crit-flow-web']}, async ({creat
     await expect(memberPages.conversationDetails().groupMembers.filter({hasText: member.fullName})).toBeVisible();
 
     await memberPages.conversation().leaveConversation();
-    await memberModals.leaveConversation().clickConfirm();
+    await memberModals.leaveConversation().actionButton.click();
     await expect(memberPages.conversation().messageInput).not.toBeAttached();
   });
 

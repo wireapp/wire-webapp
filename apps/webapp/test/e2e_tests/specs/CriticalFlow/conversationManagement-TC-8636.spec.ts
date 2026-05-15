@@ -102,7 +102,7 @@ test('Conversation Management', {tag: ['@TC-8636', '@crit-flow-web']}, async ({c
     const contextMenu = await conversation.openContextMenu();
     await contextMenu.leaveConversationButton.click();
     await modals.leaveConversation().toggleCheckbox();
-    await modals.leaveConversation().clickConfirm();
+    await modals.leaveConversation().actionButton.click();
     await expect(pages.conversation().messageInput).not.toBeAttached();
   });
 });
