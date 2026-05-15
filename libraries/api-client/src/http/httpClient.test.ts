@@ -217,7 +217,11 @@ describe('HttpClient', () => {
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
         dependencies: httpClientDependenciesForTest,
       });
-      const serviceUnavailableError = new BackendError('Service unavailable', undefined, StatusCode.SERVICE_UNAVAILABLE);
+      const serviceUnavailableError = new BackendError(
+        'Service unavailable',
+        undefined,
+        StatusCode.SERVICE_UNAVAILABLE,
+      );
 
       client._sendRequest = jest.fn().mockRejectedValueOnce(serviceUnavailableError);
 
