@@ -19,6 +19,8 @@
 
 import {container} from 'tsyringe';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
@@ -34,6 +36,7 @@ import {WindowContextProvider} from '../useWindow';
 interface DetachedCallingCellProps {
   propertiesRepository: PropertiesRepository;
   callingRepository: CallingRepository;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
   callState?: CallState;
   userState?: UserState;
@@ -42,6 +45,7 @@ interface DetachedCallingCellProps {
 export const DetachedCallingCell = ({
   propertiesRepository,
   callingRepository,
+  fireAndForgetInvoker,
   toggleScreenshare,
   callState = container.resolve(CallState),
   userState = container.resolve(UserState),
@@ -65,6 +69,7 @@ export const DetachedCallingCell = ({
         <CallingContainer
           propertiesRepository={propertiesRepository}
           callingRepository={callingRepository}
+          fireAndForgetInvoker={fireAndForgetInvoker}
           toggleScreenshare={toggleScreenshare}
         />
       </WindowContextProvider>

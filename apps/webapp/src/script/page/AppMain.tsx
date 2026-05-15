@@ -376,6 +376,7 @@ export const AppMain = (properties: AppMainProps) => {
                 <CallingContainer
                   propertiesRepository={repositories.properties}
                   callingRepository={repositories.calling}
+                  fireAndForgetInvoker={fireAndForgetInvoker}
                   toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
                 />
               )}
