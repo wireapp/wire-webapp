@@ -142,6 +142,7 @@ export const AppContainer = (properties: AppProps) => {
         <DetachedCallingCell
           propertiesRepository={app.repository.properties}
           callingRepository={app.repository.calling}
+          fireAndForgetInvoker={fireAndForgetInvoker}
           toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
         />
       )}
