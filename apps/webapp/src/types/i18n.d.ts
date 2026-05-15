@@ -395,14 +395,12 @@ declare module 'I18n/en-US.json' {
     'cells.filePreviewButton.ariaLabel': `Preview for {name}`;
     'cells.fileType.archives': `Archives`;
     'cells.fileType.audio': `Audio`;
-    'cells.fileType.code': `Code`;
     'cells.fileType.documents': `Documents`;
-    'cells.fileType.folders': `Folders`;
-    'cells.fileType.others': `Others`;
     'cells.fileType.pdfs': `PDFs`;
     'cells.fileType.pictures': `Pictures`;
     'cells.fileType.presentations': `Presentations`;
     'cells.fileType.spreadsheets': `Spreadsheets`;
+    'cells.fileType.text': `Text files`;
     'cells.fileType.videos': `Videos`;
     'cells.filter.conversation': `Conversation`;
     'cells.filter.createdBy': `Created by`;
