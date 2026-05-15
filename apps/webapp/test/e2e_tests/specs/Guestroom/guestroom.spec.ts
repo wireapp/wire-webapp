@@ -318,7 +318,7 @@ test.describe('Guestroom', () => {
       // Guest leaves the conversation
       await guestPages.conversation().toggleGroupInformation();
       await guestPages.conversation().leaveConversation();
-      await guestModals.leaveConversation().clickConfirm();
+      await guestModals.leaveConversation().actionButton.click();
 
       await expect(
         ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.fullName} left`}),

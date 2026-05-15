@@ -174,7 +174,7 @@ test.describe('Status', () => {
       sendAction: async ({userAPageManager}) => {
         const {pages, modals} = userAPageManager;
         await pages.conversation().leaveConversation();
-        await modals.leaveConversation().clickConfirm();
+        await modals.leaveConversation().actionButton.click();
       },
     },
     {

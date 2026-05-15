@@ -229,7 +229,7 @@ test.describe('Group Conversation', () => {
       // User A leaves conversation through options menu from conversation list
       const contextMenu = await userAPages.conversationList().getConversation(groupName).openContextMenu();
       await contextMenu.leaveConversationButton.click();
-      await userAModals.leaveConversation().confirmButton.click();
+      await userAModals.leaveConversation().actionButton.click();
 
       await expect(userBPages.conversation().systemMessages.filter({hasText: `${userA.fullName} left`})).toBeVisible();
     },
