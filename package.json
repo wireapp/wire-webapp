@@ -70,7 +70,7 @@
     "stylelint-config-idiomatic-order": "10.0.0",
     "ts-node": "10.9.2",
     "tsc-watch": "7.2.0",
-    "typescript": "5.9.3"
+    "typescript": "6.0.3"
   },
   "engines": {
     "yarn": ">=4.12.0",
@@ -124,7 +124,7 @@
     "type-check": "nx run-many -t type-check --all"
   },
   "resolutions": {
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "xml2js": "0.6.2",
     "@stablelib/utf8": "1.0.2",
     "dexie-encrypted@2.0.0": "patch:dexie-encrypted@npm%3A2.0.0#./.yarn/patches/dexie-encrypted-npm-2.0.0-eb61eb5975.patch",
