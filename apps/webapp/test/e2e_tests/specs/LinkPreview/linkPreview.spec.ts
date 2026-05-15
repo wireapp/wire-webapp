@@ -49,16 +49,17 @@ test.describe('Link Preview', () => {
             await expect(frame.getByRole('application', {name: 'Pause', exact: true})).toBeVisible();
           },
         },
-        {
-          url: 'https://www.youtube.com/watch?v=BMFsJiAcELY',
-          iframeSelector: 'iframe.youtube',
-          validate: async (frame: FrameLocator) => {
-            await expect(frame.getByLabel('Time elapsed')).not.toBeVisible();
-            await frame.getByRole('button', {name: 'Play video', exact: true}).click();
-            // Video player might take some time to load, so here we aren't checking for the pause button
-            await expect(frame.getByLabel('Time elapsed')).toBeVisible();
-          },
-        },
+        // YouTube has implemented some anti-bot checks on embedded videos so this test is currently disabled [WPB-25663]
+        // {
+        //   url: 'https://www.youtube.com/watch?v=BMFsJiAcELY',
+        //   iframeSelector: 'iframe.youtube',
+        //   validate: async (frame: FrameLocator) => {
+        //     await expect(frame.getByLabel('Time elapsed')).not.toBeVisible();
+        //     await frame.getByRole('button', {name: 'Play video', exact: true}).click();
+        //     // Video player might take some time to load, so here we aren't checking for the pause button
+        //     await expect(frame.getByLabel('Time elapsed')).toBeVisible();
+        //   },
+        // },
         {
           url: 'https://play.spotify.com/album/7buEcyw6fJF3WPgr06BomH',
           iframeSelector: 'iframe.spotify',
