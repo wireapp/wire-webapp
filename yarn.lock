@@ -9564,7 +9564,7 @@ __metadata:
     tough-cookie: "npm:4.1.4"
     ts-node: "npm:10.9.2"
     webpack: "npm:5.106.2"
-    ws: "npm:8.20.0"
+    ws: "npm:8.20.1"
     zod: "npm:3.25.76"
   languageName: unknown
   linkType: soft
@@ -28137,9 +28137,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:8.20.0":
-  version: 8.20.0
-  resolution: "ws@npm:8.20.0"
+"ws@npm:8.20.1":
+  version: 8.20.1
+  resolution: "ws@npm:8.20.1"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ">=5.0.2"
@@ -28148,7 +28148,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 10/b7ab934b21ffdea9f25a5af5097e8c1ec7625db553bca026c5a23e35b7c236f3fb89782f2b57fab9da553864512f9aa7d245827ef998d26ffa1b2187a19a6d10
+  checksum: 10/8c4d2b06dc65381b6bfab1f2e584275dabd30a99a5ce058b4dc76f3d03fad1921cef3a21d8f53127d30a808cfd1864aa2fe6890a5d43359f682457315baec873
   languageName: node
   linkType: hard
 
