@@ -36,10 +36,6 @@ export class LeaveConversationModal {
     await this.modalCheckbox.click();
   }
 
-  async clickCancel() {
-    await this.cancelButton.click();
-  }
-
   async clickConfirm() {
     await this.confirmButton.click();
   }
