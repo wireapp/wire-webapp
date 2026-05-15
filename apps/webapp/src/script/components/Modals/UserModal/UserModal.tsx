@@ -17,7 +17,7 @@
  *
  */
 
-import {useContext, useEffect, useState} from 'react';
+import {ReactNode, useContext, useEffect, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import cx from 'classnames';
@@ -39,7 +39,16 @@ import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 
 import {useUserModalState} from './UserModal.state';
-import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
+import {
+  unverifiedUserWarningIconStyle,
+  unverifiedUserWarningLinkStyle,
+  unverifiedUserWarningMessageCenteredStyle,
+  unverifiedUserWarningMessageStyle,
+  unverifiedUserWarningRowStyle,
+  unverifiedUserWarningStyle,
+  userModalStyle,
+  userModalWrapperStyle,
+} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {RootContext} from '../../../page/RootProvider';
@@ -101,52 +110,66 @@ interface UnverifiedUserWarningProps {
   user?: User;
 }
 
+interface UserModalWarningMessageProps {
+  content: ReactNode;
+  showIcon?: boolean;
+  textAlignCenter?: boolean;
+  linkText: string;
+  href: string;
+}
+
+const UserModalWarningMessage = ({
+  content,
+  href,
+  linkText,
+  showIcon = false,
+  textAlignCenter = false,
+}: UserModalWarningMessageProps) => {
+  return (
+    <div
+      css={[showIcon && unverifiedUserWarningRowStyle, textAlignCenter && unverifiedUserWarningMessageCenteredStyle]}
+    >
+      {showIcon && <Icon.InfoIcon css={unverifiedUserWarningIconStyle} />}
+      <p css={unverifiedUserWarningMessageStyle}>
+        {content}
+        <Link css={unverifiedUserWarningLinkStyle} variant={LinkVariant.PRIMARY} targetBlank href={href}>
+          {linkText}
+        </Link>
+      </p>
+    </div>
+  );
+};
+
 export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
   const learnMoreHref = Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS;
 
-  if (user) {
+  if (user !== undefined) {
     return (
-      <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
-        <Icon.InfoIcon css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
-        <p css={{fontSize: 'var(--font-size-medium)'}}>
-          {t('userNotVerified', {user: user.name()})}
-          <Link
-            css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
-            variant={LinkVariant.PRIMARY}
-            targetBlank
-            href={learnMoreHref}
-          >
-            {t('modalUserLearnMore')}
-          </Link>
-        </p>
+      <div css={unverifiedUserWarningStyle}>
+        <UserModalWarningMessage
+          content={t('userNotVerified', {user: user.name()})}
+          href={learnMoreHref}
+          linkText={t('modalUserLearnMore')}
+          showIcon
+        />
       </div>
     );
   }
 
   return (
-    <div css={{color: 'var(--danger-color)', margin: '1em 0', textAlign: 'center'}}>
-      <p css={{fontSize: 'var(--font-size-medium)'}}>
-        {t('conversationConnectionVerificationWarning')}
-        <Link
-          css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
-          variant={LinkVariant.PRIMARY}
-          targetBlank
-          href={learnMoreHref}
-        >
-          {t('modalUserLearnMore')}
-        </Link>
-      </p>
-      <p css={{fontSize: 'var(--font-size-medium)'}}>
-        {t('conversationConnectionSupportWarning')}
-        <Link
-          css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
-          variant={LinkVariant.PRIMARY}
-          targetBlank
-          href={learnMoreHref}
-        >
-          {t('conversationConnectionReportMisuse')}
-        </Link>
-      </p>
+    <div css={unverifiedUserWarningStyle}>
+      <UserModalWarningMessage
+        content={t('conversationConnectionVerificationWarning')}
+        href={learnMoreHref}
+        linkText={t('modalUserLearnMore')}
+        textAlignCenter
+      />
+      <UserModalWarningMessage
+        content={t('conversationConnectionSupportWarning')}
+        href={learnMoreHref}
+        linkText={t('conversationConnectionReportMisuse')}
+        textAlignCenter
+      />
     </div>
   );
 };
@@ -188,7 +211,7 @@ const UserModal = ({
     user.teamId === selfUser.teamId;
 
   useEffect(() => {
-    if (userId) {
+    if (userId !== null) {
       userRepository
         // We want to get the fresh version of the user from backend (in case the user was deleted)
         .refreshUser(userId)
@@ -207,7 +230,7 @@ const UserModal = ({
       setUser(null);
       setUserNotFound(false);
     };
-  }, [userId?.id, userId?.domain]);
+  }, [userId, userRepository]);
 
   return (
     <ModalComponent
