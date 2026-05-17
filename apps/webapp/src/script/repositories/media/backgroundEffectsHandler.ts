@@ -105,10 +105,7 @@ export class BackgroundEffectsHandler {
     backgroundEffectsStore.getState().setLastVirtualBackgroundId(this.readLastVirtualBackgroundIdFromStore());
 
     // On CPU-only devices (no WebGL2) default to the lighter model
-    if (
-      !is.nullOrUndefined(controller.getCapabilityInfo) &&
-      is.nullOrUndefined(controller.getCapabilityInfo().webgl2)
-    ) {
+    if (!is.nullOrUndefined(controller.getCapabilityInfo) && controller.getCapabilityInfo().webgl2 === false) {
       backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
     }
 
@@ -176,6 +173,7 @@ export class BackgroundEffectsHandler {
         backgroundSource,
         onMetrics: this.onMetrics,
         onModelChange: this.onModelChange,
+        onRendererFallback: this.onRendererFallback,
       });
       const processedStream = new MediaStream([outputTrack]);
       this.currentReleasableStream = new ReleasableMediaStream(processedStream, () => {
@@ -254,10 +252,6 @@ export class BackgroundEffectsHandler {
   public enableSuperhighQualityTier(enable: boolean): void {
     this.controller.setModelPath(enable ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH);
     backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(enable);
-  }
-
-  public isSuperhighQualityTierAllowed(): boolean {
-    return this.controller.getMaxQualityTier() === 'superhigh';
   }
 
   public getCapabilityInfo(): CapabilityInfo {
@@ -342,6 +336,10 @@ export class BackgroundEffectsHandler {
   private onModelChange = (modelPath: string): void => {
     const model = modelPath.split('/').pop();
     backgroundEffectsStore.getState().setModel(model);
+  };
+
+  private onRendererFallback = (modelPath: string): void => {
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(modelPath === SELFIE_MULTICLASS_MODEL_PATH);
   };
 }
 

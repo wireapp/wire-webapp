@@ -41,6 +41,7 @@ export type ProcessVideoTrackOptions = {
   // Metrics callback.
   onMetrics: ((metrics: Metrics) => void) | null;
   onModelChange: ((model: string) => void) | null;
+  onRendererFallback: ((modelPath: string) => void) | null;
 
   // Segmenter options.
   borderSmooth: number;
@@ -66,7 +67,7 @@ export type WorkerBackgroundSource = {
 };
 export type WorkerProcessVideoTrackOptions = Omit<
   ProcessVideoTrackOptions,
-  'onMetrics' | 'onModelChange' | 'backgroundSource'
+  'onMetrics' | 'onModelChange' | 'onRendererFallback' | 'backgroundSource'
 > & {
   backgroundSource: WorkerBackgroundSource | null;
 };
@@ -98,6 +99,7 @@ export const defaultOpts = {
   // Metrics callback.
   onMetrics: null,
   onModelChange: null,
+  onRendererFallback: null,
 
   // Segmenter options.
   borderSmooth: 0,
@@ -114,4 +116,4 @@ export const defaultOpts = {
   brightness: 0,
   contrast: 1,
   gamma: 1,
-} as ProcessVideoTrackOptions;
+} satisfies ProcessVideoTrackOptions;

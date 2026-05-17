@@ -20,13 +20,7 @@
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/logger';
 
-import {
-  type CapabilityInfo,
-  type EffectMode,
-  type Metrics,
-  QualityMode,
-  type QualityTier,
-} from './backgroundEffectsWorkerTypes';
+import {type CapabilityInfo, type EffectMode, type Metrics, QualityMode} from './backgroundEffectsWorkerTypes';
 import {detectCapabilities} from './helper/capability';
 import {
   defaultOpts,
@@ -42,13 +36,13 @@ import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
 // visually useful blur.  Multiply by this factor to get from the 0–1 range.
 const BLUR_SIGMA_SCALE = 15;
 
+type WorkerMessage = {name: 'stats'; stats: Metrics} | {name: 'rendererFallback'; modelPath: string};
+
 export class BackgroundEffectsController {
   private readonly logger: Logger;
 
   private worker: Worker | null = null;
   private options: ProcessVideoTrackOptions = defaultOpts;
-
-  private onMetrics: ((metrics: Metrics) => void) | null = null;
 
   private readonly capabilityInfo: CapabilityInfo = {
     offscreenCanvas: false,
@@ -57,7 +51,6 @@ export class BackgroundEffectsController {
     requestVideoFrameCallback: false,
   };
 
-  private maxQualityTier: QualityTier = 'superhigh';
   private refcount = 0;
 
   /**
@@ -70,11 +63,10 @@ export class BackgroundEffectsController {
     this.capabilityInfo = detectCapabilities();
   }
 
-  public async start(inputTrack: MediaStreamTrack, options: ProcessVideoTrackOptions): Promise<MediaStreamTrack> {
+  public async start(inputTrack: MediaStreamTrack, trackOptions: ProcessVideoTrackOptions): Promise<MediaStreamTrack> {
     this.refcount++;
-    const resolved = await resolveOptions(options);
+    const resolved = await resolveOptions(trackOptions);
     this.options = withoutBitmap(resolved);
-    this.onMetrics = options.onMetrics;
 
     const trackCapabilities = inputTrack.getCapabilities();
     const trackSettings = inputTrack.getSettings();
@@ -109,16 +101,42 @@ export class BackgroundEffectsController {
         transferables,
       );
       onWorkerMessage = ({data}: MessageEvent) => {
-        const {name, stats} = data as {name: string; stats: Metrics};
-        if (name === 'stats' && this.onMetrics) {
-          this.onMetrics(stats);
+        switch (data.name) {
+          case 'stats':
+            if (trackOptions.onMetrics) {
+              trackOptions.onMetrics(data.stats);
+            }
+
+            break;
+
+          case 'rendererFallback':
+            this.options = {...this.options, modelPath: data.modelPath};
+            if (trackOptions.onRendererFallback) {
+              trackOptions.onRendererFallback(data.modelPath);
+            }
+            break;
         }
       };
 
       this.worker.addEventListener('message', onWorkerMessage);
     } else {
       const {options: workerOptions} = getWorkerOptions(resolved);
-      await runSegmenter(offscreen, readable, workerOptions, stats => this.onMetrics?.(stats));
+      await runSegmenter(
+        offscreen,
+        readable,
+        workerOptions,
+        stats => {
+          if (trackOptions.onMetrics) {
+            trackOptions.onMetrics(stats);
+          }
+        },
+        modelPath => {
+          this.options = {...this.options, modelPath};
+          if (trackOptions.onRendererFallback) {
+            trackOptions.onRendererFallback(modelPath);
+          }
+        },
+      );
     }
 
     outputTrack.stop = () => {
@@ -192,14 +210,6 @@ export class BackgroundEffectsController {
 
   public getCapabilityInfo(): CapabilityInfo {
     return this.capabilityInfo;
-  }
-
-  public setMaxQualityTier(quality: QualityTier): void {
-    this.maxQualityTier = quality;
-  }
-
-  public getMaxQualityTier(): QualityTier {
-    return this.maxQualityTier;
   }
 
   public setModelPath(path: string): void {

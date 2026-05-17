@@ -41,9 +41,17 @@ globalThis.onmessage = ({data}) => {
       readable: ReadableStream;
       options: WorkerProcessVideoTrackOptions;
     };
-    runSegmenter(canvas, readable, opts, (stats: Metrics) => {
-      globalThis.postMessage({name: 'stats', stats});
-    }).catch((err: unknown) => {
+    runSegmenter(
+      canvas,
+      readable,
+      opts,
+      (stats: Metrics) => {
+        globalThis.postMessage({name: 'stats', stats});
+      },
+      (modelPath: string) => {
+        globalThis.postMessage({name: 'rendererFallback', modelPath});
+      },
+    ).catch((err: unknown) => {
       workerLogger.error(`[virtual-background] video error: ${(err as Error).message}`);
     });
   }

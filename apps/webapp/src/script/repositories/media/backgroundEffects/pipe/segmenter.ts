@@ -31,7 +31,7 @@ import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/re
 
 import {Canvas2DRenderer, createCanvas2DRenderer} from './canvas2DRenderer';
 import {VideoFilter} from './filter';
-import {WorkerProcessVideoTrackOptions} from './options';
+import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH, WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
 import {createWallClock} from '../../../../clock/wallClock';
@@ -43,9 +43,7 @@ export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
   Object.assign(segmenterOptions, opts);
 }
 
-let useGPU = true;
-
-async function createSegmenter(canvas: OffscreenCanvas) {
+async function createSegmenter(canvas: OffscreenCanvas, useGPU: boolean) {
   const logger = getSafeLogger('segmenter:createSegmenter');
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
   const fileset =
@@ -90,6 +88,7 @@ export async function runSegmenter(
   readable: ReadableStream,
   opts: WorkerProcessVideoTrackOptions,
   onMetrics: (metrics: Metrics) => void,
+  onRendererFallback: (modelPath: string) => void,
 ) {
   const logger = getSafeLogger('segmenter:runSegmenter');
   logger.log(`[virtual-background] runSegmenter`);
@@ -102,12 +101,17 @@ export async function runSegmenter(
   try {
     logger.log('[virtual-background] initializing WebGL2 with GPU pipeline');
     webGLRenderer = new WebGLRenderer(canvas);
-    useGPU = true;
   } catch {
     logger.log('[virtual-background] WebGL2 unavailable — falling back to 2D Canvas CPU pipeline');
     canvas2DRenderer = createCanvas2DRenderer(canvas);
-    useGPU = false;
+
+    if (segmenterOptions.modelPath === SELFIE_MULTICLASS_MODEL_PATH) {
+      segmenterOptions.modelPath = SELFIE_SEGMENTER_MODEL_PATH;
+      onRendererFallback(SELFIE_SEGMENTER_MODEL_PATH);
+    }
   }
+
+  const useGPU = webGLRenderer !== null;
 
   function onContextLost(event: Event) {
     logger.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
@@ -138,7 +142,7 @@ export async function runSegmenter(
     attachCanvasEvents();
   }
 
-  let segmenter = await createSegmenter(canvas);
+  let segmenter = await createSegmenter(canvas, useGPU);
   let currentModelPath = segmenterOptions.modelPath;
 
   const restartSegmenter = createRestartQueue(restartSegmenterSequentially);
@@ -147,7 +151,7 @@ export async function runSegmenter(
     const targetModelPath = segmenterOptions.modelPath;
 
     try {
-      const newSegmenter = await createSegmenter(canvas);
+      const newSegmenter = await createSegmenter(canvas, useGPU);
 
       const oldSegmenter = segmenter;
       segmenter = newSegmenter;
