@@ -97,10 +97,38 @@ export class BackgroundEffectsController {
     const offscreen = canvas.transferControlToOffscreen();
 
     const outputTrackStop = outputTrack.stop.bind(outputTrack);
+    let onWorkerMessage: ({data}: MessageEvent) => void = () => null;
+
+    if (resolved.useWorker) {
+      if (this.worker === null) {
+        this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
+      }
+      const {options: workerOptions, transferables} = getWorkerOptions(resolved);
+
+      transferables.push(offscreen, readable);
+
+      this.worker.postMessage(
+        {name: 'runSegmenter', canvas: offscreen, readable, options: workerOptions},
+        transferables,
+      );
+      onWorkerMessage = ({data}: MessageEvent) => {
+        const {name, stats} = data as {name: string; stats: Metrics};
+        if (name === 'stats' && this.onMetrics) {
+          this.onMetrics(stats);
+        }
+      };
+
+      this.worker.addEventListener('message', onWorkerMessage);
+    } else {
+      const {options: workerOptions} = getWorkerOptions(resolved);
+      await runSegmenter(offscreen, readable, workerOptions, stats => this.onMetrics?.(stats));
+    }
 
     outputTrack.stop = () => {
       this.logger.info('start: outputTrack stop');
       outputTrackStop();
+
+      this.worker?.removeEventListener('message', onWorkerMessage);
 
       this.refcount--;
       if (!this.refcount) {
@@ -115,30 +143,6 @@ export class BackgroundEffectsController {
     outputTrack.getSettings = () => trackSettings;
     outputTrack.getConstraints = () => trackConstraints;
     inputTrack.addEventListener('ended', () => outputTrack.stop());
-
-    if (resolved.useWorker) {
-      if (this.worker === null) {
-        this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
-      }
-      const {options: workerOptions, transferables} = getWorkerOptions(resolved);
-
-      transferables.push(offscreen, readable);
-
-      this.worker.postMessage(
-        {name: 'runSegmenter', canvas: offscreen, readable, options: workerOptions},
-        transferables,
-      );
-
-      this.worker.addEventListener('message', ({data}) => {
-        const {name, stats} = data as {name: string; stats: Metrics};
-        if (name === 'stats' && this.onMetrics) {
-          this.onMetrics(stats);
-        }
-      });
-    } else {
-      const {options: workerOptions} = getWorkerOptions(resolved);
-      await runSegmenter(offscreen, readable, workerOptions, stats => this.onMetrics?.(stats));
-    }
 
     return {
       outputTrack: outputTrack,
