@@ -21,32 +21,34 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {ClientType} from '@wireapp/api-client/lib/client/index';
-import {BackendError, BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http';
-import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
+import {BackendError, BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {isValidEmail, PATTERN} from '@wireapp/commons/lib/util/ValidationUtil';
 import {FormattedMessage} from 'react-intl';
-import {connect} from 'react-redux';
+import {connect, useDispatch} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
+import {container} from 'tsyringe';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {Button, Checkbox, CheckboxLabel, ErrorMessage, Form, Input, InputBlock, Loading} from '@wireapp/react-ui-kit';
 
+import {APIClient} from 'src/script/service/apiClientSingleton';
 import {t} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
-import {Config} from '../../Config';
-import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
-import {useEnterpriseLoginV2} from '../hooks/useEnterpriseLoginV2';
-import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {ValidationError} from '../module/action/ValidationError';
-import {RootState, ThunkDispatch} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import * as ConversationSelector from '../module/selector/ConversationSelector';
-import {QUERY_KEY, ROUTE} from '../route';
-import {parseError, parseValidationErrors} from '../util/errorUtil';
-import {getEnterpriseLoginV2FF} from '../util/helpers';
-import {logoutReasonStrings} from '../util/logoutUtil';
-import {getSearchParams, SSO_CODE_PREFIX} from '../util/urlUtil';
+import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, requiresPasswordModal} from './util';
+
+import {Config} from '../../../Config';
+import {JoinGuestLinkPasswordModal} from '../../component/JoinGuestLinkPasswordModal';
+import {actionRoot as ROOT_ACTIONS} from '../../module/action/';
+import {ValidationError} from '../../module/action/ValidationError';
+import {RootState, ThunkDispatch} from '../../module/reducer';
+import * as AuthSelector from '../../module/selector/AuthSelector';
+import * as ConversationSelector from '../../module/selector/ConversationSelector';
+import {QUERY_KEY, ROUTE} from '../../route';
+import {parseError, parseValidationErrors} from '../../util/errorUtil';
+import {getEnterpriseLoginV2FF} from '../../util/helpers';
+import {logoutReasonStrings} from '../../util/logoutUtil';
+import {getSearchParams, SSO_CODE_PREFIX} from '../../util/urlUtil';
 
 interface SingleSignOnFormProps {
   doLogin: (code: string) => Promise<void>;
@@ -54,6 +56,7 @@ interface SingleSignOnFormProps {
 }
 
 const SSO_CODE_PREFIX_REGEX = '[wW][iI][rR][eE]-';
+
 const SingleSignOnFormComponent = ({
   initialCode,
   isFetching,
@@ -77,6 +80,7 @@ const SingleSignOnFormComponent = ({
   const [codeOrMail, setCodeOrMail] = useState(account.email ?? '');
   const [disableInput, setDisableInput] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [clientType, setClientType] = useState<ClientType>(ClientType.PERMANENT);
   const [ssoError, setSsoError] = useState<BackendError | null>(null);
   const [isCodeOrMailInputValid, setIsCodeOrMailInputValid] = useState(true);
@@ -111,10 +115,6 @@ const SingleSignOnFormComponent = ({
 
     navigate(ROUTE.HISTORY_INFO);
   };
-
-  const {loginV2} = useEnterpriseLoginV2({
-    loginWithSSO,
-  });
 
   useEffect(() => {
     setIsLinkPasswordModalOpen(
@@ -186,40 +186,36 @@ const SingleSignOnFormComponent = ({
     setIsCodeOrMailInputValid(true);
   };
 
+  const validateInputElement = (inputElement: HTMLInputElement): {validationError: unknown; isValid: boolean} => {
+    const wasDisabled = inputElement.disabled;
+    inputElement.disabled = false;
+    inputElement.value = inputElement.value.trim();
+    const validationError = inputElement.checkValidity()
+      ? null
+      : ValidationError.handleValidationState(inputElement.name, inputElement.validity);
+    const isValid = inputElement.validity.valid;
+    inputElement.disabled = wasDisabled;
+    return {validationError, isValid};
+  };
+
   const handleSubmit = async (event?: React.FormEvent, password?: string): Promise<void> => {
     if (event) {
       event.preventDefault();
     }
-
     resetAuthError();
 
     if (isFetching || codeOrMailInput.current === null) {
       return;
     }
 
-    if (
-      isLinkPasswordModalOpen !== true &&
-      (conversationInfo?.has_password === true ||
-        (conversationError !== undefined &&
-          conversationError !== null &&
-          conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD))
-    ) {
+    if (requiresPasswordModal(isLinkPasswordModalOpen, conversationInfo?.has_password ?? false, conversationError)) {
       setIsLinkPasswordModalOpen(true);
       return;
     }
 
-    const currentlyDisabled = codeOrMailInput.current.disabled;
-    codeOrMailInput.current.disabled = false;
-
-    codeOrMailInput.current.value = codeOrMailInput.current.value.trim();
-    const currentValidationError = codeOrMailInput.current.checkValidity()
-      ? null
-      : ValidationError.handleValidationState(codeOrMailInput.current.name, codeOrMailInput.current.validity);
-
+    const {validationError: currentValidationError, isValid} = validateInputElement(codeOrMailInput.current);
     setValidationError(currentValidationError);
-    setIsCodeOrMailInputValid(codeOrMailInput.current.validity.valid);
-
-    codeOrMailInput.current.disabled = currentlyDisabled;
+    setIsCodeOrMailInputValid(isValid);
 
     try {
       if (currentValidationError) {
@@ -229,27 +225,26 @@ const SingleSignOnFormComponent = ({
       if (isValidEmail(email)) {
         await pushAccountRegistrationData({email});
         if (isEnterpriseLoginV2Enabled) {
-          await loginV2(email, password);
+          await handleEnterpriseLogin({
+            email,
+            password,
+            loginWithSSO: loginWithSSO,
+            dispatch,
+            navigate,
+            apiClient: container.resolve(APIClient),
+          });
         } else {
           const domain = email.split('@')[1];
           const {webapp_welcome_url} = await doGetDomainInfo(domain);
-          const [path, query = ''] = webapp_welcome_url.split('?');
-          const welcomeUrl = pathWithParams(
-            path,
-            {[QUERY_KEY.CLIENT_TYPE]: clientType, [QUERY_KEY.SSO_AUTO_LOGIN]: true},
-            undefined,
-            query,
-          );
-
+          const [, query = ''] = webapp_welcome_url.split('?');
+          const redirectUrl = buildDomainRedirectUrl(webapp_welcome_url, query, clientType);
           // This refreshes the page as we replace the whole URL.
           // This works for now as we don't need anything from the state anymore at this point.
           // Ideal would be to abandon the HashRouter (in the near future) and use something that
           // allows us to pass search query parameters.
           // https://reacttraining.com/react-router/web/api/HashRouter
           doNavigate(
-            `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(welcomeUrl)})}#${
-              ROUTE.CUSTOM_ENV_REDIRECT
-            }`,
+            `/auth?${getSearchParams({[QUERY_KEY.DESTINATION_URL]: encodeURIComponent(redirectUrl)})}#${ROUTE.CUSTOM_ENV_REDIRECT}`,
           );
         }
       } else {
@@ -258,35 +253,7 @@ const SingleSignOnFormComponent = ({
     } catch (error: unknown) {
       setIsLoading(false);
       if (isBackendError(error)) {
-        switch (error.label) {
-          case BackendErrorLabel.TOO_MANY_CLIENTS: {
-            resetAuthError();
-            navigate(ROUTE.CLIENTS);
-            break;
-          }
-          case BackendErrorLabel.CUSTOM_BACKEND_NOT_FOUND: {
-            setSsoError(error);
-            break;
-          }
-          case BackendErrorLabel.INVALID_CONVERSATION_PASSWORD: {
-            // error will be hanlded by opening modal
-            break;
-          }
-          case SyntheticErrorLabel.SSO_USER_CANCELLED_ERROR:
-          case BackendErrorLabel.NOT_FOUND: {
-            break;
-          }
-          default: {
-            setSsoError(error);
-            const isValidationError = Object.values(ValidationError.ERROR).some(
-              errorType => is.nonEmptyString(error.label) && error.label.endsWith(errorType),
-            );
-            if (!isValidationError) {
-              console.warn('SSO authentication error', JSON.stringify(Object.entries(error)), error);
-            }
-            break;
-          }
-        }
+        handleSSOBackendError(error, {navigate, resetAuthError, setSsoError});
       }
     }
   };

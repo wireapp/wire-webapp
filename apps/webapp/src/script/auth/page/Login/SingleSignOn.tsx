@@ -51,16 +51,16 @@ import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {Page} from './Page';
 import {SingleSignOnForm} from './SingleSignOnForm';
 
-import {Config} from '../../Config';
-import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {BackButton} from '../component/BackButton';
-import {RootState, bindActionCreators} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import {srOnlyStyle} from '../util/a11y';
-import {getEnterpriseLoginV2FF} from '../util/helpers';
+import {Config} from '../../../Config';
+import {AppAlreadyOpen} from '../../component/AppAlreadyOpen';
+import {BackButton} from '../../component/BackButton';
+import {RootState, bindActionCreators} from '../../module/reducer';
+import * as AuthSelector from '../../module/selector/AuthSelector';
+import {srOnlyStyle} from '../../util/a11y';
+import {getEnterpriseLoginV2FF} from '../../util/helpers';
+import {Page} from '../Page';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 
