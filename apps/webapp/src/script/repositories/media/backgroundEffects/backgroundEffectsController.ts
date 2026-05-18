@@ -70,10 +70,7 @@ export class BackgroundEffectsController {
     this.capabilityInfo = detectCapabilities();
   }
 
-  public async start(
-    inputTrack: MediaStreamTrack,
-    options: ProcessVideoTrackOptions,
-  ): Promise<{outputTrack: MediaStreamTrack; stop: () => void}> {
+  public async start(inputTrack: MediaStreamTrack, options: ProcessVideoTrackOptions): Promise<MediaStreamTrack> {
     this.refcount++;
     const resolved = await resolveOptions(options);
     this.options = withoutBitmap(resolved);
@@ -144,19 +141,8 @@ export class BackgroundEffectsController {
     outputTrack.getConstraints = () => trackConstraints;
     inputTrack.addEventListener('ended', () => outputTrack.stop());
 
-    return {
-      outputTrack: outputTrack,
-      stop: async () => this.stop(),
-    };
+    return outputTrack;
   }
-
-  /**
-   * In the old version, ending the effect was done centrally in the calling repository. Now we've tied ending the
-   * effect directly to the video track. This method is therefore no longer necessary. However, I'm leaving this
-   * method in to resolve any potential About errors. Sometimes the effect is started twice, in which case one needs
-   * to be stopped before starting again.
-   */
-  public stop(): void {}
 
   public setMode(mode: EffectMode): void {
     this.logger.info('Background effects mode', mode);

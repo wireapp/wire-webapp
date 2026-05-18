@@ -153,7 +153,7 @@ export class BackgroundEffectsHandler {
     }
 
     try {
-      const {outputTrack, stop} = await this.controller.start(videoTrack, {
+      const outputTrack = await this.controller.start(videoTrack, {
         ...defaultOpts,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
@@ -165,13 +165,11 @@ export class BackgroundEffectsHandler {
       const processedStream = new MediaStream([outputTrack]);
       this.currentReleasableStream = new ReleasableMediaStream(processedStream, () => {
         this.currentReleasableStream = undefined;
-        stop();
         outputTrack.stop();
       });
 
       return {applied: true, media: this.currentReleasableStream};
     } catch (error) {
-      await this.controller.stop();
       this.logger.warn('BackgroundEffectsController failed with error:', error);
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
