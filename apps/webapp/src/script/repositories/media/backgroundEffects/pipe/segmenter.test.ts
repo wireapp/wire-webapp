@@ -17,7 +17,11 @@
  *
  */
 
-import {getSegmenterModelUpdatedOptions, runSegmenter} from 'Repositories/media/backgroundEffects/pipe/segmenter';
+import {
+  getSegmenterModelUpdatedOptions,
+  runSegmenter,
+  updateSegmenterOptions
+} from 'Repositories/media/backgroundEffects/pipe/segmenter';
 import {ImageSegmenter} from "@mediapipe/tasks-vision";
 
 jest.mock('../../../../clock/wallClock', () => ({
@@ -76,6 +80,28 @@ jest.mock('Repositories/media/backgroundEffects/helper/metrics', () => ({
 }));
 
 describe('segmenter tests', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+
+    Object.assign(globalThis, {
+      OffscreenCanvas: jest.fn().mockImplementation(() => ({
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        width: 1,
+        height: 1,
+      })),
+    });
+
+    Object.assign(globalThis, {
+      WritableStream: jest.fn().mockImplementation((sink, strategy) => ({
+        sink,
+        strategy,
+      })),
+      CountQueuingStrategy: jest.fn().mockImplementation(options => options),
+    });
+  });
+
   describe('getSegmenterModelUpdatedOptions', () => {
     it('returns null when model path has not changed', () => {
       expect(getSegmenterModelUpdatedOptions('model-a.tflite', 'model-a.tflite')).toBeNull();
@@ -98,28 +124,67 @@ describe('segmenter tests', () => {
     });
   });
 
-  describe('runSegmenter webgl context handling', () => {
-    beforeEach(() => {
-      jest.clearAllMocks();
+  describe('updateSegmenterOptions', () => {
+    it('keeps the segmenter options reference stable and updates values', async () => {
+      const firstSegmenter = {
+        close: jest.fn(),
+        setOptions: jest.fn(),
+        segmentForVideo: jest.fn(),
+      };
 
-      Object.assign(globalThis, {
-        OffscreenCanvas: jest.fn().mockImplementation(() => ({
-          addEventListener: jest.fn(),
-          removeEventListener: jest.fn(),
-          width: 1,
-          height: 1,
-        })),
-      });
+      (ImageSegmenter.createFromOptions as jest.Mock).mockResolvedValueOnce(firstSegmenter);
 
-      Object.assign(globalThis, {
-        WritableStream: jest.fn().mockImplementation((sink, strategy) => ({
-          sink,
-          strategy,
-        })),
-        CountQueuingStrategy: jest.fn().mockImplementation(options => options),
+      let writerSink!: UnderlyingSink<VideoFrame>;
+
+      const readable = {
+        pipeTo: jest.fn(writer => {
+          writerSink = (writer as any).sink;
+          return Promise.resolve();
+        }),
+      } as unknown as ReadableStream;
+
+      const canvas = {
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+      } as unknown as OffscreenCanvas;
+
+      await runSegmenter(
+        canvas,
+        readable,
+        {
+          enabled: false,
+          quality: 'bypass',
+          modelPath: 'model-a.tflite',
+        } as any,
+        jest.fn(),
+      );
+
+      updateSegmenterOptions({
+        enabled: false,
+        quality: 'bypass',
+        modelPath: 'model-b.tflite',
+      } as any);
+
+      const frame = {
+        codedWidth: 640,
+        codedHeight: 480,
+        displayWidth: 640,
+        displayHeight: 480,
+        timestamp: 1,
+        close: jest.fn(),
+      } as unknown as VideoFrame;
+
+      await writerSink.write!(frame, {} as WritableStreamDefaultController);
+
+      expect(firstSegmenter.setOptions).toHaveBeenCalledWith({
+        baseOptions: {
+          modelAssetPath: 'model-b.tflite',
+        },
       });
     });
+  });
 
+  describe('runSegmenter webgl context handling', () => {
     it('closes renderer on webglcontextlost and recreates it on webglcontextrestored', async () => {
       const listeners = new Map<string, EventListener>();
 
@@ -168,7 +233,6 @@ describe('segmenter tests', () => {
     });
   });
 
-  const flushPromises = () => new Promise<void>(resolve => setImmediate(resolve));
   describe('runSegmenter restart queue', () => {
     beforeEach(() => {
       jest.clearAllMocks();
@@ -187,20 +251,17 @@ describe('segmenter tests', () => {
       });
     });
 
-    it('restarts the segmenter sequentially when restartEvery is reached multiple times', async () => {
-      const closeFirstSegmenter = jest.fn();
-      const closeSecondSegmenter = jest.fn();
-
-      let resolveSecondCreate!: () => void;
+    it('queues segmenter restarts sequentially on repeated webglcontextrestored events', async () => {
+      const listeners = new Map<string, EventListener>();
 
       const firstSegmenter = {
-        close: closeFirstSegmenter,
+        close: jest.fn(),
         setOptions: jest.fn(),
         segmentForVideo: jest.fn(),
       };
 
       const secondSegmenter = {
-        close: closeSecondSegmenter,
+        close: jest.fn(),
         setOptions: jest.fn(),
         segmentForVideo: jest.fn(),
       };
@@ -210,6 +271,8 @@ describe('segmenter tests', () => {
         setOptions: jest.fn(),
         segmentForVideo: jest.fn(),
       };
+
+      let resolveSecondCreate!: () => void;
 
       (ImageSegmenter.createFromOptions as jest.Mock)
         .mockResolvedValueOnce(firstSegmenter)
@@ -221,63 +284,73 @@ describe('segmenter tests', () => {
         )
         .mockResolvedValueOnce(thirdSegmenter);
 
-      let writerSink!: UnderlyingSink<VideoFrame>;
-
-      const readable = {
-        pipeTo: jest.fn(writer => {
-          writerSink = (writer as any).sink;
-          return Promise.resolve();
-        }),
-      } as unknown as ReadableStream;
-
       const canvas = {
-        addEventListener: jest.fn(),
+        addEventListener: jest.fn((eventName: string, listener: EventListener) => {
+          listeners.set(eventName, listener);
+        }),
         removeEventListener: jest.fn(),
       } as unknown as OffscreenCanvas;
+
+      const readable = {
+        pipeTo: jest.fn().mockResolvedValue(undefined),
+      } as unknown as ReadableStream;
 
       await runSegmenter(
         canvas,
         readable,
         {
-          enabled: false,
-          quality: 'bypass',
-          restartEvery: 1,
+          enabled: true,
+          quality: 'auto',
+          modelPath: 'model-a.tflite',
         } as any,
         jest.fn(),
       );
 
-      const firstFrame = {
-        codedWidth: 640,
-        codedHeight: 480,
-        timestamp: 1,
-        close: jest.fn(),
-      } as unknown as VideoFrame;
+      const lostEvent = {
+        preventDefault: jest.fn(),
+      } as unknown as Event;
 
-      const secondFrame = {
-        codedWidth: 640,
-        codedHeight: 480,
-        timestamp: 2,
-        close: jest.fn(),
-      } as unknown as VideoFrame;
+      listeners.get('webglcontextlost')?.(lostEvent);
 
-      await writerSink.write!(firstFrame, {} as WritableStreamDefaultController);
-      await flushPromises();
+      expect(lostEvent.preventDefault).toHaveBeenCalled();
+
+      expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(1);
+
+      listeners.get('webglcontextrestored')?.({} as Event);
+
+      await Promise.resolve();
+
+      // Restore schedules the restart asynchronously through:
+      // createWallClock -> setTimeout -> restart queue.
+      // No second segmenter should exist yet.
+      expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(1);
+
+      listeners.get('webglcontextlost')?.(lostEvent);
+      listeners.get('webglcontextrestored')?.({} as Event);
+
+      await Promise.resolve();
+
+      // First queued restart starts now.
+      expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(2);
+
+      // Second restart must stay queued while the first restart is pending.
+      listeners.get('webglcontextlost')?.(lostEvent);
+      listeners.get('webglcontextrestored')?.({} as Event);
+
+      await Promise.resolve();
 
       expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(2);
 
-      await writerSink.write!(secondFrame, {} as WritableStreamDefaultController);
-      await flushPromises();
-
-      expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(2);
-
+      // Finish first queued restart.
       resolveSecondCreate();
 
-      await flushPromises();
-      await flushPromises();
+      await Promise.resolve();
+      await Promise.resolve();
 
-      expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(3);
-      expect(closeFirstSegmenter).toHaveBeenCalled();
-      expect(closeSecondSegmenter).toHaveBeenCalled();
+      // No additional restart should have started synchronously.
+      expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(2);
+
+      expect(firstSegmenter.close).toHaveBeenCalled();
     });
   });
 });
