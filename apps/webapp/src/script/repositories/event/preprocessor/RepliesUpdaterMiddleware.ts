@@ -18,7 +18,7 @@
  */
 
 import {DeleteEvent, MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import {StoredEvent} from 'Repositories/storage/record/EventRecord';
+import {StoredEvent} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 
 import {QuoteEntity} from '../../../message/QuoteEntity';

@@ -28,8 +28,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../../Config';

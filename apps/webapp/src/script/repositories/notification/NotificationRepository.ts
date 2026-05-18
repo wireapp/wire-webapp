@@ -51,7 +51,7 @@ import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermission
 import {getPermissionState, setPermissionState} from 'Repositories/permission/permissionHandlers';
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {Declension, t, getUserName} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';

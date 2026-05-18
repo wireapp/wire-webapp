@@ -27,7 +27,7 @@ import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import * as util from 'Util/util';
 

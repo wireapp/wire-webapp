@@ -35,7 +35,7 @@ import {CALL} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {MediaType} from 'Repositories/media/MediaType';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';

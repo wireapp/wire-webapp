@@ -25,7 +25,7 @@ import {RestVersion} from 'cells-sdk-ts';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';

@@ -24,7 +24,7 @@ import {omit} from 'underscore';
 import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';

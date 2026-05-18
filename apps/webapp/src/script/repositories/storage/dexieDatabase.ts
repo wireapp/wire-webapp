@@ -22,9 +22,9 @@ import {Dexie, Table, Transaction} from 'dexie';
 import {getLogger, Logger} from 'Util/logger';
 
 import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';
-import {ClientRecord} from './record/ClientRecord';
-import {GroupIdRecord} from './record/GroupIdRecord';
-import {StorageSchemata} from './StorageSchemata';
+import {ClientRecord} from './record/clientRecord';
+import {GroupIdRecord} from './record/groupIdRecord';
+import {StorageSchemata} from './storageSchemata';
 
 /**
  * TypeScript representation of local IndexedDB schema managed with Dexie.

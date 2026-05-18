@@ -32,7 +32,7 @@ import {
   EventRecord,
   hasQuoteForMessage,
 } from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger, Logger} from 'Util/logger';
 import {toError} from 'Util/toError';
 

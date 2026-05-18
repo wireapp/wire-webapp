@@ -56,8 +56,8 @@ import {User} from 'Repositories/entity/User';
 import {USER} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import type {EventSource} from 'Repositories/event/EventSource';
-import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -69,11 +69,11 @@ import {fixWebsocketString} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
 import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
-import {showAvailabilityModal} from './AvailabilityModal';
-import {ConsentValue} from './ConsentValue';
-import {UserMapper} from './UserMapper';
-import type {UserService} from './UserService';
-import {UserState} from './UserState';
+import {showAvailabilityModal} from './availabilityModal';
+import {ConsentValue} from './consentValue';
+import {UserMapper} from './userMapper';
+import type {UserService} from './userService';
+import {UserState} from './userState';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {Config} from '../../Config';

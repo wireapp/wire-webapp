@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';

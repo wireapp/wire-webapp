@@ -21,8 +21,8 @@ import {FormEvent, useState} from 'react';
 
 import cx from 'classnames';
 
-import {validateHandle} from 'Repositories/user/UserHandleGenerator';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {validateHandle} from 'Repositories/user/userHandleGenerator';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {t} from 'Util/localizerUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 

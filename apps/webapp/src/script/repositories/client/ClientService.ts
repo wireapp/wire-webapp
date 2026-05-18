@@ -22,7 +22,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
 import {type ClientRecord, StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 
 import {APIClient} from '../../service/apiClientSingleton';
 

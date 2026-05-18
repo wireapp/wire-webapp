@@ -22,8 +22,8 @@ import type {User as APIClientUser, QualifiedHandle, QualifiedId} from '@wireapp
 import {container} from 'tsyringe';
 
 import {UserRecord} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {StorageService} from 'Repositories/storage/StorageService';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
+import {StorageService} from 'Repositories/storage/storageService';
 import {constructUserPrimaryKey} from 'Util/storageUtil';
 
 import {APIClient} from '../../service/apiClientSingleton';

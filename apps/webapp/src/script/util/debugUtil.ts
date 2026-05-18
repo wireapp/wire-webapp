@@ -52,13 +52,13 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {disableForcedErrorReporting} from 'Repositories/tracking/Telemetry.helpers';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {disableForcedErrorReporting} from 'Repositories/tracking/telemetry.helpers';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 

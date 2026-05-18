@@ -35,8 +35,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
-import {EventName} from 'Repositories/tracking/EventName';
-import {UserState} from 'Repositories/user/UserState';
+import {EventName} from 'Repositories/tracking/eventName';
+import {UserState} from 'Repositories/user/userState';
 import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';

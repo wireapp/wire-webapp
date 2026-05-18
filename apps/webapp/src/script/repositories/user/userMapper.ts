@@ -24,7 +24,7 @@ import {User} from 'Repositories/entity/User';
 import {UserRecord} from 'Repositories/storage';
 import {getLogger, Logger} from 'Util/logger';
 
-import {isSelfAPIUser} from './UserGuards';
+import {isSelfAPIUser} from './userGuards';
 
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import '../../view_model/bindings/CommonBindings';

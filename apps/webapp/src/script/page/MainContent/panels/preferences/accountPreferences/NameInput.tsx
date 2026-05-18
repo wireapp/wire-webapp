@@ -17,7 +17,7 @@
  *
  */
 
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 

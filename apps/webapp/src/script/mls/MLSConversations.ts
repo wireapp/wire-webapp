@@ -36,7 +36,7 @@ import {ConversationService} from 'Repositories/conversation/ConversationService
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {getLogger} from 'Util/logger';
 
 const logger = getLogger('Webapp/MLSConversations');

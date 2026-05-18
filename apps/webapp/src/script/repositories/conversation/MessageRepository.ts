@@ -69,17 +69,17 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {EventTypeHandling} from 'Repositories/event/EventTypeHandling';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {EventRecord, ReactionMap} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserType} from 'Repositories/tracking/attribute';
-import {EventName} from 'Repositories/tracking/EventName';
-import * as trackingHelpers from 'Repositories/tracking/Helpers';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
-import {protoFromType} from 'Repositories/user/AvailabilityMapper';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {EventName} from 'Repositories/tracking/eventName';
+import * as trackingHelpers from 'Repositories/tracking/helpers';
+import {Segmentation} from 'Repositories/tracking/segmentation';
+import {protoFromType} from 'Repositories/user/availabilityMapper';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,

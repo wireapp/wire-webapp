@@ -28,22 +28,22 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ContributedSegmentations, MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {ClientEvent} from 'Repositories/event/Client';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue, storeValue, resetStoreValue} from 'Util/storageUtil';
 import {includesString} from 'Util/stringUtil';
 import {getParameter} from 'Util/urlUtil';
 import {createUuid} from 'Util/uuid';
 
-import {EventName} from './EventName';
-import {getPlatform} from './Helpers';
-import {Segmentation} from './Segmentation';
+import {EventName} from './eventName';
+import {getPlatform} from './helpers';
+import {Segmentation} from './segmentation';
 import {
   getForcedErrorReportingStatus,
   initForcedErrorReporting,
   isTelemetryEnabledAtCurrentEnvironment,
-} from './Telemetry.helpers';
-import {UserData} from './UserData';
+} from './telemetry.helpers';
+import {UserData} from './userData';
 
 import {URLParameter} from '../../auth/URLParameter';
 import {Config} from '../../Config';

@@ -30,9 +30,9 @@ import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes
 import type {User} from 'Repositories/entity/User';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {StorageKey} from 'Repositories/storage';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/Telemetry.helpers';
-import {ConsentValue} from 'Repositories/user/ConsentValue';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
+import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
+import {ConsentValue} from 'Repositories/user/consentValue';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/environment';
@@ -40,8 +40,8 @@ import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue} from 'Util/storageUtil';
 
-import type {PropertiesService} from './PropertiesService';
-import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
+import type {PropertiesService} from './propertiesService';
+import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.

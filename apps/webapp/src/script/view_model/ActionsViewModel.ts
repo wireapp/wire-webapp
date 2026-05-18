@@ -38,7 +38,7 @@ import type {User} from 'Repositories/entity/User';
 import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 

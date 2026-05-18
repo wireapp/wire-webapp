@@ -20,9 +20,9 @@
 import {User} from 'Repositories/entity/User/User';
 import {createUuid} from 'Util/uuid';
 
-import {AppLockCrypto, AppLockRepository} from './AppLockRepository';
-import {AppLockState} from './AppLockState';
-import {UserState} from './UserState';
+import {AppLockCrypto, AppLockRepository} from './appLockRepository';
+import {AppLockState} from './appLockState';
+import {UserState} from './userState';
 
 const mockCryptoPwhashStr = jest.fn();
 const mockCryptoPwhashStrVerify = jest.fn();

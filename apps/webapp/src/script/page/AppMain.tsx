@@ -45,8 +45,8 @@ import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/c
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {showInitialModal} from 'Repositories/user/AvailabilityModal';
-import {UserState} from 'Repositories/user/UserState';
+import {showInitialModal} from 'Repositories/user/availabilityModal';
+import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
