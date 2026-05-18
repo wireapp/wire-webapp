@@ -31,6 +31,8 @@ import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
+import {createWallClock} from '../../../../clock/wallClock';
+
 export let segmenterOptions = {} as WorkerProcessVideoTrackOptions;
 
 async function createSegmenter(canvas: OffscreenCanvas) {
@@ -96,7 +98,8 @@ export async function runSegmenter(
   function onContextRestored() {
     logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
     if (!webGLRenderer) {
-      setTimeout(() => {
+      const timer = createWallClock();
+      timer.setTimeout(() => {
         logger.log('[virtual-background] restart segmenter onContextRestored');
         webGLRenderer = new WebGLRenderer(canvas);
         restartSegmenter();
