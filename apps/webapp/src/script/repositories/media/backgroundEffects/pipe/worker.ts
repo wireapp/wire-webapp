@@ -21,7 +21,7 @@ import {Metrics} from 'Repositories/media/backgroundEffects';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
 import {WorkerProcessVideoTrackOptions} from './options';
-import {runSegmenter, segmenterOptions} from './segmenter';
+import {runSegmenter, updateSegmenterOptions} from './segmenter';
 
 const workerLogger = getSafeLogger('virtual-background-worker');
 
@@ -30,7 +30,7 @@ globalThis.onmessage = ({data}) => {
   const {name} = data as {name: string};
   if (name === 'options') {
     const {options: opts} = data as {options: WorkerProcessVideoTrackOptions};
-    Object.assign(segmenterOptions, opts);
+    updateSegmenterOptions(opts);
   } else if (name === 'runSegmenter') {
     const {
       canvas,

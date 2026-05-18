@@ -35,7 +35,7 @@ import {
   WorkerProcessVideoTrackOptions,
 } from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
-import {runSegmenter, segmenterOptions} from './pipe/segmenter';
+import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
 
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
@@ -232,7 +232,7 @@ export class BackgroundEffectsController {
     if (this.options.useWorker && this.worker) {
       this.worker.postMessage({name: 'options', options: finalOptions}, transferables);
     } else {
-      Object.assign(segmenterOptions, finalOptions);
+      updateSegmenterOptions(finalOptions);
     }
   }
 }

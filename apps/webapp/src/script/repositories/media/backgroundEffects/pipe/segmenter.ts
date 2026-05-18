@@ -34,7 +34,12 @@ import {WebGLRenderer} from './renderer';
 
 import {createWallClock} from '../../../../clock/wallClock';
 
-export let segmenterOptions = {} as WorkerProcessVideoTrackOptions;
+let segmenterOptions: WorkerProcessVideoTrackOptions = {} as WorkerProcessVideoTrackOptions;
+
+export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
+  // Keep the references stable, this allows us to do option changes on segmenter runtime.
+  Object.assign(segmenterOptions, opts);
+}
 
 async function createSegmenter(canvas: OffscreenCanvas) {
   const logger = getSafeLogger('segmenter:createSegmenter');
