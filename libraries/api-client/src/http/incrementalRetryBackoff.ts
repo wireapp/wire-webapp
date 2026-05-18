@@ -34,9 +34,10 @@ export type IncrementalRetryBackoffPolicy = {
 
 const initialRetryDelayInMilliseconds = 100;
 const maximumRetryDelayInMilliseconds = 10 * 60 * 1000;
-const nonStandardRetryableStatusCode = StatusCodes.METHOD_FAILURE;
-const serverErrorStatusCodeRangeStart = StatusCodes.INTERNAL_SERVER_ERROR;
-const serverErrorStatusCodeRangeEnd = StatusCodes.NETWORK_AUTHENTICATION_REQUIRED;
+const nonStandardRetryableStatusCode = 420;
+const serverErrorStatusCodeRangeStart = 500;
+const serverErrorStatusCodeRangeEnd = 599;
+const serviceUnavailableStatusCode = 503;
 
 export function createIncrementalRetryBackoffPolicy(): IncrementalRetryBackoffPolicy {
   return {
@@ -72,7 +73,7 @@ export function createIncrementalRetryBackoffPolicy(): IncrementalRetryBackoffPo
           return (
             statusCodeValue >= serverErrorStatusCodeRangeStart &&
             statusCodeValue <= serverErrorStatusCodeRangeEnd &&
-            statusCodeValue !== StatusCodes.SERVICE_UNAVAILABLE
+            statusCodeValue !== serviceUnavailableStatusCode
           );
         })
         .unwrapOr(false);
