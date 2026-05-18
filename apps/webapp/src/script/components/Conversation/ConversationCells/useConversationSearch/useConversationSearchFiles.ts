@@ -138,9 +138,16 @@ export const useConversationSearchFiles = ({
 
   const handleSearch = (value: string): void => {
     setSearchValue(value);
-    if (!is.nonEmptyString(value)) {
-      searchNodesDebounced.cancel();
-      handleClearSearch();
+    const isEmpty = value.length === 0;
+    if (!is.nonEmptyStringAndNotWhitespace(value)) {
+      if (isEmpty) {
+        handleClearSearch();
+      } else if (searchQuery.length > 0) {
+        handleClearSearch({preserveInputValue: true});
+      } else {
+        searchNodesDebounced.cancel();
+        shouldPerformSearch.current = false;
+      }
       return;
     }
     shouldPerformSearch.current = true;
@@ -149,9 +156,14 @@ export const useConversationSearchFiles = ({
     });
   };
 
-  const handleClearSearch = ({preserveFilters = true}: {preserveFilters?: boolean} = {}) => {
+  const handleClearSearch = ({
+    preserveFilters = true,
+    preserveInputValue = false,
+  }: {preserveFilters?: boolean; preserveInputValue?: boolean} = {}) => {
     searchNodesDebounced.cancel();
-    setSearchValue('');
+    if (!preserveInputValue) {
+      setSearchValue('');
+    }
     setSearchQuery('');
     shouldPerformSearch.current = false;
 

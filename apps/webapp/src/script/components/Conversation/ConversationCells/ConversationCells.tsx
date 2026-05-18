@@ -122,12 +122,12 @@ export const ConversationCells = memo(
     }, [clearSearch]);
 
     useEffect(() => {
-      if (wasSearchViewOpen.current && !isSearchViewOpen && (searchValue || hasActiveFilters)) {
+      if (wasSearchViewOpen.current && !isSearchViewOpen && (isSearchActive || hasActiveFilters)) {
         clearAllFilters();
         clearSearch({preserveFilters: false});
       }
       wasSearchViewOpen.current = isSearchViewOpen;
-    }, [clearAllFilters, clearSearch, hasActiveFilters, isSearchViewOpen, searchValue]);
+    }, [clearAllFilters, clearSearch, hasActiveFilters, isSearchActive, isSearchViewOpen]);
 
     // When search is active, refresh should trigger search reload
     const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
