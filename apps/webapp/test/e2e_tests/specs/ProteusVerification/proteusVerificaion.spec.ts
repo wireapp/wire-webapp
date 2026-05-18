@@ -66,7 +66,7 @@ test.describe('Proteus verification', () => {
       const {pages, components} = pageManager.webapp;
 
       await pageManager.openLoginPage();
-      await pageManager.webapp.pages.login().login(userA);
+      await pages.login().login(userA);
 
       // Due to the difference on this page between Proteus and MLS login flows,
       // we need to use the password to remove the existing device
@@ -78,6 +78,30 @@ test.describe('Proteus verification', () => {
       await expect(components.conversationSidebar().sidebar).toBeVisible({
         timeout: LOGIN_TIMEOUT,
       });
+    },
+  );
+
+  test(
+    'Login as temporary device after device limit is reached',
+    {tag: ['@TC-716', '@regression']},
+    async ({createPage}) => {
+      await createPage(withLogin(userA));
+      await Promise.all(Array.from({length: 6}, () => createPage(withLogin(userA, {confirmNewHistory: true}))));
+
+      const newDevicePage = await createPage();
+      const pageManager = PageManager.from(newDevicePage);
+      const {pages, components} = pageManager.webapp;
+
+      await pageManager.openLoginPage();
+      await pages.login().login(userA, {publicComputer: true});
+      await pages.historyInfo().clickConfirmButton();
+      await expect(components.conversationSidebar().sidebar).toBeVisible({
+        timeout: LOGIN_TIMEOUT,
+      });
+
+      await components.conversationSidebar().clickPreferencesButton();
+      await pages.settings().devicesButton.click();
+      await expect(pages.devices().activeDevices).toHaveCount(7); // Verify that the temporary device is not added to the device list
     },
   );
 });
