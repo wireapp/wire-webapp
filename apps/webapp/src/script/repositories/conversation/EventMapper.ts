@@ -56,8 +56,8 @@ import {PingMessage} from 'Repositories/entity/message/PingMessage';
 import {ProtocolUpdateMessage} from 'Repositories/entity/message/ProtocolUpdateMessage';
 import {ReceiptModeUpdateMessage} from 'Repositories/entity/message/ReceiptModeUpdateMessage';
 import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
-import {Text} from 'Repositories/entity/message/Text';
 import type {Text as TextAsset} from 'Repositories/entity/message/Text';
+import {Text} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
@@ -69,17 +69,17 @@ import {isErrorWithType} from 'Util/typePredicateUtil';
 import {base64ToArray} from 'Util/util';
 
 import {
+  ClientConversationEvent,
+  CompositeMessageAddEvent,
+  E2EIVerificationEvent,
+  ErrorEvent,
+  FailedToAddUsersMessageEvent,
+  FederationStopEvent,
   MemberJoinEvent,
   MemberLeaveEvent,
-  TeamMemberLeaveEvent,
-  ErrorEvent,
-  ClientConversationEvent,
-  FederationStopEvent,
-  FailedToAddUsersMessageEvent,
-  E2EIVerificationEvent,
   MessageAddEvent,
-  CompositeMessageAddEvent,
   MultipartMessageAddEvent,
+  TeamMemberLeaveEvent,
 } from './EventBuilder';
 
 import {ConversationError} from '../../error/conversationError';
@@ -95,6 +95,7 @@ import {APIClient} from '../../service/apiClientSingleton';
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
   logger: Logger;
+
   /**
    * Construct a new Event Mapper.
    */
@@ -174,6 +175,11 @@ export class EventMapper {
       originalEntity.assets.removeAll();
       const multipartAsset = this._mapAssetMultipart(eventData as MultipartMessageAddEvent['data']);
       originalEntity.assets.push(multipartAsset);
+    } else if (id !== originalEntity.id && originalEntity.isComposite()) {
+      // Handle composite messages when ID changes (edit case)
+      originalEntity.assets.removeAll();
+      const compositeAsset = this._mapAssetComposite(eventData as CompositeMessageAddEvent['data']);
+      originalEntity.assets.push(...compositeAsset);
     } else if (id !== originalEntity.id && originalEntity.hasAssetText()) {
       // Handle regular text messages when ID changes (edit case)
       originalEntity.assets.removeAll();
@@ -718,10 +724,8 @@ export class EventMapper {
     return assetEntity;
   }
 
-  private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent) {
-    const {data: eventData} = event;
-    const messageEntity = new CompositeMessage();
-    const assets = eventData.items.flatMap(item => {
+  private _mapAssetComposite(eventData: CompositeMessageAddEvent['data']) {
+    return eventData.items.flatMap(item => {
       if (item.button) {
         return [new Button(item.button.id, item.button.text)];
       }
@@ -730,7 +734,14 @@ export class EventMapper {
       }
       return [];
     });
+  }
+
+  private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent) {
+    const {data: eventData} = event;
+    const messageEntity = new CompositeMessage();
+    const assets = this._mapAssetComposite(eventData);
     messageEntity.assets.push(...assets);
+    messageEntity.replacing_message_id = eventData.replacing_message_id;
     return messageEntity;
   }
 

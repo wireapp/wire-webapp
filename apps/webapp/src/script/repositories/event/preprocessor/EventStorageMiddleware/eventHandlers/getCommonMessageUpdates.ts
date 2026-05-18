@@ -17,10 +17,18 @@
  *
  */
 
-import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {
+  CompositeMessageAddEvent,
+  MessageAddEvent,
+  MultipartMessageAddEvent,
+} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 
 import {EditableEvent} from './editedEventHandler';
+
+function isCompositeEvent(event: EditableEvent): event is CompositeMessageAddEvent {
+  return 'items' in event.data && Array.isArray(event.data.items);
+}
 
 function isMultipartEvent(event: EditableEvent): event is MultipartMessageAddEvent {
   return 'attachments' in event.data && Array.isArray(event.data.attachments);
@@ -40,6 +48,18 @@ export function getCommonMessageUpdates(
     status: !newEvent.status || newEvent.status < originalEvent.status ? originalEvent.status : newEvent.status,
     time: originalEvent.time,
   };
+
+  // Handle composite messages
+  if (isCompositeEvent(newEvent) && isCompositeEvent(originalEvent)) {
+    return {
+      ...newEvent,
+      ...commonProps,
+      data: {
+        ...newEvent.data,
+        expects_read_confirmation: originalEvent.data.expects_read_confirmation,
+      },
+    };
+  }
 
   // Handle multipart messages
   if (isMultipartEvent(newEvent) && isMultipartEvent(originalEvent)) {

@@ -222,8 +222,20 @@ export type DeleteEverywhereEvent = ConversationEvent<
 >;
 export type CompositeMessageAddEvent = ConversationEvent<
   CONVERSATION.COMPOSITE_MESSAGE_ADD,
-  {items: {button: {id: string; text: string}; text: MessageAddEvent['data']}[]}
->;
+  {
+    items: {button: {id: string; text: string}; text: MessageAddEvent['data']}[];
+    replacing_message_id?: string;
+    expects_read_confirmation?: boolean;
+  }
+> & {
+  /** who have received/read the event */
+  read_receipts?: ReadReceipt[];
+  /** who reacted to the event */
+  reactions?: UserReactionMap | ReactionMap;
+  edited_time?: string;
+  status: StatusType;
+  version?: number;
+};
 export type IncomingMessageTooBigEvent = ConversationEvent<CONVERSATION.INCOMING_MESSAGE_TOO_BIG>;
 export type KnockEvent = ConversationEvent<
   CONVERSATION.KNOCK,
