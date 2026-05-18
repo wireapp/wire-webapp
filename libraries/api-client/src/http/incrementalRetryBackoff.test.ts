@@ -104,7 +104,7 @@ describe('IncrementalRetryBackoff', function () {
     expect(resetBackoffState.totalRetryDelayInMilliseconds).toBe(0);
   });
 
-  it('treats 420, 429, and 5xx statuses as retryable', () => {
+  it('treats 420, 429, and 5xx statuses (except 503) as retryable', () => {
     expect(incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(420))).toBe(true);
     expect(incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(tooManyRequestsStatusCode))).toBe(
       true,
@@ -115,9 +115,12 @@ describe('IncrementalRetryBackoff', function () {
     expect(incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(badGatewayStatusCode))).toBe(
       true,
     );
+  });
+
+  it('does not retry on 503 Service Unavailable', () => {
     expect(
       incrementalRetryBackoffPolicy.shouldRetryWithIncrementalBackoff(Maybe.just(serviceUnavailableStatusCode)),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('does not treat unrelated statuses as retryable', () => {

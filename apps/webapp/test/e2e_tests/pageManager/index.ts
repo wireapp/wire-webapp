@@ -73,6 +73,8 @@ import {InviteModal} from './webapp/modals/invite.modal';
 import {JoinGuestLinkPasswordModal} from './webapp/modals/joinGuestLinkPassword.modal';
 import {WithoutTitle} from './webapp/modals/withoutTitle.modal';
 import {AboutPage} from './webapp/pages/about.page';
+import {NewDeviceModal} from './webapp/modals/newDevice.modal';
+import {ReadReceiptModal} from './webapp/modals/readReceipt.modal';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
@@ -217,6 +219,8 @@ export class PageManager {
         this.getOrCreate('webapp.modals.createConversation', () => CreateConversationModal(this.page)),
       invite: () => this.getOrCreate('webapp.modals.invite', () => InviteModal(this.page)),
       withoutTitle: () => this.getOrCreate('webapp.modals.withoutTitle', () => new WithoutTitle(this.page)),
+      newDevice: () => this.getOrCreate('webapp.modals.newDevice', () => new NewDeviceModal(this.page)),
+      readReceipt: () => this.getOrCreate('webapp.modals.readReceipt', () => new ReadReceiptModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),
