@@ -28,7 +28,7 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import {StorageKey} from 'Repositories/storage/StorageKey';
 import type {StorageRepository} from 'Repositories/storage/StorageRepository';
-import type {UserRepository} from 'Repositories/user/UserRepository';
+import type {UserRepository} from 'Repositories/user/userRepository';
 import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
 import {getLogger, Logger} from 'Util/logger';
 import {includesString} from 'Util/stringUtil';

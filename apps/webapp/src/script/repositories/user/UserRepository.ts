@@ -69,11 +69,11 @@ import {fixWebsocketString} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
 import {isAxiosError, isBackendError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
-import {showAvailabilityModal} from './AvailabilityModal';
-import {ConsentValue} from './ConsentValue';
-import {UserMapper} from './UserMapper';
-import type {UserService} from './UserService';
-import {UserState} from './UserState';
+import {showAvailabilityModal} from './availabilityModal';
+import {ConsentValue} from './consentValue';
+import {UserMapper} from './userMapper';
+import type {UserService} from './userService';
+import {UserState} from './userState';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {Config} from '../../Config';

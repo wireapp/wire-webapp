@@ -27,7 +27,7 @@ import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
 import {createUuid} from 'Util/uuid';
 
-import {UserMapper} from './UserMapper';
+import {UserMapper} from './userMapper';
 
 describe('User Mapper', () => {
   const mapper = new UserMapper(serverTimeHandler);

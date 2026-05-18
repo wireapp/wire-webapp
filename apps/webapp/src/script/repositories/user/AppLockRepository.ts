@@ -23,8 +23,8 @@ import {container, singleton} from 'tsyringe';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {t} from 'Util/localizerUtil';
 
-import {AppLockState} from './AppLockState';
-import {UserState} from './UserState';
+import {AppLockState} from './appLockState';
+import {UserState} from './userState';
 
 const APP_LOCK_STORAGE = 'app_lock';
 const APP_LOCK_ENABLED_STORAGE = 'app_lock_enabled';

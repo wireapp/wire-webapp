@@ -77,9 +77,9 @@ import {UserType} from 'Repositories/tracking/attribute';
 import {EventName} from 'Repositories/tracking/EventName';
 import * as trackingHelpers from 'Repositories/tracking/Helpers';
 import {Segmentation} from 'Repositories/tracking/Segmentation';
-import {protoFromType} from 'Repositories/user/AvailabilityMapper';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {protoFromType} from 'Repositories/user/availabilityMapper';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {
   cancelSendingLinkPreview,
   clearLinkPreviewSendingState,

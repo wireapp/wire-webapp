@@ -23,7 +23,7 @@ import is from '@sindresorhus/is';
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
-import {MAX_HANDLE_LENGTH} from 'Repositories/user/UserHandleGenerator';
+import {MAX_HANDLE_LENGTH} from 'Repositories/user/userHandleGenerator';
 import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 

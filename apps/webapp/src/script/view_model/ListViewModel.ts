@@ -34,7 +34,7 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';

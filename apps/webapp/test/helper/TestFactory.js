@@ -59,9 +59,9 @@ import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamService} from 'Repositories/team/TeamService';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserService} from 'Repositories/user/UserService';
-import {UserState} from 'Repositories/user/UserState';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserService} from 'Repositories/user/userService';
+import {UserState} from 'Repositories/user/userState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 
 import {entities} from '../api/payloads';

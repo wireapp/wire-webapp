@@ -42,10 +42,10 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {generateAPIUser} from 'test/helper/UserGenerator';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {ConsentValue} from './ConsentValue';
-import {UserRepository} from './UserRepository';
-import {UserService} from './UserService';
-import {UserState} from './UserState';
+import {ConsentValue} from './consentValue';
+import {UserRepository} from './userRepository';
+import {UserService} from './userService';
+import {UserState} from './userState';
 
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 

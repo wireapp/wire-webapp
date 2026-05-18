@@ -43,8 +43,8 @@ import type {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {StorageRepository} from 'Repositories/storage';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import type {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
-import type {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import type {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
