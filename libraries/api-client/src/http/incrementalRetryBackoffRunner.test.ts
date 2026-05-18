@@ -97,7 +97,7 @@ describe('IncrementalRetryBackoffRunner', () => {
     let incrementalRetryBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
     const runRequestAttempt = jest
       .fn<Promise<string>, []>()
-      .mockRejectedValueOnce({statusCode: 503})
+      .mockRejectedValueOnce({statusCode: 500})
       .mockResolvedValueOnce('response');
 
     const response = await incrementalRetryBackoffRunner.runWithIncrementalRetryBackoff({
@@ -138,8 +138,8 @@ describe('IncrementalRetryBackoffRunner', () => {
     let incrementalRetryBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
     const runRequestAttempt = jest
       .fn<Promise<string>, []>()
-      .mockRejectedValueOnce({statusCode: 503})
-      .mockRejectedValueOnce({statusCode: 503})
+      .mockRejectedValueOnce({statusCode: 500})
+      .mockRejectedValueOnce({statusCode: 500})
       .mockResolvedValueOnce('response');
 
     const response = await incrementalRetryBackoffRunner.runWithIncrementalRetryBackoff({
@@ -168,7 +168,10 @@ describe('IncrementalRetryBackoffRunner', () => {
     expect(incrementalRetryBackoffState.delayInMilliseconds).toBe(200);
   });
 
-  it('rethrows non-retryable failures without waiting', async () => {
+  it.each([
+    {expectedDescription: '400 Bad Request', statusCode: 400},
+    {expectedDescription: '503 Service Unavailable', statusCode: 503},
+  ] as const)('rethrows $expectedDescription immediately without waiting', async ({statusCode}) => {
     const {abortableWait, waitForDurationInMilliseconds} = createIncrementalRetryBackoffRunnerDependenciesForTest();
     const incrementalRetryBackoffPolicy = createIncrementalRetryBackoffPolicy();
     const incrementalRetryBackoffRunner = createIncrementalRetryBackoffRunner({
@@ -179,7 +182,7 @@ describe('IncrementalRetryBackoffRunner', () => {
       incrementalRetryBackoffPolicy,
     });
     let incrementalRetryBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
-    const nonRetryableError = {statusCode: 400};
+    const nonRetryableError = {statusCode};
     const runRequestAttempt = jest.fn<Promise<string>, []>().mockRejectedValue(nonRetryableError);
 
     await expect(
@@ -224,7 +227,7 @@ describe('IncrementalRetryBackoffRunner', () => {
     const resetAbortController = new AbortController();
     const runRequestAttempt = jest
       .fn<Promise<string>, []>()
-      .mockRejectedValueOnce({statusCode: 503})
+      .mockRejectedValueOnce({statusCode: 500})
       .mockResolvedValueOnce('response');
 
     waitForDurationInMilliseconds.mockImplementationOnce(async (_durationInMilliseconds, abortSignal) => {
@@ -272,7 +275,7 @@ describe('IncrementalRetryBackoffRunner', () => {
     });
     let incrementalRetryBackoffState = incrementalRetryBackoffPolicy.createInitialIncrementalRetryBackoffState();
     const requestAbortController = new AbortController();
-    const runRequestAttempt = jest.fn<Promise<string>, []>().mockRejectedValueOnce({statusCode: 503});
+    const runRequestAttempt = jest.fn<Promise<string>, []>().mockRejectedValueOnce({statusCode: 500});
 
     waitForDurationInMilliseconds.mockImplementationOnce(async (_durationInMilliseconds, abortSignal) => {
       requestAbortController.abort();
