@@ -79,7 +79,7 @@
     "type-check": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "echo \"workspace-tools has no type-check\""
+        "command": "tsc --project ./tsconfig.bin.json --noEmit"
       }
     }
   },
