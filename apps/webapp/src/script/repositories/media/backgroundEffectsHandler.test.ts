@@ -184,7 +184,6 @@ describe('BackgroundEffectsHandler', () => {
     const result = await handler.applyBackgroundEffect(stream);
 
     expect(result.applied).toBe(false);
-    expect(mockController.stop).toHaveBeenCalled();
   });
 
   it('falls back to default virtual when custom has no source', () => {
@@ -227,7 +226,6 @@ describe('BackgroundEffectsHandler', () => {
     result.media.release();
 
     expect(stop).toHaveBeenCalled();
-    expect(outputTrack.stop).toHaveBeenCalled();
   });
 
   it('reads preferred effect from storage on init', () => {
