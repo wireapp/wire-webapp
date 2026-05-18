@@ -59,6 +59,9 @@ jobs:
       - name: Build libraries
         run: yarn nx run-many -t build --projects=tag:type:lib
 
+      - name: Type check workspace tools
+        run: yarn nx run workspace-tools:type-check
+
       - name: Lint file names
         run: yarn lint:fileNames
 
