@@ -168,7 +168,9 @@ export const useConversationSearchFiles = ({
     shouldPerformSearch.current = false;
 
     if (preserveFilters && hasActiveParams) {
-      void searchNodes({query: FETCH_ALL_QUERY, filters});
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await searchNodes({query: FETCH_ALL_QUERY, filters});
+      });
       return;
     }
 

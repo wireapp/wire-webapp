@@ -22,6 +22,7 @@ import {useEffect, useMemo, useState} from 'react';
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
@@ -41,6 +42,7 @@ export const useTagsManagement = ({
   initialSelectedTags,
   onSuccess,
 }: UseTagsManagementProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const tagNames = useAllCellsTagsStore(state => state.tags);
   const isLoadingAllTags = useAllCellsTagsStore(state => state.isLoading);
   const apiError = useAllCellsTagsStore(state => state.error);
@@ -59,7 +61,7 @@ export const useTagsManagement = ({
       return;
     }
 
-    void fetchAllTags(cellsRepository);
+    fireAndForgetInvoker.fireAndForget(() => fetchAllTags(cellsRepository));
     // cellsRepository is a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchAllTags, fetchTagsEnabled, hasFetchedTags]);
@@ -99,7 +101,7 @@ export const useTagsManagement = ({
       tags: selectedTags.map(option => option.value as string).filter(Boolean),
     });
     // Invalidate the centralized tags cache so the filter bar (and other views) pick up new tags.
-    void useAllCellsTagsStore.getState().fetch(cellsRepository);
+    fireAndForgetInvoker.fireAndForget(() => useAllCellsTagsStore.getState().fetch(cellsRepository));
     onSuccess?.();
     setIsUpdatingTags(false);
   };
