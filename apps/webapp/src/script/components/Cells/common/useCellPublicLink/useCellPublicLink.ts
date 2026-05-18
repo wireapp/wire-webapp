@@ -24,6 +24,7 @@ import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import type {CellNode} from 'src/script/types/cellNode';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
@@ -47,6 +48,7 @@ export const useCellPublicLink = ({
   setStatusOnPublicLinkUrl = false,
   includeNodePublicLinkInCallbacks = false,
 }: UseCellPublicLinkParams) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [isEnabled, setIsEnabled] = useState(node?.publicLink?.alreadyShared === true);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink !== undefined ? 'success' : 'idle');
   const [linkData, setLinkData] = useState<RestShareLink | null>(null);
@@ -225,19 +227,19 @@ export const useCellPublicLink = ({
     const shouldGetLink = isEnabled === true && node?.publicLink?.alreadyShared === true;
 
     if (shouldGetLink) {
-      void getPublicLink();
+      fireAndForgetInvoker.fireAndForget(getPublicLink);
       return;
     }
 
     if (shouldDeleteLink) {
-      void deletePublicLink();
+      fireAndForgetInvoker.fireAndForget(deletePublicLink);
       return;
     }
 
     if (shouldCreateNewLink) {
-      void createPublicLink();
+      fireAndForgetInvoker.fireAndForget(createPublicLink);
     }
-  }, [isEnabled, node?.publicLink, createPublicLink, deletePublicLink, getPublicLink]);
+  }, [createPublicLink, deletePublicLink, fireAndForgetInvoker, getPublicLink, isEnabled, node?.publicLink]);
 
   useEffect(() => {
     if (!setStatusOnPublicLinkUrl) {

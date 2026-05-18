@@ -3,7 +3,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import ko from 'knockout';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {act, getByRole} from '@testing-library/react';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {User} from 'Repositories/entity/User';
 import {RootContext, RootContextValue} from '../../../page/RootProvider';
 import {amplify} from 'amplify';

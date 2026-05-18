@@ -17,10 +17,10 @@
  *
  */
 
-export * from './AmplifyRecord';
-export * from './ClientRecord';
-export * from './ConversationRecord';
-export * from './CryptoboxRecord';
-export * from './EventRecord';
-export * from './EventRecordGuards';
-export * from './UserRecord';
+export * from './amplifyRecord';
+export * from './clientRecord';
+export * from './conversationRecord';
+export * from './cryptoboxRecord';
+export * from './eventRecord';
+export * from './eventRecordGuards';
+export * from './userRecord';

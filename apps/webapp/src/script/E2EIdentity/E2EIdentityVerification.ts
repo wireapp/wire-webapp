@@ -23,7 +23,7 @@ import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/ut
 import {container} from 'tsyringe';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {base64ToArray} from 'Util/util';
 
 import {mapMLSStatus, MLSStatuses} from './mlsStatus';

@@ -27,7 +27,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
-import {AuthError} from '../error/AuthError';
+import {AuthError} from '../error/authError';
 
 export const checkIndexedDb = (): Promise<void> => {
   if (!Runtime.isSupportingIndexedDb()) {

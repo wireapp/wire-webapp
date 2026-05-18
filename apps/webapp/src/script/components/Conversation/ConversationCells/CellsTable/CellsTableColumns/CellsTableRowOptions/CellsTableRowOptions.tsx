@@ -48,6 +48,7 @@ import {useDeleteNode} from './useDeleteNode/useDeleteNode';
 import {useRestoreNestedNode} from './useRestoreNestedNode/useRestoreNestedNode';
 import {useRestoreParentNode} from './useRestoreParentNode/useRestoreParentNode';
 
+import {useApplicationContext} from '../../../../../../page/RootProvider';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareModal} from '../CellsNodeShareModal/CellsNodeShareModal';
 
@@ -92,6 +93,7 @@ const CellsTableRowOptionsContent = ({
   conversationName,
   onRefresh,
 }: CellsTableRowOptionsProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {handleOpenFile} = useCellsFilePreviewModal();
   const [isMoveNodeModalOpen, setIsMoveNodeModalOpen] = useState(false);
   const [isTagsModalOpen, setIsTagsModalOpen] = useState(false);
@@ -186,6 +188,7 @@ const CellsTableRowOptionsContent = ({
               uuid: node.id,
               conversationId: conversationQualifiedId.id,
               cellsRepository,
+              fireAndForgetInvoker,
             })
           }
         >

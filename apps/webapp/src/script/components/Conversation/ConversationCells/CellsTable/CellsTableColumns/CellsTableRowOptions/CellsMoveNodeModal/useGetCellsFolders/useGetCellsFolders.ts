@@ -21,6 +21,8 @@ import {useCallback, useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
@@ -32,8 +34,8 @@ interface UseGetCellsFoldersProps {
   nodeToMove: CellNode;
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
-
   enabled: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 type Status = 'idle' | 'loading' | 'success' | 'error';
@@ -51,6 +53,7 @@ export const useGetCellsFolders = ({
   conversationQualifiedId,
   currentPath,
   enabled,
+  fireAndForgetInvoker,
 }: UseGetCellsFoldersProps) => {
   const [folders, setFolders] = useState<Array<Folder>>([]);
   const [status, setStatus] = useState<Status>('idle');
@@ -90,8 +93,8 @@ export const useGetCellsFolders = ({
   }, [setFolders, setStatus, conversationQualifiedId, enabled, currentPath, nodeToMove]);
 
   useEffect(() => {
-    void fetchFolders();
-  }, [fetchFolders]);
+    fireAndForgetInvoker.fireAndForget(fetchFolders);
+  }, [fetchFolders, fireAndForgetInvoker]);
 
   useEffect(() => {
     if (!['loading', 'idle'].includes(status)) {

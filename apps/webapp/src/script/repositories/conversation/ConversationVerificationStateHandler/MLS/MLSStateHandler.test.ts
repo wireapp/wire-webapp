@@ -22,7 +22,7 @@ import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as e2eIdentity from 'src/script/E2EIdentity';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {createUuid} from 'Util/uuid';
 import {waitFor} from 'Util/waitFor';
 

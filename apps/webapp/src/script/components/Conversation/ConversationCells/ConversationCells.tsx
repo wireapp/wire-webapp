@@ -17,14 +17,14 @@
  *
  */
 
-import {memo, useEffect, useRef} from 'react';
+import {memo, useCallback, useEffect, useRef} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -48,6 +48,8 @@ import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 
+import {useApplicationContext} from '../../../page/RootProvider';
+
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;
   userRepository: UserRepository;
@@ -66,6 +68,7 @@ export const ConversationCells = memo(
     isSearchViewOpen,
     onOpenSearchView,
   }: ConversationCellsProps) => {
+    const {fireAndForgetInvoker} = useApplicationContext();
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
     const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
@@ -77,6 +80,7 @@ export const ConversationCells = memo(
       initialCellState,
       conversationRepository,
       conversationQualifiedId,
+      fireAndForgetInvoker,
     });
 
     const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
@@ -86,6 +90,7 @@ export const ConversationCells = memo(
       cellsRepository,
       conversationQualifiedId,
       enabled: isCellsStateReady,
+      fireAndForgetInvoker,
       userRepository,
     });
 
@@ -97,6 +102,7 @@ export const ConversationCells = memo(
       cellsRepository,
       conversationQualifiedId,
       enabled: isCellsStateReady,
+      fireAndForgetInvoker,
       userRepository,
       onClear: refresh,
     });
@@ -106,17 +112,17 @@ export const ConversationCells = memo(
     const isSearchViewIdle = isSearchViewOpen && !trimmedSearchValue;
     const wasSearchViewOpen = useRef(isSearchViewOpen);
 
-    const handleClearSearch = () => {
+    const handleClearSearch = useCallback((): void => {
       clearSearch();
-      void refresh();
-    };
+      fireAndForgetInvoker.fireAndForget(refresh);
+    }, [clearSearch, fireAndForgetInvoker, refresh]);
 
     useEffect(() => {
       if (wasSearchViewOpen.current && !isSearchViewOpen && searchValue) {
         handleClearSearch();
       }
       wasSearchViewOpen.current = isSearchViewOpen;
-    }, [isSearchViewOpen, searchValue]);
+    }, [handleClearSearch, isSearchViewOpen, searchValue]);
 
     // When search is active, refresh should trigger search reload
     const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;

@@ -27,7 +27,7 @@ import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandle
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaDeviceType} from 'Repositories/media/MediaDeviceType';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {t} from 'Util/localizerUtil';
 
 import {AudioOutPreferences} from './avPreferences/AudioOutPreferences';

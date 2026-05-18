@@ -26,7 +26,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
@@ -36,7 +36,7 @@ import {validateProfileImageResolution} from 'Util/util';
 import {FileInput} from './FileInput';
 
 import {Config} from '../../../../../Config';
-import {UserError} from '../../../../../error/UserError';
+import {UserError} from '../../../../../error/userError';
 
 interface AvatarInputProps {
   isActivatedAccount: boolean;

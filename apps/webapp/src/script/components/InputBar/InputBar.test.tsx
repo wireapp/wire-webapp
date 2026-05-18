@@ -28,14 +28,18 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PropertiesService} from 'Repositories/properties/PropertiesService';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PropertiesService} from 'Repositories/properties/propertiesService';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
@@ -75,6 +79,8 @@ beforeAll(async () => {
 
 describe('InputBar', () => {
   let propertiesRepository: PropertiesRepository;
+  const rootContextValue = createRootContextValueForTest({});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
@@ -116,9 +122,15 @@ describe('InputBar', () => {
   const testMessage = 'text';
   const pngFile = new File(['(⌐□_□)'], 'wire-example-image.png', {type: 'image/png'});
 
+  function renderInputBar(properties: ReturnType<typeof getDefaultProps>): ReturnType<typeof render> {
+    return render(withTheme(<InputBar {...properties} />), {
+      wrapper: rootProviderWrapper,
+    });
+  }
+
   it('has passed value', async () => {
     const props = getDefaultProps();
-    const {getByTestId} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId} = renderInputBar(props);
 
     await new Promise(resolve => setTimeout(resolve));
     const inputBar = getByTestId('input-message');
@@ -135,7 +147,7 @@ describe('InputBar', () => {
   // eslint-disable-next-line jest/no-disabled-tests
   it.skip('typing request is sent if the typing indicator mode is enabled and user is typing', async () => {
     const props = getDefaultProps();
-    const {getByTestId, container} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId, container} = renderInputBar(props);
     const inputBar = getByTestId('input-message');
 
     fireEvent.keyDown(container, {key: 'Enter', code: 'Enter'});
@@ -157,7 +169,7 @@ describe('InputBar', () => {
 
   it('typing request is not sent when user is typing but the typing indicator mode is disabled', async () => {
     const props = getDefaultProps();
-    const {getByTestId} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId} = renderInputBar(props);
     const inputBar = getByTestId('input-message');
     const property = PropertiesRepository.CONFIG.WIRE_TYPING_INDICATOR_MODE;
     const defaultValue = property.defaultValue;
@@ -182,7 +194,7 @@ describe('InputBar', () => {
   it('has pasted image', async () => {
     const promise = Promise.resolve();
     const props = getDefaultProps();
-    const {getByTestId, queryByTestId} = render(withTheme(<InputBar {...props} />));
+    const {getByTestId, queryByTestId} = renderInputBar(props);
     await promise;
 
     const textArea = getByTestId('input-message');

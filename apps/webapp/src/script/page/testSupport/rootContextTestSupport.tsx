@@ -21,7 +21,7 @@ import {ReactNode} from 'react';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {WallClock} from '../../clock/wallClock';
+import {WallClock, createWallClock} from '../../clock/wallClock';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {RootContextValue, RootProvider} from '../RootProvider';
@@ -30,8 +30,8 @@ type CreateRootContextValueForTestParameters = {
   readonly doesApplicationNeedForceReload?: boolean;
   readonly fireAndForgetInvoker?: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled?: (featureName: StartupFeatureToggleName) => boolean;
-  readonly mainViewModel: MainViewModel;
-  readonly wallClock: WallClock;
+  readonly mainViewModel?: MainViewModel;
+  readonly wallClock?: WallClock;
 };
 
 type RootProviderWrapperProperties = {
@@ -42,11 +42,46 @@ function isFeatureToggleDisabledForTest(): boolean {
   return false;
 }
 
+function createMainViewModelForTest(): MainViewModel {
+  return {} as MainViewModel;
+}
+
 export function createFireAndForgetInvokerForTest(): FireAndForgetInvoker {
   return {
     fireAndForget: jest.fn(),
-    waitUntilAllSettled: jest.fn(async () => {}),
-  } as FireAndForgetInvoker;
+    waitUntilAllSettled: jest.fn(async (): Promise<void> => {
+      return undefined;
+    }),
+  };
+}
+
+export function createExecutingFireAndForgetInvokerForTest(): FireAndForgetInvoker {
+  const activePromises = new Set<Promise<unknown>>();
+
+  async function observePromise(activePromise: Promise<unknown>): Promise<void> {
+    try {
+      await activePromise;
+    } catch {
+      return undefined;
+    } finally {
+      activePromises.delete(activePromise);
+    }
+  }
+
+  function fireAndForget(asyncAction: () => Promise<unknown>): void {
+    const activePromise = asyncAction();
+    activePromises.add(activePromise);
+    observePromise(activePromise).catch(() => undefined);
+  }
+
+  async function waitUntilAllSettled(): Promise<void> {
+    await Promise.allSettled(activePromises);
+  }
+
+  return {
+    fireAndForget,
+    waitUntilAllSettled,
+  };
 }
 
 export function createRootContextValueForTest(parameters: CreateRootContextValueForTestParameters): RootContextValue {
@@ -54,8 +89,8 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     doesApplicationNeedForceReload = false,
     fireAndForgetInvoker = createFireAndForgetInvokerForTest(),
     isFeatureToggleEnabled = isFeatureToggleDisabledForTest,
-    mainViewModel,
-    wallClock,
+    mainViewModel = createMainViewModelForTest(),
+    wallClock = createWallClock(),
   } = parameters;
 
   return {
@@ -67,7 +102,9 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
   };
 }
 
-export function createRootProviderWrapperForTest(rootContextValue: RootContextValue) {
+export function createRootProviderWrapperForTest(
+  rootContextValue: RootContextValue,
+): (properties: RootProviderWrapperProperties) => ReactNode {
   function wrapper(properties: RootProviderWrapperProperties): ReactNode {
     return <RootProvider value={rootContextValue}>{properties.children}</RootProvider>;
   }

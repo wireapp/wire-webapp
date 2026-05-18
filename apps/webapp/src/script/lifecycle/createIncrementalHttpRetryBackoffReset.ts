@@ -17,7 +17,7 @@
  *
  */
 
-import {APIClient} from '../service/APIClientSingleton';
+import {APIClient} from '../service/apiClientSingleton';
 
 type ConfigureIncrementalHttpRetryBackoffResetDependencies = {
   readonly isElectron: () => boolean;

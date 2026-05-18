@@ -55,7 +55,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["webapp:stylelint", "webapp:type-check"],
       "options": {
-        "command": "eslint --max-warnings=1289 --ext .js,.ts,.tsx {projectRoot}"
+        "command": "eslint --max-warnings=1036 --ext .js,.ts,.tsx {projectRoot}"
       }
     },
     "stylelint": {

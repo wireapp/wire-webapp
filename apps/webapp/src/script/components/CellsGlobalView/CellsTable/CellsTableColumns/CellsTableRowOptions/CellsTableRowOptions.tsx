@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import is from '@sindresorhus/is';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
@@ -29,6 +31,7 @@ import {forcedDownloadFile} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 
+import {useApplicationContext} from '../../../../../page/RootProvider';
 import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 import {showShareModal} from '../CellsShareModal/CellsShareModal';
 
@@ -37,7 +40,9 @@ interface CellsTableRowOptionsProps {
   cellsRepository: CellsRepository;
 }
 
-export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptionsProps) => {
+export const CellsTableRowOptions = (properties: CellsTableRowOptionsProps): ReactElement => {
+  const {node, cellsRepository} = properties;
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {handleOpenFile} = useCellsFilePreviewModal();
 
   const url = node.url;
@@ -57,7 +62,9 @@ export const CellsTableRowOptions = ({node, cellsRepository}: CellsTableRowOptio
         >
           {t('cells.options.open')}
         </DropdownMenu.Item>
-        <DropdownMenu.Item onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository})}>
+        <DropdownMenu.Item
+          onClick={() => showShareModal({type: node.type, uuid: node.id, cellsRepository, fireAndForgetInvoker})}
+        >
           {t('cells.options.share')}
         </DropdownMenu.Item>
         {is.nonEmptyString(url) && (

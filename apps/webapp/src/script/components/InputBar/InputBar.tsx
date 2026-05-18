@@ -37,13 +37,13 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/EventName';
-import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/TypingIndicatorMode';
+import {EventName} from 'Repositories/tracking/eventName';
+import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -65,6 +65,7 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
+import {useApplicationContext} from '../../page/RootProvider';
 
 const CONFIG = {
   ...Config.getConfig(),
@@ -115,6 +116,7 @@ export const InputBar = ({
   onCellImageUpload,
   onCellAssetUpload,
 }: InputBarProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {classifiedDomains, isSelfDeletingMessagesEnabled, isFileSharingSendingEnabled} = useKoSubscribableChildren(
     teamState,
     ['classifiedDomains', 'isSelfDeletingMessagesEnabled', 'isFileSharingSendingEnabled'],
@@ -187,12 +189,16 @@ export const InputBar = ({
       isTyping => {
         isTypingRef.current = isTyping;
         if (isTyping) {
-          void conversationRepository.sendTypingStart(conversation);
+          fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+            await conversationRepository.sendTypingStart(conversation);
+          });
         } else {
-          void conversationRepository.sendTypingStop(conversation);
+          fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+            await conversationRepository.sendTypingStop(conversation);
+          });
         }
       },
-      [conversationRepository, conversation],
+      [conversationRepository, conversation, fireAndForgetInvoker],
     ),
   });
 
@@ -260,8 +266,8 @@ export const InputBar = ({
       return;
     }
 
-    void sendMessage();
-  }, [isSendingDisabled, sendMessage]);
+    fireAndForgetInvoker.fireAndForget(sendMessage);
+  }, [fireAndForgetInvoker, isSendingDisabled, sendMessage]);
 
   const showAvatar = !!messageContent.text.length;
 

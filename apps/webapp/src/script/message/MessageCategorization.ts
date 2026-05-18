@@ -20,7 +20,7 @@
 import {isObject} from 'underscore';
 
 import {ClientEvent} from 'Repositories/event/Client';
-import {EventRecord} from 'Repositories/storage/record/EventRecord';
+import {EventRecord} from 'Repositories/storage/record/eventRecord';
 
 import {MessageCategory} from './MessageCategory';
 

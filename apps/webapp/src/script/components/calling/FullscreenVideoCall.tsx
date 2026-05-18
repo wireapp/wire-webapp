@@ -23,6 +23,7 @@ import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {
   Checkbox,
   CheckboxLabel,
@@ -51,7 +52,7 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
@@ -101,6 +102,7 @@ export interface FullscreenVideoCallProps {
   switchMicrophoneInput: (deviceId: string) => void;
   switchSpeakerOutput: (deviceId: string) => void;
   switchVideoBackgroundEffect: (effect: BackgroundEffectSelection) => void;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   teamState?: TeamState;
   callState?: CallState;
   toggleCamera: (call: Call) => void;
@@ -131,6 +133,7 @@ const FullscreenVideoCall = ({
   switchMicrophoneInput,
   switchSpeakerOutput,
   switchVideoBackgroundEffect,
+  fireAndForgetInvoker,
   setMaximizedParticipant,
   setActiveCallViewTab,
   toggleMute,
@@ -288,7 +291,9 @@ const FullscreenVideoCall = ({
   const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
-    void switchVideoBackgroundEffect(effect);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await switchVideoBackgroundEffect(effect);
+    });
   };
 
   const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {

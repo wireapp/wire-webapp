@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
-import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {CallOptions} from './CallOptions';

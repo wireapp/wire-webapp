@@ -21,14 +21,14 @@ import {FormEvent, useState} from 'react';
 
 import cx from 'classnames';
 
-import {validateHandle} from 'Repositories/user/UserHandleGenerator';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {validateHandle} from 'Repositories/user/userHandleGenerator';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {t} from 'Util/localizerUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
 
-import {UserError} from '../../../../../error/UserError';
+import {UserError} from '../../../../../error/userError';
 
 enum UserNameState {
   AVAILABLE = 'AVAILABLE',

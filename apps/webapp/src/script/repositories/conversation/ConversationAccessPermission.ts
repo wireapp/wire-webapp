@@ -19,7 +19,7 @@
 
 import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
-import {combinePermissions, hasPermissions} from 'Repositories/user/UserPermission';
+import {combinePermissions, hasPermissions} from 'Repositories/user/userPermission';
 
 import {ACCESS_STATE, TEAM} from './AccessState';
 

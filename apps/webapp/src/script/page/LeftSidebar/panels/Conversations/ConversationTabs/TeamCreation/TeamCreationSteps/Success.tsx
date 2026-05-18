@@ -22,8 +22,8 @@ import {amplify} from 'amplify';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {EventName} from 'Repositories/tracking/EventName';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
+import {EventName} from 'Repositories/tracking/eventName';
+import {Segmentation} from 'Repositories/tracking/segmentation';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';

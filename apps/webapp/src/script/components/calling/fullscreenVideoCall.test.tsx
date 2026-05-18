@@ -26,8 +26,8 @@ import {Participant} from 'Repositories/calling/Participant';
 import {Grid} from 'Repositories/calling/videoGridHandler';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
 

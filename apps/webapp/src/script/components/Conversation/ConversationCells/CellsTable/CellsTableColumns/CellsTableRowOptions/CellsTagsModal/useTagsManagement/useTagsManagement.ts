@@ -22,6 +22,7 @@ import {useCallback, useState} from 'react';
 import {ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 
 import {transformTagToSelectOption} from './transformTagToSelectOption/transformTagToSelectOption';
@@ -40,6 +41,7 @@ export const useTagsManagement = ({
   initialSelectedTags,
   onSuccess,
 }: UseTagsManagementProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [allTags, setAllTags] = useState<ComboboxSelectOption[]>([]);
   const [selectedTags, setSelectedTags] = useState<ComboboxSelectOption[]>(
     initialSelectedTags.map(transformTagToSelectOption),
@@ -54,6 +56,7 @@ export const useTagsManagement = ({
   const {isLoading: isLoadingAllTags, error: apiError} = useGetAllTags({
     cellsRepository,
     enabled: fetchTagsEnabled,
+    fireAndForgetInvoker,
     onSuccess: handleSetAllTags,
   });
 

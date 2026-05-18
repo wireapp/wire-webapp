@@ -26,7 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {PropertiesService} from 'Repositories/properties/PropertiesService';
+import type {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
