@@ -17,7 +17,6 @@
  *
  */
 
-import {StatusCodes} from 'http-status-codes';
 import {Maybe} from 'true-myth';
 
 export type IncrementalRetryBackoffState = {
@@ -35,9 +34,10 @@ export type IncrementalRetryBackoffPolicy = {
 const initialRetryDelayInMilliseconds = 100;
 const maximumRetryDelayInMilliseconds = 10 * 60 * 1000;
 const nonStandardRetryableStatusCode = 420;
+const tooManyRequestsStatusCode = 429;
 const serverErrorStatusCodeRangeStart = 500;
-const serverErrorStatusCodeRangeEnd = 599;
 const serviceUnavailableStatusCode = 503;
+const serverErrorStatusCodeRangeEnd = 599;
 
 export function createIncrementalRetryBackoffPolicy(): IncrementalRetryBackoffPolicy {
   return {
@@ -66,7 +66,7 @@ export function createIncrementalRetryBackoffPolicy(): IncrementalRetryBackoffPo
     shouldRetryWithIncrementalBackoff(statusCode) {
       return statusCode
         .map((statusCodeValue): boolean => {
-          if (statusCodeValue === nonStandardRetryableStatusCode || statusCodeValue === StatusCodes.TOO_MANY_REQUESTS) {
+          if (statusCodeValue === nonStandardRetryableStatusCode || statusCodeValue === tooManyRequestsStatusCode) {
             return true;
           }
 
