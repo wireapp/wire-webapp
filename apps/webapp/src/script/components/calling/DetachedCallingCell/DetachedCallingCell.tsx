@@ -24,7 +24,7 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

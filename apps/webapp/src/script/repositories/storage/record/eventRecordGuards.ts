@@ -17,7 +17,7 @@
  *
  */
 
-import {EventRecord} from './EventRecord';
+import {EventRecord} from './eventRecord';
 
 import {MessageAddEvent, MultipartMessageAddEvent} from '../../conversation/EventBuilder';
 import {ClientEvent} from '../../event/Client';

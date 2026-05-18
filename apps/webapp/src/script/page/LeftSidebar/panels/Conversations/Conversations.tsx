@@ -35,7 +35,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';

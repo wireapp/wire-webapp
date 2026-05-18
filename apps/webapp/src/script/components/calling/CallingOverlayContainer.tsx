@@ -32,7 +32,7 @@ import {Participant} from 'Repositories/calling/Participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ChooseScreen} from './ChooseScreen';

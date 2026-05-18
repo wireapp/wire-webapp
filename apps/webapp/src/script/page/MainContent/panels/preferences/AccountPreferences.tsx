@@ -30,7 +30,7 @@ import {ClientRepository} from 'Repositories/client';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';

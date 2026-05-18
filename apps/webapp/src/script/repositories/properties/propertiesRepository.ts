@@ -40,8 +40,8 @@ import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue} from 'Util/storageUtil';
 
-import type {PropertiesService} from './PropertiesService';
-import {PROPERTIES_TYPE, UserConsentStatus} from './PropertiesType';
+import type {PropertiesService} from './propertiesService';
+import {PROPERTIES_TYPE, UserConsentStatus} from './propertiesType';
 
 export class PropertiesRepository {
   // Value names are specified by the protocol but key names can be changed.

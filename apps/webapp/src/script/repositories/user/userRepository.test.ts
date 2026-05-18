@@ -34,7 +34,7 @@ import {ClientMapper} from 'Repositories/client/ClientMapper';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamState} from 'Repositories/team/TeamState';
 import {entities} from 'test/api/payloads';

@@ -30,7 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';

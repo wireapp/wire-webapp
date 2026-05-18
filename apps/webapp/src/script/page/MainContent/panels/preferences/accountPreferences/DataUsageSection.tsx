@@ -25,8 +25,8 @@ import {amplify} from 'amplify';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
 import {getForcedErrorReportingStatus} from 'Repositories/tracking/telemetry.helpers';
 import {ConsentValue} from 'Repositories/user/consentValue';
