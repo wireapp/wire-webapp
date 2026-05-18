@@ -29,8 +29,8 @@ import type {User} from 'Repositories/entity/User';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ConversationType, UserType, PlatformType} from './attribute';
-import {EventName} from './EventName';
-import {Segmentation} from './Segmentation';
+import {EventName} from './eventName';
+import {Segmentation} from './segmentation';
 
 export interface GuestAttributes {
   is_allow_guests: boolean;

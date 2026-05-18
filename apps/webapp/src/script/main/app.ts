@@ -85,7 +85,7 @@ import {SelfService} from 'Repositories/self/SelfService';
 import {StorageRepository, StorageService} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamService} from 'Repositories/team/TeamService';
-import {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserService} from 'Repositories/user/userService';
 import {initializeDataDog} from 'Util/dataDog';

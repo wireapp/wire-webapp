@@ -35,15 +35,15 @@ import {includesString} from 'Util/stringUtil';
 import {getParameter} from 'Util/urlUtil';
 import {createUuid} from 'Util/uuid';
 
-import {EventName} from './EventName';
-import {getPlatform} from './Helpers';
-import {Segmentation} from './Segmentation';
+import {EventName} from './eventName';
+import {getPlatform} from './helpers';
+import {Segmentation} from './segmentation';
 import {
   getForcedErrorReportingStatus,
   initForcedErrorReporting,
   isTelemetryEnabledAtCurrentEnvironment,
-} from './Telemetry.helpers';
-import {UserData} from './UserData';
+} from './telemetry.helpers';
+import {UserData} from './userData';
 
 import {URLParameter} from '../../auth/URLParameter';
 import {Config} from '../../Config';

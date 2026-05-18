@@ -39,7 +39,7 @@ import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/EventName';
+import {EventName} from 'Repositories/tracking/eventName';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';

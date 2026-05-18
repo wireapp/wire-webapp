@@ -42,7 +42,7 @@ import type {SearchRepository} from 'Repositories/search/searchRepository';
 import type {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {StorageRepository} from 'Repositories/storage';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import type {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
+import type {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 
