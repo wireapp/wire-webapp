@@ -26,13 +26,13 @@ import {
   createMetricsWindow,
   pushMetricsSample,
 } from 'Repositories/media/backgroundEffects/helper/metrics';
+import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
 
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
 import {createWallClock} from '../../../../clock/wallClock';
-import {createRestartQueue} from "Repositories/media/backgroundEffects/helper/restartQueue";
 
 export let segmenterOptions = {} as WorkerProcessVideoTrackOptions;
 
