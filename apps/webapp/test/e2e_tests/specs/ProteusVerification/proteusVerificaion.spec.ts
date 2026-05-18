@@ -19,7 +19,7 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 
 test.describe('Proteus verification', () => {
   let proteusTeam: Team;
@@ -52,4 +52,32 @@ test.describe('Proteus verification', () => {
     await modals.password().clickAction();
     await expect(pages.devices().activeDevices).toBeHidden();
   });
+
+  test(
+    'Login as permanent device after permanent device limit is reached',
+    {tag: ['@TC-715', '@regression']},
+    async ({createPage}) => {
+      await createPage(withLogin(userA));
+      // create 6 devices to reach the limit
+      await Promise.all(Array.from({length: 6}, () => createPage(withLogin(userA, {confirmNewHistory: true}))));
+
+      const newDevicePage = await createPage();
+      const pageManager = PageManager.from(newDevicePage);
+      const {pages, components} = pageManager.webapp;
+
+      await pageManager.openLoginPage();
+      await pageManager.webapp.pages.login().login(userA);
+
+      // Due to the difference on this page between Proteus and MLS login flows,
+      // we need to use the password to remove the existing device
+      await newDevicePage.getByTestId('go-remove-device').first().click({timeout: LOGIN_TIMEOUT});
+      await newDevicePage.getByRole('textbox', {name: 'Password'}).fill(userA.password);
+      await newDevicePage.getByRole('button', {name: 'Remove device'}).click();
+
+      await pages.historyInfo().clickConfirmButton();
+      await expect(components.conversationSidebar().sidebar).toBeVisible({
+        timeout: LOGIN_TIMEOUT,
+      });
+    },
+  );
 });
