@@ -49,7 +49,7 @@ export const hasActiveSearchParams = (params: DriveSearchParams): boolean =>
 export const hasActiveGlobalDriveFilters = (filters: GlobalDriveFiltersState): boolean =>
   hasActiveConversationDriveFilters(filters) ||
   filters.selectedConversationIds.length > 0 ||
-  (filters.path !== undefined && filters.path.length > 0);
+  is.nonEmptyString(filters.path);
 
 export const toConversationDriveSearchParams = (filters: ConversationDriveFiltersState): DriveSearchParams => ({
   tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
