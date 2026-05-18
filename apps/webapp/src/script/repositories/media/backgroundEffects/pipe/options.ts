@@ -60,8 +60,8 @@ export type ProcessVideoTrackOptions = {
 
 // Make options type serializable for worker
 export type WorkerBackgroundSource = {
-  type: 'image' | 'video' | 'stream';
-  media?: ImageBitmap;
+  type: 'image';
+  media: ImageBitmap;
   url: string;
 };
 export type WorkerProcessVideoTrackOptions = Omit<

@@ -40,11 +40,9 @@ export type BackgroundEffectSelection =
 export type ImageBackgroundSource = HTMLImageElement | ImageBitmap | ReadableStream;
 
 export type BackgroundSource = {
-  type: 'image' | 'video' | 'stream';
+  type: 'image';
   media?: ImageBackgroundSource;
   url: string;
-  video?: HTMLVideoElement;
-  track?: MediaStreamTrack;
 };
 
 /**

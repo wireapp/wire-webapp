@@ -162,10 +162,6 @@ export class BackgroundEffectsController {
   }
 
   public async setBackgroundSource(source: BackgroundSource): Promise<void> {
-    if (source.type !== 'image') {
-      return;
-    }
-
     const {media, url} = source;
 
     if (media instanceof HTMLImageElement) {
