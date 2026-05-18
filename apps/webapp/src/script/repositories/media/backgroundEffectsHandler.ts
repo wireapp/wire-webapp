@@ -143,7 +143,7 @@ export class BackgroundEffectsHandler {
       if (isVirtual) {
         this.controller.setMode('virtual');
         if (backgroundSource) {
-          this.controller.setBackgroundSource(backgroundSource);
+          await this.controller.setBackgroundSource(backgroundSource);
         }
       } else {
         this.controller.setMode('blur');

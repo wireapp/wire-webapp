@@ -171,7 +171,7 @@ export class BackgroundEffectsController {
     this.pushOptionsUpdate();
   }
 
-  public setBackgroundSource(source: BackgroundSource): void {
+  public async setBackgroundSource(source: BackgroundSource): Promise<void> {
     if (source.type !== 'image') {
       return;
     }
@@ -179,7 +179,7 @@ export class BackgroundEffectsController {
     const {media, url} = source;
 
     if (media instanceof HTMLImageElement) {
-      createImageBitmap(media)
+      await createImageBitmap(media)
         .then(bitmap => this.applyImageBitmap(bitmap, url))
         .catch((error: unknown) => this.logger.warn('Failed to set background image', error));
       return;
