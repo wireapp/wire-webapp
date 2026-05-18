@@ -57,5 +57,5 @@ export const toConversationDriveSearchParams = (filters: ConversationDriveFilter
 
 export const toGlobalDriveSearchParams = (filters: GlobalDriveFiltersState): DriveSearchParams => ({
   tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
-  path: filters.path !== undefined && filters.path.length > 0 ? filters.path : undefined,
+  path: is.nonEmptyString(filters.path) ? filters.path : undefined,
 });
