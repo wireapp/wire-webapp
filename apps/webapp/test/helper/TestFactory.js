@@ -48,7 +48,7 @@ import {EventService} from 'Repositories/event/EventService';
 import {NotificationService} from 'Repositories/event/NotificationService';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {Core} from 'src/script/service/coreSingleton';

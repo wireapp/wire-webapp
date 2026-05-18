@@ -51,7 +51,7 @@ import {container} from 'tsyringe';
 import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventService} from 'Repositories/event/EventService';
-import {search as fullTextSearch} from 'Repositories/search/FullTextSearch';
+import {search as fullTextSearch} from 'Repositories/search/fullTextSearch';
 import {StorageService} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';

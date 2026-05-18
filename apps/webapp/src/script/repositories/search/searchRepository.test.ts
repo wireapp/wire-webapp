@@ -22,7 +22,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
-import {SearchRepository} from './SearchRepository';
+import {SearchRepository} from './searchRepository';
 
 import {randomInt} from '../../auth/util/randomUtil';
 import {generateUsers} from '../../auth/util/test/TestUtil';

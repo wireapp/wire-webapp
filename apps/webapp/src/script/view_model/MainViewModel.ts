@@ -38,7 +38,7 @@ import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import type {SearchRepository} from 'Repositories/search/SearchRepository';
+import type {SearchRepository} from 'Repositories/search/searchRepository';
 import type {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {StorageRepository} from 'Repositories/storage';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';

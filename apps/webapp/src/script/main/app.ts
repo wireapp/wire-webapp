@@ -79,7 +79,7 @@ import {PreferenceNotificationRepository} from 'Repositories/notification/Prefer
 import {initializePermissions} from 'Repositories/permission/permissionHandlers';
 import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
 import {PropertiesService} from 'Repositories/properties/PropertiesService';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {StorageRepository, StorageService} from 'Repositories/storage';
