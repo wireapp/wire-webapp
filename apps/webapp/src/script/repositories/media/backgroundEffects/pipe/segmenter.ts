@@ -32,6 +32,7 @@ import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
 import {createWallClock} from '../../../../clock/wallClock';
+import {createRestartQueue} from "Repositories/media/backgroundEffects/helper/restartQueue";
 
 export let segmenterOptions = {} as WorkerProcessVideoTrackOptions;
 
@@ -117,18 +118,21 @@ export async function runSegmenter(
   let segmenter = await createSegmenter(canvas);
   let currentModelPath = segmenterOptions.modelPath;
 
-  function restartSegmenter() {
+  const restartSegmenter = createRestartQueue(restartSegmenterSequentially);
+
+  async function restartSegmenterSequentially() {
     const targetModelPath = segmenterOptions.modelPath;
-    createSegmenter(canvas)
-      .then(newSegmenter => {
-        const oldSegmenter = segmenter;
-        segmenter = newSegmenter;
-        currentModelPath = targetModelPath;
-        oldSegmenter.close();
-      })
-      .catch((error: unknown) => {
-        logger.error('Error restarting segmenter:', error);
-      });
+
+    try {
+      const newSegmenter = await createSegmenter(canvas);
+
+      const oldSegmenter = segmenter;
+      segmenter = newSegmenter;
+      currentModelPath = targetModelPath;
+      oldSegmenter.close();
+    } catch (error: unknown) {
+      logger.error('Error restarting segmenter:', error);
+    }
   }
 
   async function updateSegmenterModel() {
