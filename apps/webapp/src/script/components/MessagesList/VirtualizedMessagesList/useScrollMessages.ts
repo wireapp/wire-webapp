@@ -41,7 +41,7 @@ function shouldStickToBottomFromPrev(
     return false;
   }
 
-  const scrollBottomPosition = (virtualizer.scrollOffset || 0) + scrollElement.clientHeight;
+  const scrollBottomPosition = (virtualizer.scrollOffset ?? 0) + scrollElement.clientHeight;
   const distanceFromPrevBottom = Math.max(0, prevTotalSize - scrollBottomPosition);
 
   return distanceFromPrevBottom < threshold;
@@ -79,7 +79,7 @@ export const useScrollMessages = (
           virtualizer.scrollToIndex(messages.length - 1, {align: 'end'});
         });
       }
-    } else if (lastMessage && lastMessage?.status() === StatusType.SENDING && lastMessage.user().id === userId) {
+    } else if (lastMessage.status() === StatusType.SENDING && lastMessage.user().id === userId) {
       // The self user just sent a message, we scroll straight to the bottom
       const index = messages.findIndex(message => !isMarker(message) && message.message.id === lastMessage.id);
       if (index !== -1) {

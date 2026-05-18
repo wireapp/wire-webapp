@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -38,9 +39,10 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string>();
   const [toBeRestoredVersionId, setToBeRestoredVersionId] = useState<string>();
+  const hasValidNodeUuid = is.nonEmptyString(nodeUuid);
 
   useEffect(() => {
-    if (!nodeUuid) {
+    if (!hasValidNodeUuid) {
       setFileInfo(undefined);
       setFileVersions({});
       return;
@@ -70,7 +72,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 
         setFileInfo(info);
 
-        const groupedVersions = groupVersionsByDate(versions || []);
+        const groupedVersions = groupVersionsByDate(versions ?? []);
         setFileVersions(groupedVersions);
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToLoadVersions');
@@ -81,7 +83,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     };
 
     void loadFileVersions();
-  }, [nodeUuid]);
+  }, [hasValidNodeUuid, nodeUuid]);
 
   const reset = useCallback(() => {
     setFileInfo(undefined);
@@ -101,7 +103,9 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
       setIsDownloading(true);
       setError(undefined);
       try {
-        await forcedDownloadFile({url, name: fileInfo?.name || 'file'});
+        const fallbackFileName = 'file';
+        const fileName = is.nonEmptyString(fileInfo?.name) ? fileInfo.name : fallbackFileName;
+        await forcedDownloadFile({url, name: fileName});
       } finally {
         setIsDownloading(false);
       }
@@ -110,7 +114,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
   );
 
   const handleRestore = useCallback(async () => {
-    if (!toBeRestoredVersionId || !nodeUuid) {
+    if (!is.nonEmptyString(toBeRestoredVersionId) || !hasValidNodeUuid) {
       return;
     }
     setIsLoading(true);
@@ -126,7 +130,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
     } finally {
       reset();
     }
-  }, [toBeRestoredVersionId, nodeUuid, reset]);
+  }, [toBeRestoredVersionId, hasValidNodeUuid, nodeUuid, reset]);
 
   return {
     fileInfo,

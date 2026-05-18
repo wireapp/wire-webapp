@@ -27,9 +27,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockState} from 'Repositories/user/AppLockState';
-import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {AppLockState} from 'Repositories/user/appLockState';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 

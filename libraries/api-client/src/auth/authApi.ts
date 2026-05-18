@@ -78,9 +78,9 @@ export class AuthAPI {
     const {verificationCode, ...rest} = loginData;
     const login = {
       ...rest,
-      ...(verificationCode && {verification_code: verificationCode}),
+      ...(verificationCode !== undefined && verificationCode.length > 0 && {verification_code: verificationCode}),
       clientType: undefined as any,
-      password: loginData.password ? String(loginData.password) : undefined,
+      password: loginData.password !== undefined ? String(loginData.password) : undefined,
     };
 
     const config: AxiosRequestConfig = {

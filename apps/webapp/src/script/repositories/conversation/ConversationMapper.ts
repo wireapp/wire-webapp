@@ -37,15 +37,15 @@ import {isObject} from 'underscore';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
+import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
-import {BaseError, BASE_ERROR_TYPE} from '../../error/BaseError';
-import {ConversationError} from '../../error/ConversationError';
+import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
+import {ConversationError} from '../../error/conversationError';
 
 /** Conversation self data from the database. */
 export interface SelfStatusUpdateDatabaseData {
@@ -141,7 +141,7 @@ export class ConversationMapper {
       mlsVerificationState,
     } = selfState;
 
-    if (archived_timestamp) {
+    if (archived_timestamp !== undefined) {
       conversationEntity.setTimestamp(archived_timestamp, Conversation.TIMESTAMP_TYPE.ARCHIVED);
       conversationEntity.archivedState(selfState.archived_state ?? false);
     }
@@ -162,19 +162,19 @@ export class ConversationMapper {
       conversationEntity.receiptMode(receipt_mode);
     }
 
-    if (last_event_timestamp) {
+    if (last_event_timestamp !== undefined) {
       conversationEntity.setTimestamp(last_event_timestamp, Conversation.TIMESTAMP_TYPE.LAST_EVENT);
     }
 
-    if (last_read_timestamp) {
+    if (last_read_timestamp !== undefined) {
       conversationEntity.setTimestamp(last_read_timestamp, Conversation.TIMESTAMP_TYPE.LAST_READ);
     }
 
-    if (last_server_timestamp) {
+    if (last_server_timestamp !== undefined) {
       conversationEntity.setTimestamp(last_server_timestamp, Conversation.TIMESTAMP_TYPE.LAST_SERVER);
     }
 
-    if (muted_timestamp) {
+    if (muted_timestamp !== undefined) {
       conversationEntity.setTimestamp(muted_timestamp, Conversation.TIMESTAMP_TYPE.MUTED);
       conversationEntity.mutedState(selfState.muted_state ?? NOTIFICATION_STATE.EVERYTHING);
     }
@@ -191,7 +191,7 @@ export class ConversationMapper {
       conversationEntity.mlsVerificationState(mlsVerificationState);
     }
 
-    if (legal_hold_status) {
+    if (legal_hold_status !== undefined) {
       conversationEntity.legalHoldStatus(legal_hold_status);
     }
 
@@ -218,14 +218,14 @@ export class ConversationMapper {
   }
 
   private static computeRoles(conversationData: ConversationBackendData | ConversationDatabaseData): Roles {
-    if ('roles' in conversationData && conversationData.roles) {
+    if ('roles' in conversationData && conversationData.roles !== undefined) {
       return conversationData.roles;
     }
     const {members} = conversationData;
 
-    const allMembers = [...(members?.others ?? []), members?.self];
+    const allMembers = [...(members?.others ?? []), members?.self].filter(member => member !== undefined);
     return allMembers.reduce<Record<string, string>>((roles, member) => {
-      if (!member || !member.conversation_role) {
+      if (member.conversation_role === undefined) {
         return roles;
       }
       return {
@@ -248,7 +248,7 @@ export class ConversationMapper {
 
     // since api V10 /get or /post conversation does not return id in conversation data
     const conversationIdFromQualifiedId = conversationData?.qualified_id?.id;
-    if (conversationIdFromQualifiedId) {
+    if (conversationIdFromQualifiedId !== undefined) {
       conversationData.id = conversationIdFromQualifiedId;
     }
 
@@ -272,25 +272,25 @@ export class ConversationMapper {
 
     let conversationEntity = new Conversation(
       id,
-      conversationData.domain || conversationData.qualified_id?.domain,
+      conversationData.domain ?? conversationData.qualified_id?.domain,
       protocol,
     );
     conversationEntity.roles(this.computeRoles(conversationData));
 
     conversationEntity.creator = creator;
     conversationEntity.groupId = group_id;
-    conversationEntity.initialProtocol = initial_protocol || protocol;
+    conversationEntity.initialProtocol = initial_protocol ?? protocol;
     conversationEntity.epoch = epoch ?? -1;
     conversationEntity.cipherSuite = cipher_suite;
     conversationEntity.type(type);
-    conversationEntity.name(name || '');
-    conversationEntity.groupConversationType(group_conv_type || GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
-    conversationEntity.conversationModerator(add_permission || ADD_PERMISSION.ADMINS);
-    conversationEntity.cellsState(cells_state || CONVERSATION_CELLS_STATE.DISABLED);
-    const selfState = members?.self || conversationData;
+    conversationEntity.name(name ?? '');
+    conversationEntity.groupConversationType(group_conv_type ?? GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
+    conversationEntity.conversationModerator(add_permission ?? ADD_PERMISSION.ADMINS);
+    conversationEntity.cellsState(cells_state ?? CONVERSATION_CELLS_STATE.DISABLED);
+    const selfState = members?.self ?? conversationData;
     conversationEntity = ConversationMapper.updateSelfStatus(conversationEntity, selfState as any);
 
-    if (!conversationEntity.last_event_timestamp() && initialTimestamp) {
+    if ((conversationEntity.last_event_timestamp() ?? 0) === 0 && initialTimestamp !== undefined) {
       conversationEntity.last_event_timestamp(initialTimestamp);
       conversationEntity.last_server_timestamp(initialTimestamp);
     }
@@ -301,19 +301,20 @@ export class ConversationMapper {
 
     // Active participants from database or backend payload
     let participatingUserIds: QualifiedId[] = [];
+    const otherMembers = members?.others ?? [];
 
-    if (qualified_others) {
+    if ((qualified_others?.length ?? 0) > 0) {
       participatingUserIds = qualified_others;
     }
 
-    if (!qualified_others && members?.others?.length) {
-      participatingUserIds = members.others.map(other => ({
+    if (qualified_others === undefined && otherMembers.length > 0) {
+      participatingUserIds = otherMembers.map(other => ({
         domain: other.qualified_id?.domain ?? '',
         id: other.id,
       }));
     }
 
-    if (!qualified_others && !members?.others?.length && others) {
+    if (qualified_others === undefined && otherMembers.length === 0 && others !== undefined) {
       participatingUserIds = others.map(userId => ({
         domain: '',
         id: userId,
@@ -323,22 +324,22 @@ export class ConversationMapper {
     conversationEntity.participating_user_ids(participatingUserIds);
 
     // Team ID from database or backend payload
-    const teamId = conversationData.team_id || conversationData.team;
-    if (teamId) {
+    const teamId = conversationData.team_id ?? conversationData.team;
+    if (teamId !== undefined) {
       conversationEntity.teamId = teamId;
     }
 
-    if (conversationData.is_guest) {
+    if (conversationData.is_guest !== undefined) {
       conversationEntity.isGuest(conversationData.is_guest);
     }
 
     // Access related data
-    const accessModes = conversationData.accessModes || conversationData.access;
-    const accessRole = conversationData.accessRole || conversationData.access_role;
-    const accessRoleV2 = conversationData.accessRoleV2 || conversationData.access_role_v2;
-    if (accessModes && (accessRole || accessRoleV2)) {
+    const accessModes = conversationData.accessModes ?? conversationData.access;
+    const accessRole = conversationData.accessRole ?? conversationData.access_role;
+    const accessRoleV2 = conversationData.accessRoleV2 ?? conversationData.access_role_v2;
+    if (accessModes !== undefined && (accessRole !== undefined || accessRoleV2 !== undefined)) {
       conversationEntity.accessModes = accessModes;
-      conversationEntity.accessRole = accessRoleV2 || accessRole;
+      conversationEntity.accessRole = accessRoleV2 ?? accessRole;
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
     }
@@ -360,14 +361,14 @@ export class ConversationMapper {
   ): ConversationDatabaseData[] {
     const foundRemoteConversations = remoteConversations.found;
 
-    if (!foundRemoteConversations) {
+    if (foundRemoteConversations === undefined) {
       return localConversations;
     }
 
     const conversationsMap = new Map<string, ConversationDatabaseData>();
 
     for (const localConversation of localConversations) {
-      const conversationId = localConversation.qualified_id?.id || localConversation.id;
+      const conversationId = localConversation.qualified_id?.id ?? localConversation.id;
       conversationsMap.set(conversationId, localConversation);
     }
 
@@ -376,12 +377,12 @@ export class ConversationMapper {
       const conversationId = remoteConversation.qualified_id?.id;
       const localConversation = conversationsMap.get(conversationId);
 
-      if (localConversation) {
+      if (localConversation !== undefined) {
         conversationsMap.set(conversationId, this.mergeSingleConversation(localConversation, remoteConversation, i));
         continue;
       }
 
-      const localConversationData = (remoteConversation.qualified_id || {
+      const localConversationData = (remoteConversation.qualified_id ?? {
         id: conversationId,
         domain: '',
       }) as ConversationDatabaseData;
@@ -477,7 +478,7 @@ export class ConversationMapper {
     const mergedConversation: ConversationDatabaseData = {...localConversationData, ...updates};
 
     const isGroup = type === CONVERSATION_TYPE.REGULAR;
-    const noOthers = !mergedConversation.others || !mergedConversation.others.length;
+    const noOthers = mergedConversation.others === undefined || mergedConversation.others.length === 0;
     if (isGroup || noOthers) {
       mergedConversation.others = othersStates
         .filter(otherState => (otherState.status as number) === (ConversationStatus.CURRENT_MEMBER as number))
@@ -485,13 +486,13 @@ export class ConversationMapper {
     }
 
     // This should ensure a proper order
-    if (!mergedConversation.last_event_timestamp && lastEventTimestampFallback !== undefined) {
+    if (mergedConversation.last_event_timestamp === undefined && lastEventTimestampFallback !== undefined) {
       mergedConversation.last_event_timestamp = lastEventTimestampFallback + 1;
     }
 
     // Set initially or correct server timestamp
     const wrongServerTimestamp = mergedConversation.last_server_timestamp < mergedConversation.last_event_timestamp;
-    if (!mergedConversation.last_server_timestamp || wrongServerTimestamp) {
+    if (mergedConversation.last_server_timestamp === undefined || wrongServerTimestamp) {
       mergedConversation.last_server_timestamp = mergedConversation.last_event_timestamp;
     }
 
@@ -524,9 +525,10 @@ export class ConversationMapper {
   }
 
   static mapAccessCode(conversation: Conversation, accessCode: ConversationCode): void {
-    const isTeamConversation = conversation && conversation.teamId;
+    const isTeamConversation =
+      conversation.teamId !== undefined && conversation.teamId !== null && conversation.teamId !== '';
 
-    if (accessCode.uri && isTeamConversation) {
+    if (accessCode.uri !== undefined && isTeamConversation) {
       const baseUrl = `${window.wire.env.URL.ACCOUNT_BASE}/conversation-join/?key=${accessCode.key}&code=${accessCode.code}`;
       const accessCodeUrl = conversation.domain ? `${baseUrl}&domain=${conversation.domain}` : baseUrl;
       conversation.accessCode(accessCodeUrl);
@@ -557,7 +559,7 @@ export class ConversationMapper {
         accessState = this.mapAccessStateV2(accessRole);
       }
 
-      if (accessState) {
+      if (accessState !== undefined) {
         return conversationEntity.accessState(accessState);
       }
 

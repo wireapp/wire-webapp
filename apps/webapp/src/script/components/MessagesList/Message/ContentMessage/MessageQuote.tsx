@@ -46,7 +46,7 @@ import {TextMessageRenderer} from './asset/TextMessageRenderer';
 import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
-import {ConversationError} from '../../../../error/ConversationError';
+import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 
@@ -110,7 +110,7 @@ export const Quote: FC<QuoteProps> = ({
   }, [quotedMessage]);
 
   useEffect(() => {
-    if (!error && quote.messageId) {
+    if (error === undefined && quote.messageId !== '') {
       findMessage(conversation, quote.messageId)
         .then(message => {
           setQuotedMessage(message as ContentMessage);
@@ -126,7 +126,7 @@ export const Quote: FC<QuoteProps> = ({
 
   return (
     <div className="message-quote" data-uie-name="quote-item">
-      {error ? (
+      {error !== undefined ? (
         <div className="message-quote__error" data-uie-name="label-error-quote">
           {t('replyQuoteError')}
         </div>
@@ -290,9 +290,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         type="button"
         className="button-reset-default message-quote__timestamp"
         onClick={() => {
-          if (quotedMessage) {
-            focusMessage(quotedMessage.id);
-          }
+          focusMessage(quotedMessage.id);
         }}
         data-uie-name="label-timestamp-quote"
         tabIndex={messageFocusedTabIndex}

@@ -123,7 +123,7 @@ export const CallingParticipantList = ({
                     key={participant.clientId}
                     callParticipant={participant}
                     isSelfVerified={isSelfVerified}
-                    showContextMenu={!!isModerator}
+                    showContextMenu={isModerator === true}
                     onContextMenu={event => getParticipantContext(event, participant)}
                     isLast={participantsArray.length === index}
                   />
@@ -143,7 +143,7 @@ export const CallingParticipantList = ({
                   key={participant.clientId}
                   callParticipant={participant}
                   isSelfVerified={isSelfVerified}
-                  showContextMenu={!!isModerator}
+                  showContextMenu={isModerator === true}
                   onContextMenu={event => getParticipantContext(event, participant)}
                   isLast={participantsArray.length === index}
                 />

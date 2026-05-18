@@ -19,7 +19,7 @@
 
 import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
-import {combinePermissions, hasPermissions} from 'Repositories/user/UserPermission';
+import {combinePermissions, hasPermissions} from 'Repositories/user/userPermission';
 
 import {ACCESS_STATE, TEAM} from './AccessState';
 
@@ -116,7 +116,7 @@ export function accessFromPermissions(permissions: number): TEAM {
   const detectedRole = AccessStatesByPerm.filter(role => !invalidRoles.includes(role)).find(role =>
     hasPermissionForRole(permissions, role),
   );
-  return detectedRole || ACCESS_STATE.TEAM.LEGACY;
+  return detectedRole ?? ACCESS_STATE.TEAM.LEGACY;
 }
 
 function hasPermissionForRole(memberPermissions: number, state: ACCESS_STATE): boolean {
@@ -153,9 +153,9 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     .forEach(feature => {
       const accessRole = CONVERSATION_ACCESS_ROLE[feature as keyof typeof CONVERSATION_ACCESS_ROLE];
       const accessModes = CONVERSATION_ACCESS[feature as keyof typeof CONVERSATION_ACCESS];
-      if (accessRole) {
+      if (accessRole !== undefined) {
         newAccessRights.accessRole.push(accessRole);
-      } else if (accessModes) {
+      } else if (accessModes !== undefined) {
         newAccessRights.accessModes.push(accessModes);
       }
     });

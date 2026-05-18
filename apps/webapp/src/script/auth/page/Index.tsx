@@ -19,6 +19,7 @@
 
 import React, {useCallback, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {Navigate, useNavigate} from 'react-router-dom';
@@ -30,7 +31,7 @@ import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/r
 
 import {LogoFullIcon} from 'Components/Icon';
 import {useSingleInstance} from 'Hooks/useSingleInstance';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';
 import {t} from 'Util/localizerUtil';
@@ -59,7 +60,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
 
   useEffect(() => {
     const queryLogoutReason = UrlUtil.getURLParameter(QUERY_KEY.LOGOUT_REASON) || null;
-    if (queryLogoutReason) {
+    if (is.nonEmptyString(queryLogoutReason)) {
       setLogoutReason(queryLogoutReason);
     }
   }, []);
@@ -78,7 +79,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
     }
   }, [immediateLogin]);
 
-  if (defaultSSOCode || isEnterpriseLoginV2Enabled) {
+  if (is.nonEmptyString(defaultSSOCode) || isEnterpriseLoginV2Enabled) {
     // Redirect to prefilled SSO login if default SSO code is set on backend
     // or if enterprise login v2 is enabled
     return <Navigate to={`${ROUTE.SSO}/${getPrefixedSSOCode(defaultSSOCode)}`} />;
@@ -142,7 +143,7 @@ const IndexComponent = ({defaultSSOCode, doInit}: Props & ConnectedProps & Dispa
         <Button type="button" onClick={() => navigate(ROUTE.LOGIN)} block data-uie-name="go-login">
           {t('index.login')}
         </Button>
-        {logoutReason && (
+        {is.nonEmptyString(logoutReason) && (
           <ErrorMessage data-uie-name="status-logout-reason">
             <FormattedMessage
               id={logoutReasonStrings[logoutReason]}

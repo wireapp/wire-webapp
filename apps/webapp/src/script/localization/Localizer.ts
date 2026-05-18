@@ -40,7 +40,7 @@ import sk from 'I18n/sk-SK.json';
 import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
-import {StorageKey} from 'Repositories/storage/StorageKey';
+import {StorageKey} from 'Repositories/storage/storageKey';
 import {DEFAULT_LOCALE, setLocale, setStrings} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/storageUtil';
 import {setDateLocale, LocaleType} from 'Util/timeUtil';

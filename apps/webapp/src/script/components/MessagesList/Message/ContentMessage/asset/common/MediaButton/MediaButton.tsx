@@ -103,7 +103,7 @@ const MediaButton = ({
         />
       )}
       {isDownloading && (
-        <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress || 0} onCancel={cancel} />
+        <AssetLoader large={large} loadProgress={unwrappedAsset.downloadProgress ?? 0} onCancel={cancel} />
       )}
       {isUploading && <AssetLoader large={large} loadProgress={uploadProgress} onCancel={cancel} />}
     </div>

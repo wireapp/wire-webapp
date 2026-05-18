@@ -94,7 +94,7 @@ export type MenuRenderFn<TOption extends TypeaheadOption> = (
 
 const scrollToOption = <TOption extends TypeaheadOption>(index: number, options: TOption[]) => {
   const selectedOption = options[index];
-  const element = selectedOption && selectedOption.ref?.current;
+  const element = selectedOption !== undefined ? selectedOption.ref?.current : undefined;
   element?.scrollIntoView({block: 'nearest'});
 };
 
@@ -212,7 +212,7 @@ function isSelectionOnEntityBoundary(editor: LexicalEditor, offset: number): boo
 }
 
 function startTransition(callback: () => void) {
-  if (React.startTransition) {
+  if (typeof React.startTransition === 'function') {
     React.startTransition(callback);
   } else {
     callback();
@@ -336,7 +336,7 @@ function LexicalPopoverMenu<TOption extends TypeaheadOption>({
     containerId,
     resolution: resolution,
     setResolution,
-    className: `typeahead-menu ${anchorClassName || ''}`,
+    className: `typeahead-menu ${anchorClassName ?? ''}`,
     menuVisible,
     onAdded: () => {
       // when the menu first renders, we scroll to the initially selected element
@@ -527,7 +527,7 @@ function useMenuAnchorRef(opt: UseMenuAnchorRefOptions): MutableRefObject<HTMLEl
       }
 
       if (!containerDiv.isConnected) {
-        if (className) {
+        if (className !== undefined && className !== '') {
           containerDiv.className = className;
         }
         containerDiv.setAttribute('aria-label', 'Typeahead menu');

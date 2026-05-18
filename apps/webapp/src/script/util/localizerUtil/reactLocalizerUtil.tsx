@@ -52,7 +52,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
     [[], []] as [StringReplacement[], ComponentReplacement[]],
   );
 
-  if (!componentReplacements.length && !stringReplacements.length) {
+  if (componentReplacements.length === 0 && stringReplacements.length === 0) {
     return [html];
   }
 
@@ -73,7 +73,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
   return html
     .split(splitRegexp)
     .map(node => {
-      if (!node) {
+      if (typeof node !== 'string' || node.length === 0) {
         return false;
       }
       const componentsReplacementMatch = componentReplacements.find(
@@ -87,7 +87,7 @@ export function replaceReactComponents(html: string, replacements: Replacement[]
         );
 
         // There is a special case where we have a string replacement inside a component replacement.
-        if (stringSplitRegexpStr) {
+        if (stringSplitRegexpStr !== null) {
           const regexp = new RegExp(stringSplitRegexpStr, 'g');
           const split = text.split(regexp);
           return split

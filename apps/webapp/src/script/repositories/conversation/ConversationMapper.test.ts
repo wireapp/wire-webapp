@@ -33,7 +33,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {BaseError} from 'src/script/error/BaseError';
+import {BaseError} from 'src/script/error/baseError';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';

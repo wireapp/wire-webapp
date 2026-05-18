@@ -99,7 +99,7 @@ export class ConnectionAPI {
         allConnections = allConnections.concat(connections);
       }
 
-      if (has_more) {
+      if (has_more === true) {
         return getConnectionChunks(paging_state);
       }
 

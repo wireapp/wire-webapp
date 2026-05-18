@@ -735,6 +735,17 @@ describe('MLSService', () => {
     });
   });
 
+  describe('updateKeyingMaterialForConversation', () => {
+    it('updates keying material in a core crypto transaction', async () => {
+      const [mlsService, {transactionContext}] = await createMLSService();
+      const groupId = 'mXOagqRIX/RFd7QyXJA8/Ed8X+hvQgLXIiwYHm4OQFc=';
+
+      await mlsService.updateKeyingMaterialForConversation(groupId);
+
+      expect(transactionContext.updateKeyingMaterial).toHaveBeenCalledWith(expect.any(ConversationId));
+    });
+  });
+
   describe('handleMLSWelcomeMessageEvent', () => {
     it("before processing welcome it verifies that there's enough key packages locally", async () => {
       const [mlsService, {apiClient, transactionContext}] = await createMLSService();

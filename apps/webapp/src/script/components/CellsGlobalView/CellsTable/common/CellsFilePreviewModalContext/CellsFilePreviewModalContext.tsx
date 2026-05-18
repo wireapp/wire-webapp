@@ -48,7 +48,7 @@ export const FilePreviewProvider = ({children}: FilePreviewProviderProps) => {
       isEditMode,
       handleOpenFile: (file: CellFile, isEditMode?: boolean) => {
         setSelectedFile(file);
-        setIsEditMode(!!isEditMode);
+        setIsEditMode(isEditMode === true);
       },
       handleCloseFile: () => setSelectedFile(null),
     }),
@@ -60,7 +60,7 @@ export const FilePreviewProvider = ({children}: FilePreviewProviderProps) => {
 
 export const useCellsFilePreviewModal = () => {
   const context = useContext(CellsFilePreviewModalContext);
-  if (!context) {
+  if (context === null) {
     throw new Error('useCellsFilePreviewModal must be used within a CellsFilePreviewModalProvider');
   }
   return context;

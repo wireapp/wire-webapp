@@ -19,7 +19,7 @@
 
 export const loadState = (key: string): number | undefined => {
   const storedState = localStorage.getItem(key);
-  return !storedState ? undefined : parseInt(storedState, 10);
+  return storedState === null ? undefined : parseInt(storedState, 10);
 };
 
 export const saveState = (key: string, firedAt: number) => {

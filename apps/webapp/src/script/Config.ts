@@ -101,6 +101,8 @@ const config = {
 
   COUNTLY_SERVER_URL: 'https://wire.count.ly/',
   GET_WIRE_URL: 'https://wire.com/app-download',
+  PRIVACY_POLICY_URL_DE: 'https://wire.com/de/datenschutzerklaerung',
+  TERMS_OF_USE_URL_DE: 'https://wire.com/de/legal/teams',
 } as const;
 
 export type Configuration = typeof config;
@@ -113,7 +115,7 @@ const Config = {
     (config.FEATURE as unknown) = newConfigFeatures;
   },
   getDesktopConfig: () => {
-    if (!Runtime.isDesktopApp) {
+    if (!Runtime.isDesktopApp()) {
       return undefined;
     }
 

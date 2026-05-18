@@ -21,7 +21,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
-import {expect, test, withConnectedUser, withLogin} from '../../test.fixtures';
+import {expect, test, withLogin} from '../../test.fixtures';
 import {Locator} from 'playwright/test';
 
 test.describe('Archive', () => {
@@ -37,7 +37,8 @@ test.describe('Archive', () => {
     'I want to archive and unarchive conversation via conversation list',
     {tag: ['@TC-97', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
+      const page = await createPage(withLogin(memberA));
+      await connectWithUser(page, memberB);
       const {pages, components} = PageManager.from(page).webapp;
 
       const conversation = pages.conversationList().getConversation(memberB.fullName);
@@ -61,10 +62,13 @@ test.describe('Archive', () => {
     'Verify the conversation is not unarchived when there are new messages in this conversation',
     {tag: ['@TC-99', '@regression']},
     async ({createPage}) => {
-      const [memberAPages, memberBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(memberA), withConnectedUser(memberB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+      const [memberAPage, memberBPage] = await Promise.all([
+        createPage(withLogin(memberA)),
+        createPage(withLogin(memberB)),
       ]);
+      await connectWithUser(memberAPage, memberB);
+
+      const [memberAPages, memberBPages] = [memberAPage, memberBPage].map(page => PageManager.from(page).webapp.pages);
 
       const memberAConversation = await memberAPages
         .conversationList()
@@ -96,7 +100,8 @@ test.describe('Archive', () => {
     ] as const
   ).forEach(({title, tag}) => {
     test(title, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
+      const page = await createPage(withLogin(memberA));
+      await connectWithUser(page, memberB);
       const {pages, components} = PageManager.from(page).webapp;
 
       const conversation = await pages.conversationList().getConversation(memberB.fullName).open();

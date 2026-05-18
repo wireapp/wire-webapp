@@ -24,7 +24,7 @@ import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {AssetType} from 'Repositories/assets/assetType';
-import type {ReadReceipt} from 'Repositories/storage/record/EventRecord';
+import type {ReadReceipt} from 'Repositories/storage/record/eventRecord';
 import {t, getUserName} from 'Util/localizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -199,8 +199,7 @@ export class Message {
 
   hasMultipartAsset(): this is ContentMessage {
     const contentMessageCandidate = this as unknown as {assets?: () => Array<{type: AssetType}>};
-    const hasAssetsFunction =
-      Object.prototype.hasOwnProperty.call(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
+    const hasAssetsFunction = Object.hasOwn(this, 'assets') && typeof contentMessageCandidate.assets === 'function';
     return this.isContent() && hasAssetsFunction
       ? this.assets().some(assetEntity => assetEntity.type === AssetType.MULTIPART)
       : false;

@@ -30,7 +30,7 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 
 import {CallingViewModel} from './CallingViewModel';
 
-import {Core} from '../service/CoreSingleton';
+import {Core} from '../service/coreSingleton';
 
 export const mockCallingRepository = {
   startCall: jest.fn(),

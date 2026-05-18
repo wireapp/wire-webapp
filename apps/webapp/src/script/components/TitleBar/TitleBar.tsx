@@ -119,7 +119,7 @@ export const TitleBar = ({
   const isStartingCallRef = useRef(false);
 
   // Reset local state when a call becomes active or cleared
-  if (isStartingCallRef && (isCallActive || activeCalls.length === 0)) {
+  if (isStartingCallRef.current && (isCallActive || activeCalls.length === 0)) {
     isStartingCallRef.current = false;
   }
 
@@ -152,7 +152,7 @@ export const TitleBar = ({
 
   const showCallControls = ConversationFilter.showCallControls(conversation, hasCall);
 
-  const conversationSubtitle = is1to1 && firstUserEntity?.isFederated ? (firstUserEntity?.handle ?? '') : '';
+  const conversationSubtitle = is1to1 && firstUserEntity?.isFederated === true ? (firstUserEntity?.handle ?? '') : '';
 
   const conversationDetailsTooltip = t('tooltipConversationPeople', {displayName});
 
@@ -439,22 +439,22 @@ export function generateWarningBadgeKey({
 }): WarningBadgeKey {
   const baseKey = 'guestRoomConversationBadge';
   const extras = [];
-  if (hasGuest && !hasExternal && !hasService && !hasFederated) {
+  if (hasGuest === true && hasExternal !== true && hasService !== true && hasFederated !== true) {
     return baseKey;
   }
-  if (hasFederated) {
+  if (hasFederated === true) {
     extras.push('Federated');
   }
-  if (hasExternal) {
+  if (hasExternal === true) {
     extras.push('External');
   }
-  if (hasGuest) {
+  if (hasGuest === true) {
     extras.push('Guest');
   }
-  if (hasService) {
+  if (hasService === true) {
     extras.push('Service');
   }
-  if (!extras.length) {
+  if (extras.length === 0) {
     return '';
   }
   return `${baseKey}${extras.join('And')}` as WarningBadgeKey;

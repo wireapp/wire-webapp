@@ -70,6 +70,7 @@ export class ConversationListPage {
       unreadIndicator: conversation.getByTitle('Unread message'),
       mutedIndicator: conversation.getByTitle('Muted conversation'),
       mentionIndicator: conversation.getByTitle('Unread mention'),
+      unreadReplyIndicator: conversation.getByTitle('Unread reply'),
       blockedIndicator: conversation.locator(`span[data-uie-name="status-label"] + span`),
       joinCallButton: conversation.getByRole('button', {name: 'Join'}),
 
@@ -103,6 +104,7 @@ export class ConversationListPage {
       unarchiveButton: contextMenu.getByRole('button', {name: 'Unarchive'}),
       blockButton: contextMenu.getByRole('button', {name: 'Block'}),
       unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
+      addToFavoritesButton: contextMenu.getByRole('button', {name: 'Add to favorites'}),
       moveToButton: contextMenu.getByRole('button', {name: 'Move to'}),
       notificationsButton: contextMenu.getByRole('menuitem', {name: 'Notifications'}),
       clearContentButton: contextMenu.getByRole('button', {name: 'Clear content'}),

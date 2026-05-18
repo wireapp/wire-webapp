@@ -32,6 +32,7 @@ declare global {
   interface Window {
     wire: WireModule;
     amplify: amplify.Static;
+    showOpenFilePicker: () => Promise<FileSystemFileHandle[]>;
     z: any;
   }
 

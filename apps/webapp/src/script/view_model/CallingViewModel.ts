@@ -43,11 +43,11 @@ import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {isPermissionGranted} from 'Repositories/permission/permissionHandlers';
 import {PermissionType} from 'Repositories/permission/PermissionType';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {ROLE} from 'Repositories/user/UserPermission';
+import {ROLE} from 'Repositories/user/userPermission';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
@@ -101,7 +101,7 @@ export class CallingViewModel {
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
         const {conversation} = call;
-        if (!conversation || conversation.isSelfUserRemoved()) {
+        if (conversation.isSelfUserRemoved()) {
           return false;
         }
 
@@ -132,7 +132,7 @@ export class CallingViewModel {
       };
       const initialCallState = call.state();
       const soundId = sounds[initialCallState];
-      if (!soundId || typeof call.reason() !== 'undefined') {
+      if (soundId === undefined || typeof call.reason() !== 'undefined') {
         return;
       }
 

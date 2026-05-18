@@ -19,11 +19,14 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {useDebouncedCallback} from 'use-debounce';
+
+import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';
 import {getUsersFromNodes} from './getUsersFromNodes';
@@ -36,18 +39,32 @@ interface UseSearchCellsNodesProps {
   cellsRepository: CellsRepository;
   userRepository: UserRepository;
   conversationRepository: ConversationRepository;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
+
+type SearchNodesProperties = {
+  query: string;
+  status: Status;
+  limit?: number;
+};
+
+type UseSearchCellsNodesResult = {
+  searchValue: string;
+  pageSize: number;
+  increasePageSize: () => Promise<void>;
+  setPageSize: (pageSize: number) => void;
+  handleSearch: (value: string) => void;
+  handleReload: () => Promise<void>;
+  handleClearSearch: () => Promise<void>;
+};
 
 const PAGE_INITIAL_SIZE = 30;
 const PAGE_SIZE_INCREMENT = 20;
 const DEBOUNCE_TIME = 300;
 const FETCH_ALL_QUERY = '*';
 
-export const useSearchCellsNodes = ({
-  cellsRepository,
-  userRepository,
-  conversationRepository,
-}: UseSearchCellsNodesProps) => {
+export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSearchCellsNodesResult => {
+  const {cellsRepository, userRepository, conversationRepository, fireAndForgetInvoker} = properties;
   const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
@@ -57,11 +74,12 @@ export const useSearchCellsNodes = ({
   const shouldPerformFullReload = useRef(true);
 
   const searchNodes = useCallback(
-    async ({query, status, limit = pageSize}: {query: string; status: Status; limit?: number}) => {
+    async (properties: SearchNodesProperties): Promise<void> => {
+      const {query, status, limit = pageSize} = properties;
       try {
         setStatus(status);
 
-        const shouldSort = !query || query === FETCH_ALL_QUERY;
+        const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
 
         const result = await cellsRepository.searchNodes({
           query,
@@ -74,26 +92,26 @@ export const useSearchCellsNodes = ({
         });
 
         const users = await getUsersFromNodes({
-          nodes: result.Nodes || [],
+          nodes: result.Nodes ?? [],
           userRepository,
         });
 
         const conversations = await getConversationsFromNodes({
-          nodes: result.Nodes || [],
+          nodes: result.Nodes ?? [],
           conversationRepository,
         });
 
         // filter out draft nodes from results
-        const filteredNodes = result.Nodes?.filter(node => !node.IsDraft);
+        const filteredNodes = result.Nodes?.filter(node => node.IsDraft !== true) ?? [];
 
         const transformedNodes = transformCellsNodes({
-          nodes: filteredNodes || [],
+          nodes: filteredNodes,
           users,
           conversations,
         });
 
         setNodes(transformedNodes);
-        if (result.Pagination) {
+        if (result.Pagination !== undefined) {
           setPagination(transformCellsPagination(result.Pagination));
         } else {
           setPagination(null);
@@ -104,7 +122,7 @@ export const useSearchCellsNodes = ({
         }
 
         setStatus('success');
-      } catch (error: unknown) {
+      } catch {
         // If the user isn't part of any cells-enabled conversations, the user will not exist in Cells database
         // the search will return a 401 error
         const hasCellsConversations = conversationRepository.getAllCellEnabledGroupConversations().length > 0;
@@ -122,42 +140,44 @@ export const useSearchCellsNodes = ({
     [pageSize, setNodes, setPagination, setStatus, filters],
   );
 
-  const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
+  const searchNodesDebounced = useDebouncedCallback(async (value: string): Promise<void> => {
     shouldPerformFullReload.current = false;
     setSearchQuery(value);
     await searchNodes({query: value, status: 'loading'});
     shouldPerformFullReload.current = true;
   }, DEBOUNCE_TIME);
 
-  const handleSearch = (value: string) => {
-    if (!value) {
-      void handleClearSearch();
+  const handleSearch = (value: string): void => {
+    if (!is.nonEmptyString(value)) {
+      fireAndForgetInvoker.fireAndForget(handleClearSearch);
       return;
     }
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue(value);
-    void searchNodesDebounced(value);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await searchNodesDebounced(value);
+    });
   };
 
-  const handleClearSearch = async () => {
+  const handleClearSearch = async (): Promise<void> => {
     setPageSize(PAGE_INITIAL_SIZE);
     setSearchValue('');
     setSearchQuery('');
     await searchNodes({query: FETCH_ALL_QUERY, status: 'loading'});
   };
 
-  const handleReload = async () => {
+  const handleReload = async (): Promise<void> => {
     setStatus('loading');
     clearAll();
-    await searchNodes({query: searchQuery || FETCH_ALL_QUERY, status: 'loading'});
+    await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, status: 'loading'});
   };
 
-  const increasePageSize = useCallback(async () => {
+  const increasePageSize = useCallback(async (): Promise<void> => {
     shouldPerformFullReload.current = false;
     setStatus('fetchingMore');
     setPageSize(pageSize + PAGE_SIZE_INCREMENT);
     await searchNodes({
-      query: searchQuery || FETCH_ALL_QUERY,
+      query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY,
       status: 'fetchingMore',
       limit: pageSize + PAGE_SIZE_INCREMENT,
     });
@@ -166,9 +186,11 @@ export const useSearchCellsNodes = ({
 
   useEffect(() => {
     if (isInitialLoad.current || shouldPerformFullReload.current) {
-      void searchNodes({query: searchQuery || FETCH_ALL_QUERY, status: 'loading'});
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await searchNodes({query: searchQuery.length > 0 ? searchQuery : FETCH_ALL_QUERY, status: 'loading'});
+      });
     }
-  }, [searchNodes, searchQuery]);
+  }, [fireAndForgetInvoker, searchNodes, searchQuery]);
 
   return {
     searchValue,

@@ -84,7 +84,7 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
     [HistoryImportState.IMPORTING]: t('backupImportProgressSecondary', replacements),
   };
 
-  const loadingMessage = historyImportMessages?.[historyImportState] || '';
+  const loadingMessage = historyImportMessages[historyImportState] ?? '';
 
   const onCancel = () => backupRepository.cancelAction();
 

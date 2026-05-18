@@ -32,6 +32,7 @@ import axios from 'axios';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
+import {z} from 'zod';
 
 import {
   AUDIO_STATE,
@@ -59,6 +60,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {NetworkQualityInfo, NetworkQualityInfoSchema} from 'Repositories/calling/calling.schema';
 import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -76,11 +78,11 @@ import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/EventName';
-import * as trackingHelpers from 'Repositories/tracking/Helpers';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/Telemetry.helpers';
-import type {UserRepository} from 'Repositories/user/UserRepository';
+import {EventName} from 'Repositories/tracking/eventName';
+import * as trackingHelpers from 'Repositories/tracking/helpers';
+import {Segmentation} from 'Repositories/tracking/segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
+import type {UserRepository} from 'Repositories/user/userRepository';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -103,9 +105,9 @@ import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
 
 import {Config} from '../../Config';
-import {NoAudioInputError} from '../../error/NoAudioInputError';
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {NoAudioInputError} from '../../error/noAudioInputError';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
@@ -549,7 +551,13 @@ export class CallingRepository {
       this.videoStateChanged, // `vstateh`,
     );
     const tenSeconds = 10;
-    wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
+    wCall.setNetworkQualityHandler(
+      wUser,
+      (conversationId, userId, clientId, quality) => {
+        this.updateCallQuality(conversationId, userId, clientId, quality);
+      },
+      tenSeconds,
+    );
     wCall.setMuteHandler(wUser, this.updateMuteState);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
@@ -624,12 +632,28 @@ export class CallingRepository {
     conversationId: SerializedConversationId,
     userId: string,
     clientId: string,
-    quality: number,
+    qualityInfoJson: string,
   ) => {
+    let qualityInfo: NetworkQualityInfo;
+
+    try {
+      const parsedQualityInfo = JSON.parse(qualityInfoJson);
+      qualityInfo = NetworkQualityInfoSchema.parse(parsedQualityInfo);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        this.logger.warn('Invalid network quality info schema', error);
+      } else {
+        this.logger.warn('Invalid network quality info JSON', error);
+      }
+
+      return;
+    }
+
     const call = this.findCall(this.parseQualifiedId(conversationId));
     if (!call) {
       return;
     }
+    const {quality} = qualityInfo;
     if (!this.poorCallQualityUsers[conversationId]) {
       this.poorCallQualityUsers[conversationId] = [];
     }
@@ -642,7 +666,7 @@ export class CallingRepository {
     if (!isOldPoorCallQualityUser && quality !== QUALITY.NORMAL) {
       users = [...users, userId];
     }
-    if (users.length === call.participants.length - 1) {
+    if (users.length === call.participants().length - 1) {
       Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
       Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
@@ -670,6 +694,12 @@ export class CallingRepository {
       case QUALITY.NETWORK_PROBLEM: {
         this.logger.warn(
           `Network problem during call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.RECONNECTING: {
+        this.logger.warn(
+          `Reconnecting call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
         );
         break;
       }

@@ -19,10 +19,11 @@
 
 import React, {useEffect, useLayoutEffect, useRef} from 'react';
 
+import is from '@sindresorhus/is';
 import cx from 'classnames';
 
 import type {User} from 'Repositories/entity/User';
-import {MAX_HANDLE_LENGTH} from 'Repositories/user/UserHandleGenerator';
+import {MAX_HANDLE_LENGTH} from 'Repositories/user/userHandleGenerator';
 import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -68,7 +69,7 @@ export const SearchInput = ({
   return (
     <form
       autoComplete="off"
-      className={`search-outer ${forceDark ? '' : 'user-list-light'}`}
+      className={`search-outer ${forceDark === true ? '' : 'user-list-light'}`}
       css={noSelectedUsers && {minHeight: '32px'}}
     >
       <div className="search-inner-wrap">
@@ -76,7 +77,7 @@ export const SearchInput = ({
           <div className="search-icon icon-search" />
 
           <input
-            className={cx('search-input', {'search-input-padding': !!input})}
+            className={cx('search-input', {'search-input-padding': is.nonEmptyString(input)})}
             data-uie-name="enter-users"
             maxLength={MAX_HANDLE_LENGTH}
             onChange={event => setInput(event.target.value)}
@@ -96,7 +97,7 @@ export const SearchInput = ({
             aria-label={placeholder}
           />
 
-          {input && (
+          {is.nonEmptyString(input) && (
             <button
               className="search-input-cancel"
               onClick={() => setInput('')}

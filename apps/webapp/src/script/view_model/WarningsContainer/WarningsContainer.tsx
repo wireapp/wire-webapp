@@ -283,10 +283,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
         </div>
       )}
       {visibleWarning === type.CALL_QUALITY_POOR && (
-        <div
-          data-uie-name="call-quality-poor"
-          className="warning-bar warning-bar-connection warning-bar-poor-call-quality"
-        >
+        <div data-uie-name="call-quality-poor" className="warning-bar warning-bar-connection">
           <div className="warning-bar-message">
             <span>{t('warningCallQualityPoor')}</span>
           </div>

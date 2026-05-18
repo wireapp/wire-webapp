@@ -17,8 +17,8 @@
  *
  */
 
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 
 describe('PropertiesRepository', () => {

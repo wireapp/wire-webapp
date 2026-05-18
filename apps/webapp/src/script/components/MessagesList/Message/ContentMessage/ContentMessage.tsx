@@ -155,10 +155,10 @@ export const ContentMessageComponent = ({
   };
 
   const asset = assets?.[0] as FileAssetType | undefined;
-  const isFileMessage = !!asset?.isFile();
-  const isAudioMessage = !!asset?.isAudio();
-  const isVideoMessage = !!asset?.isVideo();
-  const isImageMessage = !!asset?.isImage();
+  const isFileMessage = asset?.isFile() === true;
+  const isAudioMessage = asset?.isAudio() === true;
+  const isVideoMessage = asset?.isVideo() === true;
+  const isImageMessage = asset?.isImage() === true;
 
   const isAssetMessage = isFileMessage || isAudioMessage || isVideoMessage || isImageMessage;
   const isEphemeralMessage = ephemeral_status === EphemeralStatusType.ACTIVE;
@@ -274,7 +274,7 @@ export const ContentMessageComponent = ({
 
         {message.expectsReadConfirmation && (
           <div css={deliveredMessageIndicator}>
-            {is1to1 && isLastDeliveredMessage && (
+            {is1to1 === true && isLastDeliveredMessage && (
               <div
                 data-uie-name="status-message-read-receipt-delivered"
                 title={t('conversationMessageDelivered')}
@@ -303,7 +303,7 @@ export const ContentMessageComponent = ({
         />
       )}
 
-      {!!reactions.length && (
+      {reactions.length > 0 && (
         <MessageReactionsList
           reactions={reactions}
           selfUserId={selfId}

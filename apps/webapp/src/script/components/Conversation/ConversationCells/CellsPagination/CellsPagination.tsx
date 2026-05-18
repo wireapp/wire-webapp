@@ -73,7 +73,7 @@ export const CellsPagination = ({
   return (
     <FlexBox css={containerStyles}>
       <p css={pageResultStyles}>
-        {totalRows && lastRow
+        {totalRows !== undefined && lastRow !== undefined
           ? t('cells.pagination.resultsOutOf', {start: firstRow, end: lastRow, total: totalRows})
           : null}
       </p>

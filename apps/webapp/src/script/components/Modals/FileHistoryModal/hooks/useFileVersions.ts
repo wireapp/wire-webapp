@@ -25,7 +25,7 @@ import {RestVersion} from 'cells-sdk-ts';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
@@ -47,7 +47,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
   const [toBeRestoredVersionId, setToBeRestoredVersionId] = useState<string>();
 
   useEffect(() => {
-    if (!nodeUuid) {
+    if (nodeUuid === undefined || nodeUuid === '') {
       setFileInfo(undefined);
       setFileVersions({});
       return;
@@ -65,7 +65,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
         ]);
 
         // Validate node data
-        if (!node?.Path) {
+        if (node?.Path == null || node.Path === '') {
           throw new Error(t('fileHistoryModal.invalidNodeData'));
         }
 
@@ -77,8 +77,9 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 
         setFileInfo(info);
 
-        const ownerNamesByUserIdMap = getOwnerNamesByUserIdMap(versions || []);
-        const groupedVersions = groupVersionsByDate(versions || [], version => {
+        const nodeVersions = versions ?? [];
+        const ownerNamesByUserIdMap = getOwnerNamesByUserIdMap(nodeVersions);
+        const groupedVersions = groupVersionsByDate(nodeVersions, version => {
           const ownerQualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
           if (!ownerQualifiedId) {
             return undefined;
@@ -116,7 +117,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
       setIsDownloading(true);
       setError(undefined);
       try {
-        await forcedDownloadFile({url, name: fileInfo?.name || 'file'});
+        await forcedDownloadFile({url, name: fileInfo?.name ?? 'file'});
       } finally {
         setIsDownloading(false);
       }
@@ -125,7 +126,12 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
   );
 
   const handleRestore = useCallback(async () => {
-    if (!toBeRestoredVersionId || !nodeUuid) {
+    if (
+      toBeRestoredVersionId === undefined ||
+      toBeRestoredVersionId === '' ||
+      nodeUuid === undefined ||
+      nodeUuid === ''
+    ) {
       return;
     }
     setIsLoading(true);
@@ -156,7 +162,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 };
 
 const parseOwnerQualifiedId = (ownerUuid?: string): QualifiedId | undefined => {
-  if (!ownerUuid) {
+  if (ownerUuid === undefined || ownerUuid === '') {
     return undefined;
   }
 
@@ -176,13 +182,15 @@ const getOwnerNamesByUserIdMap = (versions: Partial<RestVersion>[]): Map<string,
     }),
   );
 
-  if (!ownerIds.size) {
+  if (ownerIds.size === 0) {
     return new Map();
   }
 
   try {
     const users = container.resolve(UserState).users();
-    const matchingUsers = users.filter(user => ownerIds.has(user.id) && user.name());
+    const matchingUsers = users.filter(user => {
+      return ownerIds.has(user.id) && user.name() !== '';
+    });
 
     return new Map<string, string>(matchingUsers.map(user => [user.id, user.name()]));
   } catch (error) {

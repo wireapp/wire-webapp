@@ -64,6 +64,10 @@ import {User} from 'Repositories/entity/User';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/effects/backgroundEffectsController';
 import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {setStrings} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -105,6 +109,9 @@ const withRouter = (component: React.ReactNode) => (
   <Router future={{v7_relativeSplatPath: true, v7_startTransition: true}}>{component}</Router>
 );
 
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
 const loadLanguage = (language: string) => {
   return require(`I18n/${mapLanguage(language)}.json`);
 };
@@ -119,7 +126,9 @@ export const withIntl = (component: React.ReactNode) => {
   );
 };
 
-export const withTheme = (component: React.ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+export function withTheme(component: React.ReactNode): React.ReactElement {
+  return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children: component})}</StyledApp>;
+}
 
 const wrapComponent = (
   component: React.ReactNode,
@@ -144,7 +153,7 @@ export function generateUsers(nbUsers: number, domain: string) {
 export function generateUserClients(users: User[]): QualifiedUserClients {
   const userClients: QualifiedUserClients = {};
   users.forEach(user => {
-    const domainUsers = userClients[user.qualifiedId.domain] || {};
+    const domainUsers = userClients[user.qualifiedId.domain] ?? {};
     domainUsers[user.qualifiedId.id] = [];
     userClients[user.qualifiedId.domain] = domainUsers;
   });

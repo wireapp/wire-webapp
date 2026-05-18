@@ -37,21 +37,21 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import type {SearchRepository} from 'Repositories/search/SearchRepository';
+import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import type {SearchRepository} from 'Repositories/search/searchRepository';
 import type {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {StorageRepository} from 'Repositories/storage';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import type {EventTrackingRepository} from 'Repositories/tracking/EventTrackingRepository';
-import type {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import type {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
+import type {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
 import {ContentViewModel} from './ContentViewModel';
 import {ListViewModel} from './ListViewModel';
 
-import {Core} from '../service/CoreSingleton';
+import {Core} from '../service/coreSingleton';
 import type {ServerTimeHandler} from '../time/serverTimeHandler';
 
 export interface ViewModelRepositories {

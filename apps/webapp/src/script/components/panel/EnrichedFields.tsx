@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import type {User} from 'Repositories/entity/User';
-import {RichProfileRepository} from 'Repositories/user/RichProfileRepository';
+import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
@@ -49,7 +49,8 @@ export const useEnrichedFields = (
   const {email} = useKoSubscribableChildren(user, ['email']);
   useEffect(() => {
     let cancel = false;
-    const returnFields: RichInfoField[] = addEmail && email ? [{type: t('userProfileEmail'), value: email}] : [];
+    const returnFields: RichInfoField[] =
+      addEmail && email != null && email !== '' ? [{type: t('userProfileEmail'), value: email}] : [];
 
     if (addDomain && user.domain) {
       returnFields.push({

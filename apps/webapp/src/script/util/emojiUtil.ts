@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import emojies from 'emoji-picker-react/src/data/emojis.json';
 import {groupBy} from 'underscore';
 
@@ -54,7 +55,7 @@ Object.keys(emojiesList).forEach(key => {
   }
   const emojiValue = emojiesList[key];
   // return if not found in list
-  if (!emojiValue) {
+  if (emojiValue === undefined) {
     return;
   }
 
@@ -73,7 +74,7 @@ Object.keys(emojiesList).forEach(key => {
 // Function to get the emoji without skintone modifiers
 const removeSkinToneModifiers = (emojiUnicode: string): string => {
   const skinToneModifiers = new Set(['1f3fd', '1f3fe', '1f3ff', '1f3fc', '1f3fb']);
-  if (!emojiUnicode) {
+  if (!is.nonEmptyString(emojiUnicode)) {
     return '';
   }
   const emojiUnicodeSplitted = emojiUnicode.split('-');
@@ -88,7 +89,7 @@ export const getEmojiTitleFromEmojiUnicode = (emojiUnicode: string): string => {
 
   const unicodeWithoutSkinModifier = removeSkinToneModifiers(emojiUnicode);
 
-  return emojiDictionary.get(unicodeWithoutSkinModifier) || '';
+  return emojiDictionary.get(unicodeWithoutSkinModifier) ?? '';
 };
 
 export function getEmojiUnicode(emojis: string) {

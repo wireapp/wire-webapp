@@ -73,7 +73,7 @@ export const UserListItem = ({
   const isTemporaryGuest = user.isTemporaryGuest();
   const isAvailable = user.isAvailable();
 
-  const hasUsernameInfo = !hideInfo && !customInfo && !isTemporaryGuest;
+  const hasUsernameInfo = hideInfo !== true && (customInfo === undefined || customInfo === '') && !isTemporaryGuest;
   const isOthersMode = mode === UserlistMode.OTHERS;
 
   const selfString = `(${capitalizeFirstChar(t('conversationYouNominative'))})`;
@@ -81,11 +81,11 @@ export const UserListItem = ({
   const userName = useUserName(user);
 
   const getContentInfoText = () => {
-    if (customInfo) {
+    if (customInfo !== undefined && customInfo !== '') {
       return customInfo;
     }
 
-    if (hideInfo) {
+    if (hideInfo === true) {
       return '';
     }
 

@@ -87,7 +87,7 @@ export const useCellsStore = create<CellsState>((set, get) => ({
         count += 1;
       }
 
-      if (filters.path) {
+      if (filters.path !== undefined && filters.path.length > 0) {
         count += 1;
       }
 

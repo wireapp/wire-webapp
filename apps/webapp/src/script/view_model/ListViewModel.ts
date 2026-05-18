@@ -30,11 +30,11 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
@@ -223,7 +223,7 @@ export class ListViewModel {
       return this.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
     }
 
-    if (nextItem) {
+    if (nextItem !== undefined) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem, {});
     }
   };
@@ -239,7 +239,7 @@ export class ListViewModel {
 
     const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as ContentState;
 
-    if (nextPreference) {
+    if (nextPreference !== undefined) {
       this.contentViewModel.switchContent(nextPreference);
     }
   };
@@ -433,8 +433,8 @@ export class ListViewModel {
 
     if (!conversationEntity.isGroupOrChannel()) {
       const userEntity = conversationEntity.firstUserEntity();
-      const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
-      const canUnblock = userEntity && userEntity.isBlocked();
+      const canBlock = userEntity !== undefined && (userEntity.isConnected() || userEntity.isRequest());
+      const canUnblock = userEntity !== undefined && userEntity.isBlocked();
 
       if (canBlock) {
         entries.push({

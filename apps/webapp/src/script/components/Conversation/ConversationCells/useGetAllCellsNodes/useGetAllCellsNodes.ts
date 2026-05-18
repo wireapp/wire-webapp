@@ -21,8 +21,10 @@ import {useEffect, useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 
 import {getUsersFromNodes} from './getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from './transformDataToCellsNodes';
@@ -37,6 +39,7 @@ interface UseGetAllCellsNodesProps {
   userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useGetAllCellsNodes = ({
@@ -44,6 +47,7 @@ export const useGetAllCellsNodes = ({
   userRepository,
   conversationQualifiedId,
   enabled,
+  fireAndForgetInvoker,
 }: UseGetAllCellsNodesProps) => {
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
@@ -61,7 +65,7 @@ export const useGetAllCellsNodes = ({
         deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
       });
 
-      if (!result.Nodes?.length) {
+      if (result.Nodes === undefined || result.Nodes.length === 0) {
         setStatus('success');
         setPagination({conversationId: id, pagination: null});
         return;
@@ -70,12 +74,12 @@ export const useGetAllCellsNodes = ({
       const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
       // filter out draft nodes from results
-      const filteredNodes = result.Nodes.filter(node => !node.IsDraft);
+      const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
 
       const transformedNodes = transformDataToCellsNodes({nodes: filteredNodes, users});
       setNodes({conversationId: id, nodes: transformedNodes});
 
-      const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;
+      const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
       setPagination({conversationId: id, pagination});
 
       setStatus('success');
@@ -89,22 +93,22 @@ export const useGetAllCellsNodes = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setNodes, setStatus, setError, id, offset, pageSize, setPagination]);
 
-  const handleHashChange = useCallback(() => {
-    if (!enabled) {
+  const handleHashChange = useCallback((): void => {
+    if (enabled !== true) {
       return;
     }
     clearAll({conversationId: id});
     setOffset(0);
-    void fetchNodes();
-  }, [fetchNodes, setOffset, clearAll, id, enabled]);
+    fireAndForgetInvoker.fireAndForget(fetchNodes);
+  }, [clearAll, enabled, fetchNodes, fireAndForgetInvoker, id, setOffset]);
 
   useEffect(() => {
-    if (!enabled) {
+    if (enabled !== true) {
       return;
     }
 
-    void fetchNodes();
-  }, [fetchNodes, enabled]);
+    fireAndForgetInvoker.fireAndForget(fetchNodes);
+  }, [enabled, fetchNodes, fireAndForgetInvoker]);
 
   useEffect(() => {
     window.addEventListener('hashchange', handleHashChange);

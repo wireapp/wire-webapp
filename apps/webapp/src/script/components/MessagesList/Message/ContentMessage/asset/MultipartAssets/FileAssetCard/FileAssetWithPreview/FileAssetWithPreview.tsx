@@ -68,12 +68,13 @@ export const FileAssetWithPreview = ({
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [isInEditMode, setIsInEditMode] = useState(false);
 
-  const shouldDisplayLoading = (imagePreviewUrl ? !isImageLoaded : isLoading) && !isError;
-  const shouldDisplayPreviewError = isError || (!isLoading && !imagePreviewUrl);
+  const hasImagePreview = imagePreviewUrl !== undefined && imagePreviewUrl !== '';
+  const shouldDisplayLoading = (hasImagePreview ? !isImageLoaded : isLoading) && !isError;
+  const shouldDisplayPreviewError = isError || (!isLoading && !hasImagePreview);
 
   const showModal = (isEditMode?: boolean) => {
     setIsOpen(true);
-    setIsInEditMode(!!isEditMode);
+    setIsInEditMode(isEditMode === true);
   };
 
   const hideModal = () => {
@@ -100,7 +101,7 @@ export const FileAssetWithPreview = ({
         >
           <img
             src={imagePreviewUrl}
-            style={{'--opacity': isImageLoaded && imagePreviewUrl ? 1 : 0} as CSSProperties}
+            style={{'--opacity': isImageLoaded && hasImagePreview ? 1 : 0} as CSSProperties}
             alt=""
             css={imageStyles}
             onLoad={() => setIsImageLoaded(true)}

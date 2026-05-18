@@ -24,7 +24,7 @@ import {toBufferSource} from '../../util/bufferUtils';
 function getBrowserCrypto(): globalThis.Crypto {
   const browserCrypto = globalThis.crypto;
 
-  if (!browserCrypto?.subtle) {
+  if (browserCrypto?.subtle === undefined) {
     throw new Error('Web Crypto API is unavailable');
   }
 

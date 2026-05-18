@@ -47,9 +47,9 @@ export const CellsRenameForm = ({isOpen, onSubmit, name, onChangeName, onClearNa
         ref={inputRef}
         placeholder={t('cells.renameNodeModal.placeholder')}
         onChange={onChangeName}
-        error={error ? <ErrorMessage>{error}</ErrorMessage> : undefined}
+        error={error !== null ? <ErrorMessage>{error}</ErrorMessage> : undefined}
         endContent={
-          name && (
+          name.length > 0 && (
             <button type="button" onClick={onClearName} css={closeIconStyles}>
               <CircleCloseIcon />
             </button>

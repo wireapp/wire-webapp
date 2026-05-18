@@ -57,6 +57,7 @@ jest.mock('./conversation', () => {
 });
 
 import {Account, ConnectionState} from './account';
+import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
 
 const BASE_URL = 'mock-backend.wire.com';
@@ -521,6 +522,120 @@ describe('Account', () => {
           });
         });
       });
+    });
+  });
+
+  describe('MLS pending-proposals rehydration is deferred to the LIVE transition', () => {
+    // Regression guard for rehydrateMlsPendingProposalsTasksOnLiveTransition (account.ts):
+    // persisted timers must not be rehydrated during initClient. We drive the legacy
+    // notification stream processor directly to avoid websocket/login setup in this file.
+
+    type MlsServiceStub = {
+      isEnabled: boolean;
+      initialisePendingProposalsTasks: jest.Mock<Promise<void>, []>;
+    };
+
+    const buildMlsServiceStub = (): MlsServiceStub => ({
+      isEnabled: true,
+      initialisePendingProposalsTasks: jest.fn<Promise<void>, []>().mockResolvedValue(undefined),
+    });
+
+    const setup = async (mlsService: MlsServiceStub) => {
+      const {account, apiClient} = await createAccount();
+
+      if (!account.service) {
+        throw new Error('Service is not set');
+      }
+
+      // Override the (heavy) real MLS service with a minimal stub. We only care about
+      // whether/when initialisePendingProposalsTasks is invoked, not what it does.
+      account.service.mls = mlsService as unknown as MLSService;
+
+      // Drain the legacy notification stream synchronously with no notifications.
+      jest
+        .spyOn(account.service.notification, 'legacyProcessNotificationStream')
+        .mockResolvedValue({total: 0, error: 0, success: 0});
+
+      // Avoid touching the websocket transport during the test.
+      jest.spyOn(apiClient.transport.ws, 'lock').mockImplementation(() => undefined);
+      jest.spyOn(apiClient.transport.ws, 'unlock').mockImplementation(() => undefined);
+
+      // The legacy processor pushes its "transition to LIVE" task onto a queue that the
+      // production code resumes from `connect()`. Since we invoke the factory directly
+      // here, we need to resume that queue so the pushed task actually runs.
+      account['notificationProcessingQueue'].resume();
+
+      return {account};
+    };
+
+    const indexOfFirstLiveTransition = (mock: jest.Mock<void, [ConnectionState]>): number =>
+      mock.mock.calls.findIndex(([state]) => state === ConnectionState.LIVE);
+
+    it('rehydrates pending-proposals before emitting the LIVE connection state, after the legacy stream is drained', async () => {
+      const mlsService = buildMlsServiceStub();
+      const {account} = await setup(mlsService);
+
+      const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
+
+      const processStream = account['createLegacyNotificationStreamProcessor']({
+        handleLegacyNotification: jest.fn().mockResolvedValue(undefined),
+        handleMissedNotifications: jest.fn().mockResolvedValue(undefined),
+        onConnectionStateChanged,
+      });
+
+      await processStream();
+
+      // The LIVE transition is dispatched via the notificationProcessingQueue (async).
+      await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+
+      expect(mlsService.initialisePendingProposalsTasks).toHaveBeenCalledTimes(1);
+
+      // Crucial ordering: rehydration happens BEFORE the LIVE transition is announced.
+      const rehydrateOrder = mlsService.initialisePendingProposalsTasks.mock.invocationCallOrder[0];
+      const liveOrder =
+        onConnectionStateChanged.mock.invocationCallOrder[indexOfFirstLiveTransition(onConnectionStateChanged)];
+      expect(rehydrateOrder).toBeLessThan(liveOrder);
+    });
+
+    it('rehydrates pending-proposals only once when the legacy stream processor runs multiple times', async () => {
+      const mlsService = buildMlsServiceStub();
+      const {account} = await setup(mlsService);
+
+      const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
+      const liveTransitionCount = () =>
+        onConnectionStateChanged.mock.calls.filter(([state]) => state === ConnectionState.LIVE).length;
+
+      const processStream = account['createLegacyNotificationStreamProcessor']({
+        handleLegacyNotification: jest.fn().mockResolvedValue(undefined),
+        handleMissedNotifications: jest.fn().mockResolvedValue(undefined),
+        onConnectionStateChanged,
+      });
+
+      await processStream();
+      await waitFor(() => expect(liveTransitionCount()).toBe(1));
+      expect(mlsService.initialisePendingProposalsTasks).toHaveBeenCalledTimes(1);
+
+      await processStream();
+      await waitFor(() => expect(liveTransitionCount()).toBe(2));
+      expect(mlsService.initialisePendingProposalsTasks).toHaveBeenCalledTimes(1);
+    });
+
+    it('does NOT rehydrate pending-proposals when MLS is not enabled for the client', async () => {
+      const mlsService: MlsServiceStub = {...buildMlsServiceStub(), isEnabled: false};
+      const {account} = await setup(mlsService);
+
+      const onConnectionStateChanged = jest.fn<void, [ConnectionState]>();
+
+      const processStream = account['createLegacyNotificationStreamProcessor']({
+        handleLegacyNotification: jest.fn().mockResolvedValue(undefined),
+        handleMissedNotifications: jest.fn().mockResolvedValue(undefined),
+        onConnectionStateChanged,
+      });
+
+      await processStream();
+      await waitFor(() => expect(onConnectionStateChanged).toHaveBeenCalledWith(ConnectionState.LIVE));
+
+      expect(mlsService.initialisePendingProposalsTasks).not.toHaveBeenCalled();
     });
   });
 });

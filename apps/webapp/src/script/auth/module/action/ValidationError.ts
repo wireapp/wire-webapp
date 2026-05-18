@@ -42,9 +42,11 @@ export class ValidationError extends Error {
 
   static getAllPropertyNames(obj: {}): string[] {
     let props: string[] = [];
-    do {
-      props = props.concat(Object.getOwnPropertyNames(obj));
-    } while ((obj = Object.getPrototypeOf(obj)));
+    let objectToInspect: {} | null = obj;
+    while (objectToInspect !== null) {
+      props = props.concat(Object.getOwnPropertyNames(objectToInspect));
+      objectToInspect = Object.getPrototypeOf(objectToInspect);
+    }
     return props;
   }
 

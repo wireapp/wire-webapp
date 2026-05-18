@@ -43,6 +43,7 @@ import {WEBSOCKET_STATE} from '@wireapp/api-client/lib/tcp/reconnectingWebsocket
 import {FEATURE_KEY, FEATURE_STATUS} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
+import {once} from 'lodash';
 import logdown from 'logdown';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
@@ -166,6 +167,13 @@ export class Account extends TypedEventEmitter<Events> {
   private coreCallbacks?: CoreCallbacks;
   private connectionState: ConnectionState = ConnectionState.CLOSED;
 
+  /**
+   * {@link once}-wrapped {@link MLSService.initialisePendingProposalsTasks}; recreated in
+   * {@link resetContext} (login / logout) so each logged-in session runs it at most once after MLS
+   * is available on the first catch-up → LIVE hand-off.
+   */
+  private initialisePendingProposalsTasksOnce: () => Promise<void>;
+
   private readonly notificationProcessingQueue = new PromiseQueue({
     name: 'notification-processing-queue',
     paused: true,
@@ -232,6 +240,18 @@ export class Account extends TypedEventEmitter<Events> {
     });
 
     this.logger = LogFactory.getLogger('@wireapp/core/Account');
+    this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
+  }
+
+  private createInitialisePendingProposalsTasksOnce(): () => Promise<void> {
+    return once(async () => {
+      if (this.service?.mls === undefined) {
+        const errorMessage = 'Failed to initialise pending proposals tasks: MLS service is not set';
+        this.logger.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+      await this.service.mls.initialisePendingProposalsTasks();
+    });
   }
 
   /**
@@ -287,7 +307,7 @@ export class Account extends TypedEventEmitter<Events> {
       throw new Error('Client has not been initialized - please login first');
     }
 
-    if (!this.service?.mls?.isEnabled || !this.service?.e2eIdentity) {
+    if (this.service?.mls?.isEnabled !== true || this.service?.e2eIdentity === undefined) {
       throw new Error('MLS not initialized, unable to enroll E2EI');
     }
 
@@ -417,8 +437,6 @@ export class Account extends TypedEventEmitter<Events> {
     if ((await this.isMLSActiveForClient()) && this.service.mls && mlsConfig) {
       const {userId, domain = ''} = this.apiClient.context;
       await this.service.mls.initClient({id: userId, domain}, client, mlsConfig);
-      // initialize schedulers for pending mls proposals once client is initialized
-      await this.service.mls.initialisePendingProposalsTasks();
 
       // initialize scheduler for syncing key packages with backend
       await this.service.mls.schedulePeriodicKeyPackagesBackendSync(client.id);
@@ -446,7 +464,7 @@ export class Account extends TypedEventEmitter<Events> {
       },
     };
 
-    if (this.options.coreCryptoConfig?.enabled) {
+    if (this.options.coreCryptoConfig?.enabled === true) {
       const {buildClient} = await import('./messagingProtocols/proteus/proteusService/cryptoClient/coreCryptoWrapper');
       const client = await buildClient(
         storeEngine,
@@ -560,6 +578,7 @@ export class Account extends TypedEventEmitter<Events> {
 
   private readonly resetContext = (): void => {
     this.currentClient = undefined;
+    this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
     delete this.apiClient.context;
     delete this.service;
   };
@@ -572,9 +591,9 @@ export class Account extends TypedEventEmitter<Events> {
     this.db?.close();
     this.encryptedDb?.close();
 
-    if (data?.clearAllData) {
+    if (data?.clearAllData === true) {
       await this.wipeAllData();
-    } else if (data?.clearCryptoData) {
+    } else if (data?.clearCryptoData === true) {
       await this.wipeCryptoData();
     }
 
@@ -648,7 +667,7 @@ export class Account extends TypedEventEmitter<Events> {
    * return true if the current user has a MLS device that is initialized and ready to use
    */
   public get hasMLSDevice(): boolean {
-    return !!this.service?.mls?.isEnabled;
+    return this.service?.mls?.isEnabled === true;
   }
 
   /**
@@ -867,7 +886,7 @@ export class Account extends TypedEventEmitter<Events> {
             this.logger.info(`Processing legacy notification "${notification.id}" at ${notificationTime}`);
             this.logger.info(`Total notifications queue length: ${this.notificationProcessingQueue.getLength()}`);
             this.logger.info(`Total pending proposals queue length: ${getProposalQueueLength()}`);
-            if (notificationTime) {
+            if (notificationTime !== null && notificationTime.length > 0) {
               onNotificationStreamProgress(notificationTime);
             }
 
@@ -937,6 +956,27 @@ export class Account extends TypedEventEmitter<Events> {
     this.apiClient.transport.ws.acknowledgeConsumableNotificationSynchronization(notification);
   };
 
+  /**
+   * Persistence-backed MLS pending-proposals timers: {@link MLSService.initialisePendingProposalsTasks}.
+   * Call only at the catch-up → LIVE hand-off, immediately before {@link resumeProposalProcessing}.
+   * The MLS call is wrapped with lodash `once` ({@link initialisePendingProposalsTasksOnce}), recreated
+   * in {@link resetContext}, so it runs at most once per logged-in session after MLS is available—matching
+   * the historical single call from {@link initClient} while keeping the unsafe work off the cold-start path.
+   *
+   * **Why defer:** rehydrating during {@link Account.initClient} or while notifications are still
+   * replaying is unsafe. Persisted `firingDate` values are often in the past, so {@link TaskScheduler}
+   * fires auto-commits on the next tick while the backlog is still being applied. That usually surfaces
+   * as failing or conflicting commits (for example `mls-stale-message` / delivery rejection), not as a
+   * dependable way to “catch up”. “Wrong epoch” skew during replay is not uniquely attributable to
+   * proposal commits (recovery / rejoin paths matter too); this method exists to keep **all**
+   * rehydrated pending-proposal side effects aligned with a session that has finished ordered replay.
+   */
+  private readonly rehydrateMlsPendingProposalsTasksOnLiveTransition = async (): Promise<void> => {
+    if (this.hasMLSDevice && this.service?.mls !== undefined) {
+      await this.initialisePendingProposalsTasksOnce();
+    }
+  };
+
   private readonly handleSynchronizationNotification = async (
     notification: ConsumableNotificationSynchronization,
     onConnectionStateChanged: (state: ConnectionState) => void,
@@ -957,6 +997,7 @@ export class Account extends TypedEventEmitter<Events> {
      * if the marker ID matches the current marker ID.
      */
     if (markerId === currentMarkerId) {
+      await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
       resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
@@ -976,7 +1017,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       const firstEventPayload = notification.data.event.payload[0];
       const notificationTime = firstEventPayload ? this.getNotificationEventTime(firstEventPayload) : null;
-      if (this.connectionState !== ConnectionState.LIVE && notificationTime) {
+      if (this.connectionState !== ConnectionState.LIVE && notificationTime !== null && notificationTime.length > 0) {
         onNotificationStreamProgress(notificationTime);
       }
 
@@ -1067,6 +1108,7 @@ export class Account extends TypedEventEmitter<Events> {
       void this.notificationProcessingQueue
         .push(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
+          await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
           resumeProposalProcessing();
           resumeMessageSending();
           resumeRejoiningMLSConversations();
@@ -1140,7 +1182,7 @@ export class Account extends TypedEventEmitter<Events> {
         }
       }
 
-      if (connectionState) {
+      if (connectionState !== undefined) {
         onConnectionStateChanged(connectionState);
       }
     });
@@ -1172,7 +1214,7 @@ export class Account extends TypedEventEmitter<Events> {
     const localStorageKey = 'has_missing_notification';
 
     // First-time handling: set flag and reload to trigger full re-fetch of state.
-    if (!AccountLocalStorageStore.has(localStorageKey)) {
+    if (AccountLocalStorageStore.has(localStorageKey) === false) {
       this.logger.info('First missed notification detected, reloading to recover state');
       AccountLocalStorageStore.add(localStorageKey, 'true');
       window.location.reload();
@@ -1241,7 +1283,7 @@ export class Account extends TypedEventEmitter<Events> {
     conversationId: QualifiedId,
     subconversationId?: SUBCONVERSATION_ID,
   ): Promise<string | undefined> => {
-    if (!subconversationId) {
+    if (subconversationId === undefined) {
       return this.coreCallbacks?.groupIdFromConversationId(conversationId);
     }
 
@@ -1250,7 +1292,7 @@ export class Account extends TypedEventEmitter<Events> {
 
   public isMLSActiveForClient = async (): Promise<boolean> => {
     // Check for CoreCrypto library, it is required for MLS
-    if (!this.options.coreCryptoConfig?.enabled) {
+    if (this.options.coreCryptoConfig?.enabled !== true) {
       return false;
     }
 

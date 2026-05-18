@@ -26,7 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import type {PropertiesService} from 'Repositories/properties/PropertiesService';
+import type {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -136,7 +136,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     const storedData = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
     let parsedStoredData: LabelProperty | null = null;
 
-    if (storedData) {
+    if (is.nonEmptyString(storedData)) {
       try {
         parsedStoredData = JSON.parse(storedData);
       } catch (error: unknown) {
@@ -147,11 +147,11 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     }
 
     // Only save if data has actually changed
-    if (!parsedStoredData || JSON.stringify(currentData.labels) !== JSON.stringify(parsedStoredData.labels)) {
+    if (parsedStoredData === null || JSON.stringify(currentData.labels) !== JSON.stringify(parsedStoredData.labels)) {
       const conversationLabelJson = {
         ...currentData,
         lastSyncTimestamp: Date.now(),
-        version: (parsedStoredData?.version || 0) + 1,
+        version: (parsedStoredData?.version ?? 0) + 1,
       };
       void this.propertiesService.putPropertiesByKey(propertiesKey, conversationLabelJson);
       this.persistValues(conversationLabelJson);
@@ -163,7 +163,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       const conversationLabelJson = localStorage.getItem(ConversationLabelRepository.LocalStorageKey);
       let localData: LabelProperty | null = null;
 
-      if (conversationLabelJson) {
+      if (is.nonEmptyString(conversationLabelJson)) {
         try {
           localData = JSON.parse(conversationLabelJson);
         } catch (error: unknown) {
@@ -177,12 +177,12 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       // Always fetch from backend first
       const labelProperties = await this.propertiesService.getPropertiesByKey(propertiesKey);
 
-      if (localData && labelProperties) {
+      if (localData !== null && labelProperties !== undefined) {
         // Compare timestamps to determine which is newer
-        const localTimestamp = localData.lastSyncTimestamp || 0;
-        const remoteTimestamp = labelProperties.lastSyncTimestamp || 0;
-        const localVersion = localData.version || 0;
-        const remoteVersion = labelProperties.version || 0;
+        const localTimestamp = localData.lastSyncTimestamp ?? 0;
+        const remoteTimestamp = labelProperties.lastSyncTimestamp ?? 0;
+        const localVersion = localData.version ?? 0;
+        const remoteVersion = labelProperties.version ?? 0;
 
         // Use local data if it has a newer timestamp, or same timestamp but higher version.
         // If remote has no timestamp, treat remote as source of truth.
@@ -196,7 +196,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
           const updatedData = {
             ...localData,
             lastSyncTimestamp: Date.now(),
-            version: (localData.version || 0) + 1,
+            version: (localData.version ?? 0) + 1,
           };
           void this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
           this.persistValues(updatedData);
@@ -205,16 +205,16 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       }
 
       // Use backend data if available (either because local is empty or older)
-      if (labelProperties) {
+      if (labelProperties !== undefined) {
         this.unmarshal(labelProperties);
         this.persistValues(labelProperties);
-      } else if (localData) {
+      } else if (localData !== null) {
         // Backend has no data but local does, use local and sync to backend
         this.unmarshal(localData);
         const updatedData = {
           ...localData,
           lastSyncTimestamp: Date.now(),
-          version: (localData.version || 0) + 1,
+          version: (localData.version ?? 0) + 1,
         };
         void this.propertiesService.putPropertiesByKey(propertiesKey, updatedData);
         this.persistValues(updatedData);
@@ -227,7 +227,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   };
 
   private persistValues = (data?: LabelProperty) => {
-    const values = data || this.marshal();
+    const values = data ?? this.marshal();
     localStorage.setItem(ConversationLabelRepository.LocalStorageKey, JSON.stringify(values));
   };
 
@@ -268,8 +268,9 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     return favoriteLabel ? this.getLabelConversations(favoriteLabel, conversations) : [];
   };
 
-  readonly getLabelConversations = (label: ConversationLabel, conversations = this.conversations()): Conversation[] =>
-    label ? conversations.filter(conversation => label.conversations().includes(conversation)) : [];
+  readonly getLabelConversations = (label: ConversationLabel, conversations = this.conversations()): Conversation[] => {
+    return conversations.filter(conversation => label.conversations().includes(conversation));
+  };
 
   readonly isFavorite = (conversation: Conversation): boolean => this.getFavorites().includes(conversation);
 

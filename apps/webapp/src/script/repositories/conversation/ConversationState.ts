@@ -24,7 +24,7 @@ import {container, singleton} from 'tsyringe';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortGroupsByLastEvent} from 'Util/util';
 

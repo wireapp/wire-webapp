@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {
@@ -51,13 +52,13 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {disableForcedErrorReporting} from 'Repositories/tracking/Telemetry.helpers';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {disableForcedErrorReporting} from 'Repositories/tracking/telemetry.helpers';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
@@ -66,8 +67,8 @@ import {createUuid} from './uuid';
 
 import {E2EIHandler} from '../E2EIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
+import {APIClient} from '../service/apiClientSingleton';
+import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 export enum CoreCryptoLogLevel {
@@ -157,7 +158,7 @@ export class DebugUtil {
   addCallParticipants(number: number) {
     const call = this.callState.activeCalls()[0];
 
-    if (!call) {
+    if (call === undefined) {
       return;
     }
 
@@ -184,7 +185,8 @@ export class DebugUtil {
       const epochCC = await this.core.service?.mls?.getEpoch(groupId);
       const membersCC = (await this.core.service?.mls?.getClientIds(groupId))?.reduce<Record<string, string[]>>(
         (acc, curr) => {
-          acc[curr.userId] = acc[curr.userId] ? [...acc[curr.userId], curr.clientId] : [curr.clientId];
+          const existingClientIds = acc[curr.userId];
+          acc[curr.userId] = existingClientIds !== undefined ? [...existingClientIds, curr.clientId] : [curr.clientId];
           return acc;
         },
         {},
@@ -206,7 +208,7 @@ export class DebugUtil {
         const debugInfo = document.createElement('div');
         debugInfo.classList.add('debug-info');
         const value = el.dataset.uieUid;
-        if (value) {
+        if (is.nonEmptyString(value)) {
           debugInfo.textContent = value;
           el.appendChild(debugInfo);
         }
@@ -262,7 +264,7 @@ export class DebugUtil {
 
   async updateActiveConversationKeyPackages() {
     const groupId = this.conversationState.activeConversation()?.groupId;
-    if (groupId) {
+    if (is.nonEmptyString(groupId)) {
       return this.core.service?.mls?.renewKeyMaterial(groupId);
     }
   }
@@ -365,7 +367,7 @@ export class DebugUtil {
     defaultProtocol?: CONVERSATION_PROTOCOL,
   ) {
     const {teamId} = await this.userRepository.getSelf();
-    if (!teamId) {
+    if (!is.nonEmptyString(teamId)) {
       throw new Error('teamId of self user is undefined');
     }
 
@@ -376,7 +378,7 @@ export class DebugUtil {
     }
 
     const response = await this.apiClient.api.teams.feature.putMLSFeature(teamId, {
-      config: {...mlsFeature.config, supportedProtocols, defaultProtocol: defaultProtocol || supportedProtocols[0]},
+      config: {...mlsFeature.config, supportedProtocols, defaultProtocol: defaultProtocol ?? supportedProtocols[0]},
       status: FEATURE_STATUS.ENABLED,
     });
 
@@ -393,7 +395,7 @@ export class DebugUtil {
   ) {
     const {teamId} = await this.userRepository.getSelf();
 
-    if (!teamId) {
+    if (!is.nonEmptyString(teamId)) {
       throw new Error('teamId of self user is undefined');
     }
 
@@ -499,7 +501,7 @@ export class DebugUtil {
     const isOTRMessage = (notification: BackendEvent) => notification.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD;
     const isInCurrentConversation = (notification: ConversationEvent) => notification.conversation === conversationId;
     const wasSentByOurCurrentClient = (notification: ConversationOtrMessageAddEvent) =>
-      notification.from === userId && notification.data && notification.data.sender === clientId;
+      notification.from === userId && notification.data.sender === clientId;
     const hasExpectedTimestamp = (notification: ConversationOtrMessageAddEvent, dateTime: Date) =>
       notification.time === dateTime.toISOString();
     const conversation = await this.conversationRepository.getConversationById({domain: '', id: conversationId});
@@ -578,19 +580,19 @@ export class DebugUtil {
     navigator.mediaDevices.enumerateDevices = () => Promise.resolve(cameras.concat(microphones) as MediaDeviceInfo[]);
 
     navigator.mediaDevices.getUserMedia = (constraints: MediaStreamConstraints) => {
-      const audioSet = constraints.audio as MediaTrackConstraintSet;
-      const audio = audioSet ? generateAudioTrack(audioSet) : [];
+      const audioSet = is.object(constraints.audio) ? (constraints.audio as MediaTrackConstraintSet) : undefined;
+      const audio = audioSet === undefined ? [] : generateAudioTrack(audioSet);
 
-      const videoSet = constraints.video as MediaTrackConstraintSet;
-      const video = videoSet ? generateVideoTrack(videoSet) : [];
+      const videoSet = is.object(constraints.video) ? (constraints.video as MediaTrackConstraintSet) : undefined;
+      const video = videoSet === undefined ? [] : generateVideoTrack(videoSet);
 
       return Promise.resolve(new MediaStream(audio.concat(video)));
     };
 
     function generateAudioTrack(constraints: MediaTrackConstraintSet): MediaStreamTrack[] {
       const constrainMatchMock = {exact: undefined} as ConstrainDOMStringParameters;
-      const constrainMatch = (constraints.deviceId as ConstrainDOMStringParameters) || constrainMatchMock;
-      const hz = (constrainMatch.exact as string) || microphones[0].deviceId;
+      const constrainMatch = (constraints.deviceId as ConstrainDOMStringParameters | undefined) ?? constrainMatchMock;
+      const hz = (constrainMatch.exact as string | undefined) ?? microphones[0].deviceId;
       const context = new window.AudioContext();
       const osc = context.createOscillator(); // instantiate an oscillator
       osc.type = 'sine'; // this is the default - also square, sawtooth, triangle
@@ -604,8 +606,8 @@ export class DebugUtil {
 
     function generateVideoTrack(constraints: MediaTrackConstraintSet): MediaStreamTrack[] {
       const constrainMatchMock = {exact: undefined} as ConstrainDOMStringParameters;
-      const constrainMatch = (constraints.deviceId as ConstrainDOMStringParameters) || constrainMatchMock;
-      const color = (constrainMatch.exact as string) || cameras[0].deviceId;
+      const constrainMatch = (constraints.deviceId as ConstrainDOMStringParameters | undefined) ?? constrainMatchMock;
+      const color = (constrainMatch.exact as string | undefined) ?? cameras[0].deviceId;
       const width = 300;
       const height = 240;
       const canvas = document.createElement('canvas');

@@ -28,8 +28,8 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {trackCallQualityFeedback} from 'Repositories/tracking/Helpers';
-import {UserState} from 'Repositories/user/UserState';
+import {trackCallQualityFeedback} from 'Repositories/tracking/helpers';
+import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
@@ -75,15 +75,10 @@ export const QualityFeedbackModal = ({callingRepository}: Props) => {
   }
 
   const handleCloseModal = ({skipNotification = false} = {}) => {
-    if (!selfUser) {
-      setQualityFeedbackModalShown(false);
-      setConversationId();
-      return;
-    }
-
     try {
       const qualityFeedbackStorage = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
-      const currentStorageData = qualityFeedbackStorage ? JSON.parse(qualityFeedbackStorage) : {};
+      const currentStorageData =
+        qualityFeedbackStorage !== null && qualityFeedbackStorage !== '' ? JSON.parse(qualityFeedbackStorage) : {};
       const currentDate = new Date();
       const dateUntilShowModal = new Date(currentDate.getTime() + CALL_SURVEY_MUTE_INTERVAL);
 

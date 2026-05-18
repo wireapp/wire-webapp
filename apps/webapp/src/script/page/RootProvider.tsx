@@ -19,11 +19,14 @@
 
 import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {WallClock} from '../clock/wallClock';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {MainViewModel} from '../view_model/MainViewModel';
 
 export type RootContextValue = {
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly mainViewModel: MainViewModel;
   readonly wallClock: WallClock;
   readonly doesApplicationNeedForceReload: boolean;

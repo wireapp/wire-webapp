@@ -59,7 +59,7 @@ export class IdentityProviderAPI {
       url: `${IdentityProviderAPI.URL.PROVIDER}/${identityProviderId}`,
     };
 
-    if (purge) {
+    if (purge === true) {
       config.params = {purge};
     }
 
@@ -73,7 +73,7 @@ export class IdentityProviderAPI {
       url: `${IdentityProviderAPI.URL.PROVIDER}`,
     };
 
-    if (replaceProviderId) {
+    if (replaceProviderId !== undefined && replaceProviderId.length > 0) {
       config.params = {replaces: replaceProviderId};
     }
 

@@ -19,6 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
@@ -68,7 +69,7 @@ const SetHandleComponent = ({
   useEffect(() => {
     if (hasSelfHandle) {
       void removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
-      if (!isNewAccount) {
+      if (isNewAccount !== true) {
         window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
       }
     }
@@ -95,7 +96,7 @@ const SetHandleComponent = ({
     event.preventDefault();
     try {
       await doSetHandle(handle.trim());
-      if (Runtime.isDesktopApp() || !isNewAccount) {
+      if (Runtime.isDesktopApp() || isNewAccount !== true) {
         resetTelemetrySession();
         window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
       } else {
@@ -155,7 +156,12 @@ const SetHandleComponent = ({
                 />
               </InputSubmitCombo>
             </InputBlock>
-            <Button disabled={!handle || isFetching} type="submit" data-uie-name="do-send-handle" block>
+            <Button
+              disabled={!is.nonEmptyString(handle) || isFetching}
+              type="submit"
+              data-uie-name="do-send-handle"
+              block
+            >
               {t('chooseHandle.submitButton')}
             </Button>
           </Form>
@@ -172,7 +178,7 @@ const SetHandleComponent = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasSelfHandle: SelfSelector.hasSelfHandle(state),
-  hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
+  hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) ?? false,
   isFetching: SelfSelector.isFetching(state),
   name: SelfSelector.getSelfName(state),
 });

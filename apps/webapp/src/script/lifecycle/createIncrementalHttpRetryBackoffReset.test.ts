@@ -19,7 +19,7 @@
 
 import assert from 'assert';
 
-import {APIClient} from '../service/APIClientSingleton';
+import {APIClient} from '../service/apiClientSingleton';
 import {createIncrementalHttpRetryBackoffReset} from './createIncrementalHttpRetryBackoffReset';
 
 type ListenerMap = Map<string, () => void>;

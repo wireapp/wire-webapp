@@ -81,7 +81,7 @@ export const UserAvatar = ({
   teamState = container.resolve(TeamState),
   ...props
 }: UserAvatarProps) => {
-  const isImageGrey = !noFilter && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
+  const isImageGrey = noFilter !== true && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const isBlocked = state === STATE.BLOCKED;
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
   const name = useUserName(participant);
@@ -127,7 +127,7 @@ export const UserAvatar = ({
         mediumPicture={mediumPictureResource}
         previewPicture={previewPictureResource}
       />
-      {!noBadge && shouldShowBadge(avatarSize, state) && (
+      {noBadge !== true && shouldShowBadge(avatarSize, state) && (
         <AvatarBadge state={state} iconSize={getIconSize(avatarSize)} />
       )}
 

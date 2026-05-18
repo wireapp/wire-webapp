@@ -272,7 +272,7 @@ export class APIClient extends EventEmitter {
       version: backendVersion,
       domain: responsePayload?.domain ?? '',
       federationEndpoints: backendVersion > 0,
-      isFederated: responsePayload?.federation || false,
+      isFederated: responsePayload?.federation ?? false,
       supportsMLS: backendVersion >= 5,
       supportsGuestLinksWithPassword: backendVersion >= 4,
     };
@@ -427,20 +427,20 @@ export class APIClient extends EventEmitter {
   }
 
   public get clientId(): string | undefined {
-    return this.context?.clientId || undefined;
+    return this.context?.clientId;
   }
 
   public get userId(): string | undefined {
-    return this.context?.userId || undefined;
+    return this.context?.userId;
   }
 
   public get domain(): string | undefined {
-    return this.context?.domain || undefined;
+    return this.context?.domain;
   }
 
   /** Should be used in cases where the user ID is MANDATORY. */
   public get validatedUserId(): string {
-    if (this.userId) {
+    if (this.userId !== undefined && this.userId.length > 0) {
       return this.userId;
     }
     throw new Error('No valid user ID.');
@@ -448,7 +448,7 @@ export class APIClient extends EventEmitter {
 
   /** Should be used in cases where the client ID is MANDATORY. */
   public get validatedClientId(): string {
-    if (this.clientId) {
+    if (this.clientId !== undefined && this.clientId.length > 0) {
       return this.clientId;
     }
     throw new Error('No valid client ID.');
@@ -466,7 +466,7 @@ export class APIClient extends EventEmitter {
 
     try {
       const backendRemovalKey = (await this.api.client.getPublicKeys()).removal;
-      return !!backendRemovalKey;
+      return backendRemovalKey !== undefined;
     } catch {
       // Ignore errors, backend might not support removal keys
     }

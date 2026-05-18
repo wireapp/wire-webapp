@@ -65,7 +65,6 @@ export class Account extends EventEmitter {
       initialize: jest.fn(),
     },
     mls: {
-      schedulePeriodicKeyMaterialRenewals: jest.fn(),
       addUsersToExistingConversation: jest.fn(),
       conversationExists: jest.fn(),
       wipeConversation: jest.fn(),

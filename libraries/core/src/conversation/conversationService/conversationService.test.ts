@@ -153,6 +153,7 @@ describe('ConversationService', () => {
       getClientIdsInGroup: jest.fn(),
       getKeyPackagesPayload: jest.fn(),
       addUsersToExistingConversation: jest.fn(),
+      updateKeyingMaterialForConversation: jest.fn(),
       removeClientsFromConversation: jest.fn(),
       resetKeyMaterialRenewal: jest.fn(),
       handleMLSWelcomeMessageEvent: jest.fn(),
@@ -1104,6 +1105,37 @@ describe('ConversationService', () => {
 
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
       expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledTimes(2);
+    });
+
+    it('updates keying material when self has no key packages to add', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+
+      const mockGroupId = 'groupId';
+      const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+      const selfUserToAdd = {id: 'self-user-id', domain: 'local.wire.com'};
+
+      jest.spyOn(mlsService, 'commitPendingProposals').mockResolvedValueOnce(undefined);
+      jest.spyOn(mlsService, 'getClientIdsInGroup').mockResolvedValueOnce([]);
+      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages: [], failures: []});
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        epoch: 1,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.addUsersToMLSConversation({
+        qualifiedUsers: [selfUserToAdd],
+        groupId: mockGroupId,
+        conversationId: mockConversationId,
+        updateKeyingMaterialIfEmpty: true,
+        commitPendingFirst: true,
+      });
+
+      expect(mlsService.commitPendingProposals).toHaveBeenCalledWith(mockGroupId, true);
+      expect(mlsService.addUsersToExistingConversation).not.toHaveBeenCalled();
+      expect(mlsService.updateKeyingMaterialForConversation).toHaveBeenCalledWith(mockGroupId);
+      expect(mlsService.resetKeyMaterialRenewal).toHaveBeenCalledWith(mockGroupId);
     });
   });
 

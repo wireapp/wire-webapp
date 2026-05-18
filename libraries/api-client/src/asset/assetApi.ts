@@ -85,7 +85,7 @@ export class AssetAPI {
     forceCaching: boolean = false,
     progressCallback?: ProgressCallback,
   ): RequestCancelable<AssetResponse> {
-    if (token && !isValidToken(token)) {
+    if (token !== null && token !== undefined && token.length > 0 && !isValidToken(token)) {
       throw new TypeError(`Expected token "${token.substr(0, 5)}..." (redacted) to be base64 encoded string.`);
     }
 
@@ -100,7 +100,7 @@ export class AssetAPI {
       url: assetUrl,
     };
 
-    if (token) {
+    if (token !== null && token !== undefined && token.length > 0) {
       config.params.asset_token = token;
     }
 
@@ -146,7 +146,7 @@ export class AssetAPI {
       filetype?: string;
     } = {
       public: options?.public ?? true,
-      retention: options?.retention || AssetRetentionPolicy.PERSISTENT,
+      retention: options?.retention ?? AssetRetentionPolicy.PERSISTENT,
       domain: options?.domain,
     };
 

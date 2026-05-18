@@ -19,11 +19,11 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, withConnectedUser, expect} from 'test/e2e_tests/test.fixtures';
+import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
 
 import {getTextFilePath, shareAssetHelper} from '../../utils/asset.util';
 import {getImageFilePath} from '../../utils/sendImage.util';
-import {createGroup} from '../../utils/userActions';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 import {ConversationListPage} from 'test/e2e_tests/pageManager/webapp/pages/conversationList.page';
 
 test.describe('Clear Conversation Content', () => {
@@ -108,7 +108,8 @@ test.describe('Clear Conversation Content', () => {
       {tag: [tag, '@regression']},
       async ({createPage}) => {
         const userBPageManager = PageManager.from(await createPage(withLogin(userB)));
-        const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
+        const userAPageManager = PageManager.from(await createPage(withLogin(userA)));
+        await connectWithUser(userAPageManager, userB);
 
         const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
         const userBPages = userBPageManager.webapp.pages;
@@ -157,17 +158,18 @@ test.describe('Clear Conversation Content', () => {
       `I want to see incoming picture, ping and call after I clear content of a ${conversationType} conversation via conversation list`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const [userBPage, userCPage] = await Promise.all([createPage(withLogin(userB)), createPage(withLogin(userC))]);
+        const [userAPage, userBPage, userCPage] = await Promise.all([
+          createPage(withLogin(userA)),
+          createPage(withLogin(userB)),
+          createPage(withLogin(userC)),
+        ]);
 
-        const userAPage = await createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC));
+        await connectWithUser(userAPage, userB);
+        await connectWithUser(userAPage, userC);
 
-        const userAPageManager = PageManager.from(userAPage);
-        const userBPageManager = PageManager.from(userBPage);
-        const userCPageManager = PageManager.from(userCPage);
-
-        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-        const userBPages = userBPageManager.webapp.pages;
-        const userCPages = userCPageManager.webapp.pages;
+        const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+        const userBPages = PageManager.from(userBPage).webapp.pages;
+        const userCPages = PageManager.from(userCPage).webapp.pages;
 
         // Step 1: Create a group conversation with User A, B and C
         const conversationName = conversationType === 'group' ? 'Group conversation' : userB.fullName;
@@ -263,11 +265,11 @@ test.describe('Clear Conversation Content', () => {
       `I want to clear the ${conversationType} conversation content from conversation details options`,
       {tag: [tag, '@regression']},
       async ({createPage}) => {
-        const userBPageManager = PageManager.from(await createPage(withLogin(userB)));
-        const userAPageManager = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB)));
+        const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+        await connectWithUser(PageManager.from(userAPage), userB);
 
-        const {pages: userAPages, modals: userAModals} = userAPageManager.webapp;
-        const userBPages = userBPageManager.webapp.pages;
+        const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+        const {pages: userBPages} = PageManager.from(userBPage).webapp;
 
         const conversationName = 'Group conversation';
         let userAConversation: ReturnType<ConversationListPage['getConversation']>;

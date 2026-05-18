@@ -165,6 +165,7 @@ const config: Linter.Config[] = [
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/strict-boolean-expressions': 'error',
       '@typescript-eslint/no-floating-promises': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
@@ -214,6 +215,55 @@ const config: Linter.Config[] = [
     rules: {
       'no-magic-numbers': 'off',
       'id-length': 'off',
+    },
+  },
+  {
+    files: ['apps/webapp/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': 'off',
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/components/**/*.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/strict-boolean-expressions': 'error',
+    },
+  },
+  {
+    files: [
+      'apps/webapp/src/script/components/Badge/components/VerificationBadges/VerificationBadges.tsx',
+      'apps/webapp/src/script/components/Cells/common/useCellPublicLink/useCellPublicLink.ts',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsGlobalView.tsx',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsHeader/CellsFilters/CellsFiltersMenu/CellsFiltersMenu.tsx',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsHeader/CellsFilters/CellsFiltersMenu/useGetAllTags/useGetAllTags.ts',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsTable/CellsTableColumns/CellsShareModal/CellsShareModal.tsx',
+      'apps/webapp/src/script/components/CellsGlobalView/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTableRowOptions.tsx',
+      'apps/webapp/src/script/components/CellsGlobalView/useSearchCellsNodes/useSearchCellsNodes.ts',
+      'apps/webapp/src/script/components/ConfigToolbar/ConfigToolbar.tsx',
+      'apps/webapp/src/script/components/Conversation/Conversation.tsx',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/ConversationCells.tsx',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsNodeShareModal/CellsNodeShareModal.tsx',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsMoveNodeModal/CellsMoveNodeModal.tsx',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsMoveNodeModal/useGetCellsFolders/useGetCellsFolders.ts',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTableRowOptions.tsx',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTagsModal/useTagsManagement/useGetAllTags/useGetAllTags.ts',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/CellsTable/CellsTableColumns/CellsTableRowOptions/CellsTagsModal/useTagsManagement/useTagsManagement.ts',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/useConversationSearch/useConversationSearchFiles.ts',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/useGetAllCellsNodes/useGetAllCellsNodes.ts',
+      'apps/webapp/src/script/components/Conversation/ConversationCells/useRefreshCellsState/useRefreshCellsState.ts',
+      'apps/webapp/src/script/components/InputBar/InputBar.tsx',
+      'apps/webapp/src/script/components/InputBar/usePing/usePing.ts',
+      'apps/webapp/src/script/components/MessagesList/Message/MessageWrapper.tsx',
+      'apps/webapp/src/script/components/MessagesList/utils/useLoadConversation.ts',
+      'apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx',
+      'apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx',
+      'apps/webapp/src/script/components/calling/CallingCell/CallingCell.tsx',
+      'apps/webapp/src/script/components/calling/CallingOverlayContainer.tsx',
+      'apps/webapp/src/script/components/calling/FullscreenVideoCall.tsx',
+    ],
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'error',
+      'no-void': 'error',
     },
   },
 ];

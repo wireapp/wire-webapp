@@ -52,7 +52,7 @@ const normalizePath = (pathname: string): string => {
 const normalizeOrigin = (url: URL): string => url.origin.toLowerCase();
 
 export const parseAccountDeepLink = (href: string, accountBase?: string): ParseAccountDeepLink => {
-  if (!href || !accountBase) {
+  if (href.length === 0 || accountBase === undefined || accountBase.length === 0) {
     return null;
   }
   let linkUrl: URL;
@@ -73,23 +73,26 @@ export const parseAccountDeepLink = (href: string, accountBase?: string): ParseA
 
   if (pathname === '/user-profile') {
     const rawId = linkUrl.searchParams.get('id');
-    const explicitDomain = linkUrl.searchParams.get('domain') || undefined;
+    const explicitDomain = linkUrl.searchParams.get('domain');
 
-    if (!rawId) {
+    if (rawId === null || rawId.length === 0) {
       return null;
     }
 
     const qualified = parseQualifiedUserId(rawId);
+    const resolvedDomain = explicitDomain === null || explicitDomain.length === 0 ? qualified.domain : explicitDomain;
 
-    return {type: 'user-profile', id: qualified.id, domain: explicitDomain ?? qualified.domain};
+    return {type: 'user-profile', id: qualified.id, domain: resolvedDomain};
   }
 
   if (pathname === '/conversation-join') {
     const key = linkUrl.searchParams.get('key');
     const code = linkUrl.searchParams.get('code');
-    const domain = linkUrl.searchParams.get('domain') || undefined;
+    const domainQueryParameter = linkUrl.searchParams.get('domain');
+    const domain =
+      domainQueryParameter === null || domainQueryParameter.length === 0 ? undefined : domainQueryParameter;
 
-    if (!key || !code) {
+    if (key === null || key.length === 0 || code === null || code.length === 0) {
       return null;
     }
     return {type: 'conversation-join', key, code, domain};

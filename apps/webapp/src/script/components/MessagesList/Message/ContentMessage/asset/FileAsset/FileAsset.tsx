@@ -113,7 +113,7 @@ const FileAsset = ({
               )}
 
               {isDownloading && (
-                <AssetLoader loadProgress={downloadProgress || 0} onCancel={() => asset.cancelDownload()} />
+                <AssetLoader loadProgress={downloadProgress ?? 0} onCancel={() => asset.cancelDownload()} />
               )}
 
               {isUploading && <AssetLoader loadProgress={uploadProgress || 0} onCancel={() => cancelUpload()} />}

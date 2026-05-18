@@ -32,7 +32,7 @@ import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
+import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';

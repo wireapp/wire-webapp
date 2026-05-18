@@ -32,8 +32,8 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
-import type {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import type {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isConversationEntity} from 'Util/typePredicateUtil';
@@ -41,7 +41,7 @@ import {isConversationEntity} from 'Util/typePredicateUtil';
 import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 
 import {Config} from '../Config';
-import {ConversationError} from '../error/ConversationError';
+import {ConversationError} from '../error/conversationError';
 import '../page/LeftSidebar';
 import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
 import '../page/MainContent';
@@ -158,10 +158,10 @@ export class ContentViewModel {
     return this.switchContent(ContentState.CONNECTION_REQUESTS);
   }
 
-  private isConversationOpen(conversationEntity: Conversation, isActiveConversation: boolean): boolean {
+  private isConversationOpen(isActiveConversation: boolean): boolean {
     const {contentState} = useAppState.getState();
     const isConversationState = contentState === ContentState.CONVERSATION;
-    return conversationEntity && isActiveConversation && isConversationState;
+    return isActiveConversation && isConversationState;
   }
 
   private switchToNotificationSettingsIfApplicable(
@@ -281,7 +281,7 @@ export class ContentViewModel {
         this.closeRightSidebar();
       }
 
-      const isOpenedConversation = this.isConversationOpen(conversationEntity, isActiveConversation);
+      const isOpenedConversation = this.isConversationOpen(isActiveConversation);
       this.handleConversationState(isOpenedConversation, openNotificationSettings, conversationEntity);
       if (!isActiveConversation) {
         this.conversationState.activeConversation(conversationEntity);

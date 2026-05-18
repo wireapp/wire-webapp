@@ -67,7 +67,8 @@ export const ImageAssetLarge = ({
   const [hasLoadError, setHasLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  const aspectRatio = metadata?.width && metadata?.height ? metadata?.width / metadata?.height : undefined;
+  const aspectRatio =
+    metadata?.width !== undefined && metadata?.height !== undefined ? metadata.width / metadata.height : undefined;
   const opacity = isLoaded ? 1 : 0;
   const isUnavailable = isError || hasLoadError;
   const displaySrc = getBestPreviewSource({

@@ -43,7 +43,7 @@ export const useGetAssetUrl = ({asset, isEnabled, getAssetUrl, onError, onSucces
   const [isError, setIsError] = useState(false);
 
   const fetchAssetUrl = useCallback(async () => {
-    if (url || !isEnabled) {
+    if ((url !== undefined && url !== '') || !isEnabled) {
       return;
     }
 

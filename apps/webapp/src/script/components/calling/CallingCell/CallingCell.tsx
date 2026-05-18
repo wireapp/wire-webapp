@@ -40,11 +40,12 @@ import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
 import type {Participant} from 'Repositories/calling/Participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
@@ -89,6 +90,7 @@ export const CallingCell = ({
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: CallingCellProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {conversation} = call;
   const {reason, state, isCbrEnabled, startedAt, maximizedParticipant, muteState} = useKoSubscribableChildren(call, [
     'reason',
@@ -138,7 +140,10 @@ export const CallingCell = ({
   const isMuted = muteState !== MuteState.NOT_MUTED;
   const isCurrentlyMuted = useCallback(() => muteState === MuteState.SELF_MUTED, [muteState]);
 
-  const isDeclined = !!reason && [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
+  const isDeclined =
+    reason !== undefined &&
+    reason !== null &&
+    [CALL_REASON.STILL_ONGOING, CALL_REASON.ANSWERED_ELSEWHERE].includes(reason);
 
   const isOutgoing = state === CALL_STATE.OUTGOING;
   const isIncoming = state === CALL_STATE.INCOMING;
@@ -170,7 +175,7 @@ export const CallingCell = ({
 
   const currentCallStatus = callStatus[state];
 
-  const showNoCameraPreview = !hasAccessToCamera && isVideoCall && !isOngoing;
+  const showNoCameraPreview = hasAccessToCamera !== true && isVideoCall && !isOngoing;
 
   const videoGrid = useVideoGrid(call);
 
@@ -184,11 +189,13 @@ export const CallingCell = ({
     [call, callActions],
   );
 
-  const isPressSpaceToUnmuteEnabled =
+  const isPressSpaceToUnmutePreferenceEnabled =
     useUserPropertyValue(
       () => propertiesRepository.getPreference(PROPERTIES_TYPE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE),
       WebAppEvents.PROPERTIES.UPDATE.CALL.ENABLE_PRESS_SPACE_TO_UNMUTE,
-    ) && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
+    ) === true;
+  const isPressSpaceToUnmuteEnabled =
+    isPressSpaceToUnmutePreferenceEnabled && Config.getConfig().FEATURE.ENABLE_PRESS_SPACE_TO_UNMUTE;
 
   usePressSpaceToUnmute({
     callState,
@@ -220,18 +227,22 @@ export const CallingCell = ({
         return;
       }
       if (isSpaceOrEnterKey(event.key)) {
-        void callingRepository.setViewModeFullScreen();
+        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+          await callingRepository.setViewModeFullScreen();
+        });
       }
     },
-    [isOngoing, callingRepository],
+    [callingRepository, fireAndForgetInvoker, isOngoing],
   );
 
   const handleMaximizeClick = useCallback(() => {
     if (!isOngoing) {
       return;
     }
-    void callingRepository.setViewModeFullScreen();
-  }, [isOngoing, callingRepository]);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await callingRepository.setViewModeFullScreen();
+    });
+  }, [callingRepository, fireAndForgetInvoker, isOngoing]);
 
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {showAlert, clearShowAlert} = useCallAlertState();
@@ -321,10 +332,14 @@ export const CallingCell = ({
 
   const toggleDetachedWindow = () => {
     if (isDetachedWindow) {
-      void callingRepository.setViewModeMinimized();
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await callingRepository.setViewModeMinimized();
+      });
       return;
     }
-    void callingRepository.setViewModeDetached();
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await callingRepository.setViewModeDetached();
+    });
   };
 
   if (isFullScreen) {
@@ -339,7 +354,7 @@ export const CallingCell = ({
         </p>
       )}
 
-      {(!isDeclined || isTemporaryUser) && (
+      {(!isDeclined || isTemporaryUser === true) && (
         <div
           className="conversation-list-calling-cell-background"
           data-uie-name="item-call"
@@ -360,7 +375,7 @@ export const CallingCell = ({
             conversationUrl={conversationUrl}
             callStartedAlert={isGroupOrChannel ? callGroupStartedAlert : call1To1StartedAlert}
             ongoingCallAlert={isGroupOrChannel ? onGoingGroupCallAlert : onGoingCallAlert}
-            isTemporaryUser={!!isTemporaryUser}
+            isTemporaryUser={isTemporaryUser === true}
             conversationParticipants={conversationParticipants}
             conversationName={conversationName}
             currentCallStatus={currentCallStatus}

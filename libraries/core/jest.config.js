@@ -32,7 +32,7 @@ module.exports = {
     '^.+\\.(ts|tsx)$': '@swc/jest',
     '^.+\\.(js|jsx)$': '@swc/jest',
   },
-  transformIgnorePatterns: ['/node_modules/(?!(true-myth|uuid)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(true-myth|uuid|noop-esm)/)'],
   coverageDirectory: '../../coverage/libraries/core',
   testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],

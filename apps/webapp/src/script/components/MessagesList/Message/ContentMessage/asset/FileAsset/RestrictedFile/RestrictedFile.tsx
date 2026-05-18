@@ -26,14 +26,15 @@ interface RestrictedFileProps {
 }
 
 const RestrictedFile = ({asset}: RestrictedFileProps) => {
-  const fileName = asset?.file_name && trimFileExtension(asset.file_name);
+  const fileName =
+    asset?.file_name !== undefined && asset.file_name !== '' ? trimFileExtension(asset.file_name) : undefined;
   return (
     <div className="file">
       <div className="file__icon icon-file" data-uie-name="file-icon">
         <span className="file__icon__ext icon-block" />
       </div>
       <div className="file__desc">
-        {fileName && (
+        {fileName !== undefined && fileName !== '' && (
           <div className="label-bold-xs ellipsis" data-uie-name="file-name">
             {fileName}
           </div>

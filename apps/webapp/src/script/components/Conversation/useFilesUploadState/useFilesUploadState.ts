@@ -86,14 +86,14 @@ export const useFileUploadState = create<FileUploadStore>()((set, get) => ({
     set(state => ({
       filesByConversation: {
         ...state.filesByConversation,
-        [conversationId]: [...(state.filesByConversation[conversationId] || []), ...files],
+        [conversationId]: [...(state.filesByConversation[conversationId] ?? []), ...files],
       },
     })),
   deleteFile: ({conversationId, fileId}) =>
     set(state => ({
       filesByConversation: {
         ...state.filesByConversation,
-        [conversationId]: state.filesByConversation[conversationId]?.filter(file => file.id !== fileId) || [],
+        [conversationId]: state.filesByConversation[conversationId]?.filter(file => file.id !== fileId) ?? [],
       },
     })),
   updateFile: ({conversationId, fileId, data}) =>
@@ -103,16 +103,30 @@ export const useFileUploadState = create<FileUploadStore>()((set, get) => ({
         [conversationId]:
           state.filesByConversation[conversationId]?.map(file => {
             if (file.id === fileId) {
-              file.remoteUuid = data.remoteUuid || file.remoteUuid;
-              file.remoteVersionId = data.remoteVersionId || file.remoteVersionId;
-              file.uploadStatus = data.uploadStatus || file.uploadStatus;
-              file.image = data.image || file.image;
-              file.audio = data.audio || file.audio;
-              file.video = data.video || file.video;
-              file.uploadProgress = data.uploadProgress || file.uploadProgress;
+              if (data.remoteUuid !== undefined) {
+                file.remoteUuid = data.remoteUuid;
+              }
+              if (data.remoteVersionId !== undefined) {
+                file.remoteVersionId = data.remoteVersionId;
+              }
+              if (data.uploadStatus !== undefined) {
+                file.uploadStatus = data.uploadStatus;
+              }
+              if (data.image !== undefined) {
+                file.image = data.image;
+              }
+              if (data.audio !== undefined) {
+                file.audio = data.audio;
+              }
+              if (data.video !== undefined) {
+                file.video = data.video;
+              }
+              if (data.uploadProgress !== undefined) {
+                file.uploadProgress = data.uploadProgress;
+              }
             }
             return file;
-          }) || [],
+          }) ?? [],
       },
     })),
   clearAll: ({conversationId}) => {
@@ -123,6 +137,6 @@ export const useFileUploadState = create<FileUploadStore>()((set, get) => ({
   },
   getFiles: ({conversationId}) => {
     const state = get().filesByConversation;
-    return state[conversationId] || [];
+    return state[conversationId] ?? [];
   },
 }));

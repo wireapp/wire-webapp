@@ -22,6 +22,7 @@ import {MutableRefObject, useEffect} from 'react';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface Props {
   conversation: Conversation;
@@ -36,6 +37,7 @@ export const useLoadConversation = ({
   conversationLastReadTimestamp,
   onLoading,
 }: Props) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const loadConversation = async (conversationToLoad: Conversation): Promise<MessageEntity[]> => {
     onLoading(true);
     try {
@@ -53,13 +55,15 @@ export const useLoadConversation = ({
   };
 
   useEffect(() => {
-    void loadConversation(conversation);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await loadConversation(conversation);
+    });
 
     return () => {
       conversation.release();
       onLoading(true);
     };
-  }, [conversation]);
+  }, [conversation, fireAndForgetInvoker]);
 
   return {loadConversation};
 };

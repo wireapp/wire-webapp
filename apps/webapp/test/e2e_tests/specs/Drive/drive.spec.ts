@@ -22,8 +22,8 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {getImageFilePath, getLocalQRCodeValue, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
 import {getVideoFilePath, VideoFileName} from 'test/e2e_tests/utils/asset.util';
 
-import {test, expect, withLogin, withConnectedUser} from '../../test.fixtures';
-import {createGroup} from '../../utils/userActions';
+import {test, expect, withLogin} from '../../test.fixtures';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 import {ConversationPage} from '../../pageManager/webapp/pages/conversation.page';
 import {Locator} from '@playwright/test';
 
@@ -68,9 +68,10 @@ test.describe('Conversations', () => {
     {tag: ['@crit-flow-cells', '@regression', '@TC-8785']},
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
 
       const {pages: userAPages, modals: userAModals, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages, modals: userBModals} = userBPageManager.webapp;
@@ -115,9 +116,10 @@ test.describe('Conversations', () => {
     {tag: ['@crit-flow-cells', '@regression', '@TC-8786']},
     async ({createPage}) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
 
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;
@@ -156,9 +158,10 @@ test.describe('Conversations', () => {
     {tag: ['@crit-flow-cells', '@regression', '@TC-8787']},
     async ({createPage}) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
 
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages, components: userBComponents} = userBPageManager.webapp;
@@ -196,9 +199,10 @@ test.describe('Conversations', () => {
     {tag: ['@crit-flow-cells', '@regression', '@TC-8788']},
     async ({createPage}) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))),
+        PageManager.from(createPage(withLogin(userA))),
         PageManager.from(createPage(withLogin(userB))),
       ]);
+      await connectWithUser(userAPageManager, userB);
 
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
       const {pages: userBPages} = userBPageManager.webapp;

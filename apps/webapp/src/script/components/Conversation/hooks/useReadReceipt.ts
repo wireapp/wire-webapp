@@ -41,7 +41,7 @@ export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sen
       Object.values(groupedMessages).forEach(readMessagesBatch => {
         const [firstEntry, ...otherEntries] = readMessagesBatch;
 
-        if (firstEntry) {
+        if (firstEntry !== undefined) {
           const {conversation, message: firstMessage} = firstEntry;
           const otherMessageIds = otherEntries.map(({message}) => message);
           messageSender.sendReadReceipt(conversation, firstMessage, otherMessageIds);
@@ -61,7 +61,7 @@ export const useReadReceiptSender = (messageSender: Pick<MessageRepository, 'sen
         return;
       }
 
-      if (flushTimer.current) {
+      if (flushTimer.current !== undefined) {
         window.clearTimeout(flushTimer.current);
       }
 

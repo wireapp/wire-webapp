@@ -318,7 +318,7 @@ test.describe('Guestroom', () => {
       // Guest leaves the conversation
       await guestPages.conversation().toggleGroupInformation();
       await guestPages.conversation().leaveConversation();
-      await guestModals.leaveConversation().clickConfirm();
+      await guestModals.leaveConversation().actionButton.click();
 
       await expect(
         ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.fullName} left`}),
@@ -459,6 +459,7 @@ test.describe('Guestroom', () => {
       // WORKAROUND: The 'Join in Browser' button currently redirects to Production.
       // To maintain the existing logged-in session, we must force the invitation
       // URL to use the same environment as our current test session.
+      if (process.env.WEBAPP_URL === undefined) throw new Error(`Missing env var "WEBAPP_URL"`);
       const envUrl = new URL(process.env.WEBAPP_URL);
       const invitationLink = new URL(guestPage.url());
 
@@ -516,6 +517,7 @@ test.describe('Guestroom', () => {
       // WORKAROUND: The 'Join in Browser' button currently redirects to Production.
       // To maintain the existing logged-in session, we must force the invitation
       // URL to use the same environment as our current test session.
+      if (process.env.WEBAPP_URL === undefined) throw new Error(`Missing env var "WEBAPP_URL"`);
       const envUrl = new URL(process.env.WEBAPP_URL);
       const invitationLink = new URL(guestPage.url());
 

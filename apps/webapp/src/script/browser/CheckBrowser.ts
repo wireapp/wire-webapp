@@ -57,7 +57,7 @@ const supportsCookies = (): boolean => {
       return false;
     default:
       Cookies.set(cookieName, 'yes');
-      if (Cookies.get(cookieName)) {
+      if (Cookies.get(cookieName) !== undefined) {
         Cookies.remove(cookieName);
         return true;
       }

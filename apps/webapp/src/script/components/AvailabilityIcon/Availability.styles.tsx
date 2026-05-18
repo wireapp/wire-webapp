@@ -41,7 +41,7 @@ export const iconStyles = (availabilityState: AvailabilityProp.Type, avatarSize:
   const squareIconSize = getSquareIconSize();
 
   return {
-    ...CSS_SQUARE(squareIconSize?.[avatarSize] || 8),
+    ...CSS_SQUARE(squareIconSize[avatarSize] ?? 8),
     fill: availabilityStateColors[availabilityState],
     stroke: availabilityStateColors[availabilityState],
     borderRadius: '50%',

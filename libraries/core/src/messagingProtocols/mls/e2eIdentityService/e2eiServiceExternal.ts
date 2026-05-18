@@ -324,7 +324,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       cx.e2eiRegisterCRL(url, crl),
     );
 
-    const expirationTimestamp = expirationTimestampSeconds && expirationTimestampSeconds * TimeInMillis.SECOND;
+    const expirationTimestamp =
+      expirationTimestampSeconds !== undefined ? expirationTimestampSeconds * TimeInMillis.SECOND : undefined;
 
     await this.cancelCrlDistributionTimer(url);
 
@@ -334,7 +335,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     }
 
     //if it was dirty, trigger e2eiconversationstate for every conversation
-    if (dirty) {
+    if (dirty === true) {
       onDirty();
     }
   }

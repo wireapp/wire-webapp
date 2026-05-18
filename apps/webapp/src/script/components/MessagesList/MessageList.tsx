@@ -241,7 +241,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   }
 
   const scrollToElement: ScrollToElement = ({element, center}, isUnread) => {
-    if (isUnread && messagesContainer) {
+    if (isUnread === true && messagesContainer !== null) {
       // if it's a new unread message, but we are not on the first render of the list,
       // we do not need to scroll to the unread message
       return;
@@ -252,7 +252,7 @@ export const MessagesList: FC<MessagesListParams> = ({
   };
 
   const jumpToLastMessage = () => {
-    if (conversation) {
+    if (conversation !== undefined) {
       // clean up anything like search result
       setHighlightedMessage(undefined);
       conversation.initialMessage(undefined);
@@ -308,8 +308,9 @@ export const MessagesList: FC<MessagesListParams> = ({
 
               const key = `${message.id || 'message'}-${message.timestamp()}`;
 
-              const isHighlighted = !!highlightedMessage && highlightedMessage === message.id;
-              const isFocused = !!focusedId && focusedId === message.id;
+              const isHighlighted =
+                highlightedMessage !== undefined && highlightedMessage !== '' && highlightedMessage === message.id;
+              const isFocused = focusedId !== undefined && focusedId !== '' && focusedId === message.id;
 
               return (
                 <Message

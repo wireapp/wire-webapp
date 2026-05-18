@@ -27,7 +27,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
-import {AuthError} from '../error/AuthError';
+import {AuthError} from '../error/authError';
 
 export const checkIndexedDb = (): Promise<void> => {
   if (!Runtime.isSupportingIndexedDb()) {
@@ -60,7 +60,7 @@ export const checkIndexedDb = (): Promise<void> => {
       const interval_id = window.setInterval(() => {
         currentAttempt += 1;
 
-        if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
+        if (dbOpenRequest.readyState === 'done' && dbOpenRequest.result === undefined) {
           window.clearInterval(interval_id);
           return reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
         }
@@ -146,7 +146,7 @@ export const loadUrlBlob = (url: string): Promise<Blob> => {
 export const getFileExtension = (filename: string): string => {
   const extensionMatch = filename?.match(/\.(tar\.gz|[^.]*)$/i);
   const foundExtension = extensionMatch?.[1];
-  return foundExtension || '';
+  return foundExtension ?? '';
 };
 
 export const getName = (nodePath: string): string => {
@@ -256,12 +256,8 @@ export const base64ToBlob = (base64: string): Blob => {
  * Downloads blob using a hidden link element.ƒ
  */
 export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): number => {
-  if (blob) {
-    const url = window.URL.createObjectURL(blob);
-    return downloadFile(url, filename, mimeType);
-  }
-
-  throw new Error('Failed to download blob: Resource not provided');
+  const url = window.URL.createObjectURL(blob);
+  return downloadFile(url, filename, mimeType);
 };
 
 export const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
@@ -269,7 +265,7 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   anchor.download = fileName;
   anchor.href = url;
   anchor.style.display = 'none';
-  if (mimeType) {
+  if (mimeType !== undefined && mimeType.length > 0) {
     anchor.type = mimeType;
   }
 

@@ -45,7 +45,7 @@ export const ConversationOption = ({onClick, title, isSelected, isUpgradeBannerV
         )}
         <p className="heading-h3">{title}</p>
       </FlexBox>
-      {isUpgradeBannerVisible && <UpgradeBadge />}
+      {isUpgradeBannerVisible === true && <UpgradeBadge />}
     </FlexBox>
   );
 };

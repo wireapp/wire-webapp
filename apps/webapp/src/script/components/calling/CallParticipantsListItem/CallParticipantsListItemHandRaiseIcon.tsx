@@ -45,7 +45,7 @@ export function CallParticipantsListItemHandRaiseIcon({handRaisedAt}: CallPartic
     };
   });
 
-  if (!duration) {
+  if (duration === undefined || duration === '') {
     return null;
   }
 

@@ -63,9 +63,9 @@ export class ScimAPI {
       data: {
         description,
         password,
-        ...(idp && {idp}),
-        ...(name && {name}),
-        ...(verificationCode && {verification_code: verificationCode}),
+        ...(idp !== undefined && idp.length > 0 && {idp}),
+        ...(name !== undefined && name.length > 0 && {name}),
+        ...(verificationCode !== undefined && verificationCode.length > 0 && {verification_code: verificationCode}),
       },
       method: 'post',
       url: `${ScimAPI.URL.SCIM}/${ScimAPI.URL.AUTH_TOKENS}`,

@@ -71,7 +71,7 @@ const ModalComponent = ({
 
   useEffect(() => {
     // Get the correct document based on the container
-    const targetDocument = container ? (container as HTMLElement).ownerDocument || document : document;
+    const targetDocument = container ? ((container as HTMLElement).ownerDocument ?? document) : document;
 
     const trapFocus = (event: KeyboardEvent) => preventFocusOutside(event, trapId, targetDocument);
 

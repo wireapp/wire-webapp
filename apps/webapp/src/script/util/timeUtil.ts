@@ -86,7 +86,7 @@ const locales = {cs, da, de, el, es, et, fi, fr, hr, hu, it, lt, nl, pl, pt, ro,
 const defaultLocale = enUS;
 let locale = defaultLocale;
 export type LocaleType = keyof typeof locales;
-export const setDateLocale = (newLocale: LocaleType) => (locale = locales[newLocale] || defaultLocale);
+export const setDateLocale = (newLocale: LocaleType) => (locale = locales[newLocale] ?? defaultLocale);
 
 export const formatLocale = (date: FnDate | string | number, formatString: string) =>
   format(new Date(date), formatString, {locale});
@@ -216,7 +216,7 @@ export const formatDurationCaption = (duration: number): string => {
   const mappedUnits = mapUnits(duration, false);
   const hours = mappedUnits.find(unit => unit.symbol === 'h');
   const minutes = mappedUnits.find(unit => unit.symbol === 'm');
-  const hasHours = hours?.value ?? 0 > 0;
+  const hasHours = (hours?.value ?? 0) > 0;
   const validUnitStrings = [];
   for (let index = 0; index < mappedUnits.length; index++) {
     const unit = mappedUnits[index];

@@ -26,8 +26,8 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
-import {EventName} from 'Repositories/tracking/EventName';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
+import {EventName} from 'Repositories/tracking/eventName';
+import {Segmentation} from 'Repositories/tracking/segmentation';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {Call} from './Call';
