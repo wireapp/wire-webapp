@@ -3692,6 +3692,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@formatjs/cli-native-linux-arm64@npm:1.2.0":
+  version: 1.2.0
+  resolution: "@formatjs/cli-native-linux-arm64@npm:1.2.0"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
 "@formatjs/cli-native-linux-x64@npm:1.1.0":
   version: 1.1.0
   resolution: "@formatjs/cli-native-linux-x64@npm:1.1.0"
@@ -3699,11 +3706,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:6.15.0":
-  version: 6.15.0
-  resolution: "@formatjs/cli@npm:6.15.0"
+"@formatjs/cli@npm:6.16.0":
+  version: 6.16.0
+  resolution: "@formatjs/cli@npm:6.16.0"
   dependencies:
     "@formatjs/cli-native-darwin-arm64": "npm:1.1.0"
+    "@formatjs/cli-native-linux-arm64": "npm:1.2.0"
     "@formatjs/cli-native-linux-x64": "npm:1.1.0"
   peerDependencies:
     "@glimmer/syntax": ^0.84.3 || ^0.95.0
@@ -3712,6 +3720,8 @@ __metadata:
     vue: ^3.5.0
   dependenciesMeta:
     "@formatjs/cli-native-darwin-arm64":
+      optional: true
+    "@formatjs/cli-native-linux-arm64":
       optional: true
     "@formatjs/cli-native-linux-x64":
       optional: true
@@ -3732,7 +3742,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 10/2420a1c248acbd89464f6c899fa3b877f0fb3600176953ec1330424a10ee50296940dc7faae2fed9f5b784bc53e7775c62f2513cbe3a3c3c7ce5fcf5d8d5e0e4
+  checksum: 10/0fc5fd4d7a1cfef8ee95b50b17da9d5bec45fe76f3fc7cebc35f8c75246efb7eac24e71086926390874606cffd5cb547292e5cd8b2275a3f4792d949129c532b
   languageName: node
   linkType: hard
 
@@ -10084,7 +10094,7 @@ __metadata:
     "@datadog/browser-rum": "npm:7.1.0"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@emotion/react": "npm:11.14.0"
-    "@formatjs/cli": "npm:6.15.0"
+    "@formatjs/cli": "npm:6.16.0"
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.27.2"
     "@lexical/history": "npm:0.27.2"
