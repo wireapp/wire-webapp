@@ -812,8 +812,9 @@ test.describe('Calling', () => {
   test(
     'I want to see a group call timing out after 300s if no one else joined',
     {tag: ['@TC-2936', '@regression']},
-    async ({createPage}) => {
-      test.setTimeout(390_000);
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 300_000);
+
       const userAPage = await createPage(withLogin(userA));
       const userAPages = PageManager.from(userAPage).webapp.pages;
 
