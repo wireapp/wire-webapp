@@ -19,10 +19,10 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {createGroup} from '../../utils/userActions';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 import {Page} from '@playwright/test';
 import {ApiManagerE2E} from '../../backend/apiManager.e2e';
 
@@ -119,10 +119,8 @@ test.describe('Read Receipts', () => {
       // TODO: remove this line when [WPB-25618] is resolved
       test.skip(tag === '@TC-3556', 'TODO: [WPB-25618] read receipt is not visible on location share');
 
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
       const {pages: userBPages, components: userBComponents} = PageManager.from(userBPage).webapp;
@@ -160,10 +158,8 @@ test.describe('Read Receipts', () => {
     'I want to see a popup when I toggled read receipts on and off from another device',
     {tag: ['@TC-3567', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const userAPage2 = await createPage(withLogin(userA, {confirmNewHistory: true}));
 
