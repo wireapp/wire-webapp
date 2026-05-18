@@ -20,7 +20,9 @@
 import assert from 'node:assert';
 import {result} from 'true-myth';
 
-import {validateGetAllTagsResponse} from './useAllCellsTagsStore';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+
+import {useAllCellsTagsStore, validateGetAllTagsResponse} from './useAllCellsTagsStore';
 
 describe('validateGetAllTagsResponse()', () => {
   it('returns Result ok with tags for a valid getAllTags response', () => {
@@ -47,5 +49,61 @@ describe('validateGetAllTagsResponse()', () => {
     });
 
     expect(result.isErr(validationResult)).toBe(true);
+  });
+});
+
+describe('useAllCellsTagsStore', () => {
+  beforeEach(() => {
+    useAllCellsTagsStore.setState({
+      tags: [],
+      isLoading: false,
+      error: null,
+      hasFetched: false,
+    });
+  });
+
+  it('sets hasFetched to true after successfully fetching tags', async () => {
+    const cellsRepository = {
+      getAllTags: jest.fn().mockResolvedValue({Values: ['finance']}),
+    } as unknown as CellsRepository;
+
+    await useAllCellsTagsStore.getState().fetch(cellsRepository);
+
+    expect(useAllCellsTagsStore.getState()).toMatchObject({
+      tags: ['finance'],
+      isLoading: false,
+      error: null,
+      hasFetched: true,
+    });
+  });
+
+  it('keeps hasFetched false when the tags response is invalid', async () => {
+    const cellsRepository = {
+      getAllTags: jest.fn().mockResolvedValue({Values: ['finance', 123]}),
+    } as unknown as CellsRepository;
+
+    await useAllCellsTagsStore.getState().fetch(cellsRepository);
+
+    expect(useAllCellsTagsStore.getState()).toMatchObject({
+      tags: [],
+      isLoading: false,
+      hasFetched: false,
+    });
+    expect(useAllCellsTagsStore.getState().error).toBeInstanceOf(Error);
+  });
+
+  it('keeps hasFetched false when fetching tags fails', async () => {
+    const cellsRepository = {
+      getAllTags: jest.fn().mockRejectedValue(new Error('Network error')),
+    } as unknown as CellsRepository;
+
+    await useAllCellsTagsStore.getState().fetch(cellsRepository);
+
+    expect(useAllCellsTagsStore.getState()).toMatchObject({
+      tags: [],
+      isLoading: false,
+      hasFetched: false,
+    });
+    expect(useAllCellsTagsStore.getState().error).toEqual(new Error('Network error'));
   });
 });

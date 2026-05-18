@@ -57,15 +57,15 @@ export const useAllCellsTagsStore = create<AllCellsTagsState>(set => ({
       const validated = validateGetAllTagsResponse(raw);
 
       if (result.isErr(validated)) {
-        set({error: validated.error});
+        set({error: validated.error, hasFetched: false});
         return;
       }
 
-      set({tags: validated.value});
+      set({tags: validated.value, hasFetched: true});
     } catch (error: unknown) {
-      set({error: error instanceof Error ? error : new Error('Failed to load tags')});
+      set({error: error instanceof Error ? error : new Error('Failed to load tags'), hasFetched: false});
     } finally {
-      set({isLoading: false, hasFetched: true});
+      set({isLoading: false});
     }
   },
 }));
