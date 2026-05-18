@@ -64,7 +64,7 @@ import {EventService} from 'Repositories/event/EventService';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {LegacyEventRecord, StorageService} from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';

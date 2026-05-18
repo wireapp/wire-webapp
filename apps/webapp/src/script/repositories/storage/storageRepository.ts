@@ -21,7 +21,7 @@ import {container} from 'tsyringe';
 
 import {Logger, getLogger} from 'Util/logger';
 
-import {StorageService} from './StorageService';
+import {StorageService} from './storageService';
 
 export class StorageRepository {
   private readonly logger: Logger;

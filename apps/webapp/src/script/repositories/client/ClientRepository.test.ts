@@ -23,7 +23,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Runtime} from '@wireapp/commons';
 
 import {User} from 'Repositories/entity/User';
-import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
+import {ClientRecord} from 'Repositories/storage/record/clientRecord';
 import {ClientError} from 'src/script/error/clientError';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';

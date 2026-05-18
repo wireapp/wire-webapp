@@ -37,7 +37,7 @@ import {isObject} from 'underscore';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
+import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';

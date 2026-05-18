@@ -54,7 +54,7 @@ import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {Core} from 'src/script/service/coreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/storeEngineProvider';
 import {StorageService} from 'Repositories/storage';
-import {StorageRepository} from 'Repositories/storage/StorageRepository';
+import {StorageRepository} from 'Repositories/storage/storageRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamService} from 'Repositories/team/TeamService';
 import {TeamState} from 'Repositories/team/TeamState';

@@ -27,8 +27,8 @@ import {Logger, getLogger} from 'Util/logger';
 import {loadValue, storeValue} from 'Util/storageUtil';
 import {toError} from 'Util/toError';
 
-import {DexieDatabase} from './DexieDatabase';
-import {StorageSchemata} from './StorageSchemata';
+import {DexieDatabase} from './dexieDatabase';
+import {StorageSchemata} from './storageSchemata';
 
 import {StorageError} from '../../error/storageError';
 

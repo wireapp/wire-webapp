@@ -33,7 +33,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
-import {StorageKey} from 'Repositories/storage/StorageKey';
+import {StorageKey} from 'Repositories/storage/storageKey';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
