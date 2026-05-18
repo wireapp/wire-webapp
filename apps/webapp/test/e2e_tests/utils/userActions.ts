@@ -19,7 +19,6 @@
 
 import {expect, Page, TestInfo} from 'playwright/test';
 
-import {ApiManagerE2E} from '../backend/apiManager.e2e';
 import {User} from '../data/user';
 import {PageManager} from '../pageManager';
 
@@ -29,16 +28,6 @@ export const loginUser = async (user: User, pageManager: PageManager) => {
   await pages.singleSignOn().enterEmailOnSSOPage(user.email);
   await pages.login().passwordInput.fill(user.password);
   await pages.login().signInButton.click();
-};
-
-export const inviteMembers = async (members: User[], owner: User, api: ApiManagerE2E) => {
-  await Promise.all(
-    members.map(async member => {
-      const invitationId = await api.team.inviteUserToTeam(member.email, owner);
-      const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId!, invitationId);
-      await api.createPersonalUser(member, invitationCode);
-    }),
-  );
 };
 
 export const logOutUser = async (pageManager: PageManager, shouldDeleteClient = false) => {
