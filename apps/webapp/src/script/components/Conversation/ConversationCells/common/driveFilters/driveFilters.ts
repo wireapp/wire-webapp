@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 export interface ConversationDriveFiltersState {
   selectedTagIds: string[];
   selectedFileTypeIds: string[];
