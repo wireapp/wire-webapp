@@ -39,7 +39,8 @@ export const requiresPasswordModal = (
 ): boolean =>
   !isOpen &&
   (hasPassword ||
-    (conversationError != null && conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD));
+    (!is.nullOrUndefined(conversationError) &&
+      conversationError.label === BackendErrorLabel.INVALID_CONVERSATION_PASSWORD));
 
 export const buildDomainRedirectUrl = (welcomeUrl: string, existingQuery: string, clientType: ClientType): string => {
   const [path] = welcomeUrl.split('?');
