@@ -59,7 +59,7 @@ import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {isBackendError} from 'Util/typePredicateUtil';
 
-import {separator} from './Login.styles';
+import {separator} from './login.styles';
 
 import {Config} from '../../../Config';
 import {AccountAlreadyExistsModal} from '../../component/AccountAlreadyExistsModal';
@@ -70,7 +70,7 @@ import {JoinGuestLinkPasswordModal} from '../../component/JoinGuestLinkPasswordM
 import {LoginForm} from '../../component/LoginForm';
 import {EXTERNAL_ROUTE} from '../../externalRoute';
 import {useRouteA11y} from '../../hooks/useRouteA11y';
-import {actionRoot} from '../../module/action/';
+import {actionRoot} from '../../module/action';
 import {LabeledError} from '../../module/action/LabeledError';
 import {ValidationError} from '../../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';

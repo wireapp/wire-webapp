@@ -51,7 +51,7 @@ import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {SingleSignOnForm} from './SingleSignOnForm';
+import {SingleSignOnForm} from './singleSignOnForm';
 
 import {Config} from '../../../Config';
 import {AppAlreadyOpen} from '../../component/AppAlreadyOpen';

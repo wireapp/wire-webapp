@@ -24,7 +24,7 @@ import {StatusCodes} from 'http-status-codes';
 
 import {TypeUtil} from '@wireapp/commons';
 
-import {Login} from './Login';
+import {Login} from './login';
 
 import {Config, Configuration} from '../../../Config';
 import {actionRoot} from '../../module/action';

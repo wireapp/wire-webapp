@@ -21,7 +21,7 @@ import {fireEvent, waitFor} from '@testing-library/react';
 
 import {TypeUtil} from '@wireapp/commons';
 
-import {SingleSignOnForm} from './SingleSignOnForm';
+import {SingleSignOnForm} from './singleSignOnForm';
 
 import {Config, Configuration} from '../../../Config';
 import {actionRoot} from '../../module/action';

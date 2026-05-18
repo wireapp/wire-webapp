@@ -39,7 +39,7 @@ import {buildDomainRedirectUrl, handleEnterpriseLogin, handleSSOBackendError, re
 
 import {Config} from '../../../Config';
 import {JoinGuestLinkPasswordModal} from '../../component/JoinGuestLinkPasswordModal';
-import {actionRoot as ROOT_ACTIONS} from '../../module/action/';
+import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ValidationError} from '../../module/action/ValidationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
 import * as AuthSelector from '../../module/selector/AuthSelector';

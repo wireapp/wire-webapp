@@ -35,7 +35,7 @@ import {noop} from 'Util/util';
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
 import {ConversationJoinFull} from './ConversationJoinInvalid';
 import {EntropyContainer} from './EntropyContainer';
-import {Login} from './Login/Login';
+import {Login} from './Login/login';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
