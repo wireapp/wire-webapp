@@ -11,37 +11,37 @@
     "changelog-production": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ts-node ./bin/changelog.ts production 2>&1 | grep -v '\\[dotenv@'"
+        "command": "ts-node --project ./tsconfig.bin.json ./bin/changelog.ts production 2>&1 | grep -v '\\[dotenv@'"
       }
     },
     "changelog-staging": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ts-node ./bin/changelog.ts staging 2>&1 | grep -v '\\[dotenv@'"
+        "command": "ts-node --project ./tsconfig.bin.json ./bin/changelog.ts staging 2>&1 | grep -v '\\[dotenv@'"
       }
     },
     "changelog-rc": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "ts-node ./bin/changelog.ts production master 2>&1 | grep -v '\\[dotenv@'"
+        "command": "ts-node --project ./tsconfig.bin.json ./bin/changelog.ts production master 2>&1 | grep -v '\\[dotenv@'"
       }
     },
     "release-staging": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "git checkout master && git pull origin master && ts-node ./bin/release_tag.ts staging"
+        "command": "git checkout master && git pull origin master && ts-node --project ./tsconfig.bin.json ./bin/release_tag.ts staging"
       }
     },
     "release-production": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "git checkout master && git pull origin master && ts-node ./bin/release_tag.ts production"
+        "command": "git checkout master && git pull origin master && ts-node --project ./tsconfig.bin.json ./bin/release_tag.ts production"
       }
     },
     "release-custom": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "npx ts-node ./bin/release_tag.ts"
+        "command": "npx ts-node --project ./tsconfig.bin.json ./bin/release_tag.ts"
       }
     },
     "clean-jest": {
