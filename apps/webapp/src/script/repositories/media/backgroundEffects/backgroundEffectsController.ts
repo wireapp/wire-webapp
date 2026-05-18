@@ -328,7 +328,6 @@ const getWorkerOptions = (
     smoothing: options.smoothing,
     smoothstepMin: options.smoothstepMin,
     smoothstepMax: options.smoothstepMax,
-    restartEvery: options.restartEvery,
     bgBlur: options.bgBlur,
     bgBlurRadius: options.bgBlurRadius,
     enableFilters: options.enableFilters,

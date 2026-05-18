@@ -291,12 +291,6 @@ export async function runSegmenter(
           filterMsSum = 0;
           frames = 0;
         }
-
-        // Restart segmenter to avoid memory leaks.
-        if (segmenterOptions.restartEvery && totalFrames % segmenterOptions.restartEvery === 0) {
-          logger.log('[virtual-background] restart segmenter to avoid memory leaks');
-          restartSegmenter();
-        }
       },
 
       close() {

@@ -47,7 +47,6 @@ export type ProcessVideoTrackOptions = {
   smoothing: number;
   smoothstepMin: number;
   smoothstepMax: number;
-  restartEvery: number;
   bgBlur: number;
   bgBlurRadius: number;
 
