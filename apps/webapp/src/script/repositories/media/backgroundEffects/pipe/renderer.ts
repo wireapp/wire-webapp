@@ -30,21 +30,13 @@ type ImageInfo = {
   url: string;
 };
 
-type VideoInfo = {
-  type: 'video';
-  texture: WebGLTexture;
-  url: string;
-  media: ReadableStream;
-  canvas: OffscreenCanvas;
-};
-
 type ColorInfo = {
   type: 'color';
   texture: WebGLTexture;
   color: readonly [number, number, number, number];
 };
 
-type BackgroundRenderInfo = ImageInfo | VideoInfo | ColorInfo;
+type BackgroundRenderInfo = ImageInfo | ColorInfo;
 
 export class WebGLRenderer {
   readonly logger = getSafeLogger('WebGLRenderer');
@@ -414,46 +406,6 @@ export class WebGLRenderer {
         height: media.height,
         url,
       };
-    } else if (newSource.type === 'video') {
-      const {media, url} = newSource as {media: ReadableStream; url: string};
-
-      const canvas = new OffscreenCanvas(1, 1);
-      const ctx = canvas.getContext('2d');
-      const logger = getSafeLogger('virtual-background');
-      const writer = new WritableStream({
-        write(videoFrame: VideoFrame) {
-          canvas.width = videoFrame.codedWidth;
-          canvas.height = videoFrame.codedHeight;
-          ctx?.drawImage(videoFrame, 0, 0);
-          videoFrame.close();
-        },
-        close() {
-          logger.error('[virtual-background] video background close');
-        },
-      });
-      media.pipeTo(writer).catch((err: unknown) => {
-        this.logger.error('media.pipeTo(writer) error', err);
-      });
-
-      const texture = this.gl.createTexture();
-      if (!texture) {
-        throw new Error('Failed to create texture for video');
-      }
-      this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
-      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, 1, 1, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-      this.gl.bindTexture(this.gl.TEXTURE_2D, null);
-
-      this.backgroundRenderInfo = {
-        type: 'video',
-        texture,
-        url,
-        media,
-        canvas,
-      };
     }
 
     if (!this.backgroundRenderInfo) {
@@ -609,14 +561,7 @@ export class WebGLRenderer {
       let bgHeight = 1;
       let bgWidth = 1; // Default for color type
 
-      if (this.backgroundRenderInfo.type === 'video') {
-        const {canvas} = this.backgroundRenderInfo;
-        const {width, height} = canvas;
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, canvas);
-        bgWidth = width;
-        bgHeight = height;
-      } else if (this.backgroundRenderInfo.type === 'image') {
+      if (this.backgroundRenderInfo.type === 'image') {
         bgWidth = this.backgroundRenderInfo.width;
         bgHeight = this.backgroundRenderInfo.height;
       }
