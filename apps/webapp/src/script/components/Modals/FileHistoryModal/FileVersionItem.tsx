@@ -17,8 +17,11 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import {Button, ButtonVariant, DownloadIcon, ReloadIcon} from '@wireapp/react-ui-kit';
 
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -51,14 +54,16 @@ interface FileVersionItemProps {
   onRestore: (versionId: string) => void;
 }
 
-export const FileVersionItem = ({
-  version,
-  isCurrentVersion,
-  showTimelineConnector,
-  onDownload,
-  onRestore,
-}: FileVersionItemProps) => {
+export const FileVersionItem = (properties: FileVersionItemProps): ReactElement => {
+  const {fireAndForgetInvoker} = useApplicationContext();
+  const {version, isCurrentVersion, showTimelineConnector, onDownload, onRestore} = properties;
   const versionDetailsTitle = `${version.ownerName} ${version.size}`.trim();
+
+  function handleDownloadClick(): void {
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await onDownload(version.downloadUrl);
+    });
+  }
 
   return (
     <div key={version.versionId} css={fileVersionItemWrapperCss}>
@@ -77,7 +82,7 @@ export const FileVersionItem = ({
         <Button
           variant={ButtonVariant.SECONDARY}
           css={versionButtonCss}
-          onClick={() => void onDownload(version.downloadUrl)}
+          onClick={handleDownloadClick}
           aria-label={t('cells.versionHistory.downloadAriaLabel', {time: version.time})}
         >
           <DownloadIcon css={iconMarginRightCss} /> {t('cells.versionHistory.download')}
