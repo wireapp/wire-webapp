@@ -155,13 +155,7 @@ describe('segmenter tests', () => {
         wasmBinaryPath: '/mock/vision_wasm_internal.wasm',
       };
 
-      await runSegmenter(
-        canvas,
-        readable,
-        baseOptions as any,
-        jest.fn(),
-        jest.fn(),
-      );
+      await runSegmenter(canvas, readable, baseOptions as any, jest.fn(), jest.fn());
 
       updateSegmenterOptions({
         ...baseOptions,
