@@ -21,9 +21,14 @@ import {render, screen, waitFor, act} from '@testing-library/react';
 import {RestNode} from 'cells-sdk-ts';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
+import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {
+  createExecutingFireAndForgetInvokerForTest,
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {MultipartAssets} from './MultipartAssets';
 
@@ -49,8 +54,19 @@ const mockRecycledNode: RestNode = {
   IsRecycled: true,
 };
 
+type RenderMultipartAssetsProperties = {
+  assets: ICellAsset[];
+  cellsRepository: jest.Mocked<CellsRepository>;
+  conversationId?: string;
+  senderName?: string;
+  timestamp?: number;
+};
+
 describe('MultipartAssets', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
+  const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -59,12 +75,40 @@ describe('MultipartAssets', () => {
     } as unknown as jest.Mocked<CellsRepository>;
   });
 
-  const createMockAsset = (uuid: string, contentType: string, initialName: string): ICellAsset => ({
-    uuid,
-    initialName,
-    initialSize: 1024,
-    contentType,
-  });
+  function createMockAsset(uuid: string, contentType: string, initialName: string): ICellAsset {
+    return {
+      uuid,
+      initialName,
+      initialSize: 1024,
+      contentType,
+    };
+  }
+
+  function renderMultipartAssets(properties: RenderMultipartAssetsProperties): ReturnType<typeof render> {
+    const {
+      assets,
+      cellsRepository,
+      conversationId = 'conv-123',
+      senderName = 'John Doe',
+      timestamp = Date.now(),
+    } = properties;
+
+    return render(
+      <StyledApp themeId={THEME_ID.DEFAULT}>
+        {rootProviderWrapper({
+          children: (
+            <MultipartAssets
+              assets={assets}
+              conversationId={conversationId}
+              cellsRepository={cellsRepository}
+              senderName={senderName}
+              timestamp={timestamp}
+            />
+          ),
+        })}
+      </StyledApp>,
+    );
+  }
 
   describe('isRecycled state rendering', () => {
     it('should display unavailable file message for recycled files', async () => {
@@ -72,17 +116,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(screen.getByText('cells.unavailableFile')).toBeInTheDocument();
@@ -94,17 +128,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(mockCellsRepository.getNode).toHaveBeenCalledWith({uuid: 'test-uuid'});
@@ -118,17 +142,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/zip', 'archive.zip')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(mockCellsRepository.getNode).toHaveBeenCalledWith({uuid: 'test-uuid'});
@@ -149,17 +163,7 @@ describe('MultipartAssets', () => {
         createMockAsset('uuid-3', 'application/pdf', 'file3.pdf'),
       ];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         const unavailableMessages = screen.getAllByText('cells.unavailableFile');
@@ -179,17 +183,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(mockCellsRepository.getNode).toHaveBeenCalled();
@@ -213,17 +207,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
@@ -246,17 +230,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
@@ -279,17 +253,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
@@ -325,17 +289,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      const {unmount} = render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      const {unmount} = renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(mockCellsRepository.getNode).toHaveBeenCalledTimes(1);
@@ -366,17 +320,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(mockCellsRepository.getNode).toHaveBeenCalled();
@@ -400,17 +344,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'application/pdf', 'test.pdf')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(screen.queryByText('cells.unavailableFile')).not.toBeInTheDocument();
@@ -439,17 +373,7 @@ describe('MultipartAssets', () => {
         },
       ];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(screen.getByText('cells.unavailableFile')).toBeInTheDocument();
@@ -461,17 +385,7 @@ describe('MultipartAssets', () => {
 
       const assets: ICellAsset[] = [createMockAsset('test-uuid', 'video/mp4', 'test.mp4')];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(screen.getByText('cells.unavailableFile')).toBeInTheDocument();
@@ -488,17 +402,7 @@ describe('MultipartAssets', () => {
         },
       ];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(screen.getByText('sample')).toBeInTheDocument();
@@ -529,17 +433,7 @@ describe('MultipartAssets', () => {
         },
       ];
 
-      render(
-        withTheme(
-          <MultipartAssets
-            assets={assets}
-            conversationId="conv-123"
-            cellsRepository={mockCellsRepository}
-            senderName="John Doe"
-            timestamp={Date.now()}
-          />,
-        ),
-      );
+      renderMultipartAssets({assets, cellsRepository: mockCellsRepository});
 
       await waitFor(() => {
         expect(screen.getByLabelText('accessibility.conversationAssetImageAlt')).toBeInTheDocument();
