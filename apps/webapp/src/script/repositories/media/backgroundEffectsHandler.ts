@@ -18,8 +18,13 @@
  */
 
 import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
+import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/effects/backgroundEffectsController';
+import {
+  defaultOpts,
+  SELFIE_MULTICLASS_MODEL_PATH,
+  SELFIE_SEGMENTER_MODEL_PATH,
+} from 'Repositories/media/backgroundEffects/pipe/options';
 import {
   BackgroundEffectSelection,
   BackgroundSource,
@@ -87,7 +92,7 @@ const parseStoredPreferredEffect = (stored: string | null): BackgroundEffectSele
 export class BackgroundEffectsHandler {
   private readonly logger: Logger = getLogger('BackgroundEffectsHandler');
   private readonly storage: Storage | undefined;
-  private customBackground: BackgroundSource | undefined = undefined;
+  private customBackground: BackgroundSource | null = null;
   private saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private currentReleasableStream: ReleasableMediaStream | undefined = undefined;
 
@@ -132,13 +137,13 @@ export class BackgroundEffectsHandler {
 
     const isVirtual = isVirtualEffect(preferredEffect);
     const blurStrength = getBlurStrength(preferredEffect);
-    const backgroundSource = isVirtual ? await this.loadBackgroundSource(preferredEffect) : undefined;
+    const backgroundSource = isVirtual ? await this.loadBackgroundSource(preferredEffect) : null;
 
     if (this.controller.isProcessing() && this.currentReleasableStream) {
       if (isVirtual) {
         this.controller.setMode('virtual');
         if (backgroundSource) {
-          this.controller.setBackgroundSource(backgroundSource);
+          await this.controller.setBackgroundSource(backgroundSource);
         }
       } else {
         this.controller.setMode('blur');
@@ -148,32 +153,32 @@ export class BackgroundEffectsHandler {
     }
 
     try {
-      const {outputTrack, stop} = await this.controller.start(videoTrack, {
+      const outputTrack = await this.controller.start(videoTrack, {
+        ...defaultOpts,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
         quality: 'auto',
-        targetFps: TARGET_FPS,
-        debugMode: 'off',
-        ...(isVirtual && backgroundSource ? {backgroundImage: backgroundSource} : {}),
+        backgroundSource,
         onMetrics: this.onMetrics,
         onModelChange: this.onModelChange,
       });
       const processedStream = new MediaStream([outputTrack]);
       this.currentReleasableStream = new ReleasableMediaStream(processedStream, () => {
         this.currentReleasableStream = undefined;
-        stop();
         outputTrack.stop();
       });
 
       return {applied: true, media: this.currentReleasableStream};
     } catch (error) {
-      await this.controller.stop();
       this.logger.warn('BackgroundEffectsController failed with error:', error);
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }
   }
 
-  public setPreferredBackgroundEffect(effect: BackgroundEffectSelection, customBackground?: BackgroundSource): void {
+  public setPreferredBackgroundEffect(
+    effect: BackgroundEffectSelection,
+    customBackground: BackgroundSource | null = null,
+  ): void {
     if (effect.type === 'custom' && !customBackground) {
       backgroundEffectsStore
         .getState()
@@ -232,7 +237,8 @@ export class BackgroundEffectsHandler {
   }
 
   public enableSuperhighQualityTier(enable: boolean): void {
-    this.controller.setMaxQualityTier(enable ? 'superhigh' : 'high');
+    this.controller.setModelPath(enable ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH);
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(enable);
   }
 
   public isSuperhighQualityTierAllowed(): boolean {
@@ -243,7 +249,7 @@ export class BackgroundEffectsHandler {
     return this.controller.getCapabilityInfo();
   }
 
-  private async loadBackgroundSource(effect: BackgroundEffectSelection): Promise<BackgroundSource | undefined> {
+  private async loadBackgroundSource(effect: BackgroundEffectSelection): Promise<BackgroundSource | null> {
     try {
       if (effect.type === 'virtual') {
         return await loadBackgroundSource(effect.backgroundId);
@@ -256,10 +262,10 @@ export class BackgroundEffectsHandler {
         return this.customBackground;
       }
 
-      return undefined;
+      return null;
     } catch (error) {
       this.logger.warn('Failed to load background source', error);
-      return undefined;
+      return null;
     }
   }
 

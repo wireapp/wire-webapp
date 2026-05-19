@@ -17,7 +17,7 @@
  *
  */
 
-import type {PerformanceSample} from './samples';
+import type {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 
 import type {Metrics} from '../backgroundEffectsWorkerTypes';
 

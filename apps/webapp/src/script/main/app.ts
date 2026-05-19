@@ -69,7 +69,7 @@ import {GiphyService} from 'Repositories/extension/GiphyService';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {IntegrationService} from 'Repositories/integration/IntegrationService';
 import {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
-import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/effects/backgroundEffectsController';
+import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';

@@ -288,6 +288,7 @@ const FullscreenVideoCall = ({
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
+  const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -424,7 +425,7 @@ const FullscreenVideoCall = ({
               onSelectEffect={handleBackgroundSidebarSelect}
               onEnableHighQualityBlur={handleEnableHighQualityBlur}
               onClose={() => setIsBackgroundSidebarOpen(false)}
-              highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
+              highQualityBlurAllowed={isHighQualityBlurEnabled}
             />
           )}
         </div>
@@ -506,7 +507,7 @@ const FullscreenVideoCall = ({
           onSelectEffect={handleBackgroundSidebarSelect}
           onEnableHighQualityBlur={handleEnableHighQualityBlur}
           onClose={() => setIsBackgroundSidebarOpen(false)}
-          highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
+          highQualityBlurAllowed={isHighQualityBlurEnabled}
         />
       )}
       <ModalComponent
