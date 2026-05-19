@@ -34,7 +34,7 @@ jest.mock('Util/useChannelsFeatureFlag', () => ({
   }),
 }));
 
-jest.mock('Repositories/team/TeamState', () => ({
+jest.mock('Repositories/team/teamState', () => ({
   TeamState: class {
     isCellsEnabled = () => false;
   },

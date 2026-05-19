@@ -88,8 +88,8 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {EventRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamRepository} from 'Repositories/team/teamRepository';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserFilter} from 'Repositories/user/userFilter';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';

@@ -30,8 +30,8 @@ import {EventSource} from 'Repositories/event/EventSource';
 import {
   FeatureUpdateType,
   detectTeamFeatureUpdate,
-} from 'Repositories/team/TeamFeatureConfigChangeDetector/TeamFeatureConfigChangeDetector';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
+} from 'Repositories/team/teamFeatureConfigChangeDetector/teamFeatureConfigChangeDetector';
+import {TeamRepository} from 'Repositories/team/teamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {Logger, getLogger} from 'Util/logger';

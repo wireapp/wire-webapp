@@ -31,7 +31,7 @@ import type {MemberMessage as MemberMessageEntity} from 'Repositories/entity/mes
 import {Message as BaseMessage} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {isTabKey} from 'Util/keyboardUtil';

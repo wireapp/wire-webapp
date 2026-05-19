@@ -21,7 +21,7 @@ import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/li
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {TeamEntity} from 'Repositories/team/TeamEntity';
+import {TeamEntity} from 'Repositories/team/teamEntity';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';

@@ -21,7 +21,7 @@ import {useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

@@ -23,8 +23,8 @@ import ko from 'knockout';
 import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamRepository} from 'Repositories/team/teamRepository';
+import {TeamState} from 'Repositories/team/teamState';
 
 import {GuestServicesOptions} from './guestServicesOptions';
 

@@ -41,7 +41,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {StorageRepository} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

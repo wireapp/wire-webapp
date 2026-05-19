@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ContributedSegmentations, MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {ClientEvent} from 'Repositories/event/Client';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue, storeValue, resetStoreValue} from 'Util/storageUtil';

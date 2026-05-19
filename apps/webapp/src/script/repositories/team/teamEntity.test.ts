@@ -17,7 +17,7 @@
  *
  */
 
-import {TeamEntity} from './TeamEntity';
+import {TeamEntity} from './teamEntity';
 
 describe('TeamEntity', () => {
   it('returns an icon resource', () => {

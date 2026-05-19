@@ -26,7 +26,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
 import {UserRepository} from 'Repositories/user/userRepository';

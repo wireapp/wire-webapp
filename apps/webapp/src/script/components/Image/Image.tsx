@@ -26,7 +26,7 @@ import {container} from 'tsyringe';
 import {InViewport} from 'Components/InViewport';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {getImageStyle, getWrapperStyles} from './Image.styles';

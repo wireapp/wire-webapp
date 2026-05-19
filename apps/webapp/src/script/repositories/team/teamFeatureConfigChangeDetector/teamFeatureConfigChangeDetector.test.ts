@@ -26,7 +26,7 @@ import {
   CONVERSATION_PROTOCOL,
 } from '@wireapp/api-client/lib/team';
 
-import {FeatureUpdateType, detectTeamFeatureUpdate} from './TeamFeatureConfigChangeDetector';
+import {FeatureUpdateType, detectTeamFeatureUpdate} from './teamFeatureConfigChangeDetector';
 
 describe('TeamFeatureUtil', () => {
   describe('hasTeamFeatureChanged', () => {

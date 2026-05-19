@@ -27,7 +27,7 @@ import {COLOR} from '@wireapp/react-ui-kit';
 import {AvailabilityIcon} from 'Components/AvailabilityIcon';
 import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 

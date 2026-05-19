@@ -77,7 +77,7 @@ import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import * as trackingHelpers from 'Repositories/tracking/helpers';
 import {Segmentation} from 'Repositories/tracking/segmentation';

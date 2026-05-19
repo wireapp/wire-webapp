@@ -60,7 +60,7 @@ import type {PropertiesRepository} from 'Repositories/properties/propertiesRepos
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {chunk, partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';

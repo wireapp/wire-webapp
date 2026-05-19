@@ -22,7 +22,7 @@ import {render} from '@testing-library/react';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 
 import {UserAvatar} from './UserAvatar';
 

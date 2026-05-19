@@ -72,7 +72,7 @@ import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandli
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {EventRecord, ReactionMap} from 'Repositories/storage';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import {UserType} from 'Repositories/tracking/attribute';
 import {EventName} from 'Repositories/tracking/eventName';
 import * as trackingHelpers from 'Repositories/tracking/helpers';

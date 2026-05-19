@@ -30,7 +30,7 @@ import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
-import {TeamEntity} from './TeamEntity';
+import {TeamEntity} from './teamEntity';
 
 @singleton()
 export class TeamState {

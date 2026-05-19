@@ -54,11 +54,11 @@ import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {loadDataUrl} from 'Util/util';
 
-import {TeamEntity} from './TeamEntity';
-import {TeamMapper} from './TeamMapper';
-import {TeamMemberEntity} from './TeamMemberEntity';
-import {TeamService} from './TeamService';
-import {TeamState} from './TeamState';
+import {TeamEntity} from './teamEntity';
+import {TeamMapper} from './teamMapper';
+import {TeamMemberEntity} from './teamMemberEntity';
+import {TeamService} from './teamService';
+import {TeamState} from './teamState';
 
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';

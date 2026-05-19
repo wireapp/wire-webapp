@@ -19,7 +19,7 @@
 
 import {queryByRole, render} from '@testing-library/react';
 import {ServicesOptions} from './servicesOptions';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import ko from 'knockout';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';

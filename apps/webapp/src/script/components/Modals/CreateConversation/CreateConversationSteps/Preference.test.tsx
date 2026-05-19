@@ -1,7 +1,7 @@
 import {getByRole, render} from '@testing-library/react';
 import {Preference} from 'Components/Modals/CreateConversation/CreateConversationSteps/Preference';
 import {container} from 'tsyringe';
-import {TeamState} from 'Repositories/team/TeamState';
+import {TeamState} from 'Repositories/team/teamState';
 import ko from 'knockout';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 

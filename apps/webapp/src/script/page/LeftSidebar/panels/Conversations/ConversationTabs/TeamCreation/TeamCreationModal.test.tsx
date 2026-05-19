@@ -28,7 +28,7 @@ import {setStrings} from 'Util/localizerUtil';
 import {TeamCreationModal} from './TeamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
-jest.mock('Repositories/team/TeamService');
+jest.mock('Repositories/team/teamService');
 jest.mock('@wireapp/react-ui-kit', () => {
   const actualModule = jest.requireActual('@wireapp/react-ui-kit');
 
