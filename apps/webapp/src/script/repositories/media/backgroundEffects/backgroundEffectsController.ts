@@ -22,12 +22,8 @@ import {getLogger, Logger} from 'Util/logger';
 
 import {type CapabilityInfo, type EffectMode, type Metrics, QualityMode} from './backgroundEffectsWorkerTypes';
 import {detectCapabilities} from './helper/capability';
-import {
-  defaultOpts,
-  ProcessVideoTrackOptions,
-  WorkerBackgroundSource,
-  WorkerProcessVideoTrackOptions,
-} from './pipe/options';
+import {defaultVideoTrackOptions} from './pipe/defaultVideoTrackOptions';
+import {ProcessVideoTrackOptions, WorkerBackgroundSource, WorkerProcessVideoTrackOptions} from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
 import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
 
@@ -42,7 +38,7 @@ export class BackgroundEffectsController {
   private readonly logger: Logger;
 
   private worker: Worker | null = null;
-  private options: ProcessVideoTrackOptions = defaultOpts;
+  private options: ProcessVideoTrackOptions = defaultVideoTrackOptions;
 
   private readonly capabilityInfo: CapabilityInfo = {
     offscreenCanvas: false,

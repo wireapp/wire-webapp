@@ -22,8 +22,8 @@ import is from '@sindresorhus/is';
 import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import {defaultVideoTrackOptions} from 'Repositories/media/backgroundEffects/pipe/defaultVideoTrackOptions';
 import {
-  defaultOpts,
   SELFIE_MULTICLASS_MODEL_PATH,
   SELFIE_SEGMENTER_MODEL_PATH,
 } from 'Repositories/media/backgroundEffects/pipe/options';
@@ -165,7 +165,7 @@ export class BackgroundEffectsHandler {
         : SELFIE_SEGMENTER_MODEL_PATH;
 
       const outputTrack = await this.controller.start(videoTrack, {
-        ...defaultOpts,
+        ...defaultVideoTrackOptions,
         modelPath,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,

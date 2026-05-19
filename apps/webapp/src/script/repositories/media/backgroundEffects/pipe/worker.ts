@@ -17,7 +17,7 @@
  *
  */
 
-import {Metrics} from 'Repositories/media/backgroundEffects';
+import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
 import {WorkerProcessVideoTrackOptions} from './options';
