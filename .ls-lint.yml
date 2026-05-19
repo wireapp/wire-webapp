@@ -8,6 +8,9 @@ ls:
   .test.tsx: camelCase
   .spec.ts: camelCase
   .spec.tsx: camelCase
+  docs:
+    .dir: kebab-case
+    .md: kebab-case
 ignore:
   - .git
   - .github
@@ -21,4 +24,3 @@ ignore:
   - apps/webapp/{test,resource,app-config,assets/mediapipe-models}
   - libraries/api-client
   - libraries/core/__mocks__
-  - docs
