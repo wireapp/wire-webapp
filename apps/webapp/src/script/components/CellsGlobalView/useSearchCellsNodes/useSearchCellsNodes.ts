@@ -24,6 +24,10 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
+import {
+  GlobalDriveFiltersState,
+  toGlobalDriveSearchParams,
+} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -40,6 +44,7 @@ interface UseSearchCellsNodesProps {
   userRepository: UserRepository;
   conversationRepository: ConversationRepository;
   fireAndForgetInvoker: FireAndForgetInvoker;
+  filters: GlobalDriveFiltersState;
 }
 
 type SearchNodesProperties = {
@@ -64,8 +69,8 @@ const DEBOUNCE_TIME = 300;
 const FETCH_ALL_QUERY = '*';
 
 export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSearchCellsNodesResult => {
-  const {cellsRepository, userRepository, conversationRepository, fireAndForgetInvoker} = properties;
-  const {setNodes, setStatus, setPagination, clearAll, filters} = useCellsStore();
+  const {cellsRepository, userRepository, conversationRepository, fireAndForgetInvoker, filters} = properties;
+  const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -80,12 +85,12 @@ export const useSearchCellsNodes = (properties: UseSearchCellsNodesProps): UseSe
         setStatus(status);
 
         const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
+        const searchParams = toGlobalDriveSearchParams(filters);
 
         const result = await cellsRepository.searchNodes({
           query,
           limit,
-          tags: filters.tags,
-          path: filters.path,
+          ...searchParams,
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
           type: 'file',

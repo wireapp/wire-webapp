@@ -37,19 +37,14 @@ import type {
   FilterConfig,
   FilterItem,
 } from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
+import {GlobalDriveFiltersState} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
 // ---------------------------------------------------------------------------
 // Mock data — replace each array with an API call in the integration sprint.
 // ---------------------------------------------------------------------------
-
-const MOCK_TAGS: FilterItem[] = [
-  {id: 'a-tag', label: 'A tag'},
-  {id: 'hello-tag', label: 'Hello tag'},
-  {id: 'b-tag', label: 'B tag'},
-  {id: 'new-tag-1', label: 'New tag 1'},
-  {id: 'e-tag', label: 'E Tag'},
-];
 
 const MOCK_CONVERSATIONS: FilterItem[] = [
   {id: 'conv-1', label: 'Marketing Team'},
@@ -65,7 +60,13 @@ const MOCK_CREATORS: FilterItem[] = [
 
 // ---------------------------------------------------------------------------
 
-export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
+export const useGlobalDriveFilters = ({
+  cellsRepository,
+}: {
+  cellsRepository: CellsRepository;
+}): {filters: FilterConfig[]; filterState: GlobalDriveFiltersState} => {
+  const {tags: allTags} = useGetAllTags({cellsRepository});
+
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedFileTypeIds, setSelectedFileTypeIds] = useState<string[]>([]);
   const [selectedConversationIds, setSelectedConversationIds] = useState<string[]>([]);
@@ -73,6 +74,18 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
   const [isSharedViaLink, setIsSharedViaLink] = useState(false);
 
   const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
+  const filterState = useMemo<GlobalDriveFiltersState>(
+    () => ({
+      selectedTagIds,
+      selectedFileTypeIds,
+      selectedCreatorIds,
+      selectedConversationIds,
+      isSharedViaLink,
+    }),
+    [isSharedViaLink, selectedConversationIds, selectedCreatorIds, selectedFileTypeIds, selectedTagIds],
+  );
+
+  const tagItems = useMemo<FilterItem[]>(() => allTags.map(tag => ({id: tag, label: tag})), [allTags]);
 
   const fileTypes = useMemo<FilterItem[]>(
     () => [
@@ -97,7 +110,7 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
         type: 'popover',
         id: 'tags',
         label: t('cells.filter.tags'),
-        items: MOCK_TAGS,
+        items: tagItems,
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
       },
@@ -135,6 +148,7 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
     ],
     [
       fileTypes,
+      tagItems,
       selectedTagIds,
       selectedFileTypeIds,
       selectedConversationIds,
@@ -144,5 +158,5 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
     ],
   );
 
-  return {filters};
+  return {filters, filterState};
 };

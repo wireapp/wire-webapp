@@ -24,14 +24,14 @@ import {StatusCodes} from 'http-status-codes';
 
 import {TypeUtil} from '@wireapp/commons';
 
-import {Login} from './Login';
+import {Login} from './login';
 
-import {Config, Configuration} from '../../Config';
-import {actionRoot} from '../module/action';
-import {initialRootState} from '../module/reducer';
-import {ROUTE} from '../route';
-import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {Config, Configuration} from '../../../Config';
+import {actionRoot} from '../../module/action';
+import {initialRootState} from '../../module/reducer';
+import {ROUTE} from '../../route';
+import {mockStoreFactory} from '../../util/test/mockStoreFactory';
+import {mountComponent} from '../../util/test/TestUtil';
 
 describe('Login', () => {
   it('successfully logs in with email', async () => {

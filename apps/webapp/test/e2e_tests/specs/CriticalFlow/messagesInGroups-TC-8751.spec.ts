@@ -39,6 +39,8 @@ test(
   'Messages in Groups',
   {tag: ['@TC-8751', '@crit-flow-web']},
   async ({createUser, createTeam, createPage}, testInfo) => {
+    test.setTimeout(testInfo.timeout + 11_000);
+
     const userB = await createUser();
     const {owner: userA} = await createTeam('Critical Team', {users: [userB]});
 

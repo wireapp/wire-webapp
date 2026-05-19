@@ -17,6 +17,8 @@
  *
  */
 
+import {FunctionComponent} from 'react';
+
 import {
   fileHistoryContentCss,
   fileHistoryDateHeadingCss,
@@ -26,15 +28,15 @@ import {
 import {FileVersionItem} from './FileVersionItem';
 import {FileVersion} from './types';
 
-export const FileHistoryContent = ({
-  fileVersions,
-  handleDownload,
-  handleRestore,
-}: {
-  fileVersions: Record<string, FileVersion[]>;
-  handleDownload: (url: string) => Promise<void>;
-  handleRestore: (versionId: string) => void;
-}) => {
+type FileHistoryContentProps = {
+  readonly fileVersions: Record<string, FileVersion[]>;
+  readonly handleDownload: (url: string) => Promise<void>;
+  readonly handleRestore: (versionId: string) => void;
+};
+
+export const FileHistoryContent: FunctionComponent<FileHistoryContentProps> = properties => {
+  const {fileVersions, handleDownload, handleRestore} = properties;
+
   return (
     <div css={fileHistoryContentCss}>
       <div css={fileHistoryListCss}>

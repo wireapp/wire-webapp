@@ -255,6 +255,8 @@ const config: Linter.Config[] = [
       'apps/webapp/src/script/components/InputBar/usePing/usePing.ts',
       'apps/webapp/src/script/components/MessagesList/Message/MessageWrapper.tsx',
       'apps/webapp/src/script/components/MessagesList/utils/useLoadConversation.ts',
+      'apps/webapp/src/script/components/Modals/FileHistoryModal/FileVersionItem.tsx',
+      'apps/webapp/src/script/components/Modals/FileHistoryModal/hooks/useFileVersions.ts',
       'apps/webapp/src/script/components/Modals/DetailViewModal/DetailViewModalFooter.tsx',
       'apps/webapp/src/script/components/UserSearchableList/UserSearchableList.tsx',
       'apps/webapp/src/script/components/calling/CallingCell/CallingCell.tsx',

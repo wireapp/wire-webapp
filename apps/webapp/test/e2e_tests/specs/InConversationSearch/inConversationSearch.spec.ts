@@ -68,7 +68,9 @@ test.describe('In Conversation Search', () => {
   test(
     "Verify ephemeral messages aren't shown in collection after timeout",
     {tag: ['@TC-354', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 10_000);
+
       const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 

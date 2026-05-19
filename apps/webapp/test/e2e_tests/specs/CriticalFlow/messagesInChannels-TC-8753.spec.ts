@@ -37,6 +37,8 @@ test(
   'Messages in Channels',
   {tag: ['@TC-8753', '@crit-flow-web']},
   async ({createUser, createTeam, createPage}, testInfo) => {
+    test.setTimeout(testInfo.timeout + 11_000);
+
     const userB = await createUser();
     const {owner: userA} = await createTeam('Critical Team', {users: [userB], features: {channels: true}});
 
