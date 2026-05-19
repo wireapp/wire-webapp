@@ -25,7 +25,7 @@ import {DEFAULT_BACKGROUND_COLOR, WorkerBackgroundSource, WorkerProcessVideoTrac
 
 const DEFAULT_BG_COLOR = `rgb(${DEFAULT_BACKGROUND_COLOR.red},${DEFAULT_BACKGROUND_COLOR.green},${DEFAULT_BACKGROUND_COLOR.blue})`;
 
-export type Canvas2DRenderer = {
+export type Canvas2dRenderer = {
   render: (
     videoFrame: VideoFrame,
     options: WorkerProcessVideoTrackOptions,
@@ -36,8 +36,8 @@ export type Canvas2DRenderer = {
   close: () => void;
 };
 
-export const createCanvas2DRenderer = (canvas: OffscreenCanvas): Canvas2DRenderer => {
-  const logger = getSafeLogger('Canvas2DRenderer');
+export const createCanvas2DRenderer = (canvas: OffscreenCanvas): Canvas2dRenderer => {
+  const logger = getSafeLogger('Canvas2dRenderer');
 
   const context = canvas.getContext('2d');
   if (is.nullOrUndefined(context)) {
@@ -64,7 +64,7 @@ export const createCanvas2DRenderer = (canvas: OffscreenCanvas): Canvas2DRendere
 
   let isRunning = true;
 
-  logger.log('[virtual-background] - Canvas2D - Canvas2DRenderer initialized');
+  logger.log('[virtual-background] - Canvas2D - Canvas2dRenderer initialized');
 
   const resizeIfNeeded = (width: number, height: number): void => {
     for (const targetCanvas of [canvas, frameCanvas, blurCanvas, backgroundCanvas]) {

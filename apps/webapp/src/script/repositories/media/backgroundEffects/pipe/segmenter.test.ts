@@ -65,7 +65,7 @@ jest.mock('./renderer', () => ({
   })),
 }));
 
-jest.mock('./canvas2DRenderer', () => ({
+jest.mock('./canvas2dRenderer', () => ({
   createCanvas2DRenderer: jest.fn().mockReturnValue({
     close: jest.fn(),
     render: jest.fn(),

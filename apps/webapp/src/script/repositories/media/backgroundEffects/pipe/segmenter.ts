@@ -29,7 +29,7 @@ import {
 } from 'Repositories/media/backgroundEffects/helper/metrics';
 import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
 
-import {Canvas2DRenderer, createCanvas2DRenderer} from './canvas2DRenderer';
+import {Canvas2dRenderer, createCanvas2DRenderer} from './canvas2dRenderer';
 import {VideoFilter} from './filter';
 import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH, WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
@@ -96,7 +96,7 @@ export async function runSegmenter(
 
   // Try WebGL first; fall back to 2D Canvas if unavailable.
   let webGLRenderer: WebGLRenderer | null = null;
-  let canvas2DRenderer: Canvas2DRenderer | null = null;
+  let canvas2DRenderer: Canvas2dRenderer | null = null;
 
   try {
     logger.log('[virtual-background] initializing WebGL2 with GPU pipeline');

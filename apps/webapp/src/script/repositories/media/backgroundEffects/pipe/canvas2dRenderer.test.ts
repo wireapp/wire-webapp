@@ -1,4 +1,4 @@
-import {createCanvas2DRenderer} from './canvas2DRenderer';
+import {createCanvas2DRenderer} from './canvas2dRenderer';
 import type {WorkerProcessVideoTrackOptions} from './options';
 
 jest.mock('Repositories/media/backgroundEffects/helper/logger', () => ({
