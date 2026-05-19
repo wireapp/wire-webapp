@@ -27,6 +27,7 @@ export class ConversationSidebar {
   readonly personalStatusIcon: Locator;
   readonly personalStatusName: Locator;
   readonly personalUserName: Locator;
+  readonly verifiedBadge: Locator;
   readonly preferencesButton: Locator;
   readonly allConversationsButton: Locator;
   readonly connectButton: Locator;
@@ -45,6 +46,7 @@ export class ConversationSidebar {
     this.personalStatusIcon = this.navigation.getByTestId('status-availability-icon');
     this.personalStatusName = page.getByTestId('status-name');
     this.personalUserName = page.getByTestId('user-handle');
+    this.verifiedBadge = this.personalStatusLabel.getByTestId('proteus-verified');
     this.preferencesButton = page.getByTestId('go-preferences');
     this.allConversationsButton = page.getByTestId('go-recent-view');
     this.connectButton = page.getByTestId('go-people');

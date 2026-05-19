@@ -104,4 +104,30 @@ test.describe('Proteus verification', () => {
       await expect(pages.devices().activeDevices).toHaveCount(7); // Verify that the temporary device is not added to the device list
     },
   );
+
+  test(
+    'My other clients should be notified when I`m login on a new device',
+    {tag: ['@TC-717', '@regression']},
+    async ({createPage}) => {
+      const {pages, components, modals} = PageManager.from(await createPage(withLogin(userA))).webapp;
+      // Ensure the initial active session starts as verified
+      await expect(components.conversationSidebar().verifiedBadge).toBeVisible();
+
+      // User logins on second unverified device
+      await createPage(withLogin(userA, {confirmNewHistory: true}));
+      // Verify that the initial session drops its verified status due to the new device
+      await expect(components.conversationSidebar().verifiedBadge).toBeHidden();
+
+      await components.conversationSidebar().clickPreferencesButton();
+      await expect(modals.accountNewDevices().modalTitle).toContainText('Your account was used on');
+
+      await modals.accountNewDevices().clickAction();
+      await pages.settings().devicesButton.click();
+      await pages.devices().activeDevices.getByTestId('go-device-details').click();
+
+      // User verifies the new device, which restore the original session's verified status
+      await pages.deviceDetails().toggleDeviceVerification();
+      await expect(components.conversationSidebar().verifiedBadge).toBeVisible();
+    },
+  );
 });

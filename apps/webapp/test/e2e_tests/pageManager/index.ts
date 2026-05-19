@@ -73,6 +73,8 @@ import {InviteModal} from './webapp/modals/invite.modal';
 import {JoinGuestLinkPasswordModal} from './webapp/modals/joinGuestLinkPassword.modal';
 import {WithoutTitle} from './webapp/modals/withoutTitle.modal';
 import {AboutPage} from './webapp/pages/about.page';
+import {AccountNewDevicesModal} from './webapp/modals/accountNewDevices.modal';
+import {DeviceDetailsPage} from './webapp/pages/deviceDetails.page';
 import {NewDeviceModal} from './webapp/modals/newDevice.modal';
 import {ReadReceiptModal} from './webapp/modals/readReceipt.modal';
 
@@ -170,6 +172,7 @@ export class PageManager {
       fullScreenCall: () => this.getOrCreate('webapp.pages.fullScreenCall', () => FullScreenCallPage(this.page)),
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
       devices: () => this.getOrCreate('webapp.pages.devices', () => new DevicesPage(this.page)),
+      deviceDetails: () => this.getOrCreate('webapp.pages.deviceDetails', () => DeviceDetailsPage(this.page)),
       options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
       audioVideoSettings: () =>
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
@@ -196,6 +199,8 @@ export class PageManager {
     },
     modals: {
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
+      accountNewDevices: () =>
+        this.getOrCreate('webapp.modals.accountNewDevices', () => new AccountNewDevicesModal(this.page)),
       userProfile: () => this.getOrCreate('webapp.modals.userProfile', () => new UserProfileModal(this.page)),
       confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
       leaveConversation: () =>
