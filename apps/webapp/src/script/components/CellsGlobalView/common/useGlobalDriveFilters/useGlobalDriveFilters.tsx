@@ -23,7 +23,11 @@ import type {
   FilterConfig,
   FilterItem,
 } from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
-import {GlobalDriveFiltersState} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+import {
+  type GlobalDriveFiltersState,
+  getActiveGlobalDriveFilterType,
+  isFilterTypeDisabled,
+} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {FILE_TYPE_CATALOG} from 'Components/Conversation/ConversationCells/common/driveFilters/fileTypeCatalog';
 import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -73,6 +77,7 @@ export const useGlobalDriveFilters = ({
   );
 
   const tagItems = useMemo<FilterItem[]>(() => allTags.map(tag => ({id: tag, label: tag})), [allTags]);
+  const activeFilterType = useMemo(() => getActiveGlobalDriveFilterType(filterState), [filterState]);
 
   const fileTypes = useMemo<FilterItem[]>(
     () =>
@@ -93,6 +98,7 @@ export const useGlobalDriveFilters = ({
         items: tagItems,
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
+        disabled: isFilterTypeDisabled('tags', activeFilterType),
       },
       {
         type: 'popover',
@@ -101,6 +107,7 @@ export const useGlobalDriveFilters = ({
         items: fileTypes,
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
+        disabled: isFilterTypeDisabled('fileType', activeFilterType),
       },
       {
         type: 'popover',
@@ -109,6 +116,7 @@ export const useGlobalDriveFilters = ({
         items: MOCK_CONVERSATIONS,
         selectedIds: selectedConversationIds,
         onSelectionChange: setSelectedConversationIds,
+        disabled: isFilterTypeDisabled('conversation', activeFilterType),
       },
       {
         type: 'popover',
@@ -117,6 +125,7 @@ export const useGlobalDriveFilters = ({
         items: MOCK_CREATORS,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
+        disabled: isFilterTypeDisabled('createdBy', activeFilterType),
       },
       {
         type: 'toggle',
@@ -124,9 +133,11 @@ export const useGlobalDriveFilters = ({
         label: t('cells.filter.sharedViaLink'),
         isActive: isSharedViaLink,
         onToggle: toggleSharedViaLink,
+        disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
       },
     ],
     [
+      activeFilterType,
       fileTypes,
       tagItems,
       selectedTagIds,

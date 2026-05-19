@@ -18,10 +18,13 @@
  */
 
 import {
-  ConversationDriveFiltersState,
-  GlobalDriveFiltersState,
+  type ConversationDriveFiltersState,
+  getActiveConversationDriveFilterType,
+  getActiveGlobalDriveFilterType,
+  type GlobalDriveFiltersState,
   hasActiveConversationDriveFilters,
   hasActiveGlobalDriveFilters,
+  isFilterTypeDisabled,
   toConversationDriveSearchParams,
   toGlobalDriveSearchParams,
 } from './driveFilters';
@@ -103,6 +106,52 @@ describe('hasActiveGlobalDriveFilters', () => {
       expect(hasActiveGlobalDriveFilters({...emptyGlobalFilters, ...activeFilter})).toBe(true);
     },
   );
+});
+
+describe('getActiveConversationDriveFilterType', () => {
+  it('returns null when no filter type is active', () => {
+    expect(getActiveConversationDriveFilterType(emptyFilters)).toBeNull();
+  });
+
+  it('returns tags when tags are selected', () => {
+    expect(getActiveConversationDriveFilterType({...emptyFilters, selectedTagIds: ['tag-a']})).toBe('tags');
+  });
+});
+
+describe('getActiveGlobalDriveFilterType', () => {
+  it('returns null when no filter type is active', () => {
+    expect(getActiveGlobalDriveFilterType(emptyGlobalFilters)).toBeNull();
+  });
+
+  it('returns "conversation" when the global-only conversation filter type is active', () => {
+    expect(getActiveGlobalDriveFilterType({...emptyGlobalFilters, selectedConversationIds: ['conv-a']})).toBe(
+      'conversation',
+    );
+  });
+
+  it('returns tags when tags are selected globally', () => {
+    expect(getActiveGlobalDriveFilterType({...emptyGlobalFilters, selectedTagIds: ['tag-a']})).toBe('tags');
+  });
+});
+
+describe('isFilterTypeDisabled', () => {
+  it('returns false for every filter type when none is active', () => {
+    expect(isFilterTypeDisabled('tags', null)).toBe(false);
+    expect(isFilterTypeDisabled('fileType', null)).toBe(false);
+    expect(isFilterTypeDisabled('createdBy', null)).toBe(false);
+    expect(isFilterTypeDisabled('sharedViaLink', null)).toBe(false);
+  });
+
+  it('returns false for the active filter type itself', () => {
+    expect(isFilterTypeDisabled('tags', 'tags')).toBe(false);
+  });
+
+  it('returns true for any other filter type when one is active', () => {
+    expect(isFilterTypeDisabled('fileType', 'tags')).toBe(true);
+    expect(isFilterTypeDisabled('createdBy', 'tags')).toBe(true);
+    expect(isFilterTypeDisabled('sharedViaLink', 'tags')).toBe(true);
+    expect(isFilterTypeDisabled('conversation', 'tags')).toBe(true);
+  });
 });
 
 describe('toGlobalDriveSearchParams', () => {

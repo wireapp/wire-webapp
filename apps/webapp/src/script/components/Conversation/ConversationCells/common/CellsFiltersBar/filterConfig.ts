@@ -17,25 +17,28 @@
  *
  */
 
+import type {ActiveFilterType} from '../driveFilters/driveFilters';
 import {FilterItem} from '../FilterPopover/FilterPopover';
 
 export type {FilterItem};
 
 export type PopoverFilterConfig = {
   type: 'popover';
-  id: string;
+  id: ActiveFilterType;
   label: string;
   items: FilterItem[];
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
+  disabled?: boolean;
 };
 
 export type ToggleFilterConfig = {
   type: 'toggle';
-  id: string;
+  id: ActiveFilterType;
   label: string;
   isActive: boolean;
   onToggle: () => void;
+  disabled?: boolean;
 };
 
 export type FilterConfig = PopoverFilterConfig | ToggleFilterConfig;

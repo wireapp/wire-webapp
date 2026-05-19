@@ -19,6 +19,13 @@
 
 import {CSSObject} from '@emotion/react';
 
+const outlineBorder = 'var(--Border-Base-Primary, #DCE0E3)';
+const darkOutlineBorder = 'var(--Border-Base-Primary, #34373D)';
+const disabledBackground = 'var(--Background-Base-Secondary, #EDEFF0)';
+const darkDisabledBackground = 'var(--Background-Base-Primary, #17181A)';
+const disabledTextColor = 'var(--Backgrounds-On-Surface, #000)';
+const darkDisabledTextColor = 'var(--Backgrounds-On-Surface, #FFFFFF)';
+
 export const clearAllButtonStyles: CSSObject = {
   border: 'none',
   background: 'transparent',
@@ -43,36 +50,51 @@ export const filterGroupStyles: CSSObject = {
   flexWrap: 'wrap',
 };
 
-export const toggleFilterButtonStyles = (isActive: boolean): CSSObject => ({
+export const toggleFilterButtonStyles: CSSObject = {
   display: 'inline-flex',
   alignItems: 'center',
   height: '32px',
   padding: '0 10px',
   borderRadius: '12px',
-  border: `1px solid ${isActive ? 'var(--accent-color-500)' : 'var(--Border-Base-Primary, #DCE0E3)'}`,
-  background: isActive ? 'var(--accent-color-highlight)' : 'var(--Background-Base-Primary, #FFF)',
+  border: `1px solid ${outlineBorder}`,
+  background: 'var(--Background-Base-Primary, #FFF)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-semibold)',
   lineHeight: 'var(--line-height-small-plus)',
   letterSpacing: '0.25px',
-  color: isActive ? 'var(--accent-color-500)' : 'var(--main-color)',
+  color: 'var(--main-color)',
   cursor: 'pointer',
   flexShrink: 0,
   whiteSpace: 'nowrap',
   '&:hover': {
     border: '1px solid var(--accent-color-500)',
   },
+  '&[data-active="true"]': {
+    border: '1px solid var(--accent-color-500)',
+    background: 'var(--accent-color-highlight)',
+    color: 'var(--accent-color-500)',
+  },
+  '&[aria-disabled="true"]': {
+    border: `1px solid ${outlineBorder}`,
+    background: disabledBackground,
+    color: disabledTextColor,
+    cursor: 'not-allowed',
+  },
   'body.theme-dark &': {
-    border: '1px solid var(--Border-Base-Primary, #34373D)',
+    border: `1px solid ${darkOutlineBorder}`,
     background: 'var(--Background-Base-Primary, #17181A)',
-    color: 'var(--main-color)',
     '&:hover': {
       border: '1px solid var(--accent-color-500)',
     },
-    ...(isActive && {
+    '&[data-active="true"]': {
       border: '1px solid var(--accent-color-500)',
       background: 'var(--accent-color-highlight)',
       color: 'var(--accent-color-500)',
-    }),
+    },
+    '&[aria-disabled="true"]': {
+      border: `1px solid ${darkOutlineBorder}`,
+      background: darkDisabledBackground,
+      color: darkDisabledTextColor,
+    },
   },
-});
+};

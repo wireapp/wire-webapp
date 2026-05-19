@@ -23,7 +23,11 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
 import type {FilterConfig, FilterItem} from '../CellsFiltersBar/filterConfig';
-import {ConversationDriveFiltersState} from '../driveFilters/driveFilters';
+import {
+  type ConversationDriveFiltersState,
+  getActiveConversationDriveFilterType,
+  isFilterTypeDisabled,
+} from '../driveFilters/driveFilters';
 import {FILE_TYPE_CATALOG} from '../driveFilters/fileTypeCatalog';
 import {useGetAllTags} from '../useGetAllTags/useGetAllTags';
 
@@ -75,6 +79,7 @@ export const useConversationDriveFilters = ({
   }, []);
 
   const tagItems = useMemo<FilterItem[]>(() => allTags.map(tag => ({id: tag, label: tag})), [allTags]);
+  const activeFilterType = useMemo(() => getActiveConversationDriveFilterType(filterState), [filterState]);
 
   const fileTypes = useMemo<FilterItem[]>(
     () =>
@@ -95,6 +100,7 @@ export const useConversationDriveFilters = ({
         items: tagItems,
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
+        disabled: isFilterTypeDisabled('tags', activeFilterType),
       },
       {
         type: 'popover',
@@ -103,6 +109,7 @@ export const useConversationDriveFilters = ({
         items: fileTypes,
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
+        disabled: isFilterTypeDisabled('fileType', activeFilterType),
       },
       {
         type: 'popover',
@@ -111,6 +118,7 @@ export const useConversationDriveFilters = ({
         items: MOCK_CREATORS,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
+        disabled: isFilterTypeDisabled('createdBy', activeFilterType),
       },
       {
         type: 'toggle',
@@ -118,9 +126,11 @@ export const useConversationDriveFilters = ({
         label: t('cells.filter.sharedViaLink'),
         isActive: isSharedViaLink,
         onToggle: toggleSharedViaLink,
+        disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
       },
     ],
     [
+      activeFilterType,
       fileTypes,
       tagItems,
       selectedTagIds,

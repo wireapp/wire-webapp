@@ -53,14 +53,21 @@ export const CellsFiltersBar = ({filters}: CellsFiltersBarProps) => {
             items={filter.items}
             selectedIds={filter.selectedIds}
             onSelectionChange={filter.onSelectionChange}
+            disabled={filter.disabled}
           />
         ) : (
           <button
             key={filter.id}
             type="button"
-            css={toggleFilterButtonStyles(filter.isActive)}
-            onClick={filter.onToggle}
+            css={toggleFilterButtonStyles}
+            onClick={() => {
+              if (filter.disabled !== true) {
+                filter.onToggle();
+              }
+            }}
             aria-pressed={filter.isActive}
+            aria-disabled={filter.disabled ?? false}
+            data-active={filter.isActive}
             data-uie-name={`filter-${filter.id}`}
           >
             {filter.label}
