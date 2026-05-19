@@ -19,10 +19,10 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {isFileEditable} from 'Util/fileTypeUtil';
 
-import {FileAssetOptions} from './FileAssetOptions';
+import {FileAssetOptions} from './fileAssetOptions';
 
 jest.mock('Util/util', () => ({
   forcedDownloadFile: jest.fn(),

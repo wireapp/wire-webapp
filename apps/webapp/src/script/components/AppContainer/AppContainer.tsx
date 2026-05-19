@@ -27,11 +27,11 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
-import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
-import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
+import {DetachedCallingCell} from 'Components/calling/detachedCallingCell';
+import {PrimaryModalComponent} from 'Components/modals/primaryModal/primaryModal';
+import {QualityFeedbackModal} from 'Components/modals/qualityFeedbackModal';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
+import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
@@ -41,15 +41,15 @@ import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
 
 import {WallClock} from '../../clock/wallClock';
-import {Config, Configuration} from '../../Config';
+import {Config, Configuration} from '../../config';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
-import {setAppLocale} from '../../localization/Localizer';
+import {setAppLocale} from '../../localization/localizer';
 import {App} from '../../main/app';
-import {AppMain} from '../../page/AppMain';
+import {AppMain} from '../../page/appMain';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
-import {MainViewModel} from '../../view_model/MainViewModel';
-import {AppLoader} from '../AppLoader';
+import {MainViewModel} from '../../viewModel/mainViewModel';
+import {AppLoader} from '../appLoader';
 
 type AppProps = {
   readonly config: Configuration;

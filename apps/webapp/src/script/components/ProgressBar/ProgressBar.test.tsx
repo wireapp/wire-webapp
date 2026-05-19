@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {ProgressBar} from './ProgressBar';
+import {ProgressBar} from './progressBar';
 
 describe('ProgressBar', () => {
   it('renders correct progress', async () => {

@@ -21,12 +21,12 @@ import {FC} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {BackupFileUpload} from 'Components/HistoryImport/BackupFileUpload';
-import {Config} from 'src/script/Config';
+import {BackupFileUpload} from 'Components/historyImport/backupFileUpload';
+import {Config} from 'src/script/config';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/localizerUtil';
 
-import {PreferencesSection} from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/preferencesSection';
 
 interface HistoryBackupSectionProps {
   brandName: string;

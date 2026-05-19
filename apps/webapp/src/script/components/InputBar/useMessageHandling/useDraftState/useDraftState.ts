@@ -21,8 +21,8 @@ import {useCallback} from 'react';
 
 import {LexicalEditor, CLEAR_EDITOR_COMMAND} from 'lexical';
 
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {StorageRepository} from 'Repositories/storage';
 import {sanitizeMarkdown} from 'Util/markdownUtil';
 

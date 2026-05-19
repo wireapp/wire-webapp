@@ -17,10 +17,10 @@
  *
  */
 
-import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
+import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {t} from 'Util/localizerUtil';
 
-import {wrapperStyles} from './CellsSearch.styles';
+import {wrapperStyles} from './cellsSearch.styles';
 
 interface CellsSearchProps {
   searchValue: string;

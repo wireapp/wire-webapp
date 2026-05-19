@@ -17,7 +17,7 @@
  *
  */
 
-import {devicePart} from './FormattedId.styles';
+import {devicePart} from './formattedId.styles';
 
 interface FormattedIdProps {
   idSlices: string[];

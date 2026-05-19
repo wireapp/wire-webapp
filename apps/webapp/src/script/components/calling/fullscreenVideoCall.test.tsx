@@ -21,17 +21,17 @@ import {act, render, waitFor} from '@testing-library/react';
 
 import {QUERY, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {Call} from 'Repositories/calling/Call';
-import {Participant} from 'Repositories/calling/Participant';
+import {Call} from 'Repositories/calling/call';
+import {Participant} from 'Repositories/calling/participant';
 import {Grid} from 'Repositories/calling/videoGridHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/selfService';
-import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
+import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/testUtil';
 
-import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
+import {FullscreenVideoCall, FullscreenVideoCallProps} from './fullscreenVideoCall';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
 

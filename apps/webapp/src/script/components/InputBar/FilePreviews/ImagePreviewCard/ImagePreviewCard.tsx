@@ -19,9 +19,9 @@
 
 import {t} from 'Util/localizerUtil';
 
-import {imageStyles} from './ImagePreviewCard.styles';
+import {imageStyles} from './imagePreviewCard.styles';
 
-import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
+import {MediaFilePreviewCard} from '../common/mediaFilePreviewCard/mediaFilePreviewCard';
 
 interface ImagePreviewCardProps {
   src: string;

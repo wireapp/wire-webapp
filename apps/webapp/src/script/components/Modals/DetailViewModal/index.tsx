@@ -25,26 +25,26 @@ import cx from 'classnames';
 import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ZoomableImage} from 'Components/ZoomableImage';
+import {ZoomableImage} from 'Components/zoomableImage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {User} from 'Repositories/entity/user';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';
 
-import {DetailViewModalFooter} from './DetailViewModalFooter';
-import {DetailViewModalHeader} from './DetailViewModalHeader';
+import {DetailViewModalFooter} from './detailViewModalFooter';
+import {DetailViewModalHeader} from './detailViewModalHeader';
 
-import {isContentMessage} from '../../../guards/Message';
-import {MessageCategory} from '../../../message/MessageCategory';
-import {isOfCategory} from '../../../page/MainContent/panels/Collection/utils';
+import {isContentMessage} from '../../../guards/message';
+import {messageCategory} from '../../../message/messageCategory';
+import {isOfCategory} from '../../../page/mainContent/panels/collection/utils';
 
 interface DetailViewModalProps {
   readonly assetRepository: AssetRepository;
@@ -201,7 +201,7 @@ export const DetailViewModal = ({
   const messageExpired = (message: ContentMessage) => messageRemoved(message.id, message.conversation_id);
 
   const getAllImages = async (conversation: Conversation) => {
-    const conversationItems = await conversationRepository.getEventsForCategory(conversation, MessageCategory.IMAGE);
+    const conversationItems = await conversationRepository.getEventsForCategory(conversation, messageCategory.IMAGE);
     const filteredImages = conversationItems.filter(message => {
       return isContentMessage(message) && isOfCategory('images', message) === true;
     });

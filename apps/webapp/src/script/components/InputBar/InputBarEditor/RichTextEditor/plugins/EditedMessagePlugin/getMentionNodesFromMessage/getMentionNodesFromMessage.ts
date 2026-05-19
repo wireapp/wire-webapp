@@ -17,10 +17,10 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Text} from 'Repositories/entity/message/Text';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Text} from 'Repositories/entity/message/text';
 
-import {$createMentionNode, MentionNode} from '../../../nodes/MentionNode';
+import {$createMentionNode, MentionNode} from '../../../nodes/mentionNode';
 import {createNodes} from '../../../utils/generateNodes';
 
 export const getMentionNodesFromMessage = (message: ContentMessage): MentionNode[] => {

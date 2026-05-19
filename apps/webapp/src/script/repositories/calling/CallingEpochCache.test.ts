@@ -17,7 +17,7 @@
  *
  */
 
-import {CallingEpochCache} from './CallingEpochCache';
+import {CallingEpochCache} from './callingEpochCache';
 
 describe('CallingEpochCache', () => {
   let cache: CallingEpochCache;

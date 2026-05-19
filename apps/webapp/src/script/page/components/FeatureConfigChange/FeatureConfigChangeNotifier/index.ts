@@ -17,4 +17,4 @@
  *
  */
 
-export * from './FeatureConfigChangeNotifier';
+export * from './featureConfigChangeNotifier';

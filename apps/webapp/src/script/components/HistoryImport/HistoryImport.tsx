@@ -21,9 +21,9 @@ import {useEffect, useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
+import * as Icon from 'Components/icon';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {ProgressBar} from 'Components/progressBar/progressBar';
 import {BackupRepository} from 'Repositories/backup/backupRepository';
 import {
   CancelError,
@@ -32,17 +32,17 @@ import {
   IncompatibleBackupFormatError,
   InvalidPassword,
 } from 'Repositories/backup/error';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/backupUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {loadFileBuffer} from 'Util/util';
 
-import {BackupFileUpload} from './BackupFileUpload';
+import {BackupFileUpload} from './backupFileUpload';
 
-import {Config} from '../../Config';
-import {MotionDuration} from '../../motion/MotionDuration';
+import {Config} from '../../config';
+import {MotionDuration} from '../../motion/motionDuration';
 
 export enum HistoryImportState {
   DONE = 'HistoryImportState.STATE.DONE',

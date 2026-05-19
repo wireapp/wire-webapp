@@ -24,11 +24,11 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/Icon';
-import {UserList, UserlistMode} from 'Components/UserList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {UserList, UserlistMode} from 'Components/userList';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {User} from 'Repositories/entity/user';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';
@@ -40,7 +40,7 @@ import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {sortByPriority} from 'Util/stringUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
-import {TopPeople} from './components/TopPeople';
+import {TopPeople} from './components/topPeople';
 
 import {getManageTeamUrl} from '../../../../externalRoute';
 

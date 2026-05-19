@@ -17,7 +17,7 @@
  *
  */
 
-import type {Location} from 'Repositories/entity/message/Location';
+import type {Location} from 'Repositories/entity/message/location';
 import {t} from 'Util/localizerUtil';
 import {getMapsUrl} from 'Util/locationUtil';
 

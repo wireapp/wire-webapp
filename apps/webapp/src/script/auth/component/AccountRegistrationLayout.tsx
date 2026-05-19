@@ -35,7 +35,7 @@ import {
   whiteFontCss,
   registrationLayoutListItemContainerCss,
   registrationLayoutListItemIconCss,
-} from './Layout.styles';
+} from './layout.styles';
 
 export const AccountRegistrationLayout = ({children}: {children: ReactNode}) => {
   const featureList = [

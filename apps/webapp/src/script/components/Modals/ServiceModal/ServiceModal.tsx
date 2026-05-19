@@ -17,17 +17,17 @@
  *
  */
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import * as Icon from 'Components/icon';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 
 interface ServiceModalProps {
   readonly service: ServiceEntity;

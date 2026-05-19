@@ -21,10 +21,10 @@ import {useEffect, useRef, useState} from 'react';
 
 import EmojiPicker, {EmojiClickData, EmojiStyle} from 'emoji-picker-react';
 
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
 import {t} from 'Util/localizerUtil';
 
-import {styles} from './EmojisBar.styles';
+import {styles} from './emojisBar.styles';
 
 interface EmojisBarProps {
   onEmojiClick: (emoji: string) => void;

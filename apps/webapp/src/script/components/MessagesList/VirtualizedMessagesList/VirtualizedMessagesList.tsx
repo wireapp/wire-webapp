@@ -22,21 +22,21 @@ import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useR
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
-import {MarkerComponent} from 'Components/MessagesList/Message/Marker';
-import {Message} from 'Components/MessagesList/Message/VirtualizedMessage';
-import {MessagesListParams} from 'Components/MessagesList/MessageList.types';
-import {UploadAssets} from 'Components/MessagesList/UploadAssets';
-import {verticallyCenterMessage} from 'Components/MessagesList/utils/helpers';
-import {filterMessages} from 'Components/MessagesList/utils/messagesFilter';
-import {useLoadConversation} from 'Components/MessagesList/utils/useLoadConversation';
-import {useScrollToLastUnreadMessage} from 'Components/MessagesList/utils/useScrollToLastUnreadMessage';
-import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/utils/virtualizedMessagesGroup';
-import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
-import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList/useScrollMessages';
+import {MarkerComponent} from 'Components/messagesList/message/marker';
+import {Message} from 'Components/messagesList/message/virtualizedMessage';
+import {MessagesListParams} from 'Components/messagesList/messageList.types';
+import {UploadAssets} from 'Components/messagesList/uploadAssets';
+import {verticallyCenterMessage} from 'Components/messagesList/utils/helpers';
+import {filterMessages} from 'Components/messagesList/utils/messagesFilter';
+import {useLoadConversation} from 'Components/messagesList/utils/useLoadConversation';
+import {useScrollToLastUnreadMessage} from 'Components/messagesList/utils/useScrollToLastUnreadMessage';
+import {groupMessagesBySenderAndTime, isMarker} from 'Components/messagesList/utils/virtualizedMessagesGroup';
+import {useLoadMessages} from 'Components/messagesList/virtualizedMessagesList/useLoadMessages';
+import {useScrollMessages} from 'Components/messagesList/virtualizedMessagesList/useScrollMessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';
+import {VirtualizedJumpToLastMessageButton} from '../virtualizedJumpToLastMessageButton';
 
 const ESTIMATED_ELEMENT_SIZE = 70;
 const MARKER_ESTIMATE = 56;

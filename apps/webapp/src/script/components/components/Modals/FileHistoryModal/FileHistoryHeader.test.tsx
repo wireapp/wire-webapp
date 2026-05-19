@@ -19,7 +19,7 @@
 
 import {render, screen, fireEvent} from '@testing-library/react';
 
-import {FileHistoryHeader} from './FileHistoryHeader';
+import {FileHistoryHeader} from './fileHistoryHeader';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 
 jest.mock('./hooks/useFileHistoryModal');

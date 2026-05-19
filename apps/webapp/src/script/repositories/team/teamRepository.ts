@@ -37,17 +37,17 @@ import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {User} from 'Repositories/entity/User';
-import {EventSource} from 'Repositories/event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {User} from 'Repositories/entity/user';
+import {EventSource} from 'Repositories/event/eventSource';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandlingState';
 import {IntegrationMapper} from 'Repositories/integration/integrationMapper';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/user/userPermission';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {Environment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -61,7 +61,7 @@ import {TeamService} from './teamService';
 import {TeamState} from './teamState';
 
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
-import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
+import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/mlsMigration/migrationStatus';
 import {APIClient} from '../../service/apiClientSingleton';
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';

@@ -21,9 +21,9 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import {CONVERSATION} from 'Repositories/event/Client';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
+import {CONVERSATION} from 'Repositories/event/client';
 
 export type MappedEvent = Record<string, any> & {
   data?: MappedEventData | string;

@@ -29,14 +29,14 @@ import {ContainerXS, Loading} from '@wireapp/react-ui-kit';
 
 import {getLogger} from 'Util/logger';
 
-import {ClientItem} from './ClientItem';
+import {ClientItem} from './clientItem';
 
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import * as LocalStorageAction from '../module/action/LocalStorageAction';
+import * as LocalStorageAction from '../module/action/localStorageAction';
 import {RootState, ThunkDispatch} from '../module/reducer';
-import {getEntropy} from '../module/selector/AuthSelector';
-import * as ClientSelector from '../module/selector/ClientSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
+import {getEntropy} from '../module/selector/authSelector';
+import * as ClientSelector from '../module/selector/clientSelector';
+import * as SelfSelector from '../module/selector/selfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 
 const logger = getLogger('ClientList');

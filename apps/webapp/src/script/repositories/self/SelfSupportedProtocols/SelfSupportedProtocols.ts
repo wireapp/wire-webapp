@@ -19,8 +19,8 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {isMLSSupportedByEnvironment} from '../../../mls/isMLSSupportedByEnvironment';
-import {MLSMigrationStatus} from '../../../mls/MLSMigration/migrationStatus';
+import {isMlsSupportedByEnvironment} from '../../../mls/isMlsSupportedByEnvironment';
+import {MLSMigrationStatus} from '../../../mls/mlsMigration/migrationStatus';
 
 interface SelfSupportedProtocolsTeamHandler {
   getTeamSupportedProtocols: () => CONVERSATION_PROTOCOL[];
@@ -58,7 +58,7 @@ const isMLSForcedWithoutMigration = async (
   teamHandler: SelfSupportedProtocolsTeamHandler,
   selfClientsHandler: SelfSupportedProtocolsSelfClientsHandler,
 ): Promise<boolean> => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
+  const isMLSSupportedByEnv = await isMlsSupportedByEnvironment();
 
   if (!isMLSSupportedByEnv) {
     return false;
@@ -84,7 +84,7 @@ const isMLSSupported = async (
   teamHandler: SelfSupportedProtocolsTeamHandler,
   selfClientsHandler: SelfSupportedProtocolsSelfClientsHandler,
 ): Promise<boolean> => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
+  const isMLSSupportedByEnv = await isMlsSupportedByEnvironment();
 
   if (!isMLSSupportedByEnv) {
     return false;

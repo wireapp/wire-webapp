@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Collection';
+export * from './collection';

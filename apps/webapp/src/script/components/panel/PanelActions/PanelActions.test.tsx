@@ -19,9 +19,9 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {CopyIcon, EditIcon, PickupIcon} from 'Components/Icon';
+import {CopyIcon, EditIcon, PickupIcon} from 'Components/icon';
 
-import {PanelActions, MenuItem} from './PanelActions';
+import {PanelActions, MenuItem} from './panelActions';
 
 describe('PanelActions', () => {
   it('displays a single action', () => {

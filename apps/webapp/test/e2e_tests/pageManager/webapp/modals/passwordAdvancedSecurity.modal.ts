@@ -19,7 +19,7 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModalType} from 'Components/modals/primaryModal/primaryModalTypes';
 
 import {BaseModal} from './base.modal';
 

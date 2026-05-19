@@ -20,7 +20,7 @@
 import type {Self} from '@wireapp/api-client/lib/self/';
 import {UserType} from '@wireapp/api-client/lib/user';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import type {RootState} from '../reducer';
 
 const unsetSelf: Self = {

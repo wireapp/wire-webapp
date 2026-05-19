@@ -21,7 +21,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {buttonStyles, wrapperStyles} from './CellsFiltersModalActions.styles';
+import {buttonStyles, wrapperStyles} from './cellsFiltersModalActions.styles';
 
 interface CellsFiltersModalActionsProps {
   onSecondaryAction: () => void;

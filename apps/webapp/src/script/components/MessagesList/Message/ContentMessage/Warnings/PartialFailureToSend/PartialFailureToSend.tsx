@@ -25,12 +25,12 @@ import {countBy, map} from 'underscore';
 
 import {Bold, Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {Config} from 'src/script/Config';
+import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';
+import {backendErrorLink, button, warning, wrapper} from '../warnings.styles';
 
 export type User = {qualifiedId: QualifiedId; name: () => string};
 type Props = {

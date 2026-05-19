@@ -17,8 +17,8 @@
  *
  */
 
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {getFileExtension} from 'Util/util';
 
 import {fileNameStyles, itemStyles, listStyles} from './showFileDropzoneErrorModal.styles';

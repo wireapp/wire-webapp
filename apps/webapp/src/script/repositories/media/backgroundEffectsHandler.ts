@@ -27,7 +27,7 @@ import {
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
-} from 'Repositories/media/VideoBackgroundEffects';
+} from 'Repositories/media/videoBackgroundEffects';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 

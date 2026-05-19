@@ -23,14 +23,14 @@ import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 import {afterRender} from 'Util/util';
 
-import {closeWarning, useWarningsState} from './WarningsState';
-import {CONFIG, TYPE} from './WarningsTypes';
+import {closeWarning, useWarningsState} from './warningsState';
+import {CONFIG, TYPE} from './warningsTypes';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 interface WarningProps {
   onRefresh: () => void;

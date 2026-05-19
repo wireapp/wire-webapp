@@ -17,12 +17,12 @@
  *
  */
 
-import {ClientEvent} from 'Repositories/event/Client';
+import {ClientEvent} from 'Repositories/event/client';
 import {EventRecord} from 'Repositories/storage';
-import {MessageCategory} from 'src/script/message/MessageCategory';
+import {messageCategory} from 'src/script/message/messageCategory';
 
 import {CPBLogger} from '..';
-import {BackupMessageContent, BackupMessage} from '../CPB.library';
+import {BackupMessageContent, BackupMessage} from '../cPB.library';
 
 // Type definition for common message fields
 type CommonMessageFields = Required<
@@ -99,40 +99,40 @@ const isFileContent = (
 ): metadata is BackupMessageContent.Asset.AssetMetadata.Generic =>
   metadata instanceof BackupMessageContent.Asset.AssetMetadata.Generic;
 
-const mapMessageContentToCategory = (message: BackupMessage): MessageCategory => {
+const mapMessageContentToCategory = (message: BackupMessage): messageCategory => {
   if (isTextContent(message.content)) {
-    return MessageCategory.TEXT;
+    return messageCategory.TEXT;
   }
   if (isLocationContent(message.content)) {
-    return MessageCategory.LOCATION;
+    return messageCategory.LOCATION;
   }
   if (isAssetContent(message.content)) {
     const name = message.content.name;
     const metadata = message.content.metaData;
     if (!metadata) {
       if (name) {
-        return MessageCategory.FILE;
+        return messageCategory.FILE;
       }
-      return MessageCategory.UNDEFINED;
+      return messageCategory.UNDEFINED;
     }
     if (isImageContent(metadata)) {
       const mimeType = message.content.mimeType;
       if (mimeType === 'image/gif') {
-        return MessageCategory.GIF;
+        return messageCategory.GIF;
       }
-      return MessageCategory.IMAGE;
+      return messageCategory.IMAGE;
     }
     if (isVideoContent(metadata)) {
-      return MessageCategory.VIDEO;
+      return messageCategory.VIDEO;
     }
     if (isAudioContent(metadata)) {
-      return MessageCategory.AUDIO;
+      return messageCategory.AUDIO;
     }
     if (isFileContent(metadata)) {
-      return MessageCategory.FILE;
+      return messageCategory.FILE;
     }
   }
-  return MessageCategory.UNDEFINED;
+  return messageCategory.UNDEFINED;
 };
 
 type TextBackupMessage = BackupMessage & {content: BackupMessageContent.Text};

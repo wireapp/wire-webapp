@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {wrapperStyles} from './FileCardHeader.styles';
+import {wrapperStyles} from './fileCardHeader.styles';
 
 interface FileCardHeaderProps {
   children: ReactNode;

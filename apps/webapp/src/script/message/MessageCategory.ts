@@ -18,7 +18,7 @@
  */
 
 /** Enum for different message categories */
-export enum MessageCategory {
+export enum messageCategory {
   AUDIO = 1 << 10,
   COMPOSITE = 1 << 14,
   EXCLUDED = 1 << 1,

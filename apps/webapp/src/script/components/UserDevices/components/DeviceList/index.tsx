@@ -17,4 +17,4 @@
  *
  */
 
-export * from './DeviceList';
+export * from './deviceList';

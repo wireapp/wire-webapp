@@ -20,9 +20,9 @@
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
-import {getEnrollmentTimer, messageRetentionTime} from './EnrollmentTimer';
+import {getEnrollmentTimer, messageRetentionTime} from './enrollmentTimer';
 
-import {MLSStatuses} from '../E2EIdentityVerification';
+import {MLSStatuses} from '../e2eIdentityVerification';
 
 describe('e2ei delays', () => {
   const gracePeriod = 7 * TimeInMillis.DAY;

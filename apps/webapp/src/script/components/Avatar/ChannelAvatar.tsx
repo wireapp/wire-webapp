@@ -21,7 +21,7 @@ import {ChannelIcon, LockClosedIcon} from '@wireapp/react-ui-kit';
 
 import {getChannelAvatarColors} from 'Util/avatarUtil';
 
-import {channelAvatarContainerCss, channelAvatarIconCss, channelAvatarLockIconCss} from './ChannelAvatar.styles';
+import {channelAvatarContainerCss, channelAvatarIconCss, channelAvatarLockIconCss} from './channelAvatar.styles';
 
 export type ChannelAvatarSize = 'small' | 'large';
 

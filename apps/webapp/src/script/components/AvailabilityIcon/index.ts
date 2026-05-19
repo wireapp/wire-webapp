@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Availability';
+export * from './availability';

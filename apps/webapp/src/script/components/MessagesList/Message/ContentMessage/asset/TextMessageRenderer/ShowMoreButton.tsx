@@ -21,8 +21,8 @@ import {FC, HTMLProps} from 'react';
 
 import cx from 'classnames';
 
-import * as Icon from 'Components/Icon';
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import * as Icon from 'Components/icon';
+import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {t} from 'Util/localizerUtil';
 
 interface ShowMoreButtonProps {

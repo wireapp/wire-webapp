@@ -23,7 +23,7 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {WallClock} from '../clock/wallClock';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {MainViewModel} from '../viewModel/mainViewModel';
 
 export type RootContextValue = {
   readonly fireAndForgetInvoker: FireAndForgetInvoker;

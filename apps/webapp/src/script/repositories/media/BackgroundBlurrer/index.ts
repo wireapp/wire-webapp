@@ -17,4 +17,4 @@
  *
  */
 
-export * from './BackgroundBlurrer';
+export * from './backgroundBlurrer';

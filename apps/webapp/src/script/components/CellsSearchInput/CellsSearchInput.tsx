@@ -24,7 +24,7 @@ import {
   searchFieldStyles,
   searchIconStyles,
   searchNativeInputStyles,
-} from './CellsSearchInput.styles';
+} from './cellsSearchInput.styles';
 
 interface CellsSearchInputProps {
   value: string;

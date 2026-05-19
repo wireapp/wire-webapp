@@ -17,14 +17,14 @@
  *
  */
 
-import {GroupAvatar} from 'Components/Avatar';
-import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
-import {openConversation} from 'Components/CellsGlobalView/common/openConversation/openConversation';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {GroupAvatar} from 'Components/avatar';
+import {ChannelAvatar} from 'Components/avatar/channelAvatar';
+import {openConversation} from 'Components/cellsGlobalView/common/openConversation/openConversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
-import {avatarWrapperStyles, textStyles, wrapperStyles} from './CellsConversationColumn.styles';
+import {avatarWrapperStyles, textStyles, wrapperStyles} from './cellsConversationColumn.styles';
 
 interface CellsConversationColumnProps {
   conversation?: Conversation;

@@ -22,9 +22,9 @@ import ko from 'knockout';
 
 import {AccentColor} from '@wireapp/commons';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
-import {AccentColorPicker, AccentColorPickerProps} from './AccentColorPicker';
+import {AccentColorPicker, AccentColorPickerProps} from './accentColorPicker';
 
 describe('AccentColorPicker', () => {
   it('shows expected accent colors', async () => {

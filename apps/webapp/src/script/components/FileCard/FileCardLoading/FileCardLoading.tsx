@@ -19,7 +19,7 @@
 
 import {CSSProperties, useEffect, useState} from 'react';
 
-import {easeOutStyles, loadingStyles, wrapperStyles} from './FileCardLoading.styles';
+import {easeOutStyles, loadingStyles, wrapperStyles} from './fileCardLoading.styles';
 
 interface FileCardLoadingProps {
   /**

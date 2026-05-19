@@ -24,12 +24,12 @@ import {
 } from '@wireapp/api-client/lib/conversation';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 
-import {ConversationFilter} from './ConversationFilter';
-import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
-import {ConversationStatus} from './ConversationStatus';
-import {ConversationVerificationState} from './ConversationVerificationState';
+import {ConversationFilter} from './conversationFilter';
+import {ConversationDatabaseData, ConversationMapper} from './conversationMapper';
+import {ConversationStatus} from './conversationStatus';
+import {ConversationVerificationState} from './conversationVerificationState';
 
 describe('ConversationFilter', () => {
   describe('showCallControls', () => {

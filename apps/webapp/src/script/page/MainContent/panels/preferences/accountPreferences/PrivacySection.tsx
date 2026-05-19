@@ -32,7 +32,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {formatDurationCaption} from 'Util/timeUtil';
 
-import {PreferencesSection} from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/preferencesSection';
 
 interface PrivacySectionProps {
   appLockRepository?: AppLockRepository;

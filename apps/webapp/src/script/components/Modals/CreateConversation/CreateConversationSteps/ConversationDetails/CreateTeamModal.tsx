@@ -19,8 +19,8 @@
 
 import {Button, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {useTeamCreationModal} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/useTeamCreationModal';
+import {ModalComponent} from 'Components/modals/modalComponent';
+import {useTeamCreationModal} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/useTeamCreationModal';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -31,7 +31,7 @@ import {
   salesModalBodyTextCss,
   salesModalBodyWrapperCss,
   salesModalWrapperCss,
-} from './ConversationDetails.styles';
+} from './conversationDetails.styles';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 

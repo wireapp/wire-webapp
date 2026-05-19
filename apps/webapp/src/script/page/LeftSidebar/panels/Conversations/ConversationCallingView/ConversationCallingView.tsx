@@ -17,10 +17,10 @@
  *
  */
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import {Call} from 'Repositories/calling/Call';
+import {CallingCell} from 'Components/calling/callingCell';
+import {Call} from 'Repositories/calling/call';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {ListViewModel} from 'src/script/view_model/ListViewModel';
+import {ListViewModel} from 'src/script/viewModel/listViewModel';
 
 type ConversationCallingViewProps = {
   activeCalls: Call[];

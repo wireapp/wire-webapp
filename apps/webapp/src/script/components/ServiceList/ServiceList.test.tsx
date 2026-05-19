@@ -22,7 +22,7 @@ import {render} from '@testing-library/react';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {createUuid} from 'Util/uuid';
 
-import {ServiceList} from './ServiceList';
+import {ServiceList} from './serviceList';
 
 describe('ServiceList', () => {
   it('lists the services', () => {

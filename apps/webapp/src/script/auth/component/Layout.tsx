@@ -25,9 +25,9 @@ import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './Layout.styles';
+import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './layout.styles';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 export const Layout = ({children}: {children: ReactNode}) => {
   return (

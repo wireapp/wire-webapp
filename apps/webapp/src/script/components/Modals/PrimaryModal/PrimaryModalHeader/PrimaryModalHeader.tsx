@@ -19,9 +19,9 @@
 
 import {forwardRef} from 'react';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 
-import {removeCurrentModal} from '../PrimaryModalState';
+import {removeCurrentModal} from '../primaryModalState';
 
 interface ModalHeaderProps {
   titleText: string;

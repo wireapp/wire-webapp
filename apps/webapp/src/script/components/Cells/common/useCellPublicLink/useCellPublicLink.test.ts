@@ -29,7 +29,7 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';
 
-jest.mock('src/script/Config', () => ({
+jest.mock('src/script/config', () => ({
   Config: {
     getConfig: () => ({
       CELLS_PYDIO_URL: 'https://cells.example.com',

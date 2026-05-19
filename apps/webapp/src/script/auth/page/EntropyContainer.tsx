@@ -25,8 +25,8 @@ import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 import {EntropyData} from '../../util/entropy';
-import {EntropyCanvas} from '../component/EntropyCanvas';
-import {ProgressBar} from '../component/ProgressBar';
+import {EntropyCanvas} from '../component/entropyCanvas';
+import {ProgressBar} from '../component/progressBar';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   onSetEntropy: (entropyData: Uint8Array) => void;

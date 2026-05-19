@@ -24,22 +24,22 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Button, ButtonVariant, useTimeout} from '@wireapp/react-ui-kit';
 
-import {RestrictedVideo} from 'Components/asset/RestrictedVideo';
+import {RestrictedVideo} from 'Components/asset/restrictedVideo';
 import {AssetError} from 'Repositories/assets/assetError';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {formatSeconds} from 'Util/timeUtil';
 import {useEffectRef} from 'Util/useEffectRef';
 
-import {MediaButton} from '../common/MediaButton/MediaButton';
-import {SeekBar} from '../common/SeekBar/SeekBar';
+import {MediaButton} from '../common/mediaButton/mediaButton';
+import {SeekBar} from '../common/seekBar/seekBar';
 import {AssetUrl, useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
-import {FileAsset} from '../FileAsset/FileAsset';
+import {FileAsset} from '../fileAsset/fileAsset';
 
 interface VideoAssetProps {
   assetRepository?: AssetRepository;

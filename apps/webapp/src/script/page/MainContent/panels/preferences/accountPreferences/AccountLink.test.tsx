@@ -19,9 +19,9 @@
 
 import {fireEvent, render, screen} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
-import {AccountLink} from './AccountLink';
+import {AccountLink} from './accountLink';
 
 import * as utils from '../../../../../util/clipboardUtil';
 

@@ -19,10 +19,10 @@
 
 import {render, fireEvent, act} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
-import {PrimaryModalComponent} from './PrimaryModal';
-import {PrimaryModalType} from './PrimaryModalTypes';
+import {PrimaryModalComponent} from './primaryModal';
+import {PrimaryModalType} from './primaryModalTypes';
 
 import {PrimaryModal, removeCurrentModal} from '.';
 

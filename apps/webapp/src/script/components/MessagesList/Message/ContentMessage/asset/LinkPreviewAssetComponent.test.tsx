@@ -19,12 +19,12 @@
 
 import {render} from '@testing-library/react';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
-import {Text} from 'Repositories/entity/message/Text';
-import {StatusType} from 'src/script/message/StatusType';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {LinkPreview} from 'Repositories/entity/message/linkPreview';
+import {Text} from 'Repositories/entity/message/text';
+import {StatusType} from 'src/script/message/statusType';
 
-import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
+import {LinkPreviewAsset} from './linkPreviewAssetComponent';
 
 describe('LinkPreviewAssetComponent', () => {
   function mockLinkPreview(url = 'https://example.com'): ContentMessage {

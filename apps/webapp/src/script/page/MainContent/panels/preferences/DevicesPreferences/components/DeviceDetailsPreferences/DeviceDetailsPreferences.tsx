@@ -21,15 +21,15 @@ import {useEffect, useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {WireIdentity} from 'src/script/e2eIdentity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {Config} from '../../../../../../../Config';
-import {MotionDuration} from '../../../../../../../motion/MotionDuration';
-import {contentStyle} from '../../../components/PreferencesPage.styles';
-import {DetailedDevice} from '../DetailedDevice';
+import {Config} from '../../../../../../../config';
+import {MotionDuration} from '../../../../../../../motion/motionDuration';
+import {contentStyle} from '../../../components/preferencesPage.styles';
+import {DetailedDevice} from '../detailedDevice';
 
 interface DevicesPreferencesProps {
   device: ClientEntity;

@@ -19,8 +19,8 @@
 
 import {FC} from 'react';
 
-import * as Icon from 'Components/Icon';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import * as Icon from 'Components/icon';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';

@@ -19,11 +19,11 @@
 
 import {fireEvent} from '@testing-library/react';
 
-import {Success} from './Success';
+import {Success} from './success';
 
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/testUtil';
 import * as trackingUtil from '../util/trackingUtil';
 import * as urlUtil from '../util/urlUtil';
 import * as browserLocationModule from '../../navigation/browserLocation';

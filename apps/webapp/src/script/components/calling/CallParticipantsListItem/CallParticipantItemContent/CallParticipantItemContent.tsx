@@ -21,9 +21,9 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
-import {UserInfo} from 'Components/UserInfo';
-import {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {UserInfo} from 'Components/userInfo';
+import {User} from 'Repositories/entity/user';
 import {t} from 'Util/localizerUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
@@ -34,7 +34,7 @@ import {
   chevronIcon,
   contentText,
   wrapper,
-} from './CallParticipantItemContent.styles';
+} from './callParticipantItemContent.styles';
 
 interface CallParticipantItemContentProps {
   user: User;

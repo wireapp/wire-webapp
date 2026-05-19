@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ConversationListCell';
+export * from './conversationListCell';

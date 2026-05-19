@@ -30,12 +30,12 @@ import {
   ShowIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
-import {EditIcon} from 'Components/Icon';
-import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
-import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
-import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
+import {isInRecycleBin} from 'Components/conversation/conversationCells/common/recycleBin/recycleBin';
+import {EditIcon} from 'Components/icon';
+import {iconStyles} from 'Components/messagesList/message/contentMessage/asset/multipartAssets/fileAssetCard/common/fileAssetOptions/fileAssetOptions.styles';
+import {MessageTime} from 'Components/messagesList/message/messageTime';
+import {useFileHistoryModal} from 'Components/modals/fileHistoryModal/hooks/useFileHistoryModal';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
@@ -51,7 +51,7 @@ import {
   downloadButtonStyles,
   actionButtonsStyles,
   editModeButtonStyles,
-} from './FileHeader.styles';
+} from './fileHeader.styles';
 
 interface FileHeaderProps {
   id: string;

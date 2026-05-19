@@ -17,9 +17,9 @@
  *
  */
 
-import {wrapperStyles} from './VideoPlayOverlay.styles';
+import {wrapperStyles} from './videoPlayOverlay.styles';
 
-import {VideoPlayButton} from '../common/VideoPlayButton/VideoPlayButton';
+import {VideoPlayButton} from '../common/videoPlayButton/videoPlayButton';
 
 interface VideoPlayOverlayProps {
   isPlaying: boolean;

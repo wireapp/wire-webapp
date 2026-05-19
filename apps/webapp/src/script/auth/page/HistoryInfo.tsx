@@ -30,12 +30,12 @@ import {Button, ContainerXS, Link, Paragraph, Text} from '@wireapp/react-ui-kit'
 import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import {Page} from './Page';
+import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {actionRoot} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
-import * as ClientSelector from '../module/selector/ClientSelector';
+import * as ClientSelector from '../module/selector/clientSelector';
 import {ROUTE} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 

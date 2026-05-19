@@ -17,4 +17,4 @@
  *
  */
 
-export * from './MLSMigration';
+export * from './mlsMigration';

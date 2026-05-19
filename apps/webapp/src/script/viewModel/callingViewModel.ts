@@ -26,23 +26,23 @@ import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import 'Components/calling/ChooseScreen';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import 'Components/calling/chooseScreen';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import type {AudioRepository} from 'Repositories/audio/audioRepository';
 import {AudioType} from 'Repositories/audio/audioType';
-import type {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import type {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/callState';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/leaveCallReason';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
+import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
+import type {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {isPermissionGranted} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
+import {PermissionType} from 'Repositories/permission/permissionType';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {TeamRepository} from 'Repositories/team/teamRepository';
@@ -52,7 +52,7 @@ import {replaceLink, t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 
 export interface CallActions {
   answer: (call: Call) => Promise<void>;

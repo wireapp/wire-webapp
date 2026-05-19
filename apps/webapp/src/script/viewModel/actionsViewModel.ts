@@ -25,16 +25,16 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/modals/primaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {ClientEntity} from 'Repositories/client';
 import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
-import type {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import type {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {NOTIFICATION_STATE} from 'Repositories/conversation/notificationSetting';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {Message} from 'Repositories/entity/message/message';
+import type {User} from 'Repositories/entity/user';
 import type {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import type {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {SelfRepository} from 'Repositories/self/selfRepository';
@@ -42,7 +42,7 @@ import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
-import type {MainViewModel} from './MainViewModel';
+import type {MainViewModel} from './mainViewModel';
 
 export class ActionsViewModel {
   constructor(

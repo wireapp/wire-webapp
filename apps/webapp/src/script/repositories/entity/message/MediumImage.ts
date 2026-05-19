@@ -23,7 +23,7 @@ import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetType} from 'Repositories/assets/assetType';
 import {getLogger} from 'Util/logger';
 
-import {FileAsset} from './FileAsset';
+import {FileAsset} from './fileAsset';
 
 export class MediumImage extends FileAsset {
   public readonly resource: ko.Observable<AssetRemoteData>;

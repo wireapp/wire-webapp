@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {GifImage} from 'Components/Giphy/GifImage';
+import {GifImage} from 'Components/giphy/gifImage';
 
 const staticImage = 'https://mock.image/500/300';
 const hoveredImage = 'https://mock.image/500/400';

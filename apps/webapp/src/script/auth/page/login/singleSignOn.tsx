@@ -46,21 +46,21 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {LogoFullIcon} from 'Components/Icon';
-import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
+import {LogoFullIcon} from 'Components/icon';
+import {calculateChildWindowPosition} from 'Util/dOM/caculateChildWindowPosition';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {SingleSignOnForm} from './singleSignOnForm';
 
-import {Config} from '../../../Config';
-import {AppAlreadyOpen} from '../../component/AppAlreadyOpen';
-import {BackButton} from '../../component/BackButton';
+import {Config} from '../../../config';
+import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
+import {BackButton} from '../../component/backButton';
 import {RootState, bindActionCreators} from '../../module/reducer';
-import * as AuthSelector from '../../module/selector/AuthSelector';
+import * as AuthSelector from '../../module/selector/authSelector';
 import {srOnlyStyle} from '../../util/a11y';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
-import {Page} from '../Page';
+import {Page} from '../page';
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
 

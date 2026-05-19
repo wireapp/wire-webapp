@@ -21,12 +21,12 @@ import {act} from 'react';
 
 import {fireEvent, waitFor} from '@testing-library/react';
 
-import {SetHandle} from './SetHandle';
+import {SetHandle} from './setHandle';
 
 import {actionRoot} from '../module/action';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/testUtil';
 
 const handleInputId = 'enter-handle';
 const setHandleButtonId = 'do-send-handle';

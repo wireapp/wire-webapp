@@ -21,17 +21,17 @@ import {useAutoAnimate} from '@formkit/auto-animate/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
+import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
 import {isAudio, isVideo, isImage} from 'Repositories/assets/assetMetaDataBuilder';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {isPreviewableImage} from 'Util/imageUtil';
 
-import {AudioPreviewCard} from './AudioPreviewCard/AudioPreviewCard';
-import {FilePreviewCard} from './FilePreviewCard/FilePreviewCard';
-import {wrapperStyles} from './FilePreviews.styles';
-import {ImagePreviewCard} from './ImagePreviewCard/ImagePreviewCard';
+import {AudioPreviewCard} from './audioPreviewCard/audioPreviewCard';
+import {FilePreviewCard} from './filePreviewCard/filePreviewCard';
+import {wrapperStyles} from './filePreviews.styles';
+import {ImagePreviewCard} from './imagePreviewCard/imagePreviewCard';
 import {useFilePreview} from './useFilePreview/useFilePreview';
-import {VideoPreviewCard} from './VideoPreviewCard/VideoPreviewCard';
+import {VideoPreviewCard} from './videoPreviewCard/videoPreviewCard';
 
 interface FilePreviewsProps {
   files: FileWithPreview[];

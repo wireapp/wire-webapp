@@ -30,27 +30,27 @@ import {container} from 'tsyringe';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientRepository} from 'Repositories/client/ClientRepository';
-import {ClientService} from 'Repositories/client/ClientService';
-import {ClientState} from 'Repositories/client/ClientState';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {ClientRepository} from 'Repositories/client/clientRepository';
+import {ClientService} from 'Repositories/client/clientService';
+import {ClientState} from 'Repositories/client/clientState';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConnectionService} from 'Repositories/connection/connectionService';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationService} from 'Repositories/conversation/ConversationService';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationService} from 'Repositories/conversation/conversationService';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
 import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {NotificationService} from 'Repositories/event/NotificationService';
+import {EventRepository} from 'Repositories/event/eventRepository';
+import {EventService} from 'Repositories/event/eventService';
+import {NotificationService} from 'Repositories/event/notificationService';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfService} from 'Repositories/self/SelfService';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {SelfService} from 'Repositories/self/selfService';
+import {SelfRepository} from 'Repositories/self/selfRepository';
 import {Core} from 'src/script/service/coreSingleton';
 import {createStorageEngine, DatabaseTypes} from 'src/script/service/storeEngineProvider';
 import {StorageService} from 'Repositories/storage';
@@ -65,9 +65,9 @@ import {UserState} from 'Repositories/user/userState';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 
 import {entities} from '../api/payloads';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
+import {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
+import {MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
+import {MediaConstraintsHandler} from 'Repositories/media/mediaConstraintsHandler';
 
 export class TestFactory {
   constructor() {

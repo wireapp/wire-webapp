@@ -25,15 +25,15 @@ import {singleton} from 'tsyringe';
 import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import type {ElectronDesktopCapturerSource} from 'Repositories/media/mediaDevicesHandler';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {Call} from './Call';
+import {Call} from './call';
 
-import {Config} from '../../Config';
-import {CallViewTab} from '../../view_model/CallingViewModel';
+import {Config} from '../../config';
+import {CallViewTab} from '../../viewModel/callingViewModel';
 
 export enum MuteState {
   NOT_MUTED,

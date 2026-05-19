@@ -17,4 +17,4 @@
  *
  */
 
-export * from './SelfFingerprint';
+export * from './selfFingerprint';

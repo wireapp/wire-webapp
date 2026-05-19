@@ -22,16 +22,16 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
-import {ClientEvent} from 'Repositories/event/Client';
+import {ClientEvent} from 'Repositories/event/client';
 import {Declension, getUserName, t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
-import {SystemMessage} from './SystemMessage';
+import {SystemMessage} from './systemMessage';
 
-import {SuperType} from '../../../message/SuperType';
-import {SystemMessageType} from '../../../message/SystemMessageType';
-import {User} from '../User';
+import {SuperType} from '../../../message/superType';
+import {SystemMessageType} from '../../../message/systemMessageType';
+import {User} from '../user';
 
 export class MemberMessage extends SystemMessage {
   public allTeamMembers: User[] | undefined;

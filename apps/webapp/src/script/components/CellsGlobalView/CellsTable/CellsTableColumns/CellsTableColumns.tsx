@@ -23,13 +23,13 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
-import {CellsConversationColumn} from './CellsConversationColumn/CellsConversationColumn';
-import {CellsTableOwnerColumn} from './CellsOwnerColumn/CellsOwnerColumn';
-import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
-import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
-import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
-import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
-import {CellsTableTagsColumn} from './CellsTableTagsColumn/CellsTableTagsColumn';
+import {CellsConversationColumn} from './cellsConversationColumn/cellsConversationColumn';
+import {CellsTableOwnerColumn} from './cellsOwnerColumn/cellsOwnerColumn';
+import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
+import {CellsTableNameColumn} from './cellsTableNameColumn/cellsTableNameColumn';
+import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions';
+import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
+import {CellsTableTagsColumn} from './cellsTableTagsColumn/cellsTableTagsColumn';
 
 const columnHelper = createColumnHelper<CellNode>();
 

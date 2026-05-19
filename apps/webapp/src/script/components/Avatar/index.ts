@@ -17,6 +17,6 @@
  *
  */
 
-export * from './Avatar';
-export * from './ChannelAvatar';
-export * from './GroupAvatar';
+export * from './avatar';
+export * from './channelAvatar';
+export * from './groupAvatar';

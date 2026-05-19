@@ -21,7 +21,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {AccountInput, useInputDone} from './AccountInput';
+import {AccountInput, useInputDone} from './accountInput';
 
 interface NameInputProps {
   canEditProfile: boolean;

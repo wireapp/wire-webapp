@@ -19,8 +19,8 @@
 
 import {t} from 'Util/localizerUtil';
 
-import {FileAssetSmall} from './FileAssetSmall/FileAssetSmall';
-import {FileAssetWithPreview} from './FileAssetWithPreview/FileAssetWithPreview';
+import {FileAssetSmall} from './fileAssetSmall/fileAssetSmall';
+import {FileAssetWithPreview} from './fileAssetWithPreview/fileAssetWithPreview';
 
 interface FileAssetCardProps {
   src?: string;

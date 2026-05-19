@@ -17,4 +17,4 @@
  *
  */
 
-export * from './InviteModal';
+export * from './inviteModal';

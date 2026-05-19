@@ -17,4 +17,4 @@
  *
  */
 
-export * from './LeftSidebar';
+export * from './leftSidebar';

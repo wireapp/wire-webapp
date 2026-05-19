@@ -17,7 +17,7 @@
  *
  */
 
-import {Note} from 'Components/Note/Note';
+import {Note} from 'Components/note/note';
 import {t} from 'Util/localizerUtil';
 
 const AppsDisabledNote = () => {

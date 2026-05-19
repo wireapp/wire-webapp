@@ -23,19 +23,19 @@ import {ClientClassification} from '@wireapp/api-client/lib/client/';
 
 import {useUserIdentity} from 'Hooks/useDeviceIdentities';
 import {ClientRepository, ClientEntity} from 'Repositories/client';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {User} from 'Repositories/entity/user';
 import {partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
-import {DeviceDetails} from './components/DeviceDetails';
-import {DeviceList} from './components/DeviceList';
-import {NoDevicesFound} from './components/NoDevicesFound';
-import {SelfFingerprint} from './components/SelfFingerprint';
-import {FIND_MODE, UserDevicesState} from './UserDevices.types';
+import {DeviceDetails} from './components/deviceDetails';
+import {DeviceList} from './components/deviceList';
+import {NoDevicesFound} from './components/noDevicesFound';
+import {SelfFingerprint} from './components/selfFingerprint';
+import {FIND_MODE, UserDevicesState} from './userDevices.types';
 
 export interface UserDevicesHistoryEntry {
   headline: string;

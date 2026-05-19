@@ -29,14 +29,14 @@ import {Button, ContainerXS, Form, H1, Input, Small} from '@wireapp/react-ui-kit
 import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
 
-import {Page} from './Page';
+import {Page} from './page';
 
-import {Config} from '../../Config';
-import {Exception} from '../component/Exception';
+import {Config} from '../../config';
+import {Exception} from '../component/exception';
 import {actionRoot} from '../module/action';
-import {ValidationError} from '../module/action/ValidationError';
+import {ValidationError} from '../module/action/validationError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import * as SelfSelector from '../module/selector/SelfSelector';
+import * as SelfSelector from '../module/selector/selfSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;

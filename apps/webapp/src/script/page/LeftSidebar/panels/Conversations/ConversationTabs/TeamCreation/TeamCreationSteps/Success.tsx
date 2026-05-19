@@ -24,14 +24,14 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
-import {StepProps} from './StepProps';
-import {listCss, modalButtonsCss, successStepSubHeaderCss} from './TeamCreationSteps.styles';
+import {StepProps} from './stepProps';
+import {listCss, modalButtonsCss, successStepSubHeaderCss} from './teamCreationSteps.styles';
 
-import {buttonCss} from '../TeamCreation.styles';
+import {buttonCss} from '../teamCreation.styles';
 
 export const Success = ({onSuccess, teamName, userName}: StepProps) => {
   const handleOpenTeamsClick = () => {

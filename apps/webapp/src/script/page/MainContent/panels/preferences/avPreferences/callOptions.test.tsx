@@ -23,14 +23,14 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {MediaConstraintsHandler} from 'Repositories/media/mediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
-import {CallOptions} from './CallOptions';
+import {CallOptions} from './callOptions';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 
 jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,

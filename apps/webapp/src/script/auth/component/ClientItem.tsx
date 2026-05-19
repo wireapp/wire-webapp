@@ -42,7 +42,7 @@ import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
-import {ValidationError} from '../module/action/ValidationError';
+import {ValidationError} from '../module/action/validationError';
 import {parseError, parseValidationErrors} from '../util/errorUtil';
 
 interface Props extends HTMLProps<HTMLDivElement> {

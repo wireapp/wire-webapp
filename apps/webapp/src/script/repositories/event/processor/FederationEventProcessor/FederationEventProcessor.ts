@@ -21,20 +21,20 @@ import {FEDERATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 import {debounce} from 'underscore';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {ConversationStatus} from 'Repositories/conversation/conversationStatus';
+import {EventBuilder} from 'Repositories/conversation/eventBuilder';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {ServerTimeHandler} from 'src/script/time/serverTimeHandler';
 
 import {
   getUsersToDeleteFromFederatedConversations,
   getFederationDeleteEventUpdates,
-} from './ConversationFederationUtils';
+} from './conversationFederationUtils';
 
-import {EventProcessor, IncomingEvent} from '../../EventProcessor';
-import {EventRepository} from '../../EventRepository';
+import {EventProcessor, IncomingEvent} from '../../eventProcessor';
+import {EventRepository} from '../../eventRepository';
 
 export class FederationEventProcessor implements EventProcessor {
   constructor(

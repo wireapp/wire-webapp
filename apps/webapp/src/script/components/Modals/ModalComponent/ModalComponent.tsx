@@ -31,9 +31,9 @@ import {
   ModalContentVisibleStyles,
   ModalOverlayStyles,
   ModalOverlayVisibleStyles,
-} from './ModalComponent.styles';
+} from './modalComponent.styles';
 
-import {LoadingIcon} from '../../Icon';
+import {LoadingIcon} from '../../icon';
 
 interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
   children: React.ReactNode;

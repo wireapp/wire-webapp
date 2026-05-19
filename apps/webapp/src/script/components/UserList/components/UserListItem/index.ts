@@ -17,4 +17,4 @@
  *
  */
 
-export * from './UserListItem';
+export * from './userListItem';

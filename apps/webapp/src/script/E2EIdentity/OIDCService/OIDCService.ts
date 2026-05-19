@@ -22,7 +22,7 @@ import {UserManager, UserManagerSettings, WebStorageStateStore} from 'oidc-clien
 
 import {clearKeysStartingWith} from 'Util/localStorage';
 
-import {EncryptedStorage} from './OauthEncryptedStore';
+import {EncryptedStorage} from './oauthEncryptedStore';
 
 export class OIDCService {
   private readonly userManager: UserManager;

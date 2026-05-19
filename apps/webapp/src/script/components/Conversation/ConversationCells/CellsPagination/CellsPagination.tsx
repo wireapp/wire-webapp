@@ -21,11 +21,11 @@ import {useCallback} from 'react';
 
 import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
-import {CellsPageList} from './CellsPageList/CellsPageList';
-import {CellsPageSizeSelect} from './CellsPageSizeSelect/CellsPageSizeSelect';
+import {CellsPageList} from './cellsPageList/cellsPageList';
+import {CellsPageSizeSelect} from './cellsPageSizeSelect/cellsPageSizeSelect';
 import {
   pagesContainerStyles,
   arrowButtonStyles,
@@ -37,7 +37,7 @@ import {
   pageResultStyles,
   arrowPreviousIconDisabledStyles,
   arrowNextIconDisabledStyles,
-} from './CellsPagination.styles';
+} from './cellsPagination.styles';
 
 interface CellsPaginationProps {
   currentPage?: number;

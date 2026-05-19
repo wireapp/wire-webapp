@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 
 const REFRESH_INTERVAL_MS = 10000;
 const MAX_REFRESH_COUNT = 5;

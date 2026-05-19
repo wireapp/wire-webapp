@@ -21,7 +21,7 @@ import {RegisteredClient} from '@wireapp/api-client/lib/client';
 
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {wasClientActiveWithinLast4Weeks} from './ClientUtils';
+import {wasClientActiveWithinLast4Weeks} from './clientUtils';
 
 const createClientWithLastActive = (date: Date): RegisteredClient => {
   return {last_active: date.toISOString()} as RegisteredClient;

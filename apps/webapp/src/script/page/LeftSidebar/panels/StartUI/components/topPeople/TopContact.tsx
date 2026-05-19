@@ -23,8 +23,8 @@ import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {User} from 'Repositories/entity/User';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {User} from 'Repositories/entity/user';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 

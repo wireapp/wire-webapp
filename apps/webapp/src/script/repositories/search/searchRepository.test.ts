@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
@@ -25,7 +25,7 @@ import {createUuid} from 'Util/uuid';
 import {SearchRepository} from './searchRepository';
 
 import {randomInt} from '../../auth/util/randomUtil';
-import {generateUsers} from '../../auth/util/test/TestUtil';
+import {generateUsers} from '../../auth/util/test/testUtil';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 

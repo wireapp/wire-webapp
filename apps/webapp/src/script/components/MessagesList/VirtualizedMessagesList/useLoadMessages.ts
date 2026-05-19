@@ -21,8 +21,8 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {Virtualizer} from '@tanstack/react-virtual';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 
 interface Props {

@@ -25,13 +25,13 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ClientState} from 'Repositories/client/ClientState';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
+import {ClientState} from 'Repositories/client/clientState';
+import type {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
 import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
-import {DeviceCard} from '../DeviceCard';
+import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import {DeviceCard} from '../deviceCard';
 
 interface SelfFingerprintProps {
   clientState?: ClientState;

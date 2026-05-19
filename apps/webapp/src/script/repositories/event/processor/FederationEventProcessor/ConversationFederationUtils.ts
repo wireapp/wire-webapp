@@ -17,8 +17,8 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 
 export interface FederationDeleteResult {
   /**

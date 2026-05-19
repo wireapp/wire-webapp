@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2026 Wire Swiss GmbH
+ * Copyright (C) 2022 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,28 +17,15 @@
  *
  */
 
-import type {ActiveFilterType} from '../driveFilters/driveFilters';
-import {FilterItem} from '../FilterPopover/FilterPopover';
+import './warningsContainer';
+import {hideWarning, showWarning} from './warningsState';
+import {CONFIG, TYPE} from './warningsTypes';
 
-export type {FilterItem};
-
-export type PopoverFilterConfig = {
-  type: 'popover';
-  id: ActiveFilterType;
-  label: string;
-  items: FilterItem[];
-  selectedIds: string[];
-  onSelectionChange: (ids: string[]) => void;
-  disabled?: boolean;
+const Warnings = {
+  CONFIG,
+  TYPE,
+  hideWarning,
+  showWarning,
 };
 
-export type ToggleFilterConfig = {
-  type: 'toggle';
-  id: ActiveFilterType;
-  label: string;
-  isActive: boolean;
-  onToggle: () => void;
-  disabled?: boolean;
-};
-
-export type FilterConfig = PopoverFilterConfig | ToggleFilterConfig;
+export {Warnings};

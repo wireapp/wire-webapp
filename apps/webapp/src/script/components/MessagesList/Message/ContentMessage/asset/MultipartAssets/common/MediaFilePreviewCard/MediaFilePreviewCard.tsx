@@ -30,7 +30,7 @@ import {
   loadingWrapperStyles,
   wrapperErrorStyles,
   wrapperStyles,
-} from './MediaFilePreviewCard.styles';
+} from './mediaFilePreviewCard.styles';
 
 interface MediaFilePreviewCardProps {
   label: string;

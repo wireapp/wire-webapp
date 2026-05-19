@@ -22,11 +22,11 @@ import type {FormEvent} from 'react';
 import {ValidationUtil} from '@wireapp/commons';
 import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
-import {Config} from 'src/script/Config';
+import {PasswordGeneratorButton} from 'Components/passwordGeneratorButton';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 
-import {errorMessageStyles} from './GuestLinkPasswordForm.styles';
+import {errorMessageStyles} from './guestLinkPasswordForm.styles';
 
 interface GuestLinkPasswordFormProps {
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;

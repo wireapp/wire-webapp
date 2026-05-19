@@ -24,12 +24,12 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
-import {CellsTableDateColumn} from './CellsTableDateColumn/CellsTableDateColumn';
-import {CellsTableNameColumn} from './CellsTableNameColumn/CellsTableNameColumn';
-import {CellsTableOwnerColumn} from './CellsTableOwnerColumn/CellsTableOwnerColumn';
-import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions';
-import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
-import {CellsTagsColumn} from './CellsTagsColumn/CellsTagsColumn';
+import {CellsTableDateColumn} from './cellsTableDateColumn/cellsTableDateColumn';
+import {CellsTableNameColumn} from './cellsTableNameColumn/cellsTableNameColumn';
+import {CellsTableOwnerColumn} from './cellsTableOwnerColumn/cellsTableOwnerColumn';
+import {CellsTableRowOptions} from './cellsTableRowOptions/cellsTableRowOptions';
+import {CellsTableSharedColumn} from './cellsTableSharedColumn/cellsTableSharedColumn';
+import {CellsTagsColumn} from './cellsTagsColumn/cellsTagsColumn';
 
 const columnHelper = createColumnHelper<CellNode>();
 

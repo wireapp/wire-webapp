@@ -17,9 +17,9 @@
  *
  */
 
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {EventService} from 'Repositories/event/EventService';
+import {ConversationEphemeralHandler} from 'Repositories/conversation/conversationEphemeralHandler';
+import {Conversation} from 'Repositories/entity/conversation';
+import {EventService} from 'Repositories/event/eventService';
 
 const buildConversationEphemeralHandler = () => {
   const eventService = new EventService(null, null);

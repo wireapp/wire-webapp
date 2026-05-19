@@ -17,14 +17,14 @@
  *
  */
 
-import {DeleteEvent, MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {DeleteEvent, MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/eventBuilder';
 import {StoredEvent} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 
-import {QuoteEntity} from '../../../message/QuoteEntity';
-import {ClientEvent} from '../Client';
-import {EventMiddleware, IncomingEvent} from '../EventProcessor';
-import type {EventService} from '../EventService';
+import {QuoteEntity} from '../../../message/quoteEntity';
+import {ClientEvent} from '../client';
+import {EventMiddleware, IncomingEvent} from '../eventProcessor';
+import type {EventService} from '../eventService';
 
 export class RepliesUpdaterMiddleware implements EventMiddleware {
   private readonly logger: Logger;

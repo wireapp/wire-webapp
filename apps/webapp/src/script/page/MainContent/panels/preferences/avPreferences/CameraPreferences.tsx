@@ -21,17 +21,17 @@ import {memo, useCallback, useEffect, useRef, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/Icon';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaType} from 'Repositories/media/MediaType';
+import * as Icon from 'Components/icon';
+import {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
+import {MediaType} from 'Repositories/media/mediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {DeviceSelect} from './DeviceSelect';
+import {DeviceSelect} from './deviceSelect';
 
-import {Config} from '../../../../../Config';
-import {PreferencesSection} from '../components/PreferencesSection';
+import {Config} from '../../../../../config';
+import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('CameraPreferences');
 

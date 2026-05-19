@@ -22,7 +22,7 @@ import {Runtime} from '@wireapp/commons';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
-import {MediaDeviceType} from './MediaDeviceType';
+import {MediaDeviceType} from './mediaDeviceType';
 import {MediaDevicesState, mediaDevicesStore} from './useMediaDevicesStore';
 
 export interface ElectronDesktopCapturerSource {

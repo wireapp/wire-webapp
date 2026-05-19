@@ -24,19 +24,19 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, IconButton, IconButtonVariant, useMatchMedia} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
-import {UserName} from 'Components/UserName';
-import {User} from 'Repositories/entity/User';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {UserClassifiedBar} from 'Components/classifiedBar/classifiedBar';
+import {UnverifiedUserWarning} from 'Components/modals/userModal';
+import {UserName} from 'Components/userName';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {RootContext} from '../../page/RootProvider';
+import {RootContext} from '../../page/rootProvider';
 
 interface ConnectRequestsProps {
   readonly userState: UserState;

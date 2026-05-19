@@ -17,4 +17,4 @@
  *
  */
 
-export * from './StatusIcon';
+export * from './statusIcon';

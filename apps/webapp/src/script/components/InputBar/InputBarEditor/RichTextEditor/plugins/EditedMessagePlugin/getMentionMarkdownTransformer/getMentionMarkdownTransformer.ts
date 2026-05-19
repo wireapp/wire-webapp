@@ -19,7 +19,7 @@
 
 import {TextMatchTransformer} from '@lexical/markdown';
 
-import {$createMentionNode, $isMentionNode, MentionNode} from '../../../nodes/MentionNode';
+import {$createMentionNode, $isMentionNode, MentionNode} from '../../../nodes/mentionNode';
 
 // Cutom transformer for handling mentions when converting markdown to editor format.
 // Based on https://github.com/facebook/lexical/blob/main/packages/lexical-markdown/src/MarkdownTransformers.ts#L489

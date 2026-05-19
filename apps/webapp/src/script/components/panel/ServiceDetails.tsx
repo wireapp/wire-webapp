@@ -19,8 +19,8 @@
 
 import {useId} from 'react';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {authorLabel, description, header, panel} from 'Components/panel/ServiceDetails.styles';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {authorLabel, description, header, panel} from 'Components/panel/serviceDetails.styles';
 import type {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';

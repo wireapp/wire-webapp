@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {availabilityStatus} from 'Util/availabilityStatus';
 import {t} from 'Util/localizerUtil';
 
-import {ContextMenuEntry} from '../../../../../ui/ContextMenu';
+import {ContextMenuEntry} from '../../../../../ui/contextMenu';
 
 interface AvailabilityInputProps {
   availability: Availability.Type;

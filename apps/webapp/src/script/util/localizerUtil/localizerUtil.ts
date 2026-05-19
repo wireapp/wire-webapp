@@ -21,7 +21,7 @@ import is from '@sindresorhus/is';
 import {escape} from 'underscore';
 
 import en from 'I18n/en-US.json';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 
 import {Declension} from './localizerUtil.types';
 

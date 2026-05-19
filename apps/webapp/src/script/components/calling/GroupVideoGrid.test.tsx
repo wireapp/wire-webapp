@@ -21,14 +21,14 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {CALL_TYPE, VIDEO_STATE} from '@wireapp/avs';
 
-import {Call} from 'Repositories/calling/Call';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Call} from 'Repositories/calling/call';
+import {Participant} from 'Repositories/calling/participant';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 
-import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
+import {GroupVideoGrid, GroupVideoGripProps} from './groupVideoGrid';
 
-import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
+import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
 
 jest.mock('Components/Avatar', () => ({
   AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},

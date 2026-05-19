@@ -29,19 +29,19 @@ import {Runtime} from '@wireapp/commons';
 import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
 import {StorageKey} from 'Repositories/storage';
-import {navigate} from 'src/script/router/Router';
+import {navigate} from 'src/script/router/router';
 import {t} from 'Util/localizerUtil';
 import {storeValue} from 'Util/storageUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
-import {Page} from './Page';
+import {Page} from './page';
 
-import {AcceptNewsModal} from '../component/AcceptNewsModal';
-import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
+import {AcceptNewsModal} from '../component/acceptNewsModal';
+import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, ThunkDispatch} from '../module/reducer';
-import * as SelfSelector from '../module/selector/SelfSelector';
+import * as SelfSelector from '../module/selector/selfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import {createSuggestions} from '../util/handleUtil';

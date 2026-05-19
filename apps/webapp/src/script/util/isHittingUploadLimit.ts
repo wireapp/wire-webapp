@@ -17,7 +17,7 @@
  *
  */
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {t} from 'Util/localizerUtil';
 

@@ -24,7 +24,7 @@ import {escape} from 'underscore';
 import {highlightCode, languages} from './highlightCode';
 import {replaceInRange} from './stringUtil';
 
-import type {MentionEntity} from '../message/MentionEntity';
+import type {MentionEntity} from '../message/mentionEntity';
 
 interface MentionText {
   domain: string | null | undefined;

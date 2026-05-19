@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import {getCellsApiPath} from 'Components/Conversation/ConversationCells/common/getCellsApiPath/getCellsApiPath';
+import {getCellsApiPath} from 'Components/conversation/conversationCells/common/getCellsApiPath/getCellsApiPath';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 

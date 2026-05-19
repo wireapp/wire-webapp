@@ -19,13 +19,13 @@
 
 import {AssetType} from 'Repositories/assets/assetType';
 
-import {ContentMessage} from './ContentMessage';
-import {FileAsset} from './FileAsset';
-import {Message} from './Message';
-import {Multipart} from './Multipart';
-import {Text} from './Text';
+import {ContentMessage} from './contentMessage';
+import {FileAsset} from './fileAsset';
+import {Message} from './message';
+import {Multipart} from './multipart';
+import {Text} from './text';
 
-import {SuperType} from '../../../message/SuperType';
+import {SuperType} from '../../../message/superType';
 
 describe('Message', () => {
   describe('getMultipartAssets', () => {

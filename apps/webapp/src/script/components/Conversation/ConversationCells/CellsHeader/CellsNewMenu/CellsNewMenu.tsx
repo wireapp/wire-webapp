@@ -26,9 +26,9 @@ import {Button, ButtonVariant, DropdownMenu, PlusIcon} from '@wireapp/react-ui-k
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
-import {CellsNewFileModal} from './CellsNewFileModal/CellsNewFileModal';
-import {CellsNewFolderModal} from './CellsNewFolderModal/CellsNewFolderModal';
-import {buttonStyles, iconStyles} from './CellsNewMenu.styles';
+import {CellsNewFileModal} from './cellsNewFileModal/cellsNewFileModal';
+import {CellsNewFolderModal} from './cellsNewFolderModal/cellsNewFolderModal';
+import {buttonStyles, iconStyles} from './cellsNewMenu.styles';
 
 import {getCellsFilesPath} from '../../common/getCellsFilesPath/getCellsFilesPath';
 

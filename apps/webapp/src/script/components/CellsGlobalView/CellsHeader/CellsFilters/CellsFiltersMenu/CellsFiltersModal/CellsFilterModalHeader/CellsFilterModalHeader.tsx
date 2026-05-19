@@ -21,7 +21,7 @@ import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {closeButtonStyles, headerStyles, headingStyles} from './CellsFilterModalHeader.styles';
+import {closeButtonStyles, headerStyles, headingStyles} from './cellsFilterModalHeader.styles';
 
 interface CellsFilterModalHeaderProps {
   onClose: () => void;

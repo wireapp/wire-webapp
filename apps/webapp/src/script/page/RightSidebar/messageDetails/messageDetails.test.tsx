@@ -20,10 +20,10 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {User} from 'Repositories/entity/user';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -31,7 +31,7 @@ import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './messageDetails';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

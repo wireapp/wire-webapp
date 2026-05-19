@@ -19,11 +19,11 @@
 
 import {AlertIcon, UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
+import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
 
-import {errorIconStyles, unavailableIconStyles} from './FileCardIcon.styles';
+import {errorIconStyles, unavailableIconStyles} from './fileCardIcon.styles';
 
-import {useFileCardContext} from '../common/FileCardContext/FileCardContext';
+import {useFileCardContext} from '../common/fileCardContext/fileCardContext';
 
 interface FileCardIconProps {
   type?: 'file' | 'error' | 'unavailable';

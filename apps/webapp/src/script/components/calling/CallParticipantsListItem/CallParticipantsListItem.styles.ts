@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {listWrapper} from '../../ParticipantItemContent/ParticipantItem.styles';
+import {listWrapper} from '../../participantItemContent/participantItem.styles';
 
 export const callParticipantListItemWrapper = (isLast = false): CSSObject => ({
   ...listWrapper({noUnderline: true, noInteraction: true}),

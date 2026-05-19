@@ -24,8 +24,8 @@ import {Runtime} from '@wireapp/commons';
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {User} from 'Repositories/entity/User';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
@@ -34,7 +34,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {externalUrl, getManageTeamUrl} from '../../../../../externalRoute';
-import {PreferencesSection} from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/preferencesSection';
 
 interface AccountSecuritySectionProps {
   appLockState?: AppLockState;

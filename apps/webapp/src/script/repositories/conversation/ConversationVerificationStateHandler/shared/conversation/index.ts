@@ -19,14 +19,14 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {UserState} from 'Repositories/user/userState';
 import {Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {isMLSCapableConversation, MLSCapableConversation} from '../../../ConversationSelectors';
-import {ConversationState} from '../../../ConversationState';
-import {ConversationVerificationState} from '../../../ConversationVerificationState';
+import {isMLSCapableConversation, MLSCapableConversation} from '../../../conversationSelectors';
+import {ConversationState} from '../../../conversationState';
+import {ConversationVerificationState} from '../../../conversationVerificationState';
 
 interface GetActiveConversationsWithUsersParams {
   userIds: QualifiedId[];

@@ -36,13 +36,13 @@ import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger, Logger} from 'Util/logger';
 import {toError} from 'Util/toError';
 
-import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
+import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './client';
 
 import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
 import {StorageError} from '../../error/storageError';
-import {categoryFromEvent} from '../../message/MessageCategorization';
-import {MessageCategory} from '../../message/MessageCategory';
+import {categoryFromEvent} from '../../message/messageCategorization';
+import {messageCategory} from '../../message/messageCategory';
 
 type Includes = {includeFrom: boolean; includeTo: boolean};
 type DexieCollection = Dexie.Collection<any, any>;
@@ -180,8 +180,8 @@ export class EventService {
    */
   async loadEventsWithCategory(
     conversationId: string,
-    categoryMin: MessageCategory,
-    categoryMax = MessageCategory.LIKED,
+    categoryMin: messageCategory,
+    categoryMax = messageCategory.LIKED,
   ): Promise<DBEvents> {
     const filterExpired = (record: EventRecord) => {
       if (typeof record.ephemeral_expires !== 'undefined') {

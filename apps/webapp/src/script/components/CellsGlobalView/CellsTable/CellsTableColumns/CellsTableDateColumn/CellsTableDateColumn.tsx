@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
+import {MessageTime} from 'Components/messagesList/message/messageTime';
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 
 interface CellsTableDateColumnProps {

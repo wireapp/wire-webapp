@@ -21,10 +21,10 @@ import {MutableRefObject} from 'react';
 
 import {LexicalEditor} from 'lexical';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {User} from 'Repositories/entity/User';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {User} from 'Repositories/entity/user';
 
-import {RichTextEditor} from './RichTextEditor';
+import {RichTextEditor} from './richTextEditor';
 
 import {DraftState} from '../common/draftState/draftState';
 import {MessageContent} from '../common/messageContent/messageContent';

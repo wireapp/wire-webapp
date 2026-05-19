@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 
 import {getLogger, Logger} from 'Util/logger';
 
-import {CryptographyMapper} from './CryptographyMapper';
+import {CryptographyMapper} from './cryptographyMapper';
 
 import {Core} from '../../service/coreSingleton';
 

@@ -25,27 +25,27 @@ import {CALL_TYPE, REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/av
 import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useAppNotification} from 'Components/AppNotification';
-import {callingContainer} from 'Components/calling/CallingCell/CallingCell.styles';
-import {CallingControls} from 'Components/calling/CallingCell/CallingControls';
-import {CallingHeader} from 'Components/calling/CallingCell/CallingHeader';
-import {GroupVideoGrid} from 'Components/calling/GroupVideoGrid';
+import {useAppNotification} from 'Components/appNotification';
+import {callingContainer} from 'Components/calling/callingCell/callingCell.styles';
+import {CallingControls} from 'Components/calling/callingCell/callingControls';
+import {CallingHeader} from 'Components/calling/callingCell/callingHeader';
+import {GroupVideoGrid} from 'Components/calling/groupVideoGrid';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import * as Icon from 'Components/Icon';
+import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
+import * as Icon from 'Components/icon';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {Call} from 'Repositories/calling/Call';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallState';
-import type {Participant} from 'Repositories/calling/Participant';
+import type {Call} from 'Repositories/calling/call';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
+import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/callState';
+import type {Participant} from 'Repositories/calling/participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {TeamState} from 'Repositories/team/teamState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceOrEnterKey} from 'Util/keyboardUtil';
@@ -54,7 +54,7 @@ import {t} from 'Util/localizerUtil';
 import {usePressSpaceToUnmute} from './usePressSpaceToUnmute/usePressSpaceToUnmute';
 
 import {generateConversationUrl} from '../../../router/routeGenerator';
-import {CallActions, CallViewTab} from '../../../view_model/CallingViewModel';
+import {CallActions, CallViewTab} from '../../../viewModel/callingViewModel';
 
 interface VideoCallProps {
   hasAccessToCamera?: boolean;

@@ -21,18 +21,18 @@ import {useMemo} from 'react';
 
 import cx from 'classnames';
 
-import * as Icons from 'Components/Icon';
-import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
-import {useFolderStore} from 'src/script/page/LeftSidebar/panels/Conversations/useFoldersStore';
+import * as Icons from 'Components/icon';
+import {createLabel, LabelType} from 'Repositories/conversation/conversationLabelRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {Config} from 'src/script/config';
+import {useFolderStore} from 'src/script/page/leftSidebar/panels/conversations/useFoldersStore';
 import {
   SidebarStatus,
   SidebarTabs,
   useSidebarStore,
-} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
+} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {ContextMenuEntry, showContextMenu} from 'src/script/ui/contextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 

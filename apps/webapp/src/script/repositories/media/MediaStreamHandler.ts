@@ -21,23 +21,23 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
+import {CallingViewMode, CallState} from 'Repositories/calling/callState';
+import {BrowserPermissionStatus} from 'Repositories/permission/browserPermissionStatus';
 import {getPermissionStates} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
+import {PermissionType} from 'Repositories/permission/permissionType';
 import {getLogger, Logger} from 'Util/logger';
 import {toError} from 'Util/toError';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
-import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
-import {MEDIA_STREAM_ERROR} from './MediaStreamError';
-import {isMediaStreamReadDeviceError, MEDIA_STREAM_ERROR_TYPES} from './MediaStreamErrorTypes';
-import {MediaType} from './MediaType';
+import {MediaConstraintsHandler, ScreensharingMethods} from './mediaConstraintsHandler';
+import {MEDIA_STREAM_ERROR} from './mediaStreamError';
+import {isMediaStreamReadDeviceError, MEDIA_STREAM_ERROR_TYPES} from './mediaStreamErrorTypes';
+import {MediaType} from './mediaType';
 
 import {MediaError} from '../../error/mediaError';
 import {NoAudioInputError} from '../../error/noAudioInputError';
 import {PermissionError} from '../../error/permissionError';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 
 export class MediaStreamHandler {
   static get CONFIG() {

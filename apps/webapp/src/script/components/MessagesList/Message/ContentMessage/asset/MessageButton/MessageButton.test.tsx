@@ -20,11 +20,11 @@
 import {render} from '@testing-library/react';
 import ko from 'knockout';
 
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
 
-import {MessageButton} from './MessageButton';
+import {MessageButton} from './messageButton';
 
-import {withTheme} from '../../../../../../auth/util/test/TestUtil';
+import {withTheme} from '../../../../../../auth/util/test/testUtil';
 
 describe('MessageButton', () => {
   it('shows error message', async () => {

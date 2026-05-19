@@ -17,4 +17,4 @@
  *
  */
 
-export * from './CallingControls';
+export * from './callingControls';

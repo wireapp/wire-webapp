@@ -19,13 +19,13 @@
 
 import ko from 'knockout';
 
-import type {TERMINATION_REASON} from 'Repositories/calling/enum/TerminationReason';
+import type {TERMINATION_REASON} from 'Repositories/calling/enum/terminationReason';
 import {t} from 'Util/localizerUtil';
 
-import {Message} from './Message';
+import {Message} from './message';
 
-import {CALL_MESSAGE_TYPE} from '../../../message/CallMessageType';
-import {SuperType} from '../../../message/SuperType';
+import {CALL_MESSAGE_TYPE} from '../../../message/callMessageType';
+import {SuperType} from '../../../message/superType';
 
 export class CallMessage extends Message {
   private readonly call_message_type: CALL_MESSAGE_TYPE;

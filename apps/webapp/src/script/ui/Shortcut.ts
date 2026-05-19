@@ -25,7 +25,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {capitalizeFirstChar, includesString} from 'Util/stringUtil';
 
-import {ShortcutType} from './ShortcutType';
+import {ShortcutType} from './shortcutType';
 
 interface Shortcut {
   event: string;

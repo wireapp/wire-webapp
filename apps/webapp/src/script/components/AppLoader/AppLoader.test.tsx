@@ -19,7 +19,7 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
 import {AppLoader} from '.';
 

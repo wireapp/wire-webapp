@@ -26,30 +26,30 @@ import {isError} from 'underscore';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import type {Message} from 'Repositories/entity/message/message';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isConversationEntity} from 'Util/typePredicateUtil';
 
-import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
+import type {MainViewModel, ViewModelRepositories} from './mainViewModel';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 import {ConversationError} from '../error/conversationError';
-import '../page/LeftSidebar';
-import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
-import '../page/MainContent';
-import {PanelState} from '../page/RightSidebar';
+import '../page/leftSidebar';
+import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+import '../page/mainContent';
+import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, useAppState} from '../page/useAppState';
 import {generateConversationUrl} from '../router/routeGenerator';
-import {navigate, setHistoryParam} from '../router/Router';
+import {navigate, setHistoryParam} from '../router/router';
 
 interface ShowConversationOptions {
   exposeMessage?: Message;

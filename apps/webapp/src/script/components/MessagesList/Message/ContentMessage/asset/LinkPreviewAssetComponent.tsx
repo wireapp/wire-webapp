@@ -21,9 +21,9 @@ import {UIEvent, useRef} from 'react';
 
 import cx from 'classnames';
 
-import {Image} from 'Components/Image';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {Text} from 'Repositories/entity/message/Text';
+import {Image} from 'Components/image';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {Text} from 'Repositories/entity/message/text';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
@@ -31,7 +31,7 @@ import {safeWindowOpen} from 'Util/sanitizationUtil';
 import {cleanURL, prependProtocol} from 'Util/urlUtil';
 import {isTweetUrl} from 'Util/validationUtil';
 
-import {AssetHeader} from './common/AssetHeader/AssetHeader';
+import {AssetHeader} from './common/assetHeader/assetHeader';
 
 import {useMessageFocusedTabIndex} from '../../util';
 

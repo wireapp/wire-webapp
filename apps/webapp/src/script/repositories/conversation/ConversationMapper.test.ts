@@ -32,15 +32,15 @@ import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {BaseError} from 'src/script/error/baseError';
 import {createUuid} from 'Util/uuid';
 
-import {ACCESS_STATE} from './AccessState';
-import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
-import {ConversationStatus} from './ConversationStatus';
-import {ConversationVerificationState} from './ConversationVerificationState';
-import {NOTIFICATION_STATE} from './NotificationSetting';
+import {ACCESS_STATE} from './accessState';
+import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './conversationMapper';
+import {ConversationStatus} from './conversationStatus';
+import {ConversationVerificationState} from './conversationVerificationState';
+import {NOTIFICATION_STATE} from './notificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
 

@@ -23,7 +23,7 @@ import {Select} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {wrapperStyles, labelStyles, selectWrapperStyles, selectStyles} from './CellsPageSizeSelect.styles';
+import {wrapperStyles, labelStyles, selectWrapperStyles, selectStyles} from './cellsPageSizeSelect.styles';
 
 const options = [
   {value: '10', label: '10'},

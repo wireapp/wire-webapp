@@ -37,11 +37,11 @@ import {exposeWrapperGlobals} from 'Util/wrapper';
 import './configureEnvironment';
 import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
-import {Root} from './page/Root';
+import {Root} from './page/root';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
-import {setAppLocale} from '../localization/Localizer';
+import {setAppLocale} from '../localization/localizer';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
 import {createAPIClient} from '../service/createApiClient';
@@ -98,7 +98,7 @@ async function runApp() {
   setAppLocale();
   if (hotReloadCapableModule.hot !== undefined) {
     hotReloadCapableModule.hot.accept('./page/Root', () => {
-      render(require('./page/Root').Root);
+      render(require('./page/root').Root);
     });
   }
 }

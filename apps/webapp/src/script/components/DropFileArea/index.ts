@@ -17,4 +17,4 @@
  *
  */
 
-export * from './DropFileArea';
+export * from './dropFileArea';

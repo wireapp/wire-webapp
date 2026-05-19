@@ -30,10 +30,10 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {LegalHoldStatus} from '@wireapp/core/lib/conversation/content';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/conversationMapper';
+import {ConversationStatus} from 'Repositories/conversation/conversationStatus';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import {Conversation} from 'Repositories/entity/conversation';
 import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 

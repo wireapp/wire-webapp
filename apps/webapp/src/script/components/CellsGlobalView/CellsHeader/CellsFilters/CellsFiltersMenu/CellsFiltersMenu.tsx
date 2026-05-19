@@ -23,11 +23,11 @@ import {IconButton, IconButtonVariant, OptionsIcon} from '@wireapp/react-ui-kit'
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
-import {buttonStyles, counterStyles} from './CellsFiltersMenu.styles';
-import {CellsFiltersModal} from './CellsFiltersModal/CellsFiltersModal';
+import {buttonStyles, counterStyles} from './cellsFiltersMenu.styles';
+import {CellsFiltersModal} from './cellsFiltersModal/cellsFiltersModal';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';
 
-import {useApplicationContext} from '../../../../../page/RootProvider';
+import {useApplicationContext} from '../../../../../page/rootProvider';
 
 interface CellsFiltersMenuProps {
   activeFiltersCount: number;

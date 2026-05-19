@@ -22,14 +22,14 @@ import {CONVERSATION_TYPE, MLSConversation} from '@wireapp/api-client/lib/conver
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {container} from 'tsyringe';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {Core} from 'src/script/service/coreSingleton';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
 
-import {E2EICertificateDetails} from './E2EICertificateDetails';
+import {E2EICertificateDetails} from './e2eiCertificateDetails';
 
 const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
   status,

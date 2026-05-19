@@ -22,7 +22,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
-import {ConversationProtocolDetails} from './ConversationProtocolDetails';
+import {ConversationProtocolDetails} from './conversationProtocolDetails';
 
 describe('ConversationProtocolDetails', () => {
   it('renders the correct infos for the conversation with mls protocol', () => {

@@ -17,9 +17,9 @@
  *
  */
 
-import {Message} from './Message';
+import {Message} from './message';
 
-import {SuperType} from '../../../message/SuperType';
+import {SuperType} from '../../../message/superType';
 
 /**
  * Federation stop system message

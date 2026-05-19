@@ -57,13 +57,13 @@ import sk from 'I18n/sk-SK.json';
 import sl from 'I18n/sl-SI.json';
 import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {Participant} from 'Repositories/calling/participant';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/effects/backgroundEffectsController';
 import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,

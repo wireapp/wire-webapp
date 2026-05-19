@@ -19,8 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {useAppNotification} from 'Components/AppNotification';
-import {useCellsStore} from 'Components/Conversation/ConversationCells/common/useCellsStore/useCellsStore';
+import {useAppNotification} from 'Components/appNotification';
+import {useCellsStore} from 'Components/conversation/conversationCells/common/useCellsStore/useCellsStore';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 

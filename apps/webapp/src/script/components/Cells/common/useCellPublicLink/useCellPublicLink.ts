@@ -23,8 +23,8 @@ import is from '@sindresorhus/is';
 import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {Config} from 'src/script/config';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import type {CellNode} from 'src/script/types/cellNode';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';

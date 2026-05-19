@@ -26,7 +26,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-import {FileHistoryContent} from './FileHistoryContent';
+import {FileHistoryContent} from './fileHistoryContent';
 import {FileVersion} from './types';
 
 type RenderFileHistoryContent = (fileVersions: Record<string, FileVersion[]>) => ReturnType<typeof render>;

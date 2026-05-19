@@ -17,4 +17,4 @@
  *
  */
 
-export * from './EmptyConversationList';
+export * from './emptyConversationList';

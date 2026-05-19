@@ -19,11 +19,11 @@
 
 import {useState} from 'react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {Config} from 'src/script/config';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

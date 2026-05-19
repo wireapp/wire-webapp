@@ -27,18 +27,18 @@ import {ValidationUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, Checkbox, CheckboxLabel, Input, Link, LinkVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import * as Icon from 'Components/icon';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {ClientRepository} from 'Repositories/client';
-import {ClientState} from 'Repositories/client/ClientState';
+import {ClientState} from 'Repositories/client/clientState';
 import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
-import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
-import {Config} from 'src/script/Config';
+import {SIGN_OUT_REASON} from 'src/script/auth/signOutReason';
+import {Config} from 'src/script/config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {applockStyles} from './Applock.styles';
+import {applockStyles} from './applock.styles';
 
 export enum APPLOCK_STATE {
   FORGOT = 'applock.forgot',

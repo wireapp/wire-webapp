@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -29,7 +29,7 @@ import {
   restoreModalContainerCss,
   restoreModalDescriptionCss,
   restoreModalTitleCss,
-} from './FileHistoryModal.styles';
+} from './fileHistoryModal.styles';
 
 interface FileRestoreConfirmModalProps {
   isLoading: boolean;

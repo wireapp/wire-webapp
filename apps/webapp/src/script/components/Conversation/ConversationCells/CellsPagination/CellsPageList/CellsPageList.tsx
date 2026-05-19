@@ -19,7 +19,7 @@
 
 import {Bold} from '@wireapp/react-ui-kit';
 
-import {listStyles, numberActiveStyles, numberStyles} from './CellsPageList.styles';
+import {listStyles, numberActiveStyles, numberStyles} from './cellsPageList.styles';
 
 interface CellsPageListProps {
   currentPage?: number;

@@ -25,25 +25,25 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {listCSS} from 'Components/panel/PanelActions/PanelActions.styles';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import type {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {listCSS} from 'Components/panel/panelActions/panelActions.styles';
+import {ACCESS_STATE} from 'Repositories/conversation/accessState';
+import type {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import type {MenuItem} from './PanelActions';
-import {PanelActions} from './PanelActions';
-import {SingleAction} from './SingleAction/SingleAction';
+import type {MenuItem} from './panelActions';
+import {PanelActions} from './panelActions';
+import {SingleAction} from './singleAction/singleAction';
 
-import type {ActionsViewModel} from '../../view_model/ActionsViewModel';
+import type {ActionsViewModel} from '../../viewModel/actionsViewModel';
 
 export enum Actions {
   ACCEPT_REQUEST = 'UserActions.ACCEPT_REQUEST',

@@ -22,8 +22,8 @@ import {container} from 'tsyringe';
 
 import {APIClient} from 'src/script/service/apiClientSingleton';
 
-import {GiphyRepository} from './GiphyRepository';
-import {GiphyService} from './GiphyService';
+import {GiphyRepository} from './giphyRepository';
+import {GiphyService} from './giphyService';
 
 const randomFooGiphyResponse = {
   data: {

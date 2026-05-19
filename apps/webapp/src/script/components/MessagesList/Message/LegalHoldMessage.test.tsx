@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/LegalHoldMessage';
+import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/legalHoldMessage';
 
-import {LegalHoldMessage} from './LegalHoldMessage';
+import {LegalHoldMessage} from './legalHoldMessage';
 
 const createLegalHoldMessage = (partialLegalHoldMessage: Partial<LegalHoldMessageEntity>) => {
   const legalHoldMessage: Partial<LegalHoldMessageEntity> = {

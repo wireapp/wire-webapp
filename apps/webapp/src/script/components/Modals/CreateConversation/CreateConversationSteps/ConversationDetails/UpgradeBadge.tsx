@@ -19,7 +19,7 @@
 
 import {t} from 'Util/localizerUtil';
 
-import {upgradeBadgeCss} from './ConversationDetails.styles';
+import {upgradeBadgeCss} from './conversationDetails.styles';
 
 export const UpgradeBadge = () => {
   return <div css={upgradeBadgeCss}>{t('createConversationUpgradeBadge')}</div>;

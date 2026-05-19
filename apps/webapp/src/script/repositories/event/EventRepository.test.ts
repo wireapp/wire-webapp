@@ -23,15 +23,15 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 
-import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {ClientConversationEvent} from 'Repositories/conversation/eventBuilder';
+import {Warnings} from '../../viewModel/warningsContainer';
 
-import {ClientEvent} from './Client';
-import {EventRepository} from './EventRepository';
-import {EventSource} from './EventSource';
-import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
+import {ClientEvent} from './client';
+import {EventRepository} from './eventRepository';
+import {EventSource} from './eventSource';
+import {NOTIFICATION_HANDLING_STATE} from './notificationHandlingState';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 
 const testFactory = new TestFactory();
 

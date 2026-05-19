@@ -29,20 +29,20 @@ import {container} from 'tsyringe';
 import {UrlUtil} from '@wireapp/commons';
 import {Button, ButtonVariant, ContainerXS, ErrorMessage, Text} from '@wireapp/react-ui-kit';
 
-import {LogoFullIcon} from 'Components/Icon';
+import {LogoFullIcon} from 'Components/icon';
 import {useSingleInstance} from 'Hooks/useSingleInstance';
 import {Core} from 'src/script/service/coreSingleton';
 import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';
 import {t} from 'Util/localizerUtil';
 
-import {Page} from './Page';
+import {Page} from './page';
 
-import {Config} from '../../Config';
-import '../../localization/Localizer';
+import {Config} from '../../config';
+import '../../localization/localizer';
 import {actionRoot} from '../module/action';
 import {bindActionCreators, RootState} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
+import * as AuthSelector from '../module/selector/authSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {getEnterpriseLoginV2FF} from '../util/helpers';
 import {logoutReasonStrings} from '../util/logoutUtil';

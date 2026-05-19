@@ -21,7 +21,7 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {CloseIcon} from 'Components/Icon';
+import {CloseIcon} from 'Components/icon';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 interface AssetLoaderProps {

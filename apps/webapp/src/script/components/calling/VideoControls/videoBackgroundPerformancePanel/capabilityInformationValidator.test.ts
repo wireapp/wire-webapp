@@ -1,5 +1,5 @@
 import {Maybe} from 'true-myth';
-import {areCapabilityInfosEqual} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
+import {areCapabilityInfosEqual} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
 import {createFactory} from '@enormora/objectory';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 

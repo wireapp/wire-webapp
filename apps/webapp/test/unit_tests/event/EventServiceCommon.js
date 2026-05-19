@@ -21,7 +21,7 @@ import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {ConversationError} from 'src/script/error/conversationError';
 import {StorageError} from 'src/script/error/storageError';
-import {MessageCategory} from 'src/script/message/MessageCategory';
+import {messageCategory} from 'src/script/message/messageCategory';
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../helper/TestFactory';
@@ -279,7 +279,7 @@ const testEventServiceClass = (testedServiceName, className) => {
 
       it('should return no entry matches the given category', () => {
         return testFactory[testedServiceName]
-          .loadEventsWithCategory(events[0].conversation, MessageCategory.VIDEO)
+          .loadEventsWithCategory(events[0].conversation, messageCategory.VIDEO)
           .then(result => {
             expect(result.length).toBe(0);
           });
@@ -287,7 +287,7 @@ const testEventServiceClass = (testedServiceName, className) => {
 
       it('should get images in the correct order', () => {
         return testFactory[testedServiceName]
-          .loadEventsWithCategory(events[0].conversation, MessageCategory.IMAGE)
+          .loadEventsWithCategory(events[0].conversation, messageCategory.IMAGE)
           .then(result => {
             expect(result.length).toBe(2);
             expect(result[0].id).toBe(events[1].id);
@@ -305,7 +305,7 @@ const testEventServiceClass = (testedServiceName, className) => {
         time: '2016-08-04T13:27:58.993Z',
         type: 'conversation.message-add',
       };
-      const categorizedEvent = {...newEvent, category: MessageCategory.TEXT};
+      const categorizedEvent = {...newEvent, category: messageCategory.TEXT};
 
       it('save event in the database', () => {
         spyOn(testFactory.storage_service, 'save').and.callFake(event => Promise.resolve(event));

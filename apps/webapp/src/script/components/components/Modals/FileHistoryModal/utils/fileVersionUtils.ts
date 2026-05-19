@@ -20,4 +20,4 @@
 export {
   groupVersionsByDate,
   transformRestVersionToFileVersion,
-} from '../../../../Modals/FileHistoryModal/utils/fileVersionUtils';
+} from '../../../../modals/fileHistoryModal/utils/fileVersionUtils';

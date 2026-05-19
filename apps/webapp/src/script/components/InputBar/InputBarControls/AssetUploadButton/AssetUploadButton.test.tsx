@@ -19,7 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
-import {AssetUploadButton} from './AssetUploadButton';
+import {AssetUploadButton} from './assetUploadButton';
 
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
 

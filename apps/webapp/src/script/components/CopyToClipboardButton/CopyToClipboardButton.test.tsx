@@ -19,9 +19,9 @@
 
 import {render, waitFor, act} from '@testing-library/react';
 
-import {CopyToClipboardButton} from './CopyToClipboardButton';
+import {CopyToClipboardButton} from './copyToClipboardButton';
 
-import {withTheme} from '../../auth/util/test/TestUtil';
+import {withTheme} from '../../auth/util/test/testUtil';
 
 jest.mock('Util/clipboardUtil', () => ({
   copyText: jest.fn(),

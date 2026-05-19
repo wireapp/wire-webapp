@@ -17,14 +17,14 @@
  *
  */
 
-import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'Repositories/entity/User';
-import {StatusType} from 'src/script/message/StatusType';
+import {ConfirmationEvent} from 'Repositories/conversation/eventBuilder';
+import {User} from 'Repositories/entity/user';
+import {StatusType} from 'src/script/message/statusType';
 import {createUuid} from 'Util/uuid';
 
-import {ReceiptsMiddleware} from './ReceiptsMiddleware';
+import {ReceiptsMiddleware} from './receiptsMiddleware';
 
-import {ClientEvent} from '../Client';
+import {ClientEvent} from '../client';
 
 function buildReadReceiptMiddleware() {
   const selfUser = new User(createUuid());

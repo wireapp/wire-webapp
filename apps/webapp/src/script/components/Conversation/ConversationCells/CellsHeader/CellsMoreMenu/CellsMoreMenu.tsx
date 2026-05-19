@@ -23,7 +23,7 @@ import {DropdownMenu, IconButton, IconButtonVariant, MoreIcon, TrashIcon} from '
 
 import {t} from 'Util/localizerUtil';
 
-import {buttonStyles, itemStyles} from './CellsMoreMenu.styles';
+import {buttonStyles, itemStyles} from './cellsMoreMenu.styles';
 
 import {openBreadcrumb} from '../../common/openBreadcrumb/openBreadcrumb';
 import {RECYCLE_BIN_PATH} from '../../common/recycleBin/recycleBin';

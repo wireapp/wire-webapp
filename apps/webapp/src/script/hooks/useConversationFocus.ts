@@ -20,7 +20,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import type {KeyboardEvent as ReactKeyboardEvent} from 'react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {isKey, isTabKey, KEY} from 'Util/keyboardUtil';
 
 function useConversationFocus(conversations: Conversation[]) {

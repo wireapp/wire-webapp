@@ -25,18 +25,18 @@ import {ReactionType} from '@wireapp/core/lib/conversation';
 import {FireAndForgetInvoker} from '@wireapp/core';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {DownloadButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/DownloadButton';
-import {useMessageActionsState} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.state';
+import {DownloadButton} from 'Components/messagesList/message/contentMessage/messageActions/downloadButton';
+import {useMessageActionsState} from 'Components/messagesList/message/contentMessage/messageActions/messageActions.state';
 import {
   getActionsMenuCSS,
   getIconCSS,
   messageActionsMenuButton,
-} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageActions.styles';
-import {MessageReactions} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/MessageReactions';
-import {ReplyButton} from 'Components/MessagesList/Message/ContentMessage/MessageActions/ReplyButton';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+} from 'Components/messagesList/message/contentMessage/messageActions/messageActions.styles';
+import {MessageReactions} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions';
+import {ReplyButton} from 'Components/messagesList/message/contentMessage/messageActions/replyButton';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isTabKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';

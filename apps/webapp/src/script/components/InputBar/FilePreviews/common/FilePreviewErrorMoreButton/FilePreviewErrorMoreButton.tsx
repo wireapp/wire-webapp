@@ -21,12 +21,12 @@ import {KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
 
 import {MoreIcon} from '@wireapp/react-ui-kit';
 
-import {showContextMenu} from 'src/script/ui/ContextMenu';
+import {showContextMenu} from 'src/script/ui/contextMenu';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {buttonStyles, iconStyles} from './FilePreviewErrorMoreButton.styles';
+import {buttonStyles, iconStyles} from './filePreviewErrorMoreButton.styles';
 
 interface FilePreviewErrorMoreButtonProps {
   onDelete: () => void;

@@ -19,7 +19,7 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {DropFileArea} from './DropFileArea';
+import {DropFileArea} from './dropFileArea';
 
 const getDefaultProps = () => ({
   onFileDropped: jest.fn(),

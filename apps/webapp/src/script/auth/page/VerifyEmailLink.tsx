@@ -26,11 +26,11 @@ import {ContainerXS, H1, H3, Muted} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {Page} from './Page';
+import {Page} from './page';
 
-import {RouterLink} from '../component/RouterLink';
+import {RouterLink} from '../component/routerLink';
 import {RootState} from '../module/reducer';
-import * as SelfSelector from '../module/selector/SelfSelector';
+import * as SelfSelector from '../module/selector/selfSelector';
 import {ROUTE} from '../route';
 
 type Props = React.HTMLProps<HTMLDivElement>;

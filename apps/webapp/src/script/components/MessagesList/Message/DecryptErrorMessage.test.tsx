@@ -21,10 +21,10 @@ import {act} from 'react';
 import {render, fireEvent} from '@testing-library/react';
 import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
-import {User} from 'Repositories/entity/User';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
+import {User} from 'Repositories/entity/user';
 
-import {DecryptErrorMessage} from './DecryptErrorMessage';
+import {DecryptErrorMessage} from './decryptErrorMessage';
 
 function createError(code: number) {
   const error = new DecryptErrorMessageEntity('client', code);

@@ -22,13 +22,13 @@ import {container} from 'tsyringe';
 import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 
-import {ChannelSettings} from './ChannelSettings';
-import {groupsNotAllowedSectionCss} from './ConversationDetails.styles';
-import {ConversationNameInput} from './ConversationNameInput';
+import {ChannelSettings} from './channelSettings';
+import {groupsNotAllowedSectionCss} from './conversationDetails.styles';
+import {ConversationNameInput} from './conversationNameInput';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ConversationType} from '../../types';
-import {Preference} from '../Preference';
+import {Preference} from '../preference';
 
 export const ConversationDetails = () => {
   const {conversationType} = useCreateConversationModal();

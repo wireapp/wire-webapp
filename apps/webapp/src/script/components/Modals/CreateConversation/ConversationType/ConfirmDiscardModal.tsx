@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -29,7 +29,7 @@ import {
   confirmConversationTextCss,
   confirmConversationButtonContainerCss,
   confirmConversationButtonCss,
-} from './ConversationType.styles';
+} from './conversationType.styles';
 
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';
 

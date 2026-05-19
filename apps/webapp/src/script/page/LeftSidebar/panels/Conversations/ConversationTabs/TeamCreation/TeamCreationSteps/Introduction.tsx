@@ -19,19 +19,19 @@
 
 import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 
-import {StepProps} from './StepProps';
+import {StepProps} from './stepProps';
 import {
   checkIconCss,
   introItemCss,
   introStepLinkCss,
   introStepSubHeaderCss,
   modalButtonsCss,
-} from './TeamCreationSteps.styles';
+} from './teamCreationSteps.styles';
 
-import {buttonCss} from '../TeamCreation.styles';
+import {buttonCss} from '../teamCreation.styles';
 
 export const Introduction = ({onNextStep}: StepProps) => {
   const featuresList = [

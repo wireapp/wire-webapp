@@ -25,14 +25,14 @@ import {
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
 import type {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {Logger, getLogger} from 'Util/logger';
 
-import type {ConversationService} from './ConversationService';
+import type {ConversationService} from './conversationService';
 
 export enum Permissions {
   addParticipants = 'add_conversation_member',

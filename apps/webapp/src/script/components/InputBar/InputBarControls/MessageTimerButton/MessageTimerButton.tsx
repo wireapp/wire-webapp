@@ -22,11 +22,11 @@ import {MouseEvent, KeyboardEvent} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/Icon';
-import {Conversation} from 'Repositories/entity/Conversation';
+import * as Icon from 'Components/icon';
+import {Conversation} from 'Repositories/entity/conversation';
 import {TeamState} from 'Repositories/team/teamState';
-import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
-import {showContextMenu} from 'src/script/ui/ContextMenu';
+import {EphemeralTimings} from 'src/script/ephemeral/ephemeralTimings';
+import {showContextMenu} from 'src/script/ui/contextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';

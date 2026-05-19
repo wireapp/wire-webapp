@@ -19,9 +19,9 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {JoinGuestLinkPasswordModal, JoinGuestLinkPasswordModalProps} from './JoinGuestLinkPasswordModal';
+import {JoinGuestLinkPasswordModal, JoinGuestLinkPasswordModalProps} from './joinGuestLinkPasswordModal';
 
-import {withIntl, withTheme} from '../util/test/TestUtil';
+import {withIntl, withTheme} from '../util/test/testUtil';
 
 describe('JoinGuestLinkPasswordModal', () => {
   const onSubmitPasswordMock = jest.fn();

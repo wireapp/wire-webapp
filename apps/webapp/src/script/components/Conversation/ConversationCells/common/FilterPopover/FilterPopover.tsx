@@ -43,7 +43,7 @@ import {
   searchRowStyles,
   startContentStyles,
   triggerButtonStyles,
-} from './FilterPopover.styles';
+} from './filterPopover.styles';
 
 export interface FilterItem {
   id: string;

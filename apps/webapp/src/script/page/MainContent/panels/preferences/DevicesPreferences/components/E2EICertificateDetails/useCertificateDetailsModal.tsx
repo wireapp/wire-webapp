@@ -19,8 +19,8 @@
 
 import {useState, useEffect} from 'react';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
-import {ModalOptions} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal, removeCurrentModal} from 'Components/modals/primaryModal';
+import {ModalOptions} from 'Components/modals/primaryModal/primaryModalTypes';
 import {t} from 'Util/localizerUtil';
 import {downloadFile} from 'Util/util';
 

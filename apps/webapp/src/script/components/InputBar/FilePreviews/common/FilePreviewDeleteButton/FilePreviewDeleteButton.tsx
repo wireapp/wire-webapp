@@ -17,10 +17,10 @@
  *
  */
 
-import {CloseIcon} from 'Components/Icon';
+import {CloseIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
-import {buttonStyles, iconStyles} from './FilePreviewDeleteButton.styles';
+import {buttonStyles, iconStyles} from './filePreviewDeleteButton.styles';
 
 interface FilePreviewDeleteButtonProps {
   onDelete: () => void;

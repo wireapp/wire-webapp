@@ -21,9 +21,9 @@ import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
 
-import {MediaButton, MediaButtonProps} from './MediaButton';
+import {MediaButton, MediaButtonProps} from './mediaButton';
 
 describe('MediaButton', () => {
   const getDefaultProps = (): MediaButtonProps => {

@@ -23,14 +23,14 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {UserState} from 'Repositories/user/userState';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 import {getLogger, Logger} from 'Util/logger';
 
-import {isMixedConversation, isProteusConversation} from '../../ConversationSelectors';
-import {ConversationState} from '../../ConversationState';
-import {ConversationVerificationState} from '../../ConversationVerificationState';
+import {isMixedConversation, isProteusConversation} from '../../conversationSelectors';
+import {ConversationState} from '../../conversationState';
+import {ConversationVerificationState} from '../../conversationVerificationState';
 import {
   getActiveConversationsWithUsers,
   attemptChangeToVerified,

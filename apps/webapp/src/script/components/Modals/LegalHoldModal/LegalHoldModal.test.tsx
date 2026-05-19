@@ -20,21 +20,21 @@
 import {act, render} from '@testing-library/react';
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
 import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 
-import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
+import {LegalHoldModal, LegalHoldModalType} from './legalHoldModal';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../../test/helper/testFactory';
 
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();

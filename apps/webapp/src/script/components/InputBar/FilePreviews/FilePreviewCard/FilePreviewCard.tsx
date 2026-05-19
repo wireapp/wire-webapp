@@ -17,12 +17,12 @@
  *
  */
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {FileCard} from 'Components/fileCard/fileCard';
 
-import {wrapperStyles} from './FilePreviewCard.styles';
+import {wrapperStyles} from './filePreviewCard.styles';
 
-import {FilePreviewDeleteButton} from '../common/FilePreviewDeleteButton/FilePreviewDeleteButton';
-import {FilePreviewErrorMoreButton} from '../common/FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
+import {FilePreviewDeleteButton} from '../common/filePreviewDeleteButton/filePreviewDeleteButton';
+import {FilePreviewErrorMoreButton} from '../common/filePreviewErrorMoreButton/filePreviewErrorMoreButton';
 
 interface FilePreviewCardProps {
   extension: string;

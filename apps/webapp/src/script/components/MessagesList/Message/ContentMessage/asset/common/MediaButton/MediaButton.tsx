@@ -21,14 +21,14 @@ import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {FileAsset} from 'Repositories/entity/message/FileAsset';
+import type {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {noop} from 'Util/util';
 
-import {AssetLoader} from '../AssetLoader/AssetLoader';
+import {AssetLoader} from '../assetLoader/assetLoader';
 
 export interface MediaButtonProps {
   asset: FileAsset;

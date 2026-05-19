@@ -17,7 +17,7 @@
  *
  */
 
-export * from './ClientRepository';
-export * from './ClientMapper';
-export * from './ClientEntity';
-export * from './ClientService';
+export * from './clientRepository';
+export * from './clientMapper';
+export * from './clientEntity';
+export * from './clientService';

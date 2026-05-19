@@ -22,9 +22,9 @@ import ko from 'knockout';
 import {ReactionMap} from 'Repositories/storage';
 import {t} from 'Util/localizerUtil';
 
-import {Message} from './Message';
+import {Message} from './message';
 
-import {SuperType} from '../../../message/SuperType';
+import {SuperType} from '../../../message/superType';
 
 export class PingMessage extends Message {
   public readonly caption: ko.PureComputed<string>;

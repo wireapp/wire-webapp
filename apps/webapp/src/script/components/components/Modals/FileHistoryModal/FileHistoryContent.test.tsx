@@ -19,9 +19,9 @@
 
 import {render, screen, fireEvent} from '@testing-library/react';
 
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
-import {FileHistoryContent} from './FileHistoryContent';
+import {FileHistoryContent} from './fileHistoryContent';
 import {FileVersion} from './types';
 
 jest.mock('Util/localizerUtil', () => ({

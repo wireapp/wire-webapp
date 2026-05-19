@@ -20,15 +20,15 @@
 import type {Conversation as BackendConversation} from '@wireapp/api-client/lib/conversation';
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {ClientEvent} from 'Repositories/event/Client';
-import type {EventService} from 'Repositories/event/EventService';
+import {ClientEvent} from 'Repositories/event/client';
+import type {EventService} from 'Repositories/event/eventService';
 import type {EventRecord, StorageService} from 'Repositories/storage';
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
 
-import {MessageCategory} from '../../message/MessageCategory';
+import {messageCategory} from '../../message/messageCategory';
 import type {APIClient} from '../../service/apiClientSingleton';
 import type {Core} from '../../service/coreSingleton';
-import {ConversationService} from './ConversationService';
+import {ConversationService} from './conversationService';
 
 type EventServiceLike = Pick<EventService, 'loadEventsWithCategory'>;
 
@@ -37,7 +37,7 @@ describe('ConversationService', () => {
     it('matches multipart message text content', async () => {
       const multipartEvent: EventRecord = {
         primary_key: 'primary-key',
-        category: MessageCategory.TEXT,
+        category: messageCategory.TEXT,
         conversation: 'conversation-id',
         from: 'user-id',
         time: new Date(0).toISOString(),
@@ -72,7 +72,7 @@ describe('ConversationService', () => {
     it('matches composite message text items', async () => {
       const compositeEvent: EventRecord = {
         primary_key: 'primary-key',
-        category: MessageCategory.TEXT,
+        category: messageCategory.TEXT,
         conversation: 'conversation-id',
         from: 'user-id',
         time: new Date(0).toISOString(),

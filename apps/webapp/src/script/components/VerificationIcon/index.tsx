@@ -17,4 +17,4 @@
  *
  */
 
-export * from './VerificationIcon';
+export * from './verificationIcon';

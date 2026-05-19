@@ -17,7 +17,7 @@
  *
  */
 
-import {LinkIcon} from 'Components/Icon';
+import {LinkIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -26,7 +26,7 @@ import {
   textStyles,
   wrapperStylesHidden,
   iconStyles,
-} from './CellsTableSharedColumn.styles';
+} from './cellsTableSharedColumn.styles';
 
 interface CellsTableSharedColumnProps {
   isShared: boolean;

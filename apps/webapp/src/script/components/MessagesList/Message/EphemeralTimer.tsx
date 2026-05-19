@@ -19,11 +19,11 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import type {Message} from 'Repositories/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/message';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './EphemeralTimer.styles';
+import {ephemeralTimerBackgroundStyle, ephemeralTimerDialStyle} from './ephemeralTimer.styles';
 
 interface EphemeralTimerProps {
   message: Message;

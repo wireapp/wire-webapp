@@ -21,8 +21,8 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
+import {User} from 'Repositories/entity/user';
+import {ClientEvent} from 'Repositories/event/client';
 import {StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {generateConversation} from 'test/helper/ConversationGenerator';

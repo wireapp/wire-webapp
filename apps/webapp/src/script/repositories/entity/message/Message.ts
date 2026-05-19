@@ -28,35 +28,35 @@ import type {ReadReceipt} from 'Repositories/storage/record/eventRecord';
 import {t, getUserName} from 'Util/localizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {CallingTimeoutMessage} from './CallingTimeoutMessage';
-import type {CallMessage} from './CallMessage';
-import type {CompositeMessage} from './CompositeMessage';
-import type {ContentMessage} from './ContentMessage';
-import type {DecryptErrorMessage} from './DecryptErrorMessage';
-import type {DeleteMessage} from './DeleteMessage';
-import {E2EIVerificationMessage} from './E2EIVerificationMessage';
-import type {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
-import type {FederationStopMessage} from './FederationStopMessage';
-import type {FileAsset} from './FileAsset';
-import type {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
-import type {LegalHoldMessage} from './LegalHoldMessage';
-import type {LinkPreview} from './LinkPreview';
-import type {MemberMessage} from './MemberMessage';
-import type {MissedMessage} from './MissedMessage';
-import type {PingMessage} from './PingMessage';
-import type {SystemMessage} from './SystemMessage';
-import type {VerificationMessage} from './VerificationMessage';
+import {CallingTimeoutMessage} from './callingTimeoutMessage';
+import type {CallMessage} from './callMessage';
+import type {CompositeMessage} from './compositeMessage';
+import type {ContentMessage} from './contentMessage';
+import type {DecryptErrorMessage} from './decryptErrorMessage';
+import type {DeleteMessage} from './deleteMessage';
+import {E2EIVerificationMessage} from './e2eiVerificationMessage';
+import type {FailedToAddUsersMessage} from './failedToAddUsersMessage';
+import type {FederationStopMessage} from './federationStopMessage';
+import type {FileAsset} from './fileAsset';
+import type {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
+import type {LegalHoldMessage} from './legalHoldMessage';
+import type {LinkPreview} from './linkPreview';
+import type {MemberMessage} from './memberMessage';
+import type {MissedMessage} from './missedMessage';
+import type {PingMessage} from './pingMessage';
+import type {SystemMessage} from './systemMessage';
+import type {VerificationMessage} from './verificationMessage';
 
-import {EphemeralStatusType} from '../../../message/EphemeralStatusType';
-import type {MessageCategory} from '../../../message/MessageCategory';
-import {StatusType} from '../../../message/StatusType';
-import {SuperType} from '../../../message/SuperType';
-import {User} from '../User';
+import {EphemeralStatusType} from '../../../message/ephemeralStatusType';
+import type {messageCategory} from '../../../message/messageCategory';
+import {StatusType} from '../../../message/statusType';
+import {SuperType} from '../../../message/superType';
+import {User} from '../user';
 
 export class Message {
   private messageTimerStarted: boolean;
   protected readonly affect_order: ko.Observable<boolean>;
-  public category?: MessageCategory;
+  public category?: messageCategory;
   public conversation_id: string;
   public from: string;
   // TODO(Federation): Map domain to Message entity
@@ -138,7 +138,7 @@ export class Message {
     this.timestamp = ko.observable(Date.now());
     this.timestamp_affects_order = ko.pureComputed(() => this.visible() && this.affect_order());
 
-    // MessageCategory
+    // messageCategory
     this.category = undefined;
 
     this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true));

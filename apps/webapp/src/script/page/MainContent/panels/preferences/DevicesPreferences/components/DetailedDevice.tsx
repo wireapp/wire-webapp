@@ -17,12 +17,12 @@
  *
  */
 
-import {DeviceVerificationBadges} from 'Components/Badge';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {E2EIHandler, WireIdentity} from 'src/script/E2EIdentity';
+import {DeviceVerificationBadges} from 'Components/badge';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {E2EIHandler, WireIdentity} from 'src/script/e2eIdentity';
 
-import {MLSDeviceDetails} from './MLSDeviceDetails';
-import {ProteusDeviceDetails} from './ProteusDeviceDetails';
+import {MLSDeviceDetails} from './mlsDeviceDetails';
+import {ProteusDeviceDetails} from './proteusDeviceDetails';
 
 export interface DeviceProps {
   device: ClientEntity;

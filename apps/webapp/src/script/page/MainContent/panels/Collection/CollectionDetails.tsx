@@ -19,15 +19,15 @@
 
 import {Fragment} from 'react';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {formatLocale, isThisYear, isToday} from 'Util/timeUtil';
 import {noop} from 'Util/util';
 
-import {CollectionItem} from './CollectionItem';
+import {CollectionItem} from './collectionItem';
 
 interface CollectionDetailsProps {
   conversation: Conversation;

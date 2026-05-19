@@ -19,7 +19,7 @@
 
 import {act, fireEvent, render} from '@testing-library/react';
 
-import {WarningsContainer} from './WarningsContainer';
+import {WarningsContainer} from './warningsContainer';
 
 import {Warnings} from '.';
 

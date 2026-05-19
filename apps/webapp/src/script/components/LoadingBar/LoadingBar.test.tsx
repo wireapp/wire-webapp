@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {LoadingBar} from './LoadingBar';
+import {LoadingBar} from './loadingBar';
 
 jest.mock('@wireapp/react-ui-kit', () => {
   const originalModule = jest.requireActual('@wireapp/react-ui-kit');

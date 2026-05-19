@@ -31,19 +31,19 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
-import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
+import {ConversationFolderTab} from 'src/script/page/leftSidebar/panels/conversations/conversationTab/conversationFolderTab';
 import {
   isTabVisible,
   SidebarTabs,
   useSidebarStore,
-} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDataDogEnabled} from 'Util/dataDog';
@@ -57,13 +57,13 @@ import {
   footerDisclaimerEllipsis,
   footerDisclaimerTooltip,
   iconStyle,
-} from './ConversationTabs.styles';
-import {FolderIcon} from './FolderIcon';
-import {TeamCreationBanner} from './TeamCreation/TeamCreationBanner';
+} from './conversationTabs.styles';
+import {FolderIcon} from './folderIcon';
+import {TeamCreationBanner} from './teamCreation/teamCreationBanner';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {ContentState} from '../../../../useAppState';
-import {ConversationTab} from '../ConversationTab';
+import {ConversationTab} from '../conversationTab';
 import {conversationFilters} from '../helpers';
 import {TabAndFilterSettings} from '../tabAndFilterSettings';
 

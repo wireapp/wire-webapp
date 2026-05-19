@@ -19,10 +19,10 @@
 
 import {ConversationEvent} from '@wireapp/api-client/lib/event';
 
-import {ClientConversationEvent} from 'Repositories/conversation/EventBuilder';
+import {ClientConversationEvent} from 'Repositories/conversation/eventBuilder';
 import {EventRecord} from 'Repositories/storage';
 
-import {IdentifiedUpdatePayload} from '../../EventService';
+import {IdentifiedUpdatePayload} from '../../eventService';
 
 export type HandledEvents = ClientConversationEvent | ConversationEvent;
 export type DBOperation =

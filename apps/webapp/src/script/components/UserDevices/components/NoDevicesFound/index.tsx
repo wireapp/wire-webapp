@@ -17,4 +17,4 @@
  *
  */
 
-export * from './NoDevicesFound';
+export * from './noDevicesFound';

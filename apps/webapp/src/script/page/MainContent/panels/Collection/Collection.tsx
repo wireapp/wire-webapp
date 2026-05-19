@@ -25,27 +25,27 @@ import {amplify} from 'amplify';
 import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
+import * as Icon from 'Components/icon';
+import {showDetailViewModal} from 'Components/modals/detailViewModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {User} from 'Repositories/entity/User';
-import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {User} from 'Repositories/entity/user';
+import {Config} from 'src/script/config';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {CollectionDetails} from './CollectionDetails';
-import {CollectionSection} from './CollectionSection';
-import {FullSearch} from './FullSearch';
+import {CollectionDetails} from './collectionDetails';
+import {CollectionSection} from './collectionSection';
+import {FullSearch} from './fullSearch';
 import {Category, isOfCategory} from './utils';
 
-import {MessageCategory} from '../../../../message/MessageCategory';
+import {messageCategory} from '../../../../message/messageCategory';
 
 interface CollectionDetailsProps {
   conversation: Conversation;
@@ -99,7 +99,7 @@ const Collection = ({
 
   useEffect(() => {
     conversationRepository
-      .getEventsForCategory(conversation, MessageCategory.LINK_PREVIEW)
+      .getEventsForCategory(conversation, messageCategory.LINK_PREVIEW)
       .then(allMessages => setMessages(allMessages as ContentMessage[]));
   }, []);
 

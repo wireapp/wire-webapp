@@ -17,4 +17,4 @@
  *
  */
 
-export * from './UserSearchableList';
+export * from './userSearchableList';

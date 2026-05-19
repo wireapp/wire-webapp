@@ -30,9 +30,9 @@ import {
   MultipartMessageAddEvent,
   ReactionEvent,
 } from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CONVERSATION} from 'Repositories/event/Client';
-import {StatusType} from 'src/script/message/StatusType';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CONVERSATION} from 'Repositories/event/client';
+import {StatusType} from 'src/script/message/statusType';
 import {createUuid} from 'Util/uuid';
 
 export function createMessageAddEvent({

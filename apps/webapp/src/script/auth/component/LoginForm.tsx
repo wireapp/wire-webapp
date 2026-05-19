@@ -29,9 +29,9 @@ import {t} from 'Util/localizerUtil';
 import {isValidEmail, isValidUsername} from 'Util/validationUtil';
 
 import {useAutoFocus} from '../hooks/useAutoFocus';
-import {ValidationError} from '../module/action/ValidationError';
+import {ValidationError} from '../module/action/validationError';
 import {RootState} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
+import * as AuthSelector from '../module/selector/authSelector';
 
 interface LoginFormProps {
   isFetching: boolean;

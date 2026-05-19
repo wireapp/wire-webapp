@@ -19,10 +19,10 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {createUuid} from 'Util/uuid';
 
-import {CollectionSection} from './CollectionSection';
+import {CollectionSection} from './collectionSection';
 
 const NUMBER_OF_ASSETS = 5;
 

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './PasswordGeneratorButton';
+export * from './passwordGeneratorButton';

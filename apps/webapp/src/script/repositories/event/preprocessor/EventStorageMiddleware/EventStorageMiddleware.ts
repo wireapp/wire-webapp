@@ -20,22 +20,22 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {container} from 'tsyringe';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {User} from 'Repositories/entity/user';
 import type {EventRecord} from 'Repositories/storage';
 import {UserFilter} from 'Repositories/user/userFilter';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {handleLinkPreviewEvent, handleEditEvent, handleAssetEvent, handleReactionEvent} from './eventHandlers';
-import {EventValidationError} from './eventHandlers/EventValidationError';
+import {EventValidationError} from './eventHandlers/eventValidationError';
 import {HandledEvents, DBOperation} from './types';
 
-import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/StatusType';
-import {CONVERSATION} from '../../Client';
-import {EventMiddleware, IncomingEvent} from '../../EventProcessor';
-import {EventService} from '../../EventService';
-import {EventSource} from '../../EventSource';
-import {eventShouldBeStored} from '../../EventTypeHandling';
+import {isEventRecordFailed, isEventRecordWithFederationError} from '../../../../message/statusType';
+import {CONVERSATION} from '../../client';
+import {EventMiddleware, IncomingEvent} from '../../eventProcessor';
+import {EventService} from '../../eventService';
+import {EventSource} from '../../eventSource';
+import {eventShouldBeStored} from '../../eventTypeHandling';
 
 export class EventStorageMiddleware implements EventMiddleware {
   constructor(

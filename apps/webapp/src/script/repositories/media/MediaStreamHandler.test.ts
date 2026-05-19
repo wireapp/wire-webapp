@@ -19,8 +19,8 @@
 
 import {UserState} from 'Repositories/user/userState';
 
-import {MediaConstraintsHandler} from './MediaConstraintsHandler';
-import {MediaStreamHandler} from './MediaStreamHandler';
+import {MediaConstraintsHandler} from './mediaConstraintsHandler';
+import {MediaStreamHandler} from './mediaStreamHandler';
 
 describe('MediaStreamHandler', () => {
   let streamHandler: MediaStreamHandler;

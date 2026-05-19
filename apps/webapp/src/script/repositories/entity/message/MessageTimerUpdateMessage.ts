@@ -19,13 +19,13 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
+import {ConversationEphemeralHandler} from 'Repositories/conversation/conversationEphemeralHandler';
 import {t} from 'Util/localizerUtil';
 import {formatDuration} from 'Util/timeUtil';
 
-import {SystemMessage} from './SystemMessage';
+import {SystemMessage} from './systemMessage';
 
-import {SystemMessageType} from '../../../message/SystemMessageType';
+import {SystemMessageType} from '../../../message/systemMessageType';
 
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;

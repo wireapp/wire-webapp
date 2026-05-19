@@ -19,9 +19,9 @@
 
 import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
-import {Message} from './Message';
+import {Message} from './message';
 
-import {SuperType} from '../../../message/SuperType';
+import {SuperType} from '../../../message/superType';
 
 export class DecryptErrorMessage extends Message {
   constructor(

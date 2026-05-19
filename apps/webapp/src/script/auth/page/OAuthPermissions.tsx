@@ -40,7 +40,7 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
@@ -60,13 +60,13 @@ import {
   mobileTextCSS,
   teamImageCSS,
   textCSS,
-} from './OauthPermissions.styles';
-import {Page} from './Page';
+} from './oauthPermissions.styles';
+import {Page} from './page';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {actionRoot} from '../module/action';
 import {RootState, ThunkDispatch} from '../module/reducer';
-import * as SelfSelector from '../module/selector/SelfSelector';
+import * as SelfSelector from '../module/selector/selfSelector';
 import {oAuthParams, oAuthScope, oAuthScopesToString} from '../util/oauthUtil';
 
 interface Props extends React.HTMLProps<HTMLDivElement> {

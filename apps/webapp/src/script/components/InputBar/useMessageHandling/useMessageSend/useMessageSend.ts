@@ -23,22 +23,22 @@ import {LexicalEditor} from 'lexical';
 
 import {IAttachment} from '@wireapp/protocol-messaging';
 
-import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {MessageContent} from 'Components/InputBar/common/messageContent/messageContent';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
+import {useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
+import {MessageContent} from 'Components/inputBar/common/messageContent/messageContent';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {showWarningModal} from 'Components/modals/utils/showWarningModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {Config} from 'src/script/Config';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import {MessageRepository, OutgoingQuote} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {EventRepository} from 'Repositories/event/eventRepository';
+import {Config} from 'src/script/config';
 import {ConversationError} from 'src/script/error/conversationError';
-import {MentionEntity} from 'src/script/message/MentionEntity';
-import {MessageHasher} from 'src/script/message/MessageHasher';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {MentionEntity} from 'src/script/message/mentionEntity';
+import {MessageHasher} from 'src/script/message/messageHasher';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {isErrorWithType} from 'src/script/util/typePredicateUtil';
 import {t} from 'Util/localizerUtil';
 

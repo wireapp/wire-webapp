@@ -21,7 +21,7 @@ import {randomInt} from '@wireapp/commons/lib/util/RandomUtil';
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
-import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
+import {MLSStatuses, WireIdentity} from '../e2eIdentityVerification';
 
 const FIVE_MINUTES = TimeInMillis.MINUTE * 5;
 const FIFTEEN_MINUTES = TimeInMillis.MINUTE * 15;

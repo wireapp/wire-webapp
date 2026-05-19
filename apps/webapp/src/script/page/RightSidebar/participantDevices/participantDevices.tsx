@@ -19,13 +19,13 @@
 
 import {FC} from 'react';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {UserDevices, UserDevicesState} from 'Components/UserDevices';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {UserDevices, UserDevicesState} from 'Components/userDevices';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {t} from 'Util/localizerUtil';
 
-import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {ViewModelRepositories} from '../../../viewModel/mainViewModel';
 import {PanelHeader} from '../panelHeader';
 
 interface ParticipantDevicesProps {

@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import {ServiceListItem} from 'Components/ServiceList/components/ServiceListItem';
+import {ServiceListItem} from 'Components/serviceList/components/serviceListItem';
 import type {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {t} from 'Util/localizerUtil';
 

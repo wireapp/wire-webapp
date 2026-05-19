@@ -21,23 +21,23 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {UserStatusBadges} from 'Components/Badge';
-import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
-import {Participant} from 'Repositories/calling/Participant';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {UserStatusBadges} from 'Components/badge';
+import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/callParticipantsListItem/callParticipantsListItemHandRaiseIcon';
+import {Participant} from 'Repositories/calling/participant';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {CallParticipantItemContent} from './CallParticipantItemContent';
+import {CallParticipantItemContent} from './callParticipantItemContent';
 import {
   callParticipantListItemWrapper,
   callParticipantListItem,
   callParticipantAvatar,
   callParticipantConnecting,
-} from './CallParticipantsListItem.styles';
-import {CallParticipantStatusIcons} from './CallParticipantStatusIcons';
+} from './callParticipantsListItem.styles';
+import {CallParticipantStatusIcons} from './callParticipantStatusIcons';
 
 interface CallParticipantsListItemProps {
   callParticipant: Participant;

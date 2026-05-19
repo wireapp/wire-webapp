@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
-import {Preferences} from './Preferences';
+import {Preferences} from './preferences';
 
 describe('Preferences', () => {
   const defaultParams = {

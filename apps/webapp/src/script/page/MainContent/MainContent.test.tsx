@@ -19,17 +19,17 @@
 
 import {act, render, screen, waitFor} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
-import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {ContentViewModel} from 'src/script/view_model/ContentViewModel';
+import {User} from 'Repositories/entity/user';
+import {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
+import {ContentViewModel} from 'src/script/viewModel/contentViewModel';
 
-import {MainContent} from './MainContent';
+import {MainContent} from './mainContent';
 
-import {withTheme} from '../../auth/util/test/TestUtil';
-import {MainViewModel} from '../../view_model/MainViewModel';
+import {withTheme} from '../../auth/util/test/testUtil';
+import {MainViewModel} from '../../viewModel/mainViewModel';
 import {createDeterministicWallClock} from '../../clock/deterministicWallClock';
 import {createRootContextValueForTest} from '../testSupport/rootContextTestSupport';
-import {RootProvider} from '../RootProvider';
+import {RootProvider} from '../rootProvider';
 import {ContentState, useAppState} from '../useAppState';
 
 jest.mock('./panels/preferences/AccountPreferences', () => ({

@@ -17,8 +17,8 @@
  *
  */
 
-import {TextInput} from 'Components/TextInput';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {TextInput} from 'Components/textInput';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 

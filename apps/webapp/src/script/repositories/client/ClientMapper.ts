@@ -22,8 +22,8 @@ import type {PublicClient, RegisteredClient} from '@wireapp/api-client/lib/clien
 import {ClientRecord} from 'Repositories/storage';
 import {isClientRecord, isClientWithMLSPublicKeys} from 'Util/typePredicateUtil';
 
-import {ClientEntity} from './ClientEntity';
-import {parseClientId} from './ClientIdUtil';
+import {ClientEntity} from './clientEntity';
+import {parseClientId} from './clientIdUtil';
 
 export class ClientMapper {
   static get CONFIG() {

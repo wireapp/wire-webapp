@@ -25,22 +25,22 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import type {ClientRepository, ClientEntity} from 'Repositories/client';
-import {isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import type {User} from 'Repositories/entity/User';
-import {WireIdentity} from 'src/script/E2EIdentity';
-import {MLSDeviceDetails} from 'src/script/page/MainContent/panels/preferences/DevicesPreferences/components/MLSDeviceDetails';
+import {isMLSConversation} from 'Repositories/conversation/conversationSelectors';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import type {MessageRepository} from 'Repositories/conversation/messageRepository';
+import type {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import type {User} from 'Repositories/entity/user';
+import {WireIdentity} from 'src/script/e2eIdentity';
+import {MLSDeviceDetails} from 'src/script/page/mainContent/panels/preferences/devicesPreferences/components/mlsDeviceDetails';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import type {Logger} from 'Util/logger';
 import {splitFingerprint} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
 
-import {Config} from '../../../../Config';
-import {MotionDuration} from '../../../../motion/MotionDuration';
-import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {Config} from '../../../../config';
+import {MotionDuration} from '../../../../motion/motionDuration';
+import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 
 interface DeviceDetailsProps {
   clickToShowSelfFingerprint: () => void;

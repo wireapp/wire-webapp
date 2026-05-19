@@ -23,7 +23,7 @@ import ko from 'knockout';
 import {ClientRecord} from 'Repositories/storage';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {ClientMapper} from './ClientMapper';
+import {ClientMapper} from './clientMapper';
 
 import {isObject} from '../../guards/common';
 

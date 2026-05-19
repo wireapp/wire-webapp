@@ -23,9 +23,9 @@ import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {headerStyles, headingStyles, closeButtonStyles} from './CellsModalHeader.styles';
+import {headerStyles, headingStyles, closeButtonStyles} from './cellsModalHeader.styles';
 
-import {useCellsModal} from '../CellsModalContext/CellsModalContext';
+import {useCellsModal} from '../cellsModalContext/cellsModalContext';
 
 interface CellsModalHeaderProps {
   children: ReactNode;

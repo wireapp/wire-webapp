@@ -18,19 +18,19 @@
  */
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {FileAsset} from 'Repositories/entity/message/FileAsset';
-import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
-import type {Text} from 'Repositories/entity/message/Text';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {FileAsset} from 'Repositories/entity/message/fileAsset';
+import type {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import type {SystemMessage} from 'Repositories/entity/message/systemMessage';
+import type {Text} from 'Repositories/entity/message/text';
 import {t} from 'Util/localizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {ConversationStatusIcon} from './ConversationStatusIcon';
+import {ConversationStatusIcon} from './conversationStatusIcon';
 
 import {ConversationError} from '../../error/conversationError';
-import {E2EIVerificationMessageType} from '../../message/E2EIVerificationMessageType';
+import {E2EIVerificationMessageType} from '../../message/e2eiVerificationMessageType';
 
 enum ACTIVITY_TYPE {
   CALL = 'ConversationCellState.ACTIVITY_TYPE.CALL',

@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 
-import {ErrorFallback} from './ErrorFallback';
+import {ErrorFallback} from './errorFallback';
 
 describe('ErrorFallback', () => {
   it('Correctly prints the error', () => {

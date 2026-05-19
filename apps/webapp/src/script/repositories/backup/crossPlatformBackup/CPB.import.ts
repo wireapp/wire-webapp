@@ -19,8 +19,8 @@
 
 import {ConversationRecord, EventRecord, UserRecord} from 'Repositories/storage';
 
-import {CPBackupImporter, BackupImportResult, BackupQualifiedId} from './CPB.library';
-import {ImportHistoryToDatabaseParams} from './CPB.types';
+import {CPBackupImporter, BackupImportResult, BackupQualifiedId} from './cPB.library';
+import {ImportHistoryToDatabaseParams} from './cPB.types';
 import {mapConversationRecord, mapUserRecord} from './importMappers';
 import {mapEventRecord} from './importMappers/mapEventRecord';
 

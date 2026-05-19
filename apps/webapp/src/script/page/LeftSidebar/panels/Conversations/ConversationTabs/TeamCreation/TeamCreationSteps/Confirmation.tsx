@@ -24,21 +24,21 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant, Checkbox, Link} from '@wireapp/react-ui-kit';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {TeamService} from 'Repositories/team/teamService';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 
-import {StepProps} from './StepProps';
+import {StepProps} from './stepProps';
 import {
   listCss,
   modalButtonsCss,
   termsCheckboxLabelCss,
   termsOfUseLinkCss,
   termsCheckboxWrapperCss,
-} from './TeamCreationSteps.styles';
+} from './teamCreationSteps.styles';
 
-import {buttonCss} from '../TeamCreation.styles';
+import {buttonCss} from '../teamCreation.styles';
 
 export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstStep, onSuccess}: StepProps) => {
   const confirmationList = [

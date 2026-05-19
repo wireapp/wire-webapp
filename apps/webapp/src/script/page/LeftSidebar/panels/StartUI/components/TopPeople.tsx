@@ -19,9 +19,9 @@
 
 import React from 'react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
-import {TopContact} from './topPeople/TopContact';
+import {TopContact} from './topPeople/topContact';
 
 interface TopPeopleProps {
   clickOnUser: (user: User, event: React.UIEvent) => void;

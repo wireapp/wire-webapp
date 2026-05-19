@@ -17,27 +17,27 @@
  *
  */
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 
-import {MessageCategory} from '../../../../message/MessageCategory';
+import {messageCategory} from '../../../../message/messageCategory';
 
 export type Category = 'images' | 'links' | 'files' | 'audio';
 
 export const isOfCategory = (category: Category, message: ContentMessage) => {
-  const messageCategory = message.category;
-  if (messageCategory === undefined) {
+  const messageCategoryValue = message.category;
+  if (messageCategoryValue === undefined) {
     return false;
   }
   switch (category) {
     case 'images':
-      return messageCategory & MessageCategory.IMAGE && !(messageCategory & MessageCategory.GIF);
+      return messageCategoryValue & messageCategory.IMAGE && !(messageCategoryValue & messageCategory.GIF);
     case 'links':
-      return messageCategory & MessageCategory.LINK_PREVIEW;
+      return messageCategoryValue & messageCategory.LINK_PREVIEW;
     case 'audio':
-      return messageCategory & MessageCategory.FILE && message.getFirstAsset()?.isAudio();
+      return messageCategoryValue & messageCategory.FILE && message.getFirstAsset()?.isAudio();
     case 'files':
       return (
-        messageCategory & MessageCategory.FILE &&
+        messageCategoryValue & messageCategory.FILE &&
         (message.getFirstAsset()?.isFile() || message.getFirstAsset()?.isVideo())
       );
     default:

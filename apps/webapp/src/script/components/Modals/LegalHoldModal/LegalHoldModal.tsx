@@ -23,17 +23,17 @@ import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import * as Icon from 'Components/Icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {UserDevicesState, UserDevices} from 'Components/UserDevices';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import * as Icon from 'Components/icon';
+import {LegalHoldDot} from 'Components/legalHoldDot';
+import {ModalComponent} from 'Components/modals/modalComponent';
+import {UserDevicesState, UserDevices} from 'Components/userDevices';
+import {UserSearchableList} from 'Components/userSearchableList';
 import {useUserDevicesHistory} from 'Hooks/useUserDevicesHistory';
 import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {User} from 'Repositories/entity/user';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {handleEnterDown} from 'Util/keyboardUtil';
@@ -41,7 +41,7 @@ import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
-import {useLegalHoldModalState} from './LegalHoldModal.state';
+import {useLegalHoldModalState} from './legalHoldModal.state';
 
 const DISABLE_SUBMIT_TEXT_LENGTH = 1;
 
@@ -296,10 +296,10 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       isShown={isOpen}
       onBgClick={onBgClick}
       onClosed={onClose}
-      data-uie-name="legal-hold-modal"
+      data-uie-name="legalHold-modal"
       showLoading={isLoading}
-      id="legal-hold-modal"
-      className="legal-hold-modal"
+      id="legalHold-modal"
+      className="legalHold-modal"
     >
       <div className="modal__header">
         {userDevices && (
@@ -324,7 +324,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
         )}
       </div>
 
-      <div className={cx('modal__body legal-hold-modal__wrapper', {'legal-hold-modal__wrapper--request': isRequest})}>
+      <div className={cx('modal__body legalHold-modal__wrapper', {'legalHold-modal__wrapper--request': isRequest})}>
         {isRequest && (
           <>
             <div className="modal__text" data-uie-name="status-modal-text">
@@ -332,7 +332,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                 dangerouslySetInnerHTML={{
                   __html: t('legalHoldModalText', undefined, {
                     br: '<br>',
-                    fingerprint: `<span class="legal-hold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
+                    fingerprint: `<span class="legalHold-modal__fingerprint" data-uie-name="status-modal-fingerprint">${fingerprint}</span>`,
                   }),
                 }}
               />
@@ -377,7 +377,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
                   {t('legalHoldModalPrimaryAction')}
                 </button>
               ) : (
-                <div className="modal__button modal__button--primary legal-hold-modal__loading-button">
+                <div className="modal__button modal__button--primary legalHold-modal__loading-button">
                   <Icon.LoadingIcon />
                 </div>
               )}
@@ -389,23 +389,23 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
           <>
             {!userDevices ? (
               <>
-                <div className="legal-hold-modal__logo">
-                  <LegalHoldDot large dataUieName="status-modal-legal-hold-icon" />
+                <div className="legalHold-modal__logo">
+                  <LegalHoldDot large dataUieName="status-modal-legalHold-icon" />
                 </div>
 
-                <div className="legal-hold-modal__headline" data-uie-name="status-modal-title">
+                <div className="legalHold-modal__headline" data-uie-name="status-modal-title">
                   {t('legalHoldHeadline')}
                 </div>
 
                 <p
-                  className="legal-hold-modal__info"
+                  className="legalHold-modal__info"
                   data-uie-name="status-modal-text"
                   dangerouslySetInnerHTML={{
                     __html: isSelfInfo ? t('legalHoldDescriptionSelf') : t('legalHoldDescriptionOthers'),
                   }}
                 />
 
-                <div className="legal-hold-modal__subjects">{t('legalHoldSubjects')}</div>
+                <div className="legalHold-modal__subjects">{t('legalHoldSubjects')}</div>
 
                 <UserSearchableList
                   users={users}

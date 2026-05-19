@@ -19,12 +19,12 @@
 
 import {render, fireEvent, within} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {ReactionMap} from 'Repositories/storage';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 
-import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
+import {MessageReactionsList, MessageReactionsListProps} from './messageReactionsList';
 
 const user1 = new User();
 const user2 = new User();

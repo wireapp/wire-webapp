@@ -17,5 +17,5 @@
  *
  */
 
-export * from './PartialFailureToSend';
-export * from './CompleteFailureToSend';
+export * from './partialFailureToSend';
+export * from './completeFailureToSend';

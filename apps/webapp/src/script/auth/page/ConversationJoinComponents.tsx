@@ -37,7 +37,7 @@ import {
   Checkbox,
 } from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 
 import {parseValidationErrors, parseError} from '../util/errorUtil';

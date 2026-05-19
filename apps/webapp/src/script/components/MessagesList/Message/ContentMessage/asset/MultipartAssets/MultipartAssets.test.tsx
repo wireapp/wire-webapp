@@ -30,7 +30,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
-import {MultipartAssets} from './MultipartAssets';
+import {MultipartAssets} from './multipartAssets';
 
 jest.mock('Hooks/useInView/useInView', () => ({
   useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => ({

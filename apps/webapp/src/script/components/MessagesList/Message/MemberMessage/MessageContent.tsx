@@ -20,11 +20,11 @@
 import {MemberLeaveReason} from '@wireapp/api-client/lib/conversation/data/';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
-import {Config} from 'src/script/Config';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
+import {User} from 'Repositories/entity/user';
+import {ClientEvent} from 'Repositories/event/client';
+import {Config} from 'src/script/config';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {Declension, joinNames, replaceLink, t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -147,7 +147,7 @@ function getContent(message: MemberMessageEntity) {
         const replaceLinkLegalHold = replaceLink(
           Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
           '',
-          'read-more-legal-hold',
+          'read-more-legalHold',
         );
         if (message.userEntities().some(user => user.isMe)) {
           return t('conversationYouRemovedMissingLegalHoldConsent', undefined, replaceLinkLegalHold);

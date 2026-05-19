@@ -19,14 +19,14 @@
 
 import {BackgroundEffectsHandler, ReleasableMediaStream} from './backgroundEffectsHandler';
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
-import {DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
+import {DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/videoBackgroundEffects';
 
 // Mocks
 jest.mock('Util/localStorage', () => ({
   getStorage: jest.fn(),
 }));
 
-jest.mock('Repositories/media/VideoBackgroundEffects', () => ({
+jest.mock('Repositories/media/videoBackgroundEffects', () => ({
   BLUR_STRENGTHS: {high: 10},
   DEFAULT_BACKGROUND_EFFECT: {type: 'none'},
   DEFAULT_BUILTIN_BACKGROUND_ID: 'default-id',
@@ -132,7 +132,7 @@ describe('BackgroundEffectsHandler', () => {
   });
 
   it('applies virtual background successfully', async () => {
-    const {loadBackgroundSource} = require('Repositories/media/VideoBackgroundEffects');
+    const {loadBackgroundSource} = require('Repositories/media/videoBackgroundEffects');
 
     loadBackgroundSource.mockResolvedValue('mock-bg');
 

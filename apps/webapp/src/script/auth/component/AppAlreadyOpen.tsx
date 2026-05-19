@@ -22,7 +22,7 @@ import {Button, Column, Columns, Container, H3, Modal, Text} from '@wireapp/reac
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {t} from 'Util/localizerUtil';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 interface AppAlreadyOpenProps {
   fullscreen?: boolean;

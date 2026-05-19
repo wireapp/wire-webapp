@@ -22,21 +22,21 @@ import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {AudioSpeakerFactory} from 'Repositories/calling/AudioSpeakerFactory';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CanvasMediaStreamMixer} from 'Repositories/media/CanvasMediaStreamMixer';
-import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {AudioSpeakerFactory} from 'Repositories/calling/audioSpeakerFactory';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CanvasMediaStreamMixer} from 'Repositories/media/canvasMediaStreamMixer';
+import type {MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {chunk, getDifference, partition} from 'Util/arrayUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
-import {CallingEpochCache} from './CallingEpochCache';
-import {MuteState} from './CallState';
-import type {ClientId, Participant} from './Participant';
+import {CallingEpochCache} from './callingEpochCache';
+import {MuteState} from './callState';
+import type {ClientId, Participant} from './participant';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 export type SerializedConversationId = string;
 

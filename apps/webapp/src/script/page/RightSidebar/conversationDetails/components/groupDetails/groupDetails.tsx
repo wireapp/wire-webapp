@@ -19,8 +19,8 @@
 
 import {FC} from 'react';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {t} from 'Util/localizerUtil';
 

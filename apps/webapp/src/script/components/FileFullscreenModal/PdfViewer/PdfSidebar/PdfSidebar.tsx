@@ -21,8 +21,8 @@ import {forwardRef, RefObject} from 'react';
 
 import {useVirtualizer} from '@tanstack/react-virtual';
 
-import {PdfPageThumbnail} from './PdfPageThumbnail/PdfPageThumbnail';
-import {listItemStyles, listStyles, wrapperStyles} from './PdfSidebar.styles';
+import {PdfPageThumbnail} from './pdfPageThumbnail/pdfPageThumbnail';
+import {listItemStyles, listStyles, wrapperStyles} from './pdfSidebar.styles';
 import {useArrowsNavigation} from './useArrowsNavigation/useArrowsNavigation';
 
 interface PdfSidebarProps {

@@ -24,15 +24,15 @@ import {MenuOption as _MenuOption, MenuRenderFn, MenuTextMatch} from '@lexical/r
 import {$createTextNode, TextNode} from 'lexical';
 import * as ReactDOM from 'react-dom';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {IgnoreOutsideClickWrapper} from 'Components/InputBar/util/clickHandlers';
-import {User} from 'Repositories/entity/User';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {IgnoreOutsideClickWrapper} from 'Components/inputBar/util/clickHandlers';
+import {User} from 'Repositories/entity/user';
 
-import {MentionSuggestionsItem} from './MentionSuggestionsItem';
+import {MentionSuggestionsItem} from './mentionSuggestionsItem';
 
-import {$createMentionNode} from '../../nodes/MentionNode';
+import {$createMentionNode} from '../../nodes/mentionNode';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
-import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin/TypeaheadMenuPlugin';
+import {TypeaheadMenuPlugin} from '../typeaheadMenuPlugin/typeaheadMenuPlugin';
 
 const TRIGGER = '@';
 const triggerRegexp = new RegExp(`(^| )(${TRIGGER}(\\S*))$`);

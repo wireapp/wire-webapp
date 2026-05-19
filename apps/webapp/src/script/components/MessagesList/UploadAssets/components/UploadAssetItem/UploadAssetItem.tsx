@@ -21,11 +21,11 @@ import {useEffect, useState} from 'react';
 
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
-import {ProgressBar} from 'Components/ProgressBar';
+import {ProgressBar} from 'Components/progressBar';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {t} from 'Util/localizerUtil';
 
-import {uploadingProgressText} from './UploadAssetItem.styles';
+import {uploadingProgressText} from './uploadAssetItem.styles';
 
 interface Props {
   assetRepository: AssetRepository;

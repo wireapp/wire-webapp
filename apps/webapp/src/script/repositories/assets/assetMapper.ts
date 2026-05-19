@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import type {UserAsset as APIClientUserAsset} from '@wireapp/api-client/lib/user/';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import type {ServiceEntity} from 'Repositories/integration/serviceEntity';
 
 import {AssetRemoteData} from './assetRemoteData';

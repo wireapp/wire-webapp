@@ -33,8 +33,8 @@ import {Account, ConnectionState, ProcessedEventPayload} from '@wireapp/core';
 import {PromiseQueue} from '@wireapp/promise-queue';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {CryptographyMapper} from 'Repositories/cryptography/CryptographyMapper';
+import {ClientConversationEvent, EventBuilder} from 'Repositories/conversation/eventBuilder';
+import {CryptographyMapper} from 'Repositories/cryptography/cryptographyMapper';
 import {EventName} from 'Repositories/tracking/eventName';
 import {UserState} from 'Repositories/user/userState';
 import {getLogger, Logger} from 'Util/logger';
@@ -42,21 +42,21 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
 import {isAxiosError} from 'Util/typePredicateUtil';
 
-import {ClientEvent} from './Client';
-import {EventMiddleware, EventProcessor, IncomingEvent} from './EventProcessor';
-import type {EventService} from './EventService';
-import {EventSource} from './EventSource';
-import {EVENT_TYPE} from './EventType';
-import {EventValidation} from './EventValidation';
-import {validateEvent} from './EventValidator';
-import {NOTIFICATION_HANDLING_STATE} from './NotificationHandlingState';
-import type {NotificationService} from './NotificationService';
-import {EventValidationError} from './preprocessor/EventStorageMiddleware/eventHandlers/EventValidationError';
+import {ClientEvent} from './client';
+import {EventMiddleware, EventProcessor, IncomingEvent} from './eventProcessor';
+import type {EventService} from './eventService';
+import {EventSource} from './eventSource';
+import {EVENT_TYPE} from './eventType';
+import {EventValidation} from './eventValidation';
+import {validateEvent} from './eventValidator';
+import {NOTIFICATION_HANDLING_STATE} from './notificationHandlingState';
+import type {NotificationService} from './notificationService';
+import {EventValidationError} from './preprocessor/eventStorageMiddleware/eventHandlers/eventValidationError';
 
 import {CryptographyError} from '../../error/cryptographyError';
 import {EventError} from '../../error/eventError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 
 export class EventRepository {
   logger: Logger;

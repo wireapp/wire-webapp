@@ -19,15 +19,15 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {MessageAddEvent, MultipartMessageAddEvent, QuoteData} from 'Repositories/conversation/EventBuilder';
+import {MessageAddEvent, MultipartMessageAddEvent, QuoteData} from 'Repositories/conversation/eventBuilder';
 import {StoredEvent} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 import {base64ToArray} from 'Util/util';
 
-import {QuoteEntity} from '../../../message/QuoteEntity';
-import {ClientEvent} from '../Client';
-import {EventMiddleware, IncomingEvent} from '../EventProcessor';
-import type {EventService} from '../EventService';
+import {QuoteEntity} from '../../../message/quoteEntity';
+import {ClientEvent} from '../client';
+import {EventMiddleware, IncomingEvent} from '../eventProcessor';
+import type {EventService} from '../eventService';
 
 type ProcessedQuoteData = Exclude<QuoteData, string>;
 

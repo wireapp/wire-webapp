@@ -22,13 +22,13 @@ import {container} from 'tsyringe';
 
 import {Muted, Option, Select} from '@wireapp/react-ui-kit';
 
-import {RadioGroup} from 'Components/Radio';
+import {RadioGroup} from 'Components/radio';
 import {TeamState} from 'Repositories/team/teamState';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
-import {channelSettingsTextCss} from './ConversationDetails.styles';
-import {CustomHistorySharingOption} from './CustomHistorySharingOption';
+import {channelSettingsTextCss} from './conversationDetails.styles';
+import {CustomHistorySharingOption} from './customHistorySharingOption';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
 import {ChatHistory, ConversationAccess} from '../../types';

@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {StorageKey} from 'Repositories/storage';
 import {getLogger} from 'Util/logger';
 

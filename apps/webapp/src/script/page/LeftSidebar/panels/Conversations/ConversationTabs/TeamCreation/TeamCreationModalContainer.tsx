@@ -19,13 +19,13 @@
 
 import {useState} from 'react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {ConfirmLeaveModal} from './ConfirmLeaveModal';
-import {TeamCreationModal} from './TeamCreationModal';
+import {ConfirmLeaveModal} from './confirmLeaveModal';
+import {TeamCreationModal} from './teamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
 interface Props {

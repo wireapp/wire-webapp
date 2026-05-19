@@ -22,8 +22,8 @@ import React, {memo, ReactElement, ReactNode} from 'react';
 import {css} from '@emotion/react';
 import {throttle} from 'underscore';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
 import {useConnectionQuality} from 'src/script/hooks/useConnectionQuality';
 import {t} from 'Util/localizerUtil';
 import {isScrollable, isScrolledBottom, isScrolledTop} from 'Util/scrollHelpers';

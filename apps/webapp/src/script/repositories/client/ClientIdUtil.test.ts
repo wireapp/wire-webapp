@@ -17,7 +17,7 @@
  *
  */
 
-import {constructClientId, parseClientId} from './ClientIdUtil';
+import {constructClientId, parseClientId} from './clientIdUtil';
 
 describe('ClientIdUtil', () => {
   it.each([

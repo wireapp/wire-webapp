@@ -21,7 +21,7 @@ import {Button, ButtonVariant, PlusIcon} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {buttonStyles, iconStyles, textStyles, wrapperStyles} from './CellsCreateNewFolderHint.styles';
+import {buttonStyles, iconStyles, textStyles, wrapperStyles} from './cellsCreateNewFolderHint.styles';
 
 interface CellsCreateNewFolderHintProps {
   onCreate: () => void;

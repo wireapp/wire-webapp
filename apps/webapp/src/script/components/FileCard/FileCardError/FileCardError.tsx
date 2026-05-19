@@ -17,7 +17,7 @@
  *
  */
 
-import {wrapperStyles, errorStyles} from './FileCardError.styles';
+import {wrapperStyles, errorStyles} from './fileCardError.styles';
 
 export const FileCardError = () => {
   return (

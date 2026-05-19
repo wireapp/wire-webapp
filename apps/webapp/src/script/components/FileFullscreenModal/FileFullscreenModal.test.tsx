@@ -19,17 +19,17 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {FileFullscreenModal} from './FileFullscreenModal';
+import {FileFullscreenModal} from './fileFullscreenModal';
 
-jest.mock('Components/FullscreenModal/FullscreenModal', () => ({
+jest.mock('Components/fullscreenModal/fullscreenModal', () => ({
   FullscreenModal: ({children, isOpen}: any) => (isOpen ? <div>{children}</div> : null),
 }));
 
-jest.mock('./FileHeader/FileHeader', () => ({
+jest.mock('./fileHeader/fileHeader', () => ({
   FileHeader: () => <div data-uie-name="file-header">Header</div>,
 }));
 
-jest.mock('./FileEditor/FileEditor', () => {
+jest.mock('./fileEditor/fileEditor', () => {
   let renderCount = 0;
   return {
     FileEditor: ({id}: {id: string; key?: number}) => {
@@ -43,11 +43,11 @@ jest.mock('./FileEditor/FileEditor', () => {
   };
 });
 
-jest.mock('./FileLoader/FileLoader', () => ({
+jest.mock('./fileLoader/fileLoader', () => ({
   FileLoader: () => <div data-uie-name="file-loader">Loading...</div>,
 }));
 
-jest.mock('./ImageFileView/ImageFileView', () => ({
+jest.mock('./imageFileView/imageFileView', () => ({
   ImageFileView: ({src}: {src?: string}) => (
     <div data-uie-name="image-view" data-src={src}>
       Image View
@@ -55,11 +55,11 @@ jest.mock('./ImageFileView/ImageFileView', () => ({
   ),
 }));
 
-jest.mock('./NoPreviewAvailable/NoPreviewAvailable', () => ({
+jest.mock('./noPreviewAvailable/noPreviewAvailable', () => ({
   NoPreviewAvailable: () => <div data-uie-name="no-preview">No preview available</div>,
 }));
 
-jest.mock('./PdfViewer/PdfViewer', () => ({
+jest.mock('./pdfViewer/pdfViewer', () => ({
   PDFViewer: () => <div data-uie-name="pdf-viewer">PDF Viewer</div>,
 }));
 
@@ -80,9 +80,13 @@ jest.mock('Util/getFileTypeFromExtension/getFileTypeFromExtension', () => ({
 }));
 
 jest.mock('Util/util', () => ({
+  forcedDownloadFile: jest.fn(),
   getFileExtensionFromUrl: (url: string) => {
     const match = url.match(/\.([^.]+)$/);
     return match ? match[1] : '';
+  },
+  getFileNameWithExtension: (name: string, extension: string) => {
+    return name.endsWith(`.${extension}`) ? name : `${name}.${extension}`;
   },
 }));
 

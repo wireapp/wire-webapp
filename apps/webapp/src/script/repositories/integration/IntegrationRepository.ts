@@ -21,11 +21,11 @@ import type {ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {MemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {MemberLeaveEvent} from 'Repositories/conversation/eventBuilder';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
 import type {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';
 import {getLogger, Logger} from 'Util/logger';

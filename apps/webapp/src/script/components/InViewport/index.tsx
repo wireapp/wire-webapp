@@ -17,4 +17,4 @@
  *
  */
 
-export * from './InViewport';
+export * from './inViewport';

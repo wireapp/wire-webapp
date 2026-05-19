@@ -23,7 +23,7 @@ import {createPortal} from 'react-dom';
 
 import {useActiveWindowState} from 'src/script/hooks/useActiveWindow';
 
-import {portalContainerCss} from './BannerPortal.styles';
+import {portalContainerCss} from './bannerPortal.styles';
 
 interface Props {
   onClose: () => void;

@@ -26,14 +26,14 @@ import {Runtime} from '@wireapp/commons';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {MediaConstraintsHandler} from 'Repositories/media/mediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {t} from 'Util/localizerUtil';
 
-import {Config} from '../../../../../Config';
-import {PreferencesSection} from '../components/PreferencesSection';
+import {Config} from '../../../../../config';
+import {PreferencesSection} from '../components/preferencesSection';
 
 interface CallOptionsProps {
   constraintsHandler: MediaConstraintsHandler;

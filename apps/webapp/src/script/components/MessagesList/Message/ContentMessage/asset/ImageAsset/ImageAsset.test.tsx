@@ -22,11 +22,11 @@ import {container} from 'tsyringe';
 
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
-import {User} from 'Repositories/entity/User';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {User} from 'Repositories/entity/user';
 
-import {ImageAsset, ImageAssetProps} from './ImageAsset';
+import {ImageAsset, ImageAssetProps} from './imageAsset';
 
 jest.mock('Components/InViewport', () => ({
   InViewport: ({onVisible, children, ...props}: {onVisible: () => void; children: any; [key: string]: any}) => {

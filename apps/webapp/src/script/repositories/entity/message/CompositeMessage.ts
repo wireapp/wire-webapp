@@ -19,7 +19,7 @@
 
 import ko from 'knockout';
 
-import {ContentMessage} from './ContentMessage';
+import {ContentMessage} from './contentMessage';
 
 export class CompositeMessage extends ContentMessage {
   errorButtonId: ko.Observable<string | undefined>;

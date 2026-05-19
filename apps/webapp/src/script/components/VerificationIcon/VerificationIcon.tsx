@@ -17,7 +17,7 @@
  *
  */
 
-import {VerifiedIcon, NotVerifiedIcon} from '../Icon';
+import {VerifiedIcon, NotVerifiedIcon} from '../icon';
 
 interface VerificationIconProps {
   className?: string;

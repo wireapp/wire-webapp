@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import type {User} from 'Repositories/entity/User';
+import type {User} from 'Repositories/entity/user';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 

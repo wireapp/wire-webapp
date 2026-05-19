@@ -24,7 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/localizerUtil';
 
-import {ContextMenuEntry, showContextMenu} from './ContextMenu';
+import {ContextMenuEntry, showContextMenu} from './contextMenu';
 
 export const AvailabilityContextMenu = {
   show: (event: MouseEvent, elementName: string): void => {

@@ -17,9 +17,9 @@
  *
  */
 
-import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
-import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
-import * as Icon from 'Components/Icon';
+import {FileTypeIcon} from 'Components/conversation/common/fileTypeIcon/fileTypeIcon';
+import {FileLoader} from 'Components/fileFullscreenModal/fileLoader/fileLoader';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -28,7 +28,7 @@ import {
   fileHistoryHeaderTitleCss,
   fileHeaderInfoWrapperCss,
   fileHeaderFileInfoCss,
-} from './FileHistoryModal.styles';
+} from './fileHistoryModal.styles';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {FileInfo} from './types';
 

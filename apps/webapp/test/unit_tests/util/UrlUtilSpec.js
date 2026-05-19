@@ -17,7 +17,7 @@
  *
  */
 
-import {URLParameter} from 'src/script/auth/URLParameter';
+import {URLParameter} from 'src/script/auth/urlParameter';
 import {
   forwardParameter,
   appendParameter,

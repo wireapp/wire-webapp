@@ -17,4 +17,4 @@
  *
  */
 
-export * from './CellDescription';
+export * from './cellDescription';

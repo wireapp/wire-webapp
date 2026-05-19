@@ -23,7 +23,7 @@ import {container} from 'tsyringe';
 import {getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 import {Core} from '../service/coreSingleton';
 
 let core: Core | undefined = undefined;

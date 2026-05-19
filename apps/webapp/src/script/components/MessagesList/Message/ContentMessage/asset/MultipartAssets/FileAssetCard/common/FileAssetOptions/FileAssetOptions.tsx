@@ -19,12 +19,12 @@
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
-import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
+import {useFileHistoryModal} from 'Components/modals/fileHistoryModal/hooks/useFileHistoryModal';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
-import {buttonStyles, iconStyles} from './FileAssetOptions.styles';
+import {buttonStyles, iconStyles} from './fileAssetOptions.styles';
 
 interface FileAssetOptionsProps {
   src?: string;

@@ -22,15 +22,15 @@ import {ReactElement} from 'react';
 
 import {render} from '@testing-library/react';
 
-import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
+import {usePrimaryModalState} from 'Components/modals/primaryModal';
 import {createDeterministicWallClock, DeterministicWallClock} from 'src/script/clock/deterministicWallClock';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {MainViewModel} from 'src/script/viewModel/mainViewModel';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {RootProvider} from '../../RootProvider';
+import {RootProvider} from '../../rootProvider';
 import {createRootContextValueForTest} from '../../testSupport/rootContextTestSupport';
-import {ForceReloadModal} from './ForceReloadModal';
+import {ForceReloadModal} from './forceReloadModal';
 
 interface ForceReloadModalTestContextValue {
   readonly doesApplicationNeedForceReload: boolean;

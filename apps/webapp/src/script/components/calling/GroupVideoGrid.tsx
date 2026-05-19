@@ -24,17 +24,17 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {QUERY} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import * as Icon from 'Components/Icon';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
-import {Call} from 'Repositories/calling/Call';
-import type {Participant} from 'Repositories/calling/Participant';
+import {Call} from 'Repositories/calling/call';
+import type {Participant} from 'Repositories/calling/participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {GroupVideoGridTile} from './GroupVideoGridTile';
-import {Video} from './Video';
+import {GroupVideoGridTile} from './groupVideoGridTile';
+import {Video} from './video';
 
 const PARTICIPANTS_LIMITS = {
   TABLET: {SHORT: 2, MEDIUM: 4, TALL: 8},

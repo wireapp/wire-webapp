@@ -19,7 +19,7 @@
 
 import {AssetType} from 'Repositories/assets/assetType';
 
-import {Asset} from './Asset';
+import {Asset} from './asset';
 
 export class Location extends Asset {
   public latitude: string;

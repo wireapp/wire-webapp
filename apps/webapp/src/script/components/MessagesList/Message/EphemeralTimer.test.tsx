@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import {Message} from 'Repositories/entity/message/Message';
+import {Message} from 'Repositories/entity/message/message';
 
-import {EphemeralTimer} from './EphemeralTimer';
+import {EphemeralTimer} from './ephemeralTimer';
 
 describe('EphemeralTimer', () => {
   it('shows the icon', () => {

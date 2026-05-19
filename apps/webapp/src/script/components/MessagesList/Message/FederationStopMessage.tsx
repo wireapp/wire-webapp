@@ -19,13 +19,13 @@
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
-import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/FederationStopMessage';
-import {Config} from 'src/script/Config';
+import * as Icon from 'Components/icon';
+import {FederationStopMessage as FederationStopMessageEntity} from 'Repositories/entity/message/federationStopMessage';
+import {Config} from 'src/script/config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {MessageTime} from './MessageTime';
+import {MessageTime} from './messageTime';
 import {useMessageFocusedTabIndex} from './util';
 
 interface FederationStopMessageProps {

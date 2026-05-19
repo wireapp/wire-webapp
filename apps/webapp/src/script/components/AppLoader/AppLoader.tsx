@@ -19,10 +19,10 @@
 
 import {FC, ReactNode, useEffect, useRef, useState} from 'react';
 
-import {LoadingBar} from 'Components/LoadingBar/LoadingBar';
-import {User} from 'Repositories/entity/User';
+import {LoadingBar} from 'Components/loadingBar/loadingBar';
+import {User} from 'Repositories/entity/user';
 
-import {styles} from './AppLoader.styles';
+import {styles} from './appLoader.styles';
 
 interface AppLoaderProps {
   init: (onProgress: (message?: string) => void) => Promise<User | undefined>;

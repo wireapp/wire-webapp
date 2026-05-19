@@ -20,11 +20,11 @@
 import {immer} from 'zustand/middleware/immer';
 import {createStore} from 'zustand/vanilla';
 
-import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
+import {AppPermissionState} from 'Repositories/notification/appPermissionState';
 
-import {BrowserPermissionStatus} from './BrowserPermissionStatus';
-import {normalizePermissionState, PermissionStateResult, UnifiedPermissionState} from './Permissions.types';
-import {PermissionType} from './PermissionType';
+import {BrowserPermissionStatus} from './browserPermissionStatus';
+import {normalizePermissionState, PermissionStateResult, UnifiedPermissionState} from './permissions.types';
+import {PermissionType} from './permissionType';
 
 export type PermissionsState = {
   permissions: Record<PermissionType, UnifiedPermissionState>;

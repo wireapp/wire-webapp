@@ -21,14 +21,14 @@ import React from 'react';
 
 import ko from 'knockout';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {CSS_FILL_PARENT} from 'Util/cssMixin';
 
-import {AvatarBackground} from './AvatarBackground';
-import {AvatarBorder} from './AvatarBorder';
-import {AvatarImage} from './AvatarImage';
-import {AvatarWrapper} from './AvatarWrapper';
+import {AvatarBackground} from './avatarBackground';
+import {AvatarBorder} from './avatarBorder';
+import {AvatarImage} from './avatarImage';
+import {AvatarWrapper} from './avatarWrapper';
 
 import {AVATAR_SIZE} from '.';
 

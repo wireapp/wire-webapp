@@ -36,9 +36,9 @@ import {
   infoOverlayStyles,
   infoWrapperStyles,
   loaderIconStyles,
-} from './ImageAssetLarge.styles';
+} from './imageAssetLarge.styles';
 
-import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from '../../../../../../../fileFullscreenModal/fileFullscreenModal';
 
 interface ImageAssetLargeProps {
   filePreviewUrl?: string;

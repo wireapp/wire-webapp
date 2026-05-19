@@ -19,17 +19,17 @@
 
 import {HTMLProps, MouseEvent as ReactMouseEvent, KeyboardEvent as ReactKeyBoardEvent} from 'react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, isKeyboardEvent, KEY} from 'Util/keyboardUtil';
 
-import {PlaceholderAvatar} from './PlaceholderAvatar';
-import {ServiceAvatar} from './ServiceAvatar';
-import {TemporaryGuestAvatar} from './TemporaryGuestAvatar';
-import {UserAvatar} from './UserAvatar';
+import {PlaceholderAvatar} from './placeholderAvatar';
+import {ServiceAvatar} from './serviceAvatar';
+import {TemporaryGuestAvatar} from './temporaryGuestAvatar';
+import {UserAvatar} from './userAvatar';
 
-import {isAppOrServiceEntity} from '../../guards/Service';
+import {isAppOrServiceEntity} from '../../guards/service';
 
 export enum AVATAR_SIZE {
   LARGE = 'avatar-l',

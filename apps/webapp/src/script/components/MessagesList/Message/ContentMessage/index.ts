@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ContentMessage';
+export * from './contentMessage';

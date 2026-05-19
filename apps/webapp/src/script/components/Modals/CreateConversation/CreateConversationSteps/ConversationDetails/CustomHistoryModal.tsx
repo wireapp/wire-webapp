@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, FlexBox, Input, Select, Text} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -33,7 +33,7 @@ import {
   customHistorySharingSelectCss,
   customHistorySharingButtonContainerCss,
   customHistorySharingButtonCss,
-} from '../CreateConversationSteps.styles';
+} from '../createConversationSteps.styles';
 
 export const CustomHistoryModal = () => {
   const {

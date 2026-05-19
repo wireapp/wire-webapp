@@ -19,10 +19,10 @@
 
 import type {TypeUtil} from '@wireapp/commons';
 
-import {Configuration, Config} from 'src/script/Config';
+import {Configuration, Config} from 'src/script/config';
 
-import {MediaEmbeds} from './MediaEmbeds';
-import {MediaParser} from './MediaParser';
+import {MediaEmbeds} from './mediaEmbeds';
+import {MediaParser} from './mediaParser';
 
 describe('MediaEmbeds', () => {
   // Will test all common link variations

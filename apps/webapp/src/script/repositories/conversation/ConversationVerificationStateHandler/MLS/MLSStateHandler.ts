@@ -22,8 +22,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {E2eiConversationState, MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {
   E2EIHandler,
   getActiveWireIdentity,
@@ -31,15 +31,15 @@ import {
   getConversationVerificationState,
   MLSStatuses,
   WireIdentity,
-} from 'src/script/E2EIdentity';
-import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
+} from 'src/script/e2eIdentity';
+import {E2EIVerificationMessageType} from 'src/script/message/e2eiVerificationMessageType';
 import {Core} from 'src/script/service/coreSingleton';
 import {Logger, getLogger} from 'Util/logger';
 import {waitFor} from 'Util/waitFor';
 
-import {isMLSConversation, MLSCapableConversation, MLSConversation} from '../../ConversationSelectors';
-import {ConversationState} from '../../ConversationState';
-import {ConversationVerificationState} from '../../ConversationVerificationState';
+import {isMLSConversation, MLSCapableConversation, MLSConversation} from '../../conversationSelectors';
+import {ConversationState} from '../../conversationState';
+import {ConversationVerificationState} from '../../conversationVerificationState';
 import {getConversationByGroupId, OnConversationE2EIVerificationStateChange} from '../shared';
 
 enum UserVerificationState {

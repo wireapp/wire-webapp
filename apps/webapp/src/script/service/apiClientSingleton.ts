@@ -21,7 +21,7 @@ import {singleton} from 'tsyringe';
 
 import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 
 const wireClientHeaderName = 'Wire-Client';
 const wireClientVersionHeaderName = 'Wire-Client-Version';

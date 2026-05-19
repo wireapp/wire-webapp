@@ -25,21 +25,21 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {t} from 'Util/localizerUtil';
 
-import {loadMoreWrapperStyles, wrapperStyles} from './CellsGlobalView.styles';
-import {CellsHeader} from './CellsHeader/CellsHeader';
-import {CellsLoader} from './CellsLoader/CellsLoader';
-import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
-import {CellsTable} from './CellsTable/CellsTable';
+import {loadMoreWrapperStyles, wrapperStyles} from './cellsGlobalView.styles';
+import {CellsHeader} from './cellsHeader/cellsHeader';
+import {CellsLoader} from './cellsLoader/cellsLoader';
+import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
+import {CellsTable} from './cellsTable/cellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDriveFilters';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
-import {useApplicationContext} from '../../page/RootProvider';
+import {useApplicationContext} from '../../page/rootProvider';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;

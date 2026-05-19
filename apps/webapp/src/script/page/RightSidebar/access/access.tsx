@@ -23,13 +23,13 @@ import {ADD_PERMISSION, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conve
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {ConversationAccess} from 'Components/Modals/CreateConversation/types';
-import {getConversationAccessOptions, getConversationManagerOptions} from 'Components/Modals/CreateConversation/utils';
-import {RadioGroup} from 'Components/Radio';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {ConversationAccess} from 'Components/modals/createConversation/types';
+import {getConversationAccessOptions, getConversationManagerOptions} from 'Components/modals/createConversation/utils';
+import {RadioGroup} from 'Components/radio';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';

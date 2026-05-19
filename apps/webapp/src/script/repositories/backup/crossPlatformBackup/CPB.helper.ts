@@ -19,10 +19,10 @@
 
 import Dexie from 'dexie';
 
-import {ClientEvent} from 'Repositories/event/Client';
+import {ClientEvent} from 'Repositories/event/client';
 import {getLogger} from 'Util/logger';
 
-import {CPBackupImporter, BackupPeekResult, isCreatedBySameUser, BackupQualifiedId} from './CPB.library';
+import {CPBackupImporter, BackupPeekResult, isCreatedBySameUser, BackupQualifiedId} from './cPB.library';
 
 import {BackupService} from '../backupService';
 import {IncompatibleBackupError} from '../error';

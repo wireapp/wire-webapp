@@ -25,32 +25,32 @@ import ko from 'knockout';
 
 import {OutlineCheck} from '@wireapp/react-ui-kit';
 
-import {ReadIndicator} from 'Components/MessagesList/Message/ReadIndicator';
+import {ReadIndicator} from 'Components/messagesList/message/readIndicator';
 import {useClickOutside} from 'Hooks/useClickOutside';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
-import {StatusType} from 'src/script/message/StatusType';
+import {StatusType} from 'src/script/message/statusType';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
 import {t} from 'Util/localizerUtil';
 
 import {ContentAsset} from './asset';
-import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';
-import {MessageActionsMenu} from './MessageActions/MessageActions';
-import {useMessageActionsState} from './MessageActions/MessageActions.state';
-import {MessageReactionsList} from './MessageActions/MessageReactions/MessageReactionsList';
-import {MessageHeader} from './MessageHeader';
-import {Quote} from './MessageQuote';
-import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './Warnings';
+import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './contentMessage.styles';
+import {MessageActionsMenu} from './messageActions/messageActions';
+import {useMessageActionsState} from './messageActions/messageActions.state';
+import {MessageReactionsList} from './messageActions/messageReactions/messageReactionsList';
+import {MessageHeader} from './messageHeader';
+import {Quote} from './messageQuote';
+import {CompleteFailureToSendWarning, PartialFailureToSendWarning} from './warnings';
 
 import {MessageActions} from '..';
-import {EphemeralStatusType} from '../../../../message/EphemeralStatusType';
-import {ContextMenuEntry} from '../../../../ui/ContextMenu';
-import {EphemeralTimer} from '../EphemeralTimer';
-import {MessageTime} from '../MessageTime';
+import {EphemeralStatusType} from '../../../../message/ephemeralStatusType';
+import {ContextMenuEntry} from '../../../../ui/contextMenu';
+import {EphemeralTimer} from '../ephemeralTimer';
+import {MessageTime} from '../messageTime';
 import {useMessageFocusedTabIndex} from '../util';
 
 export interface ContentMessageProps extends Omit<MessageActions, 'onClickResetSession'> {

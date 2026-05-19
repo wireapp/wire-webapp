@@ -17,7 +17,7 @@
  *
  */
 
-import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermissionStatus';
+import {BrowserPermissionStatus} from 'Repositories/permission/browserPermissionStatus';
 import {
   arePermissionsGranted,
   getPermissionState,
@@ -28,9 +28,9 @@ import {
   setPermissionState,
   setupPermissionListener,
 } from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
+import {PermissionType} from 'Repositories/permission/permissionType';
 
-import {permissionsStore} from './Permissions.store';
+import {permissionsStore} from './permissions.store';
 
 describe('Permission Handlers', () => {
   // Test utilities and constants

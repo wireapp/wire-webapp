@@ -23,8 +23,8 @@ import is from '@sindresorhus/is';
 
 import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import * as Icon from 'Components/icon';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -34,7 +34,7 @@ import {
   formStyles,
   headerStyles,
   titleStyles,
-} from './LinkDialog.styles';
+} from './linkDialog.styles';
 
 import {validateUrl} from '../../utils/url';
 

@@ -30,35 +30,36 @@ import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {ClientManager} from './ClientManager';
-import {ConversationJoin} from './ConversationJoin';
-import {ConversationJoinInvalid} from './ConversationJoinInvalid';
-import {CreatePersonalAccount} from './CreatePersonalAccount';
-import {CustomBackend} from './CustomBackend';
-import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
-import {HistoryInfo} from './HistoryInfo';
-import {Index} from './Index';
+import {ClientManager} from './clientManager';
+import {ConversationJoin} from './conversationJoin';
+import {ConversationJoinInvalid} from './conversationJoinInvalid';
+import {CreatePersonalAccount} from './createPersonalAccount';
+import {CustomBackend} from './customBackend';
+import {CustomEnvironmentRedirect} from './customEnvironmentRedirect';
+import {HistoryInfo} from './historyInfo';
 import {Login} from './login/login';
 import {SingleSignOn} from './login/singleSignOn';
-import {OAuthPermissions} from './OAuthPermissions';
-import {SetAccountType} from './SetAccountType';
-import {SetEmail} from './SetEmail';
-import {SetEntropyPage} from './SetEntropyPage';
-import {SetHandle} from './SetHandle';
-import {SetPassword} from './SetPassword';
-import {Success} from './Success';
-import {VerifyEmailCode} from './VerifyEmailCode';
-import {VerifyEmailLink} from './VerifyEmailLink';
+import {OAuthPermissions} from './oAuthPermissions';
+import {SetAccountType} from './setAccountType';
+import {SetEmail} from './setEmail';
+import {SetEntropyPage} from './setEntropyPage';
+import {SetHandle} from './setHandle';
+import {SetPassword} from './setPassword';
+import {Success} from './success';
+import {VerifyEmailCode} from './verifyEmailCode';
+import {VerifyEmailLink} from './verifyEmailLink';
 
-import {Config} from '../../Config';
-import {RouteA11y} from '../component/RouteA11y';
+import {Config} from '../../config';
+import {RouteA11y} from '../component/routeA11y';
 import {mapLanguage, normalizeLanguage} from '../localeConfig';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {bindActionCreators, RootState} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import * as LanguageSelector from '../module/selector/LanguageSelector';
+import * as AuthSelector from '../module/selector/authSelector';
+import * as LanguageSelector from '../module/selector/languageSelector';
 import {ROUTE} from '../route';
 import {getOAuthQueryString} from '../util/oauthUtil';
+
+import {Index} from './index';
 
 interface RootProps {}
 

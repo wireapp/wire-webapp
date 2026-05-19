@@ -17,13 +17,13 @@
  *
  */
 import {getGrid, updateVideoGrid} from './videoGridHandler';
-import {Call} from 'Repositories/calling/Call';
+import {Call} from 'Repositories/calling/call';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
-import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
-import {User} from 'Repositories/entity/User';
+import {buildMediaDevicesHandler} from '../../auth/util/test/testUtil';
+import {User} from 'Repositories/entity/user';
 import {createUuid} from 'Util/uuid';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Participant} from 'Repositories/calling/Participant';
+import {Conversation} from 'Repositories/entity/conversation';
+import {Participant} from 'Repositories/calling/participant';
 
 describe('videoGridHandler', () => {
   const createCall = () => {

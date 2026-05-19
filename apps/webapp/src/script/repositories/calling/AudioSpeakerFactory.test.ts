@@ -26,7 +26,7 @@ describe('AudioSpeakerFactory', () => {
       return audio;
     });
 
-    AudioSpeakerFactory = require('./AudioSpeakerFactory').AudioSpeakerFactory;
+    AudioSpeakerFactory = require('./audioSpeakerFactory').AudioSpeakerFactory;
   });
 
   afterEach(() => {
@@ -46,7 +46,7 @@ describe('AudioSpeakerFactory', () => {
   it('throws error if base element does not exist', () => {
     document.body.innerHTML = '';
     jest.resetModules();
-    AudioSpeakerFactory = require('./AudioSpeakerFactory').AudioSpeakerFactory;
+    AudioSpeakerFactory = require('./audioSpeakerFactory').AudioSpeakerFactory;
 
     expect(() => AudioSpeakerFactory.createNewCallingAudioSpeaker(mockStream)).toThrow(
       'Audio element could not be crated!',

@@ -21,10 +21,10 @@ import {Button, ButtonVariant, Input} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {StepProps} from './StepProps';
-import {modalButtonsCss} from './TeamCreationSteps.styles';
+import {StepProps} from './stepProps';
+import {modalButtonsCss} from './teamCreationSteps.styles';
 
-import {buttonCss} from '../TeamCreation.styles';
+import {buttonCss} from '../teamCreation.styles';
 
 export const Form = ({onNextStep, onPreviousStep, teamName, setTeamName}: StepProps) => {
   const trimmedTeamName = teamName.trim();

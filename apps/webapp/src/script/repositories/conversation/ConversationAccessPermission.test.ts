@@ -19,7 +19,7 @@
 
 import {CONVERSATION_ACCESS, CONVERSATION_ACCESS_ROLE} from '@wireapp/api-client/lib/conversation/';
 
-import {ACCESS_STATE, TEAM} from './AccessState';
+import {ACCESS_STATE, TEAM} from './accessState';
 import {
   accessFromPermissions,
   ACCESS_MODES,
@@ -31,7 +31,7 @@ import {
   toggleFeature,
   updateAccessRights,
   UpdatedAccessRights,
-} from './ConversationAccessPermission';
+} from './conversationAccessPermission';
 
 describe('ConversationAccessPermissions', () => {
   const mockTeam = {

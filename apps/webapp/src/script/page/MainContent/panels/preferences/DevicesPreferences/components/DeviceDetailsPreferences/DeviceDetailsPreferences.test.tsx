@@ -19,15 +19,15 @@
 
 import {act, render, waitFor} from '@testing-library/react';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
-import {DeviceDetailsPreferences} from './DeviceDetailsPreferences';
+import {DeviceDetailsPreferences} from './deviceDetailsPreferences';
 
 describe('DeviceDetailsPreferences', () => {
   const rootContextValue = createRootContextValueForTest({});

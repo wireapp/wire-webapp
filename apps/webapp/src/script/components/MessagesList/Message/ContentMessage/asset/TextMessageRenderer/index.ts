@@ -17,4 +17,4 @@
  *
  */
 
-export * from './TextMessageRenderer';
+export * from './textMessageRenderer';

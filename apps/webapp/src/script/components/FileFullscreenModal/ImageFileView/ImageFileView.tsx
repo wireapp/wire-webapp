@@ -17,10 +17,10 @@
  *
  */
 
-import {ZoomableImage} from 'Components/ZoomableImage/ZoomableImage';
+import {ZoomableImage} from 'Components/zoomableImage/zoomableImage';
 import {t} from 'Util/localizerUtil';
 
-import {imageWrapperStyles, wrapperStyles} from './ImageFileView.styles';
+import {imageWrapperStyles, wrapperStyles} from './imageFileView.styles';
 
 interface ImageFileViewProps {
   src?: string;

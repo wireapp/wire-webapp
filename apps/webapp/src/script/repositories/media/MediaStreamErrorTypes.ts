@@ -17,7 +17,7 @@
  *
  */
 
-import {MEDIA_STREAM_ERROR} from './MediaStreamError';
+import {MEDIA_STREAM_ERROR} from './mediaStreamError';
 
 /** @see https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#Errors */
 export const MEDIA_STREAM_ERROR_TYPES = {

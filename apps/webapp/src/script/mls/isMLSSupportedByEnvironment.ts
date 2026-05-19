@@ -26,7 +26,7 @@ import {APIClient} from '../service/apiClientSingleton';
 /**
  * Will check if MLS is supported by client (whether MLS feature is enabled and secret store is supported) and backend (whether used api version supports MLS and backend removal key is present).
  */
-export const isMLSSupportedByEnvironment = async () => {
+export const isMlsSupportedByEnvironment = async () => {
   const isMLSSupportedByClient = supportsMLS();
 
   if (!isMLSSupportedByClient) {

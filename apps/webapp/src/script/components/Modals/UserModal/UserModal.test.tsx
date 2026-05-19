@@ -20,13 +20,13 @@
 import {render, waitFor} from '@testing-library/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {Core} from 'src/script/service/coreSingleton';
 
-import {UserModal, UserModalProps} from './UserModal';
-import {showUserModal} from './UserModal.state';
+import {UserModal, UserModalProps} from './userModal';
+import {showUserModal} from './userModal.state';
 
 describe('UserModal', () => {
   it('correctly fetches user from user repository', async () => {

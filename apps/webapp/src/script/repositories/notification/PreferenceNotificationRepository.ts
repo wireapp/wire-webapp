@@ -26,8 +26,8 @@ import {groupBy} from 'underscore';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import type {User} from 'Repositories/entity/User';
+import type {ClientEntity} from 'Repositories/client/clientEntity';
+import type {User} from 'Repositories/entity/user';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {loadValue, resetStoreValue, storeValue} from 'Util/storageUtil';

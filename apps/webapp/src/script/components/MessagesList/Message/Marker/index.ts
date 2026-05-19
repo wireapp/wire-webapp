@@ -17,4 +17,4 @@
  *
  */
 
-export * from './Marker';
+export * from './marker';

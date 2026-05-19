@@ -25,8 +25,8 @@ import {ContainerXS, H2, Text} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {Config} from '../../Config';
-import {WirelessContainer} from '../component/WirelessContainer';
+import {Config} from '../../config';
+import {WirelessContainer} from '../component/wirelessContainer';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 

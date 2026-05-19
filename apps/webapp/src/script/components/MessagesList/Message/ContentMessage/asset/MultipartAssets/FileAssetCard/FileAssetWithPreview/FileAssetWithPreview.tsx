@@ -21,7 +21,7 @@ import {CSSProperties, useState} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {FileCard} from 'Components/fileCard/fileCard';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -32,10 +32,10 @@ import {
   infoOverlayStyles,
   infoWrapperStyles,
   loaderIconStyles,
-} from './FileAssetWithPreview.styles';
+} from './fileAssetWithPreview.styles';
 
-import {FileAssetOptions} from '../common/FileAssetOptions/FileAssetOptions';
-import {FilePreviewModal} from '../common/FilePreviewModal/FilePreviewModal';
+import {FileAssetOptions} from '../common/fileAssetOptions/fileAssetOptions';
+import {FilePreviewModal} from '../common/filePreviewModal/filePreviewModal';
 
 interface FileAssetWithPreviewProps {
   src?: string;

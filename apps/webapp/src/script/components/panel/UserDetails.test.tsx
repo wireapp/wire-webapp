@@ -19,11 +19,11 @@
 
 import {render} from '@testing-library/react';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
-import {UserDetails} from './UserDetails';
+import {UserDetails} from './userDetails';
 
 jest.mock('Components/Avatar', () => ({
   Avatar: () => <div data-testid="mock-avatar" />,

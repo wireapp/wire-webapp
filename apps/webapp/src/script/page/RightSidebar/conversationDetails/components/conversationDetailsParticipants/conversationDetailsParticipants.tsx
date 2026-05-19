@@ -17,12 +17,12 @@
  *
  */
 
-import * as Icon from 'Components/Icon';
-import {ServiceList} from 'Components/ServiceList';
-import {UserList} from 'Components/UserList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {ServiceList} from 'Components/serviceList';
+import {UserList} from 'Components/userList';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {t} from 'Util/localizerUtil';
 

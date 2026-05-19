@@ -19,7 +19,7 @@
 
 import React from 'react';
 
-import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
+import {ClientNotificationData} from 'Repositories/notification/preferenceNotificationRepository';
 
 export interface ButtonAction {
   action?: Function;

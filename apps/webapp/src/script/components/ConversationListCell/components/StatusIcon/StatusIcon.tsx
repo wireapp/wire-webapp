@@ -19,10 +19,10 @@
 
 import {useMemo} from 'react';
 
-import * as Icon from 'Components/Icon';
-import {generateCellState} from 'Repositories/conversation/ConversationCellState';
-import {ConversationStatusIcon} from 'Repositories/conversation/ConversationStatusIcon';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import * as Icon from 'Components/icon';
+import {generateCellState} from 'Repositories/conversation/conversationCellState';
+import {ConversationStatusIcon} from 'Repositories/conversation/conversationStatusIcon';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 

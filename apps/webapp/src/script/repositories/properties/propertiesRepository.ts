@@ -25,15 +25,15 @@ import ko from 'knockout';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import type {User} from 'Repositories/entity/User';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {PrimaryModalType} from 'Components/modals/primaryModal/primaryModalTypes';
+import type {User} from 'Repositories/entity/user';
 import type {SelfService} from 'Repositories/self/selfService';
 import {StorageKey} from 'Repositories/storage';
 import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';

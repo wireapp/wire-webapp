@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {UserStatusBadges} from './UserStatusBadges';
+import {UserStatusBadges} from './userStatusBadges';
 
 describe('UserBadges', () => {
   it('should render all the badges passed in config', () => {

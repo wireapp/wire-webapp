@@ -26,19 +26,19 @@ import {Runtime} from '@wireapp/commons';
 import * as uiKit from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {TitleBar} from 'Components/TitleBar';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {TitleBar} from 'Components/titleBar';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {CallState} from 'Repositories/calling/callState';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {ContentState} from 'src/script/page/useAppState';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
-import {PanelState} from '../../page/RightSidebar/RightSidebar';
-import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {TestFactory} from '../../../../test/helper/testFactory';
+import {PanelState} from '../../page/rightSidebar/rightSidebar';
+import {ViewModelRepositories} from '../../viewModel/mainViewModel';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
@@ -177,7 +177,7 @@ describe('TitleBar', () => {
     expect(videoCallButton).toBe(null);
   });
 
-  it("doesn't show legal-hold icon for non legal-hold user", async () => {
+  it("doesn't show legalHold icon for non legalHold user", async () => {
     const selfUser = createUser(true);
     const conversation = createConversationEntity({hasLegalHold: ko.pureComputed(() => false)});
 
@@ -185,11 +185,11 @@ describe('TitleBar', () => {
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
     );
 
-    const legalHoldDotButton = container.querySelector('button[data-uie-name="status-legal-hold-conversation"]');
+    const legalHoldDotButton = container.querySelector('button[data-uie-name="status-legalHold-conversation"]');
     expect(legalHoldDotButton).toBeNull();
   });
 
-  it('shows legal-hold icon for legal-hold user', async () => {
+  it('shows legalHold icon for legalHold user', async () => {
     const selfUser = createUser(true);
     const conversation = createConversationEntity({hasLegalHold: ko.pureComputed(() => true)});
 
@@ -197,7 +197,7 @@ describe('TitleBar', () => {
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
     );
 
-    const legalHoldDotButton = container.querySelector('button[data-uie-name="status-legal-hold-conversation"]');
+    const legalHoldDotButton = container.querySelector('button[data-uie-name="status-legalHold-conversation"]');
     expect(legalHoldDotButton).not.toBeNull();
   });
 

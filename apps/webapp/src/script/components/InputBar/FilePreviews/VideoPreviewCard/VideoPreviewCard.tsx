@@ -19,10 +19,10 @@
 
 import {t} from 'Util/localizerUtil';
 
-import {videoStyles, iconWrapperStyles} from './VideoPreviewCard.styles';
+import {videoStyles, iconWrapperStyles} from './videoPreviewCard.styles';
 
-import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
-import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
+import {FilePreviewPlayButton} from '../common/filePreviewPlayButton/filePreviewPlayButton';
+import {MediaFilePreviewCard} from '../common/mediaFilePreviewCard/mediaFilePreviewCard';
 
 interface VideoPreviewCardProps {
   src: string;

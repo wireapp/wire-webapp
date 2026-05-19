@@ -19,12 +19,12 @@
 
 import {useCallback} from 'react';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
 import {t} from 'Util/localizerUtil';
 
-import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
-import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
+import {useWarningsState} from '../../viewModel/warningsContainer/warningsState';
+import {TYPE} from '../../viewModel/warningsContainer/warningsTypes';
 
 export const useNoInternetCallGuard = () => {
   const warnings = useWarningsState(state => state.warnings);

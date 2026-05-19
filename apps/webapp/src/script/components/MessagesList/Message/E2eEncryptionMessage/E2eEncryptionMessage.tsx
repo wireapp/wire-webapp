@@ -19,7 +19,7 @@
 
 import {Link, LinkVariant, ShieldIcon} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -30,7 +30,7 @@ import {
   e2eMessageContentParagraphCss,
   e2eMessageContentParagraphWithMarginCss,
   e2eMessageContentLinkCss,
-} from './E2eEncryptionMessage.styles';
+} from './e2eEncryptionMessage.styles';
 
 interface E2eEncryptionMessageProps {
   isCellsConversation: boolean;

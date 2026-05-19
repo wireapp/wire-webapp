@@ -32,7 +32,7 @@ import {getForcedErrorReportingStatus} from 'Repositories/tracking/telemetry.hel
 import {ConsentValue} from 'Repositories/user/consentValue';
 import {t} from 'Util/localizerUtil';
 
-import {PreferencesSection} from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/preferencesSection';
 
 interface DataUsageSectionProps {
   brandName: string;

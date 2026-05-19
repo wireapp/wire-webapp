@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import {GroupAvatar} from './GroupAvatar';
+import {GroupAvatar} from './groupAvatar';
 
 describe('GroupAvatar', () => {
   it('renders avatar', async () => {

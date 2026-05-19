@@ -19,7 +19,7 @@
 
 import {t} from 'Util/localizerUtil';
 
-import {textStyles, wrapperStyles} from './CellsFolderListEmpty.styles';
+import {textStyles, wrapperStyles} from './cellsFolderListEmpty.styles';
 
 export const CellsFolderListEmpty = () => {
   return (

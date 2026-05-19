@@ -19,12 +19,12 @@
 
 import {FC} from 'react';
 
-import {AssetImage} from 'Components/Image';
-import {AudioAsset} from 'Components/MessagesList/Message/ContentMessage/asset/AudioAsset/AudioAsset';
-import {FileAsset} from 'Components/MessagesList/Message/ContentMessage/asset/FileAsset/FileAsset';
-import {LinkPreviewAsset} from 'Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {AssetImage} from 'Components/image';
+import {AudioAsset} from 'Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset';
+import {FileAsset} from 'Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset';
+import {LinkPreviewAsset} from 'Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {isOfCategory} from './utils';

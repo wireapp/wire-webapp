@@ -27,14 +27,14 @@ import {copyText} from 'Util/clipboardUtil';
 import {t} from 'Util/localizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/timeUtil';
 
-import type {Asset} from './Asset';
-import type {FileAsset} from './FileAsset';
-import type {MediumImage} from './MediumImage';
-import {Message} from './Message';
-import {Text as TextAsset} from './Text';
+import type {Asset} from './asset';
+import type {FileAsset} from './fileAsset';
+import type {MediumImage} from './mediumImage';
+import {Message} from './message';
+import {Text as TextAsset} from './text';
 
-import type {QuoteEntity} from '../../../message/QuoteEntity';
-import {SuperType} from '../../../message/SuperType';
+import type {QuoteEntity} from '../../../message/quoteEntity';
+import {SuperType} from '../../../message/superType';
 
 export class ContentMessage extends Message {
   public readonly assets: ko.ObservableArray<Asset | FileAsset | TextAsset | MediumImage> = ko.observableArray();

@@ -36,13 +36,13 @@ import {
 
 import {useUserIdentity} from 'Hooks/useDeviceIdentities';
 import {ClientEntity} from 'Repositories/client';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import {checkUserHandle} from 'Repositories/conversation/conversationVerificationStateHandler';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
-import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {MLSStatuses, WireIdentity} from 'src/script/e2eIdentity/e2eIdentityVerification';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {waitFor} from 'Util/waitFor';

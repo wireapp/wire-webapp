@@ -19,30 +19,30 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
-import {Text} from 'Repositories/entity/message/Text';
-import {MessageCategory} from 'src/script/message/MessageCategory';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {LinkPreview} from 'Repositories/entity/message/linkPreview';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
+import {Text} from 'Repositories/entity/message/text';
+import {messageCategory} from 'src/script/message/messageCategory';
 import {createUuid} from 'Util/uuid';
 
-import {CollectionDetails} from './CollectionDetails';
+import {CollectionDetails} from './collectionDetails';
 
-jest.mock('Components/Image', () => ({
+jest.mock('Components/image', () => ({
   AssetImage: () => <div>Image</div>,
   __esModule: true,
 }));
-jest.mock('Components/MessagesList/Message/ContentMessage/asset/AudioAsset/AudioAsset', () => ({
+jest.mock('Components/messagesList/message/contentMessage/asset/audioAsset/audioAsset', () => ({
   AudioAsset: () => <div>Audio</div>,
   __esModule: true,
 }));
-jest.mock('Components/MessagesList/Message/ContentMessage/asset/FileAsset/FileAsset', () => ({
+jest.mock('Components/messagesList/message/contentMessage/asset/fileAsset/fileAsset', () => ({
   FileAsset: () => <div>File</div>,
   __esModule: true,
 }));
-jest.mock('Components/MessagesList/Message/ContentMessage/asset/LinkPreviewAssetComponent', () => ({
+jest.mock('Components/messagesList/message/contentMessage/asset/linkPreviewAssetComponent', () => ({
   LinkPreviewAsset: () => <div>Link Preview</div>,
   __esModule: true,
 }));
@@ -53,7 +53,7 @@ const createImageMessage = (timestamp: number = Date.now()) => {
   const image = new MediumImage(createUuid());
   image.resource({} as any);
   message.assets.push(image);
-  message.category = MessageCategory.IMAGE;
+  message.category = messageCategory.IMAGE;
   return message;
 };
 
@@ -61,7 +61,7 @@ const createFileMessage = () => {
   const message = new ContentMessage(createUuid());
   const file = new FileAsset(createUuid());
   message.assets.push(file);
-  message.category = MessageCategory.FILE;
+  message.category = messageCategory.FILE;
   return message;
 };
 
@@ -70,7 +70,7 @@ const createLinkMessage = () => {
   const link = new Text(createUuid());
   link.previews.push(new LinkPreview({}));
   message.assets.push(link);
-  message.category = MessageCategory.LINK_PREVIEW;
+  message.category = messageCategory.LINK_PREVIEW;
   return message;
 };
 
@@ -79,7 +79,7 @@ const createAudioMessage = () => {
   const audio = new FileAsset(createUuid());
   spyOn(audio, 'isAudio').and.returnValue(true);
   message.assets.push(audio);
-  message.category = MessageCategory.FILE;
+  message.category = messageCategory.FILE;
   return message;
 };
 

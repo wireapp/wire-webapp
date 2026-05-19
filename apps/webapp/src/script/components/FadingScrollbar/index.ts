@@ -17,4 +17,4 @@
  *
  */
 
-export * from './FadingScrollbar';
+export * from './fadingScrollbar';

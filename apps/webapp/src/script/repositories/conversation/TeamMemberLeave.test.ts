@@ -17,11 +17,11 @@
  *
  */
 
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
 import type {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import type {ConnectionState} from 'Repositories/connection/connectionState';
-import type {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
+import type {EventRepository} from 'Repositories/event/eventRepository';
+import {EventService} from 'Repositories/event/eventService';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import type {SelfRepository} from 'Repositories/self/selfRepository';
 import type {TeamRepository} from 'Repositories/team/teamRepository';
@@ -33,10 +33,10 @@ import {generateUser} from 'test/helper/UserGenerator';
 
 jest.mock('./EventMapper', () => ({EventMapper: jest.fn().mockReturnValue({})}));
 
-import {ConversationRepository} from './ConversationRepository';
-import type {ConversationService} from './ConversationService';
-import {ConversationState} from './ConversationState';
-import type {MessageRepository} from './MessageRepository';
+import {ConversationRepository} from './conversationRepository';
+import type {ConversationService} from './conversationService';
+import {ConversationState} from './conversationState';
+import type {MessageRepository} from './messageRepository';
 
 import {Core} from '../../service/coreSingleton';
 import {serverTimeHandler} from '../../time/serverTimeHandler';

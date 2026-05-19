@@ -19,13 +19,13 @@
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {VerificationBadges} from 'Components/Badge';
-import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {VerificationBadges} from 'Components/badge';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {useCertificateStatus} from 'src/script/hooks/useCertificateStatus';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {styles} from './E2EICertificateDetails.styles';
+import {styles} from './e2eiCertificateDetails.styles';
 import {useCertificateDetailsModal} from './useCertificateDetailsModal';
 
 const logger = getLogger('E2EICertificateDetails');

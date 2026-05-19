@@ -19,11 +19,11 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {createUuid} from 'Util/uuid';
 
-import {ConversationClassifiedBar} from './ClassifiedBar';
+import {ConversationClassifiedBar} from './classifiedBar';
 
 describe('ClassifiedBar', () => {
   const conversation = new Conversation();

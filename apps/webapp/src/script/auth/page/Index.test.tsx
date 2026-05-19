@@ -20,14 +20,14 @@
 import {act, waitFor} from '@testing-library/react';
 import {Navigate} from 'react-router-dom';
 
-import {Index} from './Index';
+import {Index} from './index';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {initialRootState} from '../module/reducer';
 import {initialAuthState} from '../module/reducer/authReducer';
 import {ROUTE} from '../route';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/testUtil';
 import {getPrefixedSSOCode} from '../util/urlUtil';
 
 jest.mock('react-router-dom', () => ({

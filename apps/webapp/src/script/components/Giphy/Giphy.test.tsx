@@ -19,8 +19,8 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
-import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {GiphyRepository} from 'Repositories/extension/giphyRepository';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 import {Giphy, GiphyState} from '.';
 

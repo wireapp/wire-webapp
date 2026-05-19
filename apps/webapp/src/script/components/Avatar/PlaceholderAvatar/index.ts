@@ -17,4 +17,4 @@
  *
  */
 
-export * from './PlaceholderAvatar';
+export * from './placeholderAvatar';

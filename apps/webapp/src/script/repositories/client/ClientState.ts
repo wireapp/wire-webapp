@@ -19,7 +19,7 @@
 
 import {singleton} from 'tsyringe';
 
-import {ClientEntity} from './ClientEntity';
+import {ClientEntity} from './clientEntity';
 
 @singleton()
 export class ClientState {

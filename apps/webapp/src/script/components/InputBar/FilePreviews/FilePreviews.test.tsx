@@ -19,16 +19,16 @@
 
 import {render, screen} from '@testing-library/react';
 
-import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
-import {FilePreviews} from './FilePreviews';
+import {FilePreviews} from './filePreviews';
 
-jest.mock('./ImagePreviewCard/ImagePreviewCard', () => ({
+jest.mock('./imagePreviewCard/imagePreviewCard', () => ({
   ImagePreviewCard: () => <div data-uie-name="image-preview-card" />,
 }));
 
-jest.mock('./FilePreviewCard/FilePreviewCard', () => ({
+jest.mock('./filePreviewCard/filePreviewCard', () => ({
   FilePreviewCard: () => <div data-uie-name="file-preview-card" />,
 }));
 

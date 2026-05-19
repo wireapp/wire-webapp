@@ -24,12 +24,12 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import {PrimaryModal, usePrimaryModalState} from 'Components/modals/primaryModal';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/teamRepository';
@@ -39,20 +39,20 @@ import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import type {ActionsViewModel} from './ActionsViewModel';
-import {CallingViewModel} from './CallingViewModel';
-import {ContentViewModel} from './ContentViewModel';
-import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
+import type {ActionsViewModel} from './actionsViewModel';
+import {CallingViewModel} from './callingViewModel';
+import {ContentViewModel} from './contentViewModel';
+import type {MainViewModel, ViewModelRepositories} from './mainViewModel';
 
-import {Config} from '../Config';
-import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {PanelState} from '../page/RightSidebar';
+import {Config} from '../config';
+import {SidebarTabs, useSidebarStore} from '../page/leftSidebar/panels/conversations/useSidebarStore';
+import {PanelState} from '../page/rightSidebar';
 import {useAppMainState} from '../page/state';
 import {ContentState, ListState, useAppState} from '../page/useAppState';
-import {showContextMenu} from '../ui/ContextMenu';
-import {showLabelContextMenu} from '../ui/LabelContextMenu';
-import {Shortcut} from '../ui/Shortcut';
-import {ShortcutType} from '../ui/ShortcutType';
+import {showContextMenu} from '../ui/contextMenu';
+import {showLabelContextMenu} from '../ui/labelContextMenu';
+import {Shortcut} from '../ui/shortcut';
+import {ShortcutType} from '../ui/shortcutType';
 
 export class ListViewModel {
   private readonly userState: UserState;

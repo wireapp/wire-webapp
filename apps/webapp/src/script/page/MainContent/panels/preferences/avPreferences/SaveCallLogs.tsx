@@ -21,15 +21,15 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {CallingRepository} from 'Repositories/calling/CallingRepository';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {CallingRepository} from 'Repositories/calling/callingRepository';
 import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {Config} from '../../../../../Config';
-import {PreferencesSection} from '../components/PreferencesSection';
+import {Config} from '../../../../../config';
+import {PreferencesSection} from '../components/preferencesSection';
 
 interface SaveCallLogsProps {
   callingRepository: CallingRepository;

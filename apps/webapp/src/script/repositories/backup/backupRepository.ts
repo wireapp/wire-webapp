@@ -19,10 +19,10 @@
 
 import {omit} from 'underscore';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isReadableConversation} from 'Repositories/conversation/ConversationSelectors';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {isReadableConversation} from 'Repositories/conversation/conversationSelectors';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {EventRecord, UserRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
@@ -49,7 +49,7 @@ import {
 } from './error';
 import {createMetaData, exportHistory, importLegacyBackupToDatabase} from './legacyBackup.helper';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 const UINT8ARRAY_FIELDS = ['otr_key', 'sha256'];
 

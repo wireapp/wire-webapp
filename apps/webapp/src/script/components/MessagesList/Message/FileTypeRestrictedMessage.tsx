@@ -17,7 +17,7 @@
  *
  */
 
-import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
+import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/fileTypeRestrictedMessage';
 import {t} from 'Util/localizerUtil';
 
 interface FileTypeRestrictedMessageProps {

@@ -21,11 +21,11 @@ import {useState} from 'react';
 
 import {Document, Page} from 'react-pdf';
 
-import {PdfLoader} from './common/PdfLoader/PdfLoader';
-import {PdfControls} from './PdfControls/PdfControls';
-import {PdfError} from './PdfError/PdfError';
-import {PdfSidebar} from './PdfSidebar/PdfSidebar';
-import {mainContentStyles, pageWrapperStyles, wrapperStyles} from './PdfViewer.styles';
+import {PdfLoader} from './common/pdfLoader/pdfLoader';
+import {PdfControls} from './pdfControls/pdfControls';
+import {PdfError} from './pdfError/pdfError';
+import {PdfSidebar} from './pdfSidebar/pdfSidebar';
+import {mainContentStyles, pageWrapperStyles, wrapperStyles} from './pdfViewer.styles';
 import {usePageControls} from './usePageControls/usePageControls';
 import {useZoomControls} from './useZoomControls/useZoomControls';
 

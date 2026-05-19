@@ -21,16 +21,16 @@ import {useEffect, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
-import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common/CellsNewNodeForm/CellsNewNodeForm';
-import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
-import {useCellsNewFolderForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
+import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
+import {CellsNewNodeForm} from 'Components/conversation/conversationCells/common/cellsNewNodeForm/cellsNewNodeForm';
+import {getCellsFilesPath} from 'Components/conversation/conversationCells/common/getCellsFilesPath/getCellsFilesPath';
+import {useCellsNewFolderForm} from 'Components/conversation/conversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
-import {CellsFoldersListModalContent} from './CellsFoldersListModalContent/CellsFoldersListModalContent';
+import {CellsFoldersListModalContent} from './cellsFoldersListModalContent/cellsFoldersListModalContent';
 import {useGetCellsFolders} from './useGetCellsFolders/useGetCellsFolders';
 import {useMoveCellsNode} from './useMoveCellNode/useMoveCellsNode';
 

@@ -20,17 +20,17 @@
 import {RegisteredClient} from '@wireapp/api-client/lib/client';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS, FeatureList} from '@wireapp/api-client/lib/team';
 
-import {MLSMigrationStatus} from 'src/script/mls/MLSMigration/migrationStatus';
+import {MLSMigrationStatus} from 'src/script/mls/mlsMigration/migrationStatus';
 import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {evaluateSelfSupportedProtocols} from './selfSupportedProtocols';
 
-import * as mlsSupport from '../../../mls/isMLSSupportedByEnvironment';
+import * as mlsSupport from '../../../mls/isMlsSupportedByEnvironment';
 
 const testFactory = new TestFactory();
 
-jest.spyOn(mlsSupport, 'isMLSSupportedByEnvironment').mockResolvedValue(true);
+jest.spyOn(mlsSupport, 'isMlsSupportedByEnvironment').mockResolvedValue(true);
 
 const generateMLSFeaturesConfig = (
   migrationStatus: MLSMigrationStatus,

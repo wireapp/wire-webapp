@@ -18,12 +18,12 @@
  */
 
 jest.mock('@wireapp/telemetry');
-jest.mock('src/script/Config');
+jest.mock('src/script/config');
 jest.mock('Util/uuid');
 
 import * as telemetry from '@wireapp/telemetry';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {createUuid} from 'Util/uuid';
 
 import * as trackingUtil from './trackingUtil';

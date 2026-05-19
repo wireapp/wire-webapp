@@ -22,7 +22,7 @@ import {DeviceIdentity} from '@wireapp/core/lib/messagingProtocols/mls';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {container} from 'tsyringe';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
 import {Core} from 'src/script/service/coreSingleton';
 import {base64ToArray} from 'Util/util';
 

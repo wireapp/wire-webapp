@@ -29,9 +29,9 @@ import {container} from 'tsyringe';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {User} from 'Repositories/entity/User';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {User} from 'Repositories/entity/user';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/storageKey';
 import {t} from 'Util/localizerUtil';
@@ -41,14 +41,14 @@ import {loadValue} from 'Util/storageUtil';
 import {toError} from 'Util/toError';
 import {isAxiosError, isErrorWithCode, isErrorWithType} from 'Util/typePredicateUtil';
 
-import {ClientEntity} from './ClientEntity';
-import {constructClientId, parseClientId} from './ClientIdUtil';
-import {ClientMapper} from './ClientMapper';
-import type {ClientService} from './ClientService';
-import {ClientState} from './ClientState';
-import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
+import {ClientEntity} from './clientEntity';
+import {constructClientId, parseClientId} from './clientIdUtil';
+import {ClientMapper} from './clientMapper';
+import type {ClientService} from './clientService';
+import {ClientState} from './clientState';
+import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './clientUtils';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
 import {ClientError} from '../../error/clientError';
 import {Core} from '../../service/coreSingleton';
 

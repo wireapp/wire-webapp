@@ -22,8 +22,8 @@ import {useEffect, useState, useRef, useCallback} from 'react';
 import {amplify} from 'amplify';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {DRAFT_STATE_CHANGED_EVENT} from 'Components/InputBar/common/draftState/draftState';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {DRAFT_STATE_CHANGED_EVENT} from 'Components/inputBar/common/draftState/draftState';
+import {Conversation} from 'Repositories/entity/conversation';
 import {StorageKey} from 'Repositories/storage';
 
 import {conversationHasDraft} from '../utils/draftUtils';

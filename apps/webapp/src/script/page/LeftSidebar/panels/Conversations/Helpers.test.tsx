@@ -19,14 +19,14 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {
   conversationFilters,
   conversationSearchFilter,
   getConversationsWithHeadings,
   getTabConversations,
   scrollToConversation,
-} from 'src/script/page/LeftSidebar/panels/Conversations/helpers';
+} from 'src/script/page/leftSidebar/panels/conversations/helpers';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
 

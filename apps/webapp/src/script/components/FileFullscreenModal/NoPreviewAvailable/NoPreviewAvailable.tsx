@@ -22,7 +22,7 @@ import {Button} from '@wireapp/react-ui-kit';
 import {t} from 'Util/localizerUtil';
 import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
-import {FilePlaceholder} from '../common/FilePlaceholder/FilePlaceholder';
+import {FilePlaceholder} from '../common/filePlaceholder/filePlaceholder';
 
 interface NoPreviewAvailableProps {
   fileExtension: string;

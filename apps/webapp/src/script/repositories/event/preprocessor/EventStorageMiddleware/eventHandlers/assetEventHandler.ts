@@ -20,12 +20,12 @@
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {AssetAddEvent} from 'Repositories/conversation/EventBuilder';
+import {AssetAddEvent} from 'Repositories/conversation/eventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 
-import {EventValidationError} from './EventValidationError';
+import {EventValidationError} from './eventValidationError';
 
-import {CONVERSATION, ClientEvent} from '../../../Client';
+import {CONVERSATION, ClientEvent} from '../../../client';
 import {DBOperation, EventHandler, HandledEvents} from '../types';
 
 function validateAssetEvent(originalEvent: HandledEvents | undefined): originalEvent is StoredEvent<AssetAddEvent> {

@@ -22,13 +22,13 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {AddUsersFailure, AddUsersFailureReasons} from '@wireapp/core/lib/conversation';
 
 import en from 'I18n/en-US.json';
-import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
-import {User} from 'Repositories/entity/User';
+import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/failedToAddUsersMessage';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
-import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
+import {withTheme, generateQualifiedIds} from 'src/script/auth/util/test/testUtil';
 import {setStrings} from 'Util/localizerUtil';
 
-import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
 
 setStrings({en});
 

@@ -23,14 +23,14 @@ import {SuccessShield} from '@wireapp/react-ui-kit/lib/Images/SuccessShield';
 
 import {ActionLinkButton, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {replaceBrowserLocation} from 'src/script/navigation/browserLocation';
 import {t} from 'Util/localizerUtil';
 
-import {Page} from './Page';
-import {styles} from './Success.styles.';
+import {Page} from './page';
+import {styles} from './success.styles.';
 
-import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
+import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {PageView, resetTelemetrySession, trackTelemetryPageView} from '../util/trackingUtil';
 import {pathWithParams} from '../util/urlUtil';

@@ -17,4 +17,4 @@
  *
  */
 
-export * from './UserDetails';
+export * from './userDetails';

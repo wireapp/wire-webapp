@@ -22,8 +22,8 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {result, task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {User} from 'Repositories/entity/User';
+import {ConversationDatabaseData, ConversationMapper} from 'Repositories/conversation/conversationMapper';
+import {User} from 'Repositories/entity/user';
 import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';

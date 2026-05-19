@@ -19,13 +19,13 @@
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-import * as Icon from 'Components/Icon';
-import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/ProtocolUpdateMessage';
-import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
-import {Config} from 'src/script/Config';
+import * as Icon from 'Components/icon';
+import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories/entity/message/protocolUpdateMessage';
+import {SystemMessage} from 'Repositories/entity/message/systemMessage';
+import {Config} from 'src/script/config';
 import {replaceLink, t} from 'Util/localizerUtil';
 
-import {SystemMessageBase} from '../SystemMessage/SystemMessageBase';
+import {SystemMessageBase} from '../systemMessage/systemMessageBase';
 
 interface ProtocolUpdateMessageProps {
   message: ProtocolUpdateMessageEntity;

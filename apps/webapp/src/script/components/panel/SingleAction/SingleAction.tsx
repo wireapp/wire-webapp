@@ -21,7 +21,7 @@ import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {singleActionButtonStyle} from './SingleAction.styles';
+import {singleActionButtonStyle} from './singleAction.styles';
 
 interface MenuItem {
   click: () => void;

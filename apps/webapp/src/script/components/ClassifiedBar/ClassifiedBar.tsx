@@ -20,9 +20,9 @@
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import * as Icon from 'Components/Icon';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 

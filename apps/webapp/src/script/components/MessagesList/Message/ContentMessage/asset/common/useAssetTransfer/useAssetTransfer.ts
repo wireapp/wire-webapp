@@ -24,8 +24,8 @@ import {container} from 'tsyringe';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 export type AssetUrl = {

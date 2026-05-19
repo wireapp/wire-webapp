@@ -19,7 +19,7 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {TextMessageRenderer} from './TextMessageRenderer';
+import {TextMessageRenderer} from './textMessageRenderer';
 
 describe('TextMessageRenderer', () => {
   it('renders a text message', () => {

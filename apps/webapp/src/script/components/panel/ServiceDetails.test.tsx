@@ -21,7 +21,7 @@ import {render} from '@testing-library/react';
 
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 
-import {ServiceDetails} from './ServiceDetails';
+import {ServiceDetails} from './serviceDetails';
 
 describe('ServiceDetails', () => {
   it('renders the correct infos for the service', () => {

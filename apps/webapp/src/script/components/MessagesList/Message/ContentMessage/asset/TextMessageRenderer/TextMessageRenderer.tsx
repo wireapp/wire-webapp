@@ -19,12 +19,12 @@
 
 import {useEffect, FC, useState, HTMLProps, useRef} from 'react';
 
-import {isKeyDownEvent} from 'src/script/guards/Event';
-import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
+import {isKeyDownEvent} from 'src/script/guards/event';
+import {isAuxClickEvent, isClickEvent} from 'src/script/guards/mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
-import {ShowMoreButton} from './ShowMoreButton';
+import {ShowMoreButton} from './showMoreButton';
 
 export type ElementType = 'markdownLink' | 'email' | 'mention';
 

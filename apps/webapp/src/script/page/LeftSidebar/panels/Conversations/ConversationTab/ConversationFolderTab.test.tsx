@@ -19,12 +19,12 @@
 
 import {render} from '@testing-library/react';
 
-import * as Icon from 'Components/Icon';
-import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import * as Icon from 'Components/icon';
+import {createLabel, LabelType} from 'Repositories/conversation/conversationLabelRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {TestFactory} from 'test/helper/TestFactory';
 
-import {ConversationFolderTab} from './ConversationFolderTab';
+import {ConversationFolderTab} from './conversationFolderTab';
 
 import {SidebarTabs} from '../useSidebarStore';
 

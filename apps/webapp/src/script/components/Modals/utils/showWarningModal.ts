@@ -17,7 +17,7 @@
  *
  */
 
-import {PrimaryModal} from '../PrimaryModal';
+import {PrimaryModal} from '../primaryModal';
 
 export const showWarningModal = (title: string, message: string): void => {
   // Timeout needed for display warning modal - we need to update modal

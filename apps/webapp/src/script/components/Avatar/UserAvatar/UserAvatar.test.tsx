@@ -21,12 +21,12 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 
-import {UserAvatar} from './UserAvatar';
+import {UserAvatar} from './userAvatar';
 
-import {AVATAR_SIZE, STATE} from '../Avatar';
+import {AVATAR_SIZE, STATE} from '../avatar';
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {

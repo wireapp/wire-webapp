@@ -21,8 +21,8 @@ import {useEffect, useState} from 'react';
 
 import cx from 'classnames';
 
-import {ReadIcon} from 'Components/Icon';
-import {Message} from 'Repositories/entity/message/Message';
+import {ReadIcon} from 'Components/icon';
+import {Message} from 'Repositories/entity/message/message';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {formatTimeShort} from 'Util/timeUtil';

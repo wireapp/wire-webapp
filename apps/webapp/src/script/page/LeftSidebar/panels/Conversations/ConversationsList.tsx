@@ -33,27 +33,27 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {WIDTH} from '@wireapp/react-ui-kit';
 
-import {ConversationListCell} from 'Components/ConversationListCell';
-import {Call} from 'Repositories/calling/Call';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {ConversationListCell} from 'Components/conversationListCell';
+import {Call} from 'Repositories/calling/call';
+import {CallState} from 'Repositories/calling/callState';
+import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conversation/conversationLabelRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKeyboardEvent} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {isConversationEntity} from 'Util/typePredicateUtil';
 
-import {ConnectionRequests} from './ConnectionRequests';
-import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './ConversationsList.styles';
+import {ConnectionRequests} from './connectionRequests';
+import {conversationsList, headingTitle, noResultsMessage, virtualizationStyles} from './conversationsList.styles';
 import {conversationSearchFilter, getConversationsWithHeadings} from './helpers';
 
 import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from '../../../../router/routerBindings';
-import {ListViewModel} from '../../../../view_model/ListViewModel';
+import {ListViewModel} from '../../../../viewModel/listViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';
 

@@ -23,13 +23,13 @@ import {FlexBox} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {styles} from './CreatePersonalAccount.styles';
-import {Page} from './Page';
+import {styles} from './createPersonalAccount.styles';
+import {Page} from './page';
 
-import {Config} from '../../Config';
-import {AccountForm} from '../component/AccountForm';
-import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
-import {BackButton} from '../component/BackButton';
+import {Config} from '../../config';
+import {AccountForm} from '../component/accountForm';
+import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
+import {BackButton} from '../component/backButton';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
 

@@ -19,9 +19,9 @@
 
 import {FC} from 'react';
 
-import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {ACCESS_TYPES} from 'Repositories/conversation/ConversationAccessPermission';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {BaseToggle} from 'Components/toggle/baseToggle';
+import {ACCESS_TYPES} from 'Repositories/conversation/conversationAccessPermission';
+import {Conversation} from 'Repositories/entity/conversation';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';

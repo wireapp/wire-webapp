@@ -17,11 +17,11 @@
  *
  */
 
-import {Config} from 'src/script/Config';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {Config} from 'src/script/config';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {replaceLink, t} from 'Util/localizerUtil';
 
-import {SystemMessage} from './SystemMessage';
+import {SystemMessage} from './systemMessage';
 
 export class OneToOneMigratedToMlsMessage extends SystemMessage {
   constructor() {

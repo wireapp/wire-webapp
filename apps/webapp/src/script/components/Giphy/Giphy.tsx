@@ -25,9 +25,9 @@ import cx from 'classnames';
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {GifImage} from 'Components/Giphy/GifImage';
-import * as Icon from 'Components/Icon';
-import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
+import {GifImage} from 'Components/giphy/gifImage';
+import * as Icon from 'Components/icon';
+import {Gif, GiphyRepository} from 'Repositories/extension/giphyRepository';
 import {t} from 'Util/localizerUtil';
 
 const GIPHY_CLOSE_TIMEOUT = 350;

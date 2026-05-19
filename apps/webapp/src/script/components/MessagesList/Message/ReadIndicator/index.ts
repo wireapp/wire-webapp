@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ReadIndicator';
+export * from './readIndicator';

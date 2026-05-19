@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
+import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/fileTypeRestrictedMessage';
 
-import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
+import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
 
 const createFileTypeRestrictedMessage = (
   partialFileTypeRestrictedMessage: Partial<FileTypeRestrictedMessageEntity>,

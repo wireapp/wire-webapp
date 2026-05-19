@@ -19,17 +19,17 @@
 
 import {Quote} from '@wireapp/protocol-messaging';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {MessageHasher} from 'src/script/message/MessageHasher';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {MessageHasher} from 'src/script/message/messageHasher';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
 import {createMessageAddEvent, createMultipartMessageAddEvent, toSavedEvent} from 'test/helper/EventGenerator';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
-import {QuotedMessageMiddleware} from './QuoteDecoderMiddleware';
+import {QuotedMessageMiddleware} from './quoteDecoderMiddleware';
 
-import {EventService} from '../EventService';
+import {EventService} from '../eventService';
 
 function buildQuotedMessageMiddleware() {
   const eventService = {

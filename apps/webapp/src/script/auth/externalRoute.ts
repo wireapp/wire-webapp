@@ -17,7 +17,7 @@
  *
  */
 
-import {Config} from '../Config';
+import {Config} from '../config';
 
 export const EXTERNAL_ROUTE = {
   WEBAPP: '../',

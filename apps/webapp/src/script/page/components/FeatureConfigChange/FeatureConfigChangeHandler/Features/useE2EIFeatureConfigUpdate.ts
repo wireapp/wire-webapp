@@ -27,7 +27,7 @@ import {
 } from 'Repositories/team/teamFeatureConfigChangeDetector/teamFeatureConfigChangeDetector';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 
-import {configureE2EI} from './E2EIdentity';
+import {configureE2EI} from './e2eIdentity';
 
 const onConfigUpdate = async (configUpdate: {
   prevFeatureList?: FeatureList | undefined;

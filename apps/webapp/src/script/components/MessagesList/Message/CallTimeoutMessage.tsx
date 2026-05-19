@@ -19,12 +19,12 @@
 
 import {REASON} from '@wireapp/avs';
 
-import * as Icon from 'Components/Icon';
-import {CallingTimeoutMessage} from 'Repositories/entity/message/CallingTimeoutMessage';
+import * as Icon from 'Components/icon';
+import {CallingTimeoutMessage} from 'Repositories/entity/message/callingTimeoutMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {MessageTime} from './MessageTime';
+import {MessageTime} from './messageTime';
 
 interface CallTimeoutMessageProps {
   message: CallingTimeoutMessage;

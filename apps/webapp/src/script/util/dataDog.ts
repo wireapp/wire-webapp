@@ -19,7 +19,7 @@
 
 import is from '@sindresorhus/is';
 
-import {Config, Configuration} from '../Config';
+import {Config, Configuration} from '../config';
 
 const uuidRegex = /([a-z\d]{8})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{4})-([a-z\d]{12})/gim;
 

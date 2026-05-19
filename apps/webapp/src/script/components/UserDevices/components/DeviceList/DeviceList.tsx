@@ -19,14 +19,14 @@
 
 import cx from 'classnames';
 
-import type {ClientEntity} from 'Repositories/client/ClientEntity';
-import type {User} from 'Repositories/entity/User';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import type {ClientEntity} from 'Repositories/client/clientEntity';
+import type {User} from 'Repositories/entity/user';
+import {WireIdentity} from 'src/script/e2eIdentity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {Config} from '../../../../Config';
-import {DeviceCard} from '../DeviceCard';
+import {Config} from '../../../../config';
+import {DeviceCard} from '../deviceCard';
 
 interface DeviceListProps {
   clickOnDevice: (client: ClientEntity) => void;

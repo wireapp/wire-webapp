@@ -17,4 +17,4 @@
  *
  */
 
-export * from './CallingParticipantList';
+export * from './callingParticipantList';

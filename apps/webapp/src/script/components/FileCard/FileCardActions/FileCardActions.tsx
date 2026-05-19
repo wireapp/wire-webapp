@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {wrapperStyles} from './FileCardActions.style';
+import {wrapperStyles} from './fileCardActions.style';
 
 interface FileCardActionsProps {
   children: ReactNode;

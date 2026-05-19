@@ -19,11 +19,11 @@
 
 import {fireEvent, RenderResult} from '@testing-library/react';
 
-import {AccountForm} from './AccountForm';
+import {AccountForm} from './accountForm';
 
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/testUtil';
 
 describe('when entering account data', () => {
   let wrapper: RenderResult;

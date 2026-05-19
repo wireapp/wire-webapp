@@ -21,17 +21,17 @@ import {useContext, useMemo, useState} from 'react';
 
 import {container} from 'tsyringe';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {SearchInput} from 'Components/SearchInput';
-import {UserSearchableList} from 'Components/UserSearchableList';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {SearchInput} from 'Components/searchInput';
+import {UserSearchableList} from 'Components/userSearchableList';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
-import {RootContext} from 'src/script/page/RootProvider';
+import {RootContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
-import {participantsSelectionListCss, participantsSelectionSearchCss} from './CreateConversationSteps.styles';
+import {participantsSelectionListCss, participantsSelectionSearchCss} from './createConversationSteps.styles';
 
 import {useCreateConversation} from '../hooks/useCreateConversation';
 import {useCreateConversationModal} from '../hooks/useCreateConversationModal';

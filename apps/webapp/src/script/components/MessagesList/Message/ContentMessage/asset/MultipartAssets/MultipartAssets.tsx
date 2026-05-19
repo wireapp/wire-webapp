@@ -30,18 +30,18 @@ import {isPreviewableImage} from 'Util/imageUtil';
 import {t} from 'Util/localizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
-import {MediaFilePreviewCard} from './common/MediaFilePreviewCard/MediaFilePreviewCard';
-import {FileAssetCard} from './FileAssetCard/FileAssetCard';
-import {ImageAssetCard} from './ImageAssetCard/ImageAssetCard';
+import {MediaFilePreviewCard} from './common/mediaFilePreviewCard/mediaFilePreviewCard';
+import {FileAssetCard} from './fileAssetCard/fileAssetCard';
+import {ImageAssetCard} from './imageAssetCard/imageAssetCard';
 import {
   fileCardStyles,
   imageCardStyles,
   listSingleItemStyles,
   listStyles,
   videoCardStyles,
-} from './MultipartAssets.styles';
+} from './multipartAssets.styles';
 import {useGetMultipartAsset} from './useGetMultipartAsset/useGetMultipartAsset';
-import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
+import {VideoAssetCard} from './videoAssetCard/videoAssetCard';
 
 interface MultipartAssetsProps {
   assets: ICellAsset[];

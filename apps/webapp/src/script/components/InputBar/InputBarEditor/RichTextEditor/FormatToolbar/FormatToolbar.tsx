@@ -33,12 +33,12 @@ import {
   LinkIcon,
 } from '@wireapp/react-ui-kit';
 
-import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
+import {FormatSeparator} from 'Components/inputBar/common/formatSeparator/formatSeparator';
 import {t} from 'Util/localizerUtil';
 
-import {FormatButton} from './FormatButton/FormatButton';
-import {wrapperStyles} from './FormatToolbar.styles';
-import {LinkDialog} from './LinkDialog/LinkDialog';
+import {FormatButton} from './formatButton/formatButton';
+import {wrapperStyles} from './formatToolbar.styles';
+import {LinkDialog} from './linkDialog/linkDialog';
 import {useBlockquoteState} from './useBlockquoteState/useBlockquoteState';
 import {useCodeBlockState} from './useCodeBlockState/useCodeBlockState';
 import {useHeadingState} from './useHeadingState/useHeadingState';

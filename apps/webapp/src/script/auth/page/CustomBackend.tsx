@@ -23,13 +23,13 @@ import {useNavigate} from 'react-router-dom';
 
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
-import {LogoFullIcon} from 'Components/Icon';
+import {LogoFullIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
-import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './CustomBackend.styles';
-import {Page} from './Page';
+import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './customBackend.styles';
+import {Page} from './page';
 
-import * as AuthSelector from '../module/selector/AuthSelector';
+import * as AuthSelector from '../module/selector/authSelector';
 import {QUERY_KEY, ROUTE} from '../route';
 import {getSearchParams, navigateTo} from '../util/urlUtil';
 

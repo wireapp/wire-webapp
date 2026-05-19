@@ -26,8 +26,8 @@ import {HeadingNode, QuoteNode} from '@lexical/rich-text';
 
 import {getLogger} from 'Util/logger';
 
-import {EmojiNode} from './nodes/EmojiNode';
-import {MentionNode} from './nodes/MentionNode';
+import {EmojiNode} from './nodes/emojiNode';
+import {MentionNode} from './nodes/mentionNode';
 import {theme} from './theme';
 
 const logger = getLogger('LexicalInput');

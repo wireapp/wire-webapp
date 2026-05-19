@@ -17,14 +17,14 @@
  *
  */
 
-import {CellsBreadcrumbs} from 'Components/Conversation/ConversationCells/common/CellsBreadcrumbs/CellsBreadcrumbs';
-import {getBreadcrumbsFromPath} from 'Components/Conversation/ConversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
+import {CellsBreadcrumbs} from 'Components/conversation/conversationCells/common/cellsBreadcrumbs/cellsBreadcrumbs';
+import {getBreadcrumbsFromPath} from 'Components/conversation/conversationCells/common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 
-import {CellsCreateNewFolderHint} from './CellsCreateNewFolderHint/CellsCreateNewFolderHint';
-import {CellsFolderList} from './CellsFolderList/CellsFolderList';
-import {CellsFolderListEmpty} from './CellsFolderListEmpty/CellsFolderListEmpty';
-import {CellsFolderListLoading} from './CellsFolderListLoading/CellsFolderListLoading';
-import {breadcrumbsWrapperStyles, listWrapperStyles} from './CellsFoldersListModalContent.styles';
+import {CellsCreateNewFolderHint} from './cellsCreateNewFolderHint/cellsCreateNewFolderHint';
+import {CellsFolderList} from './cellsFolderList/cellsFolderList';
+import {CellsFolderListEmpty} from './cellsFolderListEmpty/cellsFolderListEmpty';
+import {CellsFolderListLoading} from './cellsFolderListLoading/cellsFolderListLoading';
+import {breadcrumbsWrapperStyles, listWrapperStyles} from './cellsFoldersListModalContent.styles';
 
 interface CellsFoldersListModalContentProps {
   items: Array<{id: string; name: string; path: string}>;

@@ -25,27 +25,27 @@ import {container} from 'tsyringe';
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CallingCell} from 'Components/calling/CallingCell';
-import {parseAccountDeepLink} from 'Components/Conversation/utils/parseAccountDeepLink';
-import {Giphy} from 'Components/Giphy';
-import {InputBar} from 'Components/InputBar';
-import {MessageListWrapper} from 'Components/MessagesList/MessageListWrapper';
-import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {showUserModal} from 'Components/Modals/UserModal';
-import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
-import {TitleBar} from 'Components/TitleBar';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessage';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import {Message} from 'Repositories/entity/message/Message';
-import {User} from 'Repositories/entity/User';
+import {CallingCell} from 'Components/calling/callingCell';
+import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
+import {Giphy} from 'Components/giphy';
+import {InputBar} from 'Components/inputBar';
+import {MessageListWrapper} from 'Components/messagesList/messageListWrapper';
+import {showDetailViewModal} from 'Components/modals/detailViewModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {showUserModal} from 'Components/modals/userModal';
+import {showWarningModal} from 'Components/modals/utils/showWarningModal';
+import {TitleBar} from 'Components/titleBar';
+import {CallState} from 'Repositories/calling/callState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation as ConversationEntity} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DecryptErrorMessage} from 'Repositories/entity/message/decryptErrorMessage';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {Message} from 'Repositories/entity/message/message';
+import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {TeamState} from 'Repositories/team/teamState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {sharedDriveSearchAndFiltersFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
@@ -61,25 +61,25 @@ import {
   searchResultsOverlayStyles,
   tabsHiddenStyles,
   tabsWrapperStyles,
-} from './Conversation.styles';
-import {ConversationCells} from './ConversationCells/ConversationCells';
-import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
-import {ConversationMessagesWrapper} from './ConversationMessagesWrapper/ConversationMessagesWrapper';
-import {ConversationTabPanel} from './ConversationTabPanel/ConversationTabPanel';
-import {ConversationTabs} from './ConversationTabs/ConversationTabs';
+} from './conversation.styles';
+import {ConversationCells} from './conversationCells/conversationCells';
+import {ConversationFileDropzone} from './conversationFileDropzone/conversationFileDropzone';
+import {ConversationMessagesWrapper} from './conversationMessagesWrapper/conversationMessagesWrapper';
+import {ConversationTabPanel} from './conversationTabPanel/conversationTabPanel';
+import {ConversationTabs} from './conversationTabs/conversationTabs';
 import {useReadReceiptSender} from './hooks/useReadReceipt';
-import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
+import {ReadOnlyConversationMessage} from './readOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
 import {UserError} from '../../error/userError';
-import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
-import {isServiceEntity} from '../../guards/Service';
-import {MotionDuration} from '../../motion/MotionDuration';
-import {RightSidebarParams} from '../../page/AppMain';
-import {PanelState} from '../../page/RightSidebar';
-import {useApplicationContext, useMainViewModel} from '../../page/RootProvider';
-import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
+import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/mouse';
+import {isServiceEntity} from '../../guards/service';
+import {MotionDuration} from '../../motion/motionDuration';
+import {RightSidebarParams} from '../../page/appMain';
+import {PanelState} from '../../page/rightSidebar';
+import {useApplicationContext, useMainViewModel} from '../../page/rootProvider';
+import {ElementType, MessageDetails} from '../messagesList/message/contentMessage/asset/textMessageRenderer';
 
 interface ConversationProps {
   readonly teamState: TeamState;

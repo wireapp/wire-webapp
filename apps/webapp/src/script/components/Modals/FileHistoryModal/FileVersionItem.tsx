@@ -21,7 +21,7 @@ import {ReactElement} from 'react';
 
 import {Button, ButtonVariant, DownloadIcon, ReloadIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -38,7 +38,7 @@ import {
   versionOwnerSpanCss,
   versionSizeSpanCss,
   versionTimeTextCss,
-} from './FileHistoryModal.styles';
+} from './fileHistoryModal.styles';
 
 interface FileVersionItemProps {
   version: {

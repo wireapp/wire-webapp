@@ -38,15 +38,15 @@ import {Cancelable, debounce} from 'underscore';
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
 import {ClientRepository} from 'Repositories/client';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
-import {ConversationRepository, CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {isProteusTeam1to1Conversation, isSelfConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
+import {ACCESS_STATE} from 'Repositories/conversation/accessState';
+import {ConversationRepository, CONVERSATION_READONLY_STATE} from 'Repositories/conversation/conversationRepository';
+import {isProteusTeam1to1Conversation, isSelfConversation} from 'Repositories/conversation/conversationSelectors';
+import {ConversationStatus} from 'Repositories/conversation/conversationStatus';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import {NOTIFICATION_STATE} from 'Repositories/conversation/notificationSetting';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/teamState';
 import {t} from 'Util/localizerUtil';
@@ -54,16 +54,16 @@ import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {truncate} from 'Util/stringUtil';
 
-import {CallMessage} from './message/CallMessage';
-import type {ContentMessage} from './message/ContentMessage';
-import type {Message} from './message/Message';
-import {PingMessage} from './message/PingMessage';
-import type {User} from './User';
+import {CallMessage} from './message/callMessage';
+import type {ContentMessage} from './message/contentMessage';
+import type {Message} from './message/message';
+import {PingMessage} from './message/pingMessage';
+import type {User} from './user';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {ConversationError} from '../../error/conversationError';
-import {isContentMessage, isDeleteMessage} from '../../guards/Message';
-import {StatusType} from '../../message/StatusType';
+import {isContentMessage, isDeleteMessage} from '../../guards/message';
+import {StatusType} from '../../message/statusType';
 import {ContentState, useAppState} from '../../page/useAppState';
 
 export interface UnreadState {

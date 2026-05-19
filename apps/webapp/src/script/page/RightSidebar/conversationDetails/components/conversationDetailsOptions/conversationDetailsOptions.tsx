@@ -24,14 +24,14 @@ import {amplify} from 'amplify';
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
-import {PanelActions} from 'Components/panel/PanelActions';
-import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {isGroupMLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {PanelActions} from 'Components/panel/panelActions';
+import {ReceiptModeToggle} from 'Components/toggle/receiptModeToggle';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
+import {isGroupMLSConversation} from 'Repositories/conversation/conversationSelectors';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
@@ -40,8 +40,8 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './conversationDetailsOption';
 
-import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
-import {PanelEntity, PanelState} from '../../../RightSidebar';
+import {ActionsViewModel} from '../../../../../viewModel/actionsViewModel';
+import {PanelEntity, PanelState} from '../../../rightSidebar';
 import {getConversationActions} from '../../utils/getConversationActions';
 import {ConversationDetailsBottomActions} from '../conversationDetailsBottomActions';
 

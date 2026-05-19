@@ -21,8 +21,8 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -36,7 +36,7 @@ import {
   isProteus1to1ConversationWithUser,
   isSelfConversation,
   isReadableConversation,
-} from './ConversationSelectors';
+} from './conversationSelectors';
 
 @singleton()
 export class ConversationState {

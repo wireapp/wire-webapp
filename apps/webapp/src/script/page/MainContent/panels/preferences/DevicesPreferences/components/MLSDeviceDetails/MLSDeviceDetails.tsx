@@ -18,14 +18,14 @@
  */
 
 import {isKnownSignature, MLSPublicKeys} from 'Repositories/client';
-import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/E2EIdentity';
+import {E2EIHandler, MLSStatuses, WireIdentity} from 'src/script/e2eIdentity';
 import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {styles} from './MLSDeviceDetails.styles';
+import {styles} from './mlsDeviceDetails.styles';
 
-import {E2EICertificateDetails} from '../E2EICertificateDetails';
-import {FormattedId} from '../FormattedId';
+import {E2EICertificateDetails} from '../e2eiCertificateDetails';
+import {FormattedId} from '../formattedId';
 
 interface MLSDeviceDetailsProps {
   cipherSuite?: string;

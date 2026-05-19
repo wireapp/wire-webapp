@@ -19,12 +19,12 @@
 
 import {fireEvent, waitFor} from '@testing-library/react';
 
-import {SetPassword} from './SetPassword';
+import {SetPassword} from './setPassword';
 
-import {ValidationError} from '../module/action/ValidationError';
+import {ValidationError} from '../module/action/validationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/testUtil';
 
 const passwordInputId = 'enter-password';
 const setPasswordButtonId = 'do-set-password';

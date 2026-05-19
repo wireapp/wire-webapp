@@ -17,7 +17,7 @@
  *
  */
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {t} from 'Util/localizerUtil';
 import {replaceAccents} from 'Util/stringUtil';
 

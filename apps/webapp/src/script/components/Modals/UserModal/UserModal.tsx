@@ -25,20 +25,20 @@ import {container} from 'tsyringe';
 
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {EnrichedFields} from 'Components/panel/EnrichedFields';
-import {UserActions} from 'Components/panel/UserActions';
-import {UserDetails} from 'Components/panel/UserDetails';
-import {User} from 'Repositories/entity/User';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
+import {ModalComponent} from 'Components/modals/modalComponent';
+import {EnrichedFields} from 'Components/panel/enrichedFields';
+import {UserActions} from 'Components/panel/userActions';
+import {UserDetails} from 'Components/panel/userDetails';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 
-import {useUserModalState} from './UserModal.state';
+import {useUserModalState} from './userModal.state';
 import {
   unverifiedUserWarningIconStyle,
   unverifiedUserWarningLinkStyle,
@@ -48,10 +48,10 @@ import {
   unverifiedUserWarningStyle,
   userModalStyle,
   userModalWrapperStyle,
-} from './UserModal.styles';
+} from './userModal.styles';
 
-import {Config} from '../../../Config';
-import {RootContext} from '../../../page/RootProvider';
+import {Config} from '../../../config';
+import {RootContext} from '../../../page/rootProvider';
 import {Core} from '../../../service/coreSingleton';
 
 export interface UserModalProps {
@@ -78,13 +78,13 @@ const UserModalUserActionsSection = ({user, onAction, isSelfActivated, selfUser}
     const replaceLinkLegalHold = replaceLink(
       Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
       '',
-      'read-more-legal-hold',
+      'read-more-legalHold',
     );
 
     return (
       <div
         className="modal__message"
-        data-uie-name="status-blocked-legal-hold"
+        data-uie-name="status-blocked-legalHold"
         dangerouslySetInnerHTML={{__html: t('modalUserBlockedForLegalHold', undefined, replaceLinkLegalHold)}}
       />
     );

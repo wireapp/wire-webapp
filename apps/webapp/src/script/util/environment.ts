@@ -21,7 +21,7 @@ import is from '@sindresorhus/is';
 
 import {Runtime} from '@wireapp/commons';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 import {BackendEnvironment} from '../service/backendEnvironment';
 
 const APP_ENV = {

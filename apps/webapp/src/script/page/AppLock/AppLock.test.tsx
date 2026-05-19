@@ -25,15 +25,15 @@ import ko from 'knockout';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import type {ClientRepository} from 'Repositories/client';
-import {User} from 'Repositories/entity/User/User';
+import {User} from 'Repositories/entity/user/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {UserState} from 'Repositories/user/userState';
 import {createUuid} from 'Util/uuid';
 
-import {AppLock, APPLOCK_STATE} from './AppLock';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {AppLock, APPLOCK_STATE} from './appLock';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
 const clientRepository = {} as unknown as ClientRepository;
 const appLockCrypto: AppLockCrypto = {

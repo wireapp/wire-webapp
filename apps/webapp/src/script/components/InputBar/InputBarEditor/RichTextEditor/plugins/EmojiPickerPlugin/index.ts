@@ -17,4 +17,4 @@
  *
  */
 
-export * from './EmojiPickerPlugin';
+export * from './emojiPickerPlugin';

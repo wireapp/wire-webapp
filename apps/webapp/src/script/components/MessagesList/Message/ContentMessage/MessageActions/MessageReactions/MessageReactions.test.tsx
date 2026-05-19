@@ -23,9 +23,9 @@ import {render, act, fireEvent, waitFor} from '@testing-library/react';
 
 import {t} from 'Util/localizerUtil';
 
-import {MessageReactions, MessageReactionsProps} from './MessageReactions';
+import {MessageReactions, MessageReactionsProps} from './messageReactions';
 
-import {MessageActionsId} from '../MessageActions';
+import {MessageActionsId} from '../messageActions';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';

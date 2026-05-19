@@ -23,17 +23,17 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import * as Icon from 'Components/icon';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {t} from 'Util/localizerUtil';
 
-import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './TeamCreation.styles';
-import {Confirmation} from './TeamCreationSteps/Confirmation';
-import {Form} from './TeamCreationSteps/Form';
-import {Introduction} from './TeamCreationSteps/Introduction';
-import {Success} from './TeamCreationSteps/Success';
+import {teamCreationModalBodyCss, teamCreationModalWrapperCss} from './teamCreation.styles';
+import {Confirmation} from './teamCreationSteps/confirmation';
+import {Form} from './teamCreationSteps/form';
+import {Introduction} from './teamCreationSteps/introduction';
+import {Success} from './teamCreationSteps/success';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
 enum Step {

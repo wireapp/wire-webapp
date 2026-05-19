@@ -30,11 +30,11 @@ import {StorageKey} from 'Repositories/storage';
 import {loadValue, storeValue} from 'Util/storageUtil';
 import {sortByPriority} from 'Util/stringUtil';
 
-import {EmojiItem} from './EmojiItem';
+import {EmojiItem} from './emojiItem';
 
 import {getDOMRangeRect} from '../../utils/getDomRangeRect';
 import {getSelectionInfo} from '../../utils/getSelectionInfo';
-import {TypeaheadMenuPlugin} from '../TypeaheadMenuPlugin/TypeaheadMenuPlugin';
+import {TypeaheadMenuPlugin} from '../typeaheadMenuPlugin/typeaheadMenuPlugin';
 
 const TRIGGER = ':';
 const triggerRegexp = new RegExp(`(\\W|^)(${TRIGGER}([\\w+\\-][\\w \\-]*))$`);

@@ -48,18 +48,18 @@ import {MLSServiceEvents} from '@wireapp/core/lib/messagingProtocols/mls';
 import {Task, task} from 'true-myth';
 import {container} from 'tsyringe';
 
-import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
-import {ClientEvent} from 'Repositories/event/Client';
-import type {EventService} from 'Repositories/event/EventService';
+import type {Conversation as ConversationEntity} from 'Repositories/entity/conversation';
+import {ClientEvent} from 'Repositories/event/client';
+import type {EventService} from 'Repositories/event/eventService';
 import {search as fullTextSearch} from 'Repositories/search/fullTextSearch';
 import {StorageService} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger} from 'Util/logger';
 
-import {MLSCapableConversation} from './ConversationSelectors';
+import {MLSCapableConversation} from './conversationSelectors';
 
-import {MessageCategory} from '../../message/MessageCategory';
+import {messageCategory} from '../../message/messageCategory';
 import {APIClient} from '../../service/apiClientSingleton';
 import {Core} from '../../service/coreSingleton';
 
@@ -485,8 +485,8 @@ export class ConversationService {
    * @returns Resolves with the matching events
    */
   async searchInConversation(conversation_id: string, query: string): Promise<any> {
-    const category_min = MessageCategory.TEXT;
-    const category_max = MessageCategory.TEXT | MessageCategory.LINK | MessageCategory.LINK_PREVIEW;
+    const category_min = messageCategory.TEXT;
+    const category_max = messageCategory.TEXT | messageCategory.LINK | messageCategory.LINK_PREVIEW;
 
     const events = await this.eventService.loadEventsWithCategory(conversation_id, category_min, category_max);
     return events

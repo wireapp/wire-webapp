@@ -19,16 +19,16 @@
 
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConfirmationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConfirmationEvent} from 'Repositories/conversation/eventBuilder';
+import {User} from 'Repositories/entity/user';
 import type {EventRecord} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
 
-import {StatusType} from '../../../message/StatusType';
-import {ClientEvent} from '../Client';
-import {EventMiddleware, IncomingEvent} from '../EventProcessor';
-import type {EventService} from '../EventService';
+import {StatusType} from '../../../message/statusType';
+import {ClientEvent} from '../client';
+import {EventMiddleware, IncomingEvent} from '../eventProcessor';
+import type {EventService} from '../eventService';
 
 export class ReceiptsMiddleware implements EventMiddleware {
   private readonly logger: Logger;

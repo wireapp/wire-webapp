@@ -19,7 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 
-import {SeekBar} from './SeekBar';
+import {SeekBar} from './seekBar';
 
 const createAudioElement = (currentTime: number, maxTime: number) => {
   const audioElement = document.createElement('audio');

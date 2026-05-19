@@ -66,7 +66,7 @@ import {
   expirationErrorLabelStyles,
   expirationErrorTextStyles,
   timeSelectMenuPortalStyles,
-} from './CellsShareExpirationStyles';
+} from './cellsShareExpirationStyles';
 
 interface CellsShareExpirationFieldsLabels {
   expiresLabel: string;

@@ -22,10 +22,10 @@ import {
   ConversationLabelRepository,
   LabelType,
   createLabel,
-} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+} from 'Repositories/conversation/conversationLabelRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {createUuid} from 'Util/uuid';
 
 describe('ConversationLabelRepository Synchronization', () => {

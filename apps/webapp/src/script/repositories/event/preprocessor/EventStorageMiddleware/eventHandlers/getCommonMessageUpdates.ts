@@ -17,7 +17,7 @@
  *
  */
 
-import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/eventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 
 import {EditableEvent} from './editedEventHandler';

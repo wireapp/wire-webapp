@@ -22,7 +22,7 @@ import {CONVERSATION_TYPE, Conversation as BackendConversation} from '@wireapp/a
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 export type ProteusConversation = Conversation & {protocol: CONVERSATION_PROTOCOL.PROTEUS};

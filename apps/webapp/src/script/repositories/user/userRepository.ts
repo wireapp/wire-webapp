@@ -44,18 +44,18 @@ import {TypedEventEmitter, type AccentColor} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {ClientRepository, QualifiedUserClientEntityMap} from 'Repositories/client';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientMapper} from 'Repositories/client/ClientMapper';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {ClientMapper} from 'Repositories/client/clientMapper';
 import type {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {flattenUserClientsQualifiedIds} from 'Repositories/conversation/userClientsUtils';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {USER} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import type {EventSource} from 'Repositories/event/EventSource';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {USER} from 'Repositories/event/client';
+import {EventRepository} from 'Repositories/event/eventRepository';
+import type {EventSource} from 'Repositories/event/eventSource';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {SelfService} from 'Repositories/self/selfService';
@@ -75,8 +75,8 @@ import {UserMapper} from './userMapper';
 import type {UserService} from './userService';
 import {UserState} from './userState';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {Config} from '../../Config';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {Config} from '../../config';
 import {UserError} from '../../error/userError';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 

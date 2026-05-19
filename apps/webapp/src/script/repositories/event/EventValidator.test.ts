@@ -20,9 +20,9 @@
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/';
 import {ConversationTypingEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {EventSource} from './EventSource';
-import {EventValidation} from './EventValidation';
-import {validateEvent} from './EventValidator';
+import {EventSource} from './eventSource';
+import {EventValidation} from './eventValidation';
+import {validateEvent} from './eventValidator';
 
 describe('EventValidator', () => {
   describe('validateEvent', () => {

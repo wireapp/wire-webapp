@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -27,7 +27,7 @@ import {
   teamUpgradeAccountBannerContainerCss,
   teamUpgradeBannerButtonCss,
   teamUpgradeBannerHeaderCss,
-} from './TeamCreation.styles';
+} from './teamCreation.styles';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
 export const TeamCreationAccountHeader = () => {

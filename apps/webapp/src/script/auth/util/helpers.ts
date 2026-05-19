@@ -19,7 +19,7 @@
 
 import {container} from 'tsyringe';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {Core} from 'src/script/service/coreSingleton';
 
 export function getEnterpriseLoginV2FF() {

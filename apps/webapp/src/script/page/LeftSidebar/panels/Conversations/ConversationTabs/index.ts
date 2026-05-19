@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ConversationTabs';
+export * from './conversationTabs';

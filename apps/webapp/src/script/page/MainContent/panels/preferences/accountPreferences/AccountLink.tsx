@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {copyText} from 'Util/clipboardUtil';
 import {t} from 'Util/localizerUtil';
 

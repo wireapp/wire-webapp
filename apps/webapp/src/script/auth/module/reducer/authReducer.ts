@@ -24,7 +24,7 @@ import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import type {TeamData} from '@wireapp/api-client/lib/team/';
 import type {UserAsset} from '@wireapp/api-client/lib/user/';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 import {AUTH_ACTION, AppActions, USER_ACTION} from '../action/creator/';
 
 export interface RegistrationDataState {

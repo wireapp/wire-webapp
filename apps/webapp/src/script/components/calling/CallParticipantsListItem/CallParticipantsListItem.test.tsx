@@ -21,12 +21,12 @@ import {render} from '@testing-library/react';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {Participant} from 'Repositories/calling/Participant';
-import {User} from 'Repositories/entity/User';
+import {Participant} from 'Repositories/calling/participant';
+import {User} from 'Repositories/entity/user';
 import {ROLE} from 'Repositories/user/userPermission';
 import {createUuid} from 'Util/uuid';
 
-import {CallParticipantsListItem} from './CallParticipantsListItem';
+import {CallParticipantsListItem} from './callParticipantsListItem';
 
 const createMockParticipant = ({
   name,

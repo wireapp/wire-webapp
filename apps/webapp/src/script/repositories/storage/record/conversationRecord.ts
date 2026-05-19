@@ -32,9 +32,9 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
-import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
+import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/conversationRepository';
+import {ConversationStatus} from 'Repositories/conversation/conversationStatus';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
 
 export interface ConversationRecord {
   access_role: CONVERSATION_LEGACY_ACCESS_ROLE | CONVERSATION_ACCESS_ROLE[];

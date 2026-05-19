@@ -28,10 +28,10 @@ import {Button, ButtonVariant, ContainerXS, Muted, QUERY, Text, useMatchMedia, u
 
 import {t} from 'Util/localizerUtil';
 
-import {Page} from './Page';
+import {Page} from './page';
 
-import {Config} from '../../Config';
-import {ClientList} from '../component/ClientList';
+import {Config} from '../../config';
+import {ClientList} from '../component/clientList';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {QUERY_KEY} from '../route';

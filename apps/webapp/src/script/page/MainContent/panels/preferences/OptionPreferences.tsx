@@ -25,18 +25,18 @@ import {amplify} from 'amplify';
 import {TabIndex, Checkbox, CheckboxLabel, IndicatorRangeInput} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Theme} from 'Components/AppContainer/hooks/useTheme';
-import {RadioGroup} from 'Components/Radio';
+import {Theme} from 'Components/appContainer/hooks/useTheme';
+import {RadioGroup} from 'Components/radio';
 import {RootFontSize, useRootFontSize} from 'Hooks/useRootFontSize';
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {PreferencesPage} from './components/PreferencesPage';
-import {PreferencesSection} from './components/PreferencesSection';
+import {PreferencesPage} from './components/preferencesPage';
+import {PreferencesSection} from './components/preferencesSection';
 
 interface OptionPreferencesProps {
   propertiesRepository: PropertiesRepository;

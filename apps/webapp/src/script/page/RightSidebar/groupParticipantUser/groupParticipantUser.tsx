@@ -25,26 +25,26 @@ import {amplify} from 'amplify';
 import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
-import {EnrichedFields} from 'Components/panel/EnrichedFields';
-import {UserActions, Actions} from 'Components/panel/UserActions';
-import {UserDetails} from 'Components/panel/UserDetails';
-import {BaseToggle} from 'Components/toggle/BaseToggle';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
+import {EnrichedFields} from 'Components/panel/enrichedFields';
+import {UserActions, Actions} from 'Components/panel/userActions';
+import {UserDetails} from 'Components/panel/userDetails';
+import {BaseToggle} from 'Components/toggle/baseToggle';
+import {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
+import {MemberLeaveEvent, TeamMemberLeaveEvent} from 'Repositories/conversation/eventBuilder';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {ClientEvent} from 'Repositories/event/client';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity} from '../RightSidebar';
+import {PanelEntity} from '../rightSidebar';
 
 interface GroupParticipantUserProps {
   onBack: (entity: PanelEntity) => void;

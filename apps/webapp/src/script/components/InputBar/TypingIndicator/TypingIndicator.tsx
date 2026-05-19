@@ -17,8 +17,8 @@
  *
  */
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import * as Icon from 'Components/Icon';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -29,7 +29,7 @@ import {
   indicatorAnimationWrapperStyles,
   indicatorTitleStyles,
   wrapperStyles,
-} from './TypingIndicator.styles';
+} from './typingIndicator.styles';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
 export interface TypingIndicatorProps {

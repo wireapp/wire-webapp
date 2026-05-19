@@ -21,8 +21,8 @@ import {Fragment, useCallback, useEffect, useRef} from 'react';
 
 import {container} from 'tsyringe';
 
-import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
-import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import {CallingViewMode, CallState} from 'Repositories/calling/callState';
+import {ElectronDesktopCapturerSource} from 'Repositories/media/mediaDevicesHandler';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';

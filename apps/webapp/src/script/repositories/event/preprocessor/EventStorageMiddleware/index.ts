@@ -17,4 +17,4 @@
  *
  */
 
-export * from './EventStorageMiddleware';
+export * from './eventStorageMiddleware';

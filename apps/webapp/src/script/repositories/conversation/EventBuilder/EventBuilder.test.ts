@@ -19,17 +19,17 @@
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent} from 'Repositories/event/Client';
-import {SuperType} from 'src/script/message/SuperType';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {Conversation} from 'Repositories/entity/conversation';
+import {VerificationMessage} from 'Repositories/entity/message/verificationMessage';
+import {User} from 'Repositories/entity/user';
+import {ClientEvent} from 'Repositories/event/client';
+import {SuperType} from 'src/script/message/superType';
+import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 import {createUuid} from 'Util/uuid';
 
-import {EventBuilder} from './EventBuilder';
+import {EventBuilder} from './eventBuilder';
 
-import {EventMapper} from '../EventMapper';
+import {EventMapper} from '../eventMapper';
 
 describe('EventBuilder', () => {
   let event_mapper: EventMapper = undefined;

@@ -19,7 +19,7 @@
 
 import {useStore} from 'zustand';
 
-import {permissionsStore, PermissionsState} from './Permissions.store';
+import {permissionsStore, PermissionsState} from './permissions.store';
 
 export const usePermissionsStore = <T>(selector: (state: PermissionsState) => T): T =>
   useStore(permissionsStore, selector);

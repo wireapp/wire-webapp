@@ -26,14 +26,14 @@ import cx from 'classnames';
 
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
-import {SearchInput} from 'Components/SearchInput';
-import {ServiceList} from 'Components/ServiceList/ServiceList';
-import {UserSearchableList} from 'Components/UserSearchableList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
+import {SearchInput} from 'Components/searchInput';
+import {ServiceList} from 'Components/serviceList/serviceList';
+import {UserSearchableList} from 'Components/userSearchableList';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {SearchRepository} from 'Repositories/search/searchRepository';
@@ -50,7 +50,7 @@ import {compareTransliteration, sortByPriority, sortUsersByPriority} from 'Util/
 
 import {getManageServicesUrl} from '../../../externalRoute';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity, PanelState} from '../RightSidebar';
+import {PanelEntity, PanelState} from '../rightSidebar';
 
 const ENABLE_ADD_ACTIONS_LENGTH = 0;
 const ENABLE_IS_SEARCHING_LENGTH = 0;

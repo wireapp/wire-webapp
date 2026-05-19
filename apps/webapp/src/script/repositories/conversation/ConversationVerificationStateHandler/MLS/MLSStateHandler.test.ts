@@ -20,19 +20,19 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import * as e2eIdentity from 'src/script/E2EIdentity';
+import {Conversation} from 'Repositories/entity/conversation';
+import * as e2eIdentity from 'src/script/e2eIdentity';
 import {Core} from 'src/script/service/coreSingleton';
 import {createUuid} from 'Util/uuid';
 import {waitFor} from 'Util/waitFor';
 
-import {MLSConversationVerificationStateHandler} from './MLSStateHandler';
+import {MLSConversationVerificationStateHandler} from './mlsStateHandler';
 
-import {ConversationState} from '../../ConversationState';
-import {ConversationVerificationState} from '../../ConversationVerificationState';
+import {ConversationState} from '../../conversationState';
+import {ConversationVerificationState} from '../../conversationVerificationState';
 
-jest.mock('src/script/E2EIdentity', () => ({
-  ...jest.requireActual('src/script/E2EIdentity'),
+jest.mock('src/script/e2eIdentity', () => ({
+  ...jest.requireActual('src/script/e2eIdentity'),
   getConversationVerificationState: jest.fn(),
   E2EIHandler: {
     getInstance: jest.fn().mockReturnValue({
@@ -55,6 +55,7 @@ describe('MLSConversationVerificationStateHandler', () => {
     jest.clearAllMocks();
     core.isMLSActiveForClient = jest.fn().mockReturnValue(true);
     e2eiHandler.isE2EIEnabled = jest.fn().mockReturnValue(true);
+    jest.mocked(e2eIdentity.getConversationVerificationState).mockReset();
   });
 
   it('should do nothing if MLS feature is not active', () => {
@@ -156,7 +157,7 @@ describe('MLSConversationVerificationStateHandler', () => {
       conversation.mlsVerificationState(ConversationVerificationState.VERIFIED);
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
-      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.NotVerified);
+      jest.mocked(e2eIdentity.getConversationVerificationState).mockResolvedValue(E2eiConversationState.NotVerified);
       jest
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
@@ -180,7 +181,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
-      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.NotVerified);
+      jest.mocked(e2eIdentity.getConversationVerificationState).mockResolvedValue(E2eiConversationState.NotVerified);
       jest
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
@@ -204,7 +205,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
-      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Verified);
+      jest.mocked(e2eIdentity.getConversationVerificationState).mockResolvedValue(E2eiConversationState.Verified);
       jest
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);
@@ -230,7 +231,7 @@ describe('MLSConversationVerificationStateHandler', () => {
       const newConversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MLS);
       newConversation.groupId = 'AAEAAAOygT3TL0wljoaNabgK4yIAZWxuYS53aXJlLmxpbms=';
 
-      jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Verified);
+      jest.mocked(e2eIdentity.getConversationVerificationState).mockResolvedValue(E2eiConversationState.Verified);
       jest
         .spyOn(core.service!.mls!, 'on')
         .mockImplementation((_event, listener) => (triggerEpochChange = listener) as any);

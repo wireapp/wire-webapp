@@ -19,13 +19,13 @@
 
 import {forwardRef, ReactNode, useState} from 'react';
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {FileCard} from 'Components/fileCard/fileCard';
 import {t} from 'Util/localizerUtil';
 
-import {contentWrapperStyles} from './VideoAssetCard.styles';
+import {contentWrapperStyles} from './videoAssetCard.styles';
 
-import {FileAssetOptions} from '../../../FileAssetCard/common/FileAssetOptions/FileAssetOptions';
-import {FilePreviewModal} from '../../../FileAssetCard/common/FilePreviewModal/FilePreviewModal';
+import {FileAssetOptions} from '../../../fileAssetCard/common/fileAssetOptions/fileAssetOptions';
+import {FilePreviewModal} from '../../../fileAssetCard/common/filePreviewModal/filePreviewModal';
 
 interface VideoAssetCardProps {
   src?: string;

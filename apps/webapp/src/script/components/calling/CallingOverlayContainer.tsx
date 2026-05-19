@@ -24,21 +24,21 @@ import {container} from 'tsyringe';
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {Participant} from 'Repositories/calling/Participant';
+import {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {CallingViewMode, CallState, DesktopScreenShareMenu, MuteState} from 'Repositories/calling/callState';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/leaveCallReason';
+import {Participant} from 'Repositories/calling/participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {ChooseScreen} from './ChooseScreen';
-import {FullscreenVideoCall} from './FullscreenVideoCall';
+import {ChooseScreen} from './chooseScreen';
+import {FullscreenVideoCall} from './fullscreenVideoCall';
 
-import {CallViewTab} from '../../view_model/CallingViewModel';
+import {CallViewTab} from '../../viewModel/callingViewModel';
 
 interface CallingContainerProps {
   readonly propertiesRepository: PropertiesRepository;

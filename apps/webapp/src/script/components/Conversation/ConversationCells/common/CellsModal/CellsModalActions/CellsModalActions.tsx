@@ -21,7 +21,7 @@ import {MouseEvent, ReactNode} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {buttonStyles, actionsWrapperStyles} from './CellsModalActions.styles';
+import {buttonStyles, actionsWrapperStyles} from './cellsModalActions.styles';
 
 export const CellsModalActions = ({children}: {children: ReactNode}) => {
   return <div css={actionsWrapperStyles}>{children}</div>;

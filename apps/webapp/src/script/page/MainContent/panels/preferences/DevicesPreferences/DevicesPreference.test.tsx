@@ -24,13 +24,13 @@ import {container} from 'tsyringe';
 
 import {randomUUID} from 'crypto';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {ClientState} from 'Repositories/client/clientState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -38,7 +38,7 @@ import {
 import {Core} from 'src/script/service/coreSingleton';
 import {createUuid} from 'Util/uuid';
 
-import {DevicesPreferences} from './DevicesPreference';
+import {DevicesPreferences} from './devicesPreference';
 
 function createDevice(): ClientEntity {
   const device = new ClientEntity(true, '', createUuid());

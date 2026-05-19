@@ -20,11 +20,11 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
-import {MessageActionsMenu, MessageActionsMenuProps} from './MessageActions';
+import {MessageActionsMenu, MessageActionsMenuProps} from './messageActions';
 const defaultProps: MessageActionsMenuProps = {
   isMsgWithHeader: true,
   message: new ContentMessage(createUuid()),

@@ -23,11 +23,11 @@ import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {Message} from './Message';
+import {Message} from './message';
 
-import {SuperType} from '../../../message/SuperType';
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
-import type {User} from '../User';
+import {SuperType} from '../../../message/superType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
+import type {User} from '../user';
 
 export class VerificationMessage extends Message {
   public readonly userEntities: ko.ObservableArray<User>;

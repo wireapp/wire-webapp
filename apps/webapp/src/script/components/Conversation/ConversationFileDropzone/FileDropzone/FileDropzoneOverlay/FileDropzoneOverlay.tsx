@@ -27,7 +27,7 @@ import {
   overlayStyles,
   descriptionStyles,
   titleStyles,
-} from './FileDropzoneOverlay.styles';
+} from './fileDropzoneOverlay.styles';
 
 interface FileDropzoneOverlayProps {
   isActive: boolean;

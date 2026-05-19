@@ -22,11 +22,11 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationRoleRepository} from 'Repositories/conversation/ConversationRoleRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationRoleRepository} from 'Repositories/conversation/conversationRoleRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfRepository} from 'Repositories/self/selfRepository';
@@ -39,16 +39,16 @@ import {createUuid} from 'Util/uuid';
 
 import {ConversationDetails} from './conversationDetails';
 
-import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
-import {MainViewModel} from '../../../view_model/MainViewModel';
+import {TestFactory} from '../../../../../test/helper/testFactory';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
+import {MainViewModel} from '../../../viewModel/mainViewModel';
 
-jest.mock('Components/panel/EnrichedFields', () => ({
+jest.mock('Components/panel/enrichedFields', () => ({
   useEnrichedFields: (): never[] => [],
   EnrichedFields: () => <div />,
   __esModule: true,
 }));
-jest.mock('Components/panel/UserDetails', () => ({
+jest.mock('Components/panel/userDetails', () => ({
   UserDetails: () => <div />,
   __esModule: true,
 }));

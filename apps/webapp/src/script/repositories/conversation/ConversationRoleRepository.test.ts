@@ -19,14 +19,14 @@
 
 import {DefaultConversationRoleName as DefaultRole} from '@wireapp/api-client/lib/conversation/';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {TeamEntity} from 'Repositories/team/teamEntity';
 import {createUuid} from 'Util/uuid';
 
-import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
+import {ConversationRoleRepository, Permissions} from './conversationRoleRepository';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 
 describe('ConversationRoleRepository', () => {
   const testFactory = new TestFactory();

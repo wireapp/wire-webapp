@@ -19,7 +19,7 @@
 
 import {t} from 'Util/localizerUtil';
 
-import {FilePlaceholder} from '../../common/FilePlaceholder/FilePlaceholder';
+import {FilePlaceholder} from '../../common/filePlaceholder/filePlaceholder';
 
 export const PdfError = () => {
   return <FilePlaceholder title={t('pdfViewerErrorTitle')} description={t('pdfViewerErrorDescription')} />;

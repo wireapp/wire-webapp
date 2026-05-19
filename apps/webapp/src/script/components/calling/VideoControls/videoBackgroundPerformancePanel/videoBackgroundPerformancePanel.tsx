@@ -23,7 +23,7 @@ import {Maybe} from 'true-myth';
 
 import {Button, ButtonVariant, CloseIcon, Option, Select} from '@wireapp/react-ui-kit';
 
-import {areCapabilityInfosEqual} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
+import {areCapabilityInfosEqual} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/capabilityInformationValidator';
 import {
   buttonBaseStyles,
   buttonNeutralStyles,
@@ -38,7 +38,7 @@ import {
   performancePanelResetButtonStyles,
   performancePanelStyles,
   performancePanelTitleStyles,
-} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel.styles';
+} from 'Components/calling/videoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel.styles';
 import {QualityMode} from 'Repositories/media/backgroundEffects';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';

@@ -22,20 +22,20 @@
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {ClientEntity} from 'Repositories/client/clientEntity';
 import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
-import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
-import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import 'src/script/localization/Localizer';
-import {StatusType} from 'src/script/message/StatusType';
+import {ConversationMapper} from 'Repositories/conversation/conversationMapper';
+import {NOTIFICATION_STATE} from 'Repositories/conversation/notificationSetting';
+import 'src/script/localization/localizer';
+import {StatusType} from 'src/script/message/statusType';
 import {createUuid} from 'Util/uuid';
 
-import {Conversation} from './Conversation';
-import {ContentMessage} from './message/ContentMessage';
-import {Message} from './message/Message';
-import {PingMessage} from './message/PingMessage';
-import {Text} from './message/Text';
-import {User} from './User';
+import {Conversation} from './conversation';
+import {ContentMessage} from './message/contentMessage';
+import {Message} from './message/message';
+import {PingMessage} from './message/pingMessage';
+import {Text} from './message/text';
+import {User} from './user';
 
 import {entities} from '../../../../test/api/payloads';
 import {UserType} from '@wireapp/api-client/lib/user';

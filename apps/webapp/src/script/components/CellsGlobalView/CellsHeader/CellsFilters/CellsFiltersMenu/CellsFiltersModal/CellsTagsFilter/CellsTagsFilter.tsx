@@ -21,7 +21,7 @@ import {ComboboxSelect, ComboboxSelectOption} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {wrapperStyles, menuListCSS} from './CellsTagsFilter.styles';
+import {wrapperStyles, menuListCSS} from './cellsTagsFilter.styles';
 
 interface CellsTagsFilterProps {
   allTags: string[];

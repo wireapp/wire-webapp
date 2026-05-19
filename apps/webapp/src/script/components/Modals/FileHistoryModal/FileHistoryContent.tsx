@@ -24,8 +24,8 @@ import {
   fileHistoryDateHeadingCss,
   fileHistoryListCss,
   fileHistoryTimelineContainerCss,
-} from './FileHistoryModal.styles';
-import {FileVersionItem} from './FileVersionItem';
+} from './fileHistoryModal.styles';
+import {FileVersionItem} from './fileVersionItem';
 import {FileVersion} from './types';
 
 type FileHistoryContentProps = {

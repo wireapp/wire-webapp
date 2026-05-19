@@ -54,19 +54,19 @@ import {
 } from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/CallMessageType';
-import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
-import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
+import {CALL_MESSAGE_TYPE} from 'Repositories/calling/enum/callMessageType';
+import {ConversationEphemeralHandler} from 'Repositories/conversation/conversationEphemeralHandler';
+import {MessageAddEvent} from 'Repositories/conversation/eventBuilder';
+import {ClientEvent, CONVERSATION} from 'Repositories/event/client';
 import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
 import {base64ToArray, arrayToBase64} from 'Util/util';
 
-import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
+import {PROTO_MESSAGE_TYPE} from './protoMessageType';
 
 import {CryptographyError} from '../../error/cryptographyError';
-import {StatusType} from '../../message/StatusType';
+import {StatusType} from '../../message/statusType';
 import {Core} from '../../service/coreSingleton';
 
 export interface MappedText {

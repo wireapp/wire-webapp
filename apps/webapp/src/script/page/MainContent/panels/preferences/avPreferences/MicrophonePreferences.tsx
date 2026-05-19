@@ -21,19 +21,19 @@ import {useEffect, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/Icon';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {MediaType} from 'Repositories/media/MediaType';
+import * as Icon from 'Components/icon';
+import {MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
+import {MediaStreamHandler} from 'Repositories/media/mediaStreamHandler';
+import {MediaType} from 'Repositories/media/mediaType';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {DeviceSelect} from './DeviceSelect';
-import {InputLevel} from './InputLevel';
+import {DeviceSelect} from './deviceSelect';
+import {InputLevel} from './inputLevel';
 
-import {Config} from '../../../../../Config';
-import {PreferencesSection} from '../components/PreferencesSection';
+import {Config} from '../../../../../config';
+import {PreferencesSection} from '../components/preferencesSection';
 
 const logger = getLogger('MicrophonePreferences');
 

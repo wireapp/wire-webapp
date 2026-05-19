@@ -20,8 +20,8 @@
 import is from '@sindresorhus/is';
 import {RestNode, RestPagination} from 'cells-sdk-ts';
 
-import {CellPagination} from 'Components/Conversation/ConversationCells/common/cellPagination/cellPagination';
-import {User} from 'Repositories/entity/User';
+import {CellPagination} from 'Components/conversation/conversationCells/common/cellPagination/cellPagination';
+import {User} from 'Repositories/entity/user';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {formatBytes, getFileExtension} from 'Util/util';

@@ -23,9 +23,9 @@ import {
   conversationOptionContainerCss,
   conversationOptionCss,
   conversationOptionNotSelectedCss,
-} from './ConversationType.styles';
+} from './conversationType.styles';
 
-import {UpgradeBadge} from '../CreateConversationSteps/ConversationDetails/UpgradeBadge';
+import {UpgradeBadge} from '../createConversationSteps/conversationDetails/upgradeBadge';
 
 interface ConversationOptionProps {
   title: string;

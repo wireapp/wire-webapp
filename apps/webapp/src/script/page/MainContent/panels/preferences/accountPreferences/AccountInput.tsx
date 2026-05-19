@@ -21,11 +21,11 @@ import {FC, InputHTMLAttributes, useEffect, useRef, useState} from 'react';
 
 import {IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
-import {TextInput} from 'Components/TextInput';
+import * as Icon from 'Components/icon';
+import {TextInput} from 'Components/textInput';
 import {useIsMounted} from 'Util/useIsMounted';
 
-import {MotionDuration} from '../../../../../motion/MotionDuration';
+import {MotionDuration} from '../../../../../motion/motionDuration';
 import {isEnterKey, isTabKey} from '../../../../../util/keyboardUtil';
 
 interface AccountInputProps extends InputHTMLAttributes<HTMLInputElement> {

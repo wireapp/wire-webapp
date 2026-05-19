@@ -17,10 +17,10 @@
  *
  */
 
-import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
+import {AppPermissionState} from 'Repositories/notification/appPermissionState';
 
-import {BrowserPermissionStatus} from './BrowserPermissionStatus';
-import {PermissionType} from './PermissionType';
+import {BrowserPermissionStatus} from './browserPermissionStatus';
+import {PermissionType} from './permissionType';
 
 export interface PermissionStateResult {
   state: AppPermissionState | BrowserPermissionStatus;

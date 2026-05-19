@@ -26,16 +26,16 @@ import {container} from 'tsyringe';
 import {CallIcon, IconButton, IconButtonVariant, QUERY, TabIndex, useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ConversationVerificationBadges} from 'Components/Badge';
+import {ConversationVerificationBadges} from 'Components/badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import * as Icon from 'Components/Icon';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
+import * as Icon from 'Components/icon';
+import {LegalHoldDot} from 'Components/legalHoldDot';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import {CallState} from 'Repositories/calling/CallState';
-import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {CallState} from 'Repositories/calling/callState';
+import {ConversationFilter} from 'Repositories/conversation/conversationFilter';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
@@ -45,10 +45,10 @@ import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {RightSidebarParams} from '../../page/AppMain';
-import {PanelState} from '../../page/RightSidebar';
-import {CallActions} from '../../view_model/CallingViewModel';
-import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {RightSidebarParams} from '../../page/appMain';
+import {PanelState} from '../../page/rightSidebar';
+import {CallActions} from '../../viewModel/callingViewModel';
+import {ViewModelRepositories} from '../../viewModel/mainViewModel';
 
 interface TitleBarProps {
   callActions: CallActions;
@@ -318,8 +318,8 @@ export const TitleBar = ({
           <div className="conversation-title-bar-name-label--wrapper">
             {hasLegalHold && (
               <LegalHoldDot
-                dataUieName="status-legal-hold-conversation"
-                className="conversation-title-bar-legal-hold"
+                dataUieName="status-legalHold-conversation"
+                className="conversation-title-bar-legalHold"
                 conversation={conversation}
                 isInteractive
               />

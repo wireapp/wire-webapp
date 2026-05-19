@@ -26,11 +26,11 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {ProgressBar} from 'Components/progressBar/progressBar';
 import {CancelError} from 'Repositories/backup/error';
-import {ClientState} from 'Repositories/client/ClientState';
-import {User} from 'Repositories/entity/User';
+import {ClientState} from 'Repositories/client/clientState';
+import {User} from 'Repositories/entity/user';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {ContentState} from 'src/script/page/useAppState';
@@ -39,8 +39,8 @@ import {getLogger} from 'Util/logger';
 import {getCurrentDate} from 'Util/timeUtil';
 import {downloadBlob} from 'Util/util';
 
-import {Config} from '../../Config';
-import {RootContext} from '../../page/RootProvider';
+import {Config} from '../../config';
+import {RootContext} from '../../page/rootProvider';
 
 enum ExportState {
   COMPRESSING = 'ExportState.STATE.COMPRESSING',

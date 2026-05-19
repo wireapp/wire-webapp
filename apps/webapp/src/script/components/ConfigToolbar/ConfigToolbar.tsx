@@ -24,13 +24,13 @@ import {container} from 'tsyringe';
 
 import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Config, Configuration} from 'src/script/Config';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Config, Configuration} from 'src/script/config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
-import {wrapperStyles} from './ConfigToolbar.styles';
+import {wrapperStyles} from './configToolbar.styles';
 
 export function ConfigToolbar() {
   const {fireAndForgetInvoker} = useApplicationContext();

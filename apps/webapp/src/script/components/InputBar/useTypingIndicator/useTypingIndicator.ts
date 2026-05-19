@@ -19,7 +19,7 @@
 
 import {useCallback, useEffect, useRef} from 'react';
 
-import {TYPING_TIMEOUT} from '../TypingIndicator';
+import {TYPING_TIMEOUT} from '../typingIndicator';
 
 type TypingIndicatorProps = {
   text: string;

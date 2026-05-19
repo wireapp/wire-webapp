@@ -20,11 +20,11 @@
 import {render, fireEvent} from '@testing-library/react';
 import ko from 'knockout';
 
-import {Message as MessageEntity} from 'Repositories/entity/message/Message';
+import {Message as MessageEntity} from 'Repositories/entity/message/message';
 import {ReadReceipt} from 'Repositories/storage';
 import {formatTimeShort} from 'Util/timeUtil';
 
-import {ReadReceiptStatus} from './ReadReceiptStatus';
+import {ReadReceiptStatus} from './readReceiptStatus';
 
 const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntity>) => {
   const readReceiptMessage: Partial<MessageEntity> = {

@@ -25,8 +25,8 @@ import {container} from 'tsyringe';
 import * as telemetry from '@wireapp/telemetry';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import type {ContributedSegmentations, MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {ClientEvent} from 'Repositories/event/Client';
+import type {ContributedSegmentations, MessageRepository} from 'Repositories/conversation/messageRepository';
+import {ClientEvent} from 'Repositories/event/client';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
 import {getLogger, Logger} from 'Util/logger';
@@ -45,8 +45,8 @@ import {
 } from './telemetry.helpers';
 import {UserData} from './userData';
 
-import {URLParameter} from '../../auth/URLParameter';
-import {Config} from '../../Config';
+import {URLParameter} from '../../auth/urlParameter';
+import {Config} from '../../config';
 import {APIClient} from '../../service/apiClientSingleton';
 
 const TEAM_SIZE_THRESHOLD_VALUE = 6;

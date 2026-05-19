@@ -19,7 +19,7 @@
 
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-export * from './TypingIndicator';
+export * from './typingIndicator';
 
 export {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 

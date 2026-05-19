@@ -23,8 +23,8 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {WallClock, createWallClock} from '../../clock/wallClock';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
-import {MainViewModel} from '../../view_model/MainViewModel';
-import {RootContextValue, RootProvider} from '../RootProvider';
+import {MainViewModel} from '../../viewModel/mainViewModel';
+import {RootContextValue, RootProvider} from '../rootProvider';
 
 type CreateRootContextValueForTestParameters = {
   readonly doesApplicationNeedForceReload?: boolean;

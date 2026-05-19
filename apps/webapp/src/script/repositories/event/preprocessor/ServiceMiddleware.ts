@@ -20,15 +20,15 @@
 import {CONVERSATION_EVENT, ConversationMemberJoinEvent} from '@wireapp/api-client/lib/event/';
 import {UserType, type QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/EventBuilder';
-import {User} from 'Repositories/entity/User';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MemberJoinEvent, OneToOneCreationEvent} from 'Repositories/conversation/eventBuilder';
+import {User} from 'Repositories/entity/user';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {ClientEvent} from '../Client';
-import {EventMiddleware, IncomingEvent} from '../EventProcessor';
+import {ClientEvent} from '../client';
+import {EventMiddleware, IncomingEvent} from '../eventProcessor';
 
 /**
  * will detect member join event that contain a service and add a flag to it

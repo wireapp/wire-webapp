@@ -19,14 +19,14 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import {UnverifiedUserWarning} from 'Components/Modals/UserModal';
-import {User} from 'Repositories/entity/User';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {UserClassifiedBar} from 'Components/classifiedBar/classifiedBar';
+import {UnverifiedUserWarning} from 'Components/modals/userModal';
+import {User} from 'Repositories/entity/user';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {E2eEncryptionMessage} from '../E2eEncryptionMessage/E2eEncryptionMessage';
+import {E2eEncryptionMessage} from '../e2eEncryptionMessage/e2eEncryptionMessage';
 
 interface ConnectedMessageProps {
   classifiedDomains?: string[];

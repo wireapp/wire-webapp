@@ -20,9 +20,9 @@
 import {Asset as ProtobufAsset} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {EventError} from 'src/script/error/eventError';
 import {
   createAssetAddEvent,
@@ -32,11 +32,11 @@ import {
 } from 'test/helper/EventGenerator';
 import {createUuid} from 'Util/uuid';
 
-import {EventStorageMiddleware} from './EventStorageMiddleware';
+import {EventStorageMiddleware} from './eventStorageMiddleware';
 
-import {ClientEvent} from '../../Client';
-import {EventService} from '../../EventService';
-import {EventSource} from '../../EventSource';
+import {ClientEvent} from '../../client';
+import {EventService} from '../../eventService';
+import {EventSource} from '../../eventSource';
 
 function buildEventStorageMiddleware() {
   const eventService = {

@@ -20,8 +20,8 @@
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
 import en from 'I18n/en-US.json';
-import {Config} from 'src/script/Config';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {Config} from 'src/script/config';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {setStrings} from 'Util/localizerUtil';
 
 import {TabAndFilterSettings} from './tabAndFilterSettings';
@@ -44,7 +44,7 @@ jest.mock('Util/componentUtil', () => ({
   useKoSubscribableChildren: () => ({isCellsEnabled: false}),
 }));
 
-jest.mock('Components/Icon', () => ({
+jest.mock('Components/icon', () => ({
   SettingsIcon: () => <div data-testid="settings-icon" />,
 }));
 

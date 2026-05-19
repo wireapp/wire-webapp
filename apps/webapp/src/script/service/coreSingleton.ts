@@ -27,7 +27,7 @@ import {APIClient} from './apiClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';
 import {SystemCrypto, wrapSystemCrypto} from './utils/systemCryptoWrapper';
 
-import {Config} from '../Config';
+import {Config} from '../config';
 
 declare global {
   interface Window {

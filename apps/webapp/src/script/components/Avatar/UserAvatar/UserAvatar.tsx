@@ -24,20 +24,20 @@ import {container} from 'tsyringe';
 import {Availability as AvailabilityType} from '@wireapp/protocol-messaging';
 import {COLOR} from '@wireapp/react-ui-kit';
 
-import {AvailabilityIcon} from 'Components/AvailabilityIcon';
-import {useUserName} from 'Components/UserName';
-import {User} from 'Repositories/entity/User';
+import {AvailabilityIcon} from 'Components/availabilityIcon';
+import {useUserName} from 'Components/userName';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {AVATAR_SIZE, STATE} from '../Avatar';
-import {AvatarBackground} from '../AvatarBackground';
-import {AvatarBadge} from '../AvatarBadge';
-import {AvatarBorder} from '../AvatarBorder';
-import {AvatarImage} from '../AvatarImage';
-import {AvatarInitials} from '../AvatarInitials';
-import {AvatarWrapper} from '../AvatarWrapper';
+import {AVATAR_SIZE, STATE} from '../avatar';
+import {AvatarBackground} from '../avatarBackground';
+import {AvatarBadge} from '../avatarBadge';
+import {AvatarBorder} from '../avatarBorder';
+import {AvatarImage} from '../avatarImage';
+import {AvatarInitials} from '../avatarInitials';
+import {AvatarWrapper} from '../avatarWrapper';
 
 interface UserAvatarProps {
   avatarSize: AVATAR_SIZE;

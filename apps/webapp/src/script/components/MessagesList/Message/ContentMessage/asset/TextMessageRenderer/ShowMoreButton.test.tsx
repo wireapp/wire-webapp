@@ -21,7 +21,7 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {t} from 'Util/localizerUtil';
 
-import {ShowMoreButton} from './ShowMoreButton';
+import {ShowMoreButton} from './showMoreButton';
 
 describe('ShowMoreButton', () => {
   it('toggles button show more/show less for a quoted message', () => {

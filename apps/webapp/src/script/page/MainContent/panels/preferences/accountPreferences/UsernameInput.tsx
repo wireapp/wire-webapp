@@ -26,7 +26,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {t} from 'Util/localizerUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
-import {AccountInput, useInputDone} from './AccountInput';
+import {AccountInput, useInputDone} from './accountInput';
 
 import {UserError} from '../../../../../error/userError';
 

@@ -21,10 +21,10 @@ import {useState} from 'react';
 
 import {t} from 'Util/localizerUtil';
 
-import {containerStyles, imageStyles} from './ImageAssetSmall.styles';
+import {containerStyles, imageStyles} from './imageAssetSmall.styles';
 
-import {FileFullscreenModal} from '../../../../../../../FileFullscreenModal/FileFullscreenModal';
-import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
+import {FileFullscreenModal} from '../../../../../../../fileFullscreenModal/fileFullscreenModal';
+import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
 
 interface ImageAssetSmallProps {
   filePreviewUrl?: string;

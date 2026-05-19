@@ -17,7 +17,7 @@
  *
  */
 
-import type {GiphyService} from './GiphyService';
+import type {GiphyService} from './giphyService';
 
 import {Logger, getLogger} from '../../util/logger';
 

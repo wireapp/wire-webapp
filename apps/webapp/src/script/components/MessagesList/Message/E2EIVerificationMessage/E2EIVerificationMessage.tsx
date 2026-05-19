@@ -19,19 +19,19 @@
 
 import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
+import * as Icon from 'Components/icon';
+import {Conversation} from 'Repositories/entity/conversation';
+import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/e2eiVerificationMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
-import {MessageIcon, IconInfo, Link as LinkStyles} from './E2EIVerificationMessage.styles';
+import {MessageIcon, IconInfo, Link as LinkStyles} from './e2eiVerificationMessage.styles';
 
-import {Config} from '../../../../Config';
-import {E2EIHandler} from '../../../../E2EIdentity';
-import {E2EIVerificationMessageType} from '../../../../message/E2EIVerificationMessageType';
+import {Config} from '../../../../config';
+import {E2EIHandler} from '../../../../e2eIdentity';
+import {E2EIVerificationMessageType} from '../../../../message/e2eiVerificationMessageType';
 
 const logger = getLogger('E2EIVerificationMessage');
 

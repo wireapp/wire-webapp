@@ -23,7 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode} from 'src/script/types/cellNode';
 
-import {CellsFilePreviewModal} from './CellsFilePreviewModal/CellsFilePreviewModal';
+import {CellsFilePreviewModal} from './cellsFilePreviewModal/cellsFilePreviewModal';
 import {
   headerCellStyles,
   tableActionsCellStyles,
@@ -31,9 +31,9 @@ import {
   tableCellStyles,
   tableStyles,
   wrapperStyles,
-} from './CellsTable.styles';
-import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
-import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
+} from './cellsTable.styles';
+import {getCellsTableColumns} from './cellsTableColumns/cellsTableColumns';
+import {CellsFilePreviewModalProvider} from './common/cellsFilePreviewModalContext/cellsFilePreviewModalContext';
 
 interface CellsTableProps {
   nodes: Array<CellNode>;

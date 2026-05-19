@@ -19,9 +19,9 @@
 
 import {create} from 'zustand';
 
-import {LegalHoldModalType} from 'Components/Modals/LegalHoldModal/LegalHoldModal';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {LegalHoldModalType} from 'Components/modals/legalHoldModal/legalHoldModal';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {splitFingerprint} from 'Util/stringUtil';
 
 type LegalHoldModalState = {

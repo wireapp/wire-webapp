@@ -28,28 +28,28 @@ import {CALL_TYPE, CONV_TYPE, QUALITY, REASON, STATE as CALL_STATE, VIDEO_STATE,
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {CallingEvent} from 'Repositories/event/CallingEvent';
-import {CALL} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {MediaType} from 'Repositories/media/MediaType';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {CallingEvent} from 'Repositories/event/callingEvent';
+import {CALL} from 'Repositories/event/client';
+import {EventRepository} from 'Repositories/event/eventRepository';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandlingState';
+import {MediaType} from 'Repositories/media/mediaType';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
-import {Call} from './Call';
-import {CallingRepository} from './CallingRepository';
-import {CallState, MuteState} from './CallState';
-import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
-import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
-import {Participant} from './Participant';
+import {Call} from './call';
+import {CallingRepository} from './callingRepository';
+import {CallState, MuteState} from './callState';
+import {CALL_MESSAGE_TYPE} from './enum/callMessageType';
+import {LEAVE_CALL_REASON} from './enum/leaveCallReason';
+import {Participant} from './participant';
 
-import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/TestUtil';
+import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/testUtil';
 import {Core} from '../../service/coreSingleton';
-import {Warnings} from '../../view_model/WarningsContainer';
+import {Warnings} from '../../viewModel/warningsContainer';
 import {z} from 'zod';
 
 describe('CallingRepository', () => {

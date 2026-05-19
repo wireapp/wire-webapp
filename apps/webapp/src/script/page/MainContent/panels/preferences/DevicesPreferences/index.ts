@@ -17,4 +17,4 @@
  *
  */
 
-export * from './DevicesPreference';
+export * from './devicesPreference';

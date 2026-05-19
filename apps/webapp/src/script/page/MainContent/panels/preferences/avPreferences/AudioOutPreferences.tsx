@@ -19,13 +19,13 @@
 
 import {FunctionComponent} from 'react';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {t} from 'Util/localizerUtil';
 
-import {DeviceSelect} from './DeviceSelect';
+import {DeviceSelect} from './deviceSelect';
 
-import {PreferencesSection} from '../components/PreferencesSection';
+import {PreferencesSection} from '../components/preferencesSection';
 
 interface AudioOutPreferencesProps {
   refreshCallOutputSpeaker: () => void;

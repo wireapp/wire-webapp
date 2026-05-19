@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import type {Message} from 'Repositories/entity/message/Message';
+import type {Message} from 'Repositories/entity/message/message';
 import {formatDayMonthNumeral, formatTimeShort} from 'Util/timeUtil';
 
 interface AssetHeaderProps {

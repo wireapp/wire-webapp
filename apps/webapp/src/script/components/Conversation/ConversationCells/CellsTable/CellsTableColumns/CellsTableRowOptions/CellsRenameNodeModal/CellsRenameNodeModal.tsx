@@ -17,12 +17,12 @@
  *
  */
 
-import {CellsModal} from 'Components/Conversation/ConversationCells/common/CellsModal/CellsModal';
+import {CellsModal} from 'Components/conversation/conversationCells/common/cellsModal/cellsModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
-import {CellsRenameForm} from './CellsRenameForm/CellsRenameForm';
+import {CellsRenameForm} from './cellsRenameForm/cellsRenameForm';
 import {useCellsRenameForm} from './useCellsRenameNodeForm/useCellsRenameNodeForm';
 
 interface CellsRenameNodeModalProps {

@@ -22,28 +22,28 @@ import {FC, FormEvent, MouseEvent, useState, useRef, ChangeEvent, useEffect, use
 import {ValidationUtil} from '@wireapp/commons';
 import {ErrorMessage} from '@wireapp/react-ui-kit';
 
-import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {Config} from 'src/script/Config';
+import {CopyToClipboardButton} from 'Components/copyToClipboardButton';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {Config} from 'src/script/config';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {isValidPassword} from 'Util/stringUtil';
 
-import {CheckboxOption} from './CheckboxOption/CheckboxOption';
-import {MessageContent} from './Content/MessageContent';
-import {GuestLinkPasswordForm} from './GuestLinkPasswordForm/GuestLinkPasswordForm';
-import {InputForm} from './InputForm/InputForm';
-import {JoinGuestLinkPasswordForm} from './JoinGuestLinkPasswordForm/JoinGuestLinkPasswordForm';
-import {PasswordAdvancedSecurityForm} from './PasswordAdvancedSecurityForm/PasswordAdvancedSecurityForm';
-import {PasswordForm} from './PasswordForm/PasswordForm';
-import {PrimaryButton} from './PrimaryButton/PrimaryButton';
-import {PrimaryModalButtons} from './PrimaryModalButtons/PrimaryModalButtons';
-import {PrimaryModalHeader} from './PrimaryModalHeader/PrimaryModalHeader';
-import {PrimaryModalLoading} from './PrimaryModalLoading/PrimaryModalLoading';
-import {PrimaryModalShell} from './PrimaryModalShell/PrimaryModalShell';
-import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './PrimaryModalState';
-import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
-import {SecondaryButton} from './SecondaryButton/SecondaryButton';
+import {CheckboxOption} from './checkboxOption/checkboxOption';
+import {MessageContent} from './content/messageContent';
+import {GuestLinkPasswordForm} from './guestLinkPasswordForm/guestLinkPasswordForm';
+import {InputForm} from './inputForm/inputForm';
+import {JoinGuestLinkPasswordForm} from './joinGuestLinkPasswordForm/joinGuestLinkPasswordForm';
+import {PasswordAdvancedSecurityForm} from './passwordAdvancedSecurityForm/passwordAdvancedSecurityForm';
+import {PasswordForm} from './passwordForm/passwordForm';
+import {PrimaryButton} from './primaryButton/primaryButton';
+import {PrimaryModalButtons} from './primaryModalButtons/primaryModalButtons';
+import {PrimaryModalHeader} from './primaryModalHeader/primaryModalHeader';
+import {PrimaryModalLoading} from './primaryModalLoading/primaryModalLoading';
+import {PrimaryModalShell} from './primaryModalShell/primaryModalShell';
+import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurrentModal} from './primaryModalState';
+import {ButtonAction, PrimaryModalType} from './primaryModalTypes';
+import {SecondaryButton} from './secondaryButton/secondaryButton';
 
 export const PrimaryModalComponent: FC = () => {
   const [inputValue, updateInputValue] = useState<string>('');

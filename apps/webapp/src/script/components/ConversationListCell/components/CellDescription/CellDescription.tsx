@@ -21,13 +21,13 @@ import {useMemo} from 'react';
 
 import cx from 'classnames';
 
-import * as Icon from 'Components/Icon';
-import {DraftState, generateConversationInputStorageKey} from 'Components/InputBar/common/draftState/draftState';
+import * as Icon from 'Components/icon';
+import {DraftState, generateConversationInputStorageKey} from 'Components/inputBar/common/draftState/draftState';
 import {useLocalStorage} from 'Hooks/useLocalStorage';
-import {generateCellState} from 'Repositories/conversation/ConversationCellState';
-import {Conversation, UnreadState} from 'Repositories/entity/Conversation';
+import {generateCellState} from 'Repositories/conversation/conversationCellState';
+import {Conversation, UnreadState} from 'Repositories/entity/conversation';
 
-import {iconStyle} from './CellDescription.style';
+import {iconStyle} from './cellDescription.style';
 
 interface Props {
   conversation: Conversation;

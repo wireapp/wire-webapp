@@ -30,25 +30,25 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
-import {SearchInput} from 'Components/SearchInput';
-import {TextInput} from 'Components/TextInput';
-import {InfoToggle} from 'Components/toggle/InfoToggle';
-import {UserSearchableList} from 'Components/UserSearchableList';
-import {ACCESS_STATE} from 'Repositories/conversation/AccessState';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
+import {ModalComponent} from 'Components/modals/modalComponent';
+import {AppsDisabledNote} from 'Components/note/appsDisabledNote/appsDisabledNote';
+import {SearchInput} from 'Components/searchInput';
+import {TextInput} from 'Components/textInput';
+import {InfoToggle} from 'Components/toggle/infoToggle';
+import {UserSearchableList} from 'Components/userSearchableList';
+import {ACCESS_STATE} from 'Repositories/conversation/accessState';
 import {
   ACCESS_TYPES,
   teamPermissionsForAccessState,
   toggleFeature,
-} from 'Repositories/conversation/ConversationAccessPermission';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
+} from 'Repositories/conversation/conversationAccessPermission';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -57,10 +57,10 @@ import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil
 import {replaceLink, t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
-import {Config} from '../../../Config';
-import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
-import {RootContext} from '../../../page/RootProvider';
-import {PrimaryModal} from '../PrimaryModal';
+import {Config} from '../../../config';
+import {isProtocolOption, ProtocolOption} from '../../../guards/protocol';
+import {RootContext} from '../../../page/rootProvider';
+import {PrimaryModal} from '../primaryModal';
 
 interface GroupCreationModalProps {
   userState?: UserState;

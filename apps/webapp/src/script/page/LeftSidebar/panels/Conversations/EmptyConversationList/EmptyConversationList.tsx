@@ -24,9 +24,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {t} from 'Util/localizerUtil';
 
-import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './EmptyConversationList.styles';
+import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './emptyConversationList.styles';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {SidebarTabs} from '../useSidebarStore';
 
 interface EmptyConversationListProps {

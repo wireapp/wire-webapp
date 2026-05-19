@@ -21,9 +21,9 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {t} from 'Util/localizerUtil';
 
-import {SystemMessage} from './SystemMessage';
+import {SystemMessage} from './systemMessage';
 
-import {SystemMessageType} from '../../../message/SystemMessageType';
+import {SystemMessageType} from '../../../message/systemMessageType';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
   constructor(isReceiptEnabled: boolean) {

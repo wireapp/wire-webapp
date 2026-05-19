@@ -21,10 +21,10 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Account} from '@wireapp/core';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MLSConversation, isMLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {initMLSGroupConversations} from 'src/script/mls/MLSConversations';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MLSConversation, isMLSConversation} from 'Repositories/conversation/conversationSelectors';
+import {Conversation} from 'Repositories/entity/conversation';
+import {initMLSGroupConversations} from 'src/script/mls/mlsConversations';
 
 /**
  * Will compare the list of initial conversations stored in the local database with conversations fetched from the backend.

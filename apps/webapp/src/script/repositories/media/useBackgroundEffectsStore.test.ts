@@ -1,5 +1,5 @@
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
-import {DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
+import {DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/videoBackgroundEffects';
 
 describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
   beforeEach(() => {

@@ -27,9 +27,9 @@ import {isTweetUrl} from 'Util/validationUtil';
 
 import {isBlacklisted} from './blackList';
 import {getFirstLinkWithOffset} from './helpers';
-import {LinkPreviewError} from './LinkPreviewError';
+import {LinkPreviewError} from './linkPreviewError';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 
 type LinkPreviewContent = {
   image?: {

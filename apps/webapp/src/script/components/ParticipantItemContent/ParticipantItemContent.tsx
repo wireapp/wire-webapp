@@ -21,10 +21,10 @@ import React from 'react';
 
 import ko from 'knockout';
 
-import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
-import * as Icon from 'Components/Icon';
-import {UserInfo} from 'Components/UserInfo';
-import {User} from 'Repositories/entity/User';
+import {UserBlockedBadge, UserVerificationBadges} from 'Components/badge';
+import * as Icon from 'Components/icon';
+import {UserInfo} from 'Components/userInfo';
+import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
@@ -38,7 +38,7 @@ import {
   chevronIcon,
   contentText,
   wrapper,
-} from './ParticipantItem.styles';
+} from './participantItem.styles';
 
 interface ParticipantItemContentProps {
   /** the conversation context in which we are displaying the user (will enable e2ei verification badges) */

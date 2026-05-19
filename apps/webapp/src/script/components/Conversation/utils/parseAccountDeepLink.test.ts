@@ -17,7 +17,7 @@
  *
  */
 
-import {parseAccountDeepLink} from 'Components/Conversation/utils/parseAccountDeepLink';
+import {parseAccountDeepLink} from 'Components/conversation/utils/parseAccountDeepLink';
 
 describe('parseAccountDeepLink', () => {
   const accountBase = 'https://account.wire.com';

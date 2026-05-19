@@ -17,10 +17,10 @@
  *
  */
 
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {t} from 'Util/localizerUtil';
 
-import {SystemMessage} from './SystemMessage';
+import {SystemMessage} from './systemMessage';
 
 export class MLSMigrationFinalisationOngoingCallMessage extends SystemMessage {
   constructor() {

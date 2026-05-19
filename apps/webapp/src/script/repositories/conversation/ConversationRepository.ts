@@ -64,26 +64,26 @@ import {Account} from '@wireapp/core';
 import {Asset as ProtobufAsset, Confirmation, LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {TYPING_TIMEOUT, useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/leaveCallReason';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
 import {ConnectionState} from 'Repositories/connection/connectionState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {DeleteConversationMessage} from 'Repositories/entity/message/DeleteConversationMessage';
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import {Message} from 'Repositories/entity/message/Message';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {EventSource} from 'Repositories/event/EventSource';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DeleteConversationMessage} from 'Repositories/entity/message/deleteConversationMessage';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import {Message} from 'Repositories/entity/message/message';
+import {User} from 'Repositories/entity/user';
+import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from 'Repositories/event/client';
+import {EventRepository} from 'Repositories/event/eventRepository';
+import {EventService} from 'Repositories/event/eventService';
+import {EventSource} from 'Repositories/event/eventSource';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandlingState';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfRepository} from 'Repositories/self/selfRepository';
 import type {EventRecord} from 'Repositories/storage';
@@ -111,14 +111,14 @@ import {toError} from 'Util/toError';
 import {isBackendError, isErrorWithType} from 'Util/typePredicateUtil';
 import {createUuid} from 'Util/uuid';
 
-import {ACCESS_STATE} from './AccessState';
-import {extractClientDiff} from './ClientMismatchUtil';
-import {updateAccessRights} from './ConversationAccessPermission';
-import {ConversationEphemeralHandler} from './ConversationEphemeralHandler';
-import {ConversationFilter} from './ConversationFilter';
-import {ConversationLabelRepository} from './ConversationLabelRepository';
-import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './ConversationMapper';
-import {ConversationRoleRepository} from './ConversationRoleRepository';
+import {ACCESS_STATE} from './accessState';
+import {extractClientDiff} from './clientMismatchUtil';
+import {updateAccessRights} from './conversationAccessPermission';
+import {ConversationEphemeralHandler} from './conversationEphemeralHandler';
+import {ConversationFilter} from './conversationFilter';
+import {ConversationLabelRepository} from './conversationLabelRepository';
+import {ConversationDatabaseData, ConversationMapper, SelfStatusUpdateDatabaseData} from './conversationMapper';
+import {ConversationRoleRepository} from './conversationRoleRepository';
 import {
   isBackendProteus1to1Conversation,
   isConnectionRequestConversation,
@@ -130,20 +130,20 @@ import {
   MLSCapableConversation,
   MLSConversation,
   ProteusConversation,
-} from './ConversationSelectors';
-import {ConversationService} from './ConversationService';
-import {ConversationState} from './ConversationState';
-import {ConversationStateHandler} from './ConversationStateHandler';
-import {ConversationStatus} from './ConversationStatus';
-import {ConversationVerificationState} from './ConversationVerificationState';
+} from './conversationSelectors';
+import {ConversationService} from './conversationService';
+import {ConversationState} from './conversationState';
+import {ConversationStateHandler} from './conversationStateHandler';
+import {ConversationStatus} from './conversationStatus';
+import {ConversationVerificationState} from './conversationVerificationState';
 import {
   MLSConversationVerificationStateHandler,
   ProteusConversationVerificationStateHandler,
-} from './ConversationVerificationStateHandler';
+} from './conversationVerificationStateHandler';
 import {
   OnConversationE2EIVerificationStateChange,
   OnConversationVerificationStateChange,
-} from './ConversationVerificationStateHandler/shared';
+} from './conversationVerificationStateHandler/shared';
 import {
   AssetAddEvent,
   ButtonActionConfirmationEvent,
@@ -156,19 +156,19 @@ import {
   MessageHiddenEvent,
   OneToOneCreationEvent,
   TeamMemberLeaveEvent,
-} from './EventBuilder';
-import {EventMapper} from './EventMapper';
-import {MessageRepository} from './MessageRepository';
-import {NOTIFICATION_STATE} from './NotificationSetting';
+} from './eventBuilder';
+import {EventMapper} from './eventMapper';
+import {MessageRepository} from './messageRepository';
+import {NOTIFICATION_STATE} from './notificationSetting';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
 import {ConversationError} from '../../error/conversationError';
-import {isMemberMessage} from '../../guards/Message';
-import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
-import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
-import {MessageCategory} from '../../message/MessageCategory';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {isMemberMessage} from '../../guards/message';
+import * as LegalHoldEvaluator from '../../legalHold/legalHoldEvaluator';
+import type {MappedEvent} from '../../legalHold/legalHoldEvaluator';
+import {messageCategory} from '../../message/messageCategory';
+import {SystemMessageType} from '../../message/systemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
 import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
@@ -1085,7 +1085,7 @@ export class ConversationRepository {
   /**
    * Get messages for given category. Category param acts as lower bound.
    */
-  async getEventsForCategory(conversationEntity: Conversation, category = MessageCategory.NONE): Promise<Message[]> {
+  async getEventsForCategory(conversationEntity: Conversation, category = messageCategory.NONE): Promise<Message[]> {
     const events = (await this.eventService.loadEventsWithCategory(conversationEntity.id, category)) as EventRecord[];
     const messageEntities = this.event_mapper.mapJsonEvents(events, conversationEntity) as Message[];
     return this.updateMessagesUserEntities(messageEntities);
@@ -3282,7 +3282,7 @@ export class ConversationRepository {
     const replaceLinkLegalHold = replaceLink(
       Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
       '',
-      'read-more-legal-hold',
+      'read-more-legalHold',
     );
 
     const messageText = t('modalLegalHoldConversationMissingConsentMessage', undefined, replaceLinkLegalHold);

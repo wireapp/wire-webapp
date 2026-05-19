@@ -29,8 +29,8 @@ import {
   BackupMessageContent,
   BackupMessage,
   BackupExportResult,
-} from './CPB.library';
-import {ExportHistoryFromDatabaseParams} from './CPB.types';
+} from './cPB.library';
+import {ExportHistoryFromDatabaseParams} from './cPB.types';
 import {
   AssetContentSchema,
   ConversationTableEntrySchema,

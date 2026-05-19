@@ -23,12 +23,12 @@ import {useInView} from 'src/script/hooks/useInView/useInView';
 import {useEffectRef} from 'Util/useEffectRef';
 
 import {useVideoPlayback} from './useVideoPlayback/useVideoPlayback';
-import {VideoAssetCard} from './VideoAssetCard/VideoAssetCard';
-import {VideoAssetError} from './VideoAssetError/VideoAssetError';
-import {VideoAssetLoading} from './VideoAssetLoading/VideoAssetLoading';
-import {wrapperStyles, videoStyles, controlsWrapperStyles} from './VideoAssetPlayer.styles';
-import {VideoControls} from './VideoControls/VideoControls';
-import {VideoPlayOverlay} from './VideoPlayOverlay/VideoPlayOverlay';
+import {VideoAssetCard} from './videoAssetCard/videoAssetCard';
+import {VideoAssetError} from './videoAssetError/videoAssetError';
+import {VideoAssetLoading} from './videoAssetLoading/videoAssetLoading';
+import {wrapperStyles, videoStyles, controlsWrapperStyles} from './videoAssetPlayer.styles';
+import {VideoControls} from './videoControls/videoControls';
+import {VideoPlayOverlay} from './videoPlayOverlay/videoPlayOverlay';
 
 interface VideoAssetPlayerProps {
   url?: string;

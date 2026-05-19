@@ -21,12 +21,12 @@ import React from 'react';
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {UserList} from 'Components/UserList/UserList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
+import {UserList} from 'Components/userList/userList';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {User} from 'Repositories/entity/user';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
-import {withTheme} from '../../auth/util/test/TestUtil';
+import {TestFactory} from '../../../../test/helper/testFactory';
+import {withTheme} from '../../auth/util/test/testUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;

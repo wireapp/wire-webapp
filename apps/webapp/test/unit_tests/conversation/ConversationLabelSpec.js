@@ -17,8 +17,8 @@
  *
  */
 
-import {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationLabelRepository} from 'Repositories/conversation/conversationLabelRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {createUuid} from 'Util/uuid';
 
 describe('ConversationLabelRepository', () => {

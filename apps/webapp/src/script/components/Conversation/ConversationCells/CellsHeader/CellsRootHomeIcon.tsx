@@ -17,7 +17,7 @@
  *
  */
 
-import {rootHomeIconStyles} from './CellsHeader.styles';
+import {rootHomeIconStyles} from './cellsHeader.styles';
 
 export const CellsRootHomeIcon = () => {
   return (

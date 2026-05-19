@@ -17,12 +17,12 @@
  *
  */
 
-import {PlusIcon} from 'Components/Icon';
-import type {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import {PlusIcon} from 'Components/icon';
+import type {ConversationLabelRepository} from 'Repositories/conversation/conversationLabelRepository';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {t} from 'Util/localizerUtil';
 
-import {ContextMenuEntry, showContextMenu} from './ContextMenu';
+import {ContextMenuEntry, showContextMenu} from './contextMenu';
 
 export const showLabelContextMenu = (
   event: MouseEvent | React.MouseEvent<Element, MouseEvent>,

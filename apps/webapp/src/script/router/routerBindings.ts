@@ -21,7 +21,7 @@ import React from 'react';
 
 import {KEY} from 'Util/keyboardUtil';
 
-import {navigate} from './Router';
+import {navigate} from './router';
 
 import {useAppMainState, ViewType} from '../page/state';
 

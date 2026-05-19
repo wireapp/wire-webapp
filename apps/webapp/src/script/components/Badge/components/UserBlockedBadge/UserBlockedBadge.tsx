@@ -19,7 +19,7 @@
 
 import {t} from 'Util/localizerUtil';
 
-import {wrapper} from './UserBlockedBadge.styles';
+import {wrapper} from './userBlockedBadge.styles';
 
 export const UserBlockedBadge = () => {
   return <span css={wrapper}>{t('userBlockedConnectionBadge')}</span>;

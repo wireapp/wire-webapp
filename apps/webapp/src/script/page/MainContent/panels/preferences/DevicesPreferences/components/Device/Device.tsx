@@ -21,16 +21,16 @@ import {MouseEvent, KeyboardEvent} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {DeviceVerificationBadges} from 'Components/Badge';
-import * as Icon from 'Components/Icon';
+import {DeviceVerificationBadges} from 'Components/badge';
+import * as Icon from 'Components/icon';
 import {ClientEntity} from 'Repositories/client';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {WireIdentity} from 'src/script/e2eIdentity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {FormattedId} from '../FormattedId';
+import {FormattedId} from '../formattedId';
 
 interface DeviceProps {
   device: ClientEntity;

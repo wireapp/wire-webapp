@@ -19,7 +19,7 @@
 
 import {waitFor} from '@testing-library/react';
 
-import {configureRoutes, navigate, setHistoryParam} from './Router';
+import {configureRoutes, navigate, setHistoryParam} from './router';
 
 describe('Router', () => {
   afterEach(() => {

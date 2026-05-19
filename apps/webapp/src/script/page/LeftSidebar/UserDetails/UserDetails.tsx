@@ -23,16 +23,16 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {UserVerificationBadges} from 'Components/Badge';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {User} from 'Repositories/entity/User';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {UserVerificationBadges} from 'Components/badge';
+import {LegalHoldDot} from 'Components/legalHoldDot';
+import {User} from 'Repositories/entity/user';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import * as styles from './UserDetails.styles';
+import * as styles from './userDetails.styles';
 
-import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
+import {AvailabilityContextMenu} from '../../../ui/availabilityContextMenu';
 
 interface AvailabilityStateButtonWrapperProps {
   children: React.ReactElement;
@@ -100,7 +100,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
               <div css={styles.legalHold}>
                 <LegalHoldDot
                   isPending={hasPendingLegalHold}
-                  dataUieName={hasPendingLegalHold ? 'status-legal-hold-pending' : 'status-legal-hold'}
+                  dataUieName={hasPendingLegalHold ? 'status-legalHold-pending' : 'status-legalHold'}
                   showText
                   isInteractive
                 />

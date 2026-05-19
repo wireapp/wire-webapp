@@ -33,8 +33,8 @@ import {toError} from 'Util/toError';
 import {isAxiosError, isBackendError} from 'Util/typePredicateUtil';
 
 import {AuthActionCreator} from './creator/';
-import {LabeledError} from './LabeledError';
-import {LocalStorageAction, LocalStorageKey} from './LocalStorageAction';
+import {LabeledError} from './labeledError';
+import {LocalStorageAction, LocalStorageKey} from './localStorageAction';
 
 import {currentLanguage} from '../../localeConfig';
 import type {Api, RootState, ThunkAction, ThunkDispatch} from '../reducer';

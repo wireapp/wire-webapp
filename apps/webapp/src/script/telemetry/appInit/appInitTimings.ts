@@ -20,7 +20,7 @@
 import {Logger, getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {AppInitTimingsStep} from './AppInitTimingsStep';
+import {AppInitTimingsStep} from './appInitTimingsStep';
 
 type AppTimings = Partial<Record<AppInitTimingsStep, number>>;
 

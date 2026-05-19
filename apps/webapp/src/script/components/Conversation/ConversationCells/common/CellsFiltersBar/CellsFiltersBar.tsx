@@ -19,10 +19,10 @@
 
 import {t} from 'Util/localizerUtil';
 
-import {clearAllButtonStyles, filterGroupStyles, toggleFilterButtonStyles} from './CellsFiltersBar.styles';
+import {clearAllButtonStyles, filterGroupStyles, toggleFilterButtonStyles} from './cellsFiltersBar.styles';
 import type {FilterConfig} from './filterConfig';
 
-import {FilterPopover} from '../FilterPopover/FilterPopover';
+import {FilterPopover} from '../filterPopover/filterPopover';
 
 interface CellsFiltersBarProps {
   filters: FilterConfig[];

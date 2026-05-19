@@ -17,7 +17,7 @@
  *
  */
 
-import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import {ElectronDesktopCapturerSource} from 'Repositories/media/mediaDevicesHandler';
 
 export const isMediaDevice = (
   device: MediaDeviceInfo | ElectronDesktopCapturerSource | undefined,

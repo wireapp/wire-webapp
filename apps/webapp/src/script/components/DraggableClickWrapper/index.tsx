@@ -17,4 +17,4 @@
  *
  */
 
-export * from './DraggableClickWrapper';
+export * from './draggableClickWrapper';

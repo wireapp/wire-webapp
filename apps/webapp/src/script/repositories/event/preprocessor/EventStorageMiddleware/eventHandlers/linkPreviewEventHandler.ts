@@ -17,14 +17,14 @@
  *
  */
 
-import {MessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {MessageAddEvent} from 'Repositories/conversation/eventBuilder';
 import {StoredEvent} from 'Repositories/storage';
-import {categoryFromEvent} from 'src/script/message/MessageCategorization';
+import {categoryFromEvent} from 'src/script/message/messageCategorization';
 
-import {EventValidationError} from './EventValidationError';
+import {EventValidationError} from './eventValidationError';
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
-import {CONVERSATION, ClientEvent} from '../../../Client';
+import {CONVERSATION, ClientEvent} from '../../../client';
 import {EventHandler, HandledEvents} from '../types';
 
 function getLinkPreviewUpdates(originalEvent: StoredEvent<MessageAddEvent>, newEvent: MessageAddEvent) {

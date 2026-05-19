@@ -19,9 +19,9 @@
 
 import {ConversationEvent, FederationEvent} from '@wireapp/api-client/lib/event';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from 'Repositories/entity/conversation';
 
-import {ClientConversationEvent} from './EventBuilder';
+import {ClientConversationEvent} from './eventBuilder';
 
 type ConversationEventPayload = ConversationEvent | ClientConversationEvent | FederationEvent;
 type EventHandlingFunction = (conversationEntity: Conversation, eventJson: unknown) => void | Promise<unknown>;

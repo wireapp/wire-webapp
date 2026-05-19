@@ -31,17 +31,17 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ButtonAction} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {ButtonAction} from 'Components/modals/primaryModal/primaryModalTypes';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatDuration} from 'Util/timeUtil';
 
-import {loadFeatureConfig, saveFeatureConfig} from './FeatureConfigChangeNotifier.store';
+import {loadFeatureConfig, saveFeatureConfig} from './featureConfigChangeNotifier.store';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 
 type Features =
   | 'FileSharing'

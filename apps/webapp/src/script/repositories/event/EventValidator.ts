@@ -19,8 +19,8 @@
 
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {EventSource} from './EventSource';
-import {EventValidation} from './EventValidation';
+import {EventSource} from './eventSource';
+import {EventValidation} from './eventValidation';
 
 export function validateEvent(
   event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},

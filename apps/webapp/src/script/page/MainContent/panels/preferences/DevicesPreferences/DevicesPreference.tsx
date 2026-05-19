@@ -22,21 +22,21 @@ import {useEffect, useState} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {ClientState} from 'Repositories/client/ClientState';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {ClientState} from 'Repositories/client/clientState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {CryptographyRepository} from 'Repositories/cryptography/cryptographyRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {useUserIdentity} from 'src/script/hooks/useDeviceIdentities';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {DetailedDevice} from './components/DetailedDevice';
-import {Device} from './components/Device';
-import {DeviceDetailsPreferences} from './components/DeviceDetailsPreferences';
+import {DetailedDevice} from './components/detailedDevice';
+import {Device} from './components/device';
+import {DeviceDetailsPreferences} from './components/deviceDetailsPreferences';
 
-import {PreferencesPage} from '../components/PreferencesPage';
+import {PreferencesPage} from '../components/preferencesPage';
 
 interface DevicesPreferencesProps {
   clientState: ClientState;

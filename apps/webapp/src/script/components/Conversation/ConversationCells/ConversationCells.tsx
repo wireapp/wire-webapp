@@ -22,17 +22,17 @@ import {memo, useCallback, useEffect, useRef} from 'react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {CellsHeader} from './CellsHeader/CellsHeader';
-import {CellsLoader} from './CellsLoader/CellsLoader';
-import {CellsPagination} from './CellsPagination/CellsPagination';
-import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
-import {CellsTable} from './CellsTable/CellsTable';
+import {CellsHeader} from './cellsHeader/cellsHeader';
+import {CellsLoader} from './cellsLoader/cellsLoader';
+import {CellsPagination} from './cellsPagination/cellsPagination';
+import {CellsStateInfo} from './cellsStateInfo/cellsStateInfo';
+import {CellsTable} from './cellsTable/cellsTable';
 import {hasActiveConversationDriveFilters} from './common/driveFilters/driveFilters';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
@@ -42,14 +42,14 @@ import {
   searchIdleHeadingStyles,
   searchIdleStateStyles,
   wrapperStyles,
-} from './ConversationCells.styles';
+} from './conversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 
-import {useApplicationContext} from '../../../page/RootProvider';
+import {useApplicationContext} from '../../../page/rootProvider';
 
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;

@@ -18,7 +18,7 @@
  */
 
 import {enableLogging} from 'src/script/util/LoggerUtil';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 
 describe('enableLogging', () => {
   beforeEach(() => window.localStorage.clear());

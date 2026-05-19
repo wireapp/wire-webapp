@@ -20,8 +20,8 @@
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {UploadAssetItem} from './components/UploadAssetItem';
-import {uploadAssetsContainer} from './UploadAssets.styles';
+import {UploadAssetItem} from './components/uploadAssetItem';
+import {uploadAssetsContainer} from './uploadAssets.styles';
 
 interface Props {
   assetRepository: AssetRepository;

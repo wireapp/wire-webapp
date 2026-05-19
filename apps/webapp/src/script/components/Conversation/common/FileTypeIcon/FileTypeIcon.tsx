@@ -37,7 +37,7 @@ import {
 import {FileType} from 'Util/getFileTypeFromExtension/fileType';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 
-import {iconStyles, wrapperStyles} from './FileTypeIcon.styles';
+import {iconStyles, wrapperStyles} from './fileTypeIcon.styles';
 
 interface FileTypeIconProps {
   extension: string;

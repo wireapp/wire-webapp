@@ -23,10 +23,10 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {VirtualizedMessagesList} from 'Components/MessagesList/VirtualizedMessagesList/VirtualizedMessagesList';
+import {VirtualizedMessagesList} from 'Components/messagesList/virtualizedMessagesList/virtualizedMessagesList';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {MessagesListParams} from './MessageList.types';
+import {MessagesListParams} from './messageList.types';
 
 export const VirtualizedMessageListWrapper = ({
   assetRepository,

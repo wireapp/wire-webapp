@@ -21,7 +21,7 @@ import {ReactNode} from 'react';
 
 import {AlertIcon} from '@wireapp/react-ui-kit';
 
-import {FileCard} from 'Components/FileCard/FileCard';
+import {FileCard} from 'Components/fileCard/fileCard';
 
 import {
   alertIconStyles,
@@ -29,10 +29,10 @@ import {
   iconWrapperStyles,
   errorLineWrapperStyles,
   wrapperStyles,
-} from './MediaFilePreviewCard.styles';
+} from './mediaFilePreviewCard.styles';
 
-import {FilePreviewDeleteButton} from '../FilePreviewDeleteButton/FilePreviewDeleteButton';
-import {FilePreviewErrorMoreButton} from '../FilePreviewErrorMoreButton/FilePreviewErrorMoreButton';
+import {FilePreviewDeleteButton} from '../filePreviewDeleteButton/filePreviewDeleteButton';
+import {FilePreviewErrorMoreButton} from '../filePreviewErrorMoreButton/filePreviewErrorMoreButton';
 
 interface MediaFilePreviewCardProps {
   label: string;

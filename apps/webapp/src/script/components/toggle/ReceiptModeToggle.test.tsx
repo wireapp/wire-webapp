@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data';
 
-import {ReceiptModeToggle} from './ReceiptModeToggle';
+import {ReceiptModeToggle} from './receiptModeToggle';
 
 describe('ReceiptModeToggle', () => {
   it('checks the checkbox when receipts are turned on', () => {

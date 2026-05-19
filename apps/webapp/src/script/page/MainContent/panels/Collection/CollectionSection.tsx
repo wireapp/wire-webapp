@@ -19,10 +19,10 @@
 
 import React from 'react';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
 import {t} from 'Util/localizerUtil';
 
-import {CollectionItem} from './CollectionItem';
+import {CollectionItem} from './collectionItem';
 
 const CollectionSection = ({
   messages,

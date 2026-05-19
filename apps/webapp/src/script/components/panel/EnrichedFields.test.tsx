@@ -20,11 +20,11 @@
 import {render, waitFor} from '@testing-library/react';
 import type {RichInfo} from '@wireapp/api-client/lib/user/';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
 import {createUuid} from 'Util/uuid';
 
-import {EnrichedFields} from './EnrichedFields';
+import {EnrichedFields} from './enrichedFields';
 
 const richInfo: Partial<RichInfo> = {
   fields: [

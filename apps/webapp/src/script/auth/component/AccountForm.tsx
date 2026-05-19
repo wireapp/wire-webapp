@@ -32,15 +32,15 @@ import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {styles} from './AccountForm.styles';
-import {Exception} from './Exception';
+import {styles} from './accountForm.styles';
+import {Exception} from './exception';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {actionRoot as ROOT_ACTIONS} from '../module/action/';
-import {ValidationError} from '../module/action/ValidationError';
+import {ValidationError} from '../module/action/validationError';
 import {RootState, bindActionCreators} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import * as AccentColor from '../util/AccentColor';
+import * as AuthSelector from '../module/selector/authSelector';
+import * as AccentColor from '../util/accentColor';
 import {
   EventName,
   initializeTelemetry,

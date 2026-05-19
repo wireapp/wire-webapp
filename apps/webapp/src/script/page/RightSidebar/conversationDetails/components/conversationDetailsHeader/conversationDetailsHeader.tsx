@@ -19,11 +19,11 @@
 
 import {ChangeEvent, FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
-import {ConversationVerificationBadges} from 'Components/Badge';
-import * as Icon from 'Components/Icon';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationVerificationBadges} from 'Components/badge';
+import * as Icon from 'Components/icon';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';

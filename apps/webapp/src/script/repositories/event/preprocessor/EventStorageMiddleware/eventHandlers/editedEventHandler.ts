@@ -17,13 +17,13 @@
  *
  */
 
-import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/EventBuilder';
+import {MessageAddEvent, MultipartMessageAddEvent} from 'Repositories/conversation/eventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 import {EventError} from 'src/script/error/eventError';
 
 import {getCommonMessageUpdates} from './getCommonMessageUpdates';
 
-import {CONVERSATION, ClientEvent} from '../../../Client';
+import {CONVERSATION, ClientEvent} from '../../../client';
 import {EventHandler, HandledEvents} from '../types';
 
 function throwValidationError(message: string): never {

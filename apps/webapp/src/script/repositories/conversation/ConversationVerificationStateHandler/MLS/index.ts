@@ -17,4 +17,4 @@
  *
  */
 
-export * from './MLSStateHandler';
+export * from './mlsStateHandler';

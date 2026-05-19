@@ -23,13 +23,13 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {showInviteModal} from 'Components/Modals/InviteModal';
-import {showServiceModal} from 'Components/Modals/ServiceModal';
-import {showUserModal} from 'Components/Modals/UserModal';
-import {SearchInput} from 'Components/SearchInput';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
+import {showInviteModal} from 'Components/modals/inviteModal';
+import {showServiceModal} from 'Components/modals/serviceModal';
+import {showUserModal} from 'Components/modals/userModal';
+import {SearchInput} from 'Components/searchInput';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {User} from 'Repositories/entity/user';
 import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {SearchRepository} from 'Repositories/search/searchRepository';
@@ -38,15 +38,15 @@ import {TeamState} from 'Repositories/team/teamState';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {MainViewModel} from 'src/script/view_model/MainViewModel';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/leftSidebar/panels/conversations/useSidebarStore';
+import {MainViewModel} from 'src/script/viewModel/mainViewModel';
 import {t} from 'Util/localizerUtil';
 
-import {PeopleTab, SearchResultsData} from './PeopleTab';
-import {ServicesTab} from './ServicesTab';
+import {PeopleTab, SearchResultsData} from './peopleTab';
+import {ServicesTab} from './servicesTab';
 
-import {Config} from '../../../../Config';
-import {ListWrapper} from '../ListWrapper';
+import {Config} from '../../../../config';
+import {ListWrapper} from '../listWrapper';
 
 type StartUIProps = {
   conversationRepository: ConversationRepository;

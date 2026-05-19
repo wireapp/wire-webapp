@@ -18,7 +18,7 @@
  */
 
 import {currentLanguage} from './auth/localeConfig';
-import {Config} from './Config';
+import {Config} from './config';
 
 const {URL, TERMS_OF_USE_URL_DE, PRIVACY_POLICY_URL_DE} = Config.getConfig();
 

@@ -25,17 +25,17 @@ import {Runtime} from '@wireapp/commons';
 import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import * as Icon from 'Components/icon';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {
   ClientNotificationData,
   Notification,
   PreferenceNotificationRepository,
-} from 'Repositories/notification/PreferenceNotificationRepository';
+} from 'Repositories/notification/preferenceNotificationRepository';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {t} from 'Util/localizerUtil';
 
-import {ListWrapper} from './ListWrapper';
+import {ListWrapper} from './listWrapper';
 
 import {ContentState, useAppState} from '../../useAppState';
 

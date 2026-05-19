@@ -27,12 +27,12 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
-import type {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import type {EventSource} from 'Repositories/event/EventSource';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {MemberMessage} from 'Repositories/entity/message/memberMessage';
+import type {User} from 'Repositories/entity/user';
+import {EventRepository} from 'Repositories/event/eventRepository';
+import type {EventSource} from 'Repositories/event/eventSource';
 import {SelfService} from 'Repositories/self/selfService';
 import {TeamService} from 'Repositories/team/teamService';
 import type {UserRepository} from 'Repositories/user/userRepository';
@@ -48,8 +48,8 @@ import {ConnectionMapper} from './connectionMapper';
 import type {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 
-import {Config} from '../../Config';
-import {SystemMessageType} from '../../message/SystemMessageType';
+import {Config} from '../../config';
+import {SystemMessageType} from '../../message/systemMessageType';
 
 export class ConnectionRepository {
   private readonly connectionService: ConnectionService;
@@ -212,7 +212,7 @@ export class ConnectionRepository {
             const replaceLinkLegalHold = replaceLink(
               Config.getConfig().URL.SUPPORT.LEGAL_HOLD_BLOCK,
               '',
-              'read-more-legal-hold',
+              'read-more-legalHold',
             );
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {

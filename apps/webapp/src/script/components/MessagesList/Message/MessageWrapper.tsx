@@ -25,35 +25,35 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {E2EIVerificationMessage} from 'Components/MessagesList/Message/E2EIVerificationMessage';
+import {E2EIVerificationMessage} from 'Components/messagesList/message/e2eiVerificationMessage';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
-import {OutgoingQuote} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Text} from 'Repositories/entity/message/Text';
+import {OutgoingQuote} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Text} from 'Repositories/entity/message/text';
 import {TeamState} from 'Repositories/team/teamState';
-import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {QuoteEntity} from 'src/script/message/quoteEntity';
+import {useApplicationContext} from 'src/script/page/rootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {CallMessage} from './CallMessage';
-import {CallTimeoutMessage} from './CallTimeoutMessage';
-import {ContentMessageComponent} from './ContentMessage';
-import {DecryptErrorMessage} from './DecryptErrorMessage';
-import {DeleteMessage} from './DeleteMessage';
-import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
-import {FederationStopMessage} from './FederationStopMessage';
-import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
-import {LegalHoldMessage} from './LegalHoldMessage';
-import {MemberMessage} from './MemberMessage';
-import {MissedMessage} from './MissedMessage';
-import {PingMessage} from './PingMessage';
-import {SystemMessage} from './SystemMessage';
-import {VerificationMessage} from './VerificationMessage';
+import {CallMessage} from './callMessage';
+import {CallTimeoutMessage} from './callTimeoutMessage';
+import {ContentMessageComponent} from './contentMessage';
+import {DecryptErrorMessage} from './decryptErrorMessage';
+import {DeleteMessage} from './deleteMessage';
+import {FailedToAddUsersMessage} from './failedToAddUsersMessage';
+import {FederationStopMessage} from './federationStopMessage';
+import {FileTypeRestrictedMessage} from './fileTypeRestrictedMessage';
+import {LegalHoldMessage} from './legalHoldMessage';
+import {MemberMessage} from './memberMessage';
+import {MissedMessage} from './missedMessage';
+import {PingMessage} from './pingMessage';
+import {SystemMessage} from './systemMessage';
+import {VerificationMessage} from './verificationMessage';
 
-import {ContextMenuEntry} from '../../../ui/ContextMenu';
+import {ContextMenuEntry} from '../../../ui/contextMenu';
 
 import {MessageParams} from './index';
 

@@ -23,20 +23,20 @@ import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {InViewport} from 'Components/InViewport';
+import {InViewport} from 'Components/inViewport';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
-import {MediumImage} from 'Repositories/entity/message/MediumImage';
+import {MediumImage} from 'Repositories/entity/message/mediumImage';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
-import {getImageStyle, getWrapperStyles} from './Image.styles';
-import {RestrictedImage} from './RestrictedImage';
+import {getImageStyle, getWrapperStyles} from './image.styles';
+import {RestrictedImage} from './restrictedImage';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {
   AssetUrl,
   useAssetTransfer,
-} from '../MessagesList/Message/ContentMessage/asset/common/useAssetTransfer/useAssetTransfer';
+} from '../messagesList/message/contentMessage/asset/common/useAssetTransfer/useAssetTransfer';
 
 interface BaseImageProps extends React.HTMLProps<HTMLDivElement> {
   alt?: string;

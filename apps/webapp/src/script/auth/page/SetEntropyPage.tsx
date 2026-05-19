@@ -23,10 +23,10 @@ import {connect} from 'react-redux';
 import {useNavigate} from 'react-router-dom';
 import {AnyAction, Dispatch} from 'redux';
 
-import {EntropyContainer} from './EntropyContainer';
-import {Page} from './Page';
+import {EntropyContainer} from './entropyContainer';
+import {Page} from './page';
 
-import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
+import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
 import {ROUTE} from '../route';

@@ -19,16 +19,16 @@
 
 import {render} from '@testing-library/react';
 
-import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {LegalHoldDot} from 'Components/legalHoldDot';
 
 describe('LegalHoldDot', () => {
   it('shows a pending icon', () => {
     const {getByTestId} = render(<LegalHoldDot isPending />);
-    expect(getByTestId('legal-hold-dot-pending-icon')).not.toBeNull();
+    expect(getByTestId('legalHold-dot-pending-icon')).not.toBeNull();
   });
 
   it('is not interactive dot', async () => {
-    const interactiveUieData = 'legal-hold-dot';
+    const interactiveUieData = 'legalHold-dot';
     const {getByTestId} = await render(<LegalHoldDot dataUieName={interactiveUieData} />);
 
     const button = getByTestId(interactiveUieData);
@@ -36,7 +36,7 @@ describe('LegalHoldDot', () => {
   });
 
   it('is interactive dot', async () => {
-    const interactiveUieData = 'legal-hold-dot';
+    const interactiveUieData = 'legalHold-dot';
     const {getByTestId} = await render(<LegalHoldDot isInteractive dataUieName={interactiveUieData} />);
 
     const button = getByTestId(interactiveUieData);

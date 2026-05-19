@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
+import {CellsSearchInput} from 'Components/cellsSearchInput/cellsSearchInput';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
@@ -29,15 +29,15 @@ import {
   contentStyles,
   searchWrapperStyles,
   wrapperStyles,
-} from './CellsHeader.styles';
-import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';
-import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
-import {CellsRefresh} from './CellsRefresh/CellsRefresh';
-import {CellsRootHomeIcon} from './CellsRootHomeIcon';
+} from './cellsHeader.styles';
+import {CellsMoreMenu} from './cellsMoreMenu/cellsMoreMenu';
+import {CellsNewMenu} from './cellsNewMenu/cellsNewMenu';
+import {CellsRefresh} from './cellsRefresh/cellsRefresh';
+import {CellsRootHomeIcon} from './cellsRootHomeIcon';
 
-import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
-import {CellsFiltersBar} from '../common/CellsFiltersBar/CellsFiltersBar';
-import type {FilterConfig} from '../common/CellsFiltersBar/filterConfig';
+import {CellsBreadcrumbs} from '../common/cellsBreadcrumbs/cellsBreadcrumbs';
+import {CellsFiltersBar} from '../common/cellsFiltersBar/cellsFiltersBar';
+import type {FilterConfig} from '../common/cellsFiltersBar/filterConfig';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';

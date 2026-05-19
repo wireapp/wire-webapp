@@ -22,14 +22,14 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {ClientRecord} from 'Repositories/storage/record/clientRecord';
 import {ClientError} from 'src/script/error/clientError';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 
 describe('ClientRepository', () => {
   const testFactory = new TestFactory();

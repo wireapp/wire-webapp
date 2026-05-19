@@ -18,7 +18,7 @@
  */
 
 import {clientConfig, serverConfig} from './config';
-import {Server} from './Server';
+import {Server} from './server';
 import {logServerStartup} from './serverStartupLog';
 import {formatDate} from './util/timeUtil';
 

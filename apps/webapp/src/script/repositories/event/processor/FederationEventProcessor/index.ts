@@ -17,4 +17,4 @@
  *
  */
 
-export * from './FederationEventProcessor';
+export * from './federationEventProcessor';

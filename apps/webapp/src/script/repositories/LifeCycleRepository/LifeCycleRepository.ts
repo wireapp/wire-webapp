@@ -21,11 +21,11 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {useTypingIndicatorState} from 'Components/InputBar/TypingIndicator';
+import {useTypingIndicatorState} from 'Components/inputBar/typingIndicator';
 import {CacheRepository} from 'Repositories/cache/cacheRepository';
-import type {ClientRepository} from 'Repositories/client/ClientRepository';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import type {EventRepository} from 'Repositories/event/EventRepository';
+import type {ClientRepository} from 'Repositories/client/clientRepository';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import type {EventRepository} from 'Repositories/event/eventRepository';
 import {StorageKey} from 'Repositories/storage/storageKey';
 import type {StorageRepository} from 'Repositories/storage/storageRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
@@ -34,8 +34,8 @@ import {getLogger, Logger} from 'Util/logger';
 import {includesString} from 'Util/stringUtil';
 import {appendParameter} from 'Util/urlUtil';
 
-import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {URLParameter} from '../../auth/URLParameter';
+import {SIGN_OUT_REASON} from '../../auth/signOutReason';
+import {URLParameter} from '../../auth/urlParameter';
 import {BaseError} from '../../error/baseError';
 import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';

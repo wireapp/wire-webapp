@@ -26,17 +26,17 @@ import {UserType} from '@wireapp/api-client/lib/user';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
-import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
-import {EnrichedFields} from 'Components/panel/EnrichedFields';
-import {ServiceDetails} from 'Components/panel/ServiceDetails';
-import {UserDetails} from 'Components/panel/UserDetails';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
+import {ConversationProtocolDetails} from 'Components/panel/conversationProtocolDetails/conversationProtocolDetails';
+import {EnrichedFields} from 'Components/panel/enrichedFields';
+import {ServiceDetails} from 'Components/panel/serviceDetails';
+import {UserDetails} from 'Components/panel/userDetails';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import {getNotificationText} from 'Repositories/conversation/notificationSetting';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {TeamRepository} from 'Repositories/team/teamRepository';
@@ -50,12 +50,12 @@ import {ConversationDetailsHeader} from './components/conversationDetailsHeader'
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
 
-import {isServiceEntity} from '../../../guards/Service';
-import {Shortcut} from '../../../ui/Shortcut';
-import {ShortcutType} from '../../../ui/ShortcutType';
-import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
+import {isServiceEntity} from '../../../guards/service';
+import {Shortcut} from '../../../ui/shortcut';
+import {ShortcutType} from '../../../ui/shortcutType';
+import {ActionsViewModel} from '../../../viewModel/actionsViewModel';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity, PanelState} from '../RightSidebar';
+import {PanelEntity, PanelState} from '../rightSidebar';
 
 const CONFIG = {
   MAX_USERS_VISIBLE: 7,

@@ -23,12 +23,12 @@ import cx from 'classnames';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {CallParticipantsListItem} from 'Components/calling/callParticipantsListItem';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {Participant} from 'Repositories/calling/participant';
+import {Conversation} from 'Repositories/entity/conversation';
 import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
@@ -37,9 +37,9 @@ import {
   labelStyles,
   labelWithIconStyles,
   participantListWrapperStyles,
-} from './CallingParticipantList.styles';
+} from './callingParticipantList.styles';
 
-import {ContextMenuEntry, showContextMenu} from '../../../../ui/ContextMenu';
+import {ContextMenuEntry, showContextMenu} from '../../../../ui/contextMenu';
 
 interface CallingParticipantListProps {
   callingRepository: Pick<CallingRepository, 'supportsScreenSharing' | 'sendModeratorMute'>;

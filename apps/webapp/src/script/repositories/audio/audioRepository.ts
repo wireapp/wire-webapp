@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandlingState';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {getLogger, Logger} from 'Util/logger';
 

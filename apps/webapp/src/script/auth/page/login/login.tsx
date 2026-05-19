@@ -54,36 +54,36 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import {LogoFullIcon} from 'Components/Icon';
+import {LogoFullIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {isBackendError} from 'Util/typePredicateUtil';
 
 import {separator} from './login.styles';
 
-import {Config} from '../../../Config';
-import {AccountAlreadyExistsModal} from '../../component/AccountAlreadyExistsModal';
-import {AppAlreadyOpen} from '../../component/AppAlreadyOpen';
-import {BackButton} from '../../component/BackButton';
-import {Exception} from '../../component/Exception';
-import {JoinGuestLinkPasswordModal} from '../../component/JoinGuestLinkPasswordModal';
-import {LoginForm} from '../../component/LoginForm';
+import {Config} from '../../../config';
+import {AccountAlreadyExistsModal} from '../../component/accountAlreadyExistsModal';
+import {AppAlreadyOpen} from '../../component/appAlreadyOpen';
+import {BackButton} from '../../component/backButton';
+import {Exception} from '../../component/exception';
+import {JoinGuestLinkPasswordModal} from '../../component/joinGuestLinkPasswordModal';
+import {LoginForm} from '../../component/loginForm';
 import {EXTERNAL_ROUTE} from '../../externalRoute';
 import {useRouteA11y} from '../../hooks/useRouteA11y';
 import {actionRoot} from '../../module/action';
-import {LabeledError} from '../../module/action/LabeledError';
-import {ValidationError} from '../../module/action/ValidationError';
+import {LabeledError} from '../../module/action/labeledError';
+import {ValidationError} from '../../module/action/validationError';
 import {RootState, ThunkDispatch} from '../../module/reducer';
-import * as AuthSelector from '../../module/selector/AuthSelector';
-import * as ConversationSelector from '../../module/selector/ConversationSelector';
+import * as AuthSelector from '../../module/selector/authSelector';
+import * as ConversationSelector from '../../module/selector/conversationSelector';
 import {QUERY_KEY, ROUTE} from '../../route';
 import {parseError, parseValidationErrors} from '../../util/errorUtil';
 import {getEnterpriseLoginV2FF} from '../../util/helpers';
 import {getOAuthQueryString} from '../../util/oauthUtil';
 import {getPrefixedSSOCode} from '../../util/urlUtil';
-import {EntropyContainer} from '../EntropyContainer';
-import {Page} from '../Page';
-import {styles} from '../VerifyEmailCode.styles';
+import {EntropyContainer} from '../entropyContainer';
+import {Page} from '../page';
+import {styles} from '../verifyEmailCode.styles';
 type Props = React.HTMLProps<HTMLDivElement> & {
   embedded?: boolean;
 };

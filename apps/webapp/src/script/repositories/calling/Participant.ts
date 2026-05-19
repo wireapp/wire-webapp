@@ -23,7 +23,7 @@ import ko, {computed, observable, pureComputed} from 'knockout';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 

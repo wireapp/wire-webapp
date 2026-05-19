@@ -21,7 +21,7 @@ import {isValid} from 'date-fns';
 import {escape} from 'underscore';
 import {create} from 'zustand';
 
-import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
+import {ClientNotificationData} from 'Repositories/notification/preferenceNotificationRepository';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatLocale} from 'Util/timeUtil';
@@ -36,9 +36,9 @@ import {
   ModalQueue,
   PrimaryModalType,
   Text,
-} from './PrimaryModalTypes';
+} from './primaryModalTypes';
 
-import {Config} from '../../../Config';
+import {Config} from '../../../config';
 
 type PrimaryModalState = {
   errorMessage: string | null;

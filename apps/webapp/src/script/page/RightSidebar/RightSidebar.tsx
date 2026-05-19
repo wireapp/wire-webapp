@@ -25,10 +25,10 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/Message';
-import {User} from 'Repositories/entity/User';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {Message} from 'Repositories/entity/message/message';
+import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserState} from 'Repositories/user/userState';
@@ -47,13 +47,13 @@ import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
 import {TimedMessages} from './timedMessages';
 
-import {isReadableMessage} from '../../guards/Message';
-import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/Panel';
-import {isAppOrServiceEntity} from '../../guards/Service';
+import {isReadableMessage} from '../../guards/message';
+import {isUserAppOrServiceEntity, isUserEntity} from '../../guards/panel';
+import {isAppOrServiceEntity} from '../../guards/service';
 import {Core} from '../../service/coreSingleton';
-import {ActionsViewModel} from '../../view_model/ActionsViewModel';
-import {ViewModelRepositories} from '../../view_model/MainViewModel';
-import {RightSidebarParams} from '../AppMain';
+import {ActionsViewModel} from '../../viewModel/actionsViewModel';
+import {ViewModelRepositories} from '../../viewModel/mainViewModel';
+import {RightSidebarParams} from '../appMain';
 import {useAppMainState} from '../state';
 import {ContentState} from '../useAppState';
 

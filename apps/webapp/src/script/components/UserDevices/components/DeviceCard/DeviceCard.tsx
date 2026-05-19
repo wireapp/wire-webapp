@@ -20,17 +20,17 @@
 import {ClientClassification} from '@wireapp/api-client/lib/client';
 import cx from 'classnames';
 
-import {DeviceVerificationBadges} from 'Components/Badge';
-import {LegalHoldDot} from 'Components/LegalHoldDot';
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {type ClientEntity} from 'Repositories/client/ClientEntity';
-import {WireIdentity} from 'src/script/E2EIdentity';
+import {DeviceVerificationBadges} from 'Components/badge';
+import {LegalHoldDot} from 'Components/legalHoldDot';
+import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
+import {type ClientEntity} from 'Repositories/client/clientEntity';
+import {WireIdentity} from 'src/script/e2eIdentity';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
-import * as Icon from '../../../Icon';
+import {FormattedId} from '../../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
+import * as Icon from '../../../icon';
 
 interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -75,7 +75,7 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
       {showLegalHoldIcon && (
         <LegalHoldDot
           className="device-card__icon device-card__legal_hold_icon"
-          dataUieName="status-legal-hold-device"
+          dataUieName="status-legalHold-device"
         />
       )}
 

@@ -33,18 +33,18 @@ import type {REASON as AVS_REASON} from '@wireapp/avs';
 import type {Asset, LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {Message} from 'Repositories/entity/message/Message';
-import type {User} from 'Repositories/entity/User';
-import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {Message} from 'Repositories/entity/message/message';
+import type {User} from 'Repositories/entity/user';
+import {ClientEvent, CONVERSATION} from 'Repositories/event/client';
 import {ReactionMap, ReadReceipt, UserReactionMap} from 'Repositories/storage';
 import {createUuid} from 'Util/uuid';
 
-import {BuildMessageAddParams} from './EventBuilder.types';
+import {BuildMessageAddParams} from './eventBuilder.types';
 
-import {E2EIVerificationMessageType} from '../../../message/E2EIVerificationMessageType';
-import {StatusType} from '../../../message/StatusType';
-import {VerificationMessageType} from '../../../message/VerificationMessageType';
+import {E2EIVerificationMessageType} from '../../../message/e2eiVerificationMessageType';
+import {StatusType} from '../../../message/statusType';
+import {VerificationMessageType} from '../../../message/verificationMessageType';
 
 export interface BaseEvent {
   conversation: string;

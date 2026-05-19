@@ -99,11 +99,11 @@ export const userHandle = (isSideBarOpen: boolean): CSSObject => ({
 export const legalHold: CSSObject = {
   flex: '1 0 auto',
 
-  '.legal-hold-dot-button': {
+  '.legalHold-dot-button': {
     padding: 0,
   },
 
-  '.legal-hold-dot--text': {
+  '.legalHold-dot--text': {
     fontSize: 'var(--font-size-small)',
     fontWeight: 'var(--font-weight-regular)',
     lineHeight: 'var(--line-height-md)',

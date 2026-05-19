@@ -26,12 +26,12 @@ import {randomUUID} from 'crypto';
 
 import {Account, MLSService} from '@wireapp/core';
 
-import {ConversationService} from 'Repositories/conversation/ConversationService';
-import {MLSConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationService} from 'Repositories/conversation/conversationService';
+import {MLSConversation} from 'Repositories/conversation/conversationSelectors';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {ConversationStatus} from 'Repositories/conversation/conversationStatus';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
@@ -44,7 +44,7 @@ import {
   initMLSGroupConversations,
   initialiseSelfAndTeamConversations,
   readLocalMLSState,
-} from './MLSConversations';
+} from './mlsConversations';
 
 function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
   const conversation = new Conversation(randomUUID(), '', CONVERSATION_PROTOCOL.MLS);

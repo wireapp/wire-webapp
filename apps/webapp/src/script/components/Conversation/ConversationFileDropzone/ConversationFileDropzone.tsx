@@ -22,10 +22,10 @@ import {ReactNode} from 'react';
 import cx from 'classnames';
 import {DropzoneInputProps, DropzoneRootProps} from 'react-dropzone/.';
 
-import {DropFileArea} from 'Components/DropFileArea';
+import {DropFileArea} from 'Components/dropFileArea';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
-import {FileDropzone} from './FileDropzone/FileDropzone';
+import {FileDropzone} from './fileDropzone/fileDropzone';
 
 interface ConversationFileDropzoneProps {
   isCellsEnabled: boolean;

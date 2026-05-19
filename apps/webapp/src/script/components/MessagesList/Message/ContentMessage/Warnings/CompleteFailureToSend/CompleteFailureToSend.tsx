@@ -19,11 +19,11 @@
 
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
-import {Config} from 'src/script/Config';
+import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 
-import {backendErrorLink, button, warning, wrapper} from '../Warnings.styles';
+import {backendErrorLink, button, warning, wrapper} from '../warnings.styles';
 
 type Props = {
   isMessageFocused: boolean;

@@ -17,7 +17,7 @@
  *
  */
 
-import {headingStyles, paragraphStyles, wrapperStyles} from './CellsStateInfo.styles';
+import {headingStyles, paragraphStyles, wrapperStyles} from './cellsStateInfo.styles';
 
 interface CellsStateInfoProps {
   heading: string;

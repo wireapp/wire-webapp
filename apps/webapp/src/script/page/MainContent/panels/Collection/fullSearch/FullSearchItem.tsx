@@ -19,9 +19,9 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {Text} from 'Repositories/entity/message/Text';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {Text} from 'Repositories/entity/message/text';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {formatDateShort} from 'Util/timeUtil';

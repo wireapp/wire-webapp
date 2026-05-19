@@ -17,17 +17,17 @@
  *
  */
 
-import {ClientEntity} from 'Repositories/client/ClientEntity';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ClientEntity} from 'Repositories/client/clientEntity';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {createUuid} from 'Util/uuid';
 
-import {ProteusConversationVerificationStateHandler} from './ProteusStateHandler';
+import {ProteusConversationVerificationStateHandler} from './proteusStateHandler';
 
-import {TestFactory} from '../../../../../../test/helper/TestFactory';
-import {ConversationRepository} from '../../ConversationRepository';
-import {ConversationVerificationState} from '../../ConversationVerificationState';
-import {EventBuilder} from '../../EventBuilder';
+import {TestFactory} from '../../../../../../test/helper/testFactory';
+import {ConversationRepository} from '../../conversationRepository';
+import {ConversationVerificationState} from '../../conversationVerificationState';
+import {EventBuilder} from '../../eventBuilder';
 
 describe('ProteusConversationVerificationStateHandler', () => {
   const testFactory = new TestFactory();

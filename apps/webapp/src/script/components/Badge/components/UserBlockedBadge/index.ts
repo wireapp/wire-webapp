@@ -17,4 +17,4 @@
  *
  */
 
-export * from './UserBlockedBadge';
+export * from './userBlockedBadge';

@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'Repositories/entity/User/User';
+import {User} from 'Repositories/entity/user/user';
 import {createUuid} from 'Util/uuid';
 
 import {AppLockCrypto, AppLockRepository} from './appLockRepository';

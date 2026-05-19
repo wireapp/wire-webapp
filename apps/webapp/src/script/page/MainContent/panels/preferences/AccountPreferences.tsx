@@ -22,41 +22,41 @@ import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
 
-import {UserVerificationBadges} from 'Components/Badge';
-import {ErrorFallback} from 'Components/ErrorFallback';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {useEnrichedFields} from 'Components/panel/EnrichedFields';
+import {UserVerificationBadges} from 'Components/badge';
+import {ErrorFallback} from 'Components/errorFallback';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {useEnrichedFields} from 'Components/panel/enrichedFields';
 import {ClientRepository} from 'Repositories/client';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {User} from 'Repositories/entity/user';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/teamState';
 import type {UserRepository} from 'Repositories/user/userRepository';
-import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
+import {TeamCreationAccountHeader} from 'src/script/page/leftSidebar/panels/conversations/conversationTabs/teamCreation/teamCreationAccountHeader';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {AccountInput} from './accountPreferences/AccountInput';
-import {AccountLink} from './accountPreferences/AccountLink';
-import {AccountSecuritySection} from './accountPreferences/AccountSecuritySection';
-import {AvailabilityButtons} from './accountPreferences/AvailabilityButtons';
-import {AvatarInput} from './accountPreferences/AvatarInput';
-import {DataUsageSection} from './accountPreferences/DataUsageSection';
-import {EmailInput} from './accountPreferences/EmailInput';
-import {HistoryBackupSection} from './accountPreferences/HistoryBackupSection';
-import {LogoutSection} from './accountPreferences/LogoutSection';
-import {NameInput} from './accountPreferences/NameInput';
-import {PrivacySection} from './accountPreferences/PrivacySection';
-import {UsernameInput} from './accountPreferences/UsernameInput';
-import {PreferencesPage} from './components/PreferencesPage';
-import {PreferencesSection} from './components/PreferencesSection';
+import {AccountInput} from './accountPreferences/accountInput';
+import {AccountLink} from './accountPreferences/accountLink';
+import {AccountSecuritySection} from './accountPreferences/accountSecuritySection';
+import {AvailabilityButtons} from './accountPreferences/availabilityButtons';
+import {AvatarInput} from './accountPreferences/avatarInput';
+import {DataUsageSection} from './accountPreferences/dataUsageSection';
+import {EmailInput} from './accountPreferences/emailInput';
+import {HistoryBackupSection} from './accountPreferences/historyBackupSection';
+import {LogoutSection} from './accountPreferences/logoutSection';
+import {NameInput} from './accountPreferences/nameInput';
+import {PrivacySection} from './accountPreferences/privacySection';
+import {UsernameInput} from './accountPreferences/usernameInput';
+import {PreferencesPage} from './components/preferencesPage';
+import {PreferencesSection} from './components/preferencesSection';
 
-import {Config} from '../../../../Config';
-import {AccentColorPicker} from '../../../AccentColorPicker';
+import {Config} from '../../../../config';
+import {AccentColorPicker} from '../../../accentColorPicker';
 
 interface AccountPreferencesProps {
   importFile: (file: File) => void;

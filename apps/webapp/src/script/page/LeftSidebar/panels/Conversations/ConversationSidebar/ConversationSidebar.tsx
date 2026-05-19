@@ -19,21 +19,21 @@
 
 import {ChevronIcon, IconButton} from '@wireapp/react-ui-kit';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 
 import {
   conversationsSidebarHandleIconStyles,
   conversationsSidebarHandleStyles,
   conversationsSidebarStyles,
-} from './ConversationSidebar.styles';
+} from './conversationSidebar.styles';
 
 import {ContentState} from '../../../../useAppState';
-import {UserDetails} from '../../../UserDetails';
-import {ConversationTabs} from '../ConversationTabs';
+import {UserDetails} from '../../../userDetails';
+import {ConversationTabs} from '../conversationTabs';
 import {SidebarTabs} from '../useSidebarStore';
 
 type ConversationSidebarProps = {

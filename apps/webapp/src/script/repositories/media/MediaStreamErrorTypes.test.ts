@@ -17,7 +17,7 @@
  *
  */
 
-import {isMediaStreamDeviceError, isMediaStreamReadDeviceError} from './MediaStreamErrorTypes';
+import {isMediaStreamDeviceError, isMediaStreamReadDeviceError} from './mediaStreamErrorTypes';
 
 describe('MediaStreamErrorTypes', () => {
   describe('isMediaStreamDeviceError', () => {

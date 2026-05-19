@@ -19,8 +19,8 @@
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
-import {ImageAssetLarge} from './ImageAssetLarge/ImageAssetLarge';
-import {ImageAssetSmall} from './ImageAssetSmall/ImageAssetSmall';
+import {ImageAssetLarge} from './imageAssetLarge/imageAssetLarge';
+import {ImageAssetSmall} from './imageAssetSmall/imageAssetSmall';
 
 interface ImageAssetCardProps {
   filePreviewUrl?: string;

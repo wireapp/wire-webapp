@@ -21,7 +21,7 @@ import {IconButton, IconButtonVariant, ReloadIcon} from '@wireapp/react-ui-kit';
 
 import {t} from 'Util/localizerUtil';
 
-import {buttonStyles} from './CellsRefresh.styles';
+import {buttonStyles} from './cellsRefresh.styles';
 
 interface CellsRefreshProps {
   onRefresh: () => void;

@@ -19,14 +19,14 @@
 
 import {useState} from 'react';
 
-import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
+import {FileFullscreenModal} from 'Components/fileFullscreenModal/fileFullscreenModal';
 import {t} from 'Util/localizerUtil';
 
-import {iconWrapperStyles, videoStyles} from './VideoAssetSmall.styles';
+import {iconWrapperStyles, videoStyles} from './videoAssetSmall.styles';
 
-import {FilePreviewPlayButton} from '../../common/FilePreviewPlayButton/FilePreviewPlayButton';
-import {MediaFilePreviewCard} from '../../common/MediaFilePreviewCard/MediaFilePreviewCard';
-import {hollowWrapperButtonStyles} from '../../MultipartAssets.styles';
+import {FilePreviewPlayButton} from '../../common/filePreviewPlayButton/filePreviewPlayButton';
+import {MediaFilePreviewCard} from '../../common/mediaFilePreviewCard/mediaFilePreviewCard';
+import {hollowWrapperButtonStyles} from '../../multipartAssets.styles';
 
 interface VideoAssetSmallProps {
   src?: string;

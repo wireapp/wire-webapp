@@ -23,11 +23,11 @@ import {
   MixedConversation,
   isMLSConversation,
   isMixedConversation,
-} from 'Repositories/conversation/ConversationSelectors';
-import {Conversation} from 'Repositories/entity/Conversation';
+} from 'Repositories/conversation/conversationSelectors';
+import {Conversation} from 'Repositories/entity/conversation';
 
 import {MLSMigrationStatus} from '../migrationStatus';
-import {mlsMigrationLogger} from '../MLSMigrationLogger';
+import {mlsMigrationLogger} from '../mlsMigrationLogger';
 
 type UpdateConversationProtocol = (
   conversation: Conversation,

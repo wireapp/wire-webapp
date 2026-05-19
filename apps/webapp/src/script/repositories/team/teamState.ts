@@ -23,11 +23,11 @@ import {FeatureList, FEATURE_STATUS, SELF_DELETING_TIMEOUT} from '@wireapp/api-c
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {ROLE, roleMap} from 'Repositories/user/userPermission';
 import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {TeamEntity} from './teamEntity';

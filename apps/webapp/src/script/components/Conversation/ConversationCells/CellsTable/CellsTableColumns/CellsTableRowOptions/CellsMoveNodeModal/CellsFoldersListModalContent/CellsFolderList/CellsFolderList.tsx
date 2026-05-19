@@ -19,7 +19,7 @@
 
 import {FolderIcon} from '@wireapp/react-ui-kit';
 
-import {ChevronRight} from 'Components/Icon';
+import {ChevronRight} from 'Components/icon';
 
 import {
   arrowIconStyles,
@@ -28,7 +28,7 @@ import {
   listStyles,
   nameStyles,
   nameWrapperStyles,
-} from './CellsFolderList.styles';
+} from './cellsFolderList.styles';
 
 interface CellsFolderListProps {
   items: Array<{id: string; name: string; path: string}>;

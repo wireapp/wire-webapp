@@ -24,9 +24,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {getLinksFromHtml} from 'Util/urlUtil';
 
-import {MediaEmbeds} from './MediaEmbeds';
+import {MediaEmbeds} from './mediaEmbeds';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 
 export class MediaParser {
   showEmbed: boolean;

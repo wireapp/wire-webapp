@@ -20,13 +20,13 @@
 import {act, fireEvent, waitFor} from '@testing-library/react';
 import * as ReactRouter from 'react-router';
 
-import {SetEmail} from './SetEmail';
+import {SetEmail} from './setEmail';
 
 import {actionRoot} from '../module/action';
-import {ValidationError} from '../module/action/ValidationError';
+import {ValidationError} from '../module/action/validationError';
 import {initialRootState} from '../module/reducer';
 import {mockStoreFactory} from '../util/test/mockStoreFactory';
-import {mountComponent} from '../util/test/TestUtil';
+import {mountComponent} from '../util/test/testUtil';
 
 const emailInputId = 'enter-email';
 const verifyButtonId = 'do-verify-email';

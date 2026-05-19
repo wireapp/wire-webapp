@@ -17,5 +17,5 @@
  *
  */
 
-export * from './Proteus';
-export * from './MLS';
+export * from './proteus';
+export * from './mls';

@@ -22,11 +22,11 @@ import React from 'react';
 import {act, render} from '@testing-library/react';
 import {observable} from 'knockout';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {User} from 'Repositories/entity/user';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 import {ListState} from 'src/script/page/useAppState';
 import {TestFactory} from 'test/helper/TestFactory';
 

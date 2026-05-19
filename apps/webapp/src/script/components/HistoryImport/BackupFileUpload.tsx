@@ -21,7 +21,7 @@ import {useRef} from 'react';
 
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
+import {CONFIG as HistoryExportConfig} from 'Components/historyExport';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 

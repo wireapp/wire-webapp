@@ -17,14 +17,14 @@
  *
  */
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {EventBuilder} from 'Repositories/conversation/EventBuilder';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {EventBuilder} from 'Repositories/conversation/eventBuilder';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {createUuid} from 'Util/uuid';
 
-import {ServiceMiddleware} from './ServiceMiddleware';
+import {ServiceMiddleware} from './serviceMiddleware';
 import {UserType} from '@wireapp/api-client/lib/user';
 
 function buildServiceMiddleware() {

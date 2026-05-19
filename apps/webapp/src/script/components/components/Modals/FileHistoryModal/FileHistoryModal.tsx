@@ -17,14 +17,14 @@
  *
  */
 
-import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {FileLoader} from 'Components/fileFullscreenModal/fileLoader/fileLoader';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {handleEscDown} from 'Util/keyboardUtil';
 
-import {FileHistoryContent} from './FileHistoryContent';
-import {FileHistoryHeader} from './FileHistoryHeader';
-import {fileHistoryModalWrapperCss, fileVersionRestoreModalWrapperCss} from './FileHistoryModal.styles';
-import {FileRestoreConfirmContent} from './FileRestoreConfirmContent';
+import {FileHistoryContent} from './fileHistoryContent';
+import {FileHistoryHeader} from './fileHistoryHeader';
+import {fileHistoryModalWrapperCss, fileVersionRestoreModalWrapperCss} from './fileHistoryModal.styles';
+import {FileRestoreConfirmContent} from './fileRestoreConfirmContent';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 import {useFileVersions} from './hooks/useFileVersions';
 

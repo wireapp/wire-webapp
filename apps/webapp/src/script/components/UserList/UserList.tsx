@@ -22,19 +22,19 @@ import {ChangeEvent, useCallback, useId, useMemo, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/Icon';
-import {InViewport} from 'Components/InViewport';
-import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
-import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {InViewport} from 'Components/inViewport';
+import {collapseButton, collapseIcon} from 'Components/userList/userList.styles';
+import type {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import type {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import {UserListItem} from './components/UserListItem';
+import {UserListItem} from './components/userListItem';
 
 export enum UserlistMode {
   COMPACT = 'UserlistMode.COMPACT',

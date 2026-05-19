@@ -22,21 +22,21 @@ import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 import {LowPrecisionTaskScheduler} from '@wireapp/core/lib/util/lowPrecisionTaskScheduler';
 import {container} from 'tsyringe';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {PrimaryModalType} from 'Components/modals/primaryModal/primaryModalTypes';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import * as util from 'Util/util';
 
-import {E2EIHandler} from './E2EIdentityEnrollment';
-import * as e2EIdentityVerification from './E2EIdentityVerification';
-import {getEnrollmentStore} from './Enrollment.store';
-import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+import {E2EIHandler} from './e2eIdentityEnrollment';
+import * as e2EIdentityVerification from './e2eIdentityVerification';
+import {getEnrollmentStore} from './enrollment.store';
+import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
-jest.mock('./OIDCService', () => {
+jest.mock('./oidcService', () => {
   return {
     // Mock the OIDCService class
     OIDCService: jest.fn().mockImplementation(() => ({

@@ -26,7 +26,7 @@ import {TypedEventEmitter} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientEntity, ClientRepository} from 'Repositories/client';
-import {EventSource} from 'Repositories/event/EventSource';
+import {EventSource} from 'Repositories/event/eventSource';
 import {
   FeatureUpdateType,
   detectTeamFeatureUpdate,

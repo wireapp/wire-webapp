@@ -18,8 +18,8 @@
  */
 
 /* eslint-disable */
-import {MediaDeviceType} from './MediaDeviceType';
-import {MediaDevicesHandler} from './MediaDevicesHandler';
+import {MediaDeviceType} from './mediaDeviceType';
+import {MediaDevicesHandler} from './mediaDevicesHandler';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 
 /* yarn test:app --specs media/MediaDevicesHandler --nolegacy */

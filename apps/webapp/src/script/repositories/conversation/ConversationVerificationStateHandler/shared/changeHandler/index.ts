@@ -19,11 +19,11 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {Conversation} from 'Repositories/entity/conversation';
+import {VerificationMessageType} from 'src/script/message/verificationMessageType';
 
-import {E2EIVerificationMessageType} from '../../../../../message/E2EIVerificationMessageType';
-import {ConversationVerificationState} from '../../../ConversationVerificationState';
+import {E2EIVerificationMessageType} from '../../../../../message/e2eiVerificationMessageType';
+import {ConversationVerificationState} from '../../../conversationVerificationState';
 
 interface CommonOnConversationVerificationStateChangeParams {
   conversationEntity: Conversation;

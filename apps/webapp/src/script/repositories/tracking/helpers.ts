@@ -22,10 +22,10 @@ import {amplify} from 'amplify';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
-import {Call} from 'Repositories/calling/Call';
-import {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
+import {RatingListLabel} from 'Components/modals/qualityFeedbackModal/typings';
+import {Call} from 'Repositories/calling/call';
+import {Conversation} from 'Repositories/entity/conversation';
+import type {User} from 'Repositories/entity/user';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {ConversationType, UserType, PlatformType} from './attribute';

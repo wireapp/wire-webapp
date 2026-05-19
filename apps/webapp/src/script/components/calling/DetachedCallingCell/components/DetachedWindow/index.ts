@@ -17,4 +17,4 @@
  *
  */
 
-export * from './DetachedWindow';
+export * from './detachedWindow';

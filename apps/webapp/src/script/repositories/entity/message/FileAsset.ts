@@ -26,7 +26,7 @@ import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {AssetType} from 'Repositories/assets/assetType';
 import {Logger, getLogger} from 'Util/logger';
 
-import {Asset} from './Asset';
+import {Asset} from './asset';
 
 type AssetMetaData = (ProtobufAsset.IAudioMetaData | ProtobufAsset.IImageMetaData | ProtobufAsset.IVideoMetaData) & {
   duration?: number;

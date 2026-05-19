@@ -20,10 +20,10 @@
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import {RestrictedFile} from 'Components/MessagesList/Message/ContentMessage/asset/FileAsset/RestrictedFile/RestrictedFile';
+import {RestrictedFile} from 'Components/messagesList/message/contentMessage/asset/fileAsset/restrictedFile/restrictedFile';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
+import type {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {FileAsset as FileAssetType} from 'Repositories/entity/message/fileAsset';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
@@ -31,8 +31,8 @@ import {t} from 'Util/localizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {useMessageFocusedTabIndex} from '../../../util';
-import {AssetHeader} from '../common/AssetHeader/AssetHeader';
-import {AssetLoader} from '../common/AssetLoader/AssetLoader';
+import {AssetHeader} from '../common/assetHeader/assetHeader';
+import {AssetLoader} from '../common/assetLoader/assetLoader';
 import {useAssetTransfer} from '../common/useAssetTransfer/useAssetTransfer';
 
 interface FileAssetProps {

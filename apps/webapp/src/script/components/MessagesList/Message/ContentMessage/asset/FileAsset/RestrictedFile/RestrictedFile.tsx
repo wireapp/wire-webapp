@@ -17,7 +17,7 @@
  *
  */
 
-import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {FileAsset} from 'Repositories/entity/message/fileAsset';
 import {t} from 'Util/localizerUtil';
 import {trimFileExtension} from 'Util/util';
 

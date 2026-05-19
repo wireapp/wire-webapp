@@ -32,26 +32,26 @@ import {t} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 import {noop} from 'Util/util';
 
-import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
-import {ConversationJoinFull} from './ConversationJoinInvalid';
-import {EntropyContainer} from './EntropyContainer';
+import {GuestLoginColumn, IsLoggedInColumn, Separator} from './conversationJoinComponents';
+import {ConversationJoinFull} from './conversationJoinInvalid';
+import {EntropyContainer} from './entropyContainer';
 import {Login} from './login/login';
-import {Page} from './Page';
+import {Page} from './page';
 
-import {Config} from '../../Config';
-import {AppAlreadyOpen} from '../component/AppAlreadyOpen';
-import {JoinGuestLinkPasswordModal} from '../component/JoinGuestLinkPasswordModal';
-import {WirelessContainer} from '../component/WirelessContainer';
+import {Config} from '../../config';
+import {AppAlreadyOpen} from '../component/appAlreadyOpen';
+import {JoinGuestLinkPasswordModal} from '../component/joinGuestLinkPasswordModal';
+import {WirelessContainer} from '../component/wirelessContainer';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
-import {ValidationError} from '../module/action/ValidationError';
+import {ValidationError} from '../module/action/validationError';
 import {RootState, ThunkDispatch} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
-import * as ClientSelector from '../module/selector/ClientSelector';
-import * as ConversationSelector from '../module/selector/ConversationSelector';
-import * as SelfSelector from '../module/selector/SelfSelector';
+import * as AuthSelector from '../module/selector/authSelector';
+import * as ClientSelector from '../module/selector/clientSelector';
+import * as ConversationSelector from '../module/selector/conversationSelector';
+import * as SelfSelector from '../module/selector/selfSelector';
 import {QUERY_KEY, ROUTE} from '../route';
-import * as AccentColor from '../util/AccentColor';
+import * as AccentColor from '../util/accentColor';
 
 type Props = React.HTMLProps<HTMLDivElement>;
 

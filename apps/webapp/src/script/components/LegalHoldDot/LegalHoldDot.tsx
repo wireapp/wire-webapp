@@ -21,9 +21,9 @@ import React from 'react';
 
 import cx from 'classnames';
 
-import * as Icon from 'Components/Icon';
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import * as Icon from 'Components/icon';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {t} from 'Util/localizerUtil';
 
 interface LegalHoldDotProps {
@@ -45,7 +45,7 @@ export const LegalHoldDot = ({
   large,
   showText = false,
   className = '',
-  dataUieName = 'legal-hold-dot-pending-icon',
+  dataUieName = 'legalHold-dot-pending-icon',
 }: LegalHoldDotProps) => {
   const {showRequestModal, showUsers} = useLegalHoldModalState(state => state);
 
@@ -63,21 +63,21 @@ export const LegalHoldDot = ({
 
   return (
     <button
-      id="legal-hold-button-interactive"
+      id="legalHold-button-interactive"
       type="button"
-      className="legal-hold-dot-button legal-hold-dot-button--interactive"
+      className="legalHold-dot-button legalHold-dot-button--interactive"
       onClick={onClick}
       data-uie-name={dataUieName}
       disabled={!isInteractive}
     >
       <span
         className={cx(
-          'legal-hold-dot',
+          'legalHold-dot',
           {
-            'legal-hold-dot--active': isPending !== true,
-            'legal-hold-dot--interactive': isInteractive,
-            'legal-hold-dot--large': large,
-            'legal-hold-dot--message': isMessage,
+            'legalHold-dot--active': isPending !== true,
+            'legalHold-dot--interactive': isInteractive,
+            'legalHold-dot--large': large,
+            'legalHold-dot--message': isMessage,
           },
           className,
         )}
@@ -85,7 +85,7 @@ export const LegalHoldDot = ({
         {isPending === true && <Icon.PendingIcon className="pending-icon" />}
       </span>
 
-      {showText && <span className="visibility-hidden legal-hold-dot--text">{t('legalHoldHeadline')}</span>}
+      {showText && <span className="visibility-hidden legalHold-dot--text">{t('legalHoldHeadline')}</span>}
     </button>
   );
 };

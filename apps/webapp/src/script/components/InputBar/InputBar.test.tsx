@@ -19,30 +19,30 @@
 
 import {act, fireEvent, render, waitFor} from '@testing-library/react';
 
-import {FileWithPreview} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {InputBar} from 'Components/InputBar/index';
+import {FileWithPreview} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
+import {InputBar} from 'Components/inputBar/index';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {EventRepository} from 'Repositories/event/eventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfService} from 'Repositories/self/selfService';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/teamState';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Config} from 'src/script/Config';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {Config} from 'src/script/config';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 
 jest.mock('Components/Avatar', () => ({
   AVATAR_SIZE: {X_LARGE: 'avatar-xl'},

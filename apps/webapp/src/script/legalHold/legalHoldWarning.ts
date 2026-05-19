@@ -19,14 +19,14 @@
 
 import {amplify} from 'amplify';
 
-import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import {useLegalHoldModalState} from 'Components/modals/legalHoldModal/legalHoldModal.state';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {ConversationVerificationState} from 'Repositories/conversation/conversationVerificationState';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {t} from 'Util/localizerUtil';
 
 import {ConversationError} from '../error/conversationError';
-import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
+import {OPEN_CONVERSATION_DETAILS} from '../page/rightSidebar/rightSidebar';
 
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,

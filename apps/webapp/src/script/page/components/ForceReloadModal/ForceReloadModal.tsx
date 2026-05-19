@@ -21,11 +21,11 @@ import {FunctionComponent, useEffect} from 'react';
 
 import {Maybe} from 'true-myth';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {useApplicationContext} from '../../RootProvider';
+import {useApplicationContext} from '../../rootProvider';
 
 interface ForceReloadModalProperties {
   readonly reloadApplication: () => void;

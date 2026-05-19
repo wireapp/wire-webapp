@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {singleton} from 'tsyringe';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {sortUsersByPriority} from 'Util/stringUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

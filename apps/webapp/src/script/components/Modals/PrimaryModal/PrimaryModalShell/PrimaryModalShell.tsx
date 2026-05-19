@@ -21,11 +21,11 @@ import {ReactNode, useEffect, useRef} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 
-import {largeModalStyles} from './PrimaryModalShell.styles';
+import {largeModalStyles} from './primaryModalShell.styles';
 
-import {ModalSize} from '../PrimaryModalTypes';
+import {ModalSize} from '../primaryModalTypes';
 
 interface PrimaryModalShellProps {
   title: string;

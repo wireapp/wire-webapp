@@ -17,13 +17,13 @@
  *
  */
 
-import {MessageAddEvent, ReactionEvent} from 'Repositories/conversation/EventBuilder';
+import {MessageAddEvent, ReactionEvent} from 'Repositories/conversation/eventBuilder';
 import {StoredEvent} from 'Repositories/storage';
 import {addReaction, userReactionMapToReactionMap} from 'Util/reactionUtil';
 
-import {EventValidationError} from './EventValidationError';
+import {EventValidationError} from './eventValidationError';
 
-import {CONVERSATION} from '../../../Client';
+import {CONVERSATION} from '../../../client';
 import {EventHandler} from '../types';
 
 function computeEventUpdates(target: StoredEvent<MessageAddEvent>, reactionEvent: ReactionEvent) {

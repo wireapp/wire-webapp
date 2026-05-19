@@ -27,9 +27,9 @@ import {toError} from 'Util/toError';
 import {InvitationActionCreator} from './creator/';
 
 import type {ThunkAction} from '../reducer';
-import * as InviteSelector from '../selector/InviteSelector';
-import * as languageSelector from '../selector/LanguageSelector';
-import * as selfSelector from '../selector/SelfSelector';
+import * as InviteSelector from '../selector/inviteSelector';
+import * as languageSelector from '../selector/languageSelector';
+import * as selfSelector from '../selector/selfSelector';
 
 export class InvitationAction {
   invite = (invitation: {email: string}): ThunkAction => {

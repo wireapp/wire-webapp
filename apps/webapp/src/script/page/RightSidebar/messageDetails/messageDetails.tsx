@@ -21,13 +21,13 @@ import {FC, useMemo, useState} from 'react';
 
 import cx from 'classnames';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
-import {UserList} from 'Components/UserList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {User} from 'Repositories/entity/User';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import * as Icon from 'Components/icon';
+import {UserList} from 'Components/userList';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {User} from 'Repositories/entity/user';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
@@ -35,9 +35,9 @@ import {formatLocale} from 'Util/timeUtil';
 
 import {UsersReactions} from './userReactions';
 
-import {SuperType} from '../../../message/SuperType';
+import {SuperType} from '../../../message/superType';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity, PanelState} from '../RightSidebar';
+import {PanelEntity, PanelState} from '../rightSidebar';
 
 const MESSAGE_STATES = {
   REACTIONS: 'reactions',

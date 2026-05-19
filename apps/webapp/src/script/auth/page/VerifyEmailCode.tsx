@@ -31,14 +31,14 @@ import {ActionLinkButton, CodeInput, FlexBox, Text} from '@wireapp/react-ui-kit'
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {Page} from './Page';
-import {styles} from './VerifyEmailCode.styles';
+import {Page} from './page';
+import {styles} from './verifyEmailCode.styles';
 
-import {AccountRegistrationLayout} from '../component/AccountRegistrationLayout';
-import {BackButton} from '../component/BackButton';
+import {AccountRegistrationLayout} from '../component/accountRegistrationLayout';
+import {BackButton} from '../component/backButton';
 import {actionRoot as ROOT_ACTIONS} from '../module/action';
 import {RootState, bindActionCreators} from '../module/reducer';
-import * as AuthSelector from '../module/selector/AuthSelector';
+import * as AuthSelector from '../module/selector/authSelector';
 import {ROUTE} from '../route';
 import {parseError} from '../util/errorUtil';
 import {PageView, trackTelemetryPageView} from '../util/trackingUtil';

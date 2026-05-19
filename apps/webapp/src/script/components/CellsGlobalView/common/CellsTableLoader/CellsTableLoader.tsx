@@ -17,7 +17,7 @@
  *
  */
 
-import {spinnerStyles, spinnerWrapperStyles} from './CellsTableLoader.styles';
+import {spinnerStyles, spinnerWrapperStyles} from './cellsTableLoader.styles';
 
 export const CellsTableLoader = () => {
   return (

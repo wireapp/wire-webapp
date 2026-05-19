@@ -23,7 +23,7 @@ import is from '@sindresorhus/is';
 import {createRoot, Root} from 'react-dom/client';
 import {toast, Toaster} from 'sonner';
 
-import {CloseIcon} from 'Components/Icon';
+import {CloseIcon} from 'Components/icon';
 
 interface AppNotificationOptions {
   message?: string;

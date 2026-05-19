@@ -21,7 +21,7 @@ import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client
 
 import {combinePermissions, hasPermissions} from 'Repositories/user/userPermission';
 
-import {ACCESS_STATE, TEAM} from './AccessState';
+import {ACCESS_STATE, TEAM} from './accessState';
 
 export const ACCESS_TYPES = {
   GUEST: 1 << 0,

@@ -24,11 +24,11 @@ import {Button, ButtonVariant, CheckRoundIcon, FlexBox} from '@wireapp/react-ui-
 
 import {t} from 'Util/localizerUtil';
 
-import {Page} from './Page';
-import {styles} from './SetAccountType.styles';
+import {Page} from './page';
+import {styles} from './setAccountType.styles';
 
-import {Config} from '../../Config';
-import {BackButton} from '../component/BackButton';
+import {Config} from '../../config';
+import {BackButton} from '../component/backButton';
 import {EXTERNAL_ROUTE} from '../externalRoute';
 import {ROUTE} from '../route';
 import {pathWithParams} from '../util/urlUtil';

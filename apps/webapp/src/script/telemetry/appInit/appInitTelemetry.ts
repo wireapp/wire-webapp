@@ -17,10 +17,10 @@
  *
  */
 
-import {AppInitStatistics, AppStatistics} from './AppInitStatistics';
-import type {AppInitStatisticsValue} from './AppInitStatisticsValue';
-import {AppInitTimings} from './AppInitTimings';
-import type {AppInitTimingsStep} from './AppInitTimingsStep';
+import {AppInitStatistics, AppStatistics} from './appInitStatistics';
+import type {AppInitStatisticsValue} from './appInitStatisticsValue';
+import {AppInitTimings} from './appInitTimings';
+import type {AppInitTimingsStep} from './appInitTimingsStep';
 
 export class AppInitTelemetry {
   private readonly timings: AppInitTimings;

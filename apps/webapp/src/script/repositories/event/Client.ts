@@ -36,7 +36,7 @@ export enum CONVERSATION {
   GROUP_CREATION = 'conversation.group-creation',
   INCOMING_MESSAGE_TOO_BIG = 'conversation.incoming-message-too-big',
   KNOCK = 'conversation.knock',
-  LEGAL_HOLD_UPDATE = 'conversation.legal-hold-update',
+  LEGAL_HOLD_UPDATE = 'conversation.legalHold-update',
   LOCATION = 'conversation.location',
   MESSAGE_ADD = 'conversation.message-add',
   MULTIPART_MESSAGE_ADD = 'conversation.multipart-message-add',

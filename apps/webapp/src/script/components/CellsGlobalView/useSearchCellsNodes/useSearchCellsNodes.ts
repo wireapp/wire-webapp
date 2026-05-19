@@ -27,9 +27,9 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {
   GlobalDriveFiltersState,
   toGlobalDriveSearchParams,
-} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+} from 'Components/conversation/conversationCells/common/driveFilters/driveFilters';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 
 import {getConversationsFromNodes} from './getConversationsFromNodes';

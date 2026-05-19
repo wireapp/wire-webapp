@@ -21,16 +21,16 @@ import {render} from '@testing-library/react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import en from 'I18n/en-US.json';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
-import {User} from 'Repositories/entity/User';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {Conversation} from 'Repositories/entity/conversation';
+import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/memberMessage';
+import {User} from 'Repositories/entity/user';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
+import {SystemMessageType} from 'src/script/message/systemMessageType';
 import {generateUser} from 'test/helper/UserGenerator';
 import {setStrings} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
-import {MessageWrapper} from './MessageWrapper';
+import {MessageWrapper} from './messageWrapper';
 
 setStrings({en});
 

@@ -21,11 +21,11 @@ import {ReactNode} from 'react';
 
 import {Availability as AvailabilityProp} from '@wireapp/protocol-messaging';
 
-import {AVATAR_SIZE} from 'Components/Avatar';
+import {AVATAR_SIZE} from 'Components/avatar';
 
-import * as styles from './Availability.styles';
+import * as styles from './availability.styles';
 
-import * as Icon from '../Icon';
+import * as Icon from '../icon';
 
 const availabilityIconBaseProps = {
   'data-uie-name': 'status-availability-icon',

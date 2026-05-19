@@ -17,9 +17,9 @@
  *
  */
 
-import {wrapperStyles} from './CellsLoader.styles';
+import {wrapperStyles} from './cellsLoader.styles';
 
-import {CellsTableLoader} from '../common/CellsTableLoader/CellsTableLoader';
+import {CellsTableLoader} from '../common/cellsTableLoader/cellsTableLoader';
 
 export const CellsLoader = () => {
   return (

@@ -19,16 +19,16 @@
 
 import {useState} from 'react';
 
-import * as Icon from 'Components/Icon';
-import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
-import {Config} from 'src/script/Config';
-import {MotionDuration} from 'src/script/motion/MotionDuration';
+import * as Icon from 'Components/icon';
+import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/decryptErrorMessage';
+import {Config} from 'src/script/config';
+import {MotionDuration} from 'src/script/motion/motionDuration';
 import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
-import {messageBodyWrapper} from './ContentMessage/ContentMessage.styles';
+import {messageBodyWrapper} from './contentMessage/contentMessage.styles';
 
-import {FormattedId} from '../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
+import {FormattedId} from '../../../page/mainContent/panels/preferences/devicesPreferences/components/formattedId';
 
 interface DecryptErrorMessageProps {
   message: DecryptErrorMessageEntity;

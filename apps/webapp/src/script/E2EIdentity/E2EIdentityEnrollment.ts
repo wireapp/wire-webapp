@@ -27,7 +27,7 @@ import {container} from 'tsyringe';
 import {TypedEventEmitter} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal, removeCurrentModal} from 'Components/modals/primaryModal';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {getLogger} from 'Util/logger';
@@ -39,12 +39,12 @@ import {
   getActiveWireIdentity,
   isFreshMLSSelfClient,
   MLSStatuses,
-} from './E2EIdentityVerification';
-import {getEnrollmentStore} from './Enrollment.store';
-import {getEnrollmentTimer, hasGracePeriodStartedForSelfClient} from './EnrollmentTimer';
-import {getModalOptions, ModalType} from './Modals';
-import {OIDCService} from './OIDCService';
-import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
+} from './e2eIdentityVerification';
+import {getEnrollmentStore} from './enrollment.store';
+import {getEnrollmentTimer, hasGracePeriodStartedForSelfClient} from './enrollmentTimer';
+import {getModalOptions, ModalType} from './modals';
+import {OIDCService} from './oidcService';
+import {OIDCServiceStore} from './oidcService/oidcServiceStorage';
 
 interface E2EIHandlerParams {
   discoveryUrl: string;

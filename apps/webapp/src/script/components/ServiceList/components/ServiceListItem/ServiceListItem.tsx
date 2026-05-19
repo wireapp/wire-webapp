@@ -19,9 +19,9 @@
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {ParticipantItemContent} from 'Components/ParticipantItemContent';
-import {listItem, listWrapper} from 'Components/ParticipantItemContent/ParticipantItem.styles';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {ParticipantItemContent} from 'Components/participantItemContent';
+import {listItem, listWrapper} from 'Components/participantItemContent/participantItem.styles';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';

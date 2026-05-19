@@ -23,14 +23,14 @@ import {container} from 'tsyringe';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {TeamState} from 'Repositories/team/teamState';
 import {t} from 'Util/localizerUtil';
 
-import {PreferencesPage} from './components/PreferencesPage';
-import {PreferencesSection} from './components/PreferencesSection';
+import {PreferencesPage} from './components/preferencesPage';
+import {PreferencesSection} from './components/preferencesSection';
 
-import {Config} from '../../../../Config';
+import {Config} from '../../../../config';
 import {externalUrl} from '../../../../externalRoute';
 
 interface AboutPreferencesProps {

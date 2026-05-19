@@ -20,12 +20,12 @@
 import {fireEvent, render} from '@testing-library/react';
 import ko from 'knockout';
 
-import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {TeamState} from 'Repositories/team/teamState';
-import * as Context from 'src/script/ui/ContextMenu';
+import * as Context from 'src/script/ui/contextMenu';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {MessageTimerButton} from './MessageTimerButton';
+import {MessageTimerButton} from './messageTimerButton';
 
 describe('MessageTimerButton', () => {
   it('hides the timer button when the feature is disabled', () => {

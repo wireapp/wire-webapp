@@ -23,9 +23,9 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {User} from 'Repositories/entity/User';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {PrimaryModal} from 'Components/modals/primaryModal';
+import {User} from 'Repositories/entity/user';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
@@ -33,9 +33,9 @@ import {getLogger} from 'Util/logger';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 import {validateProfileImageResolution} from 'Util/util';
 
-import {FileInput} from './FileInput';
+import {FileInput} from './fileInput';
 
-import {Config} from '../../../../../Config';
+import {Config} from '../../../../../config';
 import {UserError} from '../../../../../error/userError';
 
 interface AvatarInputProps {

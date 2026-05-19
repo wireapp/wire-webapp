@@ -1,5 +1,5 @@
 import {getByRole, render} from '@testing-library/react';
-import {Preference} from 'Components/Modals/CreateConversation/CreateConversationSteps/Preference';
+import {Preference} from 'Components/modals/createConversation/createConversationSteps/preference';
 import {container} from 'tsyringe';
 import {TeamState} from 'Repositories/team/teamState';
 import ko from 'knockout';

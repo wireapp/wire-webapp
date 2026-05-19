@@ -24,22 +24,22 @@ import cx from 'classnames';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/Avatar';
-import {ChannelAvatar} from 'Components/Avatar/ChannelAvatar';
-import {UserBlockedBadge} from 'Components/Badge';
-import {CellDescription} from 'Components/ConversationListCell/components/CellDescription';
-import {UserInfo} from 'Components/UserInfo';
+import {Avatar, AVATAR_SIZE, GroupAvatar} from 'Components/avatar';
+import {ChannelAvatar} from 'Components/avatar/channelAvatar';
+import {UserBlockedBadge} from 'Components/badge';
+import {CellDescription} from 'Components/conversationListCell/components/cellDescription';
+import {UserInfo} from 'Components/userInfo';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {MediaType} from 'Repositories/media/MediaType';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {MediaType} from 'Repositories/media/mediaType';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from 'Util/util';
 
-import {StatusIcon} from './components/StatusIcon';
+import {StatusIcon} from './components/statusIcon';
 
 interface ConversationListCellProps {
   conversation: Conversation;

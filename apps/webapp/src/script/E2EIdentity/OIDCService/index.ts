@@ -17,4 +17,4 @@
  *
  */
 
-export * from './OIDCService';
+export * from './oidcService';

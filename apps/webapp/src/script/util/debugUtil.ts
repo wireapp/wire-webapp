@@ -39,19 +39,19 @@ import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {Participant} from 'Repositories/calling/Participant';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {CallState} from 'Repositories/calling/callState';
+import {Participant} from 'Repositories/calling/participant';
 import {ClientRepository} from 'Repositories/client';
-import {ClientState} from 'Repositories/client/ClientState';
+import {ClientState} from 'Repositories/client/clientState';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {isMLSCapableConversation} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import type {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {isMLSCapableConversation} from 'Repositories/conversation/conversationSelectors';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import type {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {EventRepository} from 'Repositories/event/eventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
@@ -65,11 +65,11 @@ import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from './timeUtil';
 import {createUuid} from './uuid';
 
-import {E2EIHandler} from '../E2EIdentity';
+import {E2EIHandler} from '../e2eIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {ViewModelRepositories} from '../view_model/MainViewModel';
+import {ViewModelRepositories} from '../viewModel/mainViewModel';
 
 export enum CoreCryptoLogLevel {
   Off = 1,

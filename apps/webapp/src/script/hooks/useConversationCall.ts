@@ -23,8 +23,8 @@ import {container} from 'tsyringe';
 
 import {STATE as CALL_STATE} from '@wireapp/avs';
 
-import {CallState} from 'Repositories/calling/CallState';
-import type {Conversation} from 'Repositories/entity/Conversation';
+import {CallState} from 'Repositories/calling/callState';
+import type {Conversation} from 'Repositories/entity/conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 

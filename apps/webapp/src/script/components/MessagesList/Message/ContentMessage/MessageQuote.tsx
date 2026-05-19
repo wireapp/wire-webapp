@@ -25,29 +25,29 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
-import {AssetImage} from 'Components/Image';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {Multipart} from 'Repositories/entity/message/Multipart';
-import {Text} from 'Repositories/entity/message/Text';
-import {User} from 'Repositories/entity/User';
+import * as Icon from 'Components/icon';
+import {AssetImage} from 'Components/image';
+import type {Conversation} from 'Repositories/entity/conversation';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {Multipart} from 'Repositories/entity/message/multipart';
+import {Text} from 'Repositories/entity/message/text';
+import {User} from 'Repositories/entity/user';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
 import {t} from 'Util/localizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
-import {AudioAsset} from './asset/AudioAsset/AudioAsset';
-import {FileAsset} from './asset/FileAsset/FileAsset';
-import {LocationAsset} from './asset/LocationAsset';
-import {MultipartAssetPreview} from './asset/MultipartAssetPreview';
-import {TextMessageRenderer} from './asset/TextMessageRenderer';
-import {VideoAsset} from './asset/VideoAsset/VideoAsset';
+import {AudioAsset} from './asset/audioAsset/audioAsset';
+import {FileAsset} from './asset/fileAsset/fileAsset';
+import {LocationAsset} from './asset/locationAsset';
+import {MultipartAssetPreview} from './asset/multipartAssetPreview';
+import {TextMessageRenderer} from './asset/textMessageRenderer';
+import {VideoAsset} from './asset/videoAsset/videoAsset';
 
 import {MessageActions} from '..';
 import {ConversationError} from '../../../../error/conversationError';
-import {QuoteEntity} from '../../../../message/QuoteEntity';
+import {QuoteEntity} from '../../../../message/quoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 
 function createPlaceholderMessage() {

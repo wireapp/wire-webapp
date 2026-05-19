@@ -17,9 +17,9 @@
  *
  */
 
-import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
+import {ConversationLabel} from 'Repositories/conversation/conversationLabelRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 
 import {SidebarTabs} from './useSidebarStore';

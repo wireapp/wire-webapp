@@ -21,8 +21,8 @@ import is from '@sindresorhus/is';
 import {ACCESS_TYPE, FEATURE_KEY, FEATURE_STATUS, Role} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
-import {Config} from 'src/script/Config';
-import {ConversationState} from 'src/script/repositories/conversation/ConversationState';
+import {Config} from 'src/script/config';
+import {ConversationState} from 'src/script/repositories/conversation/conversationState';
 import {TeamState} from 'src/script/repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

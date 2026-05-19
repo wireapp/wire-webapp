@@ -24,9 +24,9 @@ import {renderHook} from '@testing-library/react';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {createDeterministicWallClock} from '../clock/deterministicWallClock';
 import {reliableWebsocketConnectionFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
-import {MainViewModel} from '../view_model/MainViewModel';
+import {MainViewModel} from '../viewModel/mainViewModel';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';
-import {RootContext, RootContextValue, RootProvider, useApplicationContext, useMainViewModel} from './RootProvider';
+import {RootContext, RootContextValue, RootProvider, useApplicationContext, useMainViewModel} from './rootProvider';
 
 interface WrapperProperties {
   children: ReactNode;

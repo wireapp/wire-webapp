@@ -17,4 +17,4 @@
  *
  */
 
-export * from './UserStatusBadges';
+export * from './userStatusBadges';

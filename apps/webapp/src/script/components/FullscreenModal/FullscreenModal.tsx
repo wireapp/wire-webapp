@@ -24,7 +24,7 @@ import {createPortal} from 'react-dom';
 import {handleEscDown} from 'Util/keyboardUtil';
 import {preventFocusOutside} from 'Util/util';
 
-import {modalStyles, contentStyles} from './FullscreenModal.styles';
+import {modalStyles, contentStyles} from './fullscreenModal.styles';
 
 const ANIMATION_OPEN_TIMEOUT = 50;
 const ANIMATION_CLOSE_TIMEOUT = 350;

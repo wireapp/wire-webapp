@@ -20,7 +20,7 @@
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import {dotStyles, dotButtonStyles} from './Pagination.styles';
+import {dotStyles, dotButtonStyles} from './pagination.styles';
 
 interface PaginationDotProps {
   page: number;

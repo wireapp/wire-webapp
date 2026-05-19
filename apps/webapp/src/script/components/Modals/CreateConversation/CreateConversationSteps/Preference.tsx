@@ -22,10 +22,10 @@ import {useEffect} from 'react';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {container} from 'tsyringe';
 
-import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
-import {InfoToggle} from 'Components/toggle/InfoToggle';
+import {AppsDisabledNote} from 'Components/note/appsDisabledNote/appsDisabledNote';
+import {InfoToggle} from 'Components/toggle/infoToggle';
 import {TeamState} from 'Repositories/team/teamState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {t} from 'Util/localizerUtil';

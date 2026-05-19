@@ -17,4 +17,4 @@
  *
  */
 
-export * from './MLSDeviceDetails';
+export * from './mlsDeviceDetails';

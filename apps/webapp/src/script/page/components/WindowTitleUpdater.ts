@@ -24,14 +24,14 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandlingState';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
-import {Config} from '../../Config';
+import {Config} from '../../config';
 import {ContentState, useAppState} from '../useAppState';
 
 const windowTitleLogger = getLogger('WindowTitlesViewModel');

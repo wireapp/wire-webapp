@@ -21,13 +21,13 @@ import {Fragment} from 'react';
 
 import type {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {EmojiChar} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/EmojiChar';
+import {EmojiChar} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/emojiChar';
 import {
   messageReactionDetailsMargin,
   reactionsCountAlignment,
-} from 'Components/MessagesList/Message/ContentMessage/MessageActions/MessageReactions/MessageReactions.styles';
-import {UserList} from 'Components/UserList';
-import {User} from 'Repositories/entity/User';
+} from 'Components/messagesList/message/contentMessage/messageActions/messageReactions/messageReactions.styles';
+import {UserList} from 'Components/userList';
+import {User} from 'Repositories/entity/user';
 import {ReactionMap} from 'Repositories/storage';
 import {getEmojiTitleFromEmojiUnicode, getEmojiUnicode} from 'Util/emojiUtil';
 import {capitalizeFirstChar} from 'Util/stringUtil';

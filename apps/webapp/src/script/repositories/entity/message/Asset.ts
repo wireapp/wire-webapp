@@ -19,11 +19,11 @@
 
 import {AssetType} from 'Repositories/assets/assetType';
 
-import type {FileAsset} from './FileAsset';
-import type {Location as LocationAsset} from './Location';
-import type {MediumImage as MediumImageAsset} from './MediumImage';
-import type {Multipart as MultipartAsset} from './Multipart';
-import type {Text as TextAsset} from './Text';
+import type {FileAsset} from './fileAsset';
+import type {Location as LocationAsset} from './location';
+import type {MediumImage as MediumImageAsset} from './mediumImage';
+import type {Multipart as MultipartAsset} from './multipart';
+import type {Text as TextAsset} from './text';
 
 export class Asset {
   public file_type?: string;

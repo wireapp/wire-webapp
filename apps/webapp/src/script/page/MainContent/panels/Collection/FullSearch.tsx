@@ -24,15 +24,15 @@ import {useDebouncedCallback} from 'use-debounce';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import type {Message} from 'Repositories/entity/message/Message';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import type {Message} from 'Repositories/entity/message/message';
 import {getSearchRegex} from 'Repositories/search/fullTextSearch';
 import {t} from 'Util/localizerUtil';
 import {isScrolledBottom} from 'Util/scrollHelpers';
 import {useEffectRef} from 'Util/useEffectRef';
 import {noop} from 'Util/util';
 
-import {FullSearchItem} from './fullSearch/FullSearchItem';
+import {FullSearchItem} from './fullSearch/fullSearchItem';
 
 const MAX_VISIBLE_MESSAGES = 30;
 const PRE_MARKED_OFFSET = 20;

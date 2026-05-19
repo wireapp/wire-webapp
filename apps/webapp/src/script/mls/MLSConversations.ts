@@ -23,7 +23,7 @@ import {match, P} from 'ts-pattern';
 
 import {Account, MLSService} from '@wireapp/core';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
 import {
   isMLSCapableConversation,
   isMLSConversation,
@@ -31,11 +31,11 @@ import {
   isTeamConversation,
   MLSCapableConversation,
   MLSConversation,
-} from 'Repositories/conversation/ConversationSelectors';
-import {ConversationService} from 'Repositories/conversation/ConversationService';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+} from 'Repositories/conversation/conversationSelectors';
+import {ConversationService} from 'Repositories/conversation/conversationService';
+import {ConversationState} from 'Repositories/conversation/conversationState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {UserState} from 'Repositories/user/userState';
 import {getLogger} from 'Util/logger';
 

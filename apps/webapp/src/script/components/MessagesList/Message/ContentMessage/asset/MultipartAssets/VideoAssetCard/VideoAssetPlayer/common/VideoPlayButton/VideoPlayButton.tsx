@@ -21,10 +21,10 @@ import {ReactNode, useEffect} from 'react';
 
 import {PauseIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
-import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
+import {useMessageFocusedTabIndex} from 'Components/messagesList/message/util';
 import {t} from 'Util/localizerUtil';
 
-import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './VideoPlayButton.styles';
+import {wrapperStyles, playButtonStyles, wrapperStylesFullscreen} from './videoPlayButton.styles';
 
 interface VideoPlayButtonProps {
   mediaElement?: HTMLMediaElement;

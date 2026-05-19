@@ -17,13 +17,13 @@
  *
  */
 
-import {categoryFromEvent} from 'src/script/message/MessageCategorization';
-import {MessageCategory} from 'src/script/message/MessageCategory';
+import {categoryFromEvent} from 'src/script/message/messageCategorization';
+import {messageCategory} from 'src/script/message/messageCategory';
 
-describe('MessageCategorization', () => {
+describe('messageCategorization', () => {
   describe('categoryFromEvent', () => {
     it('malformed events should have category of type UNDEFINED', () => {
-      expect(categoryFromEvent()).toBe(MessageCategory.UNDEFINED);
+      expect(categoryFromEvent()).toBe(messageCategory.UNDEFINED);
     });
 
     it('ephemeral message should have category of type TEXT', () => {
@@ -40,7 +40,7 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category).toBe(MessageCategory.TEXT);
+      expect(category).toBe(messageCategory.TEXT);
     });
 
     it('expired message should have category of type TEXT', () => {
@@ -57,7 +57,7 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category).toBe(MessageCategory.TEXT);
+      expect(category).toBe(messageCategory.TEXT);
     });
 
     it('text message should have category of type TEXT', () => {
@@ -72,7 +72,7 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category).toBe(MessageCategory.TEXT);
+      expect(category).toBe(messageCategory.TEXT);
     });
 
     it('text message with link should have category of type TEXT and LINK', () => {
@@ -92,8 +92,8 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category & MessageCategory.TEXT).toBe(MessageCategory.TEXT);
-      expect(category & MessageCategory.LINK).toBe(MessageCategory.LINK);
+      expect(category & messageCategory.TEXT).toBe(messageCategory.TEXT);
+      expect(category & messageCategory.LINK).toBe(messageCategory.LINK);
     });
 
     it('text message with like should have category of type TEXT and LIKED', () => {
@@ -110,8 +110,8 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category & MessageCategory.TEXT).toBe(MessageCategory.TEXT);
-      expect(category & MessageCategory.LIKED).toBe(MessageCategory.LIKED);
+      expect(category & messageCategory.TEXT).toBe(messageCategory.TEXT);
+      expect(category & messageCategory.LIKED).toBe(messageCategory.LIKED);
     });
 
     it('image message should have category of type IMAGE', () => {
@@ -133,7 +133,7 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category).toBe(MessageCategory.IMAGE);
+      expect(category).toBe(messageCategory.IMAGE);
     });
 
     it('image (gif) message should have category of type IMAGE and GIF', () => {
@@ -155,8 +155,8 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category & MessageCategory.IMAGE).toBe(MessageCategory.IMAGE);
-      expect(category & MessageCategory.GIF).toBe(MessageCategory.GIF);
+      expect(category & messageCategory.IMAGE).toBe(messageCategory.IMAGE);
+      expect(category & messageCategory.GIF).toBe(messageCategory.GIF);
     });
 
     it('file message should have category of type FILE', () => {
@@ -179,7 +179,7 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category).toBe(MessageCategory.FILE);
+      expect(category).toBe(messageCategory.FILE);
     });
 
     it('ping message should have category of type KNOCK', () => {
@@ -194,7 +194,7 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category).toBe(MessageCategory.KNOCK);
+      expect(category).toBe(messageCategory.KNOCK);
     });
 
     it('location message should have category of type LOCATION', () => {
@@ -211,7 +211,7 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category).toBe(MessageCategory.LOCATION);
+      expect(category).toBe(messageCategory.LOCATION);
     });
 
     it('composite message should have category of type COMPOSITE', () => {
@@ -232,7 +232,7 @@ describe('MessageCategorization', () => {
       };
       const category = categoryFromEvent(event);
 
-      expect(category).toBe(MessageCategory.COMPOSITE);
+      expect(category).toBe(messageCategory.COMPOSITE);
     });
   });
 });

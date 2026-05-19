@@ -24,12 +24,12 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 
-import {Conversations} from './panels/Conversations';
-import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations';
+import {Conversations} from './panels/conversations';
+import {TemporaryGuestConversations} from './panels/temporatyGuestConversations';
 
-import {ListViewModel} from '../../view_model/ListViewModel';
+import {ListViewModel} from '../../viewModel/listViewModel';
 import {useAppState, ListState} from '../useAppState';
 
 type LeftSidebarProps = {

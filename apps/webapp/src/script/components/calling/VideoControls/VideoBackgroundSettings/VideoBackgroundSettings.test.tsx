@@ -19,9 +19,9 @@
 
 import {render} from '@testing-library/react';
 
-import {VideoBackgroundSettings} from './VideoBackgroundSettings';
-import type {BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
-import {withTheme} from '../../../../auth/util/test/TestUtil';
+import {VideoBackgroundSettings} from './videoBackgroundSettings';
+import type {BuiltinBackground} from 'Repositories/media/videoBackgroundEffects';
+import {withTheme} from '../../../../auth/util/test/testUtil';
 
 jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,

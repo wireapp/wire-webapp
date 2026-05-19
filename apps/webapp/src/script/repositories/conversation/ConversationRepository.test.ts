@@ -50,18 +50,18 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {ClientEntity} from 'Repositories/client/ClientEntity';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {ClientEntity} from 'Repositories/client/clientEntity';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
-import {Message} from 'Repositories/entity/message/Message';
-import {User} from 'Repositories/entity/User';
-import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
-import {EventRepository} from 'Repositories/event/EventRepository';
-import {EventService} from 'Repositories/event/EventService';
-import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CompositeMessage} from 'Repositories/entity/message/compositeMessage';
+import {Message} from 'Repositories/entity/message/message';
+import {User} from 'Repositories/entity/user';
+import {ClientEvent, CONVERSATION} from 'Repositories/event/client';
+import {EventRepository} from 'Repositories/event/eventRepository';
+import {EventService} from 'Repositories/event/eventService';
+import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/notificationHandlingState';
 import {SelfRepository} from 'Repositories/self/selfRepository';
 import {LegacyEventRecord, StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
@@ -69,7 +69,7 @@ import {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {ConversationError} from 'src/script/error/conversationError';
 import {
   generateConversation as _generateConversation,
@@ -80,25 +80,25 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {escapeRegex} from 'Util/sanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
-import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
-import {CONVERSATION_READONLY_STATE, ConversationRepository} from './ConversationRepository';
-import {ConversationService} from './ConversationService';
-import {ConversationState} from './ConversationState';
-import {ConversationStatus} from './ConversationStatus';
+import {ConversationDatabaseData, ConversationMapper} from './conversationMapper';
+import {CONVERSATION_READONLY_STATE, ConversationRepository} from './conversationRepository';
+import {ConversationService} from './conversationService';
+import {ConversationState} from './conversationState';
+import {ConversationStatus} from './conversationStatus';
 import {
   ButtonActionConfirmationEvent,
   ButtonActionEvent,
   DeleteEvent,
   EventBuilder,
   MessageHiddenEvent,
-} from './EventBuilder';
-import {MessageRepository} from './MessageRepository';
-import {NOTIFICATION_STATE} from './NotificationSetting';
+} from './eventBuilder';
+import {MessageRepository} from './messageRepository';
+import {NOTIFICATION_STATE} from './notificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
-import {TestFactory} from '../../../../test/helper/TestFactory';
+import {TestFactory} from '../../../../test/helper/testFactory';
 import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
-import {generateUser} from '../../../../test/helper/UserGenerator';
+import {generateUser} from '../../../../test/helper/userGenerator';
 import {Core} from '../../service/coreSingleton';
 
 function buildConversationRepository() {

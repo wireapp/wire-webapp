@@ -17,7 +17,7 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger} from 'Util/logger';
 

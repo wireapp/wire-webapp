@@ -17,15 +17,15 @@
  *
  */
 
-import {CellsFiltersBar} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/CellsFiltersBar';
-import type {FilterConfig} from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
+import {CellsFiltersBar} from 'Components/conversation/conversationCells/common/cellsFiltersBar/cellsFiltersBar';
+import type {FilterConfig} from 'Components/conversation/conversationCells/common/cellsFiltersBar/filterConfig';
 import {t} from 'Util/localizerUtil';
 
-import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './CellsHeader.styles';
-import {CellsRefresh} from './CellsRefresh/CellsRefresh';
-import {CellsSearch} from './CellsSearch/CellsSeach';
+import {contentStyles, headingStyles, titleRowStyles, wrapperStyles} from './cellsHeader.styles';
+import {CellsRefresh} from './cellsRefresh/cellsRefresh';
+import {CellsSearch} from './cellsSearch/cellsSeach';
 
-import {CellsTableLoader} from '../common/CellsTableLoader/CellsTableLoader';
+import {CellsTableLoader} from '../common/cellsTableLoader/cellsTableLoader';
 
 interface CellsHeaderProps {
   searchValue: string;

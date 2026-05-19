@@ -19,14 +19,14 @@
 
 import {Accordion} from '@wireapp/react-ui-kit';
 
-import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {ModalComponent} from 'Components/modals/modalComponent';
 import {handleEscDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import {CellsFilterModalHeader} from './CellsFilterModalHeader/CellsFilterModalHeader';
-import {contentStyles, modalStyles, wrapperStyles} from './CellsFiltersModal.styles';
-import {CellsFiltersModalActions} from './CellsFiltersModalActions/CellsFiltersModalActions';
-import {CellsTagsFilter} from './CellsTagsFilter/CellsTagsFilter';
+import {CellsFilterModalHeader} from './cellsFilterModalHeader/cellsFilterModalHeader';
+import {contentStyles, modalStyles, wrapperStyles} from './cellsFiltersModal.styles';
+import {CellsFiltersModalActions} from './cellsFiltersModalActions/cellsFiltersModalActions';
+import {CellsTagsFilter} from './cellsTagsFilter/cellsTagsFilter';
 import {useModalFilters} from './useModalFilters/useModalFilters';
 
 interface CellsFiltersModalProps {

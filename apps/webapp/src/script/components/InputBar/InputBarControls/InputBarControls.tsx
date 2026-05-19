@@ -23,11 +23,11 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
+import {Conversation} from 'Repositories/entity/conversation';
+import {Config} from 'src/script/config';
 
-import {ControlButtons} from './ControlButtons';
-import {SendMessageButton} from './SendMessageButton/SendMessageButton';
+import {ControlButtons} from './controlButtons';
+import {SendMessageButton} from './sendMessageButton/sendMessageButton';
 
 import {MessageContent} from '../common/messageContent/messageContent';
 

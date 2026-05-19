@@ -23,7 +23,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Logger, getLogger} from 'Util/logger';
 
-import {AppInitStatisticsValue} from './AppInitStatisticsValue';
+import {AppInitStatisticsValue} from './appInitStatisticsValue';
 
 export type AppStatistics = Partial<Record<AppInitStatisticsValue, string | number>>;
 

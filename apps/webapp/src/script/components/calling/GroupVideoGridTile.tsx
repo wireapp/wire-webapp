@@ -24,7 +24,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {VIDEO_STATE} from '@wireapp/avs';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
 import {
   groupVideoActiveSpeaker,
   groupVideoActiveSpeakerTile,
@@ -34,14 +34,14 @@ import {
   groupVideoParticipantNameWrapper,
   groupVideoPauseOverlayLabel,
   groupVideoTileWrapper,
-} from 'Components/calling/GroupVideoGridTile.styles';
-import * as Icon from 'Components/Icon';
-import type {Participant} from 'Repositories/calling/Participant';
+} from 'Components/calling/groupVideoGridTile.styles';
+import * as Icon from 'Components/icon';
+import type {Participant} from 'Repositories/calling/participant';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import {Video} from './Video';
+import {Video} from './video';
 
 interface GroupVideoGridTileProps {
   isMaximized: boolean;

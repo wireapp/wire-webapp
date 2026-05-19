@@ -23,17 +23,17 @@ import {container} from 'tsyringe';
 
 import {Account} from '@wireapp/core';
 
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {User} from 'Repositories/entity/User';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {User} from 'Repositories/entity/user';
 import {Core as CoreSingleton} from 'src/script/service/coreSingleton';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
 import {initialiseMigrationOfProteusConversations, joinUnestablishedMixedConversations} from './migrationInitialiser';
 import {MLSMigrationStatus} from './migrationStatus';
-import {mlsMigrationLogger} from './MLSMigrationLogger';
+import {mlsMigrationLogger} from './mlsMigrationLogger';
 
-import {isMLSSupportedByEnvironment} from '../isMLSSupportedByEnvironment';
+import {isMlsSupportedByEnvironment} from '../isMlsSupportedByEnvironment';
 
 const MIGRATION_TASK_KEY = 'mls-migration';
 
@@ -96,7 +96,7 @@ const checkMigrationConfig = async (
   getTeamMLSMigrationStatus: () => MLSMigrationStatus,
   onMigrationStartTimeArrived: () => Promise<void>,
 ) => {
-  const isMLSSupportedByEnv = await isMLSSupportedByEnvironment();
+  const isMLSSupportedByEnv = await isMlsSupportedByEnvironment();
   if (!isMLSSupportedByEnv) {
     return;
   }

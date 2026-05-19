@@ -19,20 +19,20 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {CallMessage} from 'Repositories/entity/message/CallMessage';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {PingMessage} from 'Repositories/entity/message/PingMessage';
-import {Text} from 'Repositories/entity/message/Text';
-import {User} from 'Repositories/entity/User';
+import {Conversation} from 'Repositories/entity/conversation';
+import {CallMessage} from 'Repositories/entity/message/callMessage';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {PingMessage} from 'Repositories/entity/message/pingMessage';
+import {Text} from 'Repositories/entity/message/text';
+import {User} from 'Repositories/entity/user';
 import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
-import {generateCellState} from './ConversationCellState';
-import {ConversationStatusIcon} from './ConversationStatusIcon';
-import {NOTIFICATION_STATE} from './NotificationSetting';
+import {generateCellState} from './conversationCellState';
+import {ConversationStatusIcon} from './conversationStatusIcon';
+import {NOTIFICATION_STATE} from './notificationSetting';
 
-import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
+import {CALL_MESSAGE_TYPE} from '../../message/callMessageType';
 
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {

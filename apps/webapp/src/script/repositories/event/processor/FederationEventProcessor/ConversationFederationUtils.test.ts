@@ -19,7 +19,7 @@
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
-import {Conversation} from 'Repositories/entity/Conversation';
+import {Conversation} from 'Repositories/entity/conversation';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
 
@@ -28,7 +28,7 @@ import {
   FederationDeleteResult,
   getUsersToDeleteFromFederatedConversations,
   FederationConnectionRemovedResult,
-} from './ConversationFederationUtils';
+} from './conversationFederationUtils';
 
 describe('ConversationFederationUtils', () => {
   describe('getFederationDeleteEventUpdates', () => {

@@ -26,17 +26,17 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import {useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
-import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {Avatar, AVATAR_SIZE} from 'Components/avatar';
+import {ConversationClassifiedBar} from 'Components/classifiedBar/classifiedBar';
+import {useFileUploadState} from 'Components/conversation/useFilesUploadState/useFilesUploadState';
+import {EmojiPicker} from 'Components/emojiPicker/emojiPicker';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {MessageRepository} from 'Repositories/conversation/MessageRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
-import {EventRepository} from 'Repositories/event/EventRepository';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {MessageRepository} from 'Repositories/conversation/messageRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
+import {EventRepository} from 'Repositories/event/eventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {SearchRepository} from 'Repositories/search/searchRepository';
@@ -49,13 +49,13 @@ import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageContent} from './common/messageContent/messageContent';
-import {FilePreviews} from './FilePreviews/FilePreviews';
-import {InputBarContainer} from './InputBarContainer/InputBarContainer';
-import {InputBarControls} from './InputBarControls/InputBarControls';
-import {InputBarEditor} from './InputBarEditor/InputBarEditor';
-import {PastedFileControls} from './PastedFileControls/PastedFileControls';
-import {ReplyBar} from './ReplyBar/ReplyBar';
-import {TypingIndicator} from './TypingIndicator';
+import {FilePreviews} from './filePreviews/filePreviews';
+import {InputBarContainer} from './inputBarContainer/inputBarContainer';
+import {InputBarControls} from './inputBarControls/inputBarControls';
+import {InputBarEditor} from './inputBarEditor/inputBarEditor';
+import {PastedFileControls} from './pastedFileControls/pastedFileControls';
+import {ReplyBar} from './replyBar/replyBar';
+import {TypingIndicator} from './typingIndicator';
 import {useEmojiPicker} from './useEmojiPicker/useEmojiPicker';
 import {useFileHandling} from './useFileHandling/useFileHandling';
 import {useFormatToolbar} from './useFormatToolbar/useFormatToolbar';
@@ -64,8 +64,8 @@ import {useMessageHandling} from './useMessageHandling/useMessageHandling';
 import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
-import {Config} from '../../Config';
-import {useApplicationContext} from '../../page/RootProvider';
+import {Config} from '../../config';
+import {useApplicationContext} from '../../page/rootProvider';
 
 const CONFIG = {
   ...Config.getConfig(),

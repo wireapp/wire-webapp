@@ -19,18 +19,18 @@
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import {AVATAR_SIZE, Avatar} from 'Components/Avatar';
-import {UserBlockedBadge} from 'Components/Badge';
-import * as Icon from 'Components/Icon';
-import {UserName} from 'Components/UserName';
-import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
-import {User} from 'Repositories/entity/User';
+import {AVATAR_SIZE, Avatar} from 'Components/avatar';
+import {UserBlockedBadge} from 'Components/badge';
+import * as Icon from 'Components/icon';
+import {UserName} from 'Components/userName';
+import {ContentMessage} from 'Repositories/entity/message/contentMessage';
+import {DeleteMessage} from 'Repositories/entity/message/deleteMessage';
+import {User} from 'Repositories/entity/user';
 import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
-import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './MessageHeader.styles';
+import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './messageHeader.styles';
 
 type MessageHeaderParams = {
   message: ContentMessage | DeleteMessage;

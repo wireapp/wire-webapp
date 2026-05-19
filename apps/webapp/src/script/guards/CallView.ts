@@ -17,7 +17,7 @@
  *
  */
 
-import {CallViewTab} from '../view_model/CallingViewModel';
+import {CallViewTab} from '../viewModel/callingViewModel';
 
 interface CallViewOption {
   label: string;

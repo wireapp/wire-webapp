@@ -21,20 +21,20 @@ import {MouseEvent} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation/';
 
-import {FormatSeparator} from 'Components/InputBar/common/FormatSeparator/FormatSeparator';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Config} from 'src/script/Config';
+import {FormatSeparator} from 'Components/inputBar/common/formatSeparator/formatSeparator';
+import {Conversation} from 'Repositories/entity/conversation';
+import {Config} from 'src/script/config';
 
-import {AssetUploadButton} from './AssetUploadButton/AssetUploadButton';
-import {CancelEditButton} from './CancelEditButton/CancelEditButton';
-import {CellAssetUploadButton} from './CellAssetUploadButton/CellAssetUploadButton';
-import {CellImageUploadButton} from './CellImageUploadButton/CellImageUploadButton';
-import {EmojiButton} from './EmojiButton/EmojiButton';
-import {FormatTextButton} from './FormatTextButton/FormatTextButton';
-import {GiphyButton} from './GiphyButton/GiphyButton';
-import {ImageUploadButton} from './ImageUploadButton/ImageUploadButton';
-import {MessageTimerButton} from './MessageTimerButton/MessageTimerButton';
-import {PingButton} from './PingButton/PingButton';
+import {AssetUploadButton} from './assetUploadButton/assetUploadButton';
+import {CancelEditButton} from './cancelEditButton/cancelEditButton';
+import {CellAssetUploadButton} from './cellAssetUploadButton/cellAssetUploadButton';
+import {CellImageUploadButton} from './cellImageUploadButton/cellImageUploadButton';
+import {EmojiButton} from './emojiButton/emojiButton';
+import {FormatTextButton} from './formatTextButton/formatTextButton';
+import {GiphyButton} from './giphyButton/giphyButton';
+import {ImageUploadButton} from './imageUploadButton/imageUploadButton';
+import {MessageTimerButton} from './messageTimerButton/messageTimerButton';
+import {PingButton} from './pingButton/pingButton';
 
 interface ControlButtonsProps {
   input: string;

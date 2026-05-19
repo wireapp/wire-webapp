@@ -27,7 +27,7 @@ export enum SuperType {
   DEVICE = 'device',
   FEDERATION_STOP = 'federation-stop',
   FILE_TYPE_RESTRICTED = 'file-type-restricted',
-  LEGALHOLD = 'legal-hold',
+  LEGALHOLD = 'legalHold',
   LOCATION = 'location',
   MEMBER = 'member',
   MISSED = 'missed',

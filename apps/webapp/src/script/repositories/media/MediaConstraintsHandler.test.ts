@@ -17,12 +17,12 @@
  *
  */
 
-import {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/user';
 import {defaultAudioOutputId, mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {UserState} from 'Repositories/user/userState';
 import {createUuid} from 'Util/uuid';
 
-import {MediaConstraintsHandler, ScreensharingMethods} from './MediaConstraintsHandler';
+import {MediaConstraintsHandler, ScreensharingMethods} from './mediaConstraintsHandler';
 
 interface SelectedDeviceId {
   exact?: string;

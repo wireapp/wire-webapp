@@ -20,13 +20,13 @@
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
 import {AssetType} from 'Repositories/assets/assetType';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {MentionEntity} from 'src/script/message/MentionEntity';
+import {Conversation} from 'Repositories/entity/conversation';
+import {MentionEntity} from 'src/script/message/mentionEntity';
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
-import {EventMapper} from './EventMapper';
+import {EventMapper} from './eventMapper';
 
 describe('Event Mapper', () => {
   let conversation: Conversation;

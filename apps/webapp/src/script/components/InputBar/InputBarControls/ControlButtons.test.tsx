@@ -19,10 +19,10 @@
 
 import {render} from '@testing-library/react';
 
-import {Conversation} from 'Repositories/entity/Conversation';
-import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {Conversation} from 'Repositories/entity/conversation';
+import {withTheme} from 'src/script/auth/util/test/testUtil';
 
-import {ControlButtons} from './ControlButtons';
+import {ControlButtons} from './controlButtons';
 
 type PropsType = React.ComponentProps<typeof ControlButtons>;
 const defaultParams: PropsType = {

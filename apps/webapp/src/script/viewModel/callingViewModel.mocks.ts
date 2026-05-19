@@ -22,13 +22,13 @@ import {container} from 'tsyringe';
 
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 
-import {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState} from 'Repositories/calling/CallState';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
+import {Call} from 'Repositories/calling/call';
+import {CallingRepository} from 'Repositories/calling/callingRepository';
+import {CallState} from 'Repositories/calling/callState';
+import {Conversation} from 'Repositories/entity/conversation';
+import {MediaDevicesHandler} from 'Repositories/media/mediaDevicesHandler';
 
-import {CallingViewModel} from './CallingViewModel';
+import {CallingViewModel} from './callingViewModel';
 
 import {Core} from '../service/coreSingleton';
 

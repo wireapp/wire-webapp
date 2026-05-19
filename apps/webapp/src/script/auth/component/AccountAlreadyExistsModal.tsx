@@ -19,10 +19,10 @@
 
 import {Button, Container, H2, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
-import {Config} from 'src/script/Config';
+import {Config} from 'src/script/config';
 import {t} from 'Util/localizerUtil';
 
-import {buttonCss, containerCss, headerCss, linkCss} from './AccountAlreadyExistsModal.styles';
+import {buttonCss, containerCss, headerCss, linkCss} from './accountAlreadyExistsModal.styles';
 
 interface AccountAlreadyExistsModalProps {
   onClose: () => void;

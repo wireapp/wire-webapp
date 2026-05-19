@@ -19,21 +19,21 @@
 
 import {FC, useMemo, useState} from 'react';
 
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import {SearchInput} from 'Components/SearchInput';
-import {UserSearchableList} from 'Components/UserSearchableList';
-import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {User} from 'Repositories/entity/User';
+import {FadingScrollbar} from 'Components/fadingScrollbar';
+import {SearchInput} from 'Components/searchInput';
+import {UserSearchableList} from 'Components/userSearchableList';
+import {ConversationRepository} from 'Repositories/conversation/conversationRepository';
+import {Conversation} from 'Repositories/entity/conversation';
+import {User} from 'Repositories/entity/user';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
-import {isServiceEntity} from '../../../guards/Service';
+import {isServiceEntity} from '../../../guards/service';
 import {PanelHeader} from '../panelHeader';
-import {PanelEntity, PanelState} from '../RightSidebar';
+import {PanelEntity, PanelState} from '../rightSidebar';
 
 interface ConversationParticipantsProps {
   activeConversation: Conversation;

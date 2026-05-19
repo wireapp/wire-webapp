@@ -19,13 +19,13 @@
 
 import {useId} from 'react';
 
-import {VerificationBadges} from 'Components/Badge';
+import {VerificationBadges} from 'Components/badge';
 import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 import {formatTimestamp} from 'Util/timeUtil';
 
-import {type DeviceProps} from './DetailedDevice';
-import {FormattedId} from './FormattedId';
+import {type DeviceProps} from './detailedDevice';
+import {FormattedId} from './formattedId';
 
 interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getDeviceIdentity'> {
   isProteusVerified?: boolean;

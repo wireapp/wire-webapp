@@ -17,4 +17,4 @@
  *
  */
 
-export * from './ReadOnlyConversationMessage';
+export * from './readOnlyConversationMessage';

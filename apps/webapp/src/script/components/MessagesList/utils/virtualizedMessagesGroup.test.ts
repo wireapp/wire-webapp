@@ -19,9 +19,9 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
-import {EventMapper} from 'Repositories/conversation/EventMapper';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {Message} from 'Repositories/entity/message/Message';
+import {EventMapper} from 'Repositories/conversation/eventMapper';
+import {Conversation} from 'Repositories/entity/conversation';
+import {Message} from 'Repositories/entity/message/message';
 import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
 import {getRandomNumber} from 'Util/numberUtil';
 import {createUuid} from 'Util/uuid';

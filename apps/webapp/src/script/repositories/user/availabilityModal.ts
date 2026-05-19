@@ -19,7 +19,7 @@
 
 import {Availability} from '@wireapp/protocol-messaging';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {PrimaryModal} from 'Components/modals/primaryModal';
 import {t} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
