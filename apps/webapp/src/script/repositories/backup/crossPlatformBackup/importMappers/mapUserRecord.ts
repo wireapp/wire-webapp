@@ -19,7 +19,7 @@
 
 import {UserRecord} from 'Repositories/storage';
 
-import {BackupUser} from '../cPB.library';
+import {BackupUser} from '../cpb.library';
 
 export const mapUserRecord = ({id: qualifiedId, name, handle}: BackupUser): UserRecord | null => {
   if (!qualifiedId || !name || !handle) {

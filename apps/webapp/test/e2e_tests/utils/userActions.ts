@@ -77,8 +77,8 @@ export const createGroup = async (
 export async function connectWithUser(sender: Page | PageManager, receiver: Pick<User, 'username'>) {
   const {pages, modals, components} = ('webapp' in sender ? sender : PageManager.from(sender)).webapp;
   await components.conversationSidebar().clickConnectButton();
-  await pages.startUI().searchInput.fill(receiver.username);
-  await pages.startUI().selectUsers(receiver.username);
+  await pages.startUi().searchInput.fill(receiver.username);
+  await pages.startUi().selectUsers(receiver.username);
   await modals.userProfile().clickStartConversation();
 }
 
@@ -89,8 +89,8 @@ export async function connectWithUser(sender: Page | PageManager, receiver: Pick
 export async function sendConnectionRequest(sender: Page | PageManager, receiver: User) {
   const {pages, modals, components} = ('webapp' in sender ? sender : PageManager.from(sender)).webapp;
   await components.conversationSidebar().clickConnectButton();
-  await pages.startUI().searchInput.fill(receiver.username);
-  await pages.startUI().selectUsers(receiver.username);
+  await pages.startUi().searchInput.fill(receiver.username);
+  await pages.startUi().selectUsers(receiver.username);
   await modals.userProfile().clickConnectButton();
 }
 

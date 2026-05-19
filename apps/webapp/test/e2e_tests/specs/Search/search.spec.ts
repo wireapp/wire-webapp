@@ -32,9 +32,9 @@ test.describe('Search', () => {
       const partialUsername = userB.username.slice(0, -1);
 
       await userAComponents.conversationSidebar().clickConnectButton();
-      await userAPages.startUI().searchInput.fill(partialUsername);
+      await userAPages.startUi().searchInput.fill(partialUsername);
 
-      await expect(userAPages.startUI().searchResults).toContainText(userB.fullName);
+      await expect(userAPages.startUi().searchResults).toContainText(userB.fullName);
     },
   );
 
@@ -67,9 +67,9 @@ test.describe('Search', () => {
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
 
       await userAComponents.conversationSidebar().clickConnectButton();
-      await userAPages.startUI().searchInput.fill('@' + userB.username);
-      await expect(userAPages.startUI().searchResults).toContainText(userB.fullName);
-      await expect(userAPages.startUI().searchResults).toHaveCount(1);
+      await userAPages.startUi().searchInput.fill('@' + userB.username);
+      await expect(userAPages.startUi().searchResults).toContainText(userB.fullName);
+      await expect(userAPages.startUi().searchResults).toHaveCount(1);
     },
   );
 
@@ -82,8 +82,8 @@ test.describe('Search', () => {
       const {pages: userAPages, components: userAComponents} = userAPageManager.webapp;
 
       await userAComponents.conversationSidebar().clickConnectButton();
-      await userAPages.startUI().searchInput.fill(userB.username);
-      await expect(userAPages.startUI().searchResults).toContainText(userB.fullName);
+      await userAPages.startUi().searchInput.fill(userB.username);
+      await expect(userAPages.startUi().searchResults).toContainText(userB.fullName);
     },
   );
 });

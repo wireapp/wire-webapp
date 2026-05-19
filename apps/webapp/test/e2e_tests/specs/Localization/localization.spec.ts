@@ -134,10 +134,10 @@ test.describe('Localization', () => {
       // Connect users manually due to the current locators don't work in german browser
       await components.conversationSidebar().connectButton.click();
       await pages
-        .startUI()
+        .startUi()
         .component.getByPlaceholder(deTranslations['searchPeopleOnlyPlaceholder'])
         .fill(userB.fullName);
-      await pages.startUI().component.getByRole('button', {name: userB.fullName}).click();
+      await pages.startUi().component.getByRole('button', {name: userB.fullName}).click();
       await modals.userProfile().startConversationButton.click();
 
       const conversation = await pages.conversationList().getConversation(userB.fullName).open();

@@ -20,7 +20,6 @@ ignore:
   - .elasticbeanstalk
   - "**/{node_modules,dist,coverage,test-results,playwright-report,tmp,.cache,.platform,.ebextensions}"
   - apps/**/__mocks__
-  - "**/bin"
   - apps/webapp/{test,resource,app-config,assets/mediapipe-models}
   - libraries/api-client
   - libraries/core/__mocks__

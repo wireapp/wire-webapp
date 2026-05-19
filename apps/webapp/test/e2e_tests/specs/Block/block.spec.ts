@@ -317,8 +317,8 @@ test.describe('User Blocking', () => {
 
         await test.step('User A unblocks User B from Search List', async () => {
           await userAComponents.conversationSidebar().clickConnectButton();
-          await userAPages.startUI().searchInput.fill(userB.username);
-          await userAPages.startUI().selectUsers(userB.username);
+          await userAPages.startUi().searchInput.fill(userB.username);
+          await userAPages.startUi().selectUsers(userB.username);
           await userAModals.userProfile().unblockButton.click();
           await userAModals.confirm().clickAction();
         });

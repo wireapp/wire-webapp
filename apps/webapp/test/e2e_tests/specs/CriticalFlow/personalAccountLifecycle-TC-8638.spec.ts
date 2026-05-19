@@ -83,7 +83,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
   await test.step('Personal user A searches for other personal user B', async () => {
     const {pages, modals, components} = pageManagerA.webapp;
     await components.conversationSidebar().clickConnectButton();
-    await pages.startUI().selectUsers(userB.username);
+    await pages.startUi().selectUsers(userB.username);
     await expect(modals.userProfile().modal).toBeVisible();
   });
 
@@ -133,7 +133,7 @@ test('Personal Account Lifecycle', {tag: ['@TC-8638', '@crit-flow-web']}, async 
 
   await test.step('Personal user C sends a connection request to personal user A', async () => {
     await pageManagerC.webapp.components.conversationSidebar().clickConnectButton();
-    await pageManagerC.webapp.pages.startUI().selectUsers(userA.username);
+    await pageManagerC.webapp.pages.startUi().selectUsers(userA.username);
     await pageManagerC.webapp.modals.userProfile().clickConnectButton();
     await pageManagerC.webapp.pages.conversationList().getConversation(userA.fullName).open();
     await expect(pageManagerC.webapp.pages.outgoingConnection().uniqueUsernameOutgoing).toContainText(userA.username);

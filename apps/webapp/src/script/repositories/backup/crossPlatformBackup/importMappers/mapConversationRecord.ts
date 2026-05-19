@@ -21,7 +21,7 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
 import {ConversationRecord} from 'Repositories/storage';
 
-import {BackUpConversation} from '../cPB.library';
+import {BackUpConversation} from '../cpb.library';
 
 const isGroupConversation = (name: string) => name.length > 0;
 

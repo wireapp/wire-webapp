@@ -9,7 +9,7 @@
       "dependsOn": ["^build", "webapp:build"],
       "outputs": ["{projectRoot}/dist"],
       "options": {
-        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
+        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copyServerAssets.js"],
         "parallel": false
       }
     },
@@ -56,7 +56,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=999999 --ext .js,.ts {projectRoot}"
+        "command": "eslint --config eslint.config.ts --max-warnings=0 --ext .js,.ts {projectRoot}"
       }
     },
     "type-check": {

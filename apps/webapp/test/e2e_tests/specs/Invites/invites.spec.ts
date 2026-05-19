@@ -14,7 +14,7 @@ test.describe('Invites', () => {
 
     // Open connect with people sidebar & click invite people button
     await components.conversationSidebar().clickConnectButton();
-    await pages.startUI().inviteButton.click();
+    await pages.startUi().inviteButton.click();
 
     await expect(modals.invite().inviteText).toContainText(`I’m on Wire, search for @${user.username}`);
   });

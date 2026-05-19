@@ -1087,7 +1087,7 @@ const ignores = [
   'apps/webapp/src/ext/',
   'apps/webapp/src/script/localization/**/webapp*.js',
   'apps/webapp/src/worker/',
-  'apps/webapp/src/script/components/Icon.tsx',
+  'apps/webapp/src/script/components/icon.tsx',
   '**/*.test.*',
   '**/*.spec.*',
   '*.js',

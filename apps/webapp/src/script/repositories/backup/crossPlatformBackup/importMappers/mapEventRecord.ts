@@ -22,7 +22,7 @@ import {EventRecord} from 'Repositories/storage';
 import {messageCategory} from 'src/script/message/messageCategory';
 
 import {CPBLogger} from '..';
-import {BackupMessageContent, BackupMessage} from '../cPB.library';
+import {BackupMessageContent, BackupMessage} from '../cpb.library';
 
 // Type definition for common message fields
 type CommonMessageFields = Required<

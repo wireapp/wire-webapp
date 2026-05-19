@@ -64,7 +64,7 @@ import {RequestResetPasswordPage} from './webapp/pages/requestResetPassword.page
 import {ResetPasswordPage} from './webapp/pages/resetPassword.page';
 import {SettingsPage} from './webapp/pages/settings.page';
 import {SingleSignOnPage} from './webapp/pages/singleSignOn.page';
-import {StartUIPage} from './webapp/pages/startUI.page';
+import {StartUIPage} from './webapp/pages/startUi.page';
 import {WelcomePage} from './webapp/pages/welcome.page';
 import {GuestLinkPasswordModal} from './webapp/modals/guestLinkPassword.modal';
 import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
@@ -155,7 +155,7 @@ export class PageManager {
       welcome: () => this.getOrCreate('webapp.pages.welcome', () => new WelcomePage(this.page)),
       registration: () => this.getOrCreate('webapp.pages.registration', () => new RegistrationPage(this.page)),
       sidebar: () => this.getOrCreate('webapp.pages.sidebar', () => new ConversationSidebar(this.page)),
-      startUI: () => this.getOrCreate('webapp.pages.startUI', () => new StartUIPage(this.page)),
+      startUi: () => this.getOrCreate('webapp.pages.startUi', () => new StartUIPage(this.page)),
       account: () => this.getOrCreate('webapp.pages.account', () => new AccountPage(this.page)),
       conversationList: () =>
         this.getOrCreate('webapp.pages.conversationList', () => new ConversationListPage(this.page)),
