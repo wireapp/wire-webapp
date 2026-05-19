@@ -86,7 +86,7 @@ export class BackgroundEffectsController {
     const offscreen = canvas.transferControlToOffscreen();
 
     const outputTrackStop = outputTrack.stop.bind(outputTrack);
-    let onWorkerMessage: ({data}: MessageEvent) => void = () => null;
+    let onWorkerMessage: ({data}: MessageEvent<WorkerMessage>) => void = () => null;
 
     if (resolved.useWorker) {
       if (this.worker === null) {

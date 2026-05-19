@@ -31,7 +31,6 @@ function createOptions(): WorkerProcessVideoTrackOptions {
     wasmLoaderPath: '',
     wasmBinaryPath: '',
     modelPath: '',
-    restartEvery: 0,
     borderSmooth: 0,
     smoothing: 1,
     smoothstepMin: 0,

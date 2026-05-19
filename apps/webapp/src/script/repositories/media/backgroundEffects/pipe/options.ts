@@ -106,7 +106,6 @@ export const defaultOpts = {
   smoothing: 0.8,
   smoothstepMin: 0.6,
   smoothstepMax: 0.9,
-  restartEvery: 0,
   bgBlur: 0,
   bgBlurRadius: 30,
 
