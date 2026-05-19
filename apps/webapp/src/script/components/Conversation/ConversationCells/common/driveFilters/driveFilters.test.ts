@@ -61,10 +61,34 @@ describe('toConversationDriveSearchParams', () => {
     });
   });
 
-  it('omits empty tags from search params', () => {
-    expect(toConversationDriveSearchParams(emptyFilters)).toEqual({
-      tags: undefined,
+  it('maps a single file-type category to its MIME terms', () => {
+    expect(toConversationDriveSearchParams({...emptyFilters, selectedFileTypeIds: ['pdfs']})).toEqual({
+      mimeTypes: ['application/pdf'],
     });
+  });
+
+  it('flattens multiple file-type categories into a single MIME term list', () => {
+    expect(toConversationDriveSearchParams({...emptyFilters, selectedFileTypeIds: ['pictures', 'videos']})).toEqual({
+      mimeTypes: ['image/*', 'video/*'],
+    });
+  });
+
+  it('dedupes overlapping MIME terms across categories', () => {
+    expect(
+      toConversationDriveSearchParams({...emptyFilters, selectedFileTypeIds: ['spreadsheets', 'spreadsheets']}),
+    ).toEqual({
+      mimeTypes: ['*spreadsheet*', '*excel*'],
+    });
+  });
+
+  it('maps shared-via-link toggle to hasPublicLink: true', () => {
+    expect(toConversationDriveSearchParams({...emptyFilters, isSharedViaLink: true})).toEqual({
+      hasPublicLink: true,
+    });
+  });
+
+  it('omits unset params from search params', () => {
+    expect(toConversationDriveSearchParams(emptyFilters)).toEqual({});
   });
 });
 
@@ -87,19 +111,20 @@ describe('toGlobalDriveSearchParams', () => {
       toGlobalDriveSearchParams({
         ...emptyGlobalFilters,
         selectedTagIds: ['tag-a'],
+        selectedFileTypeIds: ['documents'],
         selectedConversationIds: ['conversation-a'],
+        isSharedViaLink: true,
         path: '/wire-cells-web/folder',
       }),
     ).toEqual({
       tags: ['tag-a'],
+      mimeTypes: ['*word*'],
+      hasPublicLink: true,
       path: '/wire-cells-web/folder',
     });
   });
 
   it('omits unsupported and empty global filters from search params', () => {
-    expect(toGlobalDriveSearchParams({...emptyGlobalFilters, selectedConversationIds: ['conversation-a']})).toEqual({
-      tags: undefined,
-      path: undefined,
-    });
+    expect(toGlobalDriveSearchParams({...emptyGlobalFilters, selectedConversationIds: ['conversation-a']})).toEqual({});
   });
 });

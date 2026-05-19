@@ -19,6 +19,8 @@
 
 import is from '@sindresorhus/is';
 
+import {FILE_TYPE_CATALOG} from './fileTypeCatalog';
+
 export interface ConversationDriveFiltersState {
   selectedTagIds: string[];
   selectedFileTypeIds: string[];
@@ -33,8 +35,14 @@ export interface GlobalDriveFiltersState extends ConversationDriveFiltersState {
 
 export interface DriveSearchParams {
   tags?: string[];
+  mimeTypes?: string[];
+  hasPublicLink?: boolean;
   path?: string;
 }
+
+const FILE_TYPE_MIME_TERMS: Record<string, readonly string[]> = Object.fromEntries(
+  FILE_TYPE_CATALOG.map(entry => [entry.id, entry.mimeTerms]),
+);
 
 export const hasActiveConversationDriveFilters = (filters: ConversationDriveFiltersState): boolean =>
   filters.selectedTagIds.length > 0 ||
@@ -43,21 +51,36 @@ export const hasActiveConversationDriveFilters = (filters: ConversationDriveFilt
   filters.isSharedViaLink;
 
 // True when at least one search-param field is set, i.e. the search call will
-// actually be filtered.
-// each view runs its own `to…SearchParams` mapper first, then asks this predicate.
+// actually be filtered. Each view runs its own `to…SearchParams` mapper first,
+// then asks this predicate.
 export const hasActiveSearchParams = (params: DriveSearchParams): boolean =>
-  params.tags !== undefined || params.path !== undefined;
+  params.tags !== undefined ||
+  params.mimeTypes !== undefined ||
+  params.hasPublicLink !== undefined ||
+  params.path !== undefined;
 
 export const hasActiveGlobalDriveFilters = (filters: GlobalDriveFiltersState): boolean =>
   hasActiveConversationDriveFilters(filters) ||
   filters.selectedConversationIds.length > 0 ||
   is.nonEmptyString(filters.path);
 
+const toMimeTypes = (selectedFileTypeIds: string[]): string[] | undefined => {
+  if (selectedFileTypeIds.length === 0) {
+    return undefined;
+  }
+  const mimeTerms = [...new Set(selectedFileTypeIds.flatMap(id => FILE_TYPE_MIME_TERMS[id] ?? []))];
+  return mimeTerms.length > 0 ? mimeTerms : undefined;
+};
+
 export const toConversationDriveSearchParams = (filters: ConversationDriveFiltersState): DriveSearchParams => ({
   tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
+  mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
+  hasPublicLink: filters.isSharedViaLink ? true : undefined,
 });
 
 export const toGlobalDriveSearchParams = (filters: GlobalDriveFiltersState): DriveSearchParams => ({
   tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
+  mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
+  hasPublicLink: filters.isSharedViaLink ? true : undefined,
   path: is.nonEmptyString(filters.path) ? filters.path : undefined,
 });
