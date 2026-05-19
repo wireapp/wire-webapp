@@ -251,6 +251,7 @@ const config: Linter.Config[] = [
       'apps/webapp/src/script/components/Conversation/ConversationCells/useConversationSearch/useConversationSearchFiles.ts',
       'apps/webapp/src/script/components/Conversation/ConversationCells/useGetAllCellsNodes/useGetAllCellsNodes.ts',
       'apps/webapp/src/script/components/Conversation/ConversationCells/useRefreshCellsState/useRefreshCellsState.ts',
+      'apps/webapp/src/script/components/FileFullscreenModal/FileEditor/FileEditor.tsx',
       'apps/webapp/src/script/components/InputBar/InputBar.tsx',
       'apps/webapp/src/script/components/InputBar/usePing/usePing.ts',
       'apps/webapp/src/script/components/MessagesList/Message/MessageWrapper.tsx',
