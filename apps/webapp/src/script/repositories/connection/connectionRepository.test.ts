@@ -26,7 +26,7 @@ import {StatusCodes} from 'http-status-codes';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {SelfService} from 'Repositories/self/SelfService';
+import {SelfService} from 'Repositories/self/selfService';
 import {TeamService} from 'Repositories/team/teamService';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';

@@ -33,7 +33,7 @@ import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 import type {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import type {EventSource} from 'Repositories/event/EventSource';
-import {SelfService} from 'Repositories/self/SelfService';
+import {SelfService} from 'Repositories/self/selfService';
 import {TeamService} from 'Repositories/team/teamService';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';

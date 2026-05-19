@@ -85,7 +85,7 @@ import {EventService} from 'Repositories/event/EventService';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {SelfRepository} from 'Repositories/self/selfRepository';
 import type {EventRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/teamRepository';

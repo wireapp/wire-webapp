@@ -37,8 +37,8 @@ import {UserState} from 'Repositories/user/userState';
 import {Logger, getLogger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {SelfService} from './SelfService';
-import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols/SelfSupportedProtocols';
+import {SelfService} from './selfService';
+import {evaluateSelfSupportedProtocols} from './selfSupportedProtocols/selfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
 

@@ -23,7 +23,7 @@ import type {ConnectionState} from 'Repositories/connection/connectionState';
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import type {SelfRepository} from 'Repositories/self/SelfRepository';
+import type {SelfRepository} from 'Repositories/self/selfRepository';
 import type {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';
 import type {UserRepository} from 'Repositories/user/userRepository';

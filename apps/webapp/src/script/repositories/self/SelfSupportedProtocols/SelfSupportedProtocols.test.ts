@@ -24,7 +24,7 @@ import {MLSMigrationStatus} from 'src/script/mls/MLSMigration/migrationStatus';
 import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {evaluateSelfSupportedProtocols} from './SelfSupportedProtocols';
+import {evaluateSelfSupportedProtocols} from './selfSupportedProtocols';
 
 import * as mlsSupport from '../../../mls/isMLSSupportedByEnvironment';
 

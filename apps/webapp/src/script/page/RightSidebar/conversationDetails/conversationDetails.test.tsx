@@ -29,7 +29,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {SelfRepository} from 'Repositories/self/selfRepository';
 import {TeamEntity} from 'Repositories/team/teamEntity';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';

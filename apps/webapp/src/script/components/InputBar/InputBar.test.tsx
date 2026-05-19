@@ -31,7 +31,7 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfService} from 'Repositories/self/SelfService';
+import {SelfService} from 'Repositories/self/selfService';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/teamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';

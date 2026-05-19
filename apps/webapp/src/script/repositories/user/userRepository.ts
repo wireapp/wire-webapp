@@ -58,7 +58,7 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import type {EventSource} from 'Repositories/event/EventSource';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {SelfService} from 'Repositories/self/SelfService';
+import type {SelfService} from 'Repositories/self/selfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/teamState';
 import {chunk, partition} from 'Util/arrayUtil';

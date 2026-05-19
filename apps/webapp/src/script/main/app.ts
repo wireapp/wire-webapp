@@ -80,8 +80,8 @@ import {initializePermissions} from 'Repositories/permission/permissionHandlers'
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SearchRepository} from 'Repositories/search/searchRepository';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
-import {SelfService} from 'Repositories/self/SelfService';
+import {SelfRepository} from 'Repositories/self/selfRepository';
+import {SelfService} from 'Repositories/self/selfService';
 import {StorageRepository, StorageService} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamService} from 'Repositories/team/teamService';

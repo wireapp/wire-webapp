@@ -129,6 +129,10 @@ ls:
   apps/webapp/src/script/repositories/integration:
     .dir: camelCase
     .ts: camelCase
+  apps/webapp/src/script/repositories/self:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
   apps/webapp/src/script/service:
     .dir: camelCase
     .ts: camelCase

@@ -62,7 +62,7 @@ import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {SelfRepository} from 'Repositories/self/SelfRepository';
+import {SelfRepository} from 'Repositories/self/selfRepository';
 import {LegacyEventRecord, StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {TeamRepository} from 'Repositories/team/teamRepository';

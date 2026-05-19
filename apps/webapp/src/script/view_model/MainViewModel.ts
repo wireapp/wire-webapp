@@ -39,7 +39,7 @@ import type {NotificationRepository} from 'Repositories/notification/Notificatio
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import type {SearchRepository} from 'Repositories/search/searchRepository';
-import type {SelfRepository} from 'Repositories/self/SelfRepository';
+import type {SelfRepository} from 'Repositories/self/selfRepository';
 import type {StorageRepository} from 'Repositories/storage';
 import type {TeamRepository} from 'Repositories/team/teamRepository';
 import type {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';

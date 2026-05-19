@@ -26,8 +26,8 @@ import {ClientEntity} from 'Repositories/client';
 import {TestFactory} from 'test/helper/TestFactory';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {SelfRepository} from './SelfRepository';
-import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';
+import {SelfRepository} from './selfRepository';
+import * as SelfSupportedProtocols from './selfSupportedProtocols/selfSupportedProtocols';
 
 import {Core} from '../../service/coreSingleton';
 
