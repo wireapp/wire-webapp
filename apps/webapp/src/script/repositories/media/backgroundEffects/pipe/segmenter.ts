@@ -26,8 +26,8 @@ import {
   createMetricsWindow,
   pushMetricsSample,
 } from 'Repositories/media/backgroundEffects/helper/metrics';
-import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
+import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
