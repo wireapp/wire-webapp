@@ -19,6 +19,8 @@
 
 import {CSSObject} from '@emotion/react';
 
+const outlineBorder = 'var(--Border-Base-Primary, #DCE0E3)';
+const darkOutlineBorder = 'var(--Border-Base-Primary, #34373D)';
 const disabledBackground = 'var(--Background-Base-Secondary, #EDEFF0)';
 const darkDisabledBackground = 'var(--Background-Base-Primary, #17181A)';
 const disabledTextColor = 'var(--Backgrounds-On-Surface, #000)';
@@ -54,7 +56,7 @@ export const toggleFilterButtonStyles: CSSObject = {
   height: '32px',
   padding: '0 10px',
   borderRadius: '12px',
-  border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
+  border: `1px solid ${outlineBorder}`,
   background: 'var(--Background-Base-Primary, #FFF)',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-semibold)',
@@ -73,12 +75,13 @@ export const toggleFilterButtonStyles: CSSObject = {
     color: 'var(--accent-color-500)',
   },
   '&[aria-disabled="true"]': {
+    border: `1px solid ${outlineBorder}`,
     background: disabledBackground,
     color: disabledTextColor,
     cursor: 'not-allowed',
   },
   'body.theme-dark &': {
-    border: '1px solid var(--Border-Base-Primary, #34373D)',
+    border: `1px solid ${darkOutlineBorder}`,
     background: 'var(--Background-Base-Primary, #17181A)',
     '&:hover': {
       border: '1px solid var(--accent-color-500)',
@@ -89,6 +92,7 @@ export const toggleFilterButtonStyles: CSSObject = {
       color: 'var(--accent-color-500)',
     },
     '&[aria-disabled="true"]': {
+      border: `1px solid ${darkOutlineBorder}`,
       background: darkDisabledBackground,
       color: darkDisabledTextColor,
     },

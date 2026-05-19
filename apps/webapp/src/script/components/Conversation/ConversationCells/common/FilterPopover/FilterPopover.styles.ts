@@ -55,6 +55,7 @@ export const triggerButtonStyles: CSSObject = {
     color: 'var(--accent-color-500)',
   },
   '&[data-disabled]': {
+    border: `1px solid ${outlineBorder}`,
     background: disabledBackground,
     cursor: 'not-allowed',
   },
@@ -70,6 +71,7 @@ export const triggerButtonStyles: CSSObject = {
       color: 'var(--accent-color-500)',
     },
     '&[data-disabled]': {
+      border: `1px solid ${darkOutlineBorder}`,
       background: darkDisabledBackground,
       color: 'var(--foreground-secondary, #9FA1A7)',
     },
