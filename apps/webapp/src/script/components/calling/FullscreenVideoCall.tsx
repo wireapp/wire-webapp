@@ -59,7 +59,7 @@ import {useToggleState} from 'src/script/hooks/useToggleState';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
@@ -254,10 +254,14 @@ const FullscreenVideoCall = ({
         return;
       }
 
+      if (!isTabKey(event)) {
+        return;
+      }
+
       event.preventDefault();
       event.stopPropagation();
 
-      preventFocusOutside(event, 'video-calling', targetDocument);
+      preventFocusOutside(event, 'video-calling-wrapper', targetDocument);
     };
 
     targetDocument.addEventListener('keydown', onKeyDown);
@@ -302,6 +306,7 @@ const FullscreenVideoCall = ({
 
   return (
     <div
+      id="video-calling-wrapper"
       data-uie-name="fullscreen-video-call"
       className={cx('video-calling-wrapper', {
         'app--small-offset': hasOffset && isMiniMode,

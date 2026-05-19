@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, CSSProperties, ReactNode} from 'react';
+import {ChangeEvent, CSSProperties, ReactNode, useEffect, useId, useRef} from 'react';
 
 import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@wireapp/react-ui-kit';
 
@@ -31,6 +31,7 @@ import {
   backgroundSettingsScrollableContentStyles,
   backgroundSettingsTitleStyles,
   backgroundSettingsWrapperStyles,
+  closeButtonStyles,
   sectionLabelStyles,
   tileButtonStyles,
   tileGridStyles,
@@ -60,10 +61,26 @@ const isEffectSelected = (selected: BackgroundEffectSelection, candidate: Backgr
   return true;
 };
 
+const getBackgroundEffectLabel = (effect: BackgroundEffectSelection, backgrounds: BuiltinBackground[]): string => {
+  switch (effect.type) {
+    case 'none':
+      return t('videoCallBackgroundNoEffect');
+    case 'blur':
+      return effect.level === 'low' ? t('videoCallBackgroundBlurLow') : t('videoCallBackgroundBlurHigh');
+    case 'virtual': {
+      const background = backgrounds.find(({id}) => id === effect.backgroundId);
+      return background ? t(background.labelKey) : t('videoCallBackgroundVirtual');
+    }
+    default:
+      return t('videoCallBackgroundEffectsLabel');
+  }
+};
+
 interface BackgroundTileProps {
   effect: BackgroundEffectSelection;
   selectedEffect: BackgroundEffectSelection;
   onSelectEffect: (effect: BackgroundEffectSelection) => void;
+  ariaLabel: string;
   previewContent?: ReactNode;
   previewStyle?: CSSProperties;
 }
@@ -72,6 +89,7 @@ const BackgroundTile = ({
   effect,
   selectedEffect,
   onSelectEffect,
+  ariaLabel,
   previewContent,
   previewStyle,
 }: BackgroundTileProps) => {
@@ -81,7 +99,9 @@ const BackgroundTile = ({
       type="button"
       css={tileButtonStyles}
       data-selected={selected}
-      aria-pressed={selected}
+      role="radio"
+      aria-checked={selected}
+      aria-label={ariaLabel}
       onClick={() => onSelectEffect(effect)}
     >
       <div css={tilePreviewStyles} style={previewStyle} className="bg-tile__preview">
@@ -99,15 +119,43 @@ export const VideoBackgroundSettings = ({
   onEnableHighQualityBlur,
   onClose,
 }: VideoBackgroundSettingsProps) => {
+  const titleId = useId();
+  const blurSectionId = useId();
+  const virtualSectionId = useId();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    closeButtonRef.current?.focus();
+  }, []);
+
   const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
     onEnableHighQualityBlur(event);
   };
 
+  const noneEffect: BackgroundEffectSelection = {type: 'none'};
+  const lowBlurEffect: BackgroundEffectSelection = {type: 'blur', level: 'low'};
+  const highBlurEffect: BackgroundEffectSelection = {type: 'blur', level: 'high'};
+
   return (
-    <div css={backgroundSettingsWrapperStyles} data-uie-name="video-background-settings">
+    <div
+      css={backgroundSettingsWrapperStyles}
+      data-uie-name="video-background-settings"
+      role="region"
+      aria-labelledby={titleId}
+    >
       <div css={backgroundSettingsHeaderStyles}>
-        <span css={backgroundSettingsTitleStyles}>{t('videoCallBackgroundEffectsLabel')}</span>
-        <button type="button" className="icon-button" onClick={onClose} title={t('modalCloseButton')}>
+        <h2 id={titleId} css={backgroundSettingsTitleStyles}>
+          {t('videoCallBackgroundEffectsLabel')}
+        </h2>
+        <button
+          ref={closeButtonRef}
+          type="button"
+          css={closeButtonStyles}
+          className="icon-button"
+          onClick={onClose}
+          aria-label={t('modalCloseButton')}
+          title={t('modalCloseButton')}
+        >
           <Icon.CloseIcon width={12} height={12} />
         </button>
       </div>
@@ -115,9 +163,10 @@ export const VideoBackgroundSettings = ({
       <FadingScrollbar css={backgroundSettingsScrollableContentStyles}>
         {/* No background effect — full-width tile */}
         <BackgroundTile
-          effect={{type: 'none'}}
+          effect={noneEffect}
           selectedEffect={selectedEffect}
           onSelectEffect={onSelectEffect}
+          ariaLabel={getBackgroundEffectLabel(noneEffect, backgrounds)}
           previewContent={
             <div css={tilePreviewContentStyles}>
               <CircleIcon />
@@ -128,12 +177,15 @@ export const VideoBackgroundSettings = ({
 
         {/* Blur section */}
         <div>
-          <div css={sectionLabelStyles}>{t('videoCallBackgroundBlurSectionLabel')}</div>
-          <div css={tileGridStyles}>
+          <h3 id={blurSectionId} css={sectionLabelStyles}>
+            {t('videoCallBackgroundBlurSectionLabel')}
+          </h3>
+          <div css={tileGridStyles} role="group" aria-labelledby={blurSectionId}>
             <BackgroundTile
-              effect={{type: 'blur', level: 'low'}}
+              effect={lowBlurEffect}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
+              ariaLabel={getBackgroundEffectLabel(lowBlurEffect, backgrounds)}
               previewContent={
                 <div css={tilePreviewContentStyles}>
                   <BlurLowIcon />
@@ -142,9 +194,10 @@ export const VideoBackgroundSettings = ({
               }
             />
             <BackgroundTile
-              effect={{type: 'blur', level: 'high'}}
+              effect={highBlurEffect}
               selectedEffect={selectedEffect}
               onSelectEffect={onSelectEffect}
+              ariaLabel={getBackgroundEffectLabel(highBlurEffect, backgrounds)}
               previewContent={
                 <div css={tilePreviewContentStyles}>
                   <BlurHighIcon />
@@ -170,19 +223,26 @@ export const VideoBackgroundSettings = ({
 
         {/* Virtual backgrounds section */}
         <div>
-          <div css={sectionLabelStyles}>{t('videoCallBackgroundVirtualSectionLabel')}</div>
-          <div css={tileGridStyles}>
-            {backgrounds.map(background => (
-              <BackgroundTile
-                key={background.id}
-                effect={{type: 'virtual', backgroundId: background.id}}
-                selectedEffect={selectedEffect}
-                onSelectEffect={onSelectEffect}
-                previewStyle={{
-                  backgroundImage: `url(${background.imageUrl}), ${background.previewGradient}`,
-                }}
-              />
-            ))}
+          <h3 id={virtualSectionId} css={sectionLabelStyles}>
+            {t('videoCallBackgroundVirtualSectionLabel')}
+          </h3>
+          <div css={tileGridStyles} role="group" aria-labelledby={virtualSectionId}>
+            {backgrounds.map(background => {
+              const virtualEffect: BackgroundEffectSelection = {type: 'virtual', backgroundId: background.id};
+
+              return (
+                <BackgroundTile
+                  key={background.id}
+                  effect={virtualEffect}
+                  selectedEffect={selectedEffect}
+                  onSelectEffect={onSelectEffect}
+                  ariaLabel={getBackgroundEffectLabel(virtualEffect, backgrounds)}
+                  previewStyle={{
+                    backgroundImage: `url(${background.imageUrl}), ${background.previewGradient}`,
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
       </FadingScrollbar>
