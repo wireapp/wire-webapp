@@ -259,7 +259,13 @@ export class AccountAPI {
       url: AccountAPI.URL.GET_SSO_CODE_BY_EMAIL,
     };
 
-    const response = await this.client.sendJSON<SSOCode>(config);
-    return PostSSOCodeByEmailSchema.parse(response.data);
+    try {
+      const response = await this.client.sendJSON<SSOCode>(config);
+      return PostSSOCodeByEmailSchema.parse(response.data);
+    } catch {
+      return {
+        sso_code: null,
+      };
+    }
   }
 }

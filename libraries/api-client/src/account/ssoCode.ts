@@ -24,7 +24,7 @@ import {z} from 'zod';
  * Based on backend API specification
  */
 export const PostSSOCodeByEmailSchema = z.object({
-  sso_code: z.string(),
+  sso_code: z.string().nullable(),
 });
 
 export type SSOCode = z.infer<typeof PostSSOCodeByEmailSchema>;

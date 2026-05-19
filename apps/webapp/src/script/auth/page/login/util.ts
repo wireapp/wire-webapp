@@ -104,9 +104,14 @@ export const handleEnterpriseLogin = async ({
   navigate: (route: string) => void;
   apiClient: APIClient;
 }) => {
-  const response = await apiClient.api.account.getDomainRegistration(email);
+  const ssoCodeResponse = await apiClient.api.account.getSSOCodeByEmail(email);
 
-  await match(response)
+  if (is.string(ssoCodeResponse.sso_code)) {
+    return await loginWithSSO(ssoCodeResponse.sso_code, password);
+  }
+
+  const domainRegistration = await apiClient.api.account.getDomainRegistration(email);
+  await match(domainRegistration)
     .with(
       P.union(
         {domain_redirect: DomainRedirect.NONE},
