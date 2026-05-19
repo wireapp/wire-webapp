@@ -64,6 +64,32 @@ export const hasActiveGlobalDriveFilters = (filters: GlobalDriveFiltersState): b
   filters.selectedConversationIds.length > 0 ||
   is.nonEmptyString(filters.path);
 
+export type ActiveFilterType = 'tags' | 'fileType' | 'createdBy' | 'sharedViaLink' | 'conversation';
+
+export const getActiveConversationDriveFilterType = (
+  filters: ConversationDriveFiltersState,
+): ActiveFilterType | null => {
+  if (filters.selectedTagIds.length > 0) {
+    return 'tags';
+  }
+  if (filters.selectedFileTypeIds.length > 0) {
+    return 'fileType';
+  }
+  if (filters.selectedCreatorIds.length > 0) {
+    return 'createdBy';
+  }
+  if (filters.isSharedViaLink) {
+    return 'sharedViaLink';
+  }
+  return null;
+};
+
+export const getActiveGlobalDriveFilterType = (filters: GlobalDriveFiltersState): ActiveFilterType | null =>
+  filters.selectedConversationIds.length > 0 ? 'conversation' : getActiveConversationDriveFilterType(filters);
+
+export const isFilterTypeDisabled = (filterType: ActiveFilterType, active: ActiveFilterType | null): boolean =>
+  active !== null && active !== filterType;
+
 const toMimeTypes = (selectedFileTypeIds: string[]): string[] | undefined => {
   if (selectedFileTypeIds.length === 0) {
     return undefined;

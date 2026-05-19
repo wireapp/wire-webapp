@@ -68,20 +68,33 @@ interface FilterPopoverProps {
   items: FilterItem[];
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
+  disabled?: boolean;
 }
 
-export const FilterPopover = ({triggerLabel, items, selectedIds, onSelectionChange}: FilterPopoverProps) => {
+export const FilterPopover = ({
+  triggerLabel,
+  items,
+  selectedIds,
+  onSelectionChange,
+  disabled = false,
+}: FilterPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
   const filteredItems = useMemo(() => filterItems(items, searchValue), [items, searchValue]);
 
-  const handleOpenChange = useCallback((open: boolean) => {
-    setIsOpen(open);
-    if (!open) {
-      setSearchValue('');
-    }
-  }, []);
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (disabled && open) {
+        return;
+      }
+      setIsOpen(open);
+      if (!open) {
+        setSearchValue('');
+      }
+    },
+    [disabled],
+  );
 
   const handleItemSelect = useCallback(
     (id: string) => {
@@ -101,6 +114,7 @@ export const FilterPopover = ({triggerLabel, items, selectedIds, onSelectionChan
       <Button
         css={triggerButtonStyles}
         aria-label={triggerLabel}
+        isDisabled={disabled}
         data-uie-name="filter-popover-button"
         data-active={count > 0}
       >

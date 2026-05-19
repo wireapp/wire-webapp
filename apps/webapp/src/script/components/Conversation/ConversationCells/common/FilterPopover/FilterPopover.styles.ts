@@ -19,6 +19,13 @@
 
 import {CSSObject} from '@emotion/react';
 
+const outlineBorder = 'var(--Border-Base-Primary, #DCE0E3)';
+const surfaceBackground = 'var(--Background-Base-Primary, #FFF)';
+const disabledBackground = 'var(--Background-Base-Secondary, #EDEFF0)';
+const darkOutlineBorder = 'var(--Border-Base-Primary, #34373D)';
+const darkSurfaceBackground = 'var(--Background-Base-Primary, #17181A)';
+const darkDisabledBackground = 'var(--Background-Base-Primary, #17181A)';
+
 export const triggerButtonStyles: CSSObject = {
   display: 'inline-flex',
   alignItems: 'center',
@@ -26,8 +33,8 @@ export const triggerButtonStyles: CSSObject = {
   height: '32px',
   padding: '0 10px',
   borderRadius: '12px',
-  border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
-  background: 'var(--Background-Base-Primary, #FFF)',
+  border: `1px solid ${outlineBorder}`,
+  background: surfaceBackground,
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-semibold)',
   lineHeight: 'var(--line-height-small-plus)',
@@ -47,9 +54,13 @@ export const triggerButtonStyles: CSSObject = {
     background: 'var(--accent-color-highlight)',
     color: 'var(--accent-color-500)',
   },
+  '&[data-disabled]': {
+    background: disabledBackground,
+    cursor: 'not-allowed',
+  },
   'body.theme-dark &': {
-    border: '1px solid var(--Border-Base-Primary, #34373D)',
-    background: 'var(--Background-Base-Primary, #17181A)',
+    border: `1px solid ${darkOutlineBorder}`,
+    background: darkSurfaceBackground,
     '&[data-pressed], &[data-hovered]': {
       border: '1px solid var(--accent-color-500)',
     },
@@ -57,6 +68,10 @@ export const triggerButtonStyles: CSSObject = {
       border: '1px solid var(--accent-color-500)',
       background: 'var(--accent-color-highlight)',
       color: 'var(--accent-color-500)',
+    },
+    '&[data-disabled]': {
+      background: darkDisabledBackground,
+      color: 'var(--foreground-secondary, #9FA1A7)',
     },
   },
 };
@@ -86,14 +101,14 @@ export const chevronStyles: CSSObject = {
 export const popoverStyles: CSSObject = {
   width: '260px',
   borderRadius: '12px',
-  border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
-  background: 'var(--Background-Base-Primary, #FFF)',
+  border: `1px solid ${outlineBorder}`,
+  background: surfaceBackground,
   boxShadow: '0 4px 16px rgba(0, 0, 0, 0.12)',
   outline: 'none',
   overflow: 'hidden',
   'body.theme-dark &': {
-    border: '1px solid var(--Border-Base-Primary, #34373D)',
-    background: 'var(--Background-Base-Primary, #17181A)',
+    border: `1px solid ${darkOutlineBorder}`,
+    background: darkSurfaceBackground,
     boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4)',
   },
 };
@@ -112,13 +127,13 @@ export const searchRowStyles: CSSObject = {
   gap: '8px',
   margin: '8px 12px',
   borderRadius: '8px',
-  border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
+  border: `1px solid ${outlineBorder}`,
   boxSizing: 'border-box',
   '&:focus-within': {
     border: '1px solid var(--accent-color-500)',
   },
   'body.theme-dark &': {
-    border: '1px solid var(--Border-Base-Primary, #34373D)',
+    border: `1px solid ${darkOutlineBorder}`,
     '&:focus-within': {
       border: '1px solid var(--accent-color-500)',
     },
@@ -178,14 +193,14 @@ export const itemRowHoverStyles: CSSObject = {
     left: '12px',
     right: '12px',
     height: '1px',
-    background: 'var(--Border-Base-Primary, #DCE0E3)',
+    background: outlineBorder,
   },
   '&:hover': {
     background: 'var(--Background-Base-Secondary, #F5F6F7)',
   },
   'body.theme-dark &': {
     '&:not(:last-child)::after': {
-      background: 'var(--Border-Base-Primary, #34373D)',
+      background: darkOutlineBorder,
     },
     '&:hover': {
       background: 'var(--Background-Base-Secondary, #212326)',
@@ -250,9 +265,9 @@ export const footerStyles: CSSObject = {
   display: 'flex',
   justifyContent: 'center',
   padding: '8px 12px',
-  borderTop: '1px solid var(--Border-Base-Primary, #DCE0E3)',
+  borderTop: `1px solid ${outlineBorder}`,
   'body.theme-dark &': {
-    borderTop: '1px solid var(--Border-Base-Primary, #34373D)',
+    borderTop: `1px solid ${darkOutlineBorder}`,
   },
 };
 
