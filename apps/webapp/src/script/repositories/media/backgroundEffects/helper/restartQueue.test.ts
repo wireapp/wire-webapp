@@ -59,21 +59,13 @@ describe('createRestartQueue', () => {
     await first;
     await second;
 
-    expect(calls).toEqual([
-      'first-start',
-      'first-end',
-      'second-start',
-      'second-end',
-    ]);
+    expect(calls).toEqual(['first-start', 'first-end', 'second-start', 'second-end']);
 
     expect(restart).toHaveBeenCalledTimes(2);
   });
 
   it('continues after a rejected restart', async () => {
-    const restart = jest
-      .fn()
-      .mockRejectedValueOnce(new Error('restart failed'))
-      .mockResolvedValueOnce(undefined);
+    const restart = jest.fn().mockRejectedValueOnce(new Error('restart failed')).mockResolvedValueOnce(undefined);
 
     const enqueueRestart = createRestartQueue(restart);
 

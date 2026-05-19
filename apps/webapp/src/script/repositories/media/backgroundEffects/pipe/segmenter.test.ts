@@ -20,9 +20,9 @@
 import {
   getSegmenterModelUpdatedOptions,
   runSegmenter,
-  updateSegmenterOptions
+  updateSegmenterOptions,
 } from 'Repositories/media/backgroundEffects/pipe/segmenter';
-import {ImageSegmenter} from "@mediapipe/tasks-vision";
+import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
 jest.mock('../../../../clock/wallClock', () => ({
   createWallClock: jest.fn(() => ({
@@ -80,7 +80,6 @@ jest.mock('Repositories/media/backgroundEffects/helper/metrics', () => ({
 }));
 
 describe('segmenter tests', () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
 
