@@ -33,6 +33,7 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
+import {hasActiveConversationDriveFilters} from './common/driveFilters/driveFilters';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
@@ -94,6 +95,9 @@ export const ConversationCells = memo(
       userRepository,
     });
 
+    const {filters, filterState, clearAllFilters} = useConversationDriveFilters({cellsRepository});
+    const hasActiveFilters = hasActiveConversationDriveFilters(filterState);
+
     const {
       searchValue,
       handleSearch,
@@ -101,33 +105,32 @@ export const ConversationCells = memo(
     } = useConversationSearchFiles({
       cellsRepository,
       conversationQualifiedId,
-      enabled: isCellsStateReady,
+      enabled: isCellsStateReady && isSearchViewOpen,
       fireAndForgetInvoker,
       userRepository,
+      filters: filterState,
       onClear: refresh,
     });
 
     const trimmedSearchValue = searchValue.trim();
     const isSearchActive = !!trimmedSearchValue;
-    const isSearchViewIdle = isSearchViewOpen && !trimmedSearchValue;
+    const isSearchViewIdle = isSearchViewOpen && !isSearchActive && !hasActiveFilters;
     const wasSearchViewOpen = useRef(isSearchViewOpen);
 
     const handleClearSearch = useCallback((): void => {
       clearSearch();
-      fireAndForgetInvoker.fireAndForget(refresh);
-    }, [clearSearch, fireAndForgetInvoker, refresh]);
+    }, [clearSearch]);
 
     useEffect(() => {
-      if (wasSearchViewOpen.current && !isSearchViewOpen && searchValue) {
-        handleClearSearch();
+      if (wasSearchViewOpen.current && !isSearchViewOpen && (isSearchActive || hasActiveFilters)) {
+        clearAllFilters();
+        clearSearch({preserveFilters: false});
       }
       wasSearchViewOpen.current = isSearchViewOpen;
-    }, [handleClearSearch, isSearchViewOpen, searchValue]);
+    }, [clearAllFilters, clearSearch, hasActiveFilters, isSearchActive, isSearchViewOpen]);
 
     // When search is active, refresh should trigger search reload
     const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
-
-    const {filters} = useConversationDriveFilters();
 
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
