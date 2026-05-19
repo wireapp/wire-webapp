@@ -19,15 +19,19 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
 export const useGetAllTags = ({
   cellsRepository,
   enabled,
+  fireAndForgetInvoker,
   onSuccess,
 }: {
   cellsRepository: CellsRepository;
   enabled: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   onSuccess: (tags: string[]) => void;
 }) => {
   const [tags, setTags] = useState<string[]>([]);
@@ -55,8 +59,8 @@ export const useGetAllTags = ({
       return;
     }
 
-    void fetchTags();
-  }, [enabled, fetchTags]);
+    fireAndForgetInvoker.fireAndForget(fetchTags);
+  }, [enabled, fetchTags, fireAndForgetInvoker]);
 
   return {tags, isLoading, error};
 };

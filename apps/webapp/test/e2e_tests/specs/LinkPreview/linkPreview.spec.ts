@@ -19,7 +19,8 @@
 
 import {FrameLocator} from 'playwright/test';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withLogin, expect, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Link Preview', () => {
   test(
@@ -27,15 +28,14 @@ test.describe('Link Preview', () => {
     {tag: ['@TC-1264', '@regression']},
     async ({createPage, createUser, createTeam}) => {
       const userB = await createUser();
-      const team = await createTeam('Test Team', {
-        users: [userB],
-      });
+      const team = await createTeam('Test Team', {users: [userB]});
       const userA = team.owner;
 
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
@@ -49,16 +49,17 @@ test.describe('Link Preview', () => {
             await expect(frame.getByRole('application', {name: 'Pause', exact: true})).toBeVisible();
           },
         },
-        {
-          url: 'https://www.youtube.com/watch?v=BMFsJiAcELY',
-          iframeSelector: 'iframe.youtube',
-          validate: async (frame: FrameLocator) => {
-            await expect(frame.getByLabel('Time elapsed')).not.toBeVisible();
-            await frame.getByRole('button', {name: 'Play video', exact: true}).click();
-            // Video player might take some time to load, so here we aren't checking for the pause button
-            await expect(frame.getByLabel('Time elapsed')).toBeVisible();
-          },
-        },
+        // YouTube has implemented some anti-bot checks on embedded videos so this part of the test is currently disabled [WPB-25663]
+        // {
+        //   url: 'https://www.youtube.com/watch?v=BMFsJiAcELY',
+        //   iframeSelector: 'iframe.youtube',
+        //   validate: async (frame: FrameLocator) => {
+        //     await expect(frame.getByLabel('Time elapsed')).not.toBeVisible();
+        //     await frame.getByRole('button', {name: 'Play video', exact: true}).click();
+        //     // Video player might take some time to load, so here we aren't checking for the pause button
+        //     await expect(frame.getByLabel('Time elapsed')).toBeVisible();
+        //   },
+        // },
         {
           url: 'https://play.spotify.com/album/7buEcyw6fJF3WPgr06BomH',
           iframeSelector: 'iframe.spotify',

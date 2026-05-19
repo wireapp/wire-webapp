@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {Availability} from '@wireapp/protocol-messaging';
 
 import type {User} from 'Repositories/entity/User';
-import {RichProfileRepository} from 'Repositories/user/RichProfileRepository';
+import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';

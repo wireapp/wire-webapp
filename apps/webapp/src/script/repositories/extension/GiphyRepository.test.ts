@@ -20,7 +20,7 @@
 import {GiphyResult} from '@wireapp/api-client/lib/giphy/giphyResult';
 import {container} from 'tsyringe';
 
-import {APIClient} from 'src/script/service/APIClientSingleton';
+import {APIClient} from 'src/script/service/apiClientSingleton';
 
 import {GiphyRepository} from './GiphyRepository';
 import {GiphyService} from './GiphyService';

@@ -82,7 +82,7 @@ import {
   MultipartMessageAddEvent,
 } from './EventBuilder';
 
-import {ConversationError} from '../../error/ConversationError';
+import {ConversationError} from '../../error/conversationError';
 import {isContentMessage} from '../../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {MentionEntity} from '../../message/MentionEntity';
@@ -90,7 +90,7 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {StatusType} from '../../message/StatusType';
 import {SystemMessageType} from '../../message/SystemMessageType';
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {

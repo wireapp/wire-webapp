@@ -23,13 +23,14 @@ import {ClientType} from '@wireapp/api-client/lib/client/';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
@@ -45,19 +46,21 @@ import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggl
 import {setAppLocale} from '../../localization/Localizer';
 import {App} from '../../main/app';
 import {AppMain} from '../../page/AppMain';
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 import {MainViewModel} from '../../view_model/MainViewModel';
 import {AppLoader} from '../AppLoader';
 
 type AppProps = {
   readonly config: Configuration;
   readonly clientType: ClientType;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly wallClock: WallClock;
 };
 
-export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallClock}: AppProps) => {
+export const AppContainer = (properties: AppProps) => {
+  const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, wallClock} = properties;
   setAppLocale();
   const app = useMemo(() => {
     return new App(container.resolve(Core), container.resolve(APIClient), config);
@@ -123,6 +126,7 @@ export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallCl
               selfUser={selfUser}
               mainView={mainView}
               locked={softLockEnabled}
+              fireAndForgetInvoker={fireAndForgetInvoker}
               wallClock={wallClock}
             />
           );
@@ -138,6 +142,7 @@ export const AppContainer = ({config, clientType, isFeatureToggleEnabled, wallCl
         <DetachedCallingCell
           propertiesRepository={app.repository.properties}
           callingRepository={app.repository.calling}
+          fireAndForgetInvoker={fireAndForgetInvoker}
           toggleScreenshare={mainView.calling.callActions.toggleScreenshare}
         />
       )}

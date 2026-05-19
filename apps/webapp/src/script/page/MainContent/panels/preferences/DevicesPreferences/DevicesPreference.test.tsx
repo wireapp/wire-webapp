@@ -31,7 +31,11 @@ import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {Core} from 'src/script/service/CoreSingleton';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {Core} from 'src/script/service/coreSingleton';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreference';
@@ -56,6 +60,8 @@ function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATIO
 }
 
 describe('DevicesPreferences', () => {
+  const rootContextValue = createRootContextValueForTest({});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
   const selfProteusConversation = createConversation(CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_TYPE.SELF);
   const selfMLSConversation = createConversation(CONVERSATION_PROTOCOL.MLS, CONVERSATION_TYPE.SELF);
   const regularConversation = createConversation();
@@ -84,7 +90,9 @@ describe('DevicesPreferences', () => {
   defaultParams.conversationState.conversations([selfProteusConversation, selfMLSConversation, regularConversation]);
 
   it('displays all devices', async () => {
-    const {getByText, getAllByText} = render(withTheme(<DevicesPreferences {...defaultParams} />));
+    const {getByText, getAllByText} = render(withTheme(<DevicesPreferences {...defaultParams} />), {
+      wrapper: rootProviderWrapper,
+    });
 
     await waitFor(() => getByText('preferencesDevicesCurrent'));
     expect(getByText('preferencesDevicesCurrent')).toBeDefined();

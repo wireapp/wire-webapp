@@ -39,7 +39,7 @@ import {
   WorkerProcessVideoTrackOptions,
 } from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
-import {runSegmenter, segmenterOptions} from './pipe/segmenter';
+import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
 
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
@@ -80,10 +80,7 @@ export class BackgroundEffectsController {
     this.capabilityInfo = detectCapabilities();
   }
 
-  public async start(
-    inputTrack: MediaStreamTrack,
-    options: ProcessVideoTrackOptions,
-  ): Promise<{outputTrack: MediaStreamTrack; stop: () => void}> {
+  public async start(inputTrack: MediaStreamTrack, options: ProcessVideoTrackOptions): Promise<MediaStreamTrack> {
     this.refcount++;
     const resolved = await resolveOptions(options);
     this.options = withoutBitmap(resolved);
@@ -120,10 +117,52 @@ export class BackgroundEffectsController {
     const offscreen = canvas.transferControlToOffscreen();
 
     const outputTrackStop = outputTrack.stop.bind(outputTrack);
+    let onWorkerMessage: ({data}: MessageEvent) => void = () => null;
+
+    if (resolved.useWorker) {
+      if (this.worker === null) {
+        this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
+      }
+      const {options: workerOptions, transferables} = getWorkerOptions(resolved);
+
+      transferables.push(offscreen, readable);
+
+      this.worker.postMessage(
+        {name: 'runSegmenter', canvas: offscreen, readable, options: workerOptions},
+        transferables,
+      );
+      onWorkerMessage = ({data}: MessageEvent) => {
+        const {name} = data as {name: string};
+        if (name === 'stats' && this.onMetrics) {
+          const {stats} = data as {stats: Metrics};
+          this.onMetrics(stats);
+        }
+
+        if (name === 'performanceSample' && this.qualityController !== null) {
+          const {sample, mode} = data as {sample: PerformanceSample; mode: Mode};
+          this.enqueuePerformanceSample(sample, mode);
+        }
+      };
+
+      this.worker.addEventListener('message', onWorkerMessage);
+    } else {
+      const {options: workerOptions} = getWorkerOptions(resolved);
+      await runSegmenter(
+        offscreen,
+        readable,
+        workerOptions,
+        stats => this.onMetrics?.(stats),
+        (sample: PerformanceSample, mode: Mode) => {
+          this.enqueuePerformanceSample(sample, mode);
+        },
+      );
+    }
 
     outputTrack.stop = () => {
       this.logger.info('start: outputTrack stop');
       outputTrackStop();
+
+      this.worker?.removeEventListener('message', onWorkerMessage);
 
       this.refcount--;
       if (!this.refcount) {
@@ -139,56 +178,8 @@ export class BackgroundEffectsController {
     outputTrack.getConstraints = () => trackConstraints;
     inputTrack.addEventListener('ended', () => outputTrack.stop());
 
-    if (resolved.useWorker) {
-      if (this.worker === null) {
-        this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
-      }
-      const {options: workerOptions, transferables} = getWorkerOptions(resolved);
-
-      transferables.push(offscreen, readable);
-
-      this.worker.postMessage(
-        {name: 'runSegmenter', canvas: offscreen, readable, options: workerOptions},
-        transferables,
-      );
-
-      this.worker.addEventListener('message', ({data}) => {
-        const {name} = data as {name: string};
-        if (name === 'stats' && this.onMetrics) {
-          const {stats} = data as {stats: Metrics};
-          this.onMetrics(stats);
-        }
-        if (name === 'performanceSample' && this.qualityController !== null) {
-          const {sample, mode} = data as {sample: PerformanceSample; mode: Mode};
-          this.enqueuePerformanceSample(sample, mode);
-        }
-      });
-    } else {
-      const {options: workerOptions} = getWorkerOptions(resolved);
-      await runSegmenter(
-        offscreen,
-        readable,
-        workerOptions,
-        stats => this.onMetrics?.(stats),
-        (sample: PerformanceSample, mode: Mode) => {
-          this.enqueuePerformanceSample(sample, mode);
-        },
-      );
-    }
-
-    return {
-      outputTrack: outputTrack,
-      stop: async () => this.stop(),
-    };
+    return outputTrack;
   }
-
-  /**
-   * In the old version, ending the effect was done centrally in the calling repository. Now we've tied ending the
-   * effect directly to the video track. This method is therefore no longer necessary. However, I'm leaving this
-   * method in to resolve any potential About errors. Sometimes the effect is started twice, in which case one needs
-   * to be stopped before starting again.
-   */
-  public stop(): void {}
 
   public setMode(mode: EffectMode): void {
     this.logger.info('Background effects mode', mode);
@@ -207,15 +198,11 @@ export class BackgroundEffectsController {
     this.pushOptionsUpdate();
   }
 
-  public setBackgroundSource(source: BackgroundSource): void {
-    if (source.type !== 'image') {
-      return;
-    }
-
+  public async setBackgroundSource(source: BackgroundSource): Promise<void> {
     const {media, url} = source;
 
     if (media instanceof HTMLImageElement) {
-      createImageBitmap(media)
+      await createImageBitmap(media)
         .then(bitmap => this.applyImageBitmap(bitmap, url))
         .catch((error: unknown) => this.logger.warn('Failed to set background image', error));
       return;
@@ -288,7 +275,7 @@ export class BackgroundEffectsController {
     if (this.options.useWorker && this.worker) {
       this.worker.postMessage({name: 'options', options: finalOptions}, transferables);
     } else {
-      Object.assign(segmenterOptions, finalOptions);
+      updateSegmenterOptions(finalOptions);
     }
   }
 
@@ -428,7 +415,6 @@ const getWorkerOptions = (
     smoothing: options.smoothing,
     smoothstepMin: options.smoothstepMin,
     smoothstepMax: options.smoothstepMax,
-    restartEvery: options.restartEvery,
     bgBlur: options.bgBlur,
     bgBlurRadius: options.bgBlurRadius,
     enableFilters: options.enableFilters,

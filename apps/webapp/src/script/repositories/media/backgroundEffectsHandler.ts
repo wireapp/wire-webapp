@@ -143,7 +143,7 @@ export class BackgroundEffectsHandler {
       if (isVirtual) {
         this.controller.setMode('virtual');
         if (backgroundSource) {
-          this.controller.setBackgroundSource(backgroundSource);
+          await this.controller.setBackgroundSource(backgroundSource);
         }
       } else {
         this.controller.setMode('blur');
@@ -153,7 +153,7 @@ export class BackgroundEffectsHandler {
     }
 
     try {
-      const {outputTrack, stop} = await this.controller.start(videoTrack, {
+      const outputTrack = await this.controller.start(videoTrack, {
         ...defaultOpts,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
@@ -165,13 +165,11 @@ export class BackgroundEffectsHandler {
       const processedStream = new MediaStream([outputTrack]);
       this.currentReleasableStream = new ReleasableMediaStream(processedStream, () => {
         this.currentReleasableStream = undefined;
-        stop();
         outputTrack.stop();
       });
 
       return {applied: true, media: this.currentReleasableStream};
     } catch (error) {
-      await this.controller.stop();
       this.logger.warn('BackgroundEffectsController failed with error:', error);
       return {applied: false, media: new ReleasableMediaStream(originalVideoStream)};
     }

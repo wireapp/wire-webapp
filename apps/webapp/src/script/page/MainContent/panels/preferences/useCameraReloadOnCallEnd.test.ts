@@ -22,7 +22,7 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {EventName} from 'Repositories/tracking/EventName';
+import {EventName} from 'Repositories/tracking/eventName';
 
 import {useCameraReloadOnCallEnd} from './useCameraReloadOnCallEnd';
 

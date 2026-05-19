@@ -36,6 +36,7 @@ const maximumRetryDelayInMilliseconds = 10 * 60 * 1000;
 const nonStandardRetryableStatusCode = 420;
 const tooManyRequestsStatusCode = 429;
 const serverErrorStatusCodeRangeStart = 500;
+const serviceUnavailableStatusCode = 503;
 const serverErrorStatusCodeRangeEnd = 599;
 
 export function createIncrementalRetryBackoffPolicy(): IncrementalRetryBackoffPolicy {
@@ -69,7 +70,11 @@ export function createIncrementalRetryBackoffPolicy(): IncrementalRetryBackoffPo
             return true;
           }
 
-          return statusCodeValue >= serverErrorStatusCodeRangeStart && statusCodeValue <= serverErrorStatusCodeRangeEnd;
+          return (
+            statusCodeValue >= serverErrorStatusCodeRangeStart &&
+            statusCodeValue <= serverErrorStatusCodeRangeEnd &&
+            statusCodeValue !== serviceUnavailableStatusCode
+          );
         })
         .unwrapOr(false);
     },

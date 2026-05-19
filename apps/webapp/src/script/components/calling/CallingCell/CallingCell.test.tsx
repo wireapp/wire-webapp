@@ -18,7 +18,7 @@
  */
 
 import {render, waitFor} from '@testing-library/react';
-import {act} from 'react';
+import {act, ReactNode} from 'react';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
@@ -27,8 +27,12 @@ import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {createUuid} from 'Util/uuid';
 
@@ -37,7 +41,7 @@ import {CallingCell, CallingCellProps} from './CallingCell';
 import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
 
 jest.mock('Components/InViewport', () => ({
-  InViewport: ({onVisible, children}: {onVisible: () => void; children: any}) => {
+  InViewport: ({onVisible, children}: {onVisible: () => void; children: ReactNode}) => {
     setTimeout(onVisible);
     return <div>{children}</div>;
   },
@@ -84,10 +88,13 @@ const createProps = async () => {
 };
 
 describe('ConversationListCallingCell', () => {
+  const rootContextValue = createRootContextValueForTest({});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
   it('displays an incoming ringing call', async () => {
     const props = await createProps();
     props.call.state(CALL_STATE.INCOMING);
-    const {container} = render(<CallingCell {...props} />);
+    const {container} = render(<CallingCell {...props} />, {wrapper: rootProviderWrapper});
 
     const acceptButton = container.querySelector('[data-uie-name="do-call-controls-call-accept"]');
     const declineButton = container.querySelector('[data-uie-name="do-call-controls-call-decline"]');
@@ -100,7 +107,7 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.OUTGOING);
 
-    const {getByTestId} = render(<CallingCell {...props} />);
+    const {getByTestId} = render(<CallingCell {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByTestId('call-label-outgoing')).not.toBeNull();
   });
@@ -109,7 +116,7 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.ANSWERED);
 
-    const {container} = render(<CallingCell {...props} />);
+    const {container} = render(<CallingCell {...props} />, {wrapper: rootProviderWrapper});
 
     const connectingLabel = container.querySelector('[data-uie-name="call-label-connecting"]');
     expect(connectingLabel).not.toBeNull();
@@ -119,7 +126,7 @@ describe('ConversationListCallingCell', () => {
     const props = await createProps();
     props.call.state(CALL_STATE.MEDIA_ESTAB);
 
-    const {getByText, rerender, container} = render(<CallingCell {...props} />);
+    const {getByText, rerender, container} = render(<CallingCell {...props} />, {wrapper: rootProviderWrapper});
 
     jest.useFakeTimers();
     const now = Date.now();

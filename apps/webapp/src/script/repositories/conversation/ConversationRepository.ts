@@ -84,15 +84,15 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {EventRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserFilter} from 'Repositories/user/UserFilter';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {UserFilter} from 'Repositories/user/userFilter';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
@@ -162,15 +162,15 @@ import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {Config} from '../../Config';
-import {BASE_ERROR_TYPE, BaseError} from '../../error/BaseError';
-import {ConversationError} from '../../error/ConversationError';
+import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
+import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
 import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../../message/MessageCategory';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
@@ -1602,9 +1602,9 @@ export class ConversationRepository {
               });
               if (response) {
                 await this.onMemberJoin(conversationEntity, response);
+                await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
+                amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
               }
-              await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
-              amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
             } catch (error: unknown) {
               if (!isBackendError(error)) {
                 throw error;
@@ -1678,6 +1678,11 @@ export class ConversationRepository {
       conversationId: conversationEntity.qualifiedId,
       groupId: conversationEntity.groupId,
       qualifiedUsers: [selfUserQualifiedId],
+    });
+
+    await this.ensureConversationExists({
+      conversationId: conversationEntity.qualifiedId,
+      groupId: conversationEntity.groupId,
     });
 
     await this.core.service?.conversation?.addUsersToMLSConversation({

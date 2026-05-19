@@ -47,7 +47,7 @@ import {
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
@@ -145,12 +145,14 @@ const GroupCreationModal = ({
   const rootContext = useContext(RootContext);
 
   useEffect(() => {
-    const showCreateGroup = (_: string, userEntity: User) => {
+    const showCreateGroup = (_: string, userEntity?: User) => {
       setEnableReadReceipts(isTeam);
       setIsShown(true);
       setGroupCreationState(GroupCreationModalState.PREFERENCES);
 
-      setSelectedContacts([...selectedContacts, userEntity]);
+      if (userEntity !== undefined) {
+        setSelectedContacts([...selectedContacts, userEntity]);
+      }
     };
 
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);

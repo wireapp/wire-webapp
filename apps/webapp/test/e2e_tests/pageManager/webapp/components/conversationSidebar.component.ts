@@ -35,6 +35,7 @@ export class ConversationSidebar {
   readonly sidebar: Locator;
   readonly supportButton: Locator;
   readonly favoritesButton: Locator;
+  readonly preferencesNotificationBadge: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -52,6 +53,7 @@ export class ConversationSidebar {
     this.sidebar = page.locator(`.conversations-sidebar-items`);
     this.supportButton = page.getByRole('link', {name: 'Support'});
     this.favoritesButton = page.getByRole('tab', {name: 'Favorites'});
+    this.preferencesNotificationBadge = this.preferencesButton.getByTestId('notification-badge');
   }
 
   async clickPreferencesButton() {

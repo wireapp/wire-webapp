@@ -22,7 +22,7 @@ import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
 
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 interface CellsConfig {
   pydio: {

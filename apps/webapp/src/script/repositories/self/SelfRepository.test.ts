@@ -29,7 +29,7 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {SelfRepository} from './SelfRepository';
 import * as SelfSupportedProtocols from './SelfSupportedProtocols/SelfSupportedProtocols';
 
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 
 const testFactory = new TestFactory();
 

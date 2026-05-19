@@ -19,13 +19,16 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestVersion} from 'cells-sdk-ts';
 import {container} from 'tsyringe';
 
+import {parseQualifiedId} from '@wireapp/core';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
@@ -35,10 +38,26 @@ import {groupVersionsByDate} from '../utils/fileVersionUtils';
 
 const logger = getLogger('FileVersionHistoryModal');
 
+type UseFileVersionsResult = {
+  readonly fileInfo: FileInfo | undefined;
+  readonly fileVersions: Record<string, FileVersion[]>;
+  readonly isLoading: boolean;
+  readonly error: string | undefined;
+  readonly handleDownload: (url: string) => Promise<void>;
+  readonly handleRestore: () => Promise<void>;
+  readonly setToBeRestoredVersionId: (versionId: string | undefined) => void;
+  readonly toBeRestoredVersionId: string | undefined;
+};
+
 /**
  * Hook to fetch and manage file versions for a given node UUID.
  */
-export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onRestore?: () => void) => {
+export const useFileVersions = (
+  nodeUuid?: string,
+  onClose?: () => void,
+  onRestore?: () => void,
+): UseFileVersionsResult => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [fileInfo, setFileInfo] = useState<FileInfo>();
   const [fileVersions, setFileVersions] = useState<Record<string, FileVersion[]>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -47,21 +66,23 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
   const [toBeRestoredVersionId, setToBeRestoredVersionId] = useState<string>();
 
   useEffect(() => {
-    if (nodeUuid === undefined || nodeUuid === '') {
+    if (!is.nonEmptyString(nodeUuid)) {
       setFileInfo(undefined);
       setFileVersions({});
       return;
     }
 
-    const loadFileVersions = async () => {
+    const fileNodeUuid = nodeUuid;
+
+    async function loadFileVersions(): Promise<void> {
       setIsLoading(true);
       setError(undefined);
       const cellsRepository = container.resolve(CellsRepository);
       try {
         // Fetch the node details and versions in parallel
         const [node, versions] = await Promise.all([
-          cellsRepository.getNode({uuid: nodeUuid}),
-          cellsRepository.getNodeVersions({uuid: nodeUuid, flags: ['WithPreSignedURLs']}),
+          cellsRepository.getNode({uuid: fileNodeUuid}),
+          cellsRepository.getNodeVersions({uuid: fileNodeUuid, flags: ['WithPreSignedURLs']}),
         ]);
 
         // Validate node data
@@ -81,7 +102,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
         const ownerNamesByUserIdMap = getOwnerNamesByUserIdMap(nodeVersions);
         const groupedVersions = groupVersionsByDate(nodeVersions, version => {
           const ownerQualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
-          if (!ownerQualifiedId) {
+          if (is.undefined(ownerQualifiedId)) {
             return undefined;
           }
 
@@ -89,15 +110,15 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
         });
         setFileVersions(groupedVersions);
       } catch (err: unknown) {
-        const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToLoadVersions');
+        const errorMessage = is.error(err) ? err.message : t('fileHistoryModal.failedToLoadVersions');
         setError(errorMessage);
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
-    void loadFileVersions();
-  }, [nodeUuid]);
+    fireAndForgetInvoker.fireAndForget(loadFileVersions);
+  }, [fireAndForgetInvoker, nodeUuid]);
 
   const reset = useCallback(() => {
     setFileInfo(undefined);
@@ -126,23 +147,21 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
   );
 
   const handleRestore = useCallback(async () => {
-    if (
-      toBeRestoredVersionId === undefined ||
-      toBeRestoredVersionId === '' ||
-      nodeUuid === undefined ||
-      nodeUuid === ''
-    ) {
+    if (!is.nonEmptyString(toBeRestoredVersionId) || !is.nonEmptyString(nodeUuid)) {
       return;
     }
+
+    const fileNodeUuid = nodeUuid;
+
     setIsLoading(true);
     try {
       const cellsRepository = container.resolve(CellsRepository);
       await cellsRepository.promoteNodeDraft({
-        uuid: nodeUuid,
+        uuid: fileNodeUuid,
         versionId: toBeRestoredVersionId,
       });
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : t('fileHistoryModal.failedToRestore');
+      const errorMessage = is.error(err) ? err.message : t('fileHistoryModal.failedToRestore');
       setError(errorMessage);
     } finally {
       reset();
@@ -162,7 +181,7 @@ export const useFileVersions = (nodeUuid?: string, onClose?: () => void, onResto
 };
 
 const parseOwnerQualifiedId = (ownerUuid?: string): QualifiedId | undefined => {
-  if (ownerUuid === undefined || ownerUuid === '') {
+  if (!is.nonEmptyString(ownerUuid)) {
     return undefined;
   }
 
@@ -178,7 +197,11 @@ const getOwnerNamesByUserIdMap = (versions: Partial<RestVersion>[]): Map<string,
   const ownerIds = new Set(
     versions.flatMap(version => {
       const qualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
-      return qualifiedId ? [qualifiedId.id] : [];
+      if (is.undefined(qualifiedId)) {
+        return [];
+      }
+
+      return [qualifiedId.id];
     }),
   );
 

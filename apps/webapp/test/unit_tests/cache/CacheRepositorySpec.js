@@ -20,7 +20,7 @@
 import {amplify} from 'amplify';
 
 import {CacheRepository} from 'Repositories/cache/cacheRepository';
-import {StorageKey} from 'Repositories/storage/StorageKey';
+import {StorageKey} from 'Repositories/storage/storageKey';
 import {createUuid} from 'Util/uuid';
 
 describe('CacheRepository', () => {

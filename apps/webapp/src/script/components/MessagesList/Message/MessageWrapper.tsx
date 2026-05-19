@@ -34,6 +34,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {TeamState} from 'Repositories/team/TeamState';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -85,6 +86,7 @@ export const MessageWrapper = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const findMessage = async (conversation: Conversation, messageId: string) => {
     const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const event =
@@ -193,7 +195,9 @@ export const MessageWrapper = ({
     if (!message.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversation, message, reaction, selfId);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await messageRepository.toggleReaction(conversation, message, reaction, selfId);
+    });
   };
   if (message.isContent()) {
     return (

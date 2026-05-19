@@ -3,7 +3,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import ko from 'knockout';
 import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationModal';
 import {act, getByRole} from '@testing-library/react';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {User} from 'Repositories/entity/User';
 import {RootContext, RootContextValue} from '../../../page/RootProvider';
 import {amplify} from 'amplify';
@@ -13,6 +13,8 @@ import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
 import {t} from 'Util/localizerUtil';
 import {TypeUtil} from '@wireapp/commons';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
@@ -92,10 +94,14 @@ describe('GroupCreationModal', () => {
           },
         },
       } as RootContextValue;
+      const rootContextValue = createRootContextValueForTest({
+        mainViewModel: mockRootContext.mainViewModel,
+        wallClock: createDeterministicWallClock(),
+      });
 
       // Act
       const {getByTestId} = mountComponent(
-        <RootContext.Provider value={mockRootContext}>
+        <RootContext.Provider value={rootContextValue}>
           <GroupCreationModal userState={mockUserState} teamState={mockTeamState as TeamState} />
         </RootContext.Provider>,
         mockStoreFactory()({

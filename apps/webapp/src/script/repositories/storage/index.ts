@@ -18,7 +18,7 @@
  */
 
 export * from './record/';
-export * from './StorageKey';
-export * from './StorageRepository';
-export * from './StorageSchemata';
-export * from './StorageService';
+export * from './storageKey';
+export * from './storageRepository';
+export * from './storageSchemata';
+export * from './storageService';

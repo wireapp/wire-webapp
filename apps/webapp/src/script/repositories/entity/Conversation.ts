@@ -47,7 +47,7 @@ import {isProteusTeam1to1Conversation, isSelfConversation} from 'Repositories/co
 import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
+import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -61,7 +61,7 @@ import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
 
 import {Config} from '../../Config';
-import {ConversationError} from '../../error/ConversationError';
+import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
 import {ContentState, useAppState} from '../../page/useAppState';

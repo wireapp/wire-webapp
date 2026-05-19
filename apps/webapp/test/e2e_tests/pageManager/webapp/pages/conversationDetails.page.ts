@@ -43,6 +43,8 @@ export class ConversationDetailsPage {
   readonly editConversationNameButton: Locator;
   readonly textFieldForConversationName: Locator;
 
+  readonly protocol: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.conversationDetails = page.locator('#conversation-details');
@@ -63,6 +65,8 @@ export class ConversationDetailsPage {
     this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
     this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
     this.textFieldForConversationName = this.page.locator('textarea[data-uie-name="enter-name"]');
+
+    this.protocol = this.conversationDetails.getByLabel('Protocol');
   }
 
   async waitForSidebar() {

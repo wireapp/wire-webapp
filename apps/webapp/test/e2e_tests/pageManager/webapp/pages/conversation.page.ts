@@ -62,6 +62,7 @@ export class ConversationPage {
   readonly mentionSuggestions: Locator;
   readonly invitePeopleButton: Locator;
   readonly guestsIndicator: Locator;
+  readonly replyQuoteBoxAboveMessageInputField: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -110,6 +111,7 @@ export class ConversationPage {
     this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
     this.invitePeopleButton = page.getByRole('button', {name: 'Invite people'});
     this.guestsIndicator = page.getByTestId('status-indication-badge');
+    this.replyQuoteBoxAboveMessageInputField = page.getByTestId('input-bar-reply-box');
   }
 
   getImageLocator(user: User): Locator {
@@ -360,5 +362,10 @@ export class ConversationPage {
    */
   getPing(): Locator {
     return this.messageItems.getByTestId('element-message-ping');
+  }
+
+  async getMessageReadReceipt(message: Locator) {
+    await message.hover();
+    return message.getByTestId('status-message-read-receipts');
   }
 }

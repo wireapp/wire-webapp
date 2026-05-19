@@ -17,6 +17,8 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
@@ -24,7 +26,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {t} from 'Util/localizerUtil';
 
 import {loadMoreWrapperStyles, wrapperStyles} from './CellsGlobalView.styles';
@@ -33,8 +35,11 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
+import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDriveFilters';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
+
+import {useApplicationContext} from '../../page/RootProvider';
 
 interface CellsGlobalViewProps {
   cellsRepository?: CellsRepository;
@@ -42,18 +47,23 @@ interface CellsGlobalViewProps {
   conversationRepository?: ConversationRepository;
 }
 
-export const CellsGlobalView = ({
-  cellsRepository = container.resolve(CellsRepository),
-  userRepository = container.resolve(UserRepository),
-  conversationRepository = container.resolve(ConversationRepository),
-}: CellsGlobalViewProps) => {
+export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement => {
+  const {
+    cellsRepository = container.resolve(CellsRepository),
+    userRepository = container.resolve(UserRepository),
+    conversationRepository = container.resolve(ConversationRepository),
+  } = properties;
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
 
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
     userRepository,
     conversationRepository,
+    fireAndForgetInvoker,
   });
+
+  const {filters} = useGlobalDriveFilters();
 
   useOnPresignedUrlExpired({refreshCallback: handleReload});
 
@@ -86,7 +96,7 @@ export const CellsGlobalView = ({
         onClearSearch={handleClearSearch}
         onRefresh={handleReload}
         searchStatus={nodesStatus}
-        cellsRepository={cellsRepository}
+        filters={filters}
       />
       {emptySearchResults && (
         <CellsStateInfo

@@ -19,9 +19,9 @@
 
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, LOGIN_TIMEOUT, withLogin, withConnectedUser} from '../../test.fixtures';
+import {test, expect, LOGIN_TIMEOUT, withLogin} from '../../test.fixtures';
 
 test.describe('account settings', () => {
   let owner: User;
@@ -181,9 +181,11 @@ test.describe('account settings', () => {
 
   test('Verify I can retrieve calling logs', {tag: ['@TC-1725', '@regression']}, async ({createPage}) => {
     const [memberAPage, memberBPage] = await Promise.all([
-      createPage(withLogin(memberA), withConnectedUser(memberB)),
+      createPage(withLogin(memberA)),
       createPage(withLogin(memberB)),
     ]);
+    await connectWithUser(memberAPage, memberB);
+
     const memberAPages = PageManager.from(memberAPage).webapp.pages;
     const memberBPages = PageManager.from(memberBPage).webapp.pages;
 

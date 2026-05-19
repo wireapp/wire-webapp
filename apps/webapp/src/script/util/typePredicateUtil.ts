@@ -22,7 +22,7 @@ import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
+import {ClientRecord} from 'Repositories/storage/record/clientRecord';
 
 import {isObject} from '../guards/common';
 

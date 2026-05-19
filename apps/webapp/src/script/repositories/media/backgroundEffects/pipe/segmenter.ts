@@ -27,12 +27,20 @@ import {
   pushMetricsSample,
 } from 'Repositories/media/backgroundEffects/helper/metrics';
 import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
+import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
 
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
-export let segmenterOptions = {} as WorkerProcessVideoTrackOptions;
+import {createWallClock} from '../../../../clock/wallClock';
+
+let segmenterOptions: WorkerProcessVideoTrackOptions = {} as WorkerProcessVideoTrackOptions;
+
+export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
+  // Keep the references stable, this allows us to do option changes on segmenter runtime.
+  Object.assign(segmenterOptions, opts);
+}
 
 async function createSegmenter(canvas: OffscreenCanvas) {
   const logger = getSafeLogger('segmenter:createSegmenter');
@@ -101,7 +109,8 @@ export async function runSegmenter(
   function onContextRestored() {
     logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
     if (!webGLRenderer) {
-      setTimeout(() => {
+      const timer = createWallClock();
+      timer.setTimeout(() => {
         logger.log('[virtual-background] restart segmenter onContextRestored');
         webGLRenderer = new WebGLRenderer(canvas);
         restartSegmenter();
@@ -119,18 +128,21 @@ export async function runSegmenter(
   let segmenter = await createSegmenter(canvas);
   let currentModelPath = segmenterOptions.modelPath;
 
-  function restartSegmenter() {
+  const restartSegmenter = createRestartQueue(restartSegmenterSequentially);
+
+  async function restartSegmenterSequentially() {
     const targetModelPath = segmenterOptions.modelPath;
-    createSegmenter(canvas)
-      .then(newSegmenter => {
-        const oldSegmenter = segmenter;
-        segmenter = newSegmenter;
-        currentModelPath = targetModelPath;
-        oldSegmenter.close();
-      })
-      .catch((error: unknown) => {
-        logger.error('Error restarting segmenter:', error);
-      });
+
+    try {
+      const newSegmenter = await createSegmenter(canvas);
+
+      const oldSegmenter = segmenter;
+      segmenter = newSegmenter;
+      currentModelPath = targetModelPath;
+      oldSegmenter.close();
+    } catch (error: unknown) {
+      logger.error('Error restarting segmenter:', error);
+    }
   }
 
   async function updateSegmenterModel() {
@@ -292,12 +304,6 @@ export async function runSegmenter(
           gpuMsSum = 0;
           filterMsSum = 0;
           frames = 0;
-        }
-
-        // Restart segmenter to avoid memory leaks.
-        if (segmenterOptions.restartEvery && totalFrames % segmenterOptions.restartEvery === 0) {
-          logger.log('[virtual-background] restart segmenter to avoid memory leaks');
-          restartSegmenter();
         }
       },
 

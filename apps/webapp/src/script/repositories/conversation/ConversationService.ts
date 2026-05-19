@@ -51,17 +51,17 @@ import {container} from 'tsyringe';
 import type {Conversation as ConversationEntity} from 'Repositories/entity/Conversation';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventService} from 'Repositories/event/EventService';
-import {search as fullTextSearch} from 'Repositories/search/FullTextSearch';
+import {search as fullTextSearch} from 'Repositories/search/fullTextSearch';
 import {StorageService} from 'Repositories/storage';
-import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger} from 'Util/logger';
 
 import {MLSCapableConversation} from './ConversationSelectors';
 
 import {MessageCategory} from '../../message/MessageCategory';
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 
 const logger = getLogger('ConversationService');
 

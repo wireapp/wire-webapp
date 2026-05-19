@@ -19,28 +19,25 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
-import {SearchIcon} from '@wireapp/react-ui-kit';
-
+import {CellsSearchInput} from 'Components/CellsSearchInput/CellsSearchInput';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
 import {
   actionsStyles,
   breadcrumbsRowStyles,
-  clearButtonStyles,
   contentStyles,
-  searchIconStyles,
-  searchInputStyles,
-  searchNativeInputStyles,
+  searchWrapperStyles,
   wrapperStyles,
 } from './CellsHeader.styles';
 import {CellsMoreMenu} from './CellsMoreMenu/CellsMoreMenu';
 import {CellsNewMenu} from './CellsNewMenu/CellsNewMenu';
 import {CellsRefresh} from './CellsRefresh/CellsRefresh';
 import {CellsRootHomeIcon} from './CellsRootHomeIcon';
-import {CellsSearchClearIcon} from './CellsSearchClearIcon';
 
 import {CellsBreadcrumbs} from '../common/CellsBreadcrumbs/CellsBreadcrumbs';
+import {CellsFiltersBar} from '../common/CellsFiltersBar/CellsFiltersBar';
+import type {FilterConfig} from '../common/CellsFiltersBar/filterConfig';
 import {getBreadcrumbsFromPath} from '../common/getBreadcrumbsFromPath/getBreadcrumbsFromPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {openBreadcrumb} from '../common/openBreadcrumb/openBreadcrumb';
@@ -55,6 +52,7 @@ interface CellsHeaderProps {
   searchValue: string;
   onSearchChange: (value: string) => void;
   onSearchClear: () => void;
+  filters: FilterConfig[];
 }
 
 export const CellsHeader = ({
@@ -67,6 +65,7 @@ export const CellsHeader = ({
   searchValue,
   onSearchChange,
   onSearchClear,
+  filters,
 }: CellsHeaderProps) => {
   const breadcrumbs = getBreadcrumbsFromPath({
     baseCrumb: t('cells.breadcrumb.files', {conversationName}),
@@ -77,33 +76,21 @@ export const CellsHeader = ({
   return (
     <div css={wrapperStyles}>
       <div css={contentStyles}>
-        <div css={searchInputStyles}>
-          <SearchIcon css={searchIconStyles} />
-
-          <input
-            css={searchNativeInputStyles}
-            type="text"
+        <div css={searchWrapperStyles}>
+          <CellsSearchInput
             value={searchValue}
-            aria-label={t('cells.search.placeholder')}
             placeholder={t('cells.search.placeholder')}
+            onChange={onSearchChange}
+            onClear={onSearchClear}
             onFocus={onOpenSearchView}
-            onChange={event => onSearchChange(event.currentTarget.value)}
-            data-uie-name="full-search-header-input"
+            clearAriaLabel={t('fullsearchCancelCloseBtn')}
+            uieName="full-search-header-input"
           />
-
-          {searchValue && (
-            <button
-              type="button"
-              css={clearButtonStyles}
-              data-uie-name="full-search-dismiss"
-              aria-label={t('fullsearchCancelCloseBtn')}
-              onClick={onSearchClear}
-            >
-              <CellsSearchClearIcon />
-            </button>
-          )}
         </div>
-        {!isSearchViewOpen && (
+
+        {isSearchViewOpen ? (
+          <CellsFiltersBar filters={filters} />
+        ) : (
           <div css={actionsStyles}>
             <CellsNewMenu
               cellsRepository={cellsRepository}
@@ -115,6 +102,7 @@ export const CellsHeader = ({
           </div>
         )}
       </div>
+
       {!isSearchViewOpen && (
         <div css={breadcrumbsRowStyles}>
           {isRootLevel ? (

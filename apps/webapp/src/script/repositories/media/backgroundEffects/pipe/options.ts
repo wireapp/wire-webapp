@@ -47,7 +47,6 @@ export type ProcessVideoTrackOptions = {
   smoothing: number;
   smoothstepMin: number;
   smoothstepMax: number;
-  restartEvery: number;
   bgBlur: number;
   bgBlurRadius: number;
 
@@ -61,7 +60,7 @@ export type ProcessVideoTrackOptions = {
 
 // Make options type serializable for worker
 export type WorkerBackgroundSource = {
-  type: 'image' | 'video' | 'stream';
+  type: 'image';
   media?: ImageBitmap;
   url: string;
 };

@@ -20,7 +20,7 @@
 import {currentLanguage} from './auth/localeConfig';
 import {Config} from './Config';
 
-const URL = Config.getConfig().URL;
+const {URL, TERMS_OF_USE_URL_DE, PRIVACY_POLICY_URL_DE} = Config.getConfig();
 
 const isProductionWebsite = URL.WEBSITE_BASE && URL.WEBSITE_BASE === 'https://wire.com';
 
@@ -43,9 +43,21 @@ const getAccountPagesUrl = (path: string = ''): string | undefined => {
   return URL.ACCOUNT_BASE ? `${URL.ACCOUNT_BASE}${path}` : undefined;
 };
 
-const getPrivacyPolicyUrl = (): string | undefined => addLocaleToUrl(URL.PRIVACY_POLICY || undefined);
-const getTermsOfUsePersonalUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_PERSONAL || undefined);
-const getTermsOfUseTeamUrl = (): string | undefined => addLocaleToUrl(URL.TERMS_OF_USE_TEAMS || undefined);
+const getPrivacyPolicyUrl = () => {
+  const language = currentLanguage();
+  if (language === 'de-DE') {
+    return PRIVACY_POLICY_URL_DE;
+  }
+  return URL.PRIVACY_POLICY;
+};
+
+const getTermsOfUseUrl = () => {
+  const language = currentLanguage();
+  if (language === 'de-DE') {
+    return TERMS_OF_USE_URL_DE;
+  }
+  return URL.TERMS_OF_USE_TEAMS;
+};
 
 /**
  * Retrieves the URL for managing services with optional UTM parameters.
@@ -86,7 +98,6 @@ export const externalUrl = {
   createTeam: getCreateTeamUrl(),
   passwordReset: getAccountPagesUrl(URL.URL_PATH?.PASSWORD_RESET),
   privacyPolicy: getPrivacyPolicyUrl(),
-  termsOfUsePersonnal: getTermsOfUsePersonalUrl(),
-  termsOfUseTeam: getTermsOfUseTeamUrl(),
+  termsOfUse: getTermsOfUseUrl(),
   website: getWebsiteUrl(),
 };
