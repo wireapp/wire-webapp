@@ -66,8 +66,8 @@ import {ServiceMiddleware} from 'Repositories/event/preprocessor/ServiceMiddlewa
 import {FederationEventProcessor} from 'Repositories/event/processor/FederationEventProcessor';
 import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {GiphyService} from 'Repositories/extension/GiphyService';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {IntegrationService} from 'Repositories/integration/IntegrationService';
+import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
+import {IntegrationService} from 'Repositories/integration/integrationService';
 import {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/effects/backgroundEffectsController';
 import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';

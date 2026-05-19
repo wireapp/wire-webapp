@@ -33,7 +33,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SearchRepository} from 'Repositories/search/searchRepository';

@@ -31,7 +31,7 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import type {GiphyRepository} from 'Repositories/extension/GiphyRepository';
-import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import type {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import type {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';

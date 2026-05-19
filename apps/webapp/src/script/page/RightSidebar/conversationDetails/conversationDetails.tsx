@@ -37,8 +37,8 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {getNotificationText} from 'Repositories/conversation/NotificationSetting';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {TeamRepository} from 'Repositories/team/teamRepository';
 import {TeamState} from 'Repositories/team/teamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

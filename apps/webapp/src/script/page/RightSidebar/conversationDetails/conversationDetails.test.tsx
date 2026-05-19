@@ -27,7 +27,7 @@ import {ConversationRoleRepository} from 'Repositories/conversation/Conversation
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
+import {IntegrationRepository} from 'Repositories/integration/integrationRepository';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamEntity} from 'Repositories/team/teamEntity';

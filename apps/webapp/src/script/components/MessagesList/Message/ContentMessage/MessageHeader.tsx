@@ -26,7 +26,7 @@ import {UserName} from 'Components/UserName';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 

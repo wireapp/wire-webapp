@@ -23,7 +23,7 @@ import {UserList} from 'Components/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {t} from 'Util/localizerUtil';
 
 interface ConversationDetailsParticipantsProps {

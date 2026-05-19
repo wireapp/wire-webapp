@@ -35,8 +35,8 @@ import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting'
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {User} from 'Repositories/entity/User';
-import type {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
-import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import type {IntegrationRepository} from 'Repositories/integration/integrationRepository';
+import type {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';

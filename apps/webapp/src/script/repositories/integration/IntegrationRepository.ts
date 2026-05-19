@@ -32,10 +32,10 @@ import {getLogger, Logger} from 'Util/logger';
 import {compareTransliteration, sortByPriority} from 'Util/stringUtil';
 import {toError} from 'Util/toError';
 
-import {IntegrationMapper} from './IntegrationMapper';
-import type {IntegrationService} from './IntegrationService';
-import {ProviderEntity} from './ProviderEntity';
-import {ServiceEntity} from './ServiceEntity';
+import {IntegrationMapper} from './integrationMapper';
+import type {IntegrationService} from './integrationService';
+import {ProviderEntity} from './providerEntity';
+import {ServiceEntity} from './serviceEntity';
 
 export class IntegrationRepository {
   private readonly logger: Logger;

@@ -29,7 +29,7 @@ import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessa
 import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 
 export interface MessagesListParams {
   assetRepository: AssetRepository;

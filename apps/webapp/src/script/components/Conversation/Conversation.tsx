@@ -43,7 +43,7 @@ import {DecryptErrorMessage} from 'Repositories/entity/message/DecryptErrorMessa
 import {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {TeamState} from 'Repositories/team/teamState';
 import {Config} from 'src/script/Config';
 import {sharedDriveSearchAndFiltersFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';

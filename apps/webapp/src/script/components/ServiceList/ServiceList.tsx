@@ -20,7 +20,7 @@
 import cx from 'classnames';
 
 import {ServiceListItem} from 'Components/ServiceList/components/ServiceListItem';
-import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import type {ServiceEntity} from 'Repositories/integration/serviceEntity';
 import {t} from 'Util/localizerUtil';
 
 enum MODE {

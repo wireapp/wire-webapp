@@ -20,7 +20,7 @@
 import {render} from '@testing-library/react';
 
 import {AVATAR_SIZE} from 'Components/Avatar';
-import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {ServiceEntity} from 'Repositories/integration/serviceEntity';
 
 import {ServiceAvatar} from './ServiceAvatar';
 
