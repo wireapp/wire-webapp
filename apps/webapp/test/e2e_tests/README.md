@@ -30,7 +30,7 @@ Some of the E2E tests require a connection to a running [Testservice](https://gi
 If you're not in the Wire VPN you can run it locally as a docker container:
 
 1. Start it by running `docker run -d --platform linux/amd64 -p 8080:8080 -p 8081:8081 quay.io/wire/testservice`
-2. Update the env var `TEST_SERVICE_URL` in `test/e2e_tests/.env` to point to it: `TEST_SERVICE_URL=http://localhost:8080``
+2. Update the env var `TEST_SERVICE_URL` in `test/e2e_tests/.env` to point to it: `TEST_SERVICE_URL=http://localhost:8080`
 
 ## Tests
 
