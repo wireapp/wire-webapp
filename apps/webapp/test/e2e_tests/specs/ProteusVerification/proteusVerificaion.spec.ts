@@ -130,4 +130,29 @@ test.describe('Proteus verification', () => {
       await expect(components.conversationSidebar().verifiedBadge).toBeVisible();
     },
   );
+
+  test(
+    'I should not be able to remove device with wrong password',
+    {tag: ['@TC-718', '@regression']},
+    async ({createPage}) => {
+      await createPage(withLogin(userA));
+
+      const {pages, modals, components} = PageManager.from(
+        await createPage(withLogin(userA, {confirmNewHistory: true})),
+      ).webapp;
+
+      await components.conversationSidebar().clickPreferencesButton();
+      await pages.settings().devicesButton.click();
+      await pages.devices().activeDevices.getByRole('button', {name: 'Remove Device'}).click();
+
+      await modals.password().passwordInput.fill('Wrong123456!');
+      await modals.password().clickAction();
+      await expect(modals.password().modal).toContainText('Please verify your details and try again');
+
+      await modals.password().passwordInput.clear();
+      await modals.password().passwordInput.fill(userA.password);
+      await modals.password().clickAction();
+      await expect(pages.devices().activeDevices).toBeHidden();
+    },
+  );
 });
