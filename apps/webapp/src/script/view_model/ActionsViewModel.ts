@@ -17,7 +17,9 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
+import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {UserType, QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
@@ -25,6 +27,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useLeaveGroupAdminModalStore} from 'Components/Modals/LeaveGroupAdminModal/useLeaveGroupAdminModalStore';
 import {PrimaryModal, removeCurrentModal, usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {ClientEntity} from 'Repositories/client';
@@ -291,6 +294,49 @@ export class ActionsViewModel {
   readonly leaveConversation = (conversation?: Conversation): Promise<void> => {
     if (conversation === undefined) {
       return Promise.reject();
+    }
+
+    const selfUser = this.userState.self();
+    const roles = conversation.roles();
+    const selfRole = roles[selfUser.id];
+    const isSelfAdmin = selfRole === DefaultConversationRoleName.WIRE_ADMIN;
+    const otherAdminCount = Object.entries(roles).filter(
+      ([id, role]) => id !== selfUser.id && role === DefaultConversationRoleName.WIRE_ADMIN,
+    ).length;
+    const isLastAdmin = isSelfAdmin && otherAdminCount === 0;
+
+    if (isLastAdmin) {
+      const eligibleUsers = conversation
+        .participating_user_ets()
+        .filter(
+          user =>
+            !user.isFederated &&
+            !user.isService &&
+            user.type !== UserType.APP &&
+            is.nonEmptyString(user.name()) &&
+            is.nonEmptyString(user.username()) &&
+            !user.isTemporaryGuest(),
+        );
+
+      useLeaveGroupAdminModalStore.getState().show({
+        conversation,
+        eligibleUsers,
+        onLeave: async (clearContent, newAdmin) => {
+          if (newAdmin) {
+            await this.conversationRepository.conversationRoleRepository.setMemberConversationRole(
+              conversation,
+              newAdmin.qualifiedId,
+              DefaultConversationRoleName.WIRE_ADMIN,
+            );
+
+            roles[newAdmin.id] = DefaultConversationRoleName.WIRE_ADMIN;
+            conversation.roles(roles);
+          }
+          await this.leaveOrClearConversation(conversation, {leave: true, clear: clearContent});
+        },
+        onDelete: () => this.deleteConversation(conversation),
+      });
+      return Promise.resolve();
     }
 
     return new Promise(resolve => {

@@ -28,6 +28,7 @@ import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {DetachedCallingCell} from 'Components/calling/DetachedCallingCell';
+import {LeaveGroupAdminModal} from 'Components/Modals/LeaveGroupAdminModal/LeaveGroupAdminModal';
 import {PrimaryModalComponent} from 'Components/Modals/PrimaryModal/PrimaryModal';
 import {QualityFeedbackModal} from 'Components/Modals/QualityFeedbackModal';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
@@ -135,6 +136,7 @@ export const AppContainer = (properties: AppProps) => {
 
       <StyledApp themeId={themeId} css={{backgroundColor: 'unset', height: '100%'}}>
         <PrimaryModalComponent />
+        <LeaveGroupAdminModal />
         <QualityFeedbackModal callingRepository={app.repository.calling} />
       </StyledApp>
 
