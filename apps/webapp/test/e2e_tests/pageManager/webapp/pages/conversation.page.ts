@@ -35,6 +35,7 @@ export class ConversationPage {
   readonly sendMessageButton: Locator;
   readonly searchButton: Locator;
   readonly conversationTitle: Locator;
+  readonly verifiedBadge: Locator;
   readonly watermark: Locator;
   readonly timerMessageButton: Locator;
   readonly timerOffButton: Locator;
@@ -81,6 +82,7 @@ export class ConversationPage {
     this.sendMessageButton = page.getByTestId('do-send-message');
     this.searchButton = page.getByRole('button', {name: 'Search'});
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
+    this.verifiedBadge = page.getByTestId('do-participants').getByTestId('proteus-verified');
     this.openGroupInformationViaName = page.getByTestId('status-conversation-title-bar-label');
     this.timerMessageButton = page.getByTestId('do-set-ephemeral-timer');
     this.timerOffButton = page.getByRole('button', {name: 'Off'});

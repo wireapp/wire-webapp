@@ -185,4 +185,62 @@ test.describe('Proteus verification', () => {
     await userAPages.conversation().sendMessage('Message');
     await expect(userBPages.conversation().getMessage({sender: userA})).toBeVisible();
   });
+
+  test('You can verify and unverify your devices', {tag: ['@TC-723', '@regression']}, async ({createPage}) => {
+    // Setup: Log in User A on two devices and connect with User B
+    const [userAPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userA2Device = await createPage(withLogin(userA, {confirmNewHistory: true}));
+    const {pages: userAPages, components: userAComponents} = PageManager.from(userAPage).webapp;
+
+    await test.step('Action: User A verifies both of their active devices', async () => {
+      for (const page of [userAPage, userA2Device]) {
+        const {pages, components, modals} = PageManager.from(page).webapp;
+
+        await components.conversationSidebar().clickPreferencesButton();
+        if (page === userAPage) {
+          await modals.accountNewDevices().clickAction();
+        }
+        await pages.settings().devicesButton.click();
+        await pages.devices().activeDevices.getByTestId('go-device-details').click();
+        await pages.deviceDetails().toggleDeviceVerification();
+      }
+    });
+
+    await test.step('Action: User A verifies User B`s device', async () => {
+      await userAComponents.conversationSidebar().clickAllConversationsButton();
+      await userAPages.conversationList().getConversation(userB.fullName).open();
+      await userAPages.conversation().clickConversationInfoButton();
+      await userAPages.conversationDetails().devicesButton.click();
+
+      const firstDevice = userAPages.participantDevices().activeDevices.first();
+      await firstDevice.click();
+      await userAPages.participantDeviceDetails().toggleDeviceVerification();
+      await expect(userAPages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
+    });
+
+    await test.step('Verify: Successful verification status and system messages', async () => {
+      await expect(
+        userAPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
+      ).toBeVisible();
+      await expect(userAPages.conversation().verifiedBadge).toBeVisible();
+    });
+
+    await test.step('Action: Unverify User A primary device', async () => {
+      await userAComponents.conversationSidebar().clickPreferencesButton();
+      await userAPages.settings().devicesButton.click();
+      await userAPages.devices().activeDevices.getByTestId('go-device-details').click();
+      await userAPages.deviceDetails().toggleDeviceVerification();
+    });
+
+    await test.step('Verify: Device unverified status and system message updates', async () => {
+      await userAComponents.conversationSidebar().clickAllConversationsButton();
+      await userAPages.conversationList().getConversation(userB.fullName).open();
+      await expect(
+        userAPages.conversation().systemMessages.filter({hasText: 'You unverified one of your device'}),
+      ).toBeVisible();
+      await expect(userAPages.conversation().verifiedBadge).toBeHidden();
+    });
+  });
 });
