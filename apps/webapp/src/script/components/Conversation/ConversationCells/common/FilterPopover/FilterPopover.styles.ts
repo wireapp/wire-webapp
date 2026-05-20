@@ -228,6 +228,9 @@ export const checkboxWrapperStyles: CSSObject = {
     minWidth: '18px',
     height: '18px',
   },
+  '& .wireinput:not(:checked):not(:disabled) + label::before': {
+    borderColor: 'var(--accent-color)',
+  },
   '& .wireinput + label > svg': {
     width: '12px',
     height: '11px',
@@ -277,12 +280,12 @@ export const clearAllButtonStyles: CSSObject = {
   border: 'none',
   background: 'transparent',
   cursor: 'pointer',
-  fontSize: '13px',
-  color: 'var(--accent-color, #0667C8)',
+  fontSize: 'var(--font-size-small)',
+  fontWeight: 'var(--font-weight-regular)',
+  lineHeight: 'var(--line-height-small-plus)',
+  color: 'var(--main-color)',
+  textDecoration: 'underline',
   padding: '2px 4px',
-  '&:hover': {
-    textDecoration: 'underline',
-  },
 };
 
 export const emptyStateStyles: CSSObject = {
