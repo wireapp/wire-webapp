@@ -19,6 +19,8 @@
 
 import {ChangeEvent, CSSProperties, ReactNode, useEffect, useId, useRef} from 'react';
 
+import {match} from 'ts-pattern';
+
 import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
@@ -61,19 +63,21 @@ const isEffectSelected = (selected: BackgroundEffectSelection, candidate: Backgr
   return true;
 };
 
-const getBackgroundEffectLabel = (effect: BackgroundEffectSelection, backgrounds: BuiltinBackground[]): string => {
-  switch (effect.type) {
-    case 'none':
-      return t('videoCallBackgroundNoEffect');
-    case 'blur':
-      return effect.level === 'low' ? t('videoCallBackgroundBlurLow') : t('videoCallBackgroundBlurHigh');
-    case 'virtual': {
-      const background = backgrounds.find(({id}) => id === effect.backgroundId);
+export const getBackgroundEffectLabel = (
+  effect: BackgroundEffectSelection,
+  backgrounds: BuiltinBackground[],
+): string => {
+  return match(effect)
+    .with({type: 'none'}, () => t('videoCallBackgroundNoEffect'))
+    .with({type: 'blur', level: 'low'}, () => t('videoCallBackgroundBlurLow'))
+    .with({type: 'blur', level: 'high'}, () => t('videoCallBackgroundBlurHigh'))
+    .with({type: 'virtual'}, ({backgroundId}: {backgroundId: string}) => {
+      const background = backgrounds.find(({id}) => id === backgroundId);
+
       return background ? t(background.labelKey) : t('videoCallBackgroundVirtual');
-    }
-    default:
-      return t('videoCallBackgroundEffectsLabel');
-  }
+    })
+    .with({type: 'custom'}, () => t('videoCallBackgroundCustom'))
+    .exhaustive();
 };
 
 interface BackgroundTileProps {
@@ -180,7 +184,7 @@ export const VideoBackgroundSettings = ({
           <h3 id={blurSectionId} css={sectionLabelStyles}>
             {t('videoCallBackgroundBlurSectionLabel')}
           </h3>
-          <div css={tileGridStyles} role="group" aria-labelledby={blurSectionId}>
+          <div css={tileGridStyles} role="radiogroup" aria-labelledby={blurSectionId}>
             <BackgroundTile
               effect={lowBlurEffect}
               selectedEffect={selectedEffect}
@@ -226,7 +230,7 @@ export const VideoBackgroundSettings = ({
           <h3 id={virtualSectionId} css={sectionLabelStyles}>
             {t('videoCallBackgroundVirtualSectionLabel')}
           </h3>
-          <div css={tileGridStyles} role="group" aria-labelledby={virtualSectionId}>
+          <div css={tileGridStyles} role="radiogroup" aria-labelledby={virtualSectionId}>
             {backgrounds.map(background => {
               const virtualEffect: BackgroundEffectSelection = {type: 'virtual', backgroundId: background.id};
 

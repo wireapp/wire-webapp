@@ -2078,6 +2078,7 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundSettings': `Background Settings`;
     'videoCallBackgroundUpload': `Upload background`;
     'videoCallBackgroundVirtual': `Virtual Background`;
+    'videoCallBackgroundCustom': `Custom Background`;
     'videoCallBackgroundVirtualSectionLabel': `Virtual Backgrounds`;
     'videoCallBackgroundWire1': `Wire 1`;
     'videoCallBackgroundsLabel': `Backgrounds`;

@@ -22,7 +22,7 @@ import {fireEvent, render} from '@testing-library/react';
 import type {BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
 import {withTheme} from '../../../../auth/util/test/TestUtil';
 
-import {VideoBackgroundSettings} from './VideoBackgroundSettings';
+import {getBackgroundEffectLabel, VideoBackgroundSettings} from './VideoBackgroundSettings';
 
 jest.mock('Util/localizerUtil', () => ({
   t: (key: string) => key,
@@ -33,11 +33,13 @@ describe('VideoBackgroundSettings', () => {
     {
       id: 'office',
       imageUrl: 'office.jpg',
+      labelKey: 'videoCallBackgroundOffice1',
       previewGradient: 'linear-gradient(red, blue)',
     },
     {
       id: 'beach',
       imageUrl: 'beach.jpg',
+      labelKey: 'videoCallBackgroundOffice2',
       previewGradient: 'linear-gradient(yellow, green)',
     },
   ] as BuiltinBackground[];
@@ -121,15 +123,13 @@ describe('VideoBackgroundSettings', () => {
       selectedEffect: {type: 'blur', level: 'high'},
     });
 
-    expect(getByText('videoCallBackgroundBlurHigh').closest('button')).toHaveAttribute('aria-pressed', 'true');
+    expect(getByText('videoCallBackgroundBlurHigh').closest('button')).toHaveAttribute('aria-checked', 'true');
   });
 
   it('selects a virtual background', () => {
-    const {getAllByRole} = renderComponent();
+    const {getByRole} = renderComponent();
 
-    const firstVirtualBackgroundButton = getAllByRole('button')[4];
-
-    fireEvent.click(firstVirtualBackgroundButton);
+    fireEvent.click(getByRole('radio', {name: /office1/i}));
 
     expect(defaultProps.onSelectEffect).toHaveBeenCalledWith({
       type: 'virtual',
@@ -138,13 +138,13 @@ describe('VideoBackgroundSettings', () => {
   });
 
   it('marks selected virtual background tile as pressed', () => {
-    const {getAllByRole} = renderComponent({
+    const {getByRole} = renderComponent({
       selectedEffect: {type: 'virtual', backgroundId: 'beach'},
     });
 
-    const secondVirtualBackgroundButton = getAllByRole('button')[5];
+    const secondVirtualBackgroundButton = getByRole('radio', {name: /office2/i});
 
-    expect(secondVirtualBackgroundButton).toHaveAttribute('aria-pressed', 'true');
+    expect(secondVirtualBackgroundButton).toHaveAttribute('aria-checked', 'true');
   });
 
   it('calls onSelectEffect with none when no effect tile is clicked', () => {
@@ -160,7 +160,7 @@ describe('VideoBackgroundSettings', () => {
   it('marks no effect tile as pressed when none is selected', () => {
     const {getByText} = renderComponent();
 
-    expect(getByText('videoCallBackgroundNoEffect').closest('button')).toHaveAttribute('aria-pressed', 'true');
+    expect(getByText('videoCallBackgroundNoEffect').closest('button')).toHaveAttribute('aria-checked', 'true');
   });
 
   it('marks selected low blur tile as pressed', () => {
@@ -168,7 +168,7 @@ describe('VideoBackgroundSettings', () => {
       selectedEffect: {type: 'blur', level: 'low'},
     });
 
-    expect(getByText('videoCallBackgroundBlurLow').closest('button')).toHaveAttribute('aria-pressed', 'true');
+    expect(getByText('videoCallBackgroundBlurLow').closest('button')).toHaveAttribute('aria-checked', 'true');
   });
 
   it('does not render virtual background tiles when backgrounds list is empty', () => {
@@ -176,8 +176,8 @@ describe('VideoBackgroundSettings', () => {
       backgrounds: [],
     });
 
-    // close button + no effect + low blur + high blur
-    expect(getAllByRole('button')).toHaveLength(4);
+    // close button
+    expect(getAllByRole('button')).toHaveLength(1);
   });
 
   it('renders virtual background preview image and fallback gradient', () => {
@@ -195,16 +195,52 @@ describe('VideoBackgroundSettings', () => {
       selectedEffect: {type: 'blur', level: 'high'},
     });
 
-    expect(getByText('videoCallBackgroundBlurLow').closest('button')).toHaveAttribute('aria-pressed', 'false');
+    expect(getByText('videoCallBackgroundBlurLow').closest('button')).toHaveAttribute('aria-checked', 'false');
   });
 
   it('does not mark another virtual background as pressed when one virtual background is selected', () => {
-    const {getAllByRole} = renderComponent({
+    const {getByRole} = renderComponent({
       selectedEffect: {type: 'virtual', backgroundId: 'beach'},
     });
 
-    const firstVirtualBackgroundButton = getAllByRole('button')[4];
+    const firstVirtualBackgroundButton = getByRole('radio', {name: /office1/i});
 
-    expect(firstVirtualBackgroundButton).toHaveAttribute('aria-pressed', 'false');
+    expect(firstVirtualBackgroundButton).toHaveAttribute('aria-checked', 'false');
+  });
+
+  it('autofocuses the close button when video background settings opens', () => {
+    const {getByRole} = renderComponent();
+
+    expect(getByRole('button', {name: 'modalCloseButton'})).toHaveFocus();
+  });
+
+  describe('getBackgroundEffectLabel', () => {
+    it('returns label for no effect', () => {
+      expect(getBackgroundEffectLabel({type: 'none'}, backgrounds)).toBe('videoCallBackgroundNoEffect');
+    });
+
+    it('returns label for low blur', () => {
+      expect(getBackgroundEffectLabel({type: 'blur', level: 'low'}, backgrounds)).toBe('videoCallBackgroundBlurLow');
+    });
+
+    it('returns label for high blur', () => {
+      expect(getBackgroundEffectLabel({type: 'blur', level: 'high'}, backgrounds)).toBe('videoCallBackgroundBlurHigh');
+    });
+
+    it('returns label for matching virtual background', () => {
+      expect(getBackgroundEffectLabel({type: 'virtual', backgroundId: 'office'}, backgrounds)).toBe(
+        'videoCallBackgroundOffice1',
+      );
+    });
+
+    it('returns fallback label for unknown virtual background', () => {
+      expect(getBackgroundEffectLabel({type: 'virtual', backgroundId: 'missing'}, backgrounds)).toBe(
+        'videoCallBackgroundVirtual',
+      );
+    });
+
+    it('returns label for custom background', () => {
+      expect(getBackgroundEffectLabel({type: 'custom'}, backgrounds)).toBe('videoCallBackgroundCustom');
+    });
   });
 });
