@@ -23,21 +23,25 @@ import {Virtualizer} from '@tanstack/react-virtual';
 
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 
-interface Props {
+type UseLoadMessagesProps = {
   conversation: Conversation;
   conversationRepository: ConversationRepository;
   itemsLength: number;
   shouldPullMessages: boolean;
   isConversationLoaded: boolean;
   parentElement: HTMLElement;
-}
+};
 
 export const useLoadMessages = (
   virtualizer: Virtualizer<HTMLDivElement, Element>,
-  {conversation, conversationRepository, itemsLength, shouldPullMessages, isConversationLoaded, parentElement}: Props,
-) => {
+  properties: UseLoadMessagesProps,
+): void => {
+  const {conversation, conversationRepository, itemsLength, shouldPullMessages, isConversationLoaded, parentElement} =
+    properties;
+  const {fireAndForgetInvoker} = useApplicationContext();
   const fillContainerByMessagesRef = useRef(false);
   const [isLoadingMessages, setIsLoadingMessages] = useState(false);
 
@@ -103,12 +107,12 @@ export const useLoadMessages = (
       const [firstItem] = [...virtualItems];
 
       if (firstItem.index === 0) {
-        void loadPrecedingMessages();
+        fireAndForgetInvoker.fireAndForget(loadPrecedingMessages);
       }
     }, 100);
 
     return () => clearTimeout(timeout);
-  }, [isConversationLoaded, isLoadingMessages, loadPrecedingMessages, virtualItems]);
+  }, [fireAndForgetInvoker, isConversationLoaded, isLoadingMessages, loadPrecedingMessages, virtualItems]);
 
   // Load new messages when scrolling to the down
   useEffect(() => {
@@ -127,12 +131,20 @@ export const useLoadMessages = (
       const [lastItem] = [...virtualItems].reverse();
 
       if (lastItem.index >= itemsLength - 1) {
-        void loadFollowingMessages();
+        fireAndForgetInvoker.fireAndForget(loadFollowingMessages);
       }
     }, 100);
 
     return () => clearTimeout(timeout);
-  }, [isConversationLoaded, isLoadingMessages, itemsLength, loadFollowingMessages, virtualizer, virtualItems]);
+  }, [
+    fireAndForgetInvoker,
+    isConversationLoaded,
+    isLoadingMessages,
+    itemsLength,
+    loadFollowingMessages,
+    virtualizer,
+    virtualItems,
+  ]);
 
   // This function ensures that after user scroll to top or bottom content,
   // the preceding / following messages will be loaded.
@@ -148,12 +160,12 @@ export const useLoadMessages = (
       const containerHeight = virtualizer.scrollElement?.clientHeight ?? 0;
 
       if (totalSize < containerHeight) {
-        void loadPrecedingMessages();
+        fireAndForgetInvoker.fireAndForget(loadPrecedingMessages);
       }
 
       fillContainerByMessagesRef.current = true;
     });
 
     return () => cancelAnimationFrame(frame);
-  }, [itemsLength, loadPrecedingMessages, virtualizer]);
+  }, [fireAndForgetInvoker, itemsLength, loadPrecedingMessages, virtualizer]);
 };
