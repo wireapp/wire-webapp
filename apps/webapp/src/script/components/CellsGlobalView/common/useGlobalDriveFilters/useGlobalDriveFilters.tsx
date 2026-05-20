@@ -117,6 +117,7 @@ export const useGlobalDriveFilters = ({
         selectedIds: selectedConversationIds,
         onSelectionChange: setSelectedConversationIds,
         disabled: isFilterTypeDisabled('conversation', activeFilterType),
+        singleSelect: true,
       },
       {
         type: 'popover',

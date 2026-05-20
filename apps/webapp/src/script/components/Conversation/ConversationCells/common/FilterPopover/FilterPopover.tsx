@@ -69,6 +69,7 @@ interface FilterPopoverProps {
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
   disabled?: boolean;
+  singleSelect?: boolean;
 }
 
 export const FilterPopover = ({
@@ -77,6 +78,7 @@ export const FilterPopover = ({
   selectedIds,
   onSelectionChange,
   disabled = false,
+  singleSelect = false,
 }: FilterPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
@@ -166,17 +168,19 @@ export const FilterPopover = ({
             )}
           </div>
 
-          <ul css={itemListStyles} role="listbox" aria-multiselectable aria-label={triggerLabel}>
+          <ul css={itemListStyles} role="listbox" aria-multiselectable={!singleSelect} aria-label={triggerLabel}>
             {filteredItems.length === 0 ? (
               <li css={emptyStateStyles}>{t('cells.filtersModal.tags.noTagsFound')}</li>
             ) : (
               filteredItems.map(item => {
                 const isSelected = selectedIds.includes(item.id);
+                const isItemDisabled = singleSelect && selectedIds.length > 0 && !isSelected;
                 return (
                   <li key={item.id} css={itemRowHoverStyles} role="option" aria-selected={isSelected}>
                     <Checkbox
                       wrapperCSS={checkboxWrapperStyles}
                       checked={isSelected}
+                      disabled={isItemDisabled}
                       onChange={() => handleItemSelect(item.id)}
                       labelBeforeCheckbox
                       data-uie-name="filter-popover-item"
