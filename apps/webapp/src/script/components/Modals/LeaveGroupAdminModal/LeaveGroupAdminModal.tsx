@@ -95,10 +95,15 @@ export const LeaveGroupAdminModal = () => {
       </div>
 
       <div style={modalBodyStyles}>
-        <p style={messageStyles} data-uie-name="leave-group-admin-modal-message">
-          {hasEligibleUsers ? t('leaveGroupAdminModalMessageWithEligible') : t('leaveGroupAdminModalMessageNoEligible')}
-        </p>
-
+        <p
+          style={messageStyles}
+          data-uie-name="leave-group-admin-modal-message"
+          dangerouslySetInnerHTML={{
+            __html: hasEligibleUsers
+              ? t('leaveGroupAdminModalMessageWithEligible')
+              : t('leaveGroupAdminModalMessageNoEligible'),
+          }}
+        />
         {hasEligibleUsers && (
           <AdminSearchInput
             eligibleUsers={eligibleUsers}
