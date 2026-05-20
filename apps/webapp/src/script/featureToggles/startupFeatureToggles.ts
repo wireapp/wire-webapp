@@ -30,7 +30,7 @@ const allowedStartupFeatureToggleNameSet = new Set<StartupFeatureToggleName>(all
 
 export type StartupFeatureToggles = {
   readonly isFeatureToggleEnabled: (featureToggleName: StartupFeatureToggleName) => boolean;
-  readonly getEnabledFeatureToggleNames: () => readonly StartupFeatureToggleName[];
+  readonly enabledFeatureToggleNames: readonly StartupFeatureToggleName[];
 };
 
 function trimFeatureToggleName(featureToggleName: string): string {
@@ -68,11 +68,11 @@ export function createStartupFeatureTogglesFromLocationSearch(locationSearch: st
   );
 
   return {
-    isFeatureToggleEnabled: function isFeatureToggleEnabled(featureToggleName: StartupFeatureToggleName): boolean {
+    isFeatureToggleEnabled(featureToggleName) {
       return enabledFeatureToggleNameSet.has(featureToggleName);
     },
 
-    getEnabledFeatureToggleNames: function getEnabledFeatureToggleNames(): readonly StartupFeatureToggleName[] {
+    get enabledFeatureToggleNames() {
       return [...enabledFeatureToggleNameSet];
     },
   };

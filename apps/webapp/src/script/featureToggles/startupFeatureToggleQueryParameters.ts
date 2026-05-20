@@ -43,7 +43,7 @@ function readEnabledFeatureToggleNameSetFromLocationSearch(
   locationSearch: string,
 ): ReadonlySet<StartupFeatureToggleName> {
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(locationSearch);
-  return new Set(startupFeatureToggles.getEnabledFeatureToggleNames());
+  return new Set(startupFeatureToggles.enabledFeatureToggleNames);
 }
 
 function toUpdatedEnabledFeatureToggleNameSet(
