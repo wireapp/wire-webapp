@@ -151,6 +151,9 @@ Feature flags are required for trunk-based development:
 
 - Incomplete or risky work must be hidden behind feature flags before it is merged to `main`.
 - Release branches validate the intended feature flag state for that release.
+- Feature flags are not automatically removed before merging to `main`.
+- A feature may be merged to `main` behind a disabled flag, enabled on Edge for dogfooding, and later enabled for Beta and Production when it is part of the release scope.
+- Feature flag removal is a separate cleanup step after the feature is fully rolled out and no rollback-by-flag is needed anymore.
 - Edge may expose trunk changes earlier than Beta and Production by design.
 
 ## Consequences
