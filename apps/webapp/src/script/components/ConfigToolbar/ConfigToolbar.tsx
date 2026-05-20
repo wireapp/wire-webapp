@@ -40,6 +40,7 @@ export function createLocationUrl(pathname: string, search: string, hash: string
 
 export function ConfigToolbar() {
   const {fireAndForgetInvoker, applicationNavigation, isFeatureToggleEnabled} = useApplicationContext();
+  const alphabeticallySortedStartupFeatureToggleNames = [...startupFeatureToggleNames].sort();
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
@@ -331,7 +332,7 @@ export function ConfigToolbar() {
       <fieldset style={{margin: 0, border: 0, padding: 0}}>
         <legend style={{fontWeight: 'bold', marginBottom: '8px'}}>Startup Feature Toggles</legend>
         <ul style={{listStyle: 'none', margin: 0, padding: 0}}>
-          {startupFeatureToggleNames.map(featureToggleName => {
+          {alphabeticallySortedStartupFeatureToggleNames.map(featureToggleName => {
             const featureToggleCheckboxIdentifier = `startup-feature-toggle-checkbox-${featureToggleName}`;
 
             return (
