@@ -17,18 +17,17 @@
  *
  */
 
-import {Page} from '@playwright/test';
+import {Locator, Page} from '@playwright/test';
 
-export const DeviceDetailsPage = (page: Page) => {
-  const verificationToggleLabel = page.getByText('Verified');
-  const verifiedBadge = page.getByTestId('device-model').getByTestId('proteus-verified');
+export const ParticipantDevicesPage = (page: Page) => {
+  const activeDevices = page.getByTestId('device-card');
 
-  const toggleDeviceVerification = async () => {
-    await verificationToggleLabel.click();
+  const getVerifiedBadge = (device: Locator) => {
+    return device.getByTestId('proteus-verified');
   };
 
   return {
-    verifiedBadge,
-    toggleDeviceVerification,
+    activeDevices,
+    getVerifiedBadge,
   };
 };

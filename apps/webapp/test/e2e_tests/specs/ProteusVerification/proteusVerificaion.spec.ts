@@ -20,6 +20,7 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Proteus verification', () => {
   let proteusTeam: Team;
@@ -155,4 +156,33 @@ test.describe('Proteus verification', () => {
       await expect(pages.devices().activeDevices).toBeHidden();
     },
   );
+
+  test('Verify other user`s devices in 1on1 conversation', {tag: ['@TC-719', '@regression']}, async ({createPage}) => {
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await userAPages.conversationList().getConversation(userB.fullName).open();
+    await userBPages.conversationList().getConversation(userA.fullName).open();
+
+    for (const pages of [userAPages, userBPages]) {
+      await pages.conversation().clickConversationInfoButton();
+      await pages.conversationDetails().devicesButton.click();
+
+      const firstDevice = pages.participantDevices().activeDevices.first();
+      await firstDevice.click();
+
+      await pages.participantDeviceDetails().toggleDeviceVerification();
+      await expect(pages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
+    }
+
+    await expect(
+      userBPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
+    ).toBeVisible();
+
+    await userAPages.conversation().sendMessage('Message');
+    await expect(userBPages.conversation().getMessage({sender: userA})).toBeVisible();
+  });
 });

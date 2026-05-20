@@ -75,6 +75,8 @@ import {WithoutTitle} from './webapp/modals/withoutTitle.modal';
 import {AboutPage} from './webapp/pages/about.page';
 import {AccountNewDevicesModal} from './webapp/modals/accountNewDevices.modal';
 import {DeviceDetailsPage} from './webapp/pages/deviceDetails.page';
+import {ParticipantDeviceDetailsPage} from './webapp/pages/participantDeviceDetail.page';
+import {ParticipantDevicesPage} from './webapp/pages/participantDevices.page';
 import {NewDeviceModal} from './webapp/modals/newDevice.modal';
 import {ReadReceiptModal} from './webapp/modals/readReceipt.modal';
 
@@ -173,6 +175,10 @@ export class PageManager {
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
       devices: () => this.getOrCreate('webapp.pages.devices', () => new DevicesPage(this.page)),
       deviceDetails: () => this.getOrCreate('webapp.pages.deviceDetails', () => DeviceDetailsPage(this.page)),
+      participantDevices: () =>
+        this.getOrCreate('webapp.pages.participantDevices', () => ParticipantDevicesPage(this.page)),
+      participantDeviceDetails: () =>
+        this.getOrCreate('webapp.pages.participantDeviceDetails', () => ParticipantDeviceDetailsPage(this.page)),
       options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
       audioVideoSettings: () =>
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),

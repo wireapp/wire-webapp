@@ -19,16 +19,16 @@
 
 import {Page} from '@playwright/test';
 
-export const DeviceDetailsPage = (page: Page) => {
+export const ParticipantDeviceDetailsPage = (page: Page) => {
   const verificationToggleLabel = page.getByText('Verified');
-  const verifiedBadge = page.getByTestId('device-model').getByTestId('proteus-verified');
+  const returnButton = page.getByRole('button', {name: 'Go back to device details'});
 
   const toggleDeviceVerification = async () => {
     await verificationToggleLabel.click();
+    await returnButton.click();
   };
 
   return {
-    verifiedBadge,
     toggleDeviceVerification,
   };
 };
