@@ -224,6 +224,10 @@ export const checkboxWrapperStyles: CSSObject = {
   margin: 0,
   left: '0',
   justifyContent: 'space-between',
+  minWidth: 0,
+  '& > label': {
+    minWidth: 0,
+  },
   '& .wireinput + label::before': {
     minWidth: '18px',
     height: '18px',
@@ -256,14 +260,17 @@ export const labelGroupStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
+  marginRight: '8px',
 };
 
 export const checkboxLabelStyles: CSSObject = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+  color: 'var(--main-color)',
   fontSize: 'var(--font-size-medium)',
-  lineHeight: '18px',
+  fontWeight: 'var(--font-weight-medium)',
+  lineHeight: 'var(--line-height-md)',
 };
 
 export const footerStyles: CSSObject = {
