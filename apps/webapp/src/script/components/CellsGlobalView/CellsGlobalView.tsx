@@ -17,13 +17,14 @@
  *
  */
 
-import {ReactElement} from 'react';
+import {ReactElement, useMemo} from 'react';
 
 import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
+import type {GlobalDriveFiltersState} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -39,6 +40,7 @@ import {useGlobalDriveFilters} from './common/useGlobalDriveFilters/useGlobalDri
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useSearchCellsNodes} from './useSearchCellsNodes/useSearchCellsNodes';
 
+import {sharedDriveSearchAndFiltersFeatureToggleName} from '../../featureToggles/startupFeatureToggleNames';
 import {useApplicationContext} from '../../page/RootProvider';
 
 interface CellsGlobalViewProps {
@@ -53,17 +55,31 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
     userRepository = container.resolve(UserRepository),
     conversationRepository = container.resolve(ConversationRepository),
   } = properties;
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled} = useApplicationContext();
   const {nodes, status: nodesStatus, pagination} = useCellsStore();
+  const legacyFilters = useCellsStore(state => state.filters);
+  const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
 
   const {filters, filterState} = useGlobalDriveFilters({cellsRepository});
+  const legacyFilterState = useMemo<GlobalDriveFiltersState>(
+    () => ({
+      selectedTagIds: legacyFilters.tags,
+      selectedFileTypeIds: [],
+      selectedCreatorIds: [],
+      selectedConversationIds: [],
+      isSharedViaLink: false,
+      path: legacyFilters.path,
+    }),
+    [legacyFilters.path, legacyFilters.tags],
+  );
+  const searchFilterState = isSharedDriveSearchAndFiltersEnabled ? filterState : legacyFilterState;
 
   const {searchValue, handleSearch, handleClearSearch, handleReload, increasePageSize} = useSearchCellsNodes({
     cellsRepository,
     userRepository,
     conversationRepository,
     fireAndForgetInvoker,
-    filters: filterState,
+    filters: searchFilterState,
   });
 
   useOnPresignedUrlExpired({refreshCallback: handleReload});
@@ -98,6 +114,8 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
         onRefresh={handleReload}
         searchStatus={nodesStatus}
         filters={filters}
+        cellsRepository={cellsRepository}
+        isSharedDriveSearchAndFiltersEnabled={isSharedDriveSearchAndFiltersEnabled}
       />
       {emptySearchResults && (
         <CellsStateInfo

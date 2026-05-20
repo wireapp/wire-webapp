@@ -30,7 +30,7 @@ export const wrapperStyles: CSSObject = {
 
 export const titleRowStyles: CSSObject = {
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'flex-start',
   justifyContent: 'space-between',
   width: '100%',
   marginBottom: '8px',
