@@ -25,4 +25,3 @@ export const wrapperStyles: CSSObject = {
   flexDirection: 'column',
   height: '100%',
 };
-
