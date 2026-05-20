@@ -2064,6 +2064,7 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundBlurHigh': `High`;
     'videoCallBackgroundBlurLow': `Low`;
     'videoCallBackgroundBlurSectionLabel': `Blur`;
+    'videoCallBackgroundCustom': `Custom Background`;
     'videoCallBackgroundEffectsLabel': `Background Settings`;
     'videoCallBackgroundEnableHighQualityBlur': `Enable high quality blur`;
     'videoCallBackgroundNoEffect': `No background effect`;
