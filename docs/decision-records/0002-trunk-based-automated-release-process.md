@@ -27,9 +27,9 @@ flowchart LR
   edgeEnvironment[Edge]
   releaseBranch[release/YYYY-MM-DD.N]
   betaEnvironment[Beta]
-  betaTag[YYYY-MM-DD-beta.X]
+  betaTag[YYYY-MM-DD.N-beta.M]
   productionEnvironment[Production]
-  productionTag[YYYY-MM-DD-production.N]
+  productionTag[YYYY-MM-DD.N-production]
   maintenanceBranch[maintenance/maintenance-line-key]
   maintenanceTag[maintenance-line-key-maintenance.X]
 
@@ -67,14 +67,14 @@ The branch model is:
 - Release branches are cut from `main` as `release/YYYY-MM-DD.N`.
 - On-premises maintenance branches are created only when a customer-managed release line needs maintenance after the original production release.
 
-The release identifier uses the release branch name: `YYYY-MM-DD.N`. The date part is anchored to the release branch identifier, not to the later deployment date. For example, updates to `release/2026-05-05.1` always create tags in the `2026-05-05` family, even if a hotfix is added on a later day.
+The release identifier uses the release branch name: `YYYY-MM-DD.N`. The full identifier is anchored to the release branch, not to the later deployment date. For example, updates to `release/2026-05-05.1` always create tags in the `2026-05-05.1` family, even if a hotfix is added on a later day.
 
 The cloud release process is:
 
 - Every merge to `main` deploys continuously to Edge without an approval gate.
 - Creating or updating `release/YYYY-MM-DD.N` automatically starts the release workflow.
 - The release workflow deploys the release branch to Beta.
-- After a successful beta deployment, the workflow creates a beta tag such as `YYYY-MM-DD-beta.1`, `YYYY-MM-DD-beta.2`, and so on.
+- After a successful beta deployment, the workflow creates a beta tag such as `YYYY-MM-DD.N-beta.1`, `YYYY-MM-DD.N-beta.2`, and so on.
 - Beta tag numbers are derived from existing beta tags for the release identifier. If concurrent workflows try to create the same tag for different commits, the later workflow must fail and be rerun after fetching the latest tags.
 - The release workflow runs end-to-end tests against Beta and reports the result to Testiny.
 - The production deployment job waits for GitHub Environment approval on the production environment.
@@ -82,7 +82,7 @@ The cloud release process is:
 - Quality assurance owns the go/no-go quality gate.
 - The engineering release captain owns production rollout, observability, and incident response.
 - The production workflow promotes the beta-tested artifact and does not rebuild from source.
-- After successful production deployment, the workflow creates the production tag `YYYY-MM-DD-production.N`.
+- After successful production deployment, the workflow creates the production tag `YYYY-MM-DD.N-production`.
 - If the current release branch commit already has the matching production tag, the release workflow must not redeploy that commit.
 - Production tags are immutable release history and are never moved or deleted.
 - Release workflow failures and stalled approvals are monitored by the engineering release captain and announced in Wire.
@@ -93,12 +93,12 @@ flowchart TD
   deployToEdge[Deploy to Edge]
   createReleaseBranch[Create or update release/YYYY-MM-DD.N]
   deployToBeta[Deploy release branch to Beta]
-  createBetaTag[Create YYYY-MM-DD-beta.X]
+  createBetaTag[Create YYYY-MM-DD.N-beta.M]
   runEndToEndTests[Run end-to-end tests against Beta]
   reportToTestiny[Report result to Testiny]
   productionApproval[GitHub Environment approval<br/>Production]
   deployToProduction[Deploy promoted beta artifact to Production]
-  createProductionTag[Create YYYY-MM-DD-production.N]
+  createProductionTag[Create YYYY-MM-DD.N-production]
   rollbackWorkflow[Rollback Production workflow_dispatch<br/>optional incident action]
   deployKnownGoodArtifact[Deploy previous known-good production artifact]
 
