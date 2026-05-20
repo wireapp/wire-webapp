@@ -79,18 +79,21 @@ export const triggerButtonStyles: CSSObject = {
 };
 
 export const badgeStyles: CSSObject = {
-  display: 'inline-flex',
+  display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minWidth: '18px',
-  height: '18px',
-  padding: '0 5px',
+  gap: '8px',
+  padding: '2px 8px',
   borderRadius: '6px',
   background: 'var(--accent-color-500)',
   color: '#FFF',
-  fontSize: 'var(--font-size-small)',
-  fontWeight: 'var(--font-weight-semibold)',
-  lineHeight: 1,
+  fontSize: 'var(--font-size-xsmall)',
+  fontWeight: 590,
+  lineHeight: '13px',
+  letterSpacing: '0.06px',
+  'body.theme-dark &': {
+    color: '#000',
+  },
 };
 
 export const chevronStyles: CSSObject = {
