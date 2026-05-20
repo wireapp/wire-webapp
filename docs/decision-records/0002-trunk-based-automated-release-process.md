@@ -85,6 +85,13 @@ The cloud release process is:
 - After successful production deployment, the workflow creates the production tag `YYYY-MM-DD.N-production`.
 - If the current release branch commit already has the matching production tag, the release workflow must not redeploy that commit.
 - Production tags are immutable release history and are never moved or deleted.
+Release workflows must be serialized:
+
+- Only one Beta deployment may run at a time for a given release branch.
+- A newer Beta run for the same release branch may cancel an older in-progress Beta run before deployment starts.
+- Only one Production deployment may run at a time for the repository.
+- Production deployments must not be cancelled automatically.
+
 - Release workflow failures and stalled approvals are monitored by the engineering release captain and announced in Wire.
 
 ```mermaid
