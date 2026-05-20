@@ -19,6 +19,8 @@
 
 import {ReactNode} from 'react';
 
+import {noop} from 'noop-esm';
+
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {WallClock, createWallClock} from '../../clock/wallClock';
@@ -99,6 +101,18 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     isFeatureToggleEnabled,
     mainViewModel,
     wallClock,
+    applicationNavigation: {
+      get currentPathname(): string {
+        return '/';
+      },
+      get currentSearch(): string {
+        return '';
+      },
+      get currentHash(): string {
+        return '';
+      },
+      navigateTo: noop,
+    },
   };
 }
 

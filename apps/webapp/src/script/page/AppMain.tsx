@@ -321,6 +321,20 @@ export const AppMain = (properties: AppMainProps) => {
           wallClock,
           doesApplicationNeedForceReload,
           isFeatureToggleEnabled,
+          applicationNavigation: {
+            get currentPathname(): string {
+              return window.location.pathname;
+            },
+            get currentSearch(): string {
+              return window.location.search;
+            },
+            get currentHash(): string {
+              return window.location.hash;
+            },
+            navigateTo(url) {
+              window.location.assign(url);
+            },
+          },
         }}
       >
         <ErrorBoundary FallbackComponent={ErrorFallback}>
