@@ -258,6 +258,7 @@ const config: Linter.Config[] = [
       'apps/webapp/src/script/components/MessagesList/Message/ContentMessage/asset/MultipartAssets/MultipartAssets.tsx',
       'apps/webapp/src/script/components/MessagesList/Message/ContentMessage/asset/MultipartAssets/useGetMultipartAsset/useGetMultipartAsset.ts',
       'apps/webapp/src/script/components/MessagesList/Message/MessageWrapper.tsx',
+      'apps/webapp/src/script/components/MessagesList/VirtualizedMessagesList/VirtualizedMessagesList.tsx',
       'apps/webapp/src/script/components/MessagesList/VirtualizedMessagesList/useLoadMessages.ts',
       'apps/webapp/src/script/components/MessagesList/utils/useLoadConversation.ts',
       'apps/webapp/src/script/components/Modals/FileHistoryModal/FileVersionItem.tsx',
