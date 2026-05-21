@@ -19,6 +19,8 @@
 
 import React from 'react';
 
+import is from '@sindresorhus/is';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
@@ -56,8 +58,10 @@ export const LeaveGroupAdminModal = () => {
   const handleLeave = async () => {
     setIsLoading(true);
     try {
-      await onLeave(clearContent, selectedUser);
-      hide();
+      if (is.nonEmptyObject(selectedUser)) {
+        await onLeave(clearContent, selectedUser);
+        hide();
+      }
     } finally {
       setIsLoading(false);
     }
@@ -95,15 +99,19 @@ export const LeaveGroupAdminModal = () => {
       </div>
 
       <div style={modalBodyStyles}>
-        <p
-          style={messageStyles}
-          data-uie-name="leave-group-admin-modal-message"
-          dangerouslySetInnerHTML={{
-            __html: hasEligibleUsers
-              ? t('leaveGroupAdminModalMessageWithEligible')
-              : t('leaveGroupAdminModalMessageNoEligible'),
-          }}
-        />
+        <p style={messageStyles} data-uie-name="leave-group-admin-modal-message">
+          {hasEligibleUsers ? (
+            <>
+              {t('leaveGroupAdminModalMessageWithEligibleFirstPart')} <br />
+              {t('leaveGroupAdminModalMessageWithEligibleSecondPart')}
+            </>
+          ) : (
+            <>
+              {t('leaveGroupAdminModalMessageNoEligibleFirstPart')} <br />
+              {t('leaveGroupAdminModalMessageNoEligibleSecondPart')}
+            </>
+          )}
+        </p>
         {hasEligibleUsers && (
           <AdminSearchInput
             eligibleUsers={eligibleUsers}

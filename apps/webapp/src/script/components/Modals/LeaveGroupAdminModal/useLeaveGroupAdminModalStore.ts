@@ -29,7 +29,7 @@ export type LeaveGroupAdminModalParams = {
    * Empty array means there are no eligible users — a "no eligible users" variant is shown.
    */
   eligibleUsers: User[];
-  onLeave: (clearContent: boolean, newAdmin: User | null) => Promise<void>;
+  onLeave: (clearContent: boolean, newAdmin: User) => Promise<void>;
   onDelete: () => void;
 };
 

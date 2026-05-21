@@ -60,12 +60,12 @@ export const AdminSearchInput = ({
   const selectedOption = selectedUser ? (options.find(opt => opt.value === selectedUser.id) ?? null) : null;
 
   const handleChange = (option: Option | null) => {
-    if (!option) {
+    if (is.nullOrUndefined(option)) {
       onUserSelect(null);
       return;
     }
     const user = eligibleUsers.find(usr => usr.id === option.value);
-    if (user) {
+    if (!is.nullOrUndefined(user)) {
       onUserSelect(user);
     }
   };

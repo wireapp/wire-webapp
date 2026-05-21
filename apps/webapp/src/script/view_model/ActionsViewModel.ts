@@ -299,10 +299,10 @@ export class ActionsViewModel {
       return Promise.reject();
     }
 
-    const isPreventAdminLessGroupsFFEnabled =
+    const isPreventAdminLessGroupsFeatureEnabled =
       this.teamState.teamFeatures()?.[FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]?.status === FEATURE_STATUS.ENABLED;
 
-    if (isPreventAdminLessGroupsFFEnabled) {
+    if (isPreventAdminLessGroupsFeatureEnabled) {
       const selfUser = this.userState.self();
       const roles = conversation.roles();
       const selfRole = roles[selfUser.id];
@@ -329,16 +329,14 @@ export class ActionsViewModel {
           conversation,
           eligibleUsers,
           onLeave: async (clearContent, newAdmin) => {
-            if (newAdmin) {
-              await this.conversationRepository.conversationRoleRepository.setMemberConversationRole(
-                conversation,
-                newAdmin.qualifiedId,
-                DefaultConversationRoleName.WIRE_ADMIN,
-              );
+            await this.conversationRepository.conversationRoleRepository.setMemberConversationRole(
+              conversation,
+              newAdmin.qualifiedId,
+              DefaultConversationRoleName.WIRE_ADMIN,
+            );
 
-              roles[newAdmin.id] = DefaultConversationRoleName.WIRE_ADMIN;
-              conversation.roles(roles);
-            }
+            conversation.roles({...roles, [newAdmin.id]: DefaultConversationRoleName.WIRE_ADMIN});
+
             await this.leaveOrClearConversation(conversation, {leave: true, clear: clearContent});
           },
           onDelete: () => this.deleteConversation(conversation),
