@@ -73,7 +73,6 @@ import {InviteModal} from './webapp/modals/invite.modal';
 import {JoinGuestLinkPasswordModal} from './webapp/modals/joinGuestLinkPassword.modal';
 import {WithoutTitle} from './webapp/modals/withoutTitle.modal';
 import {AboutPage} from './webapp/pages/about.page';
-import {AccountNewDevicesModal} from './webapp/modals/accountNewDevices.modal';
 import {DeviceDetailsPage} from './webapp/pages/deviceDetails.page';
 import {ParticipantDeviceDetailsPage} from './webapp/pages/participantDeviceDetail.page';
 import {ParticipantDevicesPage} from './webapp/pages/participantDevices.page';
@@ -205,8 +204,6 @@ export class PageManager {
     },
     modals: {
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
-      accountNewDevices: () =>
-        this.getOrCreate('webapp.modals.accountNewDevices', () => new AccountNewDevicesModal(this.page)),
       userProfile: () => this.getOrCreate('webapp.modals.userProfile', () => new UserProfileModal(this.page)),
       confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
       leaveConversation: () =>

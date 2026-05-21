@@ -24,6 +24,26 @@ import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 import {sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 import {createGroup} from 'test/e2e_tests/utils/userActions';
 
+const verifyCrossDeviceTrust = async (
+  userAPages: PageManager['webapp']['pages'],
+  userBPages: PageManager['webapp']['pages'],
+) => {
+  for (const userPages of [userAPages, userBPages]) {
+    await userPages.conversation().clickConversationInfoButton();
+    await userPages.conversationDetails().devicesButton.click();
+
+    const firstDevice = userPages.participantDevices().activeDevices.first();
+    await firstDevice.click();
+
+    await userPages.participantDeviceDetails().toggleDeviceVerification();
+    await expect(userPages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
+  }
+
+  await expect(
+    userBPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
+  ).toBeVisible();
+};
+
 test.describe('Proteus verification', () => {
   let proteusTeam: Team;
   let userA: User;
@@ -49,7 +69,9 @@ test.describe('Proteus verification', () => {
 
     await components.conversationSidebar().clickPreferencesButton();
     await pages.settings().devicesButton.click();
-    await pages.devices().activeDevices.getByRole('button', {name: 'Remove Device'}).click();
+
+    const firstDevice = pages.devices().activeDevices.first();
+    await pages.devices().enhanceDeviceLocator(firstDevice).removeButton.click();
 
     await modals.password().passwordInput.fill(userA.password);
     await modals.password().clickAction();
@@ -122,11 +144,11 @@ test.describe('Proteus verification', () => {
       await expect(components.conversationSidebar().verifiedBadge).toBeHidden();
 
       await components.conversationSidebar().clickPreferencesButton();
-      await expect(modals.accountNewDevices().modalTitle).toContainText('Your account was used on');
+      await expect(modals.newDevice().modalTitle).toContainText('Your account was used on');
 
-      await modals.accountNewDevices().clickAction();
+      await modals.newDevice().clickAction();
       await pages.settings().devicesButton.click();
-      await pages.devices().activeDevices.getByTestId('go-device-details').click();
+      await pages.devices().activeDevices.first().click();
 
       // User verifies the new device, which restore the original session's verified status
       await pages.deviceDetails().toggleDeviceVerification();
@@ -146,7 +168,9 @@ test.describe('Proteus verification', () => {
 
       await components.conversationSidebar().clickPreferencesButton();
       await pages.settings().devicesButton.click();
-      await pages.devices().activeDevices.getByRole('button', {name: 'Remove Device'}).click();
+
+      const firstDevice = pages.devices().activeDevices.first();
+      await pages.devices().enhanceDeviceLocator(firstDevice).removeButton.click();
 
       await modals.password().passwordInput.fill('Wrong123456!');
       await modals.password().clickAction();
@@ -169,20 +193,7 @@ test.describe('Proteus verification', () => {
     await userAPages.conversationList().getConversation(userB.fullName).open();
     await userBPages.conversationList().getConversation(userA.fullName).open();
 
-    for (const pages of [userAPages, userBPages]) {
-      await pages.conversation().clickConversationInfoButton();
-      await pages.conversationDetails().devicesButton.click();
-
-      const firstDevice = pages.participantDevices().activeDevices.first();
-      await firstDevice.click();
-
-      await pages.participantDeviceDetails().toggleDeviceVerification();
-      await expect(pages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
-    }
-
-    await expect(
-      userBPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
-    ).toBeVisible();
+    await verifyCrossDeviceTrust(userAPages, userBPages);
 
     await userAPages.conversation().sendMessage('Message');
     await expect(userBPages.conversation().getMessage({sender: userA})).toBeVisible();
@@ -202,10 +213,10 @@ test.describe('Proteus verification', () => {
 
         await components.conversationSidebar().clickPreferencesButton();
         if (page === userAPage) {
-          await modals.accountNewDevices().clickAction();
+          await modals.newDevice().clickAction();
         }
         await pages.settings().devicesButton.click();
-        await pages.devices().activeDevices.getByTestId('go-device-details').click();
+        await pages.devices().activeDevices.first().click();
         await pages.deviceDetails().toggleDeviceVerification();
       }
     });
@@ -232,7 +243,7 @@ test.describe('Proteus verification', () => {
     await test.step('Action: Unverify User A primary device', async () => {
       await userAComponents.conversationSidebar().clickPreferencesButton();
       await userAPages.settings().devicesButton.click();
-      await userAPages.devices().activeDevices.getByTestId('go-device-details').click();
+      await userAPages.devices().activeDevices.first().click();
       await userAPages.deviceDetails().toggleDeviceVerification();
     });
 
@@ -259,20 +270,7 @@ test.describe('Proteus verification', () => {
       await test.step('Prerequisite: All devices from both participants are verified', async () => {
         await userAPages.conversationList().getConversation(userB.fullName).open();
         await userBPages.conversationList().getConversation(userA.fullName).open();
-        for (const pages of [userAPages, userBPages]) {
-          await pages.conversation().clickConversationInfoButton();
-          await pages.conversationDetails().devicesButton.click();
-
-          const firstDevice = pages.participantDevices().activeDevices.first();
-          await firstDevice.click();
-
-          await pages.participantDeviceDetails().toggleDeviceVerification();
-          await expect(pages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
-        }
-
-        await expect(
-          userAPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
-        ).toBeVisible();
+        await verifyCrossDeviceTrust(userAPages, userBPages);
       });
 
       const userB2Device = await test.step('Action: User B adds a new device', async () => {
@@ -287,9 +285,9 @@ test.describe('Proteus verification', () => {
       });
 
       await test.step('Action: User B sends a message to User A from the second device', async () => {
-        const userBPages = PageManager.from(userB2Device).webapp.pages;
-        await userBPages.conversation().sendMessage('Message from User B');
-        await expect(userBPages.conversation().getMessage({sender: userB})).toBeVisible();
+        const userB2Pages = PageManager.from(userB2Device).webapp.pages;
+        await userB2Pages.conversation().sendMessage('Message from User B');
+        await expect(userB2Pages.conversation().getMessage({sender: userB})).toBeVisible();
       });
 
       await test.step('Verify: User A sees a system message in conversation ', async () => {
@@ -385,31 +383,18 @@ test.describe('Proteus verification', () => {
       await test.step('Prerequisite: All devices from both participants are verified', async () => {
         await userAPages.conversationList().getConversation(userB.fullName).open();
         await userBPages.conversationList().getConversation(userA.fullName).open();
-        for (const pages of [userAPages, userBPages]) {
-          await pages.conversation().clickConversationInfoButton();
-          await pages.conversationDetails().devicesButton.click();
-
-          const firstDevice = pages.participantDevices().activeDevices.first();
-          await firstDevice.click();
-
-          await pages.participantDeviceDetails().toggleDeviceVerification();
-          await expect(pages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
-        }
-
-        await expect(
-          userAPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
-        ).toBeVisible();
+        await verifyCrossDeviceTrust(userAPages, userBPages);
       });
 
       await test.step('Action: User A logs with a new device', async () => {
         await createPage(withLogin(userA, {confirmNewHistory: true}));
       });
 
-      await test.step('Action: User A sends a message from a new device', async () => {
+      await test.step('Action: User A sends a message from the first device', async () => {
         await expect(
           userAPages.conversation().systemMessages.filter({hasText: 'You started using a new device'}),
         ).toBeVisible();
-        
+
         await userAPages.conversation().sendMessage('Message from verified device');
 
         await expect(userAModals.confirm().modalTitle).toContainText(`You started using a new device`);
