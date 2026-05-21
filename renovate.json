@@ -74,14 +74,13 @@
       "groupName": "eslint tooling"
     },
     {
+      "matchPackageNames": ["jest", "@jest/**", "jest-*", "babel-jest", "@types/jest", "@nx/jest", "@swc/jest"],
+      "groupName": "jest ecosystem"
+    },
+    {
       "matchPackageNames": [
-        "jest",
-        "babel-jest",
         "jest-environment-jsdom",
         "jest-jasmine2",
-        "@types/jest",
-        "@nx/jest",
-        "@swc/jest",
         "@testing-library/dom",
         "@testing-library/jest-dom",
         "@testing-library/react",
