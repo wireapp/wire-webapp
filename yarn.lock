@@ -9130,7 +9130,7 @@ __metadata:
     "@types/geolite2": "npm:2.0.2"
     "@types/hbs": "npm:4.0.5"
     "@wireapp/config": "workspace:^"
-    date-fns: "npm:4.1.0"
+    date-fns: "npm:4.2.1"
     dotenv-extended: "npm:2.9.0"
     express: "npm:4.22.2"
     express-sitemap-xml: "npm:3.1.0"
@@ -9279,7 +9279,7 @@ __metadata:
     core-js: "npm:3.49.0"
     css-loader: "npm:7.1.4"
     cssnano: "npm:7.1.9"
-    date-fns: "npm:4.1.0"
+    date-fns: "npm:4.2.1"
     dexie: "npm:4.4.2"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
@@ -12221,10 +12221,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:4.1.0":
-  version: 4.1.0
-  resolution: "date-fns@npm:4.1.0"
-  checksum: 10/d5f6e9de5bbc52310f786099e18609289ed5e30af60a71e0646784c8185ddd1d0eebcf7c96b7faaaefc4a8366f3a3a4244d099b6d0866ee2bec80d1361e64342
+"date-fns@npm:4.2.1":
+  version: 4.2.1
+  resolution: "date-fns@npm:4.2.1"
+  checksum: 10/c2731946a2d022935b3641062cd64bcdd62a65066115fee3490ba360a17fbf42134918493c43acb2c5c995b9ea4a2c7f505f0d9c02e73351cd2899b13e081729
   languageName: node
   linkType: hard
 

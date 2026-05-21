@@ -50,7 +50,7 @@
     "classnames": "2.5.1",
     "copy-webpack-plugin": "13.0.1",
     "core-js": "3.49.0",
-    "date-fns": "4.1.0",
+    "date-fns": "4.2.1",
     "dexie-batch": "0.4.3",
     "dexie-encrypted": "2.0.0",
     "dotenv-extended": "2.9.0",
