@@ -19,7 +19,7 @@
 
 import {ShieldIcon} from '@wireapp/react-ui-kit';
 
-import {CheckIcon} from 'Components/Icon';
+import {CheckIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {

@@ -22,7 +22,7 @@ import {FC, useMemo, useState} from 'react';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {UserList} from 'Components/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

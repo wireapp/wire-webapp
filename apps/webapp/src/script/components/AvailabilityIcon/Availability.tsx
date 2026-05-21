@@ -25,7 +25,7 @@ import {AVATAR_SIZE} from 'Components/Avatar';
 
 import * as styles from './Availability.styles';
 
-import * as Icon from '../Icon';
+import * as Icon from '../icon';
 
 const availabilityIconBaseProps = {
   'data-uie-name': 'status-availability-icon',

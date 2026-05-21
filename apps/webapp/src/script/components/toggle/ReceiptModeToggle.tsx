@@ -24,7 +24,7 @@ import cx from 'classnames';
 
 import {t} from 'Util/localizerUtil';
 
-import * as Icon from '../Icon';
+import * as Icon from '../icon';
 
 interface ReceiptModeToggleProps {
   onReceiptModeChanged: (receiptMode: RECEIPT_MODE) => void;

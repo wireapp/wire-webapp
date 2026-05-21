@@ -26,7 +26,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions, Actions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';

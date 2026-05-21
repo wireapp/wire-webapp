@@ -24,6 +24,14 @@ ls:
   apps/webapp/src/script/util/test/mock:
     .ts: camelCase
     .mock.ts: camelCase
+  apps/webapp/src/script/components/icon.tsx:
+    .tsx: camelCase
+  apps/webapp/src/script/page/appLock:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
   apps/webapp/src/script/page/RightSidebar/access:
     .ts: camelCase
     .tsx: camelCase

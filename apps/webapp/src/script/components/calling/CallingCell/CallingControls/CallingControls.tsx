@@ -25,7 +25,7 @@ import {
   cellControlsWrapper,
 } from 'Components/calling/CallingCell/CallingControls/CallingControls.styles';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {Call} from 'Repositories/calling/Call';
 import {DesktopScreenShareMenu} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';

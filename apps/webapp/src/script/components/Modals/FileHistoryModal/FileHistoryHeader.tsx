@@ -19,7 +19,7 @@
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {FileLoader} from 'Components/FileFullscreenModal/FileLoader/FileLoader';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {

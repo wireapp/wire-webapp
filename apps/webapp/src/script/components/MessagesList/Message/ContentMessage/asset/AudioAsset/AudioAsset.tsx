@@ -22,7 +22,7 @@ import {useEffect, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';

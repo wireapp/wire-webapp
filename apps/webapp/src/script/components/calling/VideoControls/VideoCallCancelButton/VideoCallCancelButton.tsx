@@ -17,7 +17,7 @@
  *
  */
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 

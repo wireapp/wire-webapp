@@ -21,7 +21,7 @@ import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
 import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from 'Util/keyboardUtil';

@@ -25,7 +25,7 @@ import {connect} from 'react-redux';
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {LogoIcon} from 'Components/Icon';
+import {LogoIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 import {afterRender} from 'Util/util';
 

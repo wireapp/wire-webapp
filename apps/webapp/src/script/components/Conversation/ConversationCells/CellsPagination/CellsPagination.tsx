@@ -21,7 +21,7 @@ import {useCallback} from 'react';
 
 import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {CellsPageList} from './CellsPageList/CellsPageList';

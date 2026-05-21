@@ -37,7 +37,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {Call} from 'Repositories/calling/Call';

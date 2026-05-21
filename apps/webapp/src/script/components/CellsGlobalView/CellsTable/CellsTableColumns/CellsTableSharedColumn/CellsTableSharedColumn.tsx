@@ -17,7 +17,7 @@
  *
  */
 
-import {LinkIcon} from 'Components/Icon';
+import {LinkIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {wrapperStyles, iconWrapperStyles, textStyles, wrapperStylesHidden} from './CellsTableSharedColumn.styles';

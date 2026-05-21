@@ -27,7 +27,7 @@ import cx from 'classnames';
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';

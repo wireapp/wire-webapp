@@ -25,7 +25,7 @@ import {RenameMessage} from 'Repositories/entity/message/RenameMessage';
 
 import {SystemMessage} from './SystemMessage';
 
-jest.mock('Components/Icon', () => ({
+jest.mock('Components/icon', () => ({
   EditIcon: () => {
     return <span data-uie-name="editicon" className="editicon"></span>;
   },
