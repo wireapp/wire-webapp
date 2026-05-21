@@ -128,7 +128,7 @@ export const useLoadMessages = (
       if (virtualItems.length === 0) {
         return;
       }
-      const [lastItem] = [...virtualItems].reverse();
+      const [lastItem] = virtualItems.toReversed();
 
       if (lastItem.index >= itemsLength - 1) {
         fireAndForgetInvoker.fireAndForget(loadFollowingMessages);

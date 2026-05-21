@@ -42,7 +42,7 @@ export class UserState {
       .pureComputed(() => {
         return this.users()
           .filter(userEntity => userEntity.isConnected())
-          .sort(sortUsersByPriority);
+          .toSorted(sortUsersByPriority);
       })
       .extend({rateLimit: TIME_IN_MILLIS.SECOND});
   }

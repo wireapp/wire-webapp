@@ -638,7 +638,7 @@ test.describe('Calling', () => {
         await expect(callScreen.gridTiles).toHaveCount(6); // Ensure first grid page is full
         const displayedNames = await callScreen.gridTiles.getByTestId('call-participant-name').allInnerTexts();
         const listToVerify = displayedNames.filter(name => name !== localUser);
-        const sortedNames = [...listToVerify].sort((a, b) => a.localeCompare(b));
+        const sortedNames = listToVerify.toSorted((a, b) => a.localeCompare(b));
 
         expect(listToVerify).toEqual(sortedNames);
       },

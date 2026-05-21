@@ -126,7 +126,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const contacts = useMemo(() => {
     if (isTeam) {
       const isTeamOrServices = isTeamOnly || isServicesRoom;
-      return isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
+      return isTeamOrServices ? teamMembers.toSorted(sortUsersByPriority) : teamUsers;
     }
     return connectedUsers;
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
@@ -137,7 +137,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
       .filter(contact => contact.type === UserType.APP)
       .map(contact => integrationRepository.mapServiceFromUser(contact))
       .filter(contact => compareTransliteration(contact.name(), normalizedQuery))
-      .sort((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
+      .toSorted((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
   }, [contacts, integrationRepository, searchInput]);
 
   const servicesList = useMemo(() => {

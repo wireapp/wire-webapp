@@ -70,7 +70,7 @@ export function createDeterministicWallClock(options: DeterministicWallClockOpti
       .filter(([, timeoutRegistration]) => {
         return timeoutRegistration.executionTimestampInMilliseconds <= currentTimestampInMilliseconds;
       })
-      .sort((firstTimeoutEntry, secondTimeoutEntry) => {
+      .toSorted((firstTimeoutEntry, secondTimeoutEntry) => {
         const [firstTimeoutIdentifier, firstTimeoutRegistration] = firstTimeoutEntry;
         const [secondTimeoutIdentifier, secondTimeoutRegistration] = secondTimeoutEntry;
 

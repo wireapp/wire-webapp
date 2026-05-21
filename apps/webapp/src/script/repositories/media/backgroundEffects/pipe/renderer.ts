@@ -72,7 +72,7 @@ export class WebGLRenderer {
   };
   readonly positionBuffer: WebGLBuffer | null;
   readonly texCoordBuffer: WebGLBuffer | null;
-  readonly storedStateTextures: (WebGLTexture | null)[];
+  storedStateTextures: (WebGLTexture | null)[];
   readonly fbo: WebGLFramebuffer | null;
 
   private running = false;
@@ -621,7 +621,7 @@ export class WebGLRenderer {
         gl.deleteTexture(texture);
       }
     });
-    this.storedStateTextures.splice(0, this.storedStateTextures.length);
+    this.storedStateTextures = this.storedStateTextures.toSpliced(0, this.storedStateTextures.length);
     if (this.backgroundRenderInfo?.texture) {
       gl.deleteTexture(this.backgroundRenderInfo.texture);
       this.backgroundRenderInfo = null;

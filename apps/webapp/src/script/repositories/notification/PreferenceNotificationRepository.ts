@@ -118,7 +118,7 @@ export class PreferenceNotificationRepository {
     const groupedNotifications = groupBy(notifications, notification => notification.type);
     return Object.entries(groupedNotifications)
       .map(([type, notification]) => ({notification, type}))
-      .sort((a, b) => prio(a) - prio(b));
+      .toSorted((a, b) => prio(a) - prio(b));
   }
 
   onClientRemove(_userId: string, clientId: string, domain: string | null): void {

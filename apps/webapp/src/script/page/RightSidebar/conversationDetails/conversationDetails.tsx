@@ -186,7 +186,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       });
 
       if (!isSelfUserRemoved) {
-        return [...filteredUsers, selfUser].sort(sortUsersByPriority);
+        return [...filteredUsers, selfUser].toSorted(sortUsersByPriority);
       }
 
       return filteredUsers;

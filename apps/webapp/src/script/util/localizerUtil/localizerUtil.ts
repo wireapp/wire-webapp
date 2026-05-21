@@ -106,7 +106,7 @@ export const LocalizerUtil = {
       userEntities = userEntities.filter(userEntity => !userEntity.isMe);
     }
 
-    const userNames = userEntities.sort(sortUsersByPriority).map(userEntity => {
+    const userNames = userEntities.toSorted(sortUsersByPriority).map(userEntity => {
       const userName = userEntity.name();
       return boldNames ? `[bold]${userName}[/bold]` : userName;
     });
@@ -118,13 +118,16 @@ export const LocalizerUtil = {
     const numberOfNames = userNames.length;
     const joinByAnd = !skipAnd && numberOfNames >= 2;
     if (joinByAnd) {
-      const [secondLastName, lastName] = userNames.splice(userNames.length - 2, 2);
+      const finalPairStartIndex = userNames.length - 2;
+      const [secondLastName, lastName] = userNames.slice(finalPairStartIndex);
+      const userNamesWithoutFinalPair = userNames.toSpliced(finalPairStartIndex, 2);
 
       const exactlyTwoNames = numberOfNames === 2;
       const additionalNames = exactlyTwoNames
         ? `${secondLastName} ${t('and')} ${lastName}`
         : `${secondLastName}${t('enumerationAnd')}${lastName}`;
-      userNames.push(additionalNames);
+      userNamesWithoutFinalPair.push(additionalNames);
+      return userNamesWithoutFinalPair.join(', ');
     }
 
     return userNames.join(', ');

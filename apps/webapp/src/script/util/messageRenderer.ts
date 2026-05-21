@@ -115,7 +115,7 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 
   const previousWithMap = tokens
     .slice(0, idx)
-    .reverse()
+    .toReversed()
     .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? (previousWithMap.map || [0, 0])[1] - 1 : 0;
   const count = position - previousPosition;
@@ -158,7 +158,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
   let mentionlessText = mentionEntities
     .slice()
     // sort mentions to start with the latest mention first (in order not to have to recompute the index every time we modify the original text)
-    .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex)
+    .toSorted((mention1, mention2) => mention2.startIndex - mention1.startIndex)
     .reduce((strippedText, mention) => {
       const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
       const mentionKey = createMentionHash(mention);

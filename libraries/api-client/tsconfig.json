@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "rootDir": "src",
     "types": ["node"],
-    "lib": ["dom", "es2022"],
+    "lib": ["dom", "es2024"],
     "target": "es2020",
     "module": "commonjs",
     "moduleResolution": "node",

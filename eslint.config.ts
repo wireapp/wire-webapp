@@ -9,6 +9,7 @@ import {FlatCompat} from '@eslint/eslintrc';
 import emotionPlugin from '@emotion/eslint-plugin';
 import stylisticPlugin from '@stylistic/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
+import unicornPlugin from 'eslint-plugin-unicorn';
 import tsParser from '@typescript-eslint/parser';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import headerPlugin, {HeaderOptions, HeaderRuleConfig} from '@tony.ganchev/eslint-plugin-header';
@@ -119,6 +120,7 @@ const config: Linter.Config[] = [
       '@emotion': emotionPlugin,
       import: importPlugin,
       'react-hooks': reactHooksPlugin,
+      unicorn: unicornPlugin,
       'header-tony': headerPlugin,
     },
     rules: {
@@ -126,6 +128,8 @@ const config: Linter.Config[] = [
       '@emotion/no-vanilla': 'error',
       '@emotion/import-from-emotion': 'error',
       '@emotion/styled-import': 'error',
+      'unicorn/no-array-reverse': 'error',
+      'unicorn/no-array-sort': 'error',
       'header-tony/header': [
         'error',
         {
@@ -161,6 +165,14 @@ const config: Linter.Config[] = [
         } as HeaderOptions,
       ] as HeaderRuleConfig,
       'id-length': 'warn',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.property.name='splice']",
+          message:
+            'Use toSpliced() instead of splice() to avoid mutating arrays. Reassign the toSpliced() result when ordering must be preserved.',
+        },
+      ],
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/ban-ts-comment': 'off',
       '@typescript-eslint/no-var-requires': 'off',
@@ -196,6 +208,9 @@ const config: Linter.Config[] = [
   },
   {
     files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs'],
+    plugins: {
+      unicorn: unicornPlugin,
+    },
     languageOptions: {
       parser: require('espree'),
       parserOptions: {
@@ -208,6 +223,16 @@ const config: Linter.Config[] = [
       // Disable TS-only rules on JS mocks/shims
       '@typescript-eslint/require-array-sort-compare': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
+      'unicorn/no-array-reverse': 'error',
+      'unicorn/no-array-sort': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.property.name='splice']",
+          message:
+            'Use toSpliced() instead of splice() to avoid mutating arrays. Reassign the toSpliced() result when ordering must be preserved.',
+        },
+      ],
     },
   },
   {
