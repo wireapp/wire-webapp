@@ -299,6 +299,11 @@ export class ActionsViewModel {
       return Promise.reject();
     }
 
+    if (is.emptyArray(conversation.participating_user_ets())) {
+      this.deleteConversation(conversation);
+      return Promise.resolve();
+    }
+
     const isPreventAdminLessGroupsFeatureEnabled =
       this.teamState.teamFeatures()?.[FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]?.status === FEATURE_STATUS.ENABLED;
 
