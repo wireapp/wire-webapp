@@ -243,4 +243,61 @@ test.describe('Proteus verification', () => {
       await expect(userAPages.conversation().verifiedBadge).toBeHidden();
     });
   });
+
+  test(
+    'Verify conversation degrades on incoming message from non-verified device',
+    {tag: ['@TC-724', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const {pages: userBPages} = PageManager.from(userBPage).webapp;
+
+      await userAPages.conversationList().getConversation(userB.fullName).open();
+      await userBPages.conversationList().getConversation(userA.fullName).open();
+
+      await test.step('Action: All devices from both participants are verified', async () => {
+        for (const pages of [userAPages, userBPages]) {
+          await pages.conversation().clickConversationInfoButton();
+          await pages.conversationDetails().devicesButton.click();
+
+          const firstDevice = pages.participantDevices().activeDevices.first();
+          await firstDevice.click();
+
+          await pages.participantDeviceDetails().toggleDeviceVerification();
+          await expect(pages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
+        }
+
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
+        ).toBeVisible();
+      });
+
+      const userB2Device = await test.step('Action: User B adds a new device', async () => {
+        return await createPage(withLogin(userB, {confirmNewHistory: true}));
+      });
+
+      await test.step('Action: User A sends a message into the conversation with User B', async () => {
+        await userAPages.conversation().sendMessage('Message from User A');
+        
+        await expect(userAModals.confirm().modalTitle).toContainText(`${userB.fullName} started using a new device`);
+        await userAModals.confirm().clickAction();
+      });
+
+      await test.step('Action: User B sends a message to User A from the second device', async () => {
+        const userBPages = PageManager.from(userB2Device).webapp.pages;
+        await userBPages.conversation().sendMessage('Message from User B');
+        await expect(userBPages.conversation().getMessage({sender: userB})).toBeVisible();
+      });
+
+      await test.step('Verify: User A sees a system message in conversation ', async () => {
+        const systemMessage = userAPages
+          .conversation()
+          .systemMessages.filter({hasText: `${userB.fullName} started using a new device`});
+        await expect(systemMessage).toBeVisible();
+        await expect(systemMessage.getByTestId('user-device-not-verified')).toBeVisible();
+      });
+    },
+  );
 });
