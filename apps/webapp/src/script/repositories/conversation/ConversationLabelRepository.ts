@@ -286,7 +286,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
     if (favoriteLabel) {
       const folderIndex = this.labels.indexOf(favoriteLabel);
-      this.labels.splice(folderIndex, 1, updatedLabel);
+      this.labels(this.labels().with(folderIndex, updatedLabel));
     } else {
       // The favorite label doesn't need a name since it is set at runtime for i18n compatibility
       this.labels.push(updatedLabel);
@@ -306,7 +306,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
         LabelType.Favorite,
       );
       const folderIndex = this.labels.indexOf(favoriteLabel);
-      this.labels.splice(folderIndex, 1, updatedLabel);
+      this.labels(this.labels().with(folderIndex, updatedLabel));
 
       // trigger a rerender on sidebar to remove the conversation from favorites
       const {currentTab, setCurrentTab} = useSidebarStore.getState();
@@ -349,7 +349,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
   readonly getLabels = (): ConversationLabel[] =>
     this.labels()
       .filter(({type}) => type === LabelType.Custom)
-      .sort(({name: nameA}, {name: nameB}) => nameA.localeCompare(nameB, undefined, {sensitivity: 'base'}));
+      .toSorted(({name: nameA}, {name: nameB}) => nameA.localeCompare(nameB, undefined, {sensitivity: 'base'}));
 
   readonly removeConversationFromLabel = (label: ConversationLabel, removeConversation: Conversation): void => {
     const {setCurrentTab} = useSidebarStore.getState();
@@ -363,7 +363,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
       label.type,
     );
 
-    this.labels.splice(folderIndex, 1, updatedFolder);
+    this.labels(this.labels().with(folderIndex, updatedFolder));
 
     // Delete folder if it no longer contains any conversation
     if (is.nonEmptyArray(updatedFolder.conversations())) {

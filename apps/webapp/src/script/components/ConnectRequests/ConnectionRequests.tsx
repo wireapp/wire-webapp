@@ -53,7 +53,7 @@ export const ConnectRequests = ({
   const rootContext = useContext(RootContext);
   const {classifiedDomains} = useKoSubscribableChildren(teamState, ['classifiedDomains']);
   const {connectRequests: unsortedConnectionRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
-  const connectionRequests = unsortedConnectionRequests.sort((user1, user2) => {
+  const connectionRequests = unsortedConnectionRequests.toSorted((user1, user2) => {
     const user1Connection = user1.connection();
     const user2Connection = user2.connection();
 

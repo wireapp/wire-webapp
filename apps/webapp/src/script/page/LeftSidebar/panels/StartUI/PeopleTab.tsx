@@ -130,7 +130,7 @@ export const PeopleTab = ({
     const nonExternalContacts = await teamRepository.filterExternals(contacts);
     return {
       ...searchResults,
-      contacts: [...searchResults.contacts, ...nonExternalContacts].sort((userA, userB) =>
+      contacts: [...searchResults.contacts, ...nonExternalContacts].toSorted((userA, userB) =>
         sortByPriority(userA.name(), userB.name(), query),
       ),
       others: others,

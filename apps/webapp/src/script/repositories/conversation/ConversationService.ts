@@ -424,7 +424,7 @@ export class ConversationService {
       const records = await this.storageService.getAll<{time: number}>(StorageSchemata.OBJECT_STORE.EVENTS);
       events = records
         .filter(record => record.time.toString() >= min_date.toISOString())
-        .sort((a, b) => a.time - b.time);
+        .toSorted((a, b) => a.time - b.time);
     }
 
     const conversations = events.reduce((accumulated, event) => {
@@ -434,7 +434,7 @@ export class ConversationService {
     }, {});
 
     return Object.keys(conversations)
-      .sort((id_a, id_b) => conversations[id_b] - conversations[id_a])
+      .toSorted((id_a, id_b) => conversations[id_b] - conversations[id_a])
       .map(id => ({domain: '', id}));
   }
 

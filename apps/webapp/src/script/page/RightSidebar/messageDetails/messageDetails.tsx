@@ -91,7 +91,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
   const receiptUsers = userRepository
     .findUsersByIds(readReceipts.map(({userId, domain}) => ({domain: domain || '', id: userId})))
-    .sort(sortUsers);
+    .toSorted(sortUsers);
 
   const supportsReactions = useMemo(() => {
     const isPing = messageEntity.super_type === SuperType.PING;

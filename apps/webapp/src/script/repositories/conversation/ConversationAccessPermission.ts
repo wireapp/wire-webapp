@@ -147,7 +147,7 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     .toString(2)
     .split('')
     //reverse so that the index reflects the number of significant figures for finding the feature
-    .reverse()
+    .toReversed()
     //find the name of the feature with the correct sigfigs
     .map((bit: '1' | '0', i) => Object.entries(ACCESS).find(([, bitmask]) => bitmask === +bit << i)?.[0])
     .forEach(feature => {

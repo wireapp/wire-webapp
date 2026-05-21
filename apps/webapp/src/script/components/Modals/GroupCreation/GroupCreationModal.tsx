@@ -183,7 +183,7 @@ const GroupCreationModal = ({
         return teamState.teamUsers();
       }
 
-      return teamState.teamMembers().sort(sortUsersByPriority);
+      return teamState.teamMembers().toSorted(sortUsersByPriority);
     }
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);

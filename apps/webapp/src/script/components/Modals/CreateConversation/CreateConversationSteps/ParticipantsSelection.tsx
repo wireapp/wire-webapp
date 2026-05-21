@@ -63,7 +63,7 @@ export const ParticipantsSelection = () => {
       return teamState.teamUsers();
     }
 
-    return teamState.teamMembers().sort(sortUsersByPriority);
+    return teamState.teamMembers().toSorted(sortUsersByPriority);
   }, [isGuestsEnabled, isTeam, teamState, userState]);
 
   const filteredContacts = contacts.filter(user => user.isAvailable());

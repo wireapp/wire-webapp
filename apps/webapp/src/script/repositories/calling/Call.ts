@@ -101,7 +101,7 @@ export class Call {
     this.handRaisedParticipants = ko.pureComputed(() =>
       this.participants()
         .filter(participant => Boolean(participant.handRaisedAt()))
-        .sort((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
+        .toSorted((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
     );
     this.canvasMixer = new CanvasMediaStreamMixer();
     this.maximizedParticipant = ko.observable(null);
@@ -207,7 +207,7 @@ export class Call {
       // Limit them to 4.
       .slice(0, 4)
       // Sort them by name
-      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+      .toSorted((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
 
     // Set the new active speakers.
     const isSameSpeakers =
@@ -238,7 +238,7 @@ export class Call {
 
   updatePages() {
     const selfParticipant = this.getSelfParticipant();
-    const remoteParticipants = this.getRemoteParticipants().sort((p1, p2) => sortUsersByPriority(p1.user, p2.user));
+    const remoteParticipants = this.getRemoteParticipants().toSorted((p1, p2) => sortUsersByPriority(p1.user, p2.user));
 
     const [withVideoAndScreenShare, withoutVideo] = partition(remoteParticipants, participant =>
       participant.isSendingVideo(),

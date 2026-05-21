@@ -731,7 +731,7 @@ export class CallingRepository {
     call.participants.removeAll();
     call.removeAllAudio();
     if (index !== -1) {
-      this.callState.calls.splice(index, 1);
+      this.callState.calls(this.callState.calls().toSpliced(index, 1));
     }
   }
 

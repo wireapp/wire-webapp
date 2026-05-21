@@ -1475,7 +1475,7 @@ const COUNTRY_CODES: CountryCode[] = [
 export const getCountryByCode = (countryCode: string): string | void => {
   const parsedCode = parseInt(countryCode, 10);
   const country = COUNTRY_CODES.filter(({code}) => code === parsedCode)
-    .sort((countryA, countryB) => countryA.population - countryB.population)
+    .toSorted((countryA, countryB) => countryA.population - countryB.population)
     .pop();
   if (country) {
     return country.iso;

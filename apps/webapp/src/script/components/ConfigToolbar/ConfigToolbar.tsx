@@ -40,7 +40,7 @@ export function createLocationUrl(pathname: string, search: string, hash: string
 
 export function ConfigToolbar() {
   const {fireAndForgetInvoker, applicationNavigation, isFeatureToggleEnabled} = useApplicationContext();
-  const alphabeticallySortedStartupFeatureToggleNames = [...startupFeatureToggleNames].sort();
+  const alphabeticallySortedStartupFeatureToggleNames = startupFeatureToggleNames.toSorted();
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);

@@ -136,7 +136,7 @@ export const CallingParticipantList = ({
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
           {participants
             .slice()
-            .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
+            .toSorted((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
             .map((participant, index, participantsArray) => (
               <li key={participant.clientId} className="call-ui__participant-list__participant">
                 <CallParticipantsListItem

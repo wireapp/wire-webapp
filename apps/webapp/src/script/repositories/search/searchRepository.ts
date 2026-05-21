@@ -88,15 +88,10 @@ export class SearchRepository {
         given user of name Bardia and username of bardia_wire this mapping
         will get name & username properties and return an array value like ['Bardia', 'bardia_wire']
       */
-      const values: string[] = properties
-        .slice()
-        .reverse()
-        .map(prop => {
-          const property = prop as keyof User;
-          return typeof userEntity[property] === 'function'
-            ? (userEntity[property] as Function)()
-            : userEntity[property];
-        });
+      const values: string[] = properties.toReversed().map(prop => {
+        const property = prop as keyof User;
+        return typeof userEntity[property] === 'function' ? (userEntity[property] as Function)() : userEntity[property];
+      });
 
       const uniqueValues = Array.from(new Set(values));
       const matchWeight = uniqueValues.reduce((weight, value, index) => {
@@ -109,7 +104,7 @@ export class SearchRepository {
     }, []);
 
     return weightedResults
-      .sort((result1, result2) => {
+      .toSorted((result1, result2) => {
         if (result2.weight === result1.weight) {
           return result2.user.name() > result1.user.name() ? -1 : 1;
         }
@@ -153,7 +148,7 @@ export class SearchRepository {
 
     const tokens = nameSlug.split(/-/g);
     // computing the match value by testing all components of the property
-    return tokens.reverse().reduce((weight, token, index) => {
+    return tokens.toReversed().reduce((weight, token, index) => {
       const indexWeight = index + 1;
       let tokenWeight = 0;
       const tokenIndex = transliterationIndex(token, termSlug);
@@ -198,7 +193,7 @@ export class SearchRepository {
         // Filter out selfUser
         .filter(user => !user.isMe)
         .filter(user => !isHandleQuery || startsWith(user.username(), query))
-        .sort((userA, userB) => {
+        .toSorted((userA, userB) => {
           if (userA.teamId === teamId && userB.teamId !== teamId) {
             // put team members first
             return -1;
