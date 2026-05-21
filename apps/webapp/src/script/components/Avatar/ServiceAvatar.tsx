@@ -21,7 +21,7 @@ import React from 'react';
 
 import ko from 'knockout';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {CSS_FILL_PARENT} from 'Util/cssMixin';
 

@@ -23,7 +23,7 @@ import {useNavigate} from 'react-router-dom';
 
 import {Button, ButtonVariant, Container, Text} from '@wireapp/react-ui-kit';
 
-import {LogoFullIcon} from 'Components/Icon';
+import {LogoFullIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {buttonContainerCss, containerCss, headerCss, logoCss, paragraphCss} from './CustomBackend.styles';

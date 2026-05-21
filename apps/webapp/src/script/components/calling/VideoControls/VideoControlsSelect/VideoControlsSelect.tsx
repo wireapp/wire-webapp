@@ -22,7 +22,7 @@ import React from 'react';
 import {Select} from '@wireapp/react-ui-kit';
 
 import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {

@@ -24,7 +24,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {UserList, UserlistMode} from 'Components/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';

@@ -21,7 +21,7 @@ import React, {useState} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {User} from 'Repositories/entity/User';
 import {t} from 'Util/localizerUtil';

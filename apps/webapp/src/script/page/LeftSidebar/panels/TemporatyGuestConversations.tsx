@@ -18,7 +18,7 @@
  */
 
 import {CallingCell} from 'Components/calling/CallingCell';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

@@ -44,7 +44,7 @@ jest.mock('Util/componentUtil', () => ({
   useKoSubscribableChildren: () => ({isCellsEnabled: false}),
 }));
 
-jest.mock('Components/Icon', () => ({
+jest.mock('Components/icon', () => ({
   SettingsIcon: () => <div data-testid="settings-icon" />,
 }));
 
