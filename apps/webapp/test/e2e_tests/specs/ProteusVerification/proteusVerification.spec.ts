@@ -334,7 +334,7 @@ test.describe('Proteus verification', () => {
             .conversationDetails()
             .openParticipantDetails(pages === userAPages ? userB.fullName : userA.fullName);
           await pages.participantDetails().devicesButton.click();
-          
+
           const firstDevice = pages.participantDevices().activeDevices.first();
           await firstDevice.click();
 
@@ -368,6 +368,54 @@ test.describe('Proteus verification', () => {
         await expect(
           userAPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
         ).toHaveCount(2);
+      });
+    },
+  );
+
+  test(
+    'Verify conversation degrades with warning if your own account gets new device',
+    {tag: ['@TC-731', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await test.step('Prerequisite: All devices from both participants are verified', async () => {
+        await userAPages.conversationList().getConversation(userB.fullName).open();
+        await userBPages.conversationList().getConversation(userA.fullName).open();
+        for (const pages of [userAPages, userBPages]) {
+          await pages.conversation().clickConversationInfoButton();
+          await pages.conversationDetails().devicesButton.click();
+
+          const firstDevice = pages.participantDevices().activeDevices.first();
+          await firstDevice.click();
+
+          await pages.participantDeviceDetails().toggleDeviceVerification();
+          await expect(pages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
+        }
+
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
+        ).toBeVisible();
+      });
+
+      await test.step('Action: User A logs with a new device', async () => {
+        await createPage(withLogin(userA, {confirmNewHistory: true}));
+      });
+
+      await test.step('Action: User A sends a message from a new device', async () => {
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: 'You started using a new device'}),
+        ).toBeVisible();
+        
+        await userAPages.conversation().sendMessage('Message from verified device');
+
+        await expect(userAModals.confirm().modalTitle).toContainText(`You started using a new device`);
+        await userAModals.confirm().clickAction();
+
+        await expect(userAPages.conversation().getMessage({sender: userA})).toBeVisible();
       });
     },
   );
