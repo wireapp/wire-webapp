@@ -99,6 +99,7 @@ export const useGlobalDriveFilters = ({
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
         disabled: isFilterTypeDisabled('tags', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'popover',
@@ -108,6 +109,7 @@ export const useGlobalDriveFilters = ({
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
         disabled: isFilterTypeDisabled('fileType', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'popover',
@@ -117,6 +119,7 @@ export const useGlobalDriveFilters = ({
         selectedIds: selectedConversationIds,
         onSelectionChange: setSelectedConversationIds,
         disabled: isFilterTypeDisabled('conversation', activeFilterType),
+        singleSelect: true,
       },
       {
         type: 'popover',
@@ -126,6 +129,7 @@ export const useGlobalDriveFilters = ({
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
         disabled: isFilterTypeDisabled('createdBy', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'toggle',

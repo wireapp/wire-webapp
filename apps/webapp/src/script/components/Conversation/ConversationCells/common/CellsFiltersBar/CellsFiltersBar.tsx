@@ -54,6 +54,7 @@ export const CellsFiltersBar = ({filters}: CellsFiltersBarProps) => {
             selectedIds={filter.selectedIds}
             onSelectionChange={filter.onSelectionChange}
             disabled={filter.disabled}
+            singleSelect={filter.singleSelect}
           />
         ) : (
           <button

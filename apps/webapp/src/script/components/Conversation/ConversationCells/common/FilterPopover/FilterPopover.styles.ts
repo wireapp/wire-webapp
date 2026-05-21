@@ -79,18 +79,21 @@ export const triggerButtonStyles: CSSObject = {
 };
 
 export const badgeStyles: CSSObject = {
-  display: 'inline-flex',
+  display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minWidth: '18px',
-  height: '18px',
-  padding: '0 5px',
+  gap: '8px',
+  padding: '2px 8px',
   borderRadius: '6px',
   background: 'var(--accent-color-500)',
   color: '#FFF',
-  fontSize: 'var(--font-size-small)',
-  fontWeight: 'var(--font-weight-semibold)',
-  lineHeight: 1,
+  fontSize: 'var(--font-size-xsmall)',
+  fontWeight: 590,
+  lineHeight: '13px',
+  letterSpacing: '0.06px',
+  'body.theme-dark &': {
+    color: '#000',
+  },
 };
 
 export const chevronStyles: CSSObject = {
@@ -224,9 +227,16 @@ export const checkboxWrapperStyles: CSSObject = {
   margin: 0,
   left: '0',
   justifyContent: 'space-between',
+  minWidth: 0,
+  '& > label': {
+    minWidth: 0,
+  },
   '& .wireinput + label::before': {
     minWidth: '18px',
     height: '18px',
+  },
+  '& .wireinput:not(:checked):not(:disabled) + label::before': {
+    borderColor: 'var(--accent-color)',
   },
   '& .wireinput + label > svg': {
     width: '12px',
@@ -253,14 +263,17 @@ export const labelGroupStyles: CSSObject = {
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
+  marginRight: '8px',
 };
 
 export const checkboxLabelStyles: CSSObject = {
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+  color: 'var(--main-color)',
   fontSize: 'var(--font-size-medium)',
-  lineHeight: '18px',
+  fontWeight: 'var(--font-weight-medium)',
+  lineHeight: 'var(--line-height-md)',
 };
 
 export const footerStyles: CSSObject = {
@@ -277,12 +290,12 @@ export const clearAllButtonStyles: CSSObject = {
   border: 'none',
   background: 'transparent',
   cursor: 'pointer',
-  fontSize: '13px',
-  color: 'var(--accent-color, #0667C8)',
+  fontSize: 'var(--font-size-small)',
+  fontWeight: 'var(--font-weight-regular)',
+  lineHeight: 'var(--line-height-small-plus)',
+  color: 'var(--main-color)',
+  textDecoration: 'underline',
   padding: '2px 4px',
-  '&:hover': {
-    textDecoration: 'underline',
-  },
 };
 
 export const emptyStateStyles: CSSObject = {
