@@ -21,6 +21,8 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {connectWithUser} from 'test/e2e_tests/utils/userActions';
+import {sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Proteus verification', () => {
   let proteusTeam: Team;
@@ -254,10 +256,9 @@ test.describe('Proteus verification', () => {
       const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
       const {pages: userBPages} = PageManager.from(userBPage).webapp;
 
-      await userAPages.conversationList().getConversation(userB.fullName).open();
-      await userBPages.conversationList().getConversation(userA.fullName).open();
-
-      await test.step('Action: All devices from both participants are verified', async () => {
+      await test.step('Prerequisite: All devices from both participants are verified', async () => {
+        await userAPages.conversationList().getConversation(userB.fullName).open();
+        await userBPages.conversationList().getConversation(userA.fullName).open();
         for (const pages of [userAPages, userBPages]) {
           await pages.conversation().clickConversationInfoButton();
           await pages.conversationDetails().devicesButton.click();
@@ -280,7 +281,7 @@ test.describe('Proteus verification', () => {
 
       await test.step('Action: User A sends a message into the conversation with User B', async () => {
         await userAPages.conversation().sendMessage('Message from User A');
-        
+
         await expect(userAModals.confirm().modalTitle).toContainText(`${userB.fullName} started using a new device`);
         await userAModals.confirm().clickAction();
       });
@@ -297,6 +298,76 @@ test.describe('Proteus verification', () => {
           .systemMessages.filter({hasText: `${userB.fullName} started using a new device`});
         await expect(systemMessage).toBeVisible();
         await expect(systemMessage.getByTestId('user-device-not-verified')).toBeVisible();
+      });
+    },
+  );
+
+  test(
+    'Verify conversation degrades when you add participant to verified group',
+    {tag: ['@TC-726', '@regression']},
+    async ({createPage, createUser}) => {
+      const userC = await createUser();
+      const [userAPage, userBPage, userCPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+        createPage(withLogin(userC)),
+      ]);
+      await connectWithUser(userAPage, userB);
+      await sendConnectionRequest(userAPage, userC);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+      const userCPages = PageManager.from(userCPage).webapp.pages;
+
+      await userCPages.conversationList().openPendingConnectionRequest();
+      await userCPages.connectRequest().clickConnectButton();
+
+      await test.step('Prerequisite: Devices of User A and User B are verified in group conversation', async () => {
+        const groupName = 'Test Group';
+        await createGroup(userAPages, groupName, [userB]);
+        await userAPages.conversationList().getConversation(groupName).open();
+        await userBPages.conversationList().getConversation(groupName).open();
+
+        for (const pages of [userAPages, userBPages]) {
+          await pages.conversation().clickConversationInfoButton();
+          await pages
+            .conversationDetails()
+            .openParticipantDetails(pages === userAPages ? userB.fullName : userA.fullName);
+          await pages.participantDetails().devicesButton.click();
+          
+          const firstDevice = pages.participantDevices().activeDevices.first();
+          await firstDevice.click();
+
+          await pages.participantDeviceDetails().toggleDeviceVerification();
+          await expect(pages.participantDevices().getVerifiedBadge(firstDevice)).toBeVisible();
+        }
+
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
+        ).toBeVisible();
+      });
+
+      await test.step('Action: User A adds User C to the group conversation', async () => {
+        await userAPages.conversation().clickConversationInfoButton();
+        await userAPages.conversation().clickAddMemberButton();
+        await userAPages.conversationDetails().addUsersToConversation([userC.fullName]);
+        await expect(userAPages.conversationDetails().groupMembers.filter({hasText: userC.fullName})).toBeVisible();
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: 'New people joined. Verify devices'}),
+        ).toBeVisible();
+      });
+
+      await test.step('Action: User A verifies User C`s device', async () => {
+        await userAPages.conversationDetails().openParticipantDetails(userC.fullName);
+        await userAPages.participantDetails().devicesButton.click();
+
+        const firstDevice = userAPages.participantDevices().activeDevices.first();
+        await firstDevice.click();
+
+        await userAPages.participantDeviceDetails().toggleDeviceVerification();
+        await expect(
+          userAPages.conversation().systemMessages.filter({hasText: 'All fingerprints are verified (Proteus)'}),
+        ).toHaveCount(2);
       });
     },
   );

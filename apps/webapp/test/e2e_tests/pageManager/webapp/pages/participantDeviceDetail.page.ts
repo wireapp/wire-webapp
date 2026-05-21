@@ -20,7 +20,7 @@
 import {Page} from '@playwright/test';
 
 export const ParticipantDeviceDetailsPage = (page: Page) => {
-  const verificationToggleLabel = page.getByText('Verified');
+  const verificationToggleLabel = page.getByTestId('do-toggle-verified').getByText('Verified');
   const returnButton = page.getByRole('button', {name: 'Go back to device details'});
 
   const toggleDeviceVerification = async () => {
