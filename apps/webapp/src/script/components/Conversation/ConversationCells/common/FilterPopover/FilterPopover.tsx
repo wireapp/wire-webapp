@@ -69,7 +69,7 @@ interface FilterPopoverProps {
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
   disabled?: boolean;
-  singleSelect?: boolean;
+  singleSelect: boolean;
 }
 
 export const FilterPopover = ({
@@ -78,7 +78,7 @@ export const FilterPopover = ({
   selectedIds,
   onSelectionChange,
   disabled = false,
-  singleSelect = false,
+  singleSelect,
 }: FilterPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');

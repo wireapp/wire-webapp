@@ -101,6 +101,7 @@ export const useConversationDriveFilters = ({
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
         disabled: isFilterTypeDisabled('tags', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'popover',
@@ -110,6 +111,7 @@ export const useConversationDriveFilters = ({
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
         disabled: isFilterTypeDisabled('fileType', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'popover',
@@ -119,6 +121,7 @@ export const useConversationDriveFilters = ({
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
         disabled: isFilterTypeDisabled('createdBy', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'toggle',

@@ -30,7 +30,7 @@ export type PopoverFilterConfig = {
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
   disabled?: boolean;
-  singleSelect?: boolean;
+  singleSelect: boolean;
 };
 
 export type ToggleFilterConfig = {
