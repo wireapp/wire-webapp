@@ -22,10 +22,14 @@ import ko from 'knockout';
 
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import * as Context from 'src/script/ui/ContextMenu';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageTimerButton} from './MessageTimerButton';
+
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('MessageTimerButton', () => {
   it('hides the timer button when the feature is disabled', () => {
@@ -43,7 +47,7 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     };
 
-    const {queryByTestId} = render(<MessageTimerButton {...props} />);
+    const {queryByTestId} = render(<MessageTimerButton {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('message-timer-button')).toBeNull();
     expect(queryByTestId('message-timer-icon')).toBeNull();
@@ -64,7 +68,7 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     };
 
-    const {queryByTestId} = render(<MessageTimerButton {...props} />);
+    const {queryByTestId} = render(<MessageTimerButton {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('message-timer-button')).toBeNull();
     expect(queryByTestId('message-timer-icon')).not.toBeNull();
@@ -87,7 +91,7 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     };
 
-    const {getByTestId} = render(<MessageTimerButton {...props} />);
+    const {getByTestId} = render(<MessageTimerButton {...props} />, {wrapper: rootProviderWrapper});
 
     const messageTimerElement = getByTestId('do-set-ephemeral-timer');
     expect(messageTimerElement.getAttribute('data-uie-value')).toBe('enabled');
@@ -117,7 +121,9 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     };
 
-    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />);
+    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(queryByTestId('message-timer-button')).not.toBeNull();
     expect(queryByTestId('message-timer-icon')).toBeNull();
@@ -145,7 +151,9 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     };
 
-    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />);
+    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(queryByTestId('message-timer-button')).not.toBeNull();
     expect(queryByTestId('message-timer-icon')).toBeNull();
@@ -173,7 +181,9 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     };
 
-    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />);
+    const {queryByTestId, getByText, getByTestId} = render(<MessageTimerButton {...props} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(queryByTestId('message-timer-button')).not.toBeNull();
     expect(queryByTestId('message-timer-icon')).toBeNull();
@@ -201,7 +211,7 @@ describe('MessageTimerButton', () => {
       teamState: mockTeamState as TeamState,
     };
 
-    const {getByTestId} = render(<MessageTimerButton {...props} />);
+    const {getByTestId} = render(<MessageTimerButton {...props} />, {wrapper: rootProviderWrapper});
 
     const messageTimerElement = getByTestId('do-set-ephemeral-timer');
     expect(messageTimerElement.getAttribute('data-uie-value')).toBe('disabled');

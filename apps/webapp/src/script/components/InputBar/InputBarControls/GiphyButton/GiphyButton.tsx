@@ -18,13 +18,16 @@
  */
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+
+import {useApplicationContext} from '../../../../page/RootProvider';
 
 interface GiphyButtonProps {
   onGifClick: () => void;
 }
 
 export const GiphyButton = ({onGifClick}: GiphyButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <>
       <li>
@@ -32,8 +35,8 @@ export const GiphyButton = ({onGifClick}: GiphyButtonProps) => {
           className="input-bar-control"
           type="button"
           css={{marginBottom: '0'}}
-          title={t('extensionsBubbleButtonGif')}
-          aria-label={t('extensionsBubbleButtonGif')}
+          title={translate('extensionsBubbleButtonGif')}
+          aria-label={translate('extensionsBubbleButtonGif')}
           onClick={onGifClick}
           data-uie-name="do-giphy-popover"
         >

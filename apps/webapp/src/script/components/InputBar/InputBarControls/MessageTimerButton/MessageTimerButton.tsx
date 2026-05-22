@@ -29,9 +29,10 @@ import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {DurationUnit, formatDuration} from 'Util/timeUtil';
 import {setContextMenuPosition} from 'Util/util';
+
+import {useApplicationContext} from '../../../../page/RootProvider';
 
 interface MessageTimerButtonProps {
   conversation: Conversation;
@@ -39,6 +40,7 @@ interface MessageTimerButtonProps {
 }
 
 const MessageTimerButton = ({conversation, teamState = container.resolve(TeamState)}: MessageTimerButtonProps) => {
+  const {translate} = useApplicationContext();
   const {messageTimer, hasGlobalMessageTimer} = useKoSubscribableChildren(conversation, [
     'messageTimer',
     'hasGlobalMessageTimer',
@@ -55,7 +57,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
     [
       {
         click: () => conversation.localMessageTimer(0),
-        label: t('ephemeralUnitsNone'),
+        label: translate('ephemeralUnitsNone'),
       },
     ].concat(
       EphemeralTimings.VALUES.map(milliseconds => {
@@ -92,7 +94,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
       className="input-bar-control conversation-input-bar-message-timer"
       onClick={isTimerDisabled ? undefined : onClick}
       onKeyDown={handleContextKeyDown}
-      title={t('tooltipConversationEphemeral')}
+      title={translate('tooltipConversationEphemeral')}
       disabled={isTimerDisabled}
       data-uie-value={isTimerDisabled ? 'disabled' : 'enabled'}
       data-uie-name="do-set-ephemeral-timer"

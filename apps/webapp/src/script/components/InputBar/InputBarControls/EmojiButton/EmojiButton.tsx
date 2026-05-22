@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {EmojiIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from '../../../../page/RootProvider';
 
 interface EmojiButtonProps {
   isActive: boolean;
@@ -32,6 +32,8 @@ interface EmojiButtonProps {
 }
 
 export const EmojiButton = ({isActive, isEditing = false, onClick}: EmojiButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       className={cx('input-bar-control', {
@@ -40,8 +42,8 @@ export const EmojiButton = ({isActive, isEditing = false, onClick}: EmojiButtonP
       })}
       type="button"
       onClick={onClick}
-      title={t('tooltipConversationEmoji')}
-      aria-label={t('tooltipConversationEmoji')}
+      title={translate('tooltipConversationEmoji')}
+      aria-label={translate('tooltipConversationEmoji')}
       data-uie-name="add-emoji"
     >
       <EmojiIcon width={14} height={14} />

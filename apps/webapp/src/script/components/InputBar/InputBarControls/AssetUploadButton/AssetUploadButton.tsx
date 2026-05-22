@@ -22,7 +22,8 @@ import {useRef} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+
+import {useApplicationContext} from '../../../../page/RootProvider';
 
 interface AssetUploadButtonProps {
   onSelectFiles: (files: File[]) => void;
@@ -30,6 +31,7 @@ interface AssetUploadButtonProps {
 }
 
 export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploadButtonProps) => {
+  const {translate} = useApplicationContext();
   const fileRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -50,8 +52,8 @@ export const AssetUploadButton = ({onSelectFiles, acceptedFileTypes}: AssetUploa
     <form ref={formRef}>
       <button
         type="button"
-        aria-label={t('tooltipConversationFile')}
-        title={t('tooltipConversationFile')}
+        aria-label={translate('tooltipConversationFile')}
+        title={translate('tooltipConversationFile')}
         className="input-bar-control file-button"
         onClick={() => fileRef.current?.click()}
         data-uie-name="do-share-file"

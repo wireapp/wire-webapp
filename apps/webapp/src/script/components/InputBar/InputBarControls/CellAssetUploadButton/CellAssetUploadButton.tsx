@@ -18,18 +18,21 @@
  */
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+
+import {useApplicationContext} from '../../../../page/RootProvider';
 
 interface CellAssetUploadButtonProps {
   onClick: () => void;
 }
 
 export const CellAssetUploadButton = ({onClick}: CellAssetUploadButtonProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       type="button"
-      aria-label={t('tooltipConversationFile')}
-      title={t('tooltipConversationFile')}
+      aria-label={translate('tooltipConversationFile')}
+      title={translate('tooltipConversationFile')}
       className="input-bar-control file-button"
       onClick={onClick}
       data-uie-name="do-share-file"

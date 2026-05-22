@@ -19,11 +19,15 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {ImageUploadButton} from './ImageUploadButton';
 
 const ALLOWED_IMAGE_TYPES = ['image/gif', 'image/avif'];
 
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('ImageUploadButton', () => {
   it('Does call onSelectImages with uploaded image file', () => {
@@ -31,6 +35,7 @@ describe('ImageUploadButton', () => {
 
     const {container} = render(
       <ImageUploadButton onSelectImages={onSelectImages} acceptedImageTypes={ALLOWED_IMAGE_TYPES} />,
+      {wrapper: rootProviderWrapper},
     );
     const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
 
@@ -46,6 +51,7 @@ describe('ImageUploadButton', () => {
 
     const {container} = render(
       <ImageUploadButton onSelectImages={onSelectImages} acceptedImageTypes={ALLOWED_IMAGE_TYPES} />,
+      {wrapper: rootProviderWrapper},
     );
 
     const form = container.querySelector('form');
