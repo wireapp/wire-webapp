@@ -25,7 +25,7 @@ import {Input, ErrorMessage, Button, ButtonVariant} from '@wireapp/react-ui-kit'
 
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {t} from 'Util/localizerUtil';
+import {RootContextValue, useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   buttonGroupStyles,
@@ -65,6 +65,7 @@ export const LinkDialog = ({
   isOpen,
   isEditing,
 }: LinkDialogProps) => {
+  const {translate} = useApplicationContext();
   const [formData, setFormData] = useState<FormData>({
     url: initialUrl,
     text: initialText,
@@ -98,7 +99,7 @@ export const LinkDialog = ({
     if (isSubmitted) {
       setErrors(prev => ({
         ...prev,
-        [field]: !isFieldValid(field, value) ? getFieldError(field) : undefined,
+        [field]: !isFieldValid(field, value) ? getFieldError(field, translate) : undefined,
       }));
     }
   };
@@ -117,8 +118,8 @@ export const LinkDialog = ({
 
   const validateForm = (data: FormData): boolean => {
     const newErrors: FormErrors = {
-      url: !isFieldValid('url', data.url) ? getFieldError('url') : undefined,
-      text: !isFieldValid('text', data.text) ? getFieldError('text') : undefined,
+      url: !isFieldValid('url', data.url) ? getFieldError('url', translate) : undefined,
+      text: !isFieldValid('text', data.text) ? getFieldError('text', translate) : undefined,
     };
 
     setErrors(newErrors);
@@ -128,12 +129,14 @@ export const LinkDialog = ({
   return (
     <ModalComponent isShown={isOpen} onBgClick={onClose}>
       <div css={headerStyles}>
-        <h2 css={titleStyles}>{isEditing ? t('richTextLinkDialogEditTitle') : t('richTextLinkDialogNewTitle')}</h2>
+        <h2 css={titleStyles}>
+          {isEditing ? translate('richTextLinkDialogEditTitle') : translate('richTextLinkDialogNewTitle')}
+        </h2>
         <button
           type="button"
           css={closeButtonStyles}
           onClick={onClose}
-          aria-label={t('modalCloseButton')}
+          aria-label={translate('modalCloseButton')}
           data-uie-name="do-close"
         >
           <Icon.CloseIcon aria-hidden="true" />
@@ -143,7 +146,7 @@ export const LinkDialog = ({
         <Input
           ref={textInputRef}
           type="text"
-          label={t('richTextLinkDialogTextLabel')}
+          label={translate('richTextLinkDialogTextLabel')}
           value={formData.text}
           markInvalid={isSubmitted && hasTextError}
           onChange={event => handleInputChange({event, field: 'text'})}
@@ -151,7 +154,7 @@ export const LinkDialog = ({
         />
         <Input
           type="text"
-          label={t('richTextLinkDialogLinkLabel')}
+          label={translate('richTextLinkDialogLinkLabel')}
           value={formData.url}
           markInvalid={isSubmitted && hasUrlError}
           onChange={event => handleInputChange({event, field: 'url'})}
@@ -159,10 +162,10 @@ export const LinkDialog = ({
         />
         <div css={buttonGroupStyles}>
           <Button type="button" onClick={onClose} variant={ButtonVariant.SECONDARY} css={buttonStyles}>
-            {t('richTextLinkDialogCancelButton')}
+            {translate('richTextLinkDialogCancelButton')}
           </Button>
           <Button type="submit" variant={ButtonVariant.PRIMARY} css={buttonStyles}>
-            {isEditing ? t('richTextLinkDialogEditButton') : t('richTextLinkDialogNewButton')}
+            {isEditing ? translate('richTextLinkDialogEditButton') : translate('richTextLinkDialogNewButton')}
           </Button>
         </div>
       </form>
@@ -179,11 +182,14 @@ const isFieldValid = (field: keyof FormData, value: string): boolean => {
   return fieldValidators[field](value) ?? true;
 };
 
-const getFieldError = (field: keyof FormData): string => {
+function getFieldError(
+  field: keyof FormData,
+  translate: RootContextValue['translate'],
+): string {
   const fieldErrors = {
-    url: t('richTextLinkDialogLinkError'),
-    text: t('richTextLinkDialogTextError'),
+    url: translate('richTextLinkDialogLinkError'),
+    text: translate('richTextLinkDialogTextError'),
   } as const;
 
   return fieldErrors?.[field] || '';
-};
+}
