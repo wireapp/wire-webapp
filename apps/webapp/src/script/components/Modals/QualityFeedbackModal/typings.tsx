@@ -17,15 +17,13 @@
  *
  */
 
-import {StringIdentifer, TranslationStrings} from 'Util/localizerUtil';
+import {StringIdentifer} from 'Util/localizerUtil';
 
-type TranslationKeyWithoutPlaceholders = {
-  [Key in StringIdentifer]: TranslationStrings[Key] extends `${string}{${string}}${string}` ? never : Key;
-}[StringIdentifer];
+type QualityFeedbackTranslationKey = Extract<StringIdentifer, `qualityFeedback.${string}`>;
 
 export type RatingListItem = {
   value: number;
-  headingTranslationKey?: TranslationKeyWithoutPlaceholders;
+  headingTranslationKey?: QualityFeedbackTranslationKey;
 };
 
 export enum RatingListLabel {
