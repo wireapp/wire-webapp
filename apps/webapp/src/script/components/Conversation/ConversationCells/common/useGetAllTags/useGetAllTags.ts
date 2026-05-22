@@ -20,10 +20,12 @@
 import {useEffect} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {useAllCellsTagsStore} from '../useAllCellsTagsStore/useAllCellsTagsStore';
 
 export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const tags = useAllCellsTagsStore(state => state.tags);
   const isLoading = useAllCellsTagsStore(state => state.isLoading);
   const error = useAllCellsTagsStore(state => state.error);
@@ -34,10 +36,12 @@ export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsReposito
     if (hasFetched) {
       return;
     }
-    void fetch(cellsRepository);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await fetch(cellsRepository);
+    });
     // cellsRepository is a singleton
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fetch, hasFetched]);
+  }, [fetch, fireAndForgetInvoker, hasFetched]);
 
   return {tags, isLoading, error};
 };
