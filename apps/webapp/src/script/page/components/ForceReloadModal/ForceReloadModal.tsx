@@ -22,7 +22,6 @@ import {FunctionComponent, useEffect} from 'react';
 import {Maybe} from 'true-myth';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {useApplicationContext} from '../../RootProvider';
@@ -35,7 +34,7 @@ const forceReloadDelayInMilliseconds = TIME_IN_MILLIS.SECOND * 60;
 
 export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = properties => {
   const {reloadApplication} = properties;
-  const {doesApplicationNeedForceReload, wallClock} = useApplicationContext();
+  const {doesApplicationNeedForceReload, translate, wallClock} = useApplicationContext();
 
   useEffect((): void | (() => void) => {
     if (!doesApplicationNeedForceReload) {
@@ -72,11 +71,11 @@ export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = p
       preventClose: true,
       primaryAction: {
         action: triggerReloadApplicationOnce,
-        text: t('forceReloadModalAction'),
+        text: translate('forceReloadModalAction'),
       },
       text: {
-        title: t('forceReloadModalTitle'),
-        htmlMessage: t('forceReloadModalMessage'),
+        title: translate('forceReloadModalTitle'),
+        htmlMessage: translate('forceReloadModalMessage'),
       },
     });
     forceReloadTimeoutIdentifier = Maybe.just(

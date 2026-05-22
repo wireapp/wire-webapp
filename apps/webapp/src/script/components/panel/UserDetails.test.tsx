@@ -17,9 +17,13 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import {render} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
+import {RootProvider} from 'src/script/page/RootProvider';
+import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -29,6 +33,10 @@ jest.mock('Components/Avatar', () => ({
   Avatar: () => <div data-testid="mock-avatar" />,
   AVATAR_SIZE: {X_LARGE: 'x-large'},
 }));
+
+function renderWithRootProvider(element: ReactElement) {
+  return render(<RootProvider value={createRootContextValueForTest({})}>{element}</RootProvider>);
+}
 
 describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {
@@ -45,7 +53,7 @@ describe('UserDetails', () => {
       participant,
     };
 
-    const {getByText, queryByTestId} = render(<UserDetails {...props} />);
+    const {getByText, queryByTestId} = renderWithRootProvider(<UserDetails {...props} />);
 
     getByText(name);
     getByText(`@${userName}`);
@@ -69,7 +77,7 @@ describe('UserDetails', () => {
       participant,
     };
 
-    const {getByText} = render(<UserDetails {...props} />);
+    const {getByText} = renderWithRootProvider(<UserDetails {...props} />);
 
     expect(getByText(badge)).not.toBeNull();
   });
@@ -89,7 +97,7 @@ describe('UserDetails', () => {
       participant,
     };
 
-    const {getByTestId, getByText} = render(<UserDetails {...props} />);
+    const {getByTestId, getByText} = renderWithRootProvider(<UserDetails {...props} />);
 
     expect(getByTestId('status-guest')).not.toBeNull();
     expect(getByText(expirationText)).not.toBeNull();
@@ -106,7 +114,7 @@ describe('UserDetails', () => {
       participant,
     };
 
-    const {getByTestId} = render(<UserDetails {...props} />);
+    const {getByTestId} = renderWithRootProvider(<UserDetails {...props} />);
 
     expect(getByTestId('status-name').textContent).toBe(t('unavailableUser'));
   });

@@ -17,17 +17,23 @@
  *
  */
 
+import {ReactElement} from 'react';
+
 import {render, screen, fireEvent} from '@testing-library/react';
+
+import {RootProvider} from 'src/script/page/RootProvider';
+import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileHistoryHeader} from './FileHistoryHeader';
 import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 
 jest.mock('./hooks/useFileHistoryModal');
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
 
 const mockedUseFileHistoryModal = jest.mocked(useFileHistoryModal);
+
+function renderWithRootProvider(element: ReactElement) {
+  return render(<RootProvider value={createRootContextValueForTest({})}>{element}</RootProvider>);
+}
 
 describe('FileHistoryHeader', () => {
   const mockHideModal = jest.fn();
@@ -43,7 +49,7 @@ describe('FileHistoryHeader', () => {
   });
 
   it('should render the header with title', () => {
-    render(<FileHistoryHeader />);
+    renderWithRootProvider(<FileHistoryHeader />);
 
     expect(screen.getByText('cells.versionHistory.title')).toBeInTheDocument();
   });
@@ -54,20 +60,20 @@ describe('FileHistoryHeader', () => {
       extension: 'pdf',
     };
 
-    render(<FileHistoryHeader file={fileInfo} />);
+    renderWithRootProvider(<FileHistoryHeader file={fileInfo} />);
 
     expect(screen.getByText(fileInfo.name)).toBeInTheDocument();
   });
 
   it('should render loader when file info is not provided', () => {
-    render(<FileHistoryHeader />);
+    renderWithRootProvider(<FileHistoryHeader />);
 
     // FileLoader renders a loading state
     expect(screen.queryByText('test-document.pdf')).not.toBeInTheDocument();
   });
 
   it('should call hideModal when close button is clicked', () => {
-    render(<FileHistoryHeader />);
+    renderWithRootProvider(<FileHistoryHeader />);
 
     const closeButton = screen.getByRole('button', {name: 'cells.versionHistory.closeAriaLabel'});
     fireEvent.click(closeButton);
@@ -76,7 +82,7 @@ describe('FileHistoryHeader', () => {
   });
 
   it('should have proper data attribute on close button', () => {
-    render(<FileHistoryHeader />);
+    renderWithRootProvider(<FileHistoryHeader />);
 
     const closeButton = screen.getByRole('button', {name: 'cells.versionHistory.closeAriaLabel'});
     expect(closeButton).toHaveAttribute('data-uie-name', 'do-close-file-history');
