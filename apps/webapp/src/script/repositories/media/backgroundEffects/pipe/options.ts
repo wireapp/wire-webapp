@@ -17,8 +17,10 @@
  *
  */
 
-import type {EffectMode, Metrics, QualityMode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import type {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
+import {Runtime} from '@wireapp/commons';
+
+import {EffectMode, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
+import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 
 export type ProcessVideoTrackOptions = {
   // MediaPipe options.
@@ -39,7 +41,6 @@ export type ProcessVideoTrackOptions = {
   // Metrics callback.
   onMetrics: ((metrics: Metrics) => void) | null;
   onModelChange: ((model: string) => void) | null;
-  onRendererFallback: ((modelPath: string) => void) | null;
 
   // Segmenter options.
   borderSmooth: number;
@@ -65,7 +66,7 @@ export type WorkerBackgroundSource = {
 };
 export type WorkerProcessVideoTrackOptions = Omit<
   ProcessVideoTrackOptions,
-  'onMetrics' | 'onModelChange' | 'onRendererFallback' | 'backgroundSource'
+  'onMetrics' | 'onModelChange' | 'backgroundSource'
 > & {
   backgroundSource: WorkerBackgroundSource | null;
 };
@@ -73,4 +74,42 @@ export type WorkerProcessVideoTrackOptions = Omit<
 export const SELFIE_MULTICLASS_MODEL_PATH = '/assets/mediapipe-models/selfie_multiclass_256x256.tflite';
 export const SELFIE_SEGMENTER_MODEL_PATH = '/assets/mediapipe-models/selfie_segmenter_landscape.tflite';
 
-export const DEFAULT_BACKGROUND_COLOR = {red: 33, green: 150, blue: 243, alpha: 255} as const;
+/**
+ * Configuration options for the virtual background.
+ */
+export const defaultOpts = {
+  // MediaPipe options.
+  wasmLoaderPath: '/min/mediapipe/wasm/vision_wasm_internal.js',
+  wasmBinaryPath: '/min/mediapipe/wasm/vision_wasm_internal.wasm',
+  modelPath: SELFIE_MULTICLASS_MODEL_PATH,
+  useWorker: !Runtime.isFirefox(),
+
+  // Virtual background options.
+  mode: 'blur',
+  blurStrength: 0,
+  enabled: true,
+  backgroundSource: null,
+
+  // quality mode
+  quality: 'auto',
+
+  // Metrics callback.
+  onMetrics: null,
+  onModelChange: null,
+
+  // Segmenter options.
+  borderSmooth: 0,
+  smoothing: 0.8,
+  smoothstepMin: 0.6,
+  smoothstepMax: 0.9,
+  restartEvery: 0,
+  bgBlur: 0,
+  bgBlurRadius: 30,
+
+  // Filter options.
+  enableFilters: false,
+  blur: 0,
+  brightness: 0,
+  contrast: 1,
+  gamma: 1,
+} as ProcessVideoTrackOptions;

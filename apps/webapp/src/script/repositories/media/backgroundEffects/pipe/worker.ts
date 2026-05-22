@@ -17,7 +17,7 @@
  *
  */
 
-import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import {Metrics} from 'Repositories/media/backgroundEffects';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
 import {WorkerProcessVideoTrackOptions} from './options';
@@ -41,17 +41,9 @@ globalThis.onmessage = ({data}) => {
       readable: ReadableStream;
       options: WorkerProcessVideoTrackOptions;
     };
-    runSegmenter(
-      canvas,
-      readable,
-      opts,
-      (stats: Metrics) => {
-        globalThis.postMessage({name: 'stats', stats});
-      },
-      (modelPath: string) => {
-        globalThis.postMessage({name: 'rendererFallback', modelPath});
-      },
-    ).catch((err: unknown) => {
+    runSegmenter(canvas, readable, opts, (stats: Metrics) => {
+      globalThis.postMessage({name: 'stats', stats});
+    }).catch((err: unknown) => {
       workerLogger.error(`[virtual-background] video error: ${(err as Error).message}`);
     });
   }

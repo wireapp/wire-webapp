@@ -17,13 +17,11 @@
  *
  */
 
-import is from '@sindresorhus/is';
-
 import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
-import {defaultVideoTrackOptions} from 'Repositories/media/backgroundEffects/pipe/defaultVideoTrackOptions';
 import {
+  defaultOpts,
   SELFIE_MULTICLASS_MODEL_PATH,
   SELFIE_SEGMENTER_MODEL_PATH,
 } from 'Repositories/media/backgroundEffects/pipe/options';
@@ -104,11 +102,6 @@ export class BackgroundEffectsHandler {
     backgroundEffectsStore.getState().setPreferredEffect(this.readPreferredBackgroundEffectFromStore());
     backgroundEffectsStore.getState().setLastVirtualBackgroundId(this.readLastVirtualBackgroundIdFromStore());
 
-    // On CPU-only devices (no WebGL2) default to the lighter model
-    if (!is.nullOrUndefined(controller.getCapabilityInfo) && controller.getCapabilityInfo().webgl2 === false) {
-      backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
-    }
-
     backgroundEffectsStore.subscribe((state, prevState) => {
       if (state.preferredEffect !== prevState.preferredEffect) {
         if (this.saveDebounceTimer) {
@@ -160,20 +153,14 @@ export class BackgroundEffectsHandler {
     }
 
     try {
-      const modelPath = backgroundEffectsStore.getState().isHighQualityBlurEnabled
-        ? SELFIE_MULTICLASS_MODEL_PATH
-        : SELFIE_SEGMENTER_MODEL_PATH;
-
       const outputTrack = await this.controller.start(videoTrack, {
-        ...defaultVideoTrackOptions,
-        modelPath,
+        ...defaultOpts,
         mode: isVirtual ? 'virtual' : 'blur',
         blurStrength,
         quality: 'auto',
         backgroundSource,
         onMetrics: this.onMetrics,
         onModelChange: this.onModelChange,
-        onRendererFallback: this.onRendererFallback,
       });
       const processedStream = new MediaStream([outputTrack]);
       this.currentReleasableStream = new ReleasableMediaStream(processedStream, () => {
@@ -252,6 +239,10 @@ export class BackgroundEffectsHandler {
   public enableSuperhighQualityTier(enable: boolean): void {
     this.controller.setModelPath(enable ? SELFIE_MULTICLASS_MODEL_PATH : SELFIE_SEGMENTER_MODEL_PATH);
     backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(enable);
+  }
+
+  public isSuperhighQualityTierAllowed(): boolean {
+    return this.controller.getMaxQualityTier() === 'superhigh';
   }
 
   public getCapabilityInfo(): CapabilityInfo {
@@ -336,10 +327,6 @@ export class BackgroundEffectsHandler {
   private onModelChange = (modelPath: string): void => {
     const model = modelPath.split('/').pop();
     backgroundEffectsStore.getState().setModel(model);
-  };
-
-  private onRendererFallback = (modelPath: string): void => {
-    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(modelPath === SELFIE_MULTICLASS_MODEL_PATH);
   };
 }
 
