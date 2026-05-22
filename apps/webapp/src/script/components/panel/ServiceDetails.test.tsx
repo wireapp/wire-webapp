@@ -20,8 +20,11 @@
 import {render} from '@testing-library/react';
 
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ServiceDetails} from './ServiceDetails';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('ServiceDetails', () => {
   it('renders the correct infos for the service', () => {
@@ -31,7 +34,7 @@ describe('ServiceDetails', () => {
     const service = new ServiceEntity({description: serviceDescription, name: serviceName});
     service.providerName(serviceProvider);
 
-    const {getByText} = render(<ServiceDetails service={service} />);
+    const {getByText} = render(<ServiceDetails service={service} />, {wrapper: rootProviderWrapper});
 
     getByText(serviceName);
     getByText(serviceProvider);

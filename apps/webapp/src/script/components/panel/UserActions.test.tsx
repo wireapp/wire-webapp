@@ -35,6 +35,7 @@ import {TeamEntity} from 'Repositories/team/TeamEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 
@@ -49,6 +50,12 @@ const getAllActions = (queryFunction: (id: string) => HTMLElement | null) =>
   Object.values(ActionIdentifier)
     .map(action => queryFunction(action))
     .filter(action => action !== null);
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+
+function renderWithRootProvider(node: React.ReactElement) {
+  return render(node, {wrapper: rootProviderWrapper});
+}
 
 describe('UserActions', () => {
   const conversationState = container.resolve(ConversationState);
@@ -75,7 +82,7 @@ describe('UserActions', () => {
       user,
     };
 
-    const {queryByTestId} = render(<UserActions {...props} />);
+    const {queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
 
     const allActions = getAllActions(queryByTestId);
 
@@ -102,7 +109,7 @@ describe('UserActions', () => {
       user,
     };
 
-    const {queryByTestId} = render(<UserActions {...props} />);
+    const {queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(1);
@@ -143,7 +150,7 @@ describe('UserActions', () => {
       user,
     };
 
-    const {queryByTestId} = render(<UserActions {...props} />);
+    const {queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(3);
@@ -187,7 +194,7 @@ describe('UserActions', () => {
       user,
     };
 
-    const {queryByTestId} = render(<UserActions {...props} />);
+    const {queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(1);
@@ -224,7 +231,7 @@ describe('UserActions', () => {
       user,
     };
 
-    const {queryByTestId} = render(<UserActions {...props} />);
+    const {queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(2);
@@ -268,7 +275,7 @@ describe('UserActions', () => {
       .spyOn(actionsViewModel, 'getOrCreate1to1Conversation')
       .mockRejectedValueOnce(new ClientMLSError(ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE));
 
-    const {getByTestId, getByText} = render(
+    const {getByTestId, getByText} = renderWithRootProvider(
       <>
         <UserActions {...props} />
         <PrimaryModalComponent />
@@ -320,7 +327,7 @@ describe('UserActions', () => {
       user,
     };
 
-    const {queryByTestId} = render(<UserActions {...props} />);
+    const {queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(2);
@@ -349,7 +356,7 @@ describe('UserActions', () => {
       user,
     };
 
-    const {queryByTestId} = render(<UserActions {...props} />);
+    const {queryByTestId} = renderWithRootProvider(<UserActions {...props} />);
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(1);
@@ -376,7 +383,7 @@ describe('UserActions', () => {
       isModal: true,
     };
 
-    const {queryByTestId} = render(withTheme(<UserActions {...props} />));
+    const {queryByTestId} = renderWithRootProvider(withTheme(<UserActions {...props} />));
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(1);
@@ -405,7 +412,7 @@ describe('UserActions', () => {
       user,
     };
 
-    const {queryByTestId} = render(withTheme(<UserActions {...props} />));
+    const {queryByTestId} = renderWithRootProvider(withTheme(<UserActions {...props} />));
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(1);
@@ -435,7 +442,7 @@ describe('UserActions', () => {
       isModal: true,
     };
 
-    const {queryByTestId} = render(withTheme(<UserActions {...props} />));
+    const {queryByTestId} = renderWithRootProvider(withTheme(<UserActions {...props} />));
 
     const allActions = getAllActions(queryByTestId);
     expect(allActions).toHaveLength(2);

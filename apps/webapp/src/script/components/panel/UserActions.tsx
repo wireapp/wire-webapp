@@ -35,8 +35,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import type {MenuItem} from './PanelActions';
@@ -118,6 +118,7 @@ const UserActions = ({
   teamState = container.resolve(TeamState),
   conversationState = container.resolve(ConversationState),
 }: UserActionsProps) => {
+  const {translate} = useApplicationContext();
   const {
     isAvailable,
     isBlocked,
@@ -151,7 +152,7 @@ const UserActions = ({
     const conversationEntity = await actionsViewModel.getOrCreate1to1Conversation(userEntity);
     if (showConversation) {
       setCurrentSidebarTab(SidebarTabs.RECENT);
-      actionsViewModel.open1to1Conversation(conversationEntity);
+      void actionsViewModel.open1to1Conversation(conversationEntity);
     }
   };
 
@@ -163,7 +164,7 @@ const UserActions = ({
         },
         Icon: Icon.ProfileIcon,
         identifier: ActionIdentifier[Actions.OPEN_PROFILE],
-        label: t('groupParticipantActionSelfProfile'),
+        label: translate('groupParticipantActionSelfProfile'),
       }
     : undefined;
 
@@ -180,7 +181,9 @@ const UserActions = ({
           },
           Icon: Icon.LeaveIcon,
           identifier: ActionIdentifier[Actions.LEAVE],
-          label: conversation.isChannel() ? t('channelParticipantActionLeave') : t('groupParticipantActionLeave'),
+          label: conversation.isChannel()
+            ? translate('channelParticipantActionLeave')
+            : translate('groupParticipantActionLeave'),
         }
       : undefined;
 
@@ -193,7 +196,7 @@ const UserActions = ({
           },
           Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.OPEN_CONVERSATION],
-          label: t('groupParticipantActionOpenConversation'),
+          label: translate('groupParticipantActionOpenConversation'),
         }
       : undefined;
 
@@ -208,8 +211,10 @@ const UserActions = ({
               if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
                 return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
                   text: {
-                    title: t('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
-                    htmlMessage: t('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {name: user.name()}),
+                    title: translate('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
+                    htmlMessage: translate('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {
+                      name: user.name(),
+                    }),
                   },
                 });
               }
@@ -218,7 +223,7 @@ const UserActions = ({
           },
           Icon: Icon.MessageIcon,
           identifier: ActionIdentifier[Actions.START_CONVERSATION],
-          label: t('groupParticipantActionStartConversation'),
+          label: translate('groupParticipantActionStartConversation'),
         }
       : undefined;
 
@@ -232,7 +237,7 @@ const UserActions = ({
           },
           Icon: Icon.CheckIcon,
           identifier: ActionIdentifier[Actions.ACCEPT_REQUEST],
-          label: t('groupParticipantActionIncomingRequest'),
+          label: translate('groupParticipantActionIncomingRequest'),
         }
       : undefined;
 
@@ -245,7 +250,7 @@ const UserActions = ({
           },
           Icon: Icon.CloseIcon,
           identifier: ActionIdentifier[Actions.IGNORE_REQUEST],
-          label: t('groupParticipantActionIgnoreRequest'),
+          label: translate('groupParticipantActionIgnoreRequest'),
         }
       : undefined;
 
@@ -259,7 +264,7 @@ const UserActions = ({
           },
           Icon: Icon.UndoIcon,
           identifier: ActionIdentifier[Actions.CANCEL_REQUEST],
-          label: t('groupParticipantActionCancelRequest'),
+          label: translate('groupParticipantActionCancelRequest'),
         }
       : undefined;
 
@@ -296,7 +301,7 @@ const UserActions = ({
           },
           Icon: Icon.PlusIcon,
           identifier: ActionIdentifier[Actions.SEND_REQUEST],
-          label: t('groupParticipantActionSendRequest'),
+          label: translate('groupParticipantActionSendRequest'),
         }
       : undefined;
 
@@ -310,7 +315,7 @@ const UserActions = ({
           },
           Icon: Icon.BlockIcon,
           identifier: ActionIdentifier[Actions.BLOCK],
-          label: t('groupParticipantActionBlock'),
+          label: translate('groupParticipantActionBlock'),
         }
       : undefined;
 
@@ -324,7 +329,7 @@ const UserActions = ({
           },
           Icon: Icon.BlockIcon,
           identifier: ActionIdentifier[Actions.UNBLOCK],
-          label: t('groupParticipantActionUnblock'),
+          label: translate('groupParticipantActionUnblock'),
         }
       : undefined;
 
@@ -341,7 +346,7 @@ const UserActions = ({
           },
           Icon: Icon.MinusIcon,
           identifier: 'do-remove',
-          label: t('groupParticipantActionRemove'),
+          label: translate('groupParticipantActionRemove'),
         }
       : undefined;
 
