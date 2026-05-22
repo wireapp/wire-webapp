@@ -105,7 +105,6 @@ jobs:
       - name: Verify generated i18n artifacts are committed
         run: |
           ./bin/yarn nx run webapp:translate-merge
-          ./bin/yarn nx run webapp:translate-generate-types
 
           if ! test -z "$(git status --porcelain)"; then
             echo "Repository is not clean after generation. Run generation locally and commit the changes."

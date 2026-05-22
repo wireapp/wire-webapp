@@ -54,7 +54,6 @@ const ignores = [
   '**/storybook-static/',
   '**/.storybook/',
   '*.js',
-  'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
   'libraries/core/lib/',
   'libraries/api-client/lib/',

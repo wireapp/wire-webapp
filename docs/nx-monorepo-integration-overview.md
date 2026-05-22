@@ -1031,7 +1031,6 @@ const ignores = [
   '**/*.test.*',
   '**/*.spec.*',
   '*.js',
-  'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
   'libraries/core/lib/',
   'libraries/api-client/lib/',
