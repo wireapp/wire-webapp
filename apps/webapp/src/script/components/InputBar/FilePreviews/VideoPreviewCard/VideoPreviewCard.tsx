@@ -17,10 +17,9 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
-
 import {videoStyles, iconWrapperStyles} from './VideoPreviewCard.styles';
 
+import {useApplicationContext} from '../../../../page/RootProvider';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
 import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
@@ -33,9 +32,11 @@ interface VideoPreviewCardProps {
 }
 
 export const VideoPreviewCard = ({src, onDelete, onRetry, isError, uploadProgress}: VideoPreviewCardProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <MediaFilePreviewCard
-      label={t('conversationFileVideoPreviewLabel', {src})}
+      label={translate('conversationFileVideoPreviewLabel', {src})}
       onDelete={onDelete}
       onRetry={onRetry}
       isError={isError}

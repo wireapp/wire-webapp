@@ -23,10 +23,11 @@ import {MoreIcon} from '@wireapp/react-ui-kit';
 
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FilePreviewErrorMoreButton.styles';
+
+import {useApplicationContext} from '../../../../../page/RootProvider';
 
 interface FilePreviewErrorMoreButtonProps {
   onDelete: () => void;
@@ -34,9 +35,11 @@ interface FilePreviewErrorMoreButtonProps {
 }
 
 export const FilePreviewErrorMoreButton = ({onDelete, onRetry}: FilePreviewErrorMoreButtonProps) => {
+  const {translate} = useApplicationContext();
+
   const showOptionsMenu = (event: ReactMouseEvent<HTMLButtonElement> | MouseEvent) => {
-    const retryLabel = t('conversationFilePreviewErrorRetry');
-    const removeLabel = t('conversationFilePreviewErrorRemove');
+    const retryLabel = translate('conversationFilePreviewErrorRetry');
+    const removeLabel = translate('conversationFilePreviewErrorRemove');
 
     showContextMenu({
       event,
@@ -60,7 +63,7 @@ export const FilePreviewErrorMoreButton = ({onDelete, onRetry}: FilePreviewError
       css={buttonStyles}
       onKeyDown={handleKeyDown}
       onClick={showOptionsMenu}
-      aria-label={t('conversationFilePreviewErrorMoreOptions')}
+      aria-label={translate('conversationFilePreviewErrorMoreOptions')}
     >
       <MoreIcon css={iconStyles} />
     </button>
