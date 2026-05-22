@@ -18,7 +18,6 @@
  */
 
 import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
-import is from '@sindresorhus/is';
 
 import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
@@ -29,9 +28,8 @@ import {
 } from 'Repositories/media/backgroundEffects/helper/metrics';
 import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
 
-import {Canvas2dRenderer, createCanvas2DRenderer} from './canvas2dRenderer';
 import {VideoFilter} from './filter';
-import {SELFIE_MULTICLASS_MODEL_PATH, SELFIE_SEGMENTER_MODEL_PATH, WorkerProcessVideoTrackOptions} from './options';
+import {WorkerProcessVideoTrackOptions} from './options';
 import {WebGLRenderer} from './renderer';
 
 import {createWallClock} from '../../../../clock/wallClock';
@@ -43,27 +41,28 @@ export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
   Object.assign(segmenterOptions, opts);
 }
 
-async function createSegmenter(canvas: OffscreenCanvas, useGPU: boolean) {
+async function createSegmenter(canvas: OffscreenCanvas) {
   const logger = getSafeLogger('segmenter:createSegmenter');
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
   const fileset =
     wasmLoaderPath && wasmBinaryPath
-      ? {wasmLoaderPath, wasmBinaryPath}
+      ? {
+          wasmLoaderPath,
+          wasmBinaryPath,
+        }
       : await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm');
-  logger.log(`[virtual-background] createSegmenter (gpu=${useGPU})`);
-
+  logger.log(`[virtual-background] createSegmenter`);
   const segmenter = await ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
       modelAssetPath:
         modelPath ||
         'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
-      delegate: useGPU ? 'GPU' : 'CPU',
+      delegate: 'GPU',
     },
     runningMode: 'VIDEO',
     outputCategoryMask: true,
     outputConfidenceMasks: true,
-    // Only share the canvas when using GPU — it is needed for getAsWebGLTexture().
-    ...(useGPU ? {canvas} : {}),
+    canvas,
   });
   return segmenter;
 }
@@ -88,30 +87,12 @@ export async function runSegmenter(
   readable: ReadableStream,
   opts: WorkerProcessVideoTrackOptions,
   onMetrics: (metrics: Metrics) => void,
-  onRendererFallback: (modelPath: string) => void,
 ) {
   const logger = getSafeLogger('segmenter:runSegmenter');
   logger.log(`[virtual-background] runSegmenter`);
   segmenterOptions = opts;
 
-  // Try WebGL first; fall back to 2D Canvas if unavailable.
-  let webGLRenderer: WebGLRenderer | null = null;
-  let canvas2DRenderer: Canvas2dRenderer | null = null;
-
-  try {
-    logger.log('[virtual-background] initializing WebGL2 with GPU pipeline');
-    webGLRenderer = new WebGLRenderer(canvas);
-  } catch {
-    logger.log('[virtual-background] WebGL2 unavailable — falling back to 2D Canvas CPU pipeline');
-    canvas2DRenderer = createCanvas2DRenderer(canvas);
-
-    if (segmenterOptions.modelPath === SELFIE_MULTICLASS_MODEL_PATH) {
-      segmenterOptions.modelPath = SELFIE_SEGMENTER_MODEL_PATH;
-      onRendererFallback(SELFIE_SEGMENTER_MODEL_PATH);
-    }
-  }
-
-  const useGPU = webGLRenderer !== null;
+  let webGLRenderer: WebGLRenderer | null = new WebGLRenderer(canvas);
 
   function onContextLost(event: Event) {
     logger.log(`[virtual-background] webglcontextlost (${!!webGLRenderer})`);
@@ -122,7 +103,7 @@ export async function runSegmenter(
 
   function onContextRestored() {
     logger.log(`[virtual-background] webglcontextrestored (${!!webGLRenderer})`);
-    if (webGLRenderer === null) {
+    if (!webGLRenderer) {
       const timer = createWallClock();
       timer.setTimeout(() => {
         logger.log('[virtual-background] restart segmenter onContextRestored');
@@ -137,12 +118,9 @@ export async function runSegmenter(
     canvas.addEventListener('webglcontextlost', onContextLost, {once: true});
     canvas.addEventListener('webglcontextrestored', onContextRestored, {once: true});
   }
+  attachCanvasEvents();
 
-  if (useGPU) {
-    attachCanvasEvents();
-  }
-
-  let segmenter = await createSegmenter(canvas, useGPU);
+  let segmenter = await createSegmenter(canvas);
   let currentModelPath = segmenterOptions.modelPath;
 
   const restartSegmenter = createRestartQueue(restartSegmenterSequentially);
@@ -151,7 +129,7 @@ export async function runSegmenter(
     const targetModelPath = segmenterOptions.modelPath;
 
     try {
-      const newSegmenter = await createSegmenter(canvas, useGPU);
+      const newSegmenter = await createSegmenter(canvas);
 
       const oldSegmenter = segmenter;
       segmenter = newSegmenter;
@@ -201,15 +179,13 @@ export async function runSegmenter(
     const quality = segmenterOptions.quality ?? 'auto';
     const tier = quality === 'auto' ? 'superhigh' : quality;
 
-    onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, useGPU ? 'GPU' : 'CPU'));
+    onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, 'GPU'));
   }
 
   function close() {
     segmenter.close();
     webGLRenderer?.close();
     webGLRenderer = null;
-    canvas2DRenderer?.close();
-    canvas2DRenderer = null;
     videoFilter?.destroy();
     canvas.removeEventListener('webglcontextlost', onContextLost);
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
@@ -219,7 +195,7 @@ export async function runSegmenter(
     {
       async write(videoFrame: VideoFrame) {
         const {codedWidth, codedHeight, timestamp} = videoFrame;
-        if (codedWidth === 0 || codedHeight === 0) {
+        if (!codedWidth || !codedHeight) {
           videoFrame.close();
           return;
         }
@@ -234,7 +210,7 @@ export async function runSegmenter(
         let filterMs = 0;
         let segmentationMs = 0;
         let gpuMs = 0;
-        const writableStreamLogger = getSafeLogger('segmenter:WritableStream::write');
+        const logger = getSafeLogger('segmenter:WritableStream::write');
 
         try {
           if (segmenterOptions.enabled && segmenterOptions.quality !== 'bypass') {
@@ -263,38 +239,24 @@ export async function runSegmenter(
                   const confidenceMask = result.confidenceMasks?.[0];
 
                   try {
-                    if (is.nullOrUndefined(categoryMask) || is.nullOrUndefined(confidenceMask)) {
-                      writableStreamLogger.warn('[virtual-background] Skipping frame: Missing masks.');
+                    if (!categoryMask || !confidenceMask) {
+                      logger.warn('Skipping frame: Missing masks or WebGL data.');
                       return;
                     }
 
+                    const categoryTextureMP = categoryMask.getAsWebGLTexture();
+                    const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
                     const gpuStart = performance.now();
-
-                    if (useGPU && !is.nullOrUndefined(webGLRenderer)) {
-                      const categoryTexture = categoryMask.getAsWebGLTexture();
-                      const confidenceTexture = confidenceMask.getAsWebGLTexture();
-                      webGLRenderer.render(
-                        videoFrame,
-                        segmenterOptions,
-                        categoryTexture,
-                        confidenceTexture,
-                        useSelfieModel,
-                      );
-                    } else if (!is.nullOrUndefined(canvas2DRenderer)) {
-                      const categoryData = categoryMask.getAsFloat32Array();
-                      const confidenceData = confidenceMask.getAsFloat32Array();
-                      canvas2DRenderer.render(
-                        videoFrame,
-                        segmenterOptions,
-                        categoryData,
-                        confidenceData,
-                        useSelfieModel,
-                      );
-                    }
-
+                    webGLRenderer?.render(
+                      videoFrame,
+                      segmenterOptions,
+                      categoryTextureMP,
+                      confidenceTextureMP,
+                      useSelfieModel,
+                    );
                     gpuMs = performance.now() - gpuStart;
-                  } catch (error) {
-                    writableStreamLogger.error('[virtual-background] Error in videoCallback:', error);
+                  } catch (e) {
+                    logger.error('Error in videoCallback:', e);
                   } finally {
                     categoryMask?.close();
                     confidenceMask?.close();
@@ -305,11 +267,7 @@ export async function runSegmenter(
             });
           } else {
             const gpuStart = performance.now();
-            if (useGPU) {
-              webGLRenderer?.render(videoFrame, segmenterOptions);
-            } else {
-              canvas2DRenderer?.render(videoFrame, segmenterOptions);
-            }
+            webGLRenderer?.render(videoFrame, segmenterOptions);
             gpuMs = performance.now() - gpuStart;
           }
         } finally {
