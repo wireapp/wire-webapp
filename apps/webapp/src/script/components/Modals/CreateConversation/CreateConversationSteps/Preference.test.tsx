@@ -1,9 +1,14 @@
 import {getByRole, render} from '@testing-library/react';
 import {Preference} from 'Components/Modals/CreateConversation/CreateConversationSteps/Preference';
-import {container} from 'tsyringe';
 import {TeamState} from 'Repositories/team/TeamState';
-import ko from 'knockout';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
+import ko from 'knockout';
+import {container} from 'tsyringe';
+
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
@@ -13,6 +18,9 @@ type TeamStateDateSet = {
 };
 
 describe('Preference', () => {
+  const rootContextValue = createRootContextValueForTest({});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
   beforeEach(() => {
     container.clearInstances();
   });
@@ -63,7 +71,7 @@ describe('Preference', () => {
       container.registerInstance(TeamState, mockTeamState);
 
       // Act
-      const {getByTestId} = render(<Preference />);
+      const {getByTestId} = render(<Preference />, {wrapper: rootProviderWrapper});
 
       // Assert
       const servicesToggleContainer = getByTestId('info-toggle-services');
