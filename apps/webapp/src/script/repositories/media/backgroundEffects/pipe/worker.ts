@@ -17,13 +17,21 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 
+import {runCanvas2dSegmenter} from './canvas2dSegmenter';
 import {WorkerProcessVideoTrackOptions} from './options';
-import {runSegmenter, updateSegmenterOptions} from './segmenter';
+import {updateSegmenterOptions} from './segmenter';
+import {runWebGlSegmenter} from './webGlSegmenter';
 
 const workerLogger = getSafeLogger('virtual-background-worker');
+
+type PipelineType = 'webgl2' | 'canvas2d';
+
+let stopSegmenter: (() => Promise<void>) | null = null;
 
 globalThis.onmessage = ({data}) => {
   workerLogger.log(`[virtual-background] worker onmessage`, data);
@@ -36,12 +44,15 @@ globalThis.onmessage = ({data}) => {
       canvas,
       readable,
       options: opts,
+      pipeline,
     } = data as {
       canvas: OffscreenCanvas;
       readable: ReadableStream;
       options: WorkerProcessVideoTrackOptions;
+      pipeline: PipelineType;
     };
-    runSegmenter(
+    const runner = pipeline === 'canvas2d' ? runCanvas2dSegmenter : runWebGlSegmenter;
+    runner(
       canvas,
       readable,
       opts,
@@ -51,8 +62,25 @@ globalThis.onmessage = ({data}) => {
       (modelPath: string) => {
         globalThis.postMessage({name: 'rendererFallback', modelPath});
       },
-    ).catch((err: unknown) => {
-      workerLogger.error(`[virtual-background] video error: ${(err as Error).message}`);
-    });
+    )
+      .then(stop => {
+        stopSegmenter = stop;
+      })
+      .catch((err: unknown) => {
+        const errorMessage = is.error(err) ? err.message : 'unknown error';
+        workerLogger.error(`[virtual-background] video error: ${errorMessage}`);
+      });
+  } else if (name === 'stop') {
+    const stop = stopSegmenter;
+
+    stopSegmenter = null;
+    Promise.resolve(stop?.())
+      .catch((err: unknown) => {
+        const errorMessage = is.error(err) ? err.message : 'unknown error';
+        workerLogger.error(`[virtual-background] stop error: ${errorMessage}`);
+      })
+      .finally(() => {
+        globalThis.postMessage({name: 'stopped'});
+      });
   }
 };

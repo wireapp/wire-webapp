@@ -20,16 +20,17 @@
 import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
 
 import {
-  getSegmenterModelUpdatedOptions,
-  runSegmenter,
-  updateSegmenterOptions,
-} from 'Repositories/media/backgroundEffects/pipe/segmenter';
-import {
   SELFIE_MULTICLASS_MODEL_PATH,
   SELFIE_SEGMENTER_MODEL_PATH,
   WorkerProcessVideoTrackOptions,
 } from 'Repositories/media/backgroundEffects/pipe/options';
 import {WebGLRenderer} from 'Repositories/media/backgroundEffects/pipe/renderer';
+import {
+  getSegmenterModelUpdatedOptions,
+  updateSegmenterOptions,
+} from 'Repositories/media/backgroundEffects/pipe/segmenter';
+import {runWebGlSegmenter} from 'Repositories/media/backgroundEffects/pipe/webGlSegmenter';
+import {runCanvas2dSegmenter} from 'Repositories/media/backgroundEffects/pipe/canvas2dSegmenter';
 
 jest.mock('../../../../clock/wallClock', () => ({
   createWallClock: jest.fn(() => ({
@@ -213,11 +214,11 @@ describe('segmenter tests', () => {
     });
   });
 
-  describe('runSegmenter', () => {
-    it('creates the segmenter with GPU delegate and shared canvas when WebGL is available', async () => {
+  describe('runWebGlSegmenter', () => {
+    it('creates the segmenter with GPU delegate and shared canvas', async () => {
       const canvas = createCanvas();
 
-      await runSegmenter(canvas, createClosedReadable(), createOptions(), jest.fn(), jest.fn());
+      await runWebGlSegmenter(canvas, createClosedReadable(), createOptions(), jest.fn(), jest.fn());
 
       expect(createFromOptionsMock).toHaveBeenCalledWith(
         expect.anything(),
@@ -236,13 +237,13 @@ describe('segmenter tests', () => {
       expect(canvas.addEventListener).toHaveBeenCalledWith('webglcontextrestored', expect.any(Function), {once: true});
     });
 
-    it('falls back to CPU delegate and does not pass canvas when WebGL renderer cannot be created', async () => {
+    it('falls back to runCanvas2dSegmenter when WebGLRenderer ctor throws', async () => {
       jest.mocked(WebGLRenderer).mockImplementationOnce(() => {
         throw new Error('WebGL unavailable');
       });
       const canvas = createCanvas();
 
-      await runSegmenter(canvas, createClosedReadable(), createOptions(), jest.fn(), jest.fn());
+      await runWebGlSegmenter(canvas, createClosedReadable(), createOptions(), jest.fn(), jest.fn());
 
       expect(createFromOptionsMock).toHaveBeenCalledWith(
         expect.anything(),
@@ -263,7 +264,7 @@ describe('segmenter tests', () => {
 
     it('uses provided wasm paths instead of loading the default vision task fileset', async () => {
       const options = createOptions();
-      await runSegmenter(
+      await runWebGlSegmenter(
         createCanvas(),
         createClosedReadable(),
         createOptionWithWasmPaths(options, '/local/tasks-vision.loader.js', '/local/tasks-vision.wasm'),
@@ -281,14 +282,14 @@ describe('segmenter tests', () => {
       );
     });
 
-    it('falls back from multiclass model to selfie segmenter model when WebGL is unavailable', async () => {
+    it('falls back from multiclass model to selfie segmenter model when WebGLRenderer ctor throws', async () => {
       jest.mocked(WebGLRenderer).mockImplementationOnce(() => {
         throw new Error('WebGL unavailable');
       });
 
       const onRendererFallback = jest.fn();
 
-      await runSegmenter(
+      await runWebGlSegmenter(
         createCanvas(),
         createClosedReadable(),
         createOptions({
@@ -312,14 +313,84 @@ describe('segmenter tests', () => {
       );
     });
 
-    it('does not call renderer fallback when WebGL is unavailable but model is already CPU-compatible', async () => {
-      jest.mocked(WebGLRenderer).mockImplementationOnce(() => {
-        throw new Error('WebGL unavailable');
-      });
+    it('returns a stop() that closes the segmenter and renderer', async () => {
+      const segmenterInstance = {
+        close: jest.fn(),
+        setOptions: jest.fn(),
+        segmentForVideo: jest.fn(),
+      };
+      createFromOptionsMock.mockResolvedValueOnce(segmenterInstance as any);
 
+      const rendererInstance = {close: jest.fn(), render: jest.fn()};
+      jest.mocked(WebGLRenderer).mockImplementationOnce(() => rendererInstance as any);
+
+      const stop = await runWebGlSegmenter(
+        createCanvas(),
+        createClosedReadable(),
+        createOptions(),
+        jest.fn(),
+        jest.fn(),
+      );
+
+      await stop();
+
+      expect(segmenterInstance.close).toHaveBeenCalledTimes(1);
+      expect(rendererInstance.close).toHaveBeenCalledTimes(1);
+
+      // Calling stop() again is a no-op (no double close).
+      await stop();
+      expect(segmenterInstance.close).toHaveBeenCalledTimes(1);
+      expect(rendererInstance.close).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('runCanvas2dSegmenter', () => {
+    it('skips WebGLRenderer construction and uses CPU delegate', async () => {
+      const canvas = createCanvas();
+
+      await runCanvas2dSegmenter(canvas, createClosedReadable(), createOptions(), jest.fn(), jest.fn());
+
+      expect(WebGLRenderer).not.toHaveBeenCalled();
+
+      expect(createFromOptionsMock).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          baseOptions: expect.objectContaining({
+            delegate: 'CPU',
+          }),
+          runningMode: 'VIDEO',
+          outputCategoryMask: true,
+          outputConfidenceMasks: true,
+        }),
+      );
+
+      const [, options] = createFromOptionsMock.mock.calls[0];
+      expect(options).not.toHaveProperty('canvas');
+      expect(canvas.addEventListener).not.toHaveBeenCalled();
+    });
+
+    it('falls back from multiclass model to selfie segmenter model on the CPU path', async () => {
       const onRendererFallback = jest.fn();
 
-      await runSegmenter(
+      await runCanvas2dSegmenter(
+        createCanvas(),
+        createClosedReadable(),
+        createOptions({
+          ...createOptions(),
+          modelPath: SELFIE_MULTICLASS_MODEL_PATH,
+        }),
+        jest.fn(),
+        onRendererFallback,
+      );
+
+      expect(WebGLRenderer).not.toHaveBeenCalled();
+      expect(onRendererFallback).toHaveBeenCalledWith(SELFIE_SEGMENTER_MODEL_PATH);
+    });
+
+    it('does not call renderer fallback when model is already CPU-compatible', async () => {
+      const onRendererFallback = jest.fn();
+
+      await runCanvas2dSegmenter(
         createCanvas(),
         createClosedReadable(),
         createOptions({
@@ -365,7 +436,7 @@ describe('segmenter tests', () => {
 
       const canvas = createCanvas();
 
-      await runSegmenter(
+      await runWebGlSegmenter(
         canvas,
         readable,
         createOptions({
@@ -406,7 +477,7 @@ describe('segmenter tests', () => {
     });
   });
 
-  describe('runSegmenter webgl context handling', () => {
+  describe('runWebGlSegmenter webgl context handling', () => {
     it('closes renderer on webglcontextlost and recreates it on webglcontextrestored', async () => {
       const listeners = new Map<string, EventListener>();
 
@@ -419,7 +490,7 @@ describe('segmenter tests', () => {
 
       const readable = createClosedReadable();
 
-      await runSegmenter(canvas, readable, createOptions(), jest.fn(), jest.fn());
+      await runWebGlSegmenter(canvas, readable, createOptions(), jest.fn(), jest.fn());
 
       const {WebGLRenderer} = await import('./renderer');
       const {createWallClock} = await import('../../../../clock/wallClock');
@@ -445,7 +516,7 @@ describe('segmenter tests', () => {
     });
   });
 
-  describe('runSegmenter restart queue', () => {
+  describe('runWebGlSegmenter restart queue', () => {
     it('queues segmenter restarts sequentially on repeated webglcontextrestored events', async () => {
       const listeners = new Map<string, EventListener>();
 
@@ -488,7 +559,7 @@ describe('segmenter tests', () => {
 
       const readable = createClosedReadable();
 
-      await runSegmenter(
+      await runWebGlSegmenter(
         canvas,
         readable,
         createOptions({

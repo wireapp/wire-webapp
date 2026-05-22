@@ -17,22 +17,33 @@
  *
  */
 
+import {runCanvas2dSegmenter} from 'Repositories/media/backgroundEffects/pipe/canvas2dSegmenter';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/logger';
 
 import {type CapabilityInfo, type EffectMode, type Metrics, QualityMode} from './backgroundEffectsWorkerTypes';
-import {detectCapabilities} from './helper/capability';
+import {choosePipeline, detectCapabilities} from './helper/capability';
 import {defaultVideoTrackOptions} from './pipe/defaultVideoTrackOptions';
 import {ProcessVideoTrackOptions, WorkerBackgroundSource, WorkerProcessVideoTrackOptions} from './pipe/options';
 import {TrackProcessor} from './pipe/processor';
-import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
+import {updateSegmenterOptions} from './pipe/segmenter';
+import {runWebGlSegmenter} from './pipe/webGlSegmenter';
 
 // Blur strength (0–1) maps to Gaussian sigma in pixel units for the shader.
 // The shader's blur radius is 30 px, so a sigma in the ~10–20 px range gives
 // visually useful blur.  Multiply by this factor to get from the 0–1 range.
 const BLUR_SIGMA_SCALE = 15;
+const STOP_ACK_TIMEOUT_MS = 250;
 
-type WorkerMessage = {name: 'stats'; stats: Metrics} | {name: 'rendererFallback'; modelPath: string};
+type WorkerMessage =
+  | {name: 'stats'; stats: Metrics}
+  | {name: 'rendererFallback'; modelPath: string}
+  | {name: 'stopped'};
+
+type ActivePipeline = {
+  outputTrack: MediaStreamTrack;
+  teardown: () => Promise<void>;
+};
 
 export class BackgroundEffectsController {
   private readonly logger: Logger;
@@ -47,7 +58,7 @@ export class BackgroundEffectsController {
     requestVideoFrameCallback: false,
   };
 
-  private refcount = 0;
+  private activePipeline: ActivePipeline | null = null;
 
   /**
    * Creates a new background effects controller.
@@ -60,7 +71,11 @@ export class BackgroundEffectsController {
   }
 
   public async start(inputTrack: MediaStreamTrack, trackOptions: ProcessVideoTrackOptions): Promise<MediaStreamTrack> {
-    this.refcount++;
+    if (this.activePipeline !== null) {
+      this.logger.info('start: tearing down previous pipeline before starting a new one');
+      await this.activePipeline.teardown();
+    }
+
     const resolved = await resolveOptions(trackOptions);
     this.options = withoutBitmap(resolved);
 
@@ -81,10 +96,29 @@ export class BackgroundEffectsController {
     const outputTrack = canvas.captureStream(frameRate).getVideoTracks()[0];
     const offscreen = canvas.transferControlToOffscreen();
 
+    const pipelineType = choosePipeline(this.capabilityInfo, resolved.useWorker);
+    const useWorker = pipelineType === 'worker-webgl2';
+    const useCanvas2d = pipelineType === 'canvas2d';
+    this.logger.info(`start: pipeline=${pipelineType}, useWorker=${useWorker}, useCanvas2d=${useCanvas2d}`);
+
     const outputTrackStop = outputTrack.stop.bind(outputTrack);
     let onWorkerMessage: ({data}: MessageEvent<WorkerMessage>) => void = () => null;
+    let stopMainSegmenter: (() => Promise<void>) | null = null;
 
-    if (resolved.useWorker) {
+    const onMetrics = (stats: Metrics) => {
+      if (trackOptions.onMetrics) {
+        trackOptions.onMetrics(stats);
+      }
+    };
+
+    const onRendererFallback = (modelPath: string) => {
+      this.options = {...this.options, modelPath};
+      if (trackOptions.onRendererFallback) {
+        trackOptions.onRendererFallback(modelPath);
+      }
+    };
+
+    if (useWorker) {
       if (this.worker === null) {
         this.worker = new Worker(/* webpackChunkName: "worker" */ new URL('./pipe/worker.ts', import.meta.url));
       }
@@ -93,23 +127,18 @@ export class BackgroundEffectsController {
       transferables.push(offscreen, readable);
 
       this.worker.postMessage(
-        {name: 'runSegmenter', canvas: offscreen, readable, options: workerOptions},
+        {name: 'runSegmenter', pipeline: 'webgl2', canvas: offscreen, readable, options: workerOptions},
         transferables,
       );
-      onWorkerMessage = ({data}: MessageEvent) => {
+
+      onWorkerMessage = ({data}: MessageEvent<WorkerMessage>) => {
         switch (data.name) {
           case 'stats':
-            if (trackOptions.onMetrics) {
-              trackOptions.onMetrics(data.stats);
-            }
-
+            onMetrics(data.stats);
             break;
 
           case 'rendererFallback':
-            this.options = {...this.options, modelPath: data.modelPath};
-            if (trackOptions.onRendererFallback) {
-              trackOptions.onRendererFallback(data.modelPath);
-            }
+            onRendererFallback(data.modelPath);
             break;
         }
       };
@@ -117,43 +146,47 @@ export class BackgroundEffectsController {
       this.worker.addEventListener('message', onWorkerMessage);
     } else {
       const {options: workerOptions} = getWorkerOptions(resolved);
-      await runSegmenter(
-        offscreen,
-        readable,
-        workerOptions,
-        stats => {
-          if (trackOptions.onMetrics) {
-            trackOptions.onMetrics(stats);
-          }
-        },
-        modelPath => {
-          this.options = {...this.options, modelPath};
-          if (trackOptions.onRendererFallback) {
-            trackOptions.onRendererFallback(modelPath);
-          }
-        },
-      );
+      stopMainSegmenter = useCanvas2d
+        ? await runCanvas2dSegmenter(offscreen, readable, workerOptions, onMetrics, onRendererFallback)
+        : await runWebGlSegmenter(offscreen, readable, workerOptions, onMetrics, onRendererFallback);
     }
+
+    const teardown = async (): Promise<void> => {
+      this.logger.info('start: tearing down pipeline');
+
+      if (useWorker && this.worker !== null) {
+        try {
+          this.worker.postMessage({name: 'stop'});
+          await waitForWorkerStopAck(this.worker, STOP_ACK_TIMEOUT_MS);
+        } catch (error) {
+          this.logger.warn('teardown: worker stop failed', error);
+        }
+        this.worker.removeEventListener('message', onWorkerMessage);
+        this.worker.terminate();
+        this.worker = null;
+      } else if (stopMainSegmenter) {
+        try {
+          await stopMainSegmenter();
+        } catch (error) {
+          this.logger.warn('teardown: main-thread segmenter stop failed', error);
+        }
+      }
+
+      this.activePipeline = null;
+    };
 
     outputTrack.stop = () => {
       this.logger.info('start: outputTrack stop');
       outputTrackStop();
-
-      this.worker?.removeEventListener('message', onWorkerMessage);
-
-      this.refcount--;
-      if (!this.refcount) {
-        if (this.worker !== null) {
-          this.worker.terminate();
-          this.worker = null;
-        }
-      }
+      void teardown();
     };
 
     outputTrack.getCapabilities = () => trackCapabilities;
     outputTrack.getSettings = () => trackSettings;
     outputTrack.getConstraints = () => trackConstraints;
     inputTrack.addEventListener('ended', () => outputTrack.stop());
+
+    this.activePipeline = {outputTrack, teardown};
 
     return outputTrack;
   }
@@ -201,7 +234,7 @@ export class BackgroundEffectsController {
   }
 
   public isProcessing(): boolean {
-    return this.refcount > 0;
+    return this.activePipeline !== null;
   }
 
   public getCapabilityInfo(): CapabilityInfo {
@@ -226,7 +259,7 @@ export class BackgroundEffectsController {
    * its transferable ImageBitmap can be supplied for setBackgroundSource calls.
    */
   private pushOptionsUpdate(workerSource?: WorkerBackgroundSource, transferables: Transferable[] = []): void {
-    if (!this.refcount) {
+    if (this.activePipeline === null) {
       return;
     }
 
@@ -235,7 +268,7 @@ export class BackgroundEffectsController {
       ? {...workerOptions, backgroundSource: workerSource}
       : workerOptions;
 
-    if (this.options.useWorker && this.worker) {
+    if (this.worker !== null) {
       this.worker.postMessage({name: 'options', options: finalOptions}, transferables);
     } else {
       updateSegmenterOptions(finalOptions);
@@ -332,3 +365,23 @@ const getWorkerOptions = (
 
   return {options: workerOptions, transferables: transferables};
 };
+
+const waitForWorkerStopAck = (worker: Worker, timeoutMs: number): Promise<void> =>
+  new Promise(resolve => {
+    const timeoutId = window.setTimeout(() => {
+      worker.removeEventListener('message', onMessage);
+      resolve();
+    }, timeoutMs);
+
+    const onMessage = ({data}: MessageEvent<WorkerMessage>) => {
+      if (data.name !== 'stopped') {
+        return;
+      }
+
+      window.clearTimeout(timeoutId);
+      worker.removeEventListener('message', onMessage);
+      resolve();
+    };
+
+    worker.addEventListener('message', onMessage);
+  });
