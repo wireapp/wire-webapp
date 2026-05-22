@@ -19,12 +19,21 @@
 
 import {render} from '@testing-library/react';
 
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {UserStatusBadges} from './UserStatusBadges';
+
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('UserBadges', () => {
   it('should render all the badges passed in config', () => {
     const {getByTestId} = render(
       <UserStatusBadges config={{guest: true, federated: true, external: true, verified: true}} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByTestId('status-guest')).toBeDefined();
@@ -36,6 +45,7 @@ describe('UserBadges', () => {
   it('should not render badges that are not included in the config or are falsy', () => {
     const {getByTestId, queryByTestId} = render(
       <UserStatusBadges config={{guest: true, external: true, verified: false}} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByTestId('status-guest')).toBeDefined();

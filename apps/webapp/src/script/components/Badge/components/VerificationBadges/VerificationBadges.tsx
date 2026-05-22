@@ -42,9 +42,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {RootContextValue, useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {waitFor} from 'Util/waitFor';
 
 type VerificationBadgeContext = 'user' | 'conversation' | 'device';
@@ -194,10 +193,12 @@ const MLSVerificationBadge = ({
   context,
   MLSStatus,
   tooltipId,
+  translate,
 }: {
   MLSStatus?: MLSStatuses;
   context: VerificationBadgeContext;
   tooltipId: string;
+  translate: RootContextValue['translate'];
 }) => {
   const mlsVerificationProps = {
     css: iconStyles,
@@ -223,31 +224,31 @@ const MLSVerificationBadge = ({
       } as const;
 
       return (
-        <TooltipIcon {...mlsVerificationProps} body={t(translationKeys[context])}>
+        <TooltipIcon {...mlsVerificationProps} body={translate(translationKeys[context])}>
           <MLSVerified />
         </TooltipIcon>
       );
     case MLSStatuses.NOT_ACTIVATED:
       return (
-        <TooltipIcon {...mlsVerificationProps} body={t('E2EI.certificateNotDownloaded')}>
+        <TooltipIcon {...mlsVerificationProps} body={translate('E2EI.certificateNotDownloaded')}>
           <CertificateExpiredIcon />
         </TooltipIcon>
       );
     case MLSStatuses.EXPIRED:
       return (
-        <TooltipIcon {...mlsVerificationProps} body={t('E2EI.certificateExpired')}>
+        <TooltipIcon {...mlsVerificationProps} body={translate('E2EI.certificateExpired')}>
           <CertificateExpiredIcon />
         </TooltipIcon>
       );
     case MLSStatuses.REVOKED:
       return (
-        <TooltipIcon {...mlsVerificationProps} body={t('E2EI.certificateRevoked')}>
+        <TooltipIcon {...mlsVerificationProps} body={translate('E2EI.certificateRevoked')}>
           <CertificateRevoked />
         </TooltipIcon>
       );
     case MLSStatuses.EXPIRES_SOON:
       return (
-        <TooltipIcon {...mlsVerificationProps} body={t('E2EI.certificateExpiresSoon')}>
+        <TooltipIcon {...mlsVerificationProps} body={translate('E2EI.certificateExpiresSoon')}>
           <ExpiresSoon />
         </TooltipIcon>
       );
@@ -263,6 +264,7 @@ export const VerificationBadges = ({
   context,
 }: VerificationBadgesProps) => {
   const id = useRef(new Date().getTime());
+  const {translate} = useApplicationContext();
 
   if (MLSStatus === undefined && isProteusVerified === false) {
     return null;
@@ -285,18 +287,18 @@ export const VerificationBadges = ({
     <div className="conversation-badges" css={{display: 'flex', alignItems: 'center', gap: '6px'}}>
       {showMLSBadge && (
         <div css={badgeWrapper} tabIndex={TabIndex.FOCUSABLE} aria-describedby={mlsTooltipId}>
-          {displayTitle && <span style={title(true)}>{t('E2EI.verified')}</span>}
+          {displayTitle && <span style={title(true)}>{translate('E2EI.verified')}</span>}
 
-          <MLSVerificationBadge MLSStatus={MLSStatus} context={context} tooltipId={mlsTooltipId} />
+          <MLSVerificationBadge MLSStatus={MLSStatus} context={context} tooltipId={mlsTooltipId} translate={translate} />
         </div>
       )}
 
       {showProteusBadge && (
         <div css={badgeWrapper} tabIndex={TabIndex.FOCUSABLE} aria-describedby={proteusTooltipId}>
-          {displayTitle && <span style={title(false)}>{t('proteusVerifiedDetails')}</span>}
+          {displayTitle && <span style={title(false)}>{translate('proteusVerifiedDetails')}</span>}
 
-          <div id={proteusTooltipId} role="tooltip" aria-label={t('proteusDeviceVerified')}></div>
-          <Tooltip body={t('proteusDeviceVerified')} css={iconStyles} data-uie-name="proteus-verified">
+          <div id={proteusTooltipId} role="tooltip" aria-label={translate('proteusDeviceVerified')}></div>
+          <Tooltip body={translate('proteusDeviceVerified')} css={iconStyles} data-uie-name="proteus-verified">
             <ProteusVerified data-uie-name={`proteus-${context}-verified`} />
           </Tooltip>
         </div>
