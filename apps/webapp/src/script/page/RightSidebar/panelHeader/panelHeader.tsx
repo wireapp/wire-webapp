@@ -25,7 +25,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {DraggableClickWrapper} from 'Components/DraggableClickWrapper';
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {noop} from 'Util/util';
 
 interface PanelHeaderProps {
@@ -55,17 +55,20 @@ const PanelHeader: FC<PanelHeaderProps> = ({
   showActionMute = false,
   showNotificationsNothing = false,
   goBackUie = 'back-button',
-  goBackTitle = t('accessibility.rightPanel.GoBack'),
+  goBackTitle,
   title = '',
   titleDataUieName = '',
   closeUie = 'do-close',
-  closeBtnTitle = t('accessibility.rightPanel.close'),
+  closeBtnTitle,
   handleBlur = noop,
   onGoBack = noop,
   onToggleMute = noop,
   shouldFocusFirstButton = true,
 }: PanelHeaderProps) => {
+  const {translate} = useApplicationContext();
   const panelHeaderRef = useRef<HTMLHeadingElement>(null);
+  const effectiveGoBackTitle = goBackTitle || translate('accessibility.rightPanel.GoBack');
+  const effectiveCloseButtonTitle = closeBtnTitle || translate('accessibility.rightPanel.close');
 
   useEffect(() => {
     if (!!panelHeaderRef.current && shouldFocusFirstButton) {
@@ -82,7 +85,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
     <header className={cx('panel__header', {'panel__header--reverse': isReverse}, className)} ref={panelHeaderRef}>
       {showBackArrow && (
         <DraggableClickWrapper onClick={() => onGoBack()}>
-          <button className="icon-button" data-uie-name={goBackUie} title={goBackTitle} onBlur={handleBlur}>
+          <button className="icon-button" data-uie-name={goBackUie} title={effectiveGoBackTitle} onBlur={handleBlur}>
             <Icon.ArrowLeftIcon />
           </button>
         </DraggableClickWrapper>
@@ -95,7 +98,7 @@ const PanelHeader: FC<PanelHeaderProps> = ({
       )}
 
       <DraggableClickWrapper onClick={onClose}>
-        <button className="icon-button" data-uie-name={closeUie} title={closeBtnTitle} onBlur={handleBlur}>
+        <button className="icon-button" data-uie-name={closeUie} title={effectiveCloseButtonTitle} onBlur={handleBlur}>
           <Icon.CloseIcon className="right-panel-close" />
         </button>
       </DraggableClickWrapper>

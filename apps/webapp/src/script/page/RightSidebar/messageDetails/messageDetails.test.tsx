@@ -27,6 +27,10 @@ import {User} from 'Repositories/entity/User';
 import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './messageDetails';
@@ -36,17 +40,12 @@ import {TestFactory} from '../../../../../test/helper/TestFactory';
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
 let searchRepository: SearchRepository;
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(() => {
-  testFactory.exposeConversationActors().then(factory => {
-    conversationRepository = factory;
-    return conversationRepository;
-  });
-
-  testFactory.exposeSearchActors().then(factory => {
-    searchRepository = factory;
-    return searchRepository;
-  });
+beforeAll(async () => {
+  conversationRepository = await testFactory.exposeConversationActors();
+  searchRepository = await testFactory.exposeSearchActors();
 });
 
 const getDefaultParams = (showReactions: boolean = false) => {
@@ -96,6 +95,7 @@ describe('MessageDetails', () => {
         messageEntity={message}
         userRepository={userRepository}
       />,
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => {

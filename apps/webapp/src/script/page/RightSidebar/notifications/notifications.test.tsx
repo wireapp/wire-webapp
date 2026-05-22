@@ -23,6 +23,10 @@ import ko from 'knockout';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {Notifications} from './notifications';
@@ -31,12 +35,11 @@ import {ViewModelRepositories} from '../../../view_model/MainViewModel';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(() => {
-  testFactory.exposeConversationActors().then(factory => {
-    conversationRepository = factory;
-    return conversationRepository;
-  });
+beforeAll(async () => {
+  conversationRepository = await testFactory.exposeConversationActors();
 });
 
 const getDefaultParams = () => {
@@ -54,7 +57,7 @@ describe('Notifications', () => {
       value: ko.observable(NOTIFICATION_STATE.MENTIONS_AND_REPLIES),
     });
     const defaultProps = getDefaultParams();
-    render(<Notifications {...defaultProps} activeConversation={conversation} />);
+    render(<Notifications {...defaultProps} activeConversation={conversation} />, {wrapper: rootProviderWrapper});
     expect(screen.getByLabelText('notificationSettingsMentionsAndReplies')).toBeDefined();
   });
 
@@ -70,6 +73,7 @@ describe('Notifications', () => {
         activeConversation={conversation}
         repositories={{conversation: conversationRepository} as unknown as ViewModelRepositories}
       />,
+      {wrapper: rootProviderWrapper},
     );
     const input = screen.getByTestId(`preferences-options-notifications-${NOTIFICATION_STATE.MENTIONS_AND_REPLIES}`);
     fireEvent.click(input);
