@@ -50,6 +50,7 @@ import {UserState} from 'Repositories/user/userState';
 import {isUUID} from 'src/script/auth/util/stringUtil';
 import {Config} from 'src/script/Config';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import {t} from 'Util/localizerUtil';
 
 import {AppLock} from './AppLock';
 import {useE2EIFeatureConfigUpdate} from './components/FeatureConfigChange/FeatureConfigChangeHandler/Features/useE2EIFeatureConfigUpdate';
@@ -330,6 +331,7 @@ export const AppMain = (properties: AppMainProps) => {
           wallClock,
           doesApplicationNeedForceReload,
           isFeatureToggleEnabled,
+          translate: t,
           applicationNavigation: {
             get currentPathname(): string {
               return window.location.pathname;

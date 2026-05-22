@@ -117,4 +117,18 @@ describe('RootProvider', () => {
     expect(result.current.isFeatureToggleEnabled(applockRefactoredFeatureToggleName)).toBe(true);
     expect(isFeatureToggleEnabled).toHaveBeenCalledWith(applockRefactoredFeatureToggleName);
   });
+
+  it('provides the injected translate function through useApplicationContext()', () => {
+    const translate = jest.fn((identifier: Parameters<RootContextValue['translate']>[0]) => {
+      return identifier;
+    }) as RootContextValue['translate'];
+    const rootContextValue = createRootContextValueForTest({mainViewModel, translate});
+    const wrapper = createRootProviderWrapperForTest(rootContextValue);
+
+    const {result} = renderHook(useApplicationContext, {wrapper});
+
+    expect(result.current.translate).toBe(translate);
+    expect(result.current.translate('conversationYouNominative')).toBe('conversationYouNominative');
+    expect(translate).toHaveBeenCalledWith('conversationYouNominative');
+  });
 });
