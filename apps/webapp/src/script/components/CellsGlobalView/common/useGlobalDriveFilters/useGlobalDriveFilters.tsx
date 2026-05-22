@@ -19,37 +19,23 @@
 
 import {useCallback, useMemo, useState} from 'react';
 
-import {
-  ArchiveFileIcon,
-  AudioFileIcon,
-  CodeFileIcon,
-  DocumentFileIcon,
-  FolderIcon,
-  ImageFileIcon,
-  OtherFileIcon,
-  PdfFileIcon,
-  PresentationFileIcon,
-  SpreadsheetFileIcon,
-  VideoFileIcon,
-} from '@wireapp/react-ui-kit';
-
 import type {
   FilterConfig,
   FilterItem,
 } from 'Components/Conversation/ConversationCells/common/CellsFiltersBar/filterConfig';
+import {
+  type GlobalDriveFiltersState,
+  getActiveGlobalDriveFilterType,
+  isFilterTypeDisabled,
+} from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
+import {FILE_TYPE_CATALOG} from 'Components/Conversation/ConversationCells/common/driveFilters/fileTypeCatalog';
+import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
 
 // ---------------------------------------------------------------------------
 // Mock data — replace each array with an API call in the integration sprint.
 // ---------------------------------------------------------------------------
-
-const MOCK_TAGS: FilterItem[] = [
-  {id: 'a-tag', label: 'A tag'},
-  {id: 'hello-tag', label: 'Hello tag'},
-  {id: 'b-tag', label: 'B tag'},
-  {id: 'new-tag-1', label: 'New tag 1'},
-  {id: 'e-tag', label: 'E Tag'},
-];
 
 const MOCK_CONVERSATIONS: FilterItem[] = [
   {id: 'conv-1', label: 'Marketing Team'},
@@ -65,7 +51,13 @@ const MOCK_CREATORS: FilterItem[] = [
 
 // ---------------------------------------------------------------------------
 
-export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
+export const useGlobalDriveFilters = ({
+  cellsRepository,
+}: {
+  cellsRepository: CellsRepository;
+}): {filters: FilterConfig[]; filterState: GlobalDriveFiltersState} => {
+  const {tags: allTags} = useGetAllTags({cellsRepository});
+
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedFileTypeIds, setSelectedFileTypeIds] = useState<string[]>([]);
   const [selectedConversationIds, setSelectedConversationIds] = useState<string[]>([]);
@@ -73,21 +65,27 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
   const [isSharedViaLink, setIsSharedViaLink] = useState(false);
 
   const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
+  const filterState = useMemo<GlobalDriveFiltersState>(
+    () => ({
+      selectedTagIds,
+      selectedFileTypeIds,
+      selectedCreatorIds,
+      selectedConversationIds,
+      isSharedViaLink,
+    }),
+    [isSharedViaLink, selectedConversationIds, selectedCreatorIds, selectedFileTypeIds, selectedTagIds],
+  );
+
+  const tagItems = useMemo<FilterItem[]>(() => allTags.map(tag => ({id: tag, label: tag})), [allTags]);
+  const activeFilterType = useMemo(() => getActiveGlobalDriveFilterType(filterState), [filterState]);
 
   const fileTypes = useMemo<FilterItem[]>(
-    () => [
-      {id: 'pictures', label: t('cells.fileType.pictures'), startContent: <ImageFileIcon />},
-      {id: 'spreadsheets', label: t('cells.fileType.spreadsheets'), startContent: <SpreadsheetFileIcon />},
-      {id: 'presentations', label: t('cells.fileType.presentations'), startContent: <PresentationFileIcon />},
-      {id: 'documents', label: t('cells.fileType.documents'), startContent: <DocumentFileIcon />},
-      {id: 'pdfs', label: t('cells.fileType.pdfs'), startContent: <PdfFileIcon />},
-      {id: 'audio', label: t('cells.fileType.audio'), startContent: <AudioFileIcon />},
-      {id: 'videos', label: t('cells.fileType.videos'), startContent: <VideoFileIcon />},
-      {id: 'archives', label: t('cells.fileType.archives'), startContent: <ArchiveFileIcon />},
-      {id: 'code', label: t('cells.fileType.code'), startContent: <CodeFileIcon />},
-      {id: 'others', label: t('cells.fileType.others'), startContent: <OtherFileIcon />},
-      {id: 'folders', label: t('cells.fileType.folders'), startContent: <FolderIcon />},
-    ],
+    () =>
+      FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => ({
+        id,
+        label: t(labelKey),
+        startContent: <Icon />,
+      })),
     [],
   );
 
@@ -97,9 +95,11 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
         type: 'popover',
         id: 'tags',
         label: t('cells.filter.tags'),
-        items: MOCK_TAGS,
+        items: tagItems,
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
+        disabled: isFilterTypeDisabled('tags', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'popover',
@@ -108,6 +108,8 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
         items: fileTypes,
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
+        disabled: isFilterTypeDisabled('fileType', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'popover',
@@ -116,6 +118,8 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
         items: MOCK_CONVERSATIONS,
         selectedIds: selectedConversationIds,
         onSelectionChange: setSelectedConversationIds,
+        disabled: isFilterTypeDisabled('conversation', activeFilterType),
+        singleSelect: true,
       },
       {
         type: 'popover',
@@ -124,6 +128,8 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
         items: MOCK_CREATORS,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
+        disabled: isFilterTypeDisabled('createdBy', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'toggle',
@@ -131,10 +137,13 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
         label: t('cells.filter.sharedViaLink'),
         isActive: isSharedViaLink,
         onToggle: toggleSharedViaLink,
+        disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
       },
     ],
     [
+      activeFilterType,
       fileTypes,
+      tagItems,
       selectedTagIds,
       selectedFileTypeIds,
       selectedConversationIds,
@@ -144,5 +153,5 @@ export const useGlobalDriveFilters = (): {filters: FilterConfig[]} => {
     ],
   );
 
-  return {filters};
+  return {filters, filterState};
 };

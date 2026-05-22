@@ -17,7 +17,7 @@
  *
  */
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ServiceList} from 'Components/ServiceList';
 import {UserList} from 'Components/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

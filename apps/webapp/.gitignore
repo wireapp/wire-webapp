@@ -25,4 +25,4 @@ yalc.lock
 .yalc
 
 # Generated files
-src/script/components/Icon.tsx
+src/script/components/icon.tsx

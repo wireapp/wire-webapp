@@ -30,7 +30,7 @@ import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
-import * as Icon from '../../../Icon';
+import * as Icon from '../../../icon';
 
 interface DeviceCardProps {
   click?: (device: ClientEntity) => void;

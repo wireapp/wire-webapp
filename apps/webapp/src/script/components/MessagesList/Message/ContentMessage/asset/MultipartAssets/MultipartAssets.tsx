@@ -25,6 +25,7 @@ import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isPreviewableImage} from 'Util/imageUtil';
 import {t} from 'Util/localizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
@@ -56,7 +57,7 @@ export const MultipartAssets = ({
   cellsRepository = container.resolve(CellsRepository),
   senderName,
   timestamp,
-}: MultipartAssetsProps) => {
+}: MultipartAssetsProps): JSX.Element => {
   return (
     <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
@@ -93,7 +94,8 @@ const MultipartAsset = ({
   image: imageMetadata,
   senderName,
   timestamp,
-}: MultipartAssetProps) => {
+}: MultipartAssetProps): JSX.Element => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
@@ -126,15 +128,20 @@ const MultipartAsset = ({
    * renamed, or otherwise modified.
    */
   useEffect(() => {
-    const handleHashChange = () => {
+    function handleHashChange(): void {
       const currentPath = window.location.hash;
       if (currentPath.includes(conversationId) && !currentPath.endsWith('/files')) {
-        void fetchData(true);
+        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+          await fetchData(true);
+        });
       }
-    };
+    }
+
     window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [fetchData, conversationId]);
+    return (): void => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [conversationId, fetchData, fireAndForgetInvoker]);
 
   if (isRecycled === true) {
     return (

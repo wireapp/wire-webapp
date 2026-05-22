@@ -1389,7 +1389,7 @@ export class MessageRepository {
       .filter(user => {
         return user.isFederated === false;
       })
-      .sort(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
+      .toSorted(({id: idA}, {id: idB}) => idA.localeCompare(idB, undefined, {sensitivity: 'base'}));
     const [members, other] = partition(sortedUsers, user => this.teamState.isInTeam(user));
     const selfUser = this.userState.self();
     if (selfUser === undefined) {

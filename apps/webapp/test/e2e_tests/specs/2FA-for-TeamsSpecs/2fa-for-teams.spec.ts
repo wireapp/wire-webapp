@@ -68,7 +68,9 @@ test.describe('2FA for teams', () => {
   test(
     'I want to receive new verification code email after clicking "Resend code" button',
     {tag: ['@TC-40', '@regression']},
-    async ({createPage, api}) => {
+    async ({createPage, api}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 61_000);
+
       const pageManager = PageManager.from(await createPage());
       const {pages} = pageManager.webapp;
 

@@ -19,7 +19,7 @@
 
 import {FolderIcon} from '@wireapp/react-ui-kit';
 
-import {ChevronRight} from 'Components/Icon';
+import {ChevronRight} from 'Components/icon';
 
 import {
   arrowIconStyles,

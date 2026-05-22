@@ -57,7 +57,7 @@ describe('generateRandomPassword', () => {
 
   it('shuffles characters sufficiently', () => {
     const password = generateRandomPassword(12);
-    const sortedPassword = password.split('').sort().join('');
+    const sortedPassword = password.split('').toSorted().join('');
     expect(password).not.toEqual(sortedPassword); // Rare chance of equality, indicates weak shuffling
   });
 });

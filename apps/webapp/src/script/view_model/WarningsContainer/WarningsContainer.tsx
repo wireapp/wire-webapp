@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {Runtime} from '@wireapp/commons';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 import {afterRender} from 'Util/util';
 

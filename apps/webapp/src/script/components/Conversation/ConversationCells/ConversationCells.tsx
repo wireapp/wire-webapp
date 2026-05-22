@@ -33,15 +33,11 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
+import {hasActiveConversationDriveFilters} from './common/driveFilters/driveFilters';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
-import {
-  searchIdleDescriptionStyles,
-  searchIdleHeadingStyles,
-  searchIdleStateStyles,
-  wrapperStyles,
-} from './ConversationCells.styles';
+import {wrapperStyles} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
@@ -94,6 +90,9 @@ export const ConversationCells = memo(
       userRepository,
     });
 
+    const {filters, filterState, clearAllFilters} = useConversationDriveFilters({cellsRepository});
+    const hasActiveFilters = hasActiveConversationDriveFilters(filterState);
+
     const {
       searchValue,
       handleSearch,
@@ -101,33 +100,31 @@ export const ConversationCells = memo(
     } = useConversationSearchFiles({
       cellsRepository,
       conversationQualifiedId,
-      enabled: isCellsStateReady,
+      enabled: isCellsStateReady && isSearchViewOpen,
       fireAndForgetInvoker,
       userRepository,
+      filters: filterState,
       onClear: refresh,
     });
 
     const trimmedSearchValue = searchValue.trim();
     const isSearchActive = !!trimmedSearchValue;
-    const isSearchViewIdle = isSearchViewOpen && !trimmedSearchValue;
     const wasSearchViewOpen = useRef(isSearchViewOpen);
 
     const handleClearSearch = useCallback((): void => {
       clearSearch();
-      fireAndForgetInvoker.fireAndForget(refresh);
-    }, [clearSearch, fireAndForgetInvoker, refresh]);
+    }, [clearSearch]);
 
     useEffect(() => {
-      if (wasSearchViewOpen.current && !isSearchViewOpen && searchValue) {
-        handleClearSearch();
+      if (wasSearchViewOpen.current && !isSearchViewOpen && (isSearchActive || hasActiveFilters)) {
+        clearAllFilters();
+        clearSearch({preserveFilters: false});
       }
       wasSearchViewOpen.current = isSearchViewOpen;
-    }, [handleClearSearch, isSearchViewOpen, searchValue]);
+    }, [clearAllFilters, clearSearch, hasActiveFilters, isSearchActive, isSearchViewOpen]);
 
     // When search is active, refresh should trigger search reload
     const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
-
-    const {filters} = useConversationDriveFilters();
 
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
@@ -148,11 +145,11 @@ export const ConversationCells = memo(
     const hasNodes = !!nodes.length;
     const emptyView = !isError && !hasNodes && isCellsStateReady;
 
-    const isTableVisible = (isSuccess || isLoading) && isCellsStateReady && !isSearchViewIdle;
-    const isLoadingVisible = isLoading && isCellsStateReady && !isSearchViewIdle;
-    const isNoNodesVisible = !isLoading && emptyView && !isInRecycleBin() && !isSearchViewIdle;
-    const isPaginationVisible = !emptyView && !isSearchViewIdle;
-    const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading && !isSearchViewIdle;
+    const isTableVisible = (isSuccess || isLoading) && isCellsStateReady;
+    const isLoadingVisible = isLoading && isCellsStateReady;
+    const isNoNodesVisible = !isLoading && emptyView && !isInRecycleBin();
+    const isPaginationVisible = !emptyView;
+    const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading;
 
     return (
       <div css={wrapperStyles}>
@@ -177,12 +174,6 @@ export const ConversationCells = memo(
             onRefresh={handleRefresh}
           />
         )}
-        {isSearchViewIdle && (
-          <div css={searchIdleStateStyles}>
-            <p css={searchIdleHeadingStyles}>{t('cells.search.idle.heading')}</p>
-            <p css={searchIdleDescriptionStyles}>{t('cells.search.idle.description')}</p>
-          </div>
-        )}
         {isCellsStatePending && !isRefreshing && (
           <CellsStateInfo heading={t('cells.pending.heading')} description={t('cells.pending.description')} />
         )}
@@ -190,7 +181,7 @@ export const ConversationCells = memo(
           <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
         )}
         {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
-        {(isLoadingVisible || (isRefreshing && !isSearchViewIdle)) && <CellsLoader />}
+        {(isLoadingVisible || isRefreshing) && <CellsLoader />}
         {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
         {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
       </div>

@@ -79,6 +79,12 @@ export const sectionLabelStyles: CSSObject = {
   marginBottom: 8,
 };
 
+export const closeButtonStyles: CSSObject = {
+  '&:focus-visible': {
+    outlineOffset: '0.4rem',
+  },
+};
+
 /** 2-column grid for blur and virtual background tiles. */
 export const tileGridStyles: CSSObject = {
   display: 'grid',
@@ -96,6 +102,10 @@ export const tileButtonStyles: CSSObject = {
   gap: 5,
   padding: 0,
   textAlign: 'center',
+
+  '&:focus-visible': {
+    outline: 'none',
+  },
 
   '&:focus-visible .bg-tile__preview': {
     outline: '2px solid var(--accent-color-focus)',

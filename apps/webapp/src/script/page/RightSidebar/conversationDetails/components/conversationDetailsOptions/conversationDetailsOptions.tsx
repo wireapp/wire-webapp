@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {CollectionIcon, HideIcon, HistoryIcon, LockClosedIcon, UnlockedIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {PanelActions} from 'Components/panel/PanelActions';
 import {ReceiptModeToggle} from 'Components/toggle/ReceiptModeToggle';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

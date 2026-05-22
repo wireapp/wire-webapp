@@ -75,6 +75,24 @@ describe('User', () => {
 
       expect(user.devices().length).toBe(2);
     });
+
+    it('keeps own devices sorted by descending creation time', () => {
+      const olderClient = new ClientEntity(false, null);
+      olderClient.id = 'older-client';
+      olderClient.time = '2024-01-01T00:00:00.000Z';
+
+      const newerClient = new ClientEntity(false, null);
+      newerClient.id = 'newer-client';
+      newerClient.time = '2024-01-02T00:00:00.000Z';
+
+      const user = new User();
+      user.isMe = true;
+
+      user.addClient(olderClient);
+      user.addClient(newerClient);
+
+      expect(user.devices().map(clientEntity => clientEntity.id)).toEqual(['newer-client', 'older-client']);
+    });
   });
 
   describe('accent_color', () => {

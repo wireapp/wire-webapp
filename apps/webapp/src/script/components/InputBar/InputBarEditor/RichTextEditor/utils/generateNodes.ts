@@ -34,7 +34,7 @@ const breakWhere = (words: MentionEntity[], str: string) =>
   );
 
 export const createNodes = (mentions: MentionEntity[], str: string) => {
-  const sortedMentions = mentions.slice(0).sort(({startIndex: o1}, {startIndex: o2}) => o1 - o2);
+  const sortedMentions = mentions.toSorted(({startIndex: o1}, {startIndex: o2}) => o1 - o2);
 
   return breakWhere(sortedMentions, str)
     .map((string: string, index: number) =>

@@ -395,14 +395,12 @@ declare module 'I18n/en-US.json' {
     'cells.filePreviewButton.ariaLabel': `Preview for {name}`;
     'cells.fileType.archives': `Archives`;
     'cells.fileType.audio': `Audio`;
-    'cells.fileType.code': `Code`;
     'cells.fileType.documents': `Documents`;
-    'cells.fileType.folders': `Folders`;
-    'cells.fileType.others': `Others`;
     'cells.fileType.pdfs': `PDFs`;
     'cells.fileType.pictures': `Pictures`;
     'cells.fileType.presentations': `Presentations`;
     'cells.fileType.spreadsheets': `Spreadsheets`;
+    'cells.fileType.text': `Text files`;
     'cells.fileType.videos': `Videos`;
     'cells.filter.conversation': `Conversation`;
     'cells.filter.createdBy': `Created by`;
@@ -504,8 +502,6 @@ declare module 'I18n/en-US.json' {
     'cells.restoreRootNodeModal.folder.headline': `Restore folder`;
     'cells.search.closeButton': `Close`;
     'cells.search.failed': `Something went wrong, please try again later.`;
-    'cells.search.idle.description': `Apply a search terms, or a filter to see results.`;
-    'cells.search.idle.heading': `Searching within Shared Drive and all its folders`;
     'cells.search.placeholder': `Search files and folders`;
     'cells.selfDeletingMessage.info': `The feature is not available for conversations with a shared Drive.`;
     'cells.shareModal.changePassword': `Change Password`;
@@ -2068,6 +2064,7 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundBlurHigh': `High`;
     'videoCallBackgroundBlurLow': `Low`;
     'videoCallBackgroundBlurSectionLabel': `Blur`;
+    'videoCallBackgroundCustom': `Custom Background`;
     'videoCallBackgroundEffectsLabel': `Background Settings`;
     'videoCallBackgroundEnableHighQualityBlur': `Enable high quality blur`;
     'videoCallBackgroundNoEffect': `No background effect`;

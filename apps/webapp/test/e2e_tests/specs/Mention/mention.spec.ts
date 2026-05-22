@@ -138,7 +138,9 @@ test.describe('Mention', () => {
   test(
     'I want to send an ephemeral message with a mention',
     {tag: ['@TC-3491', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 10_000);
+
       const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
       await connectWithUser(userAPage, userB);
 

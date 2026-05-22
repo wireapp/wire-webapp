@@ -32,6 +32,8 @@ const textFilePath = getTextFilePath();
 const selfDestructMessageText = 'This message will self-destruct in 10 seconds.';
 
 test('Messages in 1:1', {tag: ['@TC-8750', '@crit-flow-web']}, async ({createTeam, createPage}, testInfo) => {
+  test.setTimeout(testInfo.timeout + 11_000);
+
   // Precondition: Users A and B exist in two separate teams
   const [{owner: memberA}, {owner: memberB}] = await Promise.all([createTeam('Critical A'), createTeam('Critical B')]);
 

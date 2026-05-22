@@ -26,7 +26,7 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {GifImage} from 'Components/Giphy/GifImage';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {Gif, GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {t} from 'Util/localizerUtil';
 

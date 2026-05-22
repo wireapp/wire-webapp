@@ -27,7 +27,7 @@ import {MAX_HANDLE_LENGTH} from 'Repositories/user/userHandleGenerator';
 import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
-import * as Icon from '../Icon';
+import * as Icon from '../icon';
 
 interface SearchInputProps {
   onEnter?: (event: React.KeyboardEvent<HTMLInputElement>) => void | Promise<void>;

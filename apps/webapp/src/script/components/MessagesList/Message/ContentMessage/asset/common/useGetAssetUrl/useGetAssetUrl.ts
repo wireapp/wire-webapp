@@ -23,6 +23,7 @@ import {AssetError} from 'Repositories/assets/assetError';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import type {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 
 import {AssetUrl} from '../useAssetTransfer/useAssetTransfer';
@@ -37,12 +38,25 @@ interface UseGetAssetUrlProps {
   onSuccess?: (url: string) => void;
 }
 
-export const useGetAssetUrl = ({asset, isEnabled, getAssetUrl, onError, onSuccess}: UseGetAssetUrlProps) => {
+type UseGetAssetUrlResult = {
+  url: string | undefined;
+  isLoading: boolean;
+  isError: boolean;
+};
+
+export const useGetAssetUrl = ({
+  asset,
+  isEnabled,
+  getAssetUrl,
+  onError,
+  onSuccess,
+}: UseGetAssetUrlProps): UseGetAssetUrlResult => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [url, setUrl] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
-  const fetchAssetUrl = useCallback(async () => {
+  const fetchAssetUrl = useCallback(async (): Promise<void> => {
     if ((url !== undefined && url !== '') || !isEnabled) {
       return;
     }
@@ -67,8 +81,8 @@ export const useGetAssetUrl = ({asset, isEnabled, getAssetUrl, onError, onSucces
   }, [url, isEnabled, asset, getAssetUrl, onSuccess, onError]);
 
   useEffect(() => {
-    void fetchAssetUrl();
-  }, [fetchAssetUrl]);
+    fireAndForgetInvoker.fireAndForget(fetchAssetUrl);
+  }, [fetchAssetUrl, fireAndForgetInvoker]);
 
   return {
     url,

@@ -21,7 +21,7 @@ import {Fragment} from 'react';
 
 import {Tooltip} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {badgesWrapper, icon} from './UserStatusBadges.styles';

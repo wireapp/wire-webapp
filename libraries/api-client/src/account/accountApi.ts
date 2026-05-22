@@ -24,6 +24,7 @@ import {BackendConfigData} from './backendConfigData';
 import {CallConfigData} from './callConfigData';
 import {DomainData} from './domainData';
 import {DomainRedirect, DomainRedirectPayload} from './domainRedirect';
+import {PostSSOCodeByEmailSchema, SSOCode} from './ssoCode';
 import {SSOSettings} from './ssoSettings';
 
 import {HttpClient, BackendErrorLabel, BackendError, StatusCode} from '../http';
@@ -46,6 +47,7 @@ export class AccountAPI {
     SETTINGS: 'settings',
     SSO: '/sso',
     GET_DOMAIN_REGISTRATION: '/get-domain-registration',
+    GET_SSO_CODE_BY_EMAIL: '/sso/get-by-email',
   };
 
   /**
@@ -245,6 +247,25 @@ export class AccountAPI {
         };
       }
       throw error;
+    }
+  }
+
+  public async getSSOCodeByEmail(email: string): Promise<SSOCode> {
+    const config: AxiosRequestConfig = {
+      data: {
+        email,
+      },
+      method: 'post',
+      url: AccountAPI.URL.GET_SSO_CODE_BY_EMAIL,
+    };
+
+    try {
+      const response = await this.client.sendJSON<SSOCode>(config);
+      return PostSSOCodeByEmailSchema.parse(response.data);
+    } catch {
+      return {
+        sso_code: null,
+      };
     }
   }
 }

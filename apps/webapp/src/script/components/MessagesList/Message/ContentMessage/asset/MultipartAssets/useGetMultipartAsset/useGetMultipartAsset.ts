@@ -20,6 +20,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 type Status = 'idle' | 'loading' | 'success' | 'error' | 'retrying';
 
@@ -31,6 +32,18 @@ interface UseGetMultipartAssetPreviewProps {
   maxRetries?: number;
   retryDelay?: number;
 }
+
+type UseGetMultipartAssetResult = {
+  fetchData: (forceRefetch?: boolean) => Promise<void>;
+  isRecycled: boolean | undefined;
+  src: string | undefined;
+  imagePreviewUrl: string | undefined;
+  pdfPreviewUrl: string | undefined;
+  hasPreview: boolean | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  path: string | undefined;
+};
 
 const DEFAULT_MAX_RETRIES = 10;
 const DEFAULT_RETRY_DELAY = 1000;
@@ -54,7 +67,8 @@ export const useGetMultipartAsset = ({
   retryPreviewUntilSuccess = false,
   maxRetries = DEFAULT_MAX_RETRIES,
   retryDelay = DEFAULT_RETRY_DELAY,
-}: UseGetMultipartAssetPreviewProps) => {
+}: UseGetMultipartAssetPreviewProps): UseGetMultipartAssetResult => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const uuidRef = useRef(uuid);
   const [path, setPath] = useState<string | undefined>(undefined);
   const [src, setSrc] = useState<string | undefined>(undefined);
@@ -74,7 +88,7 @@ export const useGetMultipartAsset = ({
   }
 
   const fetchData = useCallback(
-    async (forceRefetch = false) => {
+    async (forceRefetch = false): Promise<void> => {
       if (!forceRefetch && (isMounted.current === false || status === 'success')) {
         return;
       }
@@ -123,7 +137,7 @@ export const useGetMultipartAsset = ({
         setPath(asset.Path);
         setIsRecycled(asset.IsRecycled);
         setStatus('success');
-      } catch (err: unknown) {
+      } catch {
         if (!isMounted.current) {
           return;
         }
@@ -152,8 +166,8 @@ export const useGetMultipartAsset = ({
     }
 
     hasStartedFetchRef.current = true;
-    void fetchData();
-  }, [isEnabled, fetchData, status]);
+    fireAndForgetInvoker.fireAndForget(fetchData);
+  }, [isEnabled, fetchData, fireAndForgetInvoker, status]);
 
   useEffect(() => {
     if (status !== 'retrying') {
@@ -161,7 +175,7 @@ export const useGetMultipartAsset = ({
     }
 
     timeoutRef.current = window.setTimeout(() => {
-      void fetchData();
+      fireAndForgetInvoker.fireAndForget(fetchData);
     }, retryDelay);
 
     return () => {
@@ -169,7 +183,7 @@ export const useGetMultipartAsset = ({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [status, fetchData, retryDelay]);
+  }, [status, fetchData, fireAndForgetInvoker, retryDelay]);
 
   return {
     fetchData,
