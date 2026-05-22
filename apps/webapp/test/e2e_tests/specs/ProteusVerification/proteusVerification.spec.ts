@@ -20,9 +20,7 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, expect, withLogin, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
-import {connectWithUser} from 'test/e2e_tests/utils/userActions';
-import {sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 const verifyCrossDeviceTrust = async (
   userAPages: PageManager['webapp']['pages'],
@@ -31,6 +29,7 @@ const verifyCrossDeviceTrust = async (
   for (const userPages of [userAPages, userBPages]) {
     await userPages.conversation().clickConversationInfoButton();
     await userPages.conversationDetails().devicesButton.click();
+    await expect(userPages.participantDevices().activeDevices).toHaveCount(1);
 
     const firstDevice = userPages.participantDevices().activeDevices.first();
     await firstDevice.click();
@@ -69,6 +68,7 @@ test.describe('Proteus verification', () => {
 
     await components.conversationSidebar().clickPreferencesButton();
     await pages.settings().devicesButton.click();
+    await expect(pages.devices().activeDevices).toHaveCount(1);
 
     const firstDevice = pages.devices().activeDevices.first();
     await pages.devices().enhanceDeviceLocator(firstDevice).removeButton.click();
@@ -148,6 +148,7 @@ test.describe('Proteus verification', () => {
 
       await modals.newDevice().clickAction();
       await pages.settings().devicesButton.click();
+      await expect(pages.devices().activeDevices).toHaveCount(1);
       await pages.devices().activeDevices.first().click();
 
       // User verifies the new device, which restore the original session's verified status
@@ -168,6 +169,7 @@ test.describe('Proteus verification', () => {
 
       await components.conversationSidebar().clickPreferencesButton();
       await pages.settings().devicesButton.click();
+      await expect(pages.devices().activeDevices).toHaveCount(1);
 
       const firstDevice = pages.devices().activeDevices.first();
       await pages.devices().enhanceDeviceLocator(firstDevice).removeButton.click();
@@ -216,6 +218,8 @@ test.describe('Proteus verification', () => {
           await modals.newDevice().clickAction();
         }
         await pages.settings().devicesButton.click();
+        await expect(pages.devices().activeDevices).toHaveCount(1);
+
         await pages.devices().activeDevices.first().click();
         await pages.deviceDetails().toggleDeviceVerification();
       }
@@ -226,6 +230,7 @@ test.describe('Proteus verification', () => {
       await userAPages.conversationList().getConversation(userB.fullName).open();
       await userAPages.conversation().clickConversationInfoButton();
       await userAPages.conversationDetails().devicesButton.click();
+      await expect(userAPages.participantDevices().activeDevices).toHaveCount(1);
 
       const firstDevice = userAPages.participantDevices().activeDevices.first();
       await firstDevice.click();
@@ -243,6 +248,8 @@ test.describe('Proteus verification', () => {
     await test.step('Action: Unverify User A primary device', async () => {
       await userAComponents.conversationSidebar().clickPreferencesButton();
       await userAPages.settings().devicesButton.click();
+      await expect(userAPages.devices().activeDevices).toHaveCount(1);
+
       await userAPages.devices().activeDevices.first().click();
       await userAPages.deviceDetails().toggleDeviceVerification();
     });
@@ -286,6 +293,7 @@ test.describe('Proteus verification', () => {
 
       await test.step('Action: User B sends a message to User A from the second device', async () => {
         const userB2Pages = PageManager.from(userB2Device).webapp.pages;
+        await userB2Pages.conversationList().getConversation(userA.fullName).open();
         await userB2Pages.conversation().sendMessage('Message from User B');
         await expect(userB2Pages.conversation().getMessage({sender: userB})).toBeVisible();
       });
@@ -332,6 +340,7 @@ test.describe('Proteus verification', () => {
             .conversationDetails()
             .openParticipantDetails(pages === userAPages ? userB.fullName : userA.fullName);
           await pages.participantDetails().devicesButton.click();
+          await expect(pages.participantDevices().activeDevices).toHaveCount(1);
 
           const firstDevice = pages.participantDevices().activeDevices.first();
           await firstDevice.click();
@@ -359,6 +368,7 @@ test.describe('Proteus verification', () => {
         await userAPages.conversationDetails().openParticipantDetails(userC.fullName);
         await userAPages.participantDetails().devicesButton.click();
 
+        await expect(userAPages.participantDevices().activeDevices).toHaveCount(1);
         const firstDevice = userAPages.participantDevices().activeDevices.first();
         await firstDevice.click();
 
