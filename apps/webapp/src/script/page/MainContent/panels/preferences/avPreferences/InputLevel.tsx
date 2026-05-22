@@ -21,7 +21,7 @@ import {HTMLProps, useEffect, useRef, useState} from 'react';
 
 import cx from 'classnames';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 
 export interface InputLevelProps extends HTMLProps<HTMLDivElement> {
@@ -31,6 +31,7 @@ export interface InputLevelProps extends HTMLProps<HTMLDivElement> {
 
 /** How many bullets should be displayed */
 export const MAX_AUDIO_BULLETS = 20;
+const VOLUME_NORMALIZATION_DIVISOR = 160;
 const AUDIO_METER = {
   FFT_SIZE: 128,
   INTERVAL: 100,
@@ -46,6 +47,7 @@ const logger = getLogger('InputLevel');
  * @param level Audio input volume as floating point number, `1.0` is 100%
  */
 const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevelProps) => {
+  const {translate} = useApplicationContext();
   const bullets = useRef(Array.from(Array(MAX_AUDIO_BULLETS).keys()));
   const [level, setLevel] = useState(0);
 
@@ -68,7 +70,7 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
     const audioInterval = window.setInterval(() => {
       audioAnalyser.getByteFrequencyData(audioDataArray);
       const volume = audioDataArray.reduce((acc, curr) => acc + curr, 0);
-      const averageVolume = volume / 160 / audioDataArray.length;
+      const averageVolume = volume / VOLUME_NORMALIZATION_DIVISOR / audioDataArray.length;
       setLevel(averageVolume);
     }, AUDIO_METER.INTERVAL);
 
@@ -88,7 +90,11 @@ const InputLevel = ({disabled, mediaStream, className = '', ...rest}: InputLevel
 
   return (
     <div
-      aria-label={level > 0 ? t('preferencesOptionsInputLevelDetected') : t('preferencesOptionsInputLevelNotDetected')}
+      aria-label={
+        level > 0
+          ? translate('preferencesOptionsInputLevelDetected')
+          : translate('preferencesOptionsInputLevelNotDetected')
+      }
       className={`input-level ${className}`}
       {...rest}
     >

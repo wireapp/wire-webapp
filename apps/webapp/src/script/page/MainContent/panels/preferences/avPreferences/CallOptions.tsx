@@ -22,13 +22,15 @@ import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
+import {Runtime} from '@wireapp/commons';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/PreferencesSection';
@@ -39,6 +41,7 @@ interface CallOptionsProps {
 }
 
 const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProps) => {
+  const {translate} = useApplicationContext();
   const {current: isCbrEncodingEnforced} = useRef(Config.getConfig().FEATURE.ENFORCE_CONSTANT_BITRATE);
   const [vbrEncoding, setVbrEncoding] = useState(
     !isCbrEncodingEnforced && propertiesRepository.properties.settings.call.enable_vbr_encoding,
@@ -54,15 +57,31 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     !!propertiesRepository.properties.settings.call.enable_press_space_to_unmute,
   );
 
+  const hardwareAccelerationDescriptionId = 'status-preference-hardware-acceleration-description';
+
+  const desktopSettings = Config.getDesktopSettings();
+
+  const isHardwareAccelerationChangeable = Runtime.isDesktopApp() && !!desktopSettings;
+
+  const [isHardwareAccelerationEnabled, setIsHardwareAccelerationEnabled] = useState<boolean>(() => {
+    if (!isHardwareAccelerationChangeable) {
+      return true;
+    }
+
+    return desktopSettings.isHardwareAccelerationEnabled();
+  });
+
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties) => {
       setVbrEncoding(!isCbrEncodingEnforced && settings.call.enable_vbr_encoding);
     };
+
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
+
     return () => {
       amplify.unsubscribe(WebAppEvents.PROPERTIES.UPDATED, updateProperties);
     };
-  }, []);
+  }, [isCbrEncodingEnforced]);
 
   const handleCbrEncodingChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -102,8 +121,35 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     [propertiesRepository],
   );
 
+  const confirmHardwareAccelerationChange = () => {
+    if (!desktopSettings) {
+      return;
+    }
+
+    const currentHardwareAccelerationValue = desktopSettings.isHardwareAccelerationEnabled();
+
+    desktopSettings.setHardwareAccelerationEnabled(!currentHardwareAccelerationValue);
+    setIsHardwareAccelerationEnabled(!currentHardwareAccelerationValue);
+
+    amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+  };
+
+  const showHardwareAccelerationRestartModal = () => {
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
+      size: 'large',
+      primaryAction: {
+        action: confirmHardwareAccelerationChange,
+        text: translate('preferencesOptionsEnableHardwareAccelerationModalOk'),
+      },
+      text: {
+        message: translate('preferencesOptionsEnableHardwareAccelerationModalMessage'),
+        title: translate('preferencesOptionsEnableHardwareAccelerationModalTitle'),
+      },
+    });
+  };
+
   return (
-    <PreferencesSection title={t('preferencesOptionsCall')}>
+    <PreferencesSection title={translate('preferencesOptionsCall')}>
       <div>
         <Checkbox
           onChange={handleCbrEncodingChange}
@@ -112,16 +158,22 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
           disabled={isCbrEncodingEnforced}
         >
           <CheckboxLabel htmlFor="status-preference-vbr-encoding">
-            {t('preferencesOptionsEnableVbrCheckbox')}
+            {translate('preferencesOptionsEnableVbrCheckbox')}
           </CheckboxLabel>
         </Checkbox>
-        <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableVbrDetails')}</p>
+        <p className="preferences-detail preferences-detail-intended">
+          {translate('preferencesOptionsEnableVbrDetails')}
+        </p>
       </div>
       <div className="checkbox-margin">
         <Checkbox onChange={handleAgcChange} checked={agcEnabled} data-uie-name="status-preference-agc">
-          <CheckboxLabel htmlFor="status-preference-agc">{t('preferencesOptionsEnableAgcCheckbox')}</CheckboxLabel>
+          <CheckboxLabel htmlFor="status-preference-agc">
+            {translate('preferencesOptionsEnableAgcCheckbox')}
+          </CheckboxLabel>
         </Checkbox>
-        <p className="preferences-detail preferences-detail-intended">{t('preferencesOptionsEnableAgcDetails')}</p>
+        <p className="preferences-detail preferences-detail-intended">
+          {translate('preferencesOptionsEnableAgcDetails')}
+        </p>
       </div>
       <div className="checkbox-margin">
         <Checkbox
@@ -130,11 +182,11 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
           data-uie-name="status-preference-soundless-incoming-calls"
         >
           <CheckboxLabel htmlFor="status-preference-soundless-incoming-calls">
-            {t('preferencesOptionsEnableSoundlessIncomingCalls')}
+            {translate('preferencesOptionsEnableSoundlessIncomingCalls')}
           </CheckboxLabel>
         </Checkbox>
         <p className="preferences-detail preferences-detail-intended">
-          {t('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
+          {translate('preferencesOptionsEnableSoundlessIncomingCallsDetails')}
         </p>
       </div>
       {isPressSpaceToUnmuteFlagEnabled && (
@@ -145,11 +197,30 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
             data-uie-name="status-preference-press-space-to-unmute"
           >
             <CheckboxLabel htmlFor="status-preference-press-space-to-unmute">
-              {t('preferencesOptionsEnablePressSpaceToUnmute')}
+              {translate('preferencesOptionsEnablePressSpaceToUnmute')}
             </CheckboxLabel>
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
-            {t('preferencesOptionsEnablePressSpaceToUnmuteDetails')}
+            {translate('preferencesOptionsEnablePressSpaceToUnmuteDetails')}
+          </p>
+        </div>
+      )}
+
+      {isHardwareAccelerationChangeable && (
+        <div className="checkbox-margin">
+          <Checkbox
+            onChange={showHardwareAccelerationRestartModal}
+            checked={isHardwareAccelerationEnabled}
+            id="status-preference-hardware-acceleration"
+            data-uie-name="status-preference-hardware-acceleration"
+            aria-describedby={hardwareAccelerationDescriptionId}
+          >
+            <CheckboxLabel htmlFor="status-preference-hardware-acceleration">
+              {translate('preferencesOptionsEnableHardwareAcceleration')}
+            </CheckboxLabel>
+          </Checkbox>
+          <p id={hardwareAccelerationDescriptionId} className="preferences-detail preferences-detail-intended">
+            {translate('preferencesOptionsEnableHardwareAccelerationDetails')}
           </p>
         </div>
       )}
