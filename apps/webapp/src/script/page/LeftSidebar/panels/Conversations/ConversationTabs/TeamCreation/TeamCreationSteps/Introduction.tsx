@@ -20,7 +20,7 @@
 import {Button, CheckRoundIcon, Link} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {StepProps} from './StepProps';
 import {
@@ -34,21 +34,22 @@ import {
 import {buttonCss} from '../TeamCreation.styles';
 
 export const Introduction = ({onNextStep}: StepProps) => {
+  const {translate} = useApplicationContext();
   const featuresList = [
-    t('teamCreationIntroListItem1'),
-    t('teamCreationIntroListItem2'),
-    t('teamCreationIntroListItem3'),
-    t('teamCreationIntroListItem4'),
-    t('teamCreationIntroListItem5'),
+    translate('teamCreationIntroListItem1'),
+    translate('teamCreationIntroListItem2'),
+    translate('teamCreationIntroListItem3'),
+    translate('teamCreationIntroListItem4'),
+    translate('teamCreationIntroListItem5'),
   ];
 
   return (
     <>
       <h2 className="heading-h2" data-uie-name="team-creation-intro-title">
-        {t('teamCreationIntroTitle')}
+        {translate('teamCreationIntroTitle')}
       </h2>
       <p className="text-regular" data-uie-name="team-creation-intro-sub-title" css={introStepSubHeaderCss}>
-        {t('teamCreationIntroSubTitle')}
+        {translate('teamCreationIntroSubTitle')}
       </p>
       {featuresList.map(listItem => (
         <div css={introItemCss} key={listItem}>
@@ -66,12 +67,12 @@ export const Introduction = ({onNextStep}: StepProps) => {
 
       <Link block css={introStepLinkCss} href={Config.getConfig().URL.PRICING} targetBlank>
         <span className="text-medium" data-uie-name="team-creation-intro-link">
-          {t('teamCreationIntroLink')}
+          {translate('teamCreationIntroLink')}
         </span>
       </Link>
       <div className="modal__buttons" css={modalButtonsCss}>
         <Button css={buttonCss} onClick={onNextStep} data-uie-name="do-continue">
-          {t('teamCreationContinue')}
+          {translate('teamCreationContinue')}
         </Button>
       </div>
     </>

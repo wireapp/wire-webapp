@@ -23,6 +23,10 @@ import {render, fireEvent, waitFor} from '@testing-library/react';
 
 import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {setStrings} from 'Util/localizerUtil';
 
 import {TeamCreationModal} from './TeamCreationModal';
@@ -53,11 +57,15 @@ describe('TeamCreationModal', () => {
   const onCloseMock = jest.fn();
   const onSuccessMock = jest.fn();
   const userName = 'testUser';
+  const rootContextValue = createRootContextValueForTest({});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
   setStrings({en});
 
   const renderTeamCreationModal = () => {
     useTeamCreationModal.setState({isModalOpen: true});
-    return render(withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />));
+    return render(withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />), {
+      wrapper: rootProviderWrapper,
+    });
   };
 
   beforeEach(() => {
