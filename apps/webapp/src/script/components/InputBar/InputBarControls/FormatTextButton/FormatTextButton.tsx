@@ -22,7 +22,6 @@ import type {MouseEvent} from 'react';
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
-
 import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface FormatTextButtonProps {

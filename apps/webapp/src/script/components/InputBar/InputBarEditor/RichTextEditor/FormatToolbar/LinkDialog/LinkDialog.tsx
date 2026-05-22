@@ -182,10 +182,7 @@ const isFieldValid = (field: keyof FormData, value: string): boolean => {
   return fieldValidators[field](value) ?? true;
 };
 
-function getFieldError(
-  field: keyof FormData,
-  translate: RootContextValue['translate'],
-): string {
+function getFieldError(field: keyof FormData, translate: RootContextValue['translate']): string {
   const fieldErrors = {
     url: translate('richTextLinkDialogLinkError'),
     text: translate('richTextLinkDialogTextError'),

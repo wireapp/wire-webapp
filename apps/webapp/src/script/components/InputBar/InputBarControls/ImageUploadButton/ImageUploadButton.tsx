@@ -22,7 +22,6 @@ import {useRef} from 'react';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-
 import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface ImageUploadButtonProps {

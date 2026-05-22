@@ -26,8 +26,8 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {GuestOptions} from './components/guestOptions';
 import {ServicesOptions} from './components/servicesOptions';
@@ -56,6 +56,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
   isPasswordSupported = false,
 }) => {
   const [isRequestOngoing, setIsRequestOngoing] = useState<boolean>(false);
+  const {translate} = useApplicationContext();
 
   const {accessState, inTeam, isTeamOnly} = useKoSubscribableChildren(activeConversation, [
     'accessState',
@@ -89,11 +90,13 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         preventClose: true,
         primaryAction: {
           action: changeAccessState,
-          text: t('modalConversationRemoveGuestsOrServicesAction'),
+          text: translate('modalConversationRemoveGuestsOrServicesAction'),
         },
         text: {
           message,
-          title: isGuest ? t('modalConversationRemoveGuestsHeadline') : t('modalConversationRemoveServicesHeadline'),
+          title: isGuest
+            ? translate('modalConversationRemoveGuestsHeadline')
+            : translate('modalConversationRemoveServicesHeadline'),
         },
       });
     }
@@ -105,7 +108,7 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         onGoBack={onBack}
         goBackUie={isGuest ? 'go-back-guest-options' : 'go-back-services-options'}
         onClose={onClose}
-        title={isGuest ? t('guestOptionsTitle') : t('servicesOptionsTitle')}
+        title={isGuest ? translate('guestOptionsTitle') : translate('servicesOptionsTitle')}
       />
 
       <FadingScrollbar className="panel__content">

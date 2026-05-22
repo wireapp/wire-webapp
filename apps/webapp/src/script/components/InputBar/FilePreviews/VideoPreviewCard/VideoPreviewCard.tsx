@@ -17,9 +17,10 @@
  *
  */
 
+import {useApplicationContext} from 'src/script/page/RootProvider';
+
 import {videoStyles, iconWrapperStyles} from './VideoPreviewCard.styles';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
 import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 

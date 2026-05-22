@@ -17,9 +17,10 @@
  *
  */
 
+import {useApplicationContext} from 'src/script/page/RootProvider';
+
 import {imageStyles} from './ImagePreviewCard.styles';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 
 interface ImagePreviewCardProps {

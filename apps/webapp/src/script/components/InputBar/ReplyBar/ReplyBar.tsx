@@ -25,10 +25,9 @@ import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/Image';
 import {MultipartAssetPreview} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssetPreview';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {renderMessage} from 'Util/messageRenderer';
-
-import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface ReplyBarProps {
   replyMessageEntity: ContentMessage;

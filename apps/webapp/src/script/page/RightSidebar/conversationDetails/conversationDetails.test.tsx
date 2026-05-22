@@ -34,6 +34,10 @@ import {TeamEntity} from 'Repositories/team/TeamEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import 'src/script/util/test/mock/localStorageMock';
 import {createUuid} from 'Util/uuid';
 
@@ -56,17 +60,12 @@ jest.mock('Components/panel/UserDetails', () => ({
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
 let searchRepository: SearchRepository;
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(() => {
-  testFactory.exposeConversationActors().then(factory => {
-    conversationRepository = factory;
-    return conversationRepository;
-  });
-
-  testFactory.exposeSearchActors().then(factory => {
-    searchRepository = factory;
-    return searchRepository;
-  });
+beforeAll(async () => {
+  conversationRepository = await testFactory.exposeConversationActors();
+  searchRepository = await testFactory.exposeSearchActors();
 });
 
 const getDefaultParams = () => {
@@ -124,7 +123,9 @@ describe('ConversationDetails', () => {
 
     const defaultProps = getDefaultParams();
 
-    const {rerender, getByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+    const {rerender, getByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     const tests = [
       {

@@ -26,13 +26,12 @@ import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {DurationUnit, formatDuration} from 'Util/timeUtil';
 import {setContextMenuPosition} from 'Util/util';
-
-import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface MessageTimerButtonProps {
   conversation: Conversation;

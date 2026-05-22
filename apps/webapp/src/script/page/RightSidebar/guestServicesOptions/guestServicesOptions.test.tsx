@@ -25,6 +25,10 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {GuestServicesOptions} from './guestServicesOptions';
 
@@ -32,12 +36,11 @@ import {TestFactory} from '../../../../../test/helper/TestFactory';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
-beforeAll(() => {
-  testFactory.exposeConversationActors().then(factory => {
-    conversationRepository = factory;
-    return conversationRepository;
-  });
+beforeAll(async () => {
+  conversationRepository = await testFactory.exposeConversationActors();
 });
 
 const getDefaultParams = (isGuest: boolean = true) => {
@@ -69,7 +72,9 @@ describe('GuestServicesOptions', () => {
     } as Conversation;
 
     const defaultProps = getDefaultParams();
-    const {getByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={newConv} />);
+    const {getByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={newConv} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     await waitFor(() => {
       getByText('guestOptionsCopyLink');
@@ -81,7 +86,9 @@ describe('GuestServicesOptions', () => {
   it('renders services options', () => {
     const conversation = new Conversation();
     const defaultProps = getDefaultParams(false);
-    const {getByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={conversation} />);
+    const {getByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={conversation} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(getByText('servicesRoomToggleInfo')).not.toBeNull();
   });

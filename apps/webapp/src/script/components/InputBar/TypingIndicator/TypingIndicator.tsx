@@ -19,6 +19,7 @@
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   dotOneStyles,
@@ -31,7 +32,9 @@ import {
 } from './TypingIndicator.styles';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+const MAX_VISIBLE_TYPING_USERS = 3;
+const TWO_TYPING_USERS = 2;
+const ADDITIONAL_TYPING_USER_OFFSET = 1;
 
 export interface TypingIndicatorProps {
   conversationId: string;
@@ -49,7 +52,7 @@ export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
   return (
     <div css={wrapperStyles} data-uie-name="typing-indicator">
       <div aria-hidden css={{display: 'flex', marginRight: 8}}>
-        {users.slice(0, 3).map((user, index) => (
+        {users.slice(0, MAX_VISIBLE_TYPING_USERS).map((user, index) => (
           <Avatar
             key={user.id}
             className="cursor-default"
@@ -64,7 +67,7 @@ export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
       <p css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
         {usersCount === 1 &&
           translate('tooltipConversationInputOneUserTyping', {user1: users[0].name()}, undefined, true)}
-        {usersCount === 2 &&
+        {usersCount === TWO_TYPING_USERS &&
           translate(
             'tooltipConversationInputTwoUserTyping',
             {
@@ -74,12 +77,12 @@ export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
             undefined,
             true,
           )}
-        {usersCount > 2 &&
+        {usersCount > TWO_TYPING_USERS &&
           translate(
             'tooltipConversationInputMoreThanTwoUserTyping',
             {
               user1: users[0].name(),
-              count: (usersCount - 1).toString(),
+              count: (usersCount - ADDITIONAL_TYPING_USER_OFFSET).toString(),
             },
             undefined,
             true,

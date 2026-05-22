@@ -24,6 +24,10 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {createUuid} from 'Util/uuid';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ConversationDetailsHeader} from './conversationDetailsHeader';
 
@@ -32,6 +36,9 @@ const service = new ServiceEntity({id: 'id'});
 const conversation = new Conversation(createUuid());
 conversation.name('Group Chat');
 conversation.type(CONVERSATION_TYPE.REGULAR);
+
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 const getDefaultProps = () => ({
   isActiveGroupParticipant: true,
@@ -47,7 +54,7 @@ const getDefaultProps = () => ({
 describe('ConversationDetailsHeader', () => {
   it('renders the display name when not editing', () => {
     const props = getDefaultProps();
-    const {getByText} = render(<ConversationDetailsHeader {...props} />);
+    const {getByText} = render(<ConversationDetailsHeader {...props} />, {wrapper: rootProviderWrapper});
 
     const nameElement = getByText(props.conversation.display_name());
     expect(nameElement).not.toBe(null);
@@ -55,7 +62,7 @@ describe('ConversationDetailsHeader', () => {
 
   it('allows editing the group name', () => {
     const props = getDefaultProps();
-    const {getByText, getByTestId} = render(<ConversationDetailsHeader {...props} />);
+    const {getByText, getByTestId} = render(<ConversationDetailsHeader {...props} />, {wrapper: rootProviderWrapper});
 
     const nameElement = getByText(props.conversation.display_name());
     fireEvent.click(nameElement);
@@ -66,7 +73,7 @@ describe('ConversationDetailsHeader', () => {
 
   it('calls updateConversationName when pressing Enter to save the renamed conversation', () => {
     const props = getDefaultProps();
-    const {getByText, getByTestId} = render(<ConversationDetailsHeader {...props} />);
+    const {getByText, getByTestId} = render(<ConversationDetailsHeader {...props} />, {wrapper: rootProviderWrapper});
 
     const nameElement = getByText(props.conversation.display_name());
     fireEvent.click(nameElement);

@@ -24,9 +24,16 @@ import {Availability} from '@wireapp/protocol-messaging';
 import {Participant} from 'Repositories/calling/Participant';
 import {User} from 'Repositories/entity/User';
 import {ROLE} from 'Repositories/user/userPermission';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
+
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 const createMockParticipant = ({
   name,
@@ -75,6 +82,7 @@ describe('CallParticipantsListItem', () => {
     const participant = createMockParticipant({});
     const {getByTestId} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByTestId('element-avatar-user')).toBeDefined();
@@ -89,6 +97,7 @@ describe('CallParticipantsListItem', () => {
 
     const {getByText} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByText(participantName)).toBeDefined();
@@ -99,6 +108,7 @@ describe('CallParticipantsListItem', () => {
 
     const {getByText} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByText('(ConversationYouNominative)')).toBeDefined();
@@ -113,6 +123,7 @@ describe('CallParticipantsListItem', () => {
 
     const {getByTestId} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={jest.fn()} callParticipant={selfParticipant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByTestId('status-guest')).toBeDefined();
@@ -124,6 +135,7 @@ describe('CallParticipantsListItem', () => {
     const onContextMenu = jest.fn();
     const {getByTestId} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     const userItem = getByTestId('item-user');
@@ -137,6 +149,7 @@ describe('CallParticipantsListItem', () => {
     const onContextMenu = jest.fn();
     const {getByTestId} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     const userItem = getByTestId('item-user');
@@ -150,6 +163,7 @@ describe('CallParticipantsListItem', () => {
     const onContextMenu = jest.fn();
     const {getByText} = render(
       <CallParticipantsListItem showContextMenu onContextMenu={onContextMenu} callParticipant={participant} />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByText('videoCallParticipantConnecting')).toBeDefined();

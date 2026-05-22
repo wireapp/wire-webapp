@@ -22,6 +22,10 @@ import {ServicesOptions} from './servicesOptions';
 import {TeamState} from 'Repositories/team/TeamState';
 import ko from 'knockout';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 type TestData = {
@@ -31,6 +35,9 @@ type TestData = {
   isGuestAndServicesRoom: boolean;
   expectedToggleToBeVisible: boolean;
 };
+
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('serviceOptions', () => {
   it.each<TestData>([
@@ -113,6 +120,7 @@ describe('serviceOptions', () => {
           toggleAccessState={jest.fn()}
           teamState={mockTeamState as TeamState}
         />,
+        {wrapper: rootProviderWrapper},
       );
 
       // Assert

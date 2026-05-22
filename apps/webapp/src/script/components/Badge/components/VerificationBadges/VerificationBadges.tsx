@@ -289,7 +289,12 @@ export const VerificationBadges = ({
         <div css={badgeWrapper} tabIndex={TabIndex.FOCUSABLE} aria-describedby={mlsTooltipId}>
           {displayTitle && <span style={title(true)}>{translate('E2EI.verified')}</span>}
 
-          <MLSVerificationBadge MLSStatus={MLSStatus} context={context} tooltipId={mlsTooltipId} translate={translate} />
+          <MLSVerificationBadge
+            MLSStatus={MLSStatus}
+            context={context}
+            tooltipId={mlsTooltipId}
+            translate={translate}
+          />
         </div>
       )}
 

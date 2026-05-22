@@ -22,15 +22,16 @@ import {FunctionComponent, useEffect} from 'react';
 import {Maybe} from 'true-myth';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+const forceReloadDelayMultiplier = 60;
 
 interface ForceReloadModalProperties {
   readonly reloadApplication: () => void;
 }
 
-const forceReloadDelayInMilliseconds = TIME_IN_MILLIS.SECOND * 60;
+const forceReloadDelayInMilliseconds = TIME_IN_MILLIS.SECOND * forceReloadDelayMultiplier;
 
 export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = properties => {
   const {reloadApplication} = properties;
@@ -85,7 +86,7 @@ export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = p
     return () => {
       clearScheduledForceReloadTimeout();
     };
-  }, [doesApplicationNeedForceReload, reloadApplication, wallClock]);
+  }, [doesApplicationNeedForceReload, reloadApplication, translate, wallClock]);
 
   return null;
 };

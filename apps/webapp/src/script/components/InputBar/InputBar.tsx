@@ -44,6 +44,7 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -64,11 +65,12 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+
+const PING_TIMEOUT_MULTIPLIER = 2;
 
 const CONFIG = {
   ...Config.getConfig(),
-  PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
+  PING_TIMEOUT: TIME_IN_MILLIS.SECOND * PING_TIMEOUT_MULTIPLIER,
   GIPHY_TEXT_LENGTH: 256,
 };
 
