@@ -58,6 +58,7 @@ import {
 
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
+import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
 import {
   MlsRecoveryOrchestrator,
   MlsRecoveryOrchestratorImpl,
@@ -1021,7 +1022,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
     } catch (error: unknown) {
       // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
       // and instead log and return null so the event processing queue can continue safely.
-      this.logger.error('Failed to handle MLS message-add event after recovery; returning null', {error, event});
+      const isSafeMissingSubconversationGroup = event.subconv !== undefined && isMlsConversationNotFoundError(error);
+
+      this.logger.error(
+        isSafeMissingSubconversationGroup
+          ? 'MLS message-add for subconversation skipped: local group missing (safe after leave); returning null'
+          : 'Failed to handle MLS message-add event after recovery; returning null',
+        {error, event},
+      );
       return null;
     }
   }
