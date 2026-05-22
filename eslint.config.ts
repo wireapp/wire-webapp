@@ -281,6 +281,7 @@ const config: Linter.Config[] = [
       'apps/webapp/src/script/components/InputBar/InputBar.tsx',
       'apps/webapp/src/script/components/InputBar/FilePreviews/useFilePreview/useFilePreview.ts',
       'apps/webapp/src/script/components/InputBar/usePing/usePing.ts',
+      'apps/webapp/src/script/components/InputBar/useMessageHandling/useDraftState/useDraftState.ts',
       'apps/webapp/src/script/components/MessagesList/Message/ContentMessage/asset/common/useGetAssetUrl/useGetAssetUrl.ts',
       'apps/webapp/src/script/components/MessagesList/Message/ContentMessage/asset/MultipartAssets/MultipartAssets.tsx',
       'apps/webapp/src/script/components/MessagesList/Message/ContentMessage/asset/MultipartAssets/useGetMultipartAsset/useGetMultipartAsset.ts',
