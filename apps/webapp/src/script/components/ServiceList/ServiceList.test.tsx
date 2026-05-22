@@ -20,9 +20,16 @@
 import {render} from '@testing-library/react';
 
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {ServiceList} from './ServiceList';
+
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('ServiceList', () => {
   it('lists the services', () => {
@@ -35,7 +42,7 @@ describe('ServiceList', () => {
       services: [serviceEntity1, serviceEntity2],
     };
 
-    const {getByTestId} = render(<ServiceList {...props} />);
+    const {getByTestId} = render(<ServiceList {...props} />, {wrapper: rootProviderWrapper});
 
     expect(expect(getByTestId(`service-list-service-${serviceEntity1.id}`))).not.toBeNull();
     expect(expect(getByTestId(`service-list-service-${serviceEntity2.id}`))).not.toBeNull();
@@ -48,7 +55,7 @@ describe('ServiceList', () => {
       services: [] as ServiceEntity[],
     };
 
-    const {getByTestId} = render(<ServiceList {...props} />);
+    const {getByTestId} = render(<ServiceList {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByTestId('service-list-no-results')).not.toBeNull();
   });
