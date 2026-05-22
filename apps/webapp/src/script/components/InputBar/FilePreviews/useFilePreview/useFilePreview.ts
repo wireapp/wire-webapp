@@ -22,6 +22,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {FileWithPreview, useFileUploadState} from 'Components/Conversation/useFilesUploadState/useFilesUploadState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {getFileExtension, trimFileExtension, formatBytes} from 'Util/util';
 
 interface FilePreviewParams {
@@ -31,6 +32,7 @@ interface FilePreviewParams {
 }
 
 export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}: FilePreviewParams) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {deleteFile, updateFile} = useFileUploadState();
 
   const name = trimFileExtension(file.name);
@@ -58,7 +60,9 @@ export const useFilePreview = ({file, cellsRepository, conversationQualifiedId}:
     }
 
     deleteFile({conversationId: conversationQualifiedId.id, fileId: file.id});
-    void cellsRepository.deleteNodeDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await cellsRepository.deleteNodeDraft({uuid: file.remoteUuid, versionId: file.remoteVersionId});
+    });
   };
 
   const handleRetry = async () => {
