@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {EmojiIcon} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from '../../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface EmojiButtonProps {
   isActive: boolean;

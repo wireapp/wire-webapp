@@ -28,7 +28,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {renderMessage} from 'Util/messageRenderer';
 
-import {useApplicationContext} from '../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface ReplyBarProps {
   replyMessageEntity: ContentMessage;

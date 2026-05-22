@@ -24,7 +24,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 
 import {Config} from '../../../Config';
-import {useApplicationContext} from '../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface PastedFileControlsProps {
   pastedFile: File;

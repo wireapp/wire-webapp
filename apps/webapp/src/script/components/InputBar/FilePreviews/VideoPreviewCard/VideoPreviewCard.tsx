@@ -19,7 +19,7 @@
 
 import {videoStyles, iconWrapperStyles} from './VideoPreviewCard.styles';
 
-import {useApplicationContext} from '../../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {FilePreviewPlayButton} from '../common/FilePreviewPlayButton/FilePreviewPlayButton';
 import {MediaFilePreviewCard} from '../common/MediaFilePreviewCard/MediaFilePreviewCard';
 

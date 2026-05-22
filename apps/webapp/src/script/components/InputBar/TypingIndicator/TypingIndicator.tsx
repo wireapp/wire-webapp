@@ -31,7 +31,7 @@ import {
 } from './TypingIndicator.styles';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
-import {useApplicationContext} from '../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 export interface TypingIndicatorProps {
   conversationId: string;

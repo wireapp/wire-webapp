@@ -32,7 +32,7 @@ import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {DurationUnit, formatDuration} from 'Util/timeUtil';
 import {setContextMenuPosition} from 'Util/util';
 
-import {useApplicationContext} from '../../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface MessageTimerButtonProps {
   conversation: Conversation;

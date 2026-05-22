@@ -64,7 +64,7 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-import {useApplicationContext} from '../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 const CONFIG = {
   ...Config.getConfig(),

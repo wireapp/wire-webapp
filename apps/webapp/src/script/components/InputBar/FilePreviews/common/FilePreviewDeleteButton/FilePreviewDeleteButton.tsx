@@ -21,7 +21,7 @@ import {CloseIcon} from 'Components/icon';
 
 import {buttonStyles, iconStyles} from './FilePreviewDeleteButton.styles';
 
-import {useApplicationContext} from '../../../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface FilePreviewDeleteButtonProps {
   onDelete: () => void;

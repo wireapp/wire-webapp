@@ -19,7 +19,7 @@
 
 import * as Icon from 'Components/icon';
 
-import {useApplicationContext} from '../../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface GiphyButtonProps {
   onGifClick: () => void;

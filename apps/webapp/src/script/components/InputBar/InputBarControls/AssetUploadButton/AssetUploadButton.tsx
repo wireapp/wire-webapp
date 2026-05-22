@@ -23,7 +23,7 @@ import {TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 
-import {useApplicationContext} from '../../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface AssetUploadButtonProps {
   onSelectFiles: (files: File[]) => void;

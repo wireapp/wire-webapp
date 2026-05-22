@@ -27,7 +27,7 @@ import {setContextMenuPosition} from 'Util/util';
 
 import {buttonStyles, iconStyles} from './FilePreviewErrorMoreButton.styles';
 
-import {useApplicationContext} from '../../../../../page/RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface FilePreviewErrorMoreButtonProps {
   onDelete: () => void;

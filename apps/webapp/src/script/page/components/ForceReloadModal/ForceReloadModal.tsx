@@ -24,7 +24,7 @@ import {Maybe} from 'true-myth';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {useApplicationContext} from '../../RootProvider';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface ForceReloadModalProperties {
   readonly reloadApplication: () => void;

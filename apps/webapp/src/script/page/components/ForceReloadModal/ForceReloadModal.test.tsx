@@ -28,7 +28,7 @@ import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
-import {RootProvider} from '../../RootProvider';
+import {RootProvider} from 'src/script/page/RootProvider';
 import {createRootContextValueForTest} from '../../testSupport/rootContextTestSupport';
 import {ForceReloadModal} from './ForceReloadModal';
 
