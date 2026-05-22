@@ -19,7 +19,6 @@
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
 
 import {
   dotOneStyles,
@@ -32,11 +31,14 @@ import {
 } from './TypingIndicator.styles';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
 
+import {useApplicationContext} from '../../../page/RootProvider';
+
 export interface TypingIndicatorProps {
   conversationId: string;
 }
 
 export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
+  const {translate} = useApplicationContext();
   const users = useTypingIndicatorState(state => state.getTypingUsersInConversation(conversationId));
   const usersCount = users.length;
 
@@ -60,9 +62,10 @@ export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
         ))}
       </div>
       <p css={indicatorTitleStyles} data-uie-name="typing-indicator-title">
-        {usersCount === 1 && t('tooltipConversationInputOneUserTyping', {user1: users[0].name()}, undefined, true)}
+        {usersCount === 1 &&
+          translate('tooltipConversationInputOneUserTyping', {user1: users[0].name()}, undefined, true)}
         {usersCount === 2 &&
-          t(
+          translate(
             'tooltipConversationInputTwoUserTyping',
             {
               user1: users[0].name(),
@@ -72,7 +75,7 @@ export const TypingIndicator = ({conversationId}: TypingIndicatorProps) => {
             true,
           )}
         {usersCount > 2 &&
-          t(
+          translate(
             'tooltipConversationInputMoreThanTwoUserTyping',
             {
               user1: users[0].name(),

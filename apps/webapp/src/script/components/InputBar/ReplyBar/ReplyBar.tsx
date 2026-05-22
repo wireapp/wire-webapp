@@ -26,8 +26,9 @@ import {AssetImage} from 'Components/Image';
 import {MultipartAssetPreview} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssetPreview';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {renderMessage} from 'Util/messageRenderer';
+
+import {useApplicationContext} from '../../../page/RootProvider';
 
 interface ReplyBarProps {
   replyMessageEntity: ContentMessage;
@@ -35,6 +36,7 @@ interface ReplyBarProps {
 }
 
 export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
+  const {translate} = useApplicationContext();
   const {
     assets,
     senderName,
@@ -50,15 +52,15 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
 
   const attachmentsCountCopy =
     attachmentsCount === 1
-      ? t('replyBarSingleAttachment')
-      : t('replyBarMultipleAttachments', {count: attachmentsCount});
+      ? translate('replyBarSingleAttachment')
+      : translate('replyBarMultipleAttachments', {count: attachmentsCount});
 
   const shouldRenderText = isMultipart ? replyAsset.should_render_text?.() : false;
 
   return (
     <div className="input-bar__reply" data-uie-name="input-bar-reply-box">
       <button
-        aria-label={t('replyBarCancelMessage')}
+        aria-label={translate('replyBarCancelMessage')}
         type="button"
         className="button-reset-default"
         onClick={onCancel}
@@ -80,7 +82,7 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
               <Icon.EditIcon
                 className="edit-icon"
                 data-uie-name="message-edited-reply-box"
-                aria-label={t('replyBarEditMessage')}
+                aria-label={translate('replyBarEditMessage')}
                 tabIndex={TabIndex.FOCUSABLE}
               />
             )}
@@ -139,7 +141,7 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
             <div className="input-bar__reply__message" data-uie-name="media-audio-reply-box">
               <ParticipantMicOnIcon className="input-bar__reply__icon" />
 
-              <span tabIndex={TabIndex.FOCUSABLE}>{t('replyAudioMessage')}</span>
+              <span tabIndex={TabIndex.FOCUSABLE}>{translate('replyAudioMessage')}</span>
             </div>
           )}
 
@@ -153,7 +155,7 @@ export const ReplyBar = ({replyMessageEntity, onCancel}: ReplyBarProps) => {
 
           {replyAsset?.isLocation() && (
             <div className="input-bar__reply__message" data-uie-name="media-location-reply-box">
-              <Icon.LocationIcon className="input-bar__reply__icon" aria-label={t('replyBarLocation')} />
+              <Icon.LocationIcon className="input-bar__reply__icon" aria-label={translate('replyBarLocation')} />
 
               <span tabIndex={TabIndex.FOCUSABLE}>{replyAsset.name}</span>
             </div>

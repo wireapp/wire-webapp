@@ -21,6 +21,10 @@ import {render} from '@testing-library/react';
 import {act} from 'react';
 
 import {User} from 'Repositories/entity/User';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TypingIndicator, TypingIndicatorProps} from './TypingIndicator';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
@@ -30,6 +34,9 @@ function createUser(id: string, name: string): User {
   user.name(name);
   return user;
 }
+
+const rootContextValue = createRootContextValueForTest({});
+const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('TypingIndicator', () => {
   afterEach(() => {
@@ -44,7 +51,7 @@ describe('TypingIndicator', () => {
       conversationId: 'test-conversation-id',
     };
 
-    const {container} = render(<TypingIndicator {...props} />);
+    const {container} = render(<TypingIndicator {...props} />, {wrapper: rootProviderWrapper});
 
     expect(container.innerHTML).toEqual('');
   });
@@ -60,7 +67,7 @@ describe('TypingIndicator', () => {
     addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-2', 'user2'), timerId: 0});
     addTypingUser({conversationId: 'test-conversation-id', user: createUser('test-id-3', 'user3'), timerId: 0});
 
-    const {getAllByTestId} = render(<TypingIndicator {...props} />);
+    const {getAllByTestId} = render(<TypingIndicator {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getAllByTestId('element-avatar-user')).toHaveLength(3);
   });
@@ -70,7 +77,7 @@ describe('TypingIndicator', () => {
       conversationId: 'test-conversation-id',
     };
 
-    const {container, getAllByTestId} = render(<TypingIndicator {...props} />);
+    const {container, getAllByTestId} = render(<TypingIndicator {...props} />, {wrapper: rootProviderWrapper});
 
     expect(container.innerHTML).toEqual('');
 
@@ -90,7 +97,7 @@ describe('TypingIndicator', () => {
       conversationId: 'test-conversation-id',
     };
 
-    const {container, getAllByTestId} = render(<TypingIndicator {...props} />);
+    const {container, getAllByTestId} = render(<TypingIndicator {...props} />, {wrapper: rootProviderWrapper});
 
     expect(container.innerHTML).toEqual('');
 
