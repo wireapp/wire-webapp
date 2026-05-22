@@ -25,9 +25,9 @@ import {DeviceVerificationBadges} from 'Components/Badge';
 import * as Icon from 'Components/icon';
 import {ClientEntity} from 'Repositories/client';
 import {WireIdentity} from 'src/script/E2EIdentity';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../FormattedId';
@@ -42,9 +42,12 @@ interface DeviceProps {
 }
 
 export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, deviceNumber}: DeviceProps) => {
+  const {translate} = useApplicationContext();
   const {isVerified} = useKoSubscribableChildren(device.meta, ['isVerified']);
-  const verifiedLabel = isVerified ? t('preferencesDevicesVerification') : t('preferencesDeviceNotVerified');
-  const deviceAriaLabel = `${t('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
+  const verifiedLabel = isVerified
+    ? translate('preferencesDevicesVerification')
+    : translate('preferencesDeviceNotVerified');
+  const deviceAriaLabel = `${translate('preferencesDevice')} ${deviceNumber}, ${device.getName()}, ${verifiedLabel}`;
 
   const deviceIdentity = getDeviceIdentity?.(device.id);
 
@@ -71,7 +74,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
         })
       }
       role="button"
-      aria-label={t('accessibility.headings.preferencesDeviceDetails')}
+      aria-label={translate('accessibility.headings.preferencesDeviceDetails')}
       tabIndex={TabIndex.FOCUSABLE}
     >
       <div className="preferences-devices-card-info">
@@ -86,7 +89,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
 
         {deviceIdentity?.thumbprint && (
           <p className="preferences-devices-id">
-            <span>{t('preferencesMLSThumbprint')}</span>
+            <span>{translate('preferencesMLSThumbprint')}</span>
 
             <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
               <FormattedId idSlices={splitFingerprint(deviceIdentity.thumbprint)} smallPadding />
@@ -95,7 +98,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
         )}
 
         <p className="preferences-devices-id">
-          <span>{t('preferencesDevicesId')}</span>
+          <span>{translate('preferencesDevicesId')}</span>
 
           <span className="preferences-formatted-id" data-uie-name="preferences-device-active-id">
             <FormattedId idSlices={device.formatId()} smallPadding />
@@ -106,7 +109,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
       <div className="preferences-devices-card-action">
         {!device.isLegalHold() && (
           <button
-            aria-label={t('preferencesDevicesRemove')}
+            aria-label={translate('preferencesDevicesRemove')}
             type="button"
             className={`preferences-devices-card-action__delete ${isSSO && 'svg-red'}`}
             onClick={handleClick}
@@ -120,7 +123,7 @@ export const Device = ({device, isSSO, onSelect, onRemove, getDeviceIdentity, de
         <button
           className="icon-forward preferences-devices-card-action__forward"
           data-uie-name="go-device-details"
-          aria-label={t('accessibility.headings.preferencesDeviceDetails')}
+          aria-label={translate('accessibility.headings.preferencesDeviceDetails')}
           aria-hidden
         />
       </div>

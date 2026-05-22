@@ -20,7 +20,7 @@
 import {useId} from 'react';
 
 import {VerificationBadges} from 'Components/Badge';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {splitFingerprint} from 'Util/stringUtil';
 import {formatTimestamp} from 'Util/timeUtil';
 
@@ -33,15 +33,16 @@ interface ProteusDeviceDetailsProps extends Omit<DeviceProps, 'getDeviceIdentity
 }
 
 export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: ProteusDeviceDetailsProps) => {
+  const {translate} = useApplicationContext();
   const proteusLabelId = useId();
 
   return (
     <div className="preferences-proteus-details">
-      <h4>{t('proteusDeviceDetails')}</h4>
+      <h4>{translate('proteusDeviceDetails')}</h4>
 
       <div>
         <p id={proteusLabelId} className="label preferences-label preferences-devices-fingerprint-label">
-          {t('proteusID')}
+          {translate('proteusID')}
         </p>
 
         <p className="preferences-devices-fingerprint" css={{width: '230px'}} aria-labelledby={proteusLabelId}>
@@ -52,7 +53,7 @@ export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: P
       {device.time !== undefined && (
         <div>
           <p className="label preferences-label preferences-devices-fingerprint-label">
-            {t('preferencesDevicesActivatedOn')}
+            {translate('preferencesDevicesActivatedOn')}
           </p>
 
           <p className="preferences-devices-fingerprint">{formatTimestamp(device.time)}</p>
@@ -60,7 +61,7 @@ export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: P
       )}
 
       <h3 className="label preferences-label preferences-devices-fingerprint-label">
-        {t('participantDevicesProteusKeyFingerprint')}
+        {translate('participantDevicesProteusKeyFingerprint')}
       </h3>
 
       <p className="preferences-devices-fingerprint" css={{width: '230px'}}>
@@ -70,17 +71,17 @@ export const ProteusDeviceDetails = ({device, fingerprint, isProteusVerified}: P
       {isProteusVerified !== undefined && (
         <>
           <h3 className="label preferences-label preferences-devices-fingerprint-label">
-            {t('preferencesDeviceDetailsVerificationStatus')}
+            {translate('preferencesDeviceDetailsVerificationStatus')}
           </h3>
 
           <p className="preferences-devices-verification-details">
             {isProteusVerified ? (
               <>
-                <span>{t('proteusVerified')}</span>
+                <span>{translate('proteusVerified')}</span>
                 <VerificationBadges isProteusVerified context="device" />
               </>
             ) : (
-              <span>{t('proteusNotVerified')}</span>
+              <span>{translate('proteusNotVerified')}</span>
             )}
           </p>
         </>

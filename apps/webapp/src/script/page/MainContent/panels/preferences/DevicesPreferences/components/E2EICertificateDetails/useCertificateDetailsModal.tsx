@@ -17,11 +17,11 @@
  *
  */
 
-import {useState, useEffect} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {downloadFile} from 'Util/util';
 
 const COPY_MESSAGE_TIMEOUT = 3000;
@@ -47,20 +47,12 @@ const ModalMessageWrapper = ({message}: {message: string}) => (
 );
 
 export const useCertificateDetailsModal = (certificate: string) => {
+  const {translate} = useApplicationContext();
   const [isTextCopied, setIsTextCopied] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isModalActive, setIsModalActive] = useState(false);
 
-  useEffect(() => {
-    if (isModalActive) {
-      removeCurrentModal();
-      showModal();
-      // removeCurrentModal will trigger the close callback of the previous modal, so we need to reset the state
-      setIsModalActive(true);
-    }
-  }, [isTextCopied, isDownloading, isModalActive]);
-
-  const onDownload = () => {
+  const onDownload = useCallback(() => {
     setIsDownloading(true);
 
     const certificateUrl = `data:${CERTIFICATE_TYPE},${encodeURIComponent(certificate)}`;
@@ -69,9 +61,9 @@ export const useCertificateDetailsModal = (certificate: string) => {
     setTimeout(() => {
       setIsDownloading(false);
     }, DOWNLOAD_CERTIFICATE_TIMEOUT);
-  };
+  }, [certificate]);
 
-  const onCopy = async () => {
+  const onCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(certificate).then(() => {
         setIsTextCopied(true);
@@ -83,37 +75,48 @@ export const useCertificateDetailsModal = (certificate: string) => {
     } catch (err: unknown) {
       console.error('Failed to copy: ', err);
     }
-  };
+  }, [certificate]);
 
-  const modalOptions: ModalOptions = {
-    text: {
-      title: t('E2EI.certificateDetails'),
-      message: <ModalMessageWrapper message={certificate} />,
-    },
-    secondaryAction: [
-      {
-        action: onCopy,
-        text: <>{t(isTextCopied ? 'E2EI.certificateCopied' : 'E2EI.copyCertificate')}</>,
-        uieName: 'copy-certificate',
-        disabled: isTextCopied,
+  const modalOptions: ModalOptions = useMemo(() => {
+    return {
+      text: {
+        title: translate('E2EI.certificateDetails'),
+        message: <ModalMessageWrapper message={certificate} />,
       },
-      {
-        action: onDownload,
-        text: t('E2EI.downloadCertificate'),
-        uieName: 'download-certificate',
-        disabled: isDownloading,
+      secondaryAction: [
+        {
+          action: onCopy,
+          text: <>{translate(isTextCopied ? 'E2EI.certificateCopied' : 'E2EI.copyCertificate')}</>,
+          uieName: 'copy-certificate',
+          disabled: isTextCopied,
+        },
+        {
+          action: onDownload,
+          text: translate('E2EI.downloadCertificate'),
+          uieName: 'download-certificate',
+          disabled: isDownloading,
+        },
+      ],
+      closeOnSecondaryAction: false,
+      close: () => {
+        setIsModalActive(false);
       },
-    ],
-    closeOnSecondaryAction: false,
-    close: () => {
-      setIsModalActive(false);
-    },
-  };
+    };
+  }, [certificate, isDownloading, isTextCopied, onCopy, onDownload, translate]);
   const modalType = PrimaryModal.type.MULTI_ACTIONS;
 
-  const showModal = () => {
+  const showModal = useCallback(() => {
     PrimaryModal.show(modalType, modalOptions);
-  };
+  }, [modalOptions, modalType]);
+
+  useEffect(() => {
+    if (isModalActive) {
+      removeCurrentModal();
+      showModal();
+      // removeCurrentModal will trigger the close callback of the previous modal, so we need to reset the state
+      setIsModalActive(true);
+    }
+  }, [isTextCopied, isDownloading, isModalActive, showModal]);
 
   return () => {
     setIsModalActive(true);
