@@ -20,8 +20,8 @@
 import {useState, RefObject, FC, useRef} from 'react';
 
 import {EmojiPicker} from 'Components/EmojiPicker/EmojiPicker';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {EmojiChar} from './EmojiChar';
 import {reactionImgSize} from './EmojiChar.styles';
@@ -55,6 +55,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   wrapperRef,
   handleReactionClick,
 }) => {
+  const {translate} = useApplicationContext();
   const isThumbUpAction = currentMsgActionName === MessageActionsId.THUMBSUP;
   const isLikeAction = currentMsgActionName === MessageActionsId.HEART;
   const [showEmojis, setShowEmojis] = useState(false);
@@ -160,7 +161,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...getIconCSS,
           ...getActionsMenuCSS(isThumbUpAction),
         }}
-        aria-label={t('accessibility.messageActionsMenuThumbsUp')}
+        aria-label={translate('accessibility.messageActionsMenuThumbsUp')}
         data-uie-name={MessageActionsId.THUMBSUP}
         aria-pressed={isThumbUpAction}
         type="button"
@@ -176,7 +177,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...getIconCSS,
           ...getActionsMenuCSS(isLikeAction),
         }}
-        aria-label={t('accessibility.messageActionsMenuLike')}
+        aria-label={translate('accessibility.messageActionsMenuLike')}
         data-uie-name={MessageActionsId.HEART}
         aria-pressed={isLikeAction}
         type="button"
@@ -192,7 +193,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
           ...getIconCSS,
           ...getActionsMenuCSS(currentMsgActionName === MessageActionsId.EMOJI),
         }}
-        aria-label={t('accessibility.messageActionsMenuEmoji')}
+        aria-label={translate('accessibility.messageActionsMenuEmoji')}
         data-uie-name={MessageActionsId.EMOJI}
         type="button"
         tabIndex={messageFocusedTabIndex}

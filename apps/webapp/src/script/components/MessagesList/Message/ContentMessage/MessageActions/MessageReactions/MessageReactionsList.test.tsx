@@ -22,6 +22,10 @@ import {render, fireEvent, within} from '@testing-library/react';
 import {User} from 'Repositories/entity/User';
 import {ReactionMap} from 'Repositories/storage';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
@@ -46,6 +50,7 @@ const defaultProps: MessageReactionsListProps = {
   selfUserId: generateQualifiedId(),
   users: [user1, user2, user3],
 };
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('MessageReactionsList', () => {
   afterEach(() => {
@@ -53,7 +58,9 @@ describe('MessageReactionsList', () => {
   });
 
   test('renders a button for each reaction and user count', () => {
-    const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const {getAllByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />), {
+      wrapper: rootProviderWrapper,
+    });
 
     const winkButton = getAllByTitle('wink');
     const smileyFace1 = getAllByTitle('innocent');
@@ -79,7 +86,9 @@ describe('MessageReactionsList', () => {
   });
 
   test('handles click on reaction button', () => {
-    const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />));
+    const {getByTitle} = render(withTheme(<MessageReactionsList {...defaultProps} />), {
+      wrapper: rootProviderWrapper,
+    });
 
     fireEvent.click(getByTitle('+1'));
     const {handleReactionClick} = defaultProps;

@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface DownloadButtonProps {
   actionId: string;
@@ -38,13 +38,14 @@ const DownloadButton = ({
   children,
   ...rest
 }: DownloadButtonProps) => {
+  const {translate} = useApplicationContext();
   return (
     <button
       {...rest}
       type="button"
       tabIndex={messageFocusedTabIndex}
       data-uie-name={actionId}
-      aria-label={t('conversationContextMenuDownload')}
+      aria-label={translate('conversationContextMenuDownload')}
       onClick={onDownloadClick}
       onKeyDown={onKeyPress}
     >

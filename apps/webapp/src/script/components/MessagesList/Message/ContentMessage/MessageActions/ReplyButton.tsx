@@ -20,7 +20,7 @@
 import {FC} from 'react';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {getActionsMenuCSS, getIconCSS, messageActionsMenuButton} from './MessageActions.styles';
 import {reactionImgSize} from './MessageReactions/EmojiChar.styles';
@@ -40,6 +40,7 @@ const ReplyButton: FC<ReplyButtonProps> = ({
   onReplyClick,
   onKeyPress,
 }) => {
+  const {translate} = useApplicationContext();
   return (
     <button
       css={{
@@ -50,7 +51,7 @@ const ReplyButton: FC<ReplyButtonProps> = ({
       type="button"
       tabIndex={messageFocusedTabIndex}
       data-uie-name={actionId}
-      aria-label={t('conversationContextMenuReply')}
+      aria-label={translate('conversationContextMenuReply')}
       onClick={onReplyClick}
       onKeyDown={onKeyPress}
     >
