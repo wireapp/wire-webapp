@@ -201,10 +201,14 @@ export async function runSegmenter(
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
   }
 
+  // 1. Erstellen Sie EINEN permanenten Hilfs-Canvas für das Video-Mapping (außerhalb des Streams)
+  const bufferCanvas = new OffscreenCanvas(1, 1);
+  const bufferCtx = bufferCanvas.getContext('2d');
+
   const glCtx = canvas.getContext('webgl2', {
     alpha: true,
     premultipliedAlpha: false,
-    preserveDrawingBuffer: false
+    preserveDrawingBuffer: false,
   }) as WebGL2RenderingContext;
 
   const drawingUtils = glCtx ? new DrawingUtils(glCtx) : null;
@@ -239,6 +243,15 @@ export async function runSegmenter(
         let gpuMs = 0;
         const logger = getSafeLogger('segmenter:WritableStream::write');
 
+        // 2. OffscreenCanvas an die Größe des VideoFrames anpassen
+        if (bufferCanvas.width !== videoFrame.displayWidth || bufferCanvas.height !== videoFrame.displayHeight) {
+          bufferCanvas.width = videoFrame.displayWidth;
+          bufferCanvas.height = videoFrame.displayHeight;
+        }
+
+        // 3. Das VideoFrame auf den Offscreen-Buffer zeichnen
+        bufferCtx?.drawImage(videoFrame, 0, 0);
+
         try {
           if (segmenterOptions.enabled && segmenterOptions.quality !== 'bypass') {
             if (segmenterOptions.enableFilters) {
@@ -264,7 +277,9 @@ export async function runSegmenter(
             ];
             const transparent: RGBAColor = [0, 0, 0, 0];
 
-            segmenter.segmentForVideo(videoFrame, timestampMs, result => {
+            // 4. WICHTIG: Übergeben Sie nun 'bufferCanvas' statt 'videoFrame' an MediaPipe
+            segmenter.segmentForVideo(bufferCanvas, timestampMs, result => {
+
               if (result.categoryMask && colors && drawingUtils && glCtx) {
                 const width = result.categoryMask.width;
                 const height = result.categoryMask.height;
@@ -275,13 +290,9 @@ export async function runSegmenter(
                   glCtx.viewport(0, 0, width, height);
                 }
 
-                // Zeichnen
                 drawingUtils.drawCategoryMask(result.categoryMask, colors, transparent);
-
-                // Windows Fix: Erzwingt die sofortige Ausführung auf der DirectX-Pipeline
                 glCtx.flush();
 
-                // Wasm-Maske sofort schließen (Das ist im synchronen Callback sicher!)
                 result.categoryMask.close();
               }
 
