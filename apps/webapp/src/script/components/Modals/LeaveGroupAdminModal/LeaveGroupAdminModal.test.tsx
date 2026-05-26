@@ -64,8 +64,12 @@ describe('LeaveGroupAdminModal', () => {
 
     const {getByTestId, queryByTestId} = renderModal();
 
-    expect(getByTestId('leave-group-admin-modal-message')).toHaveTextContent(t('leaveGroupAdminModalMessageNoEligibleFirstPart'));
-    expect(getByTestId('leave-group-admin-modal-message')).toHaveTextContent(t('leaveGroupAdminModalMessageNoEligibleSecondPart'));
+    expect(getByTestId('leave-group-admin-modal-message')).toHaveTextContent(
+      t('leaveGroupAdminModalMessageNoEligibleFirstPart'),
+    );
+    expect(getByTestId('leave-group-admin-modal-message')).toHaveTextContent(
+      t('leaveGroupAdminModalMessageNoEligibleSecondPart'),
+    );
     expect(queryByTestId('do-leave-group-and-promote-admin')).toBeNull();
     expect(getByTestId('do-delete-group-from-leave-modal')).toBeInTheDocument();
   });
