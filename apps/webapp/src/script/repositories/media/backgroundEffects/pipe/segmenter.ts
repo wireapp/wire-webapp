@@ -208,15 +208,24 @@ export async function runSegmenter(
   }) as WebGL2RenderingContext;
 
   const drawingUtils = glCtx ? new DrawingUtils(glCtx) : null;
+  let isProcessing = false;
 
   const writer = new WritableStream(
     {
       async write(videoFrame: VideoFrame) {
+
+        // 1. Frame-Skipping: Wenn die GPU/MediaPipe ausgelastet ist, Frame sofort verwerfen
+        if (isProcessing) {
+          videoFrame.close();
+          return;
+        }
+
         const {codedWidth, codedHeight, timestamp} = videoFrame;
         if (!codedWidth || !codedHeight) {
           videoFrame.close();
           return;
         }
+        isProcessing = true;
 
         await updateSegmenterModel();
 
@@ -255,40 +264,30 @@ export async function runSegmenter(
             ];
             const transparent: RGBAColor = [0, 0, 0, 0];
 
-            await new Promise<void>(resolve => {
-              segmenter.segmentForVideo(videoFrame, timestampMs, result => {
-                const segmentationMs = performance.now() - segStart;
+            segmenter.segmentForVideo(videoFrame, timestampMs, result => {
+              if (result.categoryMask && colors && drawingUtils && glCtx) {
+                const width = result.categoryMask.width;
+                const height = result.categoryMask.height;
 
-                // Nutzen Sie die Variablen aus dem äußeren Scope (Closure)
-                if (result.categoryMask && colors && drawingUtils && glCtx) {
-                  const width = result.categoryMask.width;
-                  const height = result.categoryMask.height;
-
-                  if (canvas.width !== width || canvas.height !== height) {
-                    canvas.width = width;
-                    canvas.height = height;
-                    glCtx.viewport(0, 0, width, height);
-                  }
-
-                  // Zeichnen über die langlebige Instanz
-                  drawingUtils.drawCategoryMask(result.categoryMask, colors, transparent);
-
-                  // Windows-ANGLE Fix: GPU-Pipeline leeren bevor Speicher freigegeben wird
-                  glCtx.flush();
-
-                  // Wasm-Speicher asynchron im nächsten Tick schließen
-                  setTimeout(() => {
-                    result.categoryMask?.close();
-                  }, 0);
+                if (canvas.width !== width || canvas.height !== height) {
+                  canvas.width = width;
+                  canvas.height = height;
+                  glCtx.viewport(0, 0, width, height);
                 }
 
-                if (result.confidenceMasks) {
-                  setTimeout(() => {
-                    result.confidenceMasks?.forEach((m: any) => m.close());
-                  }, 0);
-                }
-                resolve();
-              });
+                // Zeichnen
+                drawingUtils.drawCategoryMask(result.categoryMask, colors, transparent);
+
+                // Windows Fix: Erzwingt die sofortige Ausführung auf der DirectX-Pipeline
+                glCtx.flush();
+
+                // Wasm-Maske sofort schließen (Das ist im synchronen Callback sicher!)
+                result.categoryMask.close();
+              }
+
+              if (result.confidenceMasks) {
+                result.confidenceMasks.forEach((m: any) => m.close());
+              }
             });
           } else {
             const gpuStart = performance.now();
@@ -296,6 +295,7 @@ export async function runSegmenter(
             gpuMs = performance.now() - gpuStart;
           }
         } finally {
+          isProcessing = false;
           videoFrame.close();
         }
 
