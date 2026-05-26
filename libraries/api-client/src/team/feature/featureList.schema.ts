@@ -117,6 +117,12 @@ const mlsMigrationConfigSchema = z.object({
   finaliseRegardlessAfter: z.string().optional(),
 });
 
+const preventAdminLessGroupsConfigSchema = z.object({
+  deletionTimeout: z.number(),
+  promotionStrategy: z.union([z.literal('alphabetical'), z.literal('random'), z.literal('all')]),
+  reminderTimeouts: z.array(z.number()),
+});
+
 /**
  * Helper to create a feature schema that includes both base fields
  * (status, lockStatus, ttl) and a feature-specific config object.
@@ -142,6 +148,9 @@ const selfDeletingMessagesFeatureSchema = createFeatureSchemaWithConfig(selfDele
 const mlsFeatureSchema = createFeatureSchemaWithConfig(mlsConfigSchema).optional();
 const mlsE2EIdFeatureSchema = createFeatureSchemaWithConfig(mlsE2EIdConfigSchema).optional();
 const mlsMigrationFeatureSchema = createFeatureSchemaWithConfig(mlsMigrationConfigSchema).optional();
+const preventAdminLessGroupsFeatureSchema = createFeatureSchemaWithConfig(
+  preventAdminLessGroupsConfigSchema,
+).optional();
 
 /**
  * Complete feature list schema for the /feature-configs endpoint.
@@ -194,6 +203,7 @@ export const allFeaturesResponseSchema = z
     [FEATURE_KEY.STEALTH_USERS]: baseFeatureWithoutConfigSchema.optional(),
     [FEATURE_KEY.VALIDATE_SAML_EMAILS]: baseFeatureWithoutConfigSchema.optional(),
     [FEATURE_KEY.VIDEO_CALLING]: baseFeatureWithoutConfigSchema.optional(),
+    [FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]: preventAdminLessGroupsFeatureSchema,
   })
   .passthrough(); // Allow unknown features from newer backend versions
 
@@ -221,6 +231,7 @@ export type FeatureSelfDeletingMessages = z.infer<typeof selfDeletingMessagesFea
 export type FeatureMLS = z.infer<typeof mlsFeatureSchema>;
 export type FeatureMLSE2EId = z.infer<typeof mlsE2EIdFeatureSchema>;
 export type FeatureMLSMigration = z.infer<typeof mlsMigrationFeatureSchema>;
+export type FeaturePreventAdminLessGroups = z.infer<typeof preventAdminLessGroupsFeatureSchema>;
 export type FeatureWithoutConfig = z.infer<typeof baseFeatureWithoutConfigSchema>;
 
 // Additional feature types that use baseFeatureWithoutConfigSchema

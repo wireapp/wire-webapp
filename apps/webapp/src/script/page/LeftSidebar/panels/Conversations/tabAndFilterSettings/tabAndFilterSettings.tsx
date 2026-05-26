@@ -21,7 +21,7 @@ import {useCallback, useEffect, useId, useRef, useState} from 'react';
 
 import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from 'Util/keyboardUtil';
@@ -50,7 +50,7 @@ export const TabAndFilterSettings = () => {
 
   const {shouldShowChannelTab} = useChannelsFeatureFlag();
 
-  const availableTabs = [
+  const defaultTabs = [
     {type: SidebarTabs.FAVORITES, label: t('conversationLabelFavorites')},
     {type: SidebarTabs.GROUPS, label: t('conversationLabelGroups')},
     {type: SidebarTabs.DIRECTS, label: t('conversationLabelDirects')},
@@ -62,10 +62,9 @@ export const TabAndFilterSettings = () => {
     {type: SidebarTabs.DRAFTS, label: t('conversationLabelDrafts')},
     {type: SidebarTabs.PINGS, label: t('conversationLabelPings')},
   ];
-
-  if (shouldShowChannelTab) {
-    availableTabs.splice(2, 0, {type: SidebarTabs.CHANNELS, label: t('conversationLabelChannels')});
-  }
+  const availableTabs = shouldShowChannelTab
+    ? defaultTabs.toSpliced(2, 0, {type: SidebarTabs.CHANNELS, label: t('conversationLabelChannels')})
+    : defaultTabs;
 
   const handleMenuKeyDown = useCallback(
     (event: KeyboardEvent) => {

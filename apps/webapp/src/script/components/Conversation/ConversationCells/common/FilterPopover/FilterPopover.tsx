@@ -68,20 +68,35 @@ interface FilterPopoverProps {
   items: FilterItem[];
   selectedIds: string[];
   onSelectionChange: (ids: string[]) => void;
+  disabled?: boolean;
+  singleSelect: boolean;
 }
 
-export const FilterPopover = ({triggerLabel, items, selectedIds, onSelectionChange}: FilterPopoverProps) => {
+export const FilterPopover = ({
+  triggerLabel,
+  items,
+  selectedIds,
+  onSelectionChange,
+  disabled = false,
+  singleSelect,
+}: FilterPopoverProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState('');
 
   const filteredItems = useMemo(() => filterItems(items, searchValue), [items, searchValue]);
 
-  const handleOpenChange = useCallback((open: boolean) => {
-    setIsOpen(open);
-    if (!open) {
-      setSearchValue('');
-    }
-  }, []);
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (disabled && open) {
+        return;
+      }
+      setIsOpen(open);
+      if (!open) {
+        setSearchValue('');
+      }
+    },
+    [disabled],
+  );
 
   const handleItemSelect = useCallback(
     (id: string) => {
@@ -101,6 +116,7 @@ export const FilterPopover = ({triggerLabel, items, selectedIds, onSelectionChan
       <Button
         css={triggerButtonStyles}
         aria-label={triggerLabel}
+        isDisabled={disabled}
         data-uie-name="filter-popover-button"
         data-active={count > 0}
       >
@@ -152,17 +168,19 @@ export const FilterPopover = ({triggerLabel, items, selectedIds, onSelectionChan
             )}
           </div>
 
-          <ul css={itemListStyles} role="listbox" aria-multiselectable aria-label={triggerLabel}>
+          <ul css={itemListStyles} role="listbox" aria-multiselectable={!singleSelect} aria-label={triggerLabel}>
             {filteredItems.length === 0 ? (
               <li css={emptyStateStyles}>{t('cells.filtersModal.tags.noTagsFound')}</li>
             ) : (
               filteredItems.map(item => {
                 const isSelected = selectedIds.includes(item.id);
+                const isItemDisabled = singleSelect && selectedIds.length > 0 && !isSelected;
                 return (
                   <li key={item.id} css={itemRowHoverStyles} role="option" aria-selected={isSelected}>
                     <Checkbox
                       wrapperCSS={checkboxWrapperStyles}
                       checked={isSelected}
+                      disabled={isItemDisabled}
                       onChange={() => handleItemSelect(item.id)}
                       labelBeforeCheckbox
                       data-uie-name="filter-popover-item"

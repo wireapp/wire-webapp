@@ -24,7 +24,7 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {RadioGroup} from 'Components/Radio';
 import {SelectText} from 'Components/SelectText';

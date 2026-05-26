@@ -82,7 +82,7 @@ export class TeamState {
       return this.teamMembers()
         .concat(this.userState.connectedUsers())
         .filter((item, index, array) => array.indexOf(item) === index)
-        .sort(sortUsersByPriority);
+        .toSorted(sortUsersByPriority);
     });
 
     this.supportsLegalHold = ko.observable(false);

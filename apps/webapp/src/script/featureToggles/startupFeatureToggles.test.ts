@@ -40,7 +40,7 @@ describe('startupFeatureToggles', function () {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch('?foo=bar');
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(false);
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
+    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
   });
 
   it('enables a whitelisted feature toggle when present in the query parameter', () => {
@@ -57,7 +57,7 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain('unknown-feature');
+    expect(startupFeatureToggles.enabledFeatureToggleNames).not.toContain('unknown-feature');
   });
 
   it('ignores unknown feature toggles from the query parameter', () => {
@@ -65,7 +65,7 @@ describe('startupFeatureToggles', function () {
       `?${startupFeatureToggleQueryParameterName}=unknown-feature`,
     );
 
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([]);
+    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([]);
   });
 
   it('keeps only whitelisted feature toggles when known and unknown values are mixed', () => {
@@ -74,7 +74,7 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain('unknown-feature');
+    expect(startupFeatureToggles.enabledFeatureToggleNames).not.toContain('unknown-feature');
   });
 
   it('enables the applock refactored feature toggle when present in the query parameter', () => {
@@ -107,9 +107,7 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([
-      reliableWebsocketConnectionFeatureToggleName,
-    ]);
+    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([reliableWebsocketConnectionFeatureToggleName]);
   });
 
   it('ignores empty list entries in the feature toggle query parameter', () => {
@@ -118,9 +116,7 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(true);
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).toEqual([
-      reliableWebsocketConnectionFeatureToggleName,
-    ]);
+    expect(startupFeatureToggles.enabledFeatureToggleNames).toEqual([reliableWebsocketConnectionFeatureToggleName]);
   });
 
   it('treats feature toggle names as case-sensitive', () => {
@@ -130,7 +126,7 @@ describe('startupFeatureToggles', function () {
     );
 
     expect(startupFeatureToggles.isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName)).toBe(false);
-    expect(startupFeatureToggles.getEnabledFeatureToggleNames()).not.toContain(uppercaseFeatureToggleName);
+    expect(startupFeatureToggles.enabledFeatureToggleNames).not.toContain(uppercaseFeatureToggleName);
   });
 
   it('contains only whitelisted values in allowedStartupFeatureToggleNames', () => {

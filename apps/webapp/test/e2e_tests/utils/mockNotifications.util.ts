@@ -13,19 +13,22 @@ declare global {
  * **Important**: Don't use this function within playwright directly, only in the browser e.g. within `page.evaluate()`.
  */
 const stubNotifications = () => {
-  if (!window.wire?.app?.repository?.notification?.notifications)
+  const notificationRepository = window.wire?.app?.repository?.notification;
+  if (!notificationRepository?.notifications)
     throw new Error("Can't stub notifications - Notifications array wasn't initialized yet");
 
   window.__wireNotifications ??= [];
+  let currentNotifications = notificationRepository.notifications;
 
-  // Mock the push function of the notifications array
-  window.wire.app.repository.notification.notifications.push = (...notifications) => {
-    // Every time one or more notifications are pushed to the array also keep a reference to them in the global variable
-    window.__wireNotifications.push(...notifications);
-
-    // Use the native push function of the prototype to not modify the behavior
-    return Array.prototype.push.apply(window.wire.app.repository.notification.notifications, notifications);
-  };
+  Object.defineProperty(notificationRepository, 'notifications', {
+    configurable: true,
+    get: () => currentNotifications,
+    set: nextNotifications => {
+      const newNotifications = nextNotifications.slice(currentNotifications.length);
+      window.__wireNotifications = window.__wireNotifications.concat(newNotifications);
+      currentNotifications = nextNotifications;
+    },
+  });
 };
 
 /**

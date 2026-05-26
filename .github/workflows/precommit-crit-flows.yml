@@ -37,6 +37,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -44,6 +45,7 @@ jobs:
         if: ${{ github.event_name == 'merge_group' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -156,11 +158,14 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout (merge_group)
         if: ${{ github.event_name == 'merge_group' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:

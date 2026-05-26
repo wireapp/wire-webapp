@@ -40,7 +40,7 @@ import {
 } from 'Components/Cells/ShareModal/CellsShareExpirationFields';
 import {CellsTableLoader} from 'Components/Conversation/ConversationCells/common/CellsTableLoader/CellsTableLoader';
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClipboardButton';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
 import {t} from 'Util/localizerUtil';

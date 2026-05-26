@@ -133,7 +133,7 @@ export function EmojiPickerPlugin({openStateRef}: Props) {
     });
 
     return filteredEmojis
-      .sort((emojiA, emojiB) => {
+      .toSorted((emojiA, emojiB) => {
         const usageCountA = getUsageCount(emojiA.title);
         const usageCountB = getUsageCount(emojiB.title);
 

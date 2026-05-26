@@ -46,7 +46,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {LogoFullIcon} from 'Components/Icon';
+import {LogoFullIcon} from 'Components/icon';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';

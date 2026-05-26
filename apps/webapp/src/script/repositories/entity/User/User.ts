@@ -273,9 +273,11 @@ export class User {
     this.devices.push(new_client_et);
 
     if (this.isMe) {
-      this.devices.sort((client_a, client_b) => {
-        return new Date(client_b.time ?? '').getTime() - new Date(client_a.time ?? '').getTime();
-      });
+      this.devices(
+        this.devices().toSorted((client_a, client_b) => {
+          return new Date(client_b.time ?? '').getTime() - new Date(client_a.time ?? '').getTime();
+        }),
+      );
     }
 
     return true;

@@ -347,14 +347,8 @@ export class CallingRepository {
     await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
   }
 
-  public allowSuperhighQualityTier(event: boolean) {
-    if (this.isSuperhighQualityTierAllowed()) {
-      this.backgroundEffectsHandler.enableSuperhighQualityTier(event);
-    }
-  }
-
-  public isSuperhighQualityTierAllowed() {
-    return this.backgroundEffectsHandler.isSuperhighQualityTierAllowed();
+  public allowSuperhighQualityTier(enable: boolean) {
+    this.backgroundEffectsHandler.enableSuperhighQualityTier(enable);
   }
 
   public getBackgroundEffectsHandler(): BackgroundEffectsHandler {
@@ -737,7 +731,7 @@ export class CallingRepository {
     call.participants.removeAll();
     call.removeAllAudio();
     if (index !== -1) {
-      this.callState.calls.splice(index, 1);
+      this.callState.calls(this.callState.calls().toSpliced(index, 1));
     }
   }
 

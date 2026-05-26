@@ -471,7 +471,7 @@ export class Conversation {
 
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() =>
-      [...this.messages_unordered()].sort((message_a, message_b) => {
+      this.messages_unordered().toSorted((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
       }),
     );
@@ -1023,8 +1023,7 @@ export class Conversation {
    */
   private getLastDeliveredMessage(): Message | undefined {
     return this.messages()
-      .slice()
-      .reverse()
+      .toReversed()
       .find(messageEntity => {
         const isDelivered = [StatusType.DELIVERED, StatusType.SEEN].includes(messageEntity.status());
         return isDelivered && messageEntity.user().isMe;

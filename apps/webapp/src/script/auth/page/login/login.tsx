@@ -54,7 +54,7 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import {LogoFullIcon} from 'Components/Icon';
+import {LogoFullIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {isBackendError} from 'Util/typePredicateUtil';

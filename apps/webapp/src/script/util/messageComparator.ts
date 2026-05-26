@@ -30,7 +30,7 @@ import type {MentionEntity} from '../message/MentionEntity';
  * @returns Are the mentions different from each other
  */
 export function areMentionsDifferent(originalMessageEntity: ContentMessage, updatedMentions: MentionEntity[]): boolean {
-  const flattenToUserId = (mentions: MentionEntity[]): string[] => mentions.map(mention => mention.userId).sort();
+  const flattenToUserId = (mentions: MentionEntity[]): string[] => mentions.map(mention => mention.userId).toSorted();
 
   const existingMentions = flattenToUserId((originalMessageEntity.getFirstAsset() as TextAsset).mentions());
   const userIds = flattenToUserId(updatedMentions);

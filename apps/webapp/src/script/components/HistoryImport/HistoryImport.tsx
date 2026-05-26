@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
 import {BackupRepository} from 'Repositories/backup/backupRepository';

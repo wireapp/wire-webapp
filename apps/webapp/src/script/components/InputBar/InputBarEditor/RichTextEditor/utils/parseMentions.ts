@@ -29,7 +29,7 @@ export const parseMentions = (editor: LexicalEditor, textValue: string, mentions
     $nodesOfType(MentionNode)
       // The nodes given by lexical are not sorted by their position in the text. Instead they are sorted according to the moment they were inserted into the global text.
       // We need to manually sort the nodes by their position before parsing the mentions in the entire text
-      .sort((m1, m2) => (m1.isBefore(m2) ? -1 : 1))
+      .toSorted((m1, m2) => (m1.isBefore(m2) ? -1 : 1))
       .map(node => node.getValue()),
   );
   let position = -1;

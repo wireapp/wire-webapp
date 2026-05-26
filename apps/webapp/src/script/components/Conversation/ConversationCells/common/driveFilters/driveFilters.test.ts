@@ -18,10 +18,13 @@
  */
 
 import {
-  ConversationDriveFiltersState,
-  GlobalDriveFiltersState,
+  type ConversationDriveFiltersState,
+  getActiveConversationDriveFilterType,
+  getActiveGlobalDriveFilterType,
+  type GlobalDriveFiltersState,
   hasActiveConversationDriveFilters,
   hasActiveGlobalDriveFilters,
+  isFilterTypeDisabled,
   toConversationDriveSearchParams,
   toGlobalDriveSearchParams,
 } from './driveFilters';
@@ -61,10 +64,34 @@ describe('toConversationDriveSearchParams', () => {
     });
   });
 
-  it('omits empty tags from search params', () => {
-    expect(toConversationDriveSearchParams(emptyFilters)).toEqual({
-      tags: undefined,
+  it('maps a single file-type category to its MIME terms', () => {
+    expect(toConversationDriveSearchParams({...emptyFilters, selectedFileTypeIds: ['pdfs']})).toEqual({
+      mimeTypes: ['application/pdf'],
     });
+  });
+
+  it('flattens multiple file-type categories into a single MIME term list', () => {
+    expect(toConversationDriveSearchParams({...emptyFilters, selectedFileTypeIds: ['pictures', 'videos']})).toEqual({
+      mimeTypes: ['image/*', 'video/*'],
+    });
+  });
+
+  it('dedupes overlapping MIME terms across categories', () => {
+    expect(
+      toConversationDriveSearchParams({...emptyFilters, selectedFileTypeIds: ['spreadsheets', 'spreadsheets']}),
+    ).toEqual({
+      mimeTypes: ['*spreadsheet*', '*excel*'],
+    });
+  });
+
+  it('maps shared-via-link toggle to hasPublicLink: true', () => {
+    expect(toConversationDriveSearchParams({...emptyFilters, isSharedViaLink: true})).toEqual({
+      hasPublicLink: true,
+    });
+  });
+
+  it('omits unset params from search params', () => {
+    expect(toConversationDriveSearchParams(emptyFilters)).toEqual({});
   });
 });
 
@@ -81,25 +108,72 @@ describe('hasActiveGlobalDriveFilters', () => {
   );
 });
 
+describe('getActiveConversationDriveFilterType', () => {
+  it('returns null when no filter type is active', () => {
+    expect(getActiveConversationDriveFilterType(emptyFilters)).toBeNull();
+  });
+
+  it('returns tags when tags are selected', () => {
+    expect(getActiveConversationDriveFilterType({...emptyFilters, selectedTagIds: ['tag-a']})).toBe('tags');
+  });
+});
+
+describe('getActiveGlobalDriveFilterType', () => {
+  it('returns null when no filter type is active', () => {
+    expect(getActiveGlobalDriveFilterType(emptyGlobalFilters)).toBeNull();
+  });
+
+  it('returns "conversation" when the global-only conversation filter type is active', () => {
+    expect(getActiveGlobalDriveFilterType({...emptyGlobalFilters, selectedConversationIds: ['conv-a']})).toBe(
+      'conversation',
+    );
+  });
+
+  it('returns tags when tags are selected globally', () => {
+    expect(getActiveGlobalDriveFilterType({...emptyGlobalFilters, selectedTagIds: ['tag-a']})).toBe('tags');
+  });
+});
+
+describe('isFilterTypeDisabled', () => {
+  it('returns false for every filter type when none is active', () => {
+    expect(isFilterTypeDisabled('tags', null)).toBe(false);
+    expect(isFilterTypeDisabled('fileType', null)).toBe(false);
+    expect(isFilterTypeDisabled('createdBy', null)).toBe(false);
+    expect(isFilterTypeDisabled('sharedViaLink', null)).toBe(false);
+  });
+
+  it('returns false for the active filter type itself', () => {
+    expect(isFilterTypeDisabled('tags', 'tags')).toBe(false);
+  });
+
+  it('returns true for any other filter type when one is active', () => {
+    expect(isFilterTypeDisabled('fileType', 'tags')).toBe(true);
+    expect(isFilterTypeDisabled('createdBy', 'tags')).toBe(true);
+    expect(isFilterTypeDisabled('sharedViaLink', 'tags')).toBe(true);
+    expect(isFilterTypeDisabled('conversation', 'tags')).toBe(true);
+  });
+});
+
 describe('toGlobalDriveSearchParams', () => {
   it('maps backend-supported global filters to search params', () => {
     expect(
       toGlobalDriveSearchParams({
         ...emptyGlobalFilters,
         selectedTagIds: ['tag-a'],
+        selectedFileTypeIds: ['documents'],
         selectedConversationIds: ['conversation-a'],
+        isSharedViaLink: true,
         path: '/wire-cells-web/folder',
       }),
     ).toEqual({
       tags: ['tag-a'],
+      mimeTypes: ['*word*'],
+      hasPublicLink: true,
       path: '/wire-cells-web/folder',
     });
   });
 
   it('omits unsupported and empty global filters from search params', () => {
-    expect(toGlobalDriveSearchParams({...emptyGlobalFilters, selectedConversationIds: ['conversation-a']})).toEqual({
-      tags: undefined,
-      path: undefined,
-    });
+    expect(toGlobalDriveSearchParams({...emptyGlobalFilters, selectedConversationIds: ['conversation-a']})).toEqual({});
   });
 });

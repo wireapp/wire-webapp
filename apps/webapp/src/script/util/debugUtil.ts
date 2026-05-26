@@ -486,7 +486,7 @@ export class DebugUtil {
     if (this.storageRepository.storageService.db) {
       const records = await this.storageRepository.storageService.db.events.toArray();
       const messages = records.filter(event => event.conversation === conversationId);
-      return messages.slice(-amount).reverse();
+      return messages.slice(-amount).toReversed();
     }
     return [];
   }

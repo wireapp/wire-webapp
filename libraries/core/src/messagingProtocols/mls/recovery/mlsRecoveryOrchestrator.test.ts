@@ -78,7 +78,11 @@ describe('MlsRecoveryOrchestrator', () => {
       callBack: cb,
     });
 
-    expect(deps.recoverFromEpochMismatch).toHaveBeenCalledWith(qid(), SUBCONVERSATION_ID.CONFERENCE);
+    expect(deps.recoverFromEpochMismatch).toHaveBeenCalledWith(qid(), SUBCONVERSATION_ID.CONFERENCE, {
+      operationName: OperationName.send,
+      errorType: 'WrongEpoch',
+      groupId: undefined,
+    });
     expect(cb).toHaveBeenCalledTimes(2);
     expect(res).toBe('ok');
   });
@@ -291,7 +295,11 @@ describe('MlsRecoveryOrchestrator', () => {
     // Flush any microtasks from initial rejection handling
     await Promise.resolve();
     expect(cb).toHaveBeenCalledTimes(1);
-    expect(deps.recoverFromEpochMismatch).toHaveBeenCalledWith(qid(), SUBCONVERSATION_ID.CONFERENCE);
+    expect(deps.recoverFromEpochMismatch).toHaveBeenCalledWith(qid(), SUBCONVERSATION_ID.CONFERENCE, {
+      operationName: OperationName.send,
+      errorType: 'WrongEpoch',
+      groupId: undefined,
+    });
 
     // The rerun should not happen until timers advance
     jest.advanceTimersByTime(49);

@@ -21,4 +21,8 @@ import {CSSObject} from '@emotion/react';
 
 export const buttonStyles: CSSObject = {
   marginBottom: '0',
+  border: '1px solid var(--Border-Base-Primary, #DCE0E3)',
+  'body.theme-dark &': {
+    border: '1px solid var(--Border-Base-Primary, #34373D)',
+  },
 };

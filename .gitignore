@@ -16,7 +16,7 @@ npm-debug.log
 yarn-error.log
 
 # auto generated source files
-apps/webapp/src/script/components/Icon.tsx
+apps/webapp/src/script/components/icon.tsx
 
 # yarn 2 - not using zero-installs
 .pnp.*

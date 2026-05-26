@@ -24,7 +24,7 @@ import is from '@sindresorhus/is';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

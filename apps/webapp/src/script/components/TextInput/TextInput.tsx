@@ -23,7 +23,7 @@ import is from '@sindresorhus/is';
 
 import {CheckIcon, COLOR} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {isTabKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 

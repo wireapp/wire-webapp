@@ -143,7 +143,7 @@ export const UserSearchableList = ({
       return filteredUsers;
     }
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
-    return [...filteredUsers, ...remoteTeamMembers].sort((userA, userB) =>
+    return [...filteredUsers, ...remoteTeamMembers].toSorted((userA, userB) =>
       sortByPriority(userA.name(), userB.name(), normalizedQuery),
     );
   };

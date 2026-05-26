@@ -31,7 +31,7 @@ import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
 import {SearchInput} from 'Components/SearchInput';
@@ -183,7 +183,7 @@ const GroupCreationModal = ({
         return teamState.teamUsers();
       }
 
-      return teamState.teamMembers().sort(sortUsersByPriority);
+      return teamState.teamMembers().toSorted(sortUsersByPriority);
     }
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);

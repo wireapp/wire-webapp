@@ -48,7 +48,7 @@
  * }
  * ```
  */
-export {detectCapabilities} from './effects/capability';
+export {detectCapabilities} from './helper/capability';
 
 /**
  * Selects the optimal rendering pipeline based on browser capabilities.
@@ -62,15 +62,7 @@ export {detectCapabilities} from './effects/capability';
  * const pipeline = choosePipeline(caps, true);
  * ```
  */
-export {choosePipeline} from './effects/capability';
-
-/**
- * Video source wrapper for extracting frames from MediaStreamTrack.
- *
- * Provides frame callbacks using requestVideoFrameCallback (preferred) or
- * requestAnimationFrame (fallback). Used internally by BackgroundEffectsController.
- */
-export {VideoSource} from './effects/videoSource';
+export {choosePipeline} from './helper/capability';
 
 /**
  * Effect mode type ('blur', 'virtual', or 'passthrough').
