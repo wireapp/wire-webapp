@@ -3843,12 +3843,16 @@ export class ConversationRepository {
     const conversation = this.conversationState.findConversation(conversationId);
 
     if (!conversation) {
+      this.logger.warn('MLS conversation recovered but conversation entity not found; skipping system message', {
+        conversationId,
+      });
       return;
     }
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
 
     const event = EventBuilder.buildMLSConversationRecovered(conversation, currentTimestamp);
 
+    this.logger.info('Injecting MLS conversation recovered system message', {conversationId});
     void this.eventRepository.injectEvent(event);
   };
 
