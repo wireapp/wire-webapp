@@ -201,6 +201,14 @@ export async function runSegmenter(
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
   }
 
+  const glCtx = canvas.getContext('webgl2', {
+    alpha: true,
+    premultipliedAlpha: false,
+    preserveDrawingBuffer: false
+  }) as WebGL2RenderingContext;
+
+  const drawingUtils = glCtx ? new DrawingUtils(glCtx) : null;
+
   const writer = new WritableStream(
     {
       async write(videoFrame: VideoFrame) {
@@ -248,65 +256,39 @@ export async function runSegmenter(
             const transparent: RGBAColor = [0, 0, 0, 0];
 
             await new Promise<void>(resolve => {
-              segmenter.segmentForVideo(
-                segmenterOptions.enableFilters ? effectsCanvas : videoFrame,
-                timestampMs,
-                result => {
-                  segmentationMs = performance.now() - segStart;
+              segmenter.segmentForVideo(videoFrame, timestampMs, result => {
+                const segmentationMs = performance.now() - segStart;
 
-                  let width = 0;
-                  let height = 0;
+                // Nutzen Sie die Variablen aus dem äußeren Scope (Closure)
+                if (result.categoryMask && colors && drawingUtils && glCtx) {
+                  const width = result.categoryMask.width;
+                  const height = result.categoryMask.height;
 
-                  if (result.categoryMask && colors) {
-                    width = result.categoryMask.width;
-                    height = result.categoryMask.height;
-
+                  if (canvas.width !== width || canvas.height !== height) {
                     canvas.width = width;
                     canvas.height = height;
-
-                    const glCtx = canvas.getContext('webgl2') as WebGL2RenderingContext;
-                    if (glCtx) {
-                      const drawingUtils = new DrawingUtils(glCtx);
-                      drawingUtils.drawCategoryMask(result.categoryMask, colors, transparent);
-                    }
-                    result.categoryMask.close();
+                    glCtx.viewport(0, 0, width, height);
                   }
 
-                  if (result.confidenceMasks) {
-                    result.confidenceMasks.forEach((m: any) => m.close());
-                  }
+                  // Zeichnen über die langlebige Instanz
+                  drawingUtils.drawCategoryMask(result.categoryMask, colors, transparent);
 
-                  resolve();
+                  // Windows-ANGLE Fix: GPU-Pipeline leeren bevor Speicher freigegeben wird
+                  glCtx.flush();
 
-                  // const categoryMask = result.categoryMask;
-                  // const confidenceMask = result.confidenceMasks?.[0];
-                  //
-                  // try {
-                  //   if (!categoryMask || !confidenceMask) {
-                  //     logger.warn('Skipping frame: Missing masks or WebGL data.');
-                  //     return;
-                  //   }
-                  //
-                  //   const categoryTextureMP = categoryMask.getAsWebGLTexture();
-                  //   const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
-                  //   const gpuStart = performance.now();
-                  //   webGLRenderer?.render(
-                  //     videoFrame,
-                  //     segmenterOptions,
-                  //     categoryTextureMP,
-                  //     confidenceTextureMP,
-                  //     useSelfieModel,
-                  //   );
-                  //   gpuMs = performance.now() - gpuStart;
-                  // } catch (e) {
-                  //   logger.error('Error in videoCallback:', e);
-                  // } finally {
-                  //   categoryMask?.close();
-                  //   confidenceMask?.close();
-                  //   resolve();
-                  // }
-                },
-              );
+                  // Wasm-Speicher asynchron im nächsten Tick schließen
+                  setTimeout(() => {
+                    result.categoryMask?.close();
+                  }, 0);
+                }
+
+                if (result.confidenceMasks) {
+                  setTimeout(() => {
+                    result.confidenceMasks?.forEach((m: any) => m.close());
+                  }, 0);
+                }
+                resolve();
+              });
             });
           } else {
             const gpuStart = performance.now();
