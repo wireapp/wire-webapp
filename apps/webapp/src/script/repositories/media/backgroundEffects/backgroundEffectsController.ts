@@ -46,6 +46,8 @@ import {runSegmenter, updateSegmenterOptions} from './pipe/segmenter';
 // visually useful blur.  Multiply by this factor to get from the 0–1 range.
 const BLUR_SIGMA_SCALE = 15;
 const DEFAULT_FRAME_RATE = 15;
+const MAX_WIDTH = 256;
+const MAX_HEIGHT = 144;
 
 export class BackgroundEffectsController {
   private readonly logger: Logger;
@@ -113,6 +115,8 @@ export class BackgroundEffectsController {
     const {readable} = new TrackProcessor({track: inputTrack});
 
     const canvas = document.createElement('canvas');
+    canvas.width = MAX_WIDTH;
+    canvas.height = MAX_HEIGHT;
     const outputTrack = canvas.captureStream(frameRate).getVideoTracks()[0];
     const offscreen = canvas.transferControlToOffscreen();
 
