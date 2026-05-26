@@ -17,21 +17,18 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {Page} from '@playwright/test';
 
-export class DevicesPage {
-  readonly proteusId: Locator;
-  readonly activeDevices: Locator;
+export const DeviceDetailsPage = (page: Page) => {
+  const verificationToggleLabel = page.getByText('Verified');
+  const verifiedBadge = page.getByTestId('device-model').getByTestId('proteus-verified');
 
-  constructor(page: Page) {
-    this.proteusId = page.getByLabel('Proteus ID');
-    this.activeDevices = page.getByRole('group', {name: 'Active'}).getByRole('button', {name: /device details/});
-  }
+  const toggleDeviceVerification = async () => {
+    await verificationToggleLabel.click();
+  };
 
-  enhanceDeviceLocator(deviceLocator: Locator) {
-    return Object.assign(deviceLocator, {
-      removeButton: deviceLocator.getByRole('button', {name: 'Remove Device'}),
-      detailsButton: deviceLocator.getByTestId('go-device-details'),
-    });
-  }
-}
+  return {
+    verifiedBadge,
+    toggleDeviceVerification,
+  };
+};
