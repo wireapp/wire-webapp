@@ -17,7 +17,7 @@
  *
  */
 
-import {ImageSegmenter} from '@mediapipe/tasks-vision';
+import {DrawingUtils, ImageSegmenter, RGBAColor} from '@mediapipe/tasks-vision';
 
 import type {Metrics, Mode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
@@ -177,6 +177,7 @@ export async function runSegmenter(
   let frames = 0;
   let totalFrames = 0;
   const droppedFrames = 0;
+  let lastTimestampMs = 0;
 
   function updateMetrics(totalMs: number, segmentationMs: number, gpuMs: number) {
     pushMetricsSample(metricsWindow, {totalMs, segmentationMs, gpuMs});
@@ -237,40 +238,73 @@ export async function runSegmenter(
 
             const segStart = performance.now();
 
+            const now = performance.now();
+            const timestampMs = now > lastTimestampMs ? now : lastTimestampMs + 1;
+            lastTimestampMs = timestampMs;
+            const colors: RGBAColor[] = [
+              [0, 0, 0, 0], // background transparent
+              [255, 255, 255, 255], // person white
+            ];
+            const transparent: RGBAColor = [0, 0, 0, 0];
+
             await new Promise<void>(resolve => {
               segmenter.segmentForVideo(
                 segmenterOptions.enableFilters ? effectsCanvas : videoFrame,
-                timestamp * 1000,
+                timestampMs,
                 result => {
                   segmentationMs = performance.now() - segStart;
 
-                  const categoryMask = result.categoryMask;
-                  const confidenceMask = result.confidenceMasks?.[0];
+                  let width = 0;
+                  let height = 0;
 
-                  try {
-                    if (!categoryMask || !confidenceMask) {
-                      logger.warn('Skipping frame: Missing masks or WebGL data.');
-                      return;
+                  if (result.categoryMask && colors) {
+                    width = result.categoryMask.width;
+                    height = result.categoryMask.height;
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const glCtx = canvas.getContext('webgl2') as WebGL2RenderingContext;
+                    if (glCtx) {
+                      const drawingUtils = new DrawingUtils(glCtx);
+                      drawingUtils.drawCategoryMask(result.categoryMask, colors, transparent);
                     }
-
-                    const categoryTextureMP = categoryMask.getAsWebGLTexture();
-                    const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
-                    const gpuStart = performance.now();
-                    webGLRenderer?.render(
-                      videoFrame,
-                      segmenterOptions,
-                      categoryTextureMP,
-                      confidenceTextureMP,
-                      useSelfieModel,
-                    );
-                    gpuMs = performance.now() - gpuStart;
-                  } catch (e) {
-                    logger.error('Error in videoCallback:', e);
-                  } finally {
-                    categoryMask?.close();
-                    confidenceMask?.close();
-                    resolve();
+                    result.categoryMask.close();
                   }
+
+                  if (result.confidenceMasks) {
+                    result.confidenceMasks.forEach((m: any) => m.close());
+                  }
+
+                  resolve();
+
+                  // const categoryMask = result.categoryMask;
+                  // const confidenceMask = result.confidenceMasks?.[0];
+                  //
+                  // try {
+                  //   if (!categoryMask || !confidenceMask) {
+                  //     logger.warn('Skipping frame: Missing masks or WebGL data.');
+                  //     return;
+                  //   }
+                  //
+                  //   const categoryTextureMP = categoryMask.getAsWebGLTexture();
+                  //   const confidenceTextureMP = confidenceMask.getAsWebGLTexture();
+                  //   const gpuStart = performance.now();
+                  //   webGLRenderer?.render(
+                  //     videoFrame,
+                  //     segmenterOptions,
+                  //     categoryTextureMP,
+                  //     confidenceTextureMP,
+                  //     useSelfieModel,
+                  //   );
+                  //   gpuMs = performance.now() - gpuStart;
+                  // } catch (e) {
+                  //   logger.error('Error in videoCallback:', e);
+                  // } finally {
+                  //   categoryMask?.close();
+                  //   confidenceMask?.close();
+                  //   resolve();
+                  // }
                 },
               );
             });
