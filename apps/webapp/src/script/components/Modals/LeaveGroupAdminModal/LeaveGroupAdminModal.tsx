@@ -62,6 +62,8 @@ export const LeaveGroupAdminModal = () => {
         await onLeave(clearContent, selectedUser);
         hide();
       }
+    } catch {
+      console.warn('Failed to promote new admin. Leave action was not executed.');
     } finally {
       setIsLoading(false);
     }
