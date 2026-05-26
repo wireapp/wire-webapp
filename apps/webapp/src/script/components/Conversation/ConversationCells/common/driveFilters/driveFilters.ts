@@ -37,6 +37,7 @@ export interface DriveSearchParams {
   tags?: string[];
   mimeTypes?: string[];
   hasPublicLink?: boolean;
+  creatorIds?: string[];
   path?: string;
 }
 
@@ -57,6 +58,7 @@ export const hasActiveSearchParams = (params: DriveSearchParams): boolean =>
   params.tags !== undefined ||
   params.mimeTypes !== undefined ||
   params.hasPublicLink !== undefined ||
+  params.creatorIds !== undefined ||
   params.path !== undefined;
 
 export const hasActiveGlobalDriveFilters = (filters: GlobalDriveFiltersState): boolean =>
@@ -102,11 +104,13 @@ export const toConversationDriveSearchParams = (filters: ConversationDriveFilter
   tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
   mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
   hasPublicLink: filters.isSharedViaLink ? true : undefined,
+  creatorIds: filters.selectedCreatorIds.length > 0 ? filters.selectedCreatorIds : undefined,
 });
 
 export const toGlobalDriveSearchParams = (filters: GlobalDriveFiltersState): DriveSearchParams => ({
   tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
   mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
   hasPublicLink: filters.isSharedViaLink ? true : undefined,
+  creatorIds: filters.selectedCreatorIds.length > 0 ? filters.selectedCreatorIds : undefined,
   path: is.nonEmptyString(filters.path) ? filters.path : undefined,
 });

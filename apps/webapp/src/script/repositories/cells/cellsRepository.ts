@@ -243,6 +243,7 @@ export class CellsRepository {
     tags,
     mimeTypes,
     hasPublicLink,
+    creatorIds,
     path,
     type,
     sortBy,
@@ -253,6 +254,7 @@ export class CellsRepository {
     tags?: string[];
     mimeTypes?: string[];
     hasPublicLink?: boolean;
+    creatorIds?: string[];
     path?: string;
     type?: 'file' | 'folder';
     sortBy?: SortBy;
@@ -266,6 +268,7 @@ export class CellsRepository {
       tags,
       mimeTypes,
       hasPublicLink,
+      creatorIds,
       path,
       ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
