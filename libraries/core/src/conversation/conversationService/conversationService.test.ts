@@ -244,8 +244,7 @@ describe('ConversationService', () => {
 
       const remoteEpoch = 6;
       const localEpoch = 5;
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValue({
         qualified_id: mockConversationId,
@@ -288,8 +287,7 @@ describe('ConversationService', () => {
 
       const remoteEpoch = 10;
       const localEpoch = 9;
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
         protocol: CONVERSATION_PROTOCOL.MLS,
@@ -347,8 +345,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 5;
       const localEpoch = 4;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
@@ -390,8 +387,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 5;
       const localEpoch = 4;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
@@ -780,8 +776,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 5;
       const localEpoch = 4;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
@@ -813,8 +808,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 5;
       const localEpoch = 4;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       const mockedSubconversationResponse = {
         epoch: remoteEpoch,
@@ -1084,8 +1078,7 @@ describe('ConversationService', () => {
 
       const remoteEpoch = 5;
       const localEpoch = 4;
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       const getConvSpy = jest.spyOn(apiClient.api.conversation, 'getConversation');
       getConvSpy.mockResolvedValue({
@@ -1365,8 +1358,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 3;
       const localEpoch = 2;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id,
