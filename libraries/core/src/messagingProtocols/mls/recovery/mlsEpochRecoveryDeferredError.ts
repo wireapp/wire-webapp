@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,19 @@
  *
  */
 
-export type {
-  DomainMlsError,
-  DomainMlsErrorType,
-  ErrorContextInput,
-  ErrorHandler,
-  MlsErrorMapper,
-} from './mlsErrorMapper';
-export {ChainedMlsErrorMapper, createDefaultMlsErrorMapper} from './mlsErrorMapper';
-export type {
-  RecoveryActionKind,
-  RetryPolicy,
-  RecoveryPolicy,
-  PolicyTable,
-  OperationContext,
-  MlsRecoveryOrchestrator,
-  OrchestratorDeps,
-  MlsEpochRecoveryTrigger,
-} from './mlsRecoveryOrchestrator';
-export {MlsRecoveryOrchestratorImpl, minimalDefaultPolicies, OperationName} from './mlsRecoveryOrchestrator';
-export {MlsEpochRecoveryDeferredError} from './mlsEpochRecoveryDeferredError';
+import {SUBCONVERSATION_ID} from '@wireapp/api-client/lib/conversation';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+/**
+ * Thrown when MLS epoch-mismatch recovery is intentionally deferred while the
+ * notification backlog is still being replayed (connection not yet LIVE).
+ */
+export class MlsEpochRecoveryDeferredError extends Error {
+  constructor(
+    readonly conversationId: QualifiedId,
+    readonly subconvId?: SUBCONVERSATION_ID,
+  ) {
+    super('MLS epoch recovery deferred until notification replay completes');
+    this.name = 'MlsEpochRecoveryDeferredError';
+  }
+}
