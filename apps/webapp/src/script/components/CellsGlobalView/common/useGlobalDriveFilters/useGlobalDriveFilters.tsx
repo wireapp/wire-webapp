@@ -29,8 +29,10 @@ import {
   isFilterTypeDisabled,
 } from 'Components/Conversation/ConversationCells/common/driveFilters/driveFilters';
 import {FILE_TYPE_CATALOG} from 'Components/Conversation/ConversationCells/common/driveFilters/fileTypeCatalog';
+import {useDriveEnabledParticipantFilterItems} from 'Components/Conversation/ConversationCells/common/useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
 import {useGetAllTags} from 'Components/Conversation/ConversationCells/common/useGetAllTags/useGetAllTags';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {t} from 'Util/localizerUtil';
 
 // ---------------------------------------------------------------------------
@@ -43,20 +45,17 @@ const MOCK_CONVERSATIONS: FilterItem[] = [
   {id: 'conv-3', label: 'Design'},
 ];
 
-const MOCK_CREATORS: FilterItem[] = [
-  {id: 'a-user', label: 'A User', subLabel: '@auser'},
-  {id: 'hello-user', label: 'Hello User', subLabel: '@hellouser'},
-  {id: 'b-user', label: 'B User', subLabel: '@buser'},
-];
-
 // ---------------------------------------------------------------------------
 
 export const useGlobalDriveFilters = ({
   cellsRepository,
+  conversationRepository,
 }: {
   cellsRepository: CellsRepository;
+  conversationRepository: ConversationRepository;
 }): {filters: FilterConfig[]; filterState: GlobalDriveFiltersState} => {
   const {tags: allTags} = useGetAllTags({cellsRepository});
+  const creatorItems = useDriveEnabledParticipantFilterItems({conversationRepository});
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedFileTypeIds, setSelectedFileTypeIds] = useState<string[]>([]);
@@ -125,7 +124,7 @@ export const useGlobalDriveFilters = ({
         type: 'popover',
         id: 'createdBy',
         label: t('cells.filter.createdBy'),
-        items: MOCK_CREATORS,
+        items: creatorItems,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
         disabled: isFilterTypeDisabled('createdBy', activeFilterType),
@@ -142,6 +141,7 @@ export const useGlobalDriveFilters = ({
     ],
     [
       activeFilterType,
+      creatorItems,
       fileTypes,
       tagItems,
       selectedTagIds,
