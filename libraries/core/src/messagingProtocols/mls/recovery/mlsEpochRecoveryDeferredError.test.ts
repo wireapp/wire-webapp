@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,18 @@
  *
  */
 
-export type {
-  DomainMlsError,
-  DomainMlsErrorType,
-  ErrorContextInput,
-  ErrorHandler,
-  MlsErrorMapper,
-} from './mlsErrorMapper';
-export {ChainedMlsErrorMapper, createDefaultMlsErrorMapper} from './mlsErrorMapper';
-export type {
-  RecoveryActionKind,
-  RetryPolicy,
-  RecoveryPolicy,
-  PolicyTable,
-  OperationContext,
-  MlsRecoveryOrchestrator,
-  OrchestratorDeps,
-  MlsEpochRecoveryTrigger,
-} from './mlsRecoveryOrchestrator';
-export {MlsRecoveryOrchestratorImpl, minimalDefaultPolicies, OperationName} from './mlsRecoveryOrchestrator';
-export {MlsEpochRecoveryDeferredError} from './mlsEpochRecoveryDeferredError';
+import {QualifiedId} from '@wireapp/api-client/lib/user';
+
+import {MlsEpochRecoveryDeferredError} from './mlsEpochRecoveryDeferredError';
+
+describe('MlsEpochRecoveryDeferredError', () => {
+  it('exposes conversation context', () => {
+    const conversationId: QualifiedId = {id: 'conv', domain: 'wire.test'};
+    const error = new MlsEpochRecoveryDeferredError(conversationId);
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error.name).toBe('MlsEpochRecoveryDeferredError');
+    expect(error.conversationId).toEqual(conversationId);
+    expect(error.subconvId).toBeUndefined();
+  });
+});
