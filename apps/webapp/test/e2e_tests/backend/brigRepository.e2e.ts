@@ -19,17 +19,16 @@
 
 import axios, {AxiosInstance} from 'axios';
 
-const BASIC_AUTH = process.env.BASIC_AUTH;
-
 export class BrigRepositoryE2E {
   readonly axiosInstance: AxiosInstance;
 
-  constructor() {
+  constructor(config: {backendUrl: string; basicAuth: string}) {
     this.axiosInstance = axios.create({
-      baseURL: process.env.BACKEND_URL,
+      baseURL: config.backendUrl,
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
+        Authorization: `Basic ${config.basicAuth}`,
       },
     });
   }
@@ -37,9 +36,6 @@ export class BrigRepositoryE2E {
   public async getActivationCodeForEmail(email: string): Promise<string> {
     const activationCodeResponse = await this.axiosInstance.get(`/i/users/activation-code`, {
       params: {email: email},
-      headers: {
-        Authorization: `Basic ${BASIC_AUTH}`,
-      },
     });
 
     return activationCodeResponse.data.code;
@@ -51,88 +47,37 @@ export class BrigRepositoryE2E {
         team: teamId,
         invitation_id: invitationId,
       },
-      headers: {
-        Authorization: `Basic ${BASIC_AUTH}`,
-      },
     });
 
     return invitationCodeResponse.data.code;
   }
 
   public async unlockConferenceCallingFeature(teamId: string) {
-    await this.axiosInstance.put(
-      `i/teams/${teamId}/features/conferenceCalling/unlocked`,
-      {},
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    await this.axiosInstance.put(`i/teams/${teamId}/features/conferenceCalling/unlocked`, {});
   }
 
   public async enableConferenceCallingBackdoorViaBackdoorTeam(teamId: string) {
-    await this.axiosInstance.patch(
-      `i/teams/${teamId}/features/conferenceCalling`,
-      {
-        status: 'enabled',
-      },
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    await this.axiosInstance.patch(`i/teams/${teamId}/features/conferenceCalling`, {
+      status: 'enabled',
+    });
   }
 
   public async unlockChannelFeature(teamId: string) {
-    await this.axiosInstance.put(
-      `i/teams/${teamId}/features/channels/unlocked`,
-      {},
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    await this.axiosInstance.put(`i/teams/${teamId}/features/channels/unlocked`, {});
   }
 
   public async unlockSndFactorPasswordChallenge(teamId: string) {
-    await this.axiosInstance.put(
-      `i/teams/${teamId}/features/sndFactorPasswordChallenge/unlocked`,
-      {},
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    await this.axiosInstance.put(`i/teams/${teamId}/features/sndFactorPasswordChallenge/unlocked`, {});
   }
 
   public async unlockAppLock(teamId: string) {
-    await this.axiosInstance.put(
-      `i/teams/${teamId}/features/appLock/unlocked`,
-      {},
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    await this.axiosInstance.put(`i/teams/${teamId}/features/appLock/unlocked`, {});
   }
 
   public async enableChannelsFeature(teamId: string) {
-    await this.axiosInstance.patch(
-      `i/teams/${teamId}/features/channels`,
-      {
-        status: 'enabled',
-      },
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    await this.axiosInstance.patch(`i/teams/${teamId}/features/channels`, {
+      status: 'enabled',
+    });
   }
 
   public async configureMLSFeature(
@@ -143,113 +88,81 @@ export class BrigRepositoryE2E {
       supportedProtocols: ('mls' | 'proteus')[];
     },
   ) {
-    await this.axiosInstance.patch(
-      `i/teams/${teamId}/features/mls`,
-      {
-        status: config.status ?? 'enabled',
-        config: {
-          protocolToggleUsers: [],
-          allowedCipherSuites: [2],
-          defaultProtocol: config?.defaultProtocol ?? 'mls',
-          defaultCipherSuite: 2,
-          supportedProtocols: config?.supportedProtocols ?? ['mls', 'proteus'],
-        },
+    await this.axiosInstance.patch(`i/teams/${teamId}/features/mls`, {
+      status: config.status ?? 'enabled',
+      config: {
+        protocolToggleUsers: [],
+        allowedCipherSuites: [2],
+        defaultProtocol: config?.defaultProtocol ?? 'mls',
+        defaultCipherSuite: 2,
+        supportedProtocols: config?.supportedProtocols ?? ['mls', 'proteus'],
       },
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    });
   }
 
   public async toggleAppLock(teamId: string, status: 'enabled' | 'disabled', enforceAppLock: boolean = true) {
-    await this.axiosInstance.patch(
-      `i/teams/${teamId}/features/appLock`,
-      {
-        status: status,
-        config: {
-          enforceAppLock: enforceAppLock,
-          inactivityTimeoutSecs: 30,
-        },
+    await this.axiosInstance.patch(`i/teams/${teamId}/features/appLock`, {
+      status: status,
+      config: {
+        enforceAppLock: enforceAppLock,
+        inactivityTimeoutSecs: 30,
       },
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    });
   }
 
   public async unlockCellsFeature(teamId: string) {
-    await this.axiosInstance.put(
-      `i/teams/${teamId}/features/cells/unlocked`,
-      {},
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+    await this.axiosInstance.put(`i/teams/${teamId}/features/cells/unlocked`, {});
   }
 
   public async enableCells(teamId: string) {
-    await this.axiosInstance.put(
-      `i/teams/${teamId}/features/cells`,
-      {
-        config: {
-          channels: {
-            default: 'enabled',
-            enabled: true,
-          },
-          collabora: {
-            enabled: true,
-          },
-          groups: {
-            default: 'enabled',
-            enabled: true,
-          },
-          metadata: {
-            namespaces: {
-              usermetaTags: {
-                allowFreeValues: true,
-                defaultValues: [],
-              },
+    await this.axiosInstance.put(`i/teams/${teamId}/features/cells`, {
+      config: {
+        channels: {
+          default: 'enabled',
+          enabled: true,
+        },
+        collabora: {
+          enabled: true,
+        },
+        groups: {
+          default: 'enabled',
+          enabled: true,
+        },
+        metadata: {
+          namespaces: {
+            usermetaTags: {
+              allowFreeValues: true,
+              defaultValues: [],
             },
           },
-          one2one: {
-            default: 'enabled',
-            enabled: true,
-          },
-          publicLinks: {
-            enableFiles: true,
-            enableFolders: true,
-            enforceExpirationDefault: 0,
-            enforceExpirationMax: 0,
-            enforcePassword: false,
-          },
-          storage: {
-            perFileQuotaBytes: '104857600',
-            recycle: {
-              allowSkip: false,
-              autoPurgeDays: 30,
-              disable: false,
-            },
-          },
-          users: {
-            externals: true,
-            guests: true,
+        },
+        one2one: {
+          default: 'enabled',
+          enabled: true,
+        },
+        publicLinks: {
+          enableFiles: true,
+          enableFolders: true,
+          enforceExpirationDefault: 0,
+          enforceExpirationMax: 0,
+          enforcePassword: false,
+        },
+        storage: {
+          perFileQuotaBytes: '104857600',
+          recycle: {
+            allowSkip: false,
+            autoPurgeDays: 30,
+            disable: false,
           },
         },
-        status: 'enabled',
-        ttl: 'unlimited',
-      },
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
+        users: {
+          externals: true,
+          guests: true,
         },
       },
-    );
+      status: 'enabled',
+      ttl: 'unlimited',
+    });
   }
 
   public async claimDomain(domain: string) {
