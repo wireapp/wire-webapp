@@ -100,6 +100,14 @@ const toMimeTypes = (selectedFileTypeIds: string[]): string[] | undefined => {
   return mimeTerms.length > 0 ? mimeTerms : undefined;
 };
 
+// The conversation filter is single-select; the selected id is a stringified qualified id
+// (`<id>@<domain>`), which is also the conversation's cells path root. Using it as the search
+// path scopes the recursive search to that conversation only.
+const toConversationPath = (selectedConversationIds: string[]): string | undefined => {
+  const [stringifiedQualifiedId] = selectedConversationIds;
+  return is.nonEmptyString(stringifiedQualifiedId) ? stringifiedQualifiedId : undefined;
+};
+
 export const toConversationDriveSearchParams = (filters: ConversationDriveFiltersState): DriveSearchParams => ({
   tags: filters.selectedTagIds.length > 0 ? filters.selectedTagIds : undefined,
   mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
@@ -112,5 +120,6 @@ export const toGlobalDriveSearchParams = (filters: GlobalDriveFiltersState): Dri
   mimeTypes: toMimeTypes(filters.selectedFileTypeIds),
   hasPublicLink: filters.isSharedViaLink ? true : undefined,
   creatorIds: filters.selectedCreatorIds.length > 0 ? filters.selectedCreatorIds : undefined,
-  path: is.nonEmptyString(filters.path) ? filters.path : undefined,
+  path:
+    toConversationPath(filters.selectedConversationIds) ?? (is.nonEmptyString(filters.path) ? filters.path : undefined),
 });

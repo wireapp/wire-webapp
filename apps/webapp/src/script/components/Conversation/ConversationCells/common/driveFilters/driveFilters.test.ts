@@ -161,7 +161,6 @@ describe('toGlobalDriveSearchParams', () => {
         ...emptyGlobalFilters,
         selectedTagIds: ['tag-a'],
         selectedFileTypeIds: ['documents'],
-        selectedConversationIds: ['conversation-a'],
         isSharedViaLink: true,
         path: '/wire-cells-web/folder',
       }),
@@ -173,7 +172,18 @@ describe('toGlobalDriveSearchParams', () => {
     });
   });
 
-  it('omits unsupported and empty global filters from search params', () => {
-    expect(toGlobalDriveSearchParams({...emptyGlobalFilters, selectedConversationIds: ['conversation-a']})).toEqual({});
+  it('maps the selected conversation id to the conversation cells path', () => {
+    expect(
+      toGlobalDriveSearchParams({
+        ...emptyGlobalFilters,
+        selectedConversationIds: ['conv-uuid@staging.zinfra.io'],
+      }),
+    ).toEqual({
+      path: 'conv-uuid@staging.zinfra.io',
+    });
+  });
+
+  it('omits empty global filters from search params', () => {
+    expect(toGlobalDriveSearchParams(emptyGlobalFilters)).toEqual({});
   });
 });
