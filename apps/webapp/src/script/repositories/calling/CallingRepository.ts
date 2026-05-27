@@ -661,9 +661,9 @@ export class CallingRepository {
       users = [...users, userId];
     }
     const poorCallQualityUsers = users.length;
-    const remoteparticipants = call.participants().length - 1;
-    // Edge case: In call start remoteparticipants and poorCallQualityUsers are 0
-    if (remoteparticipants !== 0 && poorCallQualityUsers === remoteparticipants) {
+    const remoteParticipants = call.participants().length - 1;
+    // Edge case: In call start remote participants and poorCallQualityUsers are always 0
+    if (remoteParticipants !== 0 && poorCallQualityUsers === remoteParticipants) {
       Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
       Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
