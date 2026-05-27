@@ -660,7 +660,10 @@ export class CallingRepository {
     if (!isOldPoorCallQualityUser && quality !== QUALITY.NORMAL) {
       users = [...users, userId];
     }
-    if (users.length === call.participants().length - 1) {
+    const poorCallQualityUsers = users.length;
+    const remoteparticipants = call.participants().length - 1;
+    // Edge case: In call start remoteparticipants and poorCallQualityUsers are 0
+    if (remoteparticipants !== 0 && poorCallQualityUsers === remoteparticipants) {
       Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
       Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
