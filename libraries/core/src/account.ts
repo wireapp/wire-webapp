@@ -57,6 +57,11 @@ import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
+import {
+  ConnectionState,
+  ConnectionStateTracker,
+  createConnectionStateTracker,
+} from './connectionState/connectionStateTracker';
 import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
 import {SubconversationService} from './conversation/subconversationService/subconversationService';
@@ -94,11 +99,6 @@ import {TeamService} from './team/';
 import {UserService} from './user/';
 import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
-import {
-  ConnectionState,
-  ConnectionStateTracker,
-  createConnectionStateTracker,
-} from './connectionState/connectionStateTracker';
 
 export type ProcessedEventPayload = HandledEventPayload;
 
