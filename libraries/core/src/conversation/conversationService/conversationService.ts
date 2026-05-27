@@ -56,6 +56,11 @@ import {
   SendResult,
 } from './conversationService.types';
 
+import {
+  ConnectionState,
+  ConnectionStateTracker,
+  createConnectionStateTracker,
+} from '../../connectionState/connectionStateTracker';
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
@@ -73,11 +78,6 @@ import {
   AddUsersToProteusConversationParams,
   SendProteusMessageParams,
 } from '../../messagingProtocols/proteus/proteusService/proteusService.types';
-import {
-  ConnectionState,
-  ConnectionStateTracker,
-  createConnectionStateTracker,
-} from '../../connectionState/connectionStateTracker';
 import {HandledEventPayload, HandledEventResult} from '../../notification';
 import {CoreDatabase} from '../../storage/coreDb';
 import {isMLSConversation} from '../../util';
@@ -1172,9 +1172,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     conversationId: QualifiedId,
     subconversationId?: SUBCONVERSATION_ID,
     trigger?: MlsEpochRecoveryTrigger,
-    options?: {force?: boolean},
+    options: {force: boolean} = {force: false},
   ) {
-    if (!options?.force && this.shouldDeferEpochRecovery(trigger)) {
+    if (options.force === false && this.shouldDeferEpochRecovery(trigger)) {
       this.deferEpochRecovery(conversationId, subconversationId, trigger);
     }
 
