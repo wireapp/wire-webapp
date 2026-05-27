@@ -89,8 +89,13 @@ export async function connectWithUser(sender: Page | PageManager, receiver: Pick
 export async function sendConnectionRequest(sender: Page | PageManager, receiver: User) {
   const {pages, modals, components} = ('webapp' in sender ? sender : PageManager.from(sender)).webapp;
   await components.conversationSidebar().clickConnectButton();
-  await pages.startUI().searchInput.fill(receiver.username);
-  await pages.startUI().selectUsers(receiver.username);
+
+  const userHandle = receiver.qualifiedId?.domain
+    ? `${receiver.username}@${receiver.qualifiedId?.domain}`
+    : receiver.username;
+
+  await pages.startUI().searchInput.fill(userHandle);
+  await pages.startUI().selectUsers(userHandle);
   await modals.userProfile().clickConnectButton();
 }
 
