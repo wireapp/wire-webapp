@@ -200,6 +200,26 @@ test.describe('account settings', () => {
       .toEqual(expect.arrayContaining([expect.stringContaining(expectedLog)]));
   });
 
+  test('Verify new username is synced across the devices', {tag: ['@TC-1938', '@regression']}, async ({createPage}) => {
+    const {components, pages} = PageManager.from(await createPage(withLogin(memberA))).webapp;
+    await components.conversationSidebar().clickPreferencesButton();
+    // Verify initial username
+    await expect(pages.account().usernameDisplay).toContainText(memberA.username);
+
+    // Change username to a unique name
+    const newUserName = `user_${Date.now()}`;
+    await pages.account().changeUserName(newUserName);
+    await expect(pages.account().usernameDisplay).toContainText(newUserName);
+
+    // Setup second device session
+    const {components: userA2DeviceComponents} = PageManager.from(
+      await createPage(withLogin(memberA, {confirmNewHistory: true})),
+    ).webapp;
+
+    // Verify sync on second device
+    await expect(userA2DeviceComponents.conversationSidebar().personalUserName).toContainText(newUserName);
+  });
+
   test(
     'I want to see the Full Name wherever my name gets displayed',
     {tag: ['@TC-1948', '@regression']},
