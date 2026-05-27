@@ -804,10 +804,9 @@ describe('ConversationService', () => {
       jest.spyOn(client.api.user, 'postListClients').mockResolvedValue({
         qualified_user_map: {},
       });
-      jest.spyOn(client.api.user, 'getUserSupportedProtocols').mockResolvedValue([
-        CONVERSATION_PROTOCOL.MLS,
-        CONVERSATION_PROTOCOL.PROTEUS,
-      ]);
+      jest
+        .spyOn(client.api.user, 'getUserSupportedProtocols')
+        .mockResolvedValue([CONVERSATION_PROTOCOL.MLS, CONVERSATION_PROTOCOL.PROTEUS]);
       client.context = {
         clientType: ClientType.NONE,
         userId: PayloadHelper.getUUID(),
