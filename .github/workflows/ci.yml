@@ -70,7 +70,9 @@ jobs:
 
       - name: Fetch base branch for Nx format checks
         if: ${{ github.event_name == 'pull_request' }}
-        run: git fetch origin "${{ github.base_ref }}:${{ github.base_ref }}"
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: git fetch origin "${BASE_REF}:${BASE_REF}"
 
       - name: Checkout (non-PR)
         if: ${{ github.event_name != 'pull_request' }}
