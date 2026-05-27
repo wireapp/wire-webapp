@@ -1,7 +1,7 @@
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {createUser, test, withLogin} from 'test/e2e_tests/test.fixtures';
+import {createUser, test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
 import {sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Federation', () => {
@@ -39,5 +39,20 @@ test.describe('Federation', () => {
 
     await normalUserPages.conversationList().getConversation(federatedUser.fullName, {protocol: 'mls'}).open();
     await federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}).open();
+
+    await normalUserPages.conversation().callButton.click();
+    await federatedUserPages.calling().acceptCallButton.click();
+
+    await normalUserPages.calling().toggleVideoButton.click();
+    await federatedUserPages.calling().toggleVideoButton.click();
+
+    const normalUserCall = await normalUserPages.calling().maximizeCell();
+    const federatedUserCall = await federatedUserPages.calling().maximizeCell();
+
+    await expect(normalUserCall.getCallingParticipant(federatedUser.fullName).muteIcon).not.toBeVisible();
+    await expect(normalUserCall.getGridTile(federatedUser.fullName).videoElement).toBeVisible();
+
+    await expect(federatedUserCall.getCallingParticipant(normalUser.fullName).muteIcon).not.toBeVisible();
+    await expect(federatedUserCall.getGridTile(normalUser.fullName).videoElement).toBeVisible();
   });
 });
