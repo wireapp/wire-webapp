@@ -8887,10 +8887,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:10.3.22":
-  version: 10.3.22
-  resolution: "@wireapp/avs@npm:10.3.22"
-  checksum: 10/4d3250939233022b66535fb287ff038f6de6863230d266a32d57463b5c2a5cabd04ed8073e92b8fec374b7c2675d6b8d305d486e005f9d66ae16e71f84e852f6
+"@wireapp/avs@npm:10.3.28":
+  version: 10.3.28
+  resolution: "@wireapp/avs@npm:10.3.28"
+  checksum: 10/8a06870e30aa41e464670c0922fa85ff1fc1cb15924cff6c627c882d8dea6e35411267e36745642379affff0ab54ba4380707146afac6d5160cab6d4cf829634
   languageName: node
   linkType: hard
 
@@ -9251,7 +9251,7 @@ __metadata:
     "@types/webpack-bundle-analyzer": "npm:4.7.0"
     "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:2023.10.7"
-    "@wireapp/avs": "npm:10.3.22"
+    "@wireapp/avs": "npm:10.3.28"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/config": "workspace:^"
     "@wireapp/core": "workspace:^"
