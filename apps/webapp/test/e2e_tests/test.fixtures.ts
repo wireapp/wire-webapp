@@ -76,9 +76,15 @@ export type Team = {
 export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
+  // Create a new instance of ApiManager for each test
   api: async ({}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
+    const backendUrl = process.env.BACKEND_URL;
+    if (backendUrl === undefined) throw new Error('Missing environment variable BACKEND_URL');
+
+    const basicAuth = process.env.BASIC_AUTH;
+    if (basicAuth === undefined) throw new Error('Missing environment variable BASIC_AUTH');
+
+    await use(new ApiManagerE2E({backendUrl, basicAuth}));
   },
   pageManager: async ({page}, use) => {
     // Create a new instance of PageManager for each test
@@ -246,7 +252,7 @@ export const withGuestUser =
     await pageManager.webapp.pages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   };
 
-const createUser = async (
+export const createUser = async (
   api: ApiManagerE2E,
   options?: {disableTelemetry?: boolean} & Parameters<typeof getUser>[0],
 ) => {
