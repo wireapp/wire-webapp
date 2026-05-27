@@ -60,7 +60,7 @@ export const CellsGlobalView = (properties: CellsGlobalViewProps): ReactElement 
   const legacyFilters = useCellsStore(state => state.filters);
   const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
 
-  const {filters, filterState} = useGlobalDriveFilters({cellsRepository});
+  const {filters, filterState} = useGlobalDriveFilters({cellsRepository, conversationRepository});
   const legacyFilterState = useMemo<GlobalDriveFiltersState>(
     () => ({
       selectedTagIds: legacyFilters.tags,

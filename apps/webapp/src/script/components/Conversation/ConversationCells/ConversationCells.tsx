@@ -90,7 +90,10 @@ export const ConversationCells = memo(
       userRepository,
     });
 
-    const {filters, filterState, clearAllFilters} = useConversationDriveFilters({cellsRepository});
+    const {filters, filterState, clearAllFilters} = useConversationDriveFilters({
+      cellsRepository,
+      conversationRepository,
+    });
     const hasActiveFilters = hasActiveConversationDriveFilters(filterState);
 
     const {
