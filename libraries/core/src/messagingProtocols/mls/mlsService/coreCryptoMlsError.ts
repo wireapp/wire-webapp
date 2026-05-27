@@ -62,6 +62,22 @@ const isOtherErrorToIgnore = (error: Error): boolean => {
   );
 };
 
+const CONVERSATION_NOT_FOUND_MESSAGE = "Couldn't find conversation";
+
+/** Local MLS group was removed (e.g. after leaving a call subconversation). */
+export const isMlsConversationNotFoundError = (error: unknown): boolean => {
+  if (!(error instanceof Error) || error.name !== CORE_CRYPTO_ERROR_NAMES.MlsErrorOther) {
+    return false;
+  }
+
+  if (error.message.includes(CONVERSATION_NOT_FOUND_MESSAGE)) {
+    return true;
+  }
+
+  const nestedMessage = (error as {context?: {context?: {msg?: string}}}).context?.context?.msg;
+  return nestedMessage === CONVERSATION_NOT_FOUND_MESSAGE;
+};
+
 export const shouldMLSDecryptionErrorBeIgnored = (error: unknown): error is Error => {
   return (
     error instanceof Error && (mlsDecryptionErrorNamesToIgnore.includes(error.name) || isOtherErrorToIgnore(error))

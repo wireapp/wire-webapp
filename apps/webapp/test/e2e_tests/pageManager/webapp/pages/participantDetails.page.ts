@@ -35,6 +35,7 @@ export class ParticipantDetails {
   readonly removeFromGroupButton: Locator;
   readonly openConversationButton: Locator;
   readonly connectButton: Locator;
+  readonly devicesButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -53,6 +54,7 @@ export class ParticipantDetails {
     this.removeFromGroupButton = this.page.getByRole('button', {name: 'Remove from group'});
     this.openConversationButton = this.page.getByRole('button', {name: 'Open conversation', exact: true});
     this.connectButton = this.page.getByRole('button', {name: 'Connect'});
+    this.devicesButton = this.page.getByRole('button', {name: 'Show Devices'});
   }
 
   async blockUser() {

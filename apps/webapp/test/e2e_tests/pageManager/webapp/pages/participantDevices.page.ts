@@ -19,19 +19,15 @@
 
 import {Locator, Page} from '@playwright/test';
 
-export class DevicesPage {
-  readonly proteusId: Locator;
-  readonly activeDevices: Locator;
+export const ParticipantDevicesPage = (page: Page) => {
+  const activeDevices = page.getByTestId('device-card');
 
-  constructor(page: Page) {
-    this.proteusId = page.getByLabel('Proteus ID');
-    this.activeDevices = page.getByRole('group', {name: 'Active'}).getByRole('button', {name: /device details/});
-  }
+  const getVerifiedBadge = (device: Locator) => {
+    return device.getByTestId('proteus-verified');
+  };
 
-  enhanceDeviceLocator(deviceLocator: Locator) {
-    return Object.assign(deviceLocator, {
-      removeButton: deviceLocator.getByRole('button', {name: 'Remove Device'}),
-      detailsButton: deviceLocator.getByTestId('go-device-details'),
-    });
-  }
-}
+  return {
+    activeDevices,
+    getVerifiedBadge,
+  };
+};
