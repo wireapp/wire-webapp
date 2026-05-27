@@ -217,10 +217,10 @@ export const LOGIN_TIMEOUT = 40_000;
 
 /** PagePlugin to log in as the given user */
 export const withLogin =
-  (user: User | Promise<User>, options?: {confirmNewHistory?: boolean}): PagePlugin =>
+  (user: User | Promise<User>, options?: {baseUrl?: string; confirmNewHistory?: boolean}): PagePlugin =>
   async page => {
     const pageManager = PageManager.from(page);
-    await pageManager.openLoginPage();
+    await pageManager.openLoginPage(options?.baseUrl);
     await pageManager.webapp.pages.login().login(await user);
 
     if (options?.confirmNewHistory) {
