@@ -23,7 +23,7 @@ import is from '@sindresorhus/is';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {handleEscDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
