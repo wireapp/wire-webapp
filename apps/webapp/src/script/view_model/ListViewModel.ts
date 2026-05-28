@@ -195,7 +195,7 @@ export class ListViewModel {
     if (
       isEscapeKey(keyboardEvent) &&
       currentModalId === null &&
-      ![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(currentTab)
+      ![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(currentTab as SidebarTabs)
     ) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
