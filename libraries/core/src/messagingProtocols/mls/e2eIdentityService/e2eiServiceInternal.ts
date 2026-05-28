@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
@@ -224,7 +225,7 @@ export class E2EIServiceInternal {
     });
     this.logger.debug('oidc data', oidcData);
 
-    if (oidcData.data.validated !== 'valid') {
+    if (is.nullOrUndefined(oidcData.data.validated)) {
       throw new Error('Error while trying to continue OAuth flow. OIDC challenge not validated');
     }
 
