@@ -20,6 +20,7 @@
 import {container} from 'tsyringe';
 
 import {
+  CallIcon,
   ChannelIcon,
   CollectionIcon,
   ExternalLinkIcon,
@@ -316,6 +317,23 @@ export const ConversationTabs = ({
             />
           </>
         )}
+
+        <div className="conversations-sidebar-divider" />
+
+        <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+          {t('meetings.navigation.parent.label')}
+        </div>
+
+        <ConversationTab
+          title={t('meetings.navigation.title')}
+          label={t('meetings.navigation.label')}
+          type={SidebarTabs.MEETINGS}
+          Icon={<CallIcon />}
+          onChangeTab={onChangeTab}
+          conversationTabIndex={visibleConversationTabs.length + 3}
+          dataUieName="go-meetings"
+          isActive={currentTab === SidebarTabs.MEETINGS}
+        />
       </div>
 
       <div

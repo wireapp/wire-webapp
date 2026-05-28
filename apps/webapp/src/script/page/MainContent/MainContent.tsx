@@ -30,6 +30,7 @@ import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/icon';
+import {Meetings} from 'Components/Meeting/Meetings';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -279,6 +280,8 @@ const MainContent = ({
                 conversationRepository={repositories.conversation}
               />
             )}
+
+            {contentState === ContentState.MEETINGS && <Meetings />}
           </>
         </Animated>
       </SwitchTransition>

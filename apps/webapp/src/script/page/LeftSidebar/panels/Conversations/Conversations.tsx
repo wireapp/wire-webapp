@@ -154,6 +154,7 @@ export const Conversations = ({
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
   const isCells = currentTab === SidebarTabs.CELLS;
+  const isMeetings = currentTab === SidebarTabs.MEETINGS;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
@@ -303,13 +304,18 @@ export const Conversations = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(nextTab)) {
+      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(nextTab)) {
         onExitPreferences();
       }
 
       if (nextTab === SidebarTabs.CELLS) {
         switchList(ListState.CELLS);
         switchContent(ContentState.CELLS);
+      }
+
+      if (nextTab === SidebarTabs.MEETINGS) {
+        switchList(ListState.MEETINGS);
+        switchContent(ContentState.MEETINGS);
       }
 
       clearConversationFilter();
@@ -438,7 +444,7 @@ export const Conversations = ({
           />
         }
       >
-        {isCells ? null : isPreferences ? (
+        {isCells || isMeetings ? null : isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}
