@@ -275,7 +275,7 @@ export const generateRandomPassword = (passwordLength: number = 8): string => {
   // Shuffle the characters of the password randomly to make it more secure
   password = password
     .split('')
-    .sort(() => getRandomIndex(2) - 1) // Generates either -1 or 1 for shuffling
+    .toSorted(() => getRandomIndex(2) - 1) // Generates either -1 or 1 for shuffling
     .join('');
 
   // Truncate the password to the desired length if necessary

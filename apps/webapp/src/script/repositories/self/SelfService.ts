@@ -23,8 +23,8 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import type {UserUpdate} from '@wireapp/api-client/lib/user/';
 import {container} from 'tsyringe';
 
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 
 export class SelfService {
   constructor(

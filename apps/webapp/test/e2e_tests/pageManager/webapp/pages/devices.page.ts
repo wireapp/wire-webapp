@@ -27,4 +27,11 @@ export class DevicesPage {
     this.proteusId = page.getByLabel('Proteus ID');
     this.activeDevices = page.getByRole('group', {name: 'Active'}).getByRole('button', {name: /device details/});
   }
+
+  enhanceDeviceLocator(deviceLocator: Locator) {
+    return Object.assign(deviceLocator, {
+      removeButton: deviceLocator.getByRole('button', {name: 'Remove Device'}),
+      detailsButton: deviceLocator.getByTestId('go-device-details'),
+    });
+  }
 }

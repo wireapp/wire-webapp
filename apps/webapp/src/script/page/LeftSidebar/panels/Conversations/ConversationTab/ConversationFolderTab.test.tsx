@@ -19,7 +19,7 @@
 
 import {render} from '@testing-library/react';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TestFactory} from 'test/helper/TestFactory';

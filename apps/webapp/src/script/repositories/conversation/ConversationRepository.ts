@@ -84,15 +84,15 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
 import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {EventRecord} from 'Repositories/storage';
 import {ConversationRecord} from 'Repositories/storage';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserFilter} from 'Repositories/user/UserFilter';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {UserFilter} from 'Repositories/user/userFilter';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {getNextItem} from 'Util/arrayUtil';
 import {allowsAllFiles, getFileExtensionOrName, isAllowedFile} from 'Util/fileTypeUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
@@ -162,15 +162,15 @@ import {MessageRepository} from './MessageRepository';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {Config} from '../../Config';
-import {BASE_ERROR_TYPE, BaseError} from '../../error/BaseError';
-import {ConversationError} from '../../error/ConversationError';
+import {BASE_ERROR_TYPE, BaseError} from '../../error/baseError';
+import {ConversationError} from '../../error/conversationError';
 import {isMemberMessage} from '../../guards/Message';
 import * as LegalHoldEvaluator from '../../legal-hold/LegalHoldEvaluator';
 import type {MappedEvent} from '../../legal-hold/LegalHoldEvaluator';
 import {MessageCategory} from '../../message/MessageCategory';
 import {SystemMessageType} from '../../message/SystemMessageType';
 import {ensureMLSGroupIsEstablished, initMLSGroupConversation} from '../../mls';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 import {ServerTimeHandler} from '../../time/serverTimeHandler';
 
 type ConversationDBChange = {obj: EventRecord; oldObj: EventRecord};
@@ -1368,7 +1368,7 @@ export class ConversationRepository {
 
         return false;
       })
-      .sort((conversationA, conversationB) => {
+      .toSorted((conversationA, conversationB) => {
         return sortByPriority(conversationA.display_name(), conversationB.display_name(), query);
       })
       .map(conversationEntity => {
@@ -1803,7 +1803,7 @@ export class ConversationRepository {
 
     // In the event that multiple 1:1 Proteus conversations exist, we migrate the one with the lowest id
     // See https://wearezeta.atlassian.net/wiki/spaces/ENGINEERIN/pages/1344602120/Use+case+multiple+1+1+conversation+in+teams+Proteus
-    const proteusConversationToBeKept = proteusConversations.sort((a, b) =>
+    const proteusConversationToBeKept = proteusConversations.toSorted((a, b) =>
       a.qualifiedId.id.localeCompare(b.qualifiedId.id),
     )[0];
 
@@ -2363,7 +2363,7 @@ export class ConversationRepository {
     );
 
     // Sort conversations so mls 1:1 conversations are initialised first
-    const sortedConverstions = [...team1To1Conversations].sort((a, b) => {
+    const sortedConverstions = team1To1Conversations.toSorted((a, b) => {
       const aIsMLSConversation = isMLSConversation(a);
       const bIsMLSConversation = isMLSConversation(b);
 
@@ -2529,8 +2529,7 @@ export class ConversationRepository {
     const userEntities = await this.userRepository.getUsersById(conversationEntity.participating_user_ids(), {
       localOnly: offline,
     });
-    userEntities.sort(sortUsersByPriority);
-    conversationEntity.participating_user_ets(userEntities);
+    conversationEntity.participating_user_ets(userEntities.toSorted(sortUsersByPriority));
 
     if (updateGuests) {
       conversationEntity.updateGuests();
@@ -3844,12 +3843,16 @@ export class ConversationRepository {
     const conversation = this.conversationState.findConversation(conversationId);
 
     if (!conversation) {
+      this.logger.warn('MLS conversation recovered but conversation entity not found; skipping system message', {
+        conversationId,
+      });
       return;
     }
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
 
     const event = EventBuilder.buildMLSConversationRecovered(conversation, currentTimestamp);
 
+    this.logger.info('Injecting MLS conversation recovered system message', {conversationId});
     void this.eventRepository.injectEvent(event);
   };
 
@@ -4718,8 +4721,7 @@ export class ConversationRepository {
       return this.userRepository
         .getUsersById((messageEntity as MemberMessage).userIds(), options)
         .then(userEntities => {
-          userEntities.sort(sortUsersByPriority);
-          (messageEntity as MemberMessage).userEntities(userEntities);
+          (messageEntity as MemberMessage).userEntities(userEntities.toSorted(sortUsersByPriority));
           return messageEntity;
         });
     }

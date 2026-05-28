@@ -21,7 +21,7 @@ import {useMemo} from 'react';
 
 import cx from 'classnames';
 
-import * as Icons from 'Components/Icon';
+import * as Icons from 'Components/icon';
 import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';

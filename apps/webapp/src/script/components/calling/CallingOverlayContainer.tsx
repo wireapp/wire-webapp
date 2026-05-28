@@ -21,6 +21,8 @@ import {Fragment, useEffect} from 'react';
 
 import {container} from 'tsyringe';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -30,8 +32,7 @@ import {Participant} from 'Repositories/calling/Participant';
 import {useVideoGrid} from 'Repositories/calling/videoGridHandler';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {ChooseScreen} from './ChooseScreen';
@@ -42,6 +43,7 @@ import {CallViewTab} from '../../view_model/CallingViewModel';
 interface CallingContainerProps {
   readonly propertiesRepository: PropertiesRepository;
   readonly callingRepository: CallingRepository;
+  readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly callState?: CallState;
   readonly toggleScreenshare: (call: Call, desktopScreenShareMenu: DesktopScreenShareMenu) => void;
 }
@@ -49,10 +51,10 @@ interface CallingContainerProps {
 const CallingContainer = ({
   propertiesRepository,
   callingRepository,
+  fireAndForgetInvoker,
   callState = container.resolve(CallState),
   toggleScreenshare,
 }: CallingContainerProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
   const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
   const {activeCallViewTab, joinedCall, hasAvailableScreensToShare, desktopScreenShareMenu, viewMode} =
     useKoSubscribableChildren(callState, [
@@ -183,6 +185,7 @@ const CallingContainer = ({
           switchMicrophoneInput={switchMicrophoneInput}
           switchSpeakerOutput={switchSpeakerOutput}
           switchVideoBackgroundEffect={effect => callingRepository.switchVideoBackgroundEffect(effect)}
+          fireAndForgetInvoker={fireAndForgetInvoker}
           setMaximizedParticipant={setMaximizedParticipant}
           setActiveCallViewTab={setActiveCallViewTab}
           toggleMute={toggleMute}

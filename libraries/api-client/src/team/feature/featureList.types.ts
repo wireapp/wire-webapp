@@ -40,6 +40,7 @@ import type {
   FeatureMLSE2EId,
   FeatureMLSMigration,
   FeatureOutlookCalIntegration,
+  FeaturePreventAdminLessGroups,
   FeatureSearchVisibility,
   FeatureSearchVisibilityInbound,
   FeatureSelfDeletingMessages,
@@ -87,6 +88,7 @@ export enum FEATURE_KEY {
   STEALTH_USERS = 'stealthUsers',
   VALIDATE_SAML_EMAILS = 'validateSAMLemails',
   VIDEO_CALLING = 'videoCalling',
+  PREVENT_ADMIN_LESS_GROUPS = 'preventAdminlessGroups',
 }
 
 export enum FEATURE_LOCK_STATUS {
@@ -166,6 +168,7 @@ export type FeatureList = {
   [FEATURE_KEY.STEALTH_USERS]?: FeatureStealthUsers;
   [FEATURE_KEY.VALIDATE_SAML_EMAILS]?: FeatureValidateSAMLEmails;
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
+  [FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]?: FeaturePreventAdminLessGroups;
   // Allow additional unknown features from newer API versions (matches Zod schema .passthrough())
   [key: string]: unknown;
 };

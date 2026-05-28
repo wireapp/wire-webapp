@@ -82,7 +82,7 @@ import {
   MultipartMessageAddEvent,
 } from './EventBuilder';
 
-import {ConversationError} from '../../error/ConversationError';
+import {ConversationError} from '../../error/conversationError';
 import {isContentMessage} from '../../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {MentionEntity} from '../../message/MentionEntity';
@@ -90,7 +90,7 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {StatusType} from '../../message/StatusType';
 import {SystemMessageType} from '../../message/SystemMessageType';
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -114,7 +114,7 @@ export class EventMapper {
    * @returns Resolves with the mapped message entities
    */
   mapJsonEvents(events: EventRecord[], conversationEntity: Conversation): Message[] {
-    const reversedEvents = events.filter(event => !!event).reverse();
+    const reversedEvents = events.filter(event => !!event).toReversed();
     const mappedEvents = reversedEvents.map((event): Message | void => {
       try {
         return this._mapJsonEvent(event, conversationEntity);
@@ -612,6 +612,7 @@ export class EventMapper {
     const {data: eventData, from: sender} = event;
     const {has_service: hasService} = eventData;
     const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
+    let messageUserIds = userIds;
 
     const messageEntity = new MemberMessage();
 
@@ -620,11 +621,11 @@ export class EventMapper {
 
     if (conversationEntity.isGroupOrChannel()) {
       const messageFromCreator = sender === conversationEntity.creator;
-      const creatorIndex = userIds.findIndex(user => user.id === sender);
+      const creatorIndex = messageUserIds.findIndex(user => user.id === sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {
-        userIds.splice(creatorIndex, 1);
+        messageUserIds = messageUserIds.toSpliced(creatorIndex, 1);
         messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
       }
 
@@ -632,7 +633,7 @@ export class EventMapper {
         messageEntity.showServicesWarning = true;
       }
 
-      messageEntity.userIds(userIds);
+      messageEntity.userIds(messageUserIds);
     }
 
     return messageEntity;

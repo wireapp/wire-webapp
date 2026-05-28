@@ -19,78 +19,68 @@
 
 import {useCallback, useMemo, useState} from 'react';
 
-import {
-  ArchiveFileIcon,
-  AudioFileIcon,
-  CodeFileIcon,
-  DocumentFileIcon,
-  FolderIcon,
-  ImageFileIcon,
-  OtherFileIcon,
-  PdfFileIcon,
-  PresentationFileIcon,
-  SpreadsheetFileIcon,
-  VideoFileIcon,
-} from '@wireapp/react-ui-kit';
-
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {t} from 'Util/localizerUtil';
 
 import type {FilterConfig, FilterItem} from '../CellsFiltersBar/filterConfig';
-
-// ---------------------------------------------------------------------------
-// Mock data — replace each array with an API call in the integration sprint.
-// ---------------------------------------------------------------------------
-
-const MOCK_TAGS: FilterItem[] = [
-  {id: 'a-tag', label: 'A tag'},
-  {id: 'hello-tag', label: 'Hello tag'},
-  {id: 'b-tag', label: 'B tag'},
-  {id: 'new-tag-1', label: 'New tag 1'},
-  {id: 'e-tag', label: 'E Tag'},
-];
-
-const MOCK_CREATORS: FilterItem[] = [
-  {id: 'a-user', label: 'A User', subLabel: '@auser'},
-  {id: 'hello-user', label: 'Hello User', subLabel: '@hellouser'},
-  {id: 'b-user', label: 'B User', subLabel: '@buser'},
-];
-
-// ---------------------------------------------------------------------------
-
-export interface ConversationDriveFiltersState {
-  selectedTagIds: string[];
-  selectedFileTypeIds: string[];
-  selectedCreatorIds: string[];
-  isSharedViaLink: boolean;
-}
+import {
+  type ConversationDriveFiltersState,
+  getActiveConversationDriveFilterType,
+  isFilterTypeDisabled,
+} from '../driveFilters/driveFilters';
+import {FILE_TYPE_CATALOG} from '../driveFilters/fileTypeCatalog';
+import {useDriveEnabledParticipantFilterItems} from '../useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
+import {useGetAllTags} from '../useGetAllTags/useGetAllTags';
 
 export interface UseConversationDriveFiltersResult {
   filters: FilterConfig[];
   filterState: ConversationDriveFiltersState;
+  clearAllFilters: () => void;
 }
 
-export const useConversationDriveFilters = (): UseConversationDriveFiltersResult => {
+export const useConversationDriveFilters = ({
+  cellsRepository,
+  conversationRepository,
+}: {
+  cellsRepository: CellsRepository;
+  conversationRepository: ConversationRepository;
+}): UseConversationDriveFiltersResult => {
+  const {tags: allTags} = useGetAllTags({cellsRepository});
+  const creatorItems = useDriveEnabledParticipantFilterItems({conversationRepository});
+
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedFileTypeIds, setSelectedFileTypeIds] = useState<string[]>([]);
   const [selectedCreatorIds, setSelectedCreatorIds] = useState<string[]>([]);
   const [isSharedViaLink, setIsSharedViaLink] = useState(false);
 
   const toggleSharedViaLink = useCallback(() => setIsSharedViaLink(prev => !prev), []);
+  const filterState = useMemo<ConversationDriveFiltersState>(
+    () => ({
+      selectedTagIds,
+      selectedFileTypeIds,
+      selectedCreatorIds,
+      isSharedViaLink,
+    }),
+    [isSharedViaLink, selectedCreatorIds, selectedFileTypeIds, selectedTagIds],
+  );
+  const clearAllFilters = useCallback(() => {
+    setSelectedTagIds([]);
+    setSelectedFileTypeIds([]);
+    setSelectedCreatorIds([]);
+    setIsSharedViaLink(false);
+  }, []);
+
+  const tagItems = useMemo<FilterItem[]>(() => allTags.map(tag => ({id: tag, label: tag})), [allTags]);
+  const activeFilterType = useMemo(() => getActiveConversationDriveFilterType(filterState), [filterState]);
 
   const fileTypes = useMemo<FilterItem[]>(
-    () => [
-      {id: 'pictures', label: t('cells.fileType.pictures'), startContent: <ImageFileIcon />},
-      {id: 'spreadsheets', label: t('cells.fileType.spreadsheets'), startContent: <SpreadsheetFileIcon />},
-      {id: 'presentations', label: t('cells.fileType.presentations'), startContent: <PresentationFileIcon />},
-      {id: 'documents', label: t('cells.fileType.documents'), startContent: <DocumentFileIcon />},
-      {id: 'pdfs', label: t('cells.fileType.pdfs'), startContent: <PdfFileIcon />},
-      {id: 'audio', label: t('cells.fileType.audio'), startContent: <AudioFileIcon />},
-      {id: 'videos', label: t('cells.fileType.videos'), startContent: <VideoFileIcon />},
-      {id: 'archives', label: t('cells.fileType.archives'), startContent: <ArchiveFileIcon />},
-      {id: 'code', label: t('cells.fileType.code'), startContent: <CodeFileIcon />},
-      {id: 'others', label: t('cells.fileType.others'), startContent: <OtherFileIcon />},
-      {id: 'folders', label: t('cells.fileType.folders'), startContent: <FolderIcon />},
-    ],
+    () =>
+      FILE_TYPE_CATALOG.map(({id, labelKey, Icon}) => ({
+        id,
+        label: t(labelKey),
+        startContent: <Icon />,
+      })),
     [],
   );
 
@@ -100,9 +90,11 @@ export const useConversationDriveFilters = (): UseConversationDriveFiltersResult
         type: 'popover',
         id: 'tags',
         label: t('cells.filter.tags'),
-        items: MOCK_TAGS,
+        items: tagItems,
         selectedIds: selectedTagIds,
         onSelectionChange: setSelectedTagIds,
+        disabled: isFilterTypeDisabled('tags', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'popover',
@@ -111,14 +103,18 @@ export const useConversationDriveFilters = (): UseConversationDriveFiltersResult
         items: fileTypes,
         selectedIds: selectedFileTypeIds,
         onSelectionChange: setSelectedFileTypeIds,
+        disabled: isFilterTypeDisabled('fileType', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'popover',
         id: 'createdBy',
         label: t('cells.filter.createdBy'),
-        items: MOCK_CREATORS,
+        items: creatorItems,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
+        disabled: isFilterTypeDisabled('createdBy', activeFilterType),
+        singleSelect: false,
       },
       {
         type: 'toggle',
@@ -126,13 +122,25 @@ export const useConversationDriveFilters = (): UseConversationDriveFiltersResult
         label: t('cells.filter.sharedViaLink'),
         isActive: isSharedViaLink,
         onToggle: toggleSharedViaLink,
+        disabled: isFilterTypeDisabled('sharedViaLink', activeFilterType),
       },
     ],
-    [fileTypes, selectedTagIds, selectedFileTypeIds, selectedCreatorIds, isSharedViaLink, toggleSharedViaLink],
+    [
+      activeFilterType,
+      creatorItems,
+      fileTypes,
+      tagItems,
+      selectedTagIds,
+      selectedFileTypeIds,
+      selectedCreatorIds,
+      isSharedViaLink,
+      toggleSharedViaLink,
+    ],
   );
 
   return {
     filters,
-    filterState: {selectedTagIds, selectedFileTypeIds, selectedCreatorIds, isSharedViaLink},
+    filterState,
+    clearAllFilters,
   };
 };

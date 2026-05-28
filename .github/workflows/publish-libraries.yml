@@ -20,6 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           fetch-depth: 0
           ref: dev
           token: ${{ secrets.OTTO_THE_BOT_GH_TOKEN }}

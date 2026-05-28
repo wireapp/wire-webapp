@@ -32,8 +32,8 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/UserState';
-import {Core} from 'src/script/service/CoreSingleton';
+import {UserState} from 'Repositories/user/userState';
+import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {

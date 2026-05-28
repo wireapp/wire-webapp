@@ -25,7 +25,7 @@ import cx from 'classnames';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {AssetImage} from 'Components/Image';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
@@ -46,7 +46,7 @@ import {TextMessageRenderer} from './asset/TextMessageRenderer';
 import {VideoAsset} from './asset/VideoAsset/VideoAsset';
 
 import {MessageActions} from '..';
-import {ConversationError} from '../../../../error/ConversationError';
+import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 

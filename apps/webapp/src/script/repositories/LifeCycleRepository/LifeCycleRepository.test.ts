@@ -27,16 +27,16 @@ import type {ClientRepository} from 'Repositories/client/ClientRepository';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {EventRepository} from 'Repositories/event/EventRepository';
-import {StorageKey} from 'Repositories/storage/StorageKey';
-import type {StorageRepository} from 'Repositories/storage/StorageRepository';
-import type {UserRepository} from 'Repositories/user/UserRepository';
+import {StorageKey} from 'Repositories/storage/storageKey';
+import type {StorageRepository} from 'Repositories/storage/storageRepository';
+import type {UserRepository} from 'Repositories/user/userRepository';
 
 import {LifeCycleRepository, doSimpleRedirect, type LifeCycleDependencies} from './LifeCycleRepository';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
 import {URLParameter} from '../../auth/URLParameter';
-import {BaseError} from '../../error/BaseError';
-import {ClientError} from '../../error/ClientError';
+import {BaseError} from '../../error/baseError';
+import {ClientError} from '../../error/clientError';
 import {externalUrl} from '../../externalRoute';
 import * as browserLocationModule from '../../navigation/browserLocation';
 

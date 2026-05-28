@@ -19,7 +19,7 @@
 
 import {REASON} from '@wireapp/avs';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {CallingTimeoutMessage} from 'Repositories/entity/message/CallingTimeoutMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';

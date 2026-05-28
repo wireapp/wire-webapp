@@ -28,7 +28,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ConversationVerificationBadges} from 'Components/Badge';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';

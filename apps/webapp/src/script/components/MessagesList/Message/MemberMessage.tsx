@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, CollectionIcon} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';

@@ -216,7 +216,7 @@ export class IntegrationRepository {
       if (isCurrentQuery) {
         serviceEntities = serviceEntities
           .filter(serviceEntity => compareTransliteration(serviceEntity.name(), normalizedQuery))
-          .sort((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
+          .toSorted((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
         this.services(serviceEntities);
         return serviceEntities;
       }

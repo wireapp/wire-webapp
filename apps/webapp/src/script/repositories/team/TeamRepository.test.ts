@@ -23,9 +23,9 @@ import {randomUUID} from 'crypto';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
-import {ROLE} from 'Repositories/user/UserPermission';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {ROLE} from 'Repositories/user/userPermission';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMemberEntity} from './TeamMemberEntity';

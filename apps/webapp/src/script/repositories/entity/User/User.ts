@@ -29,7 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ROLE as TEAM_ROLE} from 'Repositories/user/UserPermission';
+import {ROLE as TEAM_ROLE} from 'Repositories/user/userPermission';
 import {t} from 'Util/localizerUtil';
 import {clamp} from 'Util/numberUtil';
 import {getFirstChar} from 'Util/stringUtil';
@@ -273,9 +273,11 @@ export class User {
     this.devices.push(new_client_et);
 
     if (this.isMe) {
-      this.devices.sort((client_a, client_b) => {
-        return new Date(client_b.time ?? '').getTime() - new Date(client_a.time ?? '').getTime();
-      });
+      this.devices(
+        this.devices().toSorted((client_a, client_b) => {
+          return new Date(client_b.time ?? '').getTime() - new Date(client_a.time ?? '').getTime();
+        }),
+      );
     }
 
     return true;

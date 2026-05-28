@@ -318,7 +318,7 @@ test.describe('Guestroom', () => {
       // Guest leaves the conversation
       await guestPages.conversation().toggleGroupInformation();
       await guestPages.conversation().leaveConversation();
-      await guestModals.leaveConversation().clickConfirm();
+      await guestModals.leaveConversation().actionButton.click();
 
       await expect(
         ownerPages.conversation().systemMessages.filter({hasText: `${guestUser.fullName} left`}),
@@ -362,8 +362,9 @@ test.describe('Guestroom', () => {
   test(
     'I want to see a system message when wireless guest has expired',
     {tag: ['@TC-3337', '@regression']},
-    async ({createPage}) => {
-      test.setTimeout(150_000);
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 60_000);
+
       let createdLink: string;
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
 

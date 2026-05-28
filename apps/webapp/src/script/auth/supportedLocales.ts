@@ -17,7 +17,7 @@
  *
  */
 
-export const supportedLocales: string[] = [
+export const Locales = [
   'ar-SA',
   'cs-CZ',
   'da-DK',
@@ -53,4 +53,6 @@ export const supportedLocales: string[] = [
   'uk-UA',
   'zh-CN',
   'zh-TW',
-];
+] as const;
+
+export type SupportedLocale = (typeof Locales)[number];

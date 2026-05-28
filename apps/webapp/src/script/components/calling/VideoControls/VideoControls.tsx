@@ -37,7 +37,7 @@ import {
 } from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {useActiveWindowMatchMedia} from 'Hooks/useActiveWindowMatchMedia';
 import {useUserPropertyValue} from 'Hooks/useUserProperty';
 import {Call} from 'Repositories/calling/Call';
@@ -52,8 +52,8 @@ import {
   DEFAULT_BACKGROUND_EFFECT,
   DEFAULT_BUILTIN_BACKGROUND_ID,
 } from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {isCallViewOption} from 'src/script/guards/CallView';

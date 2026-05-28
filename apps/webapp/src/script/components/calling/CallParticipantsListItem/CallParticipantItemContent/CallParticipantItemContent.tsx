@@ -21,7 +21,7 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
 import {t} from 'Util/localizerUtil';

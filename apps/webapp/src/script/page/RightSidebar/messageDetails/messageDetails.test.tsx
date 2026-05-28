@@ -24,9 +24,9 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './messageDetails';

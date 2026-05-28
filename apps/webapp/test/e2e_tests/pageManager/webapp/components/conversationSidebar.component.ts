@@ -27,6 +27,7 @@ export class ConversationSidebar {
   readonly personalStatusIcon: Locator;
   readonly personalStatusName: Locator;
   readonly personalUserName: Locator;
+  readonly verifiedBadge: Locator;
   readonly preferencesButton: Locator;
   readonly allConversationsButton: Locator;
   readonly connectButton: Locator;
@@ -35,6 +36,7 @@ export class ConversationSidebar {
   readonly sidebar: Locator;
   readonly supportButton: Locator;
   readonly favoritesButton: Locator;
+  readonly preferencesNotificationBadge: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -44,6 +46,7 @@ export class ConversationSidebar {
     this.personalStatusIcon = this.navigation.getByTestId('status-availability-icon');
     this.personalStatusName = page.getByTestId('status-name');
     this.personalUserName = page.getByTestId('user-handle');
+    this.verifiedBadge = this.personalStatusLabel.getByTestId('proteus-verified');
     this.preferencesButton = page.getByTestId('go-preferences');
     this.allConversationsButton = page.getByTestId('go-recent-view');
     this.connectButton = page.getByTestId('go-people');
@@ -52,6 +55,7 @@ export class ConversationSidebar {
     this.sidebar = page.locator(`.conversations-sidebar-items`);
     this.supportButton = page.getByRole('link', {name: 'Support'});
     this.favoritesButton = page.getByRole('tab', {name: 'Favorites'});
+    this.preferencesNotificationBadge = this.preferencesButton.getByTestId('notification-badge');
   }
 
   async clickPreferencesButton() {

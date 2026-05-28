@@ -24,6 +24,14 @@ ls:
   apps/webapp/src/script/util/test/mock:
     .ts: camelCase
     .mock.ts: camelCase
+  apps/webapp/src/script/components/icon.tsx:
+    .tsx: camelCase
+  apps/webapp/src/script/page/appLock:
+    .dir: camelCase
+    .ts: camelCase
+    .tsx: camelCase
+    .test.tsx: camelCase
+    .styles.ts: camelCase
   apps/webapp/src/script/page/RightSidebar/access:
     .ts: camelCase
     .tsx: camelCase
@@ -101,6 +109,34 @@ ls:
     .dir: camelCase
     .ts: camelCase
     .test.ts: camelCase
+  apps/webapp/src/script/repositories/search:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/repositories/tracking:
+    .dir: camelCase
+    .ts: camelCase
+    .helpers.ts: camelCase
+  apps/webapp/src/script/repositories/properties:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/storage:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/storage/record:
+    .dir: camelCase
+    .ts: camelCase
+  apps/webapp/src/script/repositories/user:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/service:
+    .dir: camelCase
+    .ts: camelCase
+    .test.ts: camelCase
+  apps/webapp/src/script/error:
+    .dir: camelCase
+    .ts: camelCase
   apps/server/routes:
     .dir: camelCase
     .ts: camelCase

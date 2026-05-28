@@ -25,8 +25,8 @@ import {container, singleton} from 'tsyringe';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {ROLE, roleMap} from 'Repositories/user/UserPermission';
-import {UserState} from 'Repositories/user/UserState';
+import {ROLE, roleMap} from 'Repositories/user/userPermission';
+import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
@@ -82,7 +82,7 @@ export class TeamState {
       return this.teamMembers()
         .concat(this.userState.connectedUsers())
         .filter((item, index, array) => array.indexOf(item) === index)
-        .sort(sortUsersByPriority);
+        .toSorted(sortUsersByPriority);
     });
 
     this.supportsLegalHold = ko.observable(false);

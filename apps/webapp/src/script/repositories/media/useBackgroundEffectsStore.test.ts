@@ -22,4 +22,21 @@ describe('backgroundEffectsStore:lastVirtualBackgroundId', () => {
     expect(state.lastVirtualBackgroundId).toBeDefined();
     expect(typeof state.lastVirtualBackgroundId).toBe('string');
   });
+
+  it('initializes high quality blur as enabled', () => {
+    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
+  });
+
+  it('updates isHighQualityBlurEnabled when setIsHighQualityBlurEnabled is called', () => {
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
+
+    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(false);
+  });
+
+  it('can enable high quality blur again', () => {
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(true);
+
+    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
+  });
 });

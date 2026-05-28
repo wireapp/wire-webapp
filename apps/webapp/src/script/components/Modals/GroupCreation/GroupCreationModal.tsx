@@ -31,7 +31,7 @@ import {Button, ButtonVariant, Option, Select} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {AppsDisabledNote} from 'Components/Note/AppsDisabledNote/AppsDisabledNote';
 import {SearchInput} from 'Components/SearchInput';
@@ -47,7 +47,7 @@ import {
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/useSidebarStore';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
@@ -183,7 +183,7 @@ const GroupCreationModal = ({
         return teamState.teamUsers();
       }
 
-      return teamState.teamMembers().sort(sortUsersByPriority);
+      return teamState.teamMembers().toSorted(sortUsersByPriority);
     }
     return [];
   }, [isGuestEnabled, isTeam, showContacts, teamState, userState]);

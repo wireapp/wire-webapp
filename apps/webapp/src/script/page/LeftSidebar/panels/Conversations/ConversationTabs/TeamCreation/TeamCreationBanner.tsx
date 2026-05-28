@@ -25,9 +25,9 @@ import {Button, ButtonVariant, IconButton} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {BannerPortal} from 'Components/BannerPortal/BannerPortal';
-import * as Icon from 'Components/Icon';
-import {EventName} from 'Repositories/tracking/EventName';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
+import * as Icon from 'Components/icon';
+import {EventName} from 'Repositories/tracking/eventName';
+import {Segmentation} from 'Repositories/tracking/segmentation';
 import {t} from 'Util/localizerUtil';
 
 import {

@@ -17,7 +17,7 @@
  *
  */
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 
 import {SidebarStatus, useSidebarStore} from 'src/script/page/LeftSidebar/useSidebarStore';
 

@@ -203,7 +203,7 @@ test.describe('Conversations', () => {
       await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().clickConversationInfoButton();
       await adminPages.conversation().leaveConversation();
-      await modals.leaveConversation().clickConfirm();
+      await modals.leaveConversation().actionButton.click();
       await expect(adminPages.conversation().systemMessages.filter({hasText: 'You left'})).toBeVisible();
 
       // User B sees the empty admins section

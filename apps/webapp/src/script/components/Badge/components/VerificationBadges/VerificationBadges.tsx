@@ -40,7 +40,7 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {checkUserHandle} from 'Repositories/conversation/ConversationVerificationStateHandler';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {MLSStatuses, WireIdentity} from 'src/script/E2EIdentity/E2EIdentityVerification';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';

@@ -26,7 +26,7 @@ import {useDebouncedCallback} from 'use-debounce';
 import {UserList} from 'Components/UserList';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/RootProvider';
@@ -143,7 +143,7 @@ export const UserSearchableList = ({
       return filteredUsers;
     }
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
-    return [...filteredUsers, ...remoteTeamMembers].sort((userA, userB) =>
+    return [...filteredUsers, ...remoteTeamMembers].toSorted((userA, userB) =>
       sortByPriority(userA.name(), userB.name(), normalizedQuery),
     );
   };

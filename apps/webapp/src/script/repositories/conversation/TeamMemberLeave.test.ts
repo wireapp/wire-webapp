@@ -22,12 +22,12 @@ import type {ConnectionRepository} from 'Repositories/connection/connectionRepos
 import type {ConnectionState} from 'Repositories/connection/connectionState';
 import type {EventRepository} from 'Repositories/event/EventRepository';
 import {EventService} from 'Repositories/event/EventService';
-import type {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import type {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import type {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import type {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
 
@@ -38,7 +38,7 @@ import type {ConversationService} from './ConversationService';
 import {ConversationState} from './ConversationState';
 import type {MessageRepository} from './MessageRepository';
 
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 function buildConversationRepository() {

@@ -47,7 +47,7 @@ import {isProteusTeam1to1Conversation, isSelfConversation} from 'Repositories/co
 import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
-import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
+import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
@@ -61,7 +61,7 @@ import {PingMessage} from './message/PingMessage';
 import type {User} from './User';
 
 import {Config} from '../../Config';
-import {ConversationError} from '../../error/ConversationError';
+import {ConversationError} from '../../error/conversationError';
 import {isContentMessage, isDeleteMessage} from '../../guards/Message';
 import {StatusType} from '../../message/StatusType';
 import {ContentState, useAppState} from '../../page/useAppState';
@@ -471,7 +471,7 @@ export class Conversation {
 
     this.messages_unordered = ko.observableArray();
     this.messages = ko.pureComputed(() =>
-      [...this.messages_unordered()].sort((message_a, message_b) => {
+      this.messages_unordered().toSorted((message_a, message_b) => {
         return message_a.timestamp() - message_b.timestamp();
       }),
     );
@@ -1023,8 +1023,7 @@ export class Conversation {
    */
   private getLastDeliveredMessage(): Message | undefined {
     return this.messages()
-      .slice()
-      .reverse()
+      .toReversed()
       .find(messageEntity => {
         const isDelivered = [StatusType.DELIVERED, StatusType.SEEN].includes(messageEntity.status());
         return isDelivered && messageEntity.user().isMe;

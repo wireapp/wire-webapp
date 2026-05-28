@@ -327,7 +327,9 @@ test.describe('Sending Assets', () => {
   test(
     'I should not be able to download sent files when they are obfuscated',
     {tag: ['@TC-3728', '@regression']},
-    async ({createPage}) => {
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 11_000);
+
       const userAPage = await createPage(withLogin(userA));
       await connectWithUser(userAPage, userB);
       const {pages} = PageManager.from(userAPage).webapp;

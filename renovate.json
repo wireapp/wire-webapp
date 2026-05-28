@@ -15,9 +15,10 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["/^\\.github/workflows/e2e-tests\\.yml$/"],
-      "matchStrings": ["image:\\s+mcr\\.microsoft\\.com/playwright:v(?<currentValue>\\d+\\.\\d+\\.\\d+)-noble"],
+      "matchStrings": ["image:\\s+mcr\\.microsoft\\.com/playwright:(?<currentValue>v\\d+\\.\\d+\\.\\d+-noble)"],
       "depNameTemplate": "mcr.microsoft.com/playwright",
-      "datasourceTemplate": "docker"
+      "datasourceTemplate": "docker",
+      "extractVersionTemplate": "^v(?<version>\\d+\\.\\d+\\.\\d+)-noble$"
     }
   ],
   "packageRules": [
@@ -73,14 +74,13 @@
       "groupName": "eslint tooling"
     },
     {
+      "matchPackageNames": ["jest", "@jest/**", "jest-*", "babel-jest", "@types/jest", "@nx/jest", "@swc/jest"],
+      "groupName": "jest ecosystem"
+    },
+    {
       "matchPackageNames": [
-        "jest",
-        "babel-jest",
         "jest-environment-jsdom",
         "jest-jasmine2",
-        "@types/jest",
-        "@nx/jest",
-        "@swc/jest",
         "@testing-library/dom",
         "@testing-library/jest-dom",
         "@testing-library/react",

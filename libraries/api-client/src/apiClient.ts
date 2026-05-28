@@ -325,7 +325,7 @@ export class APIClient extends EventEmitter {
    */
   private findHighestCompatibleVersion(versions: number[], min: number, max: number): number | undefined {
     const inRangeVersions = versions.filter(version => version >= min && version <= max);
-    const [highestVersion] = inRangeVersions.sort((a, b) => b - a);
+    const [highestVersion] = inRangeVersions.toSorted((a, b) => b - a);
     return highestVersion;
   }
 

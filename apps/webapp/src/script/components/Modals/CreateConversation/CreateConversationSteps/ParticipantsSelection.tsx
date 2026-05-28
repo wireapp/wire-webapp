@@ -25,7 +25,7 @@ import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {SearchInput} from 'Components/SearchInput';
 import {UserSearchableList} from 'Components/UserSearchableList';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {RootContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
@@ -63,7 +63,7 @@ export const ParticipantsSelection = () => {
       return teamState.teamUsers();
     }
 
-    return teamState.teamMembers().sort(sortUsersByPriority);
+    return teamState.teamMembers().toSorted(sortUsersByPriority);
   }, [isGuestsEnabled, isTeam, teamState, userState]);
 
   const filteredContacts = contacts.filter(user => user.isAvailable());

@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';

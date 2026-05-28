@@ -52,23 +52,24 @@ import type {MessageRepository} from 'Repositories/conversation/MessageRepositor
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRepository} from 'Repositories/event/EventRepository';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/PropertiesType';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import {EventRecord, StorageRepository, StorageSchemata} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
-import {disableForcedErrorReporting} from 'Repositories/tracking/Telemetry.helpers';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {disableForcedErrorReporting} from 'Repositories/tracking/telemetry.helpers';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
 import {TIME_IN_MILLIS} from './timeUtil';
+import {downloadBlob} from './util';
 import {createUuid} from './uuid';
 
 import {E2EIHandler} from '../E2EIdentity';
 import {checkVersion} from '../lifecycle/newVersionHandler';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
+import {APIClient} from '../service/apiClientSingleton';
+import {Core} from '../service/coreSingleton';
 import {ViewModelRepositories} from '../view_model/MainViewModel';
 
 export enum CoreCryptoLogLevel {
@@ -79,6 +80,31 @@ export enum CoreCryptoLogLevel {
   Warn = 5,
   Error = 6,
 }
+
+export type NotificationBackendDumpEvent = {
+  notificationId: string;
+  type: string;
+  time: string;
+  from?: string;
+  conversation?: string;
+  qualified_conversation?: QualifiedId;
+  senderClient?: string;
+  recipientClient?: string;
+};
+
+export type NotificationBackendDump = {
+  fetchedAt: string;
+  clientId?: string;
+  lastNotificationId?: string;
+  timeRange: {from: string; to: string};
+  counts: {
+    notifications: number;
+    events: number;
+    eventsInRange: number;
+  };
+  eventsInRange: NotificationBackendDumpEvent[];
+  notifications: Notification[];
+};
 
 export class DebugUtil {
   private readonly logger: Logger;
@@ -486,9 +512,131 @@ export class DebugUtil {
     if (this.storageRepository.storageService.db) {
       const records = await this.storageRepository.storageService.db.events.toArray();
       const messages = records.filter(event => event.conversation === conversationId);
-      return messages.slice(-amount).reverse();
+      return messages.slice(-amount).toReversed();
     }
     return [];
+  }
+
+  private hasEventTime(event: BackendEvent): event is BackendEvent & {time: string} {
+    return 'time' in event && is.nonEmptyString(event.time);
+  }
+
+  private isEventInTimeRange(event: BackendEvent, from: Date, to: Date): boolean {
+    if (!this.hasEventTime(event)) {
+      return false;
+    }
+
+    const eventTime = new Date(event.time).getTime();
+    return eventTime >= from.getTime() && eventTime <= to.getTime();
+  }
+
+  private async getCurrentClientId(): Promise<string | undefined> {
+    const currentClientId = this.clientState.currentClient?.id;
+    if (is.nonEmptyString(currentClientId)) {
+      return currentClientId;
+    }
+
+    const clients = await this.clientRepository.getClientsForSelf();
+    return clients.find(client => client.isPermanent())?.id ?? clients[0]?.id;
+  }
+
+  private async fetchAllNotifications(clientId?: string): Promise<Notification[]> {
+    const notifications: Notification[] = [];
+    let sinceNotificationId: string | undefined;
+
+    while (true) {
+      const page = await this.eventRepository.notificationService.getNotifications(
+        clientId,
+        sinceNotificationId,
+        EventRepository.CONFIG.NOTIFICATION_BATCHES.MAX,
+      );
+
+      notifications.push(...page.notifications);
+      this.logger.info(`Fetched ${notifications.length} notification(s) from backend`);
+
+      if (!page.has_more) {
+        break;
+      }
+
+      sinceNotificationId = page.notifications.at(-1)?.id;
+      if (!is.nonEmptyString(sinceNotificationId)) {
+        break;
+      }
+    }
+
+    return notifications;
+  }
+
+  async dumpNotificationsFromBackend(from: Date, to: Date): Promise<NotificationBackendDump> {
+    if (from.getTime() > to.getTime()) {
+      throw new Error('Invalid time range: "from" must be before "to"');
+    }
+
+    const clientId = await this.getCurrentClientId();
+    const lastNotificationRecord = await this.storageRepository.storageService.load<{value: string}>(
+      StorageSchemata.OBJECT_STORE.AMPLIFY,
+      DatabaseKeys.PRIMARY_KEY_LAST_NOTIFICATION,
+    );
+    const lastNotificationId = lastNotificationRecord?.value;
+    const notifications = await this.fetchAllNotifications(clientId);
+    const notificationsInRange = notifications.filter(notification =>
+      notification.payload.some(event => this.isEventInTimeRange(event, from, to)),
+    );
+    const eventsInRange = notificationsInRange.flatMap(notification =>
+      notification.payload
+        .filter((event): event is BackendEvent & {time: string} => this.isEventInTimeRange(event, from, to))
+        .map(event => {
+          const summary: NotificationBackendDumpEvent = {
+            notificationId: notification.id,
+            type: event.type,
+            time: event.time,
+          };
+
+          if ('from' in event) {
+            summary.from = event.from;
+          }
+
+          if ('conversation' in event) {
+            summary.conversation = event.conversation;
+          }
+
+          if ('qualified_conversation' in event) {
+            summary.qualified_conversation = event.qualified_conversation;
+          }
+
+          if (event.type === CONVERSATION_EVENT.OTR_MESSAGE_ADD) {
+            const otrEvent = event as ConversationOtrMessageAddEvent;
+            summary.senderClient = otrEvent.data.sender;
+            summary.recipientClient = otrEvent.data.recipient;
+          }
+
+          return summary;
+        }),
+    );
+
+    const dump: NotificationBackendDump = {
+      fetchedAt: new Date().toISOString(),
+      clientId,
+      lastNotificationId,
+      timeRange: {from: from.toISOString(), to: to.toISOString()},
+      counts: {
+        notifications: notificationsInRange.length,
+        events: notifications.flatMap(notification => notification.payload).length,
+        eventsInRange: eventsInRange.length,
+      },
+      eventsInRange,
+      notifications: notificationsInRange,
+    };
+
+    this.logger.info('Notification backend dump ready', dump.counts);
+    return dump;
+  }
+
+  async downloadNotificationsDump(from: Date, to: Date): Promise<void> {
+    const dump = await this.dumpNotificationsFromBackend(from, to);
+    const blob = new Blob([JSON.stringify(dump, null, 2)], {type: 'application/json'});
+    const filename = `wire-notifications-${from.toISOString()}-${to.toISOString()}.json`.replaceAll(':', '-');
+    downloadBlob(blob, filename, 'application/json');
   }
 
   async haveISentThisMessageToMyOtherClients(

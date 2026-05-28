@@ -17,7 +17,7 @@
  *
  */
 
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 
 import {MediaConstraintsHandler} from './MediaConstraintsHandler';
 import {MediaStreamHandler} from './MediaStreamHandler';

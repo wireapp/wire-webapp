@@ -43,7 +43,7 @@ test.describe('Registration', () => {
           pages.registration().termsLabel.click(),
         ]);
 
-        await expect(newTab).toHaveURL(/legal#terms/);
+        await expect(newTab).toHaveURL(/wire\.com\/en\/legal/);
       },
     );
 

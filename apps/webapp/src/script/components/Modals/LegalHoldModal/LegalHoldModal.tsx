@@ -23,7 +23,7 @@ import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {UserDevicesState, UserDevices} from 'Components/UserDevices';
@@ -34,7 +34,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';

@@ -27,9 +27,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {ClientRepository} from 'Repositories/client';
 import {User} from 'Repositories/entity/User/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {AppLockCrypto, AppLockRepository} from 'Repositories/user/AppLockRepository';
-import {AppLockState} from 'Repositories/user/AppLockState';
-import {UserState} from 'Repositories/user/UserState';
+import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
+import {AppLockState} from 'Repositories/user/appLockState';
+import {UserState} from 'Repositories/user/userState';
 import {createUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';

@@ -34,22 +34,6 @@ export abstract class BaseModal {
     this.cancelButton = this.modal.getByTestId('do-secondary');
   }
 
-  async isModalPresent() {
-    return await this.modal.isVisible();
-  }
-
-  async getModalTitle() {
-    return (await this.modalTitle.textContent()) ?? '';
-  }
-
-  async getModalText() {
-    return (await this.modalText.textContent()) ?? '';
-  }
-
-  async isActionButtonVisible() {
-    return await this.actionButton.isVisible();
-  }
-
   async clickCancel() {
     await this.cancelButton.click();
   }

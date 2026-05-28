@@ -33,5 +33,6 @@ export type {
   OperationContext,
   MlsRecoveryOrchestrator,
   OrchestratorDeps,
+  MlsEpochRecoveryTrigger,
 } from './mlsRecoveryOrchestrator';
 export {MlsRecoveryOrchestratorImpl, minimalDefaultPolicies, OperationName} from './mlsRecoveryOrchestrator';

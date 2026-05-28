@@ -21,7 +21,7 @@ import {FC, HTMLProps} from 'react';
 
 import cx from 'classnames';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {useMessageFocusedTabIndex} from 'Components/MessagesList/Message/util';
 import {t} from 'Util/localizerUtil';
 

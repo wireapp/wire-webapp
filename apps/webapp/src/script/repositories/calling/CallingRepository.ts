@@ -78,11 +78,11 @@ import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/EventName';
-import * as trackingHelpers from 'Repositories/tracking/Helpers';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/Telemetry.helpers';
-import type {UserRepository} from 'Repositories/user/UserRepository';
+import {EventName} from 'Repositories/tracking/eventName';
+import * as trackingHelpers from 'Repositories/tracking/helpers';
+import {Segmentation} from 'Repositories/tracking/segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
+import type {UserRepository} from 'Repositories/user/userRepository';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -105,9 +105,9 @@ import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
 
 import {Config} from '../../Config';
-import {NoAudioInputError} from '../../error/NoAudioInputError';
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {NoAudioInputError} from '../../error/noAudioInputError';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
@@ -347,14 +347,8 @@ export class CallingRepository {
     await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
   }
 
-  public allowSuperhighQualityTier(event: boolean) {
-    if (this.isSuperhighQualityTierAllowed()) {
-      this.backgroundEffectsHandler.enableSuperhighQualityTier(event);
-    }
-  }
-
-  public isSuperhighQualityTierAllowed() {
-    return this.backgroundEffectsHandler.isSuperhighQualityTierAllowed();
+  public allowSuperhighQualityTier(enable: boolean) {
+    this.backgroundEffectsHandler.enableSuperhighQualityTier(enable);
   }
 
   public getBackgroundEffectsHandler(): BackgroundEffectsHandler {
@@ -737,7 +731,7 @@ export class CallingRepository {
     call.participants.removeAll();
     call.removeAllAudio();
     if (index !== -1) {
-      this.callState.calls.splice(index, 1);
+      this.callState.calls(this.callState.calls().toSpliced(index, 1));
     }
   }
 

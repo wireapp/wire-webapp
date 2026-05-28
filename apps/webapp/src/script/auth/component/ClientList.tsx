@@ -63,7 +63,7 @@ const ClientListComponent = ({
 
   useEffect(() => {
     setSortedClients(
-      permanentClients.sort((clientA, clientB) => {
+      permanentClients.toSorted((clientA, clientB) => {
         return new Date(clientA.time).getTime() - new Date(clientB.time).getTime();
       }),
     );

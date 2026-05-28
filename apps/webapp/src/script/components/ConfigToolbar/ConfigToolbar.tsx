@@ -26,14 +26,38 @@ import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
+import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupFeatureToggleQueryParameters';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 
+export function createLocationUrl(pathname: string, search: string, hash: string): string {
+  return `${pathname}${search}${hash}`;
+}
+
+function getStartOfToday(): Date {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  return startOfToday;
+}
+
+function toDateInputValue(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+type NotificationDumpToMode = 'now' | 'date';
+
+function getEndOfDate(dateInputValue: string): Date {
+  return new Date(`${dateInputValue}T23:59:59.999`);
+}
+
 export function ConfigToolbar() {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, applicationNavigation, isFeatureToggleEnabled} = useApplicationContext();
+  const alphabeticallySortedStartupFeatureToggleNames = startupFeatureToggleNames.toSorted();
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
   const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
@@ -51,6 +75,10 @@ export function ConfigToolbar() {
     window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled() ?? false,
   );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
+  const [notificationDumpFrom, setNotificationDumpFrom] = useState(() => toDateInputValue(getStartOfToday()));
+  const [notificationDumpToMode, setNotificationDumpToMode] = useState<NotificationDumpToMode>('now');
+  const [notificationDumpToDate, setNotificationDumpToDate] = useState(() => toDateInputValue(new Date()));
+  const [isDownloadingNotifications, setIsDownloadingNotifications] = useState(false);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -303,6 +331,52 @@ export function ConfigToolbar() {
     );
   };
 
+  function reloadApplicationForStartupFeatureToggle(
+    featureToggleName: StartupFeatureToggleName,
+    shouldEnableFeatureToggle: boolean,
+  ): void {
+    const locationSearch = applicationNavigation.currentSearch;
+    const nextLocationSearch = updateLocationSearchForStartupFeatureToggle({
+      locationSearch,
+      featureToggleName,
+      shouldEnableFeatureToggle,
+    });
+    const locationPathname = applicationNavigation.currentPathname;
+    const locationHash = applicationNavigation.currentHash;
+    const nextLocationUrl = createLocationUrl(locationPathname, nextLocationSearch, locationHash);
+
+    applicationNavigation.navigateTo(nextLocationUrl);
+  }
+
+  function renderStartupFeatureToggleCheckboxList() {
+    return (
+      <fieldset style={{margin: 0, border: 0, padding: 0}}>
+        <legend style={{fontWeight: 'bold', marginBottom: '8px'}}>Startup Feature Toggles</legend>
+        <ul style={{listStyle: 'none', margin: 0, padding: 0}}>
+          {alphabeticallySortedStartupFeatureToggleNames.map(featureToggleName => {
+            const featureToggleCheckboxIdentifier = `startup-feature-toggle-checkbox-${featureToggleName}`;
+
+            return (
+              <li key={featureToggleName} style={{marginBottom: '10px'}}>
+                <label htmlFor={featureToggleCheckboxIdentifier} style={{display: 'block'}}>
+                  <input
+                    id={featureToggleCheckboxIdentifier}
+                    type="checkbox"
+                    checked={isFeatureToggleEnabled(featureToggleName)}
+                    onChange={event => {
+                      reloadApplicationForStartupFeatureToggle(featureToggleName, event.currentTarget.checked);
+                    }}
+                  />
+                  {` ${featureToggleName}`}
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
+    );
+  }
+
   const resetMLSConversation = async () => {
     setIsResettingMLSConversation(true);
     try {
@@ -312,6 +386,91 @@ export function ConfigToolbar() {
     } finally {
       setIsResettingMLSConversation(false);
     }
+  };
+
+  const downloadNotificationsDump = async () => {
+    setIsDownloadingNotifications(true);
+    try {
+      const from = new Date(`${notificationDumpFrom}T00:00:00`);
+      const to = notificationDumpToMode === 'now' ? new Date() : getEndOfDate(notificationDumpToDate);
+
+      if (Number.isNaN(from.getTime())) {
+        throw new Error('Invalid start date');
+      }
+
+      if (Number.isNaN(to.getTime())) {
+        throw new Error('Invalid end date');
+      }
+
+      if (from.getTime() > to.getTime()) {
+        throw new Error('Start date must be before end date');
+      }
+
+      await window.wire?.app?.debug?.downloadNotificationsDump(from, to);
+    } catch (error: unknown) {
+      console.error('Error downloading notifications dump:', error);
+    } finally {
+      setIsDownloadingNotifications(false);
+    }
+  };
+
+  const renderNotificationDumpSection = () => {
+    return (
+      <>
+        <h3>Notification Dump</h3>
+        <p>
+          Fetches raw notification payloads from the backend for the selected time range and saves them as JSON. Message
+          content stays encrypted (OTR/MLS ciphertext only); nothing is decrypted locally.
+        </p>
+        <div style={{marginBottom: '10px'}}>
+          <label htmlFor="notification-dump-from" style={{display: 'block', fontWeight: 'bold'}}>
+            From
+          </label>
+          <input
+            id="notification-dump-from"
+            type="date"
+            value={notificationDumpFrom}
+            onChange={event => setNotificationDumpFrom(event.currentTarget.value)}
+            style={{padding: '6px 8px', width: '100%'}}
+          />
+        </div>
+        <div style={{marginBottom: '10px'}}>
+          <span style={{display: 'block', fontWeight: 'bold', marginBottom: '8px'}}>To</span>
+          <label htmlFor="notification-dump-to-now" style={{display: 'block', marginBottom: '8px'}}>
+            <input
+              id="notification-dump-to-now"
+              type="radio"
+              name="notification-dump-to-mode"
+              checked={notificationDumpToMode === 'now'}
+              onChange={() => setNotificationDumpToMode('now')}
+            />
+            {' Now'}
+          </label>
+          <label htmlFor="notification-dump-to-date-mode" style={{display: 'block', marginBottom: '8px'}}>
+            <input
+              id="notification-dump-to-date-mode"
+              type="radio"
+              name="notification-dump-to-mode"
+              checked={notificationDumpToMode === 'date'}
+              onChange={() => setNotificationDumpToMode('date')}
+            />
+            {' Date'}
+          </label>
+          {notificationDumpToMode === 'date' && (
+            <input
+              id="notification-dump-to-date"
+              type="date"
+              value={notificationDumpToDate}
+              onChange={event => setNotificationDumpToDate(event.currentTarget.value)}
+              style={{padding: '6px 8px', width: '100%'}}
+            />
+          )}
+        </div>
+        <Button disabled={isDownloadingNotifications} onClick={downloadNotificationsDump}>
+          {isDownloadingNotifications ? 'Downloading…' : 'Download notifications'}
+        </Button>
+      </>
+    );
   };
 
   if (!showConfig) {
@@ -339,6 +498,12 @@ export function ConfigToolbar() {
         Reset MLS Conversation
       </Button>
 
+      <hr />
+
+      <div>{renderNotificationDumpSection()}</div>
+
+      <hr />
+
       <div>{renderAvsSwitch()}</div>
 
       <hr />
@@ -356,6 +521,10 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderCoreCryptoLogLevelSelect()}</div>
+
+      <hr />
+
+      <div>{renderStartupFeatureToggleCheckboxList()}</div>
 
       <hr />
 

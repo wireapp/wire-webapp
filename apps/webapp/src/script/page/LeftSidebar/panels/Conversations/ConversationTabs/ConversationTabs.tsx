@@ -31,12 +31,12 @@ import {
   Tooltip,
 } from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {FEATURES, hasAccessToFeature} from 'Repositories/user/UserPermission';
+import {FEATURES, hasAccessToFeature} from 'Repositories/user/userPermission';
 import {getManageTeamUrl} from 'src/script/externalRoute';
 import {ConversationFolderTab} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTab/ConversationFolderTab';
 import {
@@ -44,7 +44,7 @@ import {
   SidebarTabs,
   useSidebarStore,
 } from 'src/script/page/LeftSidebar/useSidebarStore';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';

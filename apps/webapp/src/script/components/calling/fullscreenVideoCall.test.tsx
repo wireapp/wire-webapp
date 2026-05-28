@@ -26,12 +26,14 @@ import {Participant} from 'Repositories/calling/Participant';
 import {Grid} from 'Repositories/calling/videoGridHandler';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
+import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
+import {KEY} from 'Util/keyboardUtil';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
 
@@ -127,5 +129,59 @@ describe('fullscreenVideoCall', () => {
     });
 
     expect(setMaximizedSpy).toHaveBeenCalledWith(props.call, null);
+  });
+
+  it('traps focus when Tab key is pressed', () => {
+    const props = createProps();
+    const callState = new CallState();
+    callState.viewMode(CallingViewMode.FULL_SCREEN);
+    props.callState = callState;
+
+    render(withTheme(<FullscreenVideoCall {...props} />));
+
+    const wrapper = document.querySelector('[data-uie-name="fullscreen-video-call"]') as HTMLElement;
+
+    const event = new KeyboardEvent('keydown', {
+      key: KEY.TAB,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+    const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
+
+    act(() => {
+      wrapper.dispatchEvent(event);
+    });
+
+    expect(preventDefaultSpy).toHaveBeenCalled();
+    expect(stopPropagationSpy).toHaveBeenCalled();
+  });
+
+  it('does not trap focus when pressed key is not Tab', () => {
+    const props = createProps();
+    const callState = new CallState();
+    callState.viewMode(CallingViewMode.FULL_SCREEN);
+    props.callState = callState;
+
+    render(withTheme(<FullscreenVideoCall {...props} />));
+
+    const wrapper = document.querySelector('[data-uie-name="fullscreen-video-call"]') as HTMLElement;
+
+    const event = new KeyboardEvent('keydown', {
+      key: KEY.SPACE,
+      bubbles: true,
+      cancelable: true,
+    });
+
+    const preventDefaultSpy = jest.spyOn(event, 'preventDefault');
+    const stopPropagationSpy = jest.spyOn(event, 'stopPropagation');
+
+    act(() => {
+      wrapper.dispatchEvent(event);
+    });
+
+    expect(preventDefaultSpy).not.toHaveBeenCalled();
+    expect(stopPropagationSpy).not.toHaveBeenCalled();
   });
 });
