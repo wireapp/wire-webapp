@@ -3502,9 +3502,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:6.16.1":
-  version: 6.16.1
-  resolution: "@formatjs/cli@npm:6.16.1"
+"@formatjs/cli@npm:6.16.3":
+  version: 6.16.3
+  resolution: "@formatjs/cli@npm:6.16.3"
   dependencies:
     "@formatjs/cli-native-darwin-arm64": "npm:1.1.0"
     "@formatjs/cli-native-linux-arm64": "npm:1.2.0"
@@ -3541,7 +3541,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 10/6de947b4dc62d57345675cd003b3eb285e044c4dbacb49b5da8a40cc2fd6fdd13d1138a6089445f2741c0524553a973d5cf3b496449f51ac5bd0b39bd748ff4f
+  checksum: 10/5f1a19e020cf6861487ba312fdc7d086a934bdfae0ab849f4e39ddf75630227254ccb03b10edd68225916e6ad3ea4cd02d5e0a9c731d61981ab138977e101e44
   languageName: node
   linkType: hard
 
@@ -9214,7 +9214,7 @@ __metadata:
     "@datadog/browser-rum": "npm:7.1.0"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@emotion/react": "npm:11.14.0"
-    "@formatjs/cli": "npm:6.16.1"
+    "@formatjs/cli": "npm:6.16.3"
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.27.2"
     "@lexical/history": "npm:0.27.2"
