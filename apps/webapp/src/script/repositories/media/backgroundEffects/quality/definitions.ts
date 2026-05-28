@@ -61,19 +61,12 @@ export const TIER_DEFINITIONS: Record<QualityTier, QualityTierParams> = {
   },
 };
 
-const QUALITY_TIERS = [
-  TIER_DEFINITIONS.fhd,
-  TIER_DEFINITIONS.hd,
-  TIER_DEFINITIONS.qhd,
-] as const;
+const QUALITY_TIERS = [TIER_DEFINITIONS.fhd, TIER_DEFINITIONS.hd, TIER_DEFINITIONS.qhd] as const;
 
-export function getBestMatchingQualityTier(
-  resolution: Resolution,
-): QualityTierParams {
+export function getBestMatchingQualityTier(resolution: Resolution): QualityTierParams {
   return (
-    QUALITY_TIERS.find(({resolution: minResolution}) =>
-      resolutionIsGreaterThanOrEqualTo(resolution, minResolution),
-    ) ?? TIER_DEFINITIONS.nhd
+    QUALITY_TIERS.find(({resolution: minResolution}) => resolutionIsGreaterThanOrEqualTo(resolution, minResolution)) ??
+    TIER_DEFINITIONS.nhd
   );
 }
 
