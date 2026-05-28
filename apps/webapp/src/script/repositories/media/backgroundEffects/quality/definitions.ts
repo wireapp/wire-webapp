@@ -61,23 +61,20 @@ export const TIER_DEFINITIONS: Record<QualityTier, QualityTierParams> = {
   },
 };
 
-export function getBestMatchingQualityTier(resolution: Resolution): QualityTierParams {
-  const FHD = TIER_DEFINITIONS.fhd.resolution;
-  if (resolutionIsGreaterThanOrEqualTo(resolution, FHD)) {
-    return TIER_DEFINITIONS.fhd;
-  }
+const QUALITY_TIERS = [
+  TIER_DEFINITIONS.fhd,
+  TIER_DEFINITIONS.hd,
+  TIER_DEFINITIONS.qhd,
+] as const;
 
-  const HD = TIER_DEFINITIONS.hd.resolution;
-  if (resolutionIsGreaterThanOrEqualTo(resolution, HD)) {
-    return TIER_DEFINITIONS.hd;
-  }
-
-  const QHD = TIER_DEFINITIONS.qhd.resolution;
-  if (resolutionIsGreaterThanOrEqualTo(resolution, QHD)) {
-    return TIER_DEFINITIONS.qhd;
-  }
-
-  return TIER_DEFINITIONS.nhd;
+export function getBestMatchingQualityTier(
+  resolution: Resolution,
+): QualityTierParams {
+  return (
+    QUALITY_TIERS.find(({resolution: minResolution}) =>
+      resolutionIsGreaterThanOrEqualTo(resolution, minResolution),
+    ) ?? TIER_DEFINITIONS.nhd
+  );
 }
 
 export function resolutionIsGreaterThanOrEqualTo(resolution: Resolution, lowerThan: Resolution): boolean {
