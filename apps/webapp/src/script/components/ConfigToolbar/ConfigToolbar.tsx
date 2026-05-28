@@ -38,6 +38,23 @@ export function createLocationUrl(pathname: string, search: string, hash: string
   return `${pathname}${search}${hash}`;
 }
 
+function getStartOfToday(): Date {
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  return startOfToday;
+}
+
+function toDateInputValue(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+type NotificationDumpToMode = 'now' | 'date';
+
+function getEndOfDate(dateInputValue: string): Date {
+  return new Date(`${dateInputValue}T23:59:59.999`);
+}
+
 export function ConfigToolbar() {
   const {fireAndForgetInvoker, applicationNavigation, isFeatureToggleEnabled} = useApplicationContext();
   const alphabeticallySortedStartupFeatureToggleNames = startupFeatureToggleNames.toSorted();
@@ -58,6 +75,10 @@ export function ConfigToolbar() {
     window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled() ?? false,
   );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
+  const [notificationDumpFrom, setNotificationDumpFrom] = useState(() => toDateInputValue(getStartOfToday()));
+  const [notificationDumpToMode, setNotificationDumpToMode] = useState<NotificationDumpToMode>('now');
+  const [notificationDumpToDate, setNotificationDumpToDate] = useState(() => toDateInputValue(new Date()));
+  const [isDownloadingNotifications, setIsDownloadingNotifications] = useState(false);
 
   // Toggle config tool on 'cmd/ctrl + shift + 2'
   useEffect(() => {
@@ -367,6 +388,91 @@ export function ConfigToolbar() {
     }
   };
 
+  const downloadNotificationsDump = async () => {
+    setIsDownloadingNotifications(true);
+    try {
+      const from = new Date(`${notificationDumpFrom}T00:00:00`);
+      const to = notificationDumpToMode === 'now' ? new Date() : getEndOfDate(notificationDumpToDate);
+
+      if (Number.isNaN(from.getTime())) {
+        throw new Error('Invalid start date');
+      }
+
+      if (Number.isNaN(to.getTime())) {
+        throw new Error('Invalid end date');
+      }
+
+      if (from.getTime() > to.getTime()) {
+        throw new Error('Start date must be before end date');
+      }
+
+      await window.wire?.app?.debug?.downloadNotificationsDump(from, to);
+    } catch (error: unknown) {
+      console.error('Error downloading notifications dump:', error);
+    } finally {
+      setIsDownloadingNotifications(false);
+    }
+  };
+
+  const renderNotificationDumpSection = () => {
+    return (
+      <>
+        <h3>Notification Dump</h3>
+        <p>
+          Fetches raw notification payloads from the backend for the selected time range and saves them as JSON. Message
+          content stays encrypted (OTR/MLS ciphertext only); nothing is decrypted locally.
+        </p>
+        <div style={{marginBottom: '10px'}}>
+          <label htmlFor="notification-dump-from" style={{display: 'block', fontWeight: 'bold'}}>
+            From
+          </label>
+          <input
+            id="notification-dump-from"
+            type="date"
+            value={notificationDumpFrom}
+            onChange={event => setNotificationDumpFrom(event.currentTarget.value)}
+            style={{padding: '6px 8px', width: '100%'}}
+          />
+        </div>
+        <div style={{marginBottom: '10px'}}>
+          <span style={{display: 'block', fontWeight: 'bold', marginBottom: '8px'}}>To</span>
+          <label htmlFor="notification-dump-to-now" style={{display: 'block', marginBottom: '8px'}}>
+            <input
+              id="notification-dump-to-now"
+              type="radio"
+              name="notification-dump-to-mode"
+              checked={notificationDumpToMode === 'now'}
+              onChange={() => setNotificationDumpToMode('now')}
+            />
+            {' Now'}
+          </label>
+          <label htmlFor="notification-dump-to-date-mode" style={{display: 'block', marginBottom: '8px'}}>
+            <input
+              id="notification-dump-to-date-mode"
+              type="radio"
+              name="notification-dump-to-mode"
+              checked={notificationDumpToMode === 'date'}
+              onChange={() => setNotificationDumpToMode('date')}
+            />
+            {' Date'}
+          </label>
+          {notificationDumpToMode === 'date' && (
+            <input
+              id="notification-dump-to-date"
+              type="date"
+              value={notificationDumpToDate}
+              onChange={event => setNotificationDumpToDate(event.currentTarget.value)}
+              style={{padding: '6px 8px', width: '100%'}}
+            />
+          )}
+        </div>
+        <Button disabled={isDownloadingNotifications} onClick={downloadNotificationsDump}>
+          {isDownloadingNotifications ? 'Downloading…' : 'Download notifications'}
+        </Button>
+      </>
+    );
+  };
+
   if (!showConfig) {
     return null;
   }
@@ -391,6 +497,12 @@ export function ConfigToolbar() {
       <Button disabled={isResettingMLSConversation} onClick={resetMLSConversation}>
         Reset MLS Conversation
       </Button>
+
+      <hr />
+
+      <div>{renderNotificationDumpSection()}</div>
+
+      <hr />
 
       <div>{renderAvsSwitch()}</div>
 
