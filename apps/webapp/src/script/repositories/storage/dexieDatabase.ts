@@ -19,6 +19,12 @@
 
 import {Dexie, Table, Transaction} from 'dexie';
 
+// Extension system record types
+export interface ExtMetaRecord { extensionId: string; tables: string[]; provisionedAt: string }
+export interface InstalledExtensionRecord { id: string; manifest: unknown; state: string; installedAt: string; source: string; sourceUrl?: string; enabled: boolean }
+// Generic extension storage row — each extension defines its own shape
+export type ExtRow = Record<string, unknown>
+
 import {getLogger, Logger} from 'Util/logger';
 
 import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';
@@ -43,6 +49,27 @@ export class DexieDatabase extends Dexie {
   users: Table<UserRecord, string>;
   groupIds: Table<GroupIdRecord, string>;
 
+  // Extension system tables
+  ext_meta: Table<ExtMetaRecord, string>;
+  ext_datasets: Table<ExtRow, string>;
+  installed_extensions: Table<InstalledExtensionRecord, string>;
+  // Reports
+  'ext_com_wire_reports__reports': Table<ExtRow, string>;
+  'ext_com_wire_reports__subReports': Table<ExtRow, number>;
+  'ext_com_wire_reports__finalEntries': Table<ExtRow, number>;
+  'ext_com_wire_reports__convSettings': Table<ExtRow, string>;
+  'ext_com_wire_reports__settings': Table<ExtRow, string>;
+  'ext_com_wire_reports__promptTemplates': Table<ExtRow, string>;
+  'ext_com_wire_reports__entryNotes': Table<ExtRow, string>;
+  // Jira
+  'ext_com_wire_jira__tickets': Table<ExtRow, string>;
+  'ext_com_wire_jira__problems': Table<ExtRow, number>;
+  'ext_com_wire_jira__settings': Table<ExtRow, string>;
+  'ext_com_wire_jira__convSettings': Table<ExtRow, string>;
+  // Exports
+  'ext_com_wire_exports__exports': Table<ExtRow, string>;
+  'ext_com_wire_exports__settings': Table<ExtRow, string>;
+
   private readonly logger: Logger;
 
   constructor(dbName: string) {
@@ -61,6 +88,24 @@ export class DexieDatabase extends Dexie {
     this.sessions = this.table(StorageSchemata.OBJECT_STORE.SESSIONS);
     this.users = this.table(StorageSchemata.OBJECT_STORE.USERS);
     this.groupIds = this.table(StorageSchemata.OBJECT_STORE.GROUP_IDS);
+
+    // Extension system tables
+    this.ext_meta = this.table('ext_meta');
+    this.ext_datasets = this.table('ext_datasets');
+    this.installed_extensions = this.table('installed_extensions');
+    this['ext_com_wire_reports__reports'] = this.table('ext_com_wire_reports__reports');
+    this['ext_com_wire_reports__subReports'] = this.table('ext_com_wire_reports__subReports');
+    this['ext_com_wire_reports__finalEntries'] = this.table('ext_com_wire_reports__finalEntries');
+    this['ext_com_wire_reports__convSettings'] = this.table('ext_com_wire_reports__convSettings');
+    this['ext_com_wire_reports__settings'] = this.table('ext_com_wire_reports__settings');
+    this['ext_com_wire_reports__promptTemplates'] = this.table('ext_com_wire_reports__promptTemplates');
+    this['ext_com_wire_reports__entryNotes'] = this.table('ext_com_wire_reports__entryNotes');
+    this['ext_com_wire_jira__tickets'] = this.table('ext_com_wire_jira__tickets');
+    this['ext_com_wire_jira__problems'] = this.table('ext_com_wire_jira__problems');
+    this['ext_com_wire_jira__settings'] = this.table('ext_com_wire_jira__settings');
+    this['ext_com_wire_jira__convSettings'] = this.table('ext_com_wire_jira__convSettings');
+    this['ext_com_wire_exports__exports'] = this.table('ext_com_wire_exports__exports');
+    this['ext_com_wire_exports__settings'] = this.table('ext_com_wire_exports__settings');
   }
 
   private readonly initDbSchema = async (): Promise<void> => {

@@ -24,6 +24,7 @@ import {base64ToArray} from 'Util/util';
 import {ConversationRecord} from './record';
 
 import {categoryFromEvent} from '../../message/MessageCategorization';
+import {generateExtensionSchema} from '../../extensions/storage/extensionStorageSchemas';
 
 interface DexieSchema {
   schema: Record<string, string>;
@@ -431,6 +432,18 @@ export class StorageSchemata {
         // This version enables DB encryption at rest
         schema: {},
         version: 21,
+      },
+      {
+        // Extension system tables — meta registry, dataset cache, installed extensions,
+        // and per-extension namespaced storage tables (generated from extensionStorageSchemas).
+        // To add a new extension: update extensionStorageSchemas.ts, then bump to version 23.
+        schema: {
+          'ext_meta':             'extensionId',
+          'ext_datasets':         'channel',
+          'installed_extensions': 'id',
+          ...generateExtensionSchema(),
+        },
+        version: 22,
       },
     ];
   }
