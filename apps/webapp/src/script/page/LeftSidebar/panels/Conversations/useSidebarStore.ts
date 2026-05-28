@@ -80,11 +80,14 @@ export const SidebarStatus = {
 
 export type SidebarStatus = (typeof SidebarStatus)[keyof typeof SidebarStatus];
 
+/** Extension tabs are string tabs of the form `ext:{extensionId}` */
+export type ExtensionTabId = `ext:${string}`;
+
 export interface SidebarStore {
   status: SidebarStatus;
   setStatus: (status: SidebarStatus) => void;
-  currentTab: SidebarTabs;
-  setCurrentTab: (tab: SidebarTabs) => void;
+  currentTab: SidebarTabs | ExtensionTabId;
+  setCurrentTab: (tab: SidebarTabs | ExtensionTabId) => void;
   visibleTabs: readonly SidebarTabs[];
   setVisibleTabs: (tabs: readonly SidebarTabs[]) => void;
   toggleTabVisibility: (tab: SidebarTabs) => void;
@@ -94,8 +97,8 @@ export interface SidebarStore {
 const useSidebarStore = create<SidebarStore>()(
   persist(
     set => ({
-      currentTab: SidebarTabs.RECENT,
-      setCurrentTab: (tab: SidebarTabs) => {
+      currentTab: SidebarTabs.RECENT as SidebarTabs | ExtensionTabId,
+      setCurrentTab: (tab: SidebarTabs | ExtensionTabId) => {
         set({currentTab: tab});
       },
       status: SidebarStatus.OPEN,
@@ -105,7 +108,10 @@ const useSidebarStore = create<SidebarStore>()(
       resetDisabledFeatureTabs: () =>
         set(state => ({
           visibleTabs: DEFAULT_TABS,
-          currentTab: FILTER_TABS.includes(state.currentTab) ? SidebarTabs.RECENT : state.currentTab,
+          currentTab:
+            typeof state.currentTab === 'number' && FILTER_TABS.includes(state.currentTab as SidebarTabs)
+              ? SidebarTabs.RECENT
+              : state.currentTab,
         })),
       toggleTabVisibility: (tab: SidebarTabs) => {
         if (ALWAYS_VISIBLE_TABS.includes(tab)) {
@@ -136,9 +142,14 @@ const useSidebarStore = create<SidebarStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         status: state.status,
-        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS].includes(state.currentTab)
-          ? SidebarTabs.RECENT
-          : state.currentTab,
+        currentTab:
+          typeof state.currentTab === 'string' && state.currentTab.startsWith('ext:')
+            ? SidebarTabs.RECENT
+            : [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS].includes(
+                state.currentTab as SidebarTabs,
+              )
+            ? SidebarTabs.RECENT
+            : state.currentTab,
         visibleTabs: state.visibleTabs,
       }),
     },

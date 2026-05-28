@@ -64,6 +64,7 @@ import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
+import {useExtensionRegistry} from '../extensions/registry/ExtensionRegistry';
 
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
@@ -73,6 +74,7 @@ import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
 import {generateConversationUrl} from '../router/routeGenerator';
 import {configureRoutes, navigate} from '../router/Router';
+import {bootstrapExtensions} from '../extensions';
 import {TIME_IN_MILLIS} from '../util/timeUtil';
 import {MainViewModel} from '../view_model/MainViewModel';
 import {WarningsContainer} from '../view_model/WarningsContainer/WarningsContainer';
@@ -243,6 +245,18 @@ export const AppMain = (properties: AppMainProps) => {
       showUserModal({domain, id: userId}, () => navigate('/'));
     };
 
+    const showExtension = (extensionId: string, subPath: string = '/') => {
+      const {setContentState, setActiveExtension} = useAppState.getState();
+      const ext = useExtensionRegistry.getState().getExtension(extensionId);
+      if (!ext) {
+        setContentState(ContentState.EXTENSION_NOT_FOUND);
+        return;
+      }
+      setActiveExtension(extensionId, subPath || '/');
+      setContentState(ContentState.EXTENSION_VIEW);
+      useSidebarStore.getState().setCurrentTab(`ext:${extensionId}` as any);
+    };
+
     configureRoutes({
       '/': showMostRecentConversation,
       '/conversation/:conversationId/:domain': showConversationMessages,
@@ -256,6 +270,13 @@ export const AppMain = (properties: AppMainProps) => {
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
+      '/preferences/extensions': () => {
+        useAppState.getState().setContentState(ContentState.PREFERENCES_EXTENSIONS);
+        useSidebarStore.getState().setCurrentTab(SidebarTabs.PREFERENCES);
+      },
+      '/plugins/:extensionId': (extensionId: string) => showExtension(extensionId),
+      '/plugins/:extensionId/*subPath': (extensionId: string, subPath: string) =>
+        showExtension(extensionId, `/${subPath}`),
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,
@@ -298,6 +319,7 @@ export const AppMain = (properties: AppMainProps) => {
   useLayoutEffect(() => {
     if (!locked) {
       initializeApp();
+      void bootstrapExtensions();
     }
   }, [locked]);
 

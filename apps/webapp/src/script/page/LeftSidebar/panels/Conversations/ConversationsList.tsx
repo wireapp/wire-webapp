@@ -138,7 +138,7 @@ export const ConversationsList = ({
 
   const conversationsToDisplay = filteredConversations.length
     ? filteredConversations
-    : getConversationsWithHeadings(conversations, conversationsFilter, currentTab);
+    : getConversationsWithHeadings(conversations, conversationsFilter, currentTab as SidebarTabs);
 
   const parentRef = useRef(null);
 

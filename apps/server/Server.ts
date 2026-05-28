@@ -21,12 +21,14 @@ import express, {Router} from 'express';
 import expressSitemapXml from 'express-sitemap-xml';
 import hbs from 'hbs';
 import helmet from 'helmet';
+import {createProxyMiddleware} from 'http-proxy-middleware';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import nocache from 'nocache';
 
 import fs from 'fs';
 import http from 'http';
 import https from 'https';
+import net from 'net';
 import path from 'path';
 
 import type {ClientConfig, ServerConfig} from '@wireapp/config';
@@ -45,6 +47,7 @@ import {replaceHostnameInObject} from './util/hostnameReplacer';
 class Server {
   private readonly app: express.Express;
   private server?: http.Server | https.Server;
+  private wsProxyUpgrade?: (req: http.IncomingMessage, socket: net.Socket, head: Buffer) => void;
 
   constructor(
     private readonly config: ServerConfig,
@@ -77,6 +80,7 @@ class Server {
     this.app.use(ConfigRoute(this.config, this.clientConfig));
     this.app.use(GoogleWebmasterRoute(this.config));
     this.app.use(AppleAssociationRoute());
+    this.initProxy();
 
     this.app.use(
       createClientVersionCheckRoute({
@@ -88,6 +92,100 @@ class Server {
     );
     this.app.use(NotFoundRoute());
     this.app.use(InternalErrorRoute());
+  }
+
+  private initProxy(): void {
+    const restUpstream = process.env.BACKEND_REST_UPSTREAM;
+    const wsUpstream = process.env.BACKEND_WS_UPSTREAM;
+
+    // Ollama runs on plain HTTP; the Wire app is served over HTTPS. Browsers block
+    // cross-protocol fetches (mixed content), so Ollama calls route through this proxy.
+    // The client sends the actual Ollama URL in X-Ollama-Target (localhost only allowed).
+    this.app.use(
+      '/proxy/ollama',
+      createProxyMiddleware({
+        changeOrigin: true,
+        pathRewrite: {'^/proxy/ollama': ''},
+        router: req => {
+          const raw = req.headers['x-ollama-target'];
+          const target = Array.isArray(raw) ? raw[0] : raw;
+          if (target) {
+            try {
+              const parsed = new URL(target);
+              if (['localhost', '127.0.0.1'].includes(parsed.hostname)) {
+                return target;
+              }
+            } catch {}
+          }
+          return 'http://localhost:11434';
+        },
+        on: {
+          proxyReq: proxyReq => {
+            proxyReq.removeHeader('origin');
+            proxyReq.removeHeader('referer');
+          },
+        },
+      }),
+    );
+
+    // Proxy Jira Cloud REST API calls. The browser sends X-Jira-Email and X-Jira-Token;
+    // the proxy converts them to a Basic auth header before forwarding.
+    this.app.use(
+      '/proxy/jira',
+      createProxyMiddleware({
+        target: 'https://wearezeta.atlassian.net',
+        changeOrigin: true,
+        pathRewrite: {'^/proxy/jira': ''},
+        on: {
+          proxyReq: (proxyReq, req) => {
+            const rawEmail = req.headers['x-jira-email'];
+            const rawToken = req.headers['x-jira-token'];
+            const email = Array.isArray(rawEmail) ? rawEmail[0] : rawEmail;
+            const token = Array.isArray(rawToken) ? rawToken[0] : rawToken;
+            proxyReq.removeHeader('x-jira-email');
+            proxyReq.removeHeader('x-jira-token');
+            if (email && token) {
+              const encoded = Buffer.from(`${email}:${token}`).toString('base64');
+              proxyReq.setHeader('Authorization', `Basic ${encoded}`);
+            }
+          },
+        },
+      }),
+    );
+
+    // Proxy Wire backend REST API — requires BACKEND_REST_UPSTREAM env var.
+    if (restUpstream !== undefined && restUpstream !== '') {
+      this.app.use(
+        '/proxy/api',
+        createProxyMiddleware({
+          target: restUpstream,
+          changeOrigin: true,
+          pathRewrite: {'^/proxy/api': ''},
+          on: {
+            proxyRes: proxyRes => {
+              const cookies = proxyRes.headers['set-cookie'];
+              if (cookies) {
+                proxyRes.headers['set-cookie'] = cookies.map(cookie =>
+                  cookie.replace(/;\s*Domain=[^;]*/i, '').replace(/;\s*Path=[^;]*/i, '; Path=/'),
+                );
+              }
+            },
+          },
+        }),
+      );
+    }
+
+    // Proxy Wire backend WebSocket — requires BACKEND_WS_UPSTREAM env var.
+    if (wsUpstream !== undefined && wsUpstream !== '') {
+      const wsProxy = createProxyMiddleware({
+        target: wsUpstream,
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {'^/proxy/ws': ''},
+      });
+      this.app.use('/proxy/ws', wsProxy);
+      this.wsProxyUpgrade = wsProxy.upgrade;
+    }
   }
 
   private initWebpack() {
@@ -192,6 +290,35 @@ class Server {
 
     const staticRoutes = ['audio', 'ext', 'font', 'image', 'min', 'proto', 'style', 'worker', 'assets'];
 
+    // Extension assets are loaded inside a sandboxed iframe (opaque origin) and as
+    // ES-module worker/webview scripts. Two header overrides are required:
+    //  - X-Frame-Options must NOT be DENY (helmet sets DENY globally), else the iframe
+    //    document refuses to render. SAMEORIGIN is correct (host frames its own origin).
+    //  - Access-Control-Allow-Origin: * lets the opaque-origin iframe fetch its
+    //    `<script type="module" crossorigin>` assets without a CORS failure.
+    const extensionStaticHeaders = (res: express.Response) => {
+      res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    };
+
+    // Serve extension dist directories.
+    // In development: serve directly from the hackathon project root (built via `bun run build:extensions`).
+    // In production: serve from the server static dir (populated by webpack CopyPlugin).
+    if (this.config.DEVELOPMENT) {
+      // __dirname is apps/server/dist/ — go up 4 levels to reach hackathon/
+      // Serve from the extension ROOT (not just dist) so plugin.json is reachable
+      // at /extensions/{name}/plugin.json alongside /extensions/{name}/dist/...
+      const extensionsRoot = path.resolve(__dirname, '..', '..', '..', '..', 'extensions');
+      ['reports', 'jira', 'exports'].forEach(extName => {
+        const extDir = path.join(extensionsRoot, extName);
+        if (fs.existsSync(extDir)) {
+          this.app.use(`/extensions/${extName}`, express.static(extDir, {setHeaders: extensionStaticHeaders}));
+        }
+      });
+    } else {
+      this.app.use('/extensions', express.static(path.join(__dirname, 'static/extensions'), {setHeaders: extensionStaticHeaders}));
+    }
+
     staticRoutes.forEach(route => {
       this.app.use(`/${route}`, express.static(path.join(__dirname, `static/${route}`)));
     });
@@ -267,6 +394,9 @@ class Server {
             .listen(this.config.PORT_HTTP, '0.0.0.0', () => resolve(this.config.PORT_HTTP));
         } else {
           this.server = this.app.listen(this.config.PORT_HTTP, '0.0.0.0', () => resolve(this.config.PORT_HTTP));
+        }
+        if (this.wsProxyUpgrade) {
+          this.server.on('upgrade', this.wsProxyUpgrade);
         }
       } else {
         reject('Server port not specified.');

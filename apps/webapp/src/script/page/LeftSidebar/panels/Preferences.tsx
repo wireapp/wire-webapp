@@ -166,6 +166,12 @@ const Preferences = ({
       label: t('preferencesAbout'),
       uieName: 'go-about',
     },
+    {
+      IconComponent: Icon.ServiceIcon,
+      id: ContentState.PREFERENCES_EXTENSIONS,
+      label: 'Extensions',
+      uieName: 'go-extensions',
+    },
   ];
 
   return (

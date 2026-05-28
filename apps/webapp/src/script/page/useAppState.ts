@@ -51,8 +51,11 @@ export enum ContentState {
   PREFERENCES_DEVICE_DETAILS = 'ContentState.PREFERENCES_DEVICE_DETAILS',
   PREFERENCES_DEVICES = 'ContentState.PREFERENCES_DEVICES',
   PREFERENCES_OPTIONS = 'ContentState.PREFERENCES_OPTIONS',
+  PREFERENCES_EXTENSIONS = 'ContentState.PREFERENCES_EXTENSIONS',
   WATERMARK = 'ContentState.WATERMARK',
   CELLS = 'ContentState.CELLS',
+  EXTENSION_VIEW = 'ContentState.EXTENSION_VIEW',
+  EXTENSION_NOT_FOUND = 'ContentState.EXTENSION_NOT_FOUND',
 }
 
 export enum ListState {
@@ -72,6 +75,10 @@ type AppState = {
   previousContentState: ContentState | null;
   unreadMessagesCount: number;
   setUnreadMessagesCount: (unreadMessagesCount: number) => void;
+  /** Extension view state */
+  activeExtensionId: string | null;
+  activeExtensionSubPath: string;
+  setActiveExtension: (id: string, subPath: string) => void;
   /**
    * returns true if the current active content could display a conversation
    */
@@ -84,6 +91,9 @@ const useAppState = create<AppState>((set, get) => ({
   contentState: ContentState.WATERMARK,
   listState: ListState.CONVERSATIONS,
   previousContentState: null,
+  activeExtensionId: null,
+  activeExtensionSubPath: '/',
+  setActiveExtension: (id: string, subPath: string) => set({activeExtensionId: id, activeExtensionSubPath: subPath}),
   setContentState: (contentState: ContentState) => {
     const previousContentState = get().contentState;
     set(state => ({

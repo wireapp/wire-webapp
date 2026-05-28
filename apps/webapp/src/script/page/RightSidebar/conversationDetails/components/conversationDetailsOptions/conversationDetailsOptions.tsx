@@ -39,6 +39,8 @@ import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {ConversationDetailsOption} from './conversationDetailsOption';
+import {useExtensionRegistry} from 'src/script/extensions/registry/ExtensionRegistry';
+import {ExtensionConvSetting} from 'src/script/extensions/ui/conversation/ExtensionConvSetting';
 
 import {ActionsViewModel} from '../../../../../view_model/ActionsViewModel';
 import {PanelEntity, PanelState} from '../../../RightSidebar';
@@ -120,6 +122,7 @@ const ConversationDetailsOptions = ({
     isParticipantBlocked,
   });
 
+  const extensionConvSettings = useExtensionRegistry(state => state.getConversationSettings());
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;
   const isTeamConversation = !!teamId;
   const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
@@ -318,6 +321,22 @@ const ConversationDetailsOptions = ({
           </>
         )}
       </ul>
+
+      {extensionConvSettings.length > 0 && (
+        <>
+          <h3 className="conversation-details__list-head">AI Extensions</h3>
+          <ul>
+            {extensionConvSettings.map(cs => (
+              <ExtensionConvSetting
+                key={cs.id}
+                contribution={cs}
+                conversationId={activeConversation.id}
+                extensionId={cs.id.split('.').slice(0, 3).join('.')}
+              />
+            ))}
+          </ul>
+        </>
+      )}
     </div>
   );
 };

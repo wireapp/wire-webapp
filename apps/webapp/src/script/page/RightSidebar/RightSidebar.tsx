@@ -35,6 +35,7 @@ import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Access} from './access/access';
+import {ExtensionPanelPage} from 'src/script/extensions/ui/conversation/ExtensionPanelPage';
 import {AddParticipants} from './addParticipants';
 import {ConversationDetails} from './conversationDetails';
 import {ConversationHistory} from './conversationHistory/conversationHistory';
@@ -80,6 +81,7 @@ export enum PanelState {
   TIMED_MESSAGES = 'TIMED_MESSAGES',
   ACCESS = 'ACCESS',
   CONVERSATION_HISTORY = 'CONVERSATION_HISTORY',
+  EXTENSION_PANEL = 'EXTENSION_PANEL',
 }
 
 export type PanelEntity = Conversation | User | Message | ServiceEntity;
@@ -347,6 +349,16 @@ const RightSidebar: FC<RightSidebarProps> = ({
           )}
           {currentState === PanelState.CONVERSATION_HISTORY && (
             <ConversationHistory onClose={closePanel} onGoBack={onBackClick} />
+          )}
+
+          {currentState === PanelState.EXTENSION_PANEL && currentEntity && (
+            <ExtensionPanelPage
+              extensionId={(currentEntity as unknown as {extensionId: string}).extensionId}
+              panelUrl={(currentEntity as unknown as {panelUrl: string}).panelUrl}
+              conversationId={activeConversation.id}
+              onClose={closePanel}
+              onGoBack={onBackClick}
+            />
           )}
         </>
       </Animated>

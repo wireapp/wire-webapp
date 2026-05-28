@@ -53,6 +53,9 @@ import {RightSidebarParams} from '../AppMain';
 import {PanelState} from '../RightSidebar';
 import {RootContext} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
+import {ExtensionPage} from 'src/script/extensions/ui/ExtensionPage';
+import {PluginNotFound} from 'src/script/extensions/ui/PluginNotFound';
+import {ExtensionsManagementPage} from 'src/script/extensions/ui/ExtensionsManagementPage';
 
 export const ANIMATED_PAGE_TRANSITION_DURATION = 500;
 
@@ -88,6 +91,8 @@ const MainContent = ({
 
   const contentState = useAppState(state => state.contentState);
   const isShowingConversation = useAppState(state => state.isShowingConversation);
+  const activeExtensionId = useAppState(state => state.activeExtensionId);
+  const activeExtensionSubPath = useAppState(state => state.activeExtensionSubPath);
 
   useEffect(() => {
     if (!isShowingConversation() && conversationState.activeConversation()) {
@@ -135,6 +140,9 @@ const MainContent = ({
     [ContentState.PREFERENCES_DEVICES]: t('accessibility.headings.preferencesDevices'),
     [ContentState.PREFERENCES_OPTIONS]: t('accessibility.headings.preferencesOptions'),
     [ContentState.WATERMARK]: t('accessibility.headings.noConversation'),
+    [ContentState.PREFERENCES_EXTENSIONS]: 'Extensions',
+    [ContentState.EXTENSION_VIEW]: 'Extension',
+    [ContentState.EXTENSION_NOT_FOUND]: 'Extension not found',
   };
 
   const title = statesTitle[contentState];
@@ -279,6 +287,14 @@ const MainContent = ({
                 conversationRepository={repositories.conversation}
               />
             )}
+
+            {contentState === ContentState.EXTENSION_VIEW && activeExtensionId && (
+              <ExtensionPage extensionId={activeExtensionId} subPath={activeExtensionSubPath} />
+            )}
+
+            {contentState === ContentState.EXTENSION_NOT_FOUND && <PluginNotFound />}
+
+            {contentState === ContentState.PREFERENCES_EXTENSIONS && <ExtensionsManagementPage />}
           </>
         </Animated>
       </SwitchTransition>

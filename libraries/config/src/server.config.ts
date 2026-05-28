@@ -33,6 +33,7 @@ const defaultCSP = {
   defaultSrc: ["'self'"],
   fontSrc: ["'self'", 'data:'],
   frameSrc: [
+    "'self'", // required to embed sandboxed extension webviews (same-origin iframes)
     'https://*.soundcloud.com',
     'https://*.spotify.com',
     'https://*.vimeo.com',

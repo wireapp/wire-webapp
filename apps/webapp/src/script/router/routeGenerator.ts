@@ -32,3 +32,16 @@ export const generateConversationUrl = ({id, domain, filePath}: QualifiedId & {f
 
   return baseUrl;
 };
+
+export const generateExtensionUrl = (extensionId: string, subPath: string = ''): string => {
+  const clean = subPath.startsWith('/') ? subPath : `/${subPath}`;
+  return `/plugins/${extensionId}${clean === '/' ? '' : clean}`;
+};
+
+export const parseExtensionRoute = (
+  path: string,
+): {extensionId: string; subPath: string} | null => {
+  const match = path.match(/^\/plugins\/([^/]+)(\/.*)?$/);
+  if (!match) return null;
+  return {extensionId: match[1], subPath: match[2] ?? '/'};
+};

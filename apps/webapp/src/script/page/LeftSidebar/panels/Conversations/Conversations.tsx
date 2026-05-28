@@ -109,6 +109,9 @@ export const Conversations = ({
     setCurrentTab,
     resetDisabledFeatureTabs,
   } = useSidebarStore(useShallow(state => state));
+  // Extension tabs (ext:id) are not SidebarTabs enum values. Cast for all conversation-specific
+  // logic — extension tabs show an iframe, so none of the conversation filtering applies.
+  const currentSidebarTab = currentTab as SidebarTabs;
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
@@ -152,8 +155,8 @@ export const Conversations = ({
     return conversationLabelRepository.getLabelConversations(favoriteLabel, conversations);
   }, [conversationLabelRepository, conversations, favoriteLabel]);
 
-  const isPreferences = currentTab === SidebarTabs.PREFERENCES;
-  const isCells = currentTab === SidebarTabs.CELLS;
+  const isPreferences = currentSidebarTab === SidebarTabs.PREFERENCES;
+  const isCells = currentSidebarTab === SidebarTabs.CELLS;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
@@ -168,7 +171,7 @@ export const Conversations = ({
     SidebarTabs.DRAFTS,
     SidebarTabs.PINGS,
     SidebarTabs.ARCHIVES,
-  ].includes(currentTab);
+  ].includes(currentSidebarTab);
 
   const {setCurrentView} = useAppMainState(useShallow(state => state.responsiveView));
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
@@ -193,7 +196,7 @@ export const Conversations = ({
   const draftConversations = useDraftConversations(allConversations);
 
   const {conversations: currentTabConversations, searchInputPlaceholder} = getTabConversations({
-    currentTab,
+    currentTab: currentSidebarTab,
     conversations,
     conversationsFilter,
     archivedConversations,
@@ -211,7 +214,7 @@ export const Conversations = ({
     .find(folder => folder.id === expandedFolder);
 
   const groupParticipantsConversations = getGroupParticipantsConversations({
-    currentTab,
+    currentTab: currentSidebarTab,
     conversationRepository,
     searchRepository,
     conversationsFilter,
@@ -223,10 +226,10 @@ export const Conversations = ({
 
   const isGroupParticipantsVisible =
     !!conversationsFilter &&
-    ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentTab) &&
+    ![SidebarTabs.DIRECTS, SidebarTabs.GROUPS, SidebarTabs.FAVORITES].includes(currentSidebarTab) &&
     groupParticipantsConversations.length > 0;
 
-  const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentTab);
+  const showConnectionRequests = [SidebarTabs.RECENT, SidebarTabs.DIRECTS].includes(currentSidebarTab);
   const hasVisibleConnectionRequests = connectRequests.length > 0 && showConnectionRequests;
   const hasVisibleConversations = currentTabConversations.length > 0;
   const hasNoVisibleConversations = !hasVisibleConversations && !hasVisibleConnectionRequests;
@@ -391,7 +394,7 @@ export const Conversations = ({
         headerElement={
           <ConversationHeader
             currentFolder={currentFolder}
-            currentTab={currentTab}
+            currentTab={currentSidebarTab}
             selfUser={selfUser}
             showSearchInput={(showSearchInput && hasVisibleConversations) || !!conversationsFilter}
             searchValue={conversationsFilter}
@@ -415,7 +418,7 @@ export const Conversations = ({
               conversationState={conversationState}
               isTeam={isTeam}
               changeTab={changeTab}
-              currentTab={currentTab}
+              currentTab={currentSidebarTab}
               groupConversations={groupConversations}
               directConversations={directConversations}
               unreadConversations={unreadConversations}
@@ -464,7 +467,7 @@ export const Conversations = ({
 
             {hasEmptyConversationsList && (
               <EmptyConversationList
-                currentTab={currentTab}
+                currentTab={currentSidebarTab}
                 onChangeTab={changeTab}
                 searchValue={conversationsFilter}
               />

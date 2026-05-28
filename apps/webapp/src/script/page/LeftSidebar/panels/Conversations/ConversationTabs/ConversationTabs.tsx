@@ -33,6 +33,8 @@ import {
 
 import * as Icon from 'Components/icon';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
+import {useExtensionRegistry} from 'src/script/extensions/registry/ExtensionRegistry';
+import {navigate} from 'src/script/router/Router';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
@@ -76,8 +78,8 @@ interface ConversationTabsProps {
   channelConversations: Conversation[];
   draftConversations: Conversation[];
   conversationRepository: ConversationRepository;
-  onChangeTab: (tab: SidebarTabs, folderId?: string) => void;
-  currentTab: SidebarTabs;
+  onChangeTab: (tab: SidebarTabs | string, folderId?: string) => void;
+  currentTab: SidebarTabs | string;
   onClickPreferences: (contentState: ContentState) => void;
   showNotificationsBadge?: boolean;
   selfUser: User;
@@ -99,6 +101,7 @@ export const ConversationTabs = ({
   channelConversations,
 }: ConversationTabsProps) => {
   const {visibleTabs} = useSidebarStore();
+  const extensionTabs = useExtensionRegistry(state => state.getTabContributions());
   const {isChannelsEnabled, shouldShowChannelTab} = useChannelsFeatureFlag();
   const core = container.resolve(Core);
   const teamState = container.resolve(TeamState);
@@ -314,6 +317,28 @@ export const ConversationTabs = ({
               dataUieName="go-cells"
               isActive={currentTab === SidebarTabs.CELLS}
             />
+          </>
+        )}
+
+        {extensionTabs.length > 0 && (
+          <>
+            <div className="conversations-sidebar-divider" />
+            <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+              AI
+            </div>
+            {extensionTabs.map(tab => (
+              <ConversationTab
+                key={tab.id}
+                title={tab.title}
+                label={tab.title}
+                type={`ext:${tab.id}` as unknown as SidebarTabs}
+                Icon={<span style={{fontSize: '16px', lineHeight: 1}}>🤖</span>}
+                onChangeTab={() => navigate(tab.route)}
+                conversationTabIndex={visibleConversationTabs.length + 10}
+                dataUieName={`go-extension-${tab.id}`}
+                isActive={currentTab === `ext:${tab.id.split('.').slice(0, 3).join('.')}`}
+              />
+            ))}
           </>
         )}
       </div>

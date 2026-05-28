@@ -248,6 +248,21 @@ module.exports = {
           from: path.resolve(ROOT_PATH, 'node_modules/@wireapp/core-crypto/src/**/*'),
           to: `${dist}/min/[name][ext]`,
         },
+        // Copy extension dist dirs (built separately via build:extensions script)
+        // Only copy if the dist directories exist to avoid build errors
+        ...((() => {
+          const fs = require('fs');
+          const extensionsDir = path.resolve(ROOT_PATH, '../../extensions');
+          if (!fs.existsSync(extensionsDir)) return [];
+          return ['reports', 'jira', 'exports'].flatMap(extName => {
+            const distDir = path.join(extensionsDir, extName, 'dist');
+            if (!fs.existsSync(distDir)) return [];
+            return [{
+              from: distDir,
+              to: `${dist}/extensions/${extName}/dist`,
+            }];
+          });
+        })()),
       ],
     }),
     new webpack.IgnorePlugin({resourceRegExp: /.*\.wasm/}),
