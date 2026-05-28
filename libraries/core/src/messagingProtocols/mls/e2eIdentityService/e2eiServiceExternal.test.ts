@@ -266,5 +266,17 @@ describe('E2EIServiceExternal', () => {
       expect(transactionContext.e2eiRegisterAcmeCA).not.toHaveBeenCalled();
       expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
     });
+
+    it('refreshes revocation data on demand', async () => {
+      const [service, {transactionContext}] = await buildE2EIService('mockedDB3');
+
+      jest.spyOn(transactionContext, 'e2eiIsPKIEnvSetup').mockResolvedValueOnce(true);
+
+      await service.initialize('https://some.crl.discovery.url');
+      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(2);
+
+      await service.refreshRevocationData();
+      expect(transactionContext.e2eiRegisterIntermediateCA).toHaveBeenCalledTimes(4);
+    });
   });
 });
