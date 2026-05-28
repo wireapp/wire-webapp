@@ -18,9 +18,14 @@
  */
 
 /** Barrel re-exporting all AI Dexie record types and associated union types. */
+
 export * from './AiReportRecord';
 export * from './AiConversationSubReportRecord';
 export * from './AiFinalReportEntryRecord';
 export * from './AiConversationSettingsRecord';
 export * from './AiSettingsRecord';
 export * from './AiPromptTemplateRecord';
+export * from './JiraTicketRecord';
+export * from './JiraProblemRecord';
+export * from './ExportRecord';
+export * from './AiEntryNoteRecord';

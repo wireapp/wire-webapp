@@ -17,5 +17,5 @@
  *
  */
 
-/** Life-cycle status of a scan report row. 'scanning': actively running. 'interrupted': stopped (either by user, app restart, or consecutive failures). 'finished': final pass completed successfully. 'failed': unrecoverable error. */
+/** Lifecycle status of a top-level AI scan report. */
 export type ReportStatus = 'scanning' | 'interrupted' | 'finished' | 'failed';

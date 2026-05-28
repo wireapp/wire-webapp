@@ -43,7 +43,7 @@ import {
   isTabVisible,
   SidebarTabs,
   useSidebarStore,
-} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+} from 'src/script/page/LeftSidebar/useSidebarStore';
 import {Core} from 'src/script/service/CoreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDataDogEnabled} from 'Util/dataDog';
@@ -332,6 +332,32 @@ export const ConversationTabs = ({
           conversationTabIndex={visibleConversationTabs.length + 3}
           dataUieName="go-ai-report"
           isActive={currentTab === SidebarTabs.AI_REPORT}
+        />
+
+        <ConversationTab
+          title="Jira"
+          label="Jira"
+          type={SidebarTabs.AI_JIRA}
+          Icon={<SupportIcon />}
+          onChangeTab={onChangeTab}
+          conversationTabIndex={visibleConversationTabs.length + 4}
+          dataUieName="go-ai-jira"
+          isActive={currentTab === SidebarTabs.AI_JIRA}
+        />
+
+        <ConversationTab
+          title="Exports"
+          label="Exports"
+          type={SidebarTabs.AI_EXPORTS}
+          Icon={
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M2.5 1A1.5 1.5 0 0 0 1 2.5v11A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5V6.621a1.5 1.5 0 0 0-.44-1.06L10.44.44A1.5 1.5 0 0 0 9.379 0H2.5ZM2 2.5a.5.5 0 0 1 .5-.5H9v3.5A1.5 1.5 0 0 0 10.5 7H14v6.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11ZM10 3.914 13.086 7H10.5a.5.5 0 0 1-.5-.5V3.914ZM8 9.5a.5.5 0 0 0-1 0v2.793l-.646-.647a.5.5 0 0 0-.708.708l1.5 1.5a.5.5 0 0 0 .708 0l1.5-1.5a.5.5 0 0 0-.708-.708L8 12.293V9.5Z" />
+            </svg>
+          }
+          onChangeTab={onChangeTab}
+          conversationTabIndex={visibleConversationTabs.length + 5}
+          dataUieName="go-ai-exports"
+          isActive={currentTab === SidebarTabs.AI_EXPORTS}
         />
       </div>
 

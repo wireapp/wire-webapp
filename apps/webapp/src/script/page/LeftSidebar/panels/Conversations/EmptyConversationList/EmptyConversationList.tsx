@@ -27,7 +27,7 @@ import {t} from 'Util/localizerUtil';
 import {button, paragraph, paragraphBold, paragraphGray, seperator, wrapper} from './EmptyConversationList.styles';
 
 import {Config} from '../../../../../Config';
-import {SidebarTabs} from '../useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 interface EmptyConversationListProps {
   currentTab: SidebarTabs;

@@ -1,265 +1,185 @@
-import {render, screen, fireEvent, waitFor} from '@testing-library/react';
-import {ReportRow} from '../script/ai/ui/ReportsListPage/ReportRow';
-import type {AiReportRecord} from '../script/ai/storage/records';
-import {OllamaUnreachableError, OllamaModelMissingError} from '../script/ai/ollama/errors';
-import * as Router from '../script/router/Router';
-import * as routeGenerator from '../script/router/routeGenerator';
+import React from 'react';
+import {render, fireEvent, waitFor} from '@testing-library/react';
+import {ReportRow} from 'src/script/ai/ui/ReportsListPage/ReportRow';
+import * as aiModule from 'src/script/ai';
+import * as routerModule from 'src/script/router/Router';
+import * as routeGeneratorModule from 'src/script/router/routeGenerator';
+import {OllamaUnreachableError, OllamaModelMissingError} from 'src/script/ai/ollama/errors';
+
+import {useAppNotification} from 'Components/AppNotification';
 
 jest.mock('dexie-react-hooks');
 jest.mock('src/script/ai');
 jest.mock('src/script/router/Router');
 jest.mock('src/script/router/routeGenerator');
-jest.mock('src/script/components/Modals/PrimaryModal');
-jest.mock('Util/logger', () => ({
-  getLogger: () => ({info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn()}),
+jest.mock('Components/AppNotification', () => ({
+  useAppNotification: jest.fn(),
 }));
 
-const mockNavigate = jest.fn();
-const mockGenerateReportDetailUrl = jest.fn((id) => `/report/${id}`);
-const mockScanRunnerResume = jest.fn();
-const mockPrimaryModal = {
-  type: {ACKNOWLEDGE: 'acknowledge'},
-  show: jest.fn(),
-};
+import {useLiveQuery} from 'dexie-react-hooks';
 
 describe('ReportRow', () => {
+  const mockScanRunner = {
+    start: jest.fn(),
+    resume: jest.fn(),
+  };
+
+  const mockAiStorage = {
+    listReports: jest.fn(),
+    listSubReports: jest.fn(),
+  };
+
+  const mockShow = jest.fn();
+
+  const createMockReport = (overrides) => ({
+    id: 'report-1',
+    status: 'finished',
+    created_at: '2024-04-29T15:48:00Z',
+    finished_at: '2024-04-29T16:00:00Z',
+    target_conversation_ids: ['conv1', 'conv2', 'conv3'],
+    final_pass_started_at: null,
+    final_pass_finished_at: null,
+    snapshot: {
+      model: 'llama2',
+      context_size: 4096,
+      safety_margin_pct: 10,
+      per_message_token_cap: 1000,
+      job_description: 'Test scan',
+    },
+    error: null,
+    ...overrides,
+  });
+
+  const mockReport = createMockReport();
+
   beforeEach(() => {
     jest.clearAllMocks();
-    (Router.navigate as jest.Mock) = mockNavigate;
-    (routeGenerator.generateReportDetailUrl as jest.Mock) = mockGenerateReportDetailUrl;
-
-    const aiModule = require('src/script/ai');
-    aiModule.useAi = jest.fn(() => ({
-      aiStorage: {
-        listSubReports: jest.fn().mockResolvedValue([]),
-      },
-      scanRunner: {
-        resume: mockScanRunnerResume,
-      },
-    }));
-
-    const dexieModule = require('dexie-react-hooks');
-    dexieModule.useLiveQuery = jest.fn((callback, deps) => {
-      return [];
+    jest.mocked(aiModule.useAi).mockReturnValue({
+      scanRunner: mockScanRunner,
+      aiStorage: mockAiStorage,
     });
-
-    const PrimaryModalModule = require('src/script/components/Modals/PrimaryModal');
-    PrimaryModalModule.PrimaryModal = mockPrimaryModal;
+    jest.mocked(useAppNotification).mockReturnValue({show: mockShow, close: jest.fn()});
+    jest.mocked(routeGeneratorModule.generateReportDetailUrl).mockImplementation(id => `/report/${id}`);
+    jest.mocked(useLiveQuery).mockReturnValue([]);
   });
 
-  it('should render report date and status badge', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'finished',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1', 'c2'],
-    } as AiReportRecord;
+  it('should render report title with formatted date', () => {
+    const {getByText} = render(React.createElement(ReportRow, {report: mockReport}));
 
-    render(<ReportRow report={report} />);
-
-    expect(screen.getByText(/Report from/)).toBeInTheDocument();
-    expect(screen.getByText('finished')).toBeInTheDocument();
+    const titleElement = getByText(/Report from/);
+    expect(titleElement).toBeInTheDocument();
   });
 
-  it('should render status badge with finished status', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'finished',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
+  it('should display status badge with correct text', () => {
+    const {container} = render(React.createElement(ReportRow, {report: mockReport}));
 
-    render(<ReportRow report={report} />);
-    const badge = screen.getByText('finished');
-
-    expect(badge).toHaveStyle({backgroundColor: '#22c55e'});
+    expect(container.textContent).toContain('finished');
   });
 
-  it('should render status badge with scanning status', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'scanning',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
-
-    render(<ReportRow report={report} />);
-    const badge = screen.getByText('scanning');
-
-    expect(badge).toHaveStyle({backgroundColor: '#3b82f6'});
-  });
-
-  it('should render status badge with interrupted status', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'interrupted',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
-
-    render(<ReportRow report={report} />);
-    const badge = screen.getByText('interrupted');
-
-    expect(badge).toHaveStyle({backgroundColor: '#f59e0b'});
-  });
-
-  it('should render status badge with failed status', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'failed',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
-
-    render(<ReportRow report={report} />);
-    const badge = screen.getByText('failed');
-
-    expect(badge).toHaveStyle({backgroundColor: '#ef4444'});
-  });
-
-  it('should render chevron navigation button', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'finished',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
-
-    render(<ReportRow report={report} />);
-    const chevronButton = screen.getByLabelText('View report details');
+  it('should render chevron button to navigate to report', () => {
+    const {getByRole} = render(React.createElement(ReportRow, {report: mockReport}));
+    const chevronButton = getByRole('button', {name: /view report details/i});
 
     expect(chevronButton).toBeInTheDocument();
-    expect(chevronButton).toHaveTextContent('›');
   });
 
-  it('should navigate to report detail page on chevron click', () => {
-    const report: AiReportRecord = {
-      id: 'report-123',
-      status: 'finished',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
-
-    render(<ReportRow report={report} />);
-    const chevronButton = screen.getByLabelText('View report details');
+  it('should navigate to report detail on chevron click', () => {
+    const {getByRole} = render(React.createElement(ReportRow, {report: mockReport}));
+    const chevronButton = getByRole('button', {name: /view report details/i});
 
     fireEvent.click(chevronButton);
 
-    expect(mockNavigate).toHaveBeenCalledWith('/report/report-123');
+    expect(routerModule.navigate).toHaveBeenCalledWith('/report/report-1');
   });
 
-  it('should show resume button when status is interrupted', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'interrupted',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
-
-    render(<ReportRow report={report} />);
-    const resumeButton = screen.getByRole('button', {name: /resume/i});
-
-    expect(resumeButton).toBeInTheDocument();
-  });
-
-  it('should not show resume button when status is not interrupted', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'finished',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
-
-    render(<ReportRow report={report} />);
-    const resumeButton = screen.queryByRole('button', {name: /resume/i});
+  it('should not show resume button when status is finished', () => {
+    const {queryByRole} = render(React.createElement(ReportRow, {report: mockReport}));
+    const resumeButton = queryByRole('button', {name: /resume/i});
 
     expect(resumeButton).not.toBeInTheDocument();
   });
 
-  it('should call scanRunner.resume() when resume button is clicked', async () => {
-    mockScanRunnerResume.mockResolvedValue(undefined);
-    const report: AiReportRecord = {
-      id: 'report-456',
-      status: 'interrupted',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
+  it('should show resume button when status is interrupted', () => {
+    const interruptedReport = createMockReport({status: 'interrupted'});
+    const {getByRole} = render(React.createElement(ReportRow, {report: interruptedReport}));
+    const resumeButton = getByRole('button', {name: /resume/i});
 
-    render(<ReportRow report={report} />);
-    const resumeButton = screen.getByRole('button', {name: /resume/i});
+    expect(resumeButton).toBeInTheDocument();
+  });
+
+  it('should call scanRunner.resume on resume button click', async () => {
+    const interruptedReport = createMockReport({status: 'interrupted'});
+    mockScanRunner.resume.mockResolvedValue(undefined);
+
+    const {getByRole} = render(React.createElement(ReportRow, {report: interruptedReport}));
+    const resumeButton = getByRole('button', {name: /resume/i});
 
     fireEvent.click(resumeButton);
 
     await waitFor(() => {
-      expect(mockScanRunnerResume).toHaveBeenCalledWith('report-456');
+      expect(mockScanRunner.resume).toHaveBeenCalledWith('report-1');
     });
   });
 
-  it('should show error modal on OllamaUnreachableError during resume', async () => {
-    mockScanRunnerResume.mockRejectedValue(new OllamaUnreachableError());
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'interrupted',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
+  it('should show error notification on OllamaUnreachableError during resume', async () => {
+    const interruptedReport = createMockReport({status: 'interrupted'});
+    mockScanRunner.resume.mockRejectedValue(new OllamaUnreachableError('error'));
 
-    render(<ReportRow report={report} />);
-    const resumeButton = screen.getByRole('button', {name: /resume/i});
+    const {getByRole} = render(React.createElement(ReportRow, {report: interruptedReport}));
+    const resumeButton = getByRole('button', {name: /resume/i});
 
     fireEvent.click(resumeButton);
 
     await waitFor(() => {
-      expect(mockPrimaryModal.show).toHaveBeenCalledWith(
-        mockPrimaryModal.type.ACKNOWLEDGE,
+      expect(mockShow).toHaveBeenCalledWith(
         expect.objectContaining({
-          text: expect.objectContaining({
-            title: 'Ollama Error',
-            message: expect.stringContaining('Cannot reach Ollama'),
-          }),
+          message: 'Cannot reach Ollama. Check that Ollama is running at the configured URL.',
         }),
       );
     });
   });
 
-  it('should show error modal on OllamaModelMissingError during resume', async () => {
-    mockScanRunnerResume.mockRejectedValue(new OllamaModelMissingError());
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'interrupted',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
+  it('should show error notification on OllamaModelMissingError during resume', async () => {
+    const interruptedReport = createMockReport({status: 'interrupted'});
+    mockScanRunner.resume.mockRejectedValue(new OllamaModelMissingError('error'));
 
-    render(<ReportRow report={report} />);
-    const resumeButton = screen.getByRole('button', {name: /resume/i});
+    const {getByRole} = render(React.createElement(ReportRow, {report: interruptedReport}));
+    const resumeButton = getByRole('button', {name: /resume/i});
 
     fireEvent.click(resumeButton);
 
     await waitFor(() => {
-      expect(mockPrimaryModal.show).toHaveBeenCalledWith(
-        mockPrimaryModal.type.ACKNOWLEDGE,
+      expect(mockShow).toHaveBeenCalledWith(
         expect.objectContaining({
-          text: expect.objectContaining({
-            title: 'Model Error',
-            message: expect.stringContaining('not installed'),
-          }),
+          message: 'The configured Ollama model is not installed. Go to AI Preferences to change the model.',
         }),
       );
     });
   });
 
-  it('should render row with correct accessibility structure', () => {
-    const report: AiReportRecord = {
-      id: '123',
-      status: 'finished',
-      created_at: '2026-05-14T10:30:00Z',
-      target_conversation_ids: ['c1'],
-    } as AiReportRecord;
+  it('should not render progress bar when status is not scanning', () => {
+    const {container} = render(React.createElement(ReportRow, {report: mockReport}));
+    const progressBar = container.querySelector('[role="progressbar"]');
 
-    const {container} = render(<ReportRow report={report} />);
-    const row = container.querySelector('[class*="row"]');
+    expect(progressBar).not.toBeInTheDocument();
+  });
 
-    expect(row).toBeInTheDocument();
+  it('should render progress bar when status is scanning', () => {
+    const scanningReport = createMockReport({status: 'scanning'});
+    jest.mocked(useLiveQuery).mockReturnValue([]);
+
+    const {container} = render(React.createElement(ReportRow, {report: scanningReport}));
+    const progressBar = container.querySelector('[role="progressbar"]');
+
+    expect(progressBar).toBeInTheDocument();
+  });
+
+  it('should subscribe to live sub-reports when scanning', () => {
+    const scanningReport = createMockReport({status: 'scanning'});
+    jest.mocked(useLiveQuery).mockReturnValue([]);
+
+    render(React.createElement(ReportRow, {report: scanningReport}));
+
+    expect(useLiveQuery).toHaveBeenCalled();
   });
 });

@@ -38,3 +38,15 @@ export const generateReportsListUrl = (): string => '/reports';
 export const generateReportDetailUrl = (reportId: string): string => `/report/${reportId}`;
 
 export const generatePreferencesAiUrl = (): string => '/preferences/ai';
+
+export const generateJiraUrl = (): string => '/jira';
+
+export const generateJiraTicketUrl = (ticketKey: string): string => `/jira/${ticketKey}`;
+
+export const generateExportsListUrl = (): string => '/exports';
+
+export const generateExportCreateUrl = (): string => '/exports/new';
+
+export const generateExportDetailUrl = (id: string): string => `/exports/${id}`;
+
+export const generateExportResultUrl = (id: string): string => `/exports/${id}/result`;

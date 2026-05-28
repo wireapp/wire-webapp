@@ -23,6 +23,8 @@ import {isKeyDownEvent} from 'src/script/guards/Event';
 import {isAuxClickEvent, isClickEvent} from 'src/script/guards/Mouse';
 import {getAllFocusableElements, setElementsTabIndex} from 'Util/focusUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {useKnownJiraKeys} from 'src/script/ai/jira/useJiraKeysStore';
+import {injectJiraLinksIntoHtml} from 'src/script/ai/jira/jiraLinkify';
 
 import {ShowMoreButton} from './ShowMoreButton';
 
@@ -50,6 +52,8 @@ const TextMessage: FC<TextMessageRendererProps> = ({
   collapse = false,
   ...props
 }) => {
+  const known_jira_keys = useKnownJiraKeys();
+  const processed_text = known_jira_keys.size > 0 ? injectJiraLinksIntoHtml(text, known_jira_keys) : text;
   const containerRef = useRef<HTMLParagraphElement | null>(null);
   const [canShowMore, setCanShowMore] = useState<boolean>(false);
   const [showFullText, setShowFullText] = useState<boolean>(!collapse);
@@ -151,7 +155,7 @@ const TextMessage: FC<TextMessageRendererProps> = ({
         onAuxClick={handleInteraction}
         onKeyDown={handleInteraction}
         onKeyUp={handleInteraction}
-        dangerouslySetInnerHTML={{__html: text}}
+        dangerouslySetInnerHTML={{__html: processed_text}}
         dir="auto"
         className={`${className} ${extraClasses}`}
         {...props}
@@ -167,3 +171,4 @@ export const TextMessageRenderer = (props: TextMessageRendererProps) => {
   // We want to make sure that this element is re-rendered when the text changes (this will trigger useEffects' calculations to run).
   return <TextMessage key={props.text} {...props} />;
 };
+

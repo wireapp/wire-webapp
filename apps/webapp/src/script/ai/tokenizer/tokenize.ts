@@ -19,22 +19,8 @@
 
 import {encode} from 'gpt-tokenizer';
 
-/**
- * Tokenizes text using the gpt-tokenizer BPE encoder.
- * @param text The input text to tokenize.
- * @returns Array of token IDs produced by gpt-tokenizer's BPE encoder.
- * @note Results are approximate for non-GPT tokenizers (e.g., Qwen uses its own BPE vocabulary).
- * However, the approximation is acceptable given the 20% safety margin applied at the budget layer.
- */
+/** Returns the token ids for the given text (cl100k_base tokenizer — used as an estimate for Qwen). */
 export const tokenize = (text: string): number[] => encode(text);
 
-/**
- * Counts the number of tokens in text using gpt-tokenizer.
- * @param text The input text to count tokens for.
- * @returns The number of tokens produced by gpt-tokenizer for the given text.
- * @note This is a convenience wrapper equivalent to `tokenize(text).length`.
- * Used by the truncation layer to measure per-line token cost.
- * @note Results are approximate for non-GPT tokenizers (e.g., Qwen).
- * The approximation is acceptable given the 20% safety margin applied at the budget layer.
- */
+/** Returns the approximate token count for the given text. */
 export const countTokens = (text: string): number => encode(text).length;

@@ -17,22 +17,26 @@
  *
  */
 
+/**
+ * Tracks consecutive Ollama failures during a scan.
+ * Aborts the scan automatically when the threshold is reached (D20).
+ */
 export class ConsecutiveFailureTracker {
   private count = 0;
 
   constructor(private readonly threshold = 3) {}
 
-  /** Reset the failure counter. */
+  /** Resets the consecutive failure count (call at scan start and after each success). */
   reset(): void {
     this.count = 0;
   }
 
-  /** Record a success, resetting the failure counter. */
+  /** Records a success, resetting the count. */
   recordSuccess(): void {
     this.count = 0;
   }
 
-  /** Record a failure. Returns true if threshold is reached, signaling caller to halt scan. */
+  /** Records a failure. Returns true if the threshold has been reached. */
   recordFailure(): boolean {
     this.count += 1;
     return this.count >= this.threshold;

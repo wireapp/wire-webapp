@@ -17,5 +17,4 @@
  *
  */
 
-export type {TranscriptLine} from './buildTranscript';
-export {INCLUDED_EVENT_TYPES, buildTranscriptLines, transcriptLinesToString} from './buildTranscript';
+export * from './buildTranscript';

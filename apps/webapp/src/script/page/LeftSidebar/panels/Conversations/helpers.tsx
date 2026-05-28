@@ -21,7 +21,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/localizerUtil';
 import {replaceAccents} from 'Util/stringUtil';
 
-import {SidebarTabs} from './useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 export const conversationFilters = {
   hasUnread: (conv: Conversation) => conv.hasUnread(),

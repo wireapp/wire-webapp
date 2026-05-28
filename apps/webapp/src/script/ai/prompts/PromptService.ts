@@ -23,59 +23,63 @@ import type {DexieDatabase} from 'Repositories/storage/DexieDatabase';
 
 import {DEFAULT_FINAL_REPORT_TEMPLATE} from './finalReport.hbs';
 import {DEFAULT_SUB_REPORT_TEMPLATE} from './subReport.hbs';
+import {DEFAULT_SUB_REPORT_INCREMENTAL_TEMPLATE} from './subReportIncremental.hbs';
 
 import type {PromptTemplateId} from '../storage/records/AiPromptTemplateRecord';
 
+/** Version of the bundled templates. Increment when the defaults change significantly. */
 export const CURRENT_TEMPLATE_VERSION = 1;
 
 const BUNDLED: Record<PromptTemplateId, string> = {
   sub_report: DEFAULT_SUB_REPORT_TEMPLATE,
+  sub_report_incremental: DEFAULT_SUB_REPORT_INCREMENTAL_TEMPLATE,
   final_report: DEFAULT_FINAL_REPORT_TEMPLATE,
 };
 
+/**
+ * Manages Handlebars prompt templates stored in Dexie.
+ * Seeds the DB row from the bundled default on first read.
+ * Re-compiles on every render() call (D24 / Q&A R1 Q4 — no caching).
+ */
 export class PromptService {
   constructor(private readonly db: DexieDatabase) {}
 
-  /**
-   * Returns the stored template content, seeding the Dexie row from the bundled default on first access.
-   */
+  /** Returns the template source for the given id. Seeds from bundled default if not yet stored. */
   async getTemplate(id: PromptTemplateId): Promise<string> {
     const row = await this.db.ai_prompt_templates.get(id);
     if (row) {
       return row.content;
     }
+
     const bundled = BUNDLED[id];
-    const updated_at = new Date().toISOString();
     await this.db.ai_prompt_templates.put({
       template_id: id,
       content: bundled,
-      updated_at,
+      updated_at: new Date().toISOString(),
       imported_from_default_version: CURRENT_TEMPLATE_VERSION,
     });
     return bundled;
   }
 
-  /**
-   * Persists a template. Sets `imported_from_default_version` to `CURRENT_TEMPLATE_VERSION` unconditionally.
-   */
+  /** Replaces the stored template for the given id. */
   async setTemplate(id: PromptTemplateId, content: string): Promise<void> {
-    const updated_at = new Date().toISOString();
     await this.db.ai_prompt_templates.put({
       template_id: id,
       content,
-      updated_at,
+      updated_at: new Date().toISOString(),
       imported_from_default_version: CURRENT_TEMPLATE_VERSION,
     });
   }
 
-  /**
-   * Overwrites the stored template with the bundled default string and updates `imported_from_default_version`.
-   */
+  /** Overwrites the stored template with the bundled default. */
   async resetToDefault(id: PromptTemplateId): Promise<void> {
     await this.setTemplate(id, BUNDLED[id]);
   }
 
-  /** Re-compiles from source on every call (Q&A R1 Q4 / D24). */
+  /**
+   * Renders the template for the given id with the provided variables.
+   * Re-compiles the Handlebars template on every call (no caching per D24).
+   */
   async render(id: PromptTemplateId, vars: Record<string, unknown>): Promise<string> {
     const source = await this.getTemplate(id);
     const fn = Handlebars.compile(source, {noEscape: false});

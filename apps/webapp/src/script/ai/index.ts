@@ -17,33 +17,65 @@
  *
  */
 
-import type {ScanRunner} from './pipeline/ScanRunner';
-import type {AiStorageRepository} from './storage/AiStorageRepository';
+import type {ConversationState} from 'Repositories/conversation/ConversationState';
+import type {EventService} from 'Repositories/event/EventService';
+import type {DexieDatabase} from 'Repositories/storage/DexieDatabase';
 
-/** Context holding all AI feature dependencies. */
+import {OllamaClient} from './ollama/OllamaClient';
+import {ScanRunner} from './pipeline/ScanRunner';
+import {PromptService} from './prompts/PromptService';
+import {AiSettingsService} from './settings/AiSettingsService';
+import {JiraStorageRepository} from './jira/JiraStorageRepository';
+import {bootstrapJiraKeysStore} from './jira/useJiraKeysStore';
+import {AiStorageRepository} from './storage/AiStorageRepository';
+import type {SelfUserInfo} from './transcript/buildTranscript';
+
 export interface AiContext {
   aiStorage: AiStorageRepository;
+  jiraStorage: JiraStorageRepository;
+  aiSettings: AiSettingsService;
+  prompts: PromptService;
   scanRunner: ScanRunner;
 }
 
-/** Module-level singleton for AiContext. Initialized by bootstrapAi() in Chapter 14. */
-let aiContext: AiContext | null = null;
+let _ctx: AiContext | null = null;
 
-/**
- * Set the module-level AiContext singleton. Called by bootstrapAi() in Chapter 14.
- * @param context - The AI context to store.
- */
-export function setAiContext(context: AiContext): void {
-  aiContext = context;
-}
+export const bootstrapAi = (
+  db: DexieDatabase,
+  conversationState: ConversationState,
+  eventService: EventService,
+  selfUser: SelfUserInfo,
+): AiContext => {
+  const aiStorage = new AiStorageRepository(db);
+  const jiraStorage = new JiraStorageRepository(db);
+  const aiSettings = new AiSettingsService(db);
+  const prompts = new PromptService(db);
+  const buildOllama = async () => {
+    const url = await aiSettings.getOllamaUrl();
+    const model = await aiSettings.getOllamaModel();
+    return new OllamaClient(url, model);
+  };
+  const scanRunner = new ScanRunner({
+    aiStorage,
+    aiSettings,
+    prompts,
+    conversationState,
+    eventService,
+    buildOllama,
+    selfUser,
+  });
+  _ctx = {aiStorage, jiraStorage, aiSettings, prompts, scanRunner};
+  bootstrapJiraKeysStore(jiraStorage);
+  return _ctx;
+};
 
-/**
- * Get the module-level AiContext singleton. Throws if not initialized.
- * @returns The AI context.
- */
-export function useAi(): AiContext {
-  if (!aiContext) {
-    throw new Error('AiContext not initialized. Call bootstrapAi() at app start.');
+/** Returns true if bootstrapAi() has been called. Safe to call before bootstrapping. */
+export const hasAi = (): boolean => _ctx !== null;
+
+/** Getter for the module-level AiContext singleton. Throws if not yet bootstrapped. */
+export const useAi = (): AiContext => {
+  if (!_ctx) {
+    throw new Error('AiContext not bootstrapped — call bootstrapAi() before reading.');
   }
-  return aiContext;
-}
+  return _ctx;
+};

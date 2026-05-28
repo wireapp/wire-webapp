@@ -17,4 +17,40 @@
  *
  */
 
-export {};
+import {Conversation} from 'Repositories/entity/Conversation';
+import {PanelEntity, PanelState} from 'src/script/page/RightSidebar/RightSidebar';
+
+interface AiDescriptionLinkProps {
+  conversation: Conversation;
+  togglePanel: (state: PanelState, entity: PanelEntity) => void;
+}
+
+/**
+ * Panel-link button that opens the AI description side panel.
+ * Follows the openTimedMessagePanel / openGuestPanel pattern in conversationDetailsOptions.
+ */
+export const AiDescriptionLink = ({conversation, togglePanel}: AiDescriptionLinkProps) => {
+  const openAiDescriptionPanel = () => togglePanel(PanelState.AI_DESCRIPTION, conversation);
+
+  return (
+    <li className="conversation-details__ai-description">
+      <button
+        className="panel__action-item"
+        data-uie-name="go-ai-description"
+        onClick={openAiDescriptionPanel}
+        type="button"
+      >
+        <span className="panel__action-item__icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M2 2h12v1H2V2zm0 3h12v1H2V5zm0 3h8v1H2V8zm0 3h10v1H2v-1z" />
+          </svg>
+        </span>
+        <span className="panel__action-item__summary">
+          <span className="panel__action-item__text">AI Context</span>
+          <span className="panel__action-item__status">Add description for AI scanning</span>
+        </span>
+        <span className="panel__action-item__chevron">›</span>
+      </button>
+    </li>
+  );
+};

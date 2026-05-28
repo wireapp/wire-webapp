@@ -22,31 +22,48 @@ import {useLiveQuery} from 'dexie-react-hooks';
 import {useAi} from 'src/script/ai';
 
 import {ReportRow} from './ReportRow';
+import {styles} from './ReportsListPage.styles';
 import {ScanButton} from './ScanButton';
+import {ScanningAnimation} from './ScanningAnimation';
 
 /** Reports list page — the entry point of the AI scanning feature. Subscribes live to all reports via useLiveQuery. */
 export const ReportsListPage = () => {
   const {aiStorage} = useAi();
   const reports = useLiveQuery(() => aiStorage.listReports(), []) ?? [];
 
+  const has_active_reports = reports.some(report => report.status !== 'finished');
+
   return (
-    <div className="reports-list-page">
-      <div className="reports-list-page__header">
+    <div className={styles.page}>
+      <div className={styles.header}>
         <h1>Reports</h1>
         <ScanButton reports={reports} />
       </div>
       {reports.length === 0 ? (
-        <div className="reports-list-page__empty">
+        <div className={styles.empty}>
           No reports yet. Click <strong>Scan</strong> to generate one.
         </div>
       ) : (
-        <ul className="reports-list-page__list">
-          {reports.map(r => (
-            <li key={r.id}>
-              <ReportRow report={r} />
-            </li>
-          ))}
-        </ul>
+        <div className={styles.tableWrapper}>
+          {has_active_reports && <ScanningAnimation />}
+          <div className={styles.tableScroll}>
+            <table className={styles.table}>
+              <thead className={styles.tableHead}>
+                <tr>
+                  <th>Report</th>
+                  <th>Status</th>
+                  <th>Progress</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {reports.map(report => (
+                  <ReportRow key={report.id} report={report} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
       )}
     </div>
   );

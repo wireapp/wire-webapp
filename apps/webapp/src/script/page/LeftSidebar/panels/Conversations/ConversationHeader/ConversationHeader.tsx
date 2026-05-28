@@ -29,7 +29,7 @@ import {useCreateConversationModal} from 'Components/Modals/CreateConversation/h
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {User} from 'Repositories/entity/User';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';

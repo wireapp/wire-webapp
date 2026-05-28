@@ -17,6 +17,7 @@
  *
  */
 
+/** Default Handlebars template for the final-merge report prompt. */
 export const DEFAULT_FINAL_REPORT_TEMPLATE = `<role>
 You are the final-merge stage. You receive per-conversation extractions and produce a single, clean, deduplicated report.
 </role>
@@ -30,12 +31,18 @@ You are the final-merge stage. You receive per-conversation extractions and prod
 <task>
 For each entry in the final output, you MUST set \`conversation_ids\` to the list of conversation IDs that the entry was derived from (one entry can span multiple conversations if you merge duplicates).
 
+There are three entry types — preserve their type faithfully:
+1. **report** — a self-contained summary of one subject/event. Fields: participants[], description, start (ISO), end (ISO).
+2. **todo** — a future action the user should take. Fields: title, description, created_at (ISO).
+3. **ticket** — a ticket draft suggested during the conversation. Fields: title, description, created_at (ISO).
+
 Operations you should perform:
 - DEDUPE: collapse near-duplicate entries into one (combine descriptions, union participants/ids).
 - DROP: remove entries that look like noise on second look.
 - MERGE: combine partial information about the same subject across conversations.
 - IMPROVE: rewrite descriptions for clarity.
 - DO NOT invent new content. Only restructure / rewrite existing content.
+- DO NOT convert todos or tickets into report entries — keep each entry as its original type unless merging two entries of the same type.
 
 Return your output by calling the \`report_completion\` tool. If nothing relevant survives, return \`{"entries": []}\`.
 </task>

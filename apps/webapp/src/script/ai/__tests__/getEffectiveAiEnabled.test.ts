@@ -17,45 +17,79 @@
  *
  */
 
-import {getEffectiveAiEnabled} from '../domain/getEffectiveAiEnabled';
-import type {AiConversationSettingsRecord} from '../storage/records';
 import type {Conversation} from 'Repositories/entity/Conversation';
 
+import {getEffectiveAiEnabled} from '../domain/getEffectiveAiEnabled';
+import type {AiConversationSettingsRecord} from '../storage/records/AiConversationSettingsRecord';
+
+// Builds a minimal mock Conversation
+const makeMockConversation = (hasService: boolean | (() => boolean)): Conversation => {
+  return {hasService} as unknown as Conversation;
+};
+
 describe('getEffectiveAiEnabled', () => {
-  it('returns true when explicit settings.ai_enabled is true', () => {
-    const settings: AiConversationSettingsRecord = {
-      conversation_id: 'conv-1',
-      ai_enabled: true,
-      ai_description: '',
-      updated_at: '',
-    };
-    const conversation = {hasService: true} as unknown as Conversation;
-    expect(getEffectiveAiEnabled(settings, conversation)).toBe(true);
+  describe('when settings record is provided', () => {
+    it('returns true when settings.ai_enabled is true', () => {
+      const settings: AiConversationSettingsRecord = {
+        conversation_id: 'conv-1',
+        ai_enabled: true,
+        ai_description: '',
+        updated_at: '2025-01-01T00:00:00Z',
+      };
+      const conversation = makeMockConversation(false);
+
+      expect(getEffectiveAiEnabled(settings, conversation)).toBe(true);
+    });
+
+    it('returns false when settings.ai_enabled is false', () => {
+      const settings: AiConversationSettingsRecord = {
+        conversation_id: 'conv-1',
+        ai_enabled: false,
+        ai_description: '',
+        updated_at: '2025-01-01T00:00:00Z',
+      };
+      const conversation = makeMockConversation(false);
+
+      expect(getEffectiveAiEnabled(settings, conversation)).toBe(false);
+    });
+
+    it('ignores the conversation hasService value when settings are provided', () => {
+      const settings: AiConversationSettingsRecord = {
+        conversation_id: 'conv-1',
+        ai_enabled: true,
+        ai_description: '',
+        updated_at: '2025-01-01T00:00:00Z',
+      };
+      // Even a bot conversation returns true because the explicit setting wins
+      const conversation = makeMockConversation(true);
+
+      expect(getEffectiveAiEnabled(settings, conversation)).toBe(true);
+    });
   });
 
-  it('returns false when explicit settings.ai_enabled is false', () => {
-    const settings: AiConversationSettingsRecord = {
-      conversation_id: 'conv-1',
-      ai_enabled: false,
-      ai_description: '',
-      updated_at: '',
-    };
-    const conversation = {hasService: false} as unknown as Conversation;
-    expect(getEffectiveAiEnabled(settings, conversation)).toBe(false);
-  });
+  describe('when settings record is undefined (fallback to conversation default)', () => {
+    it('returns true for a human conversation (hasService = false as plain boolean)', () => {
+      const conversation = makeMockConversation(false);
 
-  it('defaults to true when no settings and conversation has no service participants', () => {
-    const conversation = {hasService: false} as unknown as Conversation;
-    expect(getEffectiveAiEnabled(undefined, conversation)).toBe(true);
-  });
+      expect(getEffectiveAiEnabled(undefined, conversation)).toBe(true);
+    });
 
-  it('defaults to false when no settings and hasService() returns true (function form)', () => {
-    const conversation = {hasService: () => true} as unknown as Conversation;
-    expect(getEffectiveAiEnabled(undefined, conversation)).toBe(false);
-  });
+    it('returns false for a service/bot conversation (hasService = true as plain boolean)', () => {
+      const conversation = makeMockConversation(true);
 
-  it('defaults to false when no settings and hasService is true (property form)', () => {
-    const conversation = {hasService: true} as unknown as Conversation;
-    expect(getEffectiveAiEnabled(undefined, conversation)).toBe(false);
+      expect(getEffectiveAiEnabled(undefined, conversation)).toBe(false);
+    });
+
+    it('returns true for a human conversation (hasService = function returning false)', () => {
+      const conversation = makeMockConversation(() => false);
+
+      expect(getEffectiveAiEnabled(undefined, conversation)).toBe(true);
+    });
+
+    it('returns false for a service/bot conversation (hasService = function returning true)', () => {
+      const conversation = makeMockConversation(() => true);
+
+      expect(getEffectiveAiEnabled(undefined, conversation)).toBe(false);
+    });
   });
 });

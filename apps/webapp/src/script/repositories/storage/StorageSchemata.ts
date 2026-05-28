@@ -53,6 +53,10 @@ export class StorageSchemata {
       AI_CONVERSATION_SETTINGS: 'ai_conversation_settings',
       AI_SETTINGS: 'ai_settings',
       AI_PROMPT_TEMPLATES: 'ai_prompt_templates',
+      JIRA_TICKETS: 'jira_tickets',
+      JIRA_PROBLEMS: 'jira_problems',
+      AI_EXPORTS: 'ai_exports',
+      AI_ENTRY_NOTES: 'ai_entry_notes',
     } as const;
   }
 
@@ -451,6 +455,66 @@ export class StorageSchemata {
           [StorageSchemata.OBJECT_STORE.AI_PROMPT_TEMPLATES]: 'template_id',
         },
         version: 22,
+      },
+      {
+        // Adds status field + index to ai_final_report_entries for accept/hide lifecycle
+        schema: {
+          [StorageSchemata.OBJECT_STORE.AI_FINAL_REPORT_ENTRIES]:
+            '++primary_key, id, report_id, type, status, [report_id+type], [report_id+status]',
+        },
+        version: 23,
+      },
+      {
+        schema: {
+          [StorageSchemata.OBJECT_STORE.JIRA_TICKETS]: 'key, status_category_color, fetched_at',
+          [StorageSchemata.OBJECT_STORE.JIRA_PROBLEMS]: '++id, ticket_key, rule_id, status, [ticket_key+rule_id]',
+        },
+        version: 24,
+      },
+      {
+        // Backfills stable UUIDs into ai_conversation_sub_reports entries[] and re-keys
+        // entry_statuses from array-index to entry id, enabling incremental re-scan.
+        schema: {},
+        upgrade: (transaction: Transaction) => {
+          transaction
+            .table(StorageSchemata.OBJECT_STORE.AI_CONVERSATION_SUB_REPORTS)
+            .toCollection()
+            .modify((sub: any) => {
+              if (!Array.isArray(sub.entries) || sub.entries.length === 0) {
+                return;
+              }
+
+              sub.entries = sub.entries.map((entry: any) => ({
+                ...entry,
+                id: entry.id ?? crypto.randomUUID(),
+              }));
+
+              if (sub.entry_statuses && typeof sub.entry_statuses === 'object') {
+                const reKeyed: Record<string, string> = {};
+                for (const [idx_str, status] of Object.entries(sub.entry_statuses)) {
+                  const idx = parseInt(idx_str, 10);
+                  const entry = sub.entries[idx];
+                  if (entry?.id) {
+                    reKeyed[entry.id] = status as string;
+                  }
+                }
+                sub.entry_statuses = reKeyed;
+              }
+            });
+        },
+        version: 25,
+      },
+      {
+        schema: {
+          [StorageSchemata.OBJECT_STORE.AI_EXPORTS]: 'id, created_at',
+        },
+        version: 26,
+      },
+      {
+        schema: {
+          [StorageSchemata.OBJECT_STORE.AI_ENTRY_NOTES]: 'entry_id',
+        },
+        version: 27,
       },
     ];
   }

@@ -1,0 +1,266 @@
+/*
+ * Wire
+ * Copyright (C) 2026 Wire Swiss GmbH
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ *
+ */
+
+.reports-list-page {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  padding: 16px;
+  gap: 16px;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    h1 {
+      margin: 0;
+      font-size: var(--font-size-large);
+      font-weight: var(--font-weight-bold);
+      line-height: var(--line-height-lg);
+    }
+  }
+
+  &__empty {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    color: var(--gray-60);
+    font-size: var(--font-size-medium);
+    text-align: center;
+
+    strong {
+      font-weight: var(--font-weight-bold);
+    }
+  }
+
+  // Wrapper provides the border, radius, and clipping context for the animation iframe.
+  // Scroll is handled by __table-scroll inside so the iframe stays fixed as a background.
+  &__table-wrapper {
+    position: relative;
+    flex: 1;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  // The ribbon animation canvas — fills the wrapper absolutely, sits behind the table.
+  &__animation-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.5;
+    z-index: 0;
+  }
+
+  // Scrollable container for the table, layered above the animation.
+  &__table-scroll {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    overflow: hidden auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  &__table-head {
+    // Sticky header stays readable above the animation.
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background-color: rgba(255, 255, 255, 0.94);
+
+    body.theme-dark & {
+      background-color: rgba(15, 17, 22, 0.94);
+    }
+
+    th {
+      padding: 10px 16px;
+      color: var(--gray-60);
+      font-size: var(--font-size-small);
+      font-weight: var(--font-weight-bold);
+      text-align: left;
+      white-space: nowrap;
+
+      &:last-child {
+        // Actions column — no label, right-aligned
+        text-align: right;
+      }
+    }
+  }
+}
+
+.report-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  // Semi-transparent rows let the animation iframe show through when active.
+  background-color: rgba(255, 255, 255, 0.82);
+
+  body.theme-dark & {
+    background-color: rgba(15, 17, 22, 0.82);
+  }
+
+  &:hover {
+    background-color: var(--gray-10);
+
+    body.theme-dark & {
+      background-color: var(--gray-90);
+    }
+  }
+
+  td {
+    padding: 12px 16px;
+    vertical-align: middle;
+  }
+
+  &:last-child td {
+    border-bottom: none;
+  }
+
+  &__title {
+    color: var(--gray-80);
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-regular);
+    line-height: var(--line-height-md);
+    white-space: nowrap;
+  }
+
+  &__middle {
+    width: 100%;
+    min-width: 120px;
+  }
+
+  &__right {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  &__chevron {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background-color: transparent;
+    color: var(--gray-60);
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--gray-20);
+      color: var(--gray-80);
+
+      body.theme-dark & {
+        background-color: var(--gray-80);
+        color: var(--white);
+      }
+    }
+
+    &:active {
+      background-color: var(--gray-30);
+    }
+  }
+
+  &__resume {
+    padding: 6px 12px;
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    background-color: var(--accent-color);
+    color: #fff;
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+    }
+
+    &:active:not(:disabled) {
+      opacity: 0.8;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}
+
+.report-row-context-menu {
+  &__content {
+    min-width: 140px;
+    padding: 4px;
+    border: 1px solid var(--gray-20);
+    border-radius: 6px;
+    background-color: var(--white);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    z-index: 100;
+
+    body.theme-dark & {
+      border-color: var(--gray-80);
+      background-color: var(--gray-95);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  &__item--destructive {
+    display: flex;
+    align-items: center;
+    padding: 7px 10px;
+    border-radius: 4px;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    font-weight: var(--font-weight-regular);
+    outline: none;
+    user-select: none;
+
+    &[data-highlighted] {
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+  }
+}
+
+// Scan button — uses the primary themed button pattern from button.less so it
+// reads correctly in both light and dark mode.
+.report-scan-button {
+  .button-text-primary;
+  min-width: 0;
+  min-height: 0;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-bold);
+}

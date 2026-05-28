@@ -43,9 +43,7 @@ import {EventName} from 'Repositories/tracking/EventName';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
-import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
-import {useAppMainState, ViewType} from 'src/script/page/state';
-import {ContentState, ListState} from 'src/script/page/useAppState';
+import {ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
@@ -59,12 +57,12 @@ import {getGroupParticipantsConversations} from './getGroupParticipantsConversat
 import {getTabConversations, scrollToConversation} from './helpers';
 import {useDraftConversations} from './hooks/useDraftConversations';
 import {useFolderStore} from './useFoldersStore';
-import {SidebarStatus, SidebarTabs, useSidebarStore} from './useSidebarStore';
+import {SidebarStatus, SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 import {Config} from '../../../../Config';
-import {generateConversationUrl, generateReportsListUrl} from '../../../../router/routeGenerator';
-import {navigate} from '../../../../router/Router';
+import {generateConversationUrl} from '../../../../router/routeGenerator';
 import {createNavigateKeyboard} from '../../../../router/routerBindings';
+import {useSidebarNavigation} from '../../useSidebarNavigation';
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {ListWrapper} from '../ListWrapper';
 import {StartUI} from '../StartUI';
@@ -156,6 +154,8 @@ export const Conversations = ({
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
   const isCells = currentTab === SidebarTabs.CELLS;
   const isAiReport = currentTab === SidebarTabs.AI_REPORT;
+  const isAiJira = currentTab === SidebarTabs.AI_JIRA;
+  const isAiExports = currentTab === SidebarTabs.AI_EXPORTS;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
@@ -172,7 +172,6 @@ export const Conversations = ({
     SidebarTabs.ARCHIVES,
   ].includes(currentTab);
 
-  const {setCurrentView} = useAppMainState(useShallow(state => state.responsiveView));
   const {openFolder, closeFolder, expandedFolder, isFoldersTabOpen, toggleFoldersTab} = useFolderStore(
     useShallow(state => state),
   );
@@ -288,50 +287,13 @@ export const Conversations = ({
   const switchList = listViewModel.switchList;
   const switchContent = listViewModel.contentViewModel.switchContent;
 
-  const onExitPreferences = useCallback(() => {
-    setCurrentView(ViewType.MOBILE_LEFT_SIDEBAR);
-    switchList(ListState.CONVERSATIONS);
-    switchContent(ContentState.CONVERSATION);
-  }, [setCurrentView, switchList, switchContent]);
-
-  const changeTab = useCallback(
-    (nextTab: SidebarTabs, folderId?: string) => {
-      if (!folderId) {
-        closeFolder();
-      }
-
-      if (nextTab === SidebarTabs.ARCHIVES) {
-        // will eventually load missing events from the db
-        void conversationRepository.updateArchivedConversations();
-      }
-
-      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.AI_REPORT].includes(nextTab)) {
-        onExitPreferences();
-      }
-
-      if (nextTab === SidebarTabs.CELLS) {
-        switchList(ListState.CELLS);
-        switchContent(ContentState.CELLS);
-      }
-
-      if (nextTab === SidebarTabs.AI_REPORT) {
-        switchList(ListState.CONVERSATIONS);
-        navigate(generateReportsListUrl());
-      }
-
-      clearConversationFilter();
-      setCurrentTab(nextTab);
-    },
-    [
-      conversationRepository,
-      closeFolder,
-      onExitPreferences,
-      switchList,
-      switchContent,
-      clearConversationFilter,
-      setCurrentTab,
-    ],
-  );
+  const {changeTab, onExitPreferences, onClickPreferences} = useSidebarNavigation({
+    switchList,
+    switchContent,
+    conversationRepository,
+    onClearFilter: clearConversationFilter,
+    onCloseFolder: closeFolder,
+  });
 
   useEffect(() => {
     const openFavorites = () => changeTab(SidebarTabs.FAVORITES);
@@ -348,21 +310,6 @@ export const Conversations = ({
       resetDisabledFeatureTabs();
     }
   }, [isAdvancedFiltersEnabled, resetDisabledFeatureTabs]);
-
-  const onClickPreferences = useCallback(
-    (itemId: ContentState) => {
-      switchList(ListState.PREFERENCES);
-      setCurrentView(ViewType.MOBILE_CENTRAL_COLUMN);
-      switchContent(itemId);
-
-      setTimeout(() => {
-        const centerColumn = document.getElementById('center-column');
-        const nextElementToFocus = centerColumn?.querySelector("[tabindex='0']") as HTMLElement | null;
-        nextElementToFocus?.focus();
-      }, ANIMATED_PAGE_TRANSITION_DURATION + 1);
-    },
-    [switchList, setCurrentView, switchContent],
-  );
 
   const handleEnterSearchClick = useCallback(
     (event: ReactKeyBoardEvent<HTMLDivElement>) => {
@@ -445,7 +392,7 @@ export const Conversations = ({
           />
         }
       >
-        {isCells || isAiReport ? null : isPreferences ? (
+        {isCells || isAiReport || isAiJira || isAiExports ? null : isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}

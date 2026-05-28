@@ -33,6 +33,8 @@ import {isGroupMLSConversation} from 'Repositories/conversation/ConversationSele
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {AiDescriptionLink} from 'src/script/ai/ui/ConversationAiOptions/AiDescriptionLink';
+import {AiEnabledToggle} from 'src/script/ai/ui/ConversationAiOptions/AiEnabledToggle';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
@@ -262,6 +264,12 @@ const ConversationDetailsOptions = ({
             />
           </li>
         )}
+
+        <li className="conversation-details__ai-scanning">
+          <AiEnabledToggle conversation={activeConversation} />
+        </li>
+
+        <AiDescriptionLink conversation={activeConversation} togglePanel={togglePanel} />
 
         {isActivatedAccount && (
           <>

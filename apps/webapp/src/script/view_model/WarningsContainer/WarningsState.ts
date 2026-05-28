@@ -39,7 +39,7 @@ type WarningsState = {
   removeWarning: (warning: TYPE) => void;
 };
 
-const useWarningsState = create<WarningsState>((set, get) => ({
+const useWarningsState = create<WarningsState>(set => ({
   addWarning: type => set(state => ({...state, warnings: [...state.warnings, type]})),
   name: '',
   removeWarning: type => set(state => ({...state, warnings: [...state.warnings.filter(warning => warning !== type)]})),

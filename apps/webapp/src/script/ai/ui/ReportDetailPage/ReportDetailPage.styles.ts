@@ -17,4 +17,15 @@
  *
  */
 
-export {};
+export const styles = {
+  page: 'report-detail-page',
+  header: 'report-detail-page__header',
+  back: 'report-detail-page__back',
+  title: 'report-detail-page__title',
+  meta: 'report-detail-page__meta',
+  tabList: 'report-detail-page__tab-list',
+  tab: 'report-detail-page__tab',
+  tabActive: 'report-detail-page__tab--active',
+  tabContent: 'report-detail-page__tab-content',
+  empty: 'report-detail-page__empty',
+} as const;

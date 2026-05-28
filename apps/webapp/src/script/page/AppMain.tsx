@@ -58,13 +58,14 @@ import {ForceReloadModal} from './components/ForceReloadModal/ForceReloadModal';
 import {WindowTitleUpdater} from './components/WindowTitleUpdater';
 import {LeftSidebar} from './LeftSidebar';
 import {TeamCreationModalContainer} from './LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationModalContainer';
-import {SidebarTabs, useSidebarStore} from './LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from './LeftSidebar/useSidebarStore';
 import {MainContent} from './MainContent';
 import {PanelEntity, PanelState, RightSidebar} from './RightSidebar';
 import {RootProvider} from './RootProvider';
 import {useAppMainState, ViewType} from './state';
 import {ContentState, useAppState} from './useAppState';
 
+import {bootstrapAi} from '../ai';
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {WallClock} from '../clock/wallClock';
@@ -250,11 +251,53 @@ export const AppMain = (properties: AppMainProps) => {
       useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_REPORT);
     };
 
+    const showJira = (): void => {
+      const {setContentState, setActiveJiraTicketKey} = useAppState.getState();
+      setActiveJiraTicketKey(null);
+      setContentState(ContentState.AI_JIRA);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_JIRA);
+    };
+
+    const showJiraTicket = (ticketKey: string): void => {
+      const {setContentState, setActiveJiraTicketKey} = useAppState.getState();
+      setActiveJiraTicketKey(ticketKey);
+      setContentState(ContentState.AI_JIRA);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_JIRA);
+    };
+
     const showReportDetail = (reportId: string): void => {
       const {setContentState, setActiveReportId} = useAppState.getState();
       setActiveReportId(reportId);
       setContentState(ContentState.AI_REPORT_DETAIL);
       useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_REPORT);
+    };
+
+    const showExportsList = (): void => {
+      const {setContentState, setActiveExportId} = useAppState.getState();
+      setActiveExportId(null);
+      setContentState(ContentState.AI_EXPORTS_LIST);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_EXPORTS);
+    };
+
+    const showExportCreate = (): void => {
+      const {setContentState, setActiveExportId} = useAppState.getState();
+      setActiveExportId(null);
+      setContentState(ContentState.AI_EXPORTS_CREATE);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_EXPORTS);
+    };
+
+    const showExportDetail = (id: string): void => {
+      const {setContentState, setActiveExportId} = useAppState.getState();
+      setActiveExportId(id);
+      setContentState(ContentState.AI_EXPORTS_CREATE);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_EXPORTS);
+    };
+
+    const showExportResult = (id: string): void => {
+      const {setContentState, setActiveExportId} = useAppState.getState();
+      setActiveExportId(id);
+      setContentState(ContentState.AI_EXPORTS_RESULT);
+      useSidebarStore.getState().setCurrentTab(SidebarTabs.AI_EXPORTS);
     };
 
     configureRoutes({
@@ -266,7 +309,13 @@ export const AppMain = (properties: AppMainProps) => {
       '/conversation/:conversationId/:domain/files/*path': showConversationFiles,
       '/conversation/:conversationId/files/*path': showConversationFiles,
       '/reports': showReportsList,
+      '/jira': showJira,
+      '/jira/:ticketKey': showJiraTicket,
       '/report/:reportId': showReportDetail,
+      '/exports': showExportsList,
+      '/exports/new': showExportCreate,
+      '/exports/:id/result': showExportResult,
+      '/exports/:id': showExportDetail,
       '/preferences/about': () => mainView.list.openPreferencesAbout(),
       '/preferences/account': () => mainView.list.openPreferencesAccount(),
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
@@ -316,6 +365,23 @@ export const AppMain = (properties: AppMainProps) => {
     if (!locked) {
       initializeApp();
     }
+  }, [locked]);
+
+  // Bootstrap AI subsystem once the app is unlocked and the database is available.
+  useEffect(() => {
+    if (locked) {
+      return;
+    }
+    const db = repositories.storage.storageService.db;
+    if (!db) {
+      return;
+    }
+    const aiCtx = bootstrapAi(db, conversationState, app.service.event, {
+      id: selfUser.id,
+      name: selfUser.name(),
+      handle: selfUser.username(),
+    });
+    void aiCtx.aiStorage.markRunningReportsInterrupted();
   }, [locked]);
 
   useE2EIFeatureConfigUpdate(repositories.team);

@@ -31,7 +31,7 @@ import {
   SidebarStatus,
   SidebarTabs,
   useSidebarStore,
-} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+} from 'src/script/page/LeftSidebar/useSidebarStore';
 import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';

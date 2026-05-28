@@ -46,6 +46,11 @@
       border-right: none;
     }
 
+    // AI tab pages are full-page — remove forced column width so the aside shrinks to the icon rail.
+    &--ai-tab {
+      min-width: 0;
+    }
+
     .team-mode & {
       width: calc(var(--conversation-list-width) + var(--teams-width));
     }

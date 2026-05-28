@@ -17,5 +17,7 @@
  *
  */
 
-export {PromptService} from './PromptService';
-export {CURRENT_TEMPLATE_VERSION} from './PromptService';
+export * from './PromptService';
+export * from './subReport.hbs';
+export * from './subReportIncremental.hbs';
+export * from './finalReport.hbs';

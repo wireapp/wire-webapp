@@ -19,7 +19,7 @@
 
 import * as Icon from 'Components/Icon';
 
-import {SidebarStatus, useSidebarStore} from '../useSidebarStore';
+import {SidebarStatus, useSidebarStore} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 export const FolderIcon = () => {
   const {status} = useSidebarStore();

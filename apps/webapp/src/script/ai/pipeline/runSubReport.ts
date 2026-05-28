@@ -19,11 +19,12 @@
 
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {EventService} from 'Repositories/event/EventService';
+import type {EventRecord} from 'Repositories/storage/record/EventRecord';
 
 import {SubReportToolArgsSchema} from '../domain/EntryTypes';
-import {OllamaToolCallMissingError, OllamaToolCallInvalidError} from '../ollama/errors';
-import type {OllamaClient} from '../ollama/OllamaClient';
+import {OllamaToolCallInvalidError, OllamaToolCallMissingError} from '../ollama/errors';
 import {SUB_REPORT_TOOL} from '../ollama/OllamaClient';
+import type {OllamaClient} from '../ollama/OllamaClient';
 import type {PromptService} from '../prompts/PromptService';
 import type {AiSettingsService} from '../settings/AiSettingsService';
 import type {AiStorageRepository} from '../storage/AiStorageRepository';
@@ -31,25 +32,16 @@ import type {AiConversationSubReportRecord} from '../storage/records';
 import {computeBudget} from '../tokenizer/budget';
 import {countTokens} from '../tokenizer/tokenize';
 import {truncateTranscript} from '../tokenizer/truncate';
-import {buildTranscriptLines} from '../transcript/buildTranscript';
+import {buildTranscriptLines, transcriptLinesToString, type SelfUserInfo} from '../transcript/buildTranscript';
 
+/** Placeholder injected into the prompt to measure overhead without the real transcript. */
 const TRANSCRIPT_PLACEHOLDER = '__TRANSCRIPT_PLACEHOLDER__';
 
-/**
- * Arguments for runSubReport.
- * @param sub Sub-report record to populate.
- * @param conversation Conversation being analyzed.
- * @param aiStorage Persists results.
- * @param aiSettings Reads token budgets and context size.
- * @param prompts Renders templates.
- * @param ollama LLM client.
- * @param eventService Loads conversation history.
- * @param signal Abort signal for pause control.
- * @param onStage Callback to update live progress label (D18).
- */
+/** Arguments for a single sub-report run. */
 export interface RunSubReportArgs {
   sub: AiConversationSubReportRecord;
   conversation: Conversation;
+  selfUser: SelfUserInfo;
   aiStorage: AiStorageRepository;
   aiSettings: AiSettingsService;
   prompts: PromptService;
@@ -60,30 +52,39 @@ export interface RunSubReportArgs {
 }
 
 /**
- * Runs the full sub-report pipeline for one conversation: load events → build transcript → apply budget → call LLM → parse → persist.
- * Throws OllamaToolCallMissingError / OllamaToolCallInvalidError on LLM failures (D26).
- * Caller handles errors by marking sub-report failed and checking 3-strike failure rule (D20).
+ * Processes a single conversation sub-report:
+ * loads events, builds + truncates transcript, renders prompt, calls Ollama, validates and persists.
  */
 export const runSubReport = async (args: RunSubReportArgs): Promise<void> => {
-  const {sub, conversation, aiStorage, aiSettings, prompts, ollama, eventService, signal, onStage} = args;
+  const {sub, conversation, selfUser, aiStorage, aiSettings, prompts, ollama, eventService, signal, onStage} = args;
   const settings = await aiSettings.getAll();
 
   onStage('Loading events');
-  const dbEvents = await eventService.loadPrecedingEvents(conversation.id, new Date(0), new Date(), 5000);
-  const events = Array.isArray(dbEvents) ? dbEvents : await dbEvents.toArray();
+  // loadPrecedingEvents always resolves to EventRecord[] at runtime; the return type is a union due to internal branching.
+  const events = (await eventService.loadPrecedingEvents(
+    conversation.id,
+    new Date(0),
+    new Date(),
+    5000,
+  )) as EventRecord[];
 
   onStage('Building transcript');
-  const lines = buildTranscriptLines(conversation, events);
+  const lines = buildTranscriptLines(conversation, events, selfUser);
   const lineStrings = lines.map(l => l.text);
   const rawTokens = countTokens(lineStrings.join('\n'));
 
-  const participants = conversation.participating_user_ets().map(u => ({
-    name: u.name?.() ?? '',
-    handle: u.handle ?? '',
+  // Build the overhead vars with a placeholder instead of the real transcript to measure prompt size.
+  const users = conversation.participating_user_ets();
+  const participants = users.map(u => ({
+    name: (u.name as (() => string) | undefined)?.() ?? '',
+    handle: (u as {handle?: string}).handle ?? '',
     qualified_id: u.qualifiedId,
   }));
   const conversationKind = conversation.is1to1?.() ? '1-to-1' : conversation.isChannel?.() ? 'channel' : 'group';
+
   const overheadVars = {
+    self_user_name: selfUser.name,
+    self_user_handle: selfUser.handle,
     user_job_description: settings.jobDescription,
     conversation_name: conversation.display_name(),
     conversation_kind: conversationKind,
@@ -93,11 +94,13 @@ export const runSubReport = async (args: RunSubReportArgs): Promise<void> => {
     example_tool_call_json: '{}',
     iso_now: new Date().toISOString(),
   };
-  const rendered = await prompts.render('sub_report', overheadVars);
-  const overheadTokens = countTokens(rendered.replace(TRANSCRIPT_PLACEHOLDER, ''));
+
+  const renderedOverhead = await prompts.render('sub_report', overheadVars);
+  const overheadTokens = countTokens(renderedOverhead.replace(TRANSCRIPT_PLACEHOLDER, ''));
 
   const reportRow = await aiStorage.getReport(sub.report_id);
   const contextSize = reportRow?.snapshot.context_size ?? settings.manualContextSize;
+
   const budget = computeBudget({
     contextSize,
     promptOverheadTokens: overheadTokens,
@@ -122,15 +125,31 @@ export const runSubReport = async (args: RunSubReportArgs): Promise<void> => {
             description: '...',
             start: '2026-01-01T00:00:00.000Z',
             end: '2026-01-01T01:00:00.000Z',
+            source_timestamp: '2026-01-01T00:00:00.000Z',
           },
-          {type: 'todo', title: '...', description: '...', created_at: '2026-01-01T00:00:00.000Z'},
-          {type: 'ticket', title: '...', description: '...', created_at: '2026-01-01T00:00:00.000Z'},
+          {
+            type: 'todo',
+            title: '...',
+            description: '...',
+            created_at: '2026-01-01T00:00:00.000Z',
+            source_timestamp: '2026-01-01T00:00:00.000Z',
+          },
+          {
+            type: 'ticket',
+            title: '...',
+            description: '...',
+            created_at: '2026-01-01T00:00:00.000Z',
+            source_timestamp: '2026-01-01T00:00:00.000Z',
+          },
         ],
       },
       null,
       2,
     ),
   });
+
+  // Suppress unused variable warning — transcriptLinesToString is part of the public API exported from this module's sibling.
+  void transcriptLinesToString;
 
   const response = await ollama.chat({
     messages: [{role: 'user', content: finalPrompt}],
@@ -145,8 +164,12 @@ export const runSubReport = async (args: RunSubReportArgs): Promise<void> => {
   if (!call) {
     throw new OllamaToolCallMissingError();
   }
+
   const rawArgs =
-    typeof call.function.arguments === 'string' ? JSON.parse(call.function.arguments) : call.function.arguments;
+    typeof call.function.arguments === 'string'
+      ? JSON.parse(call.function.arguments as string)
+      : call.function.arguments;
+
   const parse = SubReportToolArgsSchema.safeParse(rawArgs);
   if (!parse.success) {
     throw new OllamaToolCallInvalidError(parse.error.issues);
@@ -154,7 +177,7 @@ export const runSubReport = async (args: RunSubReportArgs): Promise<void> => {
 
   await aiStorage.updateSubReport(sub.id, {
     status: 'done',
-    entries: parse.data.entries,
+    entries: parse.data.entries.map(entry => ({...entry, id: crypto.randomUUID()})),
     stats: {
       ...sub.stats,
       raw_token_estimate: rawTokens,

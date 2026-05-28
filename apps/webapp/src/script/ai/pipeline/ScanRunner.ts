@@ -22,9 +22,12 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {EventService} from 'Repositories/event/EventService';
 import {getLogger} from 'Util/logger';
 
+import type {SelfUserInfo} from '../transcript/buildTranscript';
+
 import {ConsecutiveFailureTracker} from './ConsecutiveFailureTracker';
 import {runFinalReport} from './runFinalReport';
 import {runSubReport} from './runSubReport';
+import {runSubReportIncremental} from './runSubReportIncremental';
 import {selectConversationsToScan} from './selectConversationsToScan';
 
 import {OllamaModelMissingError} from '../ollama/errors';
@@ -36,15 +39,7 @@ import {useReportsStore} from '../stores/useReportsStore';
 
 const log = getLogger('AI/ScanRunner');
 
-/**
- * Dependencies for ScanRunner.
- * @param aiStorage Persists reports and sub-reports.
- * @param aiSettings Reads model, context size, token budgets.
- * @param prompts Renders templates for sub-report and final-report passes.
- * @param conversationState Provides conversation list.
- * @param eventService Loads conversation event history.
- * @param buildOllama Factory to build OllamaClient from current settings (allows URL refresh at scan time).
- */
+/** Dependencies injected into ScanRunner at construction time. */
 export interface ScanRunnerDeps {
   aiStorage: AiStorageRepository;
   aiSettings: AiSettingsService;
@@ -52,12 +47,13 @@ export interface ScanRunnerDeps {
   conversationState: ConversationState;
   eventService: EventService;
   buildOllama: () => Promise<OllamaClient>;
+  selfUser: SelfUserInfo;
 }
 
 /**
- * Stateful orchestrator for the full scan lifecycle: preflight → conversation selection → per-conversation sub-report passes → final merge pass.
- * Singleton held in bootstrap context; runs on main thread (D17).
- * Tracks consecutive failures (D20) and handles interruption/resume with final-pass statepreservation (D21).
+ * Module-level singleton orchestrating the AI scanning pipeline.
+ * Drives the per-conversation loop and the final-merge pass.
+ * Maintains a ConsecutiveFailureTracker that auto-pauses after 3 consecutive failures (D20).
  */
 export class ScanRunner {
   private currentReportId: string | null = null;
@@ -66,23 +62,18 @@ export class ScanRunner {
 
   constructor(private readonly deps: ScanRunnerDeps) {}
 
-  /** True if a scan is currently running. */
+  /** True while a scan is actively running. */
   get isRunning(): boolean {
     return this.currentReportId !== null;
   }
 
-  /**
-   * Starts a new scan. Throws if one is already running.
-   * Preflight checks model availability, selects target conversations, creates report with pending sub-reports, then launches driveScan asynchronously.
-   * Returns the report ID immediately; progress tracked via Dexie and Zustand.
-   * Throws OllamaModelMissingError if configured model is not installed.
-   */
+  /** Starts a new scan. Throws OllamaModelMissingError if the configured model is not installed. */
   async start(): Promise<string> {
     if (this.isRunning) {
       throw new Error('A scan is already running');
     }
-    const ollama = await this.deps.buildOllama();
 
+    const ollama = await this.deps.buildOllama();
     const models = await ollama.listModels();
     const model = await this.deps.aiSettings.getOllamaModel();
     if (!models.includes(model)) {
@@ -111,49 +102,99 @@ export class ScanRunner {
 
     for (const c of targets) {
       const cSettings = await this.deps.aiStorage.getConversationSettings(c.id);
-      await this.deps.aiStorage.createSubReport({
-        id: crypto.randomUUID(),
-        report_id: report.id,
-        conversation_id: c.id,
-        conversation_domain: c.domain ?? null,
-        conversation_name_snapshot: c.display_name(),
-        ai_description_snapshot: cSettings?.ai_description ?? '',
-        status: 'pending',
-        error: null,
-        entries: [],
-        stats: {
-          raw_token_estimate: 0,
-          truncated_token_estimate: 0,
-          message_count_before_truncation: 0,
-          message_count_after_truncation: 0,
-          started_at: null,
-          finished_at: null,
-        },
-        created_at: new Date().toISOString(),
-      });
+
+      const previous = await this.deps.aiStorage.findLatestDoneSubReportForConversation(c.id);
+      const scan_finished_ms = previous?.stats.finished_at
+        ? new Date(previous.stats.finished_at).getTime()
+        : 0;
+
+      if (previous !== undefined && c.last_event_timestamp() <= scan_finished_ms) {
+        // No new messages — reuse the previous sub-report wholesale (no LLM call needed).
+        log.info(`Reusing sub-report ${previous.id} for conversation ${c.id} — no new messages since last scan`);
+        await this.deps.aiStorage.createSubReport({
+          id: crypto.randomUUID(),
+          report_id: report.id,
+          conversation_id: c.id,
+          conversation_domain: c.domain ?? null,
+          conversation_name_snapshot: c.display_name(),
+          ai_description_snapshot: cSettings?.ai_description ?? '',
+          status: 'done',
+          error: null,
+          entries: previous.entries,
+          stats: previous.stats,
+          reused_from_sub_report_id: previous.id,
+          created_at: new Date().toISOString(),
+        });
+      } else if (previous !== undefined && previous.entries.length > 0) {
+        // New messages exist AND we have prior entries — use incremental scan to update in place.
+        log.info(`Incremental scan for conversation ${c.id} — previous sub-report ${previous.id} has entries`);
+        await this.deps.aiStorage.createSubReport({
+          id: crypto.randomUUID(),
+          report_id: report.id,
+          conversation_id: c.id,
+          conversation_domain: c.domain ?? null,
+          conversation_name_snapshot: c.display_name(),
+          ai_description_snapshot: cSettings?.ai_description ?? '',
+          status: 'pending',
+          error: null,
+          entries: [],
+          stats: {
+            raw_token_estimate: 0,
+            truncated_token_estimate: 0,
+            message_count_before_truncation: 0,
+            message_count_after_truncation: 0,
+            started_at: null,
+            finished_at: null,
+          },
+          // Carry forward previous entry_statuses so accept/hide decisions persist into the new scan.
+          entry_statuses: previous.entry_statuses,
+          created_at: new Date().toISOString(),
+        });
+      } else {
+        // No prior entries (first scan or previous scan produced nothing) — fresh scan.
+        await this.deps.aiStorage.createSubReport({
+          id: crypto.randomUUID(),
+          report_id: report.id,
+          conversation_id: c.id,
+          conversation_domain: c.domain ?? null,
+          conversation_name_snapshot: c.display_name(),
+          ai_description_snapshot: cSettings?.ai_description ?? '',
+          status: 'pending',
+          error: null,
+          entries: [],
+          stats: {
+            raw_token_estimate: 0,
+            truncated_token_estimate: 0,
+            message_count_before_truncation: 0,
+            message_count_after_truncation: 0,
+            started_at: null,
+            finished_at: null,
+          },
+          created_at: new Date().toISOString(),
+        });
+      }
     }
 
     this.currentReportId = report.id;
     this.abortController = new AbortController();
     this.tracker.reset();
+
     void this.driveScan(report.id, ollama, targets).catch((err: unknown) => {
       log.error(`Scan driver crashed: ${(err as Error).message}`);
     });
+
     return report.id;
   }
 
-  /**
-   * Resumes an interrupted report. Throws if not running and no report or wrong status.
-   * Reconstructs targets from persisted target list, detects if final-pass was started (D21),
-   * and launches driveScan with appropriate skip flags.
-   */
+  /** Resumes an interrupted scan from the next non-done sub-report. */
   async resume(reportId: string): Promise<void> {
     if (this.isRunning) {
       throw new Error('A scan is already running');
     }
+
     const report = await this.deps.aiStorage.getReport(reportId);
     if (!report) {
-      throw new Error(`No report ${reportId}`);
+      throw new Error(`No report found: ${reportId}`);
     }
     if (report.status !== 'interrupted') {
       throw new Error(`Report ${reportId} is not interrupted (status=${report.status})`);
@@ -170,23 +211,141 @@ export class ScanRunner {
     const allConvs = this.deps.conversationState.conversations();
     const targets = report.target_conversation_ids
       .map(id => allConvs.find(c => c.id === id))
-      .filter((c): c is NonNullable<typeof c> => Boolean(c));
+      .filter((c): c is Conversation => Boolean(c));
 
     this.currentReportId = reportId;
     this.abortController = new AbortController();
     this.tracker.reset();
-    void this.driveScan(reportId, ollama, targets, {
-      resume: true,
-      skipDoneSubReports: true,
-      jumpToFinalPass: report.final_pass_started_at !== null,
-    }).catch((err: unknown) => {
-      log.error(`Resume driver crashed: ${(err as Error).message}`);
-    });
+
+    // If final_pass_started_at is set, the sub-reports all completed — jump straight to final pass (D21 / Q&A R1 Q3).
+    const jumpToFinalPass = report.final_pass_started_at !== null;
+
+    void this.driveScan(reportId, ollama, targets, {jumpToFinalPass}).catch(
+      (err: unknown) => {
+        log.error(`Resume driver crashed: ${(err as Error).message}`);
+      },
+    );
   }
 
   /**
-   * Pauses the currently running scan. Synchronous; does not await the Dexie write.
+   * Re-runs only the final-merge LLM pass for an existing report, replacing its final entries.
+   * Useful when the prompt has changed or the previous final pass produced wrong results.
+   * Blocked while any scan is already running.
    */
+  async rerunFinalPass(reportId: string): Promise<void> {
+    if (this.isRunning) {
+      throw new Error('Cannot re-run final pass while a scan is running');
+    }
+
+    const report = await this.deps.aiStorage.getReport(reportId);
+    if (!report) {
+      throw new Error(`No report found: ${reportId}`);
+    }
+
+    const ollama = await this.deps.buildOllama();
+
+    this.currentReportId = reportId;
+    this.abortController = new AbortController();
+
+    await this.deps.aiStorage.updateReport(reportId, {
+      status: 'scanning',
+      error: null,
+      final_pass_started_at: new Date().toISOString(),
+      final_pass_finished_at: null,
+    });
+    await this.deps.aiStorage.deleteFinalEntries(reportId);
+
+    try {
+      await runFinalReport({
+        reportId,
+        aiStorage: this.deps.aiStorage,
+        aiSettings: this.deps.aiSettings,
+        prompts: this.deps.prompts,
+        ollama,
+        signal: this.abortController.signal,
+      });
+      await this.deps.aiStorage.updateReport(reportId, {
+        status: 'finished',
+        finished_at: new Date().toISOString(),
+        final_pass_finished_at: new Date().toISOString(),
+      });
+      log.info(`Final pass re-run succeeded for report ${reportId}`);
+    } catch (err) {
+      log.error(`Final pass re-run failed for report ${reportId}: ${(err as Error).message}`);
+      await this.deps.aiStorage.updateReport(reportId, {
+        status: 'interrupted',
+        error: `Final pass failed: ${(err as Error).message}`,
+      });
+    } finally {
+      this.currentReportId = null;
+      this.abortController = null;
+    }
+  }
+
+  /**
+   * Retries a single failed sub-report without starting a full scan.
+   * Blocked while a full scan is running to avoid concurrent Ollama calls.
+   */
+  async retrySingleSubReport(subReportId: string): Promise<void> {
+    if (this.isRunning) {
+      throw new Error('Cannot retry while a full scan is running');
+    }
+
+    const sub = await this.deps.aiStorage.getSubReport(subReportId);
+    if (!sub) {
+      throw new Error(`Sub-report not found: ${subReportId}`);
+    }
+
+    const conversation = this.deps.conversationState.conversations().find(c => c.id === sub.conversation_id);
+    if (!conversation) {
+      throw new Error(`Conversation not found in state: ${sub.conversation_id}`);
+    }
+
+    const ollama = await this.deps.buildOllama();
+    const liveStore = useReportsStore;
+
+    await this.deps.aiStorage.updateSubReport(subReportId, {
+      status: 'running',
+      error: null,
+      stats: {...sub.stats, started_at: new Date().toISOString()},
+    });
+
+    liveStore.setState(s => ({liveStage: {...s.liveStage, [conversation.id]: 'Loading events'}}));
+
+    const abortController = new AbortController();
+
+    try {
+      await runSubReport({
+        sub,
+        conversation,
+        selfUser: this.deps.selfUser,
+        aiStorage: this.deps.aiStorage,
+        aiSettings: this.deps.aiSettings,
+        prompts: this.deps.prompts,
+        ollama,
+        eventService: this.deps.eventService,
+        signal: abortController.signal,
+        onStage: stage => liveStore.setState(s => ({liveStage: {...s.liveStage, [conversation.id]: stage}})),
+      });
+      log.info(`Retry succeeded for sub-report ${subReportId}`);
+    } catch (err) {
+      log.error(`Retry failed for sub-report ${subReportId}: ${(err as Error).message}`);
+      const current = await this.deps.aiStorage.getSubReport(subReportId);
+      await this.deps.aiStorage.updateSubReport(subReportId, {
+        status: 'failed',
+        error: (err as Error).message,
+        stats: {...(current?.stats ?? sub.stats), finished_at: new Date().toISOString()},
+      });
+    } finally {
+      liveStore.setState(s => {
+        const next = {...s.liveStage};
+        delete next[conversation.id];
+        return {liveStage: next};
+      });
+    }
+  }
+
+  /** Pauses the running scan and marks it interrupted. */
   pause(): void {
     this.abortController?.abort();
     if (this.currentReportId) {
@@ -199,36 +358,52 @@ export class ScanRunner {
   private async driveScan(
     reportId: string,
     ollama: OllamaClient,
-    targets: ReadonlyArray<{id: string; display_name: () => string; participating_user_ets: () => unknown[]}>,
-    options: {resume?: boolean; skipDoneSubReports?: boolean; jumpToFinalPass?: boolean} = {},
+    targets: Conversation[],
+    options: {jumpToFinalPass?: boolean} = {},
   ): Promise<void> {
     const liveStore = useReportsStore;
 
-    try {
-      if (!options.jumpToFinalPass) {
-        for (const c of targets) {
-          if (this.abortController?.signal.aborted) {
-            return;
-          }
-          const sub = await this.deps.aiStorage.getSubReportForConversation(reportId, c.id);
-          if (!sub) {
-            continue;
-          }
-          if (options.skipDoneSubReports && sub.status === 'done') {
-            continue;
-          }
+    if (!options.jumpToFinalPass) {
+      for (const c of targets) {
+        if (this.abortController?.signal.aborted) {
+          return;
+        }
 
-          liveStore.setState(s => ({liveStage: {...s.liveStage, [c.id]: 'Loading events'}}));
-          await this.deps.aiStorage.updateSubReport(sub.id, {
-            status: 'running',
-            error: null,
-            stats: {...sub.stats, started_at: new Date().toISOString()},
-          });
+        const sub = await this.deps.aiStorage.getSubReportForConversation(reportId, c.id);
+        if (!sub) {
+          continue;
+        }
+        if (sub.status === 'done') {
+          continue;
+        }
 
-          try {
-            await runSubReport({
+        liveStore.setState(s => ({liveStage: {...s.liveStage, [c.id]: 'Loading events'}}));
+
+        await this.deps.aiStorage.updateSubReport(sub.id, {
+          status: 'running',
+          error: null,
+          stats: {...sub.stats, started_at: new Date().toISOString()},
+        });
+
+        try {
+          // Determine whether to run incrementally: if a previous scan produced entries
+          // for this conversation and this sub-report is a fresh pending one (not a reuse).
+          const previous_for_incremental =
+            !sub.reused_from_sub_report_id
+              ? await this.deps.aiStorage.findLatestDoneSubReportForConversation(c.id)
+              : undefined;
+
+          const use_incremental =
+            previous_for_incremental !== undefined &&
+            previous_for_incremental.id !== sub.id &&
+            previous_for_incremental.entries.length > 0;
+
+          if (use_incremental && previous_for_incremental) {
+            await runSubReportIncremental({
               sub,
-              conversation: c as unknown as Conversation,
+              previousEntries: previous_for_incremental.entries,
+              conversation: c,
+              selfUser: this.deps.selfUser,
               aiStorage: this.deps.aiStorage,
               aiSettings: this.deps.aiSettings,
               prompts: this.deps.prompts,
@@ -237,63 +412,83 @@ export class ScanRunner {
               signal: this.abortController!.signal,
               onStage: stage => liveStore.setState(s => ({liveStage: {...s.liveStage, [c.id]: stage}})),
             });
-            this.tracker.recordSuccess();
-          } catch (err) {
-            await this.deps.aiStorage.updateSubReport(sub.id, {
-              status: 'failed',
-              error: (err as Error).message,
-              stats: {...sub.stats, finished_at: new Date().toISOString()},
-            });
-            if (this.tracker.recordFailure()) {
-              log.error('Three consecutive failures — pausing scan');
-              await this.deps.aiStorage.updateReport(reportId, {
-                status: 'interrupted',
-                error: 'Three consecutive sub-report failures',
-              });
-              this.currentReportId = null;
-              liveStore.setState({liveStage: {}});
-              return;
-            }
-          } finally {
-            liveStore.setState(s => {
-              const next = {...s.liveStage};
-              delete next[c.id];
-              return {liveStage: next};
+          } else {
+            await runSubReport({
+              sub,
+              conversation: c,
+              selfUser: this.deps.selfUser,
+              aiStorage: this.deps.aiStorage,
+              aiSettings: this.deps.aiSettings,
+              prompts: this.deps.prompts,
+              ollama,
+              eventService: this.deps.eventService,
+              signal: this.abortController!.signal,
+              onStage: stage => liveStore.setState(s => ({liveStage: {...s.liveStage, [c.id]: stage}})),
             });
           }
+          this.tracker.recordSuccess();
+          log.info(`Sub-report done for conversation ${c.id}`);
+        } catch (err) {
+          log.error(`Sub-report failed for conversation ${c.id}: ${(err as Error).message}`);
+          await this.deps.aiStorage.updateSubReport(sub.id, {
+            status: 'failed',
+            error: (err as Error).message,
+            stats: {...sub.stats, finished_at: new Date().toISOString()},
+          });
+
+          if (this.tracker.recordFailure()) {
+            log.error('Three consecutive failures — pausing scan');
+            await this.deps.aiStorage.updateReport(reportId, {
+              status: 'interrupted',
+              error: 'Three consecutive sub-report failures',
+            });
+            this.currentReportId = null;
+            liveStore.setState({liveStage: {}});
+            return;
+          }
+        } finally {
+          liveStore.setState(s => {
+            const next = {...s.liveStage};
+            delete next[c.id];
+            return {liveStage: next};
+          });
         }
       }
+    }
 
-      const reportRow = await this.deps.aiStorage.getReport(reportId);
-      if (!reportRow) {
-        return;
-      }
-      if (this.abortController?.signal.aborted) {
-        return;
-      }
+    if (this.abortController?.signal.aborted) {
+      return;
+    }
 
-      try {
-        await this.deps.aiStorage.updateReport(reportId, {final_pass_started_at: new Date().toISOString()});
-        await this.deps.aiStorage.deleteFinalEntries(reportId);
-        await runFinalReport({
-          reportId,
-          aiStorage: this.deps.aiStorage,
-          aiSettings: this.deps.aiSettings,
-          prompts: this.deps.prompts,
-          ollama,
-          signal: this.abortController!.signal,
-        });
-        await this.deps.aiStorage.updateReport(reportId, {
-          status: 'finished',
-          finished_at: new Date().toISOString(),
-          final_pass_finished_at: new Date().toISOString(),
-        });
-      } catch (err) {
-        await this.deps.aiStorage.updateReport(reportId, {
-          status: 'interrupted',
-          error: `Final pass failed: ${(err as Error).message}`,
-        });
-      }
+    try {
+      log.info(`Starting final pass for report ${reportId}`);
+      await this.deps.aiStorage.updateReport(reportId, {final_pass_started_at: new Date().toISOString()});
+
+      // On resume, delete any prior final entries before re-running (D25 / Q&A R1 Q5).
+      await this.deps.aiStorage.deleteFinalEntries(reportId);
+
+      await runFinalReport({
+        reportId,
+        aiStorage: this.deps.aiStorage,
+        aiSettings: this.deps.aiSettings,
+        prompts: this.deps.prompts,
+        ollama,
+        signal: this.abortController!.signal,
+      });
+
+      await this.deps.aiStorage.updateReport(reportId, {
+        status: 'finished',
+        finished_at: new Date().toISOString(),
+        final_pass_finished_at: new Date().toISOString(),
+      });
+      log.info(`Scan ${reportId} finished`);
+    } catch (err) {
+      // Final-pass failure leaves the report interrupted with final_pass_started_at set (D21).
+      log.error(`Final pass failed for report ${reportId}: ${(err as Error).message}`);
+      await this.deps.aiStorage.updateReport(reportId, {
+        status: 'interrupted',
+        error: `Final pass failed: ${(err as Error).message}`,
+      });
     } finally {
       this.currentReportId = null;
       this.abortController = null;

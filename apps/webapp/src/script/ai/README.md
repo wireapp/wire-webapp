@@ -1,7 +1,7 @@
-# AI Feature
+AI scanning analyses Wire conversations locally via Ollama and produces per-conversation reports with summaries, action items, and tickets. Nothing leaves the device.
 
-> Full implementation plan: `docs/tasks/01-basic-ai-scanning.task.md`
+Main entry points: `ScanRunner` in `pipeline/` orchestrates scans; `AiStorageRepository` in `storage/` persists all data to IndexedDB (Dexie v22). UI routes live under `ui/` — list at `#/reports`, detail at `#/reports/:id`, preferences at `#/preferences/ai`.
 
-**What**: Local-only "Reports" feature using a locally running Ollama LLM to scan Wire conversations.
-**Where**: All new code lives under `src/script/ai/`. Dexie tables added as schema version 22.
-**How**: See the task document linked above for the complete architecture and phase-by-phase plan.
+To trigger a scan: click the Reports tab in the Wire sidebar, then click the Scan button. Requires Ollama running locally (default `http://localhost:11434`) with a supported model (default `qwen3.6:35b`).
+
+See `docs/tasks/01-basic-ai-scanning.task.md` for full specification.

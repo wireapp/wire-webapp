@@ -32,6 +32,7 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
+import {AiDescriptionPanel} from 'src/script/ai/ui/ConversationAiOptions/AiDescriptionPanel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {Access} from './access/access';
@@ -80,6 +81,7 @@ export enum PanelState {
   TIMED_MESSAGES = 'TIMED_MESSAGES',
   ACCESS = 'ACCESS',
   CONVERSATION_HISTORY = 'CONVERSATION_HISTORY',
+  AI_DESCRIPTION = 'AI_DESCRIPTION',
 }
 
 export type PanelEntity = Conversation | User | Message | ServiceEntity;
@@ -347,6 +349,10 @@ const RightSidebar: FC<RightSidebarProps> = ({
           )}
           {currentState === PanelState.CONVERSATION_HISTORY && (
             <ConversationHistory onClose={closePanel} onGoBack={onBackClick} />
+          )}
+
+          {currentState === PanelState.AI_DESCRIPTION && (
+            <AiDescriptionPanel conversation={activeConversation} onClose={closePanel} onGoBack={onBackClick} />
           )}
         </>
       </Animated>

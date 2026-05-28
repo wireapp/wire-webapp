@@ -22,9 +22,11 @@ interface ProgressBarProps {
   total: number;
 }
 
+const PERCENT_MULTIPLIER = 100;
+
 /** Reusable horizontal progress bar showing done/total ratio. Guards against total=0. */
 export const ProgressBar = ({done, total}: ProgressBarProps) => {
-  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  const pct = total > 0 ? Math.min(100, Math.round((done / total) * PERCENT_MULTIPLIER)) : 0;
 
   return (
     <div

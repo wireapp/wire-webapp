@@ -17,30 +17,27 @@
  *
  */
 
+/** Inputs for computing the token budget available for the transcript. */
 export interface BudgetInputs {
-  /** The model's total context window in tokens, sourced from Ollama /api/show or a fallback setting. */
+  /** Context window size from Ollama /api/show or the fallback manual setting. */
   contextSize: number;
-  /** Token count of the static prompt (system instruction, framing) measured with the conversation block stripped. */
+  /** Token count of the prompt with the transcript block stripped (measured separately). */
   promptOverheadTokens: number;
-  /** Fraction to withhold from context (e.g., 0.2 for 20% safety margin). */
+  /** Safety margin fraction, e.g. 0.2 for 20%. */
   safetyMarginPct: number;
 }
 
+/** Result of computeBudget. */
 export interface Budget {
-  /** The effective context size after subtracting the safety margin. */
+  /** Total tokens allowed after applying the safety margin. */
   totalAllowed: number;
-  /** The number of tokens available for transcript content (totalAllowed - promptOverheadTokens, clamped to ≥ 0). */
+  /** Tokens available for the transcript (totalAllowed minus promptOverheadTokens). */
   forTranscript: number;
 }
 
 /**
- * Computes the token budget for a given model context size and overhead.
- * @param contextSize The model's total context window in tokens.
- * @param promptOverheadTokens The token cost of the static prompt structure (measured with conversation block stripped).
- * @param safetyMarginPct The fraction to withhold for safety (e.g., 0.2 for 20%). With safetyMarginPct = 0.2, the effective context is 80% of the reported context size.
- * @returns A Budget object with totalAllowed and forTranscript fields.
- * @note forTranscript is clamped to ≥ 0 using Math.max(0, ...) to prevent infinite loops in truncateTranscript.
- * forTranscript represents the token budget available exclusively for transcript lines.
+ * Computes how many tokens are available for the conversation transcript.
+ * Applies a safety margin to guard against token-count estimation inaccuracy.
  */
 export const computeBudget = ({contextSize, promptOverheadTokens, safetyMarginPct}: BudgetInputs): Budget => {
   const totalAllowed = Math.floor(contextSize * (1 - safetyMarginPct));

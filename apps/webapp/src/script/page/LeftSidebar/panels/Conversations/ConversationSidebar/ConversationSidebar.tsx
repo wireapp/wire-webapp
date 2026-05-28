@@ -34,7 +34,7 @@ import {
 import {ContentState} from '../../../../useAppState';
 import {UserDetails} from '../../../UserDetails';
 import {ConversationTabs} from '../ConversationTabs';
-import {SidebarTabs} from '../useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 type ConversationSidebarProps = {
   isOpen: boolean;

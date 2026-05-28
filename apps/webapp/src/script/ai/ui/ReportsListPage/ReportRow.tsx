@@ -17,14 +17,17 @@
  *
  */
 
+import {useState} from 'react';
+
+import * as ContextMenu from '@radix-ui/react-context-menu';
 import {format} from 'date-fns';
 import {useLiveQuery} from 'dexie-react-hooks';
 
+import {useAppNotification} from 'Components/AppNotification';
 import {useAi} from 'src/script/ai';
 import type {ReportStatus} from 'src/script/ai/domain/ReportStatus';
 import {OllamaUnreachableError, OllamaModelMissingError} from 'src/script/ai/ollama/errors';
-import type {AiReportRecord} from 'src/script/ai/storage/records';
-import {PrimaryModal} from 'src/script/components/Modals/PrimaryModal';
+import type {AiReportRecord} from 'src/script/ai/storage/records/AiReportRecord';
 import {generateReportDetailUrl} from 'src/script/router/routeGenerator';
 import {navigate} from 'src/script/router/Router';
 import {getLogger} from 'Util/logger';
@@ -42,15 +45,7 @@ const STATUS_COLORS: Record<ReportStatus, string> = {
   failed: '#ef4444',
 };
 
-interface ReportRowProps {
-  report: AiReportRecord;
-}
-
-interface StatusBadgeProps {
-  status: ReportStatus;
-}
-
-const StatusBadge = ({status}: StatusBadgeProps) => (
+const StatusBadge = ({status}: {status: ReportStatus}) => (
   <span
     style={{
       backgroundColor: STATUS_COLORS[status],
@@ -66,9 +61,16 @@ const StatusBadge = ({status}: StatusBadgeProps) => (
   </span>
 );
 
-/** A single row in the Reports list. Shows date title, status badge, optional live progress bar (while scanning), and navigation controls. */
+interface ReportRowProps {
+  report: AiReportRecord;
+}
+
+/** A single table row in the Reports list. The entire row is clickable to open the report detail page. */
 export const ReportRow = ({report}: ReportRowProps) => {
   const {aiStorage, scanRunner} = useAi();
+  const [isResuming, setIsResuming] = useState(false);
+  const notification = useAppNotification();
+
   const subReports =
     useLiveQuery(
       () => (report.status === 'scanning' ? aiStorage.listSubReports(report.id) : Promise.resolve([])),
@@ -76,66 +78,78 @@ export const ReportRow = ({report}: ReportRowProps) => {
     ) ?? [];
 
   const total = report.target_conversation_ids.length;
-  const done = subReports.filter(s => s.status === 'done').length;
+  const done = subReports.filter(subReport => subReport.status === 'done').length;
 
-  const handleResume = async () => {
+  const handleNavigate = () => navigate(generateReportDetailUrl(report.id));
+
+  const handleResume = async (event: React.MouseEvent) => {
+    // Prevent the row click from also navigating when resuming.
+    event.stopPropagation();
+    setIsResuming(true);
     try {
       await scanRunner.resume(report.id);
     } catch (error) {
       if (error instanceof OllamaUnreachableError) {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            title: 'Ollama Error',
-            message: 'Cannot reach Ollama. Check that Ollama is running at the configured URL.',
-          },
-        });
+        notification.show({message: 'Cannot reach Ollama. Check that Ollama is running at the configured URL.'});
       } else if (error instanceof OllamaModelMissingError) {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          text: {
-            title: 'Model Error',
-            message: 'The configured Ollama model is not installed. Go to AI Preferences to change the model.',
-          },
+        notification.show({
+          message: 'The configured Ollama model is not installed. Go to AI Preferences to change the model.',
         });
       } else {
-        log.error('Unexpected error in ReportRow.handleResume', error);
+        log.error('Unexpected error in ReportRow resume:', error);
       }
+    } finally {
+      setIsResuming(false);
+    }
+  };
+
+  const handleChevronClick = (event: React.MouseEvent) => {
+    // Stop propagation so the row onClick doesn't fire a second time.
+    event.stopPropagation();
+    handleNavigate();
+  };
+
+  const handleDelete = async () => {
+    try {
+      await aiStorage.deleteReport(report.id);
+    } catch (error) {
+      log.error('Unexpected error deleting report:', error);
+      notification.show({message: 'Failed to delete report. Please try again.'});
     }
   };
 
   return (
-    <div className={styles.row} style={{display: 'flex', alignItems: 'center', gap: '16px', padding: '12px'}}>
-      <div className={styles.rowLeft} style={{flex: '0 0 auto'}}>
-        <span className={styles.rowTitle} style={{display: 'block', marginBottom: '8px'}}>
-          Report from {format(new Date(report.created_at), 'PP p')}
-        </span>
-        <StatusBadge status={report.status} />
-      </div>
-
-      {report.status === 'scanning' && (
-        <div className={styles.rowMiddle} style={{flex: '1'}}>
-          <ProgressBar done={done} total={total} />
-        </div>
-      )}
-
-      <div className={styles.rowRight} style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-        {report.status === 'interrupted' && (
-          <button
-            className={styles.rowResume}
-            onClick={handleResume}
-            style={{padding: '4px 8px', fontSize: '0.875rem'}}
-          >
-            Resume
-          </button>
-        )}
-        <button
-          className={styles.rowChevron}
-          onClick={() => navigate(generateReportDetailUrl(report.id))}
-          aria-label="View report details"
-          style={{padding: '4px 8px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem'}}
-        >
-          ›
-        </button>
-      </div>
-    </div>
+    <ContextMenu.Root>
+      <ContextMenu.Trigger asChild>
+        <tr className={styles.row} onClick={handleNavigate}>
+          <td className={styles.rowTitle}>{format(new Date(report.created_at), 'PP p')}</td>
+          <td>
+            <StatusBadge status={report.status} />
+          </td>
+          <td className={styles.rowMiddle}>
+            {report.status === 'scanning' && <ProgressBar done={done} total={total} />}
+          </td>
+          <td>
+            <div className={styles.rowRight}>
+              {report.status === 'interrupted' && (
+                <button className={styles.rowResume} onClick={handleResume} disabled={isResuming}>
+                  {isResuming ? 'Resuming...' : 'Resume'}
+                </button>
+              )}
+              <button onClick={handleChevronClick} aria-label="View report details" className={styles.rowChevron}>
+                ›
+              </button>
+            </div>
+          </td>
+        </tr>
+      </ContextMenu.Trigger>
+      <ContextMenu.Portal>
+        <ContextMenu.Content className={styles.contextMenuContent}>
+          <ContextMenu.Item className={styles.contextMenuItemDestructive} onSelect={handleDelete}>
+            Delete
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Portal>
+    </ContextMenu.Root>
   );
 };

@@ -38,7 +38,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
 import {UserRepository} from 'Repositories/user/UserRepository';
 import {UserState} from 'Repositories/user/UserState';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/useSidebarStore';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
 import {t} from 'Util/localizerUtil';
 

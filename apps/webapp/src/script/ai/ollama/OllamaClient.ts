@@ -21,76 +21,148 @@ import {zodToJsonSchema} from 'zod-to-json-schema';
 
 import {getLogger} from 'Util/logger';
 
-import {OllamaUnreachableError, OllamaModelMissingError} from './errors';
+import {OllamaModelMissingError, OllamaUnreachableError} from './errors';
+import type {OllamaChatArgs, OllamaChatResponse, OllamaModelInfo} from './OllamaTypes';
 
-import {SubReportToolArgsSchema, FinalReportToolArgsSchema} from '../domain/EntryTypes';
+import {FinalReportToolArgsSchema, SubReportIncrementalToolArgsSchema, SubReportToolArgsSchema} from '../domain/EntryTypes';
 
 const log = getLogger('AI/Ollama');
 
-/**
- * Represents a single message in the conversation history sent to Ollama.
- * Maps directly to the Ollama chat API message shape.
- */
-export interface OllamaChatMessage {
-  role: 'system' | 'user' | 'assistant' | 'tool';
-  content: string;
+interface OllamaToolDefinition {
+  type: string;
+  function: {name: string; description: string; parameters: unknown};
 }
 
-/**
- * Represents a tool call returned by Ollama in the response.
- * The arguments field is typed as unknown because Ollama may return either
- * a JSON object or a JSON-encoded string depending on server version.
- * The pipeline layer above this client normalizes it.
- */
-export interface OllamaToolCall {
-  function: {name: string; arguments: unknown};
+/** Raw entry from GET /api/tags models array. */
+interface OllamaTagEntry {
+  name: string;
+  size: number;
+  details?: {parameter_size?: string; quantization_level?: string};
 }
 
-/**
- * The full response from Ollama's /api/chat endpoint.
- * Includes message content, optional tool calls, completion flag, and optional timing metrics.
- */
-export interface OllamaChatResponse {
-  message: {
-    content: string;
-    tool_calls?: OllamaToolCall[];
+/** Raw response body from POST /api/show. */
+interface OllamaShowResponse {
+  model_info?: Record<string, unknown>;
+  parameters?: string;
+  template?: string;
+  modelfile?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Module-level helpers for parsing /api/show data into OllamaModelInfo fields
+// ---------------------------------------------------------------------------
+
+function parseContextLength(modelInfo: Record<string, unknown>): number | null {
+  for (const key of Object.keys(modelInfo)) {
+    const value = modelInfo[key];
+    // Nested form: model_info.<arch> = { context_length: number, ... }
+    if (typeof value === 'object' && value !== null && 'context_length' in value) {
+      const ctx = (value as {context_length: unknown}).context_length;
+      if (typeof ctx === 'number' && ctx > 0) {
+        return ctx;
+      }
+    }
+    // Flat form: model_info['<arch>.context_length'] = number
+    if (typeof value === 'number' && key.endsWith('.context_length')) {
+      return value;
+    }
+  }
+  return null;
+}
+
+function parseMaxOutputTokens(parameters: string | undefined): number | null {
+  if (!parameters) {
+    return null;
+  }
+  const match = /num_predict\s+(\d+)/.exec(parameters);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+function detectToolSupport(template: string): boolean {
+  return template.includes('.Tools');
+}
+
+function detectThinkingSupport(template: string, modelfile: string): boolean {
+  return template.includes('.Think') || template.includes('IsThinkSet') || /RENDERER\s+\S/.test(modelfile);
+}
+
+function buildModelInfo(entry: OllamaTagEntry, show: OllamaShowResponse | null): OllamaModelInfo {
+  return {
+    name: entry.name,
+    sizeBytes: entry.size,
+    parameterSize: entry.details?.parameter_size ?? '',
+    quantization: entry.details?.quantization_level ?? '',
+    contextLength: show !== null ? parseContextLength(show.model_info ?? {}) : null,
+    maxOutputTokens: show !== null ? parseMaxOutputTokens(show.parameters) : null,
+    supportsTools: show !== null ? detectToolSupport(show.template ?? '') : null,
+    supportsThinking: show !== null ? detectThinkingSupport(show.template ?? '', show.modelfile ?? '') : null,
   };
-  done: boolean;
-  total_duration?: number;
-  prompt_eval_count?: number;
-  eval_count?: number;
 }
 
 /**
- * Arguments for the OllamaClient.chat() method.
- * toolChoice defaults to 'auto' (Q&A R1 Q8 / D26) and must not be 'required'.
+ * Converts a Zod schema to an OpenAPI-3 JSON Schema object.
+ * @remarks `zodToJsonSchema` has deeply-nested generic overloads that trigger TS2589
+ * ("Type instantiation is excessively deep"); the `as any` cast is the library-recommended workaround.
+ * The returned shape is always a plain JSON-serialisable object passed verbatim to Ollama.
  */
-export interface OllamaChatArgs {
-  messages: OllamaChatMessage[];
-  tools: unknown[];
-  /** ollama-side option: forces tool call. Default 'auto' (Q&A R1 Q8 / D26). */
-  toolChoice?: 'auto' | 'required';
-  /** ollama 'num_ctx' override */
-  numCtx?: number;
-  signal?: AbortSignal;
-}
+const schemaToJsonSchema = (schema: unknown): unknown => (zodToJsonSchema as any)(schema, {target: 'openApi3'});
 
-/**
- * HTTP client for Ollama endpoints.
- * Provides three core methods: listModels, getContextLength, and chat.
- */
+/** Ollama tool definition for the per-conversation sub-report LLM call. */
+export const SUB_REPORT_TOOL: OllamaToolDefinition = {
+  type: 'function',
+  function: {
+    name: 'report_completion',
+    description: 'Submit the array of report entries extracted from the conversation.',
+    parameters: schemaToJsonSchema(SubReportToolArgsSchema),
+  },
+};
+
+/** Ollama tool definition for incremental re-scan: create new entries or update existing ones. */
+export const SUB_REPORT_INCREMENTAL_TOOL: OllamaToolDefinition = {
+  type: 'function',
+  function: {
+    name: 'report_completion',
+    description:
+      'Submit the list of actions (create or update) for this incremental scan pass. Omit entries that require no change.',
+    parameters: schemaToJsonSchema(SubReportIncrementalToolArgsSchema),
+  },
+};
+
+/** Ollama tool definition for the final-merge LLM call. */
+export const FINAL_REPORT_TOOL: OllamaToolDefinition = {
+  type: 'function',
+  function: {
+    name: 'report_completion',
+    description: 'Submit the merged, deduplicated final array of report entries.',
+    parameters: schemaToJsonSchema(FinalReportToolArgsSchema),
+  },
+};
+
+/** HTTP client for the local Ollama API. */
 export class OllamaClient {
+  /** Resolved base URL for all fetch calls. On HTTPS pages, routes through the Wire server proxy to avoid mixed-content blocking. */
+  private readonly fetchBase: string;
+
   constructor(
     private readonly url: string,
     private readonly model: string,
-  ) {}
+  ) {
+    // typeof window check guards against jsdom in tests (which have window but no real location).
+    const isHttpsPage = typeof window !== 'undefined' && window.location?.protocol === 'https:';
+    this.fetchBase = isHttpsPage ? '/proxy/ollama' : url;
+  }
 
-  /** Verifies reachability + returns available model names. */
+  /** Extra headers required when routing through the server proxy. */
+  private get proxyHeaders(): Record<string, string> {
+    return this.fetchBase !== this.url ? {'X-Ollama-Target': this.url} : {};
+  }
+
+  /** Hits /api/tags to verify reachability and returns installed model names. */
   async listModels(): Promise<string[]> {
     try {
-      const res = await fetch(`${this.url}/api/tags`);
+      const res = await fetch(`${this.fetchBase}/api/tags`, {headers: this.proxyHeaders});
       if (!res.ok) {
-        throw new OllamaUnreachableError(`/api/tags status ${res.status}`);
+        throw new OllamaUnreachableError(`/api/tags returned status ${res.status}`);
       }
       const json = (await res.json()) as {models?: Array<{name: string}>};
       return (json.models ?? []).map(m => m.name);
@@ -103,41 +175,93 @@ export class OllamaClient {
   }
 
   /**
-   * Calls /api/show. Tries to extract context_length from the first model_info architecture
-   * key whose value has `context_length` (Q&A R1 Q9 / D15).
-   * Handles both nested form (older Ollama) and flat form (newer Ollama).
+   * Calls /api/show and extracts context_length from model_info.
+   * Returns null if context_length cannot be determined.
    */
   async getContextLength(): Promise<number | null> {
-    const res = await fetch(`${this.url}/api/show`, {
+    const res = await fetch(`${this.fetchBase}/api/show`, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {'Content-Type': 'application/json', ...this.proxyHeaders},
       body: JSON.stringify({model: this.model}),
     });
     if (!res.ok) {
       if (res.status === 404) {
         throw new OllamaModelMissingError(this.model);
       }
-      throw new OllamaUnreachableError(`/api/show status ${res.status}`);
+      throw new OllamaUnreachableError(`/api/show returned status ${res.status}`);
     }
-    const json = (await res.json()) as {model_info?: Record<string, unknown>};
-    const modelInfo = json.model_info ?? {};
-    for (const key of Object.keys(modelInfo)) {
-      const value = modelInfo[key];
-      if (typeof value === 'object' && value !== null && 'context_length' in value) {
-        const ctx = (value as {context_length: unknown}).context_length;
-        if (typeof ctx === 'number' && ctx > 0) {
-          return ctx;
-        }
-      }
-      // Some Ollama versions place context_length at the top level keyed `<arch>.context_length`.
-      if (typeof value === 'number' && key.endsWith('.context_length')) {
-        return value;
-      }
-    }
-    return null;
+    const json = (await res.json()) as OllamaShowResponse;
+    return parseContextLength(json.model_info ?? {});
   }
 
-  /** Sends one chat request with tool definitions, returns the parsed message. */
+  /**
+   * Fetches the model list from /api/tags then calls /api/show in parallel for each model
+   * to collect rich metadata (context length, tool/thinking support, etc.).
+   */
+  async listModelsWithDetails(): Promise<OllamaModelInfo[]> {
+    let tagsRes: Response;
+    try {
+      tagsRes = await fetch(`${this.fetchBase}/api/tags`, {headers: this.proxyHeaders});
+      if (!tagsRes.ok) {
+        throw new OllamaUnreachableError(`/api/tags returned status ${tagsRes.status}`);
+      }
+    } catch (err) {
+      if (err instanceof OllamaUnreachableError) {
+        throw err;
+      }
+      throw new OllamaUnreachableError(`Cannot reach Ollama at ${this.url}: ${(err as Error).message}`);
+    }
+
+    const tagsJson = (await tagsRes.json()) as {models?: OllamaTagEntry[]};
+    const entries = tagsJson.models ?? [];
+
+    return Promise.all(
+      entries.map(async entry => {
+        try {
+          const showRes = await fetch(`${this.fetchBase}/api/show`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', ...this.proxyHeaders},
+            body: JSON.stringify({model: entry.name}),
+          });
+          if (!showRes.ok) {
+            return buildModelInfo(entry, null);
+          }
+          const show = (await showRes.json()) as OllamaShowResponse;
+          return buildModelInfo(entry, show);
+        } catch {
+          return buildModelInfo(entry, null);
+        }
+      }),
+    );
+  }
+
+  /**
+   * Sends a trivial prompt via /api/generate to verify the configured model is loaded and responsive.
+   * Does not use tool-calling so it works even with models that don't support function calling.
+   */
+  async testPrompt(signal?: AbortSignal): Promise<string> {
+    let res: Response;
+    try {
+      res = await fetch(`${this.fetchBase}/api/generate`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', ...this.proxyHeaders},
+        body: JSON.stringify({model: this.model, prompt: 'Reply with just the word: ok', stream: false}),
+        signal,
+      });
+    } catch (err) {
+      throw new OllamaUnreachableError(`Network error during /api/generate: ${(err as Error).message}`);
+    }
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new OllamaModelMissingError(this.model);
+      }
+      throw new OllamaUnreachableError(`/api/generate returned status ${res.status}`);
+    }
+    const json = (await res.json()) as {response?: string};
+    return json.response ?? '';
+  }
+
+  /** Sends a chat request with tool definitions. Returns the full response. */
   async chat({messages, tools, toolChoice = 'auto', numCtx, signal}: OllamaChatArgs): Promise<OllamaChatResponse> {
     const body: Record<string, unknown> = {
       model: this.model,
@@ -146,51 +270,32 @@ export class OllamaClient {
       stream: false,
       tool_choice: toolChoice,
     };
+
     if (typeof numCtx === 'number') {
       body.options = {num_ctx: numCtx};
     }
+
     log.debug('POST /api/chat', {model: this.model, numCtx, messageCount: messages.length, toolChoice});
 
     let res: Response;
     try {
-      res = await fetch(`${this.url}/api/chat`, {
+      res = await fetch(`${this.fetchBase}/api/chat`, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json', ...this.proxyHeaders},
         body: JSON.stringify(body),
         signal,
       });
     } catch (err) {
       throw new OllamaUnreachableError(`Network error during /api/chat: ${(err as Error).message}`);
     }
+
     if (!res.ok) {
       if (res.status === 404) {
         throw new OllamaModelMissingError(this.model);
       }
-      throw new OllamaUnreachableError(`/api/chat status ${res.status}`);
+      throw new OllamaUnreachableError(`/api/chat returned status ${res.status}`);
     }
-    const json = (await res.json()) as OllamaChatResponse;
-    return json;
+
+    return (await res.json()) as OllamaChatResponse;
   }
 }
-
-/** JSON Schema tool definition for the per-conversation sub-report extraction call. */
-export const SUB_REPORT_TOOL = {
-  type: 'function',
-  function: {
-    name: 'report_completion',
-    description: 'Submit the array of report entries extracted from the conversation.',
-    // @ts-expect-error: Complex Zod schema causes type instantiation depth limit; safe at runtime
-    parameters: zodToJsonSchema(SubReportToolArgsSchema, {target: 'openApi3'}),
-  },
-} as const;
-
-/** JSON Schema tool definition for the final merge/dedupe report call. */
-export const FINAL_REPORT_TOOL = {
-  type: 'function',
-  function: {
-    name: 'report_completion',
-    description: 'Submit the merged, deduplicated final array of report entries.',
-    // @ts-expect-error: Complex Zod schema causes type instantiation depth limit; safe at runtime
-    parameters: zodToJsonSchema(FinalReportToolArgsSchema, {target: 'openApi3'}),
-  },
-} as const;

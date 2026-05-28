@@ -41,7 +41,7 @@ import {
 } from './TeamCreation.styles';
 import {useTeamCreationModal} from './useTeamCreationModal';
 
-import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
+import {SidebarStatus, useSidebarStore} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 const Banner = ({onClick}: {onClick: () => void}) => {
   return (

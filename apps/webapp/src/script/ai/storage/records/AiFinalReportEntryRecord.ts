@@ -17,7 +17,7 @@
  *
  */
 
-import type {EntryType, EntryPayload} from '../../domain/EntryTypes';
+import type {EntryType, EntryPayload, EntryLifecycleStatus} from '../../domain/EntryTypes';
 
 /** Single deduplicated output entry from the final-pass LLM call. */
 export interface AiFinalReportEntryRecord {
@@ -25,9 +25,12 @@ export interface AiFinalReportEntryRecord {
   id: string; // uuid — stable across re-renders, used as React key
   report_id: string;
   type: EntryType; // 'report' | 'todo' | 'ticket'
+  status: EntryLifecycleStatus; // indexed — 'pending' | 'accepted' | 'hidden'
   payload: EntryPayload;
   /** conversation IDs this entry was derived from */
   conversation_ids: string[];
+  /** per-conversation navigation anchors, derived from sub-report source_timestamps */
+  source_refs: Array<{conversation_id: string; domain: string | null; timestamp: string}>;
   mutable_state: {
     checked?: boolean; // todo only
     title?: string; // ticket only override

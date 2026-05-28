@@ -22,33 +22,14 @@ import {format} from 'date-fns';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {EventRecord} from 'Repositories/storage/record/EventRecord';
 
-/**
- * Pure transformation pipeline converting raw EventRecord[] to formatted TranscriptLine[].
- *
- * The transcript builder is stateless: it takes a Conversation and an array of already-fetched
- * EventRecord instances, applies an allow-list filter (D27/Q7), formats each event according
- * to the Wire transcript format specification (D9), and returns a time-sorted array.
- *
- * All timestamps are formatted from UTC ISO-8601 strings stored in IndexedDB. Local timezone
- * conversion is NOT performed — `date-fns format()` will display times in the runtime's local
- * offset; for consistency in testing and production use a UTC environment or normalize before display.
- *
- * @see D9 for transcript format rules
- * @see D27 for the event allow-list specification
- * @see Q7 (R1) for the allowed event type decision rationale
- */
-
-/**
- * A single formatted line in a conversation transcript, produced by buildTranscriptLines.
- * See D9 for format rules.
- */
+/** A single formatted transcript line with metadata. */
 export interface TranscriptLine {
   time: Date;
   text: string;
   isSystem: boolean;
 }
 
-/** Event types included in the transcript (Q&A R1 Q7 / D27). */
+/** Event types included in AI transcripts (D27 / Q&A R1 Q7). All others are silently dropped. */
 export const INCLUDED_EVENT_TYPES = new Set<string>([
   'conversation.message-add',
   'conversation.asset-add',
@@ -58,11 +39,7 @@ export const INCLUDED_EVENT_TYPES = new Set<string>([
   'conversation.message-delete',
 ]);
 
-/** Formats an ISO timestamp to 'yyyy-MM-dd HH:mm' for transcript output (D9). Times are UTC. */
-const fmtTime = (iso: string): string => {
-  const d = new Date(iso);
-  return format(d, 'yyyy-MM-dd HH:mm');
-};
+const fmtTime = (iso: string): string => format(new Date(iso), 'yyyy-MM-dd HH:mm');
 
 interface ParticipantLookup {
   (userId: string): {handle?: string; name?: string} | undefined;
@@ -82,26 +59,42 @@ const labelFor = (lookup: ParticipantLookup, userId: string): string => {
   return `@unknown(${userId.slice(0, 8)})`;
 };
 
+/** Minimal self-user info needed so the local user's messages are labelled correctly in the transcript. */
+export interface SelfUserInfo {
+  id: string;
+  name: string;
+  handle: string;
+}
+
 /**
- * Converts raw EventRecord[] into formatted TranscriptLine[]. Only processes types in
- * INCLUDED_EVENT_TYPES (D27). Output is sorted ascending by time.
- * @see D9 for format rules.
+ * Converts an array of EventRecords into formatted TranscriptLines.
+ * Filters to INCLUDED_EVENT_TYPES, formats each line per D9, sorts ascending by time.
+ * Pass selfUser so that messages sent by the local user are labelled by name rather than @unknown.
  */
-export const buildTranscriptLines = (conversation: Conversation, events: EventRecord[]): TranscriptLine[] => {
+export const buildTranscriptLines = (
+  conversation: Conversation,
+  events: EventRecord[],
+  selfUser?: SelfUserInfo,
+): TranscriptLine[] => {
   const users = conversation.participating_user_ets();
   const lookup: ParticipantLookup = (id: string) => {
+    if (selfUser && id === selfUser.id) {
+      return {handle: selfUser.handle, name: selfUser.name};
+    }
     const u = users.find(x => x.id === id);
     if (!u) {
       return undefined;
     }
-    return {handle: u.handle, name: u.name?.()};
+    return {handle: (u as {handle?: string}).handle, name: (u.name as (() => string) | undefined)?.()};
   };
 
   const lines: TranscriptLine[] = [];
+
   for (const e of events) {
     if (!INCLUDED_EVENT_TYPES.has(e.type)) {
       continue;
     }
+
     const date = new Date(e.time);
     const t = fmtTime(e.time);
     const author = labelFor(lookup, e.from);
@@ -134,8 +127,9 @@ export const buildTranscriptLines = (conversation: Conversation, events: EventRe
       lines.push({time: date, text: `[${t}] -- ${author} deleted a message --`, isSystem: true});
     }
   }
+
   return lines.sort((a, b) => a.time.getTime() - b.time.getTime());
 };
 
-/** Joins transcript lines into a single newline-delimited string suitable for inclusion in an LLM prompt. */
+/** Joins transcript lines into a single string (one line per message). */
 export const transcriptLinesToString = (lines: TranscriptLine[]): string => lines.map(l => l.text).join('\n');

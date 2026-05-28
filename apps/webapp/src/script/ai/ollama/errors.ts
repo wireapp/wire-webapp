@@ -17,6 +17,7 @@
  *
  */
 
+/** Thrown when Ollama cannot be reached (network error, server not running). */
 export class OllamaUnreachableError extends Error {
   constructor(message: string) {
     super(message);
@@ -24,6 +25,7 @@ export class OllamaUnreachableError extends Error {
   }
 }
 
+/** Thrown when the configured model is not installed in the local Ollama instance. */
 export class OllamaModelMissingError extends Error {
   constructor(public readonly model: string) {
     super(`Ollama model not installed: ${model}`);
@@ -31,6 +33,7 @@ export class OllamaModelMissingError extends Error {
   }
 }
 
+/** Thrown when the Ollama response did not include a tool call (D26 / Q&A R1 Q8). */
 export class OllamaToolCallMissingError extends Error {
   constructor() {
     super('Ollama response did not contain a tool call');
@@ -38,6 +41,7 @@ export class OllamaToolCallMissingError extends Error {
   }
 }
 
+/** Thrown when the Ollama tool call arguments did not match the expected Zod schema. */
 export class OllamaToolCallInvalidError extends Error {
   constructor(public readonly zodIssues: unknown) {
     super('Ollama tool call did not match expected schema');

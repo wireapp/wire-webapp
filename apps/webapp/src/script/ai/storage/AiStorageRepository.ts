@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2018 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,44 +17,27 @@
  *
  */
 
-/**
- * AiStorageRepository is the **single gateway** to all AI-specific Dexie tables.
- *
- * This class owns and controls exclusive access to six tables:
- * - ai_reports
- * - ai_conversation_sub_reports
- * - ai_final_report_entries
- * - ai_conversation_settings
- * - ai_settings (via AiSettingsService in Chapter 6.2)
- * - ai_prompt_templates (via PromptService in Chapter 6.3)
- *
- * No other file in the codebase is permitted to call db.ai_* directly.
- * All reads and writes flow through this class, ensuring a single audit point
- * for cascading deletes, transaction boundaries, and index usage.
- */
-
 import type {DexieDatabase} from 'Repositories/storage/DexieDatabase';
+import type {EventRecord} from 'Repositories/storage/record/EventRecord';
 import {getLogger} from 'Util/logger';
 
-import type {
-  AiReportRecord,
-  AiConversationSubReportRecord,
-  AiFinalReportEntryRecord,
-  AiConversationSettingsRecord,
-} from './records';
+import type {EntryLifecycleStatus} from '../domain/EntryTypes';
+import type {AiConversationSettingsRecord} from './records/AiConversationSettingsRecord';
+import type {AiConversationSubReportRecord} from './records/AiConversationSubReportRecord';
+import type {AiFinalReportEntryRecord} from './records/AiFinalReportEntryRecord';
+import type {AiReportRecord} from './records/AiReportRecord';
+import type {ExportRecord} from './records/ExportRecord';
+import type {AiEntryNoteRecord} from './records/AiEntryNoteRecord';
 
 const log = getLogger('AI/Storage');
 
+/** The only module allowed to read from or write to the six AI Dexie tables. */
 export class AiStorageRepository {
   constructor(private readonly db: DexieDatabase) {}
 
-  // Reports
+  // --- Reports ---
 
-  /**
-   * Creates a new AI scan report, generating a UUID and ISO timestamp automatically.
-   * @param seed All required fields of AiReportRecord except id and created_at
-   * @returns The persisted record including the generated id and created_at
-   */
+  /** Creates a new report row. Generates id and created_at automatically. */
   async createReport(seed: Omit<AiReportRecord, 'id' | 'created_at'>): Promise<AiReportRecord> {
     const id = crypto.randomUUID();
     const created_at = new Date().toISOString();
@@ -63,40 +46,21 @@ export class AiStorageRepository {
     return record;
   }
 
-  /**
-   * Retrieves a report by its UUID primary key. Returns undefined if not found.
-   * @param id The report's UUID
-   * @returns The report record, or undefined if not found
-   */
   async getReport(id: string): Promise<AiReportRecord | undefined> {
     return this.db.ai_reports.get(id);
   }
 
-  /**
-   * Returns all reports sorted by created_at descending (newest first).
-   * @returns Array of report records sorted by created_at DESC
-   */
+  /** Returns all reports sorted by created_at DESC. */
   async listReports(): Promise<AiReportRecord[]> {
     const all = await this.db.ai_reports.toArray();
     return all.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   }
 
-  /**
-   * Merges patch into the existing report identified by id. No-op if the report does not exist.
-   * @param id The report's UUID
-   * @param patch Partial fields to update
-   * @returns Promise<void>
-   */
   async updateReport(id: string, patch: Partial<AiReportRecord>): Promise<void> {
     await this.db.ai_reports.update(id, patch);
   }
 
-  /**
-   * Deletes the report and all associated sub-reports and final entries atomically inside a Dexie transaction.
-   * @param id The report's UUID
-   * @returns Promise<void>
-   * @throws {Error} If the transaction is aborted by a Dexie constraint error (rare in normal operation)
-   */
+  /** Cascade-deletes sub-reports and final entries belonging to this report. */
   async deleteReport(id: string): Promise<void> {
     await this.db.transaction(
       'rw',
@@ -111,39 +75,24 @@ export class AiStorageRepository {
     );
   }
 
-  /**
-   * Sweeps all reports in scanning status to interrupted. Called once at app start to recover from mid-scan page reloads or crashes. Returns the IDs of the patched records.
-   * @returns Array of report IDs that were marked as interrupted
-   */
+  /** At app start: marks any report still in 'scanning' state as 'interrupted'. Returns affected ids. */
   async markRunningReportsInterrupted(): Promise<string[]> {
-    // The status field is indexed in ai_reports schema ('id, created_at, status'), so this query is efficient.
     const scanning = await this.db.ai_reports.where('status').equals('scanning').toArray();
     const ids = scanning.map(r => r.id);
     if (ids.length === 0) {
       return ids;
     }
     await this.db.ai_reports.where('id').anyOf(ids).modify({status: 'interrupted', error: 'App restart during scan'});
-    log.info(`Marked ${ids.length} interrupted reports on app start`);
+    log.info(`Marked ${ids.length} report(s) interrupted on app start`);
     return ids;
   }
 
-  // Sub-reports
+  // --- Sub-reports ---
 
-  /**
-   * Inserts a new sub-report record. The primary_key auto-increment field must be omitted from the input — Dexie assigns it on insert.
-   * @param record Sub-report data without primary_key
-   * @returns Promise<void>
-   */
   async createSubReport(record: Omit<AiConversationSubReportRecord, 'primary_key'>): Promise<void> {
     await this.db.ai_conversation_sub_reports.put(record);
   }
 
-  /**
-   * Updates the sub-report identified by UUID id. Looks up the internal primary_key first, then applies patch. No-op if not found.
-   * @param id The sub-report's UUID
-   * @param patch Partial fields to update
-   * @returns Promise<void>
-   */
   async updateSubReport(id: string, patch: Partial<AiConversationSubReportRecord>): Promise<void> {
     const existing = await this.db.ai_conversation_sub_reports.where('id').equals(id).first();
     if (!existing?.primary_key) {
@@ -152,21 +101,47 @@ export class AiStorageRepository {
     await this.db.ai_conversation_sub_reports.update(existing.primary_key, patch);
   }
 
-  /**
-   * Retrieves a sub-report by its UUID id. Returns undefined if not found.
-   * @param id The sub-report's UUID
-   * @returns The sub-report record, or undefined if not found
-   */
   async getSubReport(id: string): Promise<AiConversationSubReportRecord | undefined> {
     return this.db.ai_conversation_sub_reports.where('id').equals(id).first();
   }
 
   /**
-   * Returns the sub-report for a specific conversation within a scan report, using the compound index [report_id+conversation_id]. Returns undefined if not found.
-   * @param reportId The parent report's UUID
-   * @param conversationId The conversation ID
-   * @returns The sub-report record, or undefined if not found
+   * Follows the reused_from_sub_report_id chain to the original (root) sub-report.
+   * entry_statuses always lives on the root so that hide/accept decisions are shared
+   * across every report that reuses the same conversation data.
    */
+  private async resolveToRoot(subReportId: string): Promise<AiConversationSubReportRecord | undefined> {
+    let current = await this.db.ai_conversation_sub_reports.where('id').equals(subReportId).first();
+    while (current?.reused_from_sub_report_id) {
+      const parent = await this.db.ai_conversation_sub_reports
+        .where('id')
+        .equals(current.reused_from_sub_report_id)
+        .first();
+      if (!parent) {
+        break;
+      }
+      current = parent;
+    }
+    return current;
+  }
+
+  /**
+   * Lists sub-reports for a report, overlaying entry_statuses from the root of each
+   * reuse chain so that curation (hide/accept) is shared across reports.
+   */
+  async listSubReports(reportId: string): Promise<AiConversationSubReportRecord[]> {
+    const subs = await this.db.ai_conversation_sub_reports.where('report_id').equals(reportId).toArray();
+    return Promise.all(
+      subs.map(async sub => {
+        if (!sub.reused_from_sub_report_id) {
+          return sub;
+        }
+        const root = await this.resolveToRoot(sub.reused_from_sub_report_id);
+        return {...sub, entry_statuses: root?.entry_statuses};
+      }),
+    );
+  }
+
   async getSubReportForConversation(
     reportId: string,
     conversationId: string,
@@ -178,44 +153,38 @@ export class AiStorageRepository {
   }
 
   /**
-   * Returns all sub-reports belonging to the given report, in Dexie's natural storage order.
-   * @param reportId The parent report's UUID
-   * @returns Array of sub-report records
+   * Returns the most recent finished sub-report for a conversation across all reports.
+   * Used during scan start to detect conversations with no new messages since the last scan.
    */
-  async listSubReports(reportId: string): Promise<AiConversationSubReportRecord[]> {
-    return this.db.ai_conversation_sub_reports.where('report_id').equals(reportId).toArray();
+  async findLatestDoneSubReportForConversation(
+    conversationId: string,
+  ): Promise<AiConversationSubReportRecord | undefined> {
+    const candidates = await this.db.ai_conversation_sub_reports
+      .where('conversation_id')
+      .equals(conversationId)
+      .filter(s => s.status === 'done' && s.stats.finished_at !== null)
+      .toArray();
+
+    if (candidates.length === 0) {
+      return undefined;
+    }
+
+    return candidates.reduce((best, s) => (s.stats.finished_at! > best.stats.finished_at! ? s : best));
   }
 
-  // Final entries
+  // --- Final entries ---
 
-  /**
-   * Upserts all entries for reportId in a single atomic transaction. **Does NOT delete existing entries first.** If Replace semantics are required (e.g., re-running the final pass), the caller must call deleteFinalEntries(reportId) before calling this method.
-   * @param reportId The parent report's UUID (for documentation; entries carry report_id internally)
-   * @param entries Array of final entry records to upsert
-   * @returns Promise<void>
-   * @throws {Error} If the transaction is aborted by a Dexie constraint error (rare in normal operation)
-   */
-  async putFinalEntries(_reportId: string, entries: AiFinalReportEntryRecord[]): Promise<void> {
+  async putFinalEntries(reportId: string, entries: AiFinalReportEntryRecord[]): Promise<void> {
     await this.db.transaction('rw', this.db.ai_final_report_entries, async () => {
       await this.db.ai_final_report_entries.bulkPut(entries);
     });
+    log.debug(`Stored ${entries.length} final entries for report ${reportId}`);
   }
 
-  /**
-   * Returns all final report entries for the given report, in Dexie's natural storage order.
-   * @param reportId The parent report's UUID
-   * @returns Array of final entry records
-   */
   async listFinalEntries(reportId: string): Promise<AiFinalReportEntryRecord[]> {
     return this.db.ai_final_report_entries.where('report_id').equals(reportId).toArray();
   }
 
-  /**
-   * Shallowly merges patch into the mutable_state of the final entry identified by UUID id. Keys present in patch overwrite the corresponding existing keys; absent keys are preserved. No-op if the entry does not exist.
-   * @param id The final entry's UUID
-   * @param patch Partial mutable_state fields to merge (checked, title, description, notes)
-   * @returns Promise<void>
-   */
   async updateFinalEntryMutable(id: string, patch: Partial<AiFinalReportEntryRecord['mutable_state']>): Promise<void> {
     const existing = await this.db.ai_final_report_entries.where('id').equals(id).first();
     if (!existing?.primary_key) {
@@ -225,33 +194,111 @@ export class AiStorageRepository {
     await this.db.ai_final_report_entries.update(existing.primary_key, {mutable_state: next});
   }
 
+  async updateFinalEntryStatus(id: string, status: EntryLifecycleStatus): Promise<void> {
+    const existing = await this.db.ai_final_report_entries.where('id').equals(id).first();
+    if (!existing?.primary_key) {
+      return;
+    }
+    await this.db.ai_final_report_entries.update(existing.primary_key, {status});
+  }
+
   /**
-   * Deletes all final report entries for the given report. Called before putFinalEntries when Replace semantics are needed.
-   * @param reportId The parent report's UUID
-   * @returns Promise<void>
+   * Updates the lifecycle status for a single entry within a sub-report's entries[] array.
+   * Keyed by the entry's stable id (StoredEntry.id), not its array index.
+   * Always writes to the root of the reuse chain so the change is visible across every
+   * report that shares this conversation's sub-report data.
    */
+  async updateSubReportEntryStatus(
+    subReportId: string,
+    entryId: string,
+    status: EntryLifecycleStatus,
+  ): Promise<void> {
+    const sub = await this.db.ai_conversation_sub_reports.where('id').equals(subReportId).first();
+    const root = sub?.reused_from_sub_report_id ? await this.resolveToRoot(sub.reused_from_sub_report_id) : sub;
+    if (!root?.primary_key) {
+      return;
+    }
+    const entry_statuses = {...(root.entry_statuses ?? {}), [entryId]: status};
+    await this.db.ai_conversation_sub_reports.update(root.primary_key, {entry_statuses});
+  }
+
   async deleteFinalEntries(reportId: string): Promise<void> {
     await this.db.ai_final_report_entries.where('report_id').equals(reportId).delete();
   }
 
-  // Conversation settings
+  // --- Conversation settings ---
 
-  /**
-   * Returns the AI settings for a specific conversation, or undefined if no settings have been saved yet. Callers should treat undefined as equivalent to the default (AI enabled for human conversations).
-   * @param conversationId The conversation's ID
-   * @returns The settings record, or undefined if not found
-   */
   async getConversationSettings(conversationId: string): Promise<AiConversationSettingsRecord | undefined> {
     return this.db.ai_conversation_settings.get(conversationId);
   }
 
-  /**
-   * Creates or replaces the AI settings for a conversation. Always overwrites updated_at with the current ISO timestamp.
-   * @param record Conversation settings data without updated_at
-   * @returns Promise<void>
-   */
+  async listAllConversationSettings(): Promise<AiConversationSettingsRecord[]> {
+    return this.db.ai_conversation_settings.toArray();
+  }
+
   async upsertConversationSettings(record: Omit<AiConversationSettingsRecord, 'updated_at'>): Promise<void> {
     const updated_at = new Date().toISOString();
     await this.db.ai_conversation_settings.put({...record, updated_at});
+  }
+
+  // --- Exports ---
+
+  async createExport(seed: Omit<ExportRecord, 'id' | 'created_at' | 'updated_at'>): Promise<ExportRecord> {
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const record: ExportRecord = {...seed, id, created_at: now, updated_at: now};
+    await this.db.ai_exports.put(record);
+    return record;
+  }
+
+  async getExport(id: string): Promise<ExportRecord | undefined> {
+    return this.db.ai_exports.get(id);
+  }
+
+  /** Returns all exports sorted by created_at DESC. */
+  async listExports(): Promise<ExportRecord[]> {
+    const all = await this.db.ai_exports.toArray();
+    return all.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+  }
+
+  async updateExport(id: string, patch: Partial<Omit<ExportRecord, 'id' | 'created_at'>>): Promise<void> {
+    const updated_at = new Date().toISOString();
+    await this.db.ai_exports.update(id, {...patch, updated_at});
+  }
+
+  async deleteExport(id: string): Promise<void> {
+    await this.db.ai_exports.delete(id);
+  }
+
+  // --- Entry notes ---
+
+  async getNote(entry_id: string): Promise<AiEntryNoteRecord | undefined> {
+    return this.db.ai_entry_notes.get(entry_id);
+  }
+
+  /** Creates or replaces the note for an entry. Deletes the record if text is empty. */
+  async upsertNote(entry_id: string, text: string): Promise<void> {
+    if (text.trim() === '') {
+      await this.db.ai_entry_notes.delete(entry_id);
+      return;
+    }
+    const updated_at = new Date().toISOString();
+    await this.db.ai_entry_notes.put({entry_id, text: text.trim(), updated_at});
+  }
+
+  async deleteNote(entry_id: string): Promise<void> {
+    await this.db.ai_entry_notes.delete(entry_id);
+  }
+
+  /** Returns notes for a specific set of entry IDs (used during export). */
+  async listNotesForEntries(entry_ids: string[]): Promise<AiEntryNoteRecord[]> {
+    return this.db.ai_entry_notes.where('entry_id').anyOf(entry_ids).toArray();
+  }
+
+  // --- Events (read-only, for export transcript building) ---
+
+  /** Returns all events for a conversation sorted by time ascending. */
+  async getEventsForConversation(conversation_id: string): Promise<EventRecord[]> {
+    return this.db.events.where('conversation').equals(conversation_id).sortBy('time');
   }
 }

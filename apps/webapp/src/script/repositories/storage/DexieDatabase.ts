@@ -19,13 +19,6 @@
 
 import {Dexie, Table, Transaction} from 'dexie';
 
-import {getLogger, Logger} from 'Util/logger';
-
-import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';
-import {ClientRecord} from './record/ClientRecord';
-import {GroupIdRecord} from './record/GroupIdRecord';
-import {StorageSchemata} from './StorageSchemata';
-
 import type {
   AiReportRecord,
   AiConversationSubReportRecord,
@@ -33,7 +26,17 @@ import type {
   AiConversationSettingsRecord,
   AiSettingsRecord,
   AiPromptTemplateRecord,
-} from '../../ai/storage/records';
+  JiraTicketRecord,
+  JiraProblemRecord,
+  ExportRecord,
+  AiEntryNoteRecord,
+} from 'src/script/ai/storage/records';
+import {getLogger, Logger} from 'Util/logger';
+
+import {AmplifyRecord, ConversationRecord, CryptoboxRecord, EventRecord, UserRecord} from './record';
+import {ClientRecord} from './record/ClientRecord';
+import {GroupIdRecord} from './record/GroupIdRecord';
+import {StorageSchemata} from './StorageSchemata';
 
 /**
  * TypeScript representation of local IndexedDB schema managed with Dexie.
@@ -51,13 +54,16 @@ export class DexieDatabase extends Dexie {
   sessions: Table<CryptoboxRecord, string>;
   users: Table<UserRecord, string>;
   groupIds: Table<GroupIdRecord, string>;
-  // AI feature tables — local-only, not encrypted at rest
   ai_reports: Table<AiReportRecord, string>;
   ai_conversation_sub_reports: Table<AiConversationSubReportRecord, number>;
   ai_final_report_entries: Table<AiFinalReportEntryRecord, number>;
   ai_conversation_settings: Table<AiConversationSettingsRecord, string>;
   ai_settings: Table<AiSettingsRecord, string>;
   ai_prompt_templates: Table<AiPromptTemplateRecord, string>;
+  jira_tickets: Table<JiraTicketRecord, string>;
+  jira_problems: Table<JiraProblemRecord, number>;
+  ai_exports: Table<ExportRecord, string>;
+  ai_entry_notes: Table<AiEntryNoteRecord, string>;
 
   private readonly logger: Logger;
 
@@ -83,6 +89,10 @@ export class DexieDatabase extends Dexie {
     this.ai_conversation_settings = this.table(StorageSchemata.OBJECT_STORE.AI_CONVERSATION_SETTINGS);
     this.ai_settings = this.table(StorageSchemata.OBJECT_STORE.AI_SETTINGS);
     this.ai_prompt_templates = this.table(StorageSchemata.OBJECT_STORE.AI_PROMPT_TEMPLATES);
+    this.jira_tickets = this.table(StorageSchemata.OBJECT_STORE.JIRA_TICKETS);
+    this.jira_problems = this.table(StorageSchemata.OBJECT_STORE.JIRA_PROBLEMS);
+    this.ai_exports = this.table(StorageSchemata.OBJECT_STORE.AI_EXPORTS);
+    this.ai_entry_notes = this.table(StorageSchemata.OBJECT_STORE.AI_ENTRY_NOTES);
   }
 
   private readonly initDbSchema = async (): Promise<void> => {

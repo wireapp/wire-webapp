@@ -39,6 +39,10 @@ import {useMediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/UserState';
 import {AiPreferences} from 'src/script/ai/ui/AiPreferences/AiPreferences';
+import {ExportCreatePage} from 'src/script/ai/ui/ExportCreatePage/ExportCreatePage';
+import {ExportsListPage} from 'src/script/ai/ui/ExportsListPage/ExportsListPage';
+import {ExportResultPage} from 'src/script/ai/ui/ExportResultPage/ExportResultPage';
+import {JiraPage} from 'src/script/ai/ui/JiraPage/JiraPage';
 import {ReportDetailPage} from 'src/script/ai/ui/ReportDetailPage/ReportDetailPage';
 import {ReportsListPage} from 'src/script/ai/ui/ReportsListPage/ReportsListPage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -240,8 +244,6 @@ const MainContent = ({
               </div>
             )}
 
-            {contentState === ContentState.PREFERENCES_AI && <AiPreferences />}
-
             {contentState === ContentState.WATERMARK && (
               <div className="watermark">
                 <span className="absolute-center" aria-hidden="true" data-uie-name="no-conversation">
@@ -287,6 +289,11 @@ const MainContent = ({
 
             {contentState === ContentState.AI_REPORTS_LIST && <ReportsListPage />}
             {contentState === ContentState.AI_REPORT_DETAIL && <ReportDetailPage />}
+            {contentState === ContentState.PREFERENCES_AI && <AiPreferences />}
+            {contentState === ContentState.AI_JIRA && <JiraPage />}
+            {contentState === ContentState.AI_EXPORTS_LIST && <ExportsListPage />}
+            {contentState === ContentState.AI_EXPORTS_CREATE && <ExportCreatePage />}
+            {contentState === ContentState.AI_EXPORTS_RESULT && <ExportResultPage />}
           </>
         </Animated>
       </SwitchTransition>

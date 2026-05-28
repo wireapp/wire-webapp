@@ -17,4 +17,56 @@
  *
  */
 
-export {};
+/** A single message in an Ollama chat conversation. */
+export interface OllamaChatMessage {
+  role: 'system' | 'user' | 'assistant' | 'tool';
+  content: string;
+}
+
+/** A tool call returned by the Ollama model. */
+export interface OllamaToolCall {
+  function: {name: string; arguments: unknown};
+}
+
+/** The full response object from POST /api/chat. */
+export interface OllamaChatResponse {
+  message: {
+    content: string;
+    tool_calls?: OllamaToolCall[];
+  };
+  done: boolean;
+  total_duration?: number;
+  prompt_eval_count?: number;
+  eval_count?: number;
+}
+
+/** Arguments for OllamaClient.chat(). */
+export interface OllamaChatArgs {
+  messages: OllamaChatMessage[];
+  /** Already-JSON-Schema tool definitions (derived by zod-to-json-schema). */
+  tools: unknown[];
+  /** Always 'auto' per D26 / Q&A R1 Q8. */
+  toolChoice?: 'auto' | 'required';
+  /** Optional num_ctx override sent as options.num_ctx to Ollama. */
+  numCtx?: number;
+  signal?: AbortSignal;
+}
+
+/** Rich metadata about a single Ollama model, combining /api/tags and /api/show data. */
+export interface OllamaModelInfo {
+  name: string;
+  /** Raw disk size in bytes (from /api/tags). */
+  sizeBytes: number;
+  /** Human-readable parameter count, e.g. "35B" (from /api/tags details.parameter_size). */
+  parameterSize: string;
+  /** Quantization level, e.g. "Q4_K_M" (from /api/tags details.quantization_level). */
+  quantization: string;
+  /** Max context length in tokens (from /api/show model_info). Null if undetermined. */
+  contextLength: number | null;
+  /** Max output tokens (from /api/show parameters num_predict line). Null if not configured. */
+  maxOutputTokens: number | null;
+  /** Whether the model template includes tool-calling support. Null if /api/show failed. */
+  supportsTools: boolean | null;
+  /** Whether the model supports thinking/reasoning mode. Null if /api/show failed. */
+  supportsThinking: boolean | null;
+}

@@ -43,7 +43,7 @@ import type {MainViewModel, ViewModelRepositories} from './MainViewModel';
 import {Config} from '../Config';
 import {ConversationError} from '../error/ConversationError';
 import '../page/LeftSidebar';
-import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from '../page/LeftSidebar/useSidebarStore';
 import '../page/MainContent';
 import {PanelState} from '../page/RightSidebar';
 import {useAppMainState} from '../page/state';

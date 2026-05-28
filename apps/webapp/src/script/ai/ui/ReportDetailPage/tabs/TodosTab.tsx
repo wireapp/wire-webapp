@@ -17,5 +17,46 @@
  *
  */
 
-// Placeholder — implementation in Phase F (Chapter 11).
-export {};
+import type {AiFinalReportEntryRecord} from 'src/script/ai/storage/records/AiFinalReportEntryRecord';
+import {navigate} from 'src/script/router/Router';
+import {generateConversationUrl} from 'src/script/router/routeGenerator';
+
+import {EntryCard} from '../../shared/EntryCard';
+
+const emptyStyle: React.CSSProperties = {
+  color: '#6b7280',
+  fontStyle: 'italic',
+  padding: '16px 0',
+};
+
+interface TodosTabProps {
+  entries: AiFinalReportEntryRecord[];
+}
+
+/** Displays all 'todo' type final entries as checkable EntryCards. */
+export const TodosTab = ({entries}: TodosTabProps) => {
+  const todoEntries = entries.filter(e => e.type === 'todo');
+
+  if (todoEntries.length === 0) {
+    return <div style={emptyStyle}>No action items found.</div>;
+  }
+
+  const handleNavigate = (record: AiFinalReportEntryRecord) => {
+    const first_ref = record.source_refs?.[0];
+    if (!first_ref) return;
+    navigate(generateConversationUrl({id: first_ref.conversation_id, domain: first_ref.domain ?? ''}));
+  };
+
+  return (
+    <div>
+      {todoEntries.map(record => (
+        <EntryCard
+          key={record.id}
+          record={record}
+          onNavigate={record.source_refs?.length ? () => handleNavigate(record) : undefined}
+          navigateTimestamp={record.source_refs?.[0]?.timestamp}
+        />
+      ))}
+    </div>
+  );
+};

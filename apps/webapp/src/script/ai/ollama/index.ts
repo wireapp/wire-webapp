@@ -17,19 +17,6 @@
  *
  */
 
-export {
-  OllamaClient,
-  OllamaChatMessage,
-  OllamaToolCall,
-  OllamaChatResponse,
-  OllamaChatArgs,
-  SUB_REPORT_TOOL,
-  FINAL_REPORT_TOOL,
-} from './OllamaClient';
-
-export {
-  OllamaUnreachableError,
-  OllamaModelMissingError,
-  OllamaToolCallMissingError,
-  OllamaToolCallInvalidError,
-} from './errors';
+export * from './OllamaClient';
+export * from './OllamaTypes';
+export * from './errors';

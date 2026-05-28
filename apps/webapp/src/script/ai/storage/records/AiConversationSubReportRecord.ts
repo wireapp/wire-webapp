@@ -17,7 +17,7 @@
  *
  */
 
-import type {Entry} from '../../domain/EntryTypes';
+import type {StoredEntry, EntryLifecycleStatus} from '../../domain/EntryTypes';
 
 export type SubReportStatus = 'pending' | 'running' | 'done' | 'failed' | 'skipped';
 
@@ -31,8 +31,8 @@ export interface AiConversationSubReportRecord {
   ai_description_snapshot: string;
   status: SubReportStatus;
   error: string | null;
-  /** parsed + zod-validated tool-call output */
-  entries: Entry[];
+  /** parsed + zod-validated tool-call output; each entry carries a server-assigned stable id */
+  entries: StoredEntry[];
   stats: {
     raw_token_estimate: number;
     truncated_token_estimate: number;
@@ -41,5 +41,12 @@ export interface AiConversationSubReportRecord {
     started_at: string | null;
     finished_at: string | null;
   };
+  /**
+   * Per-entry lifecycle status keyed by entry id (StoredEntry.id).
+   * Absent key means 'pending'. Used to filter entries from the final-report LLM prompt.
+   */
+  entry_statuses?: Record<string, EntryLifecycleStatus>;
+  /** Set when this sub-report was carried over from a prior scan with no new messages. */
+  reused_from_sub_report_id?: string;
   created_at: string;
 }

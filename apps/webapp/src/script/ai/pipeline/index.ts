@@ -17,8 +17,9 @@
  *
  */
 
-export {ScanRunner, type ScanRunnerDeps} from './ScanRunner';
-export {ConsecutiveFailureTracker} from './ConsecutiveFailureTracker';
-export {selectConversationsToScan} from './selectConversationsToScan';
-export {runSubReport, type RunSubReportArgs} from './runSubReport';
-export {runFinalReport, type RunFinalReportArgs} from './runFinalReport';
+export * from './ConsecutiveFailureTracker';
+export * from './ScanRunner';
+export * from './runFinalReport';
+export * from './runSubReport';
+export * from './runSubReportIncremental';
+export * from './selectConversationsToScan';

@@ -98,6 +98,66 @@ class Server {
     const restUpstream = process.env.BACKEND_REST_UPSTREAM;
     const wsUpstream = process.env.BACKEND_WS_UPSTREAM;
 
+    // Ollama runs on plain HTTP; the Wire app is served over HTTPS. Browsers block cross-protocol
+    // fetches (mixed content), so all Ollama calls from the frontend are routed through this proxy.
+    // The client sends the actual Ollama URL in X-Ollama-Target; only localhost is allowed.
+    // Proxy Jira Cloud REST API calls from the browser. The browser sends the Atlassian account
+    // email in X-Jira-Email and the API token in X-Jira-Token; the proxy combines them into a
+    // Basic auth header and strips the custom headers before forwarding to Jira Cloud.
+    this.app.use(
+      '/proxy/jira',
+      createProxyMiddleware({
+        target: 'https://wearezeta.atlassian.net',
+        changeOrigin: true,
+        pathRewrite: {'^/proxy/jira': ''},
+        on: {
+          proxyReq: (proxyReq, req) => {
+            const rawEmail = req.headers['x-jira-email'];
+            const rawToken = req.headers['x-jira-token'];
+            const email = Array.isArray(rawEmail) ? rawEmail[0] : rawEmail;
+            const token = Array.isArray(rawToken) ? rawToken[0] : rawToken;
+            proxyReq.removeHeader('x-jira-email');
+            proxyReq.removeHeader('x-jira-token');
+            if (email && token) {
+              const encoded = Buffer.from(`${email}:${token}`).toString('base64');
+              proxyReq.setHeader('Authorization', `Basic ${encoded}`);
+            }
+          },
+        },
+      }),
+    );
+
+    this.app.use(
+      '/proxy/ollama',
+      createProxyMiddleware({
+        changeOrigin: true,
+        pathRewrite: {'^/proxy/ollama': ''},
+        router: req => {
+          const raw = req.headers['x-ollama-target'];
+          const target = Array.isArray(raw) ? raw[0] : raw;
+          if (target) {
+            try {
+              const parsed = new URL(target);
+              if (['localhost', '127.0.0.1'].includes(parsed.hostname)) {
+                return target;
+              }
+            } catch {}
+          }
+          return 'http://localhost:11434';
+        },
+        on: {
+          // Strip browser-origin headers before forwarding to Ollama.
+          // Ollama validates the Origin header against its CORS allowlist and returns 403
+          // for origins it doesn't recognise — but this is a server-to-server request so
+          // there is no cross-origin concern; the headers must not reach Ollama.
+          proxyReq: proxyReq => {
+            proxyReq.removeHeader('origin');
+            proxyReq.removeHeader('referer');
+          },
+        },
+      }),
+    );
+
     if (restUpstream !== undefined && restUpstream !== '') {
       this.app.use(
         '/proxy/api',

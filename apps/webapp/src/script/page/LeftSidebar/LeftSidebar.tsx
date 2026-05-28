@@ -31,6 +31,7 @@ import {TemporaryGuestConversations} from './panels/TemporatyGuestConversations'
 
 import {ListViewModel} from '../../view_model/ListViewModel';
 import {useAppState, ListState} from '../useAppState';
+import {SidebarTabs, useSidebarStore} from './useSidebarStore';
 
 type LeftSidebarProps = {
   listViewModel: ListViewModel;
@@ -43,6 +44,11 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
   const repositories = listViewModel.contentViewModel.repositories;
 
   const listState = useAppState(state => state.listState);
+  const {currentTab} = useSidebarStore();
+
+  // AI tab pages (reports, jira, exports) are full-page views — no conversation list column needed.
+  // ConversationSidebar (icon rail) still renders inside Conversations via ListWrapper.
+  const isAiTab = [SidebarTabs.AI_REPORT, SidebarTabs.AI_JIRA, SidebarTabs.AI_EXPORTS].includes(currentTab);
 
   useEffect(() => {
     function openCreateGroupModal() {
@@ -62,6 +68,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
       className={cx('left-column', {
         'left-column--light-theme': !isActivatedAccount,
         'left-column--shrinked': listState === ListState.CELLS,
+        'left-column--ai-tab': isAiTab,
       })}
     >
       {[

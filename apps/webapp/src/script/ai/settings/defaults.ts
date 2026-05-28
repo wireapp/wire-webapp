@@ -17,14 +17,8 @@
  *
  */
 
-export const DEFAULTS: {
-  ollamaUrl: string;
-  ollamaModel: string;
-  manualContextSize: number;
-  perMessageTokenCap: number;
-  safetyMarginPct: number;
-  jobDescription: string;
-} = {
+/** Default values for AI settings. All can be overridden by the user in AI Preferences. */
+export const DEFAULTS = {
   ollamaUrl: 'http://localhost:11434',
   ollamaModel: 'qwen3.6:35b',
   manualContextSize: 32768,

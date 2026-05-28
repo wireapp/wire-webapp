@@ -17,5 +17,5 @@
  *
  */
 
-export {AiSettingsService} from './AiSettingsService';
-export {DEFAULTS} from './defaults';
+export * from './AiSettingsService';
+export * from './defaults';

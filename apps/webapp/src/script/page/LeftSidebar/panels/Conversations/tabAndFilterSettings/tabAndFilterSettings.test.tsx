@@ -25,7 +25,7 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {setStrings} from 'Util/localizerUtil';
 
 import {TabAndFilterSettings} from './tabAndFilterSettings';
-import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 jest.mock('Util/useChannelsFeatureFlag', () => ({
   useChannelsFeatureFlag: () => ({

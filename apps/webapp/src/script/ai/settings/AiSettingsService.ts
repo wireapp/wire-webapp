@@ -19,6 +19,7 @@
 
 import type {DexieDatabase} from 'Repositories/storage/DexieDatabase';
 
+import type {OllamaModelInfo} from '../ollama/OllamaTypes';
 import {DEFAULTS} from './defaults';
 
 const KEYS = {
@@ -28,8 +29,12 @@ const KEYS = {
   PER_MESSAGE_TOKEN_CAP: 'per_message_token_cap',
   SAFETY_MARGIN_PCT: 'safety_margin_pct',
   JOB_DESCRIPTION: 'job_description',
+  KNOWN_MODELS: 'known_models',
+  JIRA_EMAIL: 'jira_email',
+  JIRA_PAT: 'jira_pat',
 } as const;
 
+/** Wraps the ai_settings KV Dexie table behind typed getters/setters. Reads return defaults if the key is missing. */
 export class AiSettingsService {
   constructor(private readonly db: DexieDatabase) {}
 
@@ -46,93 +51,95 @@ export class AiSettingsService {
     await this.db.ai_settings.put({key, value, updated_at});
   }
 
-  /**
-   * Returns the configured Ollama server URL, defaulting to `http://localhost:11434` when not set.
-   */
   getOllamaUrl(): Promise<string> {
     return this.getRaw(KEYS.OLLAMA_URL, DEFAULTS.ollamaUrl);
   }
 
-  /**
-   * Persists the Ollama server URL to the ai_settings KV table.
-   */
   setOllamaUrl(v: string): Promise<void> {
     return this.setRaw(KEYS.OLLAMA_URL, v);
   }
 
-  /**
-   * Returns the configured Ollama model, defaulting to `qwen3.6:35b` when not set.
-   */
   getOllamaModel(): Promise<string> {
     return this.getRaw(KEYS.OLLAMA_MODEL, DEFAULTS.ollamaModel);
   }
 
-  /**
-   * Persists the Ollama model to the ai_settings KV table.
-   */
   setOllamaModel(v: string): Promise<void> {
     return this.setRaw(KEYS.OLLAMA_MODEL, v);
   }
 
-  /**
-   * Returns the configured manual context size, defaulting to `32768` when not set.
-   */
   getManualContextSize(): Promise<number> {
     return this.getRaw(KEYS.MANUAL_CONTEXT_SIZE, DEFAULTS.manualContextSize);
   }
 
-  /**
-   * Persists the manual context size to the ai_settings KV table.
-   */
   setManualContextSize(v: number): Promise<void> {
     return this.setRaw(KEYS.MANUAL_CONTEXT_SIZE, v);
   }
 
-  /**
-   * Returns the configured per-message token cap, defaulting to `800` when not set.
-   */
   getPerMessageTokenCap(): Promise<number> {
     return this.getRaw(KEYS.PER_MESSAGE_TOKEN_CAP, DEFAULTS.perMessageTokenCap);
   }
 
-  /**
-   * Persists the per-message token cap to the ai_settings KV table.
-   */
   setPerMessageTokenCap(v: number): Promise<void> {
     return this.setRaw(KEYS.PER_MESSAGE_TOKEN_CAP, v);
   }
 
-  /**
-   * Returns the configured safety margin percentage, defaulting to `0.2` when not set.
-   */
   getSafetyMarginPct(): Promise<number> {
     return this.getRaw(KEYS.SAFETY_MARGIN_PCT, DEFAULTS.safetyMarginPct);
   }
 
-  /**
-   * Persists the safety margin percentage to the ai_settings KV table.
-   */
   setSafetyMarginPct(v: number): Promise<void> {
     return this.setRaw(KEYS.SAFETY_MARGIN_PCT, v);
   }
 
-  /**
-   * Returns the configured job description, defaulting to an empty string when not set.
-   */
   getJobDescription(): Promise<string> {
     return this.getRaw(KEYS.JOB_DESCRIPTION, DEFAULTS.jobDescription);
   }
 
-  /**
-   * Persists the job description to the ai_settings KV table.
-   */
   setJobDescription(v: string): Promise<void> {
     return this.setRaw(KEYS.JOB_DESCRIPTION, v);
   }
 
-  /**
-   * Reads all six AI settings in parallel. Missing keys resolve to their defaults without writing to the database.
-   */
+  /** Returns the cached list of models with rich metadata. Migrates old string[] format on read. */
+  async getKnownModels(): Promise<OllamaModelInfo[]> {
+    const raw = await this.getRaw<OllamaModelInfo[] | string[]>(KEYS.KNOWN_MODELS, []);
+    if (raw.length > 0 && typeof raw[0] === 'string') {
+      // Migrate from the old string[] format — synthesise minimal OllamaModelInfo objects.
+      return (raw as string[]).map(name => ({
+        name,
+        sizeBytes: 0,
+        parameterSize: '',
+        quantization: '',
+        contextLength: null,
+        maxOutputTokens: null,
+        supportsTools: null,
+        supportsThinking: null,
+      }));
+    }
+    return raw as OllamaModelInfo[];
+  }
+
+  /** Persists rich model metadata so the dropdown survives page reloads. */
+  setKnownModels(v: OllamaModelInfo[]): Promise<void> {
+    return this.setRaw(KEYS.KNOWN_MODELS, v);
+  }
+
+  getJiraEmail(): Promise<string> {
+    return this.getRaw(KEYS.JIRA_EMAIL, '');
+  }
+
+  setJiraEmail(v: string): Promise<void> {
+    return this.setRaw(KEYS.JIRA_EMAIL, v);
+  }
+
+  getJiraPat(): Promise<string> {
+    return this.getRaw(KEYS.JIRA_PAT, '');
+  }
+
+  setJiraPat(v: string): Promise<void> {
+    return this.setRaw(KEYS.JIRA_PAT, v);
+  }
+
+  /** Returns all settings at once, applying defaults for any missing keys. */
   async getAll(): Promise<{
     ollamaUrl: string;
     ollamaModel: string;

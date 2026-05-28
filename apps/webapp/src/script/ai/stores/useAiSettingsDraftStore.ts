@@ -19,6 +19,49 @@
 
 import {create} from 'zustand';
 
-interface AiSettingsDraftState {}
+import type {OllamaModelInfo} from '../ollama/OllamaTypes';
 
-export const useAiSettingsDraftStore = create<AiSettingsDraftState>()(() => ({}));
+/** Unsaved edits on the AI Preferences page. Cleared when the user navigates away or saves. */
+interface AiSettingsDraftState {
+  ollamaUrl: string;
+  ollamaModel: string;
+  manualContextSize: number;
+  perMessageTokenCap: number;
+  safetyMarginPct: number;
+  jobDescription: string;
+  subReportTemplate: string;
+  finalReportTemplate: string;
+  /** Cached model list with rich metadata. Persisted to IndexedDB so the dropdown survives reloads. */
+  knownModels: OllamaModelInfo[];
+  jiraEmail: string;
+  jiraPat: string;
+  isDirty: boolean;
+  /** True once the first reset() has been called with real data from storage. Used to gate Monaco
+   *  editor mounting — we never let editors mount with the empty-string placeholder values because
+   *  @monaco-editor/react is not reliably controlled when value transitions from '' to content. */
+  isReady: boolean;
+  setField: <K extends keyof Omit<AiSettingsDraftState, 'setField' | 'reset' | 'isDirty' | 'isReady'>>(
+    key: K,
+    value: AiSettingsDraftState[K],
+  ) => void;
+  reset: (values: Omit<AiSettingsDraftState, 'setField' | 'reset' | 'isDirty' | 'isReady'>) => void;
+}
+
+/** Zustand store for unsaved AI Preferences page edits. */
+export const useAiSettingsDraftStore = create<AiSettingsDraftState>()(set => ({
+  ollamaUrl: '',
+  ollamaModel: '',
+  manualContextSize: 0,
+  perMessageTokenCap: 0,
+  safetyMarginPct: 0,
+  jobDescription: '',
+  subReportTemplate: '',
+  finalReportTemplate: '',
+  knownModels: [],
+  jiraEmail: '',
+  jiraPat: '',
+  isDirty: false,
+  isReady: false,
+  setField: (key, value) => set(state => ({...state, [key]: value, isDirty: true})),
+  reset: values => set({...values, isDirty: false, isReady: true}),
+}));

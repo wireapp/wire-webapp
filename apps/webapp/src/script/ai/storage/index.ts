@@ -17,5 +17,6 @@
  *
  */
 
-export {AiStorageRepository} from './AiStorageRepository';
+/** Barrel re-exporting the AI storage repository. */
+export * from './AiStorageRepository';
 export * from './records';

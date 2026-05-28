@@ -19,6 +19,7 @@
 
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const webpack = require('webpack');
 const dotenv = require('dotenv-extended');
 const {execSync} = require('child_process');
@@ -216,6 +217,13 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+    }),
+    // Bundle Monaco editor locally to avoid CDN dependency (CSP blocks jsdelivr).
+    // monacoEditorPath must be absolute so the plugin resolves worker entry points correctly;
+    // without it, require.resolve() hits the exports-map strict mode in monaco-editor 0.55+ and fails.
+    new MonacoWebpackPlugin({
+      languages: [], // no built-in language workers needed; we use a custom Monarch tokenizer
+      monacoEditorPath: path.join(ROOT_PATH, 'node_modules', 'monaco-editor'),
     }),
     /* All wasm files will be ignored from webpack and copied over to the destination folder, they don't need any webpack processing */
     new CopyPlugin({

@@ -37,7 +37,7 @@ import {
 } from 'Repositories/conversation/ConversationAccessPermission';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
-import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useSidebarStore, SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 import {RootContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigateKeyboard, createNavigate} from 'src/script/router/routerBindings';

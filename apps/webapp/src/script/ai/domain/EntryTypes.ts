@@ -17,11 +17,7 @@
  *
  */
 
-/** Single source of truth for all entry shapes the LLM can produce. Defines Zod schemas for report, todo, and ticket payloads, their discriminated union, and the tool-call argument wrappers used when calling Ollama. No I/O; pure validation logic only. */
-
 import {z} from 'zod';
-
-const IsoDateString = z.string().describe('ISO 8601 timestamp');
 
 /** Represents a Wire user with optional display hints so the LLM can refer to participants naturally. */
 export const QualifiedUserSchema = z.object({
@@ -30,6 +26,8 @@ export const QualifiedUserSchema = z.object({
   handle: z.string().optional(),
   name: z.string().optional(),
 });
+
+const IsoDateString = z.string().describe('ISO 8601 timestamp');
 
 /** Payload for a conversation-summary report entry. Captures the participants involved, a prose description, and the time range covered. */
 export const ReportPayloadSchema = z.object({
@@ -48,7 +46,7 @@ export const TodoPayloadSchema = z.object({
   created_at: IsoDateString,
 });
 
-/** Payload for a bug/task ticket entry extracted from the conversation. */
+/** Payload for a ticket draft entry (only when somebody in the conversation explicitly suggested creating a ticket). */
 export const TicketPayloadSchema = z.object({
   type: z.literal('ticket'),
   title: z.string(),
@@ -56,42 +54,74 @@ export const TicketPayloadSchema = z.object({
   created_at: IsoDateString,
 });
 
-/** Discriminated union of all valid entry payload shapes. The 'type' field is the discriminator key. */
 export const EntryPayloadSchema = z.discriminatedUnion('type', [
   ReportPayloadSchema,
   TodoPayloadSchema,
   TicketPayloadSchema,
 ]);
 
-/** Inferred TypeScript union of all entry payload shapes. */
 export type EntryPayload = z.infer<typeof EntryPayloadSchema>;
-
-/** The discriminator string literal union: 'report' | 'todo' | 'ticket'. */
 export type EntryType = EntryPayload['type'];
 
-/** Sub-report entries are scoped to one conversation; they carry the payload only, no conversation_ids field. Alias of EntryPayloadSchema for semantic clarity. */
-export const SubReportEntrySchema = EntryPayloadSchema;
+/** User-facing lifecycle status for a single extracted entry. */
+export type EntryLifecycleStatus = 'pending' | 'accepted' | 'hidden';
 
-/** Inferred TypeScript type for sub-report entries. */
-export type Entry = z.infer<typeof SubReportEntrySchema>;
-
-/** Final-report entries extend any payload shape with a non-empty conversation_ids array that ties the entry back to one or more source conversations. */
-export const FinalEntrySchema = z.intersection(
+/** Sub-report entries carry a source_timestamp the LLM picks from the triggering transcript line. */
+export const SubReportEntrySchema = z.intersection(
   EntryPayloadSchema,
   z.object({
-    conversation_ids: z.array(z.string()).min(1),
+    source_timestamp: z
+      .string()
+      .describe(
+        'ISO 8601 timestamp (e.g. "2026-01-15T14:32:00.000Z") of the transcript line that most directly prompted this entry — convert the [YYYY-MM-DD HH:mm] prefix to ISO 8601; do not invent timestamps',
+      ),
   }),
 );
+export type Entry = z.infer<typeof SubReportEntrySchema>;
 
-/** Inferred TypeScript type for final-report entries. */
+/**
+ * Stored form of a sub-report entry — Entry plus a server-assigned stable UUID
+ * used to key entry_statuses and to reference entries in incremental update actions.
+ */
+export type StoredEntry = Entry & {id: string};
+
+/** Final-report entries carry conversation_ids[] tying them back to one or more conversations. */
+export const FinalEntrySchema = z.intersection(
+  EntryPayloadSchema,
+  z.object({conversation_ids: z.array(z.string()).min(1)}),
+);
 export type FinalEntry = z.infer<typeof FinalEntrySchema>;
 
-/** Tool-call argument schema for the sub-report LLM call. The LLM must return an object with an 'entries' array. */
+/** Tool-call schema for per-conversation sub-report (what we ask the LLM to return). */
 export const SubReportToolArgsSchema = z.object({
   entries: z.array(SubReportEntrySchema),
 });
 
-/** Tool-call argument schema for the final-merge LLM call. Each entry carries conversation_ids back-references. */
+/** Tool-call schema for final merged report (what we ask the LLM to return). */
 export const FinalReportToolArgsSchema = z.object({
   entries: z.array(FinalEntrySchema),
+});
+
+/** Action shapes for the incremental re-scan tool. The LLM emits creates for new entries
+ *  and updates (referencing the existing entry id) for changes to existing ones. */
+const SubReportIncrementalCreateSchema = z.object({
+  op: z.literal('create'),
+  entry: SubReportEntrySchema,
+});
+
+const SubReportIncrementalUpdateSchema = z.object({
+  op: z.literal('update'),
+  id: z.string().describe('Stable UUID of the existing entry to modify — must match an id from <existing_entries>'),
+  entry: SubReportEntrySchema,
+});
+
+export const SubReportIncrementalActionSchema = z.discriminatedUnion('op', [
+  SubReportIncrementalCreateSchema,
+  SubReportIncrementalUpdateSchema,
+]);
+export type SubReportIncrementalAction = z.infer<typeof SubReportIncrementalActionSchema>;
+
+/** Tool-call schema for incremental re-scan (create new entries or update existing ones). */
+export const SubReportIncrementalToolArgsSchema = z.object({
+  actions: z.array(SubReportIncrementalActionSchema),
 });

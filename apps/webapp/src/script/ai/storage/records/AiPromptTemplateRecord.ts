@@ -18,7 +18,7 @@
  */
 
 /** Identifies which LLM prompt template this record holds. */
-export type PromptTemplateId = 'sub_report' | 'final_report';
+export type PromptTemplateId = 'sub_report' | 'sub_report_incremental' | 'final_report';
 
 /** Stored Handlebars template, editable by the user in AI Preferences. */
 export interface AiPromptTemplateRecord {

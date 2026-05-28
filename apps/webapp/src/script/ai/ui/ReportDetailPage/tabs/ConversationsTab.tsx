@@ -17,4 +17,31 @@
  *
  */
 
-export {};
+import type {AiConversationSubReportRecord} from 'src/script/ai/storage/records/AiConversationSubReportRecord';
+
+import {ConversationSubReportView} from '../ConversationSubReportView';
+
+const emptyStyle: React.CSSProperties = {
+  color: '#6b7280',
+  fontStyle: 'italic',
+  padding: '16px 0',
+};
+
+interface ConversationsTabProps {
+  subReports: AiConversationSubReportRecord[];
+}
+
+/** Displays per-conversation sub-reports, each showing status and extracted entries. */
+export const ConversationsTab = ({subReports}: ConversationsTabProps) => {
+  if (subReports.length === 0) {
+    return <div style={emptyStyle}>No conversation results available.</div>;
+  }
+
+  return (
+    <div>
+      {subReports.map(subReport => (
+        <ConversationSubReportView key={subReport.id} subReport={subReport} />
+      ))}
+    </div>
+  );
+};

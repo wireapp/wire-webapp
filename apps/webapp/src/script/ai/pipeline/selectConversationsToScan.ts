@@ -23,12 +23,17 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {getEffectiveAiEnabled} from '../domain/getEffectiveAiEnabled';
 import type {AiStorageRepository} from '../storage/AiStorageRepository';
 
+/**
+ * Returns all non-archived conversations that have effective AI scanning enabled.
+ * Reads per-conversation settings from Dexie; applies the default-resolution helper (D7 / D8).
+ */
 export const selectConversationsToScan = async (
   conversationState: ConversationState,
   aiStorage: AiStorageRepository,
 ): Promise<Conversation[]> => {
   const all = conversationState.conversations();
   const result: Conversation[] = [];
+
   for (const c of all) {
     if (c.is_archived()) {
       continue;
@@ -39,5 +44,6 @@ export const selectConversationsToScan = async (
     }
     result.push(c);
   }
+
   return result;
 };

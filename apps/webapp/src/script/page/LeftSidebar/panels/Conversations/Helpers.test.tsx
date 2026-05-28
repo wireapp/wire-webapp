@@ -30,7 +30,7 @@ import {
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
 
-import {SidebarTabs} from './useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 describe('conversationFilters', () => {
   it('detects mentions, replies, pings, and archived state', () => {

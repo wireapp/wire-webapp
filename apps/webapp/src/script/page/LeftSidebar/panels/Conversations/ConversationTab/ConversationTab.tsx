@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 interface ConversationTabProps {
   title: string;

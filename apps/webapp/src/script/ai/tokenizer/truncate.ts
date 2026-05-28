@@ -21,53 +21,42 @@ import {countTokens} from './tokenize';
 
 const TRUNCATION_SUFFIX = ' …[truncated]';
 
+/** Result of truncateTranscript. */
 export interface TruncateResult {
-  /** The processed transcript lines after both truncation stages (stage 1 hard-truncation and stage 2 oldest-first drops). */
   lines: string[];
-  /** Count of whole lines removed by stage 2 (oldest-first drops). */
   droppedFromStart: number;
-  /** Count of lines that had their content hard-truncated in stage 1 (per-message cap). */
   truncatedPerMessage: number;
 }
 
 /**
- * Truncates a transcript to fit within token budgets using a two-stage algorithm.
+ * Two-stage transcript truncation:
+ * 1. Per-message truncation: any line exceeding perMessageCap tokens is hard-truncated (head kept, suffix appended).
+ * 2. Oldest-first truncation: drops lines from the front until total fits within forTranscript.
  *
- * Stage 1 (per-message hard truncation): Any single transcript line whose tokenized length exceeds
- * perMessageCap is hard-truncated by characters (keep head, append the truncation suffix).
- *
- * Stage 2 (oldest-first whole-line drops): Drop entire lines from the front (oldest first) until
- * the total token count fits within forTranscript.
- *
- * @param lines The array of transcript lines to truncate.
- * @param forTranscript The token budget available for the entire transcript (after prompt overhead).
- * @param perMessageCap The maximum token count allowed for a single transcript line.
- * @returns A TruncateResult with the processed lines and counters for dropped/truncated messages.
- * @note The per-message truncation uses targetChars = Math.max(1, Math.floor(perMessageCap * 3)),
- * which approximates 3 characters per token (conservative estimate).
- * @note Summing individual line token counts (naive approach) overcounts relative to tokenizing
- * the full joined string, because BPE doesn't tokenize at line boundaries. However, this
- * approximation is acceptable given the 20% safety margin applied at the budget layer.
+ * Order matters: per-message truncation MUST run before oldest-first truncation.
  */
 export const truncateTranscript = (lines: string[], forTranscript: number, perMessageCap: number): TruncateResult => {
-  // Stage 1: per-message hard truncation
   let truncatedPerMessage = 0;
+
+  // Stage 1: per-message cap
   const stepOne = lines.map(line => {
     if (countTokens(line) <= perMessageCap) {
       return line;
     }
     truncatedPerMessage += 1;
+    // Approximate: keep ~3 chars per token then append the suffix
     const targetChars = Math.max(1, Math.floor(perMessageCap * 3));
     return line.slice(0, targetChars) + TRUNCATION_SUFFIX;
   });
 
-  // Stage 2: oldest-first whole-line drops
+  // Stage 2: oldest-first drop
   let total = stepOne.reduce((sum, l) => sum + countTokens(l), 0);
-  const out = [...stepOne];
   let droppedFromStart = 0;
+  const out = [...stepOne];
+
   while (total > forTranscript && out.length > 0) {
     const dropped = out.shift();
-    if (dropped) {
+    if (dropped !== undefined) {
       total -= countTokens(dropped);
       droppedFromStart += 1;
     }

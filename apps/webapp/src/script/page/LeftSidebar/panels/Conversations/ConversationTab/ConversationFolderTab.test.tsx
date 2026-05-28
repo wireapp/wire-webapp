@@ -26,7 +26,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 
 import {ConversationFolderTab} from './ConversationFolderTab';
 
-import {SidebarTabs} from '../useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 const getProps = async (conversations: Conversation[] = []) => {
   const testFactory = new TestFactory();

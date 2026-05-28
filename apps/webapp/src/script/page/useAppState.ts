@@ -56,6 +56,10 @@ export enum ContentState {
   AI_REPORTS_LIST = 'ContentState.AI_REPORTS_LIST',
   AI_REPORT_DETAIL = 'ContentState.AI_REPORT_DETAIL',
   PREFERENCES_AI = 'ContentState.PREFERENCES_AI',
+  AI_JIRA = 'ContentState.AI_JIRA',
+  AI_EXPORTS_LIST = 'ContentState.AI_EXPORTS_LIST',
+  AI_EXPORTS_CREATE = 'ContentState.AI_EXPORTS_CREATE',
+  AI_EXPORTS_RESULT = 'ContentState.AI_EXPORTS_RESULT',
 }
 
 export enum ListState {
@@ -77,6 +81,10 @@ type AppState = {
   setUnreadMessagesCount: (unreadMessagesCount: number) => void;
   activeReportId: string | null;
   setActiveReportId: (id: string | null) => void;
+  activeJiraTicketKey: string | null;
+  setActiveJiraTicketKey: (key: string | null) => void;
+  activeExportId: string | null;
+  setActiveExportId: (id: string | null) => void;
   /**
    * returns true if the current active content could display a conversation
    */
@@ -91,6 +99,10 @@ const useAppState = create<AppState>((set, get) => ({
   previousContentState: null,
   activeReportId: null,
   setActiveReportId: id => set(state => ({...state, activeReportId: id})),
+  activeJiraTicketKey: null,
+  setActiveJiraTicketKey: key => set(state => ({...state, activeJiraTicketKey: key})),
+  activeExportId: null,
+  setActiveExportId: id => set(state => ({...state, activeExportId: id})),
   setContentState: (contentState: ContentState) => {
     const previousContentState = get().contentState;
     set(state => ({

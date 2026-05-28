@@ -19,15 +19,16 @@
 
 import {create} from 'zustand';
 
-/**
- * Ephemeral Zustand store for live scan progress (D17, D18).
- * Holds per-conversation stage labels like 'Loading events', 'Calling LLM'.
- * Wiped on page reload. Written by ScanRunner (non-React), read by React UI via hook.
- */
+/** Ephemeral (non-persisted) scan state for UI display. Keyed by conversation id. */
 interface ReportsStoreState {
+  /** Maps conversation ID to the current live stage label (e.g. 'Calling LLM'). */
   liveStage: Record<string, string>;
 }
 
+/**
+ * Zustand store for live scan-progress labels (D17 / D18).
+ * Not persisted — this state is ephemeral and only meaningful while a scan is running.
+ */
 export const useReportsStore = create<ReportsStoreState>()(() => ({
   liveStage: {},
 }));

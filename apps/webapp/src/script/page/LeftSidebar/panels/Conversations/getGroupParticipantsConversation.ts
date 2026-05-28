@@ -22,7 +22,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {Conversation} from 'Repositories/entity/Conversation';
 import {SearchRepository} from 'Repositories/search/SearchRepository';
 
-import {SidebarTabs} from './useSidebarStore';
+import {SidebarTabs} from 'src/script/page/LeftSidebar/useSidebarStore';
 
 type GetGroupParticipantsConversationsParams = {
   currentTab: SidebarTabs;

@@ -23,7 +23,7 @@ import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/Icon';
 import {Config} from 'src/script/Config';
-import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/useSidebarStore';
 import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';

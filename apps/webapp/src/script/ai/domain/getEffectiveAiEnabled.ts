@@ -22,28 +22,23 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {AiConversationSettingsRecord} from '../storage/records';
 
 /**
- * Resolves the effective AI-enabled status for a conversation.
- * Three-branch resolution logic:
- * 1. If explicit settings exist, they always win.
- * 2. Otherwise, default is true for human conversations (no service participants).
- * 3. Default is false for conversations with service participants.
- *
- * @param settings - Per-conversation AI settings, or undefined for defaults.
- * @param conversation - The conversation to check. The `hasService` property may be either a function
- *   (in some Knockout entity versions) or a plain boolean property (in others). This function guards
- *   for both forms to avoid throws or incorrect results.
- * @returns True if AI scanning is enabled for this conversation, false otherwise.
+ * Returns the effective `ai_enabled` value for the conversation.
+ * - If an explicit settings record exists, that value wins.
+ * - Otherwise: default true for human conversations, false if any participant isService.
  */
 export const getEffectiveAiEnabled = (
   settings: AiConversationSettingsRecord | undefined,
   conversation: Conversation,
 ): boolean => {
-  if (settings) {
+  if (settings !== undefined) {
     return settings.ai_enabled;
   }
+
+  // hasService may be a Knockout observable function or a plain boolean depending on entity version.
   const hasService =
     typeof conversation.hasService === 'function'
-      ? conversation.hasService()
+      ? (conversation.hasService as () => boolean)()
       : Boolean((conversation as unknown as {hasService: boolean}).hasService);
+
   return !hasService;
 };

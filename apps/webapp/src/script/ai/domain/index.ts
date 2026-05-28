@@ -17,8 +17,7 @@
  *
  */
 
-/** Barrel re-export for the AI domain layer. Consumers should import from this index, not from individual files. */
+/** Public surface of the AI domain layer — pure types, no IO. */
 
-export * from './EntryTypes';
 export * from './ReportStatus';
-export {getEffectiveAiEnabled} from './getEffectiveAiEnabled';
+export * from './EntryTypes';
