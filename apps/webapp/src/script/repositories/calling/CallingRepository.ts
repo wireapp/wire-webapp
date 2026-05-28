@@ -161,7 +161,6 @@ export class CallingRepository {
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
-  private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
   private selfClientId: ClientId | null = null;
   private selfUser: User | null = null;
   private wCall?: Wcall;
@@ -648,22 +647,7 @@ export class CallingRepository {
       return;
     }
     const {quality} = qualityInfo;
-    if (!this.poorCallQualityUsers[conversationId]) {
-      this.poorCallQualityUsers[conversationId] = [];
-    }
-
-    let users = this.poorCallQualityUsers[conversationId];
-    const isOldPoorCallQualityUser = users.some(_userId => _userId === userId);
-    if (isOldPoorCallQualityUser && quality === QUALITY.NORMAL) {
-      users = users.filter(_userId => _userId !== userId);
-    }
-    if (!isOldPoorCallQualityUser && quality !== QUALITY.NORMAL) {
-      users = [...users, userId];
-    }
-    const poorCallQualityUsers = users.length;
-    const remoteParticipants = call.participants().length - 1;
-    // Edge case: In call start remote participants and poorCallQualityUsers are always 0
-    if (remoteParticipants !== 0 && poorCallQualityUsers === remoteParticipants) {
+    if (quality !== QUALITY.NORMAL) {
       Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
       Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
@@ -1881,7 +1865,6 @@ export class CallingRepository {
 
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
-    delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
     AvsDebugger.reset();
   };
