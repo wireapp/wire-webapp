@@ -18,25 +18,20 @@
  */
 
 import {CONVERSATION_EVENT, USER_EVENT} from '@wireapp/api-client/lib/event/';
+import {isOutdatedNotificationStreamEvent} from '@wireapp/core/lib/notification';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 
 export function validateEvent(
-  event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},
+  event: {time?: string; type: CONVERSATION_EVENT | USER_EVENT},
   source: EventSource,
   lastEventDate?: string,
 ): EventValidation {
-  const eventTime = event.time;
-  const isFromNotificationStream = source === EventSource.NOTIFICATION_STREAM;
-  const shouldCheckEventDate = !!eventTime && isFromNotificationStream && lastEventDate;
-
-  if (shouldCheckEventDate) {
-    /** This check prevents duplicated "You joined" system messages. */
-    const isOutdated = new Date(lastEventDate).getTime() >= new Date(eventTime).getTime();
-    if (isOutdated) {
-      return EventValidation.OUTDATED_TIMESTAMP;
-    }
+  if (
+    isOutdatedNotificationStreamEvent(event, source, lastEventDate !== undefined ? new Date(lastEventDate) : undefined)
+  ) {
+    return EventValidation.OUTDATED_TIMESTAMP;
   }
 
   return EventValidation.VALID;
