@@ -220,6 +220,72 @@ test.describe('account settings', () => {
     await expect(userA2DeviceComponents.conversationSidebar().personalUserName).toContainText(newUserName);
   });
 
+  test('Verify username is unique', {tag: ['@TC-1942', '@regression']}, async ({createPage, createUser, api}) => {
+    const userA = await createUser();
+
+    const userB = getUser();
+    const userPage = await createPage();
+    const userPageManager = PageManager.from(userPage);
+    const {pages, components, modals} = userPageManager.webapp;
+
+    await test.step('Register User B before username selection', async () => {
+      await userPageManager.openMainPage();
+      await pages.singleSignOn().enterEmailOnSSOPage(userB.email);
+      await pages.welcome().clickCreateAccountButton();
+      await pages.welcome().clickCreatePersonalAccountButton();
+      await expect(pages.registration().passwordPolicyInfo).toContainText(
+        'Use at least 8 characters, with one lowercase letter, one capital letter, a number, and a special character.',
+      );
+
+      await pages.registration().fillInUserInfo(userB);
+      await expect(pages.registration().submitButton).toBeDisabled();
+
+      await pages.registration().toggleTermsCheckbox();
+      await expect(pages.registration().submitButton).toBeEnabled();
+      await pages.registration().clickSubmitButton();
+      await expect(pages.emailVerification().verificationCodeInputLabel).toBeVisible();
+
+      const verificationCode = await api.brig.getActivationCodeForEmail(userB.email);
+      await pages.emailVerification().enterVerificationCode(verificationCode);
+      await modals.marketingConsent().clickConfirmButton();
+    });
+
+    await test.step('Validate username uniqueness error during account creating', async () => {
+      await pages.setUsername().setUsername(userA.username);
+      await pages.setUsername().clickNextButton();
+      await expect(pages.setUsername().errorMessage).toContainText('This username is already taken');
+
+      // Proceed successfully with User B's unique username
+      await pages.setUsername().setUsername(userB.username);
+      await pages.setUsername().clickNextButton();
+      await pages.registerSuccess().clickOpenWireWebButton();
+      await modals.confirm().cancelButton.click();
+    });
+
+    await test.step('Validate username uniqueness error inside Profile Settings', async () => {
+      await components.conversationSidebar().clickPreferencesButton();
+      await expect(pages.account().usernameDisplay).toContainText(userB.username);
+      await pages.account().changeUserName(userA.username);
+      await pages.account().editUserNameButton.click();
+      await expect(userPage.getByText('Already taken')).toBeVisible();
+      await pages.account().userNameInput.press('Enter');
+      await expect(pages.account().usernameDisplay).toContainText(userB.username);
+    });
+
+    await test.step('Delete user', async () => {
+      await components.conversationSidebar().clickPreferencesButton();
+      await pages.account().clickDeleteAccountButton();
+      await expect(modals.confirm().modal).toBeVisible();
+      await modals.confirm().actionButton.click();
+      const url = await api.inbucket.getAccountDeletionURL(userB.email);
+
+      await userPageManager.openNewTab(url, async tab => {
+        await tab.webapp.pages.deleteAccount().deleteAccountButton.click();
+        await expect(tab.webapp.pages.deleteAccount().accountDeletedHeadline).toContainText('Account deleted');
+      });
+    });
+  });
+
   test(
     'I want to see the Full Name wherever my name gets displayed',
     {tag: ['@TC-1948', '@regression']},

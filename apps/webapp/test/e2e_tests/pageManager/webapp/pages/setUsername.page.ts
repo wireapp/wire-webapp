@@ -22,10 +22,12 @@ import {Page, Locator} from '@playwright/test';
 export class SetUsernamePage {
   readonly handleInput: Locator;
   readonly nextButton: Locator;
+  readonly errorMessage: Locator;
 
   constructor(page: Page) {
     this.handleInput = page.locator('[data-uie-name="enter-handle"]');
     this.nextButton = page.locator('[data-uie-name="do-send-handle"]');
+    this.errorMessage = page.getByTestId('error-message');
   }
 
   async setUsername(username: string) {
