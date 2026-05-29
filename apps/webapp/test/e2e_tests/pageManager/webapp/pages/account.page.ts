@@ -61,7 +61,7 @@ export class AccountPage {
     this.editUserNameButton = page.getByRole('button', {name: 'Username'});
     this.emailInput = page.getByTestId('enter-email-input');
     this.displayNameInput = page.getByTestId('enter-displayname-input');
-    this.userNameInput = page.getByTestId('enter-username-input');
+    this.userNameInput = page.getByLabel('Username');
     this.emailDisplay = page.getByTestId('email-display');
     this.nameDisplay = page.getByTestId('displayname-display');
     this.domainDisplay = page.getByTestId('item-enriched-value');
