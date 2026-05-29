@@ -88,7 +88,7 @@ export enum FEATURE_KEY {
   STEALTH_USERS = 'stealthUsers',
   VALIDATE_SAML_EMAILS = 'validateSAMLemails',
   VIDEO_CALLING = 'videoCalling',
-  PREVENT_ADMIN_LESS_GROUPS = 'preventAdminLessGroups',
+  PREVENT_ADMIN_LESS_GROUPS = 'preventAdminlessGroups',
 }
 
 export enum FEATURE_LOCK_STATUS {

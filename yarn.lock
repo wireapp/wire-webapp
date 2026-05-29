@@ -3502,9 +3502,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@formatjs/cli@npm:6.16.1":
-  version: 6.16.1
-  resolution: "@formatjs/cli@npm:6.16.1"
+"@formatjs/cli@npm:6.16.3":
+  version: 6.16.3
+  resolution: "@formatjs/cli@npm:6.16.3"
   dependencies:
     "@formatjs/cli-native-darwin-arm64": "npm:1.1.0"
     "@formatjs/cli-native-linux-arm64": "npm:1.2.0"
@@ -3541,7 +3541,7 @@ __metadata:
       optional: true
   bin:
     formatjs: bin/formatjs
-  checksum: 10/6de947b4dc62d57345675cd003b3eb285e044c4dbacb49b5da8a40cc2fd6fdd13d1138a6089445f2741c0524553a973d5cf3b496449f51ac5bd0b39bd748ff4f
+  checksum: 10/5f1a19e020cf6861487ba312fdc7d086a934bdfae0ab849f4e39ddf75630227254ccb03b10edd68225916e6ad3ea4cd02d5e0a9c731d61981ab138977e101e44
   languageName: node
   linkType: hard
 
@@ -8887,10 +8887,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wireapp/avs@npm:10.3.22":
-  version: 10.3.22
-  resolution: "@wireapp/avs@npm:10.3.22"
-  checksum: 10/4d3250939233022b66535fb287ff038f6de6863230d266a32d57463b5c2a5cabd04ed8073e92b8fec374b7c2675d6b8d305d486e005f9d66ae16e71f84e852f6
+"@wireapp/avs@npm:10.3.28":
+  version: 10.3.28
+  resolution: "@wireapp/avs@npm:10.3.28"
+  checksum: 10/8a06870e30aa41e464670c0922fa85ff1fc1cb15924cff6c627c882d8dea6e35411267e36745642379affff0ab54ba4380707146afac6d5160cab6d4cf829634
   languageName: node
   linkType: hard
 
@@ -9214,7 +9214,7 @@ __metadata:
     "@datadog/browser-rum": "npm:7.1.0"
     "@emotion/eslint-plugin": "npm:11.12.0"
     "@emotion/react": "npm:11.14.0"
-    "@formatjs/cli": "npm:6.16.1"
+    "@formatjs/cli": "npm:6.16.3"
     "@formkit/auto-animate": "npm:0.9.0"
     "@lexical/code": "npm:0.27.2"
     "@lexical/history": "npm:0.27.2"
@@ -9251,7 +9251,7 @@ __metadata:
     "@types/webpack-bundle-analyzer": "npm:4.7.0"
     "@types/webpack-env": "npm:1.18.8"
     "@types/wicg-file-system-access": "npm:2023.10.7"
-    "@wireapp/avs": "npm:10.3.22"
+    "@wireapp/avs": "npm:10.3.28"
     "@wireapp/avs-debugger": "npm:0.0.7"
     "@wireapp/config": "workspace:^"
     "@wireapp/core": "workspace:^"

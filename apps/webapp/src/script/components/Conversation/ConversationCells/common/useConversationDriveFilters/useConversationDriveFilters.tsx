@@ -20,6 +20,7 @@
 import {useCallback, useMemo, useState} from 'react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {t} from 'Util/localizerUtil';
 
 import type {FilterConfig, FilterItem} from '../CellsFiltersBar/filterConfig';
@@ -29,19 +30,8 @@ import {
   isFilterTypeDisabled,
 } from '../driveFilters/driveFilters';
 import {FILE_TYPE_CATALOG} from '../driveFilters/fileTypeCatalog';
+import {useDriveEnabledParticipantFilterItems} from '../useDriveEnabledParticipantFilterItems/useDriveEnabledParticipantFilterItems';
 import {useGetAllTags} from '../useGetAllTags/useGetAllTags';
-
-// ---------------------------------------------------------------------------
-// Mock data — replace each array with an API call in the integration sprint.
-// ---------------------------------------------------------------------------
-
-const MOCK_CREATORS: FilterItem[] = [
-  {id: 'a-user', label: 'A User', subLabel: '@auser'},
-  {id: 'hello-user', label: 'Hello User', subLabel: '@hellouser'},
-  {id: 'b-user', label: 'B User', subLabel: '@buser'},
-];
-
-// ---------------------------------------------------------------------------
 
 export interface UseConversationDriveFiltersResult {
   filters: FilterConfig[];
@@ -51,10 +41,13 @@ export interface UseConversationDriveFiltersResult {
 
 export const useConversationDriveFilters = ({
   cellsRepository,
+  conversationRepository,
 }: {
   cellsRepository: CellsRepository;
+  conversationRepository: ConversationRepository;
 }): UseConversationDriveFiltersResult => {
   const {tags: allTags} = useGetAllTags({cellsRepository});
+  const creatorItems = useDriveEnabledParticipantFilterItems({conversationRepository});
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [selectedFileTypeIds, setSelectedFileTypeIds] = useState<string[]>([]);
@@ -117,7 +110,7 @@ export const useConversationDriveFilters = ({
         type: 'popover',
         id: 'createdBy',
         label: t('cells.filter.createdBy'),
-        items: MOCK_CREATORS,
+        items: creatorItems,
         selectedIds: selectedCreatorIds,
         onSelectionChange: setSelectedCreatorIds,
         disabled: isFilterTypeDisabled('createdBy', activeFilterType),
@@ -134,6 +127,7 @@ export const useConversationDriveFilters = ({
     ],
     [
       activeFilterType,
+      creatorItems,
       fileTypes,
       tagItems,
       selectedTagIds,
