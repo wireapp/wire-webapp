@@ -104,6 +104,21 @@ export const ConversationListCell = ({
   const [focusContextMenu, setContextMenuFocus] = useState(false);
   const [isContextMenuOpen, setContextMenuOpen] = useState(false);
   const contextMenuKeyboardShortcut = `keyboard-shortcut-${conversation.id}`;
+  const unreadMessagesCount = unreadState.allMessages.length;
+  const isMutedConversation = !conversation.showNotificationsEverything();
+  const accessibilityParts = [displayName];
+
+  if (unreadMessagesCount > 0) {
+    accessibilityParts.push(`${unreadMessagesCount} ${t('conversationLabelUnread')}`);
+  }
+
+  if (isMutedConversation) {
+    accessibilityParts.push('Muted');
+  }
+
+  const accessibilityConversationLabel = `${accessibilityParts.join(', ')}. ${t('accessibility.openConversation', {
+    name: displayName,
+  })}`;
 
   // Ref for immediate synchronous protection from multiple clicks
   const isJoiningCallRef = useRef(false);
@@ -133,7 +148,7 @@ export const ConversationListCell = ({
         await onJoinCall(conversation, MediaType.AUDIO);
         isJoiningCallRef.current = false;
       });
-    } catch (error: unknown) {
+    } catch {
       // Re-enable on error
       isJoiningCallRef.current = false;
     }
@@ -196,7 +211,7 @@ export const ConversationListCell = ({
         onKeyDown={handleDivKeyDown}
         data-uie-name="go-open-conversation"
         tabIndex={isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
-        aria-label={t('accessibility.openConversation', {name: displayName})}
+        aria-label={accessibilityConversationLabel}
         aria-describedby={contextMenuKeyboardShortcut}
       >
         <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
