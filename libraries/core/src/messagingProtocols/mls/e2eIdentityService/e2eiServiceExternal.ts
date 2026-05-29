@@ -232,6 +232,22 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     await this.initialiseCrlDistributionTimers();
   }
 
+  /**
+   * Forces an immediate refresh of revocation-related data.
+   * - Re-fetches and registers federation intermediate certificates
+   * - Re-validates all known CRL distribution points from local storage
+   */
+  public async refreshRevocationData(): Promise<void> {
+    await this.registerCrossSignedCertificates(this.acmeService);
+
+    const knownCrlDistributionPoints = await this.coreDatabase.getAll('crls');
+    const uniqueDistributionPointUrls = Array.from(new Set(knownCrlDistributionPoints.map(crl => crl.url)));
+
+    for (const distributionPointUrl of uniqueDistributionPointUrls) {
+      await this.validateCrlDistributionPoint(distributionPointUrl);
+    }
+  }
+
   private get acmeService(): AcmeService {
     if (!this._acmeService) {
       throw new Error('AcmeService not initialized');

@@ -20,11 +20,21 @@
 import {getGroupAvatarColors} from 'Util/avatarUtil';
 import {CSS_SQUARE} from 'Util/cssMixin';
 
+type GroupAvatarSize = 'small' | 'medium' | 'large';
+
 interface GroupAvatarProps {
-  size?: 'small' | 'large';
+  size?: GroupAvatarSize;
   className?: string;
   conversationID?: string;
 }
+
+const OUTER_SIZE: Record<GroupAvatarSize, number> = {small: 16, medium: 28, large: 32};
+const INNER_SIZE: Record<GroupAvatarSize, number | string> = {small: '100%', medium: 24, large: 28};
+const OUTER_RADIUS: Record<GroupAvatarSize, number> = {small: 4, medium: 8, large: 8};
+const INNER_RADIUS: Record<GroupAvatarSize, number> = {small: 4, medium: 7, large: 7};
+const BORDER_WIDTH: Record<GroupAvatarSize, number> = {small: 0.5, medium: 1, large: 1};
+const SVG_WIDTH: Record<GroupAvatarSize, number> = {small: 12, medium: 16, large: 20};
+const SVG_HEIGHT: Record<GroupAvatarSize, number | 'auto'> = {small: 'auto', medium: 24, large: 28};
 
 export const GroupAvatar = ({conversationID, className, size = 'large'}: GroupAvatarProps) => {
   const colors = getGroupAvatarColors(conversationID);
@@ -33,27 +43,27 @@ export const GroupAvatar = ({conversationID, className, size = 'large'}: GroupAv
     <div
       className={className}
       css={{
-        ...CSS_SQUARE(size === 'small' ? 16 : 32),
-        border: `${size === 'small' ? 0.5 : 1}px solid var(--border-color)`,
-        borderRadius: size === 'small' ? 4 : 8,
+        ...CSS_SQUARE(OUTER_SIZE[size]),
+        border: `${BORDER_WIDTH[size]}px solid var(--border-color)`,
+        borderRadius: OUTER_RADIUS[size],
       }}
     >
       <div
         css={{
-          ...CSS_SQUARE(size === 'small' ? '100%' : 28),
+          ...CSS_SQUARE(INNER_SIZE[size]),
           backgroundColor: 'var(--group-icon-bg)',
           display: 'flex',
           flexWrap: 'wrap',
           margin: size === 'small' ? 0 : 1,
           overflow: 'hidden',
-          borderRadius: size === 'small' ? 4 : 7,
+          borderRadius: INNER_RADIUS[size],
         }}
         data-uie-name="group-avatar-box-wrapper"
       >
         <svg
           css={{margin: 'auto'}}
-          width={size === 'small' ? 12 : 20}
-          height={size === 'small' ? 'auto' : 28}
+          width={SVG_WIDTH[size]}
+          height={SVG_HEIGHT[size]}
           viewBox="0 0 20 10"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"

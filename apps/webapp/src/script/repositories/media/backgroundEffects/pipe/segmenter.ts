@@ -17,9 +17,9 @@
  *
  */
 
-import {FilesetResolver, ImageSegmenter} from '@mediapipe/tasks-vision';
+import {ImageSegmenter} from '@mediapipe/tasks-vision';
 
-import type {Metrics} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
+import type {Metrics, Mode} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {getSafeLogger} from 'Repositories/media/backgroundEffects/helper/logger';
 import {
   buildMetrics,
@@ -27,6 +27,7 @@ import {
   pushMetricsSample,
 } from 'Repositories/media/backgroundEffects/helper/metrics';
 import {createRestartQueue} from 'Repositories/media/backgroundEffects/helper/restartQueue';
+import {PerformanceSample} from 'Repositories/media/backgroundEffects/helper/samples';
 
 import {VideoFilter} from './filter';
 import {WorkerProcessVideoTrackOptions} from './options';
@@ -44,19 +45,22 @@ export function updateSegmenterOptions(opts: WorkerProcessVideoTrackOptions) {
 async function createSegmenter(canvas: OffscreenCanvas) {
   const logger = getSafeLogger('segmenter:createSegmenter');
   const {wasmLoaderPath, wasmBinaryPath, modelPath} = segmenterOptions;
-  const fileset =
-    wasmLoaderPath && wasmBinaryPath
-      ? {
-          wasmLoaderPath,
-          wasmBinaryPath,
-        }
-      : await FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm');
+  if (!wasmLoaderPath || !wasmBinaryPath) {
+    logger.error('wasmLoaderPath and wasmBinaryPath must be provided');
+    throw new Error('wasmLoaderPath and wasmBinaryPath must be provided');
+  }
+
+  const fileset = {wasmLoaderPath, wasmBinaryPath};
   logger.log(`[virtual-background] createSegmenter`);
+
+  if (!modelPath) {
+    logger.error('Model path must be provided');
+    throw new Error('Model path must be provided');
+  }
+
   const segmenter = await ImageSegmenter.createFromOptions(fileset, {
     baseOptions: {
-      modelAssetPath:
-        modelPath ||
-        'https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_multiclass_256x256/float32/latest/selfie_multiclass_256x256.tflite',
+      modelAssetPath: modelPath,
       delegate: 'GPU',
     },
     runningMode: 'VIDEO',
@@ -87,6 +91,7 @@ export async function runSegmenter(
   readable: ReadableStream,
   opts: WorkerProcessVideoTrackOptions,
   onMetrics: (metrics: Metrics) => void,
+  onPerformanceSample: (sample: PerformanceSample, mode: Mode) => void,
 ) {
   const logger = getSafeLogger('segmenter:runSegmenter');
   logger.log(`[virtual-background] runSegmenter`);
@@ -177,9 +182,13 @@ export async function runSegmenter(
     pushMetricsSample(metricsWindow, {totalMs, segmentationMs, gpuMs});
 
     const quality = segmenterOptions.quality ?? 'auto';
-    const tier = quality === 'auto' ? 'superhigh' : quality;
+    const tier = quality === 'auto' ? 'fhd' : quality;
 
     onMetrics(buildMetrics(metricsWindow, droppedFrames, tier, 'GPU'));
+
+    const mode: Mode =
+      segmenterOptions.mode === 'passthrough' || segmenterOptions.mode === undefined ? 'blur' : segmenterOptions.mode;
+    onPerformanceSample({totalMs: segmentationMs + gpuMs, segmentationMs, gpuMs}, mode);
   }
 
   function close() {

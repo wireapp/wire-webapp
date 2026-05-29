@@ -28,6 +28,7 @@ import {t} from 'Util/localizerUtil';
 import {
   badgeStyles,
   checkboxLabelStyles,
+  checkboxSubLabelStyles,
   checkboxWrapperStyles,
   clearAllButtonStyles,
   dialogStyles,
@@ -57,7 +58,9 @@ export const filterItems = (items: FilterItem[], query: string): FilterItem[] =>
     return items;
   }
   const lowerQuery = query.toLowerCase();
-  return items.filter(item => item.label.toLowerCase().includes(lowerQuery));
+  return items.filter(
+    item => item.label.toLowerCase().includes(lowerQuery) || item.subLabel?.toLowerCase().includes(lowerQuery) === true,
+  );
 };
 
 export const computeNextSelection = (currentIds: string[], id: string): string[] =>
@@ -175,6 +178,7 @@ export const FilterPopover = ({
               filteredItems.map(item => {
                 const isSelected = selectedIds.includes(item.id);
                 const isItemDisabled = singleSelect && selectedIds.length > 0 && !isSelected;
+                const hasStartContent = item.startContent !== undefined && item.startContent !== null;
                 return (
                   <li key={item.id} css={itemRowHoverStyles} role="option" aria-selected={isSelected}>
                     <Checkbox
@@ -186,12 +190,13 @@ export const FilterPopover = ({
                       data-uie-name="filter-popover-item"
                       data-uie-value={item.id}
                     >
-                      <span css={labelGroupStyles}>
+                      {hasStartContent && <span css={startContentStyles}>{item.startContent}</span>}
+                      <span css={labelGroupStyles} data-has-start-content={hasStartContent}>
                         <CheckboxLabel css={checkboxLabelStyles}>{item.label}</CheckboxLabel>
+                        {item.subLabel !== undefined && item.subLabel.length > 0 && (
+                          <span css={checkboxSubLabelStyles}>{item.subLabel}</span>
+                        )}
                       </span>
-                      {item.startContent !== undefined && item.startContent !== null && (
-                        <span css={startContentStyles}>{item.startContent}</span>
-                      )}
                     </Checkbox>
                   </li>
                 );

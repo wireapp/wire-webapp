@@ -2030,6 +2030,221 @@ describe('CellsAPI', () => {
       });
       expect(result).toEqual(mockResponse);
     });
+
+    it('filters by a single mime type with Must operation', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, mimeTypes: ['image/*']});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {Deleted: 'Not'},
+          Metadata: [{Namespace: 'mime', Term: 'image/*', Operation: 'Must'}],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+    });
+
+    it('filters by multiple mime types with Should operation (OR)', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, mimeTypes: ['*presentation*', '*powerpoint*']});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {Deleted: 'Not'},
+          Metadata: [
+            {Namespace: 'mime', Term: '*presentation*', Operation: 'Should'},
+            {Namespace: 'mime', Term: '*powerpoint*', Operation: 'Should'},
+          ],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+    });
+
+    it('omits mime metadata entries when mimeTypes is an empty array', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, mimeTypes: []});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          Filters: expect.objectContaining({Metadata: []}),
+        }),
+      );
+    });
+
+    it('sets Status.HasPublicLink to true when hasPublicLink is true', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, hasPublicLink: true});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          Filters: expect.objectContaining({
+            Status: {Deleted: 'Not', HasPublicLink: true},
+          }),
+        }),
+      );
+    });
+
+    it('sets Status.HasPublicLink to false when hasPublicLink is false', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, hasPublicLink: false});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          Filters: expect.objectContaining({
+            Status: {Deleted: 'Not', HasPublicLink: false},
+          }),
+        }),
+      );
+    });
+
+    it('omits Status.HasPublicLink when hasPublicLink is not provided', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          Filters: expect.objectContaining({
+            Status: {Deleted: 'Not'},
+          }),
+        }),
+      );
+    });
+
+    it('filters by a single creator with Must operation and JSON-stringified Term', async () => {
+      const searchPhrase = 'test';
+      const creatorId = '6840ecd8-8bf2-48e6-9637-654643d39a8b@staging.zinfra.io';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, creatorIds: [creatorId]});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {Deleted: 'Not'},
+          Metadata: [{Namespace: 'usermeta-owner-uuid', Term: JSON.stringify(creatorId), Operation: 'Must'}],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+    });
+
+    it('filters by multiple creators with Should operation (OR)', async () => {
+      const searchPhrase = 'test';
+      const creatorIds = [
+        '6840ecd8-8bf2-48e6-9637-654643d39a8b@staging.zinfra.io',
+        '937f2cd8-cb00-487c-a1ea-889f010c58ba@staging.zinfra.io',
+      ];
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, creatorIds});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {Deleted: 'Not'},
+          Metadata: [
+            {Namespace: 'usermeta-owner-uuid', Term: JSON.stringify(creatorIds[0]), Operation: 'Should'},
+            {Namespace: 'usermeta-owner-uuid', Term: JSON.stringify(creatorIds[1]), Operation: 'Should'},
+          ],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+    });
+
+    it('omits creator metadata entries when creatorIds is an empty array', async () => {
+      const searchPhrase = 'test';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: searchPhrase, creatorIds: []});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          Filters: expect.objectContaining({Metadata: []}),
+        }),
+      );
+    });
+
+    it('combines tags, mime, creator and hasPublicLink filters in a single request', async () => {
+      const searchPhrase = 'test';
+      const tags = ['important'];
+      const mimeTypes = ['image/*'];
+      const creatorId = '6840ecd8-8bf2-48e6-9637-654643d39a8b@staging.zinfra.io';
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({
+        phrase: searchPhrase,
+        tags,
+        mimeTypes,
+        creatorIds: [creatorId],
+        hasPublicLink: true,
+      });
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
+        Scope: {Root: {Path: '/'}, Recursive: true},
+        Filters: {
+          Text: {SearchIn: 'BaseName', Term: searchPhrase},
+          Type: 'UNKNOWN',
+          Status: {Deleted: 'Not', HasPublicLink: true},
+          Metadata: [
+            {Namespace: 'usermeta-tags', Term: JSON.stringify(tags.join(','))},
+            {Namespace: 'mime', Term: 'image/*', Operation: 'Must'},
+            {Namespace: 'usermeta-owner-uuid', Term: JSON.stringify(creatorId), Operation: 'Must'},
+          ],
+        },
+        Flags: ['WithPreSignedURLs'],
+        Limit: '10',
+        Offset: '0',
+      });
+    });
   });
 
   describe('createFile', () => {

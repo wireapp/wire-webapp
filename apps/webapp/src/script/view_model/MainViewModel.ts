@@ -42,6 +42,7 @@ import type {SearchRepository} from 'Repositories/search/searchRepository';
 import type {SelfRepository} from 'Repositories/self/SelfRepository';
 import type {StorageRepository} from 'Repositories/storage';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
+import {TeamState} from 'Repositories/team/TeamState';
 import type {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
@@ -103,6 +104,7 @@ export class MainViewModel {
 
   constructor(repositories: ViewModelRepositories) {
     const userState = container.resolve(UserState);
+    const teamState = container.resolve(TeamState);
     const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
     const mediaStreamHandler = container.resolve(MediaStreamHandler);
 
@@ -114,6 +116,7 @@ export class MainViewModel {
       repositories.integration,
       repositories.message,
       userState,
+      teamState,
       this,
     );
 

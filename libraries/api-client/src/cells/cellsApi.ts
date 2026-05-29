@@ -52,6 +52,7 @@ const CONFIGURATION_ERROR = 'CellsAPI is not initialized. Call initialize() befo
 const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
 const USER_META_TAGS_NAMESPACE = 'usermeta-tags';
+const USER_META_OWNER_UUID_NAMESPACE = 'usermeta-owner-uuid';
 const MIME_NAMESPACE = 'mime';
 
 // TODO: remove the apiKey (from pydio and s3) once the Pydio backend has fully support for the auth with the Wire's access token
@@ -426,6 +427,7 @@ export class CellsAPI {
     tags,
     mimeTypes,
     hasPublicLink,
+    creatorIds,
     deleted = false,
   }: {
     phrase: string;
@@ -438,6 +440,7 @@ export class CellsAPI {
     tags?: string[];
     mimeTypes?: string[];
     hasPublicLink?: boolean;
+    creatorIds?: string[];
     deleted?: boolean;
   }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
@@ -445,6 +448,7 @@ export class CellsAPI {
     }
 
     const mimeOp: 'Should' | 'Must' = mimeTypes !== undefined && mimeTypes.length > 1 ? 'Should' : 'Must';
+    const creatorOp: 'Should' | 'Must' = creatorIds !== undefined && creatorIds.length > 1 ? 'Should' : 'Must';
 
     const request: RestLookupRequest = {
       Scope: {Root: {Path: path}, Recursive: true},
@@ -460,6 +464,11 @@ export class CellsAPI {
             ? [{Namespace: USER_META_TAGS_NAMESPACE, Term: this.transformTagsToJson(tags)}]
             : []),
           ...(mimeTypes?.map(term => ({Namespace: MIME_NAMESPACE, Term: term, Operation: mimeOp})) ?? []),
+          ...(creatorIds?.map(term => ({
+            Namespace: USER_META_OWNER_UUID_NAMESPACE,
+            Term: JSON.stringify(term),
+            Operation: creatorOp,
+          })) ?? []),
         ],
       },
       Flags: ['WithPreSignedURLs'],
