@@ -251,4 +251,31 @@ export class BrigRepositoryE2E {
       },
     );
   }
+
+  public async claimDomain(domain: string) {
+    await this.axiosInstance.put(
+      `i/domain-registration/${domain}`,
+      {
+        backend: {
+          config_url: 'https://nginz-https.anta.wire.link/deeplink.json',
+          webapp_url: 'https://webapp.anta.wire.link',
+        },
+        domain_redirect: 'backend',
+        team_invite: 'not-allowed',
+      },
+      {
+        headers: {
+          Authorization: `Basic ${BASIC_AUTH}`,
+        },
+      },
+    );
+  }
+
+  public async deleteDomain(domain: string) {
+    await this.axiosInstance.delete(`i/domain-registration/${domain}`, {
+      headers: {
+        Authorization: `Basic ${BASIC_AUTH}`,
+      },
+    });
+  }
 }
