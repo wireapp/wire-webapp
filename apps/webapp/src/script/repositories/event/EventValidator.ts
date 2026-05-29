@@ -26,11 +26,11 @@ import {EventValidation} from './EventValidation';
 export function validateEvent(
   event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},
   source: EventSource,
-  lastEventDate?: string,
+  lastEventDateString?: string,
 ): EventValidation {
-  if (
-    isOutdatedNotificationStreamEvent(event, source, lastEventDate !== undefined ? new Date(lastEventDate) : undefined)
-  ) {
+  const lastEventDate = lastEventDateString ? new Date(lastEventDateString) : undefined;
+
+  if (isOutdatedNotificationStreamEvent(event, source, lastEventDate)) {
     return EventValidation.OUTDATED_TIMESTAMP;
   }
 
