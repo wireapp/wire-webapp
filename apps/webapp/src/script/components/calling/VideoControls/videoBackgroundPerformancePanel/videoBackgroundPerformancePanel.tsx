@@ -49,7 +49,7 @@ type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;
 };
 
-const QUALITY_OPTIONS: readonly QualityMode[] = ['auto', 'superhigh', 'high', 'medium', 'low', 'bypass'];
+const QUALITY_OPTIONS: readonly QualityMode[] = ['auto', 'fhd', 'hd', 'qhd', 'nhd', 'bypass'];
 
 const formatMs = (value?: number | null): string => {
   return typeof value === 'number' ? `${value.toFixed(1)} ms` : '-';
@@ -66,7 +66,7 @@ const formatValue = (value?: string | number | null): string => {
 const getMetricRows = (renderMetrics: RenderMetrics) => {
   return Maybe.of(renderMetrics)
     .map(metrics => [
-      {label: 'Quality', value: formatValue(metrics.tier)},
+      {label: 'Quality', value: formatValue(metrics.tier).toUpperCase()},
       {label: 'Total', value: formatMs(metrics.avgTotalMs)},
       {label: 'Segmentation', value: formatMs(metrics.avgSegmentationMs)},
       {label: 'GPU', value: formatMs(metrics.avgGpuMs)},
@@ -135,7 +135,7 @@ const MetricsDisplay = ({capabilityInfo}: MetricsDisplayProps) => {
 };
 
 const qualitySelectOptions = QUALITY_OPTIONS.map(option => ({
-  label: option,
+  label: option.toUpperCase(),
   value: option,
 }));
 

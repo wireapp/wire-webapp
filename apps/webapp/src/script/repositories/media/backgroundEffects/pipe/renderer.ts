@@ -441,11 +441,8 @@ export class WebGLRenderer {
     }
     const {gl, fbo, storedStateTextures, stateUpdateProgram, stateUpdateLocations, blendProgram, blendLocations} = this;
 
-    const {displayWidth: width, displayHeight: height} = videoFrame;
-    if (this.canvas.width !== width || this.canvas.height !== height) {
-      this.canvas.width = width;
-      this.canvas.height = height;
-    }
+    const width = this.canvas.width;
+    const height = this.canvas.height;
 
     if (!categoryTexture || !confidenceTexture) {
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);

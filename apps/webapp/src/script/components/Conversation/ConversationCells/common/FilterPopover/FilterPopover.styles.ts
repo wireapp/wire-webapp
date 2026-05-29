@@ -217,8 +217,8 @@ const sharedRowLayout: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  padding: '10px 12px',
-  gap: '10px',
+  padding: '12px',
+  gap: '8px',
   cursor: 'pointer',
 };
 
@@ -239,7 +239,7 @@ export const checkboxWrapperStyles: CSSObject = {
   '& .wireinput + label': {
     display: 'grid',
     gridTemplateColumns: '28px minmax(0, 1fr) 18px',
-    columnGap: '10px',
+    columnGap: '8px',
     alignItems: 'center',
     width: '100%',
     minWidth: 0,
@@ -277,7 +277,7 @@ export const startContentStyles: CSSObject = {
   justifyContent: 'center',
   width: '28px',
   height: '28px',
-  '& svg': {
+  '& > svg': {
     width: '18px',
     height: '22px',
   },

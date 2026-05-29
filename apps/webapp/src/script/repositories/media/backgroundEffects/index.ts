@@ -74,12 +74,12 @@ export type {EffectMode} from './backgroundEffectsWorkerTypes';
  */
 export type {DebugMode} from './backgroundEffectsWorkerTypes';
 
-export type {QualityTier} from './backgroundEffectsWorkerTypes';
+export type {QualityTier} from './quality/definitions';
 
 /**
  * Quality mode type ('auto' or fixed QualityTier).
  */
-export type {QualityMode} from './backgroundEffectsWorkerTypes';
+export type {QualityMode} from './quality/definitions';
 
 /**
  * BackgroundEffectsRenderingPipeline selection type.
