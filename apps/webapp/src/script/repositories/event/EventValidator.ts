@@ -24,7 +24,7 @@ import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
 
 export function validateEvent(
-  event: {time?: string; type: CONVERSATION_EVENT | USER_EVENT},
+  event: {time: string; type: CONVERSATION_EVENT | USER_EVENT},
   source: EventSource,
   lastEventDate?: string,
 ): EventValidation {
