@@ -37,6 +37,17 @@ export const getDriveEnabledConversations = (conversationRepository: Conversatio
       (conversationA, conversationB) => conversationB.last_event_timestamp() - conversationA.last_event_timestamp(),
     );
 
+const getConversationFilterStartContent = (conversation: Conversation, isChannelsEnabled: boolean) =>
+  conversation.isChannel() && isChannelsEnabled ? (
+    <ChannelAvatar
+      conversationID={conversation.id}
+      isLocked={conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK) !== true}
+      size="large"
+    />
+  ) : (
+    <GroupAvatar conversationID={conversation.id} size="medium" />
+  );
+
 export const useDriveEnabledConversationFilterItems = ({
   conversationRepository,
 }: {
@@ -47,15 +58,6 @@ export const useDriveEnabledConversationFilterItems = ({
   return getDriveEnabledConversations(conversationRepository).map(conversation => ({
     id: getDriveEnabledConversationFilterId(conversation),
     label: conversation.display_name(),
-    startContent:
-      conversation.isChannel() && isChannelsEnabled ? (
-        <ChannelAvatar
-          conversationID={conversation.id}
-          isLocked={conversation.accessModes?.includes(CONVERSATION_ACCESS.LINK) !== true}
-          size="large"
-        />
-      ) : (
-        <GroupAvatar conversationID={conversation.id} size="medium" />
-      ),
+    startContent: getConversationFilterStartContent(conversation, isChannelsEnabled),
   }));
 };
