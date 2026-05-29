@@ -124,7 +124,7 @@ describe('segmenter tests', () => {
   });
 
   describe('updateSegmenterOptions', () => {
-    it('keeps the segmenter options reference stable and updates values', async () => {
+    it('updates options during runtime and updates the segmenter model', async () => {
       const firstSegmenter = {
         close: jest.fn(),
         setOptions: jest.fn(),
@@ -147,20 +147,18 @@ describe('segmenter tests', () => {
         removeEventListener: jest.fn(),
       } as unknown as OffscreenCanvas;
 
-      await runSegmenter(
-        canvas,
-        readable,
-        {
-          enabled: false,
-          quality: 'bypass',
-          modelPath: 'model-a.tflite',
-        } as any,
-        jest.fn(),
-      );
-
-      updateSegmenterOptions({
+      const baseOptions = {
         enabled: false,
         quality: 'bypass',
+        modelPath: 'model-a.tflite',
+        wasmLoaderPath: '/mock/vision_wasm_internal.js',
+        wasmBinaryPath: '/mock/vision_wasm_internal.wasm',
+      };
+
+      await runSegmenter(canvas, readable, baseOptions as any, jest.fn(), jest.fn());
+
+      updateSegmenterOptions({
+        ...baseOptions,
         modelPath: 'model-b.tflite',
       } as any);
 
@@ -204,7 +202,11 @@ describe('segmenter tests', () => {
         {
           enabled: true,
           quality: 'auto',
+          modelPath: 'model-a.tflite',
+          wasmLoaderPath: '/mock/vision_wasm_internal.js',
+          wasmBinaryPath: '/mock/vision_wasm_internal.wasm',
         } as any,
+        jest.fn(),
         jest.fn(),
       );
 
@@ -301,7 +303,10 @@ describe('segmenter tests', () => {
           enabled: true,
           quality: 'auto',
           modelPath: 'model-a.tflite',
+          wasmLoaderPath: '/mock/vision_wasm_internal.js',
+          wasmBinaryPath: '/mock/vision_wasm_internal.wasm',
         } as any,
+        jest.fn(),
         jest.fn(),
       );
 
@@ -319,10 +324,7 @@ describe('segmenter tests', () => {
 
       await Promise.resolve();
 
-      // Restore schedules the restart asynchronously through:
-      // createWallClock -> setTimeout -> restart queue.
-      // No second segmenter should exist yet.
-      expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(1);
+      expect(ImageSegmenter.createFromOptions).toHaveBeenCalledTimes(2);
 
       listeners.get('webglcontextlost')?.(lostEvent);
       listeners.get('webglcontextrestored')?.({} as Event);
