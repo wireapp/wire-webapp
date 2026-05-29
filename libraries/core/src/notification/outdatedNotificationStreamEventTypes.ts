@@ -41,10 +41,10 @@ export const NOTIFICATION_STREAM_DUPLICATE_RISK_EVENT_TYPES: ReadonlySet<string>
 
 export function isOutdatedNotificationStreamEvent(
   event: {time?: string; type: string},
-  source: string,
+  notificationSource: string,
   lastEventDate?: Date,
 ): boolean {
-  if (source !== NotificationSource.NOTIFICATION_STREAM) {
+  if (notificationSource !== NotificationSource.NOTIFICATION_STREAM) {
     return false;
   }
 
