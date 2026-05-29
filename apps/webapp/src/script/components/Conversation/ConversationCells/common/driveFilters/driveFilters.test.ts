@@ -183,6 +183,18 @@ describe('toGlobalDriveSearchParams', () => {
     });
   });
 
+  it('uses the selected conversation as the global search root when both path sources are set', () => {
+    expect(
+      toGlobalDriveSearchParams({
+        ...emptyGlobalFilters,
+        selectedConversationIds: ['conv-uuid@staging.zinfra.io'],
+        path: '/wire-cells-web/folder',
+      }),
+    ).toEqual({
+      path: 'conv-uuid@staging.zinfra.io',
+    });
+  });
+
   it('omits empty global filters from search params', () => {
     expect(toGlobalDriveSearchParams(emptyGlobalFilters)).toEqual({});
   });
