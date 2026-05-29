@@ -1,7 +1,7 @@
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {createUser, test, withLogin, expect} from 'test/e2e_tests/test.fixtures';
+import {test, withLogin, expect, createTeam} from 'test/e2e_tests/test.fixtures';
 import {sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Federation', () => {
@@ -15,13 +15,13 @@ test.describe('Federation', () => {
   let federatedUser: User;
 
   test.beforeEach(async ({api}) => {
-    normalUser = await createUser(api);
-    federatedUser = await createUser(federationApiManager);
+    normalUser = (await createTeam(api, 'Normal Team')).owner;
+    federatedUser = (await createTeam(federationApiManager, 'Federated Team')).owner;
   });
 
   test.afterEach(async ({api}) => {
-    await api.deletePersonalUser(normalUser);
-    await federationApiManager.deletePersonalUser(federatedUser);
+    await api.team.deleteTeam(normalUser, normalUser.teamId);
+    await federationApiManager.team.deleteTeam(federatedUser, federatedUser.teamId);
   });
 
   test('I want to start a 1:1 call with a federated User', {tag: ['@TC-3208', '@regression']}, async ({createPage}) => {
