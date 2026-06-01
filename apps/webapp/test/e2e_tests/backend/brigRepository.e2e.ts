@@ -271,7 +271,7 @@ export class BrigRepositoryE2E {
     );
   }
 
-  public async deleteDomain(domain: string) {
+  public async deleteDomainClaim(domain: string) {
     await this.axiosInstance.delete(`i/domain-registration/${domain}`, {
       headers: {
         Authorization: `Basic ${BASIC_AUTH}`,

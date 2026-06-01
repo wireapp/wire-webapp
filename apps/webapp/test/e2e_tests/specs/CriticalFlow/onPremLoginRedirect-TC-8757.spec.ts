@@ -62,7 +62,7 @@ test('On Prem Login Redirect', {tag: ['@TC-8757', '@regression']}, async ({conte
     });
   } finally {
     await test.step('Delete claimed domain registration', async () => {
-      await api.brig.deleteDomain(domain);
+      await api.brig.deleteDomainClaim(domain);
     });
   }
 });
