@@ -81,7 +81,7 @@ test.describe('User Blocking', () => {
 
     test(
       'I want to cancel blocking a 1:1 conversation from conversation list',
-      {tag: ['@TC-137', '@regression']},
+      {tag: ['@TC-10908', '@regression']},
       async ({createPage}) => {
         const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
         await sendConnectionRequest(userAPageManager, userB);
@@ -111,7 +111,7 @@ test.describe('User Blocking', () => {
 
     test(
       'Verify you can block a user who is not in your team',
-      {tag: ['@TC-140', '@regression']},
+      {tag: ['@TC-10909', '@regression']},
       async ({createPage}) => {
         const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
         await sendConnectionRequest(userAPage, userB);
@@ -155,7 +155,7 @@ test.describe('User Blocking', () => {
 
     test(
       'Verify you still receive messages from blocked person in a group chat',
-      {tag: ['@TC-141', '@regression']},
+      {tag: ['@TC-10910', '@regression']},
       async ({createPage}) => {
         const [userAPageManager, userBPageManager] = await Promise.all([
           PageManager.from(createPage(withLogin(userA))),
@@ -198,8 +198,8 @@ test.describe('User Blocking', () => {
     );
 
     test(
-      'Verify you can unblock user from 1:1 conversation details',
-      {tag: ['@TC-142', '@regression']},
+      'Verify you can unblock user from 1on1 conversation details',
+      {tag: ['@TC-10911', '@regression']},
 
       async ({createPage}) => {
         const [userAPageManagerInstance, userBPageManagerInstance] = await Promise.all([
@@ -243,7 +243,7 @@ test.describe('User Blocking', () => {
 
     test(
       'Verify you cannot add a person who blocked you to a group chat',
-      {tag: ['@TC-143', '@regression']},
+      {tag: ['@TC-10912', '@regression']},
       async ({createPage}) => {
         const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
         await sendConnectionRequest(userAPageManagerInstance, userB);
@@ -282,7 +282,7 @@ test.describe('User Blocking', () => {
     // User B still sees pending connection request even though User A blocked him
     test.skip(
       'Verify you can block a user you sent a connection request from conversation list',
-      {tag: ['@TC-144', '@regression']},
+      {tag: ['@TC-10913', '@regression']},
       async ({createPage}) => {
         const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
         await sendConnectionRequest(userAPageManagerInstance, userB);
@@ -299,7 +299,7 @@ test.describe('User Blocking', () => {
 
     test(
       'Verify you can unblock someone from conversation list options',
-      {tag: ['@TC-148', '@regression']},
+      {tag: ['@TC-10914', '@regression']},
       async ({createPage}) => {
         const userAPageManagerInstance = await PageManager.from(createPage(withLogin(userA)));
         await sendConnectionRequest(userAPageManagerInstance, userB);
@@ -351,19 +351,23 @@ test.describe('User Blocking', () => {
       userA = team.owner;
     });
 
-    test('Verify you can not block a user from your team', {tag: ['@TC-8778', '@regression']}, async ({createPage}) => {
-      const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
-      await connectWithUser(userAPageManager, userB);
-      const userAPages = userAPageManager.webapp.pages;
+    test(
+      'Verify you can not block a user from your team',
+      {tag: ['@TC-10915', '@regression']},
+      async ({createPage}) => {
+        const userAPageManager = await PageManager.from(createPage(withLogin(userA)));
+        await connectWithUser(userAPageManager, userB);
+        const userAPages = userAPageManager.webapp.pages;
 
-      // Step 1: User A opens conversation with User B
-      const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
+        // Step 1: User A opens conversation with User B
+        const conversation = await userAPages.conversationList().getConversation(userB.fullName).open();
 
-      // Step 2: User A opens the options menu for user B
-      const contextMenu = await conversation.openContextMenu();
+        // Step 2: User A opens the options menu for user B
+        const contextMenu = await conversation.openContextMenu();
 
-      // Step 3: Block conversation button is not visible for team members
-      await expect(contextMenu.blockButton).not.toBeAttached();
-    });
+        // Step 3: Block conversation button is not visible for team members
+        await expect(contextMenu.blockButton).not.toBeAttached();
+      },
+    );
   });
 });
