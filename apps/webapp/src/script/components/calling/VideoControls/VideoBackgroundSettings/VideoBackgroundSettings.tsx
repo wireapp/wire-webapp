@@ -34,6 +34,7 @@ import {
   backgroundSettingsTitleStyles,
   backgroundSettingsWrapperStyles,
   closeButtonStyles,
+  enhanceQualityCheckboxHintStyles,
   sectionLabelStyles,
   tileButtonStyles,
   tileGridStyles,
@@ -220,9 +221,12 @@ export const VideoBackgroundSettings = ({
             onChange={(event: ChangeEvent<HTMLInputElement>) => handleEnableHighQualityBlur(event)}
           >
             <CheckboxLabel htmlFor="enable-high-quality-blur">
-              {t('videoCallBackgroundEnableHighQualityBlur')}
+              {t('videoCallBackgroundEnableEnhancedQuality')}
             </CheckboxLabel>
           </Checkbox>
+          <p className="preferences-detail preferences-detail-intended" css={enhanceQualityCheckboxHintStyles}>
+            {t('videoCallBackgroundEnableEnhancedQualityHint')}
+          </p>
         </div>
 
         {/* Virtual backgrounds section */}

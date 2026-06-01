@@ -2079,7 +2079,8 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundBlurSectionLabel': `Blur`;
     'videoCallBackgroundCustom': `Custom Background`;
     'videoCallBackgroundEffectsLabel': `Background Settings`;
-    'videoCallBackgroundEnableHighQualityBlur': `Enable high quality blur`;
+    'videoCallBackgroundEnableEnhancedQuality': `Enhanced quality`;
+    'videoCallBackgroundEnableEnhancedQualityHint': `Improves outline definition, but may impact the performance on your device.`;
     'videoCallBackgroundNoEffect': `No background effect`;
     'videoCallBackgroundNone': `None`;
     'videoCallBackgroundOffice1': `Office 1`;

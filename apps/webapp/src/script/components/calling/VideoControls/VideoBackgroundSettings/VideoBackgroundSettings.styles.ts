@@ -151,3 +151,7 @@ export const tilePreviewContentStyles: CSSObject = {
   fontSize: 10,
   color: 'black', // no design for dark mode, so keeping it black.
 };
+
+export const enhanceQualityCheckboxHintStyles: CSSObject = {
+  color: 'var(--base-secondary-text)',
+};
