@@ -654,7 +654,8 @@ export class CallingRepository {
     }
     const {quality} = qualityInfo;
     if (quality !== QUALITY.NORMAL) {
-      Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
+      // @note: This should be reverted back once avs is sending correct quality metrics
+      // Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
       Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     }
