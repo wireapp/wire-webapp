@@ -27,6 +27,181 @@ test.describe('Federation', () => {
     await federationApiManager.team.deleteTeam(federatedUser, federatedUser.teamId);
   });
 
+  const testCases = [
+    {
+      name: 'Image',
+      sendAction: async ({normalUserPage}) => {
+        await shareAssetHelper(
+          getImageFilePath(),
+          normalUserPage,
+          normalUserPage.getByRole('button', {name: 'Add picture'}),
+        );
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        const messageWithImage = federatedUserPages
+          .conversation()
+          .getMessage({sender: normalUser})
+          .filter({has: federatedUserPage.getByRole('img')});
+        await expect(messageWithImage).toBeVisible();
+      },
+    },
+    {
+      name: 'Text',
+      sendAction: async ({normalUserPage}) => {
+        const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
+        await normalUserPages.conversation().sendMessage('Test message');
+        await expect(normalUserPages.conversation().getMessage({content: 'Test message'})).toBeVisible();
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        const message = federatedUserPages.conversation().getMessage({content: 'Test message'});
+        await expect(message).toBeVisible();
+      },
+    },
+    {
+      name: 'Link',
+      sendAction: async ({normalUserPage}) => {
+        const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
+        await normalUserPages.conversation().sendMessage('https://www.lidl.de/');
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        const message = federatedUserPages.conversation().getMessage({content: 'https://www.lidl.de/'});
+        await expect(message).toBeVisible();
+      },
+    },
+    {
+      name: 'Audio',
+      sendAction: async ({normalUserPage}) => {
+        await shareAssetHelper(
+          getAudioFilePath(),
+          normalUserPage,
+          normalUserPage.getByRole('button', {name: 'Add file'}),
+        );
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        const messageWithAudio = federatedUserPages
+          .conversation()
+          .getMessage({sender: normalUser})
+          .filter({has: federatedUserPage.locator('[data-uie-name="audio-asset"]')});
+        await expect(messageWithAudio).toBeVisible();
+      },
+    },
+    {
+      name: 'Video',
+      sendAction: async ({normalUserPage}) => {
+        await shareAssetHelper(
+          getVideoFilePath(),
+          normalUserPage,
+          normalUserPage.getByRole('button', {name: 'Add file'}),
+        );
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        const messageWithVideo = federatedUserPages
+          .conversation()
+          .getMessage({sender: normalUser})
+          .filter({has: federatedUserPage.locator('[data-uie-name="video-asset"]')});
+        await expect(messageWithVideo).toBeVisible();
+      },
+    },
+    {
+      name: 'File',
+      sendAction: async ({normalUserPage}) => {
+        await shareAssetHelper(
+          getTextFilePath(),
+          normalUserPage,
+          normalUserPage.getByRole('button', {name: 'Add file'}),
+        );
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        const messageWithFile = federatedUserPages
+          .conversation()
+          .getMessage({sender: normalUser})
+          .filter({has: federatedUserPage.locator('[data-uie-name="file-asset"]')});
+        await expect(messageWithFile).toBeVisible();
+      },
+    },
+    {
+      name: 'Ping',
+      sendAction: async ({normalUserPage}) => {
+        const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
+        await normalUserPages.conversation().sendPing();
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        await expect(federatedUserPages.conversation().getPing()).toBeVisible();
+      },
+    },
+    {
+      name: 'Ephemeral text message',
+      sendAction: async ({normalUserPage}) => {
+        const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
+        await normalUserPages.conversation().enableSelfDeletingMessages();
+        await normalUserPages.conversation().sendMessage('Gone in 10s');
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        await expect(federatedUserPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
+
+        await federatedUserPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
+        await expect(federatedUserPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
+      },
+    },
+    {
+      name: 'Reaction',
+      sendAction: async ({normalUserPage}) => {
+        const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
+        const message = normalUserPages.conversation().getMessage({content: 'Test message'});
+        await expect(message).toBeVisible();
+        await normalUserPages.conversation().reactOnMessage(message, 'plus-one');
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        const messageWithReaction = federatedUserPages.conversation().getMessage({content: 'Test message'});
+        await expect(
+          federatedUserPages.conversation().getReactionOnMessage(messageWithReaction, 'plus-one'),
+        ).toBeVisible();
+      },
+    },
+    {
+      name: 'Reply',
+      sendAction: async ({normalUserPage}) => {
+        const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
+        const message = normalUserPages.conversation().getMessage({content: 'Test message'});
+
+        await expect(message).toBeVisible();
+        await normalUserPages.conversation().replyToMessage(message);
+        await normalUserPages.conversation().sendMessage('Reply');
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        const replyMessage = federatedUserPages.conversation().getMessage({content: 'Reply'});
+        await expect(replyMessage.getByTestId('quote-item')).toContainText('Test message');
+      },
+    },
+    {
+      name: 'Mention',
+      sendAction: async ({normalUserPage}) => {
+        const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
+        await normalUserPages.conversation().sendMessageWithUserMention(federatedUser.fullName, 'Test mention');
+      },
+      verify: async ({federatedUserPage}) => {
+        const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+        await expect(
+          federatedUserPages.conversation().getMessage({content: `@${federatedUser.fullName}`}),
+        ).toBeVisible();
+      },
+    },
+  ] as const satisfies {
+    name: string;
+    sendAction: (params: {normalUserPage: Page}) => Promise<void>;
+    verify: (params: {federatedUserPage: Page}) => Promise<void>;
+  }[];
+
   test(
     'I want to share all possible assets in a federated group',
     {tag: ['@TC-8758', '@regression']},
@@ -81,180 +256,33 @@ test.describe('Federation', () => {
         await expect(federatedUserPage.getByTestId('element-message-delete')).toBeVisible();
       });
 
-      const testCases = [
-        {
-          name: 'Image',
-          sendAction: async ({normalUserPage}) => {
-            await shareAssetHelper(
-              getImageFilePath(),
-              normalUserPage,
-              normalUserPage.getByRole('button', {name: 'Add picture'}),
-            );
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            const messageWithImage = federatedUserPages
-              .conversation()
-              .getMessage({sender: normalUser})
-              .filter({has: federatedUserPage.getByRole('img')});
-            await expect(messageWithImage).toBeVisible();
-          },
-        },
-        {
-          name: 'Text',
-          sendAction: async ({normalUserPage}) => {
-            const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
-            await normalUserPages.conversation().sendMessage('Test message');
-            await expect(normalUserPages.conversation().getMessage({content: 'Test message'})).toBeVisible();
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            const message = federatedUserPages.conversation().getMessage({content: 'Test message'});
-            await expect(message).toBeVisible();
-          },
-        },
-        {
-          name: 'Link',
-          sendAction: async ({normalUserPage}) => {
-            const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
-            await normalUserPages.conversation().sendMessage('https://www.lidl.de/');
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            const message = federatedUserPages.conversation().getMessage({content: 'https://www.lidl.de/'});
-            await expect(message).toBeVisible();
-          },
-        },
-        {
-          name: 'Audio',
-          sendAction: async ({normalUserPage}) => {
-            await shareAssetHelper(
-              getAudioFilePath(),
-              normalUserPage,
-              normalUserPage.getByRole('button', {name: 'Add file'}),
-            );
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            const messageWithAudio = federatedUserPages
-              .conversation()
-              .getMessage({sender: normalUser})
-              .filter({has: federatedUserPage.locator('[data-uie-name="audio-asset"]')});
-            await expect(messageWithAudio).toBeVisible();
-          },
-        },
-        {
-          name: 'Video',
-          sendAction: async ({normalUserPage}) => {
-            await shareAssetHelper(
-              getVideoFilePath(),
-              normalUserPage,
-              normalUserPage.getByRole('button', {name: 'Add file'}),
-            );
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            const messageWithVideo = federatedUserPages
-              .conversation()
-              .getMessage({sender: normalUser})
-              .filter({has: federatedUserPage.locator('[data-uie-name="video-asset"]')});
-            await expect(messageWithVideo).toBeVisible();
-          },
-        },
-        {
-          name: 'File',
-          sendAction: async ({normalUserPage}) => {
-            await shareAssetHelper(
-              getTextFilePath(),
-              normalUserPage,
-              normalUserPage.getByRole('button', {name: 'Add file'}),
-            );
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            const messageWithFile = federatedUserPages
-              .conversation()
-              .getMessage({sender: normalUser})
-              .filter({has: federatedUserPage.locator('[data-uie-name="file-asset"]')});
-            await expect(messageWithFile).toBeVisible();
-          },
-        },
-        {
-          name: 'Ping',
-          sendAction: async ({normalUserPage}) => {
-            const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
-            await normalUserPages.conversation().sendPing();
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            await expect(federatedUserPages.conversation().getPing()).toBeVisible();
-          },
-        },
-        {
-          name: 'Ephemeral text message',
-          sendAction: async ({normalUserPage}) => {
-            const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
-            await normalUserPages.conversation().enableSelfDeletingMessages();
-            await normalUserPages.conversation().sendMessage('Gone in 10s');
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            await expect(federatedUserPages.conversation().getMessage({content: 'Gone in 10s'})).toBeVisible();
+      for (const {name, sendAction, verify} of testCases) {
+        await test.step(`Verify user sends ${name} and federated user can see it`, async () => {
+          await sendAction({normalUserPage});
+          await verify({federatedUserPage});
+        });
+      }
+    },
+  );
 
-            await federatedUserPage.waitForTimeout(10_000); // Wait for 10s so the message is deleted
-            await expect(federatedUserPages.conversation().getMessage({content: 'Gone in 10s'})).not.toBeVisible();
-          },
-        },
-        {
-          name: 'Reaction',
-          sendAction: async ({normalUserPage}) => {
-            const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
-            const message = normalUserPages.conversation().getMessage({content: 'Test message'});
-            await expect(message).toBeVisible();
-            await normalUserPages.conversation().reactOnMessage(message, 'plus-one');
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            const messageWithReaction = federatedUserPages.conversation().getMessage({content: 'Test message'});
-            await expect(
-              federatedUserPages.conversation().getReactionOnMessage(messageWithReaction, 'plus-one'),
-            ).toBeVisible();
-          },
-        },
-        {
-          name: 'Reply',
-          sendAction: async ({normalUserPage}) => {
-            const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
-            const message = normalUserPages.conversation().getMessage({content: 'Test message'});
+  test(
+    'I want to share all possible assets in a federated 1:1',
+    {tag: ['@TC-8759', '@regression']},
+    async ({createPage}) => {
+      const [normalUserPage, federatedUserPage] = await Promise.all([
+        createPage(withLogin(normalUser)),
+        createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
+      ]);
+      await sendConnectionRequest(normalUserPage, federatedUser);
 
-            await expect(message).toBeVisible();
-            await normalUserPages.conversation().replyToMessage(message);
-            await normalUserPages.conversation().sendMessage('Reply');
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            const replyMessage = federatedUserPages.conversation().getMessage({content: 'Reply'});
-            await expect(replyMessage.getByTestId('quote-item')).toContainText('Test message');
-          },
-        },
-        {
-          name: 'Mention',
-          sendAction: async ({normalUserPage}) => {
-            const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
-            await normalUserPages.conversation().sendMessageWithUserMention(federatedUser.fullName, 'Test mention');
-          },
-          verify: async ({federatedUserPage}) => {
-            const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
-            await expect(
-              federatedUserPages.conversation().getMessage({content: `@${federatedUser.fullName}`}),
-            ).toBeVisible();
-          },
-        },
-      ] as const satisfies {
-        name: string;
-        sendAction: (params: {normalUserPage: Page}) => Promise<void>;
-        verify: (params: {federatedUserPage: Page}) => Promise<void>;
-      }[];
+      const {pages: normalUserPages} = PageManager.from(normalUserPage).webapp;
+      const {pages: federatedUserPages} = PageManager.from(federatedUserPage).webapp;
+
+      await federatedUserPages.conversationList().openPendingConnectionRequest();
+      await federatedUserPages.connectRequest().clickConnectButton();
+
+      await normalUserPages.conversationList().getConversation(federatedUser.fullName, {protocol: 'mls'}).open();
+      await federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}).open();
 
       for (const {name, sendAction, verify} of testCases) {
         await test.step(`Verify user sends ${name} and federated user can see it`, async () => {
