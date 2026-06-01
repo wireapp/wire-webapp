@@ -23,15 +23,20 @@ import {faker} from '@faker-js/faker';
 
 const ON_PREM_WEBAPP_URL = 'https://webapp.anta.wire.link';
 
-test('On Prem Login Redirect', {tag: ['@TC-8757', '@regression']}, async ({context, createPage, api}) => {
-  const domain = faker.internet.domainName();
-  const email = `redirect-user@${domain}`;
+test.describe('On Prem Login Redirect Flow', () => {
+  let domain: string;
+  let email: string;
 
-  try {
+  test.beforeEach(async ({api}) => {
+    domain = faker.internet.domainName();
+    email = `redirect-user@${domain}`;
+
     await test.step('Claim domain and configure on-prem redirect', async () => {
       await api.brig.claimDomain(domain);
     });
+  });
 
+  test('On Prem Login Redirect', {tag: ['@TC-8757', '@regression']}, async ({context, createPage}) => {
     const page = await createPage(context);
     const pageManager = PageManager.from(page);
     const {pages} = pageManager.webapp;
@@ -47,12 +52,14 @@ test('On Prem Login Redirect', {tag: ['@TC-8757', '@regression']}, async ({conte
     });
 
     await test.step('Click connect and verify redirect to on-prem webapp', async () => {
-      page.getByRole('button', {name: 'Connect'}).click();
+      await page.getByRole('button', {name: 'Connect'}).click();
       await expect(page).toHaveURL(new RegExp(String.raw`${ON_PREM_WEBAPP_URL}`), {timeout: 20_000});
     });
-  } finally {
+  });
+
+  test.afterEach(async ({api}) => {
     await test.step('Delete claimed domain registration', async () => {
       await api.brig.deleteDomainClaim(domain);
     });
-  }
+  });
 });
