@@ -113,7 +113,7 @@ export const ConversationListCell = ({
   }
 
   if (isMutedConversation) {
-    accessibilityParts.push('Muted');
+    accessibilityParts.push(t('accessibility.conversationMuted'));
   }
 
   const accessibilityConversationLabel = `${accessibilityParts.join(', ')}. ${t('accessibility.openConversation', {
