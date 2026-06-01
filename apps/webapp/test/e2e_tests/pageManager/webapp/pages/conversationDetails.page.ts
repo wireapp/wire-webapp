@@ -123,16 +123,17 @@ export class ConversationDetailsPage {
     return userLocator.isVisible();
   }
 
-  async openParticipantDetails(fullName: string) {
-    await this.getLocatorByUser(fullName).click();
-  }
+  getParticipant(fullName: string) {
+    const baseLocator = this.getLocatorByUser(fullName);
 
-  getUserRoleIcon(fullName: string) {
-    return this.getLocatorByUser(fullName).getByTestId(/^status-(external|guest|admin)$/);
-  }
-
-  getUserAvailabilityIcon(fullName: string) {
-    return this.getLocatorByUser(fullName).getByTestId('status-availability-icon');
+    return Object.assign(baseLocator, {
+      roleIcon: baseLocator.getByTestId(/^status-(external|guest|admin)$/),
+      availabilityIcon: baseLocator.getByTestId('status-availability-icon'),
+      federatedIcon: baseLocator.getByTestId('status-federated-user'),
+      openDetails: async () => {
+        await baseLocator.click();
+      },
+    });
   }
 
   getLocatorByUser(fullName: string) {

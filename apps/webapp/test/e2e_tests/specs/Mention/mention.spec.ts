@@ -568,7 +568,7 @@ test.describe('Mention', () => {
       await test.step('UserA removes userB from the group', async () => {
         await userAPages.conversationList().getConversation('Test Group').open();
         await userAPages.conversation().conversationTitle.click();
-        await userAPages.conversationDetails().openParticipantDetails(userB.fullName);
+        await userAPages.conversationDetails().getParticipant(userB.fullName).openDetails();
         await userAPages.participantDetails().removeFromGroup();
       });
 
