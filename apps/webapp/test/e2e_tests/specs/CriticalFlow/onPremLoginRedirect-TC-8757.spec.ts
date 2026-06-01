@@ -47,16 +47,8 @@ test('On Prem Login Redirect', {tag: ['@TC-8757', '@regression']}, async ({conte
     });
 
     await test.step('Click connect and verify redirect to on-prem webapp', async () => {
-      const urlPattern = new RegExp(ON_PREM_WEBAPP_URL.replace(/\./g, '\\.'));
-
-      await Promise.all([
-        page.waitForURL(urlPattern, {
-          timeout: 20_000,
-        }),
-        page.getByRole('button', {name: 'Connect'}).click(),
-      ]);
-
-      await expect(page).toHaveURL(urlPattern);
+      page.getByRole('button', {name: 'Connect'}).click();
+      await expect(page).toHaveURL(new RegExp(String.raw`${ON_PREM_WEBAPP_URL}`), {timeout: 20_000});
     });
   } finally {
     await test.step('Delete claimed domain registration', async () => {
