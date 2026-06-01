@@ -42,9 +42,8 @@ test('On Prem Login Redirect', {tag: ['@TC-8757', '@regression']}, async ({conte
     });
 
     await test.step('Verify connect-to-organization backend dialog is shown', async () => {
-      await expect(pages.customBackend().title).toBeVisible();
-      await expect(pages.customBackend().redirectWarningText).toBeVisible();
-      await expect(pages.customBackend().adminInfoText).toBeVisible();
+      await expect(page.getByText("Connect to your organization's backend?")).toBeVisible();
+      await expect(page.getByText(ON_PREM_WEBAPP_URL)).toBeVisible();
     });
 
     await test.step('Click connect and verify redirect to on-prem webapp', async () => {
