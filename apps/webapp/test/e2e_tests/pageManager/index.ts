@@ -78,7 +78,6 @@ import {ParticipantDeviceDetailsPage} from './webapp/pages/participantDeviceDeta
 import {ParticipantDevicesPage} from './webapp/pages/participantDevices.page';
 import {NewDeviceModal} from './webapp/modals/newDevice.modal';
 import {ReadReceiptModal} from './webapp/modals/readReceipt.modal';
-import {CustomBackendPage} from './webapp/pages/customBackend.page';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
@@ -202,7 +201,6 @@ export class PageManager {
         this.getOrCreate('webapp.pages.verification', () => new EmailVerificationPage(this.page)),
       setUsername: () => this.getOrCreate('webapp.pages.setUsername', () => new SetUsernamePage(this.page)),
       conversationJoin: () => this.getOrCreate('webapp.pages.conversationJoin', () => ConversationJoinPage(this.page)),
-      customBackend: () => this.getOrCreate('webapp.pages.customBackend', () => new CustomBackendPage(this.page)),
     },
     modals: {
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
