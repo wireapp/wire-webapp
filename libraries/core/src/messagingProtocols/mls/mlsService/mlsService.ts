@@ -451,7 +451,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const failures: AddUsersFailure[] = [];
 
     if (emptyKeyPackagesUsers.length > 0) {
-      failures.push({reason: AddUsersFailureReasons.OFFLINE_FOR_TOO_LONG, users: emptyKeyPackagesUsers});
+      failures.push({reason: AddUsersFailureReasons.NOT_MLS_CAPABLE, users: emptyKeyPackagesUsers});
     }
 
     if (failedToFetchKeyPackages.length > 0) {
