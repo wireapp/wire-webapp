@@ -39,7 +39,6 @@ test('On Prem Login Redirect', {tag: ['@TC-8757', '@regression']}, async ({conte
     await test.step('Open login page and enter email with claimed domain', async () => {
       await pageManager.openSSOPage();
       await pages.singleSignOn().enterEmailOnSSOPage(email);
-      await pages.singleSignOn().ssoSignInButton.click();
     });
 
     await test.step('Verify connect-to-organization backend dialog is shown', async () => {
