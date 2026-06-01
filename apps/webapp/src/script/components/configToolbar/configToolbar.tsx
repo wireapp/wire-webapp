@@ -33,7 +33,7 @@ import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 import {getLogger} from 'Util/logger';
 
-import {wrapperStyles} from './configToolbar.styles';
+import {messagePreprocessingSwitchStyles, wrapperStyles} from './configToolbar.styles';
 import {openDebugToolbarEventName} from './debugToolbarEvents';
 
 const logger = getLogger('ConfigToolbar');
@@ -312,7 +312,7 @@ export function ConfigToolbar() {
 
   const renderMessagePreprocessingSwitch = () => {
     return (
-      <div style={{marginBottom: '10px'}}>
+      <div css={messagePreprocessingSwitchStyles}>
         <label htmlFor="message-preprocessing-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
           DISABLE MESSAGE PREPROCESSING
         </label>
