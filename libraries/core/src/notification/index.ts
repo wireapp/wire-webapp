@@ -19,3 +19,4 @@
 
 export * from './notificationService';
 export * from './notificationSource.types';
+export * from './outdatedNotificationStreamEventTypes';

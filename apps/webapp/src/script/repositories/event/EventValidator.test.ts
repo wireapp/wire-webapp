@@ -18,7 +18,12 @@
  */
 
 import {CONVERSATION_TYPING} from '@wireapp/api-client/lib/conversation/data/';
-import {ConversationTypingEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
+import {
+  ConversationMemberJoinEvent,
+  ConversationOtrMessageAddEvent,
+  ConversationTypingEvent,
+  CONVERSATION_EVENT,
+} from '@wireapp/api-client/lib/event/';
 
 import {EventSource} from './EventSource';
 import {EventValidation} from './EventValidation';
@@ -37,6 +42,38 @@ describe('EventValidator', () => {
 
       const source = EventSource.WEBSOCKET;
       const result = validateEvent(event, source, undefined);
+
+      expect(result).toBe(EventValidation.VALID);
+    });
+
+    it('ignores duplicate-risk events replayed on the notification stream', () => {
+      const eventTime = '2026-05-28T06:37:31.673Z';
+
+      const event: ConversationMemberJoinEvent = {
+        conversation: '939d0410-a17e-499e-804b-e7a8503415ae',
+        data: {user_ids: ['30c6d863-6d9d-41ba-882d-fbcdc32b75a8']},
+        from: '30c6d863-6d9d-41ba-882d-fbcdc32b75a8',
+        time: eventTime,
+        type: CONVERSATION_EVENT.MEMBER_JOIN,
+      };
+
+      const result = validateEvent(event, EventSource.NOTIFICATION_STREAM, eventTime);
+
+      expect(result).toBe(EventValidation.OUTDATED_TIMESTAMP);
+    });
+
+    it('allows OTR messages with the same timestamp as lastEventDate on the notification stream', () => {
+      const eventTime = '2026-05-28T06:37:31.673Z';
+
+      const event: ConversationOtrMessageAddEvent = {
+        conversation: '939d0410-a17e-499e-804b-e7a8503415ae',
+        data: {recipient: 'a66c7dc1e8ffa326', sender: 'c9878bbba7a1f9ab', text: 'encrypted'},
+        from: '30c6d863-6d9d-41ba-882d-fbcdc32b75a8',
+        time: eventTime,
+        type: CONVERSATION_EVENT.OTR_MESSAGE_ADD,
+      };
+
+      const result = validateEvent(event, EventSource.NOTIFICATION_STREAM, eventTime);
 
       expect(result).toBe(EventValidation.VALID);
     });
