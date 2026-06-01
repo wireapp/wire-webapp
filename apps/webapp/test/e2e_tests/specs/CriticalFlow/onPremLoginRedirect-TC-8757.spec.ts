@@ -53,7 +53,7 @@ test('On Prem Login Redirect', {tag: ['@TC-8757', '@regression']}, async ({conte
         page.waitForURL(urlPattern, {
           timeout: 20_000,
         }),
-        pages.customBackend().connectButton.click(),
+        page.getByRole('button', {name: 'Connect'}).click(),
       ]);
 
       await expect(page).toHaveURL(urlPattern);
