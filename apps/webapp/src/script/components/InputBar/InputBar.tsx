@@ -19,6 +19,7 @@
 
 import {useCallback, useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import cx from 'classnames';
 import {LexicalEditor, $createTextNode, $insertNodes} from 'lexical';
@@ -213,11 +214,9 @@ export const InputBar = ({
   useEffect(() => {
     const handleMessagePreprocessingChange = (event: Event) => {
       const isDisabled =
-      event instanceof CustomEvent && is.boolean(event.detail)
-        ? event.detail
-        : isMessagePreprocessingDisabled();
+        event instanceof CustomEvent && is.boolean(event.detail) ? event.detail : isMessagePreprocessingDisabled();
 
-    setDisableMessagePreprocessing(isDisabled);
+      setDisableMessagePreprocessing(isDisabled);
     };
 
     window.addEventListener(DISABLE_MESSAGE_PREPROCESSING_EVENT, handleMessagePreprocessingChange);

@@ -29,7 +29,7 @@ import {Config, Configuration} from 'src/script/Config';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
-import {wrapperStyles} from './ConfigToolbar.styles';
+import {messagePreprocessingSwitchStyles, wrapperStyles} from './ConfigToolbar.styles';
 
 export function ConfigToolbar() {
   const [showConfig, setShowConfig] = useState(false);
@@ -269,7 +269,7 @@ export function ConfigToolbar() {
 
   const renderMessagePreprocessingSwitch = () => {
     return (
-      <div style={{marginBottom: '10px'}}>
+      <div css={messagePreprocessingSwitchStyles}>
         <label htmlFor="message-preprocessing-checkbox" style={{display: 'block', fontWeight: 'bold'}}>
           DISABLE MESSAGE PREPROCESSING
         </label>
