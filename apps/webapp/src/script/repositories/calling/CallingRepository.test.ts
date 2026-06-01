@@ -519,19 +519,21 @@ describe('CallingRepository', () => {
       spyOn(Warnings, 'hideWarning');
     });
 
-    it('shows poor call quality warning when parsed quality is medium', () => {
+    // skipping test for now. Once we have correct stats about network
+    // quality then we will enable the feature and tests again.
+    it.skip('shows poor call quality warning when parsed quality is medium', () => {
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, qualityInfo(QUALITY.MEDIUM));
 
       expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
     });
 
-    it('shows poor call quality warning when parsed quality is poor', () => {
+    it.skip('shows poor call quality warning when parsed quality is poor', () => {
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, qualityInfo(QUALITY.POOR));
 
       expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
     });
 
-    it('shows poor call quality warning when parsed quality is network problem', () => {
+    it.skip('shows poor call quality warning when parsed quality is network problem', () => {
       callingRepository['updateCallQuality'](
         conversationId,
         userId,
@@ -542,7 +544,7 @@ describe('CallingRepository', () => {
       expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
     });
 
-    it('shows poor call quality warning when parsed quality is reconnecting', () => {
+    it.skip('shows poor call quality warning when parsed quality is reconnecting', () => {
       callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, qualityInfo(QUALITY.RECONNECTING));
 
       expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
@@ -586,7 +588,9 @@ describe('CallingRepository', () => {
       expect(Warnings.hideWarning).not.toHaveBeenCalled();
     });
 
-    it('handles partially missing fields in qualityInfo JSON', () => {
+    // skipping test for now. Once we have correct stats about network
+    // quality then we will enable the feature and tests again.
+    it.skip('handles partially missing fields in qualityInfo JSON', () => {
       const json = JSON.stringify({
         quality: QUALITY.POOR,
         // missing jitter, connection, peer etc.
