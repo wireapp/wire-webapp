@@ -31,3 +31,7 @@ export const wrapperStyles: CSSObject = {
   zIndex: 100000000,
   boxShadow: '3px 1px 6px 1px #000',
 };
+
+export const messagePreprocessingSwitchStyles: CSSObject = {
+  marginBottom: '10px',
+};
