@@ -257,8 +257,8 @@ export class BrigRepositoryE2E {
       `i/domain-registration/${domain}`,
       {
         backend: {
-          config_url: 'https://nginz-https.anta.wire.link/deeplink.json',
-          webapp_url: 'https://webapp.anta.wire.link',
+          config_url: new URL('deeplink.json', process.env.FEDERATION_BACKEND_URL),
+          webapp_url: process.env.FEDERATION_WEBAPP_URL,
         },
         domain_redirect: 'backend',
         team_invite: 'not-allowed',
