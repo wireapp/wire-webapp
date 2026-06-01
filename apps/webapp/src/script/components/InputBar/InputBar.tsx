@@ -212,7 +212,12 @@ export const InputBar = ({
 
   useEffect(() => {
     const handleMessagePreprocessingChange = (event: Event) => {
-      setDisableMessagePreprocessing((event as CustomEvent<boolean>).detail ?? isMessagePreprocessingDisabled());
+      const isDisabled =
+      event instanceof CustomEvent && is.boolean(event.detail)
+        ? event.detail
+        : isMessagePreprocessingDisabled();
+
+    setDisableMessagePreprocessing(isDisabled);
     };
 
     window.addEventListener(DISABLE_MESSAGE_PREPROCESSING_EVENT, handleMessagePreprocessingChange);
