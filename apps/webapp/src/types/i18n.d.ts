@@ -115,6 +115,7 @@ declare module 'I18n/en-US.json' {
     'accessibility.conversationDetailsActionGroupAdminLabel': `Set group admin`;
     'accessibility.conversationDetailsActionNotificationsLabel': `Show notifications settings`;
     'accessibility.conversationDetailsCloseLabel': `Close image details view`;
+    'accessibility.conversationMuted': `Muted`;
     'accessibility.conversationOptionsMenu': `Open conversation options`;
     'accessibility.conversationOptionsMenuAccessKey': `Use right arrow key to focus on the conversation options menu`;
     'accessibility.conversationStatusMuted': `Muted conversation`;
