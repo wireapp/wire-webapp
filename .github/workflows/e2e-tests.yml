@@ -12,6 +12,7 @@ on:
         options:
           - https://wire-webapp-dev.zinfra.io/
           - https://wire-webapp-master.zinfra.io/
+          - https://wire-webapp-qa.zinfra.io/
       backendUrl:
         type: choice
         description: Define which backend should be used
