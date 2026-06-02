@@ -138,6 +138,16 @@ export type QuoteData =
     }
   | {error: {type: string}};
 
+interface MessageAddMetadata {
+  /** who have received/read the event */
+  read_receipts?: ReadReceipt[];
+  /** who reacted to the event */
+  reactions?: UserReactionMap | ReactionMap;
+  edited_time?: string;
+  status: StatusType;
+  version?: number;
+}
+
 export type MessageAddEvent = ConversationEvent<
   CONVERSATION.MESSAGE_ADD,
   {
@@ -153,15 +163,9 @@ export type MessageAddEvent = ConversationEvent<
     /** @deprecated this was legacy field for the conversationId */
     id?: string;
   }
-> & {
-  /** who have received/read the event */
-  read_receipts?: ReadReceipt[];
-  /** who reacted to the event */
-  reactions?: UserReactionMap | ReactionMap;
-  edited_time?: string;
-  status: StatusType;
-  version?: number;
-};
+> &
+  MessageAddMetadata;
+
 export type MultipartMessageAddEvent = ConversationEvent<
   CONVERSATION.MULTIPART_MESSAGE_ADD,
   {
@@ -175,15 +179,9 @@ export type MultipartMessageAddEvent = ConversationEvent<
     replacing_message_id?: string;
     expects_read_confirmation?: boolean;
   }
-> & {
-  /** who have received/read the event */
-  read_receipts?: ReadReceipt[];
-  /** who reacted to the event */
-  reactions?: UserReactionMap | ReactionMap;
-  edited_time?: string;
-  status: StatusType;
-  version?: number;
-};
+> &
+  MessageAddMetadata;
+
 export type MissedEvent = BaseEvent & {id: string; type: CONVERSATION.MISSED_MESSAGES};
 export type JoinedAfterMLSMigrationFinalisationEvent = BaseEvent & {
   type: CONVERSATION.JOINED_AFTER_MLS_MIGRATION;
@@ -227,15 +225,9 @@ export type CompositeMessageAddEvent = ConversationEvent<
     replacing_message_id?: string;
     expects_read_confirmation?: boolean;
   }
-> & {
-  /** who have received/read the event */
-  read_receipts?: ReadReceipt[];
-  /** who reacted to the event */
-  reactions?: UserReactionMap | ReactionMap;
-  edited_time?: string;
-  status: StatusType;
-  version?: number;
-};
+> &
+  MessageAddMetadata;
+
 export type IncomingMessageTooBigEvent = ConversationEvent<CONVERSATION.INCOMING_MESSAGE_TOO_BIG>;
 export type KnockEvent = ConversationEvent<
   CONVERSATION.KNOCK,
