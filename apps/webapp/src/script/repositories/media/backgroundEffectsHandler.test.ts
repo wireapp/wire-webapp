@@ -24,6 +24,7 @@ import {
   SELFIE_MULTICLASS_MODEL_PATH,
   SELFIE_SEGMENTER_MODEL_PATH,
 } from 'Repositories/media/backgroundEffects/pipe/options';
+import {detectCapabilities} from 'Repositories/media/backgroundEffects';
 
 // Mocks
 jest.mock('Util/localStorage', () => ({
@@ -42,6 +43,10 @@ jest.mock('Util/logger', () => ({
     warn: jest.fn(),
     error: jest.fn(),
   }),
+}));
+
+jest.mock('Repositories/media/backgroundEffects', () => ({
+  detectCapabilities: jest.fn(),
 }));
 
 describe('BackgroundEffectsHandler', () => {
@@ -74,6 +79,7 @@ describe('BackgroundEffectsHandler', () => {
 
     const {getStorage} = require('Util/localStorage');
     getStorage.mockReturnValue(mockStorage);
+    (detectCapabilities as jest.Mock).mockReturnValue({webgl2: true});
   });
 
   function createMockStream(withTrack = true): MediaStream {
@@ -324,5 +330,59 @@ describe('BackgroundEffectsHandler', () => {
 
     expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_SEGMENTER_MODEL_PATH);
     expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(false);
+  });
+
+  it('keeps stored preferred effect when WebGL is available', () => {
+    mockStorage.getItem.mockImplementation((key: string) => {
+      if (key === 'video-background-effects') {
+        return JSON.stringify({type: 'blur', level: 'high'});
+      }
+      return null;
+    });
+
+    new BackgroundEffectsHandler(mockController);
+
+    expect(detectCapabilities).toHaveBeenCalled();
+    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({
+      type: 'blur',
+      level: 'high',
+    });
+  });
+
+  it('falls back to none and persists it when WebGL is unavailable and stored effect is enabled', () => {
+    (detectCapabilities as jest.Mock).mockReturnValue({webgl2: false});
+
+    mockStorage.getItem.mockImplementation((key: string) => {
+      if (key === 'video-background-effects') {
+        return JSON.stringify({type: 'blur', level: 'high'});
+      }
+      return null;
+    });
+
+    new BackgroundEffectsHandler(mockController);
+
+    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({type: 'none'});
+    expect(mockStorage.setItem).toHaveBeenCalledWith('video-background-effects', JSON.stringify({type: 'none'}));
+  });
+
+  it('does not persist fallback when WebGL is unavailable but stored effect is already none', () => {
+    (detectCapabilities as jest.Mock).mockReturnValue({webgl2: false});
+
+    mockStorage.getItem.mockImplementation((key: string) => {
+      if (key === 'video-background-effects') {
+        return JSON.stringify({type: 'none'});
+      }
+      return null;
+    });
+
+    new BackgroundEffectsHandler(mockController);
+
+    expect(backgroundEffectsStore.getState().preferredEffect).toEqual({type: 'none'});
+
+    const preferredEffectWrites = (mockStorage.setItem as jest.Mock).mock.calls.filter(
+      ([key]) => key === 'video-background-effects',
+    );
+
+    expect(preferredEffectWrites).toHaveLength(0);
   });
 });

@@ -48,6 +48,7 @@ import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallSt
 import {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {detectCapabilities} from 'Repositories/media/backgroundEffects';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
@@ -299,6 +300,7 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
+  const isWebGLAvailable = detectCapabilities().webgl2;
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
   const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
@@ -442,6 +444,7 @@ const FullscreenVideoCall = ({
               onEnableHighQualityBlur={handleEnableHighQualityBlur}
               onClose={() => backgroundSidebarHandler(false)}
               highQualityBlurAllowed={isHighQualityBlurEnabled}
+              isWebGLAvailable={isWebGLAvailable}
             />
           )}
         </div>
@@ -500,6 +503,7 @@ const FullscreenVideoCall = ({
               setMaximizedParticipant={setMaximizedParticipant}
               sendEmoji={sendEmoji}
               onOpenBackgroundSettings={() => backgroundSidebarHandler(true)}
+              isWebGLAvailable={isWebGLAvailable}
             />
           </>
         )}
@@ -524,6 +528,7 @@ const FullscreenVideoCall = ({
           onEnableHighQualityBlur={handleEnableHighQualityBlur}
           onClose={() => backgroundSidebarHandler(false)}
           highQualityBlurAllowed={isHighQualityBlurEnabled}
+          isWebGLAvailable={isWebGLAvailable}
         />
       )}
       <ModalComponent

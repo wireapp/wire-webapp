@@ -17,7 +17,7 @@
  *
  */
 
-import {Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
+import {detectCapabilities, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import {
@@ -99,7 +99,16 @@ export class BackgroundEffectsHandler {
   constructor(private readonly controller: BackgroundEffectsController) {
     this.storage = getStorage();
     backgroundEffectsStore.getState().setIsFeatureEnabled(this.readFeatureEnabledStateFromStore());
-    backgroundEffectsStore.getState().setPreferredEffect(this.readPreferredBackgroundEffectFromStore());
+
+    const storedEffect = this.readPreferredBackgroundEffectFromStore();
+    const isWebGLAvailable = detectCapabilities().webgl2;
+    const effectToApply = !isWebGLAvailable && storedEffect.type !== 'none' ? DEFAULT_BACKGROUND_EFFECT : storedEffect;
+
+    if (!isWebGLAvailable && storedEffect.type !== 'none') {
+      this.savePreferredBackgroundEffectInStore(DEFAULT_BACKGROUND_EFFECT);
+    }
+
+    backgroundEffectsStore.getState().setPreferredEffect(effectToApply);
     backgroundEffectsStore.getState().setLastVirtualBackgroundId(this.readLastVirtualBackgroundIdFromStore());
 
     backgroundEffectsStore.subscribe((state, prevState) => {

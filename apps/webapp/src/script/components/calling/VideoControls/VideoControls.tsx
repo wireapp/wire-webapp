@@ -171,6 +171,7 @@ interface VideoControlsProps {
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   sendEmoji: (emoji: string, call: Call) => void;
   onOpenBackgroundSettings?: () => void;
+  isWebGLAvailable: boolean;
 }
 
 export const VideoControls = ({
@@ -196,6 +197,7 @@ export const VideoControls = ({
   setMaximizedParticipant,
   sendEmoji,
   onOpenBackgroundSettings,
+  isWebGLAvailable = true,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: VideoControlsProps) => {
@@ -397,8 +399,10 @@ export const VideoControls = ({
         label: t('videoCallBackgroundEffectsLabel'),
         options: [
           {label: t('videoCallBackgroundNone'), value: 'none', icon: <CircleIcon />},
-          currentBlurOption,
-          {label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <ImageIcon />},
+          ...(isWebGLAvailable ? [currentBlurOption] : []),
+          ...(isWebGLAvailable
+            ? [{label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <ImageIcon />}]
+            : []),
           {
             label: t('videoCallBackgroundSettings'),
             value: 'settings',
@@ -407,7 +411,7 @@ export const VideoControls = ({
         ],
       },
     ],
-    [currentBlurOption],
+    [currentBlurOption, isWebGLAvailable],
   );
 
   /** Merged options: camera group + (if enabled) background group. */

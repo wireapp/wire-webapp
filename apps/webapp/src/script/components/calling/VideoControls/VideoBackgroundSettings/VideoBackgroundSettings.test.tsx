@@ -25,7 +25,8 @@ import {withTheme} from '../../../../auth/util/test/TestUtil';
 import {getBackgroundEffectLabel, VideoBackgroundSettings} from './VideoBackgroundSettings';
 
 jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
+  t: (key: string, _params?: unknown, replacement?: string) => `${key}${replacement ? ` ${replacement}` : ''}`,
+  replaceLink: jest.fn(() => '<a href="https://support.wire.com/background-effects">Learn more</a>'),
 }));
 
 describe('VideoBackgroundSettings', () => {
@@ -51,6 +52,7 @@ describe('VideoBackgroundSettings', () => {
     onEnableHighQualityBlur: jest.fn(),
     onClose: jest.fn(),
     highQualityBlurAllowed: false,
+    isWebGLAvailable: true,
   };
 
   beforeEach(() => {
@@ -212,6 +214,46 @@ describe('VideoBackgroundSettings', () => {
     const {getByRole} = renderComponent();
 
     expect(getByRole('button', {name: 'modalCloseButton'})).toHaveFocus();
+  });
+
+  it('renders no WebGL hint when WebGL is unavailable', () => {
+    const {getByText} = renderComponent({isWebGLAvailable: false});
+
+    expect(getByText('videoCallBackgroundNoWebGLHint')).toBeInTheDocument();
+  });
+
+  it('does not render blur controls when WebGL is unavailable', () => {
+    const {queryByText, queryByTestId} = renderComponent({isWebGLAvailable: false});
+
+    expect(queryByText('videoCallBackgroundBlurSectionLabel')).not.toBeInTheDocument();
+    expect(queryByText('videoCallBackgroundBlurLow')).not.toBeInTheDocument();
+    expect(queryByText('videoCallBackgroundBlurHigh')).not.toBeInTheDocument();
+    expect(queryByTestId('enable-high-quality-blur')).not.toBeInTheDocument();
+  });
+
+  it('does not render virtual background tiles when WebGL is unavailable', () => {
+    const {queryByRole, queryByText} = renderComponent({isWebGLAvailable: false});
+
+    expect(queryByText('videoCallBackgroundVirtualSectionLabel')).not.toBeInTheDocument();
+    expect(queryByRole('radio', {name: /office1/i})).not.toBeInTheDocument();
+    expect(queryByRole('radio', {name: /office2/i})).not.toBeInTheDocument();
+  });
+
+  it('disables no effect tile when WebGL is unavailable', () => {
+    const {getByRole} = renderComponent({isWebGLAvailable: false});
+
+    expect(getByRole('radio', {name: 'videoCallBackgroundNoEffect'})).toBeDisabled();
+  });
+
+  it('renders support link in no WebGL hint', () => {
+    const {getByRole} = renderComponent({
+      isWebGLAvailable: false,
+    });
+
+    const link = getByRole('link', {name: 'Learn more'});
+
+    expect(link).toBeInTheDocument();
+    expect(link).toHaveAttribute('href', 'https://support.wire.com/background-effects');
   });
 
   describe('getBackgroundEffectLabel', () => {

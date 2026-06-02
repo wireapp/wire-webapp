@@ -152,6 +152,22 @@ export const tilePreviewContentStyles: CSSObject = {
   color: 'black', // no design for dark mode, so keeping it black.
 };
 
-export const enhanceQualityCheckboxHintStyles: CSSObject = {
+export const backgroundEffectPanelHintStyles: CSSObject = {
   color: 'var(--base-secondary-text)',
+  fontSize: 'var(--font-size-small)',
+  marginTop: 4,
+
+  '& a': {
+    color: 'inherit',
+    textDecoration: 'underline',
+  },
+
+  'body.theme-dark &': {
+    color: 'var(--gray-20)',
+  },
+};
+
+export const backgroundEffectPanelIndentedHintStyles: CSSObject = {
+  ...backgroundEffectPanelHintStyles,
+  marginLeft: 30,
 };
