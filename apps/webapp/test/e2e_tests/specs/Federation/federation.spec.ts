@@ -18,7 +18,7 @@ test.describe('Federation', () => {
   let federatedUser: User;
 
   test.beforeEach(async ({api}) => {
-    normalUser = (await createTeam(api, 'Normal Team')).owner;
+    normalUser = (await createTeam(api, 'Normal Team', {features: {conferenceCalling: true}})).owner;
     federatedUser = (await createTeam(federationApiManager, 'Federated Team')).owner;
   });
 
@@ -377,35 +377,86 @@ test.describe('Federation', () => {
     },
   );
 
-  test('I want to start a 1:1 call with a federated User', {tag: ['@TC-3208', '@regression']}, async ({createPage}) => {
-    const [normalUserPage, federatedUserPage] = await Promise.all([
-      createPage(withLogin(normalUser)),
-      createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
-    ]);
-    await sendConnectionRequest(normalUserPage, federatedUser);
+  const testData = [
+    {
+      title: 'I want to start a 1:1 call with a federated User',
+      tags: ['@TC-3208', '@regression'],
+      type: '1:1',
+    },
+    {
+      title: 'I want to start a conference call in a federated group with Users from 2 different backends',
+      tags: ['@TC-3220', '@regression'],
+      type: 'group',
+    },
+  ];
 
-    const {pages: normalUserPages} = PageManager.from(normalUserPage).webapp;
-    const {pages: federatedUserPages} = PageManager.from(federatedUserPage).webapp;
+  testData.forEach(({title, tags, type}) => {
+    test(title, {tag: tags}, async ({createPage}) => {
+      const [normalUserPage, federatedUserPage] = await Promise.all([
+        createPage(withLogin(normalUser)),
+        createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
+      ]);
 
-    await federatedUserPages.conversationList().openPendingConnectionRequest();
-    await federatedUserPages.connectRequest().clickConnectButton();
+      const normalUserPages = PageManager.from(normalUserPage).webapp.pages;
+      const federatedUserPages = PageManager.from(federatedUserPage).webapp.pages;
+      const groupName = 'Federation call group';
 
-    await normalUserPages.conversationList().getConversation(federatedUser.fullName, {protocol: 'mls'}).open();
-    await federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}).open();
+      await test.step('Connect federated users', async () => {
+        await sendConnectionRequest(normalUserPage, federatedUser);
+        await federatedUserPages.conversationList().openPendingConnectionRequest();
+        await federatedUserPages.connectRequest().clickConnectButton();
+      });
 
-    await normalUserPages.conversation().callButton.click();
-    await federatedUserPages.calling().acceptCallButton.click();
+      await test.step('Users open conversations', async () => {
+        if (type === '1:1') {
+          await normalUserPages.conversationList().getConversation(federatedUser.fullName, {protocol: 'mls'}).open();
+          await federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}).open();
+        } else {
+          await expect(
+            federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}),
+          ).toBeVisible();
 
-    await normalUserPages.calling().toggleVideoButton.click();
-    await federatedUserPages.calling().toggleVideoButton.click();
+          await createGroup(federatedUserPages, groupName, [normalUser]);
+          await normalUserPages.conversationList().getConversation(groupName).open();
+          await federatedUserPages.conversationList().getConversation(groupName).open();
+        }
+      });
 
-    const normalUserCall = await normalUserPages.calling().maximizeCell();
-    const federatedUserCall = await federatedUserPages.calling().maximizeCell();
+      await test.step('Start and accept call', async () => {
+        await normalUserPages.conversation().callButton.click();
+        await expect(normalUserPages.calling().callCell).toBeVisible();
+        await federatedUserPages.calling().acceptCallButton.click();
+      });
 
-    await expect(normalUserCall.getCallingParticipant(federatedUser.fullName).muteIcon).not.toBeVisible();
-    await expect(normalUserCall.getGridTile(federatedUser.fullName).videoElement).toBeVisible();
+      await test.step('Enable video streams', async () => {
+        await normalUserPages.calling().toggleVideoButton.click();
+        await federatedUserPages.calling().toggleVideoButton.click();
+      });
 
-    await expect(federatedUserCall.getCallingParticipant(normalUser.fullName).muteIcon).not.toBeVisible();
-    await expect(federatedUserCall.getGridTile(normalUser.fullName).videoElement).toBeVisible();
+      const normalUserCall = await normalUserPages.calling().maximizeCell();
+      const federatedUserCall = await federatedUserPages.calling().maximizeCell();
+
+      await test.step('Verify initial media connection', async () => {
+        // Normal User UI Checks
+        await expect(normalUserCall.getCallingParticipant(federatedUser.fullName).muteIcon).not.toBeVisible();
+        await expect(normalUserCall.getGridTile(federatedUser.fullName).videoElement).toBeVisible();
+
+        // Federated User UI Checks
+        await expect(federatedUserCall.getCallingParticipant(normalUser.fullName).muteIcon).not.toBeVisible();
+        await expect(federatedUserCall.getGridTile(normalUser.fullName).videoElement).toBeVisible();
+      });
+
+      // Conditionally execute group-only interaction steps
+      if (type === 'group') {
+        await test.step('Verify screen sharing controls', async () => {
+          await normalUserCall.toggleVideoButton.click();
+          await expect(federatedUserCall.getGridTile(normalUser.fullName).videoElement).not.toBeVisible();
+
+          await normalUserCall.toggleScreenShareButton.click();
+          await expect(normalUserCall.selfVideoThumbnail.locator('video')).toBeVisible();
+          await expect(federatedUserCall.getGridTile(normalUser.fullName).videoElement).toBeVisible();
+        });
+      }
+    });
   });
 });
