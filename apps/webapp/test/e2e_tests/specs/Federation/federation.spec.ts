@@ -293,6 +293,90 @@ test.describe('Federation', () => {
     },
   );
 
+  test(
+    'I want to be able to connect to, block, and unblock a user from different backend',
+    {tag: ['@TC-3129', '@regression']},
+    async ({createPage}) => {
+      const [normalUserPage, federatedUserPage] = await Promise.all([
+        createPage(withLogin(normalUser)),
+        createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
+      ]);
+
+      const {
+        pages: normalUserPages,
+        components: normalUserComponents,
+        modals: normalUserModals,
+      } = PageManager.from(normalUserPage).webapp;
+
+      const {pages: federatedUserPages} = PageManager.from(federatedUserPage).webapp;
+
+      const userHandle = federatedUser.qualifiedId?.domain
+        ? `${federatedUser.username}@${federatedUser.qualifiedId?.domain}`
+        : federatedUser.username;
+
+      await test.step('Send connection request to federated user', async () => {
+        await normalUserComponents.conversationSidebar().clickConnectButton();
+        await normalUserPages.startUI().searchInput.fill(userHandle);
+
+        const normalUserSearchRow = normalUserPages.startUI().searchResults.filter({hasText: federatedUser.username});
+        await expect(normalUserSearchRow).toBeVisible();
+        await expect(normalUserSearchRow.getByTestId('status-federated-user')).toBeVisible();
+
+        await normalUserPages.startUI().selectUsers(userHandle);
+        await normalUserModals.userProfile().clickConnectButton();
+      });
+
+      await test.step('Accept connection request from normal user', async () => {
+        await federatedUserPages.conversationList().openPendingConnectionRequest();
+        await federatedUserPages.connectRequest().clickConnectButton();
+      });
+
+      await test.step('Open conversation on both ends', async () => {
+        await Promise.all([
+          normalUserPages.conversationList().getConversation(federatedUser.fullName, {protocol: 'mls'}).open(),
+          federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}).open(),
+        ]);
+      });
+
+      await test.step('Verify conversation details and cross-backend presence indicators', async () => {
+        await normalUserPages.conversation().toggleGroupInformation();
+
+        await expect(normalUserPages.participantDetails().userName).toBeVisible();
+        await expect(normalUserPages.participantDetails().userHandle).toBeVisible();
+        await expect(normalUserPages.conversation().statusIndicator).toContainText('Federated users are present');
+        await expect(normalUserPages.conversation().conversationTitle).toContainText(federatedUser.fullName);
+        await expect(
+          normalUserPages.conversation().systemMessages.filter({hasText: federatedUser.username}),
+        ).toBeVisible();
+      });
+
+      await test.step('Exchange messages between normal and federated users', async () => {
+        await normalUserPages.conversation().sendMessage('Message from normal user');
+        await federatedUserPages.conversation().sendMessage('Message from federated user');
+
+        await expect(normalUserPages.conversation().getMessage({sender: federatedUser})).toBeVisible();
+        await expect(federatedUserPages.conversation().getMessage({sender: normalUser})).toBeVisible();
+      });
+
+      await test.step('Block the federated user and verify status', async () => {
+        await normalUserPages.participantDetails().blockUser();
+        await normalUserModals.confirm().actionButton.click();
+
+        await expect(normalUserPages.participantDetails().userPicture).toHaveAttribute('data-uie-status', 'blocked');
+      });
+
+      await test.step('Unblock the federated user and verify status restoration', async () => {
+        await normalUserPages.participantDetails().unblockButton.click();
+        await normalUserModals.confirm().actionButton.click();
+
+        await expect(normalUserPages.participantDetails().userPicture).not.toHaveAttribute(
+          'data-uie-status',
+          'blocked',
+        );
+      });
+    },
+  );
+
   test('I want to start a 1:1 call with a federated User', {tag: ['@TC-3208', '@regression']}, async ({createPage}) => {
     const [normalUserPage, federatedUserPage] = await Promise.all([
       createPage(withLogin(normalUser)),
