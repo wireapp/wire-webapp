@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useEffect, useState} from 'react';
+import {ChangeEvent, useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
@@ -198,6 +198,15 @@ const FullscreenVideoCall = ({
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const backgroundSidebarHandler = (newValue: boolean): void => {
+    setIsBackgroundSidebarOpen(newValue);
+
+    if (isBackgroundSidebarOpen && newValue === false) {
+      wrapperRef.current?.focus();
+    }
+  };
 
   const callNotification = useAppNotification({
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
@@ -307,6 +316,8 @@ const FullscreenVideoCall = ({
   return (
     <div
       id="video-calling-wrapper"
+      ref={wrapperRef}
+      tabIndex={-1}
       data-uie-name="fullscreen-video-call"
       className={cx('video-calling-wrapper', {
         'app--small-offset': hasOffset && isMiniMode,
@@ -429,7 +440,7 @@ const FullscreenVideoCall = ({
               backgrounds={BUILTIN_BACKGROUNDS}
               onSelectEffect={handleBackgroundSidebarSelect}
               onEnableHighQualityBlur={handleEnableHighQualityBlur}
-              onClose={() => setIsBackgroundSidebarOpen(false)}
+              onClose={() => backgroundSidebarHandler(false)}
               highQualityBlurAllowed={isHighQualityBlurEnabled}
             />
           )}
@@ -488,7 +499,7 @@ const FullscreenVideoCall = ({
               setActiveCallViewTab={setActiveCallViewTab}
               setMaximizedParticipant={setMaximizedParticipant}
               sendEmoji={sendEmoji}
-              onOpenBackgroundSettings={() => setIsBackgroundSidebarOpen(true)}
+              onOpenBackgroundSettings={() => backgroundSidebarHandler(true)}
             />
           </>
         )}
@@ -511,7 +522,7 @@ const FullscreenVideoCall = ({
           backgrounds={BUILTIN_BACKGROUNDS}
           onSelectEffect={handleBackgroundSidebarSelect}
           onEnableHighQualityBlur={handleEnableHighQualityBlur}
-          onClose={() => setIsBackgroundSidebarOpen(false)}
+          onClose={() => backgroundSidebarHandler(false)}
           highQualityBlurAllowed={isHighQualityBlurEnabled}
         />
       )}
