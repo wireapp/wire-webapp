@@ -142,6 +142,7 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnOpen = (event: Event) => {
     this.logger.info(`WebSocket opened (reconnect attempt #${this.reconnectAttemptCount})`);
+    this.hasUnansweredPing = false;
     if (this.sleepReconnectPending) {
       this.sleepReconnectPending = false;
       this.logger.info('Back from sleep reconnect completed, WebSocket opened');
@@ -174,6 +175,7 @@ export class ReconnectingWebsocket {
 
     // Force reconnect even if the browser keeps the socket in OPEN state after sleep.
     this.sleepReconnectPending = true;
+    this.reschedulePinging();
     this.socket.reconnect();
   }
 
@@ -183,10 +185,7 @@ export class ReconnectingWebsocket {
     this.recordReconnectAttempt(Date.now());
     // The ping is needed to keep the connection alive as long as possible.
     // Otherwise the connection would be closed after 1 min of inactivity and re-established.
-    if (this.isPingingEnabled) {
-      this.startPinging();
-      this.logger.debug(`Ping started (interval: ${this.PING_INTERVAL}ms)`);
-    }
+    this.ensurePinging();
     return this.onReconnect();
   };
 
@@ -194,39 +193,80 @@ export class ReconnectingWebsocket {
     this.logger.info(
       `WebSocket closed — code: ${event?.code}, reason: "${event?.reason || 'none'}", wasClean: ${event?.wasClean ?? 'unknown'}`,
     );
-    this.stopPinging();
+    this.hasUnansweredPing = false;
     this.resolvePendingHealthChecks(false);
     if (this.onClose) {
       this.onClose(event);
     }
   };
 
-  private startPinging(): void {
-    this.stopPinging();
-    this.hasUnansweredPing = false;
+  /**
+   * Starts the ping interval if pinging is enabled and not already running.
+   * The interval is kept alive across reconnects and is only cleared on disconnect/cleanup.
+   */
+  private ensurePinging(): void {
+    if (!this.isPingingEnabled || this.pingerId !== undefined) {
+      return;
+    }
+
+    this.logger.debug(`Ping interval started (interval: ${this.PING_INTERVAL}ms)`);
     this.pingerId = setInterval(this.sendPing, this.PING_INTERVAL);
+  }
+
+  /**
+   * Restarts the ping interval timer. Used after wake-from-sleep so the next tick is not
+   * delayed by time spent suspended while the OS had timers paused.
+   */
+  private reschedulePinging(): void {
+    if (!this.isPingingEnabled) {
+      return;
+    }
+
+    this.stopPinging();
+    this.pingerId = setInterval(this.sendPing, this.PING_INTERVAL);
+    this.logger.debug(`Ping interval rescheduled (interval: ${this.PING_INTERVAL}ms)`);
   }
 
   private stopPinging(): void {
     if (this.pingerId) {
       clearInterval(this.pingerId);
+      this.pingerId = undefined;
     }
   }
 
   private readonly sendPing = (): void => {
+    if (!this.isPingingEnabled) {
+      return;
+    }
+
     if (!this.socket) {
-      this.logger.debug('WebSocket instance does not exist, skipping ping');
+      this.logger.debug('Ping tick — WebSocket instance does not exist, skipping ping');
+      return;
+    }
+
+    const state = this.getState();
+
+    if (state === WEBSOCKET_STATE.CONNECTING || state === WEBSOCKET_STATE.CLOSING) {
+      this.logger.debug(`Ping tick — socket is transitioning (state: ${WEBSOCKET_STATE[state]}), skipping ping`);
+      return;
+    }
+
+    if (state === WEBSOCKET_STATE.CLOSED) {
+      this.logger.info('Ping tick — socket CLOSED, forcing reconnect');
+      this.hasUnansweredPing = false;
+      this.socket.reconnect();
       return;
     }
 
     if (this.hasUnansweredPing) {
       this.logger.warn(
-        `Ping timeout — no pong received within ${this.PING_INTERVAL}ms, WebSocket state: ${WEBSOCKET_STATE[this.getState()]} (${this.getState()}), forcing reconnect`,
+        `Ping timeout — no pong received within ${this.PING_INTERVAL}ms, WebSocket state: ${WEBSOCKET_STATE[state]} (${state}), forcing reconnect`,
       );
-      this.stopPinging();
+      this.hasUnansweredPing = false;
       this.socket.reconnect();
       return;
     }
+
     this.logger.debug('Sending ping');
     this.hasUnansweredPing = true;
     this.send(PingMessage.PING);
@@ -254,10 +294,10 @@ export class ReconnectingWebsocket {
       }
     }
 
-    this.stopPinging();
     const nextSocket = this.getReconnectingWebsocket();
     this.socket = nextSocket;
     this.bindSocketHandlers(nextSocket);
+    this.ensurePinging();
   }
 
   private bindSocketHandlers(socket: RWS): void {

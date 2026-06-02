@@ -50,6 +50,7 @@ describe('ReconnectingWebsocket back from sleep', () => {
   it('forces reconnect when waking with an OPEN zombie socket', () => {
     const RWS = new ReconnectingWebsocket(async () => 'ws://localhost');
     const reconnect = jest.fn();
+    const rescheduleSpy = jest.spyOn(RWS as never as {reschedulePinging: () => void}, 'reschedulePinging');
 
     RWS['socket'] = {
       readyState: WEBSOCKET_STATE.OPEN,
@@ -60,6 +61,7 @@ describe('ReconnectingWebsocket back from sleep', () => {
     sleepWakeCallback!();
 
     expect(reconnect).toHaveBeenCalledTimes(1);
+    expect(rescheduleSpy).toHaveBeenCalledTimes(1);
     expect(RWS['sleepReconnectPending']).toBe(true);
   });
 

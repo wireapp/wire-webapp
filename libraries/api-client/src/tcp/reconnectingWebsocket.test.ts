@@ -25,6 +25,8 @@ import {Server as WebSocketServer} from 'ws';
 
 import {AddressInfo} from 'net';
 
+import {CloseEvent} from 'reconnecting-websocket';
+
 import {PingMessage, ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
 
 async function startEchoServer(): Promise<WebSocketServer> {
@@ -881,6 +883,64 @@ describe('ReconnectingWebsocket', () => {
       });
 
       RWS.connect();
+    });
+
+    it('keeps the ping interval running after the socket closes', done => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+
+      RWS.setOnOpen(() => {
+        const pingerId = RWS['pingerId'];
+        expect(pingerId).toBeDefined();
+
+        RWS['internalOnClose']({
+          code: 1006,
+          reason: '',
+          wasClean: false,
+        } as CloseEvent);
+
+        expect(RWS['pingerId']).toBe(pingerId);
+        RWS.disconnect();
+        done();
+      });
+
+      RWS.connect();
+    });
+
+    it('keeps the ping interval running after a ping timeout reconnect', done => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect, {pingInterval: 100});
+
+      RWS.setOnOpen(() => {
+        const pingerId = RWS['pingerId'];
+        RWS['hasUnansweredPing'] = true;
+
+        setTimeout(() => {
+          RWS['sendPing']();
+          expect(RWS['pingerId']).toBe(pingerId);
+          RWS.disconnect();
+          done();
+        }, 50);
+      });
+
+      RWS.connect();
+    }, 2000);
+
+    it('forces reconnect on ping tick when socket is CLOSED', () => {
+      const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+      const RWS = createRWS(onReconnect);
+      const reconnect = jest.fn();
+
+      RWS['socket'] = {
+        close: jest.fn(),
+        readyState: WEBSOCKET_STATE.CLOSED,
+        reconnect,
+      } as never;
+
+      RWS['sendPing']();
+
+      expect(reconnect).toHaveBeenCalledTimes(1);
+      RWS.disconnect();
     });
   });
 
