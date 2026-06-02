@@ -24,6 +24,7 @@ import {Runtime} from '@wireapp/commons';
 import {createUuid} from 'Util/uuid';
 
 import packageJson from '../../package.json';
+
 const env = window.wire.env;
 
 export const ACCENT_ID = {
@@ -120,13 +121,6 @@ const Config = {
     }
 
     return window.desktopAppConfig;
-  },
-  getDesktopSettings: () => {
-    if (!Runtime.isDesktopApp()) {
-      return undefined;
-    }
-
-    return window.desktopAppSettings;
   },
 };
 
