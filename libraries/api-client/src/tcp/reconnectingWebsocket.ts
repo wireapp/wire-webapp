@@ -88,6 +88,7 @@ export class ReconnectingWebsocket {
   private reconnectSequenceRetryCount = 0;
   private reconnectSequenceStartTimestamp: Maybe<number> = Maybe.nothing<number>();
   private hasReportedLongRunningRetry = false;
+  private sleepReconnectPending = false;
 
   constructor(
     private readonly onReconnect: () => Promise<string>,
@@ -112,19 +113,7 @@ export class ReconnectingWebsocket {
      * the internal setInterval and must be called when disconnecting to prevent memory leaks.
      * **/
     this.stopBackFromSleepHandler = onBackFromSleep({
-      callback: () => {
-        if (!this.socket) {
-          this.logger.debug('WebSocket instance does not exist, skipping reconnect after sleep');
-          return;
-        }
-        const state = this.getState();
-        this.logger.info(
-          `Back from sleep detected, WebSocket state: ${WEBSOCKET_STATE[state]} (${state}), forcing reconnect`,
-        );
-        // Force reconnect even if the browser keeps the socket in OPEN state after sleep.
-        this.socket.reconnect();
-      },
-      isDisconnected: () => this.getState() === WEBSOCKET_STATE.CLOSED,
+      callback: () => this.handleBackFromSleep(),
     });
   }
 
@@ -153,6 +142,10 @@ export class ReconnectingWebsocket {
 
   private readonly internalOnOpen = (event: Event) => {
     this.logger.info(`WebSocket opened (reconnect attempt #${this.reconnectAttemptCount})`);
+    if (this.sleepReconnectPending) {
+      this.sleepReconnectPending = false;
+      this.logger.info('Back from sleep reconnect completed, WebSocket opened');
+    }
     this.resetLongRunningRetrySequence();
     if (this.socket) {
       this.socket.binaryType = 'arraybuffer';
@@ -161,6 +154,28 @@ export class ReconnectingWebsocket {
       this.onOpen(event);
     }
   };
+
+  private handleBackFromSleep(): void {
+    if (!this.socket) {
+      this.logger.info('Back from sleep detected, skipping reconnect — WebSocket instance does not exist');
+      return;
+    }
+
+    const state = this.getState();
+    const timeSinceLastMessage = this.lastMessageTimestamp > 0 ? Date.now() - this.lastMessageTimestamp : undefined;
+    const idleDescription =
+      timeSinceLastMessage !== undefined
+        ? `last message ${timeSinceLastMessage}ms ago`
+        : 'no messages received on this connection yet';
+
+    this.logger.info(
+      `Back from sleep detected, WebSocket state: ${WEBSOCKET_STATE[state]} (${state}), ${idleDescription}, unansweredPing: ${this.hasUnansweredPing}, forcing reconnect`,
+    );
+
+    // Force reconnect even if the browser keeps the socket in OPEN state after sleep.
+    this.sleepReconnectPending = true;
+    this.socket.reconnect();
+  }
 
   private readonly internalOnReconnect = async (): Promise<string> => {
     const attempt = this.reconnectAttemptCount + 1;
@@ -351,6 +366,7 @@ export class ReconnectingWebsocket {
    */
   private cleanup(): void {
     this.stopPinging();
+    this.sleepReconnectPending = false;
     // Clear the sleep detection interval if it exists
     this.stopBackFromSleepHandler?.();
   }
