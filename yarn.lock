@@ -6114,6 +6114,29 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nx/jest@npm:22.7.5":
+  version: 22.7.5
+  resolution: "@nx/jest@npm:22.7.5"
+  dependencies:
+    "@jest/reporters": "npm:^30.0.2"
+    "@jest/test-result": "npm:^30.0.2"
+    "@nx/devkit": "npm:22.7.5"
+    "@nx/js": "npm:22.7.5"
+    "@phenomnomnominal/tsquery": "npm:~6.2.0"
+    identity-obj-proxy: "npm:3.0.0"
+    jest-config: "npm:^30.0.2"
+    jest-resolve: "npm:^30.0.2"
+    jest-util: "npm:^30.0.2"
+    minimatch: "npm:10.2.5"
+    picocolors: "npm:^1.1.0"
+    resolve.exports: "npm:2.0.3"
+    semver: "npm:^7.6.3"
+    tslib: "npm:^2.3.0"
+    yargs-parser: "npm:21.1.1"
+  checksum: 10/e7ec698c463f48f6aac6751f6b1e347a7056c6bedfbc0e7e4320c008817b26270502ffcb68a383d147c18bbad52b42e3751dd37cd92e71ea6500c32f90de9faa
+  languageName: node
+  linkType: hard
+
 "@nx/js@npm:22.7.2":
   version: 22.7.2
   resolution: "@nx/js@npm:22.7.2"
@@ -28319,7 +28342,7 @@ __metadata:
     "@enormora/objectory": "npm:0.0.7"
     "@faker-js/faker": "npm:9.9.0"
     "@ls-lint/ls-lint": "npm:2.3.1"
-    "@nx/jest": "npm:22.7.2"
+    "@nx/jest": "npm:22.7.5"
     "@nx/node": "npm:22.7.2"
     "@nx/workspace": "npm:22.7.2"
     "@stylistic/eslint-plugin": "npm:5.10.0"
