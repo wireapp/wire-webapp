@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,24 @@
  *
  */
 
-import {CSSObject} from '@emotion/react';
+import {CellPagination} from '../cellPagination/cellPagination';
 
-export const wrapperStyles: CSSObject = {
-  padding: '16px 0',
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-};
+export const LOAD_MORE_INITIAL_SIZE = 30;
+export const LOAD_MORE_INCREMENT = 20;
 
-export const loadMoreWrapperStyles: CSSObject = {
-  padding: '20px',
-  display: 'flex',
-  justifyContent: 'center',
-};
+export const getLoadMoreOffset = (pagination: CellPagination | null): number | null => {
+  const nextOffset = pagination?.nextOffset;
 
-export const loadMoreErrorWrapperStyles: CSSObject = {
-  padding: '20px',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '8px',
-};
+  if (nextOffset === undefined) {
+    return null;
+  }
 
-export const loadMoreErrorMessageStyles: CSSObject = {
-  fontSize: '14px',
-  color: 'var(--text-color-secondary)',
+  const currentPage = pagination?.currentPage;
+  const totalPages = pagination?.totalPages;
+
+  if (currentPage === undefined || totalPages === undefined) {
+    return nextOffset;
+  }
+
+  return currentPage < totalPages ? nextOffset : null;
 };

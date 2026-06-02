@@ -240,6 +240,7 @@ export class CellsRepository {
   async searchNodes({
     query,
     limit = DEFAULT_MAX_FILES_LIMIT,
+    offset = 0,
     tags,
     mimeTypes,
     hasPublicLink,
@@ -248,9 +249,11 @@ export class CellsRepository {
     type,
     sortBy,
     sortDirection,
+    deleted = false,
   }: {
     query: string;
     limit?: number;
+    offset?: number;
     tags?: string[];
     mimeTypes?: string[];
     hasPublicLink?: boolean;
@@ -259,10 +262,12 @@ export class CellsRepository {
     type?: 'file' | 'folder';
     sortBy?: SortBy;
     sortDirection?: SortDirection;
+    deleted?: boolean;
   }) {
     return this.apiClient.api.cells.searchNodes({
       phrase: query,
       limit,
+      offset,
       sortBy,
       sortDirection,
       tags,
@@ -270,6 +275,7 @@ export class CellsRepository {
       hasPublicLink,
       creatorIds,
       path,
+      deleted,
       ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });
   }

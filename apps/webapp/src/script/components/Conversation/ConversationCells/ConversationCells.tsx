@@ -21,6 +21,8 @@ import {memo, useCallback, useEffect, useRef} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
+import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -33,11 +35,16 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
-import {hasActiveConversationDriveFilters} from './common/driveFilters/driveFilters';
+import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
-import {wrapperStyles} from './ConversationCells.styles';
+import {
+  loadMoreErrorMessageStyles,
+  loadMoreErrorWrapperStyles,
+  loadMoreWrapperStyles,
+  wrapperStyles,
+} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
 import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
@@ -67,7 +74,7 @@ export const ConversationCells = memo(
     const {fireAndForgetInvoker} = useApplicationContext();
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
-    const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
+    const {getNodes, status: nodesStatus, getPagination, error: storeError} = useCellsStore();
 
     const conversationId = activeConversation.id;
     const conversationQualifiedId = activeConversation.qualifiedId;
@@ -94,12 +101,13 @@ export const ConversationCells = memo(
       cellsRepository,
       conversationRepository,
     });
-    const hasActiveFilters = hasActiveConversationDriveFilters(filterState);
 
     const {
       searchValue,
       handleSearch,
+      handleReload,
       handleClearSearch: clearSearch,
+      loadMore: loadMoreSearchResults,
     } = useConversationSearchFiles({
       cellsRepository,
       conversationQualifiedId,
@@ -110,8 +118,9 @@ export const ConversationCells = memo(
       onClear: refresh,
     });
 
-    const trimmedSearchValue = searchValue.trim();
-    const isSearchActive = !!trimmedSearchValue;
+    // Search view open ⇒ load-more UI + search-hook data; closed ⇒ page-nav UI + browse-hook data.
+    // The mode is owned by the view, not by whether the user has typed/filtered yet.
+    const isInSearchMode = isSearchViewOpen;
     const wasSearchViewOpen = useRef(isSearchViewOpen);
 
     const handleClearSearch = useCallback((): void => {
@@ -119,18 +128,27 @@ export const ConversationCells = memo(
     }, [clearSearch]);
 
     useEffect(() => {
-      if (wasSearchViewOpen.current && !isSearchViewOpen && (isSearchActive || hasActiveFilters)) {
+      if (wasSearchViewOpen.current && !isSearchViewOpen) {
+        // Search view just closed — reset any active search/filter and restore the
+        // browse-mode dataset (handled by clearSearch's onClear callback → refresh).
         clearAllFilters();
         clearSearch({preserveFilters: false});
       }
       wasSearchViewOpen.current = isSearchViewOpen;
-    }, [clearAllFilters, clearSearch, hasActiveFilters, isSearchActive, isSearchViewOpen]);
+    }, [clearAllFilters, clearSearch, isSearchViewOpen]);
 
-    // When search is active, refresh should trigger search reload
-    const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
+    const handleRefresh = useCallback((): void => {
+      if (isInSearchMode) {
+        fireAndForgetInvoker.fireAndForget(handleReload);
+        return;
+      }
+
+      fireAndForgetInvoker.fireAndForget(refresh);
+    }, [fireAndForgetInvoker, handleReload, isInSearchMode, refresh]);
 
     const nodes = getNodes({conversationId});
     const pagination = getPagination({conversationId});
+    const loadMoreOffset = getLoadMoreOffset(pagination);
 
     const {goToPage, getPaginationProps} = useCellsPagination({
       pagination,
@@ -139,20 +157,36 @@ export const ConversationCells = memo(
       currentNodesCount: nodes.length,
     });
 
-    useOnPresignedUrlExpired({conversationId, refreshCallback: refresh});
+    const handleLoadMore = useCallback(async (): Promise<void> => {
+      if (loadMoreOffset === null) {
+        return;
+      }
+
+      await loadMoreSearchResults(loadMoreOffset);
+    }, [loadMoreOffset, loadMoreSearchResults]);
+
+    useOnPresignedUrlExpired({conversationId, refreshCallback: handleRefresh});
 
     const isLoading = nodesStatus === 'loading';
+    const isFetchingMore = nodesStatus === 'fetchingMore';
     const isError = nodesStatus === 'error';
     const isSuccess = nodesStatus === 'success';
 
     const hasNodes = !!nodes.length;
     const emptyView = !isError && !hasNodes && isCellsStateReady;
 
-    const isTableVisible = (isSuccess || isLoading) && isCellsStateReady;
+    const isTableVisible = (isSuccess || isLoading || isFetchingMore) && isCellsStateReady;
     const isLoadingVisible = isLoading && isCellsStateReady;
-    const isNoNodesVisible = !isLoading && emptyView && !isInRecycleBin();
-    const isPaginationVisible = !emptyView;
-    const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading;
+    const isFetchingMoreVisible = isFetchingMore && isCellsStateReady && hasNodes;
+    const isNoNodesVisible = !isLoading && !isFetchingMore && emptyView && !isInRecycleBin();
+    const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading && !isFetchingMore;
+    const hasMorePages = loadMoreOffset !== null;
+    const hasAppendError = isSuccess && hasNodes && storeError !== null;
+
+    const isPaginationVisible = !isInSearchMode && !emptyView;
+    const isLoadMoreVisible =
+      isInSearchMode && !isLoading && !isFetchingMore && !emptyView && isSuccess && hasMorePages && !hasAppendError;
+    const isLoadMoreErrorVisible = isInSearchMode && hasAppendError && hasMorePages;
 
     return (
       <div css={wrapperStyles}>
@@ -184,9 +218,24 @@ export const ConversationCells = memo(
           <CellsStateInfo heading={t('cells.noNodes.heading')} description={t('cells.noNodes.description')} />
         )}
         {isEmptyRecycleBin && <CellsStateInfo description={t('cells.emptyRecycleBin.description')} />}
-        {(isLoadingVisible || isRefreshing) && <CellsLoader />}
+        {(isLoadingVisible || isRefreshing || isFetchingMoreVisible) && <CellsLoader />}
         {isError && <CellsStateInfo heading={t('cells.error.heading')} description={t('cells.error.description')} />}
         {isPaginationVisible && <CellsPagination {...getPaginationProps()} goToPage={goToPage} />}
+        {isLoadMoreVisible && (
+          <div css={loadMoreWrapperStyles}>
+            <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
+              {t('cells.pagination.loadMoreResults')}
+            </Button>
+          </div>
+        )}
+        {isLoadMoreErrorVisible && (
+          <div css={loadMoreErrorWrapperStyles} role="alert">
+            <span css={loadMoreErrorMessageStyles}>{t('cells.pagination.loadMoreError.heading')}</span>
+            <Button variant={ButtonVariant.TERTIARY} onClick={handleLoadMore}>
+              {t('cells.pagination.loadMoreError.retry')}
+            </Button>
+          </div>
+        )}
       </div>
     );
   },

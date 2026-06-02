@@ -34,6 +34,9 @@ import {
   toConversationDriveSearchParams,
 } from '../common/driveFilters/driveFilters';
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
+import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
+import {LOAD_MORE_INCREMENT, LOAD_MORE_INITIAL_SIZE} from '../common/loadMorePagination/loadMorePagination';
+import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
 import {transformDataToCellsNodes, transformToCellPagination} from '../useGetAllCellsNodes/transformDataToCellsNodes';
@@ -60,12 +63,13 @@ export const useConversationSearchFiles = ({
   filters,
   onClear,
 }: UseConversationSearchFilesProps) => {
-  const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
+  const {setNodes, appendNodes, setStatus, setPagination, setError, clearAll} = useCellsStore();
 
   const [searchValue, setSearchValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
+  const hasFiredInitialFetchRef = useRef(false);
 
   const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
   const hasActiveParams = hasActiveSearchParams(searchParams);
@@ -75,24 +79,40 @@ export const useConversationSearchFiles = ({
   const conversationPath = getCellsApiPath({conversationQualifiedId});
 
   const searchNodes = useCallback(
-    async ({query, filters: filtersParam}: {query: string; filters: ConversationDriveFiltersState}) => {
+    async ({
+      query,
+      filters: filtersParam,
+      offset = 0,
+      append = false,
+    }: {
+      query: string;
+      filters: ConversationDriveFiltersState;
+      offset?: number;
+      append?: boolean;
+    }) => {
       try {
-        setStatus('loading');
+        setError(null);
+        setStatus(append ? 'fetchingMore' : 'loading');
 
         const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
         const searchParams = toConversationDriveSearchParams(filtersParam);
 
         const result = await cellsRepository.searchNodes({
           query,
+          limit: append ? LOAD_MORE_INCREMENT : LOAD_MORE_INITIAL_SIZE,
+          offset,
           path: conversationPath,
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
           type: 'file',
+          deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
           ...searchParams,
         });
 
         if (result.Nodes === undefined || result.Nodes.length === 0) {
-          setNodes({conversationId: id, nodes: []});
+          if (!append) {
+            setNodes({conversationId: id, nodes: []});
+          }
           setPagination({conversationId: id, pagination: null});
           setStatus('success');
           return;
@@ -108,7 +128,11 @@ export const useConversationSearchFiles = ({
           users,
         });
 
-        setNodes({conversationId: id, nodes: transformedNodes});
+        if (append) {
+          appendNodes({conversationId: id, nodes: transformedNodes});
+        } else {
+          setNodes({conversationId: id, nodes: transformedNodes});
+        }
 
         const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
         setPagination({conversationId: id, pagination});
@@ -118,15 +142,24 @@ export const useConversationSearchFiles = ({
         }
 
         setStatus('success');
-      } catch {
+      } catch (error) {
+        const wrappedError = error instanceof Error ? error : new Error('Failed to load files', {cause: error});
+        setError(wrappedError);
+
+        if (append) {
+          // Keep existing list and pagination visible; surface the failure inline via store error.
+          setStatus('success');
+          return;
+        }
+
         setStatus('error');
         setNodes({conversationId: id, nodes: []});
         setPagination({conversationId: id, pagination: null});
       }
     },
-    // cellsRepository is not a dependency because it's a singleton
+    // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [setNodes, setPagination, setStatus, id, conversationPath],
+    [appendNodes, setNodes, setPagination, setStatus, setError, id, conversationPath],
   );
 
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
@@ -177,11 +210,11 @@ export const useConversationSearchFiles = ({
     onClear?.();
   };
 
-  const handleReload = async (): Promise<void> => {
+  const handleReload = useCallback(async (): Promise<void> => {
     setStatus('loading');
     clearAll({conversationId: id});
     await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
-  };
+  }, [clearAll, filters, id, searchNodes, searchQuery, setStatus]);
 
   useEffect(() => {
     if (!enabled) {
@@ -200,6 +233,26 @@ export const useConversationSearchFiles = ({
     });
   }, [searchNodes, searchQuery, enabled, filters, hasActiveParams, fireAndForgetInvoker]);
 
+  // Fire an initial unfiltered fetch when the hook becomes enabled (search view opens) so
+  // the load-more dataset is populated even before the user types or selects a filter.
+  // The ref resets on disable so the next enable cycle (re-opening the search view) refetches.
+  useEffect(() => {
+    if (!enabled) {
+      hasFiredInitialFetchRef.current = false;
+      return;
+    }
+    if (hasFiredInitialFetchRef.current) {
+      return;
+    }
+    hasFiredInitialFetchRef.current = true;
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await searchNodes({
+        query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY,
+        filters,
+      });
+    });
+  }, [enabled, searchNodes, searchQuery, filters, fireAndForgetInvoker]);
+
   // When the search params transition from "active" to "none" with no search query,
   // restore the default unfiltered file list.
   useEffect(() => {
@@ -209,10 +262,23 @@ export const useConversationSearchFiles = ({
     hadActiveSearchParamsRef.current = hasActiveParams;
   }, [hasActiveParams, searchValue, onClear]);
 
+  const loadMore = useCallback(
+    async (offset: number): Promise<void> => {
+      await searchNodes({
+        query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY,
+        filters,
+        offset,
+        append: true,
+      });
+    },
+    [filters, searchNodes, searchQuery],
+  );
+
   return {
     searchValue,
     handleSearch,
     handleReload,
     handleClearSearch,
+    loadMore,
   };
 };

@@ -23,7 +23,7 @@ import {CellNode} from 'src/script/types/cellNode';
 
 import {CellPagination} from '../cellPagination/cellPagination';
 
-type Status = 'idle' | 'loading' | 'success' | 'error';
+type Status = 'idle' | 'loading' | 'fetchingMore' | 'success' | 'error';
 
 const DEFAULT_PAGE_SIZE = 50;
 
@@ -35,6 +35,7 @@ interface CellsState {
   pageSize: number;
   setPageSize: (pageSize: number) => void;
   setNodes: (params: {conversationId: string; nodes: CellNode[]}) => void;
+  appendNodes: (params: {conversationId: string; nodes: CellNode[]}) => void;
   setPagination: (params: {conversationId: string; pagination: CellPagination | null}) => void;
   setStatus: (status: Status) => void;
   setError: (error: Error | null) => void;
@@ -51,6 +52,7 @@ export const useCellsStore = create<CellsState>((set, get) => ({
   status: 'idle',
   error: null,
   pageSize: DEFAULT_PAGE_SIZE,
+  setPageSize: pageSize => set({pageSize}),
   setNodes: ({conversationId, nodes}) =>
     set(state => ({
       nodesByConversation: {
@@ -58,7 +60,13 @@ export const useCellsStore = create<CellsState>((set, get) => ({
         [conversationId]: nodes,
       },
     })),
-  setPageSize: pageSize => set({pageSize}),
+  appendNodes: ({conversationId, nodes}) =>
+    set(state => ({
+      nodesByConversation: {
+        ...state.nodesByConversation,
+        [conversationId]: [...(state.nodesByConversation[conversationId] ?? []), ...nodes],
+      },
+    })),
   setPagination: ({conversationId, pagination}) =>
     set(state => ({
       paginationByConversation: {
@@ -93,8 +101,15 @@ export const useCellsStore = create<CellsState>((set, get) => ({
   clearAll: ({conversationId}) => {
     const state = get();
     const updatedNodesByConversation = {...state.nodesByConversation};
+    const updatedPaginationByConversation = {...state.paginationByConversation};
     delete updatedNodesByConversation[conversationId];
-    set({nodesByConversation: updatedNodesByConversation, status: 'idle', error: null});
+    delete updatedPaginationByConversation[conversationId];
+    set({
+      nodesByConversation: updatedNodesByConversation,
+      paginationByConversation: updatedPaginationByConversation,
+      status: 'idle',
+      error: null,
+    });
   },
   getNodes: ({conversationId}) => {
     const state = get().nodesByConversation;
