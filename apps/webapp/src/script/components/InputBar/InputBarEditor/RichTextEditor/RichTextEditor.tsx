@@ -187,10 +187,9 @@ export const RichTextEditor = ({
               }
             }}
           />
-          {!disableMessagePreprocessing && (
-            <PastePlugin getMentionCandidates={getMentionCandidates} isPreviewMode={showMarkdownPreview} />
-          )}
-          {disableMessagePreprocessing ? (<PlainTextPastePlugin />) : (
+          {disableMessagePreprocessing ? (
+            <PlainTextPastePlugin />
+          ) : (
             <PastePlugin getMentionCandidates={getMentionCandidates} isPreviewMode={showMarkdownPreview} />
           )}
         </div>
