@@ -94,3 +94,14 @@ export const groupVideoElementVideo = (fitContain: boolean, mirrorSelf: boolean)
 export const groupVideoPauseOverlayLabel = (minimized: boolean): CSSObject => ({
   fontSize: minimized ? '0.6875rem' : '0.875rem',
 });
+
+export const groupVideoBackgroundInitializingOverlay: CSSObject = {
+  position: 'absolute',
+  inset: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 'inherit',
+  backgroundColor: 'var(--group-video-tile-bg)',
+  zIndex: 1,
+};

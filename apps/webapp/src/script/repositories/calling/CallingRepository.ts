@@ -76,6 +76,7 @@ import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHand
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
+import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
@@ -728,6 +729,7 @@ export class CallingRepository {
     try {
       const selfParticipant = call.getSelfParticipant();
       camera = this.teamState.isVideoCallingEnabled() ? camera : false;
+      backgroundEffectsStore.getState().setIsInitializing(true);
       const mediaStream = await this.getMediaStream({audio, camera}, call.isGroupOrConference);
       if (call.state() !== CALL_STATE.NONE) {
         selfParticipant.updateMediaStream(mediaStream, true);
@@ -743,6 +745,8 @@ export class CallingRepository {
       return true;
     } catch (_error: unknown) {
       return false;
+    } finally {
+      backgroundEffectsStore.getState().setIsInitializing(false);
     }
   }
 
@@ -2654,6 +2658,7 @@ export class CallingRepository {
         if (missingStreams.screen && selfParticipant.sharesScreen()) {
           return selfParticipant.getMediaStream();
         }
+        backgroundEffectsStore.getState().setIsInitializing(true);
         const mediaStream = await this.getMediaStream(missingStreams, call.isGroupOrConference);
         this.mediaStreamQuery = undefined;
         selfParticipant.updateMediaStream(mediaStream, true);
@@ -2668,6 +2673,8 @@ export class CallingRepository {
         this.logger.warn('Could not get mediaStream for call', error);
         this.handleMediaStreamError(call, missingStreams, error);
         return selfParticipant.getMediaStream();
+      } finally {
+        backgroundEffectsStore.getState().setIsInitializing(false);
       }
     })();
 
