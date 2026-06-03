@@ -246,14 +246,14 @@ describe('VideoBackgroundSettings', () => {
   });
 
   it('renders support link in no WebGL hint', () => {
-    const {getByRole} = renderComponent({
+    const {getByText} = renderComponent({
       isWebGLAvailable: false,
     });
 
-    const link = getByRole('link', {name: 'Learn more'});
+    const link = getByText('warningLearnMore').closest('a');
 
-    expect(link).toBeInTheDocument();
-    expect(link).toHaveAttribute('href', 'https://support.wire.com/background-effects');
+    expect(link).toBeVisible();
+    expect(link).toHaveAttribute('target', '_blank');
   });
 
   describe('getBackgroundEffectLabel', () => {

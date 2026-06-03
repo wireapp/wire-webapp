@@ -393,16 +393,28 @@ export const VideoControls = ({
     [selectedBackgroundEffect],
   );
 
+  const getEffectOptions = useMemo(() => {
+    if (!isWebGLAvailable) {
+      return [];
+    }
+
+    return [
+      currentBlurOption,
+      {
+        label: t('videoCallBackgroundVirtual'),
+        value: 'virtual',
+        icon: <ImageIcon />,
+      },
+    ];
+  }, [currentBlurOption, isWebGLAvailable]);
+
   const backgroundOptions = useMemo(
     () => [
       {
         label: t('videoCallBackgroundEffectsLabel'),
         options: [
           {label: t('videoCallBackgroundNone'), value: 'none', icon: <CircleIcon />},
-          ...(isWebGLAvailable ? [currentBlurOption] : []),
-          ...(isWebGLAvailable
-            ? [{label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <ImageIcon />}]
-            : []),
+          ...getEffectOptions,
           {
             label: t('videoCallBackgroundSettings'),
             value: 'settings',
@@ -411,7 +423,7 @@ export const VideoControls = ({
         ],
       },
     ],
-    [currentBlurOption, isWebGLAvailable],
+    [getEffectOptions],
   );
 
   /** Merged options: camera group + (if enabled) background group. */

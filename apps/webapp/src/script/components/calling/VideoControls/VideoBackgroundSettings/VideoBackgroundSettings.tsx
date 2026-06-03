@@ -26,7 +26,7 @@ import {BlurHighIcon, BlurLowIcon, Checkbox, CheckboxLabel, CircleIcon} from '@w
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import * as Icon from 'Components/icon';
 import type {BackgroundEffectSelection, BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {t} from 'Util/localizerUtil';
 
 import {
   backgroundEffectPanelHintStyles,
@@ -123,17 +123,13 @@ const BackgroundTile = ({
   );
 };
 
-const NoWebGLHint = () => (
-  <p
-    css={backgroundEffectPanelHintStyles}
-    dangerouslySetInnerHTML={{
-      __html: t(
-        'videoCallBackgroundNoWebGLHint',
-        undefined,
-        replaceLink(Config.getConfig().URL.SUPPORT.BACKGROUND_EFFECTS),
-      ),
-    }}
-  />
+const WebGLNotAvailableHint = () => (
+  <p css={backgroundEffectPanelHintStyles}>
+    {t('videoCallBackgroundNoWebGLHint')}{' '}
+    <a href={Config.getConfig().URL.SUPPORT.BACKGROUND_EFFECTS} rel="nofollow noopener noreferrer" target="_blank">
+      {t('warningLearnMore')}
+    </a>
+  </p>
 );
 
 export const VideoBackgroundSettings = ({
@@ -203,7 +199,7 @@ export const VideoBackgroundSettings = ({
         />
 
         {!isWebGLAvailable ? (
-          <NoWebGLHint />
+          <WebGLNotAvailableHint />
         ) : (
           <>
             {/* Blur section */}

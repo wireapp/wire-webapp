@@ -2082,7 +2082,7 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundEnableEnhancedQuality': `Enhanced quality`;
     'videoCallBackgroundEnableEnhancedQualityHint': `Improves outline definition, but may impact the performance on your device.`;
     'videoCallBackgroundNoEffect': `No background effect`;
-    'videoCallBackgroundNoWebGLHint': `Your device doesn\'t support blurred and virtual backgrounds. [link]Learn more[/link]`;
+    'videoCallBackgroundNoWebGLHint': `Your device doesn\'t support blurred and virtual backgrounds.`;
     'videoCallBackgroundNone': `None`;
     'videoCallBackgroundOffice1': `Office 1`;
     'videoCallBackgroundOffice2': `Office 2`;
