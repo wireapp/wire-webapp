@@ -96,6 +96,7 @@ export const showShareModal = ({
             uuid={uuid}
             conversationId={conversationId}
             cellsRepository={cellsRepository}
+            fireAndForgetInvoker={fireAndForgetInvoker}
             modalId={modalId}
           />
         ),
@@ -106,17 +107,19 @@ export const showShareModal = ({
   );
 };
 
-const CellShareModalContent = ({
+export const CellShareModalContent = ({
   type,
   uuid,
   conversationId,
   cellsRepository,
+  fireAndForgetInvoker,
   modalId,
-}: Omit<ShareModalParams, 'fireAndForgetInvoker'> & {modalId: string}) => {
+}: ShareModalParams & {modalId: string}) => {
   const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellConversationPublicLink({
     uuid,
     conversationId,
     cellsRepository,
+    fireAndForgetInvoker,
   });
   const node = useCellsStore(state =>
     state.nodesByConversation[conversationId]?.find(cellNode => cellNode.id === uuid),
