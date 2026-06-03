@@ -5,7 +5,7 @@ import {PageManager} from 'test/e2e_tests/pageManager';
 import {test, withLogin, expect, createTeam} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+import {createAndSaveBackup, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Federation', () => {
   const federationBaseUrl = process.env.FEDERATION_WEBAPP_URL!;
@@ -16,6 +16,7 @@ test.describe('Federation', () => {
 
   let normalUser: User;
   let federatedUser: User;
+  const groupName = 'Federated group';
 
   test.beforeEach(async ({api}) => {
     normalUser = (await createTeam(api, 'Normal Team', {features: {conferenceCalling: true}})).owner;
@@ -222,8 +223,8 @@ test.describe('Federation', () => {
       ).toBeVisible();
 
       await test.step('Federated user creates a group and adds normal user to it', async () => {
-        await createGroup(federatedUserPages, 'Federation group', []);
-        await federatedUserPages.conversationList().getConversation('Federation group').open();
+        await createGroup(federatedUserPages, groupName, []);
+        await federatedUserPages.conversationList().getConversation(groupName).open();
         await federatedUserPages.conversation().toggleGroupInformation();
         await federatedUserPages.conversationDetails().clickAddPeopleButton();
         await federatedUserPages.conversationDetails().addUsersToConversation([normalUser.fullName]);
@@ -236,7 +237,7 @@ test.describe('Federation', () => {
           federatedUserPages.conversationDetails().getParticipant(normalUser.fullName).federatedIcon,
         ).toBeVisible();
 
-        await normalUserPages.conversationList().getConversation('Federation group').open();
+        await normalUserPages.conversationList().getConversation(groupName).open();
         await expect(
           normalUserPages
             .conversation()
@@ -290,6 +291,109 @@ test.describe('Federation', () => {
           await verify({federatedUserPage});
         });
       }
+    },
+  );
+
+  test(
+    'I want to import my backup of conversations with users from different BE and see the conversation contents',
+    {tag: ['@TC-3128', '@regression']},
+    async ({createPage}, testInfo) => {
+      const [normalUserPage, federatedUserPage] = await Promise.all([
+        createPage(withLogin(normalUser)),
+        createPage(withLogin(federatedUser, {baseUrl: federationBaseUrl})),
+      ]);
+
+      const normalUserPageManager = PageManager.from(normalUserPage);
+      const {
+        pages: normalUserPages,
+        components: normalUserComponents,
+        modals: normalUserModals,
+      } = normalUserPageManager.webapp;
+      const {pages: federatedUserPages} = PageManager.from(federatedUserPage).webapp;
+
+      await test.step('Establish connection between normal and federated user', async () => {
+        await sendConnectionRequest(normalUserPage, federatedUser);
+        await federatedUserPages.conversationList().openPendingConnectionRequest();
+        await federatedUserPages.connectRequest().clickConnectButton();
+      });
+
+      await test.step('Exchange direct messages and verify receipt', async () => {
+        await normalUserPages.conversationList().getConversation(federatedUser.fullName, {protocol: 'mls'}).open();
+        await federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}).open();
+
+        await normalUserPages.conversation().sendMessage('Message from normal user');
+        await federatedUserPages.conversation().sendMessage('Message from federated user');
+
+        await expect(normalUserPages.conversation().getMessage({sender: federatedUser})).toBeVisible();
+        await expect(federatedUserPages.conversation().getMessage({sender: normalUser})).toBeVisible();
+      });
+
+      await test.step('Create a group chat and exchange text and image messages', async () => {
+        await createGroup(federatedUserPages, groupName, [normalUser]);
+        await federatedUserPages.conversationList().getConversation(groupName).open();
+        await normalUserPages.conversationList().getConversation(groupName).open();
+
+        await federatedUserPages.conversation().sendMessage('Group message from federated user');
+        await shareAssetHelper(
+          getImageFilePath(),
+          federatedUserPage,
+          federatedUserPage.getByRole('button', {name: 'Add picture'}),
+        );
+
+        await expect(
+          normalUserPages.conversation().getMessage({content: 'Group message from federated user'}),
+        ).toBeVisible();
+
+        const messageWithImage = normalUserPages
+          .conversation()
+          .getMessage({sender: federatedUser})
+          .filter({has: normalUserPage.getByRole('img')});
+        await expect(messageWithImage).toBeVisible();
+      });
+
+      let backupName: string;
+      await test.step('Create and save backup for the normal user', async () => {
+        await normalUserComponents.conversationSidebar().clickPreferencesButton();
+        backupName = await createAndSaveBackup(testInfo, normalUserPageManager);
+      });
+
+      await test.step('Log out the normal user from the first device', async () => {
+        await normalUserComponents.conversationSidebar().clickPreferencesButton();
+        await normalUserPages.account().clickLogoutButton();
+        await expect(normalUserModals.confirmLogout().modal).toBeVisible();
+        await normalUserModals.confirmLogout().clickConfirm();
+      });
+
+      // --- Second Device Flow ---
+      const normalUserDevice2 = await createPage(withLogin(normalUser, {confirmNewHistory: true}));
+
+      const {pages: normalUserDevice2Pages, components: normalUserDevice2Components} =
+        PageManager.from(normalUserDevice2).webapp;
+
+      await test.step('Import backup on the new device', async () => {
+        await normalUserDevice2Components.conversationSidebar().clickPreferencesButton();
+        await normalUserDevice2Pages.account().backupFileInput.setInputFiles(backupName);
+        await normalUserDevice2Components.conversationSidebar().allConversationsButton.click();
+      });
+
+      await test.step('Verify direct messages are restored on the new device', async () => {
+        await normalUserDevice2Pages
+          .conversationList()
+          .getConversation(federatedUser.fullName, {protocol: 'mls'})
+          .open();
+        await expect(normalUserDevice2Pages.conversation().getMessage({sender: federatedUser})).toBeVisible();
+      });
+
+      await test.step('Verify group messages and media are restored on the new device', async () => {
+        await normalUserDevice2Pages.conversationList().getConversation(groupName).open();
+        await expect(normalUserDevice2Pages.conversation().getMessage({sender: federatedUser})).toBeVisible();
+
+        const messageWithImage2Device = normalUserDevice2Pages
+          .conversation()
+          .getMessage({sender: normalUser})
+          .filter({has: normalUserDevice2.getByRole('img')});
+        await expect(messageWithImage2Device).toBeVisible();
+      });
     },
   );
 
