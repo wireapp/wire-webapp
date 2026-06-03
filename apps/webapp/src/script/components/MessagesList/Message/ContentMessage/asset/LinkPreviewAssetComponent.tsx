@@ -92,7 +92,7 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
       onKeyDown={event => handleKeyDown({event, callback: () => onClick(event), keys: [KEY.ENTER, KEY.SPACE]})}
     >
       <div className="link-preview-image-container">
-        {preview && previewImage ? (
+        {previewImage !== undefined ? (
           <Image
             className="link-preview-image"
             imageStyles={{height: '100%', objectFit: 'cover', objectPosition: 'center'}}
@@ -105,7 +105,7 @@ const LinkPreviewAsset = ({header = false, message, isFocusable = true}: LinkPre
       </div>
       <div className="link-preview-info">
         {header && <AssetHeader message={message} />}
-        {preview && (
+        {preview !== undefined && (
           <>
             <p
               className={cx(

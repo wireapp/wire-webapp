@@ -28,6 +28,7 @@ import {
   isBrokenMLSConversationError,
   isCoreCryptoMLSConversationAlreadyExistsError,
   isCoreCryptoMLSWrongEpochError,
+  isMlsConversationNotFoundError,
   isMLSGroupOutOfSyncError,
   isMLSStaleMessageError,
   serializeAbortReason,
@@ -54,6 +55,13 @@ describe('CoreCryptoMLSError helpers', () => {
       const other = new Error('nope');
       expect(isCoreCryptoMLSConversationAlreadyExistsError(other)).toBe(false);
       expect(isCoreCryptoMLSConversationAlreadyExistsError(42)).toBe(false);
+    });
+
+    it('detects MlsErrorOther when the local MLS group is missing', () => {
+      const err = new Error("Couldn't find conversation");
+      err.name = CORE_CRYPTO_ERROR_NAMES.MlsErrorOther;
+      expect(isMlsConversationNotFoundError(err)).toBe(true);
+      expect(isMlsConversationNotFoundError(new Error('other'))).toBe(false);
     });
   });
 

@@ -42,9 +42,9 @@ import {Root} from './page/Root';
 import {Config} from '../Config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
-import {createAPIClient} from '../service/createAPIClient';
+import {APIClient} from '../service/apiClientSingleton';
+import {Core} from '../service/coreSingleton';
+import {createAPIClient} from '../service/createApiClient';
 
 exposeWrapperGlobals();
 
@@ -83,14 +83,21 @@ const render = (Component: FC): void => {
 
 const config = Config.getConfig();
 
+type HotReloadCapableModule = NodeJS.Module & {
+  hot?: {
+    accept: (dependencyPath: string, callback: () => void) => void;
+  };
+};
+
 async function runApp() {
   const {domain} = await updateApiVersion();
   await initializeDataDog(config, {domain: domain});
+  const hotReloadCapableModule = module as HotReloadCapableModule;
 
   render(Root);
   setAppLocale();
-  if (module.hot) {
-    module.hot.accept('./page/Root', () => {
+  if (hotReloadCapableModule.hot !== undefined) {
+    hotReloadCapableModule.hot.accept('./page/Root', () => {
       render(require('./page/Root').Root);
     });
   }

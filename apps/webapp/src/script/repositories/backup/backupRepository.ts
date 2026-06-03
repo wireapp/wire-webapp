@@ -24,8 +24,8 @@ import {isReadableConversation} from 'Repositories/conversation/ConversationSele
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {EventRecord, UserRecord} from 'Repositories/storage';
-import {ConversationRecord} from 'Repositories/storage/record/ConversationRecord';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {chunk} from 'Util/arrayUtil';
 import {Logger, getLogger} from 'Util/logger';
 import {constructUserPrimaryKey} from 'Util/storageUtil';
@@ -162,7 +162,7 @@ export class BackupRepository {
     // encode header
     const backupCoder = new BackUpHeader(user.id, password);
     const backupHeader = await this.generateBackupHeader(user, password, backupCoder).catch((error: unknown) => {
-      throw new Error('Backup error:', error);
+      throw new Error('Backup error', {cause: error});
     });
 
     // Encrypt the ZIP archive using the provided password

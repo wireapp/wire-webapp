@@ -20,7 +20,7 @@
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
@@ -43,19 +43,27 @@ export const getActiveConversationsWithUsers = ({
   return conversationState
     .filteredConversations()
     .map((conversationEntity: Conversation) => {
-      if (!conversationEntity.isSelfUserRemoved()) {
-        const userIdsInConversation = conversationEntity.participating_user_ids().concat(userState.self().qualifiedId);
+      if (conversationEntity.isSelfUserRemoved() === false) {
+        const selfUser = userState.self();
+        if (selfUser === undefined) {
+          return undefined;
+        }
+
+        const userIdsInConversation = conversationEntity.participating_user_ids().concat(selfUser.qualifiedId);
         const matchingUserIds = userIdsInConversation.filter(userIdInConversation =>
           userIds.find(userId => matchQualifiedIds(userId, userIdInConversation)),
         );
 
-        if (!!matchingUserIds.length) {
+        const hasMatchingUserIds = matchingUserIds.length > 0;
+        if (hasMatchingUserIds) {
           return {conversationEntity, userIds: matchingUserIds};
         }
       }
       return undefined;
     })
-    .flatMap(activeConversationInfo => (!!activeConversationInfo ? [activeConversationInfo] : []));
+    .flatMap(activeConversationInfo => {
+      return activeConversationInfo !== undefined ? [activeConversationInfo] : [];
+    });
 };
 
 interface GetConversationByGroupIdParams {
@@ -67,7 +75,7 @@ export const getConversationByGroupId = ({
   groupId,
 }: GetConversationByGroupIdParams): MLSCapableConversation | undefined => {
   const conversation = conversationState.conversations().find(conversation => conversation.groupId === groupId);
-  return conversation && isMLSCapableConversation(conversation) ? conversation : undefined;
+  return conversation !== undefined && isMLSCapableConversation(conversation) ? conversation : undefined;
 };
 
 /**

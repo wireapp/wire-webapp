@@ -19,9 +19,9 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
-import {expect, test, withConnectedUser, withLogin} from '../../test.fixtures';
+import {expect, test, withLogin} from '../../test.fixtures';
 
 test.describe('Accessibility', () => {
   let userA: User;
@@ -44,8 +44,8 @@ test.describe('Accessibility', () => {
       ]);
 
       await createGroup(userAPages, 'Accessible Group', [userB]);
-      await userAPages.conversationList().openConversation('Accessible Group');
-      await userBPages.conversationList().openConversation('Accessible Group');
+      await userAPages.conversationList().getConversation('Accessible Group').open();
+      await userBPages.conversationList().getConversation('Accessible Group').open();
 
       await test.step('User A starts typing in group and B sees typing indicator', async () => {
         await userAPages.conversation().messageInput.pressSequentially('Test', {delay: 100});
@@ -60,7 +60,7 @@ test.describe('Accessibility', () => {
 
       await test.step('User A types more into group', async () => {
         await userAPages.sidebar().allConversationsButton.click();
-        await userAPages.conversationList().openConversation('Accessible Group');
+        await userAPages.conversationList().getConversation('Accessible Group').open();
         await userAPages.conversation().messageInput.pressSequentially('Test', {delay: 100});
         // Since A disabled the typing indicator B should not see it
         await expect(userBPages.conversation().typingIndicator).not.toBeVisible();
@@ -86,17 +86,20 @@ test.describe('Accessibility', () => {
       'I should not lose a drafted message when switching between conversations in collapsed view',
       {tag: ['@TC-51', '@regression']},
       async ({createPage}) => {
-        const pages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
+        const page = await createPage(withLogin(userA));
+        await connectWithUser(page, userB);
+
+        const {pages} = PageManager.from(page).webapp;
 
         await createGroup(pages, 'Test Group', [userB]);
         await pages.conversation().messageInput.fill('Draft Message');
 
         await pages.conversation().backButton.click();
-        await pages.conversationList().openConversation(userB.fullName);
+        await pages.conversationList().getConversation(userB.fullName).open();
         await expect(pages.conversation().messageInput).toBeEmpty();
 
         await pages.conversation().backButton.click();
-        await pages.conversationList().openConversation('Test Group');
+        await pages.conversationList().getConversation('Test Group').open();
         await expect(pages.conversation().messageInput).toHaveText('Draft Message');
       },
     );

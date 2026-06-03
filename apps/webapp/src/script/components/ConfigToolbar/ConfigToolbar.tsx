@@ -26,25 +26,36 @@ import {Button, Input, Switch} from '@wireapp/react-ui-kit';
 
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Config, Configuration} from 'src/script/Config';
+import {StartupFeatureToggleName, startupFeatureToggleNames} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {updateLocationSearchForStartupFeatureToggle} from 'src/script/featureToggles/startupFeatureToggleQueryParameters';
 import {useClickOutside} from 'src/script/hooks/useClickOutside';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {CoreCryptoLogLevel} from 'Util/debugUtil';
 
 import {wrapperStyles} from './ConfigToolbar.styles';
 
+export function createLocationUrl(pathname: string, search: string, hash: string): string {
+  return `${pathname}${search}${hash}`;
+}
+
 export function ConfigToolbar() {
+  const {fireAndForgetInvoker, applicationNavigation, isFeatureToggleEnabled} = useApplicationContext();
+  const alphabeticallySortedStartupFeatureToggleNames = startupFeatureToggleNames.toSorted();
   const [showConfig, setShowConfig] = useState(false);
   const [isResettingMLSConversation, setIsResettingMLSConversation] = useState(false);
-  const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() || false);
+  const [isGzipEnabled, setIsGzipEnabled] = useState(window.wire?.app.debug?.isGzippingEnabled() ?? false);
   const [configFeaturesState, setConfigFeaturesState] = useState<Configuration['FEATURE']>(Config.getConfig().FEATURE);
   const [isMessageSendingActive, setIsMessageSendingActive] = useState(false);
   const messageCountRef = useRef<number>(0);
   const [prefix, setPrefix] = useState('Message -');
   const [messageDelaySec, setMessageDelaySec] = useState<number>(0);
   const wrapperRef = useRef(null);
-  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsDebugger());
-  const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(!!window.wire?.app?.debug?.isEnabledAvsRustSFT());
+  const [avsDebuggerEnabled, setAvsDebuggerEnabled] = useState(
+    window.wire?.app?.debug?.isEnabledAvsDebugger() ?? false,
+  );
+  const [avsRustSftEnabled, setAvsRustSftEnabled] = useState(window.wire?.app?.debug?.isEnabledAvsRustSFT() ?? false);
   const [videoBackgroundEffectsFeatureEnabled, setVideoBackgroundEffectsFeatureEnabled] = useState(
-    !!window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled(),
+    window.wire?.app?.debug?.isVideoBackgroundEffectsFeatureEnabled() ?? false,
   );
   const [coreCryptoLevel, setCoreCryptoLevel] = useState<CoreCryptoLogLevel>(CoreCryptoLogLevel.Info);
 
@@ -104,7 +115,7 @@ export function ConfigToolbar() {
       }
     };
 
-    void sendMessage();
+    fireAndForgetInvoker.fireAndForget(sendMessage);
 
     return () => {
       isActive = false;
@@ -112,7 +123,7 @@ export function ConfigToolbar() {
         clearTimeout(timeoutId);
       }
     };
-  }, [isMessageSendingActive, prefix, messageDelaySec]);
+  }, [fireAndForgetInvoker, isMessageSendingActive, prefix, messageDelaySec]);
 
   const startSendingMessages = () => {
     messageCountRef.current = 0;
@@ -186,7 +197,7 @@ export function ConfigToolbar() {
   useClickOutside(wrapperRef, () => setShowConfig(false));
 
   const handleAvsEnable = (isChecked: boolean) => {
-    setAvsDebuggerEnabled(!!window.wire?.app?.debug?.enableAvsDebugger(isChecked));
+    setAvsDebuggerEnabled(window.wire?.app?.debug?.enableAvsDebugger(isChecked) === true);
   };
 
   const renderAvsSwitch = () => {
@@ -205,7 +216,7 @@ export function ConfigToolbar() {
   };
 
   const handleAvsRustSftEnable = (isChecked: boolean) => {
-    setAvsRustSftEnabled(!!window.wire?.app?.debug?.enableAvsRustSFT(isChecked));
+    setAvsRustSftEnabled(window.wire?.app?.debug?.enableAvsRustSFT(isChecked) === true);
   };
   const renderAvsRustSftSwitch = () => {
     return (
@@ -223,7 +234,9 @@ export function ConfigToolbar() {
   };
 
   const handleBackgroundEffectsFeature = (isChecked: boolean) => {
-    setVideoBackgroundEffectsFeatureEnabled(!!window.wire?.app?.debug?.enableVideoBackgroundEffectsFeature(isChecked));
+    setVideoBackgroundEffectsFeatureEnabled(
+      window.wire?.app?.debug?.enableVideoBackgroundEffectsFeature(isChecked) === true,
+    );
   };
   const renderBackgroundEffectsFeatureSelect = () => {
     return (
@@ -281,7 +294,9 @@ export function ConfigToolbar() {
           onChange={event => {
             const val = Number(event.currentTarget.value) as CoreCryptoLogLevel;
             setCoreCryptoLevel(val);
-            void window.wire?.app?.debug?.setCoreCryptoMaxLogLevel(val);
+            fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+              await window.wire?.app?.debug?.setCoreCryptoMaxLogLevel(val);
+            });
           }}
           style={{padding: '6px 8px'}}
         >
@@ -294,6 +309,52 @@ export function ConfigToolbar() {
       </div>
     );
   };
+
+  function reloadApplicationForStartupFeatureToggle(
+    featureToggleName: StartupFeatureToggleName,
+    shouldEnableFeatureToggle: boolean,
+  ): void {
+    const locationSearch = applicationNavigation.currentSearch;
+    const nextLocationSearch = updateLocationSearchForStartupFeatureToggle({
+      locationSearch,
+      featureToggleName,
+      shouldEnableFeatureToggle,
+    });
+    const locationPathname = applicationNavigation.currentPathname;
+    const locationHash = applicationNavigation.currentHash;
+    const nextLocationUrl = createLocationUrl(locationPathname, nextLocationSearch, locationHash);
+
+    applicationNavigation.navigateTo(nextLocationUrl);
+  }
+
+  function renderStartupFeatureToggleCheckboxList() {
+    return (
+      <fieldset style={{margin: 0, border: 0, padding: 0}}>
+        <legend style={{fontWeight: 'bold', marginBottom: '8px'}}>Startup Feature Toggles</legend>
+        <ul style={{listStyle: 'none', margin: 0, padding: 0}}>
+          {alphabeticallySortedStartupFeatureToggleNames.map(featureToggleName => {
+            const featureToggleCheckboxIdentifier = `startup-feature-toggle-checkbox-${featureToggleName}`;
+
+            return (
+              <li key={featureToggleName} style={{marginBottom: '10px'}}>
+                <label htmlFor={featureToggleCheckboxIdentifier} style={{display: 'block'}}>
+                  <input
+                    id={featureToggleCheckboxIdentifier}
+                    type="checkbox"
+                    checked={isFeatureToggleEnabled(featureToggleName)}
+                    onChange={event => {
+                      reloadApplicationForStartupFeatureToggle(featureToggleName, event.currentTarget.checked);
+                    }}
+                  />
+                  {` ${featureToggleName}`}
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
+    );
+  }
 
   const resetMLSConversation = async () => {
     setIsResettingMLSConversation(true);
@@ -348,6 +409,10 @@ export function ConfigToolbar() {
       <hr />
 
       <div>{renderCoreCryptoLogLevelSelect()}</div>
+
+      <hr />
+
+      <div>{renderStartupFeatureToggleCheckboxList()}</div>
 
       <hr />
 

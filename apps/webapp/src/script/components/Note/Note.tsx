@@ -19,7 +19,7 @@
 
 import {ReactNode} from 'react';
 
-import {InfoIcon} from 'Components/Icon';
+import {InfoIcon} from 'Components/icon';
 
 import {ContainerStyle, ContentStyle, HeaderStyle} from './Note.styles';
 

@@ -19,8 +19,8 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser, Team} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from '../../utils/userActions';
+import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser, createGroup} from '../../utils/userActions';
 
 test.describe('Ping', () => {
   let team: Team;
@@ -43,22 +43,23 @@ test.describe('Ping', () => {
       `Verify I can receive ping in ${scenario.name}`,
       {tag: [scenario.tag, '@regression']},
       async ({createPage}) => {
-        const [userAPages, userBPages] = await Promise.all([
-          PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-          PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        ]);
+        const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+        await connectWithUser(userAPage, userB);
+
+        const userAPages = PageManager.from(userAPage).webapp.pages;
+        const userBPages = PageManager.from(userBPage).webapp.pages;
 
         const conversationName = 'Test Group';
 
         if (scenario.isGroup) {
           await createGroup(userAPages, conversationName, [userB]);
-          await userBPages.conversationList().openConversation(conversationName);
+          await userBPages.conversationList().getConversation(conversationName).open();
           await userBPages.conversation().sendPing();
-          await userAPages.conversationList().openConversation(conversationName);
+          await userAPages.conversationList().getConversation(conversationName).open();
         } else {
-          await userBPages.conversationList().openConversation(userA.fullName);
+          await userBPages.conversationList().getConversation(userA.fullName).open();
           await userBPages.conversation().sendPing();
-          await userAPages.conversationList().openConversation(userB.fullName);
+          await userAPages.conversationList().getConversation(userB.fullName).open();
         }
 
         await expect(userAPages.conversation().getPing()).toBeVisible();
@@ -67,17 +68,18 @@ test.describe('Ping', () => {
   }
 
   test('Verify I can receive ping several times in a row', {tag: ['@TC-1491', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
 
-    await userBPages.conversationList().openConversation(userA.fullName);
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await userBPages.conversationList().getConversation(userA.fullName).open();
     await userBPages.conversation().sendPing();
     await expect(userBPages.conversation().pingButton).toBeDisabled();
     await userBPages.conversation().sendPing();
 
-    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversationList().getConversation(userB.fullName).open();
     await expect(userAPages.conversation().getPing()).toHaveCount(2);
   });
 
@@ -92,17 +94,18 @@ test.describe('Ping', () => {
         usersForBigGroup.push(newMember);
       }
 
-      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
       const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
 
       const conversationName = 'Test Group';
       await createGroup(userAPages, conversationName, [userB, ...usersForBigGroup]);
 
-      await userAPages.conversationList().openConversation(conversationName);
+      await userAPages.conversationList().getConversation(conversationName).open();
       await userAPages.conversation().sendPing();
 
       await expect(userAModals.confirm().modal).toBeVisible();
-      await expect(await userAModals.confirm().getModalTitle()).toContain('Are you sure you want to ping 5 people?');
+      await expect(userAModals.confirm().modalTitle).toContainText('Are you sure you want to ping 5 people?');
     },
   );
 });

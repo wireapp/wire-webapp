@@ -32,6 +32,7 @@ import axios from 'axios';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 import 'webrtc-adapter';
+import {z} from 'zod';
 
 import {
   AUDIO_STATE,
@@ -59,6 +60,7 @@ import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
+import {NetworkQualityInfo, NetworkQualityInfoSchema} from 'Repositories/calling/calling.schema';
 import {isMLSConversation, MLSConversation} from 'Repositories/conversation/ConversationSelectors';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
@@ -76,11 +78,11 @@ import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';
 import type {BackgroundEffectSelection, BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/EventName';
-import * as trackingHelpers from 'Repositories/tracking/Helpers';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
-import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/Telemetry.helpers';
-import type {UserRepository} from 'Repositories/user/UserRepository';
+import {EventName} from 'Repositories/tracking/eventName';
+import * as trackingHelpers from 'Repositories/tracking/helpers';
+import {Segmentation} from 'Repositories/tracking/segmentation';
+import {isTelemetryEnabledAtCurrentEnvironment} from 'Repositories/tracking/telemetry.helpers';
+import type {UserRepository} from 'Repositories/user/userRepository';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
@@ -103,9 +105,9 @@ import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {ClientId, Participant, UserId} from './Participant';
 
 import {Config} from '../../Config';
-import {NoAudioInputError} from '../../error/NoAudioInputError';
-import {APIClient} from '../../service/APIClientSingleton';
-import {Core} from '../../service/CoreSingleton';
+import {NoAudioInputError} from '../../error/noAudioInputError';
+import {APIClient} from '../../service/apiClientSingleton';
+import {Core} from '../../service/coreSingleton';
 import type {ServerTimeHandler} from '../../time/serverTimeHandler';
 import {Warnings} from '../../view_model/WarningsContainer';
 
@@ -159,7 +161,6 @@ export class CallingRepository {
   private isReady: boolean = false;
   /** will cache the query to media stream (in order to avoid asking the system for streams multiple times when we have multiple peers) */
   private mediaStreamQuery?: Promise<MediaStream>;
-  private poorCallQualityUsers: {[conversationId: string]: string[]} = {};
   private selfClientId: ClientId | null = null;
   private selfUser: User | null = null;
   private wCall?: Wcall;
@@ -345,14 +346,8 @@ export class CallingRepository {
     await this.applyCurrentBackgroundEffectOnSelfParticipant(true);
   }
 
-  public allowSuperhighQualityTier(event: boolean) {
-    if (this.isSuperhighQualityTierAllowed()) {
-      this.backgroundEffectsHandler.enableSuperhighQualityTier(event);
-    }
-  }
-
-  public isSuperhighQualityTierAllowed() {
-    return this.backgroundEffectsHandler.isSuperhighQualityTierAllowed();
+  public allowSuperhighQualityTier(enable: boolean) {
+    this.backgroundEffectsHandler.enableSuperhighQualityTier(enable);
   }
 
   public getBackgroundEffectsHandler(): BackgroundEffectsHandler {
@@ -381,16 +376,21 @@ export class CallingRepository {
 
     // let's check if background should be disabled, then let's do it and go back to the original video
     if (!this.backgroundEffectsHandler.isBackgroundEffectEnabled()) {
+      const originalVideoStream = selfParticipant.videoStream();
+      if (originalVideoStream === undefined) {
+        return undefined;
+      }
       selfParticipant.releaseProcessedVideoStream();
       if (hasActiveVideo && changeAvsSendingMediaSource) {
         // So let's switch back to the original video source
         this.logger.info('Disable background effects.');
-        this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+        this.changeMediaSource(originalVideoStream, MediaType.VIDEO, false);
       }
-      return selfParticipant.videoStream();
+      return originalVideoStream;
     }
 
-    if (!hasActiveVideo) {
+    const videoStream = selfParticipant.videoStream();
+    if (hasActiveVideo === false || videoStream === undefined) {
       // no Video nothing to change!!
       this.logger.warn('No video exists to apply apply background effects');
       return;
@@ -399,7 +399,7 @@ export class CallingRepository {
     // Hold a reference to the old stream so we can release it AFTER the new one is assigned,
     const previousStream = selfParticipant.processedVideoStream();
 
-    const {applied, media} = await this.backgroundEffectsHandler.applyBackgroundEffect(selfParticipant.videoStream());
+    const {applied, media} = await this.backgroundEffectsHandler.applyBackgroundEffect(videoStream);
 
     // The BackgroundEffectsHandler decide not to change the video stream, so we're going on with the original video.
     if (!applied) {
@@ -407,9 +407,9 @@ export class CallingRepository {
       selfParticipant.processedVideoStream(undefined);
       if (changeAvsSendingMediaSource) {
         this.logger.info('Background effect could not applied! Switch back to original video stream!');
-        this.changeMediaSource(selfParticipant.videoStream(), MediaType.VIDEO, false);
+        this.changeMediaSource(videoStream, MediaType.VIDEO, false);
       }
-      return selfParticipant.videoStream();
+      return videoStream;
     }
 
     // Assign new stream first, then release old.
@@ -544,7 +544,13 @@ export class CallingRepository {
       this.videoStateChanged, // `vstateh`,
     );
     const tenSeconds = 10;
-    wCall.setNetworkQualityHandler(wUser, this.updateCallQuality, tenSeconds);
+    wCall.setNetworkQualityHandler(
+      wUser,
+      (conversationId, userId, clientId, quality) => {
+        this.updateCallQuality(conversationId, userId, clientId, quality);
+      },
+      tenSeconds,
+    );
     wCall.setMuteHandler(wUser, this.updateMuteState);
     wCall.setStateHandler(wUser, this.updateCallState);
     wCall.setParticipantChangedHandler(wUser, this.handleCallParticipantChanges);
@@ -619,26 +625,31 @@ export class CallingRepository {
     conversationId: SerializedConversationId,
     userId: string,
     clientId: string,
-    quality: number,
+    qualityInfoJson: string,
   ) => {
+    let qualityInfo: NetworkQualityInfo;
+
+    try {
+      const parsedQualityInfo = JSON.parse(qualityInfoJson);
+      qualityInfo = NetworkQualityInfoSchema.parse(parsedQualityInfo);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        this.logger.warn('Invalid network quality info schema', error);
+      } else {
+        this.logger.warn('Invalid network quality info JSON', error);
+      }
+
+      return;
+    }
+
     const call = this.findCall(this.parseQualifiedId(conversationId));
     if (!call) {
       return;
     }
-    if (!this.poorCallQualityUsers[conversationId]) {
-      this.poorCallQualityUsers[conversationId] = [];
-    }
-
-    let users = this.poorCallQualityUsers[conversationId];
-    const isOldPoorCallQualityUser = users.some(_userId => _userId === userId);
-    if (isOldPoorCallQualityUser && quality === QUALITY.NORMAL) {
-      users = users.filter(_userId => _userId !== userId);
-    }
-    if (!isOldPoorCallQualityUser && quality !== QUALITY.NORMAL) {
-      users = [...users, userId];
-    }
-    if (users.length === call.participants.length - 1) {
-      Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
+    const {quality} = qualityInfo;
+    if (quality !== QUALITY.NORMAL) {
+      // @note: This should be reverted back once avs is sending correct quality metrics
+      // Warnings.showWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     } else {
       Warnings.hideWarning(Warnings.TYPE.CALL_QUALITY_POOR);
     }
@@ -665,6 +676,12 @@ export class CallingRepository {
       case QUALITY.NETWORK_PROBLEM: {
         this.logger.warn(
           `Network problem during call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
+        );
+        break;
+      }
+      case QUALITY.RECONNECTING: {
+        this.logger.warn(
+          `Reconnecting call with user "${userId}" and client "${clientId}" in conversation "${conversationId}".`,
         );
         break;
       }
@@ -702,7 +719,7 @@ export class CallingRepository {
     call.participants.removeAll();
     call.removeAllAudio();
     if (index !== -1) {
-      this.callState.calls.splice(index, 1);
+      this.callState.calls(this.callState.calls().toSpliced(index, 1));
     }
   }
 
@@ -1849,7 +1866,6 @@ export class CallingRepository {
 
     this.logger.info(`Ending call with reason ${reason} \n Stack trace: `, new Error().stack);
     const conversationIdStr = this.serializeQualifiedId(conversationId);
-    delete this.poorCallQualityUsers[conversationIdStr];
     this.wCall?.end(this.wUser, conversationIdStr);
     AvsDebugger.reset();
   };

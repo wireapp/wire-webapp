@@ -23,6 +23,7 @@ import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
 import {
   Checkbox,
   CheckboxLabel,
@@ -39,7 +40,7 @@ import {useAppNotification} from 'Components/AppNotification/AppNotification';
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {VideoBackgroundPerformancePanel} from 'Components/calling/VideoControls/videoBackgroundPerformancePanel/videoBackgroundPerformancePanel';
 import {ConversationClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import type {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
@@ -51,14 +52,14 @@ import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
 import {BUILTIN_BACKGROUNDS} from 'Repositories/media/VideoBackgroundEffects';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useActiveWindowMatchMedia} from 'src/script/hooks/useActiveWindowMatchMedia';
 import {useToggleState} from 'src/script/hooks/useToggleState';
 import {CallViewTab} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {preventFocusOutside} from 'Util/util';
 
@@ -101,6 +102,7 @@ export interface FullscreenVideoCallProps {
   switchMicrophoneInput: (deviceId: string) => void;
   switchSpeakerOutput: (deviceId: string) => void;
   switchVideoBackgroundEffect: (effect: BackgroundEffectSelection) => void;
+  fireAndForgetInvoker: FireAndForgetInvoker;
   teamState?: TeamState;
   callState?: CallState;
   toggleCamera: (call: Call) => void;
@@ -131,6 +133,7 @@ const FullscreenVideoCall = ({
   switchMicrophoneInput,
   switchSpeakerOutput,
   switchVideoBackgroundEffect,
+  fireAndForgetInvoker,
   setMaximizedParticipant,
   setActiveCallViewTab,
   toggleMute,
@@ -251,10 +254,14 @@ const FullscreenVideoCall = ({
         return;
       }
 
+      if (!isTabKey(event)) {
+        return;
+      }
+
       event.preventDefault();
       event.stopPropagation();
 
-      preventFocusOutside(event, 'video-calling', targetDocument);
+      preventFocusOutside(event, 'video-calling-wrapper', targetDocument);
     };
 
     targetDocument.addEventListener('keydown', onKeyDown);
@@ -285,9 +292,12 @@ const FullscreenVideoCall = ({
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
+  const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
 
   const handleBackgroundSidebarSelect = (effect: BackgroundEffectSelection) => {
-    void switchVideoBackgroundEffect(effect);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await switchVideoBackgroundEffect(effect);
+    });
   };
 
   const handleEnableHighQualityBlur = (event: ChangeEvent<HTMLInputElement>) => {
@@ -296,6 +306,7 @@ const FullscreenVideoCall = ({
 
   return (
     <div
+      id="video-calling-wrapper"
       data-uie-name="fullscreen-video-call"
       className={cx('video-calling-wrapper', {
         'app--small-offset': hasOffset && isMiniMode,
@@ -419,7 +430,7 @@ const FullscreenVideoCall = ({
               onSelectEffect={handleBackgroundSidebarSelect}
               onEnableHighQualityBlur={handleEnableHighQualityBlur}
               onClose={() => setIsBackgroundSidebarOpen(false)}
-              highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
+              highQualityBlurAllowed={isHighQualityBlurEnabled}
             />
           )}
         </div>
@@ -501,7 +512,7 @@ const FullscreenVideoCall = ({
           onSelectEffect={handleBackgroundSidebarSelect}
           onEnableHighQualityBlur={handleEnableHighQualityBlur}
           onClose={() => setIsBackgroundSidebarOpen(false)}
-          highQualityBlurAllowed={callingRepository.isSuperhighQualityTierAllowed()}
+          highQualityBlurAllowed={isHighQualityBlurEnabled}
         />
       )}
       <ModalComponent

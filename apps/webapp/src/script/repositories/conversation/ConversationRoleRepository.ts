@@ -29,7 +29,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {Logger, getLogger} from 'Util/logger';
 
 import type {ConversationService} from './ConversationService';
@@ -98,13 +98,14 @@ export class ConversationRoleRepository {
     const roleUpdates: Record<string, string> = {};
 
     // Add role for self participant
-    if (remoteConversationData.members.self.conversation_role) {
-      roleUpdates[remoteConversationData.members.self.id] = remoteConversationData.members.self.conversation_role;
+    const selfMember = remoteConversationData.members.self;
+    if (selfMember !== undefined && selfMember.conversation_role !== undefined) {
+      roleUpdates[selfMember.id] = selfMember.conversation_role;
     }
 
     // Add roles for other participants
     remoteConversationData.members.others.forEach(other => {
-      if (other.conversation_role) {
+      if (other.conversation_role !== undefined) {
         roleUpdates[other.id] = other.conversation_role;
       }
     });
@@ -123,7 +124,7 @@ export class ConversationRoleRepository {
   };
 
   private readonly getUserRole = (conversation: Conversation, userEntity: User): string => {
-    return conversation.roles()[userEntity.id];
+    return conversation.roles()[userEntity.id] ?? DefaultRole.WIRE_MEMBER;
   };
 
   readonly isUserGroupAdmin = (conversation: Conversation, userEntity: User): boolean => {
@@ -140,7 +141,7 @@ export class ConversationRoleRepository {
   private readonly getUserPermissions = (conversation: Conversation, user: User): ConversationRole => {
     const conversationRoles = this.getConversationRoles(conversation);
     const userRole: string = this.getUserRole(conversation, user);
-    return conversationRoles?.find(({conversation_role}) => conversation_role === userRole) || defaultMemberRole;
+    return conversationRoles.find(({conversation_role}) => conversation_role === userRole) ?? defaultMemberRole;
   };
 
   readonly hasPermission = (conversation: Conversation, user: User, permissionName: Permissions): boolean => {
@@ -153,46 +154,82 @@ export class ConversationRoleRepository {
     return userRole.actions.includes(permissionName);
   };
 
-  readonly canRenameGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.renameConversation);
+  private readonly getPermissionSubjectUser = (user: User | undefined): User | undefined => {
+    return user ?? this.userState.self();
   };
 
-  readonly canAddParticipants = (conversation: Conversation, user: User = this.userState.self()): boolean => {
+  readonly canRenameGroup = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.renameConversation)
+      : false;
+  };
+
+  readonly canAddParticipants = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    if (permissionSubjectUser === undefined) {
+      return false;
+    }
+
     return (
       conversation.conversationModerator() === ADD_PERMISSION.EVERYONE ||
-      this.hasPermission(conversation, user, Permissions.addParticipants)
+      this.hasPermission(conversation, permissionSubjectUser, Permissions.addParticipants)
     );
   };
 
-  readonly canRemoveParticipants = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.removeParticipants);
+  readonly canRemoveParticipants = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.removeParticipants)
+      : false;
   };
 
-  readonly canChangeParticipantRoles = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.changeParticipantRoles);
+  readonly canChangeParticipantRoles = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.changeParticipantRoles)
+      : false;
   };
 
-  readonly canToggleTimeout = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.toggleEphemeralTimer);
+  readonly canToggleTimeout = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.toggleEphemeralTimer)
+      : false;
   };
 
-  readonly canToggleGuests = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.toggleGuestsAndServices);
+  readonly canToggleGuests = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.toggleGuestsAndServices)
+      : false;
   };
 
-  readonly canToggleReadReceipts = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.toggleReadReceipts);
+  readonly canToggleReadReceipts = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.toggleReadReceipts)
+      : false;
   };
 
-  readonly canDeleteGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.deleteConversation);
+  readonly canDeleteGroup = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.deleteConversation)
+      : false;
   };
 
-  readonly canLeaveGroup = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.leaveConversation);
+  readonly canLeaveGroup = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.leaveConversation)
+      : false;
   };
 
-  readonly canToggleAddPermission = (conversation: Conversation, user: User = this.userState.self()): boolean => {
-    return this.hasPermission(conversation, user, Permissions.toggleAddPermission);
+  readonly canToggleAddPermission = (conversation: Conversation, user?: User): boolean => {
+    const permissionSubjectUser = this.getPermissionSubjectUser(user);
+    return permissionSubjectUser !== undefined
+      ? this.hasPermission(conversation, permissionSubjectUser, Permissions.toggleAddPermission)
+      : false;
   };
 }

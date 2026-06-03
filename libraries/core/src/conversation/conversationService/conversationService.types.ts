@@ -102,7 +102,9 @@ export type KeyPackageClaimUser = QualifiedId & {skipOwnClientId?: string};
 export type AddUsersParams = {
   conversationId: QualifiedId;
   qualifiedUsers: KeyPackageClaimUser[];
-  groupId?: string;
+  groupId: string;
+  commitPendingFirst?: boolean;
+  updateKeyingMaterialIfEmpty?: boolean;
 };
 
 export type RemoveUsersParams = {

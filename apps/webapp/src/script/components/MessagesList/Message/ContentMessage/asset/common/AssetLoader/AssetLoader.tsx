@@ -21,7 +21,7 @@ import React from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
-import {CloseIcon} from 'Components/Icon';
+import {CloseIcon} from 'Components/icon';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 
 interface AssetLoaderProps {
@@ -31,7 +31,7 @@ interface AssetLoaderProps {
 }
 
 const AssetLoader = ({large, loadProgress, onCancel}: AssetLoaderProps) => {
-  const elementScale = large ? 2 : 1;
+  const elementScale = large === true ? 2 : 1;
   const progress = `${loadProgress * elementScale} ${100 * elementScale}`;
   const viewBoxSize = 32 * elementScale;
   const viewBox = `0 0 ${viewBoxSize} ${viewBoxSize}`;

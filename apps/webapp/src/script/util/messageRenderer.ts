@@ -115,14 +115,14 @@ markdownit.renderer.rules.paragraph_open = (tokens, idx) => {
 
   const previousWithMap = tokens
     .slice(0, idx)
-    .reverse()
+    .toReversed()
     .find(({map}) => map?.length);
   const previousPosition = previousWithMap ? (previousWithMap.map || [0, 0])[1] - 1 : 0;
   const count = position - previousPosition;
 
   const previousToken = tokens[idx - 1];
   const isPreviousTokenList =
-    previousToken &&
+    previousToken !== undefined &&
     (previousToken.type === 'bullet_list_close' ||
       previousToken.type === 'ordered_list_close' ||
       previousToken.type === 'blockquote_close');
@@ -139,7 +139,7 @@ const renderMention = (mentionData: MentionText) => {
   let elementAttributes = mentionData.isSelfMentioned
     ? ' data-uie-name="label-self-mention" role="button"'
     : ` data-uie-name="label-other-mention" data-user-id="${escape(mentionData.userId)}" role="button"`;
-  if (!mentionData.isSelfMentioned && mentionData.domain) {
+  if (!mentionData.isSelfMentioned && mentionData.domain !== null && mentionData.domain !== undefined) {
     elementAttributes += ` data-user-domain="${escape(mentionData.domain)}"`;
   }
 
@@ -158,7 +158,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
   let mentionlessText = mentionEntities
     .slice()
     // sort mentions to start with the latest mention first (in order not to have to recompute the index every time we modify the original text)
-    .sort((mention1, mention2) => mention2.startIndex - mention1.startIndex)
+    .toSorted((mention1, mention2) => mention2.startIndex - mention1.startIndex)
     .reduce((strippedText, mention) => {
       const mentionText = message.slice(mention.startIndex, mention.startIndex + mention.length);
       const mentionKey = createMentionHash(mention);
@@ -215,7 +215,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
         return escape(code);
       }
 
-      if (lang && languages[lang]) {
+      if (typeof lang === 'string' && lang in languages) {
         return highlightCode({code, grammar: languages[lang], lang});
       }
 
@@ -249,7 +249,7 @@ export const renderMessage = (message: string, selfId?: QualifiedId, mentionEnti
     link.attrSet('href', href);
     if (!isWireDeepLink && !['autolink', 'linkify'].includes(link.markup)) {
       const title = link.attrGet('title');
-      if (title) {
+      if (title !== null && title !== undefined) {
         link.attrSet('title', removeMentionsHashes(title));
       }
       link.attrPush(['data-md-link', 'true']);

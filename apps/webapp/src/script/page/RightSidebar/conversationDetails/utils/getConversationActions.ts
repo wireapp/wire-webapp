@@ -21,11 +21,11 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {MenuItem} from 'Components/panel/PanelActions';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import * as UserPermission from 'Repositories/user/UserPermission';
+import * as UserPermission from 'Repositories/user/userPermission';
 import {t} from 'Util/localizerUtil';
 
 import {Config} from '../../../../Config';

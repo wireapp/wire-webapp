@@ -28,6 +28,7 @@ import {
 import {ConversationMLSMessageAddEvent, ConversationMLSWelcomeEvent} from '@wireapp/api-client/lib/event';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Converter, Decoder, Encoder} from 'bazinga64';
+import {Task, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TimeUtil, TypedEventEmitter} from '@wireapp/commons';
@@ -217,7 +218,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       switch (mlsDeviceStatus) {
         case MLSDeviceStatus.REGISTERED:
-          if (!skipInitIdentity) {
+          if (skipInitIdentity !== true) {
             await this.verifyRemoteMLSKeyPackagesAmount(client.id);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
@@ -228,7 +229,7 @@ export class MLSService extends TypedEventEmitter<Events> {
           this.emit(MLSServiceEvents.MLS_CLIENT_MISMATCH);
           break;
         case MLSDeviceStatus.FRESH:
-          if (!skipInitIdentity) {
+          if (skipInitIdentity !== true) {
             await this.uploadMLSPublicKeys(client);
           } else {
             this.logger.info(`Blocked initial key package upload for client ${client.id} as E2EI is enabled`);
@@ -379,7 +380,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const clientIdParts = fullClientId?.split(':');
       const groupClientId = clientIdParts?.[1];
 
-      if (groupClientId) {
+      if (groupClientId !== undefined && groupClientId.length > 0) {
         currentClientIdsInGroup.push(groupClientId);
       }
     }
@@ -464,9 +465,32 @@ export class MLSService extends TypedEventEmitter<Events> {
     return {keyPackages: coreCryptoKeyPackagesPayload, failures};
   }
 
+  /**
+   * @deprecated Use `getSafeEpoch` to receive a `Task` with explicit error handling.
+   */
   public getEpoch(groupId: string | Uint8Array) {
     const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
     return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
+  }
+
+  /**
+   * Safely reads the current MLS epoch for a conversation.
+   *
+   * Returns a `Task` so errors are modeled in the type instead of surfacing
+   * as an uncaught promise rejection.
+   *
+   * A common rejection reason is a core-crypto error equivalent to:
+   * `MlsErrorOther: Couldn't find conversation` (for example when the group is
+   * not present on core-crypto level).
+   */
+  public getSafeEpoch(groupId: string | Uint8Array): Task<number, unknown> {
+    return task.tryOrElse(
+      errorReason => `Failed to get safe epoch for group ${groupId}: ${errorReason}`,
+      () => {
+        const groupIdBytes = typeof groupId === 'string' ? Decoder.fromBase64(groupId).asBytes : groupId;
+        return this.coreCryptoClient.conversationEpoch(new ConversationId(groupIdBytes));
+      },
+    );
   }
 
   public async joinByExternalCommit(getGroupInfo: () => Promise<Uint8Array>) {
@@ -483,7 +507,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       await this.dispatchNewCrlDistributionPoints(welcomeBundle.crlNewDistributionPoints);
 
       this.logger.info('welcome bundle after joining via external commit');
-      if (welcomeBundle.id) {
+      if (welcomeBundle.id !== undefined) {
         //after we've successfully joined via external commit, we schedule periodic key material renewal
         const groupIdStr = Encoder.toBase64(welcomeBundle.id.copyBytes()).asString;
         const newEpoch = await this.getEpoch(groupIdStr);
@@ -536,7 +560,21 @@ export class MLSService extends TypedEventEmitter<Events> {
       this.logger.info('Message decrypted successfully', {qualifiedConversationId, duration: Date.now() - start});
       return decryptedMessage;
     } catch (error: unknown) {
-      this.logger.warn('Failed to decrypt MLS message', {qualifiedConversationId, error});
+      // This is safe (read-only) and helps correlate decryption failures with local epoch.
+      const coreCryptoEpochNumber = await task.tryOrElse<number, unknown>(
+        errorReason => `Failed to collect epoch details for decryption failure: ${conversationId}: ${errorReason}`,
+        () => {
+          return this.coreCryptoClient.conversationEpoch(conversationId);
+        },
+      );
+      this.logger.warn('Failed to decrypt MLS message', {
+        qualifiedConversationId,
+        coreCryptoEpochError: coreCryptoEpochNumber.match({
+          Ok: epoch => epoch,
+          Err: errorReason => errorReason,
+        }),
+        error,
+      });
       // According to CoreCrypto JS doc on .decryptMessage method, we should ignore some errors (corecrypto handle them internally)
       if (shouldMLSDecryptionErrorBeIgnored(error)) {
         return {
@@ -581,6 +619,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     }
   }
 
+  public async updateKeyingMaterialForConversation(groupId: string) {
+    await this.coreCryptoClient.transaction(context => this.updateKeyingMaterial(groupId, context));
+  }
+
   /**
    * Will create an empty conversation inside of coreCrypto.
    * @param groupId the id of the group to create inside of coreCrypto
@@ -596,7 +638,7 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
     let externalSenders: ExternalSenderKey[] = [];
-    if (parentGroupId) {
+    if (parentGroupId !== undefined && parentGroupId.length > 0) {
       const parentGroupIdBytes = Decoder.fromBase64(parentGroupId).asBytes;
       externalSenders = [
         new ExternalSenderKey(await this.coreCryptoClient.getExternalSender(new ConversationId(parentGroupIdBytes))),
@@ -605,7 +647,7 @@ export class MLSService extends TypedEventEmitter<Events> {
       const ciphersuiteSignature = getSignatureAlgorithmForCiphersuite(this.config.defaultCiphersuite);
       const removalKeyForSignature =
         removalKeyFor1to1Signature?.[ciphersuiteSignature] ?? mlsPublicRemovalKeys[ciphersuiteSignature];
-      if (!removalKeyForSignature) {
+      if (removalKeyForSignature === undefined || removalKeyForSignature.length === 0) {
         throw new Error(
           `Cannot create conversation: No backend removal key found for the signature ${ciphersuiteSignature}`,
         );
@@ -876,18 +918,6 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   /**
-   * Get all keying material last update dates and schedule tasks for renewal
-   * Function must only be called once, after application start
-   */
-  public schedulePeriodicKeyMaterialRenewals(groupIds: string[]) {
-    try {
-      groupIds.forEach(groupId => this.scheduleKeyMaterialRenewal(groupId));
-    } catch (error: unknown) {
-      this.logger.error('Could not get last key material update dates', error);
-    }
-  }
-
-  /**
    * Schedules a task to periodically (every 24h) check if new key packages should be generated and uploaded to backend.
    * Function must only be called once, after application start
    * @param clientId id of the client
@@ -939,7 +969,7 @@ export class MLSService extends TypedEventEmitter<Events> {
   private async getCCClientSignatureString(): Promise<string> {
     const credentialType = await this.getCredentialType();
     const publicKey = await this.coreCryptoClient.clientPublicKey(this.config.defaultCiphersuite, credentialType);
-    if (!publicKey) {
+    if (publicKey === undefined) {
       throw new Error('No public key found for client');
     }
     return btoa(Converter.arrayBufferViewToBaselineString(publicKey));
@@ -1010,6 +1040,7 @@ export class MLSService extends TypedEventEmitter<Events> {
 
       await this.schedulePendingProposalsTask(groupId, firingDate);
     } else {
+      this.logger.info('Trying to commit pending proposals immediately', {groupId});
       await this.commitPendingProposals(groupId);
     }
   }
@@ -1018,7 +1049,10 @@ export class MLSService extends TypedEventEmitter<Events> {
     await this.coreDatabase.put('pendingProposals', {groupId, firingDate}, groupId);
 
     TaskScheduler.addTask({
-      task: () => this.commitPendingProposals(groupId),
+      task: () => {
+        this.logger.info('Trying to commit pending proposals from scheduled task', {groupId});
+        return this.commitPendingProposals(groupId);
+      },
       firingDate,
       key: this.createPendingProposalsTaskKey(groupId),
     });
@@ -1080,9 +1114,9 @@ export class MLSService extends TypedEventEmitter<Events> {
   }
 
   /**
-   * Get all pending proposals from the database and schedule them
-   * Function must only be called once, after application start
-   *
+   * Reads persisted pending proposals from the database and registers matching {@link TaskScheduler} tasks.
+   * {@link Account} invokes this at most once per logged-in session (via lodash `once`), on the first catch-up → LIVE
+   * transition (not during app startup), so timers are not armed while the notification backlog is replaying.
    */
   public async initialisePendingProposalsTasks() {
     try {
@@ -1098,7 +1132,12 @@ export class MLSService extends TypedEventEmitter<Events> {
             }
 
             TaskScheduler.addTask({
-              task: () => this.commitPendingProposals(groupId),
+              task: () => {
+                this.logger.info('Trying to commit pending proposals from startup rehydration', {
+                  groupId,
+                });
+                return this.commitPendingProposals(groupId);
+              },
               firingDate,
               key: this.createPendingProposalsTaskKey(groupId),
             });
@@ -1139,9 +1178,11 @@ export class MLSService extends TypedEventEmitter<Events> {
     const groupId = await groupIdFromConversationId(qualifiedConversationId, event.subconv);
 
     // We should not receive a message for a group the client is not aware of
-    if (!groupId) {
+    if (groupId === undefined || groupId.length === 0) {
       throw new Error(
-        `Could not find a group_id for conversation ${qualifiedConversationId.id}@${qualifiedConversationId.domain}${event.subconv ? `/subconversation:${event.subconv}` : ''}`,
+        `Could not find a group_id for conversation ${qualifiedConversationId.id}@${qualifiedConversationId.domain}${
+          event.subconv !== undefined ? `/subconversation:${event.subconv}` : ''
+        }`,
       );
     }
 

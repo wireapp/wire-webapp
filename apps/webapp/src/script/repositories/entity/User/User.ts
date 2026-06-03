@@ -29,7 +29,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
-import {ROLE as TEAM_ROLE} from 'Repositories/user/UserPermission';
+import {ROLE as TEAM_ROLE} from 'Repositories/user/userPermission';
 import {t} from 'Util/localizerUtil';
 import {clamp} from 'Util/numberUtil';
 import {getFirstChar} from 'Util/stringUtil';
@@ -55,7 +55,7 @@ export class User {
   /** does not include current client/device */
   public readonly devices: ko.ObservableArray<ClientEntity>;
   public localClient: ClientEntity | undefined;
-  public readonly email: ko.Observable<string>;
+  public readonly email: ko.Observable<string | undefined>;
   public locale?: string;
   public readonly expirationRemaining: ko.Observable<number>;
   public readonly expirationRemainingText: ko.Observable<string>;
@@ -145,6 +145,7 @@ export class User {
     this.serviceId = undefined;
     this.category = undefined;
     this.description = undefined;
+    this.type = UserType.REGULAR;
 
     this.isAvailable = ko.pureComputed(() => this.id !== '' && this.name() !== '');
 
@@ -172,8 +173,12 @@ export class User {
 
     this.username = ko.observable('');
 
-    this.previewPictureResource = ko.observable().extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 100}});
-    this.mediumPictureResource = ko.observable().extend({rateLimit: {method: 'notifyWhenChangesStop', timeout: 100}});
+    this.previewPictureResource = (ko.observable<AssetRemoteData>() as ko.Observable<AssetRemoteData>).extend({
+      rateLimit: {method: 'notifyWhenChangesStop', timeout: 100},
+    });
+    this.mediumPictureResource = (ko.observable<AssetRemoteData>() as ko.Observable<AssetRemoteData>).extend({
+      rateLimit: {method: 'notifyWhenChangesStop', timeout: 100},
+    });
 
     this.connection = ko.observable<ConnectionEntity | null>(null);
 
@@ -268,7 +273,11 @@ export class User {
     this.devices.push(new_client_et);
 
     if (this.isMe) {
-      this.devices.sort((client_a, client_b) => new Date(client_b.time).getTime() - new Date(client_a.time).getTime());
+      this.devices(
+        this.devices().toSorted((client_a, client_b) => {
+          return new Date(client_b.time ?? '').getTime() - new Date(client_a.time ?? '').getTime();
+        }),
+      );
     }
 
     return true;

@@ -35,6 +35,7 @@ export class ConversationPage {
   readonly sendMessageButton: Locator;
   readonly searchButton: Locator;
   readonly conversationTitle: Locator;
+  readonly verifiedBadge: Locator;
   readonly watermark: Locator;
   readonly timerMessageButton: Locator;
   readonly timerOffButton: Locator;
@@ -62,6 +63,7 @@ export class ConversationPage {
   readonly mentionSuggestions: Locator;
   readonly invitePeopleButton: Locator;
   readonly guestsIndicator: Locator;
+  readonly replyQuoteBoxAboveMessageInputField: Locator;
 
   readonly getImageAltText = (user: User) => `Image from ${user.fullName}`;
 
@@ -80,6 +82,7 @@ export class ConversationPage {
     this.sendMessageButton = page.getByTestId('do-send-message');
     this.searchButton = page.getByRole('button', {name: 'Search'});
     this.conversationTitle = page.locator('[data-uie-name="status-conversation-title-bar-label"]');
+    this.verifiedBadge = page.getByTestId('do-participants').getByTestId('proteus-verified');
     this.openGroupInformationViaName = page.getByTestId('status-conversation-title-bar-label');
     this.timerMessageButton = page.getByTestId('do-set-ephemeral-timer');
     this.timerOffButton = page.getByRole('button', {name: 'Off'});
@@ -110,6 +113,7 @@ export class ConversationPage {
     this.mentionSuggestions = page.getByRole('listbox').getByTestId('item-mention-suggestion');
     this.invitePeopleButton = page.getByRole('button', {name: 'Invite people'});
     this.guestsIndicator = page.getByTestId('status-indication-badge');
+    this.replyQuoteBoxAboveMessageInputField = page.getByTestId('input-bar-reply-box');
   }
 
   getImageLocator(user: User): Locator {
@@ -360,5 +364,10 @@ export class ConversationPage {
    */
   getPing(): Locator {
     return this.messageItems.getByTestId('element-message-ping');
+  }
+
+  async getMessageReadReceipt(message: Locator) {
+    await message.hover();
+    return message.getByTestId('status-message-read-receipts');
   }
 }

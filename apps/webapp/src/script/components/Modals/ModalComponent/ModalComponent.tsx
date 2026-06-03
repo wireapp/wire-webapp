@@ -33,7 +33,7 @@ import {
   ModalOverlayVisibleStyles,
 } from './ModalComponent.styles';
 
-import {LoadingIcon} from '../../Icon';
+import {LoadingIcon} from '../../icon';
 
 interface ModalComponentProps extends HTMLProps<HTMLDivElement> {
   children: React.ReactNode;
@@ -71,7 +71,7 @@ const ModalComponent = ({
 
   useEffect(() => {
     // Get the correct document based on the container
-    const targetDocument = container ? (container as HTMLElement).ownerDocument || document : document;
+    const targetDocument = container ? ((container as HTMLElement).ownerDocument ?? document) : document;
 
     const trapFocus = (event: KeyboardEvent) => preventFocusOutside(event, trapId, targetDocument);
 

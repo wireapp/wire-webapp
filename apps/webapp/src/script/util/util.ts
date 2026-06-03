@@ -27,7 +27,7 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {isTabKey} from './keyboardUtil';
 import {getLogger} from './logger';
 
-import {AuthError} from '../error/AuthError';
+import {AuthError} from '../error/authError';
 
 export const checkIndexedDb = (): Promise<void> => {
   if (!Runtime.isSupportingIndexedDb()) {
@@ -60,7 +60,7 @@ export const checkIndexedDb = (): Promise<void> => {
       const interval_id = window.setInterval(() => {
         currentAttempt += 1;
 
-        if (dbOpenRequest.readyState === 'done' && !dbOpenRequest.result) {
+        if (dbOpenRequest.readyState === 'done' && dbOpenRequest.result === undefined) {
           window.clearInterval(interval_id);
           return reject(new AuthError(AuthError.TYPE.PRIVATE_MODE, AuthError.MESSAGE.PRIVATE_MODE));
         }
@@ -80,7 +80,13 @@ export const checkIndexedDb = (): Promise<void> => {
 export const loadDataUrl = (file: Blob): Promise<string | ArrayBuffer> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => {
+      if (reader.result !== null) {
+        resolve(reader.result);
+      } else {
+        reject(new Error('File reader result is empty'));
+      }
+    };
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
@@ -98,7 +104,7 @@ const loadUrlBuffer = (
     xhr.onload = () => {
       const isStatusOK = xhr.status === HTTP_STATUS.OK;
       return isStatusOK
-        ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type')})
+        ? resolve({buffer: xhr.response, mimeType: xhr.getResponseHeader('content-type') ?? ''})
         : reject(new Error(xhr.status.toString(10)));
     };
 
@@ -140,7 +146,7 @@ export const loadUrlBlob = (url: string): Promise<Blob> => {
 export const getFileExtension = (filename: string): string => {
   const extensionMatch = filename?.match(/\.(tar\.gz|[^.]*)$/i);
   const foundExtension = extensionMatch?.[1];
-  return foundExtension || '';
+  return foundExtension ?? '';
 };
 
 export const getName = (nodePath: string): string => {
@@ -217,7 +223,7 @@ export const formatBytes = (bytes: number, decimals: number = 1): string => {
 };
 
 export const getContentTypeFromDataUrl = (dataUrl: string): string => {
-  return dataUrl.match(/^.*:(.*);.*,/)[1];
+  return dataUrl.match(/^.*:(.*);.*,/)?.[1] ?? '';
 };
 
 export const stripDataUri = (string: string): string => string.replace(/^data:.*,/, '');
@@ -250,12 +256,8 @@ export const base64ToBlob = (base64: string): Blob => {
  * Downloads blob using a hidden link element.ƒ
  */
 export const downloadBlob = (blob: Blob, filename: string, mimeType?: string): number => {
-  if (blob) {
-    const url = window.URL.createObjectURL(blob);
-    return downloadFile(url, filename, mimeType);
-  }
-
-  throw new Error('Failed to download blob: Resource not provided');
+  const url = window.URL.createObjectURL(blob);
+  return downloadFile(url, filename, mimeType);
 };
 
 export const downloadFile = (url: string, fileName: string, mimeType?: string): number => {
@@ -263,7 +265,7 @@ export const downloadFile = (url: string, fileName: string, mimeType?: string): 
   anchor.download = fileName;
   anchor.href = url;
   anchor.style.display = 'none';
-  if (mimeType) {
+  if (mimeType !== undefined && mimeType.length > 0) {
     anchor.type = mimeType;
   }
 
@@ -354,8 +356,9 @@ export const preventFocusOutside = (
   }
   event.preventDefault();
   const parent = targetDocument.getElementById(parentId);
-  const focusableContent = parent ? [...parent.querySelectorAll(focusableElementsSelector)] : [];
-  const focusedItemIndex = focusableContent.indexOf(targetDocument.activeElement);
+  const focusableContent = parent !== null ? [...parent.querySelectorAll(focusableElementsSelector)] : [];
+  const activeElement = targetDocument.activeElement;
+  const focusedItemIndex = activeElement !== null ? focusableContent.indexOf(activeElement) : -1;
   if (event.shiftKey && focusedItemIndex != 0) {
     (focusableContent[focusedItemIndex - 1] as HTMLElement)?.focus();
     return;

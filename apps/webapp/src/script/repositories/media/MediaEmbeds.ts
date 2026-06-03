@@ -124,7 +124,7 @@ const generateYouTubeEmbedUrl = (url: string): string | void => {
 
     // Convert the timestamp into an embed friendly format (start=seconds)
     if (searchParams.has('t')) {
-      searchParams.set('start', convertYouTubeTimestampToSeconds(searchParams.get('t')).toString());
+      searchParams.set('start', convertYouTubeTimestampToSeconds(searchParams.get('t') ?? '').toString());
       searchParams.delete('t');
     }
 

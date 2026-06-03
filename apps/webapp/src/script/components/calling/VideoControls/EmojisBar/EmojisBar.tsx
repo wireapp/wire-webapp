@@ -77,7 +77,7 @@ export const EmojisBar = ({onEmojiClick, onPickerEmojiClick, targetWindow}: Emoj
   );
 
   const recentTopEmojis = recentEmojis
-    .sort((emojiA, emojiB) => emojiB.count - emojiA.count)
+    .toSorted((emojiA, emojiB) => emojiB.count - emojiA.count)
     .map(emoji => String.fromCodePoint(parseInt(emoji.unified, 16)))
     .concat(DEFAULT_EMOJI_LIST)
     .slice(0, 8);

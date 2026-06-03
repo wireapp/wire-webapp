@@ -17,7 +17,7 @@
  *
  */
 
-import {useState} from 'react';
+import {ReactElement, useState} from 'react';
 
 import {IconButton, IconButtonVariant, OptionsIcon} from '@wireapp/react-ui-kit';
 
@@ -27,16 +27,21 @@ import {buttonStyles, counterStyles} from './CellsFiltersMenu.styles';
 import {CellsFiltersModal} from './CellsFiltersModal/CellsFiltersModal';
 import {useGetAllTags} from './useGetAllTags/useGetAllTags';
 
+import {useApplicationContext} from '../../../../../page/RootProvider';
+
 interface CellsFiltersMenuProps {
   activeFiltersCount: number;
   cellsRepository: CellsRepository;
 }
 
-export const CellsFiltersMenu = ({activeFiltersCount, cellsRepository}: CellsFiltersMenuProps) => {
+export const CellsFiltersMenu = (properties: CellsFiltersMenuProps): ReactElement => {
+  const {activeFiltersCount, cellsRepository} = properties;
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
 
   const {tags} = useGetAllTags({
     cellsRepository,
+    fireAndForgetInvoker,
   });
 
   return (

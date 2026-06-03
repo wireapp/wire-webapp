@@ -21,7 +21,7 @@ import {useState} from 'react';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {copyText} from 'Util/clipboardUtil';
 
 interface CopyToClipboardButtonProps {
@@ -44,7 +44,7 @@ export const CopyToClipboardButton = ({
   const [isCopying, setIsCopying] = useState<boolean>(false);
 
   const copyToClipboard = async () => {
-    if (disabled) {
+    if (disabled === true) {
       return;
     }
     if (!isCopying) {

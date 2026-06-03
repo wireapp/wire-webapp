@@ -47,7 +47,9 @@ export const Layout = ({children}: {children: ReactNode}) => {
             </Link>
           </div>
         </div>
-        <WavesPattern />
+        <span aria-hidden="true">
+          <WavesPattern />
+        </span>
       </div>
 
       <div css={contentContainerCss}>{children}</div>

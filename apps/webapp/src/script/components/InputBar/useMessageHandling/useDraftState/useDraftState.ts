@@ -24,6 +24,7 @@ import {LexicalEditor, CLEAR_EDITOR_COMMAND} from 'lexical';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {StorageRepository} from 'Repositories/storage';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {sanitizeMarkdown} from 'Util/markdownUtil';
 
 import {DraftState, loadDraftState, saveDraftState} from '../../common/draftState/draftState';
@@ -47,6 +48,8 @@ export const useDraftState = ({
   editedMessageId,
   replyMessageEntityId,
 }: UseDraftStateProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
+
   const reset = useCallback(() => {
     editorRef.current?.dispatchCommand(CLEAR_EDITOR_COMMAND, undefined);
   }, [editorRef]);
@@ -58,13 +61,15 @@ export const useDraftState = ({
   }, [conversation, messageRepository, onLoad, storageRepository]);
 
   const save = async (editorState: string, text: string, replyId = '') => {
-    void saveDraftState({
-      storageRepository,
-      conversation,
-      editorState,
-      plainMessage: sanitizeMarkdown(text),
-      replyId: replyId ?? replyMessageEntityId,
-      editedMessageId,
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await saveDraftState({
+        storageRepository,
+        conversation,
+        editorState,
+        plainMessage: sanitizeMarkdown(text),
+        replyId: replyId ?? replyMessageEntityId,
+        editedMessageId,
+      });
     });
   };
 

@@ -25,7 +25,7 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/localizerUtil';
 
-import {ConversationError} from '../error/ConversationError';
+import {ConversationError} from '../error/conversationError';
 import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
 
 export const showLegalHoldWarningModal = (

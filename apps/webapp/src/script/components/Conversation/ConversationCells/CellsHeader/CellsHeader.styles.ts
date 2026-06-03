@@ -21,44 +21,44 @@ import {CSSObject} from '@emotion/react';
 
 export const wrapperStyles: CSSObject = {
   display: 'flex',
-  justifyContent: 'space-between',
   alignItems: 'flex-start',
   flexDirection: 'column',
+  gap: '16px',
   marginBottom: '20px',
-  paddingRight: '8px',
+  padding: '0 16px',
   width: '100%',
 };
 
 export const contentStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: '8px',
   width: '100%',
+  minHeight: '32px',
+};
+
+export const breadcrumbsRowStyles: CSSObject = {
+  display: 'flex',
+  width: '100%',
+  height: '24px',
+  alignItems: 'center',
+  gap: '10px',
+};
+
+export const rootHomeIconStyles: CSSObject = {
+  width: '14px',
+  height: '14px',
+  flexShrink: 0,
 };
 
 export const actionsStyles: CSSObject = {
   display: 'flex',
   alignItems: 'center',
   gap: '8px',
+  marginLeft: 'auto',
 };
 
-export const searchInputStyles: CSSObject = {
-  boxShadow: '0 0 0 0.667px transparent',
-  '.wireinput': {
-    padding: 0,
-    paddingLeft: '8px',
-    boxShadow: 'none',
-    '&:focus, &:hover, &:active': {
-      boxShadow: 'none',
-    },
-  },
-  '&:focus-within': {
-    boxShadow: '0 0 0 0.667px var(--Light-UI-Blue, #0667C8)',
-  },
-  'body.theme-dark &': {
-    '&:focus-within': {
-      boxShadow: '0 0 0 0.667px var(--Dark-UI-Blue, #54a6ff)',
-    },
-  },
+export const searchWrapperStyles: CSSObject = {
+  flex: '0 1 328px',
+  minWidth: '160px',
 };

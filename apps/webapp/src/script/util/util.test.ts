@@ -183,7 +183,7 @@ describe('sortGroupsByLastEvent', () => {
     groupB.last_event_timestamp(1414505766449);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(sortGroupsByLastEvent);
+    const [firstGroup, secondGroup] = groups.toSorted(sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupA.name());
     expect(secondGroup.name()).toEqual(groupB.name());
@@ -199,7 +199,7 @@ describe('sortGroupsByLastEvent', () => {
     groupB.last_event_timestamp(1414505857975);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(sortGroupsByLastEvent);
+    const [firstGroup, secondGroup] = groups.toSorted(sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupB.name());
     expect(secondGroup.name()).toEqual(groupA.name());
@@ -218,7 +218,7 @@ describe('sortGroupsByLastEvent', () => {
     expect(sortGroupsByLastEvent(groupA, groupB)).toEqual(0);
 
     const groups = [groupA, groupB];
-    const [firstGroup, secondGroup] = groups.sort(sortGroupsByLastEvent);
+    const [firstGroup, secondGroup] = groups.toSorted(sortGroupsByLastEvent);
 
     expect(firstGroup.name()).toEqual(groupA.name());
     expect(secondGroup.name()).toEqual(groupB.name());

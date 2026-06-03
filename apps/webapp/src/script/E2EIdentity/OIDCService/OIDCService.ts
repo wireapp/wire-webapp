@@ -32,7 +32,7 @@ export class OIDCService {
     const idpUrl = new URL(targetURL);
     // This clientId will be used to create the OIDCService. It needs to be attached to the targetURL
     const idpClientId = idpUrl.searchParams.get('client_id');
-    if (!idpClientId) {
+    if (idpClientId === null || idpClientId.length === 0) {
       throw new Error('No clientId provided by the targetUrl');
     }
 
@@ -71,7 +71,7 @@ export class OIDCService {
     };
 
     const params = {shouldBeRedirectedByProxy: true, claims: JSON.stringify(claims)};
-    return silent
+    return silent === true
       ? this.userManager.signinSilent({extraTokenParams: params})
       : this.userManager.signinRedirect({extraQueryParams: params});
   }

@@ -40,8 +40,11 @@ export class ConversationDetailsPage {
   readonly searchList: Locator;
   readonly deleteGroupButton: Locator;
   readonly notificationsButton: Locator;
+  readonly devicesButton: Locator;
   readonly editConversationNameButton: Locator;
   readonly textFieldForConversationName: Locator;
+
+  readonly protocol: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -61,8 +64,11 @@ export class ConversationDetailsPage {
     this.searchList = this.page.locator('#add-participants').getByRole('list');
     this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
     this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
+    this.devicesButton = this.page.getByRole('button', {name: 'Devices'});
     this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
     this.textFieldForConversationName = this.page.locator('textarea[data-uie-name="enter-name"]');
+
+    this.protocol = this.conversationDetails.getByLabel('Protocol');
   }
 
   async waitForSidebar() {

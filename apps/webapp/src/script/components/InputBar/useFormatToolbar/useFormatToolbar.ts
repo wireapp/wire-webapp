@@ -24,7 +24,7 @@ import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {StorageKey} from 'Repositories/storage';
-import {EventName} from 'Repositories/tracking/EventName';
+import {EventName} from 'Repositories/tracking/eventName';
 import {Config} from 'src/script/Config';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
@@ -33,7 +33,7 @@ export const useFormatToolbar = () => {
     const messageFormatButtonsEnabled = Config.getConfig().FEATURE.ENABLE_MESSAGE_FORMAT_BUTTONS;
     const storageValue = loadValue<boolean>(StorageKey.INPUT.SHOW_FORMATTING);
 
-    if (storageValue && messageFormatButtonsEnabled) {
+    if (storageValue === true && messageFormatButtonsEnabled === true) {
       return storageValue;
     }
 

@@ -26,6 +26,7 @@ import {CellsNewNodeForm} from 'Components/Conversation/ConversationCells/common
 import {getCellsFilesPath} from 'Components/Conversation/ConversationCells/common/getCellsFilesPath/getCellsFilesPath';
 import {useCellsNewFolderForm} from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFolderForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {CellNode} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
 
@@ -50,6 +51,7 @@ export const CellsMoveNodeModal = ({
   conversationQualifiedId,
   conversationName,
 }: CellsMoveNodeModalProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [currentPath, setCurrentPath] = useState(() => getCellsFilesPath());
   const [activeModalContent, setActiveModalContent] = useState<'move' | 'create'>('move');
 
@@ -59,6 +61,7 @@ export const CellsMoveNodeModal = ({
     conversationQualifiedId,
     currentPath,
     enabled: isOpen,
+    fireAndForgetInvoker,
   });
 
   const {
@@ -84,7 +87,7 @@ export const CellsMoveNodeModal = ({
     cellsRepository,
     conversationQualifiedId,
     onSuccess: () => {
-      void refresh();
+      fireAndForgetInvoker.fireAndForget(refresh);
       setActiveModalContent('move');
     },
     currentPath,

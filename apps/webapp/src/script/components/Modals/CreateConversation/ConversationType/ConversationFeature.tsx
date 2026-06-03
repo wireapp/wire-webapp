@@ -19,7 +19,7 @@
 
 import {ShieldIcon} from '@wireapp/react-ui-kit';
 
-import {CheckIcon} from 'Components/Icon';
+import {CheckIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -43,11 +43,10 @@ export const ConversationFeature = ({conversationType}: ConversationFeatureProps
   ];
   const channelFeatures = [t('channelConversationFeature1'), t('channelConversationFeature2')];
 
-  const features = [...generalFeatures];
-
-  if (conversationType === ConversationType.Channel) {
-    features.splice(1, 0, ...channelFeatures);
-  }
+  const features =
+    conversationType === ConversationType.Channel
+      ? generalFeatures.toSpliced(1, 0, ...channelFeatures)
+      : generalFeatures;
 
   return (
     <div css={conversationFeatureContainerCss}>

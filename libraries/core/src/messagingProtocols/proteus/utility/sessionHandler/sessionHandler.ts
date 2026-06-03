@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {PreKey} from '@wireapp/api-client/lib/auth';
 import {QualifiedUserClients} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId, QualifiedUserPreKeyBundleMap} from '@wireapp/api-client/lib/user';
@@ -48,11 +49,16 @@ type InitSessionsResult = {
 const constructSessionId = ({userId, clientId}: ConstructSessionIdParams): string => {
   const {id, domain} = userId;
   const baseId = `${id}@${clientId}`;
-  return domain ? `${domain}@${baseId}` : baseId;
+  return is.nonEmptyString(domain) ? `${domain}@${baseId}` : baseId;
 };
 
-const isSessionId = (object: any): object is SessionId => {
-  return object.userId && object.clientId;
+const isSessionId = (value: unknown): value is SessionId => {
+  if (!is.object(value)) {
+    return false;
+  }
+
+  const sessionIdCandidate = value as {userId?: unknown; clientId?: unknown};
+  return is.nonEmptyString(sessionIdCandidate.userId) && is.nonEmptyString(sessionIdCandidate.clientId);
 };
 
 /**
@@ -118,7 +124,7 @@ const createSessions = async ({recipients, apiClient, cryptoClient}: CreateSessi
 
   return {
     ...result,
-    failed: failed?.length ? failed : undefined,
+    failed: failed !== undefined && failed.length > 0 ? failed : undefined,
   };
 };
 
@@ -263,7 +269,7 @@ type EncryptedPayloads<T> = Record<string, Record<string, Record<string, T>>>;
 const buildEncryptedPayloads = <T>(payloads: Map<string, T>): EncryptedPayloads<T> => {
   return [...payloads].reduce((acc, [sessionId, payload]) => {
     const {userId, domain, clientId} = parseSessionId(sessionId);
-    if (!domain) {
+    if (domain === undefined || domain.length === 0) {
       throw new Error('Invalid session ID');
     }
     const domainPayloads = acc[domain] ?? {};

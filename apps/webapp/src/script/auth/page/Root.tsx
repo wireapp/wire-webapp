@@ -19,6 +19,7 @@
 
 import {FC, ReactNode, useEffect} from 'react';
 
+import is from '@sindresorhus/is';
 import {pathWithParams} from '@wireapp/commons/lib/util/UrlUtil';
 import {IntlProvider} from 'react-intl';
 import {connect} from 'react-redux';
@@ -37,14 +38,14 @@ import {CustomBackend} from './CustomBackend';
 import {CustomEnvironmentRedirect} from './CustomEnvironmentRedirect';
 import {HistoryInfo} from './HistoryInfo';
 import {Index} from './Index';
-import {Login} from './Login';
+import {Login} from './login/login';
+import {SingleSignOn} from './login/singleSignOn';
 import {OAuthPermissions} from './OAuthPermissions';
 import {SetAccountType} from './SetAccountType';
 import {SetEmail} from './SetEmail';
 import {SetEntropyPage} from './SetEntropyPage';
 import {SetHandle} from './SetHandle';
 import {SetPassword} from './SetPassword';
-import {SingleSignOn} from './SingleSignOn';
 import {Success} from './Success';
 import {VerifyEmailCode} from './VerifyEmailCode';
 import {VerifyEmailLink} from './VerifyEmailLink';
@@ -113,19 +114,21 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
     return null;
   };
 
-  const isAuthenticatedCheck = (page: ReactNode): ReactNode =>
-    page ? (isAuthenticated ? page : navigate('/auth')) : null;
+  const isAuthenticatedCheck = (page: ReactNode): ReactNode => {
+    return isAuthenticated ? page : navigate('/auth');
+  };
 
   const isOAuthCheck = (page: ReactNode): ReactNode => {
-    if (page) {
-      if (isAuthenticated) {
-        return page;
-      }
-
-      const queryString = getOAuthQueryString(window.location);
-      return queryString ? <Navigate to={`${ROUTE.LOGIN}/${queryString}`} /> : <Navigate to={ROUTE.LOGIN} />;
+    if (isAuthenticated) {
+      return page;
     }
-    return null;
+
+    const queryString = getOAuthQueryString(window.location);
+    return is.nonEmptyString(queryString) ? (
+      <Navigate to={`${ROUTE.LOGIN}/${queryString}`} />
+    ) : (
+      <Navigate to={ROUTE.LOGIN} />
+    );
   };
 
   const ProtectedHistoryInfo = () => isAuthenticatedCheck(<HistoryInfo />);

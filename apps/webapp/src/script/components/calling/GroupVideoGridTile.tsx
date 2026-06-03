@@ -35,7 +35,7 @@ import {
   groupVideoPauseOverlayLabel,
   groupVideoTileWrapper,
 } from 'Components/calling/GroupVideoGridTile.styles';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import type {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
@@ -165,7 +165,7 @@ const GroupVideoGridTile = ({
         </span>
       )}
 
-      {!minimized && handRaisedAt && <span className="group-video-grid__element__label__hand_icon">✋</span>}
+      {!minimized && handRaisedAt != null && <span className="group-video-grid__element__label__hand_icon">✋</span>}
 
       {isMaximized && (
         <div className="group-video-grid__element__overlay">

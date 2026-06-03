@@ -28,7 +28,7 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserBlockedBadge, UserVerificationBadges} from 'Components/Badge';
 import {UserClassifiedBar} from 'Components/ClassifiedBar/ClassifiedBar';
 import {ErrorFallback} from 'Components/ErrorFallback';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {UserInfo} from 'Components/UserInfo';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -90,7 +90,7 @@ const UserDetailsComponent = ({
         hideAvailabilityStatus
       />
 
-      {badge && (
+      {badge != null && badge !== '' && (
         <div className="panel-participant__label panel-participant__label--external" data-uie-name="status-external">
           <Icon.ExternalIcon />
           <span>{badge}</span>
@@ -123,7 +123,7 @@ const UserDetailsComponent = ({
         </div>
       )}
 
-      {isGroupAdmin && (
+      {isGroupAdmin === true && (
         <div className="panel-participant__label" data-uie-name="status-admin">
           <Icon.GroupAdminIcon />
           <span>{t('conversationDetailsGroupAdmin')}</span>

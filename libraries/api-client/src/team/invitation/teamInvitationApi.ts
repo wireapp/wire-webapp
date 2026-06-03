@@ -109,7 +109,7 @@ export class TeamInvitationAPI {
     try {
       await this.client.sendJSON(config);
     } catch (error: unknown) {
-      if (axios.isAxiosError(error) && error.response?.status) {
+      if (axios.isAxiosError(error) && error.response?.status !== undefined) {
         const status = error.response?.status;
         switch (status) {
           case StatusCode.NOT_FOUND: {

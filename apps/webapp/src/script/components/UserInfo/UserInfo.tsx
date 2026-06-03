@@ -80,12 +80,12 @@ export const UserInfo = ({
         className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}
         css={{userSelect: 'none'}}
         data-uie-name="status-label"
-        title={title || name}
+        title={title ?? name}
       >
         <UserName user={user} />
       </span>
 
-      {selfString && <span css={selfIndicator}>{selfString}</span>}
+      {selfString !== undefined && selfString !== '' && <span css={selfIndicator}>{selfString}</span>}
 
       {children}
     </span>
@@ -110,7 +110,7 @@ export const UserInfo = ({
     content
   );
 
-  if (className) {
+  if (className !== undefined && className !== '') {
     return <span className={className}>{wrappedContent}</span>;
   }
 

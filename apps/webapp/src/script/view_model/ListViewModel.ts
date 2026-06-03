@@ -30,11 +30,11 @@ import type {ConversationRepository} from 'Repositories/conversation/Conversatio
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
@@ -99,10 +99,12 @@ export class ListViewModel {
 
     this.isProAccount = this.teamState.isTeam;
     this.selfUser = this.userState.self;
-    this.isActivatedAccount = ko.pureComputed(() => this.selfUser()?.isActivatedAccount());
+    this.isActivatedAccount = ko.pureComputed(() => {
+      return this.selfUser().isActivatedAccount();
+    });
 
     // State
-    this.lastUpdate = ko.observable();
+    this.lastUpdate = ko.observable(0);
 
     this.visibleListItems = ko.pureComputed(() => {
       const {listState} = useAppState.getState();
@@ -170,7 +172,7 @@ export class ListViewModel {
   readonly changeNotificationSetting = () => {
     if (this.isProAccount()) {
       const {rightSidebar} = useAppMainState.getState();
-      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation()});
+      rightSidebar.goTo(PanelState.NOTIFICATIONS, {entity: this.conversationState.activeConversation() ?? null});
     } else {
       this.clickToToggleMute();
     }
@@ -221,7 +223,7 @@ export class ListViewModel {
       return this.contentViewModel.switchContent(ContentState.CONNECTION_REQUESTS);
     }
 
-    if (nextItem) {
+    if (nextItem !== undefined) {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextItem, {});
     }
   };
@@ -237,7 +239,7 @@ export class ListViewModel {
 
     const nextPreference = iterateItem(this.visibleListItems(), activePreference, reverse) as ContentState;
 
-    if (nextPreference) {
+    if (nextPreference !== undefined) {
       this.contentViewModel.switchContent(nextPreference);
     }
   };
@@ -431,8 +433,8 @@ export class ListViewModel {
 
     if (!conversationEntity.isGroupOrChannel()) {
       const userEntity = conversationEntity.firstUserEntity();
-      const canBlock = userEntity && (userEntity.isConnected() || userEntity.isRequest());
-      const canUnblock = userEntity && userEntity.isBlocked();
+      const canBlock = userEntity !== undefined && (userEntity.isConnected() || userEntity.isRequest());
+      const canUnblock = userEntity !== undefined && userEntity.isBlocked();
 
       if (canBlock) {
         entries.push({
@@ -470,7 +472,7 @@ export class ListViewModel {
   };
 
   readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
-    if (this.isActivatedAccount()) {
+    if (this.isActivatedAccount() && conversationEntity !== undefined) {
       this.actionsViewModel.archiveConversation(conversationEntity);
     }
   };
@@ -478,7 +480,7 @@ export class ListViewModel {
   clickToBlock = async (conversationEntity: Conversation): Promise<void> => {
     const userEntity = conversationEntity.firstUserEntity();
 
-    if (!userEntity) {
+    if (userEntity === undefined) {
       return;
     }
 
@@ -487,7 +489,7 @@ export class ListViewModel {
 
   clickToUnblock = async (conversationEntity: Conversation): Promise<void> => {
     const userEntity = conversationEntity.firstUserEntity();
-    if (!userEntity) {
+    if (userEntity === undefined) {
       return;
     }
     await this.actionsViewModel.unblockUser(userEntity);
@@ -495,6 +497,9 @@ export class ListViewModel {
 
   readonly clickToCancelRequest = (conversationEntity: Conversation): void => {
     const userEntity = conversationEntity.firstUserEntity();
+    if (userEntity === undefined) {
+      return;
+    }
     const hideConversation = this.shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
 
@@ -502,7 +507,9 @@ export class ListViewModel {
   };
 
   readonly clickToClear = (conversationEntity = this.conversationState.activeConversation()): void => {
-    this.actionsViewModel.clearConversation(conversationEntity);
+    if (conversationEntity !== undefined) {
+      this.actionsViewModel.clearConversation(conversationEntity);
+    }
   };
 
   readonly clickToLeave = (conversationEntity: Conversation): void => {
@@ -510,7 +517,9 @@ export class ListViewModel {
   };
 
   readonly clickToToggleMute = (conversationEntity = this.conversationState.activeConversation()): void => {
-    this.actionsViewModel.toggleMuteConversation(conversationEntity);
+    if (conversationEntity !== undefined) {
+      this.actionsViewModel.toggleMuteConversation(conversationEntity);
+    }
   };
 
   readonly clickToOpenNotificationSettings = (

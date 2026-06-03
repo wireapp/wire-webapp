@@ -17,7 +17,7 @@
  *
  */
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {CallMessage as CallMessageEntity} from 'Repositories/entity/message/CallMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 

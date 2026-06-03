@@ -210,7 +210,7 @@ const GuestLoginColumn = ({
                     .
                   </span>
                 </Checkbox>
-                {error ? parseValidationErrors(error) : parseError(conversationError)}
+                {error !== null && error !== undefined ? parseValidationErrors(error) : parseError(conversationError)}
                 {isSubmitingName ? (
                   <Loading size={32} />
                 ) : (

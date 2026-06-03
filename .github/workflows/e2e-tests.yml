@@ -12,14 +12,11 @@ on:
         options:
           - https://wire-webapp-dev.zinfra.io/
           - https://wire-webapp-master.zinfra.io/
-          - https://wire-webapp-edge.wire.com/
-          - https://wire-webapp-staging.wire.com/
       backendUrl:
         type: choice
-        description: Define which backend should be used (make sure this matches the one used by the stage set for webappUrl)
+        description: Define which backend should be used
         options:
           - https://staging-nginz-https.zinfra.io/
-          - https://prod-nginz-https.wire.com/
       grep:
         type: string
         description: Define which tests to run, the given value will be passed to the `--grep` flag of playwright
@@ -73,6 +70,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -106,6 +105,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -130,7 +131,7 @@ jobs:
     timeout-minutes: 45
     needs: [bootstrap_smoke_test, compute_shards]
     container:
-      image: mcr.microsoft.com/playwright:v1.59.1-noble
+      image: mcr.microsoft.com/playwright:v1.60.0-noble
       options: --ipc=host
 
     strategy:
@@ -148,6 +149,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -206,6 +209,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -221,43 +226,14 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
 
-      - name: Check for blob reports
-        id: check_blob_reports
-        run: |
-          if [ -d "${{ env.PLAYWRIGHT_REPORT_PATH }}/blob-reports" ]; then
-            echo "has_blob_reports=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_blob_reports=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      # Merge reports and delete blob reports and zip archives for traces, only keep resources to include within the artifact
       - name: Merge playwright reports
-        if: ${{ steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
         working-directory: apps/webapp
         run: |
           yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
           rm -rf playwright-report/blob-reports
 
-      - name: Delete trace artifacts
-        if: ${{ !inputs.keep_traces && steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
-        working-directory: apps/webapp
-        run: |
-          if [ -d "playwright-report/html/data" ]; then
-            DELETED_COUNT=$(find playwright-report/html/data -name "*.zip" -type f -delete -print)
-            echo "Deleted $DELETED_COUNT trace archive files"
-          else
-            echo "Trace data directory not found, skipping trace cleanup"
-          fi
-
-      - name: Delete blob report artifacts
-        if: ${{ always() && steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
-        uses: geekyeggo/delete-artifact@d79b2442431e4adbc383d29a28e630374eceb303
-        with:
-          name: blob-report-*
-
       - name: Upload test report
         id: upload_playwright_report
-        if: ${{ steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: playwright-report
@@ -269,54 +245,8 @@ jobs:
           echo "reportUrl=${{ steps.upload_playwright_report.outputs.artifact-url }}" >> $GITHUB_OUTPUT
           echo "reportArtifactId=${{ steps.upload_playwright_report.outputs.artifact-id }}" >> $GITHUB_OUTPUT
 
-      - name: Extract test results
-        id: test-results
-        if: ${{ steps.check_blob_reports.outputs.has_blob_reports == 'true' }}
-        run: |
-          REPORT="${{ env.PLAYWRIGHT_REPORT_PATH }}/report.json"
-          if [ ! -f "$REPORT" ]; then
-            echo "::error::Report file not found at $REPORT"
-            exit 1
-          fi
-          PASSED=$(jq '.stats.expected' "$REPORT")
-          FAILED=$(jq '.stats.unexpected' "$REPORT")
-          SKIPPED=$(jq '.stats.skipped' "$REPORT")
-          FLAKY=$(jq '.stats.flaky' "$REPORT")
-          TOTAL=$((PASSED + FAILED + SKIPPED + FLAKY))
-          echo "passed=$PASSED" >> $GITHUB_OUTPUT
-          echo "failed=$FAILED" >> $GITHUB_OUTPUT
-          echo "skipped=$SKIPPED" >> $GITHUB_OUTPUT
-          echo "flaky=$FLAKY" >> $GITHUB_OUTPUT
-          echo "total=$TOTAL" >> $GITHUB_OUTPUT
-
-      - name: Notify on Wire if succeeded
-        if: needs.test.result == 'success' && env.SLACK_WEBHOOK_URL != ''
-        continue-on-error: true
-        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
-        with:
-          status: custom
-          custom_payload: |
-            {
-              "text": "✅ Web E2E Tests succeeded ✅\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*Triggered by:* ${{ github.triggering_actor }}\n*Report:* ${{ steps.upload_playwright_report.outputs.artifact-url }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
-
-      - name: Notify on Wire if failed
-        if: needs.test.result == 'failure' && env.SLACK_WEBHOOK_URL != ''
-        continue-on-error: true
-        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_E2E_TEST_BOT_WEBHOOK_URL }}
-        with:
-          status: custom
-          custom_payload: |
-            {
-              "text": "❌ Web E2E Tests failed ❌\n*Results:* ${{ steps.test-results.outputs.passed }}/${{ steps.test-results.outputs.total }} passed · ${{ steps.test-results.outputs.failed }} failed · ${{ steps.test-results.outputs.flaky }} flaky · ${{ steps.test-results.outputs.skipped }} skipped\n*Triggered by:* ${{ github.triggering_actor }}\n*Report:* ${{ steps.upload_playwright_report.outputs.artifact-url }}\n*Build log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }
-
       - name: Update Testiny Run with results
-        if: ${{ inputs.testinyRunName }}
+        if: ${{ success() && inputs.testinyRunName }}
         env:
           TESTINY_API_KEY: ${{ secrets.TESTINY_API_KEY }}
           TESTINY_RUN_NAME: ${{ inputs.testinyRunName }}

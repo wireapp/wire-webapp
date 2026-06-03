@@ -51,7 +51,7 @@ import {BrowserPermissionStatus} from 'Repositories/permission/BrowserPermission
 import {getPermissionState, setPermissionState} from 'Repositories/permission/permissionHandlers';
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {Declension, t, getUserName} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
@@ -90,7 +90,7 @@ interface WebappNotifications extends Notification {
 export class NotificationRepository {
   private readonly conversationRepository: ConversationRepository;
   private readonly logger: Logger;
-  readonly notifications: WebappNotifications[];
+  notifications: ReadonlyArray<WebappNotifications>;
   private readonly notificationsPreference: ko.Observable<NotificationPreference>;
   private readonly assetRepository: AssetRepository;
   private isSoftLock = false;
@@ -328,6 +328,9 @@ export class NotificationRepository {
 
     if (messageEntity.hasAsset()) {
       const assetEntity = messageEntity.getFirstAsset();
+      if (assetEntity === undefined) {
+        return undefined;
+      }
 
       if (assetEntity.isAudio()) {
         return t('notificationSharedAudio');
@@ -874,7 +877,7 @@ export class NotificationRepository {
 
     notification.onclose = () => {
       window.clearTimeout(timeoutTriggerId);
-      this.notifications.splice(this.notifications.indexOf(notification), 1);
+      this.notifications = this.notifications.toSpliced(this.notifications.indexOf(notification), 1);
       this.logger.info(`Removed notification for ${messageInfo} in '${conversationId?.id || conversationId}' locally.`);
     };
 
@@ -895,7 +898,7 @@ export class NotificationRepository {
       }, notificationContent.timeout);
     };
 
-    this.notifications.push(notification);
+    this.notifications = this.notifications.concat(notification);
     this.logger.info(`Added notification for ${messageInfo} in '${conversationId?.id || conversationId}' to queue.`);
   }
 

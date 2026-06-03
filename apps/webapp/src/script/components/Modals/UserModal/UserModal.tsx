@@ -17,7 +17,7 @@
  *
  */
 
-import {useContext, useEffect, useState} from 'react';
+import {ReactNode, useContext, useEffect, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import cx from 'classnames';
@@ -26,24 +26,33 @@ import {container} from 'tsyringe';
 import {TabIndex, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {UserActions} from 'Components/panel/UserActions';
 import {UserDetails} from 'Components/panel/UserDetails';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 
 import {useUserModalState} from './UserModal.state';
-import {userModalStyle, userModalWrapperStyle} from './UserModal.styles';
+import {
+  unverifiedUserWarningIconStyle,
+  unverifiedUserWarningLinkStyle,
+  unverifiedUserWarningMessageCenteredStyle,
+  unverifiedUserWarningMessageStyle,
+  unverifiedUserWarningRowStyle,
+  unverifiedUserWarningStyle,
+  userModalStyle,
+  userModalWrapperStyle,
+} from './UserModal.styles';
 
 import {Config} from '../../../Config';
 import {RootContext} from '../../../page/RootProvider';
-import {Core} from '../../../service/CoreSingleton';
+import {Core} from '../../../service/coreSingleton';
 
 export interface UserModalProps {
   userRepository: UserRepository;
@@ -101,21 +110,66 @@ interface UnverifiedUserWarningProps {
   user?: User;
 }
 
-export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
+interface UserModalWarningMessageProps {
+  content: ReactNode;
+  showIcon?: boolean;
+  textAlignCenter?: boolean;
+  linkText: string;
+  href: string;
+}
+
+const UserModalWarningMessage = ({
+  content,
+  href,
+  linkText,
+  showIcon = false,
+  textAlignCenter = false,
+}: UserModalWarningMessageProps) => {
   return (
-    <div css={{display: 'flex', color: 'var(--danger-color)', fill: 'var(--danger-color)', margin: '1em 0'}}>
-      <Icon.InfoIcon css={{height: '1rem', margin: '0.15em 1em', minWidth: '1rem'}} />
-      <p css={{fontSize: 'var(--font-size-medium)'}}>
-        {user ? t('userNotVerified', {user: user.name()}) : t('conversationConnectionVerificationWarning')}
-        <Link
-          css={{fontSize: 'var(--font-size-medium)', margin: '0 0.2em'}}
-          variant={LinkVariant.PRIMARY}
-          targetBlank
-          href={Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS}
-        >
-          {t('modalUserLearnMore')}
+    <div
+      css={[showIcon && unverifiedUserWarningRowStyle, textAlignCenter && unverifiedUserWarningMessageCenteredStyle]}
+    >
+      {showIcon && <Icon.InfoIcon css={unverifiedUserWarningIconStyle} />}
+      <p css={unverifiedUserWarningMessageStyle}>
+        {content}
+        <Link css={unverifiedUserWarningLinkStyle} variant={LinkVariant.PRIMARY} targetBlank href={href}>
+          {linkText}
         </Link>
       </p>
+    </div>
+  );
+};
+
+export const UnverifiedUserWarning = ({user}: UnverifiedUserWarningProps) => {
+  const learnMoreHref = Config.getConfig().URL.SUPPORT.PRIVACY_UNVERIFIED_USERS;
+
+  if (user !== undefined) {
+    return (
+      <div css={unverifiedUserWarningStyle}>
+        <UserModalWarningMessage
+          content={t('userNotVerified', {user: user.name()})}
+          href={learnMoreHref}
+          linkText={t('modalUserLearnMore')}
+          showIcon
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div css={unverifiedUserWarningStyle}>
+      <UserModalWarningMessage
+        content={t('conversationConnectionVerificationWarning')}
+        href={learnMoreHref}
+        linkText={t('modalUserLearnMore')}
+        textAlignCenter
+      />
+      <UserModalWarningMessage
+        content={t('conversationConnectionSupportWarning')}
+        href={learnMoreHref}
+        linkText={t('conversationConnectionReportMisuse')}
+        textAlignCenter
+      />
     </div>
   );
 };
@@ -148,10 +202,16 @@ const UserModal = ({
   } = useKoSubscribableChildren(selfUser, ['is_trusted', 'isActivatedAccount', 'isTemporaryGuest']);
   const isFederated = core.backendFeatures?.isFederated;
 
-  const isSameTeam = user && user.teamId && selfUser.teamId && user.teamId === selfUser.teamId;
+  const isSameTeam =
+    user !== null &&
+    user.teamId !== undefined &&
+    user.teamId !== '' &&
+    selfUser.teamId !== undefined &&
+    selfUser.teamId !== '' &&
+    user.teamId === selfUser.teamId;
 
   useEffect(() => {
-    if (userId) {
+    if (userId !== null) {
       userRepository
         // We want to get the fresh version of the user from backend (in case the user was deleted)
         .refreshUser(userId)
@@ -170,7 +230,7 @@ const UserModal = ({
       setUser(null);
       setUserNotFound(false);
     };
-  }, [userId?.id, userId?.domain]);
+  }, [userId, userRepository]);
 
   return (
     <ModalComponent
@@ -217,7 +277,7 @@ const UserModal = ({
               showAvailability={isTeam && !isTemporaryGuest && teamState.isInTeam(user)}
             />
 
-            {!isTrusted && !isSameTeam && <UnverifiedUserWarning user={user} />}
+            {isTrusted === false && !isSameTeam && <UnverifiedUserWarning user={user} />}
 
             <UserModalUserActionsSection
               user={user}

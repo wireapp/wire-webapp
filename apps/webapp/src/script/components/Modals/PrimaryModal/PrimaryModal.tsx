@@ -139,7 +139,7 @@ export const PrimaryModalComponent: FC = () => {
     (!isGuestLinkPassword || !!passwordValue.trim().length) && areGuestLinkPasswordsValid;
 
   const isPrimaryActionDisabled = (disabled: boolean | undefined) => {
-    if (!!disabled) {
+    if (disabled === true) {
       return true;
     }
     if (isConfirm) {
@@ -202,7 +202,7 @@ export const PrimaryModalComponent: FC = () => {
 
   const onOptionChange = (event: ChangeEvent<HTMLInputElement>) => {
     updateOptionChecked(event.target.checked);
-    if (primaryActionButtonRef && primaryActionButtonRef.current) {
+    if (primaryActionButtonRef.current) {
       primaryActionButtonRef.current.focus();
     }
   };
@@ -264,11 +264,11 @@ export const PrimaryModalComponent: FC = () => {
   }, [isModalVisible, primaryAction, closeAction, onKeyDown]);
 
   const secondaryButtons = secondaryActions
-    .filter((action): action is ButtonAction => action !== null && !!action.text)
+    .filter((action): action is ButtonAction => action !== null && action.text !== undefined && action.text !== '')
     .map(action => (
       <SecondaryButton
         key={`${action.text}-${action.uieName}`}
-        onClick={performAction(action.action, !!closeOnSecondaryAction, true)}
+        onClick={performAction(action.action, closeOnSecondaryAction ?? false, true)}
         disabled={action.disabled}
         fullWidth={hasMultipleSecondary || allButtonsFullWidth}
         uieName={action.uieName}
@@ -277,11 +277,11 @@ export const PrimaryModalComponent: FC = () => {
       </SecondaryButton>
     ));
 
-  const primaryButton = !!primaryAction?.text && (
+  const primaryButton = primaryAction?.text !== undefined && primaryAction.text !== '' && (
     <PrimaryButton
       key="modal-primary-button"
       ref={primaryActionButtonRef}
-      onClick={performAction(confirm, !!closeOnConfirm)}
+      onClick={performAction(confirm, closeOnConfirm ?? false)}
       disabled={isPrimaryActionDisabled(primaryAction.disabled)}
       fullWidth={hasMultipleSecondary || allButtonsFullWidth}
     >
@@ -290,7 +290,7 @@ export const PrimaryModalComponent: FC = () => {
   );
 
   const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
-  const isPasswordFieldValid = isFormSubmitted && !passwordValueRef.current?.validity.valid;
+  const isPasswordFieldValid = isFormSubmitted && passwordValueRef.current?.validity.valid === false;
 
   const backupPasswordHint = t('backupPasswordHint', {
     minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
@@ -318,7 +318,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isGuestLinkPassword && (
           <GuestLinkPasswordForm
-            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             onGeneratePassword={password => {
               setPasswordValue(password);
               setPasswordConfirmationValue(password);
@@ -334,7 +334,7 @@ export const PrimaryModalComponent: FC = () => {
           />
         )}
 
-        {copyPassword && (
+        {copyPassword === true && (
           <CopyToClipboardButton
             disabled={!passwordGuestLinkActionEnabled}
             textToCopy={passwordValue}
@@ -346,7 +346,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isPassword && (
           <PasswordForm
-            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             inputPlaceholder={inputPlaceholder}
             inputValue={passwordValue}
             onInputChange={setPasswordValue}
@@ -355,7 +355,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isJoinGuestLinkPassword && (
           <JoinGuestLinkPasswordForm
-            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             inputValue={passwordValue}
             onInputChange={setPasswordValue}
           />
@@ -363,27 +363,28 @@ export const PrimaryModalComponent: FC = () => {
 
         {hasPasswordWithRules && (
           <PasswordAdvancedSecurityForm
-            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             inputValue={passwordInput}
             inputPlaceholder={inputPlaceholder}
             isInputInvalid={isFormSubmitted && !isBackupPasswordValid}
             onInputChange={updatePasswordWithRules}
             inputHelperText={backupPasswordHint}
-            {...(isFormSubmitted &&
-              !isBackupPasswordValid && {error: <ErrorMessage>{backupPasswordHint}</ErrorMessage>})}
+            {...(isFormSubmitted && !isBackupPasswordValid
+              ? {error: <ErrorMessage>{backupPasswordHint}</ErrorMessage>}
+              : {})}
           />
         )}
 
         {isInput && (
           <InputForm
-            onSubmit={performAction(confirm, !!closeOnConfirm)}
+            onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             inputValue={inputValue}
             inputPlaceholder={inputPlaceholder}
             onInputChange={updateInputValue}
           />
         )}
 
-        {errorMessage && <div className="modal__input__error">{errorMessage}</div>}
+        {errorMessage !== undefined && errorMessage !== '' && <div className="modal__input__error">{errorMessage}</div>}
 
         {isOption && <CheckboxOption isChecked={optionChecked} onChange={onOptionChange} label={checkboxLabel} />}
 

@@ -22,13 +22,13 @@ import {FC, useMemo, useState} from 'react';
 import cx from 'classnames';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {UserList} from 'Components/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
@@ -91,7 +91,7 @@ const MessageDetails: FC<MessageDetailsProps> = ({
 
   const receiptUsers = userRepository
     .findUsersByIds(readReceipts.map(({userId, domain}) => ({domain: domain || '', id: userId})))
-    .sort(sortUsers);
+    .toSorted(sortUsers);
 
   const supportsReactions = useMemo(() => {
     const isPing = messageEntity.super_type === SuperType.PING;

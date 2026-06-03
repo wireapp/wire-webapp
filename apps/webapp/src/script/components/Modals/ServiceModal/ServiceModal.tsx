@@ -18,7 +18,7 @@
  */
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
@@ -51,45 +51,43 @@ const ServiceModal = ({service, avatarSize = AVATAR_SIZE.LARGE, actionsViewModel
   return (
     <div className="service-modal" data-uie-name="modal-service">
       <ModalComponent isShown onClosed={onClose} onBgClick={onClose} data-uie-name="group-creation-label">
-        {service && (
-          <>
-            <div className="modal__header">
-              <button className="modal__header__button" type="button" onClick={onClose} data-uie-name="do-close">
-                <Icon.CloseIcon />
-              </button>
-            </div>
+        <>
+          <div className="modal__header">
+            <button className="modal__header__button" type="button" onClick={onClose} data-uie-name="do-close">
+              <Icon.CloseIcon />
+            </button>
+          </div>
 
-            <div className="modal__body service-modal__body">
-              <div className="service-modal__details">
-                <Avatar participant={service} avatarSize={avatarSize} />
+          <div className="modal__body service-modal__body">
+            <div className="service-modal__details">
+              <Avatar participant={service} avatarSize={avatarSize} />
 
-                <div className="service-modal__details__content">
-                  <h2 className="service-modal__name" data-uie-name="status-service-name">
-                    {name}
-                  </h2>
+              <div className="service-modal__details__content">
+                <h2 className="service-modal__name" data-uie-name="status-service-name">
+                  {name}
+                </h2>
 
-                  <div className="service-modal__provider" data-uie-name="status-service-provider">
-                    {providerName}
-                  </div>
+                <div className="service-modal__provider" data-uie-name="status-service-provider">
+                  {providerName}
                 </div>
               </div>
-
-              <div className="service-modal__description" data-uie-name="status-service-description">
-                {service.description}
-              </div>
             </div>
 
-            <div className="service-modal__footer">
-              <button
-                className="service-modal__button modal__button--primary"
-                onClick={onOpenService}
-                data-uie-name="do-service-confirm"
-              >
-                {t('searchServiceConfirmButton')}
-              </button>
+            <div className="service-modal__description" data-uie-name="status-service-description">
+              {service.description}
             </div>
-          </>
-        )}
+          </div>
+
+          <div className="service-modal__footer">
+            <button
+              className="service-modal__button modal__button--primary"
+              onClick={onOpenService}
+              data-uie-name="do-service-confirm"
+            >
+              {t('searchServiceConfirmButton')}
+            </button>
+          </div>
+        </>
       </ModalComponent>
     </div>
   );

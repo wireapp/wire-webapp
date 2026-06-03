@@ -46,6 +46,7 @@ import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
+import {sharedDriveSearchAndFiltersFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
@@ -55,6 +56,12 @@ import {getLogger} from 'Util/logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
 import {formatBytes} from 'Util/util';
 
+import {
+  searchResultsHeadingStyles,
+  searchResultsOverlayStyles,
+  tabsHiddenStyles,
+  tabsWrapperStyles,
+} from './Conversation.styles';
 import {ConversationCells} from './ConversationCells/ConversationCells';
 import {ConversationFileDropzone} from './ConversationFileDropzone/ConversationFileDropzone';
 import {ConversationMessagesWrapper} from './ConversationMessagesWrapper/ConversationMessagesWrapper';
@@ -65,13 +72,13 @@ import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
 import {useFilesUploadDropzone} from './useFilesUploadDropzone/useFilesUploadDropzone';
 import {checkFileSharingPermission} from './utils/checkFileSharingPermission';
 
-import {UserError} from '../../error/UserError';
+import {UserError} from '../../error/userError';
 import {isMouseRightClickEvent, isAuxRightClickEvent} from '../../guards/Mouse';
 import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
-import {useMainViewModel} from '../../page/RootProvider';
+import {useApplicationContext, useMainViewModel} from '../../page/RootProvider';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
@@ -96,12 +103,15 @@ export const Conversation = ({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
+  const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
 
   const [isConversationLoaded, setIsConversationLoaded] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
   const [isGiphyModalOpen, setIsGiphyModalOpen] = useState<boolean>(false);
+  const [isSharedDriveSearchViewOpen, setIsSharedDriveSearchViewOpen] = useState<boolean>(false);
 
   const conversationState = container.resolve(ConversationState);
   const callState = container.resolve(CallState);
@@ -182,12 +192,14 @@ export const Conversation = ({
       if (!allowsAllFiles()) {
         for (const file of fileArray) {
           if (!hasAllowedExtension(file.name)) {
-            conversationRepository.injectFileTypeRestrictedMessage(
-              activeConversation,
-              selfUser,
-              false,
-              getFileExtensionOrName(file.name),
-            );
+            fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+              await conversationRepository.injectFileTypeRestrictedMessage(
+                activeConversation,
+                selfUser,
+                false,
+                getFileExtensionOrName(file.name),
+              );
+            });
 
             return;
           }
@@ -211,7 +223,15 @@ export const Conversation = ({
         repositories.message.uploadFiles(activeConversation, files);
       }
     },
-    [activeConversation, conversationRepository, inTeam, repositories.asset, repositories.message, selfUser],
+    [
+      activeConversation,
+      conversationRepository,
+      fireAndForgetInvoker,
+      inTeam,
+      repositories.asset,
+      repositories.message,
+      selfUser,
+    ],
   );
 
   const uploadDroppedFiles = useCallback(
@@ -251,7 +271,9 @@ export const Conversation = ({
   const clickOnCancelRequest = (messageEntity: MemberMessage): void => {
     if (activeConversation) {
       const nextConversationEntity = conversationRepository.getNextConversation(activeConversation);
-      mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await mainViewModel.actions.cancelConnectionRequest(messageEntity.otherUser(), true, nextConversationEntity);
+      });
     }
   };
 
@@ -272,9 +294,11 @@ export const Conversation = ({
 
     const panelId = userEntity.isService ? PanelState.GROUP_PARTICIPANT_SERVICE : PanelState.GROUP_PARTICIPANT_USER;
 
-    const serviceEntity = userEntity.isService && (await repositories.integration.getServiceFromUser(userEntity));
+    const serviceEntity = userEntity.isService
+      ? await repositories.integration.getServiceFromUser(userEntity)
+      : undefined;
 
-    openRightSidebar(panelId, {entity: serviceEntity || userEntity}, true);
+    openRightSidebar(panelId, {entity: serviceEntity ?? userEntity}, true);
   };
 
   const showParticipants = (participants: User[]) => {
@@ -323,7 +347,9 @@ export const Conversation = ({
 
     if (parsed?.type === 'user-profile') {
       event.preventDefault();
-      void openUserProfile(parsed.id, parsed.domain);
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await openUserProfile(parsed.id, parsed.domain);
+      });
       return false;
     }
 
@@ -359,17 +385,17 @@ export const Conversation = ({
     const userId = messageDetails.userId;
     const domain = messageDetails.userDomain;
 
-    if (userId) {
-      (async () => {
+    if (userId !== undefined && userId.length > 0) {
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         try {
-          const userEntity = await repositories.user.getUserById({domain: domain || '', id: userId});
-          showUserDetails(userEntity);
+          const userEntity = await repositories.user.getUserById({domain: domain ?? '', id: userId});
+          await showUserDetails(userEntity);
         } catch (error: unknown) {
           if (error instanceof UserError && error.type !== UserError.TYPE.USER_NOT_FOUND) {
             throw error;
           }
         }
-      })();
+      });
     }
   };
 
@@ -412,6 +438,7 @@ export const Conversation = ({
       assetRepository: repositories.asset,
       conversationRepository: repositories.conversation,
       currentMessageEntity: messageEntity,
+      fireAndForgetInvoker,
       messageRepository: repositories.message,
       selfUser,
     });
@@ -425,7 +452,7 @@ export const Conversation = ({
     };
 
     try {
-      if (messageEntity.fromDomain && activeConversation) {
+      if (messageEntity.fromDomain !== undefined && messageEntity.fromDomain.length > 0 && activeConversation) {
         await repositories.message.resetSession(
           {domain: messageEntity.fromDomain, id: messageEntity.from},
           messageEntity.clientId,
@@ -447,7 +474,9 @@ export const Conversation = ({
     // if no message provided it means we need to jump to the last message
     if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
       conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
-      repositories.message.markAsRead(conversationEntity);
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await repositories.message.markAsRead(conversationEntity);
+      });
     }
   };
 
@@ -460,7 +489,9 @@ export const Conversation = ({
       if (!messageEntity.isEphemeral()) {
         const isCreationMessage = messageEntity.isMember() && messageEntity.isCreation();
         if (conversationEntity.is1to1() && isCreationMessage) {
-          repositories.integration.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
+          fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+            await repositories.integration.addProviderNameToParticipant((messageEntity as MemberMessage).otherUser());
+          });
         }
       }
 
@@ -513,13 +544,25 @@ export const Conversation = ({
         return document.hasFocus() ? trigger() : window.addEventListener('focus', () => trigger(), {once: true});
       };
     },
-    [addReadReceiptToBatch, repositories.conversation, repositories.integration, updateConversationLastRead],
+    [
+      addReadReceiptToBatch,
+      fireAndForgetInvoker,
+      repositories.conversation,
+      repositories.integration,
+      updateConversationLastRead,
+    ],
   );
 
   const isFileTabActive = activeTabIndex === 1;
 
   const isCellsEnabled =
     Config.getConfig().FEATURE.ENABLE_CELLS && activeConversation?.cellsState() !== CONVERSATION_CELLS_STATE.DISABLED;
+
+  useEffect(() => {
+    if ((!isFileTabActive || !isSharedDriveSearchAndFiltersEnabled) && isSharedDriveSearchViewOpen) {
+      setIsSharedDriveSearchViewOpen(false);
+    }
+  }, [isFileTabActive, isSharedDriveSearchAndFiltersEnabled, isSharedDriveSearchViewOpen]);
 
   const {getRootProps, getInputProps, openAllFilesView, openImageFilesView, handlePastedFile, isDragAccept} =
     useFilesUploadDropzone({
@@ -551,16 +594,32 @@ export const Conversation = ({
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
             isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
-            withBottomDivider={!isCellsEnabled}
+            withBottomDivider={!isCellsEnabled || (isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen)}
+            isSharedDriveSearchViewOpen={isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen}
+            onCloseSharedDriveSearchView={() => setIsSharedDriveSearchViewOpen(false)}
           />
 
           {isCellsEnabled && (
             <>
-              <ConversationTabs
-                activeTabIndex={activeTabIndex}
-                onIndexChange={setActiveTabIndex}
-                conversationQualifiedId={activeConversation.qualifiedId}
-              />
+              <div css={tabsWrapperStyles}>
+                <div
+                  aria-hidden={(isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen) || undefined}
+                  css={
+                    isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen ? tabsHiddenStyles : undefined
+                  }
+                >
+                  <ConversationTabs
+                    activeTabIndex={activeTabIndex}
+                    onIndexChange={setActiveTabIndex}
+                    conversationQualifiedId={activeConversation.qualifiedId}
+                  />
+                </div>
+                {isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen && (
+                  <div css={searchResultsOverlayStyles}>
+                    <h3 css={searchResultsHeadingStyles}>Search results</h3>
+                  </div>
+                )}
+              </div>
               <ConversationTabPanel id="files" isActive={isFileTabActive}>
                 {isFileTabActive && (
                   <ConversationCells
@@ -568,6 +627,12 @@ export const Conversation = ({
                     userRepository={repositories.user}
                     cellsRepository={repositories.cells}
                     conversationRepository={conversationRepository}
+                    isSearchViewOpen={isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen}
+                    onOpenSearchView={() => {
+                      if (isSharedDriveSearchAndFiltersEnabled) {
+                        setIsSharedDriveSearchViewOpen(true);
+                      }
+                    }}
                   />
                 )}
               </ConversationTabPanel>

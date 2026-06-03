@@ -23,7 +23,7 @@ import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {EventError} from 'src/script/error/EventError';
+import {EventError} from 'src/script/error/eventError';
 import {
   createAssetAddEvent,
   createMemberLeaveEvent,

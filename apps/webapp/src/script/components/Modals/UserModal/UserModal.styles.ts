@@ -59,3 +59,32 @@ export const userModalWrapperStyle: CSSObject = {
   maxHeight: '90vh',
   padding: 0,
 };
+
+export const unverifiedUserWarningStyle: CSSObject = {
+  color: 'var(--danger-color)',
+  margin: '1em 0',
+};
+
+export const unverifiedUserWarningMessageStyle: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
+};
+
+export const unverifiedUserWarningMessageCenteredStyle: CSSObject = {
+  textAlign: 'center',
+};
+
+export const unverifiedUserWarningRowStyle: CSSObject = {
+  display: 'flex',
+  fill: 'var(--danger-color)',
+};
+
+export const unverifiedUserWarningIconStyle: CSSObject = {
+  height: '1rem',
+  margin: '0.15em 1em',
+  minWidth: '1rem',
+};
+
+export const unverifiedUserWarningLinkStyle: CSSObject = {
+  fontSize: 'var(--font-size-medium)',
+  margin: '0 0.2em',
+};

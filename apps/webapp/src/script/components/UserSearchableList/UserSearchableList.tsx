@@ -26,9 +26,10 @@ import {useDebouncedCallback} from 'use-debounce';
 import {UserList} from 'Components/UserList';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {partition} from 'Util/arrayUtil';
 import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -68,6 +69,7 @@ export const UserSearchableList = ({
   teamState = container.resolve(TeamState),
   ...props
 }: UserListProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
   const {conversationState = container.resolve(ConversationState)} = props;
 
@@ -114,12 +116,16 @@ export const UserSearchableList = ({
           user.username() === normalizedQuery,
       );
 
-    if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch) {
-      fetchMembersFromBackend(filter, results);
+    if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch === true) {
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await fetchMembersFromBackend(filter, results);
+      });
     }
 
-    if (!selfFirst) {
-      void setUsers(results);
+    if (selfFirst !== true) {
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await setUsers(results);
+      });
       return;
     }
 
@@ -127,15 +133,17 @@ export const UserSearchableList = ({
     const [selfUser, otherUsers] = partition(results, user => user.isMe);
 
     const concatUsers = selfUser.concat(otherUsers);
-    void setUsers(concatUsers);
-  }, [filter, users.length]);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await setUsers(concatUsers);
+    });
+  }, [filter, fireAndForgetInvoker, users.length]);
 
   const foundUserEntities = () => {
     if (!remoteTeamMembers.length) {
       return filteredUsers;
     }
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
-    return [...filteredUsers, ...remoteTeamMembers].sort((userA, userB) =>
+    return [...filteredUsers, ...remoteTeamMembers].toSorted((userA, userB) =>
       sortByPriority(userA.name(), userB.name(), normalizedQuery),
     );
   };
@@ -152,7 +160,7 @@ export const UserSearchableList = ({
 
   const userList = foundUserEntities().filter(
     user =>
-      !props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)) &&
+      props.excludeUsers?.some(excludeId => matchQualifiedIds(user.qualifiedId, excludeId)) !== true &&
       user.type === UserType.REGULAR,
   );
   const isEmptyUserList = userList.length === 0;

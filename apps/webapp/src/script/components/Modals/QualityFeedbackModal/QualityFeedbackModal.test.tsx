@@ -30,9 +30,9 @@ import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {Call} from 'Repositories/calling/Call';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {User} from 'Repositories/entity/User';
-import {EventName} from 'Repositories/tracking/EventName';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
-import {UserState} from 'Repositories/user/UserState';
+import {EventName} from 'Repositories/tracking/eventName';
+import {Segmentation} from 'Repositories/tracking/segmentation';
+import {UserState} from 'Repositories/user/userState';
 import {TestFactory} from 'test/helper/TestFactory';
 import {t} from 'Util/localizerUtil';
 
@@ -46,7 +46,7 @@ import {
   withTheme,
 } from '../../../auth/util/test/TestUtil';
 
-jest.mock('Repositories/tracking/Telemetry.helpers', () => ({
+jest.mock('Repositories/tracking/telemetry.helpers', () => ({
   isTelemetryEnabledAtCurrentEnvironment: () => true,
 }));
 

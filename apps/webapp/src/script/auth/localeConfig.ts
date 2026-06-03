@@ -20,15 +20,15 @@
 import {UrlUtil} from '@wireapp/commons';
 
 import {QUERY_KEY} from './route';
-import {supportedLocales as Locales} from './supportedLocales';
+import {Locales, SupportedLocale} from './supportedLocales';
 
-const DEFAULT_LANGUAGE = 'en-US';
+const DEFAULT_LANGUAGE: SupportedLocale = 'en-US';
 
-function getLocale(): string {
+function getLocale(): SupportedLocale {
   return mapLanguage(navigator.languages?.length ? navigator.languages[0] : navigator.language);
 }
 
-export function currentLanguage(): string {
+export function currentLanguage(): SupportedLocale {
   return mapLanguage(UrlUtil.getURLParameter(QUERY_KEY.LANGUAGE) || getLocale());
 }
 
@@ -37,11 +37,11 @@ export function normalizeLanguage(language: string = DEFAULT_LANGUAGE): string {
   return language.substring(0, LANGUAGE_SHORTHAND_LENGTH);
 }
 
-export function findLanguage(language: string = DEFAULT_LANGUAGE): string {
+export function findLanguage(language: string = DEFAULT_LANGUAGE): SupportedLocale {
   language = normalizeLanguage(language);
-  return Locales.find(locale => locale.startsWith(language));
+  return Locales.find(locale => locale.startsWith(language)) ?? DEFAULT_LANGUAGE;
 }
 
-export function mapLanguage(language: string = DEFAULT_LANGUAGE): string {
+export function mapLanguage(language: string = DEFAULT_LANGUAGE): SupportedLocale {
   return findLanguage(language) || DEFAULT_LANGUAGE;
 }

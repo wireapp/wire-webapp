@@ -19,7 +19,7 @@
 
 import {CONVERSATION_ACCESS_ROLE, CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 
-import {combinePermissions, hasPermissions} from 'Repositories/user/UserPermission';
+import {combinePermissions, hasPermissions} from 'Repositories/user/userPermission';
 
 import {ACCESS_STATE, TEAM} from './AccessState';
 
@@ -83,9 +83,13 @@ export function featureFromStateChange(prevState: ACCESS_STATE, current: ACCESS_
   if (prevState === current) {
     return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
   }
-  const [featureName, featureBitmask] = Object.entries(ACCESS).find(
+  const featureEntry = Object.entries(ACCESS).find(
     ([, bitmask]) => bitmask & (teamPermissionsForAccessState(prevState) ^ teamPermissionsForAccessState(current)),
   );
+  if (featureEntry === undefined) {
+    return {feature: undefined, featureName: undefined, isAvailable: undefined, bitmask: 0};
+  }
+  const [featureName, featureBitmask] = featureEntry;
   const featString = CONVERSATION_ACCESS_ROLE[featureName as keyof typeof CONVERSATION_ACCESS_ROLE];
   return {
     feature: featString,
@@ -112,7 +116,7 @@ export function accessFromPermissions(permissions: number): TEAM {
   const detectedRole = AccessStatesByPerm.filter(role => !invalidRoles.includes(role)).find(role =>
     hasPermissionForRole(permissions, role),
   );
-  return detectedRole || ACCESS_STATE.TEAM.LEGACY;
+  return detectedRole ?? ACCESS_STATE.TEAM.LEGACY;
 }
 
 function hasPermissionForRole(memberPermissions: number, state: ACCESS_STATE): boolean {
@@ -143,15 +147,15 @@ export function updateAccessRights(accessState: ACCESS_STATE): UpdatedAccessRigh
     .toString(2)
     .split('')
     //reverse so that the index reflects the number of significant figures for finding the feature
-    .reverse()
+    .toReversed()
     //find the name of the feature with the correct sigfigs
     .map((bit: '1' | '0', i) => Object.entries(ACCESS).find(([, bitmask]) => bitmask === +bit << i)?.[0])
     .forEach(feature => {
       const accessRole = CONVERSATION_ACCESS_ROLE[feature as keyof typeof CONVERSATION_ACCESS_ROLE];
       const accessModes = CONVERSATION_ACCESS[feature as keyof typeof CONVERSATION_ACCESS];
-      if (accessRole) {
+      if (accessRole !== undefined) {
         newAccessRights.accessRole.push(accessRole);
-      } else if (accessModes) {
+      } else if (accessModes !== undefined) {
         newAccessRights.accessModes.push(accessModes);
       }
     });

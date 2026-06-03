@@ -17,7 +17,7 @@
  *
  */
 
-import {PlusIcon} from 'Components/Icon';
+import {PlusIcon} from 'Components/icon';
 import type {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {t} from 'Util/localizerUtil';

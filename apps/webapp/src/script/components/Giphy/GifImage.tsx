@@ -31,10 +31,10 @@ const GifImage: FC<GifProps> = ({src, animatedSrc, objectFit = 'contain', title 
 
   return (
     <img
-      src={isHovered ? animatedSrc : src}
-      alt={title || 'giphy image'}
+      src={isHovered && animatedSrc !== undefined ? animatedSrc : src}
+      alt={title.length > 0 ? title : 'giphy image'}
       css={{height: '100%', objectFit, width: '100%'}}
-      {...(!!animatedSrc && {
+      {...(animatedSrc !== undefined && {
         onMouseOut: () => {
           setIsHovered(false);
         },

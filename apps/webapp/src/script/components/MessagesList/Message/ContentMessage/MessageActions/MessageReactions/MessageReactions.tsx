@@ -79,7 +79,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
   };
 
   const handleReactionCurrentState = (actionName = '') => {
-    const isActive = !!actionName;
+    const isActive = actionName !== '';
     handleCurrentMsgAction(actionName);
     handleMenuOpen(isActive);
     setShowEmojis(isActive);
@@ -91,7 +91,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
     if (currentMsgActionName === selectedMsgActionName) {
       // reset on double click
       handleReactionCurrentState('');
-    } else if (selectedMsgActionName) {
+    } else if (selectedMsgActionName !== undefined && selectedMsgActionName !== '') {
       handleReactionCurrentState(selectedMsgActionName);
       showReactions(event.currentTarget.getBoundingClientRect());
     }
@@ -105,7 +105,7 @@ const MessageReactions: FC<MessageReactionsProps> = ({
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         handleReactionCurrentState('');
-      } else if (selectedMsgActionName) {
+      } else if (selectedMsgActionName !== undefined && selectedMsgActionName !== '') {
         handleReactionCurrentState(selectedMsgActionName);
         showReactions(event.currentTarget.getBoundingClientRect());
       }

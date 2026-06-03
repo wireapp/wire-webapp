@@ -97,8 +97,10 @@ export const UserDevices = ({
 
   const clickOnDevice = (clientEntity: ClientEntity) => {
     setSelectedClient(clientEntity);
-    const headline = user.isMe ? clientEntity.label || clientEntity.model : capitalizeFirstChar(clientEntity.class);
-    goTo(UserDevicesState.DEVICE_DETAILS, headline || '');
+    const headline = user.isMe
+      ? (clientEntity.label ?? clientEntity.model ?? '')
+      : capitalizeFirstChar(clientEntity.class);
+    goTo(UserDevicesState.DEVICE_DETAILS, headline !== '' ? headline : '');
   };
 
   const clickToShowSelfFingerprint = () => {

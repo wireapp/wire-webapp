@@ -126,7 +126,7 @@ export const getChatHistoryOptions = (
     );
   }
 
-  if (enableCustomHistory || teamState.isConferenceCallingEnabled()) {
+  if (enableCustomHistory === true || teamState.isConferenceCallingEnabled()) {
     chatHistoryOptions.push({
       value: ChatHistory.Custom,
       label: `${t('conversationHistoryOptionCustom')}${chatHistory === ChatHistory.Custom && historySharingQuantity ? ` (${historySharingQuantity} ${chatHistorySharingUnitOptions.find(option => option.value === historySharingUnit)?.label})` : ''}`,

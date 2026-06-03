@@ -18,7 +18,7 @@
  */
 
 export const deepMerge = <T>(target: T, ...sources: Partial<T>[]): T => {
-  if (!sources.length) {
+  if (sources.length === 0) {
     return target;
   }
 
@@ -28,7 +28,7 @@ export const deepMerge = <T>(target: T, ...sources: Partial<T>[]): T => {
     for (const key in source) {
       if (source.hasOwnProperty(key)) {
         if (typeof source[key] === 'object' && source[key] !== null) {
-          if (!target[key]) {
+          if (target[key] === undefined || target[key] === null) {
             (target as any)[key] = Array.isArray(source[key]) ? [] : {};
           }
           deepMerge((target as any)[key], source[key]);

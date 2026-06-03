@@ -53,11 +53,13 @@ export class ContentMessage extends Message {
 
   constructor(id?: string) {
     super(id);
-    this.was_edited = ko.pureComputed(() => !!this.edited_timestamp());
+    this.was_edited = ko.pureComputed(() => {
+      return this.edited_timestamp() !== null;
+    });
   }
 
   readonly displayEditedTimestamp = () => {
-    return t('conversationEditTimestamp', {date: formatTimeShort(this.edited_timestamp())});
+    return t('conversationEditTimestamp', {date: formatTimeShort(this.edited_timestamp() ?? 0)});
   };
 
   /**
@@ -76,7 +78,7 @@ export class ContentMessage extends Message {
    * Get the first asset attached to the message.
    * @returns The first asset attached to the message
    */
-  getFirstAsset(): Asset | FileAsset | TextAsset | MediumImage {
+  getFirstAsset(): Asset | FileAsset | TextAsset | MediumImage | undefined {
     return this.assets()[0];
   }
 
@@ -95,7 +97,8 @@ export class ContentMessage extends Message {
    * @returns `true` if the message quotes the user, `false` otherwise.
    */
   isUserQuoted(userId: string): boolean {
-    return this.quote() ? this.quote().isQuoteFromUser(userId) : false;
+    const quoteEntity = this.quote();
+    return quoteEntity !== undefined ? quoteEntity.isQuoteFromUser(userId) : false;
   }
 
   /**

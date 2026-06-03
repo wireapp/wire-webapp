@@ -26,12 +26,19 @@ import {reducers} from './module/reducer';
 
 const reduxLogdown = require('redux-logdown');
 
+type HotReloadCapableModule = NodeJS.Module & {
+  hot?: {
+    accept: (dependencyPath: string, callback: () => void) => void;
+  };
+};
+
 const configureStore = (thunkArguments: object = {}) => {
   const store = createStore(combineReducers(reducers), undefined, createMiddleware(thunkArguments));
+  const hotReloadCapableModule = module as HotReloadCapableModule;
 
   if (process.env.NODE_ENV !== 'production') {
-    if (module.hot) {
-      module.hot.accept('./module/reducer/index.ts', () => {
+    if (hotReloadCapableModule.hot !== undefined) {
+      hotReloadCapableModule.hot.accept('./module/reducer/index.ts', () => {
         store.replaceReducer(combineReducers(require('./module/reducer/index.ts').default) as any);
       });
     }

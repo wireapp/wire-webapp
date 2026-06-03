@@ -21,7 +21,7 @@ import {container} from 'tsyringe';
 
 import {supportsMLS} from 'Util/util';
 
-import {APIClient} from '../service/APIClientSingleton';
+import {APIClient} from '../service/apiClientSingleton';
 
 /**
  * Will check if MLS is supported by client (whether MLS feature is enabled and secret store is supported) and backend (whether used api version supports MLS and backend removal key is present).

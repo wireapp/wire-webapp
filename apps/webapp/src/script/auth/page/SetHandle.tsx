@@ -19,6 +19,7 @@
 
 import React, {useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {BackendErrorLabel, SyntheticErrorLabel} from '@wireapp/api-client/lib/http/';
 import {ConsentType} from '@wireapp/api-client/lib/self/index';
 import {connect} from 'react-redux';
@@ -60,7 +61,7 @@ const SetHandleComponent = ({
   name,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<unknown>(null);
   const [handle, setHandle] = useState('');
   const {state} = useLocation();
   const isNewAccount = state?.isNewAccount ?? false;
@@ -68,7 +69,7 @@ const SetHandleComponent = ({
   useEffect(() => {
     if (hasSelfHandle) {
       void removeLocalStorage(QUERY_KEY.JOIN_EXPIRES);
-      if (!isNewAccount) {
+      if (isNewAccount !== true) {
         window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
       }
     }
@@ -78,7 +79,7 @@ const SetHandleComponent = ({
     (async () => {
       doGetConsents();
       try {
-        const suggestions = createSuggestions(name);
+        const suggestions = createSuggestions(name ?? '');
         const handle = await checkHandles(suggestions);
         setHandle(handle);
       } catch (error: unknown) {
@@ -95,7 +96,7 @@ const SetHandleComponent = ({
     event.preventDefault();
     try {
       await doSetHandle(handle.trim());
-      if (Runtime.isDesktopApp() || !isNewAccount) {
+      if (Runtime.isDesktopApp() || isNewAccount !== true) {
         resetTelemetrySession();
         window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
       } else {
@@ -155,11 +156,16 @@ const SetHandleComponent = ({
                 />
               </InputSubmitCombo>
             </InputBlock>
-            <Button disabled={!handle || isFetching} type="submit" data-uie-name="do-send-handle" block>
+            <Button
+              disabled={!is.nonEmptyString(handle) || isFetching}
+              type="submit"
+              data-uie-name="do-send-handle"
+              block
+            >
               {t('chooseHandle.submitButton')}
             </Button>
           </Form>
-          {error && parseError(error)}
+          {error !== null ? parseError(error) : null}
         </ContainerXS>
         {!isFetching && hasUnsetMarketingConsent && (
           <AcceptNewsModal onConfirm={handleAcceptNewletterConsent} onDecline={handleDeclineNewletterConsent} />
@@ -172,7 +178,7 @@ const SetHandleComponent = ({
 type ConnectedProps = ReturnType<typeof mapStateToProps>;
 const mapStateToProps = (state: RootState) => ({
   hasSelfHandle: SelfSelector.hasSelfHandle(state),
-  hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) || false,
+  hasUnsetMarketingConsent: SelfSelector.hasUnsetConsent(state, ConsentType.MARKETING) ?? false,
   isFetching: SelfSelector.isFetching(state),
   name: SelfSelector.getSelfName(state),
 });

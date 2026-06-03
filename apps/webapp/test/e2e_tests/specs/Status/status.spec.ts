@@ -21,11 +21,11 @@ import {Page} from 'playwright/test';
 import {ApiManagerE2E} from 'test/e2e_tests/backend/apiManager.e2e';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin, Team} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin, Team} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {interceptNotifications} from 'test/e2e_tests/utils/mockNotifications.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 enum UserStatus {
   Away = 'Away',
@@ -157,7 +157,7 @@ test.describe('Status', () => {
       name: 'Rename group',
       sendAction: async ({userAPageManager}) => {
         const userAPages = userAPageManager.pages;
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickConversationInfoButton();
         await userAPages.conversationDetails().changeConversationName('New Group Name');
       },
@@ -174,7 +174,7 @@ test.describe('Status', () => {
       sendAction: async ({userAPageManager}) => {
         const {pages, modals} = userAPageManager;
         await pages.conversation().leaveConversation();
-        await modals.leaveConversation().clickConfirm();
+        await modals.leaveConversation().actionButton.click();
       },
     },
     {
@@ -188,7 +188,7 @@ test.describe('Status', () => {
       name: 'Add member to group',
       sendAction: async ({userAPageManager}) => {
         const userAPages = userAPageManager.pages;
-        await userAPages.conversationList().openConversation('Test Group 2');
+        await userAPages.conversationList().getConversation('Test Group 2').open();
         await userAPages.conversation().clickConversationInfoButton();
         await userAPages.conversationDetails().clickAddPeopleButton();
         await userAPages.conversationDetails().addUsersToConversation([userC.fullName]);
@@ -224,10 +224,9 @@ test.describe('Status', () => {
 
   for (const config of notificationConfigs) {
     test(config.title, {tag: config.tag}, async ({createPage, api}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB), withConnectedUser(userC)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+      await connectWithUser(userBPage, userC);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
       const userBPageManager = PageManager.from(userBPage).webapp;
@@ -249,7 +248,7 @@ test.describe('Status', () => {
 
       // User B sends initial messages for replies
       for (const {targetForUserB, options} of scenarios) {
-        await userBPages.conversationList().openConversation(targetForUserB, options);
+        await userBPages.conversationList().getConversation(targetForUserB, options).open();
         await userBPages.conversation().sendMessage('Message to reply');
       }
 
@@ -261,7 +260,7 @@ test.describe('Status', () => {
 
       await updateUserStatus(userBPageManager, userB.fullName, config.status);
       // User B opens the third conversation to receive notifications
-      await userBPages.conversationList().openConversation(userC.fullName);
+      await userBPages.conversationList().getConversation(userC.fullName).open();
 
       const {getNotifications: getUserBNotifications} = await interceptNotifications(userBPage);
 
@@ -270,7 +269,7 @@ test.describe('Status', () => {
           const filteredCases = commonTestCases.filter(
             tc => config.status === UserStatus.Away || !['Mention', 'Reply'].includes(tc.name),
           );
-          await userAPages.conversationList().openConversation(targetForUserA, options);
+          await userAPages.conversationList().getConversation(targetForUserA, options).open();
 
           for (const testCase of filteredCases) {
             await test.step(`Action: ${testCase.name} message in ${type}`, async () => {
@@ -279,7 +278,7 @@ test.describe('Status', () => {
           }
 
           await components.conversationSidebar().clickAllConversationsButton();
-          await expect(userBPages.conversationList().getConversationLocator(targetForUserB, options)).toContainText(
+          await expect(userBPages.conversationList().getConversation(targetForUserB, options)).toContainText(
             /\d+ ping, \d+ messages/,
           );
           await expect.poll(() => getUserBNotifications()).toHaveLength(0);
@@ -288,7 +287,7 @@ test.describe('Status', () => {
 
       // System Test Cases
       await test.step('User B should not receive any system notification', async () => {
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         for (const systemTestCase of systemTestCases) {
           await systemTestCase.sendAction({userAPageManager});
         }
@@ -309,7 +308,7 @@ test.describe('Status', () => {
             },
           ];
 
-          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
           for (const testCase of specialTestCases) {
             await test.step(`Action: ${testCase.name} message`, async () => {
               await testCase.sendAction({pageA: userAPage, api});
@@ -319,7 +318,7 @@ test.describe('Status', () => {
         });
       } else {
         await test.step('User B should not receive calls notification (Away status)', async () => {
-          await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+          await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
           await userAPages.conversation().startCall();
           await expect(userBPages.calling().callCell).toBeVisible();
           await expect.poll(() => getUserBNotifications()).toHaveLength(0);
@@ -352,10 +351,8 @@ test.describe('Status', () => {
     'When I am available or have unset status, I want to get notifications for every message in non-muted conversations',
     {tag: ['@TC-3626', '@regression']},
     async ({createPage, api}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
       const userBPageManager = PageManager.from(userBPage).webapp;
@@ -368,10 +365,10 @@ test.describe('Status', () => {
       await createGroup(userAPages, groupName, [userB, userC]);
 
       // User B sends initial message and sets status to available
-      await pages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await pages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await pages.conversation().sendMessage('Message to reply');
 
-      await pages.conversationList().openConversation(groupName);
+      await pages.conversationList().getConversation(groupName).open();
       await pages.conversation().sendMessage('Message to reply');
 
       await updateUserStatus(userBPageManager, userB.fullName, UserStatus.Available);
@@ -394,7 +391,7 @@ test.describe('Status', () => {
 
       for (const {type, target, options} of scenarios) {
         await test.step(`User A opens the ${type} conversation`, async () => {
-          await userAPages.conversationList().openConversation(target, options);
+          await userAPages.conversationList().getConversation(target, options).open();
         });
 
         await test.step(`User B should receive all conversation notifications`, async () => {
@@ -409,7 +406,7 @@ test.describe('Status', () => {
       }
 
       await test.step(`User B should receive system notifications only for group creation and renaming`, async () => {
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         for (const systemTestCase of systemTestCases) {
           await test.step(`Action: ${systemTestCase.name}`, async () => {
             await systemTestCase.sendAction({userAPageManager});
@@ -425,20 +422,15 @@ test.describe('Status', () => {
   );
 
   test('I want to set my status on profile page', {tag: ['@TC-1766', '@regression']}, async ({createPage}) => {
-    const [userAPageManager, userBPageManager] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA))),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userA))),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
 
-    const {pages, components, modals} = userAPageManager.webapp;
-    const userBPages = userBPageManager.webapp.pages;
+    const {pages, components, modals} = PageManager.from(userAPage).webapp;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
 
     // User B verify no status is set in conversation list
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
-    const {statusAvailabilityIcon} = userBPages
-      .conversationList()
-      .getConversationLocator(userA.fullName, {protocol: 'mls'});
-    await expect(statusAvailabilityIcon).not.toBeVisible();
+    const conversation = await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
+    await expect(conversation.statusAvailabilityIcon).not.toBeVisible();
 
     // User A opens preferences by clicking the gear button
     await components.conversationSidebar().clickPreferencesButton();
@@ -459,8 +451,8 @@ test.describe('Status', () => {
     await expect(pages.account().statusOption(UserStatus.None)).not.toHaveAccessibleName('Selected, None');
 
     // User B verifies status is Available in conversation list
-    await expect(statusAvailabilityIcon).toBeVisible();
-    await expect(statusAvailabilityIcon).toHaveAttribute('data-uie-value', 'available');
+    await expect(conversation.statusAvailabilityIcon).toBeVisible();
+    await expect(conversation.statusAvailabilityIcon).toHaveAttribute('data-uie-value', 'available');
   });
 
   test(
@@ -482,7 +474,7 @@ test.describe('Status', () => {
       await expect(components.conversationSidebar().personalStatusIcon).toBeVisible();
 
       // User B should see the BUSY status in the searchable group participant list
-      await userBPages.conversationList().openConversation(groupName);
+      await userBPages.conversationList().getConversation(groupName).open();
       await userBPages.conversation().clickConversationInfoButton();
       await expect(userBPages.conversationDetails().getUserAvailabilityIcon(userA.fullName)).toBeVisible();
       await expect(userBPages.conversationDetails().getUserAvailabilityIcon(userA.fullName)).toHaveAttribute(

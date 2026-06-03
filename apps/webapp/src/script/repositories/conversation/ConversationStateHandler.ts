@@ -54,17 +54,18 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
   }
 
   async changeAccessState(conversationEntity: Conversation, accessState: ACCESS_STATE): Promise<void> {
-    const isConversationInTeam = conversationEntity && conversationEntity.inTeam();
+    const isConversationInTeam = conversationEntity.inTeam();
     const isStateChange = conversationEntity.accessState() !== accessState;
     const prevAccessState = conversationEntity.accessState();
 
     if (isConversationInTeam) {
       if (isStateChange) {
         const {accessModes, accessRole} = updateAccessRights(accessState);
-        if (accessModes && accessRole) {
+        if (accessModes !== undefined && accessRole !== undefined) {
           try {
-            if (!isGettingAccessToFeature(ACCESS_MODES.CODE, prevAccessState, accessState)) {
-              conversationEntity.accessCode(undefined);
+            const isGettingAccessCode = isGettingAccessToFeature(ACCESS_MODES.CODE, prevAccessState, accessState);
+            if (isGettingAccessCode === false) {
+              conversationEntity.accessCode('');
               await this.revokeAccessCode(conversationEntity);
             }
 
@@ -107,9 +108,9 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
 
   async requestAccessCode(conversationEntity: Conversation, password?: string): Promise<void> {
     try {
-      const response = await this.conversationService.postConversationCode(conversationEntity.id, password);
-      const accessCode = response && response.data;
-      if (accessCode) {
+      const response = await this.conversationService.postConversationCode(conversationEntity.id, password ?? '');
+      const accessCode = response?.data;
+      if (accessCode !== undefined) {
         ConversationMapper.mapAccessCode(conversationEntity, accessCode);
       }
     } catch (e: unknown) {
@@ -120,7 +121,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
   async revokeAccessCode(conversationEntity: Conversation): Promise<void> {
     try {
       await this.conversationService.deleteConversationCode(conversationEntity.id);
-      conversationEntity.accessCode(undefined);
+      conversationEntity.accessCode('');
     } catch (e: unknown) {
       return this._showModal(t('modalConversationGuestOptionsRevokeCodeMessage'));
     }
@@ -131,11 +132,15 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
     eventJson: ConversationEvent<CONVERSATION_EVENT.ACCESS_UPDATE, ConversationAccessUpdateData>,
   ): void {
     const {access: accessModes, ...roles} = eventJson.data;
-    ConversationMapper.mapAccessState(conversationEntity, accessModes, roles?.access_role, roles?.access_role_v2);
+    const accessRole = roles.access_role;
+    if (accessRole === undefined) {
+      return;
+    }
+    ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, roles.access_role_v2);
   }
 
   private _resetConversationAccessCode(conversationEntity: Conversation): void {
-    conversationEntity.accessCode(undefined);
+    conversationEntity.accessCode('');
   }
 
   private _updateConversationAccessCode(

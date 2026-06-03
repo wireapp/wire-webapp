@@ -22,17 +22,22 @@ import {useEffect} from 'react';
 import ko from 'knockout';
 import {container} from 'tsyringe';
 
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
+import {ACCENT_ID} from 'src/script/Config';
 
 function setAccentColor(accentColor?: number) {
-  if (!accentColor) {
-    return;
-  }
-  const classes = document.body.className
-    .split(' ')
-    .filter(elementClass => !elementClass.startsWith('main-accent-color-'))
-    .concat(`main-accent-color-${accentColor}`);
-  document.body.className = classes.join(' ');
+  const accentColorClassId = accentColor ?? ACCENT_ID.BLUE;
+  const accentClassPrefix = 'main-accent-color-';
+  const bodyClassList = document.body.classList;
+  const accentClasses = Array.from(bodyClassList).filter(existingClassName => {
+    return existingClassName.startsWith(accentClassPrefix);
+  });
+
+  accentClasses.forEach(existingAccentClass => {
+    bodyClassList.remove(existingAccentClass);
+  });
+
+  bodyClassList.add(`${accentClassPrefix}${accentColorClassId}`);
 }
 
 export function useAccentColor() {
@@ -42,9 +47,12 @@ export function useAccentColor() {
       const selfUser = userState.self();
       return selfUser?.accent_id();
     });
-    const subscription = accentColor.subscribe(accent_color => {
-      setAccentColor(accent_color);
+    setAccentColor(accentColor());
+    const subscription = accentColor.subscribe(accentColorValue => {
+      setAccentColor(accentColorValue);
     });
-    return () => subscription.dispose();
+    return () => {
+      return subscription.dispose();
+    };
   }, []);
 }

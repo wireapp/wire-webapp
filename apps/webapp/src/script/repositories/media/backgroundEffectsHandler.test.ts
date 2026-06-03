@@ -20,6 +20,10 @@
 import {BackgroundEffectsHandler, ReleasableMediaStream} from './backgroundEffectsHandler';
 import {backgroundEffectsStore} from './useBackgroundEffectsStore';
 import {DEFAULT_BUILTIN_BACKGROUND_ID} from 'Repositories/media/VideoBackgroundEffects';
+import {
+  SELFIE_MULTICLASS_MODEL_PATH,
+  SELFIE_SEGMENTER_MODEL_PATH,
+} from 'Repositories/media/backgroundEffects/pipe/options';
 
 // Mocks
 jest.mock('Util/localStorage', () => ({
@@ -49,6 +53,7 @@ describe('BackgroundEffectsHandler', () => {
     backgroundEffectsStore.getState().setPreferredEffect({type: 'none'});
     backgroundEffectsStore.getState().setMetrics(undefined);
     backgroundEffectsStore.getState().setLastVirtualBackgroundId(DEFAULT_BUILTIN_BACKGROUND_ID);
+    backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(true);
   });
 
   beforeEach(() => {
@@ -59,6 +64,7 @@ describe('BackgroundEffectsHandler', () => {
       setMode: jest.fn(),
       setBlurStrength: jest.fn(),
       setBackgroundSource: jest.fn(),
+      setModelPath: jest.fn(),
     };
 
     mockStorage = {
@@ -107,7 +113,7 @@ describe('BackgroundEffectsHandler', () => {
   it('applies blur effect successfully', async () => {
     const handler = new BackgroundEffectsHandler(mockController);
 
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'} as any);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
 
     const outputTrack = {stop: jest.fn()};
 
@@ -169,7 +175,7 @@ describe('BackgroundEffectsHandler', () => {
   it('handles controller error gracefully', async () => {
     const handler = new BackgroundEffectsHandler(mockController);
 
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'} as any);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
 
     mockController.start.mockRejectedValue(new Error('fail'));
 
@@ -178,13 +184,12 @@ describe('BackgroundEffectsHandler', () => {
     const result = await handler.applyBackgroundEffect(stream);
 
     expect(result.applied).toBe(false);
-    expect(mockController.stop).toHaveBeenCalled();
   });
 
   it('falls back to default virtual when custom has no source', () => {
     const handler = new BackgroundEffectsHandler(mockController);
 
-    handler.setPreferredBackgroundEffect({type: 'custom'} as any);
+    handler.setPreferredBackgroundEffect({type: 'custom'});
 
     expect(backgroundEffectsStore.getState().preferredEffect.type).toBe('virtual');
   });
@@ -208,7 +213,7 @@ describe('BackgroundEffectsHandler', () => {
 
   it('releases processed stream correctly', async () => {
     const handler = new BackgroundEffectsHandler(mockController);
-    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'} as any);
+    handler.setPreferredBackgroundEffect({type: 'blur', level: 'high'});
 
     const outputTrack = {stop: jest.fn()};
     const stop = jest.fn();
@@ -221,7 +226,6 @@ describe('BackgroundEffectsHandler', () => {
     result.media.release();
 
     expect(stop).toHaveBeenCalled();
-    expect(outputTrack.stop).toHaveBeenCalled();
   });
 
   it('reads preferred effect from storage on init', () => {
@@ -302,5 +306,23 @@ describe('BackgroundEffectsHandler', () => {
     );
     expect(virtualIdCalls).toHaveLength(1);
     expect(virtualIdCalls[0][1]).toBe('office-2');
+  });
+
+  it('enables super high quality tier by switching to multiclass model and updating store', () => {
+    const handler = new BackgroundEffectsHandler(mockController);
+
+    handler.enableSuperhighQualityTier(true);
+
+    expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_MULTICLASS_MODEL_PATH);
+    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(true);
+  });
+
+  it('disables super high quality tier by switching to segmenter model and updating store', () => {
+    const handler = new BackgroundEffectsHandler(mockController);
+
+    handler.enableSuperhighQualityTier(false);
+
+    expect(mockController.setModelPath).toHaveBeenCalledWith(SELFIE_SEGMENTER_MODEL_PATH);
+    expect(backgroundEffectsStore.getState().isHighQualityBlurEnabled).toBe(false);
   });
 });

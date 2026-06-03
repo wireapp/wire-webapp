@@ -17,14 +17,22 @@
  *
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 import {useDebouncedCallback} from 'use-debounce';
 
-import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {FireAndForgetInvoker} from '@wireapp/core';
 
+import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
+
+import {
+  ConversationDriveFiltersState,
+  hasActiveSearchParams,
+  toConversationDriveSearchParams,
+} from '../common/driveFilters/driveFilters';
 import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 import {getUsersFromNodes} from '../useGetAllCellsNodes/getUsersFromNodes';
@@ -35,6 +43,8 @@ interface UseConversationSearchFilesProps {
   userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  filters: ConversationDriveFiltersState;
   onClear?: () => void;
 }
 
@@ -46,6 +56,8 @@ export const useConversationSearchFiles = ({
   userRepository,
   conversationQualifiedId,
   enabled,
+  fireAndForgetInvoker,
+  filters,
   onClear,
 }: UseConversationSearchFilesProps) => {
   const {setNodes, setStatus, setPagination, clearAll} = useCellsStore();
@@ -55,15 +67,20 @@ export const useConversationSearchFiles = ({
   const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
 
+  const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
+  const hasActiveParams = hasActiveSearchParams(searchParams);
+  const hadActiveSearchParamsRef = useRef(hasActiveParams);
+
   const {id} = conversationQualifiedId;
   const conversationPath = getCellsApiPath({conversationQualifiedId});
 
   const searchNodes = useCallback(
-    async ({query}: {query: string}) => {
+    async ({query, filters: filtersParam}: {query: string; filters: ConversationDriveFiltersState}) => {
       try {
         setStatus('loading');
 
-        const shouldSort = !query || query === FETCH_ALL_QUERY;
+        const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
+        const searchParams = toConversationDriveSearchParams(filtersParam);
 
         const result = await cellsRepository.searchNodes({
           query,
@@ -71,9 +88,10 @@ export const useConversationSearchFiles = ({
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
           type: 'file',
+          ...searchParams,
         });
 
-        if (!result.Nodes?.length) {
+        if (result.Nodes === undefined || result.Nodes.length === 0) {
           setNodes({conversationId: id, nodes: []});
           setPagination({conversationId: id, pagination: null});
           setStatus('success');
@@ -83,7 +101,7 @@ export const useConversationSearchFiles = ({
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
         // filter out draft nodes from results
-        const filteredNodes = result.Nodes.filter(node => !node.IsDraft);
+        const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
 
         const transformedNodes = transformDataToCellsNodes({
           nodes: filteredNodes,
@@ -92,7 +110,7 @@ export const useConversationSearchFiles = ({
 
         setNodes({conversationId: id, nodes: transformedNodes});
 
-        const pagination = result.Pagination ? transformToCellPagination(result.Pagination) : null;
+        const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
         setPagination({conversationId: id, pagination});
 
         if (isInitialLoad.current) {
@@ -100,7 +118,7 @@ export const useConversationSearchFiles = ({
         }
 
         setStatus('success');
-      } catch (error: unknown) {
+      } catch {
         setStatus('error');
         setNodes({conversationId: id, nodes: []});
         setPagination({conversationId: id, pagination: null});
@@ -114,42 +132,82 @@ export const useConversationSearchFiles = ({
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
     shouldPerformSearch.current = false;
     setSearchQuery(value);
-    await searchNodes({query: value});
+    await searchNodes({query: value, filters});
     shouldPerformSearch.current = true;
   }, DEBOUNCE_TIME);
 
-  const handleSearch = (value: string) => {
+  const handleSearch = (value: string): void => {
     setSearchValue(value);
-    if (!value) {
-      searchNodesDebounced.cancel();
-      handleClearSearch();
-      onClear?.();
+    const isEmpty = value.length === 0;
+    if (!is.nonEmptyStringAndNotWhitespace(value)) {
+      if (isEmpty) {
+        handleClearSearch();
+      } else if (searchQuery.length > 0) {
+        handleClearSearch({preserveInputValue: true});
+      } else {
+        searchNodesDebounced.cancel();
+        shouldPerformSearch.current = false;
+      }
       return;
     }
     shouldPerformSearch.current = true;
-    void searchNodesDebounced(value);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await searchNodesDebounced(value);
+    });
   };
 
-  const handleClearSearch = () => {
+  const handleClearSearch = ({
+    preserveFilters = true,
+    preserveInputValue = false,
+  }: {preserveFilters?: boolean; preserveInputValue?: boolean} = {}) => {
     searchNodesDebounced.cancel();
-    setSearchValue('');
+    if (!preserveInputValue) {
+      setSearchValue('');
+    }
     setSearchQuery('');
     shouldPerformSearch.current = false;
-  };
 
-  const handleReload = async () => {
-    setStatus('loading');
-    clearAll({conversationId: id});
-    await searchNodes({query: searchQuery || FETCH_ALL_QUERY});
-  };
-
-  useEffect(() => {
-    if (!enabled || !shouldPerformSearch.current) {
+    if (preserveFilters && hasActiveParams) {
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await searchNodes({query: FETCH_ALL_QUERY, filters});
+      });
       return;
     }
 
-    void searchNodes({query: searchQuery || FETCH_ALL_QUERY});
-  }, [searchNodes, searchQuery, enabled]);
+    onClear?.();
+  };
+
+  const handleReload = async (): Promise<void> => {
+    setStatus('loading');
+    clearAll({conversationId: id});
+    await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
+  };
+
+  useEffect(() => {
+    if (!enabled) {
+      return;
+    }
+
+    // Re-run search whenever typing has triggered it, a query is present,
+    // or the mapped search params carry any filter.
+    const hasSearchOrActiveParams = searchQuery.trim().length > 0 || hasActiveParams;
+    if (!shouldPerformSearch.current && !hasSearchOrActiveParams) {
+      return;
+    }
+
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
+    });
+  }, [searchNodes, searchQuery, enabled, filters, hasActiveParams, fireAndForgetInvoker]);
+
+  // When the search params transition from "active" to "none" with no search query,
+  // restore the default unfiltered file list.
+  useEffect(() => {
+    if (hadActiveSearchParamsRef.current && !hasActiveParams && !searchValue) {
+      onClear?.();
+    }
+    hadActiveSearchParamsRef.current = hasActiveParams;
+  }, [hasActiveParams, searchValue, onClear]);
 
   return {
     searchValue,

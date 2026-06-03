@@ -36,11 +36,11 @@ export const transformRestVersionToFileVersion = (
   resolveOwnerName?: ResolveOwnerName,
 ): FileVersion => {
   return {
-    versionId: version.VersionId || '',
+    versionId: version.VersionId ?? '',
     time: formatTime(timestamp),
     ownerName: resolveOwnerName?.(version) ?? version.OwnerName ?? '',
-    size: formatBytes(Number(version.Size) || 0),
-    downloadUrl: version.PreSignedGET?.Url || '',
+    size: formatBytes(Number(version.Size) ?? 0),
+    downloadUrl: version.PreSignedGET?.Url ?? '',
   };
 };
 
@@ -57,18 +57,23 @@ export const groupVersionsByDate = (
   return versions.reduce(
     (acc, version) => {
       // Skip versions with missing critical data
-      if (!version.VersionId || !version.MTime) {
+      if (
+        version.VersionId === undefined ||
+        version.VersionId === '' ||
+        version.MTime === undefined ||
+        version.MTime === ''
+      ) {
         return acc;
       }
 
-      const timestamp = Number(version.MTime || 0) * TIME_IN_MILLIS.SECOND;
+      const timestamp = Number(version.MTime) * TIME_IN_MILLIS.SECOND;
       const versionDate = new Date(timestamp);
 
       const daysDiff = calculateDaysDifference(today, versionDate);
       const dayPrefix = getDayPrefix(daysDiff, timestamp);
       const dateKey = formatDateKey(timestamp, dayPrefix);
 
-      if (!acc[dateKey]) {
+      if (acc[dateKey] === undefined) {
         acc[dateKey] = [];
       }
 

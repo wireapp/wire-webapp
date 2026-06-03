@@ -17,12 +17,19 @@
  *
  */
 
+import {Page} from 'playwright/test';
 import {AudioType} from 'Repositories/audio/audioType';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, withConnectedUser, withLogin, expect, Team, withConnectionRequest} from 'test/e2e_tests/test.fixtures';
+import {test, withLogin, expect, Team, LOGIN_TIMEOUT} from 'test/e2e_tests/test.fixtures';
 import {isPlayingAudio} from 'test/e2e_tests/utils/audio.util';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup, sendConnectionRequest} from 'test/e2e_tests/utils/userActions';
+
+async function joinCall(userPages: PageManager['webapp']['pages']) {
+  await expect(userPages.calling().callCell).toBeVisible();
+  await userPages.calling().clickAcceptCallButton();
+  await expect(userPages.calling().goFullScreen).toBeVisible();
+}
 
 test.describe('Calling', () => {
   let userA: User;
@@ -45,21 +52,21 @@ test.describe('Calling', () => {
     'Verify that current call is terminated if you want to call someone else (as caller)',
     {tag: ['@TC-2802', '@regression']},
     async ({createPage}) => {
-      const [{pages: userAPages, modals: userAModals}, {pages: userBPages}] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectedUser(userC))).then(
-          pm => pm.webapp,
-        ),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+      await connectWithUser(userAPage, userC);
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
+      const {pages: userBPages} = PageManager.from(userBPage).webapp;
 
       // User A has a call with user B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversation(userB.fullName).open();
       await userAPages.conversation().clickCallButton();
       await userBPages.calling().clickAcceptCallButton();
       await expect(userBPages.calling().callCell).toBeVisible();
 
       // User A starts a call with user C while in a call with user B
-      await userAPages.conversationList().openConversation(userC.fullName);
+      await userAPages.conversationList().getConversation(userC.fullName).open();
       await userAPages.conversation().clickCallButton();
 
       // A modal is shown prompting him to confirm before cancelling the ongoing call
@@ -72,10 +79,7 @@ test.describe('Calling', () => {
   );
 
   test('Verify Raise hand functionality', {tag: ['@TC-8773', '@regression']}, async ({createPage}) => {
-    const [userAPage, userBPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
 
     const userAPages = PageManager.from(userAPage).webapp.pages;
     const userBPages = PageManager.from(userBPage).webapp.pages;
@@ -83,13 +87,10 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // Establish group call; required precondition for hand-raise testing
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
-    await expect(userBPages.calling().callCell).toBeVisible();
-    await userBPages.calling().clickAcceptCallButton();
-
-    await expect(userBPages.calling().goFullScreen).toBeVisible();
+    await joinCall(userBPages);
 
     const userACall = await userAPages.calling().maximizeCell();
     await expect(userACall.selfVideoThumbnail).toBeVisible();
@@ -109,12 +110,13 @@ test.describe('Calling', () => {
   });
 
   test('Verify in call reactions', {tag: ['@TC-8774', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
 
-    await userAPages.conversationList().openConversation(userB.fullName);
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await userAPages.conversationList().getConversation(userB.fullName).open();
     await userAPages.conversation().clickCallButton();
     await userBPages.calling().clickAcceptCallButton();
 
@@ -132,15 +134,16 @@ test.describe('Calling', () => {
     'I want to answer incoming call with Join button in conversation view',
     {tag: ['@TC-2826', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().clickCallButton();
 
-      const {joinCallButton} = userBPages.conversationList().getConversationLocator(userA.fullName, {protocol: 'mls'});
+      const {joinCallButton} = userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'});
       await expect(joinCallButton).toBeVisible();
       await expect(userBPages.calling().acceptCallButton).toBeVisible();
 
@@ -162,10 +165,9 @@ test.describe('Calling', () => {
     },
   ].forEach(({description, tag, conversationType}) => {
     test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const [userAPage, userBPage1] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage1] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBDevice1Pages = PageManager.from(userBPage1).webapp.pages;
 
@@ -174,10 +176,10 @@ test.describe('Calling', () => {
       const userBDevice2Pages = PageManager.from(userBPage2).webapp.pages;
 
       if (conversationType === '1on1') {
-        await userAPages.conversationList().openConversation(userB.fullName);
+        await userAPages.conversationList().getConversation(userB.fullName).open();
       } else {
         await createGroup(userAPages, 'Calling group', [userB]);
-        await userAPages.conversationList().openConversation('Calling group');
+        await userAPages.conversationList().getConversation('Calling group').open();
       }
 
       // Ensure no audio is playing on both devices initially
@@ -205,13 +207,15 @@ test.describe('Calling', () => {
     'Verify I can make another call while current one is ignored',
     {tag: ['@TC-2803', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB), withConnectedUser(userC))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+      await connectWithUser(userBPage, userC);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       // User A calls user B
-      await userAPages.conversationList().openConversation(userB.fullName);
+      await userAPages.conversationList().getConversation(userB.fullName).open();
       await userAPages.conversation().clickCallButton();
 
       // User B declines the call
@@ -219,58 +223,71 @@ test.describe('Calling', () => {
       await expect(userBPages.calling().callCell).not.toBeVisible();
 
       // User B calls user C instead
-      await userBPages.conversationList().openConversation(userC.fullName);
+      await userBPages.conversationList().getConversation(userC.fullName).open();
       await expect(userBPages.conversation().callButton).toBeEnabled();
       await userBPages.conversation().startCall();
       await expect(userBPages.calling().callCell).toBeVisible();
     },
   );
 
-  test('Verify able to join ongoing call', {tag: ['@TC-2820', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages, userCPage] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB), withConnectedUser(userC))).then(pm => pm.webapp.pages),
-      createPage(withLogin(userC)),
-    ]);
+  [
+    {
+      description: 'Verify able to join ongoing call',
+      tag: '@TC-2820',
+    },
+    {
+      description: 'Late joiner wants to see the ongoing screen sharing on group call',
+      tag: '@TC-2874',
+      verifyScreenShare: true,
+    },
+  ].forEach(({description, tag, verifyScreenShare}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPages, userBPages, userCPage] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        createPage(withLogin(userC)),
+      ]);
 
-    const userCPages = PageManager.from(userCPage).webapp.pages;
-    await createGroup(userAPages, groupName, [userB, userC]);
+      const userCPages = PageManager.from(userCPage).webapp.pages;
+      await createGroup(userAPages, groupName, [userB, userC]);
 
-    await userAPages.conversationList().openConversation(groupName);
-    await userAPages.conversation().clickCallButton();
+      await userAPages.conversationList().getConversation(groupName).open();
+      await userAPages.conversation().clickCallButton();
 
-    await expect(userAPages.calling().callCell).toBeVisible();
-    await expect(userBPages.calling().callCell).toBeVisible();
+      await expect(userAPages.calling().callCell).toBeVisible();
+      await joinCall(userBPages);
 
-    await userBPages.calling().clickAcceptCallButton();
-    // Confirm the calls grid is visible
-    await expect(userBPages.calling().goFullScreen).toBeVisible();
+      // User A starts screen sharing
+      await userAPages.calling().clickToggleScreenShareButton();
 
-    // // User C joins the ongoing call
-    await userCPage.waitForTimeout(5000);
-    await userCPages.conversationList().getConversationLocator(groupName).joinCallButton.click();
+      // // User C joins the ongoing call
+      await userCPage.waitForTimeout(5000);
+      await userCPages.conversationList().getConversation(groupName).joinCallButton.click();
 
-    // Confirm that user C joined the call
-    await expect(userCPages.calling().goFullScreen).toBeVisible();
-    await expect(userCPages.calling().gridTiles).toHaveCount(3);
+      // Confirm that user C joined the call
+      await expect(userCPages.calling().goFullScreen).toBeVisible();
+      await expect(userCPages.calling().gridTiles).toHaveCount(3);
+
+      if (verifyScreenShare) {
+        const userCCall = await userCPages.calling().maximizeCell();
+        await expect(userCCall.getGridTile(userA.fullName).videoElement).toBeVisible();
+      }
+    });
   });
 
   test('Verify Call UI checks', {tag: ['@TC-8771', '@regression']}, async ({createPage}) => {
     const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
       PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
     ]);
 
     await createGroup(userAPages, groupName, [userB, userC]);
 
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
-    await expect(userBPages.calling().callCell).toBeVisible();
-
-    await userBPages.calling().clickAcceptCallButton();
-    await expect(userBPages.calling().goFullScreen).toBeVisible();
+    await joinCall(userBPages);
 
     await userAPages.calling().maximizeCell();
     await expect(userAPages.calling().selfVideoThumbnail).toBeVisible();
@@ -286,14 +303,13 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // User A initiates the call
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
-    await expect(userBPages.calling().callCell).toBeVisible();
 
     // User B joins the call
-    await userBPages.calling().clickAcceptCallButton();
+    await joinCall(userBPages);
     await expect(userBPages.calling().goFullScreen).toBeVisible();
 
     // User B leaves the group call
@@ -301,7 +317,7 @@ test.describe('Calling', () => {
     await expect(userBPages.calling().callCell).toBeHidden();
 
     // User B re-joins the ongoing call from the conversation list
-    await userBPages.conversationList().getConversationLocator(groupName).joinCallButton.click({timeout: 30_000});
+    await userBPages.conversationList().getConversation(groupName).joinCallButton.click({timeout: 30_000});
 
     await expect(userBPages.calling().goFullScreen).toBeVisible();
   });
@@ -315,7 +331,7 @@ test.describe('Calling', () => {
     await createGroup(userAPages, groupName, [userB]);
 
     // User A initiates the call
-    await userAPages.conversationList().openConversation(groupName);
+    await userAPages.conversationList().getConversation(groupName).open();
     await userAPages.conversation().clickCallButton();
 
     await expect(userAPages.calling().callCell).toBeVisible();
@@ -331,9 +347,10 @@ test.describe('Calling', () => {
     'Verify joining and leaving call from second client does not disconnect the first client',
     {tag: ['@TC-2827', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
-      const userAPages = PageManager.from(userAPage).webapp.pages;
-      const userBPages = PageManager.from(userBPage).webapp.pages;
+      const [userAPages, userBPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      ]);
 
       // Log in a second session/device for User A.
       const userAPage2 = await createPage(withLogin(userA, {confirmNewHistory: true}));
@@ -343,18 +360,16 @@ test.describe('Calling', () => {
       await createGroup(userAPages, groupName, [userB]);
 
       await test.step('User A starts a call and User B joins', async () => {
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
 
         await expect(userAPages.calling().callCell).toBeVisible();
-        await expect(userBPages.calling().callCell).toBeVisible();
 
-        await userBPages.calling().clickAcceptCallButton();
-        await expect(userBPages.calling().goFullScreen).toBeVisible();
+        await joinCall(userBPages);
       });
 
       await test.step('User A joins then leaves the call from their second device', async () => {
-        await userADevice2Pages.conversationList().openConversation(groupName);
+        await userADevice2Pages.conversationList().getConversation(groupName).open();
         await userADevice2Pages.conversation().clickCallButton();
         await expect(userADevice2Pages.calling().callCell).toBeVisible();
 
@@ -371,7 +386,7 @@ test.describe('Calling', () => {
         await userAPages.calling().clickLeaveCallButton();
         await expect(userAPages.calling().callCell).not.toBeAttached();
         // Verify the call is still "joinable" (User B is still there)
-        await expect(userAPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible({
+        await expect(userAPages.conversationList().getConversation(groupName).joinCallButton).toBeVisible({
           timeout: 30_000,
         });
       });
@@ -383,7 +398,7 @@ test.describe('Calling', () => {
     {tag: ['@TC-2837', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages, userCPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
       ]);
@@ -391,16 +406,14 @@ test.describe('Calling', () => {
       await createGroup(userAPages, groupName, [userB, userC]);
 
       // User A initiates the call
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPages.calling().callCell).toBeVisible();
 
       // Ensure all invited members join the call
       for (const member of [userBPages, userCPages]) {
-        await expect(member.calling().callCell).toBeVisible();
-        await member.calling().clickAcceptCallButton();
-        await expect(member.calling().goFullScreen).toBeVisible();
+        await joinCall(member);
       }
 
       // User A removes User B from the group
@@ -420,19 +433,19 @@ test.describe('Calling', () => {
     {tag: ['@TC-2838', '@regression']},
     async ({createPage}) => {
       const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
         PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
       ]);
 
       await createGroup(userAPages, groupName, [userB]);
 
       // User A initiates the call
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickCallButton();
 
       await expect(userAPages.calling().callCell).toBeVisible();
       await expect(userBPages.calling().callCell).toBeVisible();
-      await expect(userBPages.conversationList().getConversationLocator(groupName).joinCallButton).toBeVisible();
+      await expect(userBPages.conversationList().getConversation(groupName).joinCallButton).toBeVisible();
 
       // User A removes User B from the group
       await userAPages.conversation().toggleGroupInformation();
@@ -443,7 +456,7 @@ test.describe('Calling', () => {
 
       // User B cannot join the group call
       await expect(userBPages.calling().callCell).not.toBeAttached();
-      await expect(userBPages.conversationList().getConversationLocator(groupName).joinCallButton).not.toBeAttached();
+      await expect(userBPages.conversationList().getConversation(groupName).joinCallButton).not.toBeAttached();
     },
   );
 
@@ -459,14 +472,15 @@ test.describe('Calling', () => {
       }
 
       const allMembers = [userB, userC, ...extraMembers];
-      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
-      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userAPage = await createPage(withLogin(userA));
+
+      const {pages: userAPages, modals: userAModals} = PageManager.from(userAPage).webapp;
 
       await createGroup(userAPages, groupName, allMembers);
-      await userAPages.conversationList().openConversation(groupName);
+      await userAPages.conversationList().getConversation(groupName).open();
       await userAPages.conversation().clickCallButton();
 
-      await expect(userAPage.getByTestId('modal-without-title')).toContainText(
+      await expect(userAModals.withoutTitle().modalText).toContainText(
         `Are you sure you want to call ${allMembers.length} people?`,
       );
     },
@@ -477,36 +491,38 @@ test.describe('Calling', () => {
     {tag: ['@TC-2844', '@regression']},
     async ({createPage, createUser}) => {
       const guestUser = await createUser();
-      const [userAPages, userBPages, guestPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB), withConnectionRequest(guestUser))).then(
-          pm => pm.webapp.pages,
-        ),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(guestUser))).then(pm => pm.webapp.pages),
+      const [userAPage, userBPage, guestPage] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))),
+        PageManager.from(createPage(withLogin(userB))),
+        PageManager.from(createPage(withLogin(guestUser))),
       ]);
+      await sendConnectionRequest(userAPage, guestUser);
+      await connectWithUser(userAPage, userB);
+
+      const [userAPages, userBPages, guestPages] = [userAPage, userBPage, guestPage].map(pm => pm.webapp.pages);
 
       // --- Setup and Call Initialization ---
       await test.step('Setup: Accept connection and start group call', async () => {
         await guestPages.conversationList().openPendingConnectionRequest();
         await guestPages.connectRequest().clickConnectButton();
+        await expect(userAPages.conversationList().getConversation(guestUser.fullName)).toBeAttached();
+        await expect(guestPages.conversationList().getConversation(userA.fullName)).toBeAttached();
 
         await createGroup(userAPages, groupName, [userB, guestUser]);
 
-        await userAPages.conversationList().openConversation(groupName);
+        await userAPages.conversationList().getConversation(groupName).open();
         await userAPages.conversation().clickCallButton();
       });
 
       await test.step('Join call with all participants', async () => {
         for (const member of [userBPages, guestPages]) {
-          await expect(member.calling().callCell).toBeVisible();
-          await member.calling().clickAcceptCallButton();
-          await expect(member.calling().goFullScreen).toBeVisible();
+          await joinCall(member);
         }
       });
 
       const userACall = await userAPages.calling().maximizeCell();
       await userACall.toggleParticipantsList();
-      await expect(userACall.getSidebarParticipant(guestUser.fullName).guestIcon).toBeVisible();
+      await expect(userACall.getCallingParticipant(guestUser.fullName).guestIcon).toBeVisible();
 
       const participants = [
         {pages: userBPages, name: userB.fullName, label: 'User B'},
@@ -518,7 +534,7 @@ test.describe('Calling', () => {
           name: 'Mute',
           action: (p: PageManager['webapp']['pages']) => p.calling().toggleMuteButton.click(),
           verify: async (name: string) => {
-            await expect(userACall.getSidebarParticipant(name).muteIcon).not.toBeVisible();
+            await expect(userACall.getCallingParticipant(name).muteIcon).not.toBeVisible();
             await expect(userACall.getGridTile(name).muteIcon).not.toBeVisible();
           },
         },
@@ -526,7 +542,7 @@ test.describe('Calling', () => {
           name: 'Screenshare',
           action: (p: PageManager['webapp']['pages']) => p.calling().clickToggleScreenShareButton(),
           verify: async (name: string) => {
-            await expect(userACall.getSidebarParticipant(name).screenShareIcon).toBeVisible();
+            await expect(userACall.getCallingParticipant(name).screenShareIcon).toBeVisible();
             await expect(userACall.getGridTile(name).videoElement).toBeVisible();
           },
         },
@@ -534,7 +550,7 @@ test.describe('Calling', () => {
           name: 'Video',
           action: (p: PageManager['webapp']['pages']) => p.calling().clickToggleVideoButton(),
           verify: async (name: string) => {
-            await expect(userACall.getSidebarParticipant(name).videoIcon).toBeVisible();
+            await expect(userACall.getCallingParticipant(name).videoIcon).toBeVisible();
             await expect(userACall.getGridTile(name).videoElement).toBeVisible();
           },
         },
@@ -550,4 +566,400 @@ test.describe('Calling', () => {
       }
     },
   );
+
+  test(
+    'I want to accept a group video call as a personal account guest',
+    {tag: ['@TC-2852', '@regression']},
+    async ({createPage}) => {
+      const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage()]);
+      const {pages: ownerPages, modals: ownerModals} = PageManager.from(userAPage).webapp;
+      const guestPages = PageManager.from(guestPage).webapp.pages;
+
+      const createdLink = await test.step('Owner: Create group and generate guest invitation link', async () => {
+        await createGroup(ownerPages, groupName, []);
+        await ownerPages.conversationList().getConversation(groupName).open();
+        await ownerPages.conversation().toggleGroupInformation();
+        await ownerPages.conversationDetails().openGuestOptions();
+        return await ownerPages.guestOptions().createLink();
+      });
+
+      await test.step('Guest: Navigate to link and log in with personal account', async () => {
+        await guestPage.goto(createdLink.toString());
+        await guestPages.conversationJoin().joinBrowserButton.click();
+        await expect(guestPages.conversationJoin().joinAsGuestButton).toBeVisible();
+
+        await guestPages.login().login(userB);
+        await guestPages.conversation().conversationTitle.waitFor({
+          state: 'visible',
+          timeout: LOGIN_TIMEOUT,
+        });
+      });
+
+      await test.step('Owner: Verify guest arrival and initiate video call', async () => {
+        await expect(
+          ownerPages.conversation().systemMessages.filter({hasText: `${userB.fullName} joined`}),
+        ).toBeVisible();
+
+        await ownerPages.conversation().toggleGroupInformation();
+        await ownerPages.conversation().clickCallButton();
+        // Warning modal that guest started using a new device
+        await ownerModals.confirm().clickAction();
+        await expect(ownerPages.calling().callCell).toBeVisible();
+      });
+
+      await test.step('Guest: Join the active call', async () => {
+        const {joinCallButton} = guestPages.conversationList().getConversation(groupName);
+
+        await expect(guestPages.calling().callCell).toBeVisible();
+        await expect(joinCallButton).toBeVisible();
+
+        await joinCallButton.click();
+        await expect(ownerPages.calling().goFullScreen).toBeVisible();
+      });
+    },
+  );
+
+  [
+    {
+      description: 'I want to navigate between call pages',
+      tag: '@TC-2924',
+      verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>, localUser: string) => {
+        await expect(callScreen.getGridTile(localUser)).toBeVisible();
+        await callScreen.goToNextPage();
+        await expect(callScreen.getGridTile(localUser)).toBeHidden();
+        await callScreen.goToPreviousPage();
+        await expect(callScreen.getGridTile(localUser)).toBeVisible();
+      },
+    },
+    {
+      description: 'I want to see video tiles ordered alphabetically by user names',
+      tag: '@TC-2927',
+      verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>, localUser: string) => {
+        await expect(callScreen.gridTiles).toHaveCount(6); // Ensure first grid page is full
+        const displayedNames = await callScreen.gridTiles.getByTestId('call-participant-name').allInnerTexts();
+        const listToVerify = displayedNames.filter(name => name !== localUser);
+        const sortedNames = listToVerify.toSorted((a, b) => a.localeCompare(b));
+
+        expect(listToVerify).toEqual(sortedNames);
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage, createUser}) => {
+      const {pages: userAPages, modals: userAModals} = PageManager.from(await createPage(withLogin(userA))).webapp;
+
+      const {groupMembers, memberPages} =
+        await test.step('Setup: Create members and initialize all browser pages', async () => {
+          // Generate a large participant list to trigger pagination
+          const extraMembers = await Promise.all(Array.from({length: 7}, () => createUser()));
+          const groupMembers = [userB, userC, ...extraMembers];
+
+          await Promise.all(extraMembers.map(member => team.addTeamMember(member)));
+
+          const memberPages = await Promise.all(
+            groupMembers.map(async member => {
+              const page = await createPage(withLogin(member));
+              return PageManager.from(page).webapp.pages;
+            }),
+          );
+
+          return {groupMembers, memberPages};
+        });
+
+      await test.step('Action: User A initiates the group call', async () => {
+        await createGroup(userAPages, groupName, groupMembers);
+        await userAPages.conversationList().getConversation(groupName).open();
+        await userAPages.conversation().clickCallButton();
+        // Warning modal about large group call
+        await userAModals.withoutTitle().clickAction();
+        await expect(userAPages.calling().goFullScreen).toBeVisible();
+      });
+
+      await test.step('Action: All members accept the incoming call', async () => {
+        await Promise.all(
+          memberPages.map(async memberPage => {
+            await joinCall(memberPage);
+          }),
+        );
+      });
+
+      await test.step('Verify functionality', async () => {
+        const callScreen = await userAPages.calling().maximizeCell();
+        await verify(callScreen, userA.fullName);
+      });
+    });
+  });
+
+  [
+    {
+      description: 'As a moderator I want to mute another participant',
+      tag: '@TC-2928',
+      verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>) => {
+        const contextMenu = await callScreen.getCallingParticipant(userB.fullName).openContextMenu();
+        await contextMenu.muteButton.click();
+
+        await expect(callScreen.getCallingParticipant(userB.fullName).muteIcon).toBeVisible();
+        await expect(callScreen.getGridTile(userB.fullName).muteIcon).toBeVisible();
+      },
+    },
+    {
+      description: 'As moderator of a call I want to mute all other participants',
+      tag: '@TC-2929',
+      verify: async (callScreen: ReturnType<PageManager['webapp']['pages']['fullScreenCall']>) => {
+        const firstContextMenu = await callScreen.getCallingParticipant(userB.fullName).openContextMenu();
+        await firstContextMenu.muteButton.click();
+
+        const secondContextMenu = await callScreen.getCallingParticipant(userB.fullName).openContextMenu();
+        await secondContextMenu.muteOthersButton.click();
+
+        for (const participant of [userB, userC]) {
+          await expect(callScreen.getCallingParticipant(participant.fullName).muteIcon).toBeVisible();
+          await expect(callScreen.getGridTile(participant.fullName).muteIcon).toBeVisible();
+        }
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPages, userBPages, userCPages] = await Promise.all([
+        PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+        PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+      ]);
+
+      await test.step('Setup: Create group and start call', async () => {
+        await createGroup(userAPages, groupName, [userB, userC]);
+        await userAPages.conversationList().getConversation(groupName).open();
+        await userAPages.conversation().clickCallButton();
+
+        await expect(userAPages.calling().callCell).toBeVisible();
+      });
+
+      await test.step('All participants join the call', async () => {
+        for (const member of [userBPages, userCPages]) {
+          await joinCall(member);
+          await member.calling().toggleMute(); // Ensure active mic state
+        }
+      });
+
+      await test.step('Verify moderator can mute other participants', async () => {
+        const userACall = await userAPages.calling().maximizeCell();
+        await userACall.toggleParticipantsList();
+
+        await expect(userACall.getCallingParticipant(userB.fullName).muteIcon).not.toBeVisible();
+        await expect(userACall.getCallingParticipant(userC.fullName).muteIcon).not.toBeVisible();
+
+        await verify(userACall);
+      });
+    });
+  });
+
+  [
+    {
+      description: 'I want to unmute myself after I got muted',
+      tag: '@TC-2931',
+      verify: async (userCallPage: Page) => {
+        const userCallPages = PageManager.from(userCallPage).webapp.pages;
+        await userCallPages.calling().fullScreenMuteButton.click();
+        await expect(userCallPages.calling().getGridTile(userB.fullName).muteIcon).not.toBeVisible();
+      },
+    },
+    {
+      description: 'I want to get notified when I got muted',
+      tag: '@TC-2932',
+      verify: async (userCallPage: Page) => {
+        await expect(userCallPage.getByText('You have been muted')).toBeVisible();
+      },
+    },
+  ].forEach(({description, tag, verify}) => {
+    test(description, {tag: [tag, '@regression']}, async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await test.step('Setup: Create group and start call', async () => {
+        await createGroup(userAPages, groupName, [userB]);
+        await userAPages.conversationList().getConversation(groupName).open();
+        await userAPages.conversation().clickCallButton();
+
+        await expect(userAPages.calling().callCell).toBeVisible();
+      });
+
+      await test.step('User B joins the call', async () => {
+        await joinCall(userBPages);
+        await userBPages.calling().toggleMute(); // Ensure active mic state
+        await userBPages.calling().maximizeCell();
+      });
+
+      await test.step('Moderator mutes User B', async () => {
+        const userACall = await userAPages.calling().maximizeCell();
+        await userACall.toggleParticipantsList();
+        const userBParticipant = userACall.getCallingParticipant(userB.fullName);
+
+        await expect(userBParticipant.muteIcon).not.toBeVisible();
+
+        const contextMenu = await userBParticipant.openContextMenu();
+        await contextMenu.muteButton.click();
+
+        await expect(userBParticipant.muteIcon).toBeVisible();
+      });
+
+      await test.step('Verify mute functionality', async () => {
+        await verify(userBPage);
+      });
+    });
+  });
+
+  test(
+    'I want to see a group call timing out after 300s if no one else joined',
+    {tag: ['@TC-2936', '@regression']},
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 300_000);
+
+      const userAPage = await createPage(withLogin(userA));
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+
+      await createGroup(userAPages, groupName, [userB, userC]);
+
+      // User A initiates the call
+      await userAPages.conversationList().getConversation(groupName).open();
+      await userAPages.conversation().clickCallButton();
+      await expect(userAPages.calling().callCell).toBeVisible();
+
+      await userAPage.waitForTimeout(300_000);
+      await expect(
+        userAPages
+          .conversation()
+          .systemMessages.filter({hasText: 'Your call was ended because no other participant joined.'}),
+      ).toBeVisible();
+      await expect(userAPages.calling().callCell).not.toBeVisible();
+    },
+  );
+
+  test(
+    'I want to see a group call timing out after 90s if I`m the last one left in the call',
+    {tag: ['@TC-2937', '@regression']},
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 90_000);
+
+      const [userAPage, userBPage, userCPage] = await Promise.all([
+        createPage(withLogin(userA)),
+        createPage(withLogin(userB)),
+        createPage(withLogin(userC)),
+      ]);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+      const userCPages = PageManager.from(userCPage).webapp.pages;
+
+      await test.step('Setup: Create group and start call', async () => {
+        await createGroup(userAPages, groupName, [userB, userC]);
+        await userAPages.conversationList().getConversation(groupName).open();
+        await userAPages.conversation().clickCallButton();
+
+        await expect(userAPages.calling().callCell).toBeVisible();
+      });
+
+      await test.step('User B and User C join the call', async () => {
+        for (const member of [userBPages, userCPages]) {
+          await joinCall(member);
+        }
+        await expect(userAPages.calling().gridTiles).toHaveCount(3);
+      });
+
+      await test.step('User B and User C leave the call', async () => {
+        for (const member of [userBPages, userCPages]) {
+          await member.calling().clickLeaveCallButton();
+          await expect(member.calling().goFullScreen).toBeHidden();
+        }
+      });
+
+      await test.step('Verify call ends for User A after 90s of being the last one in the call', async () => {
+        await userAPage.waitForTimeout(90_000);
+        await expect(userAPages.calling().goFullScreen).toBeHidden();
+        await expect(
+          userAPages
+            .conversation()
+            .systemMessages.filter({hasText: 'Your call was ended because all other participants left'}),
+        ).toBeVisible();
+      });
+    },
+  );
+
+  test('I want to see multiple active speakers in 1 call', {tag: ['@TC-2945', '@regression']}, async ({createPage}) => {
+    const [userAPages, userBPages, userCPages] = await Promise.all([
+      PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
+      PageManager.from(createPage(withLogin(userC))).then(pm => pm.webapp.pages),
+    ]);
+
+    await test.step('Setup: Create group and start call', async () => {
+      await createGroup(userAPages, groupName, [userB, userC]);
+      await userAPages.conversationList().getConversation(groupName).open();
+      await userAPages.conversation().clickCallButton();
+
+      await expect(userAPages.calling().callCell).toBeVisible();
+    });
+
+    await test.step('User B and User C join the call', async () => {
+      for (const member of [userBPages, userCPages]) {
+        await joinCall(member);
+      }
+    });
+
+    await test.step('Verify 2 speakers are active in the call', async () => {
+      const userACall = await userAPages.calling().maximizeCell();
+      await userACall.toggleParticipantsList();
+
+      await userBPages.calling().maximizeCell();
+      await userBPages.calling().unmuteSelfInFullScreen();
+
+      await expect(userBPages.calling().getGridTile(userB.fullName).muteIcon).toBeHidden(); // Ensure active video state
+
+      await expect(userACall.getCallingParticipant(userA.fullName).activeSpeakerIcon).toBeVisible();
+      await expect(userACall.getCallingParticipant(userB.fullName).activeSpeakerIcon).toBeVisible({timeout: 30_000});
+    });
+  });
+
+  [
+    {id: '@TC-2908', title: 'I want to have 1:1 CBR audio call when the caller turned it on'} as const,
+    {id: '@TC-2909', title: 'I want to have 1:1 CBR audio call when the receiver turned it on'} as const,
+  ].forEach(({id, title}) => {
+    test(title, {tag: [id, '@regression']}, async ({createPage}) => {
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const {pages: userAPages} = PageManager.from(userAPage).webapp;
+      const {pages: userBPages} = PageManager.from(userBPage).webapp;
+
+      if (id === '@TC-2908') {
+        await test.step('Caller enables CBR', async () => {
+          const {pages: callerPages, components: callerComponents} = PageManager.from(userAPage).webapp;
+          await callerComponents.conversationSidebar().preferencesButton.click();
+          await callerPages.settings().audioVideoButton.click();
+          await callerPages.audioVideoSettings().variableBitrateCheckbox.click();
+          await callerComponents.conversationSidebar().allConversationsButton.click();
+        });
+      }
+      if (id === '@TC-2909') {
+        await test.step('Receiver enables CBR', async () => {
+          const {pages: receiverPages, components: receiverComponents} = PageManager.from(userBPage).webapp;
+          await receiverComponents.conversationSidebar().preferencesButton.click();
+          await receiverPages.settings().audioVideoButton.click();
+          await receiverPages.audioVideoSettings().variableBitrateCheckbox.click();
+          await receiverComponents.conversationSidebar().allConversationsButton.click();
+        });
+      }
+
+      await test.step('UserA calls userB', async () => {
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+        await userAPages.conversation().callButton.click();
+        await userBPages.calling().acceptCallButton.click();
+      });
+
+      await test.step('Caller and receiver see CBR text in call window', async () => {
+        await expect(userAPages.calling().callCell).toContainText('CBR');
+        await expect(userBPages.calling().callCell).toContainText('CBR');
+      });
+    });
+  });
 });

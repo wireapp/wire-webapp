@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {getStorage} from './localStorage';
 
 import {Configuration} from '../Config';
@@ -26,7 +28,7 @@ export function enableLogging(config: Configuration, search = window.location.se
   const namespace = new URLSearchParams(search).get('enableLogging');
   const force = config.FEATURE.ENABLE_DEBUG;
 
-  if (namespace) {
+  if (is.nonEmptyString(namespace)) {
     storage?.setItem('debug', namespace);
   } else if (force) {
     storage?.setItem('debug', '*');

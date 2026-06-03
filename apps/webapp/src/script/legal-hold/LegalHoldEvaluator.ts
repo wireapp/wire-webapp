@@ -44,24 +44,27 @@ export const areSomeUsersOnLegalHold = (users: User[]): boolean => {
 };
 
 export const isConversationOnLegalHold = (conversation: Conversation): boolean => {
-  const amIonLegalHold = isUserOnLegalHold(conversation.selfUser());
+  const selfUser = conversation.selfUser();
+  const amIonLegalHold = selfUser !== undefined ? isUserOnLegalHold(selfUser) : false;
   const areOthersOnLegalHold = areSomeUsersOnLegalHold(conversation.participating_user_ets());
   return amIonLegalHold || areOthersOnLegalHold;
 };
 
 export const hasMessageLegalHoldFlag = (mappedEvent: MappedEvent): boolean => {
   const supportsLegalHoldFlag = [CONVERSATION.MESSAGE_ADD].includes(mappedEvent.type as CONVERSATION);
+  const mappedEventData = mappedEvent.data;
   const hasLegalHoldFlag =
-    mappedEvent.data &&
-    typeof mappedEvent.data !== 'string' &&
-    typeof mappedEvent.data.legal_hold_status !== 'undefined' &&
-    mappedEvent.data.legal_hold_status !== LegalHoldStatus.UNKNOWN;
+    mappedEventData !== undefined &&
+    typeof mappedEventData !== 'string' &&
+    typeof mappedEventData.legal_hold_status !== 'undefined' &&
+    mappedEventData.legal_hold_status !== LegalHoldStatus.UNKNOWN;
   return supportsLegalHoldFlag && hasLegalHoldFlag;
 };
 
 export const renderLegalHoldMessage = (mappedEvent: MappedEvent, localConversationState: LegalHoldStatus): boolean => {
-  if (hasMessageLegalHoldFlag(mappedEvent)) {
-    return typeof mappedEvent.data !== 'string' && mappedEvent.data.legal_hold_status !== localConversationState;
+  const mappedEventData = mappedEvent.data;
+  if (hasMessageLegalHoldFlag(mappedEvent) && mappedEventData !== undefined && typeof mappedEventData !== 'string') {
+    return mappedEventData.legal_hold_status !== localConversationState;
   }
   return false;
 };

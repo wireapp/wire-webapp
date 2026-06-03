@@ -101,7 +101,7 @@ export class Call {
     this.handRaisedParticipants = ko.pureComputed(() =>
       this.participants()
         .filter(participant => Boolean(participant.handRaisedAt()))
-        .sort((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
+        .toSorted((p1, p2) => p1.handRaisedAt()! - p2.handRaisedAt()!),
     );
     this.canvasMixer = new CanvasMediaStreamMixer();
     this.maximizedParticipant = ko.observable(null);
@@ -118,7 +118,8 @@ export class Call {
   }
 
   getSelfParticipant(): Participant {
-    return this.participants().find(({user, clientId}) => user.isMe && this.selfClientId === clientId);
+    const selfParticipant = this.participants().find(({user, clientId}) => user.isMe && this.selfClientId === clientId);
+    return selfParticipant ?? this.selfParticipant;
   }
 
   addAudio(audioId: string, stream: MediaStream) {
@@ -202,10 +203,11 @@ export class Call {
     const activeSpeakers = uniqueAudioLevels
       // Get the participants.
       .map(({userId, clientId}) => this.getParticipant(userId, clientId))
+      .filter((participant): participant is Participant => participant !== undefined)
       // Limit them to 4.
       .slice(0, 4)
       // Sort them by name
-      .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
+      .toSorted((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user));
 
     // Set the new active speakers.
     const isSameSpeakers =
@@ -236,7 +238,7 @@ export class Call {
 
   updatePages() {
     const selfParticipant = this.getSelfParticipant();
-    const remoteParticipants = this.getRemoteParticipants().sort((p1, p2) => sortUsersByPriority(p1.user, p2.user));
+    const remoteParticipants = this.getRemoteParticipants().toSorted((p1, p2) => sortUsersByPriority(p1.user, p2.user));
 
     const [withVideoAndScreenShare, withoutVideo] = partition(remoteParticipants, participant =>
       participant.isSendingVideo(),
@@ -244,7 +246,7 @@ export class Call {
     const [withScreenShare, withVideo] = partition(withVideoAndScreenShare, participant => participant.sharesScreen());
 
     const newPages = chunk<Participant>(
-      [selfParticipant, ...withScreenShare, ...withVideo, ...withoutVideo].filter(Boolean),
+      [selfParticipant, ...withScreenShare, ...withVideo, ...withoutVideo],
       this.numberOfParticipantsInOnePage,
     );
 

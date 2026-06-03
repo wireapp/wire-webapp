@@ -32,7 +32,7 @@ import {
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
 import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
-import {EditIcon} from 'Components/Icon';
+import {EditIcon} from 'Components/icon';
 import {iconStyles} from 'Components/MessagesList/Message/ContentMessage/asset/MultipartAssets/FileAssetCard/common/FileAssetOptions/FileAssetOptions.styles';
 import {MessageTime} from 'Components/MessagesList/Message/MessageTime';
 import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useFileHistoryModal';
@@ -89,9 +89,10 @@ export const FileHeader = ({
   const {showModal} = useFileHistoryModal();
 
   const handleFileDownload = async () => {
-    if (fileUrl) {
+    if (fileUrl !== undefined && fileUrl.length > 0) {
       const node = await cellsRepository.getNode({uuid: id});
-      await forcedDownloadFile({url: node.PreSignedGET?.Url || fileUrl, name: fileNameWithExtension});
+      const resolvedDownloadUrl = node.PreSignedGET?.Url ?? fileUrl;
+      await forcedDownloadFile({url: resolvedDownloadUrl, name: fileNameWithExtension});
     }
   };
 
@@ -116,12 +117,12 @@ export const FileHeader = ({
           {badges && badges.length > 0 && <BadgesWithTooltip items={badges} />}
         </div>
       </div>
-      {isEditable && (
+      {isEditable === true && (
         <div css={editModeButtonStyles}>
           <button
             title="Viewing"
             aria-label="Viewing"
-            className={!isInEditMode ? 'active' : ''}
+            className={isInEditMode !== true ? 'active' : ''}
             onClick={() => onEditModeChange(false)}
           >
             <ShowIcon width={16} height={16} />
@@ -131,7 +132,7 @@ export const FileHeader = ({
             <button
               title="Editing"
               aria-label="Editing"
-              className={isInEditMode ? 'active' : ''}
+              className={isInEditMode === true ? 'active' : ''}
               onClick={() => onEditModeChange(true)}
             >
               <EditIcon width={14} height={14} />
@@ -146,13 +147,13 @@ export const FileHeader = ({
             variant={ButtonVariant.TERTIARY}
             css={downloadButtonStyles}
             onClick={handleFileDownload}
-            disabled={!fileUrl}
+            disabled={fileUrl === undefined || fileUrl.length === 0}
             aria-label={t('cells.imageFullScreenModal.downloadButton')}
           >
             <DownloadIcon />
           </Button>
         )}
-        {!isRecycleBin && isEditable && (
+        {!isRecycleBin && isEditable === true && (
           <DropdownMenu>
             <DropdownMenu.Trigger asChild>
               <Button variant={ButtonVariant.TERTIARY} css={downloadButtonStyles} aria-label={t('cells.options.label')}>

@@ -28,7 +28,7 @@ import {inlineReplacements} from './inlineReplacements';
 const escapeRegexp = (string: string): string => string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 
 const emojiList = inlineReplacements.map(emoji => {
-  const emoticons = emoji.emoticons || [];
+  const emoticons = emoji.emoticons ?? [];
 
   return {
     ...emoji,

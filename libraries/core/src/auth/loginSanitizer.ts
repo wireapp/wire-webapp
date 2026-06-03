@@ -17,7 +17,7 @@
  *
  */
 
-import {LoginData} from '@wireapp/api-client/lib/auth/';
+import {LoginData} from '@wireapp/api-client/lib/auth';
 
 export class LoginSanitizer {
   constructor() {}
@@ -25,15 +25,15 @@ export class LoginSanitizer {
   public static removeNonPrintableCharacters(loginData: LoginData): void {
     const nonPrintableCharacters = /\s/gm;
 
-    if (loginData.email) {
+    if (loginData.email !== undefined && loginData.email.length > 0) {
       loginData.email = loginData.email.replace(nonPrintableCharacters, '');
     }
 
-    if (loginData.handle) {
+    if (loginData.handle !== undefined && loginData.handle.length > 0) {
       loginData.handle = loginData.handle.replace(nonPrintableCharacters, '');
     }
 
-    if (loginData.password) {
+    if (loginData.password !== undefined) {
       loginData.password = loginData.password.toString();
     }
   }

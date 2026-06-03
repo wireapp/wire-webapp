@@ -20,7 +20,7 @@
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {isErrorWithCode} from 'Util/typePredicateUtil';

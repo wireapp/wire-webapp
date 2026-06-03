@@ -39,7 +39,7 @@ const isMigrationReady = (getKey: (dbName: string) => string) => (dbName: string
   const key = getKey(dbName);
   const localStorage = getLocalStorage();
   const value = localStorage.getItem(key);
-  return !!value && value === MIGRATION_READY_STATE;
+  return value !== null && value === MIGRATION_READY_STATE;
 };
 
 export const cryptoMigrationStore = {

@@ -38,10 +38,6 @@ export class ConversationListPage {
     this.conversationListHeaderTitle = page.locator('[data-uie-name="conversation-list-header-title"]');
   }
 
-  async openConversation(conversationName: string, options?: Parameters<typeof this.getConversationLocator>[1]) {
-    await this.getConversationLocator(conversationName, options).click();
-  }
-
   async openPendingConnectionRequest() {
     await this.pendingConnectionRequest.click();
   }
@@ -61,23 +57,33 @@ export class ConversationListPage {
    * @param conversationName Name of the conversation to search for
    * @param options.protocol Only locate conversations matching this protocol (mls only works for 1on1 conversations as groups still use proteus) - Default: "mls"
    */
-  getConversationLocator(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}) {
+  getConversation(conversationName: string, options?: {protocol?: 'mls' | 'proteus'}) {
     let conversation = this.page.getByTestId('item-conversation').filter({hasText: conversationName});
 
     if (options?.protocol) {
       conversation = conversation.and(this.page.locator(`[data-protocol="${options.protocol}"]`));
     }
 
-    return Object.assign(conversation, {
+    const enhancedLocator = Object.assign(conversation, {
       userAvatar: conversation.getByTestId('element-avatar-user'),
       statusAvailabilityIcon: conversation.getByTestId('status-availability-icon'),
       unreadIndicator: conversation.getByTitle('Unread message'),
       mutedIndicator: conversation.getByTitle('Muted conversation'),
       mentionIndicator: conversation.getByTitle('Unread mention'),
+      unreadReplyIndicator: conversation.getByTitle('Unread reply'),
       blockedIndicator: conversation.locator(`span[data-uie-name="status-label"] + span`),
       joinCallButton: conversation.getByRole('button', {name: 'Join'}),
+
+      // This is just syntactic sugar to allow capturing the enhanced locator from the open function
+      open: async () => {
+        await conversation.click();
+        return enhancedLocator;
+      },
+
       openContextMenu: () => this.openContextMenu(conversation),
     });
+
+    return enhancedLocator;
   }
 
   /**
@@ -98,6 +104,7 @@ export class ConversationListPage {
       unarchiveButton: contextMenu.getByRole('button', {name: 'Unarchive'}),
       blockButton: contextMenu.getByRole('button', {name: 'Block'}),
       unblockButton: contextMenu.getByRole('button', {name: 'Unblock'}),
+      addToFavoritesButton: contextMenu.getByRole('button', {name: 'Add to favorites'}),
       moveToButton: contextMenu.getByRole('button', {name: 'Move to'}),
       notificationsButton: contextMenu.getByRole('menuitem', {name: 'Notifications'}),
       clearContentButton: contextMenu.getByRole('button', {name: 'Clear content'}),

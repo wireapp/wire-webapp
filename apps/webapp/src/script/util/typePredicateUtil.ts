@@ -22,7 +22,7 @@ import type {BackendError} from '@wireapp/api-client/lib/http';
 import {AxiosError} from 'axios';
 
 import {Conversation} from 'Repositories/entity/Conversation';
-import {ClientRecord} from 'Repositories/storage/record/ClientRecord';
+import {ClientRecord} from 'Repositories/storage/record/clientRecord';
 
 import {isObject} from '../guards/common';
 
@@ -53,7 +53,7 @@ export function isConversationEntity(conversation: any): conversation is Convers
 }
 
 export function isClientRecord(record: any): record is ClientRecord {
-  return !!record.meta;
+  return isObject(record) && 'meta' in record && record.meta !== undefined;
 }
 
 export function isClientWithMLSPublicKeys(record: unknown): record is RegisteredClient {

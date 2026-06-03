@@ -20,7 +20,7 @@
 import {container} from 'tsyringe';
 
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {UserState} from 'Repositories/user/UserState';
+import {UserState} from 'Repositories/user/userState';
 import {getLogger, Logger} from 'Util/logger';
 
 import {VIDEO_QUALITY_MODE} from './VideoQualityMode';
@@ -113,7 +113,7 @@ export class MediaConstraintsHandler {
 
   getAgcPreference(): boolean {
     const storedValue = window.localStorage.getItem(this.agcStorageKey);
-    return JSON.parse(storedValue) ?? false;
+    return storedValue !== null ? (JSON.parse(storedValue) ?? false) : false;
   }
 
   getMediaStreamConstraints(

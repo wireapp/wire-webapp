@@ -44,9 +44,9 @@ import {EventSource} from 'Repositories/event/EventSource';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {IntegrationMapper} from 'Repositories/integration/IntegrationMapper';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/user/UserPermission';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {ROLE, ROLE as TEAM_ROLE, roleFromTeamPermissions} from 'Repositories/user/userPermission';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {Environment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';
@@ -62,7 +62,7 @@ import {TeamState} from './TeamState';
 
 import {scheduleRecurringTask, updateRemoteConfigLogger} from '../../lifecycle/updateRemoteConfigs';
 import {getMLSMigrationStatus, MLSMigrationStatus} from '../../mls/MLSMigration/migrationStatus';
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 export const HAS_PERSISTED_SUPPORTED_PROTOCOLS = 'HAS_PERSISTED_SUPPORTED_PROTOCOLS';
 
@@ -301,7 +301,9 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   async getSelfMember(teamId: string): Promise<TeamMemberEntity> {
     const memberEntity = await this.getTeamMember(teamId, this.userState.self().id);
-    this.updateUserRole(this.userState.self(), memberEntity.permissions);
+    if (memberEntity.permissions !== undefined) {
+      this.updateUserRole(this.userState.self(), memberEntity.permissions);
+    }
     return memberEntity;
   }
 
@@ -311,7 +313,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   private getTeamMembersFromUsers = async (users: User[]): Promise<void> => {
     const selfTeamId = this.userState.self().teamId;
-    if (!selfTeamId) {
+    if (selfTeamId === undefined || selfTeamId === '') {
       return;
     }
     const knownMemberIds = this.teamState.teamMembers().map(member => member.id);
@@ -354,18 +356,25 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   async filterExternals(users: User[]): Promise<User[]> {
     const teamId = this.teamState.team()?.id;
-    if (!teamId) {
+    if (teamId === undefined || teamId === '') {
       return users;
     }
     const userIds = users.map(({id}) => id);
     const members = await this.teamService.getTeamMembersByIds(teamId, userIds);
     return members
       .filter(member => roleFromTeamPermissions(member.permissions) !== ROLE.PARTNER)
-      .map(({user}) => users.find(({id}) => id === user));
+      .map(({user}) => users.find(({id}) => id === user))
+      .filter((user): user is User => {
+        return user !== undefined;
+      });
   }
 
   getTeamConversationRoles(): Promise<ConversationRolesList> {
-    return this.teamService.getTeamConversationRoles(this.teamState.team().id);
+    const teamId = this.teamState.team()?.id;
+    if (teamId === undefined) {
+      return Promise.reject(new Error('Team id is not available'));
+    }
+    return this.teamService.getTeamConversationRoles(teamId);
   }
 
   async getWhitelistedServices(teamId: string, domain: string): Promise<ServiceEntity[]> {

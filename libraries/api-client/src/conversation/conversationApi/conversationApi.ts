@@ -316,7 +316,7 @@ export class ConversationAPI {
     const allConversations: QualifiedId[] = [];
 
     const getConversationChunks = async (pagingState?: string): Promise<QualifiedId[]> => {
-      if (pagingState) {
+      if (pagingState !== undefined && pagingState.length > 0) {
         config.data.paging_state = pagingState;
       }
       const {data} = await this.client.sendJSON<QualifiedConversationIds>(config);
@@ -556,7 +556,7 @@ export class ConversationAPI {
       data: {},
     };
 
-    if (password) {
+    if (password !== undefined && password.length > 0) {
       config.data = {password};
     }
 

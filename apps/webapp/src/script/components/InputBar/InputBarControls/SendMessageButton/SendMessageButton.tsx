@@ -19,7 +19,7 @@
 
 import cx from 'classnames';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 interface SendMessageButtonProps {

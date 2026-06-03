@@ -23,7 +23,7 @@ import {LegalHoldMemberStatus} from '@wireapp/api-client/lib/team/legalhold/';
 import cx from 'classnames';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {UserDevicesState, UserDevices} from 'Components/UserDevices';
@@ -34,7 +34,7 @@ import {ConversationRepository} from 'Repositories/conversation/ConversationRepo
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
 import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
@@ -141,7 +141,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
     setIsSendingApprove(true);
 
     try {
-      if (!selfUser.teamId) {
+      if (selfUser.teamId === undefined || selfUser.teamId === '') {
         return;
       }
 
@@ -191,13 +191,13 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       setModalParams(true);
     }
 
-    if (!selfUser.teamId) {
+    if (selfUser.teamId === undefined || selfUser.teamId === '') {
       setModalParams(false);
 
       return;
     }
 
-    if (!fingerprint && selfUser.teamId) {
+    if ((fingerprint === undefined || fingerprint === '') && selfUser.teamId !== undefined && selfUser.teamId !== '') {
       const response = await teamRepository.teamService.getLegalHoldState(selfUser.teamId, selfUser.id);
       if (response.status === LegalHoldMemberStatus.PENDING) {
         const newFingerprint = await cryptographyRepository.getRemoteFingerprint(
@@ -230,7 +230,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   ]);
 
   const checkLegalHoldState = useCallback(async () => {
-    if (!selfUser.teamId) {
+    if (selfUser.teamId === undefined || selfUser.teamId === '') {
       return;
     }
 
@@ -244,7 +244,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
   }, [selfUser.id, selfUser.teamId, teamRepository.teamService]);
 
   useEffect(() => {
-    if (type) {
+    if (type !== null) {
       checkLegalHoldState();
     }
   }, [type, checkLegalHoldState]);
@@ -270,7 +270,7 @@ const LegalHoldModal: FC<LegalHoldModalProps> = ({
       const allUsers = await conversationRepository.getAllUsersInConversation(currentConversation);
       const legalHoldUsers = allUsers.filter(user => user.isOnLegalHold());
 
-      if (!legalHoldUsers.length) {
+      if (legalHoldUsers.length === 0) {
         setIsModalOpen(false);
 
         return;

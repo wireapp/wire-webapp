@@ -22,7 +22,7 @@ import {container, singleton} from 'tsyringe';
 
 import {createUuid} from 'Util/uuid';
 
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 interface CellsConfig {
   pydio: {
@@ -241,6 +241,8 @@ export class CellsRepository {
     query,
     limit = DEFAULT_MAX_FILES_LIMIT,
     tags,
+    mimeTypes,
+    hasPublicLink,
     path,
     type,
     sortBy,
@@ -249,6 +251,8 @@ export class CellsRepository {
     query: string;
     limit?: number;
     tags?: string[];
+    mimeTypes?: string[];
+    hasPublicLink?: boolean;
     path?: string;
     type?: 'file' | 'folder';
     sortBy?: SortBy;
@@ -260,6 +264,8 @@ export class CellsRepository {
       sortBy,
       sortDirection,
       tags,
+      mimeTypes,
+      hasPublicLink,
       path,
       ...(type ? {type: type === 'file' ? 'LEAF' : 'COLLECTION'} : {}),
     });

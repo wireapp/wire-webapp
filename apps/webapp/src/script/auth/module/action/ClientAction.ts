@@ -97,7 +97,11 @@ export class ClientAction {
     }
     const deviceLabel = `${Runtime.getOS()}${Runtime.getOS().version ? ` ${Runtime.getOS().version}` : ''}`;
     let deviceModel = StringUtil.capitalize(Runtime.getBrowserName());
-    const dev = Runtime.isEdgeEnvironment() ? '(Edge)' : Runtime.isStagingEnvironment() ? '(Staging)' : false;
+    const developmentSuffix = Runtime.isEdgeEnvironment()
+      ? '(Edge)'
+      : Runtime.isStagingEnvironment()
+        ? '(Staging)'
+        : '';
 
     if (Runtime.isDesktopApp()) {
       if (Runtime.isMacOS()) {
@@ -110,12 +114,12 @@ export class ClientAction {
     } else if (clientType === ClientType.TEMPORARY) {
       deviceModel = `${deviceModel} (Temporary)`;
     }
-    if (dev) {
-      deviceModel = `${deviceModel} ${dev}`;
+    if (developmentSuffix.length > 0) {
+      deviceModel = `${deviceModel} ${developmentSuffix}`;
     }
     return {
       classification: ClientClassification.DESKTOP,
-      cookieLabel: undefined,
+      cookieLabel: '',
       label: deviceLabel,
       model: deviceModel,
     };

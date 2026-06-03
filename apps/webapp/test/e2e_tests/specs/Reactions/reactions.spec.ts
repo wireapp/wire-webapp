@@ -20,9 +20,10 @@
 import {Page} from 'playwright/test';
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withLogin, withConnectedUser} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, getVideoFilePath, shareAssetHelper} from 'test/e2e_tests/utils/asset.util';
 import {getImageFilePath} from 'test/e2e_tests/utils/sendImage.util';
+import {connectWithUser} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Reactions', () => {
   let userA: User;
@@ -84,18 +85,16 @@ test.describe('Reactions', () => {
 
   for (const c of likeCases) {
     test(`Verify liking someone's ${c.title}`, {tag: [c.tc, '@regression']}, async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await c.sendFromUserB(userBPage);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
       const messageFromUserB = userAPages.conversation().getMessage({sender: userB});
       await expect(messageFromUserB).toBeVisible();
 
@@ -106,9 +105,10 @@ test.describe('Reactions', () => {
   }
 
   test("Verify liking someone's location", {tag: ['@TC-1533', '@regression']}, async ({createPage, api}) => {
-    const userAPages = await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(
-      pm => pm.webapp.pages,
-    );
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
 
     await test.step('Prerequisite: Send location via TestService', async () => {
       const {instanceId} = await api.testService.createInstance(
@@ -127,7 +127,7 @@ test.describe('Reactions', () => {
       });
     });
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
     const messageWithLink = userAPages.conversation().getMessage({sender: userB});
     await userAPages.conversation().reactOnMessage(messageWithLink, 'heart');
 
@@ -135,7 +135,10 @@ test.describe('Reactions', () => {
   });
 
   test('Verify liking an own text message', {tag: ['@TC-1534', '@regression']}, async ({createPage}) => {
-    const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
 
     await userAPages.conversation().sendMessage('Message from User A');
     const messageUserA = userAPages.conversation().getMessage({sender: userA});
@@ -145,7 +148,10 @@ test.describe('Reactions', () => {
   });
 
   test('Verify you cannot like a system message', {tag: ['@TC-1535', '@regression']}, async ({createPage}) => {
-    const userAPages = PageManager.from(await createPage(withLogin(userA), withConnectedUser(userB))).webapp.pages;
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
+
+    const userAPages = PageManager.from(userAPage).webapp.pages;
 
     const systemMessage = userAPages.conversation().systemMessages;
     await systemMessage.hover();
@@ -155,13 +161,14 @@ test.describe('Reactions', () => {
   });
 
   test('Verify likes are reset if you edited message', {tag: ['@TC-1538', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userBPages.conversation().sendMessage('Message from User B');
 
     const messageUserB = userAPages.conversation().getMessage({sender: userB});
@@ -182,16 +189,14 @@ test.describe('Reactions', () => {
     'Verify I can open like list by hovering the link in the tooltip of a reaction pill',
     {tag: ['@TC-1540', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('Message from User B');
 
       const messageUserB = userAPages.conversation().getMessage({sender: userB});
@@ -212,13 +217,14 @@ test.describe('Reactions', () => {
     'Verify locally deleted message can be liked by others',
     {tag: ['@TC-1543', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Message to react to');
 
       const userBMessage = userBPages.conversation().getMessage({sender: userA});
@@ -236,13 +242,14 @@ test.describe('Reactions', () => {
     'Verify likes are reset if sender edits their message',
     {tag: ['@TC-1544', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userAPages.conversation().sendMessage('Message to react to');
 
       const userBMessage = userBPages.conversation().getMessage({sender: userA});
@@ -278,13 +285,14 @@ test.describe('Reactions', () => {
 
   for (const c of toggleReactionCases) {
     test(c.title, {tag: [c.tc, '@regression']}, async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
       await userBPages.conversation().sendMessage('Message to react to');
 
       const messageInUserA = userAPages.conversation().getMessage({sender: userB});

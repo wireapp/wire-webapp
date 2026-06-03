@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolder';
@@ -56,10 +58,10 @@ export const CellsTableNameColumn = ({node}: CellsTableNameColumnProps) => {
 const FileNameColumn = ({file}: {file: CellFile}) => {
   const {id, handleOpenFile, selectedFile} = useCellsFilePreviewModal();
 
-  const isImage = file.mimeType?.startsWith('image');
-  const isVideo = file.mimeType?.startsWith('video');
+  const isImage = is.nonEmptyString(file.mimeType) && file.mimeType.startsWith('image');
+  const isVideo = is.nonEmptyString(file.mimeType) && file.mimeType.startsWith('video');
 
-  const shouldDisplayImagePreview = (isImage || isVideo) && file?.previewImageUrl;
+  const shouldDisplayImagePreview = (isImage || isVideo) && is.nonEmptyString(file.previewImageUrl);
 
   const {previewImageUrl, name} = file;
 
@@ -78,7 +80,7 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
         css={desktopNameStyles}
         onClick={() => handleOpenFile(file)}
         aria-controls={id}
-        aria-expanded={!!selectedFile}
+        aria-expanded={selectedFile !== null}
         aria-haspopup="dialog"
       >
         {name}

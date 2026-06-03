@@ -18,7 +18,7 @@
  */
 
 import {execSync} from 'child_process';
-import * as logdown from 'logdown';
+import logdown from 'logdown';
 import * as path from 'path';
 import * as readline from 'readline';
 

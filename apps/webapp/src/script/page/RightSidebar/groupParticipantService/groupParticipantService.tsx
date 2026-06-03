@@ -24,7 +24,7 @@ import is from '@sindresorhus/is';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -32,7 +32,7 @@ import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
-import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
+import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
@@ -85,7 +85,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
     return user.id === serviceEntity.id;
   });
 
-  const showActions = isActiveParticipant && serviceUser && inTeam;
+  const showActions = isActiveParticipant && serviceUser !== undefined && inTeam;
 
   const onOpen = () => {
     actionsViewModel.open1to1ConversationWithService(serviceEntity);
@@ -99,7 +99,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
   const onAdd = () => {
     if (serviceEntity.isService) {
       integrationRepository.addServiceToExistingConversation(activeConversation, serviceEntity);
-    } else if (serviceEntity.qualifiedId) {
+    } else if (serviceEntity.qualifiedId !== undefined) {
       conversationRepository.addUsers(activeConversation, [{qualifiedId: serviceEntity.qualifiedId}]);
     }
     goToRoot();
@@ -111,8 +111,8 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
 
   useEffect(() => {
     // Set the author of the Service / App to the name of the team the user is in
-    if (!is.nullOrUndefined(selfUser.teamId)) {
-      teamRepository.getTeamNameById(selfUser.teamId).then(name => serviceEntity.author(name));
+    if (!is.nullOrUndefined(selfUser.teamId) && serviceEntity.author !== undefined) {
+      teamRepository.getTeamNameById(selfUser.teamId).then(name => serviceEntity.author?.(name));
     }
   }, [teamRepository, selfUser.teamId]);
 
@@ -127,7 +127,7 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
       <div className="panel__footer">
         {showActions && (
           <>
-            {canChatWithServices() && (
+            {canChatWithServices?.() === true && (
               <div
                 role="button"
                 tabIndex={TabIndex.FOCUSABLE}
@@ -156,11 +156,19 @@ const GroupParticipantService: FC<GroupParticipantServiceProps> = ({
                 tabIndex={TabIndex.FOCUSABLE}
                 className="panel__action-item"
                 data-uie-name="do-remove"
-                onClick={() => onRemove(serviceUser)}
+                onClick={() => {
+                  if (serviceUser !== undefined) {
+                    onRemove(serviceUser);
+                  }
+                }}
                 onKeyDown={event =>
                   handleKeyDown({
                     event,
-                    callback: () => onRemove(serviceUser),
+                    callback: () => {
+                      if (serviceUser !== undefined) {
+                        onRemove(serviceUser);
+                      }
+                    },
                     keys: [KEY.ENTER, KEY.SPACE],
                   })
                 }

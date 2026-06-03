@@ -31,9 +31,9 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import type {User} from 'Repositories/entity/User';
+import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
-import {StorageKey} from 'Repositories/storage/StorageKey';
+import {StorageKey} from 'Repositories/storage/storageKey';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -49,8 +49,8 @@ import {ClientState} from './ClientState';
 import {isClientMLSCapable, wasClientActiveWithinLast4Weeks} from './ClientUtils';
 
 import {SIGN_OUT_REASON} from '../../auth/SignOutReason';
-import {ClientError} from '../../error/ClientError';
-import {Core} from '../../service/CoreSingleton';
+import {ClientError} from '../../error/clientError';
+import {Core} from '../../service/coreSingleton';
 
 export type UserClientEntityMap = {[userId: string]: ClientEntity[]};
 export type QualifiedUserClientEntityMap = {[domain: string]: UserClientEntityMap};
@@ -76,7 +76,7 @@ export class ClientRepository {
     private readonly core = container.resolve(Core),
   ) {
     this.cryptographyRepository = cryptographyRepository;
-    this.selfUser = ko.observable(undefined);
+    this.selfUser = ko.observable(new User('', ''));
     this.logger = getLogger('ClientRepository');
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient);
@@ -114,8 +114,12 @@ export class ClientRepository {
       const skippedUserIds = [this.selfUser().id, ClientRepository.PRIMARY_KEY_CURRENT_CLIENT];
 
       for (const clientRecord of clientRecords) {
-        const {userId} = parseClientId(clientRecord.meta.primary_key);
-        if (userId && !skippedUserIds.includes(userId)) {
+        const primaryKey = clientRecord.meta.primary_key;
+        if (primaryKey === undefined) {
+          continue;
+        }
+        const {userId} = parseClientId(primaryKey);
+        if (userId !== undefined && userId !== '' && !skippedUserIds.includes(userId)) {
           recipients[userId] ||= [];
           recipients[userId].push(ClientMapper.mapClient(clientRecord, false, clientRecord.domain));
         }
@@ -187,7 +191,7 @@ export class ClientRepository {
    */
   private updateClientInDb(primaryKey: string, changes: Partial<ClientRecord>): Promise<number> {
     // Preserve primary key on update
-    changes.meta.primary_key = primaryKey;
+    changes.meta = {...changes.meta, primary_key: primaryKey};
     return this.clientService.updateClientInDb(primaryKey, changes);
   }
 
@@ -236,8 +240,11 @@ export class ClientRepository {
    * @param clientType Temporary or permanent client type
    * @returns Cookie label key
    */
-  constructCookieLabelKey(login: string, clientType: ClientType = this.loadCurrentClientType()): string {
-    const loginHash = murmurhash.v3(login || this.selfUser().id, 42);
+  constructCookieLabelKey(
+    login: string,
+    clientType: ClientType = this.loadCurrentClientType() ?? ClientType.PERMANENT,
+  ): string {
+    const loginHash = murmurhash.v3(login !== '' ? login : this.selfUser().id, 42);
     return `${StorageKey.AUTH.COOKIE_LABEL}@${loginHash}@${clientType}`;
   }
 
@@ -366,8 +373,12 @@ export class ClientRepository {
   private async getClientByUserIdFromDb(userQualifiedId: QualifiedId): Promise<ClientRecord[]> {
     const clients = await this.clientService.loadAllClientsFromDb();
     return clients.filter(client => {
-      const {userId, domain} = parseClientId(client.meta.primary_key);
-      return matchQualifiedIds({domain, id: userId}, userQualifiedId);
+      const primaryKey = client.meta.primary_key;
+      if (primaryKey === undefined) {
+        return false;
+      }
+      const {userId, domain} = parseClientId(primaryKey);
+      return matchQualifiedIds({domain: domain ?? null, id: userId ?? ''}, userQualifiedId);
     });
   }
 
@@ -459,7 +470,9 @@ export class ClientRepository {
             // Locally known client changed on backend
             if (wasUpdated) {
               // Clear the previous client in DB (in case the domain changes the primary key will also change, thus invalidating the previous client)
-              await this.clientService.deleteClientFromDb(client.meta.primary_key);
+              if (client.meta.primary_key !== undefined) {
+                await this.clientService.deleteClientFromDb(client.meta.primary_key);
+              }
               this.logger.debug(`Updating local client`);
               promises.push(this.saveClientInDb(userId, client));
               continue;
@@ -563,11 +576,12 @@ export class ClientRepository {
    */
   private async onClientRemove(eventJson: UserClientRemoveEvent, source: EventSource): Promise<void> {
     const clientId = eventJson?.client ? eventJson.client.id : undefined;
-    if (!clientId) {
+    if (clientId === undefined || clientId === '') {
       return;
     }
 
-    const isCurrentClient = clientId === this.clientState.currentClient.id;
+    const currentClientId = this.clientState.currentClient?.id;
+    const isCurrentClient = currentClientId !== undefined && clientId === currentClientId;
     if (isCurrentClient) {
       // If the current client has been removed, we need to sign out
       amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.CLIENT_REMOVED, true);

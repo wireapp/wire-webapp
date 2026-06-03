@@ -17,14 +17,14 @@
  *
  */
 
-import {memo} from 'react';
+import {memo, useCallback, useEffect, useRef} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -33,8 +33,10 @@ import {CellsLoader} from './CellsLoader/CellsLoader';
 import {CellsPagination} from './CellsPagination/CellsPagination';
 import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
+import {hasActiveConversationDriveFilters} from './common/driveFilters/driveFilters';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
+import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
 import {wrapperStyles} from './ConversationCells.styles';
 import {useCellsPagination} from './useCellsPagination/useCellsPagination';
 import {useConversationSearchFiles} from './useConversationSearch/useConversationSearchFiles';
@@ -42,15 +44,27 @@ import {useGetAllCellsNodes} from './useGetAllCellsNodes/useGetAllCellsNodes';
 import {useOnPresignedUrlExpired} from './useOnPresignedUrlExpired/useOnPresignedUrlExpired';
 import {useRefreshCellsState} from './useRefreshCellsState/useRefreshCellsState';
 
+import {useApplicationContext} from '../../../page/RootProvider';
+
 interface ConversationCellsProps {
   cellsRepository: CellsRepository;
   userRepository: UserRepository;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
+  isSearchViewOpen: boolean;
+  onOpenSearchView: () => void;
 }
 
 export const ConversationCells = memo(
-  ({cellsRepository, userRepository, activeConversation, conversationRepository}: ConversationCellsProps) => {
+  ({
+    cellsRepository,
+    userRepository,
+    activeConversation,
+    conversationRepository,
+    isSearchViewOpen,
+    onOpenSearchView,
+  }: ConversationCellsProps) => {
+    const {fireAndForgetInvoker} = useApplicationContext();
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
     const {getNodes, status: nodesStatus, getPagination} = useCellsStore();
@@ -62,6 +76,7 @@ export const ConversationCells = memo(
       initialCellState,
       conversationRepository,
       conversationQualifiedId,
+      fireAndForgetInvoker,
     });
 
     const isCellsStateReady = cellsState === CONVERSATION_CELLS_STATE.READY;
@@ -71,8 +86,12 @@ export const ConversationCells = memo(
       cellsRepository,
       conversationQualifiedId,
       enabled: isCellsStateReady,
+      fireAndForgetInvoker,
       userRepository,
     });
+
+    const {filters, filterState, clearAllFilters} = useConversationDriveFilters({cellsRepository});
+    const hasActiveFilters = hasActiveConversationDriveFilters(filterState);
 
     const {
       searchValue,
@@ -81,17 +100,28 @@ export const ConversationCells = memo(
     } = useConversationSearchFiles({
       cellsRepository,
       conversationQualifiedId,
-      enabled: isCellsStateReady,
+      enabled: isCellsStateReady && isSearchViewOpen,
+      fireAndForgetInvoker,
       userRepository,
+      filters: filterState,
       onClear: refresh,
     });
 
-    const isSearchActive = !!searchValue;
+    const trimmedSearchValue = searchValue.trim();
+    const isSearchActive = !!trimmedSearchValue;
+    const wasSearchViewOpen = useRef(isSearchViewOpen);
 
-    const handleClearSearch = () => {
+    const handleClearSearch = useCallback((): void => {
       clearSearch();
-      void refresh();
-    };
+    }, [clearSearch]);
+
+    useEffect(() => {
+      if (wasSearchViewOpen.current && !isSearchViewOpen && (isSearchActive || hasActiveFilters)) {
+        clearAllFilters();
+        clearSearch({preserveFilters: false});
+      }
+      wasSearchViewOpen.current = isSearchViewOpen;
+    }, [clearAllFilters, clearSearch, hasActiveFilters, isSearchActive, isSearchViewOpen]);
 
     // When search is active, refresh should trigger search reload
     const handleRefresh = isSearchActive ? () => handleSearch(searchValue) : refresh;
@@ -125,12 +155,15 @@ export const ConversationCells = memo(
       <div css={wrapperStyles}>
         <CellsHeader
           onRefresh={handleRefresh}
-          conversationQualifiedId={conversationQualifiedId}
           conversationName={name}
+          conversationQualifiedId={conversationQualifiedId}
           cellsRepository={cellsRepository}
+          isSearchViewOpen={isSearchViewOpen}
+          onOpenSearchView={onOpenSearchView}
           searchValue={searchValue}
           onSearchChange={handleSearch}
           onSearchClear={handleClearSearch}
+          filters={filters}
         />
         {isTableVisible && (
           <CellsTable

@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
 import {MediaType} from 'Repositories/media/MediaType';

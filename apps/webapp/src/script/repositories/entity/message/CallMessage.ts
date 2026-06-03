@@ -31,7 +31,7 @@ export class CallMessage extends Message {
   private readonly call_message_type: CALL_MESSAGE_TYPE;
   private readonly duration: number;
   public readonly caption?: ko.PureComputed<string>;
-  public readonly finished_reason: TERMINATION_REASON;
+  public readonly finished_reason?: TERMINATION_REASON;
 
   constructor(type: CALL_MESSAGE_TYPE, reason?: TERMINATION_REASON, duration: number = 0) {
     super();

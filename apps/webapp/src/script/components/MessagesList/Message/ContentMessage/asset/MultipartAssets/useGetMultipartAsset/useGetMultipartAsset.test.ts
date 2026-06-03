@@ -21,6 +21,11 @@ import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNode} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {
+  createExecutingFireAndForgetInvokerForTest,
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useGetMultipartAsset} from './useGetMultipartAsset';
 
@@ -50,6 +55,9 @@ const mockRecycledNode: RestNode = {
 
 describe('useGetMultipartAsset', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
+  const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -68,13 +76,15 @@ describe('useGetMultipartAsset', () => {
     it('should set isRecycled to false for non-recycled files', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -88,13 +98,15 @@ describe('useGetMultipartAsset', () => {
     it('should set isRecycled to true for recycled files', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockRecycledNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -109,13 +121,15 @@ describe('useGetMultipartAsset', () => {
       // Start with non-recycled node
       mockCellsRepository.getNode.mockResolvedValueOnce(mockNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -139,13 +153,15 @@ describe('useGetMultipartAsset', () => {
     it('should refetch data when forceRefetch is true even if already successful', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -165,13 +181,15 @@ describe('useGetMultipartAsset', () => {
     it('should not refetch when forceRefetch is false and status is success', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -210,13 +228,15 @@ describe('useGetMultipartAsset', () => {
 
       mockCellsRepository.getNode.mockResolvedValueOnce(mockNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -242,13 +262,15 @@ describe('useGetMultipartAsset', () => {
     it('should not fetch data when isEnabled is false', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: false,
-          retryPreviewUntilSuccess: false,
-        }),
+      renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: false,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await act(async () => {
@@ -263,13 +285,15 @@ describe('useGetMultipartAsset', () => {
     it('should set error state when fetch fails', async () => {
       mockCellsRepository.getNode.mockRejectedValue(new Error('Network error'));
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -282,13 +306,15 @@ describe('useGetMultipartAsset', () => {
     it('should allow retry after error with forceRefetch', async () => {
       mockCellsRepository.getNode.mockRejectedValueOnce(new Error('Network error'));
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -313,13 +339,15 @@ describe('useGetMultipartAsset', () => {
     it('should set hasPreview to true when previews are available', async () => {
       mockCellsRepository.getNode.mockResolvedValue(mockNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -337,13 +365,15 @@ describe('useGetMultipartAsset', () => {
 
       mockCellsRepository.getNode.mockResolvedValue(noPreviewNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -370,13 +400,15 @@ describe('useGetMultipartAsset', () => {
 
       mockCellsRepository.getNode.mockResolvedValue(processingNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: false,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: false,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -419,14 +451,16 @@ describe('useGetMultipartAsset', () => {
 
       mockCellsRepository.getNode.mockResolvedValueOnce(processingNode).mockResolvedValueOnce(readyNode);
 
-      const {result} = renderHook(() =>
-        useGetMultipartAsset({
-          uuid: 'test-uuid',
-          cellsRepository: mockCellsRepository,
-          isEnabled: true,
-          retryPreviewUntilSuccess: true,
-          retryDelay: 100,
-        }),
+      const {result} = renderHook(
+        () =>
+          useGetMultipartAsset({
+            uuid: 'test-uuid',
+            cellsRepository: mockCellsRepository,
+            isEnabled: true,
+            retryPreviewUntilSuccess: true,
+            retryDelay: 100,
+          }),
+        {wrapper: rootProviderWrapper},
       );
 
       await waitFor(() => {
@@ -436,6 +470,7 @@ describe('useGetMultipartAsset', () => {
       // Wait for retry
       await act(async () => {
         jest.advanceTimersByTime(100);
+        await fireAndForgetInvoker.waitUntilAllSettled();
       });
 
       await waitFor(() => {

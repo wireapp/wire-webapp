@@ -28,12 +28,8 @@ import {ConversationSidebar} from './webapp/components/conversationSidebar.compo
 import {InputBarControls} from './webapp/components/inputBarControls.component';
 import {AcknowledgeModal} from './webapp/modals/acknowledge.modal';
 import {AppLockModal} from './webapp/modals/appLock.modal';
-import {BlockWarningModal} from './webapp/modals/blockWarning.modal';
-import {CallNotEstablishedModal} from './webapp/modals/callNotEstablished.modal';
 import {ConfirmModal} from './webapp/modals/confirm.modal';
 import {ConfirmLogoutModal} from './webapp/modals/confirmLogout.modal';
-import {DataShareConsentModal} from './webapp/modals/dataShareConsent.modal';
-import {DeleteAccountModal} from './webapp/modals/deleteAccount.modal';
 import {DetailViewModal} from './webapp/modals/detailView.modal';
 import {LeaveConversationModal} from './webapp/modals/leaveConversation.modal';
 import {OptionModal} from './webapp/modals/option.modal';
@@ -75,6 +71,13 @@ import {ConversationJoinPage} from './webapp/pages/conversationJoin.page';
 import {CreateConversationModal} from './webapp/modals/createConversation';
 import {InviteModal} from './webapp/modals/invite.modal';
 import {JoinGuestLinkPasswordModal} from './webapp/modals/joinGuestLinkPassword.modal';
+import {WithoutTitle} from './webapp/modals/withoutTitle.modal';
+import {AboutPage} from './webapp/pages/about.page';
+import {DeviceDetailsPage} from './webapp/pages/deviceDetails.page';
+import {ParticipantDeviceDetailsPage} from './webapp/pages/participantDeviceDetail.page';
+import {ParticipantDevicesPage} from './webapp/pages/participantDevices.page';
+import {NewDeviceModal} from './webapp/modals/newDevice.modal';
+import {ReadReceiptModal} from './webapp/modals/readReceipt.modal';
 
 export const webAppPath = process.env.WEBAPP_URL ?? '';
 
@@ -170,9 +173,15 @@ export class PageManager {
       fullScreenCall: () => this.getOrCreate('webapp.pages.fullScreenCall', () => FullScreenCallPage(this.page)),
       settings: () => this.getOrCreate('webapp.pages.settings', () => new SettingsPage(this.page)),
       devices: () => this.getOrCreate('webapp.pages.devices', () => new DevicesPage(this.page)),
+      deviceDetails: () => this.getOrCreate('webapp.pages.deviceDetails', () => DeviceDetailsPage(this.page)),
+      participantDevices: () =>
+        this.getOrCreate('webapp.pages.participantDevices', () => ParticipantDevicesPage(this.page)),
+      participantDeviceDetails: () =>
+        this.getOrCreate('webapp.pages.participantDeviceDetails', () => ParticipantDeviceDetailsPage(this.page)),
       options: () => this.getOrCreate('webapp.pages.options', () => new OptionsPage(this.page)),
       audioVideoSettings: () =>
         this.getOrCreate('webapp.pages.audioVideoSettings', () => new AudioVideoSettingsPage(this.page)),
+      about: () => this.getOrCreate('webapp.pages.about', () => new AboutPage(this.page)),
       outgoingConnection: () =>
         this.getOrCreate('webapp.pages.outgoingConnection', () => new OutgoingConnectionPage(this.page)),
       guestOptions: () => this.getOrCreate('webapp.pages.guestOptions', () => GuestOptionsPage(this.page)),
@@ -194,14 +203,8 @@ export class PageManager {
       conversationJoin: () => this.getOrCreate('webapp.pages.conversationJoin', () => ConversationJoinPage(this.page)),
     },
     modals: {
-      dataShareConsent: () =>
-        this.getOrCreate('webapp.modals.dataShareConsent', () => new DataShareConsentModal(this.page)),
       appLock: () => this.getOrCreate('webapp.modals.appLock', () => new AppLockModal(this.page)),
       userProfile: () => this.getOrCreate('webapp.modals.userProfile', () => new UserProfileModal(this.page)),
-      blockWarning: () => this.getOrCreate('webapp.modals.blockWarning', () => new BlockWarningModal(this.page)),
-      callNotEstablished: () =>
-        this.getOrCreate('webapp.modals.callNotEstablished', () => new CallNotEstablishedModal(this.page)),
-      deleteAccount: () => this.getOrCreate('webapp.modals.deleteAccount', () => new DeleteAccountModal(this.page)),
       confirmLogout: () => this.getOrCreate('webapp.modals.confirmLogout', () => new ConfirmLogoutModal(this.page)),
       leaveConversation: () =>
         this.getOrCreate('webapp.modals.leaveConversation', () => new LeaveConversationModal(this.page)),
@@ -223,6 +226,9 @@ export class PageManager {
       createConversation: () =>
         this.getOrCreate('webapp.modals.createConversation', () => CreateConversationModal(this.page)),
       invite: () => this.getOrCreate('webapp.modals.invite', () => InviteModal(this.page)),
+      withoutTitle: () => this.getOrCreate('webapp.modals.withoutTitle', () => new WithoutTitle(this.page)),
+      newDevice: () => this.getOrCreate('webapp.modals.newDevice', () => new NewDeviceModal(this.page)),
+      readReceipt: () => this.getOrCreate('webapp.modals.readReceipt', () => new ReadReceiptModal(this.page)),
     },
     components: {
       contactList: () => this.getOrCreate('webapp.components.ContactList', () => new ContactList(this.page)),

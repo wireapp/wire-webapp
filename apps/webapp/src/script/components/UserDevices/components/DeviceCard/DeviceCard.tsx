@@ -30,7 +30,7 @@ import {t} from 'Util/localizerUtil';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
-import * as Icon from '../../../Icon';
+import * as Icon from '../../../icon';
 
 interface DeviceCardProps {
   click?: (device: ClientEntity) => void;
@@ -85,7 +85,7 @@ const DeviceCard = ({click, getDeviceIdentity, device: clientEntity, showIcon = 
           <DeviceVerificationBadges device={clientEntity} getIdentity={getDeviceIdentity} />
         </div>
 
-        {deviceIdentity?.thumbprint && (
+        {deviceIdentity?.thumbprint !== undefined && deviceIdentity.thumbprint !== '' && (
           <p className="text-background device-card__id">
             <span>{t('preferencesMLSThumbprint')}</span>
 

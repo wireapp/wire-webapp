@@ -22,7 +22,7 @@ import {MouseEvent, KeyboardEvent} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EphemeralTimings} from 'src/script/ephemeral/EphemeralTimings';
@@ -99,22 +99,20 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
       type="button"
     >
       {hasMessageTimer ? (
-        conversation && (
-          <div
-            className={cx(
-              'message-timer-button',
-              isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
-            )}
-            data-uie-name="message-timer-button"
-          >
-            <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
-              {duration.symbol}
-            </span>
-            <span className="full-screen" data-uie-name="message-timer-button-value">
-              {duration.value}
-            </span>
-          </div>
-        )
+        <div
+          className={cx(
+            'message-timer-button',
+            isTimerDisabled ? 'message-timer-button--disabled' : 'message-timer-button--enabled',
+          )}
+          data-uie-name="message-timer-button"
+        >
+          <span className="message-timer-button-unit" data-uie-name="message-timer-button-symbol">
+            {duration.symbol}
+          </span>
+          <span className="full-screen" data-uie-name="message-timer-button-value">
+            {duration.value}
+          </span>
+        </div>
       ) : (
         <span className={cx({disabled: isTimerDisabled})} css={{display: 'flex'}}>
           <Icon.TimerIcon data-uie-name="message-timer-icon" width={14} height={14} />

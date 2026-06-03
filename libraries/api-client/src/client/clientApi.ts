@@ -231,7 +231,7 @@ export class ClientAPI {
     const config: AxiosRequestConfig = {
       method: 'POST',
       url: `/${ClientAPI.URL.MLS_CLIENTS}/${ClientAPI.URL.MLS_KEY_PACKAGES}/claim/${userDomain}/${userId}${
-        skipOwn ? `?skip_own=${skipOwn}` : ''
+        skipOwn !== undefined && skipOwn.length > 0 ? `?skip_own=${skipOwn}` : ''
       }`,
       params: {
         ciphersuite,

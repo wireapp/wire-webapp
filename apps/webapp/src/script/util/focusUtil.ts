@@ -30,7 +30,7 @@ export const getAllFocusableElements = (
   parent: Element,
   customSelector: string[] = [],
 ): NodeListOf<HTMLElement> | [] => {
-  if (!parent) {
+  if (parent === null || parent === undefined) {
     console.warn('You need to pass a parent HTMLElement');
     return []; // Return array so length queries will work
   }
@@ -46,7 +46,7 @@ export const getAllFocusableElements = (
  * @param isFocusable current message focus state
  */
 export const setElementsTabIndex = (elements: NodeListOf<HTMLElement> | [], isFocusable: boolean) => {
-  if (elements.length) {
+  if (elements.length > 0) {
     elements.forEach(element => {
       setElementTabIndex(element, isFocusable);
     });

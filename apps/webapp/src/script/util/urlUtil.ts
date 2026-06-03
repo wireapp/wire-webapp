@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {includesString} from 'Util/stringUtil';
 
 export const appendParameter = (url: string, parameter: string) => {
@@ -30,7 +32,7 @@ export const getParameter = (parameterName: string, locationSearch = window.loca
     const [parameter, value] = searchParam.split('=');
     const isExpectedParameter = parameter === parameterName;
     if (isExpectedParameter) {
-      if (value) {
+      if (is.nonEmptyString(value)) {
         const decodedValue = decodeURI(value);
 
         if (decodedValue === 'false') {
@@ -91,14 +93,14 @@ export function getDomainName(url: string): string {
 }
 
 export const getLinksFromHtml = <T extends HTMLElement>(html: string): T[] => {
-  if (!html) {
+  if (!is.nonEmptyString(html)) {
     return [];
   }
 
   const anchorTags = new RegExp(/<a[\s]+([^>]+)>((?:.(?!\<\/a\>))*.)<\/a>/, 'g');
   const links = html.match(anchorTags);
 
-  return links?.length
+  return links !== null && links.length > 0
     ? links.map(element => {
         const container = document.createElement('div');
         container.innerHTML = element.trim();

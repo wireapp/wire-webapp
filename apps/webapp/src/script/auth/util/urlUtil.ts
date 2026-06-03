@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {FORWARDED_QUERY_KEYS} from '../route';
 
 export function getSearchParams(
@@ -26,7 +28,7 @@ export function getSearchParams(
   const searchParams = window.location.search
     .replace(/^\?/, '')
     .split('&')
-    .filter(searchParam => !!searchParam)
+    .filter(searchParam => searchParam.length > 0)
     .filter(searchParam => {
       const paramName = searchParam.split('=')[0];
       return whitelistParams.includes(paramName);
@@ -54,7 +56,7 @@ export function hasURLParameter(parameterName: string): boolean {
     .includes(parameterName);
 }
 
-export function openTab(url: string): Window {
+export function openTab(url: string): Window | null {
   const newWindow = window.open(url);
   if (newWindow) {
     newWindow.opener = null;
@@ -65,7 +67,7 @@ export function openTab(url: string): Window {
 export const SSO_CODE_PREFIX = 'wire-';
 
 export function getPrefixedSSOCode(code?: string) {
-  return code ? `${SSO_CODE_PREFIX}${code}` : '';
+  return is.nonEmptyString(code) ? `${SSO_CODE_PREFIX}${code}` : '';
 }
 
 export const navigateTo = (url: string) => {

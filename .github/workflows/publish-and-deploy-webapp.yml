@@ -37,6 +37,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup Node.js
@@ -77,20 +78,14 @@ jobs:
           name: 'build-artifact'
           path: '${{env.BUILD_DIR}}${{env.BUILD_ARTIFACT}}'
 
-      - uses: kanga333/variable-mapper@3681b75f5c6c00162721168fb91ab74925eaebcb
-        id: changelog
-        with:
-          key: '${{github.ref}}'
-          map: |
-            {
-              "production": {
-                "changelog_type": "production"
-              },
-              "staging": {
-                "changelog_type": "staging"
-              }
-            }
-          export_to: env
+      - name: Define changelog type
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == *production* ]]; then
+            echo "changelog_type=production" >> "$GITHUB_ENV"
+          elif [[ "${GITHUB_REF}" == *staging* ]]; then
+            echo "changelog_type=staging" >> "$GITHUB_ENV"
+          fi
 
       - name: Generate changelog
         id: generate_changelog
@@ -157,30 +152,26 @@ jobs:
 
       # generates a mapping between branches/tag to wire-build branches
       - name: Define target branches in wireapp/wire-builds to bump
-        uses: kanga333/variable-mapper@3681b75f5c6c00162721168fb91ab74925eaebcb
         id: output_target_branches
-        with:
-          key: '${{github.ref}}'
-          # TODO  Add staging if we ever use a wire-builds as a source for staging (we use k8s)
-          # "staging": {
-          #   "targets": "[\"TBD\"]"
-          # },
-          map: |
-            {
-              "production": {
-                "targets": "[\"main\"]"
-              },
-              "dev": {
-                "targets": "[\"dev\"]"
-              },
-              "q1-2024": {
-                "targets": "[\"q1-2024\"]"
-              },
-              "q2-2025": {
-                "targets": "[\"q2-2025\"]"
-              }
-            }
-          export_to: log,output
+        shell: bash
+        run: |
+          set -eo pipefail
+
+          wire_build_target_branches_json=""
+
+          if [[ "${GITHUB_REF}" == *production* ]]; then
+            wire_build_target_branches_json='["main"]'
+          elif [[ "${GITHUB_REF}" == *dev* ]]; then
+            wire_build_target_branches_json='["dev"]'
+          elif [[ "${GITHUB_REF}" == *q1-2024* ]]; then
+            wire_build_target_branches_json='["q1-2024"]'
+          elif [[ "${GITHUB_REF}" == *q2-2025* ]]; then
+            wire_build_target_branches_json='["q2-2025"]'
+          fi
+
+          if [[ -n "${wire_build_target_branches_json}" ]]; then
+            echo "targets=${wire_build_target_branches_json}" >> "$GITHUB_OUTPUT"
+          fi
 
   publish_wire_builds:
     name: Bump webapp chart in wire-builds
@@ -196,6 +187,7 @@ jobs:
       - name: Check out wire-builds
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           repository: wireapp/wire-builds
           token: ${{secrets.WIRE_BUILDS_WRITE_ACCESS_GH_TOKEN}}
           ref: ${{matrix.target_branch}}
@@ -262,26 +254,24 @@ jobs:
 
     steps:
       # generates a mapping between branches/tag to aws envs to deploy to
-      - uses: kanga333/variable-mapper@3681b75f5c6c00162721168fb91ab74925eaebcb
-        id: targets
-        with:
-          key: '${{github.ref}}'
-          map: |
-            {
-              "dev": {
-                "targets": "[\"wire-webapp-dev\", \"wire-webapp-edge\"]"
-              },
-              "master": {
-                "targets": "[\"wire-webapp-main\"]"
-              },
-              "production": {
-                "targets": "[\"wire-webapp-prod\"]"
-              },
-              "staging": {
-                "targets": "[\"wire-webapp-staging\"]"
-              }
-            }
-          export_to: env
+      - name: Define deployment targets
+        shell: bash
+        run: |
+          deployment_targets_json=""
+
+          if [[ "${GITHUB_REF}" == *dev* ]]; then
+            deployment_targets_json='["wire-webapp-dev", "wire-webapp-edge"]'
+          elif [[ "${GITHUB_REF}" == *master* ]]; then
+            deployment_targets_json='["wire-webapp-main"]'
+          elif [[ "${GITHUB_REF}" == *production* ]]; then
+            deployment_targets_json='["wire-webapp-prod"]'
+          elif [[ "${GITHUB_REF}" == *staging* ]]; then
+            deployment_targets_json='["wire-webapp-staging"]'
+          fi
+
+          if [[ -n "${deployment_targets_json}" ]]; then
+            echo "targets=${deployment_targets_json}" >> "$GITHUB_ENV"
+          fi
 
   deploy_to_aws:
     name: 'Deploy to live environments'

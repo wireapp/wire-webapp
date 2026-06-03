@@ -32,11 +32,16 @@ interface QualifiedEntity {
  * @return boolean - do the entities match
  */
 export function matchQualifiedIds(entity1?: QualifiedEntity, entity2?: QualifiedEntity) {
-  if (!entity1 || !entity2) {
+  if (entity1 === undefined || entity2 === undefined) {
     return false;
   }
 
   const idsMatch = entity1.id === entity2.id;
-  const domainsMatch = !entity1.domain || !entity2.domain || entity1.domain === entity2.domain;
+  const domainsMatch =
+    entity1.domain === null ||
+    entity2.domain === null ||
+    entity1.domain.length === 0 ||
+    entity2.domain.length === 0 ||
+    entity1.domain === entity2.domain;
   return idsMatch && domainsMatch;
 }

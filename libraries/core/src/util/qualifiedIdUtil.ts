@@ -25,7 +25,7 @@ export const stringifyQualifiedId = (qualifiedId: QualifiedId): StringifiedQuali
 
 export const parseQualifiedId = (qualifiedId: string): QualifiedId => {
   const [id, domain] = qualifiedId.split('@');
-  if (!id || !domain) {
+  if (id === undefined || domain === undefined) {
     throw new Error(`given qualified ID is corrupted (${qualifiedId})`);
   }
   return {id, domain};

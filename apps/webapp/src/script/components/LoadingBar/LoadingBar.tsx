@@ -31,7 +31,7 @@ interface LoadingBarProps {
 
 const LoadingBar: FC<LoadingBarProps> = ({message, className = '', centerText = true}) => (
   <div data-uie-name="loading-bar" className={cx('loading-bar', {'text-center': centerText}, className)}>
-    {message && <div className="progress-console">{message}</div>}
+    {message !== undefined && message !== '' && <div className="progress-console">{message}</div>}
     <Loading data-uie-name="loading-bar-spinner" size={16} />
   </div>
 );

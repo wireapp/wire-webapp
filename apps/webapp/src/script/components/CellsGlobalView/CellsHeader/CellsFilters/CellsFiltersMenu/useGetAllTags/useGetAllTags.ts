@@ -19,14 +19,28 @@
 
 import {useCallback, useEffect, useState} from 'react';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 
-export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsRepository}) => {
+type UseGetAllTagsProps = {
+  cellsRepository: CellsRepository;
+  fireAndForgetInvoker: FireAndForgetInvoker;
+};
+
+type UseGetAllTagsResult = {
+  tags: string[];
+  isLoading: boolean;
+  error: Error | null;
+};
+
+export const useGetAllTags = (properties: UseGetAllTagsProps): UseGetAllTagsResult => {
+  const {cellsRepository, fireAndForgetInvoker} = properties;
   const [tags, setTags] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchTags = useCallback(async () => {
+  const fetchTags = useCallback(async (): Promise<void> => {
     setIsLoading(true);
     try {
       const tags = await cellsRepository.getAllTags();
@@ -42,8 +56,8 @@ export const useGetAllTags = ({cellsRepository}: {cellsRepository: CellsReposito
   }, []);
 
   useEffect(() => {
-    void fetchTags();
-  }, [fetchTags]);
+    fireAndForgetInvoker.fireAndForget(fetchTags);
+  }, [fetchTags, fireAndForgetInvoker]);
 
   return {tags, isLoading, error};
 };

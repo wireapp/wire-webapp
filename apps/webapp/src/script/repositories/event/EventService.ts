@@ -32,15 +32,15 @@ import {
   EventRecord,
   hasQuoteForMessage,
 } from 'Repositories/storage';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
 import {getLogger, Logger} from 'Util/logger';
 import {toError} from 'Util/toError';
 
 import {ClientEvent, CONVERSATION as CLIENT_CONVERSATION_EVENT} from './Client';
 
-import {BaseError, BASE_ERROR_TYPE} from '../../error/BaseError';
-import {ConversationError} from '../../error/ConversationError';
-import {StorageError} from '../../error/StorageError';
+import {BaseError, BASE_ERROR_TYPE} from '../../error/baseError';
+import {ConversationError} from '../../error/conversationError';
+import {StorageError} from '../../error/storageError';
 import {categoryFromEvent} from '../../message/MessageCategorization';
 import {MessageCategory} from '../../message/MessageCategory';
 
@@ -49,14 +49,20 @@ type DexieCollection = Dexie.Collection<any, any>;
 type DBEvents = DexieCollection | EventRecord[];
 export type IdentifiedUpdatePayload = Partial<EventRecord> & Pick<EventRecord, 'primary_key'>;
 
-const eventTimeToDate = (time: string) => new Date(time) || new Date(parseInt(time, 10));
+const eventTimeToDate = (time: string) => {
+  return new Date(time);
+};
 
-const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) =>
-  eventA.conversation.localeCompare(eventB.conversation);
+const compareEventsByConversation = (eventA: EventRecord, eventB: EventRecord) => {
+  return (eventA.conversation ?? '').localeCompare(eventB.conversation ?? '');
+};
 
-const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => eventA.id.localeCompare(eventB.id);
-const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) =>
-  eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
+const compareEventsById = (eventA: EventRecord, eventB: EventRecord) => {
+  return (eventA.id ?? '').localeCompare(eventB.id ?? '');
+};
+const compareEventsByTime = (eventA: EventRecord, eventB: EventRecord) => {
+  return eventTimeToDate(eventA.time).getTime() - eventTimeToDate(eventB.time).getTime();
+};
 const MAX_INDEXED_DB_LIMIT = 0xffffffff; // 4_294_967_295
 
 /** Handles all databases interactions related to events */
@@ -86,8 +92,8 @@ export class EventService {
 
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
-        .filter(record => record.conversation === conversationId && eventIds.includes(record.id))
-        .sort(compareEventsById);
+        .filter(record => record.conversation === conversationId && eventIds.includes(record.id ?? ''))
+        .toSorted(compareEventsById);
     } catch (error: unknown) {
       const logMessage = `Failed to get events '${eventIds.join(',')}' for conversation '${conversationId}': ${
         toError(error).message
@@ -117,7 +123,7 @@ export class EventService {
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
         .filter(record => record.conversation === conversationId && !!record.ephemeral_expires)
-        .sort(compareEventsById);
+        .toSorted(compareEventsById);
     } catch (error: unknown) {
       const logMessage = `Failed to get ephemeral events for conversation '${conversationId}': ${toError(error).message}`;
       this.logger.error(logMessage, error);
@@ -156,7 +162,7 @@ export class EventService {
       const records = await this.storageService.getAll<EventRecord>(StorageSchemata.OBJECT_STORE.EVENTS);
       return records
         .filter(record => record.id === eventId && record.conversation === conversationId)
-        .sort(compareEventsById)
+        .toSorted(compareEventsById)
         .shift();
     } catch (error: unknown) {
       const logMessage = `Failed to get event '${eventId}' for conversation '${conversationId}': ${toError(error).message}`;
@@ -202,7 +208,7 @@ export class EventService {
           record.conversation === conversationId && record.category >= categoryMin && record.category <= categoryMax,
       )
       .filter(filterExpired)
-      .sort(compareEventsByTime);
+      .toSorted(compareEventsByTime);
   }
 
   async loadEventsReplyingToMessage(conversationId: string, quotedMessageId: string, quotedMessageTime: string) {
@@ -226,7 +232,7 @@ export class EventService {
         );
       })
       .filter(event => hasQuoteForMessage(event, quotedMessageId))
-      .sort(compareEventsByConversation);
+      .toSorted(compareEventsByConversation);
   }
 
   /**
@@ -251,8 +257,10 @@ export class EventService {
     try {
       const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
       return this.storageService.db
-        ? await (events as Dexie.Collection<any, any>).reverse().sortBy('time')
-        : (events as EventRecord[]).reverse().sort(compareEventsByTime);
+        ? // Dexie.Collection.reverse() is a query API, not Array.prototype.reverse().
+          // eslint-disable-next-line unicorn/no-array-reverse
+          await (events as Dexie.Collection<any, any>).reverse().sortBy('time')
+        : (events as EventRecord[]).toReversed().toSorted(compareEventsByTime);
     } catch (error: unknown) {
       const message = `Failed to load events for conversation '${conversationId}' from database: '${toError(error).message}'`;
       this.logger.error(message);
@@ -287,7 +295,7 @@ export class EventService {
     const events = await this._loadEventsInDateRange(conversationId, fromDate, toDate, limit, includeParams);
     return this.storageService.db
       ? (events as DexieCollection).sortBy('time')
-      : (events as EventRecord[]).sort(compareEventsByTime);
+      : (events as EventRecord[]).toSorted(compareEventsByTime);
   }
 
   /**
@@ -340,7 +348,7 @@ export class EventService {
           (includeTo ? recordDate <= toDate.getTime() : recordDate < toDate.getTime())
         );
       })
-      .sort(compareEventsByConversation)
+      .toSorted(compareEventsByConversation)
       .slice(0, limit);
   }
 
@@ -357,7 +365,7 @@ export class EventService {
     };
     const savedEvent: EventRecord = {
       ...categorizedEvent,
-      primary_key: await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, undefined, categorizedEvent),
+      primary_key: await this.storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, '', categorizedEvent),
     } as EventRecord;
     return savedEvent;
   }

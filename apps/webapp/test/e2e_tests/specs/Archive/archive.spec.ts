@@ -21,7 +21,7 @@ import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
-import {expect, test, withConnectedUser, withLogin} from '../../test.fixtures';
+import {expect, test, withLogin} from '../../test.fixtures';
 import {Locator} from 'playwright/test';
 
 test.describe('Archive', () => {
@@ -37,22 +37,24 @@ test.describe('Archive', () => {
     'I want to archive and unarchive conversation via conversation list',
     {tag: ['@TC-97', '@regression']},
     async ({createPage}) => {
-      const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
+      const page = await createPage(withLogin(memberA));
+      await connectWithUser(page, memberB);
       const {pages, components} = PageManager.from(page).webapp;
 
-      let contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      const conversation = pages.conversationList().getConversation(memberB.fullName);
+      let contextMenu = await conversation.openContextMenu();
       await contextMenu.archiveButton.click();
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      await expect(conversation).not.toBeVisible();
 
       await components.conversationSidebar().clickArchive();
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+      await expect(conversation).toBeVisible();
 
-      contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+      contextMenu = await conversation.openContextMenu();
       await contextMenu.unarchiveButton.click();
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+      await expect(conversation).not.toBeVisible();
 
       await components.conversationSidebar().clickAllConversationsButton();
-      await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+      await expect(conversation).toBeVisible();
     },
   );
 
@@ -60,30 +62,33 @@ test.describe('Archive', () => {
     'Verify the conversation is not unarchived when there are new messages in this conversation',
     {tag: ['@TC-99', '@regression']},
     async ({createPage}) => {
-      const [memberAPages, memberBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(memberA), withConnectedUser(memberB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(memberB))).then(pm => pm.webapp.pages),
+      const [memberAPage, memberBPage] = await Promise.all([
+        createPage(withLogin(memberA)),
+        createPage(withLogin(memberB)),
       ]);
+      await connectWithUser(memberAPage, memberB);
 
-      await memberAPages.conversationList().openConversation(memberB.fullName, {protocol: 'mls'});
-      await memberBPages.conversationList().openConversation(memberA.fullName, {protocol: 'mls'});
+      const [memberAPages, memberBPages] = [memberAPage, memberBPage].map(page => PageManager.from(page).webapp.pages);
+
+      const memberAConversation = await memberAPages
+        .conversationList()
+        .getConversation(memberB.fullName, {protocol: 'mls'})
+        .open();
+      await memberBPages.conversationList().getConversation(memberA.fullName, {protocol: 'mls'}).open();
 
       await test.step('MemberA archives conversation with memberB', async () => {
-        const contextMenu = await memberAPages
-          .conversationList()
-          .getConversationLocator(memberB.fullName, {protocol: 'mls'})
-          .openContextMenu();
+        const contextMenu = await memberAConversation.openContextMenu();
         await contextMenu.archiveButton.click();
       });
 
       await test.step('MemberB sends message in archived conversation', async () => {
         await memberBPages.conversation().sendMessage('Test message');
-        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+        await expect(memberAConversation).not.toBeVisible();
       });
 
       await test.step('MemberB pings in archived conversation', async () => {
         await memberBPages.conversation().sendPing();
-        await expect(memberAPages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+        await expect(memberAConversation).not.toBeVisible();
       });
     },
   );
@@ -95,38 +100,39 @@ test.describe('Archive', () => {
     ] as const
   ).forEach(({title, tag}) => {
     test(title, {tag: [tag, '@regression']}, async ({createPage}) => {
-      const page = await createPage(withLogin(memberA), withConnectedUser(memberB));
+      const page = await createPage(withLogin(memberA));
+      await connectWithUser(page, memberB);
       const {pages, components} = PageManager.from(page).webapp;
 
-      await pages.conversationList().openConversation(memberB.fullName);
+      const conversation = await pages.conversationList().getConversation(memberB.fullName).open();
 
       if (tag === '@TC-103') {
         await test.step('User mutes the conversation', async () => {
-          const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+          const contextMenu = await conversation.openContextMenu();
           await contextMenu.notificationsButton.click();
           await pages.conversationDetails().selectNotificationsLevel('Nothing');
         });
       }
 
       await test.step('User archives the conversation', async () => {
-        const contextMenu = await pages.conversationList().getConversationLocator(memberB.fullName).openContextMenu();
+        const contextMenu = await conversation.openContextMenu();
         await contextMenu.archiveButton.click();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+        await expect(conversation).not.toBeVisible();
       });
 
       await test.step('User switches to archived conversations and sees it there', async () => {
         await components.conversationSidebar().archiveButton.click();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).toBeVisible();
+        await expect(conversation).toBeVisible();
       });
 
       await test.step('User starts a call in the archived conversation', async () => {
-        await pages.conversationList().openConversation(memberB.fullName);
+        await conversation.open();
         await pages.conversation().startCall();
       });
 
       await test.step('The conversation should still not be shown within all conversations', async () => {
         await components.conversationSidebar().allConversationsButton.click();
-        await expect(pages.conversationList().getConversationLocator(memberB.fullName)).not.toBeVisible();
+        await expect(conversation).not.toBeVisible();
       });
     });
   });
@@ -142,10 +148,10 @@ test.describe('Archive', () => {
         let conversation: Locator;
         if (tag === '@TC-104') {
           await createGroup(pages, 'Test Group', [memberB]);
-          conversation = pages.conversationList().getConversationLocator('Test Group');
+          conversation = pages.conversationList().getConversation('Test Group');
         } else {
           await connectWithUser(pageManager, memberB);
-          conversation = pages.conversationList().getConversationLocator(memberB.fullName);
+          conversation = pages.conversationList().getConversation(memberB.fullName);
         }
 
         await pages.conversation().conversationInfoButton.click();

@@ -20,7 +20,7 @@
 import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -28,7 +28,7 @@ import {t} from 'Util/localizerUtil';
 
 function isClassified(users: User[], classifiedDomains: string[], conversationDomain?: string): boolean {
   // if a conversation is hosted on an unclassified domain it is not considered classified
-  if (conversationDomain && !classifiedDomains.includes(conversationDomain)) {
+  if (conversationDomain !== undefined && !classifiedDomains.includes(conversationDomain)) {
     return false;
   }
   // if a conversation has any temporary guests then it is not considered classified

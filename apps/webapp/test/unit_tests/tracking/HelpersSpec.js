@@ -21,7 +21,7 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ConversationType as ConversationTypeAttribute} from 'Repositories/tracking/attribute';
-import * as trackingHelpers from 'Repositories/tracking/Helpers';
+import * as trackingHelpers from 'Repositories/tracking/helpers';
 import {createUuid} from 'Util/uuid';
 
 describe('trackingHelpers', () => {

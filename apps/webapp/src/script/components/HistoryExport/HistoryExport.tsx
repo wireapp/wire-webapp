@@ -31,8 +31,8 @@ import {ProgressBar} from 'Components/ProgressBar/ProgressBar';
 import {CancelError} from 'Repositories/backup/error';
 import {ClientState} from 'Repositories/client/ClientState';
 import {User} from 'Repositories/entity/User';
-import {EventName} from 'Repositories/tracking/EventName';
-import {Segmentation} from 'Repositories/tracking/Segmentation';
+import {EventName} from 'Repositories/tracking/eventName';
+import {Segmentation} from 'Repositories/tracking/segmentation';
 import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
@@ -102,7 +102,7 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
     [ExportState.COMPRESSING]: t('backupExportProgressCompressing'),
   };
 
-  const loadingMessage = historyMessages?.[historyState] || '';
+  const loadingMessage = historyMessages[historyState] ?? '';
 
   const dismissExport = () => {
     switchContent(ContentState.PREFERENCES_ACCOUNT);

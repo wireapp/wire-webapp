@@ -19,12 +19,13 @@
 
 import {useEffect, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {connect} from 'react-redux';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
-import {LogoIcon} from 'Components/Icon';
+import {LogoIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 import {afterRender} from 'Util/util';
 
@@ -48,7 +49,7 @@ const CustomEnvironmentRedirectComponent = ({doNavigate, doSendNavigationEvent}:
 
   useEffect(() => {
     let redirectTimeoutId: number;
-    if (destinationUrl) {
+    if (is.nonEmptyString(destinationUrl)) {
       redirectTimeoutId = window.setTimeout(() => {
         if (Runtime.isDesktopApp()) {
           doSendNavigationEvent(destinationUrl).catch(console.error);

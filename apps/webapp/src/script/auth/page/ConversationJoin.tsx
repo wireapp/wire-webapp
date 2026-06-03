@@ -19,6 +19,7 @@
 
 import {useEffect, useState, useRef, FormEvent} from 'react';
 
+import is from '@sindresorhus/is';
 import type {RegisterData} from '@wireapp/api-client/lib/auth';
 import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {connect} from 'react-redux';
@@ -34,7 +35,7 @@ import {noop} from 'Util/util';
 import {GuestLoginColumn, IsLoggedInColumn, Separator} from './ConversationJoinComponents';
 import {ConversationJoinFull} from './ConversationJoinInvalid';
 import {EntropyContainer} from './EntropyContainer';
-import {Login} from './Login';
+import {Login} from './login/login';
 import {Page} from './Page';
 
 import {Config} from '../../Config';
@@ -121,19 +122,20 @@ const ConversationJoinComponent = ({
   }, []);
 
   const routeToApp = (conversation: string = '', domain: string = '') => {
-    const redirectLocation = `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${
-      conversation && `#/conversation/${conversation}${domain && `/${domain}`}`
-    }`;
+    const conversationPath = is.nonEmptyString(conversation)
+      ? `#/conversation/${conversation}${is.nonEmptyString(domain) ? `/${domain}` : ''}`
+      : '';
+    const redirectLocation = `${UrlUtil.pathWithParams(EXTERNAL_ROUTE.WEBAPP)}${conversationPath}`;
     window.location.replace(redirectLocation);
   };
 
   const getConversationInfoAndJoin = async (password?: string) => {
-    if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
+    if (isJoinGuestLinkPasswordModalOpen !== true && conversationHasPassword === true) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
     }
     try {
-      if (!conversationCode || !conversationKey) {
+      if (!is.nonEmptyString(conversationCode) || !is.nonEmptyString(conversationKey)) {
         throw Error('Conversation code or key missing');
       }
       const conversationEvent = await doJoinConversationByCode(conversationKey, conversationCode, undefined, password);
@@ -156,13 +158,13 @@ const ConversationJoinComponent = ({
   };
 
   const handleSubmit = async (entropyData?: Uint8Array, password?: string) => {
-    if (!isJoinGuestLinkPasswordModalOpen && !!conversationHasPassword) {
+    if (isJoinGuestLinkPasswordModalOpen !== true && conversationHasPassword === true) {
       setIsJoinGuestLinkPasswordModalOpen(true);
       return;
     }
     setIsSubmitingName(true);
     try {
-      if (!conversationCode || !conversationKey) {
+      if (!is.nonEmptyString(conversationCode) || !is.nonEmptyString(conversationKey)) {
         throw Error('Conversation code or key missing');
       }
       const name = enteredName?.trim();
@@ -237,7 +239,9 @@ const ConversationJoinComponent = ({
   }
 
   const isFullConversation =
-    conversationError && conversationError.label && conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
+    conversationError !== null &&
+    conversationError !== undefined &&
+    conversationError.label === BackendErrorLabel.TOO_MANY_MEMBERS;
 
   const submitJoinCodeWithPassword = async (password: string) => {
     await handleSubmit(undefined, password);
@@ -278,7 +282,7 @@ const ConversationJoinComponent = ({
         </div>
         <Columns style={{display: 'flex', gap: '2rem', alignSelf: 'center', maxWidth: '100%'}}>
           <Column>
-            {selfName && hasLoadedClients ? (
+            {is.nonEmptyString(selfName) && hasLoadedClients ? (
               <IsLoggedInColumn selfName={selfName} handleLogout={doLogout} handleSubmit={getConversationInfoAndJoin} />
             ) : (
               <Login embedded />

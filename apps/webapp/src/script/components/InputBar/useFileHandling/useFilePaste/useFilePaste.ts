@@ -31,18 +31,19 @@ interface UseFilePasteParams {
 
 export const useFilePaste = ({onFilePasted, isFileNameKept}: UseFilePasteParams) => {
   const processClipboardFiles = useCallback(
-    (files: FileList): void => {
-      const [pastedFile] = files;
+    (files: FileList | File[]): void => {
+      const pastedFile = Array.isArray(files) ? files[0] : files.item(0);
 
-      if (!pastedFile) {
+      if (pastedFile == null) {
         return;
       }
       const {lastModified} = pastedFile;
 
-      const date = formatLocale(lastModified || new Date(), 'PP, pp');
-      const rawFileName = isFileNameKept
-        ? pastedFile.name
-        : `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
+      const date = formatLocale(lastModified > 0 ? lastModified : new Date(), 'PP, pp');
+      const rawFileName =
+        isFileNameKept === true
+          ? pastedFile.name
+          : `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
 
       // Sanitize the filename to avoid encoding issues with locale-specific characters
       const fileName = sanitizeFilename(rawFileName);
@@ -58,14 +59,14 @@ export const useFilePaste = ({onFilePasted, isFileNameKept}: UseFilePasteParams)
 
   const handlePasteEvent = useCallback(
     (event: ClipboardEvent) => {
-      if (event.clipboardData?.types.includes('text/plain')) {
+      if ((event.clipboardData?.types.includes('text/plain') ?? false) === true) {
         return;
       }
       // Avoid copying the filename into the input field
       event.preventDefault();
       const files = event.clipboardData?.files;
 
-      if (files) {
+      if (files !== undefined && files.length > 0) {
         const permissionHandler = checkFileSharingPermission(processClipboardFiles);
         permissionHandler(files);
       }

@@ -19,10 +19,11 @@
 
 import {useEffect, useRef} from 'react';
 
+import is from '@sindresorhus/is';
 import {createRoot, Root} from 'react-dom/client';
 import {toast, Toaster} from 'sonner';
 
-import {CloseIcon} from 'Components/Icon';
+import {CloseIcon} from 'Components/icon';
 
 interface AppNotificationOptions {
   message?: string;
@@ -96,7 +97,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
         const id = toast.custom(
           toastId => (
             <AppNotification
-              message={options?.message || props?.message || ''}
+              message={is.nonEmptyString(options?.message) ? options.message : (props?.message ?? '')}
               icon={props?.icon}
               withCloseButton={props?.withCloseButton}
               onClose={() => toast.dismiss(toastId)}
@@ -116,7 +117,7 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
       }, ACTION_DELAY_MS);
     },
     close: () => {
-      if (!notificationId.current) {
+      if (notificationId.current === null) {
         return;
       }
 
@@ -126,9 +127,9 @@ export const useAppNotification = (props?: AppNotificationOptions) => {
 };
 
 const injectToaster = (activeWindow: Window) => {
-  const windowKey = activeWindow.name || 'default';
+  const windowKey = is.nonEmptyString(activeWindow.name) ? activeWindow.name : 'default';
 
-  if (roots[windowKey]) {
+  if (roots[windowKey] !== undefined) {
     return;
   }
 
@@ -149,8 +150,7 @@ const injectToaster = (activeWindow: Window) => {
 // Necessary, when the activeWindow changes (e.g. switching from the main window to the detached call window).
 // Without cleaning the roots (unmounting) the <Toaster /> from the DOM note, would be rendered in both windows.
 const clearRoots = () => {
-  // eslint-disable-next-line id-length
-  Object.entries(roots).forEach(([_, rootEntry]) => {
+  Object.entries(roots).forEach(([, rootEntry]) => {
     rootEntry.unmount();
   });
   roots = {};
@@ -163,9 +163,9 @@ interface AppNotificationProps extends Pick<AppNotificationOptions, 'message' | 
 const AppNotification = ({message, icon: Icon, withCloseButton, onClose}: AppNotificationProps) => {
   return (
     <div className="app-notification">
-      {Icon && <Icon className="app-notification__icon" />}
+      {Icon !== undefined && <Icon className="app-notification__icon" />}
       <div className="app-notification__content">{message}</div>
-      {withCloseButton && (
+      {withCloseButton === true && (
         <button className="app-notification__button" onClick={onClose}>
           <CloseIcon className="app-notification__icon" />
         </button>

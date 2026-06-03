@@ -22,6 +22,8 @@ import {MutableRefObject, useCallback, useEffect, useLayoutEffect, useMemo, useR
 import {useVirtualizer} from '@tanstack/react-virtual';
 import cx from 'classnames';
 
+import {FireAndForgetInvoker} from '@wireapp/core';
+
 import {MarkerComponent} from 'Components/MessagesList/Message/Marker';
 import {Message} from 'Components/MessagesList/Message/VirtualizedMessage';
 import {MessagesListParams} from 'Components/MessagesList/MessageList.types';
@@ -34,6 +36,9 @@ import {groupMessagesBySenderAndTime, isMarker} from 'Components/MessagesList/ut
 import {useLoadMessages} from 'Components/MessagesList/VirtualizedMessagesList/useLoadMessages';
 import {useScrollMessages} from 'Components/MessagesList/VirtualizedMessagesList/useScrollMessages';
 import {useRoveFocus} from 'Hooks/useRoveFocus';
+import {MessageRepository} from 'Repositories/conversation/MessageRepository';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 
 import {VirtualizedJumpToLastMessageButton} from '../VirtualizedJumpToLastMessageButton';
@@ -45,6 +50,30 @@ interface Props extends Omit<MessagesListParams, 'isRightSidebarOpen' | 'onLoadi
   parentElement: HTMLDivElement;
   conversationLastReadTimestamp: MutableRefObject<number>;
   onLoading: (isLoading: boolean) => void;
+}
+
+type LoadMessagesForTimestampSelectionOptions = {
+  conversation: Conversation;
+  conversationRepository: Props['conversationRepository'];
+  fireAndForgetInvoker: FireAndForgetInvoker;
+  messageId: string;
+  messageRepository: MessageRepository;
+};
+
+async function loadMessagesForTimestampSelection(options: LoadMessagesForTimestampSelectionOptions): Promise<void> {
+  const {conversation, conversationRepository, fireAndForgetInvoker, messageId, messageRepository} = options;
+
+  const messageIsLoaded = conversation.getMessage(messageId);
+
+  if (messageIsLoaded) {
+    return;
+  }
+
+  const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
+  conversation.removeMessages();
+  fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+    await conversationRepository.getMessagesWithOffset(conversation, messageEntity);
+  });
 }
 
 export const VirtualizedMessagesList = ({
@@ -72,6 +101,7 @@ export const VirtualizedMessagesList = ({
   onLoading,
   isConversationLoaded,
 }: Props) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const {
     messages: allMessages,
     lastDeliveredMessage,
@@ -182,7 +212,7 @@ export const VirtualizedMessagesList = ({
 
   const scrolledToHighlightedMessage = useRef(false);
 
-  const onTimestampClick = async (messageId: string) => {
+  const onTimestampClick = async (messageId: string): Promise<void> => {
     scrolledToHighlightedMessage.current = false;
     setHighlightedMessage(messageId);
 
@@ -192,17 +222,17 @@ export const VirtualizedMessagesList = ({
       clearTimeout(clearHighlightedMessage);
     }, 5000);
 
-    const messageIsLoaded = conversation.getMessage(messageId);
-
-    if (!messageIsLoaded) {
-      const messageEntity = await messageRepository.getMessageInConversationById(conversation, messageId);
-      conversation.removeMessages();
-      void conversationRepository.getMessagesWithOffset(conversation, messageEntity);
-    }
+    await loadMessagesForTimestampSelection({
+      conversation,
+      conversationRepository,
+      fireAndForgetInvoker,
+      messageId,
+      messageRepository,
+    });
   };
 
   useLayoutEffect(() => {
-    if (highlightedMessage && !scrolledToHighlightedMessage.current) {
+    if (highlightedMessage !== undefined && highlightedMessage !== '' && !scrolledToHighlightedMessage.current) {
       const highlightedMessageIndex = groupedMessages.findIndex(
         msg => !isMarker(msg) && msg.message.id === highlightedMessage,
       );
@@ -314,7 +344,11 @@ export const VirtualizedMessagesList = ({
                   conversation={conversation}
                   hasReadReceiptsTurnedOn={conversationRepository.expectReadReceipt(conversation)}
                   isLastDeliveredMessage={lastDeliveredMessage?.id === item.message.id}
-                  isHighlighted={!!highlightedMessage && highlightedMessage === item.message.id}
+                  isHighlighted={
+                    highlightedMessage !== undefined &&
+                    highlightedMessage !== '' &&
+                    highlightedMessage === item.message.id
+                  }
                   isSelfTemporaryGuest={selfUser.isTemporaryGuest()}
                   messageRepository={messageRepository}
                   onClickAvatar={showUserDetails}
@@ -329,7 +363,7 @@ export const VirtualizedMessagesList = ({
                   onClickTimestamp={onTimestampClick}
                   selfId={selfUser.qualifiedId}
                   shouldShowInvitePeople={shouldShowInvitePeople}
-                  isFocused={!!focusedId && focusedId === item.message.id}
+                  isFocused={focusedId !== undefined && focusedId !== '' && focusedId === item.message.id}
                   handleFocus={setFocusedId}
                   handleArrowKeyDown={handleKeyDown}
                   isMsgElementsFocusable={isMsgElementsFocusable}

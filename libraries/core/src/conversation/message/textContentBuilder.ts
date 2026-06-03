@@ -38,7 +38,7 @@ export class TextContentBuilder<T extends TextContent | EditedTextContent> {
   }
 
   withLinkPreviews(linkPreviews?: LinkPreviewUploadedContent[]) {
-    if (linkPreviews?.length) {
+    if (linkPreviews !== undefined && linkPreviews.length > 0) {
       this.content.linkPreviews = linkPreviews;
     }
 
@@ -46,7 +46,7 @@ export class TextContentBuilder<T extends TextContent | EditedTextContent> {
   }
 
   withMentions(mentions?: MentionContent[]) {
-    if (mentions?.length) {
+    if (mentions !== undefined && mentions.length > 0) {
       this.content.mentions = mentions;
     }
 

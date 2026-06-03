@@ -20,7 +20,7 @@
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
 
-import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
 import {getAudioFilePath, getTextFilePath, shareAssetHelper, TextFileName} from 'test/e2e_tests/utils/asset.util';
 import {Locator} from 'playwright/test';
 import {getImageFilePath, ImageQRCodeFileName} from 'test/e2e_tests/utils/sendImage.util';
@@ -28,7 +28,7 @@ import {Buffer} from 'node:buffer';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {tmpdir} from 'node:os';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 interface DragAndDropOptions {
   buffer: Buffer;
@@ -66,10 +66,11 @@ test.describe('Sending Assets', () => {
   });
 
   test('Verify you can delete an audio message', {tag: ['@TC-111', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
     const {pages} = PageManager.from(userAPage).webapp;
 
-    await pages.conversationList().openConversation(userB.fullName);
+    await pages.conversationList().getConversation(userB.fullName).open();
     await shareAssetHelper(getAudioFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add file'}));
 
     const message = pages.conversation().getMessage({sender: userA});
@@ -79,13 +80,14 @@ test.describe('Sending Assets', () => {
   });
 
   test('I want to drag & drop a file into a conversation', {tag: ['@TC-497', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
     const {pages, modals} = PageManager.from(userAPage).webapp;
 
     const buffer = await fs.readFile(getTextFilePath());
 
     await test.step('Go to any 1:1 conversation', async () => {
-      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversationList().getConversation(userB.fullName).open();
     });
 
     await test.step('User B can drag & drop a file into a conversation', async () => {
@@ -113,7 +115,8 @@ test.describe('Sending Assets', () => {
     'I want to copy & paste an image into a conversation',
     {tag: ['@TC-498', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
       const {pages} = PageManager.from(userAPage).webapp;
 
       const buffer = await fs.readFile(getImageFilePath());
@@ -140,7 +143,7 @@ test.describe('Sending Assets', () => {
 
       const pastedFileControls = userAPage.getByTestId('pasted-file-controls');
       await test.step('Go to any 1:1 conversation', async () => {
-        await pages.conversationList().openConversation(userB.fullName);
+        await pages.conversationList().getConversation(userB.fullName).open();
       });
 
       await test.step('User A copy paste image into the conversation', async () => {
@@ -159,10 +162,11 @@ test.describe('Sending Assets', () => {
   );
 
   test('I want to copy message via message option menu', {tag: ['@TC-500', '@regression']}, async ({createPage}) => {
-    const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+    const userAPage = await createPage(withLogin(userA));
+    await connectWithUser(userAPage, userB);
     const userAPages = PageManager.from(userAPage).webapp.pages;
 
-    await userAPages.conversationList().openConversation(userB.fullName);
+    await userAPages.conversationList().getConversation(userB.fullName).open();
     await userAPages.conversation().sendMessage('Message to copy');
 
     const message = userAPages.conversation().getMessage({sender: userA});
@@ -177,11 +181,11 @@ test.describe('Sending Assets', () => {
 
   [
     {
-      tag: ['@TC-764', '@regression'],
+      tag: '@TC-764',
       conversationType: '1on1',
     } as const,
     {
-      tag: ['@TC-765', '@regression'],
+      tag: '@TC-765',
       conversationType: 'group',
     } as const,
   ].forEach(({tag, conversationType}) => {
@@ -189,7 +193,8 @@ test.describe('Sending Assets', () => {
       `Verify file can be uploaded and re-downloaded by sender himself in ${conversationType}`,
       {tag: [`${tag}`, '@regression']},
       async ({createPage}, testInfo) => {
-        const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+        const userAPage = await createPage(withLogin(userA));
+        await connectWithUser(userAPage, userB);
         const {pages} = PageManager.from(userAPage).webapp;
 
         const sourcePath = getTextFilePath();
@@ -198,10 +203,10 @@ test.describe('Sending Assets', () => {
 
         await test.step('User A opens the conversation', async () => {
           if (conversationType === '1on1') {
-            await pages.conversationList().openConversation(userB.fullName);
+            await pages.conversationList().getConversation(userB.fullName).open();
           } else {
             await createGroup(pages, 'Test Group', [userB]);
-            await pages.conversationList().openConversation('Test Group');
+            await pages.conversationList().getConversation('Test Group').open();
           }
         });
 
@@ -230,14 +235,15 @@ test.describe('Sending Assets', () => {
   });
 
   test('Verify warning is shown if file size is too big', {tag: ['@TC-767', '@regression']}, async ({createPage}) => {
-    const page = await createPage(withLogin(userA), withConnectedUser(userB));
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
     const {pages, modals} = PageManager.from(page).webapp;
     await createGroup(pages, 'Test Group', [userB]);
 
     // Verify uploading a file exceeding the limit isn't possible for both, 1on1 and group conversations
     for (const conversation of [userB.fullName, 'Test Group']) {
       await test.step(`Try sending a too big file to ${conversation}`, async () => {
-        await pages.conversationList().openConversation(conversation);
+        await pages.conversationList().getConversation(conversation).open();
         const [fileChooser] = await Promise.all([
           page.waitForEvent('filechooser'),
           page.getByRole('button', {name: 'Add file'}).click(),
@@ -263,15 +269,14 @@ test.describe('Sending Assets', () => {
   });
 
   test('Verify sender is able to cancel upload', {tag: ['@TC-773', '@regression']}, async ({createPage}) => {
-    const [userAPage, userBPage] = await Promise.all([
-      createPage(withLogin(userA), withConnectedUser(userB)),
-      createPage(withLogin(userB)),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
+
     const pages = PageManager.from(userAPage).webapp.pages;
     const userBPages = PageManager.from(userBPage).webapp.pages;
 
-    await pages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    await pages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
     const tempFilePath = path.join(tmpdir(), '25MB-testfile.tmp');
     try {
@@ -294,15 +299,14 @@ test.describe('Sending Assets', () => {
     'I should not be able to download files that were manipulated with wrong hash or invalid hash',
     {tag: ['@TC-777', '@regression']},
     async ({createPage}) => {
-      const [userAPage, userBPage] = await Promise.all([
-        createPage(withLogin(userA), withConnectedUser(userB)),
-        createPage(withLogin(userB)),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
       const userAPages = PageManager.from(userAPage).webapp.pages;
       const userBPages = PageManager.from(userBPage).webapp.pages;
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       await shareAssetHelper(getTextFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add file'}));
 
@@ -323,11 +327,14 @@ test.describe('Sending Assets', () => {
   test(
     'I should not be able to download sent files when they are obfuscated',
     {tag: ['@TC-3728', '@regression']},
-    async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+    async ({createPage}, testInfo) => {
+      test.setTimeout(testInfo.timeout + 11_000);
+
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
       const {pages} = PageManager.from(userAPage).webapp;
 
-      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversationList().getConversation(userB.fullName).open();
       await pages.conversation().enableSelfDeletingMessages();
 
       await shareAssetHelper(getImageFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add picture'}));
@@ -347,10 +354,11 @@ test.describe('Sending Assets', () => {
     'Verify you can see conversation images in fullscreen',
     {tag: ['@TC-1193', '@regression']},
     async ({createPage}) => {
-      const userAPage = await createPage(withLogin(userA), withConnectedUser(userB));
+      const userAPage = await createPage(withLogin(userA));
+      await connectWithUser(userAPage, userB);
       const {pages, modals} = PageManager.from(userAPage).webapp;
 
-      await pages.conversationList().openConversation(userB.fullName);
+      await pages.conversationList().getConversation(userB.fullName).open();
       await shareAssetHelper(getImageFilePath(), userAPage, userAPage.getByRole('button', {name: 'Add picture'}));
       await pages.conversation().clickImage(userA);
 

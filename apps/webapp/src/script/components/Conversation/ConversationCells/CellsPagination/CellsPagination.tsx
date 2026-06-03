@@ -21,7 +21,7 @@ import {useCallback} from 'react';
 
 import {FlexBox, IconButton} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {CellsPageList} from './CellsPageList/CellsPageList';
@@ -73,7 +73,7 @@ export const CellsPagination = ({
   return (
     <FlexBox css={containerStyles}>
       <p css={pageResultStyles}>
-        {totalRows && lastRow
+        {totalRows !== undefined && lastRow !== undefined
           ? t('cells.pagination.resultsOutOf', {start: firstRow, end: lastRow, total: totalRows})
           : null}
       </p>

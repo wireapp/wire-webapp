@@ -21,7 +21,7 @@ import {TabIndex, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/Avatar';
 import {Duration} from 'Components/calling/Duration';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {User} from 'Repositories/entity/User';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {t} from 'Util/localizerUtil';
@@ -121,13 +121,13 @@ export const CallingHeader = ({
         <h2 css={callDetails}>
           <div css={conversationCallName}>{conversationName}</div>
 
-          {currentCallStatus && (
+          {currentCallStatus != null && (
             <div data-uie-name={currentCallStatus.dataUieName} css={callDescription}>
               {currentCallStatus.text}
             </div>
           )}
 
-          {isOngoing && startedAt && (
+          {isOngoing && startedAt != null && (
             <div css={callDescription}>
               {isDetachedWindow ? (
                 <span data-uie-name="call-lead" aria-label={t('viewingInAnotherWindow')}>

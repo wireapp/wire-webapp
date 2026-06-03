@@ -44,13 +44,17 @@ export const FileHistoryModal = () => {
   return (
     <ModalComponent
       id="file-history-modal"
-      wrapperCSS={toBeRestoredVersionId ? fileVersionRestoreModalWrapperCss : fileHistoryModalWrapperCss}
+      wrapperCSS={
+        toBeRestoredVersionId !== undefined && toBeRestoredVersionId !== ''
+          ? fileVersionRestoreModalWrapperCss
+          : fileHistoryModalWrapperCss
+      }
       isShown={isOpen}
       onClosed={hideModal}
       data-uie-name="file-history-modal"
       onKeyDown={event => handleEscDown(event, hideModal)}
     >
-      {toBeRestoredVersionId ? (
+      {toBeRestoredVersionId !== undefined && toBeRestoredVersionId !== '' ? (
         <FileRestoreConfirmContent
           isLoading={isLoading}
           onClose={() => setToBeRestoredVersionId(undefined)}

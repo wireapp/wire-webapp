@@ -19,9 +19,9 @@
 
 import {getUser, User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
+import {connectWithUser, loginUser, logOutUser} from 'test/e2e_tests/utils/userActions';
 
-import {test, expect, LOGIN_TIMEOUT, withLogin, withConnectedUser} from '../../test.fixtures';
+import {test, expect, LOGIN_TIMEOUT, withLogin} from '../../test.fixtures';
 
 test.describe('account settings', () => {
   let owner: User;
@@ -181,13 +181,15 @@ test.describe('account settings', () => {
 
   test('Verify I can retrieve calling logs', {tag: ['@TC-1725', '@regression']}, async ({createPage}) => {
     const [memberAPage, memberBPage] = await Promise.all([
-      createPage(withLogin(memberA), withConnectedUser(memberB)),
+      createPage(withLogin(memberA)),
       createPage(withLogin(memberB)),
     ]);
+    await connectWithUser(memberAPage, memberB);
+
     const memberAPages = PageManager.from(memberAPage).webapp.pages;
     const memberBPages = PageManager.from(memberBPage).webapp.pages;
 
-    await memberAPages.conversationList().openConversation(memberB.fullName, {protocol: 'mls'});
+    await memberAPages.conversationList().getConversation(memberB.fullName, {protocol: 'mls'}).open();
 
     await memberAPages.conversation().startCall();
     await memberBPages.calling().clickAcceptCallButton();
@@ -213,7 +215,7 @@ test.describe('account settings', () => {
       });
 
       await test.step('Conversation itself on top of users message', async () => {
-        await pages.conversationList().openConversation('Test Group');
+        await pages.conversationList().getConversation('Test Group').open();
         await pages.conversation().sendMessage('test');
         await expect(pages.conversation().getMessage({content: 'test'})).toContainText(memberA.fullName);
       });
@@ -243,7 +245,7 @@ test.describe('account settings', () => {
         await pages.conversationList().clickCreateGroup();
         await modals.createConversation().createChannel('Test Channel', {members: [memberB]});
 
-        await pages.conversationList().openConversation('Test Channel');
+        await pages.conversationList().getConversation('Test Channel').open();
         await pages.conversation().conversationInfoButton.click();
         await expect(pages.conversationDetails().groupAdmins.filter({hasText: memberA.fullName})).toBeVisible();
       });

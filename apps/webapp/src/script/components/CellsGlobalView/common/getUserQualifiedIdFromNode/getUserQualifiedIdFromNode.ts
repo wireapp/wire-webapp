@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
@@ -26,7 +27,7 @@ export const getUserQualifiedIdFromNode = (node: RestNode): QualifiedId | null =
     metadata => metadata.Namespace === 'usermeta-owner-uuid',
   )?.JsonValue;
 
-  if (!userQualifiedIdJson) {
+  if (!is.nonEmptyString(userQualifiedIdJson)) {
     return null;
   }
 

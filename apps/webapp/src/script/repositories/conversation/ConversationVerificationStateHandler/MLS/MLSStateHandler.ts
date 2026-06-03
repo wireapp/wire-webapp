@@ -33,7 +33,7 @@ import {
   WireIdentity,
 } from 'src/script/E2EIdentity';
 import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMessageType';
-import {Core} from 'src/script/service/CoreSingleton';
+import {Core} from 'src/script/service/coreSingleton';
 import {Logger, getLogger} from 'Util/logger';
 import {waitFor} from 'Util/waitFor';
 

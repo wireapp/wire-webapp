@@ -43,7 +43,7 @@ const InternalErrorRoute = (): express.ErrorRequestHandler => (err, req, res, ne
     ip: req.ip,
     url: req.url,
   };
-  if (req.headers?.date) {
+  if (req.headers?.date !== undefined) {
     request.date = req.headers.date;
   }
   req.app.locals.error = error;

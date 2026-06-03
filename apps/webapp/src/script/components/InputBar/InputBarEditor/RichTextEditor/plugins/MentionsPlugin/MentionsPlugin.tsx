@@ -123,7 +123,7 @@ export function MentionsPlugin({onSearch, openStateRef}: MentionsPluginProps) {
 
   const results = onSearch(queryString);
 
-  const options = results.map(result => new MenuOption(result, result.name())).reverse();
+  const options = results.map(result => new MenuOption(result, result.name())).toReversed();
 
   const insertMention = useCallback(
     (selectedOption: MenuOption, nodeToReplace: TextNode | null, closeMenu: () => void) => {

@@ -27,7 +27,7 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {ConversationProtocolDetails} from 'Components/panel/ConversationProtocolDetails/ConversationProtocolDetails';
 import {EnrichedFields} from 'Components/panel/EnrichedFields';
 import {ServiceDetails} from 'Components/panel/ServiceDetails';
@@ -186,7 +186,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       });
 
       if (!isSelfUserRemoved) {
-        return [...filteredUsers, selfUser].sort(sortUsersByPriority);
+        return [...filteredUsers, selfUser].toSorted(sortUsersByPriority);
       }
 
       return filteredUsers;
@@ -224,6 +224,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     const showService = async (entity: ServiceEntity) => {
       if (entity.isService) {
         const serviceEntity = await integrationRepository.getServiceFromUser(entity);
+        if (serviceEntity === undefined) {
+          return;
+        }
         togglePanel(PanelState.GROUP_PARTICIPANT_SERVICE, serviceEntity);
         return;
       }

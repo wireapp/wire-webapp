@@ -50,7 +50,7 @@ export function createAbortableWait(dependencies: AbortableWaitDependencies): Ab
           resolve();
         }, durationInMilliseconds);
 
-        if (abortSignalOrUndefined?.aborted) {
+        if (abortSignalOrUndefined?.aborted === true) {
           handleAbort();
 
           return;

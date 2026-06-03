@@ -19,7 +19,7 @@
 
 import {Link, LinkVariant, MLSVerified} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {E2EIVerificationMessage as E2EIVerificationMessageEntity} from 'Repositories/entity/message/E2EIVerificationMessage';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -66,8 +66,9 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
     'selfUser',
   ]);
 
-  const messageUserId = userIds.length === 1 && userIds[0];
-  const isSelfUser = messageUserId && selfUser && matchQualifiedIds(messageUserId, selfUser.qualifiedId);
+  const messageUserId = userIds.length === 1 ? userIds[0] : undefined;
+  const isSelfUser =
+    messageUserId !== undefined && selfUser !== undefined && matchQualifiedIds(messageUserId, selfUser.qualifiedId);
 
   const degradedUsers = participatingUserEts.filter(user =>
     userIds.find(userId => matchQualifiedIds(userId, user.qualifiedId)),
@@ -116,7 +117,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
         )}
 
         {isExpired &&
-          (!isSelfUser ? (
+          (isSelfUser === false ? (
             <span
               dangerouslySetInnerHTML={{
                 __html: t('conversation.E2EICertificateExpired', {user: usersName}),
@@ -135,7 +136,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           ))}
 
         {isNewDevice &&
-          (!isSelfUser ? (
+          (isSelfUser === false ? (
             <span
               dangerouslySetInnerHTML={{
                 __html: t('conversation.E2EINewDeviceAdded', {user: usersName}),
@@ -154,7 +155,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           ))}
 
         {isNewMember &&
-          (!isSelfUser ? (
+          (isSelfUser === false ? (
             <span
               dangerouslySetInnerHTML={{
                 __html: t('conversation.E2EINewUserAdded', {user: usersName}),
@@ -173,7 +174,7 @@ export const E2EIVerificationMessage = ({message, conversation}: E2EIVerificatio
           ))}
 
         {isRevoked &&
-          (!isSelfUser ? (
+          (isSelfUser === false ? (
             <span
               dangerouslySetInnerHTML={{
                 __html: t('conversation.E2EICertificateRevoked', {user: usersName}, learnMoreReplacement),

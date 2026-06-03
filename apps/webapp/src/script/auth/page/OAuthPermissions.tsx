@@ -19,6 +19,7 @@
 
 import React, {useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
@@ -39,7 +40,7 @@ import {
   useMatchMedia,
 } from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
@@ -120,7 +121,7 @@ const OAuthPermissionsComponent = ({
   React.useEffect(() => {
     const getUserData = async () => {
       await getSelf();
-      if (selfTeamId) {
+      if (is.nonEmptyString(selfTeamId)) {
         const team = await getTeam(selfTeamId);
         const teamIcon = new AssetRemoteData({assetKey: team.icon, assetDomain: selfUser.qualified_id?.domain});
         if (teamIcon.identifier === 'default') {
@@ -130,8 +131,8 @@ const OAuthPermissionsComponent = ({
           setTeamImage(teamImageBlob && (await loadDataUrl(teamImageBlob)));
         }
       }
-      if (oauthParams.client_id) {
-        setOAuthApp(!!oauthParams.client_id ? await getOAuthApp(oauthParams.client_id) : null);
+      if (is.nonEmptyString(oauthParams.client_id)) {
+        setOAuthApp(await getOAuthApp(oauthParams.client_id));
       } else {
         throw Error('OAuth client not found');
       }

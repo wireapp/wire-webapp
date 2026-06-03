@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import type {DomainData} from '@wireapp/api-client/lib/account/domainData';
 import type {LoginData, RegisterData} from '@wireapp/api-client/lib/auth/';
 import {VerificationActionType} from '@wireapp/api-client/lib/auth/verificationActionType';
@@ -68,15 +69,15 @@ export class AuthAction {
       {actions: {localStorageAction, conversationAction}},
     ) => {
       const conversation = await dispatch(conversationAction.doJoinConversationByCode(key, code, uri, password));
+      if (conversation === undefined) {
+        return;
+      }
       const domain = conversation?.qualified_conversation?.domain;
-      return (
-        conversation &&
-        (await dispatch(
-          localStorageAction.setLocalStorage(LocalStorageKey.AUTH.LOGIN_CONVERSATION_KEY, {
-            conversation: conversation.conversation,
-            domain,
-          }),
-        ))
+      await dispatch(
+        localStorageAction.setLocalStorage(LocalStorageKey.AUTH.LOGIN_CONVERSATION_KEY, {
+          conversation: conversation.conversation,
+          domain,
+        }),
       );
     };
 
@@ -101,7 +102,7 @@ export class AuthAction {
         await this.persistClientData(loginData.clientType, dispatch, localStorageAction);
         await dispatch(selfAction.fetchSelf());
         let entropyData: Uint8Array | undefined = undefined;
-        if (getEntropy) {
+        if (getEntropy !== undefined) {
           const existingClient = await core.service!.client.loadClient();
           entropyData = existingClient ? undefined : await getEntropy();
         }
@@ -109,7 +110,7 @@ export class AuthAction {
         await dispatch(
           clientAction.doInitializeClient(
             loginData.clientType,
-            loginData.password ? String(loginData.password) : undefined,
+            is.string(loginData.password) ? loginData.password : undefined,
             loginData.verificationCode,
             entropyData,
           ),
@@ -228,7 +229,7 @@ export class AuthAction {
         if (statusCode === HTTP_STATUS.NOT_FOUND) {
           return new BackendError('', BackendErrorLabel.NOT_FOUND, HTTP_STATUS.NOT_FOUND);
         }
-        if (statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
+        if (statusCode !== undefined && statusCode >= HTTP_STATUS.INTERNAL_SERVER_ERROR) {
           return new BackendError('', BackendErrorLabel.SERVER_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
         }
         return new BackendError('', SyntheticErrorLabel.SSO_GENERIC_ERROR, HTTP_STATUS.INTERNAL_SERVER_ERROR);
@@ -283,7 +284,7 @@ export class AuthAction {
       const clientType = ClientType.PERMANENT;
       registration.locale = currentLanguage();
       registration.name = registration.name.trim();
-      registration.email = registration.email.trim();
+      registration.email = registration.email?.trim() ?? '';
 
       dispatch(AuthActionCreator.startRegisterPersonal());
       try {
@@ -342,7 +343,7 @@ export class AuthAction {
         if (persist === undefined) {
           throw new Error(`Could not find value for '${LocalStorageKey.AUTH.PERSIST}'`);
         }
-        const clientType = persist ? ClientType.PERMANENT : ClientType.TEMPORARY;
+        const clientType = persist === true ? ClientType.PERMANENT : ClientType.TEMPORARY;
 
         await core.init(clientType);
         await this.persistClientData(clientType, dispatch, localStorageAction);

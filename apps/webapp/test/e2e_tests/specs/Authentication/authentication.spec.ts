@@ -53,7 +53,7 @@ test.describe('Authentication', () => {
       const pageManager = await PageManager.from(createPage(withLogin(createUser({disableTelemetry: false}))));
       const {modals} = pageManager.webapp;
 
-      await expect(modals.dataShareConsent().modalTitle).toBeVisible();
+      await expect(modals.confirm().modalTitle).toBeVisible();
     },
   );
 
@@ -87,13 +87,14 @@ test.describe('Authentication', () => {
         await components.conversationSidebar().sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
       });
 
-      let proteusId: string;
-      await test.step('Open device settings and get current proteus id', async () => {
+      const proteusId = await test.step('Open device settings and get current proteus id', async () => {
         await components.conversationSidebar().clickPreferencesButton();
         await pages.settings().devicesButton.click();
 
-        proteusId = (await pages.devices().proteusId.textContent()) ?? '';
-        expect(proteusId).toBeTruthy();
+        const proteusId = (await pages.devices().proteusId.textContent()) ?? '';
+        expect(proteusId).toBeDefined();
+
+        return proteusId;
       });
 
       await test.step('Log out of public computer', async () => {
@@ -162,7 +163,7 @@ test.describe('Authentication', () => {
         });
 
         await test.step('Send a message', async () => {
-          await pages.conversationList().openConversation(userB.fullName);
+          await pages.conversationList().getConversation(userB.fullName).open();
           await pages.conversation().sendMessage('Before refresh');
         });
 
@@ -172,7 +173,7 @@ test.describe('Authentication', () => {
 
           await pageManager.refreshPage({waitUntil: 'load'});
 
-          await pages.conversationList().openConversation(userB.fullName);
+          await pages.conversationList().getConversation(userB.fullName).open();
           await expect(message).toBeVisible();
         });
       },
@@ -213,7 +214,7 @@ test.describe('Authentication', () => {
 
       await test.step('Connect with and send message to userB', async () => {
         await connectWithUser(pageManager, userB);
-        await pages.conversationList().openConversation(userB.fullName);
+        await pages.conversationList().getConversation(userB.fullName).open();
         await pages.conversation().sendMessage('Test message');
         await expect(pages.conversation().getMessage({content: 'Test message'})).toBeVisible();
       });
@@ -233,7 +234,7 @@ test.describe('Authentication', () => {
       });
 
       await test.step('Verify previously sent message is gone', async () => {
-        await pages.conversationList().openConversation(userB.fullName);
+        await pages.conversationList().getConversation(userB.fullName).open();
         await expect(pages.conversation().getMessage({content: 'Test message'})).not.toBeAttached();
       });
     },

@@ -5,6 +5,16 @@
     "declaration": false,
     "declarationMap": false
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "../server/", "src/sw.js", "src/worker/", "test/**/*", "**/*.test.*", "**/*.spec.*"]
+  "exclude": [
+    "node_modules",
+    "../server/",
+    "src/sw.js",
+    "src/worker/",
+    "src/**/*.mocks.ts",
+    "src/**/test/**",
+    "src/**/testSupport/**",
+    "test/unit_tests/**",
+    "test/helper/**",
+    "**/*.test.*"
+  ]
 }

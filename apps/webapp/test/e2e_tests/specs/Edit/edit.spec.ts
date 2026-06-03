@@ -19,8 +19,8 @@
 
 import {User} from 'test/e2e_tests/data/user';
 import {PageManager} from 'test/e2e_tests/pageManager';
-import {test, expect, withConnectedUser, withLogin} from 'test/e2e_tests/test.fixtures';
-import {createGroup} from 'test/e2e_tests/utils/userActions';
+import {test, expect, withLogin} from 'test/e2e_tests/test.fixtures';
+import {connectWithUser, createGroup} from 'test/e2e_tests/utils/userActions';
 
 test.describe('Edit', () => {
   let userA: User;
@@ -33,7 +33,10 @@ test.describe('Edit', () => {
   });
 
   test('I can edit my message in 1:1', {tag: ['@TC-679', '@regression']}, async ({createPage}) => {
-    const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+    const page = await createPage(withLogin(userA));
+    await connectWithUser(page, userB);
+
+    const {pages} = PageManager.from(page).webapp;
     await pages.conversation().sendMessage('Test Message');
 
     const message = pages.conversation().getMessage({sender: userA});
@@ -51,7 +54,7 @@ test.describe('Edit', () => {
     const pages = (await PageManager.from(createPage(withLogin(userA)))).webapp.pages;
     await createGroup(pages, 'Test Group', [userB]);
 
-    await pages.conversationList().openConversation('Test Group');
+    await pages.conversationList().getConversation('Test Group').open();
     await pages.conversation().sendMessage('Test Message');
 
     const message = pages.conversation().getMessage({sender: userA});
@@ -69,11 +72,14 @@ test.describe('Edit', () => {
     'I see changed message if message was edited from another device',
     {tag: ['@TC-682', '@regression']},
     async ({createPage}) => {
-      const deviceA = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const deviceAPage = await createPage(withLogin(userA));
+      await connectWithUser(deviceAPage, userB);
+
+      const deviceA = PageManager.from(deviceAPage).webapp.pages;
 
       // Device 2 is intentionally created after device 1 to ensure the history info warning is confirmed
       const deviceB = (await PageManager.from(createPage(withLogin(userA, {confirmNewHistory: true})))).webapp.pages;
-      await deviceB.conversationList().openConversation(userB.fullName);
+      await deviceB.conversationList().getConversation(userB.fullName).open();
 
       await deviceA.conversation().sendMessage('Message from device 1');
 
@@ -92,13 +98,14 @@ test.describe('Edit', () => {
   );
 
   test('I cannot edit another users message', {tag: ['@TC-683', '@regression']}, async ({createPage}) => {
-    const [userAPages, userBPages] = await Promise.all([
-      PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-      PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-    ]);
+    const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+    await connectWithUser(userAPage, userB);
 
-    await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-    await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+    const userAPages = PageManager.from(userAPage).webapp.pages;
+    const userBPages = PageManager.from(userBPage).webapp.pages;
+
+    await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+    await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
     await userAPages.conversation().sendMessage('Test Message');
 
     const message = userBPages.conversation().getMessage({sender: userA});
@@ -112,7 +119,10 @@ test.describe('Edit', () => {
     'I can edit my last message by pressing the up arrow key',
     {tag: ['@TC-686', '@regression']},
     async ({createPage}) => {
-      const pages = (await PageManager.from(createPage(withLogin(userA), withConnectedUser(userB)))).webapp.pages;
+      const page = await createPage(withLogin(userA));
+      await connectWithUser(page, userB);
+
+      const pages = PageManager.from(page).webapp.pages;
 
       await pages.conversation().sendMessage('Test Message');
       await expect(pages.conversation().getMessage({content: 'Test Message'})).toBeVisible();
@@ -126,33 +136,34 @@ test.describe('Edit', () => {
     'Editing a message does not create unread dot on receiver side',
     {tag: ['@TC-690', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
+
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
 
       await test.step('Create group as second conversation', async () => {
         // We need to create a second conversation in order to switch to it to ensure the unread marker can be shown on the not open conversation
         await createGroup(userAPages, 'Test Group', [userB]);
-        await userBPages.conversationList().openConversation('Test Group');
+        await userBPages.conversationList().getConversation('Test Group').open();
       });
 
       await test.step('Send message from user A to B', async () => {
-        await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
+        await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
         await userAPages.conversation().sendMessage('Test Message');
       });
 
       await test.step('Check user B has a unread conversation with A containing the sent message', async () => {
-        const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
+        const conversation = userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'});
         await expect(conversation.unreadIndicator).toBeVisible();
 
-        await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+        await conversation.open();
         await expect(conversation).toContainText('Test Message');
         await expect(conversation.unreadIndicator).not.toBeVisible();
       });
 
       await test.step("Open group conversation to ensure new messages won't be read immediately", async () => {
-        await userBPages.conversationList().openConversation('Test Group');
+        await userBPages.conversationList().getConversation('Test Group').open();
         await expect(userBPages.conversation().conversationTitle).toHaveText('Test Group');
       });
 
@@ -164,10 +175,10 @@ test.describe('Edit', () => {
       });
 
       await test.step('Check B received the updated message without marking the conversation as unread', async () => {
-        const conversation = userBPages.conversationList().getConversationLocator(userA.fullName);
+        const conversation = userBPages.conversationList().getConversation(userA.fullName);
         await expect(conversation.unreadIndicator).not.toBeVisible();
 
-        await userBPages.conversationList().openConversation(userA.fullName);
+        await conversation.open();
         await expect(userBPages.conversation().getMessage({sender: userA})).toContainText('Edited Message');
       });
     },
@@ -177,13 +188,14 @@ test.describe('Edit', () => {
     'I can see the changed message was edited from another user',
     {tag: ['@TC-692', '@regression']},
     async ({createPage}) => {
-      const [userAPages, userBPages] = await Promise.all([
-        PageManager.from(createPage(withLogin(userA), withConnectedUser(userB))).then(pm => pm.webapp.pages),
-        PageManager.from(createPage(withLogin(userB))).then(pm => pm.webapp.pages),
-      ]);
+      const [userAPage, userBPage] = await Promise.all([createPage(withLogin(userA)), createPage(withLogin(userB))]);
+      await connectWithUser(userAPage, userB);
 
-      await userAPages.conversationList().openConversation(userB.fullName, {protocol: 'mls'});
-      await userBPages.conversationList().openConversation(userA.fullName, {protocol: 'mls'});
+      const userAPages = PageManager.from(userAPage).webapp.pages;
+      const userBPages = PageManager.from(userBPage).webapp.pages;
+
+      await userAPages.conversationList().getConversation(userB.fullName, {protocol: 'mls'}).open();
+      await userBPages.conversationList().getConversation(userA.fullName, {protocol: 'mls'}).open();
 
       await userAPages.conversation().sendMessage('Test');
       const sentMessage = userAPages.conversation().getMessage({sender: userA});
@@ -207,7 +219,7 @@ test.describe('Edit', () => {
       const pages = await PageManager.from(createPage(withLogin(userA))).then(pm => pm.webapp.pages);
       await createGroup(pages, 'Test Group', [userB]); // The message detail view is only available for group conversations
 
-      await pages.conversationList().openConversation('Test Group');
+      await pages.conversationList().getConversation('Test Group').open();
       await pages.conversation().sendMessage('Test message');
 
       const message = pages.conversation().getMessage({sender: userA});

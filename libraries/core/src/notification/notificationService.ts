@@ -18,7 +18,7 @@
  */
 
 import {BackendEvent} from '@wireapp/api-client/lib/event';
-import {Notification} from '@wireapp/api-client/lib/notification/';
+import {Notification} from '@wireapp/api-client/lib/notification';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
@@ -126,7 +126,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
       throw error;
     }
 
-    if (databaseLastEventDate && eventDate > databaseLastEventDate) {
+    if (databaseLastEventDate !== undefined && eventDate > databaseLastEventDate) {
       return this.database.updateLastEventDate(eventDate);
     }
 
@@ -154,7 +154,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
   ): Promise<{total: number; error: number; success: number}> {
     const lastNotificationId = await this.database.getLastNotificationId();
     const {notifications, missedNotification} = await this.getAllNotifications(lastNotificationId, abortHandler);
-    if (missedNotification) {
+    if (missedNotification !== undefined && missedNotification.length > 0) {
       onMissedNotifications(missedNotification);
     }
 
@@ -165,7 +165,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         : `No notification to process from the stream`;
     this.logger.log(logMessage);
     for (const [index, notification] of notifications.entries()) {
-      if (abortHandler?.signal.aborted) {
+      if (abortHandler?.signal.aborted === true) {
         /* Stop handling notifications if the websocket has been disconnected.
          * Upon reconnecting we are going to restart handling the notification stream for where we left of
          */
@@ -197,7 +197,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
    */
   private isOutdatedEvent(event: {time: string}, source: NotificationSource, lastEventDate?: Date) {
     const isFromNotificationStream = source === NotificationSource.NOTIFICATION_STREAM;
-    const shouldCheckEventDate = !!event.time && isFromNotificationStream && lastEventDate;
+    const shouldCheckEventDate = event.time.length > 0 && isFromNotificationStream && lastEventDate !== undefined;
 
     if (shouldCheckEventDate) {
       /** This check prevents duplicated "You joined" system messages. */
@@ -225,7 +225,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
       }
       try {
         const handledEventResult = await this.handleEvent(event);
-        if (handledEventResult.status === 'handled' && handledEventResult.payload) {
+        if (handledEventResult.status === 'handled' && handledEventResult.payload !== null) {
           yield handledEventResult.payload;
         }
       } catch (error: unknown) {
@@ -241,7 +241,7 @@ export class NotificationService extends TypedEventEmitter<Events> {
         this.emit(NotificationService.TOPIC.NOTIFICATION_ERROR, notificationError);
       }
     }
-    if (!notification.transient) {
+    if (notification.transient !== true) {
       // keep track of the last handled notification for next time we fetch the notification stream
       await this.setLastNotificationId(notification);
     }

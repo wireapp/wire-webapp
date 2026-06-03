@@ -20,7 +20,9 @@
 import {prependProtocol} from './urlUtil';
 import {isValidEmail} from './validationUtil';
 
-export const escapeRegex = (string: string): string => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export const escapeRegex = (string: string): string => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
 
 /**
  * Opens a new browser tab (target="_blank") with a given URL in a safe environment.
@@ -29,12 +31,12 @@ export const escapeRegex = (string: string): string => string.replace(/[.*+?^${}
  * @param focus `true`, if the new windows should get browser focus
  * @returns New window handle
  */
-export const safeWindowOpen = (url: string, focus: boolean = true): Window => {
+export const safeWindowOpen = (url: string, focus: boolean = true): Window | null => {
   const newWindow = window.open(prependProtocol(url));
 
-  if (newWindow) {
+  if (newWindow !== null) {
     newWindow.opener = null;
-    if (focus) {
+    if (focus === true) {
       newWindow.focus();
     }
   }

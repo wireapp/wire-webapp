@@ -37,8 +37,6 @@ import {
   DataTransfer,
   External,
   GenericMessage,
-  IAsset,
-  IImageAsset,
   LastRead,
   LegalHoldStatus,
   LinkPreview,
@@ -67,9 +65,9 @@ import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 
-import {CryptographyError} from '../../error/CryptographyError';
+import {CryptographyError} from '../../error/cryptographyError';
 import {StatusType} from '../../message/StatusType';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
 
 export interface MappedText {
   data: {content: string; mentions: string[]; previews: string[]; quote?: string; replacing_message_id?: string};
@@ -311,14 +309,20 @@ export class CryptographyMapper {
         return item;
       }
 
-      const {mentions: protoMentions, content} = item.text;
+      if (item.text === null || item.text === undefined) {
+        return item;
+      }
+      const {content} = item.text;
+      const protoMentions = item.text.mentions ?? [];
 
-      if (protoMentions && protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
+      if (protoMentions.length > CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE) {
         this.logger.warn(`Message contains '${protoMentions.length}' mentions exceeding limit`);
         protoMentions.length = CryptographyMapper.CONFIG.MAX_MENTIONS_PER_MESSAGE;
       }
 
-      const mentions = protoMentions.map(protoMention => arrayToBase64(Mention.encode(protoMention).finish()));
+      const mentions = protoMentions.map((protoMention: Mention) => {
+        return arrayToBase64(Mention.encode(protoMention).finish());
+      });
 
       return {
         text: {
@@ -356,18 +360,22 @@ export class CryptographyMapper {
 
   private _mapAsset(asset: Asset) {
     const {original, preview, uploaded, notUploaded} = asset;
-    let data: AssetData;
+    let data: AssetData = {
+      content_length: 0,
+      content_type: '',
+      info: {},
+    };
 
-    if (original) {
+    if (original !== null && original !== undefined) {
       data = {
         content_length: original.size as number,
-        content_type: original.mimeType,
+        content_type: original.mimeType ?? '',
         info: {
-          name: original.name || null,
+          name: original.name ?? undefined,
         },
       };
 
-      if (original.image) {
+      if (original.image !== null && original.image !== undefined) {
         data.info.height = original.image.height;
         data.info.width = original.image.width;
       } else {
@@ -375,35 +383,39 @@ export class CryptographyMapper {
       }
     }
 
-    if (preview) {
+    if (preview !== null && preview !== undefined) {
       const remote = preview.remote;
+      if (remote === null || remote === undefined) {
+        return {data, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      }
 
       data = {
         ...data,
-        preview_domain: remote.assetDomain,
-        preview_key: remote.assetId,
+        preview_domain: remote.assetDomain ?? undefined,
+        preview_key: remote.assetId ?? undefined,
         preview_otr_key: new Uint8Array(remote.otrKey),
         preview_sha256: new Uint8Array(remote.sha256),
-        preview_token: remote.assetToken,
+        preview_token: remote.assetToken ?? undefined,
       };
     }
 
-    const isImage = original && original.image;
+    const isImage =
+      original !== null && original !== undefined && original.image !== null && original.image !== undefined;
     if (isImage) {
       data.info.tag = 'medium';
     }
 
-    if (asset.hasOwnProperty('uploaded') && uploaded !== null) {
+    if (asset.hasOwnProperty('uploaded') && uploaded !== null && uploaded !== undefined) {
       data = {
         ...data,
-        domain: uploaded.assetDomain,
-        key: uploaded.assetId,
+        domain: uploaded.assetDomain ?? undefined,
+        key: uploaded.assetId ?? undefined,
         otr_key: new Uint8Array(uploaded.otrKey),
         sha256: new Uint8Array(uploaded.sha256),
         status: AssetTransferState.UPLOADED,
-        token: uploaded.assetToken,
+        token: uploaded.assetToken ?? undefined,
       };
-    } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null) {
+    } else if (asset.hasOwnProperty('notUploaded') && notUploaded !== null && notUploaded !== undefined) {
       data = {...data, reason: notUploaded, status: AssetTransferState.UPLOAD_FAILED};
     }
 
@@ -514,6 +526,12 @@ export class CryptographyMapper {
   }
 
   private _mapEphemeral(genericMessage: GenericMessage, event: EncryptedEvent) {
+    if (genericMessage.ephemeral === null || genericMessage.ephemeral === undefined) {
+      throw new CryptographyError(
+        CryptographyError.TYPE.NO_GENERIC_MESSAGE,
+        CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
+      );
+    }
     const messageTimer = genericMessage.ephemeral[PROTO_MESSAGE_TYPE.EPHEMERAL_EXPIRATION];
     (genericMessage.ephemeral as unknown as GenericMessage).messageId = genericMessage.messageId;
 
@@ -581,6 +599,12 @@ export class CryptographyMapper {
   }
 
   private _mapDataTransfer(dataTransfer: DataTransfer) {
+    if (dataTransfer.trackingIdentifier === null || dataTransfer.trackingIdentifier === undefined) {
+      throw new CryptographyError(
+        CryptographyError.TYPE.NO_GENERIC_MESSAGE,
+        CryptographyError.MESSAGE.NO_GENERIC_MESSAGE,
+      );
+    }
     return {
       data: {
         trackingIdentifier: dataTransfer.trackingIdentifier.identifier,
@@ -677,15 +701,19 @@ export class CryptographyMapper {
   }
 }
 
-function addMetadata(
-  mappedEvent: MappedAsset,
-  asset: (IAsset | IImageAsset) & Partial<{expectsReadConfirmation: boolean; legalHoldStatus: LegalHoldStatus}>,
-) {
+function addMetadata<MappedEventWithData extends {data: object}>(
+  mappedEvent: MappedEventWithData,
+  asset: unknown,
+): MappedEventWithData {
+  if (asset === null || asset === undefined || typeof asset !== 'object') {
+    return mappedEvent;
+  }
+  const metadata = asset as Partial<{expectsReadConfirmation: boolean; legalHoldStatus: LegalHoldStatus}>;
   mappedEvent.data = {
     ...mappedEvent.data,
-    expects_read_confirmation: asset.expectsReadConfirmation,
-    legal_hold_status: asset.legalHoldStatus,
-  };
+    expects_read_confirmation: metadata.expectsReadConfirmation,
+    legal_hold_status: metadata.legalHoldStatus,
+  } as MappedEventWithData['data'];
 
   return mappedEvent;
 }

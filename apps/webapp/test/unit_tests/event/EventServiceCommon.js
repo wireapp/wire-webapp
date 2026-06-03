@@ -18,9 +18,9 @@
  */
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
-import {StorageSchemata} from 'Repositories/storage/StorageSchemata';
-import {ConversationError} from 'src/script/error/ConversationError';
-import {StorageError} from 'src/script/error/StorageError';
+import {StorageSchemata} from 'Repositories/storage/storageSchemata';
+import {ConversationError} from 'src/script/error/conversationError';
+import {StorageError} from 'src/script/error/storageError';
 import {MessageCategory} from 'src/script/message/MessageCategory';
 import {createUuid} from 'Util/uuid';
 

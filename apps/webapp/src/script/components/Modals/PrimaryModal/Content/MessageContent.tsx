@@ -25,14 +25,17 @@ interface MessageContentProps {
 const isStringMessage = (message: unknown): message is string => typeof message === 'string';
 
 export const MessageContent = ({message, messageHtml}: MessageContentProps) => {
-  if (!message && !messageHtml) {
+  const hasMessage = message !== undefined && message !== null;
+  const hasMessageHtml = messageHtml !== undefined && messageHtml !== '';
+
+  if (!hasMessage && !hasMessageHtml) {
     return null;
   }
 
   return (
     <div className="modal__text" data-uie-name="status-modal-text">
-      {messageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
-      {message && <div id="modal-description-text">{isStringMessage(message) ? <p>{message}</p> : message}</div>}
+      {hasMessageHtml && <p id="modal-description-html" dangerouslySetInnerHTML={{__html: messageHtml}} />}
+      {hasMessage && <div id="modal-description-text">{isStringMessage(message) ? <p>{message}</p> : message}</div>}
     </div>
   );
 };

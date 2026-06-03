@@ -37,6 +37,7 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
 
@@ -44,6 +45,7 @@ jobs:
         if: ${{ github.event_name == 'merge_group' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
@@ -109,50 +111,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # An extra step is needed to see if the e2e_tests folder was touched as part of the PR
-  check_edits_to_e2e_tests:
-    name: Check if the PR touches e2e tests
-    if: ${{ github.event_name == 'merge_group' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    outputs:
-      tests_to_run: ${{ steps.check_e2e_tests.outputs.tests_to_run || steps.set_default_tests_for_merge_queue.outputs.tests_to_run }}
-    steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          fetch-depth: 0
-
-      - name: Check for e2e tests changes
-        if: ${{ github.event_name == 'pull_request' }}
-        id: check_e2e_tests
-        run: |
-          git diff --exit-code origin/${{ github.base_ref }}...HEAD -- apps/webapp/test/e2e_tests/ || RESULT=$?
-
-          # If the e2e_tests folder was touched within the PR run all tests, otherwise just the critical flow ones
-          if [ $RESULT -eq 1 ]; then
-            echo "tests_to_run=" >> $GITHUB_OUTPUT
-            echo "E2E Tests have been modified, executing all tests"
-          else
-            echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
-            echo "E2E Tests have not been modified, executing critical flow tests only"
-          fi
-
-      - name: Use critical flow tests on merge queue
-        if: ${{ github.event_name == 'merge_group' }}
-        id: set_default_tests_for_merge_queue
-        run: |
-          echo "tests_to_run=@crit-flow-web" >> $GITHUB_OUTPUT
-          echo "Merge queue run detected, executing critical flow tests"
-
   deploy_and_run_e2e:
     name: Deploy to precommit and run E2E
     if: ${{ success() && github.repository == 'wireapp/wire-webapp' }}
-    needs: [build, check_edits_to_e2e_tests]
+    needs: [build]
     uses: ./.github/workflows/precommit-slot-run.yml
     with:
       env_name: ${{ needs.build.outputs.env_name }}
       backendUrl: https://staging-nginz-https.zinfra.io/
-      grep: ${{ needs.check_edits_to_e2e_tests.outputs.tests_to_run }}
+      # Run all E2E tests when attempting to merge to master when running for a PR as well as in the merge queue (base_ref contains the full ref name instead of the short name on merge_group)
+      grep: ${{ case(github.base_ref == 'master' || github.event.merge_group.base_ref == 'refs/heads/master', '', '@crit-flow-web') }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
       WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
@@ -190,11 +158,14 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Checkout (merge_group)
         if: ${{ github.event_name == 'merge_group' }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:

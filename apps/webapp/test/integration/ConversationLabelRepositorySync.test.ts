@@ -20,7 +20,7 @@
 import ko from 'knockout';
 import {ConversationLabelRepository, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {PropertiesService} from 'Repositories/properties/PropertiesService';
+import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {createUuid} from 'Util/uuid';
 
 // Simple integration test to verify the synchronization fix

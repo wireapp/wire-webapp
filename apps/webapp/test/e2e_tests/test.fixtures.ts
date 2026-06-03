@@ -22,10 +22,10 @@ import {test as baseTest, type BrowserContext, type Page} from '@playwright/test
 import {ApiManagerE2E} from './backend/apiManager.e2e';
 import {getUser, User} from './data/user';
 import {PageManager} from './pageManager';
-import {connectWithUser, sendConnectionRequest} from './utils/userActions';
 import {mockAudioAndVideoDevices} from './utils/mockVideoDevice.util';
 import {Role} from '@wireapp/api-client/lib/team';
 import {FEATURE_KEY} from '@wireapp/api-client/lib/team/feature';
+import {BrigRepositoryE2E} from './backend/brigRepository.e2e';
 
 export type PagePlugin = (page: Page) => void | Promise<void>;
 
@@ -55,8 +55,13 @@ type Fixtures = {
   createTeam: (
     teamName: string,
     options?: {
-      users: (User | {user: User; role?: keyof typeof Role})[];
-      features?: {conferenceCalling?: boolean; channels?: boolean; mls?: boolean; cells?: boolean};
+      users?: (User | {user: User; role?: keyof typeof Role})[];
+      features?: {
+        conferenceCalling?: boolean;
+        channels?: boolean;
+        mls?: boolean | Parameters<BrigRepositoryE2E['configureMLSFeature']>[1];
+        cells?: boolean;
+      };
     },
   ) => Promise<Team>;
 };
@@ -71,19 +76,6 @@ export type Team = {
 export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
-  // Temporary workaround to add the test id as annotation instead of tag so Testiny can pick it up
-  // The following test suites need to be updated to be individual tests: AppLock, Connections, RegisterSpecs
-  _beforeEach: [
-    async ({}, use, testInfo) => {
-      const testid = testInfo.tags.find(tag => tag.startsWith('@TC'));
-      if (testid && !testInfo.annotations.some(annotation => annotation.type === 'testid')) {
-        testInfo.annotations.push({type: 'testid', description: testid.slice(1)});
-      }
-
-      await use();
-    },
-    {auto: true},
-  ],
   api: async ({}, use) => {
     // Create a new instance of ApiManager for each test
     await use(new ApiManagerE2E());
@@ -167,7 +159,7 @@ export const test = baseTest.extend<Fixtures>({
         );
       }
 
-      if (options?.features && Object.values(options.features).every(Boolean)) {
+      if (options?.features && Object.values(options.features).some(Boolean)) {
         // The team will be reset right after initialization, so we need to wait a short time for it to finish
         // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -177,13 +169,23 @@ export const test = baseTest.extend<Fixtures>({
           await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
         }
 
-        // Creating channels depends on MLS to be enabled
-        if (options.features.mls || options.features.channels) {
-          await api.brig.enableMLSFeature(owner.teamId);
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+        if (options.features.mls) {
+          await api.brig.configureMLSFeature(
+            owner.teamId,
+            options.features.mls === true
+              ? {status: 'enabled', defaultProtocol: 'mls', supportedProtocols: ['mls', 'proteus']}
+              : options.features.mls,
+          );
         }
 
         if (options.features.channels) {
+          // Creating channels depends on MLS to be enabled
+          await api.brig.configureMLSFeature(owner.teamId, {
+            defaultProtocol: 'mls',
+            supportedProtocols: ['mls', 'proteus'],
+          });
+          await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+
           await api.brig.unlockChannelFeature(teamId);
           await api.brig.enableChannelsFeature(teamId);
           await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
@@ -226,28 +228,6 @@ export const withLogin =
     await pageManager.webapp.components
       .conversationSidebar()
       .sidebar.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
-  };
-
-/**
- * PagePlugin to connect with the given user
- * Note: This plugin only works if the users are in the same team
- */
-export const withConnectedUser =
-  (user: User | Promise<User>): PagePlugin =>
-  async page => {
-    const pageManager = PageManager.from(page);
-    await connectWithUser(pageManager, await user);
-  };
-
-/**
- * PagePlugin to connect with the given user
- * Note: This plugin only works if the users are NOT in the same team
- */
-export const withConnectionRequest =
-  (user: User | Promise<User>): PagePlugin =>
-  async page => {
-    const pageManager = PageManager.from(page);
-    await sendConnectionRequest(pageManager, await user);
   };
 
 /** PagePlugin to open a guest user link and join the group chat as temporary member */

@@ -82,7 +82,7 @@ import {
   MultipartMessageAddEvent,
 } from './EventBuilder';
 
-import {ConversationError} from '../../error/ConversationError';
+import {ConversationError} from '../../error/conversationError';
 import {isContentMessage} from '../../guards/Message';
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
 import {MentionEntity} from '../../message/MentionEntity';
@@ -90,7 +90,7 @@ import {MessageCategory} from '../../message/MessageCategory';
 import {QuoteEntity} from '../../message/QuoteEntity';
 import {StatusType} from '../../message/StatusType';
 import {SystemMessageType} from '../../message/SystemMessageType';
-import {APIClient} from '../../service/APIClientSingleton';
+import {APIClient} from '../../service/apiClientSingleton';
 
 // Event Mapper to convert all server side JSON events into core entities.
 export class EventMapper {
@@ -114,7 +114,7 @@ export class EventMapper {
    * @returns Resolves with the mapped message entities
    */
   mapJsonEvents(events: EventRecord[], conversationEntity: Conversation): Message[] {
-    const reversedEvents = events.filter(event => !!event).reverse();
+    const reversedEvents = events.filter(event => !!event).toReversed();
     const mappedEvents = reversedEvents.map((event): Message | void => {
       try {
         return this._mapJsonEvent(event, conversationEntity);
@@ -181,11 +181,16 @@ export class EventMapper {
       originalEntity.assets.push(textAsset);
     } else if (originalEntity.getFirstAsset) {
       const asset = originalEntity.getFirstAsset();
-      if (eventData.status && (asset as FileAsset).status) {
-        const assetEntity = this._mapAsset(event);
-        originalEntity.assets([assetEntity]);
+      if (asset === undefined) {
+        return originalEntity;
       }
-      if (eventData.previews) {
+      if (eventData.status !== undefined && (asset as FileAsset).status !== undefined) {
+        const assetEntity = this._mapAsset(event);
+        if (assetEntity !== undefined) {
+          originalEntity.assets([assetEntity]);
+        }
+      }
+      if (eventData.previews !== undefined) {
         if ((asset as TextAsset).previews().length !== eventData.previews.length) {
           const previews = this._mapAssetLinkPreviews(eventData.previews);
           (asset as TextAsset).previews(previews as LinkPreviewEntity[]);
@@ -194,12 +199,12 @@ export class EventMapper {
 
       const {
         preview_key,
-        preview_domain = qualified_conversation?.domain || this.fallbackDomain,
+        preview_domain = qualified_conversation?.domain ?? this.fallbackDomain,
         preview_otr_key,
         preview_sha256,
         preview_token,
       } = eventData as AssetData;
-      if (preview_otr_key && preview_key && preview_domain) {
+      if (preview_otr_key !== undefined && preview_key !== undefined && preview_domain !== undefined) {
         const assetRemoteData = new AssetRemoteData({
           assetKey: preview_key,
           assetDomain: preview_domain,
@@ -212,32 +217,33 @@ export class EventMapper {
       }
     }
 
-    if (event.reactions) {
+    if (event.reactions !== undefined) {
       originalEntity.reactions(userReactionMapToReactionMap(event.reactions));
-      originalEntity.version = event.version;
+      originalEntity.version = event.version ?? 1;
     }
 
-    if (event.failedToSend) {
+    if (event.failedToSend !== undefined) {
       originalEntity.failedToSend(event.failedToSend);
     }
 
-    if (event.fileData) {
+    if (event.fileData !== undefined) {
       originalEntity.fileData(event.fileData);
     }
 
-    if (event.selected_button_id) {
-      originalEntity.version = event.version;
+    if (event.selected_button_id !== undefined) {
+      originalEntity.version = event.version ?? 1;
     }
 
-    originalEntity.id = id;
+    originalEntity.id = id ?? '';
 
     if (originalEntity.isContent() || (originalEntity as Message).isPing()) {
       originalEntity.status(event.status ?? StatusType.SENT);
     }
 
     originalEntity.replacing_message_id = eventData.replacing_message_id;
-    if (editedTime || eventData.edited_time) {
-      originalEntity.edited_timestamp(new Date(editedTime || eventData.edited_time).getTime());
+    const editedTimestamp = editedTime ?? eventData.edited_time;
+    if (editedTimestamp !== undefined) {
+      originalEntity.edited_timestamp(new Date(editedTimestamp).getTime());
     }
 
     return addMetadata(originalEntity, event);
@@ -443,16 +449,16 @@ export class EventMapper {
 
     messageEntity.category = category;
     messageEntity.conversation_id = conversationEntity.id;
-    messageEntity.from = from;
-    messageEntity.fromDomain = qualified_from?.domain;
-    messageEntity.fromClientId = from_client_id;
-    messageEntity.id = id;
+    messageEntity.from = from ?? '';
+    messageEntity.fromDomain = qualified_from?.domain ?? '';
+    messageEntity.fromClientId = from_client_id ?? '';
+    messageEntity.id = id ?? '';
     messageEntity.primary_key = primary_key;
     messageEntity.timestamp(new Date(time).getTime());
     messageEntity.type = type;
-    messageEntity.version = version || 1;
+    messageEntity.version = version ?? 1;
 
-    if (data) {
+    if (data !== undefined) {
       messageEntity.legalHoldStatus = data.legal_hold_status;
     }
 
@@ -471,9 +477,10 @@ export class EventMapper {
       );
     }
 
-    if (ephemeral_expires) {
+    if (ephemeral_expires !== undefined) {
       messageEntity.ephemeral_expires(ephemeral_expires);
-      messageEntity.ephemeral_started(Number(ephemeral_started) || 0);
+      const ephemeralStartedMilliseconds = Number(ephemeral_started ?? 0);
+      messageEntity.ephemeral_started(Number.isNaN(ephemeralStartedMilliseconds) ? 0 : ephemeralStartedMilliseconds);
     }
 
     if (isNaN(messageEntity.timestamp())) {
@@ -519,6 +526,9 @@ export class EventMapper {
     const messageEntity = new ContentMessage();
 
     const assetEntity = this._mapAsset(event);
+    if (assetEntity === undefined) {
+      throw new Error('Asset entity could not be mapped');
+    }
     messageEntity.assets.push(assetEntity);
 
     return messageEntity;
@@ -545,7 +555,7 @@ export class EventMapper {
   private _mapEventGroupCreation({data: eventData}: LegacyEventRecord) {
     const messageEntity = new MemberMessage();
     messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
-    messageEntity.name(eventData.name || '');
+    messageEntity.name(eventData.name ?? '');
     messageEntity.userIds(eventData.userIds);
     messageEntity.allTeamMembers = eventData.allTeamMembers;
     return messageEntity;
@@ -564,7 +574,7 @@ export class EventMapper {
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {
-    return new LegalHoldMessage(data.legal_hold_status, timestamp);
+    return new LegalHoldMessage(data.legal_hold_status, timestamp ?? 0);
   }
 
   /**
@@ -602,6 +612,7 @@ export class EventMapper {
     const {data: eventData, from: sender} = event;
     const {has_service: hasService} = eventData;
     const userIds = eventData.qualified_user_ids || eventData.user_ids.map(id => ({domain: '', id}));
+    let messageUserIds = userIds;
 
     const messageEntity = new MemberMessage();
 
@@ -610,11 +621,11 @@ export class EventMapper {
 
     if (conversationEntity.isGroupOrChannel()) {
       const messageFromCreator = sender === conversationEntity.creator;
-      const creatorIndex = userIds.findIndex(user => user.id === sender);
+      const creatorIndex = messageUserIds.findIndex(user => user.id === sender);
       const creatorIsJoiningMember = messageFromCreator && creatorIndex !== -1;
 
       if (creatorIsJoiningMember) {
-        userIds.splice(creatorIndex, 1);
+        messageUserIds = messageUserIds.toSpliced(creatorIndex, 1);
         messageEntity.memberMessageType = SystemMessageType.CONVERSATION_CREATE;
       }
 
@@ -622,7 +633,7 @@ export class EventMapper {
         messageEntity.showServicesWarning = true;
       }
 
-      messageEntity.userIds(userIds);
+      messageEntity.userIds(messageUserIds);
     }
 
     return messageEntity;
@@ -1087,12 +1098,12 @@ export class EventMapper {
         return new MentionEntity(
           protoMention.start,
           protoMention.length,
-          protoMention.qualifiedUserId?.id || protoMention.userId,
-          protoMention.qualifiedUserId?.domain,
+          protoMention.qualifiedUserId?.id ?? protoMention.userId ?? '',
+          protoMention.qualifiedUserId?.domain ?? undefined,
         );
       })
       .filter((mentionEntity, _, allMentions): boolean | void => {
-        if (mentionEntity) {
+        if (mentionEntity !== undefined) {
           try {
             return mentionEntity.validate(messageText, allMentions);
           } catch (error: unknown) {
@@ -1111,14 +1122,14 @@ export class EventMapper {
    */
   private _mapAssetText(eventData: MessageAddEvent['data']) {
     const {id, content, mentions, message, previews} = eventData;
-    const messageText = content || message;
+    const messageText = content ?? message ?? '';
     const assetEntity = new Text(id, messageText);
 
-    if (mentions && mentions.length) {
+    if (mentions !== undefined && mentions.length > 0) {
       const mappedMentions = this._mapAssetMentions(mentions, messageText);
       assetEntity.mentions(mappedMentions);
     }
-    if (previews && previews.length) {
+    if (previews !== undefined && previews.length > 0) {
       const mappedLinkPreviews = this._mapAssetLinkPreviews(previews) as unknown as LinkPreviewEntity[];
       assetEntity.previews(mappedLinkPreviews);
     }

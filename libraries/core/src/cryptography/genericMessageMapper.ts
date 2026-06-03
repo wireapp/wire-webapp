@@ -17,7 +17,7 @@
  *
  */
 
-import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event/';
+import {ConversationOtrMessageAddEvent} from '@wireapp/api-client/lib/event';
 
 import {LogFactory} from '@wireapp/commons';
 
@@ -72,15 +72,15 @@ export class GenericMessageMapper {
 
         const content: TextContent = {expectsReadConfirmation, legalHoldStatus, text};
 
-        if (linkPreviews?.length) {
+        if (linkPreviews !== undefined && linkPreviews.length > 0) {
           content.linkPreviews = linkPreviews;
         }
 
-        if (mentions?.length) {
+        if (mentions !== undefined && mentions.length > 0) {
           content.mentions = mentions;
         }
 
-        if (quote) {
+        if (quote !== undefined) {
           content.quote = quote;
         }
 
@@ -159,15 +159,15 @@ export class GenericMessageMapper {
           text: editedText,
         };
 
-        if (editedLinkPreviews?.length) {
+        if (editedLinkPreviews !== undefined && editedLinkPreviews.length > 0) {
           content.linkPreviews = editedLinkPreviews;
         }
 
-        if (editedMentions?.length) {
+        if (editedMentions !== undefined && editedMentions.length > 0) {
           content.mentions = editedMentions;
         }
 
-        if (editedQuote) {
+        if (editedQuote !== undefined) {
           content.quote = editedQuote;
         }
 
@@ -223,7 +223,7 @@ export class GenericMessageMapper {
       case GenericMessageType.ASSET: {
         const {expectsReadConfirmation, legalHoldStatus, notUploaded, original, preview, status, uploaded} =
           genericMessage[GenericMessageType.ASSET];
-        const isImage = !!uploaded?.assetId && !!original?.image;
+        const isImage = uploaded?.assetId !== undefined && original?.image !== undefined;
 
         const content: AssetContent = {
           abortReason: notUploaded,

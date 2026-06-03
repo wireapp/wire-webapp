@@ -21,8 +21,8 @@ import {container} from 'tsyringe';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
-import {UserState} from 'Repositories/user/UserState';
+import * as Icon from 'Components/icon';
+import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 
 import {createConversationHeaderContainerCss} from './CreateConversation.styles';

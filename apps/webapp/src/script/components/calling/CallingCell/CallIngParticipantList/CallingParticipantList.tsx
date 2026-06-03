@@ -25,7 +25,7 @@ import {Tooltip} from '@wireapp/react-ui-kit';
 
 import {CallParticipantsListItem} from 'Components/calling/CallParticipantsListItem';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -123,7 +123,7 @@ export const CallingParticipantList = ({
                     key={participant.clientId}
                     callParticipant={participant}
                     isSelfVerified={isSelfVerified}
-                    showContextMenu={!!isModerator}
+                    showContextMenu={isModerator === true}
                     onContextMenu={event => getParticipantContext(event, participant)}
                     isLast={participantsArray.length === index}
                   />
@@ -136,14 +136,14 @@ export const CallingParticipantList = ({
         <ul className="call-ui__participant-list" data-uie-name="list-call-ui-participants">
           {participants
             .slice()
-            .sort((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
+            .toSorted((participantA, participantB) => sortUsersByPriority(participantA.user, participantB.user))
             .map((participant, index, participantsArray) => (
               <li key={participant.clientId} className="call-ui__participant-list__participant">
                 <CallParticipantsListItem
                   key={participant.clientId}
                   callParticipant={participant}
                   isSelfVerified={isSelfVerified}
-                  showContextMenu={!!isModerator}
+                  showContextMenu={isModerator === true}
                   onContextMenu={event => getParticipantContext(event, participant)}
                   isLast={participantsArray.length === index}
                 />

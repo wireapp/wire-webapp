@@ -193,7 +193,7 @@ describe('HttpClient', () => {
       },
     );
 
-    it('retries retryable backend errors with incremental retry backoff', async () => {
+    it('retries 500 backend errors with incremental retry backoff', async () => {
       const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
       const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
         dependencies: httpClientDependenciesForTest,
@@ -202,7 +202,7 @@ describe('HttpClient', () => {
 
       client._sendRequest = jest
         .fn()
-        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.INTERNAL_SERVER_ERROR))
         .mockResolvedValueOnce(response);
 
       const result = await client.sendRequest({method: 'GET', url: '/conversations'});
@@ -210,6 +210,24 @@ describe('HttpClient', () => {
       expect(result).toBe(response);
       expect(client._sendRequest).toHaveBeenCalledTimes(2);
       expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([100]);
+    });
+
+    it('does not retry 503 Service Unavailable backend errors', async () => {
+      const httpClientDependenciesForTest = createHttpClientDependenciesForTest();
+      const client = new HttpClient(testConfig, mockedAccessTokenStore as AccessTokenStore, {
+        dependencies: httpClientDependenciesForTest,
+      });
+      const serviceUnavailableError = new BackendError(
+        'Service unavailable',
+        undefined,
+        StatusCode.SERVICE_UNAVAILABLE,
+      );
+
+      client._sendRequest = jest.fn().mockRejectedValueOnce(serviceUnavailableError);
+
+      await expect(client.sendRequest({method: 'GET', url: '/conversations'})).rejects.toBe(serviceUnavailableError);
+      expect(client._sendRequest).toHaveBeenCalledTimes(1);
+      expect(httpClientDependenciesForTest.observedDelayInMilliseconds).toEqual([]);
     });
 
     it('does not retry non-retryable backend errors with incremental retry backoff', async () => {
@@ -235,11 +253,11 @@ describe('HttpClient', () => {
 
       client._sendRequest = jest
         .fn()
-        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.INTERNAL_SERVER_ERROR))
         .mockResolvedValueOnce(response)
-        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.INTERNAL_SERVER_ERROR))
         .mockResolvedValueOnce(response)
-        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.INTERNAL_SERVER_ERROR))
         .mockResolvedValueOnce(response);
 
       await client.sendRequest({method: 'GET', url: '/conversations'});
@@ -278,7 +296,7 @@ describe('HttpClient', () => {
 
       client._sendRequest = jest
         .fn()
-        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE))
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.INTERNAL_SERVER_ERROR))
         .mockResolvedValueOnce(response);
 
       const responsePromise = client.sendRequest({method: 'GET', url: '/conversations'});
@@ -322,7 +340,7 @@ describe('HttpClient', () => {
 
       client._sendRequest = jest
         .fn()
-        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.SERVICE_UNAVAILABLE));
+        .mockRejectedValueOnce(createRetryableBackendError(StatusCode.INTERNAL_SERVER_ERROR));
 
       const responsePromise = client.sendRequest({method: 'GET', url: '/conversations'}, false, abortController);
       await waitWasScheduled;

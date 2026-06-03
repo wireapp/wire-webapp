@@ -96,7 +96,7 @@ const prepareDataForEncryption = async () => {
   const messageBuffer = new Uint8Array(Buffer.from(message, 'utf8'));
 
   //mocked payload encrypted and returned by corecrypto
-  const encryptedMessageBuffer = messageBuffer.reverse();
+  const encryptedMessageBuffer = messageBuffer.toReversed();
 
   const validPreKey = {
     id: 1337,

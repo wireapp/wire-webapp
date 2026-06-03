@@ -34,6 +34,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {TeamState} from 'Repositories/team/TeamState';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -85,11 +86,12 @@ export const MessageWrapper = ({
   teamState = container.resolve(TeamState),
   isMsgElementsFocusable,
 }: MessageParams) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const findMessage = async (conversation: Conversation, messageId: string) => {
+    const eventFromId = await messageRepository.getMessageInConversationById(conversation, messageId);
     const event =
-      (await messageRepository.getMessageInConversationById(conversation, messageId)) ||
-      (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
-    return await messageRepository.ensureMessageSender(event);
+      eventFromId ?? (await messageRepository.getMessageInConversationByReplacementId(conversation, messageId));
+    return messageRepository.ensureMessageSender(event);
   };
   const clickButton = async (message: CompositeMessage, buttonId: string) => {
     if (message.selectedButtonId() !== buttonId && message.waitingButtonId() !== buttonId) {
@@ -118,7 +120,7 @@ export const MessageWrapper = ({
         messageId,
         attachments: [],
       });
-    } else if (file) {
+    } else if (file !== undefined && firstAsset !== undefined) {
       await messageRepository.retryUploadFile(conversation, file, firstAsset.isImage(), message.id);
     }
   };
@@ -193,7 +195,9 @@ export const MessageWrapper = ({
     if (!message.isContent()) {
       return;
     }
-    return void messageRepository.toggleReaction(conversation, message, reaction, selfId);
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+      await messageRepository.toggleReaction(conversation, message, reaction, selfId);
+    });
   };
   if (message.isContent()) {
     return (

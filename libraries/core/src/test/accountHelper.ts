@@ -17,7 +17,7 @@
  *
  */
 
-const {ClientType} = require('@wireapp/api-client/lib/client/');
+const {ClientType} = require('@wireapp/api-client/lib/client');
 
 const {APIClient} = require('@wireapp/api-client');
 const {Account} = require('@wireapp/core');

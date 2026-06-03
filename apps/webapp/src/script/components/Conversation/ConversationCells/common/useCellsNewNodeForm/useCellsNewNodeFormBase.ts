@@ -64,7 +64,7 @@ export const useCellsNewNodeFormBase = ({
 
     const trimmedName = name.trim();
     const validationError = getClientSideNodeNameError(trimmedName).unwrapOr(null);
-    if (validationError) {
+    if (validationError !== null) {
       setError(validationError);
       return;
     }

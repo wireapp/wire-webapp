@@ -35,6 +35,7 @@ import {BackendErrorLabel} from '@wireapp/api-client/lib/http';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
+import {Result, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
 import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
@@ -142,6 +143,7 @@ describe('ConversationService', () => {
       encryptMessage: () => {},
       commitPendingProposals: () => Promise.resolve(),
       getEpoch: () => Promise.resolve(),
+      getSafeEpoch: jest.fn(),
       joinByExternalCommit: jest.fn(),
       registerConversation: jest.fn(),
       register1to1Conversation: jest.fn(),
@@ -153,6 +155,7 @@ describe('ConversationService', () => {
       getClientIdsInGroup: jest.fn(),
       getKeyPackagesPayload: jest.fn(),
       addUsersToExistingConversation: jest.fn(),
+      updateKeyingMaterialForConversation: jest.fn(),
       removeClientsFromConversation: jest.fn(),
       resetKeyMaterialRenewal: jest.fn(),
       handleMLSWelcomeMessageEvent: jest.fn(),
@@ -241,8 +244,7 @@ describe('ConversationService', () => {
 
       const remoteEpoch = 6;
       const localEpoch = 5;
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValue({
         qualified_id: mockConversationId,
@@ -285,8 +287,7 @@ describe('ConversationService', () => {
 
       const remoteEpoch = 10;
       const localEpoch = 9;
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
         protocol: CONVERSATION_PROTOCOL.MLS,
@@ -344,8 +345,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 5;
       const localEpoch = 4;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
@@ -387,8 +387,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 5;
       const localEpoch = 4;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: mockConversationId,
@@ -467,7 +466,7 @@ describe('ConversationService', () => {
     };
 
     it('re-joins multiple not-established conversations', async () => {
-      const [conversationService, {apiClient}] = await buildConversationService();
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
 
       const remoteEpoch = 1;
 
@@ -477,7 +476,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation1, mlsConversation2];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockResolvedValue(false);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.err("Couldn't find conversation")));
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation1.qualified_id);
@@ -493,8 +492,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation1, mlsConversation2];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockResolvedValue(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValue(2);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(2)));
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mlsConversation1.qualified_id);
@@ -509,10 +507,7 @@ describe('ConversationService', () => {
       const mockedDBResponse: Conversation[] = [mlsConversation];
       jest.spyOn(apiClient.api.conversation, 'getConversationList').mockResolvedValueOnce({found: mockedDBResponse});
 
-      jest.spyOn(conversationService, 'mlsGroupExistsLocally').mockResolvedValueOnce(true);
-
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(1);
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(1)));
 
       await conversationService.handleConversationsEpochMismatch();
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
@@ -781,8 +776,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 5;
       const localEpoch = 4;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id: conversationId,
@@ -814,8 +808,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 5;
       const localEpoch = 4;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       const mockedSubconversationResponse = {
         epoch: remoteEpoch,
@@ -1085,8 +1078,7 @@ describe('ConversationService', () => {
 
       const remoteEpoch = 5;
       const localEpoch = 4;
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       const getConvSpy = jest.spyOn(apiClient.api.conversation, 'getConversation');
       getConvSpy.mockResolvedValue({
@@ -1104,6 +1096,37 @@ describe('ConversationService', () => {
 
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(mockConversationId);
       expect(mlsService.addUsersToExistingConversation).toHaveBeenCalledTimes(2);
+    });
+
+    it('updates keying material when self has no key packages to add', async () => {
+      const [conversationService, {apiClient, mlsService}] = await buildConversationService();
+
+      const mockGroupId = 'groupId';
+      const mockConversationId = {id: PayloadHelper.getUUID(), domain: 'local.wire.com'};
+      const selfUserToAdd = {id: 'self-user-id', domain: 'local.wire.com'};
+
+      jest.spyOn(mlsService, 'commitPendingProposals').mockResolvedValueOnce(undefined);
+      jest.spyOn(mlsService, 'getClientIdsInGroup').mockResolvedValueOnce([]);
+      jest.spyOn(mlsService, 'getKeyPackagesPayload').mockResolvedValueOnce({keyPackages: [], failures: []});
+      jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
+        qualified_id: mockConversationId,
+        protocol: CONVERSATION_PROTOCOL.MLS,
+        epoch: 1,
+        group_id: mockGroupId,
+      } as unknown as Conversation);
+
+      await conversationService.addUsersToMLSConversation({
+        qualifiedUsers: [selfUserToAdd],
+        groupId: mockGroupId,
+        conversationId: mockConversationId,
+        updateKeyingMaterialIfEmpty: true,
+        commitPendingFirst: true,
+      });
+
+      expect(mlsService.commitPendingProposals).toHaveBeenCalledWith(mockGroupId, true);
+      expect(mlsService.addUsersToExistingConversation).not.toHaveBeenCalled();
+      expect(mlsService.updateKeyingMaterialForConversation).toHaveBeenCalledWith(mockGroupId);
+      expect(mlsService.resetKeyMaterialRenewal).toHaveBeenCalledWith(mockGroupId);
     });
   });
 
@@ -1335,8 +1358,7 @@ describe('ConversationService', () => {
       const remoteEpoch = 3;
       const localEpoch = 2;
 
-      jest.spyOn(mlsService, 'conversationExists').mockResolvedValueOnce(true);
-      jest.spyOn(mlsService, 'getEpoch').mockResolvedValueOnce(localEpoch);
+      jest.spyOn(mlsService, 'getSafeEpoch').mockReturnValue(task.fromResult(Result.ok(localEpoch)));
 
       jest.spyOn(apiClient.api.conversation, 'getConversation').mockResolvedValueOnce({
         qualified_id,

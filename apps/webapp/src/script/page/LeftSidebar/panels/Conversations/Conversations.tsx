@@ -35,13 +35,13 @@ import type {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
-import {PropertiesRepository} from 'Repositories/properties/PropertiesRepository';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {EventName} from 'Repositories/tracking/EventName';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {EventName} from 'Repositories/tracking/eventName';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {Preferences} from 'src/script/page/LeftSidebar/panels/Preferences';
 import {ANIMATED_PAGE_TRANSITION_DURATION} from 'src/script/page/MainContent';
 import {useAppMainState, ViewType} from 'src/script/page/state';
@@ -145,10 +145,12 @@ export const Conversations = ({
   const {labels} = useKoSubscribableChildren(conversationLabelRepository, ['labels']);
   const favoriteLabel = conversationLabelRepository.getFavoriteLabel();
 
-  const favoriteConversations = useMemo(
-    () => conversationLabelRepository.getLabelConversations(favoriteLabel, conversations),
-    [conversationLabelRepository, conversations, favoriteLabel],
-  );
+  const favoriteConversations = useMemo(() => {
+    if (favoriteLabel === undefined) {
+      return [];
+    }
+    return conversationLabelRepository.getLabelConversations(favoriteLabel, conversations);
+  }, [conversationLabelRepository, conversations, favoriteLabel]);
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
   const isCells = currentTab === SidebarTabs.CELLS;

@@ -22,7 +22,7 @@ import React from 'react';
 import {Select} from '@wireapp/react-ui-kit';
 
 import {selectGroupStyles} from 'Components/calling/VideoControls/VideoControlsSelect/VideoControlsSelect.styles';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {t} from 'Util/localizerUtil';
 
 import {
@@ -70,7 +70,7 @@ type VideoOptionLabelProps = {
 };
 
 const VideoOptionLabel = ({option}: VideoOptionLabelProps) => {
-  if (!option.icon) {
+  if (option.icon == null) {
     return <>{option.label}</>;
   }
 
@@ -109,7 +109,7 @@ export const VideoControlsSelect = ({
 
   return (
     <>
-      {showHeader && (
+      {showHeader === true && (
         <div css={videoOptionsSheetHeaderStyles}>
           <span css={videoOptionsSheetTitleStyles}>{t('videoCallMenuMoreVideoSettings')}</span>
           {onClose && (
@@ -139,7 +139,7 @@ export const VideoControlsSelect = ({
         overlayMenu={overlayMenu}
         menuCSS={menuCssWithInlineMenu}
         selectGroupHeadingCSS={isInlineMenu ? videoOptionsSelectGroupHeadingStyles : undefined}
-        wrapperCSS={isInlineMenu ? (!showHeader ? videoOptionsInlineWrapperStyles : undefined) : wrapperCSS}
+        wrapperCSS={isInlineMenu ? (showHeader !== true ? videoOptionsInlineWrapperStyles : undefined) : wrapperCSS}
         hideControl
         selectGroupCSS={selectGroupStyles}
         isOptionSelected={isOptionSelected}

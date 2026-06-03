@@ -27,7 +27,7 @@ interface CellsStateInfoProps {
 export const CellsStateInfo = ({heading, description}: CellsStateInfoProps) => {
   return (
     <div css={wrapperStyles}>
-      {heading && <h3 css={headingStyles}>{heading}</h3>}
+      {heading !== undefined && heading.length > 0 && <h3 css={headingStyles}>{heading}</h3>}
       <p css={paragraphStyles}>{description}</p>
     </div>
   );

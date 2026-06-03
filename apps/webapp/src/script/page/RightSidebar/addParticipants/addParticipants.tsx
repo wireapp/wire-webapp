@@ -27,7 +27,7 @@ import cx from 'classnames';
 import {Button, ButtonVariant, TabIndex} from '@wireapp/react-ui-kit';
 
 import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {SearchInput} from 'Components/SearchInput';
 import {ServiceList} from 'Components/ServiceList/ServiceList';
 import {UserSearchableList} from 'Components/UserSearchableList';
@@ -36,11 +36,11 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {IntegrationRepository} from 'Repositories/integration/IntegrationRepository';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
-import {UserState} from 'Repositories/user/UserState';
+import {generatePermissionHelpers} from 'Repositories/user/userPermission';
+import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
@@ -126,7 +126,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
   const contacts = useMemo(() => {
     if (isTeam) {
       const isTeamOrServices = isTeamOnly || isServicesRoom;
-      return isTeamOrServices ? teamMembers.sort(sortUsersByPriority) : teamUsers;
+      return isTeamOrServices ? teamMembers.toSorted(sortUsersByPriority) : teamUsers;
     }
     return connectedUsers;
   }, [connectedUsers, isServicesRoom, isTeam, isTeamOnly, teamMembers, teamUsers]);
@@ -137,7 +137,7 @@ const AddParticipants: FC<AddParticipantsProps> = ({
       .filter(contact => contact.type === UserType.APP)
       .map(contact => integrationRepository.mapServiceFromUser(contact))
       .filter(contact => compareTransliteration(contact.name(), normalizedQuery))
-      .sort((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
+      .toSorted((serviceA, serviceB) => sortByPriority(serviceA.name(), serviceB.name(), normalizedQuery));
   }, [contacts, integrationRepository, searchInput]);
 
   const servicesList = useMemo(() => {

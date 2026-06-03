@@ -52,6 +52,7 @@ const CONFIGURATION_ERROR = 'CellsAPI is not initialized. Call initialize() befo
 const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
 const USER_META_TAGS_NAMESPACE = 'usermeta-tags';
+const MIME_NAMESPACE = 'mime';
 
 // TODO: remove the apiKey (from pydio and s3) once the Pydio backend has fully support for the auth with the Wire's access token
 // If it's passed we use it to authenticate, instead of the access token
@@ -117,7 +118,7 @@ export class CellsAPI {
       headers: {...this.httpClientConfig.headers},
     };
 
-    if (cellsConfig.pydio.apiKey) {
+    if (cellsConfig.pydio.apiKey !== undefined && cellsConfig.pydio.apiKey.length > 0) {
       return new HttpClient(
         {
           ...baseHttpClientConfig,
@@ -133,7 +134,7 @@ export class CellsAPI {
     // Althouht the HttpClient handles the authorization already (see _sendRequest), as we pass a custom axios instance to the NodeServiceApi, we need to add it manually
     http.client.interceptors.request.use(config => {
       const accessToken = this.accessTokenStore.getAccessToken();
-      if (accessToken) {
+      if (accessToken !== undefined && accessToken.length > 0) {
         const requestHeaders = AxiosHeaders.from(config.headers);
         requestHeaders.set('Authorization', `Bearer ${accessToken}`);
         config.headers = requestHeaders;
@@ -177,8 +178,8 @@ export class CellsAPI {
 
     const firstCreateCheckResult = result.data.Results?.[0];
 
-    if (autoRename && firstCreateCheckResult?.Exists) {
-      filePath = firstCreateCheckResult.NextPath || filePath;
+    if (autoRename === true && firstCreateCheckResult?.Exists === true) {
+      filePath = firstCreateCheckResult.NextPath ?? filePath;
     }
 
     const metadata = {
@@ -400,9 +401,9 @@ export class CellsAPI {
       Limit: `${limit}`,
       Offset: `${offset}`,
       Filters: {
-        Type: type || 'UNKNOWN',
+        Type: type ?? 'UNKNOWN',
         Status: {
-          Deleted: deleted ? 'Only' : 'Not',
+          Deleted: deleted === true ? 'Only' : 'Not',
         },
       },
       SortField: sortBy,
@@ -423,6 +424,8 @@ export class CellsAPI {
     sortDirection,
     type,
     tags,
+    mimeTypes,
+    hasPublicLink,
     deleted = false,
   }: {
     phrase: string;
@@ -433,11 +436,15 @@ export class CellsAPI {
     sortDirection?: SortDirection;
     type?: RestIncomingNode['Type'];
     tags?: string[];
+    mimeTypes?: string[];
+    hasPublicLink?: boolean;
     deleted?: boolean;
   }): Promise<RestNodeCollection> {
     if (!this.client || !this.storageService) {
       throw new Error(CONFIGURATION_ERROR);
     }
+
+    const mimeOp: 'Should' | 'Must' = mimeTypes !== undefined && mimeTypes.length > 1 ? 'Should' : 'Must';
 
     const request: RestLookupRequest = {
       Scope: {Root: {Path: path}, Recursive: true},
@@ -446,14 +453,20 @@ export class CellsAPI {
         Type: type || 'UNKNOWN',
         Status: {
           Deleted: deleted ? 'Only' : 'Not',
+          ...(hasPublicLink !== undefined ? {HasPublicLink: hasPublicLink} : {}),
         },
-        Metadata: tags?.length ? [{Namespace: USER_META_TAGS_NAMESPACE, Term: this.transformTagsToJson(tags)}] : [],
+        Metadata: [
+          ...(tags !== undefined && tags.length > 0
+            ? [{Namespace: USER_META_TAGS_NAMESPACE, Term: this.transformTagsToJson(tags)}]
+            : []),
+          ...(mimeTypes?.map(term => ({Namespace: MIME_NAMESPACE, Term: term, Operation: mimeOp})) ?? []),
+        ],
       },
       Flags: ['WithPreSignedURLs'],
       Limit: `${limit}`,
       Offset: `${offset}`,
       SortField: sortBy,
-      SortDirDesc: sortDirection ? sortDirection === 'desc' : undefined,
+      SortDirDesc: sortDirection !== undefined ? sortDirection === 'desc' : undefined,
     };
 
     const result = await this.client.lookup(request);
@@ -485,7 +498,7 @@ export class CellsAPI {
           Locator: {Path: path.normalize('NFC')},
           ResourceUuid: uuid,
           VersionId: versionId,
-          ...(templateUuid ? {TemplateUuid: templateUuid} : {}),
+          ...(templateUuid !== undefined ? {TemplateUuid: templateUuid} : {}),
         },
       ],
     });
@@ -573,7 +586,7 @@ export class CellsAPI {
       },
     };
 
-    if (createPassword && passwordEnabled) {
+    if (createPassword !== undefined && createPassword.length > 0 && passwordEnabled === true) {
       requestBody.Link.PasswordRequired = true;
       requestBody.CreatePassword = createPassword;
       requestBody.PasswordEnabled = passwordEnabled;
@@ -635,11 +648,11 @@ export class CellsAPI {
       requestBody.Link.PasswordRequired = passwordEnabled;
     }
 
-    if (createPassword) {
+    if (createPassword !== undefined && createPassword.length > 0) {
       requestBody.CreatePassword = createPassword;
     }
 
-    if (updatePassword) {
+    if (updatePassword !== undefined && updatePassword.length > 0) {
       requestBody.UpdatePassword = updatePassword;
     }
 

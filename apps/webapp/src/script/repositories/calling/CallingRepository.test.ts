@@ -24,7 +24,7 @@ import 'jsdom-worker';
 import {Subscription} from 'knockout';
 import {container} from 'tsyringe';
 
-import {CALL_TYPE, CONV_TYPE, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
+import {CALL_TYPE, CONV_TYPE, QUALITY, REASON, STATE as CALL_STATE, VIDEO_STATE, Wcall} from '@wireapp/avs';
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -35,7 +35,7 @@ import {CALL} from 'Repositories/event/Client';
 import {EventRepository} from 'Repositories/event/EventRepository';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {MediaType} from 'Repositories/media/MediaType';
-import {UserRepository} from 'Repositories/user/UserRepository';
+import {UserRepository} from 'Repositories/user/userRepository';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
@@ -48,7 +48,9 @@ import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
 import {Participant} from './Participant';
 
 import {buildMediaDevicesHandler, createConversation, createSelfParticipant} from '../../auth/util/test/TestUtil';
-import {Core} from '../../service/CoreSingleton';
+import {Core} from '../../service/coreSingleton';
+import {Warnings} from '../../view_model/WarningsContainer';
+import {z} from 'zod';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -465,6 +467,138 @@ describe('CallingRepository', () => {
         expect(callingRepository['mediaStreamHandler'].requestMediaStream).toHaveBeenCalledTimes(1);
         audioTrack.stop();
       });
+    });
+  });
+
+  describe('updateCallQuality', () => {
+    const conversationId = 'conversation-id';
+    const userId = 'user-id';
+    const remoteClientId = 'client-id';
+
+    const qualityInfo = (quality: QUALITY) =>
+      JSON.stringify({
+        quality,
+        rtt: 80,
+        loss: {tx: 1, rx: 2},
+        jitter: {
+          audio: {tx: 3, rx: 4},
+          video: {tx: 5, rx: 6},
+        },
+        connection: {
+          candidate: 'Relay',
+          protocol: 'UDP',
+        },
+        peer: 'User',
+      });
+
+    beforeEach(() => {
+      const conversation = createConversation();
+      conversation.id = conversationId;
+
+      const selfParticipant = createSelfParticipant();
+
+      const user = new User(userId);
+
+      const remoteParticipant = new Participant(user, remoteClientId);
+
+      const call = new Call(
+        callingRepository['selfUser']!.qualifiedId,
+        conversation,
+        CONV_TYPE.CONFERENCE,
+        selfParticipant,
+        CALL_TYPE.NORMAL,
+        buildMediaDevicesHandler(),
+      );
+
+      call.participants.push(remoteParticipant);
+
+      callingRepository['conversationState'].conversations.push(conversation);
+      callingRepository['callState'].calls([call]);
+
+      spyOn(Warnings, 'showWarning');
+      spyOn(Warnings, 'hideWarning');
+    });
+
+    // skipping test for now. Once we have correct stats about network
+    // quality then we will enable the feature and tests again.
+    it.skip('shows poor call quality warning when parsed quality is medium', () => {
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, qualityInfo(QUALITY.MEDIUM));
+
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
+    });
+
+    it.skip('shows poor call quality warning when parsed quality is poor', () => {
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, qualityInfo(QUALITY.POOR));
+
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
+    });
+
+    it.skip('shows poor call quality warning when parsed quality is network problem', () => {
+      callingRepository['updateCallQuality'](
+        conversationId,
+        userId,
+        remoteClientId,
+        qualityInfo(QUALITY.NETWORK_PROBLEM),
+      );
+
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
+    });
+
+    it.skip('shows poor call quality warning when parsed quality is reconnecting', () => {
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, qualityInfo(QUALITY.RECONNECTING));
+
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
+    });
+
+    it('hides poor call quality warning when parsed quality becomes normal', () => {
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, qualityInfo(QUALITY.POOR));
+
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, qualityInfo(QUALITY.NORMAL));
+
+      expect(Warnings.hideWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
+    });
+
+    it('logs warning when JSON parsing fails', () => {
+      spyOn(callingRepository['logger'], 'warn');
+      const invalidJsonString = '{invalid-json';
+
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidJsonString);
+
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
+        'Invalid network quality info JSON',
+        expect.any(Error),
+      );
+    });
+
+    it('logs warning when network quality info schema validation fails', () => {
+      spyOn(callingRepository['logger'], 'warn');
+
+      const invalidQualityInfo = JSON.stringify({
+        quality: 'invalid-quality',
+      });
+
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, invalidQualityInfo);
+
+      expect(callingRepository['logger'].warn).toHaveBeenCalledWith(
+        'Invalid network quality info schema',
+        expect.any(z.ZodError),
+      );
+
+      expect(Warnings.showWarning).not.toHaveBeenCalled();
+      expect(Warnings.hideWarning).not.toHaveBeenCalled();
+    });
+
+    // skipping test for now. Once we have correct stats about network
+    // quality then we will enable the feature and tests again.
+    it.skip('handles partially missing fields in qualityInfo JSON', () => {
+      const json = JSON.stringify({
+        quality: QUALITY.POOR,
+        // missing jitter, connection, peer etc.
+      });
+
+      callingRepository['updateCallQuality'](conversationId, userId, remoteClientId, json);
+
+      expect(Warnings.showWarning).toHaveBeenCalledWith(Warnings.TYPE.CALL_QUALITY_POOR);
     });
   });
 

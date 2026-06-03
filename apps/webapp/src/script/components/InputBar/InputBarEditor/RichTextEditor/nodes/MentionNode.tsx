@@ -136,10 +136,12 @@ export class MentionNode extends DecoratorNode<JSX.Element> {
   }
 
   decorate(_editor: LexicalEditor, config: EditorConfig) {
-    const theme: Record<string, string> = config.theme.mentions || {};
+    const themeMentions = config.theme.mentions;
+    const theme: Record<string, string> =
+      typeof themeMentions === 'object' && themeMentions !== null ? themeMentions : {};
     const entry = Object.entries(theme).find(([trigger]) => new RegExp(trigger).test(this.__trigger));
-    const className = entry && entry[1];
-    const classNameFocused = entry && theme[`${entry[0]}Focused`];
+    const className = entry !== undefined ? entry[1] : undefined;
+    const classNameFocused = entry !== undefined ? theme[`${entry[0]}Focused`] : undefined;
     return (
       <Mention
         nodeKey={this.getKey()}

@@ -37,10 +37,10 @@ export const BannerPortal = ({onClose, positionX = 0, positionY = 0, children}: 
 
   const {activeWindow} = useActiveWindowState.getState();
 
-  const updateRef = (element: HTMLDivElement) => {
+  const updateRef = (element: HTMLDivElement | null) => {
     bannerRef.current = element;
 
-    if (!element) {
+    if (element === null) {
       return;
     }
 

@@ -27,10 +27,12 @@ import {createRoot} from 'react-dom/client';
 import {container} from 'tsyringe';
 
 import {Runtime} from '@wireapp/commons';
+import {createFireAndForgetInvoker} from '@wireapp/core';
 
 import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
+import {getLogger} from 'Util/logger';
 import {enableLogging} from 'Util/loggerUtil';
 import {loadValue} from 'Util/storageUtil';
 import {exposeWrapperGlobals} from 'Util/wrapper';
@@ -42,9 +44,9 @@ import {createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
-import {APIClient} from '../service/APIClientSingleton';
-import {Core} from '../service/CoreSingleton';
-import {createAPIClient} from '../service/createAPIClient';
+import {APIClient} from '../service/apiClientSingleton';
+import {Core} from '../service/coreSingleton';
+import {createAPIClient} from '../service/createApiClient';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -73,11 +75,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(globalThis.location.search);
+  const fireAndForgetInvokerLogger = getLogger('FireAndForgetInvoker');
   const applicationServices = createApplicationServices({
+    createFireAndForgetInvoker: () => {
+      return createFireAndForgetInvoker({logger: fireAndForgetInvokerLogger});
+    },
     createWallClock,
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
-  const {wallClock} = applicationServices;
+  const {fireAndForgetInvoker, wallClock} = applicationServices;
   const apiClient = createAPIClient();
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
@@ -110,6 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     <AppContainer
       config={config}
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
+      fireAndForgetInvoker={fireAndForgetInvoker}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
       wallClock={wallClock}
     />,

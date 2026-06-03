@@ -95,11 +95,11 @@ export class MessageToProtoMapper {
       legalHoldStatus,
     });
 
-    if (linkPreviews?.length) {
+    if (linkPreviews !== undefined && linkPreviews.length > 0) {
       textMessage.linkPreview = MessageToProtoMapper.mapLinkPreviews(linkPreviews);
     }
 
-    if (mentions?.length) {
+    if (mentions !== undefined && mentions.length > 0) {
       textMessage.mentions = mentions.map(mention => Mention.create(mention));
     }
 

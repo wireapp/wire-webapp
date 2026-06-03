@@ -50,7 +50,7 @@ export class EncryptedStorage {
 
   async getItem(key: string) {
     const entry = localStorage.getItem(key);
-    if (entry) {
+    if (entry !== null) {
       const encryptionKey = await this.encryptionKey;
       const {value, iv} = JSON.parse(entry);
       const decodedBytes = Decoder.fromBase64(value).asBytes;

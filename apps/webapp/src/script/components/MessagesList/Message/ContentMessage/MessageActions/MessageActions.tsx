@@ -98,13 +98,13 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
     (event: React.KeyboardEvent<HTMLButtonElement>) => {
       const selectedMsgActionName = event.currentTarget.dataset.uieName;
       if (isSpaceOrEnterKey(event.key)) {
-        if (selectedMsgActionName) {
+        if (selectedMsgActionName !== undefined && selectedMsgActionName !== '') {
           setCurrentMsgAction(selectedMsgActionName);
           handleMenuOpen(true);
           const newEvent = setContextMenuPosition(event);
           showContextMenu({event: newEvent, entries: menuEntries, identifier: 'message-options-menu'});
         }
-      } else if (!event.shiftKey && isTabKey(event) && !reactionsTotalCount) {
+      } else if (!event.shiftKey && isTabKey(event) && reactionsTotalCount === 0) {
         // if there's no reaction then on tab from context menu hide the message actions menu
         setCurrentMsgAction('');
         handleActionMenuVisibility(false);
@@ -124,7 +124,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
         // reset on double click
         setCurrentMsgAction('');
         handleMenuOpen(false);
-      } else if (selectedMsgActionName) {
+      } else if (selectedMsgActionName !== undefined && selectedMsgActionName !== '') {
         setCurrentMsgAction(selectedMsgActionName);
         handleMenuOpen(true);
         showContextMenu({
@@ -145,7 +145,7 @@ const MessageActionsMenu: FC<MessageActionsMenuProps> = ({
       if (currentMsgActionName === selectedMsgActionName) {
         // reset on double click
         setCurrentMsgAction('');
-      } else if (selectedMsgActionName) {
+      } else if (selectedMsgActionName !== undefined && selectedMsgActionName !== '') {
         setCurrentMsgAction(selectedMsgActionName);
       }
     },

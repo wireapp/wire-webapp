@@ -24,11 +24,11 @@ import {amplify} from 'amplify';
 import {CircleCloseIcon, IconButton, Input, SearchIcon} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {useCreateConversationModal} from 'Components/Modals/CreateConversation/hooks/useCreateConversationModal';
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {User} from 'Repositories/entity/User';
-import {generatePermissionHelpers} from 'Repositories/user/UserPermission';
+import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';

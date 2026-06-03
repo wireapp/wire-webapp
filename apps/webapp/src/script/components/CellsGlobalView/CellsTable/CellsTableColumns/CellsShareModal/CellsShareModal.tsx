@@ -17,7 +17,9 @@
  *
  */
 
-import {useEffect, useRef, useState} from 'react';
+import {ReactElement, useEffect, useRef, useState} from 'react';
+
+import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {CellsShareModalContent} from 'Components/Cells/ShareModal/CellsShareModalContent';
 import {serializeShareModalInput} from 'Components/Cells/ShareModal/shareModalSerializer';
@@ -57,11 +59,18 @@ interface ShareModalParams {
   type: 'file' | 'folder';
   uuid: string;
   cellsRepository: CellsRepository;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
-const submitHandlers = new Map<string, () => Promise<void> | void>();
+type CellsShareModalProps = Omit<ShareModalParams, 'fireAndForgetInvoker'> & {
+  modalId: string;
+};
 
-export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) => {
+const submitHandlers = new Map<string, () => Promise<void> | void>();
+const ACCESS_END_SECONDS_TO_MILLISECONDS = 1000;
+
+export const showShareModal = (properties: ShareModalParams): void => {
+  const {type, uuid, cellsRepository, fireAndForgetInvoker} = properties;
   const modalId = createUuid();
   PrimaryModal.show(
     PrimaryModal.type.CONFIRM,
@@ -72,7 +81,9 @@ export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) 
         action: () => {
           const submitHandler = submitHandlers.get(modalId);
           if (submitHandler) {
-            void submitHandler();
+            fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+              await submitHandler();
+            });
           }
         },
         text: t('cells.shareModal.primaryAction'),
@@ -86,7 +97,8 @@ export const showShareModal = ({type, uuid, cellsRepository}: ShareModalParams) 
   );
 };
 
-const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParams & {modalId: string}) => {
+const CellsShareModal = (properties: CellsShareModalProps): ReactElement => {
+  const {type, uuid, cellsRepository, modalId} = properties;
   const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellGlobalPublicLink({
     uuid,
     cellsRepository,
@@ -110,7 +122,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   const initializedLinkIdRef = useRef<string | null>(null);
 
   // Derive hasExistingPassword from linkData
-  const hasExistingPassword = Boolean(linkData?.PasswordRequired);
+  const hasExistingPassword = linkData?.PasswordRequired === true;
 
   // Initialize toggles and values based on existing link data
   useEffect(() => {
@@ -119,26 +131,26 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
       return;
     }
 
-    if (linkData && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
-      setIsPasswordEnabled(!!linkData.PasswordRequired);
+    if (linkData !== null && status === 'success' && initializedLinkIdRef.current !== linkData.Uuid) {
+      setIsPasswordEnabled(linkData.PasswordRequired === true);
 
       // Always sync expiration toggle and date with linkData state
-      if (linkData.AccessEnd) {
+      if (linkData.AccessEnd !== undefined && linkData.AccessEnd.length > 0) {
         setIsExpirationEnabled(true);
         // Convert Unix timestamp (in seconds) to Date
-        const expirationDate = new Date(parseInt(linkData.AccessEnd) * 1000);
+        const expirationDate = new Date(parseInt(linkData.AccessEnd) * ACCESS_END_SECONDS_TO_MILLISECONDS);
         setExpirationDateTime(expirationDate);
       } else {
         setIsExpirationEnabled(false);
         setExpirationDateTime(null);
       }
-      if (linkData?.Uuid) {
+      if (linkData.Uuid !== undefined && linkData.Uuid.length > 0) {
         initializedLinkIdRef.current = linkData.Uuid;
       }
     }
   }, [isEnabled, linkData, status, setIsPasswordEnabled, setIsExpirationEnabled]);
 
-  const handlePasswordToggle = () => {
+  const handlePasswordToggle = (): void => {
     if (isPasswordEnabled) {
       setWasPasswordDisabled(true);
       setIsEditingPassword(false);
@@ -155,7 +167,7 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
   };
 
   // Handle "Change Password" button click
-  const handleChangePasswordClick = () => {
+  const handleChangePasswordClick = (): void => {
     setIsEditingPassword(true);
     setPasswordValue('');
   };
@@ -187,7 +199,12 @@ const CellsShareModal = ({type, uuid, cellsRepository, modalId}: ShareModalParam
 
   useEffect(() => {
     submitHandlers.set(modalId, async () => {
-      if (!isEnabled || status !== 'success' || !node?.publicLink?.uuid) {
+      if (
+        !isEnabled ||
+        status !== 'success' ||
+        node?.publicLink?.uuid === undefined ||
+        node.publicLink.uuid.length === 0
+      ) {
         return;
       }
 

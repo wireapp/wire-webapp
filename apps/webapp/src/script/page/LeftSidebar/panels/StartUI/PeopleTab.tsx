@@ -24,16 +24,16 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {partition} from 'underscore';
 import {useDebouncedCallback} from 'use-debounce';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {UserList, UserlistMode} from 'Components/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {User} from 'Repositories/entity/User';
-import {SearchRepository} from 'Repositories/search/SearchRepository';
+import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
-import {UserRepository} from 'Repositories/user/UserRepository';
-import {UserState} from 'Repositories/user/UserState';
+import {UserRepository} from 'Repositories/user/userRepository';
+import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
@@ -130,7 +130,7 @@ export const PeopleTab = ({
     const nonExternalContacts = await teamRepository.filterExternals(contacts);
     return {
       ...searchResults,
-      contacts: [...searchResults.contacts, ...nonExternalContacts].sort((userA, userB) =>
+      contacts: [...searchResults.contacts, ...nonExternalContacts].toSorted((userA, userB) =>
         sortByPriority(userA.name(), userB.name(), query),
       ),
       others: others,

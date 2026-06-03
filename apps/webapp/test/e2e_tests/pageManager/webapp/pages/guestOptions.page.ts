@@ -52,7 +52,11 @@ export const GuestOptionsPage = (page: Page) => {
       await new ConfirmModal(page).actionButton.click();
     }
 
-    return await guestLink.textContent();
+    const guestLinkText = await guestLink.textContent();
+    if (guestLinkText === null || guestLinkText.length <= 0)
+      throw new Error("Can't copy guest link since it was empty");
+
+    return guestLinkText;
   };
 
   const revokeLink = async () => {

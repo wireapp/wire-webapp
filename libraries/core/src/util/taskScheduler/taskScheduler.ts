@@ -91,12 +91,12 @@ const cancelTask = (key: string) => {
  */
 const continueTask = ({key, task}: Omit<ScheduleTaskParams, 'firingDate' | 'persist'>) => {
   const activeTaskEndTime = TaskSchedulerStore.get(key);
-  if (activeTaskEndTime) {
+  if (activeTaskEndTime !== undefined) {
     addTask({task, firingDate: activeTaskEndTime, key, persist: true});
   }
 };
 
-const hasActiveTask = (key: string) => !!activeTimeouts[key];
+const hasActiveTask = (key: string) => activeTimeouts[key] !== undefined;
 
 export const TaskScheduler = {
   addTask,

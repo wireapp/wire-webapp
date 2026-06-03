@@ -101,7 +101,7 @@ export const styles: {
     padding: '24px',
     borderRadius: 12,
     border: '1px solid',
-    borderColor: isHighlighted ? 'var(--accent-color)' : 'var(--text-input-border)',
+    borderColor: isHighlighted === true ? 'var(--accent-color)' : 'var(--text-input-border)',
     flex: 1,
     height: 360,
     position: 'relative',

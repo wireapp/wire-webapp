@@ -22,7 +22,7 @@ import {ChangeEvent, useCallback, useId, useMemo, useState} from 'react';
 import cx from 'classnames';
 import {container} from 'tsyringe';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {InViewport} from 'Components/InViewport';
 import {collapseButton, collapseIcon} from 'Components/UserList/UserList.styles';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -172,7 +172,7 @@ export const UserList = ({
       if (userEntity.isService) {
         return;
       }
-      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity)) {
+      if (conversationRepository?.conversationRoleRepository.isUserGroupAdmin(conversation, userEntity) === true) {
         admins.push(userEntity);
       } else {
         members.push(userEntity);

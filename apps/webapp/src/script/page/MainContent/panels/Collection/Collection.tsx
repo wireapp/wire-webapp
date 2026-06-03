@@ -25,7 +25,7 @@ import {amplify} from 'amplify';
 import {ChevronIcon, SecondaryButton} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {showDetailViewModal} from 'Components/Modals/DetailViewModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
@@ -34,6 +34,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -90,6 +91,7 @@ const Collection = ({
   messageRepository,
   selfUser,
 }: CollectionDetailsProps) => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name, cellsState} = useKoSubscribableChildren(conversation, ['display_name', 'cellsState']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
@@ -136,6 +138,7 @@ const Collection = ({
       assetRepository,
       conversationRepository,
       currentMessageEntity: message,
+      fireAndForgetInvoker,
       messageRepository,
       selfUser,
     });

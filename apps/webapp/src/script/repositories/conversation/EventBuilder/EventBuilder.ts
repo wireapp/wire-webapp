@@ -308,6 +308,23 @@ function buildQualifiedId(conversation: QualifiedId | string) {
   };
 }
 
+function getConversationSelfUser(conversationEntity: Conversation): User {
+  const conversationSelfUser = conversationEntity.selfUser();
+  if (conversationSelfUser !== undefined) {
+    return conversationSelfUser;
+  }
+
+  const firstConversationParticipant = conversationEntity.participating_user_ets()[0];
+  if (firstConversationParticipant !== undefined) {
+    return firstConversationParticipant;
+  }
+
+  return {
+    id: '',
+    qualifiedId: {domain: '', id: ''},
+  } as User;
+}
+
 export const EventBuilder = {
   build1to1Creation(conversationEntity: Conversation, timestamp: number = 0): OneToOneCreationEvent {
     const {creator: creatorId} = conversationEntity;
@@ -326,23 +343,25 @@ export const EventBuilder = {
   },
 
   build1to1MigratedToMLS(conversationEntity: Conversation, currentTimestamp: number): OneToOneMigratedToMlsEvent {
+    const selfUser = getConversationSelfUser(conversationEntity);
     return {
       ...buildQualifiedId(conversationEntity),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.ONE2ONE_MIGRATED_TO_MLS,
-      from: conversationEntity.selfUser().id,
+      from: selfUser.id,
       data: undefined,
       id: createUuid(),
     };
   },
 
   buildAllVerified(conversationEntity: Conversation): AllVerifiedEvent {
+    const selfUser = getConversationSelfUser(conversationEntity);
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
         type: VerificationMessageType.VERIFIED,
       },
-      from: conversationEntity.selfUser().id,
+      from: selfUser.id,
       id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
@@ -417,13 +436,14 @@ export const EventBuilder = {
     userIds: QualifiedId[],
     type: VerificationMessageType,
   ): DegradedMessageEvent {
+    const selfUser = getConversationSelfUser(conversationEntity);
     return {
       ...buildQualifiedId(conversationEntity),
       data: {
         type,
         userIds,
       },
-      from: conversationEntity.selfUser().id,
+      from: selfUser.id,
       id: createUuid(),
       time: new Date(conversationEntity.getNextTimestamp()).toISOString(),
       type: ClientEvent.CONVERSATION.VERIFICATION,
@@ -475,13 +495,14 @@ export const EventBuilder = {
     timestamp: number = 0,
   ): GroupCreationEvent {
     const {creator: creatorId} = conversationEntity;
-    const selfUserId = conversationEntity.selfUser().id;
+    const selfUser = getConversationSelfUser(conversationEntity);
+    const selfUserId = selfUser.id;
     const isoDate = new Date(timestamp).toISOString();
 
     const userIds = conversationEntity.participating_user_ids().slice();
     const createdBySelf = creatorId === selfUserId || isTemporaryGuest;
     if (!createdBySelf) {
-      userIds.push(conversationEntity.selfUser().qualifiedId);
+      userIds.push(selfUser.qualifiedId);
     }
 
     return {
@@ -612,9 +633,10 @@ export const EventBuilder = {
   },
 
   buildMissed(conversationEntity: Conversation, currentTimestamp: number): MissedEvent {
+    const selfUser = getConversationSelfUser(conversationEntity);
     return {
       ...buildQualifiedId(conversationEntity),
-      from: conversationEntity.selfUser().id,
+      from: selfUser.id,
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MISSED_MESSAGES,
@@ -625,9 +647,10 @@ export const EventBuilder = {
     conversationEntity: Conversation,
     currentTimestamp: number,
   ): MLSConversationRecoveredEvent {
+    const selfUser = getConversationSelfUser(conversationEntity);
     return {
       ...buildQualifiedId(conversationEntity),
-      from: conversationEntity.selfUser().id,
+      from: selfUser.id,
       id: createUuid(),
       time: conversationEntity.getNextIsoDate(currentTimestamp),
       type: ClientEvent.CONVERSATION.MLS_CONVERSATION_RECOVERED,
@@ -638,9 +661,10 @@ export const EventBuilder = {
     conversationEntity: Conversation,
     currentTimestamp: number,
   ): JoinedAfterMLSMigrationFinalisationEvent {
+    const selfUser = getConversationSelfUser(conversationEntity);
     return {
       ...buildQualifiedId(conversationEntity),
-      from: conversationEntity.selfUser().id,
+      from: selfUser.id,
       id: createUuid(),
       data: null,
       time: conversationEntity.getNextIsoDate(currentTimestamp),
@@ -652,9 +676,10 @@ export const EventBuilder = {
     conversationEntity: Conversation,
     currentTimestamp: number,
   ): MLSMigrationFinalisationOngoingCallEvent {
+    const selfUser = getConversationSelfUser(conversationEntity);
     return {
       ...buildQualifiedId(conversationEntity),
-      from: conversationEntity.selfUser().id,
+      from: selfUser.id,
       id: createUuid(),
       data: null,
       time: conversationEntity.getNextIsoDate(currentTimestamp),

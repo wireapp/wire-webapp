@@ -17,7 +17,7 @@
  *
  */
 
-import {Self} from '@wireapp/api-client/lib/self/';
+import {Self} from '@wireapp/api-client/lib/self';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {APIClient} from '@wireapp/api-client';
@@ -30,7 +30,7 @@ export class SelfService {
 
   public async checkUsername(username: string): Promise<boolean> {
     const [availableUsername] = await this.checkUsernames([username]);
-    return !!availableUsername;
+    return availableUsername !== undefined;
   }
 
   public checkUsernames(usernames: string[]): Promise<string[]> {
@@ -72,7 +72,11 @@ export class SelfService {
       return;
     }
 
-    if (!supportedProtocols || supportedProtocols.length === 0) {
+    if (supportedProtocols === undefined) {
+      throw new Error('Supported protocols must be a non-empty protocols list');
+    }
+
+    if (supportedProtocols.length === 0) {
       throw new Error('Supported protocols must be a non-empty protocols list');
     }
 

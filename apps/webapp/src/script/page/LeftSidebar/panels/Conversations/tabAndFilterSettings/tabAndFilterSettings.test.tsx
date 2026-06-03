@@ -22,16 +22,17 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 import en from 'I18n/en-US.json';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {setStrings} from 'Util/localizerUtil';
+import {setStrings, t} from 'Util/localizerUtil';
+import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {TabAndFilterSettings} from './tabAndFilterSettings';
 import {SidebarTabs, useSidebarStore} from '../useSidebarStore';
 
 jest.mock('Util/useChannelsFeatureFlag', () => ({
-  useChannelsFeatureFlag: () => ({
+  useChannelsFeatureFlag: jest.fn(() => ({
     isChannelsEnabled: false,
     shouldShowChannelTab: false,
-  }),
+  })),
 }));
 
 jest.mock('Repositories/team/TeamState', () => ({
@@ -44,13 +45,17 @@ jest.mock('Util/componentUtil', () => ({
   useKoSubscribableChildren: () => ({isCellsEnabled: false}),
 }));
 
-jest.mock('Components/Icon', () => ({
+jest.mock('Components/icon', () => ({
   SettingsIcon: () => <div data-testid="settings-icon" />,
 }));
 
 describe('TabAndFilterSettings', () => {
   beforeEach(() => {
     setStrings({en});
+    jest.mocked(useChannelsFeatureFlag).mockReturnValue({
+      isChannelsEnabled: false,
+      shouldShowChannelTab: false,
+    });
     Config._dangerouslySetConfigFeaturesForDebug({
       ...Config.getConfig().FEATURE,
       ENABLE_ADVANCED_FILTERS: true,
@@ -71,5 +76,32 @@ describe('TabAndFilterSettings', () => {
     await waitFor(() => {
       expect(useSidebarStore.getState().visibleTabs).not.toContain(SidebarTabs.FAVORITES);
     });
+  });
+
+  it('inserts the channels tab between groups and directs when channels are enabled', () => {
+    jest.mocked(useChannelsFeatureFlag).mockReturnValue({
+      isChannelsEnabled: true,
+      shouldShowChannelTab: true,
+    });
+
+    const {getByTitle, getAllByRole} = render(withTheme(<TabAndFilterSettings />));
+
+    fireEvent.click(getByTitle('Customize visible tabs'));
+
+    const tabLabels = getAllByRole('menuitemcheckbox').map(checkboxElement => checkboxElement.textContent);
+
+    expect(tabLabels).toEqual([
+      'Favorites',
+      'Groups',
+      'Channels',
+      t('conversationLabelDirects'),
+      'Folders',
+      t('conversationFooterArchive'),
+      'Unread',
+      'Mentions',
+      'Replies',
+      'Drafts',
+      'Pings',
+    ]);
   });
 });

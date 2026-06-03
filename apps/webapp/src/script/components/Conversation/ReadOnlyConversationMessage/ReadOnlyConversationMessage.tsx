@@ -19,11 +19,12 @@
 
 import {FC, ReactNode} from 'react';
 
+import is from '@sindresorhus/is';
 import ko from 'knockout';
 
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
-import * as Icon from 'Components/Icon';
+import * as Icon from 'Components/icon';
 import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -44,7 +45,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
     participating_user_ets: participatingUserEts,
   } = useKoSubscribableChildren(conversation, ['readOnlyState', 'is1to1', 'participating_user_ets']);
 
-  const user = (is1to1 && participatingUserEts[0]) || null;
+  const user = is1to1 ? participatingUserEts[0] : null;
   const {isBlocked: isUserBlocked} = useKoSubscribableChildren(user || userPlaceholder, ['isBlocked']);
 
   if (!user) {
@@ -60,7 +61,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
     );
   }
 
-  if (readOnlyState) {
+  if (!is.nullOrUndefined(readOnlyState)) {
     switch (readOnlyState) {
       case CONVERSATION_READONLY_STATE.READONLY_ONE_TO_ONE_OTHER_UNSUPPORTED_MLS:
         return (

@@ -27,6 +27,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalState';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -43,6 +44,7 @@ interface FileEditorProps {
 
 export const FileEditor = ({id}: FileEditorProps) => {
   const cellsRepository = container.resolve(CellsRepository);
+  const {fireAndForgetInvoker} = useApplicationContext();
   const [node, setNode] = useState<Node | null>(null);
   const [isRecycled, setIsRecycled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,7 +57,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
       setIsError(false);
       const fetchedNode = await cellsRepository.getNode({uuid: id, flags: ['WithEditorURLs']});
 
-      if (fetchedNode.IsRecycled) {
+      if (fetchedNode.IsRecycled === true) {
         setIsRecycled(true);
         setNode(null);
         return false;
@@ -74,22 +76,23 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
   const handleRetry = useCallback(() => {
     hasShownErrorModal.current = false;
-    void (async () => {
+
+    fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       const isSuccessful = await fetchNode();
       if (isSuccessful) {
         removeCurrentModal();
       }
-    })();
-  }, [fetchNode]);
+    });
+  }, [fetchNode, fireAndForgetInvoker]);
 
   // Initial fetch
   useEffect(() => {
-    void fetchNode();
-  }, [id, cellsRepository, fetchNode]);
+    fireAndForgetInvoker.fireAndForget(fetchNode);
+  }, [fetchNode, fireAndForgetInvoker]);
 
   // Auto-refresh mechanism before expiry
   useEffect(() => {
-    if (!node?.EditorURLs?.collabora.ExpiresAt) {
+    if (node?.EditorURLs?.collabora.ExpiresAt === undefined || node.EditorURLs.collabora.ExpiresAt.length === 0) {
       return undefined;
     }
 
@@ -98,16 +101,16 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
     // Set timeout to refresh before expiry
     const timeoutId = setTimeout(() => {
-      void fetchNode();
+      fireAndForgetInvoker.fireAndForget(fetchNode);
     }, refreshInSeconds * TIME_IN_MILLIS.SECOND);
 
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [node, fetchNode]);
+  }, [fetchNode, fireAndForgetInvoker, node]);
 
   useEffect(() => {
-    if (isLoading || isRecycled || (!isError && node)) {
+    if (isLoading || isRecycled || (!isError && node !== null)) {
       return;
     }
 
@@ -134,7 +137,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
   }, [handleRetry, isError, isLoading, isRecycled, node]);
 
   useEffect(() => {
-    if (!isLoading && !isError && node && !isRecycled) {
+    if (!isLoading && !isError && node !== null && !isRecycled) {
       hasShownErrorModal.current = false;
     }
   }, [isError, isLoading, isRecycled, node]);

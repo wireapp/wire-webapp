@@ -17,6 +17,11 @@
       "dependsOn": ["^build"],
       "cache": true,
       "inputs": ["default", "{workspaceRoot}/eslint.config.ts"]
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "cache": true,
+      "inputs": ["default", "^production"]
     }
   },
   "namedInputs": {

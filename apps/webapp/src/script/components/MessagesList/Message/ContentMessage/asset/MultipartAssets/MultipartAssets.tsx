@@ -25,6 +25,7 @@ import {ICellAsset} from '@wireapp/protocol-messaging';
 
 import {useInView} from 'Hooks/useInView/useInView';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isPreviewableImage} from 'Util/imageUtil';
 import {t} from 'Util/localizerUtil';
 import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
@@ -56,7 +57,7 @@ export const MultipartAssets = ({
   cellsRepository = container.resolve(CellsRepository),
   senderName,
   timestamp,
-}: MultipartAssetsProps) => {
+}: MultipartAssetsProps): JSX.Element => {
   return (
     <ul css={assets.length === 1 ? listSingleItemStyles : listStyles}>
       {assets.map(asset => (
@@ -93,7 +94,8 @@ const MultipartAsset = ({
   image: imageMetadata,
   senderName,
   timestamp,
-}: MultipartAssetProps) => {
+}: MultipartAssetProps): JSX.Element => {
+  const {fireAndForgetInvoker} = useApplicationContext();
   const extension = getFileExtension(initialName!);
   const size = formatBytes(Number(initialSize));
 
@@ -113,9 +115,9 @@ const MultipartAsset = ({
       retryPreviewUntilSuccess: isSingleAsset && !isImage && !isVideo,
     });
 
-  const name = path ? getName(path) : getName(initialName!);
-  const canPreviewImage = isPreviewableImage({mimeType: contentType, extension}) || !!imagePreviewUrl;
-  const imageSrc = imagePreviewUrl || src;
+  const name = path !== undefined && path !== '' ? getName(path) : getName(initialName!);
+  const canPreviewImage = isPreviewableImage({mimeType: contentType, extension}) || imagePreviewUrl !== undefined;
+  const imageSrc = imagePreviewUrl ?? src;
   const hasFilePreview = hasPreview ?? false;
   const fileVariant = isSingleAsset && hasFilePreview ? 'large' : 'small';
 
@@ -126,17 +128,22 @@ const MultipartAsset = ({
    * renamed, or otherwise modified.
    */
   useEffect(() => {
-    const handleHashChange = () => {
+    function handleHashChange(): void {
       const currentPath = window.location.hash;
       if (currentPath.includes(conversationId) && !currentPath.endsWith('/files')) {
-        void fetchData(true);
+        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+          await fetchData(true);
+        });
       }
-    };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, [fetchData, conversationId]);
+    }
 
-  if (isRecycled) {
+    window.addEventListener('hashchange', handleHashChange);
+    return (): void => {
+      window.removeEventListener('hashchange', handleHashChange);
+    };
+  }, [conversationId, fetchData, fireAndForgetInvoker]);
+
+  if (isRecycled === true) {
     return (
       <li ref={elementRef} css={fileCardStyles}>
         <MediaFilePreviewCard isLoading={false} isError label={t('cells.unavailableFile')} />

@@ -49,6 +49,18 @@ export const handleMLSMessageAdd = async ({
 
   const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
 
+  // Helpful for correlating decrypt failures with rejoin/epoch transitions.
+  const coreCryptoEpochNumber = await mlsService.getSafeEpoch(groupId);
+  logger.info('Decrypting MLS message-add payload', {
+    qualifiedConversationId,
+    groupId,
+    coreCryptoEpochNumber: coreCryptoEpochNumber.match({
+      Ok: epoch => epoch,
+      Err: error => error,
+    }),
+    eventTime: event.time,
+  });
+
   const decryptedMessage = await mlsService.decryptMessage(
     new ConversationId(groupIdBytes),
     encryptedData,

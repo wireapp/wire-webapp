@@ -65,7 +65,7 @@ interface ParsedUserAgent {
 }
 
 function parseUserAgent(userAgent?: string): ParsedUserAgent | null {
-  if (!userAgent) {
+  if (userAgent === undefined || userAgent.length === 0) {
     return null;
   }
 
@@ -82,12 +82,12 @@ function parseUserAgent(userAgent?: string): ParsedUserAgent | null {
   const isBingBot = userAgent.includes('bingbot');
   const isBingbot = userAgent.includes('bingbot');
   const isBlackberryTablet = agent.isBlackberry && userAgent.includes('tablet');
-  const isElectron = !!electronVersion;
-  const isFranz = !!franzVersion;
+  const isElectron = electronVersion !== undefined;
+  const isFranz = franzVersion !== undefined;
   const isGoogleBot = userAgent.includes('googlebot');
   const isIOS = /ipad|iphone|ipod/i.test(agent.platform);
   const isOSX = agent.platform.toLowerCase().includes('mac');
-  const isWire = !!wireVersion;
+  const isWire = wireVersion !== undefined;
   const isYahooBot = userAgent.includes('yahoo');
 
   const isCrawler = isBingBot || isGoogleBot || isYahooBot;
