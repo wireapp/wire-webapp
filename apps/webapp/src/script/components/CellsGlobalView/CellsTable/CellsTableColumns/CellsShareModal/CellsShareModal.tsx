@@ -62,7 +62,7 @@ interface ShareModalParams {
   fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
-type CellsShareModalProps = Omit<ShareModalParams, 'fireAndForgetInvoker'> & {
+type CellsShareModalProps = ShareModalParams & {
   modalId: string;
 };
 
@@ -89,7 +89,15 @@ export const showShareModal = (properties: ShareModalParams): void => {
         text: t('cells.shareModal.primaryAction'),
       },
       text: {
-        message: <CellsShareModal type={type} uuid={uuid} cellsRepository={cellsRepository} modalId={modalId} />,
+        message: (
+          <CellsShareModal
+            type={type}
+            uuid={uuid}
+            cellsRepository={cellsRepository}
+            fireAndForgetInvoker={fireAndForgetInvoker}
+            modalId={modalId}
+          />
+        ),
         title: t('cells.shareModal.heading'),
       },
     },
@@ -98,10 +106,11 @@ export const showShareModal = (properties: ShareModalParams): void => {
 };
 
 const CellsShareModal = (properties: CellsShareModalProps): ReactElement => {
-  const {type, uuid, cellsRepository, modalId} = properties;
+  const {type, uuid, cellsRepository, fireAndForgetInvoker, modalId} = properties;
   const {status, link, linkData, isEnabled, togglePublicLink, updatePublicLink} = useCellGlobalPublicLink({
     uuid,
     cellsRepository,
+    fireAndForgetInvoker,
   });
   const node = useCellsStore(state => state.nodes.find(cellNode => cellNode.id === uuid));
   const {

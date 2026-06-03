@@ -20,11 +20,7 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {
-  createExecutingFireAndForgetInvokerForTest,
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';
@@ -41,10 +37,7 @@ describe('useCellPublicLink', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let mockNode: CellNode | undefined;
   const mockSetPublicLink = jest.fn();
-  const rootContextValue = createRootContextValueForTest({
-    fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
-  });
-  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+  const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
   const createMockNode = (overrides: Partial<CellNode> = {}): CellNode => ({
     id: 'test-uuid',
@@ -80,11 +73,12 @@ describe('useCellPublicLink', () => {
           uuid: 'test-uuid',
           node,
           cellsRepository: mockCellsRepository,
+          fireAndForgetInvoker,
           setPublicLink: mockSetPublicLink,
           refreshLinkDataAfterUpdate,
           setStatusOnPublicLinkUrl,
         }),
-      {initialProps, wrapper: rootProviderWrapper},
+      {initialProps},
     );
 
     const rerenderWith = (props: Partial<typeof initialProps>) =>
@@ -111,6 +105,23 @@ describe('useCellPublicLink', () => {
   });
 
   describe('should create a public link when toggle is enabled', () => {
+    it('does not require a RootProvider when fireAndForgetInvoker is provided explicitly', async () => {
+      mockCellsRepository.createPublicLink.mockResolvedValue({
+        Uuid: 'new-link-uuid',
+        LinkUrl: '/public/test-link',
+      });
+
+      const {result} = renderPublicLinkHook();
+
+      act(() => {
+        result.current.togglePublicLink();
+      });
+
+      await waitFor(() => {
+        expect(result.current.status).toBe('success');
+      });
+    });
+
     it('creates a public link and updates store', async () => {
       mockCellsRepository.createPublicLink.mockResolvedValue({
         Uuid: 'new-link-uuid',
