@@ -166,29 +166,17 @@ export class BrigRepositoryE2E {
   }
 
   public async claimDomain(domain: string) {
-    await this.axiosInstance.put(
-      `i/domain-registration/${domain}`,
-      {
-        backend: {
-          config_url: new URL('deeplink.json', process.env.FEDERATION_BACKEND_URL),
-          webapp_url: process.env.FEDERATION_WEBAPP_URL,
-        },
-        domain_redirect: 'backend',
-        team_invite: 'not-allowed',
+    await this.axiosInstance.put(`i/domain-registration/${domain}`, {
+      backend: {
+        config_url: new URL('deeplink.json', process.env.FEDERATION_BACKEND_URL),
+        webapp_url: process.env.FEDERATION_WEBAPP_URL,
       },
-      {
-        headers: {
-          Authorization: `Basic ${BASIC_AUTH}`,
-        },
-      },
-    );
+      domain_redirect: 'backend',
+      team_invite: 'not-allowed',
+    });
   }
 
   public async deleteDomainClaim(domain: string) {
-    await this.axiosInstance.delete(`i/domain-registration/${domain}`, {
-      headers: {
-        Authorization: `Basic ${BASIC_AUTH}`,
-      },
-    });
+    await this.axiosInstance.delete(`i/domain-registration/${domain}`);
   }
 }
