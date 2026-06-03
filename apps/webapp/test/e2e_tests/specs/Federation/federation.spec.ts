@@ -19,8 +19,8 @@ test.describe('Federation', () => {
   const groupName = 'Federated group';
 
   test.beforeEach(async ({api}) => {
-    normalUser = (await createTeam(api, 'Normal Team', {features: {conferenceCalling: true}})).owner;
-    federatedUser = (await createTeam(federationApiManager, 'Federated Team')).owner;
+    normalUser = (await createTeam(api, 'Normal Team', {features: {conferenceCalling: true, mls: true}})).owner;
+    federatedUser = (await createTeam(federationApiManager, 'Federated Team', {features: {mls: true}})).owner;
   });
 
   test.afterEach(async ({api}) => {
@@ -222,26 +222,26 @@ test.describe('Federation', () => {
         federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}),
       ).toBeVisible();
 
-      await test.step('Federated user creates a group and adds normal user to it', async () => {
-        await createGroup(federatedUserPages, groupName, []);
-        await federatedUserPages.conversationList().getConversation(groupName).open();
-        await federatedUserPages.conversation().toggleGroupInformation();
-        await federatedUserPages.conversationDetails().clickAddPeopleButton();
-        await federatedUserPages.conversationDetails().addUsersToConversation([normalUser.fullName]);
-
-        await expect(
-          federatedUserPages.conversation().systemMessages.filter({hasText: `You added ${normalUser.fullName}`}),
-        ).toBeVisible();
-        await expect(federatedUserPages.conversation().statusIndicator).toContainText('Federated users are present');
-        await expect(
-          federatedUserPages.conversationDetails().getParticipant(normalUser.fullName).federatedIcon,
-        ).toBeVisible();
-
+      await test.step('Normal user creates a group and adds federated user to it', async () => {
+        await createGroup(normalUserPages, groupName, []);
         await normalUserPages.conversationList().getConversation(groupName).open();
+        await normalUserPages.conversation().toggleGroupInformation();
+        await normalUserPages.conversationDetails().clickAddPeopleButton();
+        await normalUserPages.conversationDetails().addUsersToConversation([federatedUser.fullName]);
+
         await expect(
-          normalUserPages
+          normalUserPages.conversation().systemMessages.filter({hasText: `You added ${federatedUser.fullName}`}),
+        ).toBeVisible();
+        await expect(normalUserPages.conversation().statusIndicator).toContainText('Federated users are present');
+        await expect(
+          normalUserPages.conversationDetails().getParticipant(federatedUser.fullName).federatedIcon,
+        ).toBeVisible();
+
+        await federatedUserPages.conversationList().getConversation(groupName).open();
+        await expect(
+          federatedUserPages
             .conversation()
-            .systemMessages.filter({hasText: `${federatedUser.fullName} added you to the conversation`}),
+            .systemMessages.filter({hasText: `${normalUser.fullName} added you to the conversation`}),
         ).toBeVisible();
       });
 
@@ -329,7 +329,7 @@ test.describe('Federation', () => {
       });
 
       await test.step('Create a group chat and exchange text and image messages', async () => {
-        await createGroup(federatedUserPages, groupName, [normalUser]);
+        await createGroup(normalUserPages, groupName, [federatedUser]);
         await federatedUserPages.conversationList().getConversation(groupName).open();
         await normalUserPages.conversationList().getConversation(groupName).open();
 
@@ -520,7 +520,7 @@ test.describe('Federation', () => {
             federatedUserPages.conversationList().getConversation(normalUser.fullName, {protocol: 'mls'}),
           ).toBeVisible();
 
-          await createGroup(federatedUserPages, groupName, [normalUser]);
+          await createGroup(normalUserPages, groupName, [federatedUser]);
           await normalUserPages.conversationList().getConversation(groupName).open();
           await federatedUserPages.conversationList().getConversation(groupName).open();
         }
@@ -541,11 +541,9 @@ test.describe('Federation', () => {
       const federatedUserCall = await federatedUserPages.calling().maximizeCell();
 
       await test.step('Verify initial media connection', async () => {
-        // Normal User UI Checks
         await expect(normalUserCall.getCallingParticipant(federatedUser.fullName).muteIcon).not.toBeVisible();
         await expect(normalUserCall.getGridTile(federatedUser.fullName).videoElement).toBeVisible();
 
-        // Federated User UI Checks
         await expect(federatedUserCall.getCallingParticipant(normalUser.fullName).muteIcon).not.toBeVisible();
         await expect(federatedUserCall.getGridTile(normalUser.fullName).videoElement).toBeVisible();
       });
