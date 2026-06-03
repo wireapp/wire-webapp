@@ -21,8 +21,8 @@
     "translate:generate-types": "nx translate-generate-types webapp"
   },
   "dependencies": {
-    "@datadog/browser-logs": "7.1.0",
-    "@datadog/browser-rum": "7.1.0",
+    "@datadog/browser-logs": "7.2.0",
+    "@datadog/browser-rum": "7.2.0",
     "@emotion/react": "11.14.0",
     "@formkit/auto-animate": "0.9.0",
     "@lexical/code": "0.27.2",
