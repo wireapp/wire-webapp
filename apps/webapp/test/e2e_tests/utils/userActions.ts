@@ -95,7 +95,7 @@ export async function sendConnectionRequest(sender: Page | PageManager, receiver
     : receiver.username;
 
   await pages.startUI().searchInput.fill(userHandle);
-  await pages.startUI().selectUsers(userHandle);
+  await pages.startUI().searchResults.filter({hasText: receiver.username}).click();
   await modals.userProfile().clickConnectButton();
 }
 

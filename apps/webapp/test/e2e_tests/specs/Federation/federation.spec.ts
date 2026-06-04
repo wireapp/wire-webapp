@@ -223,11 +223,9 @@ test.describe('Federation', () => {
       ).toBeVisible();
 
       await test.step('Normal user creates a group and adds federated user to it', async () => {
-        await createGroup(normalUserPages, groupName, []);
+        await createGroup(normalUserPages, groupName, [federatedUser]);
         await normalUserPages.conversationList().getConversation(groupName).open();
         await normalUserPages.conversation().toggleGroupInformation();
-        await normalUserPages.conversationDetails().clickAddPeopleButton();
-        await normalUserPages.conversationDetails().addUsersToConversation([federatedUser.fullName]);
 
         await expect(
           normalUserPages.conversation().systemMessages.filter({hasText: `You added ${federatedUser.fullName}`}),
@@ -351,10 +349,9 @@ test.describe('Federation', () => {
         await expect(messageWithImage).toBeVisible();
       });
 
-      let backupName: string;
-      await test.step('Create and save backup for the normal user', async () => {
+      const backupName = await test.step('Create and save backup for the normal user', async () => {
         await normalUserComponents.conversationSidebar().clickPreferencesButton();
-        backupName = await createAndSaveBackup(testInfo, normalUserPageManager);
+        return await createAndSaveBackup(testInfo, normalUserPageManager);
       });
 
       await test.step('Log out the normal user from the first device', async () => {
