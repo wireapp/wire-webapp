@@ -171,6 +171,7 @@ interface VideoControlsProps {
   setMaximizedParticipant: (call: Call, participant: Participant | null) => void;
   sendEmoji: (emoji: string, call: Call) => void;
   onOpenBackgroundSettings?: () => void;
+  isWebGLAvailable: boolean;
 }
 
 export const VideoControls = ({
@@ -196,6 +197,7 @@ export const VideoControls = ({
   setMaximizedParticipant,
   sendEmoji,
   onOpenBackgroundSettings,
+  isWebGLAvailable = true,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: VideoControlsProps) => {
@@ -391,14 +393,28 @@ export const VideoControls = ({
     [selectedBackgroundEffect],
   );
 
+  const getEffectOptions = useMemo(() => {
+    if (!isWebGLAvailable) {
+      return [];
+    }
+
+    return [
+      currentBlurOption,
+      {
+        label: t('videoCallBackgroundVirtual'),
+        value: 'virtual',
+        icon: <ImageIcon />,
+      },
+    ];
+  }, [currentBlurOption, isWebGLAvailable]);
+
   const backgroundOptions = useMemo(
     () => [
       {
         label: t('videoCallBackgroundEffectsLabel'),
         options: [
           {label: t('videoCallBackgroundNone'), value: 'none', icon: <CircleIcon />},
-          currentBlurOption,
-          {label: t('videoCallBackgroundVirtual'), value: 'virtual', icon: <ImageIcon />},
+          ...getEffectOptions,
           {
             label: t('videoCallBackgroundSettings'),
             value: 'settings',
@@ -407,7 +423,7 @@ export const VideoControls = ({
         ],
       },
     ],
-    [currentBlurOption],
+    [getEffectOptions],
   );
 
   /** Merged options: camera group + (if enabled) background group. */

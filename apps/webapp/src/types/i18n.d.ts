@@ -2079,8 +2079,10 @@ declare module 'I18n/en-US.json' {
     'videoCallBackgroundBlurSectionLabel': `Blur`;
     'videoCallBackgroundCustom': `Custom Background`;
     'videoCallBackgroundEffectsLabel': `Background Settings`;
-    'videoCallBackgroundEnableHighQualityBlur': `Enable high quality blur`;
+    'videoCallBackgroundEnableEnhancedQuality': `Enhanced quality`;
+    'videoCallBackgroundEnableEnhancedQualityHint': `Improves outline definition, but may impact the performance on your device.`;
     'videoCallBackgroundNoEffect': `No background effect`;
+    'videoCallBackgroundNoWebGLHint': `Your device doesn\'t support blurred and virtual backgrounds.`;
     'videoCallBackgroundNone': `None`;
     'videoCallBackgroundOffice1': `Office 1`;
     'videoCallBackgroundOffice2': `Office 2`;
