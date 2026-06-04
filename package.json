@@ -59,7 +59,7 @@
     "generate-changelog": "1.8.0",
     "jest": "30.4.2",
     "jest-environment-jsdom": "30.4.1",
-    "js-yaml": "4.1.1",
+    "js-yaml": "4.2.0",
     "jsdom": "29.1.1",
     "nock": "14.0.15",
     "nx": "22.7.5",
