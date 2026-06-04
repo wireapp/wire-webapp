@@ -17,6 +17,8 @@
  *
  */
 
+import type {FireAndForgetInvoker} from '@wireapp/core';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useCellPublicLink} from 'src/script/components/Cells/common/useCellPublicLink/useCellPublicLink';
 
@@ -25,9 +27,14 @@ import {useCellsStore} from '../../../common/useCellsStore/useCellsStore';
 interface UseCellGlobalPublicLinkParams {
   uuid: string;
   cellsRepository: CellsRepository;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
-export const useCellGlobalPublicLink = ({uuid, cellsRepository}: UseCellGlobalPublicLinkParams) => {
+export const useCellGlobalPublicLink = ({
+  uuid,
+  cellsRepository,
+  fireAndForgetInvoker,
+}: UseCellGlobalPublicLinkParams) => {
   const {nodes, setPublicLink} = useCellsStore();
   const node = nodes.find(n => n.id === uuid);
   return useCellPublicLink({
@@ -37,5 +44,6 @@ export const useCellGlobalPublicLink = ({uuid, cellsRepository}: UseCellGlobalPu
     setPublicLink: data => setPublicLink(uuid, data),
     setStatusOnPublicLinkUrl: true,
     includeNodePublicLinkInCallbacks: true,
+    fireAndForgetInvoker,
   });
 };

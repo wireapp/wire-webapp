@@ -22,9 +22,10 @@ import {useCallback, useEffect, useRef, useState} from 'react';
 import is from '@sindresorhus/is';
 import type {RestShareLink} from '@wireapp/api-client/lib/cells';
 
+import type {FireAndForgetInvoker} from '@wireapp/core';
+
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import type {CellNode} from 'src/script/types/cellNode';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
@@ -37,6 +38,7 @@ interface UseCellPublicLinkParams {
   refreshLinkDataAfterUpdate?: boolean;
   setStatusOnPublicLinkUrl?: boolean;
   includeNodePublicLinkInCallbacks?: boolean;
+  fireAndForgetInvoker: FireAndForgetInvoker;
 }
 
 export const useCellPublicLink = ({
@@ -47,8 +49,8 @@ export const useCellPublicLink = ({
   refreshLinkDataAfterUpdate = false,
   setStatusOnPublicLinkUrl = false,
   includeNodePublicLinkInCallbacks = false,
+  fireAndForgetInvoker,
 }: UseCellPublicLinkParams) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
   const [isEnabled, setIsEnabled] = useState(node?.publicLink?.alreadyShared === true);
   const [status, setStatus] = useState<PublicLinkStatus>(node?.publicLink !== undefined ? 'success' : 'idle');
   const [linkData, setLinkData] = useState<RestShareLink | null>(null);
