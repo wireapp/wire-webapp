@@ -346,7 +346,7 @@ export class BackgroundEffectsController {
     if (tier.tier === currentQualityTier) {
       return;
     }
-    this.logger.log(`onPerformanceSample: qualityController.update from: ${currentQualityTier} to ${tier}`);
+    this.logger.log(`onPerformanceSample: qualityController.update from: ${currentQualityTier} to ${tier.tier}`);
     return this.setQuality(tier.tier);
   }
 }
