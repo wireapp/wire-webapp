@@ -277,7 +277,6 @@ export async function runSegmenter(
                 },
               );
             });
-
           } else {
             const gpuStart = performance.now();
             webGLRenderer?.render(videoFrame, segmenterOptions);
