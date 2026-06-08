@@ -104,6 +104,7 @@ export const ConversationCells = memo(
     const {filters, filterState, clearAllFilters} = useConversationDriveFilters({
       cellsRepository,
       conversationRepository,
+      translate,
     });
 
     const {

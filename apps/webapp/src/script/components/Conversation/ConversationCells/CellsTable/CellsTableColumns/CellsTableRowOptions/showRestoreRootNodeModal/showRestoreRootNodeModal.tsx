@@ -18,19 +18,27 @@
  */
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {RootContextValue} from 'src/script/page/RootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
-export const showRestoreRootNodeModal = ({node, onRestoreNode}: {node: CellNode; onRestoreNode: () => void}) => {
+export const showRestoreRootNodeModal = ({
+  node,
+  onRestoreNode,
+  translate,
+}: {
+  node: CellNode;
+  onRestoreNode: () => void;
+  translate: RootContextValue['translate'];
+}) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
     primaryAction: {
       action: onRestoreNode,
-      text: t('cells.restoreRootNodeModal.button'),
+      text: translate('cells.restoreRootNodeModal.button'),
     },
     text: {
       message: replaceReactComponents(
-        t(
+        translate(
           node.type === CellNodeType.FILE
             ? 'cells.restoreRootNodeModal.file.description'
             : 'cells.restoreRootNodeModal.folder.description',
@@ -47,8 +55,8 @@ export const showRestoreRootNodeModal = ({node, onRestoreNode}: {node: CellNode;
       ),
       title:
         node.type === CellNodeType.FILE
-          ? t('cells.restoreRootNodeModal.file.headline')
-          : t('cells.restoreRootNodeModal.folder.headline'),
+          ? translate('cells.restoreRootNodeModal.file.headline')
+          : translate('cells.restoreRootNodeModal.folder.headline'),
     },
   });
 };

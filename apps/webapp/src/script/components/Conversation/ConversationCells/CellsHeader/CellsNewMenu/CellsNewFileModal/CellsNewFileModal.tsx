@@ -26,7 +26,7 @@ import {
   useCellsNewFileForm,
 } from 'Components/Conversation/ConversationCells/common/useCellsNewNodeForm/useCellsNewFileForm';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {descriptionStyles} from './CellsNewFileModal.styles';
 
@@ -51,6 +51,7 @@ export const CellsNewFileModal = ({
   onSuccess,
   currentPath,
 }: CellsNewFileModalProps) => {
+  const {translate} = useApplicationContext();
   const {name, error, isSubmitting, handleSubmit, handleChange, handleClear} = useCellsNewFileForm({
     fileType,
     cellsRepository,
@@ -60,15 +61,15 @@ export const CellsNewFileModal = ({
     isOpen,
   });
   const fileExtension = getFileExtensionByType(fileType);
-  const headline = `${t('cells.newItemMenuModal.headlineFile', {fileType})} (.${fileExtension})`;
+  const headline = `${translate('cells.newItemMenuModal.headlineFile', {fileType})} (.${fileExtension})`;
 
   return (
     <CellsModal isOpen={isOpen} onClose={onClose} size="large">
       <CellsModal.Header>{headline}</CellsModal.Header>
-      <p css={descriptionStyles}>{t('cells.newItemMenuModal.descriptionFile')}</p>
+      <p css={descriptionStyles}>{translate('cells.newItemMenuModal.descriptionFile')}</p>
       <CellsNewNodeForm
-        label={t('cells.newItemMenuModal.labelFile')}
-        placeholder={t('cells.newItemMenuModal.placeholderFile')}
+        label={translate('cells.newItemMenuModal.labelFile')}
+        placeholder={translate('cells.newItemMenuModal.placeholderFile')}
         onSubmit={handleSubmit}
         inputValue={name}
         onChange={handleChange}
@@ -78,10 +79,10 @@ export const CellsNewFileModal = ({
       />
       <CellsModal.Actions>
         <CellsModal.SecondaryButton onClick={onClose}>
-          {t('cells.newItemMenuModal.secondaryAction')}
+          {translate('cells.newItemMenuModal.secondaryAction')}
         </CellsModal.SecondaryButton>
         <CellsModal.PrimaryButton onClick={handleSubmit} isDisabled={isSubmitting || !name}>
-          {t('cells.newItemMenuModal.primaryAction')}
+          {translate('cells.newItemMenuModal.primaryAction')}
         </CellsModal.PrimaryButton>
       </CellsModal.Actions>
     </CellsModal>

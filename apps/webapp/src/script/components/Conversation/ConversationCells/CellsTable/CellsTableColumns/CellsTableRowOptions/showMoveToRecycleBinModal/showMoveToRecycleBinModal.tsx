@@ -18,22 +18,27 @@
  */
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {RootContextValue} from 'src/script/page/RootProvider';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 export const showMoveToRecycleBinModal = ({
   node,
   onMoveToRecycleBin,
+  translate,
 }: {
   node: CellNode;
   onMoveToRecycleBin: (uuid: string) => void;
+  translate: RootContextValue['translate'];
 }) => {
   PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    primaryAction: {action: () => onMoveToRecycleBin(node.id), text: t('cells.moveToRecycleBinModal.button')},
+    primaryAction: {
+      action: () => onMoveToRecycleBin(node.id),
+      text: translate('cells.moveToRecycleBinModal.button'),
+    },
     text: {
       message: replaceReactComponents(
-        t(
+        translate(
           node.type === CellNodeType.FILE
             ? 'cells.moveToRecycleBinModal.file.description'
             : 'cellsMoveToRecycleBinModal.folder.description',
@@ -50,8 +55,8 @@ export const showMoveToRecycleBinModal = ({
       ),
       title:
         node.type === CellNodeType.FILE
-          ? t('cellsMoveToRecycleBinModal.file.headline')
-          : t('cellsMoveToRecycleBinModal.folder.headline'),
+          ? translate('cellsMoveToRecycleBinModal.file.headline')
+          : translate('cellsMoveToRecycleBinModal.folder.headline'),
     },
   });
 };
