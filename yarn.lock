@@ -10174,7 +10174,7 @@ __metadata:
     css-loader: "npm:7.1.4"
     cssnano: "npm:7.1.9"
     date-fns: "npm:4.2.1"
-    dexie: "npm:4.4.2"
+    dexie: "npm:4.4.3"
     dexie-batch: "npm:0.4.3"
     dexie-encrypted: "npm:2.0.0"
     dotenv-extended: "npm:2.9.0"
@@ -13458,10 +13458,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dexie@npm:4.4.2":
-  version: 4.4.2
-  resolution: "dexie@npm:4.4.2"
-  checksum: 10/29736168a74f3c840e7ec9f7fdd4abf695824a4c55f097c12a7d63c096286557663609301f6d9a36874bc82548c630de9d27ba4cd33a71d1cdc07b1a1298616e
+"dexie@npm:4.4.3":
+  version: 4.4.3
+  resolution: "dexie@npm:4.4.3"
+  checksum: 10/7fe2e2d974b5fc7acb67881817974af1600fc50ba20d56353fe6b95b8453eab017e9abdb3970a43541aa965fcc1abf58533b2c3465330da83ed576d5416586b5
   languageName: node
   linkType: hard
 
