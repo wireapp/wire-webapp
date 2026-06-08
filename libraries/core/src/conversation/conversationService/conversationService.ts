@@ -789,7 +789,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
 
     for (const {conversationId, subconvId, trigger} of entries) {
       try {
-        await this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, trigger, {force: true});
+        await this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, trigger, {isForced: true});
       } catch (error: unknown) {
         this.logger.error('Failed to run deferred MLS epoch mismatch recovery', {
           error,
@@ -1173,9 +1173,9 @@ export class ConversationService extends TypedEventEmitter<Events> {
     conversationId: QualifiedId,
     subconversationId?: SUBCONVERSATION_ID,
     trigger?: MlsEpochRecoveryTrigger,
-    options: {force: boolean} = {force: false},
+    options: {isForced: boolean} = {isForced: false},
   ) {
-    if (options.force === false && this.shouldDeferEpochRecovery(trigger)) {
+    if (!options.isForced && this.shouldDeferEpochRecovery(trigger)) {
       this.deferEpochRecovery(conversationId, subconversationId, trigger);
     }
 
