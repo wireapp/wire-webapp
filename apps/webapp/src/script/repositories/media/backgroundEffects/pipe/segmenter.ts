@@ -188,7 +188,7 @@ export async function runSegmenter(
 
     const mode: Mode =
       segmenterOptions.mode === 'passthrough' || segmenterOptions.mode === undefined ? 'blur' : segmenterOptions.mode;
-    onPerformanceSample({totalMs: segmentationMs + gpuMs, segmentationMs, gpuMs}, mode);
+    onPerformanceSample({totalMs, segmentationMs, gpuMs}, mode);
   }
 
   function close() {
@@ -200,6 +200,7 @@ export async function runSegmenter(
     canvas.removeEventListener('webglcontextrestored', onContextRestored);
   }
 
+  let lastFrameTs = performance.now();
   const writer = new WritableStream(
     {
       async write(videoFrame: VideoFrame) {
@@ -215,6 +216,8 @@ export async function runSegmenter(
 
         // start to process the frame
         const frameStart = performance.now();
+        const frameDeltaMs = frameStart - lastFrameTs;
+        lastFrameTs = frameStart;
 
         let filterMs = 0;
         let segmentationMs = 0;
@@ -290,7 +293,7 @@ export async function runSegmenter(
         gpuMsSum += gpuMs;
         filterMsSum += filterMs;
 
-        updateMetrics(totalMs, segmentationMs, gpuMs);
+        updateMetrics(frameDeltaMs, segmentationMs, gpuMs);
 
         frames++;
         totalFrames++;

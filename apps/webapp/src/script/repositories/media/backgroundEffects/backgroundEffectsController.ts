@@ -27,6 +27,7 @@ import {
   TIER_DEFINITIONS,
 } from 'Repositories/media/backgroundEffects/quality/definitions';
 import {QUALITY_TIERS, QualityController} from 'Repositories/media/backgroundEffects/quality/qualityController';
+import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {BackgroundSource} from 'Repositories/media/VideoBackgroundEffects';
 import {getLogger, Logger} from 'Util/logger';
 
@@ -35,6 +36,7 @@ import {detectCapabilities} from './helper/capability';
 import {
   defaultOpts,
   ProcessVideoTrackOptions,
+  SELFIE_SEGMENTER_MODEL_PATH,
   WorkerBackgroundSource,
   WorkerProcessVideoTrackOptions,
 } from './pipe/options';
@@ -270,6 +272,11 @@ export class BackgroundEffectsController {
     if (!this.refcount) {
       return;
     }
+    // in case of not HD we will always use more performant model
+    if (this.options.quality !== 'hd' && this.options.quality !== 'fhd' && this.options.quality !== 'auto') {
+      this.options.modelPath = SELFIE_SEGMENTER_MODEL_PATH;
+      backgroundEffectsStore.getState().setIsHighQualityBlurEnabled(false);
+    }
 
     const {options: workerOptions} = getWorkerOptions(this.options);
     const finalOptions: WorkerProcessVideoTrackOptions = workerSource
@@ -333,11 +340,13 @@ export class BackgroundEffectsController {
       this.logger.warn('onPerformanceSample: qualityController is null');
       return;
     }
-    const tier = this.qualityController.update(sample, mode);
 
-    if (tier.tier === this.qualityController.getCurrentTier()) {
+    const currentQualityTier = this.qualityController.getCurrentTier();
+    const tier = this.qualityController.update(sample, mode);
+    if (tier.tier === currentQualityTier) {
       return;
     }
+    this.logger.log(`onPerformanceSample: qualityController.update from: ${currentQualityTier} to ${tier.tier}`);
     return this.setQuality(tier.tier);
   }
 }
