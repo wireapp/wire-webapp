@@ -18,7 +18,7 @@
  */
 
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
-import {E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
+import {CredentialType, E2eiConversationState} from '@wireapp/core/lib/messagingProtocols/mls';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as e2eIdentity from 'src/script/E2EIdentity';
@@ -34,6 +34,7 @@ import {ConversationVerificationState} from '../../ConversationVerificationState
 jest.mock('src/script/E2EIdentity', () => ({
   ...jest.requireActual('src/script/E2EIdentity'),
   getConversationVerificationState: jest.fn(),
+  getActiveWireIdentity: jest.fn(),
   E2EIHandler: {
     getInstance: jest.fn().mockReturnValue({
       isE2EIEnabled: jest.fn(),
@@ -42,6 +43,26 @@ jest.mock('src/script/E2EIdentity', () => ({
 }));
 
 describe('MLSConversationVerificationStateHandler', () => {
+  const createRevokedWireIdentity = (): e2eIdentity.WireIdentity => ({
+    x509Identity: {
+      free: jest.fn(),
+      certificate: '',
+      displayName: 'John Doe',
+      domain: 'wire.com',
+      handle: 'wireapp://%40john.doe@wire.com',
+      notAfter: BigInt(0),
+      notBefore: BigInt(0),
+      serialNumber: '',
+      [Symbol.dispose]: () => {},
+    },
+    thumbprint: '',
+    credentialType: CredentialType.X509,
+    status: e2eIdentity.MLSStatuses.REVOKED,
+    clientId: 'client-id',
+    deviceId: 'device-id',
+    qualifiedUserId: {id: 'user-id', domain: 'wire.com'},
+  });
+
   const conversationState = new ConversationState();
   let core: Core;
   const e2eiHandler = e2eIdentity.E2EIHandler.getInstance();
@@ -126,6 +147,62 @@ describe('MLSConversationVerificationStateHandler', () => {
     );
 
     expect(core.service?.mls?.on).not.toHaveBeenCalled();
+  });
+
+  describe('handleNewRevocationList', () => {
+    it('should check for self certificate revocation for tenant-prefixed CRL hosts', async () => {
+      const localConversationState = new ConversationState();
+      let triggerCrlChanged: (...args: {domain: string}[]) => void = () => {};
+      const onSelfClientCertificateRevoked = jest.fn().mockResolvedValue(undefined);
+
+      jest.spyOn(e2eIdentity, 'getActiveWireIdentity').mockResolvedValue(createRevokedWireIdentity());
+      jest.spyOn(core.service!.e2eIdentity!, 'on').mockImplementation((event, listener) => {
+        if (event === 'crlChanged') {
+          triggerCrlChanged = listener;
+        }
+        return core.service!.e2eIdentity!;
+      });
+
+      new MLSConversationVerificationStateHandler(
+        'wire.com',
+        () => {},
+        onSelfClientCertificateRevoked,
+        localConversationState,
+        core,
+      );
+
+      await triggerCrlChanged({domain: 'tenant-a.wire.com'});
+
+      expect(e2eIdentity.getActiveWireIdentity).toHaveBeenCalledTimes(1);
+      expect(onSelfClientCertificateRevoked).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not check for self certificate revocation for non-matching CRL hosts', async () => {
+      const localConversationState = new ConversationState();
+      let triggerCrlChanged: (...args: {domain: string}[]) => void = () => {};
+      const onSelfClientCertificateRevoked = jest.fn().mockResolvedValue(undefined);
+
+      jest.spyOn(e2eIdentity, 'getActiveWireIdentity').mockResolvedValue(createRevokedWireIdentity());
+      jest.spyOn(core.service!.e2eIdentity!, 'on').mockImplementation((event, listener) => {
+        if (event === 'crlChanged') {
+          triggerCrlChanged = listener;
+        }
+        return core.service!.e2eIdentity!;
+      });
+
+      new MLSConversationVerificationStateHandler(
+        'wire.com',
+        () => {},
+        onSelfClientCertificateRevoked,
+        localConversationState,
+        core,
+      );
+
+      await triggerCrlChanged({domain: 'tenant-a.example.com'});
+
+      expect(e2eIdentity.getActiveWireIdentity).not.toHaveBeenCalled();
+      expect(onSelfClientCertificateRevoked).not.toHaveBeenCalled();
+    });
   });
 
   describe('checkConversationVerificationState', () => {
