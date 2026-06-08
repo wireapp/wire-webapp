@@ -1104,7 +1104,7 @@ export class Account extends TypedEventEmitter<Events> {
         .push(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
           await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
-          await this.service!.conversation.runDeferredEpochRecovery();
+          await this.service?.conversation.runDeferredEpochRecovery();
           resumeProposalProcessing();
           resumeMessageSending();
           resumeRejoiningMLSConversations();
