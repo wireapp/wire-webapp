@@ -31,7 +31,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {CompositeMessage} from 'Repositories/entity/message/CompositeMessage';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
-import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
+import {createRelativeTimestampFormatter, useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
@@ -128,7 +128,14 @@ export const ContentMessageComponent = ({
     'isObfuscated',
   ]);
 
-  const timeAgo = useRelativeTimestamp(message.timestamp());
+  const relativeTimestampFormatter = useMemo(() => {
+    return createRelativeTimestampFormatter({
+      justNow: translate('conversationJustNow'),
+      today: translate('conversationToday'),
+      yesterday: translate('conversationYesterday'),
+    });
+  }, [translate]);
+  const timeAgo = useRelativeTimestamp(message.timestamp(), false, relativeTimestampFormatter);
 
   const [messageAriaLabel] = getMessageAriaLabel({
     assets,

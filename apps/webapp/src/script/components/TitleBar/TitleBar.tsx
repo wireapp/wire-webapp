@@ -36,27 +36,22 @@ import {CallState} from 'Repositories/calling/CallState';
 import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
+import {RightSidebarParams} from 'src/script/page/AppMain';
+import {PanelState} from 'src/script/page/RightSidebar';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
+import {CallActions} from 'src/script/view_model/CallingViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
-
-import {RightSidebarParams} from '../../page/AppMain';
-import {PanelState} from '../../page/RightSidebar';
-import {CallActions} from '../../view_model/CallingViewModel';
-import {ViewModelRepositories} from '../../view_model/MainViewModel';
 
 interface TitleBarProps {
   callActions: CallActions;
   conversation: Conversation;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
-  repositories: ViewModelRepositories;
   selfUser: User;
-  teamState: TeamState;
   isRightSidebarOpen?: boolean;
   callState?: CallState;
   isReadOnlyConversation?: boolean;
@@ -66,19 +61,18 @@ interface TitleBarProps {
 }
 
 export const TitleBar = ({
-  repositories,
   conversation,
   callActions,
   selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
   callState = container.resolve(CallState),
-  teamState = container.resolve(TeamState),
   isReadOnlyConversation = false,
   withBottomDivider,
   isSharedDriveSearchViewOpen = false,
   onCloseSharedDriveSearchView,
 }: TitleBarProps) => {
+  const {translate} = useApplicationContext();
   const {
     is1to1,
     isRequest,
@@ -107,7 +101,15 @@ export const TitleBar = ({
     'display_name',
   ]);
 
-  const guardCall = useNoInternetCallGuard();
+  const guardCall = useNoInternetCallGuard({
+    description: translate('callNotEstablishedDescription'),
+    descriptionPoints: [
+      translate('callNotEstablishedDescriptionPoint1'),
+      translate('callNotEstablishedDescriptionPoint2'),
+      translate('callNotEstablishedDescriptionPoint3'),
+    ],
+    title: translate('callNotEstablishedTitle'),
+  });
   const {isCallConnecting, isCallActive} = useConversationCall(conversation);
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
@@ -139,11 +141,11 @@ export const TitleBar = ({
     });
 
     if (translationKey) {
-      return t(translationKey);
+      return translate(translationKey);
     }
 
     return '';
-  }, [hasDirectGuest, hasExternal, hasFederatedUsers, hasService, hasApps, is1to1, isRequest]);
+  }, [hasApps, hasDirectGuest, hasExternal, hasFederatedUsers, hasService, is1to1, isRequest, translate]);
 
   const hasCall = useMemo(() => {
     const hasEntities = !!joinedCall;
@@ -154,7 +156,7 @@ export const TitleBar = ({
 
   const conversationSubtitle = is1to1 && firstUserEntity?.isFederated === true ? (firstUserEntity?.handle ?? '') : '';
 
-  const conversationDetailsTooltip = t('tooltipConversationPeople', {displayName});
+  const conversationDetailsTooltip = translate('tooltipConversationPeople', {displayName});
 
   // To be changed when design chooses a breakpoint, the conditional can be integrated to the ui-kit directly
   const mdBreakpoint = useMatchMedia('max-width: 1000px');
@@ -227,7 +229,7 @@ export const TitleBar = ({
         await callActions.startAudio(conversation);
         isStartingCallRef.current = false;
         showStartedCallAlert(isGroupOrChannel);
-      } catch (error: unknown) {
+      } catch {
         // Re-enable on error
         isStartingCallRef.current = false;
       }
@@ -266,7 +268,7 @@ export const TitleBar = ({
             className="conversation-title-bar-icon icon-back"
             css={{marginBottom: 0}}
             onClick={setLeftSidebar}
-            aria-label={t('index.goBack')}
+            aria-label={translate('index.goBack')}
           />
         )}
 
@@ -274,8 +276,8 @@ export const TitleBar = ({
           <button
             className="conversation-title-bar-icon conversation-title-bar-icon--borderless"
             type="button"
-            title={t('fullsearchCancelLabel')}
-            aria-label={t('fullsearchCancelLabel')}
+            title={translate('fullsearchCancelLabel')}
+            aria-label={translate('fullsearchCancelLabel')}
             onClick={onCloseSharedDriveSearchView}
             data-uie-name="do-close-shared-drive-search"
           >
@@ -287,12 +289,12 @@ export const TitleBar = ({
           <button
             className="conversation-title-bar-icon icon-search"
             type="button"
-            title={t('tooltipConversationSearch')}
-            aria-label={t('tooltipConversationSearch')}
+            title={translate('tooltipConversationSearch')}
+            aria-label={translate('tooltipConversationSearch')}
             onClick={onClickCollectionButton}
             data-uie-name="do-collections"
           >
-            <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
+            <span className="visually-hidden">{translate('tooltipConversationSearch')}</span>
           </button>
         )}
       </li>
@@ -343,8 +345,8 @@ export const TitleBar = ({
               <button
                 type="button"
                 className="conversation-title-bar-icon"
-                title={t('tooltipConversationCall')}
-                aria-label={t('tooltipConversationCall')}
+                title={translate('tooltipConversationCall')}
+                aria-label={translate('tooltipConversationCall')}
                 onClick={event => {
                   currentFocusedElementRef.current = event.currentTarget;
                   startCallAndShowAlert();
@@ -361,17 +363,17 @@ export const TitleBar = ({
                 <IconButton
                   className="icon-search"
                   css={{marginBottom: 0}}
-                  title={t('tooltipConversationSearch')}
-                  aria-label={t('tooltipConversationSearch')}
+                  title={translate('tooltipConversationSearch')}
+                  aria-label={translate('tooltipConversationSearch')}
                   onClick={onClickCollectionButton}
                   data-uie-name="do-collections"
                 >
-                  <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
+                  <span className="visually-hidden">{translate('tooltipConversationSearch')}</span>
                 </IconButton>
                 {showCallControls && (
                   <IconButton
-                    title={t('tooltipConversationCall')}
-                    aria-label={t('tooltipConversationCall')}
+                    title={translate('tooltipConversationCall')}
+                    aria-label={translate('tooltipConversationCall')}
                     css={{marginBottom: 0}}
                     onClick={onClickStartAudio}
                     data-uie-name="do-call"
@@ -384,8 +386,8 @@ export const TitleBar = ({
             ) : (
               <button
                 type="button"
-                title={t('tooltipConversationInfo')}
-                aria-label={t('tooltipConversationInfo')}
+                title={translate('tooltipConversationInfo')}
+                aria-label={translate('tooltipConversationInfo')}
                 onClick={onClickDetails}
                 className={cx('conversation-title-bar-icon', {active: isRightSidebarOpen})}
                 data-uie-name="do-open-info"

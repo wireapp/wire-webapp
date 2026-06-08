@@ -21,7 +21,7 @@ import {useMemo} from 'react';
 
 import {Select} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {wrapperStyles, labelStyles, selectWrapperStyles, selectStyles} from './CellsPageSizeSelect.styles';
 
@@ -38,11 +38,12 @@ interface CellsPageSizeSelectProps {
 }
 
 export const CellsPageSizeSelect = ({pageSize, onSizeChange}: CellsPageSizeSelectProps) => {
+  const {translate} = useApplicationContext();
   const currentOption = useMemo(() => ({value: `${pageSize}`, label: `${pageSize}`}), [pageSize]);
 
   return (
     <div css={wrapperStyles}>
-      <div css={labelStyles}>{t('cells.pagination.rowsPerPage')}</div>
+      <div css={labelStyles}>{translate('cells.pagination.rowsPerPage')}</div>
       <div css={selectWrapperStyles}>
         <Select
           id={'page-size'}

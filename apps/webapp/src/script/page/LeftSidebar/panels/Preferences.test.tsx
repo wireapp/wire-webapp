@@ -21,6 +21,8 @@ import {render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {Preferences} from './Preferences';
 
 describe('Preferences', () => {
@@ -29,11 +31,12 @@ describe('Preferences', () => {
     preferenceNotificationRepository: {getNotifications: jest.fn()},
     onPreferenceItemClick: jest.fn(),
   };
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
   it('renders the right preferences items', () => {
     jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(false);
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(false);
-    const {getByText, queryByText} = render(<Preferences {...defaultParams} />);
+    const {getByText, queryByText} = render(<Preferences {...defaultParams} />, {wrapper: rootProviderWrapper});
     expect(getByText('preferencesAccount')).not.toBeNull();
     expect(getByText('preferencesDevices')).not.toBeNull();
     expect(getByText('preferencesOptions')).not.toBeNull();
@@ -44,7 +47,7 @@ describe('Preferences', () => {
   it('renders the a/v section in a desktop app', () => {
     jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(true);
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(true);
-    const {queryByText} = render(<Preferences {...defaultParams} />);
+    const {queryByText} = render(<Preferences {...defaultParams} />, {wrapper: rootProviderWrapper});
     expect(queryByText('preferencesAV')).not.toBeNull();
     expect(queryByText('preferencesAbout')).not.toBeNull();
   });
@@ -52,7 +55,7 @@ describe('Preferences', () => {
   it('renders the about section in a web app', () => {
     jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(false);
     jest.spyOn(Runtime, 'isSupportingLegacyCalling').mockReturnValue(false);
-    const {queryByText} = render(<Preferences {...defaultParams} />);
+    const {queryByText} = render(<Preferences {...defaultParams} />, {wrapper: rootProviderWrapper});
     expect(queryByText('preferencesAV')).toBeNull();
     expect(queryByText('preferencesAbout')).not.toBeNull();
   });

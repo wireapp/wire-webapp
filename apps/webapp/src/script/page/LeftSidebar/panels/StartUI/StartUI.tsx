@@ -39,8 +39,8 @@ import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {t} from 'Util/localizerUtil';
 
 import {PeopleTab, SearchResultsData} from './PeopleTab';
 import {ServicesTab} from './ServicesTab';
@@ -80,6 +80,7 @@ const StartUI = ({
   isFederated,
   selfUser,
 }: StartUIProps) => {
+  const {translate} = useApplicationContext();
   const brandName = Config.getConfig().BRAND_NAME;
   const {canInviteTeamMembers, canSearchUnconnectedUsers, canManageServices, canChatWithServices} =
     generatePermissionHelpers(selfUser.teamRole());
@@ -147,7 +148,7 @@ const StartUI = ({
       <div className="start-ui-header-user-input" data-uie-name="enter-search">
         <SearchInput
           input={searchQuery}
-          placeholder={t('searchPeopleOnlyPlaceholder')}
+          placeholder={translate('searchPeopleOnlyPlaceholder')}
           setInput={setSearchQuery}
           onEnter={openFirstConversation}
           forceDark
@@ -163,7 +164,7 @@ const StartUI = ({
               onClick={() => setActiveTab(Tabs.PEOPLE)}
               data-uie-name="do-add-people"
             >
-              {t('searchPeople')}
+              {translate('searchPeople')}
             </button>
           </li>
           <li className={`start-ui-list-tab ${activeTab === Tabs.SERVICES ? 'active' : ''}`}>
@@ -174,7 +175,7 @@ const StartUI = ({
               onClick={() => setActiveTab(Tabs.SERVICES)}
               data-uie-name="do-add-services"
             >
-              {t('searchServices')}
+              {translate('searchServices')}
             </button>
           </li>
         </ul>
@@ -185,7 +186,7 @@ const StartUI = ({
   const content =
     activeTab === Tabs.PEOPLE ? (
       <>
-        <h2 className="visually-hidden">{t('conversationFooterContacts')}</h2>
+        <h2 className="visually-hidden">{translate('conversationFooterContacts')}</h2>
 
         <PeopleTab
           searchQuery={searchQuery}
@@ -218,7 +219,7 @@ const StartUI = ({
   const footer = !isTeam ? (
     <button className="start-ui-import" onClick={openInviteModal} data-uie-name="show-invite-modal">
       <span className="icon-invite start-ui-import-icon"></span>
-      <span>{t('searchInvite', {brandName})}</span>
+      <span>{translate('searchInvite', {brandName})}</span>
     </button>
   ) : undefined;
 

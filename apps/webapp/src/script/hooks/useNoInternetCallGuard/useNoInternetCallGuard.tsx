@@ -21,32 +21,40 @@ import {useCallback} from 'react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
-import {t} from 'Util/localizerUtil';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
 
-export const useNoInternetCallGuard = () => {
+interface NoInternetCallGuardCopy {
+  description: string;
+  descriptionPoints: [string, string, string];
+  title: string;
+}
+
+export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
   const warnings = useWarningsState(state => state.warnings);
   const visibleWarning = warnings[warnings.length - 1];
 
   const showCallNotEstablishedMessage = useCallback(() => {
+    const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] =
+      noInternetCallGuardCopy.descriptionPoints;
+
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {
         message: (
           <span>
-            {t('callNotEstablishedDescription')}
+            {noInternetCallGuardCopy.description}
             <ul css={styles}>
-              <li>{t('callNotEstablishedDescriptionPoint1')}</li>
-              <li>{t('callNotEstablishedDescriptionPoint2')}</li>
-              <li>{t('callNotEstablishedDescriptionPoint3')}</li>
+              <li>{firstDescriptionPoint}</li>
+              <li>{secondDescriptionPoint}</li>
+              <li>{thirdDescriptionPoint}</li>
             </ul>
           </span>
         ),
-        title: t('callNotEstablishedTitle'),
+        title: noInternetCallGuardCopy.title,
       },
     });
-  }, []);
+  }, [noInternetCallGuardCopy]);
 
   return useCallback(
     (startCall: () => void) => {

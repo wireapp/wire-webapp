@@ -47,11 +47,11 @@ import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {TeamState} from 'Repositories/team/TeamState';
 import {Config} from 'src/script/Config';
 import {sharedDriveSearchAndFiltersFeatureToggleName} from 'src/script/featureToggles/startupFeatureToggleNames';
+import {useApplicationContext, useMainViewModel} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
 import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
 import {formatBytes} from 'Util/util';
@@ -78,7 +78,6 @@ import {isServiceEntity} from '../../guards/Service';
 import {MotionDuration} from '../../motion/MotionDuration';
 import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
-import {useApplicationContext, useMainViewModel} from '../../page/RootProvider';
 import {ElementType, MessageDetails} from '../MessagesList/Message/ContentMessage/asset/TextMessageRenderer';
 
 interface ConversationProps {
@@ -103,7 +102,7 @@ export const Conversation = ({
   const isVirtualizedMessagesListEnabled = CONFIG.FEATURE.ENABLE_VIRTUALIZED_MESSAGES_LIST;
 
   const mainViewModel = useMainViewModel();
-  const {fireAndForgetInvoker, isFeatureToggleEnabled} = useApplicationContext();
+  const {fireAndForgetInvoker, isFeatureToggleEnabled, translate} = useApplicationContext();
   const {content: contentViewModel} = mainViewModel;
   const {conversationRepository, repositories} = contentViewModel;
   const isSharedDriveSearchAndFiltersEnabled = isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName);
@@ -170,15 +169,15 @@ export const Conversation = ({
           const maxSize = CONFIG.MAXIMUM_IMAGE_FILE_SIZE / bytesMultiplier / bytesMultiplier;
 
           return showWarningModal(
-            t(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
-            t(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', {number: maxSize}),
+            translate(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
+            translate(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', {number: maxSize}),
           );
         }
       }
 
       repositories.message.uploadImages(activeConversation, images);
     },
-    [activeConversation, repositories.asset, repositories.message],
+    [activeConversation, repositories.asset, repositories.message, translate],
   );
 
   const uploadFiles = useCallback(
@@ -214,7 +213,10 @@ export const Conversation = ({
 
           if (isFileTooLarge) {
             const fileSize = formatBytes(uploadLimit);
-            showWarningModal(t('modalAssetTooLargeHeadline'), t('modalAssetTooLargeMessage', {number: fileSize}));
+            showWarningModal(
+              translate('modalAssetTooLargeHeadline'),
+              translate('modalAssetTooLargeMessage', {number: fileSize}),
+            );
 
             return;
           }
@@ -231,6 +233,7 @@ export const Conversation = ({
       repositories.asset,
       repositories.message,
       selfUser,
+      translate,
     ],
   );
 
@@ -370,11 +373,11 @@ export const Conversation = ({
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
         action: () => safeWindowOpen(href),
-        text: t('modalOpenLinkAction'),
+        text: translate('modalOpenLinkAction'),
       },
       text: {
-        htmlMessage: t('modalOpenLinkMessage', {link: href}, {}, true),
-        title: t('modalOpenLinkTitle'),
+        htmlMessage: translate('modalOpenLinkMessage', {link: href}, {}, true),
+        title: translate('modalOpenLinkTitle'),
       },
     });
     event.preventDefault();
@@ -466,19 +469,22 @@ export const Conversation = ({
     }
   };
 
-  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
-    const conversationLastRead = conversationEntity.last_read_timestamp();
-    const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
-    const needsUpdate = conversationLastRead < lastKnownTimestamp;
+  const updateConversationLastRead = useCallback(
+    (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
+      const conversationLastRead = conversationEntity.last_read_timestamp();
+      const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
+      const needsUpdate = conversationLastRead < lastKnownTimestamp;
 
-    // if no message provided it means we need to jump to the last message
-    if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
-      conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
-      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-        await repositories.message.markAsRead(conversationEntity);
-      });
-    }
-  };
+      // if no message provided it means we need to jump to the last message
+      if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
+        conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
+        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+          await repositories.message.markAsRead(conversationEntity);
+        });
+      }
+    },
+    [fireAndForgetInvoker, repositories.message, repositories.serverTime],
+  );
 
   const getInViewportCallback = useCallback(
     (conversationEntity: ConversationEntity, messageEntity: Message) => {
@@ -586,10 +592,8 @@ export const Conversation = ({
       {activeConversation && (
         <>
           <TitleBar
-            repositories={repositories}
             conversation={activeConversation}
             selfUser={selfUser}
-            teamState={teamState}
             callActions={mainViewModel.calling.callActions}
             openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}

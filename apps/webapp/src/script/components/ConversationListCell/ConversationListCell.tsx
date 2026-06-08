@@ -33,9 +33,9 @@ import {useConversationCall} from 'Hooks/useConversationCall';
 import {useNoInternetCallGuard} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {MediaType} from 'Repositories/media/MediaType';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {noop, setContextMenuPosition} from 'Util/util';
 
@@ -67,6 +67,7 @@ export const ConversationListCell = ({
   isFocused = false,
   resetConversationFocus,
 }: ConversationListCellProps) => {
+  const {translate} = useApplicationContext();
   const {
     isGroup,
     is1to1,
@@ -93,7 +94,15 @@ export const ConversationListCell = ({
     'isGroupOrChannel',
   ]);
 
-  const guardCall = useNoInternetCallGuard();
+  const guardCall = useNoInternetCallGuard({
+    description: translate('callNotEstablishedDescription'),
+    descriptionPoints: [
+      translate('callNotEstablishedDescriptionPoint1'),
+      translate('callNotEstablishedDescriptionPoint2'),
+      translate('callNotEstablishedDescriptionPoint3'),
+    ],
+    title: translate('callNotEstablishedTitle'),
+  });
   const {isCallConnecting} = useConversationCall(conversation);
 
   const {isChannelsEnabled} = useChannelsFeatureFlag();
@@ -109,16 +118,19 @@ export const ConversationListCell = ({
   const accessibilityParts = [displayName];
 
   if (unreadMessagesCount > 0) {
-    accessibilityParts.push(`${unreadMessagesCount} ${t('conversationLabelUnread')}`);
+    accessibilityParts.push(`${unreadMessagesCount} ${translate('conversationLabelUnread')}`);
   }
 
   if (isMutedConversation) {
-    accessibilityParts.push(t('accessibility.conversationMuted'));
+    accessibilityParts.push(translate('accessibility.conversationMuted'));
   }
 
-  const accessibilityConversationLabel = `${accessibilityParts.join(', ')}. ${t('accessibility.openConversation', {
-    name: displayName,
-  })}`;
+  const accessibilityConversationLabel = `${accessibilityParts.join(', ')}. ${translate(
+    'accessibility.openConversation',
+    {
+      name: displayName,
+    },
+  )}`;
 
   // Ref for immediate synchronous protection from multiple clicks
   const isJoiningCallRef = useRef(false);
@@ -214,7 +226,10 @@ export const ConversationListCell = ({
         aria-label={accessibilityConversationLabel}
         aria-describedby={contextMenuKeyboardShortcut}
       >
-        <span id={contextMenuKeyboardShortcut} aria-label={t('accessibility.conversationOptionsMenuAccessKey')} />
+        <span
+          id={contextMenuKeyboardShortcut}
+          aria-label={translate('accessibility.conversationOptionsMenuAccessKey')}
+        />
 
         <div
           className={cx('conversation-list-cell-left', {
@@ -265,7 +280,7 @@ export const ConversationListCell = ({
             'conversation-list-cell-context-menu--active': isActive,
           })}
           data-uie-name="go-options"
-          aria-label={t('accessibility.conversationOptionsMenu')}
+          aria-label={translate('accessibility.conversationOptionsMenu')}
           type="button"
           tabIndex={focusContextMenu && isFocused ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
           aria-haspopup="true"
@@ -286,7 +301,7 @@ export const ConversationListCell = ({
             data-uie-name="do-call-controls-call-join"
             disabled={isButtonDisabled}
           >
-            {t('callJoin')}
+            {translate('callJoin')}
           </button>
         )}
       </div>

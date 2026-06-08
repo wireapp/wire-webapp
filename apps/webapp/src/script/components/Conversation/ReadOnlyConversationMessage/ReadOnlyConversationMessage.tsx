@@ -27,8 +27,8 @@ import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 
 interface ReadOnlyConversationMessageProps {
@@ -39,6 +39,7 @@ interface ReadOnlyConversationMessageProps {
 const userPlaceholder = {isBlocked: ko.observable(false)};
 
 export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> = ({conversation, reloadApp}) => {
+  const {translate} = useApplicationContext();
   const {
     readOnlyState,
     is1to1,
@@ -56,7 +57,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
   if (isUserBlocked) {
     return (
       <ReadOnlyConversationMessageBase>
-        <span>{t('conversationWithBlockedUser')}</span>
+        <span>{translate('conversationWithBlockedUser')}</span>
       </ReadOnlyConversationMessageBase>
     );
   }
@@ -67,7 +68,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
         return (
           <ReadOnlyConversationMessageBase>
             <span>
-              {replaceReactComponents(t('otherUserNotSupportMLSMsg', {participantName: '{participantName}'}), [
+              {replaceReactComponents(translate('otherUserNotSupportMLSMsg', {participantName: '{participantName}'}), [
                 {
                   exactMatch: '{participantName}',
                   render: () => <strong>{user.name()}</strong>,
@@ -80,7 +81,7 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
         return (
           <ReadOnlyConversationMessageBase>
             <span>
-              {replaceReactComponents(t('selfNotSupportMLSMsgPart1', {selfUserName: '{selfUserName}'}), [
+              {replaceReactComponents(translate('selfNotSupportMLSMsgPart1', {selfUserName: '{selfUserName}'}), [
                 {
                   exactMatch: '{selfUserName}',
                   render: () => <strong>{user.name()}</strong>,
@@ -95,9 +96,9 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
                 variant={LinkVariant.PRIMARY}
                 data-uie-name="do-update-mls"
               >
-                {t('downloadLatestMLS')}
+                {translate('downloadLatestMLS')}
               </Link>{' '}
-              <span>{t('selfNotSupportMLSMsgPart2')}</span>
+              <span>{translate('selfNotSupportMLSMsgPart2')}</span>
             </>
           </ReadOnlyConversationMessageBase>
         );
@@ -105,12 +106,15 @@ export const ReadOnlyConversationMessage: FC<ReadOnlyConversationMessageProps> =
         return (
           <ReadOnlyConversationMessageBase>
             <span>
-              {replaceReactComponents(t('otherUserNoAvailableKeyPackages', {participantName: '{participantName}'}), [
-                {
-                  exactMatch: '{participantName}',
-                  render: () => <strong>{user.name()}</strong>,
-                },
-              ])}
+              {replaceReactComponents(
+                translate('otherUserNoAvailableKeyPackages', {participantName: '{participantName}'}),
+                [
+                  {
+                    exactMatch: '{participantName}',
+                    render: () => <strong>{user.name()}</strong>,
+                  },
+                ],
+              )}
             </span>
           </ReadOnlyConversationMessageBase>
         );

@@ -117,7 +117,15 @@ export const CallingCell = ({
   ]);
   const {activeCallViewTab, viewMode} = useKoSubscribableChildren(callState, ['activeCallViewTab', 'viewMode']);
 
-  const guardCall = useNoInternetCallGuard();
+  const guardCall = useNoInternetCallGuard({
+    description: translate('callNotEstablishedDescription'),
+    descriptionPoints: [
+      translate('callNotEstablishedDescriptionPoint1'),
+      translate('callNotEstablishedDescriptionPoint2'),
+      translate('callNotEstablishedDescriptionPoint3'),
+    ],
+    title: translate('callNotEstablishedTitle'),
+  });
   const {isCallConnecting} = useConversationCall(conversation);
 
   // Ref for immediate synchronous protection from multiple clicks
