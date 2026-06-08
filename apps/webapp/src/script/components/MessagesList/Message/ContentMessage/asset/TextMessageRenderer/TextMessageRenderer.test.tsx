@@ -19,9 +19,16 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {TextMessageRenderer} from './TextMessageRenderer';
 
 describe('TextMessageRenderer', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+
   it('renders a text message', () => {
     const onClickElement = jest.fn();
     const txtMsg = 'simple message';
@@ -89,6 +96,7 @@ describe('TextMessageRenderer', () => {
 
     const {getByText} = render(
       <TextMessageRenderer text={text} onMessageClick={onClickElement} isFocusable={false} collapse />,
+      {wrapper: rootProviderWrapper},
     );
     const showMoreButton = getByText('replyQuoteShowMore');
     expect(showMoreButton).not.toBe(null);

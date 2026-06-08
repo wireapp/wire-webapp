@@ -19,7 +19,6 @@
 
 import {fireEvent, render} from '@testing-library/react';
 
-import {t} from 'Util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -38,7 +37,7 @@ describe('ShowMoreButton', () => {
       {wrapper: rootProviderWrapper},
     );
 
-    expect(getByText(t('replyQuoteShowLess'))).not.toBeNull();
+    expect(getByText('replyQuoteShowLess')).not.toBeNull();
 
     const toggleShowBtn = getByTestId('do-show-more-quote');
     fireEvent.click(toggleShowBtn);
@@ -51,6 +50,6 @@ describe('ShowMoreButton', () => {
     fireEvent.click(toggleShowBtn);
 
     expect(setShowFullText).toHaveBeenCalled();
-    expect(getByText(t('replyQuoteShowMore'))).not.toBeNull();
+    expect(getByText('replyQuoteShowMore')).not.toBeNull();
   });
 });

@@ -21,13 +21,11 @@ import {act} from 'react';
 
 import {render, fireEvent, waitFor} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings} from 'Util/localizerUtil';
 
 import {TeamCreationModal} from './TeamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
@@ -59,7 +57,6 @@ describe('TeamCreationModal', () => {
   const userName = 'testUser';
   const rootContextValue = createRootContextValueForTest({});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
-  setStrings({en});
 
   const renderTeamCreationModal = () => {
     useTeamCreationModal.setState({isModalOpen: true});
@@ -73,11 +70,10 @@ describe('TeamCreationModal', () => {
     onSuccessMock.mockClear();
   });
 
-  const getStepString = (currentStep: number) => `Step ${currentStep} of 4`;
-
   it('renders the introduction step initially', () => {
     const {getByText} = renderTeamCreationModal();
-    expect(getByText(getStepString(1))).toBeTruthy();
+    expect(getByText('teamCreationStep')).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
   });
 
   it('navigates to the form step when clicking continue', () => {
@@ -85,7 +81,7 @@ describe('TeamCreationModal', () => {
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
-    expect(getByText(getStepString(2))).toBeTruthy();
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
   });
 
   it('navigates back to the introduction step', () => {
@@ -94,23 +90,23 @@ describe('TeamCreationModal', () => {
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
-    expect(getByText(getStepString(2))).toBeTruthy();
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
 
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doGoBack));
     });
-    expect(getByText(getStepString(1))).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
   });
 
   it('navigates to confirm page after providing team name', () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
 
-    expect(getByText(getStepString(1))).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
 
-    expect(getByText(getStepString(2))).toBeTruthy();
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
     act(() => {
       fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
     });
@@ -118,18 +114,18 @@ describe('TeamCreationModal', () => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
 
-    expect(getByText(getStepString(3))).toBeTruthy();
+    expect(getByText('teamCreationConfirmTitle')).toBeTruthy();
   });
 
   it('calls onSuccess when closed from last page (success)', async () => {
     const {getByTestId, getByText} = renderTeamCreationModal();
 
-    expect(getByText(getStepString(1))).toBeTruthy();
+    expect(getByText('teamCreationIntroTitle')).toBeTruthy();
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
 
-    expect(getByText(getStepString(2))).toBeTruthy();
+    expect(getByText('teamCreationFormTitle')).toBeTruthy();
     act(() => {
       fireEvent.change(getByTestId(testIdentifiers.enterTeamName), {target: {value: 'New Team'}});
     });
@@ -137,7 +133,7 @@ describe('TeamCreationModal', () => {
       fireEvent.click(getByTestId(testIdentifiers.doContinue));
     });
 
-    expect(getByText(getStepString(3))).toBeTruthy();
+    expect(getByText('teamCreationConfirmTitle')).toBeTruthy();
     act(() => {
       fireEvent.click(getByTestId(testIdentifiers.doAcceptTerms));
     });
@@ -150,7 +146,7 @@ describe('TeamCreationModal', () => {
     });
 
     await waitFor(() => {
-      expect(getByText(getStepString(4))).toBeTruthy();
+      expect(getByText('teamCreationSuccessTitle')).toBeTruthy();
     });
 
     act(() => {

@@ -20,7 +20,6 @@
 import {render} from '@testing-library/react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 
-import en from 'I18n/en-US.json';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
@@ -28,12 +27,9 @@ import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateUser} from 'test/helper/UserGenerator';
-import {setStrings} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {MessageWrapper} from './MessageWrapper';
-
-setStrings({en});
 
 const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
@@ -104,7 +100,7 @@ describe('MessageWrapper', () => {
 
       const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(getByText('Shared Drive is on')).toBeInTheDocument();
+      expect(getByText('conversationCellsConversationEnabled')).toBeInTheDocument();
     });
 
     it('computes isCellsConversation as true when cellsState is PENDING', () => {
@@ -116,7 +112,7 @@ describe('MessageWrapper', () => {
 
       const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(getByText('Shared Drive is on')).toBeInTheDocument();
+      expect(getByText('conversationCellsConversationEnabled')).toBeInTheDocument();
     });
 
     it('computes isCellsConversation as false when cellsState is DISABLED', () => {
@@ -128,7 +124,7 @@ describe('MessageWrapper', () => {
 
       const {queryByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(queryByText('Shared Drive is on')).not.toBeInTheDocument();
+      expect(queryByText('conversationCellsConversationEnabled')).not.toBeInTheDocument();
     });
   });
 
@@ -143,7 +139,7 @@ describe('MessageWrapper', () => {
 
       const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+      expect(getByText('conversationDetailsActionTimedMessagesDisabled')).toBeInTheDocument();
     });
 
     it('computes isSelfDeletingMessagesOff as true when hasGlobalMessageTimer is false', () => {
@@ -156,7 +152,7 @@ describe('MessageWrapper', () => {
 
       const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+      expect(getByText('conversationDetailsActionTimedMessagesDisabled')).toBeInTheDocument();
     });
 
     it('computes isSelfDeletingMessagesOff as false only when hasGlobalMessageTimer is true AND isCellsConversation is false', () => {
@@ -169,7 +165,7 @@ describe('MessageWrapper', () => {
 
       const {queryByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(queryByText('Self-deleting messages are off')).not.toBeInTheDocument();
+      expect(queryByText('conversationDetailsActionTimedMessagesDisabled')).not.toBeInTheDocument();
     });
 
     it('shows both banners when Cells is enabled with PENDING state', () => {
@@ -182,8 +178,8 @@ describe('MessageWrapper', () => {
 
       const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
-      expect(getByText('Shared Drive is on')).toBeInTheDocument();
-      expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
+      expect(getByText('conversationCellsConversationEnabled')).toBeInTheDocument();
+      expect(getByText('conversationDetailsActionTimedMessagesDisabled')).toBeInTheDocument();
     });
   });
 });
