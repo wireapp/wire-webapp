@@ -32,6 +32,20 @@ import {generateUser} from 'test/helper/UserGenerator';
 
 import {SidebarTabs} from './useSidebarStore';
 
+const searchInputPlaceholders = {
+  searchConversations: 'searchConversations',
+  searchGroupConversations: 'searchGroupConversations',
+  searchChannelConversations: 'searchChannelConversations',
+  searchDirectConversations: 'searchDirectConversations',
+  searchFavoriteConversations: 'searchFavoriteConversations',
+  searchArchivedConversations: 'searchArchivedConversations',
+  searchUnreadConversations: 'searchUnreadConversations',
+  searchMentionsConversations: 'searchMentionsConversations',
+  searchRepliesConversations: 'searchRepliesConversations',
+  searchDraftsConversations: 'searchDraftsConversations',
+  searchPingsConversations: 'searchPingsConversations',
+};
+
 describe('conversationFilters', () => {
   it('detects mentions, replies, pings, and archived state', () => {
     const mentionsConversation = generateConversation({name: 'Mentions'});
@@ -202,6 +216,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: false,
       draftConversations: [],
+      searchInputPlaceholders,
     });
   };
 
@@ -235,6 +250,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: true,
       draftConversations: [],
+      searchInputPlaceholders,
     });
 
     expect(filteredConversations).toEqual(groupConversations);
@@ -290,6 +306,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: false,
       draftConversations: [],
+      searchInputPlaceholders,
     });
 
     const {conversations: filteredDirectConversations} = getTabConversations({
@@ -304,6 +321,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: false,
       draftConversations: [],
+      searchInputPlaceholders,
     });
 
     expect(filteredGroupConversations).toEqual(groupConversations);
@@ -339,6 +357,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: false,
       draftConversations: [],
+      searchInputPlaceholders,
     });
 
     expect(filteredConversations).toEqual([unreadConversation]);
@@ -361,6 +380,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: false,
       draftConversations: [draftConversation],
+      searchInputPlaceholders,
     });
 
     expect(filteredConversations).toEqual([draftConversation]);
@@ -386,6 +406,7 @@ describe('getTabConversations', () => {
       channelConversations: [activeChannel, archivedChannel],
       isChannelsEnabled: true,
       draftConversations: [],
+      searchInputPlaceholders,
     });
 
     expect(filteredConversations).toEqual([activeChannel]);
@@ -415,6 +436,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: false,
       draftConversations: [],
+      searchInputPlaceholders,
     });
 
     expect(filteredConversations).toEqual([mentionsConversation]);
@@ -444,6 +466,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: false,
       draftConversations: [],
+      searchInputPlaceholders,
     });
 
     expect(filteredConversations).toEqual([repliesConversation]);
@@ -473,6 +496,7 @@ describe('getTabConversations', () => {
       channelConversations: [],
       isChannelsEnabled: false,
       draftConversations: [],
+      searchInputPlaceholders,
     });
 
     expect(filteredConversations).toEqual([pingsConversation]);

@@ -28,7 +28,7 @@ import {BannerPortal} from 'Components/BannerPortal/BannerPortal';
 import * as Icon from 'Components/icon';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   bannerHeaderContainerCss,
@@ -44,35 +44,42 @@ import {useTeamCreationModal} from './useTeamCreationModal';
 import {SidebarStatus, useSidebarStore} from '../../useSidebarStore';
 
 const Banner = ({onClick}: {onClick: () => void}) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div css={teamUpgradeBannerContainerCss}>
       <div css={bannerHeaderContainerCss}>
         <Icon.InfoIcon />
         <span className="heading-h4" css={teamUpgradeBannerHeaderCss}>
-          {t('teamUpgradeBannerHeader')}
+          {translate('teamUpgradeBannerHeader')}
         </span>
       </div>
       <div className="subline" css={teamUpgradeBannerContentCss}>
-        {t('teamUpgradeBannerContent')}
+        {translate('teamUpgradeBannerContent')}
       </div>
       <Button css={teamUpgradeBannerButtonCss} variant={ButtonVariant.SECONDARY} onClick={onClick}>
-        {t('teamUpgradeBannerButtonText')}
+        {translate('teamUpgradeBannerButtonText')}
       </Button>
     </div>
   );
 };
 
 const PADDING_Y = 34;
+const INITIAL_POSITION_X = 0;
+const INITIAL_POSITION_Y = 0;
 
 export const TeamCreationBanner = () => {
   const {showModal} = useTeamCreationModal();
   const [isBannerVisible, setIsBannerVisible] = useState(false);
-  const [position, setPosition] = useState<{x: number; y: number}>({x: 0, y: 0});
+  const [position, setPosition] = useState<{positionX: number; positionY: number}>({
+    positionX: INITIAL_POSITION_X,
+    positionY: INITIAL_POSITION_Y,
+  });
   const {status: sidebarStatus} = useSidebarStore();
   const openHandler = (event: React.MouseEvent<HTMLButtonElement> | React.MouseEvent<HTMLDivElement>) => {
     setIsBannerVisible(true);
     const rect = event.currentTarget.getBoundingClientRect();
-    setPosition({x: rect.x, y: rect.y});
+    setPosition({positionX: rect.x, positionY: rect.y});
     amplify.publish(WebAppEvents.ANALYTICS.EVENT, EventName.UI.CLICKED.SETTINGS_MIGRATION);
   };
 
@@ -103,8 +110,8 @@ export const TeamCreationBanner = () => {
       {isBannerVisible && (
         <BannerPortal
           // Position + padding
-          positionX={position.x}
-          positionY={position.y + PADDING_Y}
+          positionX={position.positionX}
+          positionY={position.positionY + PADDING_Y}
           onClose={portalCloseHandler}
         >
           <div css={bannerWrapperCss}>

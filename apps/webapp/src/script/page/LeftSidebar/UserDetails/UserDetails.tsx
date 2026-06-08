@@ -27,8 +27,8 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserVerificationBadges} from 'Components/Badge';
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import * as styles from './UserDetails.styles';
 
@@ -60,6 +60,7 @@ interface UserDetailsProps {
 }
 
 const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = false}: UserDetailsProps) => {
+  const {translate} = useApplicationContext();
   const {
     name: userName,
     username: userHandle,
@@ -76,7 +77,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
           className={cx('see-through', {'user-details-avatar': !isTeam})}
           participant={user}
           avatarSize={AVATAR_SIZE.MEDIUM}
-          avatarAlt={t('selfProfileImageAlt')}
+          avatarAlt={translate('selfProfileImageAlt')}
         />
       </AvailabilityStateButtonWrapper>
 

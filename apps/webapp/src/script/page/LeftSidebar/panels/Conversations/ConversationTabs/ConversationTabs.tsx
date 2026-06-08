@@ -45,11 +45,12 @@ import {
   SidebarTabs,
   useSidebarStore,
 } from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {replaceLink} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
@@ -100,6 +101,7 @@ export const ConversationTabs = ({
   selfUser,
   channelConversations,
 }: ConversationTabsProps) => {
+  const {translate} = useApplicationContext();
   const {visibleTabs} = useSidebarStore();
   const {isChannelsEnabled, shouldShowChannelTab} = useChannelsFeatureFlag();
   const core = container.resolve(Core);
@@ -143,7 +145,7 @@ export const ConversationTabs = ({
     ? [
         {
           type: SidebarTabs.CHANNELS,
-          title: t('conversationLabelChannels'),
+          title: translate('conversationLabelChannels'),
           dataUieName: 'go-channels-view',
           Icon: <ChannelIcon />,
           unreadConversations: channelConversationsLength,
@@ -154,49 +156,49 @@ export const ConversationTabs = ({
   const conversationTabs = [
     {
       type: SidebarTabs.RECENT,
-      title: t('conversationViewTooltip'),
+      title: translate('conversationViewTooltip'),
       dataUieName: 'go-recent-view',
       Icon: <MessageIcon />,
       unreadConversations: unreadConversations.length,
     },
     {
       type: SidebarTabs.FAVORITES,
-      title: t('conversationLabelFavorites'),
+      title: translate('conversationLabelFavorites'),
       dataUieName: 'go-favorites-view',
       Icon: <StarIcon />,
       unreadConversations: totalUnreadFavoriteConversations,
     },
     {
       type: SidebarTabs.UNREAD,
-      title: t('conversationLabelUnread'),
+      title: translate('conversationLabelUnread'),
       dataUieName: 'go-unread-view',
       Icon: <Icon.MarkAsUnreadIcon />,
       unreadConversations: unreadCount,
     },
     {
       type: SidebarTabs.MENTIONS,
-      title: t('conversationLabelMentions'),
+      title: translate('conversationLabelMentions'),
       dataUieName: 'go-mentions-view',
       Icon: <Icon.MentionIcon />,
       unreadConversations: mentionsCount,
     },
     {
       type: SidebarTabs.PINGS,
-      title: t('conversationLabelPings'),
+      title: translate('conversationLabelPings'),
       dataUieName: 'go-pings-view',
       Icon: <Icon.PingIcon />,
       unreadConversations: pingsCount,
     },
     {
       type: SidebarTabs.REPLIES,
-      title: t('conversationLabelReplies'),
+      title: translate('conversationLabelReplies'),
       dataUieName: 'go-replies-view',
       Icon: <Icon.ReplyIcon />,
       unreadConversations: repliesCount,
     },
     {
       type: SidebarTabs.DRAFTS,
-      title: t('conversationLabelDrafts'),
+      title: translate('conversationLabelDrafts'),
       dataUieName: 'go-drafts-view',
       Icon: <Icon.DraftMessageIcon />,
       unreadConversations: draftsCount,
@@ -204,7 +206,7 @@ export const ConversationTabs = ({
     ...channelsTab,
     {
       type: SidebarTabs.GROUPS,
-      title: t('conversationLabelGroups'),
+      title: translate('conversationLabelGroups'),
       dataUieName: 'go-groups-view',
       Icon: <GroupIcon height={20} width={20} />,
       unreadConversations: isChannelsEnabled
@@ -213,22 +215,22 @@ export const ConversationTabs = ({
     },
     {
       type: SidebarTabs.DIRECTS,
-      title: t('conversationLabelDirects'),
+      title: translate('conversationLabelDirects'),
       dataUieName: 'go-directs-view',
       Icon: <Icon.PeopleIcon />,
       unreadConversations: directConversationsLength,
     },
     {
       type: SidebarTabs.FOLDER,
-      title: t('folderViewTooltip'),
+      title: translate('folderViewTooltip'),
       dataUieName: 'go-folders-view',
       Icon: <FolderIcon />,
       unreadConversations: totalUnreadConversations,
     },
     {
       type: SidebarTabs.ARCHIVES,
-      title: t('tooltipConversationsArchived', {number: archivedConversations.length}),
-      label: t('conversationFooterArchive'),
+      title: translate('tooltipConversationsArchived', {number: archivedConversations.length}),
+      label: translate('conversationFooterArchive'),
       dataUieName: 'go-archive',
       Icon: <Icon.ArchiveIcon />,
       unreadConversations: totalUnreadArchivedConversations,
@@ -250,12 +252,12 @@ export const ConversationTabs = ({
     <>
       <div
         role="tablist"
-        aria-label={t('accessibility.headings.sidebar')}
+        aria-label={translate('accessibility.headings.sidebar')}
         aria-owns="tab-1 tab-2 tab-3 tab-4 tab-5 tab-6 tab-7"
         className="conversations-sidebar-list"
       >
         <div className="conversations-sidebar-title" css={conversationsTitleWrapper}>
-          <span>{t('videoCallOverlayConversations')}</span>
+          <span>{translate('videoCallOverlayConversations')}</span>
           <TabAndFilterSettings />
         </div>
 
@@ -288,12 +290,12 @@ export const ConversationTabs = ({
         <div className="conversations-sidebar-divider" />
 
         <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
-          {t('conversationFooterContacts')}
+          {translate('conversationFooterContacts')}
         </div>
 
         <ConversationTab
-          title={t('searchConnect')}
-          label={t('searchConnect')}
+          title={translate('searchConnect')}
+          label={translate('searchConnect')}
           type={SidebarTabs.CONNECT}
           Icon={<Icon.AddParticipantsIcon />}
           onChangeTab={onChangeTab}
@@ -307,12 +309,12 @@ export const ConversationTabs = ({
             <div className="conversations-sidebar-divider" />
 
             <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
-              {t('cells.sidebar.heading')}
+              {translate('cells.sidebar.heading')}
             </div>
 
             <ConversationTab
-              title={t('cells.sidebar.title')}
-              label={t('cells.sidebar.title')}
+              title={translate('cells.sidebar.title')}
+              label={translate('cells.sidebar.title')}
               type={SidebarTabs.CELLS}
               Icon={<CollectionIcon />}
               onChangeTab={onChangeTab}
@@ -328,12 +330,12 @@ export const ConversationTabs = ({
             <div className="conversations-sidebar-divider" />
 
             <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
-              {t('meetings.navigation.parent.label')}
+              {translate('meetings.navigation.parent.label')}
             </div>
 
             <ConversationTab
-              title={t('meetings.navigation.title')}
-              label={t('meetings.navigation.label')}
+              title={translate('meetings.navigation.title')}
+              label={translate('meetings.navigation.label')}
               type={SidebarTabs.MEETINGS}
               Icon={<CallIcon />}
               onChangeTab={onChangeTab}
@@ -347,7 +349,7 @@ export const ConversationTabs = ({
 
       <div
         role="tablist"
-        aria-label={t('accessibility.headings.sidebar.footer')}
+        aria-label={translate('accessibility.headings.sidebar.footer')}
         aria-owns="tab-1 tab-2"
         className="conversations-sidebar-list-footer"
       >
@@ -360,7 +362,7 @@ export const ConversationTabs = ({
               body={
                 <div
                   dangerouslySetInnerHTML={{
-                    __html: t(
+                    __html: translate(
                       'conversationInternalEnvironmentDisclaimer',
                       {url: 'https://app.wire.com'},
                       replaceWireLink,
@@ -375,15 +377,19 @@ export const ConversationTabs = ({
             <div
               css={footerDisclaimerEllipsis}
               dangerouslySetInnerHTML={{
-                __html: t('conversationInternalEnvironmentDisclaimer', {url: 'https://app.wire.com'}, replaceWireLink),
+                __html: translate(
+                  'conversationInternalEnvironmentDisclaimer',
+                  {url: 'https://app.wire.com'},
+                  replaceWireLink,
+                ),
               }}
             />
           </div>
         )}
 
         <ConversationTab
-          title={t('preferencesHeadline')}
-          label={t('preferencesHeadline')}
+          title={translate('preferencesHeadline')}
+          label={translate('preferencesHeadline')}
           type={SidebarTabs.PREFERENCES}
           Icon={<Icon.SettingsIcon />}
           onChangeTab={tab => {
@@ -403,12 +409,12 @@ export const ConversationTabs = ({
             href={manageTeamUrl}
             type="button"
             className="conversations-sidebar-btn"
-            title={t('preferencesAccountManageTeam')}
+            title={translate('preferencesAccountManageTeam')}
             data-uie-name="go-team-management"
           >
             <span className="conversations-sidebar-btn--text-wrapper">
               <TeamIcon />
-              <span className="conversations-sidebar-btn--text"> {t('preferencesAccountManageTeam')}</span>
+              <span className="conversations-sidebar-btn--text"> {translate('preferencesAccountManageTeam')}</span>
               <ExternalLinkIcon className="external-link-icon" />
             </span>
           </a>
@@ -421,12 +427,12 @@ export const ConversationTabs = ({
           id="tab-2"
           type="button"
           className="conversations-sidebar-btn"
-          title={t('preferencesAboutSupport')}
+          title={translate('preferencesAboutSupport')}
           data-uie-name="go-support"
         >
           <span className="conversations-sidebar-btn--text-wrapper">
             <SupportIcon viewBox="0 0 16 16" />
-            <span className="conversations-sidebar-btn--text">{t('preferencesAboutSupport')}</span>
+            <span className="conversations-sidebar-btn--text">{translate('preferencesAboutSupport')}</span>
             <ExternalLinkIcon className="external-link-icon" />
           </span>
         </a>
