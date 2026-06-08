@@ -20,23 +20,27 @@
 import {getLoadMoreOffset} from './loadMorePagination';
 
 describe('getLoadMoreOffset', () => {
-  it('returns null when pagination is missing', () => {
-    expect(getLoadMoreOffset(null)).toBeNull();
+  it('returns Nothing when pagination is missing', () => {
+    expect(getLoadMoreOffset(null).isNothing).toBe(true);
   });
 
-  it('returns null when next offset is missing', () => {
-    expect(getLoadMoreOffset({currentPage: 1, totalPages: 2})).toBeNull();
+  it('returns Nothing when next offset is missing', () => {
+    expect(getLoadMoreOffset({currentPage: 1, totalPages: 2}).isNothing).toBe(true);
   });
 
-  it('returns next offset when page count is not available', () => {
-    expect(getLoadMoreOffset({nextOffset: 30})).toBe(30);
+  it('returns Just(nextOffset) when page count is not available', () => {
+    const result = getLoadMoreOffset({nextOffset: 30});
+    expect(result.isJust).toBe(true);
+    expect(result.unwrapOr(-1)).toBe(30);
   });
 
-  it('returns next offset when another page is available', () => {
-    expect(getLoadMoreOffset({nextOffset: 50, currentPage: 1, totalPages: 2})).toBe(50);
+  it('returns Just(nextOffset) when another page is available', () => {
+    const result = getLoadMoreOffset({nextOffset: 50, currentPage: 1, totalPages: 2});
+    expect(result.isJust).toBe(true);
+    expect(result.unwrapOr(-1)).toBe(50);
   });
 
-  it('returns null when the current page is the last page', () => {
-    expect(getLoadMoreOffset({nextOffset: 50, currentPage: 2, totalPages: 2})).toBeNull();
+  it('returns Nothing when the current page is the last page', () => {
+    expect(getLoadMoreOffset({nextOffset: 50, currentPage: 2, totalPages: 2}).isNothing).toBe(true);
   });
 });

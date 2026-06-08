@@ -17,24 +17,26 @@
  *
  */
 
+import {Maybe} from 'true-myth';
+
 import {CellPagination} from '../cellPagination/cellPagination';
 
 export const LOAD_MORE_INITIAL_SIZE = 30;
 export const LOAD_MORE_INCREMENT = 20;
 
-export const getLoadMoreOffset = (pagination: CellPagination | null): number | null => {
+export const getLoadMoreOffset = (pagination: CellPagination | null): Maybe<number> => {
   const nextOffset = pagination?.nextOffset;
 
   if (nextOffset === undefined) {
-    return null;
+    return Maybe.nothing();
   }
 
   const currentPage = pagination?.currentPage;
   const totalPages = pagination?.totalPages;
 
   if (currentPage === undefined || totalPages === undefined) {
-    return nextOffset;
+    return Maybe.just(nextOffset);
   }
 
-  return currentPage < totalPages ? nextOffset : null;
+  return currentPage < totalPages ? Maybe.just(nextOffset) : Maybe.nothing();
 };

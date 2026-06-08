@@ -158,11 +158,10 @@ export const ConversationCells = memo(
     });
 
     const handleLoadMore = useCallback(async (): Promise<void> => {
-      if (loadMoreOffset === null) {
-        return;
-      }
-
-      await loadMoreSearchResults(loadMoreOffset);
+      await loadMoreOffset.match({
+        Just: offset => loadMoreSearchResults(offset),
+        Nothing: () => Promise.resolve(),
+      });
     }, [loadMoreOffset, loadMoreSearchResults]);
 
     useOnPresignedUrlExpired({conversationId, refreshCallback: handleRefresh});
@@ -180,7 +179,7 @@ export const ConversationCells = memo(
     const isFetchingMoreVisible = isFetchingMore && isCellsStateReady && hasNodes;
     const isNoNodesVisible = !isLoading && !isFetchingMore && emptyView && !isInRecycleBin();
     const isEmptyRecycleBin = isInRecycleBin() && emptyView && !isLoading && !isFetchingMore;
-    const hasMorePages = loadMoreOffset !== null;
+    const hasMorePages = loadMoreOffset.isJust;
     const hasAppendError = isSuccess && hasNodes && storeError !== null;
 
     const isPaginationVisible = !isInSearchMode && !emptyView;
