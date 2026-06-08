@@ -43,7 +43,7 @@ import {QualityMode} from 'Repositories/media/backgroundEffects';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
 import type {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
 import {RenderMetrics, useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 type PerformancePanelProps = {
   backgroundEffectsHandler: BackgroundEffectsHandler;
@@ -140,6 +140,7 @@ const qualitySelectOptions = QUALITY_OPTIONS.map(option => ({
 }));
 
 export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
+  const {translate} = useApplicationContext();
   const isPerformancePanelEnabled = useBackgroundEffectsStore(state => state.isPerformancePanelEnabled);
 
   const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => backgroundEffectsHandler.getQuality());
@@ -245,15 +246,15 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
       </button>
 
       {isPanelOpen && (
-        <div css={performancePanelStyles} role="dialog" aria-label={t('videoCallBackgroundsPerformancePanel')}>
+        <div css={performancePanelStyles} role="dialog" aria-label={translate('videoCallBackgroundsPerformancePanel')}>
           <div css={performancePanelHeaderStyles}>
-            <h3 css={performancePanelTitleStyles}>{t('videoCallBackgroundsPerformancePanel')}</h3>
+            <h3 css={performancePanelTitleStyles}>{translate('videoCallBackgroundsPerformancePanel')}</h3>
             <button
               type="button"
               className="icon-button"
               css={performancePanelCloseButtonStyles}
               onClick={togglePerformancePanel}
-              aria-label={t('modalCloseButton')}
+              aria-label={translate('modalCloseButton')}
             >
               <CloseIcon width={12} height={12} />
             </button>

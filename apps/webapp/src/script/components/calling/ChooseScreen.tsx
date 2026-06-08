@@ -23,9 +23,9 @@ import {container} from 'tsyringe';
 
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {ElectronDesktopCapturerSource} from 'Repositories/media/MediaDevicesHandler';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
 interface ChooseScreenProps {
@@ -34,6 +34,7 @@ interface ChooseScreenProps {
 }
 
 function ChooseScreen({choose, callState = container.resolve(CallState)}: ChooseScreenProps) {
+  const {translate} = useApplicationContext();
   const {selectableScreens, selectableWindows} = useKoSubscribableChildren(callState, [
     'selectableScreens',
     'selectableWindows',
@@ -154,12 +155,12 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
       aria-labelledby="choose-screen-title"
     >
       <div id="choose-screen-title" className="label-xs text-white">
-        {t('callChooseSharedScreen')}
+        {translate('callChooseSharedScreen')}
       </div>
       <div className="choose-screen-list">{renderPreviews(selectableScreens, 'item-screen')}</div>
       {selectableWindows.length > 0 && (
         <Fragment>
-          <div className="label-xs text-white">{t('callChooseSharedWindow')}</div>
+          <div className="label-xs text-white">{translate('callChooseSharedWindow')}</div>
           <div className="choose-screen-list">{renderPreviews(selectableWindows, 'item-window')}</div>
         </Fragment>
       )}
@@ -169,8 +170,8 @@ function ChooseScreen({choose, callState = container.resolve(CallState)}: Choose
           className="choose-screen-controls-button button-round button-round-dark button-round-md icon-close"
           data-uie-name="do-choose-screen-cancel"
           onClick={cancel}
-          aria-label={t('callChooseScreenCancel')}
-          title={t('callChooseScreenCancel')}
+          aria-label={translate('callChooseScreenCancel')}
+          title={translate('callChooseScreenCancel')}
         ></button>
       </div>
     </div>

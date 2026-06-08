@@ -30,6 +30,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
@@ -41,6 +42,14 @@ jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
   useMatchMedia: jest.fn(),
 }));
+
+function translateForTest(translationKey: string): string {
+  return translationKey;
+}
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
@@ -79,7 +88,7 @@ describe('fullscreenVideoCall', () => {
   it('shows the calling timer', async () => {
     const props = createProps();
 
-    const {getByText} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)));
+    const {getByText} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)), {wrapper: rootProviderWrapper});
     const now = Date.now();
 
     jest.setSystemTime(now);
@@ -98,7 +107,7 @@ describe('fullscreenVideoCall', () => {
 
   it('has no active speaker toggle for calls with more less than 3 participants', () => {
     const props = createProps();
-    const {queryByTestId} = render(withTheme(<FullscreenVideoCall {...props} />));
+    const {queryByTestId} = render(withTheme(<FullscreenVideoCall {...props} />), {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('do-call-controls-video-call-view')).toBeNull();
   });
@@ -114,7 +123,9 @@ describe('fullscreenVideoCall', () => {
     props.call.addParticipant(new Participant(new User('c'), 'd'));
     props.call.addParticipant(new Participant(new User('e'), 'f'));
 
-    const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />));
+    const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />), {
+      wrapper: rootProviderWrapper,
+    });
     const callViewToggleButton = getByTestId('do-call-controls-video-call-view');
 
     act(() => {
@@ -137,7 +148,7 @@ describe('fullscreenVideoCall', () => {
     callState.viewMode(CallingViewMode.FULL_SCREEN);
     props.callState = callState;
 
-    render(withTheme(<FullscreenVideoCall {...props} />));
+    render(withTheme(<FullscreenVideoCall {...props} />), {wrapper: rootProviderWrapper});
 
     const wrapper = document.querySelector('[data-uie-name="fullscreen-video-call"]') as HTMLElement;
 
@@ -164,7 +175,7 @@ describe('fullscreenVideoCall', () => {
     callState.viewMode(CallingViewMode.FULL_SCREEN);
     props.callState = callState;
 
-    render(withTheme(<FullscreenVideoCall {...props} />));
+    render(withTheme(<FullscreenVideoCall {...props} />), {wrapper: rootProviderWrapper});
 
     const wrapper = document.querySelector('[data-uie-name="fullscreen-video-call"]') as HTMLElement;
 

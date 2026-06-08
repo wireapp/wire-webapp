@@ -17,8 +17,8 @@
  *
  */
 
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {dotStyles, dotButtonStyles} from './Pagination.styles';
 
@@ -30,6 +30,8 @@ interface PaginationDotProps {
 }
 
 export const PaginationDot = ({page, isCurrentPage, isSmaller, onClick}: PaginationDotProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <button
       className="icon-button"
@@ -42,7 +44,7 @@ export const PaginationDot = ({page, isCurrentPage, isSmaller, onClick}: Paginat
           keys: [KEY.ENTER, KEY.SPACE],
         })
       }
-      aria-label={t('paginationDotAriaLabel', {page: page + 1})}
+      aria-label={translate('paginationDotAriaLabel', {page: page + 1})}
       aria-current={isCurrentPage ? 'page' : undefined}
       data-page={page}
       data-uie-name="pagination-item"

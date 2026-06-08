@@ -38,9 +38,9 @@ import {
 } from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/icon';
 import type {Participant} from 'Repositories/calling/Participant';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
@@ -62,6 +62,7 @@ const GroupVideoGridTile = ({
   isMaximized,
   onTileDoubleClick,
 }: GroupVideoGridTileProps) => {
+  const {translate} = useApplicationContext();
   const {
     isMuted,
     videoState,
@@ -120,7 +121,7 @@ const GroupVideoGridTile = ({
         </span>
         {!isAudioEstablished && (
           <span css={groupVideoParticipantAudioStatus(isActivelySpeaking, isAudioEstablished)}>
-            {t('videoCallParticipantConnecting')}
+            {translate('videoCallParticipantConnecting')}
           </span>
         )}
       </span>
@@ -187,13 +188,17 @@ const GroupVideoGridTile = ({
 
       {isMaximized && (
         <div className="group-video-grid__element__overlay">
-          <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabelGoBack')}</span>
+          <span className="group-video-grid__element__overlay__label">
+            {translate('videoCallOverlayFitVideoLabelGoBack')}
+          </span>
         </div>
       )}
 
       {!minimized && participantCount > 1 && (
         <div className="group-video-grid__element__overlay">
-          <span className="group-video-grid__element__overlay__label">{t('videoCallOverlayFitVideoLabel')}</span>
+          <span className="group-video-grid__element__overlay__label">
+            {translate('videoCallOverlayFitVideoLabel')}
+          </span>
         </div>
       )}
 
@@ -211,7 +216,7 @@ const GroupVideoGridTile = ({
             css={groupVideoPauseOverlayLabel(minimized)}
             data-uie-name="status-video-paused"
           >
-            {hasPausedVideo ? t('videoCallPaused') : t('videoCallParticipantConnecting')}
+            {hasPausedVideo ? translate('videoCallPaused') : translate('videoCallParticipantConnecting')}
           </div>
           {nameContainer}
         </div>

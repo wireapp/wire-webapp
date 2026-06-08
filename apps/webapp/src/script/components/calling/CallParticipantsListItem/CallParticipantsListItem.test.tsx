@@ -28,6 +28,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {CallParticipantsListItem} from './CallParticipantsListItem';
@@ -166,6 +167,6 @@ describe('CallParticipantsListItem', () => {
       {wrapper: rootProviderWrapper},
     );
 
-    expect(getByText('videoCallParticipantConnecting')).toBeDefined();
+    expect(getByText(t('videoCallParticipantConnecting'))).toBeDefined();
   });
 });

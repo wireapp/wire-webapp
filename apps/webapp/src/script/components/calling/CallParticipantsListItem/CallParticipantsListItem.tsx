@@ -25,9 +25,9 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {UserStatusBadges} from 'Components/Badge';
 import {CallParticipantsListItemHandRaiseIcon} from 'Components/calling/CallParticipantsListItem/CallParticipantsListItemHandRaiseIcon';
 import {Participant} from 'Repositories/calling/Participant';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {setContextMenuPosition} from 'Util/util';
 
 import {CallParticipantItemContent} from './CallParticipantItemContent';
@@ -56,6 +56,7 @@ export const CallParticipantsListItem = ({
   isLast = false,
   handRaisedAt = null,
 }: CallParticipantsListItemProps) => {
+  const {translate} = useApplicationContext();
   const {user} = callParticipant;
   const {isMe: isSelf, isFederated} = user;
   const {isAudioEstablished} = useKoSubscribableChildren(callParticipant, ['isAudioEstablished']);
@@ -129,7 +130,7 @@ export const CallParticipantsListItem = ({
             <CallParticipantStatusIcons callParticipant={callParticipant} />
           </>
         ) : (
-          <span css={callParticipantConnecting}>{t('videoCallParticipantConnecting')}</span>
+          <span css={callParticipantConnecting}>{translate('videoCallParticipantConnecting')}</span>
         )}
       </div>
     </div>

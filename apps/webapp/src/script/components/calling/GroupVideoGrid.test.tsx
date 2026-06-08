@@ -25,6 +25,11 @@ import {Call} from 'Repositories/calling/Call';
 import {Participant} from 'Repositories/calling/Participant';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
@@ -34,6 +39,8 @@ jest.mock('Components/Avatar', () => ({
   AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},
   Avatar: () => <div data-testid="mock-avatar" />,
 }));
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 const createMockParticipant = (
   userId: string,
@@ -80,7 +87,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {getByTestId} = render(<GroupVideoGrid {...props} />);
+    const {getByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
 
     const groupVideoGrid = getByTestId('grids-wrapper');
 
@@ -106,7 +113,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {getByTestId} = render(<GroupVideoGrid {...props} />);
+    const {getByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
 
     const groupVideoGrid = getByTestId('grids-wrapper');
 
@@ -135,7 +142,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {queryByTestId} = render(<GroupVideoGrid {...props} />);
+    const {queryByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('status-video-paused')).not.toBeNull();
   });
@@ -156,7 +163,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {getAllByTestId} = render(<GroupVideoGrid {...props} />);
+    const {getAllByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
     const thumbnailElements = getAllByTestId('self-video-thumbnail-wrapper');
     const thumbnailMutedIcons = getAllByTestId('status-call-audio-muted');
 
@@ -179,7 +186,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {queryByTestId} = render(<GroupVideoGrid {...props} />);
+    const {queryByTestId} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
     const thumbnailMutedIcon = queryByTestId('status-call-audio-muted');
     expect(thumbnailMutedIcon).toBeNull();
   });
@@ -201,7 +208,7 @@ describe('GroupVideoGrid', () => {
       call: createMockCall(),
     };
 
-    const {getAllByText} = render(<GroupVideoGrid {...props} />);
-    expect(getAllByText('videoCallParticipantConnecting')).toHaveLength(2);
+    const {getAllByText} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
+    expect(getAllByText(t('videoCallParticipantConnecting'))).toHaveLength(2);
   });
 });

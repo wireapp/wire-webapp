@@ -23,7 +23,7 @@ import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 
 import {InviteIcon, Tooltip} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {formatDuration} from 'Util/timeUtil';
 
 import {toolTipStyles} from './CallParticipantsListItemHandRaiseIcon.styles';
@@ -33,6 +33,7 @@ interface CallParticipantsListItemHandRaiseIconProps {
 }
 
 export function CallParticipantsListItemHandRaiseIcon({handRaisedAt}: CallParticipantsListItemHandRaiseIconProps) {
+  const {translate} = useApplicationContext();
   const [duration, setDuration] = useState<string>();
 
   useEffect(() => {
@@ -56,7 +57,7 @@ export function CallParticipantsListItemHandRaiseIcon({handRaisedAt}: CallPartic
           <div css={toolTipStyles}>
             <InviteIcon />
             <span>
-              {t('videoCallParticipantRaisedHandRaiseDuration', {
+              {translate('videoCallParticipantRaisedHandRaiseDuration', {
                 duration,
               })}
             </span>
