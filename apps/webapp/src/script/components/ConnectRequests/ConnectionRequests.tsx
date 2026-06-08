@@ -151,6 +151,7 @@ export const ConnectRequests = ({
                 noBadge
                 noFilter
                 hideAvailabilityStatus
+                hideProfilePicture={connectRequest.domain === 'wire.com' || connectRequest.domain === 'staging.zinfra.io'}
               />
 
               <UnverifiedUserWarning />

@@ -51,6 +51,7 @@ interface UserAvatarProps {
   participant: User;
   state: STATE;
   hideAvailabilityStatus?: boolean;
+  hideProfilePicture?: boolean;
   teamState?: TeamState;
 }
 
@@ -78,6 +79,7 @@ export const UserAvatar = ({
   state,
   onAvatarInteraction,
   hideAvailabilityStatus = false,
+  hideProfilePicture = false,
   teamState = container.resolve(TeamState),
   ...props
 }: UserAvatarProps) => {
@@ -119,14 +121,16 @@ export const UserAvatar = ({
       <AvatarBackground backgroundColor={backgroundColor} />
 
       {initials && <AvatarInitials avatarSize={avatarSize} initials={initials} />}
-      <AvatarImage
-        avatarSize={avatarSize}
-        avatarAlt={avatarImgAlt}
-        backgroundColor={backgroundColor}
-        isGrey={isImageGrey}
-        mediumPicture={mediumPictureResource}
-        previewPicture={previewPictureResource}
-      />
+      {!hideProfilePicture && (
+        <AvatarImage
+          avatarSize={avatarSize}
+          avatarAlt={avatarImgAlt}
+          backgroundColor={backgroundColor}
+          isGrey={isImageGrey}
+          mediumPicture={mediumPictureResource}
+          previewPicture={previewPictureResource}
+        />
+      )}
       {noBadge !== true && shouldShowBadge(avatarSize, state) && (
         <AvatarBadge state={state} iconSize={getIconSize(avatarSize)} />
       )}

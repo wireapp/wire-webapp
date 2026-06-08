@@ -80,6 +80,7 @@ interface AvatarProps extends HTMLProps<HTMLDivElement> {
   isResponsive?: boolean;
   onAvatarClick?: (participant: User | ServiceEntity) => void;
   hideAvailabilityStatus?: boolean;
+  hideProfilePicture?: boolean;
 }
 
 const Avatar = ({
