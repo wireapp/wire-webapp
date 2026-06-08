@@ -157,6 +157,36 @@ describe('UserAvatar', () => {
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
   });
 
+  it('does not render the profile picture image when hideProfilePicture is true', () => {
+    const participant = new User('id');
+    participant.name('Anton Bertha');
+
+    const props = {
+      avatarSize: AVATAR_SIZE.LARGE,
+      participant,
+      state: STATE.NONE,
+      hideProfilePicture: true,
+    };
+
+    const {queryByRole} = render(<UserAvatar {...props} />);
+    expect(queryByRole('img')).toBeNull();
+  });
+
+  it('renders the profile picture image when hideProfilePicture is false', () => {
+    const participant = new User('id');
+    participant.name('Anton Bertha');
+
+    const props = {
+      avatarSize: AVATAR_SIZE.LARGE,
+      participant,
+      state: STATE.NONE,
+      hideProfilePicture: false,
+    };
+
+    const {getByRole} = render(<UserAvatar {...props} />);
+    expect(getByRole('img')).not.toBeNull();
+  });
+
   it('does not show availability icon if param is false', async () => {
     const participant = new User('id');
 
