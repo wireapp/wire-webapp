@@ -20,8 +20,8 @@
 import {createColumnHelper} from '@tanstack/react-table';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import type {RootContextValue} from 'src/script/page/RootProvider';
 import {CellNode} from 'src/script/types/cellNode';
-import {t} from 'Util/localizerUtil';
 
 import {CellsConversationColumn} from './CellsConversationColumn/CellsConversationColumn';
 import {CellsTableOwnerColumn} from './CellsOwnerColumn/CellsOwnerColumn';
@@ -33,43 +33,49 @@ import {CellsTableTagsColumn} from './CellsTableTagsColumn/CellsTableTagsColumn'
 
 const columnHelper = createColumnHelper<CellNode>();
 
-export const getCellsTableColumns = ({cellsRepository}: {cellsRepository: CellsRepository}) => [
+export const getCellsTableColumns = ({
+  cellsRepository,
+  translate,
+}: {
+  cellsRepository: CellsRepository;
+  translate: RootContextValue['translate'];
+}) => [
   columnHelper.accessor('name', {
-    header: t('cells.tableRow.name'),
+    header: translate('cells.tableRow.name'),
     cell: info => <CellsTableNameColumn node={info.row.original} />,
   }),
   columnHelper.accessor('conversationName', {
-    header: t('cells.tableRow.conversationName'),
+    header: translate('cells.tableRow.conversationName'),
     cell: info => <CellsConversationColumn conversation={info.row.original.conversation} name={info.getValue()} />,
     size: 190,
   }),
   columnHelper.accessor('owner', {
-    header: t('cells.tableRow.owner'),
+    header: translate('cells.tableRow.owner'),
     cell: info => <CellsTableOwnerColumn owner={info.getValue()} user={info.row.original.user} />,
     size: 175,
   }),
   columnHelper.accessor('tags', {
-    header: t('cells.tableRow.tags'),
+    header: translate('cells.tableRow.tags'),
     cell: info => <CellsTableTagsColumn tags={info.getValue()} />,
     size: 120,
   }),
   columnHelper.accessor('sizeMb', {
-    header: t('cells.tableRow.size'),
+    header: translate('cells.tableRow.size'),
     cell: info => info.getValue(),
     size: 100,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: t('cells.tableRow.created'),
+    header: translate('cells.tableRow.created'),
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),
   columnHelper.accessor('publicLink', {
-    header: t('cells.tableRow.publicLink'),
+    header: translate('cells.tableRow.publicLink'),
     cell: info => <CellsTableSharedColumn isShared={info.getValue()?.alreadyShared === true} />,
     size: 60,
   }),
   columnHelper.accessor('id', {
-    header: () => <span className="visually-hidden">{t('cells.tableRow.actions')}</span>,
+    header: () => <span className="visually-hidden">{translate('cells.tableRow.actions')}</span>,
     size: 40,
     cell: info => <CellsTableRowOptions node={info.row.original} cellsRepository={cellsRepository} />,
   }),

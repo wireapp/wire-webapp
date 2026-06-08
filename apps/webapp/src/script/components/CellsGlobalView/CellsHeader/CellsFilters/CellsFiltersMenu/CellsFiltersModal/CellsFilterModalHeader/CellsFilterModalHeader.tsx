@@ -19,7 +19,7 @@
 
 import {CloseIcon, IconButton, IconButtonVariant} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {closeButtonStyles, headerStyles, headingStyles} from './CellsFilterModalHeader.styles';
 
@@ -28,15 +28,17 @@ interface CellsFilterModalHeaderProps {
 }
 
 export const CellsFilterModalHeader = ({onClose}: CellsFilterModalHeaderProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <header css={headerStyles}>
-      <h3 css={headingStyles}>{t('cells.filtersModal.title')}</h3>
+      <h3 css={headingStyles}>{translate('cells.filtersModal.title')}</h3>
       <IconButton
         variant={IconButtonVariant.SECONDARY}
         type="button"
         css={closeButtonStyles}
         onClick={onClose}
-        aria-label={t('cells.filtersModal.closeButton')}
+        aria-label={translate('cells.filtersModal.closeButton')}
       >
         <CloseIcon />
       </IconButton>

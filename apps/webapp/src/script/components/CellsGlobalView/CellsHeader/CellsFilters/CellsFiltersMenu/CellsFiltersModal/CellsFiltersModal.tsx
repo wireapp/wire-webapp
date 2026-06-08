@@ -20,8 +20,8 @@
 import {Accordion} from '@wireapp/react-ui-kit';
 
 import {ModalComponent} from 'Components/Modals/ModalComponent';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {CellsFilterModalHeader} from './CellsFilterModalHeader/CellsFilterModalHeader';
 import {contentStyles, modalStyles, wrapperStyles} from './CellsFiltersModal.styles';
@@ -36,6 +36,7 @@ interface CellsFiltersModalProps {
 }
 
 export const CellsFiltersModal = ({isOpen, onClose, tags}: CellsFiltersModalProps) => {
+  const {translate} = useApplicationContext();
   const {tags: selectedTags, setTags, handleSave} = useModalFilters({enabled: isOpen});
 
   return (
@@ -50,7 +51,7 @@ export const CellsFiltersModal = ({isOpen, onClose, tags}: CellsFiltersModalProp
         <CellsFilterModalHeader onClose={onClose} />
         <div css={contentStyles}>
           <Accordion defaultValue="tags">
-            <Accordion.Item title={t('cells.filtersModal.accordion.tags')} value="tags">
+            <Accordion.Item title={translate('cells.filtersModal.accordion.tags')} value="tags">
               <CellsTagsFilter allTags={tags} selectedTags={selectedTags} onTagsChange={setTags} />
             </Accordion.Item>
           </Accordion>

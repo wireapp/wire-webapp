@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant, CloseIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {buttonStyles} from './CellsClearFilters.styles';
 
@@ -28,10 +28,12 @@ interface CellsClearFiltersProps {
 }
 
 export const CellsClearFilters = ({onClearAll}: CellsClearFiltersProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <Button variant={ButtonVariant.TERTIARY} css={buttonStyles} onClick={onClearAll}>
       <CloseIcon />
-      {t('cells.clearFilters.button')}
+      {translate('cells.clearFilters.button')}
     </Button>
   );
 };

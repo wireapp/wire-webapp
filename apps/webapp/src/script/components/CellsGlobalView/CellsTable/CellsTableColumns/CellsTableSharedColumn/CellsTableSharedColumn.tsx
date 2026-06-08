@@ -18,7 +18,7 @@
  */
 
 import {LinkIcon} from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {wrapperStyles, iconWrapperStyles, textStyles, wrapperStylesHidden} from './CellsTableSharedColumn.styles';
 
@@ -27,14 +27,17 @@ interface CellsTableSharedColumnProps {
 }
 
 export const CellsTableSharedColumn = ({isShared}: CellsTableSharedColumnProps) => {
+  const {translate} = useApplicationContext();
+  const sharedLabel = isShared
+    ? translate('cells.tableRow.shared.truthyValue')
+    : translate('cells.tableRow.shared.falsyValue');
+
   return (
     <div css={isShared ? wrapperStyles : wrapperStylesHidden}>
       <div css={iconWrapperStyles}>
         <LinkIcon width={10} height={10} />
       </div>
-      <span css={textStyles}>
-        {isShared ? t('cells.tableRow.shared.truthyValue') : t('cells.tableRow.shared.falsyValue')}
-      </span>
+      <span css={textStyles}>{sharedLabel}</span>
     </div>
   );
 };

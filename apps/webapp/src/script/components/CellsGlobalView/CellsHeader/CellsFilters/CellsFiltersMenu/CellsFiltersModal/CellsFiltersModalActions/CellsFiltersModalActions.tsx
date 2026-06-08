@@ -19,7 +19,7 @@
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {buttonStyles, wrapperStyles} from './CellsFiltersModalActions.styles';
 
@@ -28,13 +28,15 @@ interface CellsFiltersModalActionsProps {
   onPrimaryAction: () => void;
 }
 export const CellsFiltersModalActions = ({onSecondaryAction, onPrimaryAction}: CellsFiltersModalActionsProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div css={wrapperStyles}>
       <Button variant={ButtonVariant.SECONDARY} onClick={onSecondaryAction} css={buttonStyles}>
-        {t('cells.filtersModal.secondaryAction')}
+        {translate('cells.filtersModal.secondaryAction')}
       </Button>
       <Button variant={ButtonVariant.PRIMARY} css={buttonStyles} onClick={onPrimaryAction}>
-        {t('cells.filtersModal.primaryAction')}
+        {translate('cells.filtersModal.primaryAction')}
       </Button>
     </div>
   );
