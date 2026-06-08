@@ -7537,13 +7537,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@sindresorhus/is@npm:8.1.0":
-  version: 8.1.0
-  resolution: "@sindresorhus/is@npm:8.1.0"
-  checksum: 10/4511f60fa5f21c28694eabff61b4c2fd7b65d7ac895a9330a2e862fd35e880b9b10393c6ccb44c94fa0a1d2320044ac413277ffbdb33e75cffcb0fca8fa56b76
-  languageName: node
-  linkType: hard
-
 "@sindresorhus/merge-streams@npm:^4.0.0":
   version: 4.0.0
   resolution: "@sindresorhus/merge-streams@npm:4.0.0"
@@ -9855,7 +9848,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/core@workspace:libraries/core"
   dependencies:
-    "@sindresorhus/is": "npm:8.1.0"
+    "@sindresorhus/is": "npm:4.6.0"
     "@swc/core": "npm:1.15.40"
     "@swc/jest": "npm:0.2.39"
     "@types/lodash": "npm:4.17.24"
