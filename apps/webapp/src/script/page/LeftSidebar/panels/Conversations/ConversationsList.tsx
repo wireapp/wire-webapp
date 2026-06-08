@@ -41,9 +41,9 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKeyboardEvent} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {isConversationEntity} from 'Util/typePredicateUtil';
 
@@ -56,6 +56,9 @@ import {createNavigate, createNavigateKeyboard} from '../../../../router/routerB
 import {ListViewModel} from '../../../../view_model/ListViewModel';
 import {useAppMainState, ViewType} from '../../../state';
 import {ContentState} from '../../../useAppState';
+
+const CONVERSATION_ROW_HEIGHT = 56;
+const CONVERSATION_CLICK_DEBOUNCE_DIVISOR = 2;
 
 interface ConversationsListProps {
   callState: CallState;
@@ -93,6 +96,7 @@ export const ConversationsList = ({
   isEmpty,
   searchInputRef,
 }: ConversationsListProps) => {
+  const {translate} = useApplicationContext();
   const {setCurrentView} = useAppMainState(state => state.responsiveView);
   const {currentTab} = useSidebarStore();
 
@@ -145,7 +149,7 @@ export const ConversationsList = ({
   const rowVirtualizer = useVirtualizer({
     count: conversationsToDisplay.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 56,
+    estimateSize: () => CONVERSATION_ROW_HEIGHT,
   });
 
   const debouncedOnConversationClick = useDebouncedCallback(
@@ -170,7 +174,7 @@ export const ConversationsList = ({
       clearSearchFilter();
       setClickedFilteredConversationId(conversation.id);
     },
-    TimeInMillis.SECOND / 2, // Adjust debounce delay as needed
+    TimeInMillis.SECOND / CONVERSATION_CLICK_DEBOUNCE_DIVISOR,
     {leading: true},
   );
 
@@ -209,16 +213,16 @@ export const ConversationsList = ({
 
       setClickedFilteredConversationId(null);
     }
-  }, [conversationsFilter, clickedFilteredConversationId, conversationsToDisplay]);
+  }, [clickedFilteredConversationId, conversationsFilter, conversationsToDisplay, rowVirtualizer]);
 
   return (
     <>
-      <h2 className="visually-hidden">{t('conversationViewTooltip')}</h2>
+      <h2 className="visually-hidden">{translate('conversationViewTooltip')}</h2>
 
       <ConnectionRequests connectionRequests={connectRequests} onConnectionRequestClick={onConnectionRequestClick} />
 
       {conversations.length === 0 && groupParticipantsConversations.length > 0 && (
-        <p css={noResultsMessage}>{t('searchConversationsNoResult')}</p>
+        <p css={noResultsMessage}>{translate('searchConversationsNoResult')}</p>
       )}
 
       <ul
@@ -254,7 +258,7 @@ export const ConversationsList = ({
                     transform: `translateY(${virtualItem.start}px)`,
                   }}
                 >
-                  {t(translationKey)}
+                  {translate(translationKey)}
                 </div>
               );
             }
@@ -284,7 +288,7 @@ export const ConversationsList = ({
 
       {isGroupParticipantsVisible && (
         <>
-          <h3 css={headingTitle}>{t('searchGroupParticipants')}</h3>
+          <h3 css={headingTitle}>{translate('searchGroupParticipants')}</h3>
           <ul
             css={conversationsList}
             data-uie-name="group-participants-conversations-view"

@@ -19,10 +19,9 @@
 
 import {fireEvent, render, waitFor} from '@testing-library/react';
 
-import en from 'I18n/en-US.json';
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {setStrings, t} from 'Util/localizerUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {TabAndFilterSettings} from './tabAndFilterSettings';
@@ -50,8 +49,9 @@ jest.mock('Components/icon', () => ({
 }));
 
 describe('TabAndFilterSettings', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+
   beforeEach(() => {
-    setStrings({en});
     jest.mocked(useChannelsFeatureFlag).mockReturnValue({
       isChannelsEnabled: false,
       shouldShowChannelTab: false,
@@ -66,11 +66,13 @@ describe('TabAndFilterSettings', () => {
   });
 
   it('opens the dropdown and toggles a tab visibility', async () => {
-    const {getByTitle, getByText} = render(withTheme(<TabAndFilterSettings />));
+    const {getByTitle, getByText} = render(withTheme(<TabAndFilterSettings />), {
+      wrapper: rootProviderWrapper,
+    });
 
-    fireEvent.click(getByTitle('Customize visible tabs'));
+    fireEvent.click(getByTitle('tabsFilterTooltip'));
 
-    const favoritesLabel = getByText('Favorites');
+    const favoritesLabel = getByText('conversationLabelFavorites');
     fireEvent.click(favoritesLabel);
 
     await waitFor(() => {
@@ -84,24 +86,26 @@ describe('TabAndFilterSettings', () => {
       shouldShowChannelTab: true,
     });
 
-    const {getByTitle, getAllByRole} = render(withTheme(<TabAndFilterSettings />));
+    const {getByTitle, getAllByRole} = render(withTheme(<TabAndFilterSettings />), {
+      wrapper: rootProviderWrapper,
+    });
 
-    fireEvent.click(getByTitle('Customize visible tabs'));
+    fireEvent.click(getByTitle('tabsFilterTooltip'));
 
     const tabLabels = getAllByRole('menuitemcheckbox').map(checkboxElement => checkboxElement.textContent);
 
     expect(tabLabels).toEqual([
-      'Favorites',
-      'Groups',
-      'Channels',
-      t('conversationLabelDirects'),
-      'Folders',
-      t('conversationFooterArchive'),
-      'Unread',
-      'Mentions',
-      'Replies',
-      'Drafts',
-      'Pings',
+      'conversationLabelFavorites',
+      'conversationLabelGroups',
+      'conversationLabelChannels',
+      'conversationLabelDirects',
+      'folderViewTooltip',
+      'conversationFooterArchive',
+      'conversationLabelUnread',
+      'conversationLabelMentions',
+      'conversationLabelReplies',
+      'conversationLabelDrafts',
+      'conversationLabelPings',
     ]);
   });
 });

@@ -24,8 +24,8 @@ import {Checkbox, CheckboxLabel, TabIndex} from '@wireapp/react-ui-kit';
 import * as Icon from 'Components/icon';
 import {Config} from 'src/script/Config';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleEscDown, isEnterKey, isKey, isSpaceKey, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
@@ -39,7 +39,10 @@ import {
   roundCheckbox,
 } from './tabAndFilterSettings.styles';
 
+const CHANNEL_TAB_INSERT_INDEX = 2;
+
 export const TabAndFilterSettings = () => {
+  const {translate} = useApplicationContext();
   const {visibleTabs, toggleTabVisibility} = useSidebarStore();
   const [isOpen, setIsOpen] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState(0);
@@ -51,19 +54,22 @@ export const TabAndFilterSettings = () => {
   const {shouldShowChannelTab} = useChannelsFeatureFlag();
 
   const defaultTabs = [
-    {type: SidebarTabs.FAVORITES, label: t('conversationLabelFavorites')},
-    {type: SidebarTabs.GROUPS, label: t('conversationLabelGroups')},
-    {type: SidebarTabs.DIRECTS, label: t('conversationLabelDirects')},
-    {type: SidebarTabs.FOLDER, label: t('folderViewTooltip')},
-    {type: SidebarTabs.ARCHIVES, label: t('conversationFooterArchive')},
-    {type: SidebarTabs.UNREAD, label: t('conversationLabelUnread')},
-    {type: SidebarTabs.MENTIONS, label: t('conversationLabelMentions')},
-    {type: SidebarTabs.REPLIES, label: t('conversationLabelReplies')},
-    {type: SidebarTabs.DRAFTS, label: t('conversationLabelDrafts')},
-    {type: SidebarTabs.PINGS, label: t('conversationLabelPings')},
+    {type: SidebarTabs.FAVORITES, label: translate('conversationLabelFavorites')},
+    {type: SidebarTabs.GROUPS, label: translate('conversationLabelGroups')},
+    {type: SidebarTabs.DIRECTS, label: translate('conversationLabelDirects')},
+    {type: SidebarTabs.FOLDER, label: translate('folderViewTooltip')},
+    {type: SidebarTabs.ARCHIVES, label: translate('conversationFooterArchive')},
+    {type: SidebarTabs.UNREAD, label: translate('conversationLabelUnread')},
+    {type: SidebarTabs.MENTIONS, label: translate('conversationLabelMentions')},
+    {type: SidebarTabs.REPLIES, label: translate('conversationLabelReplies')},
+    {type: SidebarTabs.DRAFTS, label: translate('conversationLabelDrafts')},
+    {type: SidebarTabs.PINGS, label: translate('conversationLabelPings')},
   ];
   const availableTabs = shouldShowChannelTab
-    ? defaultTabs.toSpliced(2, 0, {type: SidebarTabs.CHANNELS, label: t('conversationLabelChannels')})
+    ? defaultTabs.toSpliced(CHANNEL_TAB_INSERT_INDEX, 0, {
+        type: SidebarTabs.CHANNELS,
+        label: translate('conversationLabelChannels'),
+      })
     : defaultTabs;
 
   const handleMenuKeyDown = useCallback(
@@ -145,10 +151,10 @@ export const TabAndFilterSettings = () => {
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         data-uie-name="tabs-filter-button"
-        title={t('tabsFilterTooltip')}
+        title={translate('tabsFilterTooltip')}
         css={filterButton(isOpen)}
         type="button"
-        aria-label={t('tabsFilterTooltip')}
+        aria-label={translate('tabsFilterTooltip')}
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-controls={menuId}
@@ -163,9 +169,9 @@ export const TabAndFilterSettings = () => {
           data-uie-name="tabs-filter-dropdown"
           id={menuId}
           role="menu"
-          aria-label={t('tabsFilterTooltip')}
+          aria-label={translate('tabsFilterTooltip')}
         >
-          <div css={dropdownHeader}>{t('tabsFilterHeader')}</div>
+          <div css={dropdownHeader}>{translate('tabsFilterHeader')}</div>
           <div css={dropdownDivider} />
           {availableTabs.map((tab, index) => (
             <div key={tab.type}>

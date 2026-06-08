@@ -38,6 +38,7 @@ import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conve
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 
 import {ConversationsList} from './ConversationsList';
@@ -53,6 +54,7 @@ const create1to1Conversation = (userName: string) => {
 };
 
 describe('ConversationsList', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
   let listViewModel: ListViewModel;
   let connectRequests: User[];
   let conversationState: ConversationState;
@@ -96,6 +98,7 @@ describe('ConversationsList', () => {
         isEmpty={false}
         searchInputRef={createRef()}
       />,
+      {wrapper: rootProviderWrapper},
     );
 
   it("should render all 1:1 conversations if there's no search filter", async () => {

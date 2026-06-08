@@ -30,8 +30,8 @@ import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepo
 import {User} from 'Repositories/entity/User';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleEnterDown, handleEscDown} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
 import {
@@ -69,6 +69,7 @@ export const ConversationHeaderComponent = ({
   jumpToRecentSearch,
   searchInputRef,
 }: ConversationHeaderProps) => {
+  const {translate} = useApplicationContext();
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const {canCreateChannels, isChannelsEnabled} = useChannelsFeatureFlag();
   const canExternalUserCreateChannel = canCreateChannels && isChannelsEnabled && selfUser.isExternal();
@@ -76,15 +77,15 @@ export const ConversationHeaderComponent = ({
   const isFolderView = currentTab === SidebarTabs.FOLDER;
 
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
-    [SidebarTabs.RECENT]: t('conversationViewAllConversations'),
-    [SidebarTabs.FAVORITES]: t('conversationLabelFavorites'),
-    [SidebarTabs.GROUPS]: t('conversationLabelGroups'),
-    [SidebarTabs.CHANNELS]: t('conversationLabelChannels'),
-    [SidebarTabs.DIRECTS]: t('conversationLabelDirects'),
-    [SidebarTabs.FOLDER]: t('folderViewTooltip'),
-    [SidebarTabs.ARCHIVES]: t('conversationFooterArchive'),
-    [SidebarTabs.CONNECT]: t('searchConnect'),
-    [SidebarTabs.MEETINGS]: t('meetings.navigation.title'),
+    [SidebarTabs.RECENT]: translate('conversationViewAllConversations'),
+    [SidebarTabs.FAVORITES]: translate('conversationLabelFavorites'),
+    [SidebarTabs.GROUPS]: translate('conversationLabelGroups'),
+    [SidebarTabs.CHANNELS]: translate('conversationLabelChannels'),
+    [SidebarTabs.DIRECTS]: translate('conversationLabelDirects'),
+    [SidebarTabs.FOLDER]: translate('folderViewTooltip'),
+    [SidebarTabs.ARCHIVES]: translate('conversationFooterArchive'),
+    [SidebarTabs.CONNECT]: translate('searchConnect'),
+    [SidebarTabs.MEETINGS]: translate('meetings.navigation.title'),
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -125,7 +126,7 @@ export const ConversationHeaderComponent = ({
             onClick={showCreateConversationModal}
             data-uie-name="go-create-group"
             css={button}
-            title={t('conversationDetailsActionCreateGroup')}
+            title={translate('conversationDetailsActionCreateGroup')}
           >
             <Icon.PlusIcon />
           </IconButton>
