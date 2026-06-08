@@ -26,6 +26,7 @@ import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Text} from 'Repositories/entity/message/Text';
 import {MessageCategory} from 'src/script/message/MessageCategory';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {CollectionDetails} from './CollectionDetails';
@@ -84,28 +85,37 @@ const createAudioMessage = () => {
 };
 
 describe('CollectionDetails', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
   const conversation = new Conversation();
   it('displays all image assets', async () => {
     const messages = [createImageMessage(), createImageMessage()];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('Image')).toHaveLength(messages.length);
   });
 
   it('displays all file assets', async () => {
     const messages = [createFileMessage(), createFileMessage()];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('File')).toHaveLength(messages.length);
   });
 
   it('displays all link preview assets', async () => {
     const messages = [createLinkMessage(), createLinkMessage()];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('Link Preview')).toHaveLength(messages.length);
   });
 
   it('displays all audio assets', async () => {
     const messages = [createAudioMessage(), createAudioMessage()];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('Audio')).toHaveLength(messages.length);
   });
 
@@ -122,7 +132,9 @@ describe('CollectionDetails', () => {
       createImageMessage(now - ONE_MONTH),
       createImageMessage(now - ONE_YEAR),
     ];
-    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />);
+    const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {
+      wrapper: rootProviderWrapper,
+    });
     expect(getAllByText('Image')).toHaveLength(messages.length);
     expect(getAllByText('conversationToday')).toHaveLength(1);
     expect(getAllByText('March')).toHaveLength(1);

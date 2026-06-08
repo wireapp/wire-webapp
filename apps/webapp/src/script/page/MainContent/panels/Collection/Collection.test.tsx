@@ -31,6 +31,7 @@ import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {MessageCategory} from 'src/script/message/MessageCategory';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {Collection} from './Collection';
@@ -80,6 +81,7 @@ const createAudioMessage = () => {
 };
 
 describe('Collection', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
   const conversation = new Conversation();
   const messages = [createImageMessage(), createLinkMessage(), createAudioMessage(), createFileMessage()];
   const mockConversationRepository = {
@@ -101,6 +103,7 @@ describe('Collection', () => {
           selfUser={mockSelfUser}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
@@ -127,6 +130,7 @@ describe('Collection', () => {
           selfUser={mockSelfUser}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => getAllByText('CollectionItem'));
@@ -148,6 +152,7 @@ describe('Collection', () => {
           selfUser={mockSelfUser}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => getAllByText('CollectionItem'));

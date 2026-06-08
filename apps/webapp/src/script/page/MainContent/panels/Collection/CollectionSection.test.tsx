@@ -20,11 +20,13 @@
 import {fireEvent, render} from '@testing-library/react';
 
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {CollectionSection} from './CollectionSection';
 
 const NUMBER_OF_ASSETS = 5;
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => new ContentMessage(createUuid()));
 
@@ -43,6 +45,7 @@ describe('CollectionSection', () => {
       <CollectionSection {...props}>
         <span />
       </CollectionSection>,
+      {wrapper: rootProviderWrapper},
     );
 
     props.limit = NUMBER_OF_ASSETS;
@@ -62,6 +65,7 @@ describe('CollectionSection', () => {
       <CollectionSection {...getDefaultProps(NUMBER_OF_ASSETS - 1)}>
         <span />
       </CollectionSection>,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByText('collectionShowAll')).toBeDefined();
@@ -73,6 +77,7 @@ describe('CollectionSection', () => {
       <CollectionSection {...props}>
         <span />
       </CollectionSection>,
+      {wrapper: rootProviderWrapper},
     );
 
     const button = getByText('collectionShowAll');

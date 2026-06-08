@@ -38,7 +38,6 @@ import {useApplicationContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {CollectionDetails} from './CollectionDetails';
 import {CollectionSection} from './CollectionSection';
@@ -91,17 +90,17 @@ const Collection = ({
   messageRepository,
   selfUser,
 }: CollectionDetailsProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [searchTerm, setSearchTerm] = useState('');
   const {display_name, cellsState} = useKoSubscribableChildren(conversation, ['display_name', 'cellsState']);
   const [messages, setMessages] = useState<ContentMessage[]>([]);
   const [detailCategory, setDetailCategory] = useState<Category | undefined>(undefined);
 
   useEffect(() => {
-    conversationRepository
+    void conversationRepository
       .getEventsForCategory(conversation, MessageCategory.LINK_PREVIEW)
       .then(allMessages => setMessages(allMessages as ContentMessage[]));
-  }, []);
+  }, [conversation, conversationRepository]);
 
   useEffect(() => {
     const addItem = (message: ContentMessage) => {
@@ -128,7 +127,7 @@ const Collection = ({
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, addItem);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, removeItem);
     };
-  }, []);
+  }, [conversation.id]);
 
   const categories = splitIntoCategories(messages);
   const {images, audio, links, files} = categories;
@@ -163,7 +162,7 @@ const Collection = ({
         uieName={'collection-section-image'}
         onSelect={() => setDetailCategory('images')}
         onImageClick={onImageClick}
-        label={t('collectionSectionImages')}
+        label={translate('collectionSectionImages')}
       >
         <span className={`collection-header-icon icon-library`}></span>
       </CollectionSection>
@@ -172,7 +171,7 @@ const Collection = ({
         limit={4}
         uieName={'collection-section-link'}
         onSelect={() => setDetailCategory('links')}
-        label={t('collectionSectionLinks')}
+        label={translate('collectionSectionLinks')}
       >
         <span className={`collection-header-icon icon-link`}></span>
       </CollectionSection>
@@ -181,7 +180,7 @@ const Collection = ({
         limit={4}
         uieName={'collection-section-audio'}
         onSelect={() => setDetailCategory('audio')}
-        label={t('collectionSectionAudio')}
+        label={translate('collectionSectionAudio')}
       >
         <Icon.MicOnIcon className="collection-header-icon" />
       </CollectionSection>
@@ -190,7 +189,7 @@ const Collection = ({
         limit={4}
         uieName={'collection-section-file'}
         onSelect={() => setDetailCategory('files')}
-        label={t('collectionSectionFiles')}
+        label={translate('collectionSectionFiles')}
       >
         <span className={`collection-header-icon icon-file`}></span>
       </CollectionSection>
@@ -211,7 +210,7 @@ const Collection = ({
             className="content-titlebar-icon"
             data-uie-name="do-close-collection"
             onClick={createNavigate(generateConversationUrl(conversation))}
-            aria-label={t('fullsearchCancelLabel')}
+            aria-label={translate('fullsearchCancelLabel')}
           >
             <Icon.CloseIcon />
           </button>
@@ -229,8 +228,8 @@ const Collection = ({
           {isCellsEnabled && (
             <SecondaryButton onClick={createNavigate(filesUrl)} fullWidth={true} uieName="shared-drive-id">
               <span data-secondary-button-content="true">
-                <span data-secondary-button-title="true">{t('cells.sharedDrive.title')}</span>
-                <span data-secondary-text="true">{t('cells.sharedDrive.description')}</span>
+                <span data-secondary-button-title="true">{translate('cells.sharedDrive.title')}</span>
+                <span data-secondary-text="true">{translate('cells.sharedDrive.description')}</span>
               </span>
               <span data-secondary-button-chevron="true" aria-hidden="true">
                 <ChevronIcon width={16} height={16} color="currentColor" />

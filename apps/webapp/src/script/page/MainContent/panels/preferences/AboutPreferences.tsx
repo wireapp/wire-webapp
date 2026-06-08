@@ -19,13 +19,10 @@
 
 import {useMemo} from 'react';
 
-import {container} from 'tsyringe';
-
 import {Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import {User} from 'Repositories/entity/User';
-import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {PreferencesPage} from './components/PreferencesPage';
 import {PreferencesSection} from './components/PreferencesSection';
@@ -35,11 +32,10 @@ import {externalUrl} from '../../../../externalRoute';
 
 interface AboutPreferencesProps {
   selfUser: User;
-  teamState: TeamState;
 }
 
-const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: AboutPreferencesProps) => {
-  const inTeam = teamState.isInTeam(selfUser);
+const AboutPreferences = ({selfUser}: AboutPreferencesProps) => {
+  const {translate} = useApplicationContext();
   const config = Config.getConfig();
 
   const websiteUrl = externalUrl.website;
@@ -51,15 +47,15 @@ const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: 
       return externalUrl.termsOfUse;
     }
     return '';
-  }, [selfUser, inTeam]);
+  }, [selfUser]);
 
   const showWireSection = !!(termsOfUseUrl || websiteUrl || privacyPolicyUrl);
   const showSupportSection = !!(config.URL.SUPPORT.INDEX || config.URL.SUPPORT.CONTACT);
 
   return (
-    <PreferencesPage title={t('preferencesAbout')}>
+    <PreferencesPage title={translate('preferencesAbout')}>
       {showSupportSection && (
-        <PreferencesSection title={t('preferencesAboutSupport')}>
+        <PreferencesSection title={translate('preferencesAboutSupport')}>
           <ul className="preferences-about-list">
             <li className="preferences-about-list-item">
               <Link
@@ -68,7 +64,7 @@ const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: 
                 href={config.URL.SUPPORT.INDEX}
                 data-uie-name="go-support"
               >
-                {t('preferencesAboutSupportWebsite')}
+                {translate('preferencesAboutSupportWebsite')}
               </Link>
             </li>
             <li className="preferences-about-list-item">
@@ -78,7 +74,7 @@ const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: 
                 href={config.URL.SUPPORT.CONTACT}
                 data-uie-name="go-contact-support"
               >
-                {t('preferencesAboutSupportContact')}
+                {translate('preferencesAboutSupportContact')}
               </Link>
             </li>
           </ul>
@@ -90,21 +86,21 @@ const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: 
             {termsOfUseUrl && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={termsOfUseUrl} data-uie-name="go-legal">
-                  {t('preferencesAboutTermsOfUse')}
+                  {translate('preferencesAboutTermsOfUse')}
                 </Link>
               </li>
             )}
             {privacyPolicyUrl && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={privacyPolicyUrl} data-uie-name="go-privacy">
-                  {t('preferencesAboutPrivacyPolicy')}
+                  {translate('preferencesAboutPrivacyPolicy')}
                 </Link>
               </li>
             )}
             {websiteUrl && (
               <li className="preferences-about-list-item">
                 <Link variant={LinkVariant.PRIMARY} targetBlank href={websiteUrl} data-uie-name="go-wire-dot-com">
-                  {t('preferencesAboutWebsite', {brandName: config.BRAND_NAME})}
+                  {translate('preferencesAboutWebsite', {brandName: config.BRAND_NAME})}
                 </Link>
               </li>
             )}
@@ -113,13 +109,15 @@ const AboutPreferences = ({selfUser, teamState = container.resolve(TeamState)}: 
       )}
       <PreferencesSection hasSeparator>
         {desktopConfig && (
-          <p className="preferences-detail">{t('preferencesAboutDesktopVersion', {version: desktopConfig.version})}</p>
+          <p className="preferences-detail">
+            {translate('preferencesAboutDesktopVersion', {version: desktopConfig.version})}
+          </p>
         )}
         <p className="preferences-detail">
-          {t('preferencesAboutVersion', {brandName: config.BRAND_NAME, version: config.VERSION})}
+          {translate('preferencesAboutVersion', {brandName: config.BRAND_NAME, version: config.VERSION})}
         </p>
-        <p className="preferences-detail">{t('preferencesAboutAVSVersion', {version: config.AVS_VERSION})}</p>
-        <p className="preferences-detail">{t('preferencesAboutCopyright')}</p>
+        <p className="preferences-detail">{translate('preferencesAboutAVSVersion', {version: config.AVS_VERSION})}</p>
+        <p className="preferences-detail">{translate('preferencesAboutCopyright')}</p>
       </PreferencesSection>
     </PreferencesPage>
   );
