@@ -27,7 +27,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {ClientState} from 'Repositories/client/ClientState';
 import type {CryptographyRepository} from 'Repositories/cryptography/CryptographyRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {splitFingerprint} from 'Util/stringUtil';
 
 import {FormattedId} from '../../../../page/MainContent/panels/preferences/DevicesPreferences/components/FormattedId';
@@ -44,9 +44,10 @@ export const SelfFingerprint = ({
   noPadding,
   clientState = container.resolve(ClientState),
 }: SelfFingerprintProps) => {
+  const {translate} = useApplicationContext();
   const [localFingerprint, setLocalFingerprint] = useState<string>('');
   useEffect(() => {
-    cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
+    void cryptographyRepository.getLocalFingerprint().then(setLocalFingerprint);
   }, [cryptographyRepository]);
 
   const currentClient = clientState.currentClient;
@@ -64,7 +65,7 @@ export const SelfFingerprint = ({
           className="button-reset-default participant-devices__link accent-text"
           onClick={() => amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES)}
         >
-          {t('participantDevicesSelfAllDevices')}
+          {translate('participantDevicesSelfAllDevices')}
         </button>
       </div>
     </div>
