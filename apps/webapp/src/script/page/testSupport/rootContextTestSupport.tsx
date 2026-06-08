@@ -51,6 +51,10 @@ function createMainViewModelForTest(): MainViewModel {
   return {} as MainViewModel;
 }
 
+function translateForTest(translationKey: Parameters<typeof t>[0]): string {
+  return translationKey;
+}
+
 export function createFireAndForgetInvokerForTest(): FireAndForgetInvoker {
   return {
     fireAndForget: jest.fn(),
@@ -95,7 +99,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     fireAndForgetInvoker = createFireAndForgetInvokerForTest(),
     isFeatureToggleEnabled = isFeatureToggleDisabledForTest,
     mainViewModel = createMainViewModelForTest(),
-    translate = t,
+    translate = translateForTest,
     wallClock = createWallClock(),
   } = parameters;
 

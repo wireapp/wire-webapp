@@ -30,13 +30,7 @@ const testIdentifiers = {
   paginationNext: 'pagination-next',
 };
 
-function translateForTest(translationKey: string): string {
-  return translationKey;
-}
-
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('Pagination', () => {
   const onChangePageMock = jest.fn();

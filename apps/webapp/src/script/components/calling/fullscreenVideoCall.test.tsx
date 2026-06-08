@@ -43,13 +43,7 @@ jest.mock('@wireapp/react-ui-kit', () => ({
   useMatchMedia: jest.fn(),
 }));
 
-function translateForTest(translationKey: string): string {
-  return translationKey;
-}
-
-const rootProviderWrapper = createRootProviderWrapperForTest(
-  createRootContextValueForTest({translate: translateForTest}),
-);
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
