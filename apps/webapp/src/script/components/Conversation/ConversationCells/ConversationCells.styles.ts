@@ -25,3 +25,22 @@ export const wrapperStyles: CSSObject = {
   flexDirection: 'column',
   height: '100%',
 };
+
+export const loadMoreWrapperStyles: CSSObject = {
+  padding: '20px',
+  display: 'flex',
+  justifyContent: 'center',
+};
+
+export const loadMoreErrorWrapperStyles: CSSObject = {
+  padding: '20px',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '8px',
+};
+
+export const loadMoreErrorMessageStyles: CSSObject = {
+  fontSize: '14px',
+  color: 'var(--text-color-secondary)',
+};

@@ -471,6 +471,8 @@ declare module 'I18n/en-US.json' {
     'cells.options.share': `Share via link`;
     'cells.options.tags': `Add or Remove Tags`;
     'cells.options.versionHistory': `Version History`;
+    'cells.pagination.loadMoreError.heading': `Couldn\'t load more files`;
+    'cells.pagination.loadMoreError.retry': `Retry`;
     'cells.pagination.loadMoreResults': `Load More Items`;
     'cells.pagination.nextPage': `Next Page`;
     'cells.pagination.previousPage': `Previous Page`;

@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useCallback, useState} from 'react';
+import {useEffect, useCallback, useMemo, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -52,20 +52,23 @@ export const useGetAllCellsNodes = ({
   const {setNodes, pageSize, setStatus, setPagination, setError, clearAll} = useCellsStore();
   const [offset, setOffset] = useState(0);
 
-  const {id} = conversationQualifiedId;
+  const {domain, id} = conversationQualifiedId;
+  const conversationPath = useMemo(() => getCellsApiPath({conversationQualifiedId: {domain, id}}), [domain, id]);
 
   const fetchNodes = useCallback(async () => {
     try {
+      setError(null);
       setStatus('loading');
 
       const result = await cellsRepository.getAllNodes({
-        path: getCellsApiPath({conversationQualifiedId}),
+        path: conversationPath,
         limit: pageSize,
         offset,
         deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
       });
 
       if (result.Nodes === undefined || result.Nodes.length === 0) {
+        setNodes({conversationId: id, nodes: []});
         setStatus('success');
         setPagination({conversationId: id, pagination: null});
         return;
@@ -89,9 +92,9 @@ export const useGetAllCellsNodes = ({
       setStatus('error');
       throw error;
     }
-    // cellsRepository is not a dependency because it's a singleton
+    // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setNodes, setStatus, setError, id, offset, pageSize, setPagination]);
+  }, [conversationPath, id, offset, pageSize, setError, setNodes, setPagination, setStatus]);
 
   const handleHashChange = useCallback((): void => {
     if (enabled !== true) {
@@ -100,7 +103,7 @@ export const useGetAllCellsNodes = ({
     clearAll({conversationId: id});
     setOffset(0);
     fireAndForgetInvoker.fireAndForget(fetchNodes);
-  }, [clearAll, enabled, fetchNodes, fireAndForgetInvoker, id, setOffset]);
+  }, [clearAll, enabled, fetchNodes, fireAndForgetInvoker, id]);
 
   useEffect(() => {
     if (enabled !== true) {
