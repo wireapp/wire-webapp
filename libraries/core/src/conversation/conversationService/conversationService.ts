@@ -1141,7 +1141,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   private getDeferredEpochRecoveryKey(conversationId: QualifiedId, subconvId?: SUBCONVERSATION_ID): string {
-    return `${conversationId.id}@${conversationId.domain}:${subconvId ?? 'none'}`;
+    return `${conversationId.id}@${conversationId.domain}:${subconvId ?? '-'}`;
   }
 
   private shouldDeferEpochRecovery(trigger?: MlsEpochRecoveryTrigger): boolean {
