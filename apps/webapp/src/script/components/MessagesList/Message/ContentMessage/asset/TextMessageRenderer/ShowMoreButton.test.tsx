@@ -20,15 +20,22 @@
 import {fireEvent, render} from '@testing-library/react';
 
 import {t} from 'Util/localizerUtil';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ShowMoreButton} from './ShowMoreButton';
 
 describe('ShowMoreButton', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+
   it('toggles button show more/show less for a quoted message', () => {
     let show = true;
     const setShowFullText = jest.fn(show => !show);
     const {getByTestId, getByText, rerender} = render(
       <ShowMoreButton active={show} onClick={setShowFullText} isFocusable />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(getByText(t('replyQuoteShowLess'))).not.toBeNull();

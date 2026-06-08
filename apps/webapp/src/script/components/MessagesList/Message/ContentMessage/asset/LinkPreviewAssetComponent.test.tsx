@@ -23,10 +23,16 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {Text} from 'Repositories/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 
 describe('LinkPreviewAssetComponent', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+
   function mockLinkPreview(url = 'https://example.com'): ContentMessage {
     const linkPreviewEntity = new LinkPreview({title: 'Link Preview', url});
     const asset = new Text();
@@ -60,7 +66,7 @@ describe('LinkPreviewAssetComponent', () => {
 
   it('renders link previews', () => {
     const message = mockLinkPreview();
-    const {queryByTestId} = render(<LinkPreviewAsset message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAsset message={message} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('link-preview-title')).not.toBeNull();
   });
@@ -70,7 +76,7 @@ describe('LinkPreviewAssetComponent', () => {
     message.ephemeral_expires(true);
     message.status(StatusType.SENT);
 
-    const {queryByTestId} = render(<LinkPreviewAsset message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAsset message={message} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('link-preview-title')).toBeNull();
   });
@@ -78,7 +84,7 @@ describe('LinkPreviewAssetComponent', () => {
   it('displays the author if the link is a tweet', () => {
     const message = mockTweet();
 
-    const {queryByTestId} = render(<LinkPreviewAsset message={message} />);
+    const {queryByTestId} = render(<LinkPreviewAsset message={message} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('link-preview-title')).not.toBeNull();
     expect(queryByTestId('link-preview-tweet-author')).not.toBeNull();
@@ -87,7 +93,9 @@ describe('LinkPreviewAssetComponent', () => {
   it('cleans the preview URL', () => {
     const message = mockLinkPreview('http://example.com');
 
-    const {queryByTestId, queryByText} = render(<LinkPreviewAsset message={message} />);
+    const {queryByTestId, queryByText} = render(<LinkPreviewAsset message={message} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(queryByTestId('link-preview-title')).not.toBeNull();
     expect(queryByText('example.com')).not.toBeNull();

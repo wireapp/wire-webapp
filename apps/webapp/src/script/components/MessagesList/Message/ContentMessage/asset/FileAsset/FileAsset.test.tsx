@@ -24,10 +24,16 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {TeamState} from 'Repositories/team/TeamState';
 import {StatusType} from 'src/script/message/StatusType';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileAsset as FileAssetComponent} from './FileAsset';
 
 describe('FileAssetComponent', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+
   function mockContentMessage(): ContentMessage {
     const asset = new FileAsset();
     asset.file_name = 'test-file.log';
@@ -49,7 +55,7 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {queryByTestId} = render(<FileAssetComponent {...props} />);
+    const {queryByTestId} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('file')).not.toBeNull();
   });
@@ -64,7 +70,7 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {queryByTestId} = render(<FileAssetComponent {...props} />);
+    const {queryByTestId} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
     expect(queryByTestId('file')).toBeNull();
   });
 
@@ -74,7 +80,7 @@ describe('FileAssetComponent', () => {
       teamState,
     };
 
-    const {queryByText} = render(<FileAssetComponent {...props} />);
+    const {queryByText} = render(<FileAssetComponent {...props} />, {wrapper: rootProviderWrapper});
     expect(queryByText('10 MB')).not.toBeNull();
   });
 });

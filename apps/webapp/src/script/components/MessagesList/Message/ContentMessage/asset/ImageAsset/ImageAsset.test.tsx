@@ -25,6 +25,10 @@ import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {User} from 'Repositories/entity/User';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ImageAsset, ImageAssetProps} from './ImageAsset';
 
@@ -37,6 +41,7 @@ jest.mock('Components/InViewport', () => ({
 }));
 
 describe('image-asset', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
   const fakeImageUrl = 'https://test.com/image.png';
   const mockUser = new User('user-id', 'test-domain.wire.com');
 
@@ -69,7 +74,7 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     const imageElement = screen.getByTestId('image-loader');
     expect(imageElement).toBeDefined();
@@ -93,7 +98,7 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       expect(window.URL.createObjectURL).toHaveBeenCalled();
@@ -110,7 +115,7 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    const {container} = render(<ImageAsset {...props} />);
+    const {container} = render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     const imageContainer = container.querySelector('[data-uie-name="image-asset"]');
     expect(imageContainer).toBeDefined();
@@ -137,7 +142,7 @@ describe('image-asset', () => {
     const message = createDefaultMessage();
     const props = {...defaultProps, asset: image, message, onClick: onClickMock};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       const imageElement = screen.getByTestId('image-asset-img');
@@ -169,7 +174,7 @@ describe('image-asset', () => {
     const message = createDefaultMessage();
     const props = {...defaultProps, asset: image, message, onClick: onClickMock};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       const imageElement = screen.getByTestId('image-asset-img');
@@ -202,7 +207,7 @@ describe('image-asset', () => {
     const message = createDefaultMessage();
     const props = {...defaultProps, asset: image, message, onClick: onClickMock};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       const imageElement = screen.getByTestId('image-asset-img');
@@ -234,7 +239,7 @@ describe('image-asset', () => {
     const message = createDefaultMessage();
     const props = {...defaultProps, asset: image, message};
 
-    render(<ImageAsset {...props} />);
+    render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => {
       const imageElement = screen.getByTestId('image-asset-img');
@@ -256,7 +261,7 @@ describe('image-asset', () => {
 
     const props = {...defaultProps, asset: image};
 
-    const {container} = render(<ImageAsset {...props} />);
+    const {container} = render(<ImageAsset {...props} />, {wrapper: rootProviderWrapper});
     const imageContainer = container.querySelector('.image-asset');
 
     expect(imageContainer).toBeDefined();

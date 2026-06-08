@@ -22,10 +22,16 @@ import ko from 'knockout';
 
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {MediaButton, MediaButtonProps} from './MediaButton';
 
 describe('MediaButton', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+
   const getDefaultProps = (): MediaButtonProps => {
     const videoElement = document.createElement('video');
 
@@ -51,7 +57,7 @@ describe('MediaButton', () => {
     jest.spyOn(props, 'play');
     jest.spyOn(props, 'pause');
 
-    const {getByTestId} = render(<MediaButton {...props} />);
+    const {getByTestId} = render(<MediaButton {...props} />, {wrapper: rootProviderWrapper});
 
     const playButton = getByTestId('do-play-media');
     fireEvent.click(playButton);
@@ -65,7 +71,7 @@ describe('MediaButton', () => {
   it('displays a loader if the media is being downloaded', () => {
     const props: MediaButtonProps = {...getDefaultProps(), transferState: AssetTransferState.DOWNLOADING};
 
-    const {queryByTestId} = render(<MediaButton {...props} />);
+    const {queryByTestId} = render(<MediaButton {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('status-loading-media')).not.toBe(null);
   });
@@ -73,7 +79,7 @@ describe('MediaButton', () => {
   it('displays a loader if the media is being uploaded', () => {
     const props: MediaButtonProps = {...getDefaultProps(), transferState: AssetTransferState.UPLOADING};
 
-    const {queryByTestId} = render(<MediaButton {...props} />);
+    const {queryByTestId} = render(<MediaButton {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('status-loading-media')).not.toBe(null);
   });
