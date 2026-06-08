@@ -23,8 +23,11 @@ import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
 import {User} from 'Repositories/entity/User';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {DecryptErrorMessage} from './DecryptErrorMessage';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 function createError(code: number) {
   const error = new DecryptErrorMessageEntity('client', code);
@@ -39,7 +42,7 @@ describe('DecryptErrorMessage', () => {
       onClickResetSession: jest.fn(),
     };
 
-    const {getByText} = render(<DecryptErrorMessage {...props} />);
+    const {getByText} = render(<DecryptErrorMessage {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByText('conversationUnableToDecryptResetSession')).not.toBeNull();
 
@@ -52,7 +55,7 @@ describe('DecryptErrorMessage', () => {
       onClickResetSession: jest.fn(),
     };
 
-    const {getByText, queryByText} = render(<DecryptErrorMessage {...props} />);
+    const {getByText, queryByText} = render(<DecryptErrorMessage {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByText('conversationUnableToDecrypt2')).not.toBeNull();
     expect(queryByText('conversationUnableToDecryptResetSession')).toBeNull();
@@ -65,7 +68,7 @@ describe('DecryptErrorMessage', () => {
       onClickResetSession: jest.fn(() => {}),
     };
 
-    const {getByTestId, queryByTestId} = render(<DecryptErrorMessage {...props} />);
+    const {getByTestId, queryByTestId} = render(<DecryptErrorMessage {...props} />, {wrapper: rootProviderWrapper});
 
     const decryptErrorMessage = queryByTestId('element-message-decrypt-error');
     expect(decryptErrorMessage).not.toBeNull();

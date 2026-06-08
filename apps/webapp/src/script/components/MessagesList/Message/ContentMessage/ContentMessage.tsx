@@ -33,9 +33,9 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import type {FileAsset as FileAssetType} from 'Repositories/entity/message/FileAsset';
 import {useRelativeTimestamp} from 'src/script/hooks/useRelativeTimestamp';
 import {StatusType} from 'src/script/message/StatusType';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {getMessageAriaLabel} from 'Util/conversationMessages';
-import {t} from 'Util/localizerUtil';
 
 import {ContentAsset} from './asset';
 import {deliveredMessageIndicator, messageBodyWrapper, messageEphemeralTimer} from './ContentMessage.styles';
@@ -97,6 +97,7 @@ export const ContentMessageComponent = ({
   isFileShareRestricted,
 }: ContentMessageProps) => {
   const messageRef = useRef<HTMLDivElement | null>(null);
+  const {translate} = useApplicationContext();
 
   // check if current message is focused and its elements focusable
   const msgFocusState = useMemo(() => isMsgElementsFocusable && isFocused, [isMsgElementsFocusable, isFocused]);
@@ -277,7 +278,7 @@ export const ContentMessageComponent = ({
             {is1to1 === true && isLastDeliveredMessage && (
               <div
                 data-uie-name="status-message-read-receipt-delivered"
-                title={t('conversationMessageDelivered')}
+                title={translate('conversationMessageDelivered')}
                 className="delivered-message-icon"
               >
                 <OutlineCheck />

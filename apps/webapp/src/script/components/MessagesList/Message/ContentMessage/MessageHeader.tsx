@@ -27,8 +27,8 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {DeleteMessage} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {headerIconBadge, headerLabelBadge, headerIconSizeM, headerIconSizeS} from './MessageHeader.styles';
 
@@ -45,6 +45,8 @@ type MessageHeaderParams = {
 };
 
 function BadgeSection({sender}: {sender: User}) {
+  const {translate} = useApplicationContext();
+
   return (
     <>
       {sender.isService && (
@@ -55,7 +57,7 @@ function BadgeSection({sender}: {sender: User}) {
 
       {sender.isExternal() && (
         <Tooltip
-          body={t('rolePartner')}
+          body={translate('rolePartner')}
           data-uie-name="sender-external"
           className="message-header-icon-external"
           css={headerIconBadge}
@@ -77,14 +79,14 @@ function BadgeSection({sender}: {sender: User}) {
 
       {sender.isDeleted && (
         <p data-uie-name="sender-deleted" css={headerLabelBadge}>
-          {t('deletedUserBadge')}
+          {translate('deletedUserBadge')}
         </p>
       )}
 
       {sender.isDirectGuest() && !sender.isFederated && (
         <Tooltip
           className="message-header-icon-guest"
-          body={t('conversationGuestIndicator')}
+          body={translate('conversationGuestIndicator')}
           data-uie-name="sender-guest"
           css={headerIconBadge}
         >

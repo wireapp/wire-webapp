@@ -32,9 +32,9 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {Multipart} from 'Repositories/entity/message/Multipart';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
-import {t} from 'Util/localizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
@@ -85,6 +85,7 @@ export const Quote: FC<QuoteProps> = ({
 }) => {
   const [quotedMessage, setQuotedMessage] = useState<ContentMessage>();
   const [error, setError] = useState<Error | string | undefined>(quote.error);
+  const {translate} = useApplicationContext();
 
   useEffect(() => {
     const handleQuoteDeleted = (messageId: string) => {
@@ -122,13 +123,13 @@ export const Quote: FC<QuoteProps> = ({
           throw error;
         });
     }
-  }, [quote, error]);
+  }, [conversation, error, findMessage, quote]);
 
   return (
     <div className="message-quote" data-uie-name="quote-item">
       {error !== undefined ? (
         <div className="message-quote__error" data-uie-name="label-error-quote">
-          {t('replyQuoteError')}
+          {translate('replyQuoteError')}
         </div>
       ) : (
         <QuotedMessage
@@ -172,6 +173,7 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
     'timestamp',
   ]);
   const messageFocusedTabIndex = useMessageFocusedTabIndex(isMessageFocused);
+  const {translate} = useApplicationContext();
 
   return (
     <>
@@ -201,8 +203,8 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
               const attachmentsCount = cellAssets.length;
               const attachmentsCountCopy =
                 attachmentsCount === 1
-                  ? t('replyBarSingleAttachment')
-                  : t('replyBarMultipleAttachments', {count: attachmentsCount});
+                  ? translate('replyBarSingleAttachment')
+                  : translate('replyBarMultipleAttachments', {count: attachmentsCount});
 
               return (
                 <>
@@ -296,8 +298,8 @@ const QuotedMessage: FC<QuotedMessageProps> = ({
         tabIndex={messageFocusedTabIndex}
       >
         {isBeforeToday(timestamp)
-          ? t('replyQuoteTimeStampDate', {date: formatDateNumeral(timestamp)})
-          : t('replyQuoteTimeStampTime', {time: formatTimeShort(timestamp)})}
+          ? translate('replyQuoteTimeStampDate', {date: formatDateNumeral(timestamp)})
+          : translate('replyQuoteTimeStampTime', {time: formatTimeShort(timestamp)})}
       </button>
     </>
   );

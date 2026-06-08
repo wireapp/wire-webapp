@@ -22,9 +22,12 @@ import ko from 'knockout';
 
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 import {ReadReceipt} from 'Repositories/storage';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {formatTimeShort} from 'Util/timeUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntity>) => {
   const readReceiptMessage: Partial<MessageEntity> = {
@@ -45,7 +48,7 @@ describe('ReadReceiptStatus', () => {
       }),
     };
 
-    const {queryByTestId} = render(<ReadReceiptStatus {...props} />);
+    const {queryByTestId} = render(<ReadReceiptStatus {...props} />, {wrapper: rootProviderWrapper});
 
     expect(queryByTestId('status-message-read-receipts')).not.toBeNull();
     expect(queryByTestId('status-message-read-receipts')).not.toBeNull();
@@ -64,7 +67,7 @@ describe('ReadReceiptStatus', () => {
         onClickDetails: onClickDetailsSpy,
       };
 
-      const {getByTestId} = render(<ReadReceiptStatus {...props} />);
+      const {getByTestId} = render(<ReadReceiptStatus {...props} />, {wrapper: rootProviderWrapper});
 
       const readReceiptStatus = getByTestId('status-message-read-receipts');
       fireEvent.click(readReceiptStatus);
@@ -81,7 +84,7 @@ describe('ReadReceiptStatus', () => {
         }),
       };
 
-      const {queryByTestId, queryByText} = render(<ReadReceiptStatus {...props} />);
+      const {queryByTestId, queryByText} = render(<ReadReceiptStatus {...props} />, {wrapper: rootProviderWrapper});
 
       expect(queryByTestId('status-message-read-receipts')).not.toBeNull();
       expect(queryByText(formatTimeShort(readReceiptTime))).not.toBeNull();
@@ -98,7 +101,7 @@ describe('ReadReceiptStatus', () => {
         }),
       };
 
-      const {getByText, queryByTestId} = render(<ReadReceiptStatus {...props} />);
+      const {getByText, queryByTestId} = render(<ReadReceiptStatus {...props} />, {wrapper: rootProviderWrapper});
 
       expect(queryByTestId('status-message-read-receipts')).not.toBeNull();
       expect(getByText('2')).not.toBeNull();

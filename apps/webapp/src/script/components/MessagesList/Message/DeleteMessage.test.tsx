@@ -21,9 +21,12 @@ import {render} from '@testing-library/react';
 
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {DeleteMessage} from './DeleteMessage';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 const createDeleteMessage = (sender: User) => {
   const deleteMessage = new DeleteMessageEntity();
@@ -37,7 +40,7 @@ describe('DeleteMessage', () => {
     sender.name('felix');
     const message = createDeleteMessage(sender);
 
-    const {getByTestId, getByText} = render(<DeleteMessage message={message} />);
+    const {getByTestId, getByText} = render(<DeleteMessage message={message} />, {wrapper: rootProviderWrapper});
 
     expect(getByTestId('element-message-delete')).not.toBeNull();
     expect(getByText(sender.name())).not.toBeNull();

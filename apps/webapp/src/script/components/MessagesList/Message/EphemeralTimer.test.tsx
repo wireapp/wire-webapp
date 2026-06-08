@@ -20,8 +20,11 @@
 import {render} from '@testing-library/react';
 
 import {Message} from 'Repositories/entity/message/Message';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {EphemeralTimer} from './EphemeralTimer';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('EphemeralTimer', () => {
   it('shows the icon', () => {
@@ -32,7 +35,7 @@ describe('EphemeralTimer', () => {
     message.ephemeral_expires(now + remaining);
     message.ephemeral_remaining(remaining);
 
-    const {getByTestId} = render(<EphemeralTimer message={message} />);
+    const {getByTestId} = render(<EphemeralTimer message={message} />, {wrapper: rootProviderWrapper});
 
     const circle = getByTestId('ephemeral-timer-circle');
 
@@ -47,7 +50,7 @@ describe('EphemeralTimer', () => {
   it('hides the icon when no ephemeral timer was started', () => {
     const message = new Message();
 
-    const {getByTestId} = render(<EphemeralTimer message={message} />);
+    const {getByTestId} = render(<EphemeralTimer message={message} />, {wrapper: rootProviderWrapper});
 
     const circle = getByTestId('ephemeral-timer-circle');
 

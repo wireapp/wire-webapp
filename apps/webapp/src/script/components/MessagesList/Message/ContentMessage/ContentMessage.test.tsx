@@ -26,9 +26,12 @@ import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;
@@ -68,7 +71,7 @@ describe('message', () => {
   });
 
   it('displays a message', () => {
-    const {getByText} = render(<ContentMessageComponent {...defaultParams} />);
+    const {getByText} = render(<ContentMessageComponent {...defaultParams} />, {wrapper: rootProviderWrapper});
     expect(getByText(textValue)).toBeDefined();
   });
 
@@ -76,7 +79,7 @@ describe('message', () => {
     const linkPreview = new LinkPreview({title: 'A link to the past'});
     (defaultParams.message.getFirstAsset() as Text).previews([linkPreview]);
 
-    const {getByText} = render(<ContentMessageComponent {...defaultParams} />);
+    const {getByText} = render(<ContentMessageComponent {...defaultParams} />, {wrapper: rootProviderWrapper});
     expect(getByText(linkPreview.title)).not.toBe(null);
   });
 
@@ -94,6 +97,7 @@ describe('message', () => {
 
     const {getByText} = render(
       <ContentMessageComponent {...defaultParams} message={message} findMessage={findMessage} />,
+      {wrapper: rootProviderWrapper},
     );
     expect(await waitFor(() => getByText(quoteText))).not.toBe(null);
   });
