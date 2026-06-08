@@ -58,7 +58,7 @@ jest.mock('./conversation', () => {
 });
 
 import {Account} from './account';
-import {ConnectionState} from './connectionState/connectionStateTracker';
+import {ConnectionState} from './connectionState/connectionState';
 import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
 

@@ -51,7 +51,6 @@ import {
 import {MLSServiceEvents} from '../../messagingProtocols/mls/mlsService/mlsService';
 import {ProteusService} from '../../messagingProtocols/proteus';
 import * as MessagingProtocols from '../../messagingProtocols/proteus';
-import {ConnectionState, createConnectionStateTracker} from '../../connectionState/connectionStateTracker';
 import {CoreDatabase, openDB} from '../../storage/coreDb';
 import * as PayloadHelper from '../../test/payloadHelper';
 import * as MessageBuilder from '../message/messageBuilder';
@@ -824,7 +823,7 @@ describe('ConversationService', () => {
         get: jest.fn().mockResolvedValue(undefined),
       } as unknown as CoreDatabase;
 
-      const connectionStateTracker = createConnectionStateTracker(ConnectionState.PROCESSING_NOTIFICATIONS);
+      let isConnectionLive = false;
 
       const conversationService = new ConversationService(
         client,
@@ -834,7 +833,7 @@ describe('ConversationService', () => {
         {joinConferenceSubconversation: jest.fn()} as unknown as SubconversationService,
         () => Promise.resolve(true),
         mockedMLSService as unknown as MLSService,
-        connectionStateTracker,
+        () => isConnectionLive,
       );
 
       jest.spyOn(conversationService, 'joinByExternalCommit');
@@ -862,7 +861,7 @@ describe('ConversationService', () => {
       expect(conversationService.joinByExternalCommit).not.toHaveBeenCalled();
       expect(conversationService.emit).not.toHaveBeenCalledWith('MLSConversationRecovered', {conversationId});
 
-      connectionStateTracker.setState(ConnectionState.LIVE);
+      isConnectionLive = true;
       await conversationService.runDeferredEpochRecovery();
 
       expect(conversationService.joinByExternalCommit).toHaveBeenCalledWith(conversationId);

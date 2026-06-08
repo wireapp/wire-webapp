@@ -57,11 +57,6 @@ import {
   SendResult,
 } from './conversationService.types';
 
-import {
-  ConnectionState,
-  ConnectionStateTracker,
-  createConnectionStateTracker,
-} from '../../connectionState/connectionStateTracker';
 import {MessageTimer, MessageSendingState, RemoveUsersParams} from '../../conversation/';
 import {MLSService, MLSServiceEvents} from '../../messagingProtocols/mls';
 import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsService/coreCryptoMlsError';
@@ -116,9 +111,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     private readonly subconversationService: SubconversationService,
     private readonly isMLSConversationRecoveryEnabled: () => Promise<boolean>,
     private readonly _mlsService?: MLSService,
-    private readonly connectionStateTracker: ConnectionStateTracker = createConnectionStateTracker(
-      ConnectionState.LIVE,
-    ),
+    private readonly isConnectionLive: () => boolean = () => true,
   ) {
     super();
     this.messageTimer = new MessageTimer();
@@ -1146,7 +1139,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   }
 
   private shouldDeferEpochRecovery(trigger?: MlsEpochRecoveryTrigger): boolean {
-    return trigger?.operationName === OperationName.handleMessageAdd && !this.connectionStateTracker.isLive();
+    return trigger?.operationName === OperationName.handleMessageAdd && !this.isConnectionLive();
   }
 
   private deferEpochRecovery(

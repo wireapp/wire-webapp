@@ -58,11 +58,7 @@ import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
-import {
-  ConnectionState,
-  ConnectionStateTracker,
-  createConnectionStateTracker,
-} from './connectionState/connectionStateTracker';
+import {ConnectionState} from './connectionState/connectionState';
 import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
 import {SubconversationService} from './conversation/subconversationService/subconversationService';
@@ -157,7 +153,9 @@ export class Account extends TypedEventEmitter<Events> {
   private db?: CoreDatabase;
   private encryptedDb?: EncryptedStore<any>;
   private coreCallbacks?: CoreCallbacks;
-  private readonly connectionStateTracker: ConnectionStateTracker = createConnectionStateTracker();
+  private connectionState: ConnectionState = ConnectionState.CLOSED;
+
+  private readonly isConnectionLive = (): boolean => this.connectionState === ConnectionState.LIVE;
 
   /**
    * {@link once}-wrapped {@link MLSService.initialisePendingProposalsTasks}; recreated in
@@ -539,7 +537,7 @@ export class Account extends TypedEventEmitter<Events> {
       subconversationService,
       this.isMLSConversationRecoveryEnabled,
       mlsService,
-      this.connectionStateTracker,
+      this.isConnectionLive,
     );
     const notificationService = new NotificationService(this.apiClient, this.storeEngine, conversationService);
 
@@ -572,7 +570,7 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly resetContext = (): void => {
     this.currentClient = undefined;
     this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
-    this.connectionStateTracker.setState(ConnectionState.CLOSED);
+    this.connectionState = ConnectionState.CLOSED;
     delete this.apiClient.context;
     delete this.service;
   };
@@ -825,7 +823,7 @@ export class Account extends TypedEventEmitter<Events> {
     onConnectionStateChanged: (state: ConnectionState) => void,
   ): ((state: ConnectionState) => void) => {
     return (state: ConnectionState): void => {
-      this.connectionStateTracker.setState(state);
+      this.connectionState = state;
       onConnectionStateChanged(state);
       this.logger.info(`Connection state changed to: ${state}`);
     };
@@ -1012,7 +1010,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       const firstEventPayload = notification.data.event.payload[0];
       const notificationTime = firstEventPayload ? this.getNotificationEventTime(firstEventPayload) : null;
-      if (!this.connectionStateTracker.isLive() && is.nonEmptyString(notificationTime)) {
+      if (!this.isConnectionLive() && is.nonEmptyString(notificationTime)) {
         onNotificationStreamProgress(notificationTime);
       }
 

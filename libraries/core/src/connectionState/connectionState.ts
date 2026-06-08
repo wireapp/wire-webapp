@@ -30,27 +30,3 @@ export enum ConnectionState {
   /** The WebSocket is open and new messages are processed live in real time */
   LIVE = 'live',
 }
-
-export type ConnectionStateTracker = Readonly<{
-  getState: () => ConnectionState;
-  setState: (state: ConnectionState) => void;
-  isLive: () => boolean;
-}>;
-
-/**
- * Creates a mutable connection-state holder shared between {@link Account} and
- * {@link ConversationService} (and any other core component that needs it).
- */
-export function createConnectionStateTracker(
-  initialState: ConnectionState = ConnectionState.CLOSED,
-): ConnectionStateTracker {
-  let state = initialState;
-
-  return {
-    getState: () => state,
-    setState: (nextState: ConnectionState) => {
-      state = nextState;
-    },
-    isLive: () => state === ConnectionState.LIVE,
-  };
-}
