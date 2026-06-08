@@ -63,7 +63,7 @@ const reasonToMessageDataMap = {
     translationLabel: 'OfflineForTooLong',
   },
   [AddUsersFailureReasons.NOT_MLS_CAPABLE]: {
-    link: {url: config.URL.SUPPORT.MLS_MIGRATION_FROM_PROTEUS, name: 'mls-learn-more'},
+    link: {url: config.URL.SUPPORT.MLS_LEARN_MORE, name: 'mls-learn-more'},
     translationLabel: 'NotMlsCapable',
   },
 } as const;

@@ -97,6 +97,7 @@ export const StatusIcon = ({conversation}: Props) => {
           className="conversation-list-cell-badge cell-badge-light conversation-muted"
           data-uie-name="status-silence"
           title={t('accessibility.conversationStatusMuted')}
+          aria-hidden="true"
         >
           <Icon.MuteIcon className="svg-icon" />
         </span>

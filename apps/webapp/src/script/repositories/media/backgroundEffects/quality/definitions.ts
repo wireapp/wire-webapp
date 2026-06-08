@@ -52,7 +52,7 @@ export const TIER_DEFINITIONS: Record<QualityTier, QualityTierParams> = {
   nhd: {
     tier: 'nhd',
     resolution: {width: 640, height: 360},
-    downscale: true,
+    downscale: false,
   },
   bypass: {
     tier: 'bypass',

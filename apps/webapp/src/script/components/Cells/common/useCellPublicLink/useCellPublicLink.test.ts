@@ -20,11 +20,7 @@
 import {act, renderHook, waitFor} from '@testing-library/react';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
-import {
-  createExecutingFireAndForgetInvokerForTest,
-  createRootContextValueForTest,
-  createRootProviderWrapperForTest,
-} from 'src/script/page/testSupport/rootContextTestSupport';
+import {createExecutingFireAndForgetInvokerForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useCellPublicLink} from './useCellPublicLink';
@@ -41,10 +37,7 @@ describe('useCellPublicLink', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   let mockNode: CellNode | undefined;
   const mockSetPublicLink = jest.fn();
-  const rootContextValue = createRootContextValueForTest({
-    fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
-  });
-  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+  const defaultFireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
 
   const createMockNode = (overrides: Partial<CellNode> = {}): CellNode => ({
     id: 'test-uuid',
@@ -67,15 +60,17 @@ describe('useCellPublicLink', () => {
     node?: CellNode;
     refreshLinkDataAfterUpdate?: boolean;
     setStatusOnPublicLinkUrl?: boolean;
+    fireAndForgetInvoker?: typeof defaultFireAndForgetInvoker;
   }) => {
     const initialProps = {
       node: options?.node ?? mockNode,
       refreshLinkDataAfterUpdate: options?.refreshLinkDataAfterUpdate ?? false,
       setStatusOnPublicLinkUrl: options?.setStatusOnPublicLinkUrl ?? false,
+      fireAndForgetInvoker: options?.fireAndForgetInvoker ?? defaultFireAndForgetInvoker,
     };
 
     const hook = renderHook(
-      ({node, refreshLinkDataAfterUpdate, setStatusOnPublicLinkUrl}) =>
+      ({node, refreshLinkDataAfterUpdate, setStatusOnPublicLinkUrl, fireAndForgetInvoker}) =>
         useCellPublicLink({
           uuid: 'test-uuid',
           node,
@@ -83,8 +78,9 @@ describe('useCellPublicLink', () => {
           setPublicLink: mockSetPublicLink,
           refreshLinkDataAfterUpdate,
           setStatusOnPublicLinkUrl,
+          fireAndForgetInvoker,
         }),
-      {initialProps, wrapper: rootProviderWrapper},
+      {initialProps},
     );
 
     const rerenderWith = (props: Partial<typeof initialProps>) =>
@@ -92,6 +88,7 @@ describe('useCellPublicLink', () => {
         node: props.node ?? initialProps.node,
         refreshLinkDataAfterUpdate: props.refreshLinkDataAfterUpdate ?? initialProps.refreshLinkDataAfterUpdate,
         setStatusOnPublicLinkUrl: props.setStatusOnPublicLinkUrl ?? initialProps.setStatusOnPublicLinkUrl,
+        fireAndForgetInvoker: props.fireAndForgetInvoker ?? initialProps.fireAndForgetInvoker,
       });
 
     return {...hook, rerenderWith};
@@ -138,6 +135,31 @@ describe('useCellPublicLink', () => {
           Label: 'test-file.pdf',
           Permissions: ['Preview', 'Download'],
         },
+      });
+
+      expect(mockSetPublicLink).toHaveBeenCalledWith({
+        uuid: 'new-link-uuid',
+        url: 'https://cells.example.com/public/test-link',
+        alreadyShared: true,
+      });
+    });
+
+    it('creates a public link with an explicit fire-and-forget invoker outside RootProvider', async () => {
+      mockCellsRepository.createPublicLink.mockResolvedValue({
+        Uuid: 'new-link-uuid',
+        LinkUrl: '/public/test-link',
+      });
+
+      const {result} = renderPublicLinkHook({
+        fireAndForgetInvoker: createExecutingFireAndForgetInvokerForTest(),
+      });
+
+      act(() => {
+        result.current.togglePublicLink();
+      });
+
+      await waitFor(() => {
+        expect(result.current.status).toBe('success');
       });
 
       expect(mockSetPublicLink).toHaveBeenCalledWith({

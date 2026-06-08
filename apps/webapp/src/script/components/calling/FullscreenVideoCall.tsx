@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useEffect, useState} from 'react';
+import {ChangeEvent, useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
@@ -48,6 +48,7 @@ import {CallingViewMode, CallState, MuteState} from 'Repositories/calling/CallSt
 import {Participant} from 'Repositories/calling/Participant';
 import type {Grid} from 'Repositories/calling/videoGridHandler';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import {detectCapabilities} from 'Repositories/media/backgroundEffects';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import type {BackgroundEffectSelection} from 'Repositories/media/VideoBackgroundEffects';
@@ -198,6 +199,15 @@ const FullscreenVideoCall = ({
 
   const [isParticipantsListOpen, toggleParticipantsList] = useToggleState(false);
   const [isBackgroundSidebarOpen, setIsBackgroundSidebarOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const backgroundSidebarHandler = (newValue: boolean): void => {
+    setIsBackgroundSidebarOpen(newValue);
+
+    if (isBackgroundSidebarOpen && newValue === false) {
+      wrapperRef.current?.focus();
+    }
+  };
 
   const callNotification = useAppNotification({
     activeWindow: viewMode === CallingViewMode.DETACHED_WINDOW ? detachedWindow! : window,
@@ -290,6 +300,7 @@ const FullscreenVideoCall = ({
 
   const isModerator = selfUser && roles[selfUser.id] === DefaultConversationRoleName.WIRE_ADMIN;
   const backgroundEffectsHandler = callingRepository.getBackgroundEffectsHandler();
+  const isWebGLAvailable = detectCapabilities().webgl2;
 
   const selectedBackgroundEffect = useBackgroundEffectsStore(state => state.preferredEffect);
   const isHighQualityBlurEnabled = useBackgroundEffectsStore(state => state.isHighQualityBlurEnabled);
@@ -307,6 +318,8 @@ const FullscreenVideoCall = ({
   return (
     <div
       id="video-calling-wrapper"
+      ref={wrapperRef}
+      tabIndex={-1}
       data-uie-name="fullscreen-video-call"
       className={cx('video-calling-wrapper', {
         'app--small-offset': hasOffset && isMiniMode,
@@ -429,8 +442,9 @@ const FullscreenVideoCall = ({
               backgrounds={BUILTIN_BACKGROUNDS}
               onSelectEffect={handleBackgroundSidebarSelect}
               onEnableHighQualityBlur={handleEnableHighQualityBlur}
-              onClose={() => setIsBackgroundSidebarOpen(false)}
+              onClose={() => backgroundSidebarHandler(false)}
               highQualityBlurAllowed={isHighQualityBlurEnabled}
+              isWebGLAvailable={isWebGLAvailable}
             />
           )}
         </div>
@@ -488,7 +502,8 @@ const FullscreenVideoCall = ({
               setActiveCallViewTab={setActiveCallViewTab}
               setMaximizedParticipant={setMaximizedParticipant}
               sendEmoji={sendEmoji}
-              onOpenBackgroundSettings={() => setIsBackgroundSidebarOpen(true)}
+              onOpenBackgroundSettings={() => backgroundSidebarHandler(true)}
+              isWebGLAvailable={isWebGLAvailable}
             />
           </>
         )}
@@ -511,8 +526,9 @@ const FullscreenVideoCall = ({
           backgrounds={BUILTIN_BACKGROUNDS}
           onSelectEffect={handleBackgroundSidebarSelect}
           onEnableHighQualityBlur={handleEnableHighQualityBlur}
-          onClose={() => setIsBackgroundSidebarOpen(false)}
+          onClose={() => backgroundSidebarHandler(false)}
           highQualityBlurAllowed={isHighQualityBlurEnabled}
+          isWebGLAvailable={isWebGLAvailable}
         />
       )}
       <ModalComponent
