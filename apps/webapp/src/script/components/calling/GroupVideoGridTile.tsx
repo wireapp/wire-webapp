@@ -17,9 +17,8 @@
  *
  */
 
-import {KeyboardEvent, useEffect, useState} from 'react';
+import {KeyboardEvent} from 'react';
 
-import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {VIDEO_STATE} from '@wireapp/avs';
@@ -30,7 +29,7 @@ import {
   groupVideoActiveSpeaker,
   groupVideoActiveSpeakerTile,
   groupVideoBackgroundInitializingOverlay,
-  groupVideoElementVideo,
+  getGroupVideoElementStyles,
   groupVideoParticipantAudioStatus,
   groupVideoParticipantName,
   groupVideoParticipantNameWrapper,
@@ -39,11 +38,11 @@ import {
 } from 'Components/calling/GroupVideoGridTile.styles';
 import * as Icon from 'Components/icon';
 import type {Participant} from 'Repositories/calling/Participant';
-import {useBackgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
+import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
 interface GroupVideoGridTileProps {
@@ -85,25 +84,18 @@ const GroupVideoGridTile = ({
 
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
-  const isBackgroundEffectInitializing = useBackgroundEffectsStore(state => state.isInitializing);
-
-  const [isVideoReady, setIsVideoReady] = useState(false);
-
-  useEffect(() => {
-    setIsVideoReady(false);
-  }, [processedVideoStream]);
-
   const isSelfParticipant = participant === selfParticipant;
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
   const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
   const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
   const doVideoReconnecting = videoState === VIDEO_STATE.RECONNECTING;
-  const isSelfInitializing =
-    isSelfParticipant && isBackgroundEffectInitializing && is.nullOrUndefined(processedVideoStream);
-  const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream && !isSelfInitializing;
-  const showLoadingOverlay =
-    isSelfParticipant &&
-    (isBackgroundEffectInitializing || (hasActiveVideo && !isVideoReady && !!processedVideoStream));
+  const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
+
+  const {showLoadingOverlay, onVideoCanPlay} = useShowLoadingOverlay(
+    isSelfParticipant,
+    hasActiveVideo,
+    processedVideoStream,
+  );
 
   const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
 
@@ -159,8 +151,8 @@ const GroupVideoGridTile = ({
             muted
             srcObject={processedVideoStream?.stream ?? videoStream}
             className="group-video-grid__element-video"
-            css={groupVideoElementVideo(isMaximized || sharesScreen, isSelfParticipant && sharesCamera)}
-            onCanPlay={() => setIsVideoReady(true)}
+            css={getGroupVideoElementStyles(isMaximized || sharesScreen, isSelfParticipant && sharesCamera)}
+            onCanPlay={onVideoCanPlay}
           />
         </div>
       ) : (
@@ -174,7 +166,11 @@ const GroupVideoGridTile = ({
       )}
 
       {showLoadingOverlay && (
-        <div css={groupVideoBackgroundInitializingOverlay} data-uie-name="background-effect-initializing">
+        <div
+          aria-busy={showLoadingOverlay}
+          css={groupVideoBackgroundInitializingOverlay}
+          data-uie-name="background-effect-initializing"
+        >
           <Loading size={32} />
         </div>
       )}

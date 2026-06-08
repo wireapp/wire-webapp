@@ -86,7 +86,7 @@ export const groupVideoParticipantAudioStatus = (
   };
 };
 
-export const groupVideoElementVideo = (fitContain: boolean, mirrorSelf: boolean): CSSObject => ({
+export const getGroupVideoElementStyles = (fitContain: boolean, mirrorSelf: boolean): CSSObject => ({
   objectFit: fitContain ? 'contain' : 'cover',
   transform: mirrorSelf ? 'rotateY(180deg)' : 'initial',
 });
