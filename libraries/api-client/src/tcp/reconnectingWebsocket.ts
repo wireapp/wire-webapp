@@ -217,29 +217,34 @@ export class ReconnectingWebsocket {
     this.send(PingMessage.PING);
   };
 
+  /**
+   * Reconnect on the existing ReconnectingWebSocket wrapper instead of allocating a new one.
+   * The library closes the current underlying WebSocket synchronously in `_disconnect` before
+   * opening the next, so we never leave two `/await` sessions alive from the app.
+   */
+  private reconnectInPlace(socket: RWS): void {
+    try {
+      socket.reconnect(CloseEventCode.NORMAL_CLOSURE);
+    } catch (error) {
+      this.logger.warn('Failed to reconnect WebSocket in place', error);
+    }
+  }
+
   public connect(): void {
     this.logger.info('Initializing WebSocket connection');
     this.resetLongRunningRetrySequence();
+    this.stopPinging();
 
-    if (!is.undefined(this.socket) && this.socket.readyState !== WEBSOCKET_STATE.CLOSED) {
-      this.logger.warn(
-        `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[this.socket.readyState]} (${this.socket.readyState}); closing it before reconnecting`,
-      );
-      const oldSocket = this.socket;
-      // Detach all handlers from the old socket before closing to prevent stale async events
-      // from triggering handlers on the new socket instance
-      oldSocket.onmessage = null;
-      oldSocket.onerror = null;
-      oldSocket.onopen = null;
-      oldSocket.onclose = null;
-      try {
-        oldSocket.close(CloseEventCode.NORMAL_CLOSURE, 'Reinitializing WebSocket connection');
-      } catch (error) {
-        this.logger.warn('Failed to close existing WebSocket instance before reconnecting', error);
+    if (!is.undefined(this.socket)) {
+      if (this.socket.readyState !== WEBSOCKET_STATE.CLOSED) {
+        this.logger.warn(
+          `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[this.socket.readyState]} (${this.socket.readyState}); reconnecting in place`,
+        );
       }
+      this.reconnectInPlace(this.socket);
+      return;
     }
 
-    this.stopPinging();
     const nextSocket = this.getReconnectingWebsocket();
     this.socket = nextSocket;
     this.bindSocketHandlers(nextSocket);

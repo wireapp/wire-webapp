@@ -25,7 +25,7 @@ import {Server as WebSocketServer} from 'ws';
 
 import {AddressInfo} from 'net';
 
-import {PingMessage, ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
+import {CloseEventCode, PingMessage, ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
 
 async function startEchoServer(): Promise<WebSocketServer> {
   const server = new WebSocketServer({host: '127.0.0.1', port: 0});
@@ -117,41 +117,35 @@ describe('ReconnectingWebsocket', () => {
     RWS.connect();
   });
 
-  it('closes an existing active socket before reconnecting', () => {
+  it('reconnects in place when connect is called on an open socket', () => {
     const onReconnect = jest.fn().mockReturnValue(getServerAddress());
     const RWS = createRWS(onReconnect);
 
-    const firstSocket = {
+    const socket = {
       readyState: WEBSOCKET_STATE.OPEN,
       close: jest.fn(),
-      send: jest.fn(),
       reconnect: jest.fn(),
+      send: jest.fn(),
       onmessage: undefined,
       onerror: undefined,
       onopen: undefined,
       onclose: undefined,
     };
 
-    const secondSocket = {
-      readyState: WEBSOCKET_STATE.CONNECTING,
-      close: jest.fn(),
-      send: jest.fn(),
-      reconnect: jest.fn(),
-      onmessage: undefined,
-      onerror: undefined,
-      onopen: undefined,
-      onclose: undefined,
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const getSocketSpy = jest.spyOn(RWS, 'getReconnectingWebsocket');
-    getSocketSpy.mockReturnValueOnce(firstSocket).mockReturnValueOnce(secondSocket);
+    const getSocketSpy = jest.spyOn(
+      RWS as unknown as {getReconnectingWebsocket: () => typeof RWS},
+      'getReconnectingWebsocket',
+    );
+    getSocketSpy.mockReturnValueOnce(socket as unknown as typeof RWS);
 
     RWS.connect();
     RWS.connect();
 
-    expect(firstSocket.close).toHaveBeenCalledWith(1000, 'Reinitializing WebSocket connection');
-    expect(RWS['socket']).toBe(secondSocket);
+    expect(getSocketSpy).toHaveBeenCalledTimes(1);
+    expect(socket.reconnect).toHaveBeenCalledTimes(1);
+    expect(socket.reconnect).toHaveBeenCalledWith(CloseEventCode.NORMAL_CLOSURE);
+    expect(socket.close).not.toHaveBeenCalled();
+    expect(RWS['socket']).toBe(socket);
 
     RWS.disconnect();
   });
@@ -792,7 +786,7 @@ describe('ReconnectingWebsocket', () => {
     it('cleans up resources even when socket does not exist', () => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect);
-      const cleanupSpy = jest.spyOn(RWS, 'cleanup');
+      const cleanupSpy = jest.spyOn(RWS as any, 'cleanup');
 
       RWS.disconnect();
 
