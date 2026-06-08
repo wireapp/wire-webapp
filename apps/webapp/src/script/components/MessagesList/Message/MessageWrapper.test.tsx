@@ -26,6 +26,7 @@ import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateUser} from 'test/helper/UserGenerator';
 import {setStrings} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
@@ -33,6 +34,8 @@ import {createUuid} from 'Util/uuid';
 import {MessageWrapper} from './MessageWrapper';
 
 setStrings({en});
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
   const message = new MemberMessageEntity();
@@ -99,7 +102,7 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {getByText} = render(withTheme(<MessageWrapper {...props} />));
+      const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
       expect(getByText('Shared Drive is on')).toBeInTheDocument();
     });
@@ -111,7 +114,7 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {getByText} = render(withTheme(<MessageWrapper {...props} />));
+      const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
       expect(getByText('Shared Drive is on')).toBeInTheDocument();
     });
@@ -123,7 +126,7 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {queryByText} = render(withTheme(<MessageWrapper {...props} />));
+      const {queryByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
       expect(queryByText('Shared Drive is on')).not.toBeInTheDocument();
     });
@@ -138,7 +141,7 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {getByText} = render(withTheme(<MessageWrapper {...props} />));
+      const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
       expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
     });
@@ -151,7 +154,7 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {getByText} = render(withTheme(<MessageWrapper {...props} />));
+      const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
       expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
     });
@@ -164,7 +167,7 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {queryByText} = render(withTheme(<MessageWrapper {...props} />));
+      const {queryByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
       expect(queryByText('Self-deleting messages are off')).not.toBeInTheDocument();
     });
@@ -177,7 +180,7 @@ describe('MessageWrapper', () => {
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
       const props = createBaseProps(conversation, message);
 
-      const {getByText} = render(withTheme(<MessageWrapper {...props} />));
+      const {getByText} = render(withTheme(<MessageWrapper {...props} />), {wrapper: rootProviderWrapper});
 
       expect(getByText('Shared Drive is on')).toBeInTheDocument();
       expect(getByText('Self-deleting messages are off')).toBeInTheDocument();
