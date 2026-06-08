@@ -24,8 +24,8 @@ import cx from 'classnames';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {availabilityStatus} from 'Util/availabilityStatus';
-import {t} from 'Util/localizerUtil';
 
 import {ContextMenuEntry} from '../../../../../ui/ContextMenu';
 
@@ -41,33 +41,34 @@ const headerStyles: CSSObject = {
 };
 
 const AvailabilityButtons = ({availability}: AvailabilityInputProps) => {
+  const {translate} = useApplicationContext();
   const entries: ContextMenuEntry[] = [
     {
       availability: Availability.Type.AVAILABLE,
       click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AVAILABLE),
-      label: t('userAvailabilityAvailable'),
+      label: translate('userAvailabilityAvailable'),
     },
     {
       availability: Availability.Type.BUSY,
       click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.BUSY),
-      label: t('userAvailabilityBusy'),
+      label: translate('userAvailabilityBusy'),
     },
     {
       availability: Availability.Type.AWAY,
       click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY),
-      label: t('userAvailabilityAway'),
+      label: translate('userAvailabilityAway'),
     },
     {
       availability: Availability.Type.NONE,
       click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE),
-      label: t('userAvailabilityNone'),
+      label: translate('userAvailabilityNone'),
     },
   ];
 
   return (
     <>
       <h3 className="label" css={headerStyles}>
-        {t('preferencesAccountAvailabilityUnset')}
+        {translate('preferencesAccountAvailabilityUnset')}
       </h3>
       <div className="buttons-group">
         {entries.map((item, index) => {
@@ -87,8 +88,8 @@ const AvailabilityButtons = ({availability}: AvailabilityInputProps) => {
               onClick={() => item.click?.()}
               aria-label={
                 isActive
-                  ? `${t('preferencesAccountSelectedLabel')}, ${item.label}`
-                  : `${t('preferencesAccountUpdateLabel')} ${item.label}`
+                  ? `${translate('preferencesAccountSelectedLabel')}, ${item.label}`
+                  : `${translate('preferencesAccountUpdateLabel')} ${item.label}`
               }
             >
               {item.availability !== undefined && availabilityStatus[item.availability]}

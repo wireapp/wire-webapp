@@ -23,7 +23,7 @@ import cx from 'classnames';
 
 import {validateHandle} from 'Repositories/user/userHandleGenerator';
 import {UserRepository} from 'Repositories/user/userRepository';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
 import {AccountInput, useInputDone} from './AccountInput';
@@ -34,6 +34,8 @@ enum UserNameState {
   AVAILABLE = 'AVAILABLE',
   TAKEN = 'TAKEN',
 }
+
+const MAXIMUM_HANDLE_LENGTH = 256;
 interface UsernameInputProps {
   canEditProfile: boolean;
   domain?: string;
@@ -42,6 +44,7 @@ interface UsernameInputProps {
 }
 
 const UsernameInput = ({username, domain, userRepository, canEditProfile}: UsernameInputProps) => {
+  const {translate} = useApplicationContext();
   const [errorState, setErrorState] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [requestedName, setRequestedName] = useState<string | null>(null);
@@ -114,7 +117,7 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
   return (
     <div>
       <AccountInput
-        label={t('preferencesAccountUsername')}
+        label={translate('preferencesAccountUsername')}
         value={username}
         onInput={({target}: FormEvent) => verifyUsername((target as HTMLInputElement).value)}
         readOnly={!canEditProfile}
@@ -123,7 +126,7 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
         setIsEditing={setIsEditing}
         isDone={usernameInputDone.isDone}
         onValueChange={changeUsername}
-        maxLength={256 - (domain?.length ?? 0)}
+        maxLength={MAXIMUM_HANDLE_LENGTH - (domain?.length ?? 0)}
         allowedChars="0-9a-zA-Z_.-"
         fieldName="username"
       />
@@ -138,9 +141,9 @@ const UsernameInput = ({username, domain, userRepository, canEditProfile}: Usern
         >
           {isEditing && (
             <>
-              {errorState === UserNameState.AVAILABLE && t('preferencesAccountUsernameAvailable')}
-              {errorState === UserNameState.TAKEN && t('preferencesAccountUsernameErrorTaken')}
-              {!errorState && t('preferencesAccountUsernameHint')}
+              {errorState === UserNameState.AVAILABLE && translate('preferencesAccountUsernameAvailable')}
+              {errorState === UserNameState.TAKEN && translate('preferencesAccountUsernameErrorTaken')}
+              {!errorState && translate('preferencesAccountUsernameHint')}
             </>
           )}
         </p>

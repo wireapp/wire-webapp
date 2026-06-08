@@ -34,10 +34,10 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {TeamState} from 'Repositories/team/TeamState';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {TeamCreationAccountHeader} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationTabs/TeamCreation/TeamCreationAccountHeader';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {ContentState} from 'src/script/page/useAppState';
 import {Core} from 'src/script/service/coreSingleton';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {AccountInput} from './accountPreferences/AccountInput';
@@ -89,6 +89,7 @@ export const AccountPreferences = ({
   conversationState = container.resolve(ConversationState),
 }: AccountPreferencesProps) => {
   const core = container.resolve(Core);
+  const {translate} = useApplicationContext();
   const {isTeam, teamName} = useKoSubscribableChildren(teamState, ['isTeam', 'teamName']);
   const {name, email, availability, username, managedBy} = useKoSubscribableChildren(selfUser, [
     'name',
@@ -124,11 +125,11 @@ export const AccountPreferences = ({
               logger.warn('Error while leaving room', error);
             }
           },
-          text: t('modalAccountLeaveGuestRoomAction'),
+          text: translate('modalAccountLeaveGuestRoomAction'),
         },
         text: {
-          message: t('modalAccountLeaveGuestRoomMessage'),
-          title: t('modalAccountLeaveGuestRoomHeadline'),
+          message: translate('modalAccountLeaveGuestRoomMessage'),
+          title: translate('modalAccountLeaveGuestRoomHeadline'),
         },
       },
       undefined,
@@ -136,7 +137,7 @@ export const AccountPreferences = ({
   };
 
   return (
-    <PreferencesPage title={t('preferencesAccount')}>
+    <PreferencesPage title={translate('preferencesAccount')}>
       <div className="preferences-wrapper">
         {isTeamCreationEnabled && !teamState.isInTeam(selfUser) && <TeamCreationAccountHeader />}
         <div className="preferences-account-name">
@@ -168,7 +169,7 @@ export const AccountPreferences = ({
       </div>
 
       {isActivatedAccount ? (
-        <PreferencesSection hasSeparator title={t('preferencesAccountInfo')}>
+        <PreferencesSection hasSeparator title={translate('preferencesAccountInfo')}>
           <div
             css={{
               display: 'flex',
@@ -191,7 +192,12 @@ export const AccountPreferences = ({
             )}
 
             {isTeam && (
-              <AccountInput label={t('preferencesAccountTeam')} value={teamName} readOnly fieldName="status-team" />
+              <AccountInput
+                label={translate('preferencesAccountTeam')}
+                value={teamName}
+                readOnly
+                fieldName="status-team"
+              />
             )}
 
             {richFields.map(({type, value}) => (
@@ -208,7 +214,7 @@ export const AccountPreferences = ({
           </div>
 
           <AccountLink
-            label={t('preferencesAccountLink')}
+            label={translate('preferencesAccountLink')}
             value={`${Config.getConfig().URL.ACCOUNT_BASE}/user-profile/?id=${selfUser.id}@${selfUser.domain}`}
             data-uie-name="element-profile-link"
           />
@@ -221,10 +227,10 @@ export const AccountPreferences = ({
             data-uie-name="do-leave-guest-room"
             type="button"
           >
-            {t('preferencesAccountLeaveGuestRoom')}
+            {translate('preferencesAccountLeaveGuestRoom')}
           </button>
 
-          <div className="preferences-leave-disclaimer">{t('preferencesAccountLeaveGuestRoomDescription')}</div>
+          <div className="preferences-leave-disclaimer">{translate('preferencesAccountLeaveGuestRoomDescription')}</div>
         </PreferencesSection>
       )}
 

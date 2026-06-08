@@ -27,11 +27,11 @@ import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {isErrorWithType} from 'Util/typePredicateUtil';
-import {validateProfileImageResolution} from 'Util/util';
+import {formatBytes, validateProfileImageResolution} from 'Util/util';
 
 import {FileInput} from './FileInput';
 
@@ -56,6 +56,7 @@ export const AvatarInput = ({
 }: AvatarInputProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const {translate} = useApplicationContext();
 
   if (!isActivatedAccount) {
     return <Avatar participant={selfUser} avatarSize={AVATAR_SIZE.X_LARGE} />;
@@ -70,17 +71,17 @@ export const AvatarInput = ({
   const setPicture = async (newUserPicture: File): Promise<boolean | User> => {
     const isTooLarge = newUserPicture.size > Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE;
     if (isTooLarge) {
-      const maximumSizeInMB = Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE / 1024 / 1024;
-      const messageString = t('modalPictureTooLargeMessage', {number: maximumSizeInMB});
-      const titleString = t('modalPictureTooLargeHeadline');
+      const maximumSizeInMB = Number.parseFloat(formatBytes(Config.getConfig().MAXIMUM_IMAGE_FILE_SIZE));
+      const messageString = translate('modalPictureTooLargeMessage', {number: maximumSizeInMB});
+      const titleString = translate('modalPictureTooLargeHeadline');
 
       return showUploadWarning(titleString, messageString);
     }
 
     const isWrongFormat = !FILE_TYPES.includes(newUserPicture.type);
     if (isWrongFormat) {
-      const titleString = t('modalPictureFileFormatHeadline');
-      const messageString = t('modalPictureFileFormatMessage');
+      const titleString = translate('modalPictureFileFormatHeadline');
+      const messageString = translate('modalPictureFileFormatMessage');
 
       return showUploadWarning(titleString, messageString);
     }
@@ -96,8 +97,8 @@ export const AvatarInput = ({
         return await userRepository.changePicture(newUserPicture);
       }
 
-      const messageString = t('modalPictureTooSmallMessage');
-      const titleString = t('modalPictureTooSmallHeadline');
+      const messageString = translate('modalPictureTooSmallMessage');
+      const titleString = translate('modalPictureTooSmallHeadline');
       return await showUploadWarning(titleString, messageString);
     } catch (error: unknown) {
       logger.error('Failed to validate profile image', error);
@@ -137,18 +138,18 @@ export const AvatarInput = ({
           keys: [KEY.ENTER, KEY.SPACE],
         })
       }
-      aria-label={`${t('tooltipPreferencesPicture')}`}
+      aria-label={`${translate('tooltipPreferencesPicture')}`}
     >
       <label
         className={cx('preferences-account-picture-button', {loading: isUploading})}
         htmlFor="self-upload-file-input"
-        title={t('tooltipPreferencesPicture')}
+        title={translate('tooltipPreferencesPicture')}
       >
         <Avatar
           className="see-through"
           participant={selfUser}
           avatarSize={AVATAR_SIZE.X_LARGE}
-          avatarAlt={t('selfProfileImageAlt')}
+          avatarAlt={translate('selfProfileImageAlt')}
           hideAvailabilityStatus={hideAvailabilityStatus}
         />
 
