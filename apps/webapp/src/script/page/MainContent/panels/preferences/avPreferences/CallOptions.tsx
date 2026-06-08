@@ -22,11 +22,9 @@ import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 import type {WebappProperties} from '@wireapp/api-client/lib/user/data/';
 import {amplify} from 'amplify';
 
-import {Runtime} from '@wireapp/commons';
 import {Checkbox, CheckboxLabel} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {MediaConstraintsHandler} from 'Repositories/media/MediaConstraintsHandler';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
@@ -56,20 +54,6 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
   const [pressSpaceToUnmuteEnabled, setPressSpaceToUnmuteEnabled] = useState(
     !!propertiesRepository.properties.settings.call.enable_press_space_to_unmute,
   );
-
-  const hardwareAccelerationDescriptionId = 'status-preference-hardware-acceleration-description';
-
-  const desktopSettings = Config.getDesktopSettings();
-
-  const isHardwareAccelerationChangeable = Runtime.isDesktopApp() && !!desktopSettings;
-
-  const [isHardwareAccelerationEnabled, setIsHardwareAccelerationEnabled] = useState<boolean>(() => {
-    if (!isHardwareAccelerationChangeable) {
-      return true;
-    }
-
-    return desktopSettings.isHardwareAccelerationEnabled();
-  });
 
   useEffect(() => {
     const updateProperties = ({settings}: WebappProperties) => {
@@ -120,33 +104,6 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
     },
     [propertiesRepository],
   );
-
-  const confirmHardwareAccelerationChange = () => {
-    if (!desktopSettings) {
-      return;
-    }
-
-    const currentHardwareAccelerationValue = desktopSettings.isHardwareAccelerationEnabled();
-
-    desktopSettings.setHardwareAccelerationEnabled(!currentHardwareAccelerationValue);
-    setIsHardwareAccelerationEnabled(!currentHardwareAccelerationValue);
-
-    amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
-  };
-
-  const showHardwareAccelerationRestartModal = () => {
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      size: 'large',
-      primaryAction: {
-        action: confirmHardwareAccelerationChange,
-        text: translate('preferencesOptionsEnableHardwareAccelerationModalOk'),
-      },
-      text: {
-        message: translate('preferencesOptionsEnableHardwareAccelerationModalMessage'),
-        title: translate('preferencesOptionsEnableHardwareAccelerationModalTitle'),
-      },
-    });
-  };
 
   return (
     <PreferencesSection title={translate('preferencesOptionsCall')}>
@@ -202,25 +159,6 @@ const CallOptions = ({constraintsHandler, propertiesRepository}: CallOptionsProp
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
             {translate('preferencesOptionsEnablePressSpaceToUnmuteDetails')}
-          </p>
-        </div>
-      )}
-
-      {isHardwareAccelerationChangeable && (
-        <div className="checkbox-margin">
-          <Checkbox
-            onChange={showHardwareAccelerationRestartModal}
-            checked={isHardwareAccelerationEnabled}
-            id="status-preference-hardware-acceleration"
-            data-uie-name="status-preference-hardware-acceleration"
-            aria-describedby={hardwareAccelerationDescriptionId}
-          >
-            <CheckboxLabel htmlFor="status-preference-hardware-acceleration">
-              {translate('preferencesOptionsEnableHardwareAcceleration')}
-            </CheckboxLabel>
-          </Checkbox>
-          <p id={hardwareAccelerationDescriptionId} className="preferences-detail preferences-detail-intended">
-            {translate('preferencesOptionsEnableHardwareAccelerationDetails')}
           </p>
         </div>
       )}

@@ -21,7 +21,7 @@ import {ReactNode} from 'react';
 
 import {UnavailableFileIcon} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   errorIconStyles,
@@ -40,13 +40,15 @@ interface MediaFilePreviewCardProps {
 }
 
 export const MediaFilePreviewCard = ({label, isLoading, isError, children}: MediaFilePreviewCardProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <article css={isError ? wrapperErrorStyles : wrapperStyles} aria-label={label}>
       {children}
       {isError && (
         <>
           <UnavailableFileIcon css={errorIconStyles} width={14} height={14} />
-          <p css={errorTextStyles}>{t('cells.unavailableFile')}</p>
+          <p css={errorTextStyles}>{translate('cells.unavailableFile')}</p>
         </>
       )}
       {isLoading && !isError && (
