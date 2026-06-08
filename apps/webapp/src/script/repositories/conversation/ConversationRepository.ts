@@ -3702,7 +3702,7 @@ export class ConversationRepository {
         return this.onButtonActionConfirmation(conversationEntity, eventJson);
 
       case ClientEvent.CONVERSATION.MESSAGE_ADD:
-        const isMessageEdit = !!eventJson.edited_time;
+        const isMessageEdit = is.nonEmptyString(eventJson.edited_time);
         if (isMessageEdit) {
           // in case of an edition, the DB listener will take care of updating the local entity
           return {conversationEntity};
@@ -3712,8 +3712,13 @@ export class ConversationRepository {
       case ClientEvent.CONVERSATION.MULTIPART_MESSAGE_ADD:
         return this.addEventToConversation(conversationEntity, eventJson);
 
-      case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.COMPOSITE_MESSAGE_ADD:
+        if (is.nonEmptyString(eventJson.edited_time)) {
+          return {conversationEntity};
+        }
+        return this.addEventToConversation(conversationEntity, eventJson);
+
+      case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:

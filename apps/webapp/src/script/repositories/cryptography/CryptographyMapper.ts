@@ -83,6 +83,14 @@ export interface MappedMultipart {
   type: CONVERSATION;
 }
 
+export interface MappedComposite {
+  data: {
+    items: (Composite.IItem | {text: {content: string; mentions: string[]}})[];
+    replacing_message_id?: string;
+  };
+  type: CONVERSATION;
+}
+
 export interface MappedAssetMetaData {
   duration: number;
   loudness: Uint8Array;
@@ -303,7 +311,7 @@ export class CryptographyMapper {
     return {...genericContent, ...specificContent};
   }
 
-  private _mapComposite(composite: Composite) {
+  private _mapComposite(composite: Composite): MappedComposite {
     const items = composite.items.map(item => {
       if ((item as Composite.Item).content !== GenericMessageType.TEXT) {
         return item;
@@ -518,6 +526,10 @@ export class CryptographyMapper {
       const mappedMultipart = this._mapMultipart(edited.multipart.text as Text, edited.multipart.attachments);
       mappedMultipart.data.replacing_message_id = edited.replacingMessageId;
       return mappedMultipart;
+    } else if (edited.composite) {
+      const mappedComposite = this._mapComposite(edited.composite as Composite);
+      mappedComposite.data.replacing_message_id = edited.replacingMessageId;
+      return mappedComposite;
     }
 
     const mappedMessage = this._mapText(edited.text as Text);
