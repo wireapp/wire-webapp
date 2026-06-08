@@ -20,7 +20,7 @@
 import {ShieldIcon} from '@wireapp/react-ui-kit';
 
 import {CheckIcon} from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   conversationFeatureContainerCss,
@@ -35,13 +35,19 @@ interface ConversationFeatureProps {
   conversationType: ConversationType;
 }
 
+const CHANNEL_CAPACITY = 2000;
+const GROUP_CAPACITY = 500;
+
 export const ConversationFeature = ({conversationType}: ConversationFeatureProps) => {
+  const {translate} = useApplicationContext();
   const generalFeatures = [
-    t('conversationCommonFeature1', {capacity: conversationType === ConversationType.Channel ? 2000 : 500}),
-    t('conversationCommonFeature2'),
-    t('conversationCommonFeature3'),
+    translate('conversationCommonFeature1', {
+      capacity: conversationType === ConversationType.Channel ? CHANNEL_CAPACITY : GROUP_CAPACITY,
+    }),
+    translate('conversationCommonFeature2'),
+    translate('conversationCommonFeature3'),
   ];
-  const channelFeatures = [t('channelConversationFeature1'), t('channelConversationFeature2')];
+  const channelFeatures = [translate('channelConversationFeature1'), translate('channelConversationFeature2')];
 
   const features =
     conversationType === ConversationType.Channel

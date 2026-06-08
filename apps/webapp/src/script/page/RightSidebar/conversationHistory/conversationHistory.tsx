@@ -29,7 +29,7 @@ import {ChatHistory, HistorySharingUnit} from 'Components/Modals/CreateConversat
 import {getChatHistoryOptions, getChatHistorySharingUnitOptions} from 'Components/Modals/CreateConversation/utils';
 import {RadioGroup} from 'Components/Radio';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {
   conversationHistoryContainerCss,
@@ -46,11 +46,12 @@ export interface AccessProps {
 }
 
 export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
+  const {translate} = useApplicationContext();
   const [chatHistory, setChatHistory] = useState<ChatHistory>(ChatHistory.OneDay);
   const [historySharingQuantity, setHistorySharingQuantity] = useState(1);
   const [historySharingUnit, setHistorySharingUnit] = useState<HistorySharingUnit>(HistorySharingUnit.Days);
-  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(historySharingQuantity);
-  const chatHistoryOptions = getChatHistoryOptions(chatHistory, historySharingQuantity, historySharingUnit);
+  const chatHistorySharingUnitOptions = getChatHistorySharingUnitOptions(translate, historySharingQuantity);
+  const chatHistoryOptions = getChatHistoryOptions(translate, chatHistory, historySharingQuantity, historySharingUnit);
   const teamState = container.resolve(TeamState);
 
   return (
@@ -59,14 +60,14 @@ export const ConversationHistory = ({onGoBack, onClose}: AccessProps) => {
         onGoBack={onGoBack}
         onClose={onClose}
         goBackUie="go-back-conversation-history-options"
-        title={t('conversationHistoryTitle')}
+        title={translate('conversationHistoryTitle')}
       />
 
       <FadingScrollbar className="panel__content" css={conversationHistoryContainerCss}>
-        <p className="panel__info-text">{t('conversationHistoryParagraph1')}</p>
+        <p className="panel__info-text">{translate('conversationHistoryParagraph1')}</p>
 
         <p className="panel__info-text" css={conversationHistoryParagraphCss}>
-          {t('conversationHistoryParagraph2')}
+          {translate('conversationHistoryParagraph2')}
         </p>
 
         <RadioGroup<ChatHistory>

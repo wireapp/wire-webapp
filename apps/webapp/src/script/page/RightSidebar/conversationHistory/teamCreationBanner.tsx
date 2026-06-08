@@ -20,8 +20,8 @@
 import {Button, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {
@@ -32,6 +32,7 @@ import {
 } from './conversationHistory.styles';
 
 export const TeamCreationBanner = () => {
+  const {translate} = useApplicationContext();
   const navigateToUpgradePlan = () => {
     safeWindowOpen(Config.getConfig().URL.TEAMS_BASE);
   };
@@ -40,7 +41,7 @@ export const TeamCreationBanner = () => {
     <div css={teamCreationWrapperCss}>
       <div css={teamCreationBodyCss}>
         <Text block css={teamCreationTextCss}>
-          {t('createConversationUpgradePlanModalText')}
+          {translate('createConversationUpgradePlanModalText')}
         </Text>
         <Button
           css={teamCreationButtonCss}
@@ -49,7 +50,7 @@ export const TeamCreationBanner = () => {
           data-uie-name="do-submit"
           onKeyDown={event => handleKeyDown({event, callback: navigateToUpgradePlan, keys: [KEY.ENTER, KEY.SPACE]})}
         >
-          {t('createConversationUpgradePlanModalButton')}
+          {translate('createConversationUpgradePlanModalButton')}
         </Button>
       </div>
     </div>
