@@ -28,7 +28,6 @@ import {removeCurrentModal} from 'Components/Modals/PrimaryModal/PrimaryModalSta
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import * as styles from './FileEditor.styles';
@@ -44,7 +43,7 @@ interface FileEditorProps {
 
 export const FileEditor = ({id}: FileEditorProps) => {
   const cellsRepository = container.resolve(CellsRepository);
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [node, setNode] = useState<Node | null>(null);
   const [isRecycled, setIsRecycled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +65,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
       setIsRecycled(false);
       setNode(fetchedNode);
       return true;
-    } catch (err: unknown) {
+    } catch {
       setIsError(true);
       return false;
     } finally {
@@ -123,18 +122,18 @@ export const FileEditor = ({id}: FileEditorProps) => {
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       closeOnConfirm: false,
       secondaryAction: {
-        text: t('modalConfirmSecondary'),
+        text: translate('modalConfirmSecondary'),
       },
       primaryAction: {
         action: handleRetry,
-        text: t('unknownApplicationErrorTryAgain'),
+        text: translate('unknownApplicationErrorTryAgain'),
       },
       text: {
-        message: t('fileFullscreenModal.editor.errorDescription'),
-        title: t('fileFullscreenModal.editor.errorTitle'),
+        message: translate('fileFullscreenModal.editor.errorDescription'),
+        title: translate('fileFullscreenModal.editor.errorTitle'),
       },
     });
-  }, [handleRetry, isError, isLoading, isRecycled, node]);
+  }, [handleRetry, isError, isLoading, isRecycled, node, translate]);
 
   useEffect(() => {
     if (!isLoading && !isError && node !== null && !isRecycled) {
@@ -164,7 +163,7 @@ export const FileEditor = ({id}: FileEditorProps) => {
       allow="clipboard-read; clipboard-write"
       css={styles.editorIframe}
       src={urlValidation.value}
-      title={t('fileFullscreenModal.editor.iframeTitle')}
+      title={translate('fileFullscreenModal.editor.iframeTitle')}
     />
   );
 };

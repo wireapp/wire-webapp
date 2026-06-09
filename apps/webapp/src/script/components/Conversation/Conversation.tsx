@@ -577,6 +577,7 @@ export const Conversation = ({
       conversation: activeConversation,
       isCellsEnabled: isCellsEnabled,
       isDisabled: isFileTabActive,
+      translate,
     });
 
   return (

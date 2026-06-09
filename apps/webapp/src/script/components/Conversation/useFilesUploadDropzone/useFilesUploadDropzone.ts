@@ -24,7 +24,7 @@ import {Accept, FileRejection, useDropzone} from 'react-dropzone';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import type {RootContextValue} from 'src/script/page/RootProvider';
 import {getLogger} from 'Util/logger';
 
 import {buildCellFileMetadata} from './buildCellFileMetadata/buildCellFileMetadata';
@@ -47,6 +47,7 @@ interface UseFilesUploadDropzoneParams {
   isCellsEnabled: boolean;
   isDisabled: boolean;
   cellsRepository: CellsRepository;
+  translate: RootContextValue['translate'];
   conversation?: Pick<Conversation, 'id' | 'qualifiedId'>;
 }
 
@@ -55,6 +56,7 @@ export const useFilesUploadDropzone = ({
   isDisabled,
   isCellsEnabled,
   cellsRepository,
+  translate,
   conversation = {id: '', qualifiedId: {id: '', domain: ''}},
 }: UseFilesUploadDropzoneParams) => {
   const {addFiles, getFiles, updateFile} = useFileUploadState();
@@ -82,8 +84,8 @@ export const useFilesUploadDropzone = ({
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);
       showFileDropzoneErrorModal({
-        title: t('conversationFileUploadFailedHeading'),
-        message: t('conversationFileUploadFailedMessage'),
+        title: translate('conversationFileUploadFailedHeading'),
+        message: translate('conversationFileUploadFailedMessage'),
         invalidFiles: [],
       });
     },
@@ -110,6 +112,7 @@ export const useFilesUploadDropzone = ({
       currentFiles: files,
       maxSize,
       maxFiles,
+      translate,
     });
 
     if (!validationResult.isValid) {
