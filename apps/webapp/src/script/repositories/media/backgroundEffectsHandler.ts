@@ -17,6 +17,8 @@
  *
  */
 
+import {container} from 'tsyringe';
+
 import {detectCapabilities, Metrics, QualityMode} from 'Repositories/media/backgroundEffects';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {CapabilityInfo} from 'Repositories/media/backgroundEffects/backgroundEffectsWorkerTypes';
@@ -33,6 +35,7 @@ import {
   DEFAULT_BUILTIN_BACKGROUND_ID,
   loadBackgroundSource,
 } from 'Repositories/media/VideoBackgroundEffects';
+import {TeamState} from 'Repositories/team/TeamState';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
@@ -42,7 +45,7 @@ export const TARGET_FPS = 15;
 export const DEBOUNCE_TIMER = 500;
 
 const VIDEO_BACKGROUND_EFFECT_STORAGE_KEY = 'video-background-effects';
-const VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY = 'video-background-effects-feature-enabled';
+export const VIDEO_BACKGROUND_EFFECTS_FEATURE_STORAGE_KEY = 'video-background-effects-feature-enabled';
 const VIDEO_BACKGROUND_LAST_VIRTUAL_ID_STORAGE_KEY = 'video-background-effects-last-virtual-id';
 
 const isVirtualEffect = (effect: BackgroundEffectSelection): boolean => {
@@ -96,9 +99,16 @@ export class BackgroundEffectsHandler {
   private saveDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private currentReleasableStream: ReleasableMediaStream | undefined = undefined;
 
-  constructor(private readonly controller: BackgroundEffectsController) {
+  constructor(
+    private readonly controller: BackgroundEffectsController,
+    private readonly teamState = container.resolve(TeamState),
+  ) {
     this.storage = getStorage();
     backgroundEffectsStore.getState().setIsFeatureEnabled(this.readFeatureEnabledStateFromStore());
+
+    this.teamState.isBackgroundEffectsEnabled.subscribe(() => {
+      backgroundEffectsStore.getState().setIsFeatureEnabled(this.readFeatureEnabledStateFromStore());
+    });
 
     const storedEffect = this.readPreferredBackgroundEffectFromStore();
     const isWebGLAvailable = detectCapabilities().webgl2;
@@ -209,6 +219,12 @@ export class BackgroundEffectsHandler {
   }
 
   public readFeatureEnabledStateFromStore(): boolean {
+    const isEnabledByTeam = this.teamState.isBackgroundEffectsEnabled();
+
+    if (isEnabledByTeam) {
+      return true;
+    }
+
     if (this.storage === undefined) {
       return false;
     }
@@ -222,7 +238,9 @@ export class BackgroundEffectsHandler {
   }
 
   public saveFeatureEnabledStateInStore(flag: boolean): boolean {
-    backgroundEffectsStore.getState().setIsFeatureEnabled(flag);
+    const isEnabled = this.teamState.isBackgroundEffectsEnabled() || flag;
+
+    backgroundEffectsStore.getState().setIsFeatureEnabled(isEnabled);
 
     if (this.storage === undefined) {
       return false;
