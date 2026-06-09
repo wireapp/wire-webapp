@@ -154,6 +154,17 @@ jobs:
           flags: lib_api_client
           token: ${{ secrets.CODECOV_TOKEN }}
 
+      - name: Upload react-ui-kit library coverage to Codecov
+        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        with:
+          fail_ci_if_error: false
+          files: ./coverage/libraries/react-ui-kit/lcov.info
+          flags: lib_react_ui_kit
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Build react-ui-kit storybook
+        run: yarn nx run react-ui-kit-lib:build-storybook
+
       - name: Build and package
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
         run: yarn nx run server:package

@@ -77,7 +77,7 @@ export const switchStyles = ({
   '&:before, &:after': {
     backgroundColor:
       disabled || showLoading
-        ? disabledColor ?? COLOR.tint(checked ? activatedColor : deactivatedColor, 0.4)
+        ? (disabledColor ?? COLOR.tint(checked ? activatedColor : deactivatedColor, 0.4))
         : checked
           ? activatedColor
           : deactivatedColor,

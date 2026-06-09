@@ -69,15 +69,15 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
     const switchTheme = theme?.Switch;
 
     const resolvedActivatedColor =
-      (isDarkTheme ? activatedColorDark ?? activatedColor : activatedColor) ??
+      (isDarkTheme ? (activatedColorDark ?? activatedColor) : activatedColor) ??
       switchTheme?.activatedColor ??
       COLOR.BLUE;
     const resolvedDeactivatedColor =
-      (isDarkTheme ? deactivatedColorDark ?? deactivatedColor : deactivatedColor) ??
+      (isDarkTheme ? (deactivatedColorDark ?? deactivatedColor) : deactivatedColor) ??
       switchTheme?.deactivatedColor ??
       '#d2d2d2';
     const resolvedDisabledColor =
-      (isDarkTheme ? disabledColorDark ?? disabledColor : disabledColor) ?? switchTheme?.disabledColor;
+      (isDarkTheme ? (disabledColorDark ?? disabledColor) : disabledColor) ?? switchTheme?.disabledColor;
     const isInteractionDisabled = Boolean(disabled || showLoading);
     const handleToggle = (nextChecked: boolean) => {
       if (isInteractionDisabled) {

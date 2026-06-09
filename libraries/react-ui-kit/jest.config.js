@@ -17,10 +17,17 @@
  *
  */
 
-const baseConfig = require('../../jest.config.base');
-
 module.exports = {
-  ...baseConfig,
+  displayName: 'react-ui-kit-lib',
+  testEnvironment: 'jsdom',
+  runInBand: true,
+  clearMocks: true,
+  coverageDirectory: '../../coverage/libraries/react-ui-kit',
+  testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
+  testPathIgnorePatterns: ['lib/'],
+  coveragePathIgnorePatterns: ['lib/'],
+  modulePathIgnorePatterns: ['lib/'],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
   transform: {
     '^.+\\.(ts|tsx)$': [
       '@swc/jest',

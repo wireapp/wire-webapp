@@ -55,6 +55,5 @@ const labelLinkStyle: <T>(theme, props: LabelLinkProps<T>) => CSSObject = (
 });
 
 export const LabelLink = (props: LabelProps<HTMLAnchorElement>) => (
-  // eslint-disable-next-line jsx-a11y/anchor-has-content
   <a css={(theme: Theme) => labelLinkStyle(theme, props)} {...filterTextProps(props)} />
 );

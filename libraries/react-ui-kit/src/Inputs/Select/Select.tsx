@@ -43,8 +43,11 @@ export type Option = {
   isDisabled?: boolean;
 };
 
-export interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Option>>
-  extends StateManagerProps<Option, IsMulti, Group> {
+export interface SelectProps<IsMulti extends boolean, Group extends GroupBase<Option>> extends StateManagerProps<
+  Option,
+  IsMulti,
+  Group
+> {
   id: string;
   disabled?: boolean;
   dataUieName: string;
