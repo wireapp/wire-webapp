@@ -9952,7 +9952,7 @@ __metadata:
     maxmind: "npm:4.3.29"
     nocache: "npm:4.0.0"
     opn: "npm:6.0.0"
-    true-myth: "npm:9.3.1"
+    true-myth: "npm:9.4.0"
     tslib: "npm:2.8.1"
     zod: "npm:3.25.76"
   languageName: unknown
@@ -26492,10 +26492,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"true-myth@npm:9.3.1":
-  version: 9.3.1
-  resolution: "true-myth@npm:9.3.1"
-  checksum: 10/390791d6f917dd445f82c37174317ce9dfd1e21fd0dba5ac18615aa0761c7daf87cc9e8f13cde588dc3a4a61373dc6dc5a333aa693ccae345d288fbbf97547ed
+"true-myth@npm:9.4.0":
+  version: 9.4.0
+  resolution: "true-myth@npm:9.4.0"
+  checksum: 10/e7a12a2eaa7c7238b29af5a6653d299a9126790acf778f67cfafaf86044ad55d52e8a81085fdbc397991c5e2c2d63ad1cfcc2106160929df33b1c0f3215479c9
   languageName: node
   linkType: hard
 
