@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2025 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,16 @@
  *
  */
 
-export type {
-  DomainMlsError,
-  DomainMlsErrorType,
-  ErrorContextInput,
-  ErrorHandler,
-  MlsErrorMapper,
-} from './mlsErrorMapper';
-export {ChainedMlsErrorMapper, createDefaultMlsErrorMapper} from './mlsErrorMapper';
-export type {
-  RecoveryActionKind,
-  RetryPolicy,
-  RecoveryPolicy,
-  PolicyTable,
-  OperationContext,
-  MlsRecoveryOrchestrator,
-  OrchestratorDeps,
-  MlsEpochRecoveryTrigger,
-} from './mlsRecoveryOrchestrator';
-export {MlsRecoveryOrchestratorImpl, minimalDefaultPolicies, OperationName} from './mlsRecoveryOrchestrator';
-export {MlsEpochRecoveryDeferredError} from './mlsEpochRecoveryDeferredError';
+export enum ConnectionState {
+  /** The WebSocket is closed and no notifications are being processed */
+  CLOSED = 'closed',
+
+  /** The WebSocket is being opened or reconnected */
+  CONNECTING = 'connecting',
+
+  /** The websocket is open but locked and notifications stream is being processed */
+  PROCESSING_NOTIFICATIONS = 'processing_notifications',
+
+  /** The WebSocket is open and new messages are processed live in real time */
+  LIVE = 'live',
+}

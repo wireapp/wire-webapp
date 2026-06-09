@@ -9781,6 +9781,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/core@workspace:libraries/core"
   dependencies:
+    "@sindresorhus/is": "npm:4.6.0"
     "@swc/core": "npm:1.15.40"
     "@swc/jest": "npm:0.2.39"
     "@types/lodash": "npm:4.17.24"

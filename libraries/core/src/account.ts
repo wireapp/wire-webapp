@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {
   RegisterData,
   AUTH_COOKIE_KEY,
@@ -57,6 +58,7 @@ import {LoginSanitizer} from './auth/';
 import {BroadcastService} from './broadcast/';
 import {ClientInfo, ClientService} from './client/';
 import {ConnectionService} from './connection/';
+import {ConnectionState} from './connectionState/connectionState';
 import {AssetService, ConversationService} from './conversation/';
 import {getQueueLength, pauseMessageSending, resumeMessageSending} from './conversation/message/messageSender';
 import {SubconversationService} from './conversation/subconversationService/subconversationService';
@@ -96,20 +98,6 @@ import {LocalStorageStore} from './util/localStorageStore';
 import {RecurringTaskScheduler} from './util/recurringTaskScheduler';
 
 export type ProcessedEventPayload = HandledEventPayload;
-
-export enum ConnectionState {
-  /** The WebSocket is closed and no notifications are being processed */
-  CLOSED = 'closed',
-
-  /** The WebSocket is being opened or reconnected */
-  CONNECTING = 'connecting',
-
-  /** The websocket is open but locked and notifications stream is being processed */
-  PROCESSING_NOTIFICATIONS = 'processing_notifications',
-
-  /** The WebSocket is open and new messages are processed live in real time */
-  LIVE = 'live',
-}
 
 export type CreateStoreFn = (storeName: string, key: Uint8Array) => undefined | Promise<CRUDEngine | undefined>;
 
@@ -166,6 +154,8 @@ export class Account extends TypedEventEmitter<Events> {
   private encryptedDb?: EncryptedStore<any>;
   private coreCallbacks?: CoreCallbacks;
   private connectionState: ConnectionState = ConnectionState.CLOSED;
+
+  private readonly isConnectionLive = (): boolean => this.connectionState === ConnectionState.LIVE;
 
   /**
    * {@link once}-wrapped {@link MLSService.initialisePendingProposalsTasks}; recreated in
@@ -547,6 +537,7 @@ export class Account extends TypedEventEmitter<Events> {
       subconversationService,
       this.isMLSConversationRecoveryEnabled,
       mlsService,
+      this.isConnectionLive,
     );
     const notificationService = new NotificationService(this.apiClient, this.storeEngine, conversationService);
 
@@ -579,6 +570,7 @@ export class Account extends TypedEventEmitter<Events> {
   private readonly resetContext = (): void => {
     this.currentClient = undefined;
     this.initialisePendingProposalsTasksOnce = this.createInitialisePendingProposalsTasksOnce();
+    this.connectionState = ConnectionState.CLOSED;
     delete this.apiClient.context;
     delete this.service;
   };
@@ -998,6 +990,7 @@ export class Account extends TypedEventEmitter<Events> {
      */
     if (markerId === currentMarkerId) {
       await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
+      await this.service!.conversation.runDeferredEpochRecovery();
       resumeProposalProcessing();
       resumeMessageSending();
       resumeRejoiningMLSConversations();
@@ -1017,7 +1010,7 @@ export class Account extends TypedEventEmitter<Events> {
 
       const firstEventPayload = notification.data.event.payload[0];
       const notificationTime = firstEventPayload ? this.getNotificationEventTime(firstEventPayload) : null;
-      if (this.connectionState !== ConnectionState.LIVE && notificationTime !== null && notificationTime.length > 0) {
+      if (!this.isConnectionLive() && is.nonEmptyString(notificationTime)) {
         onNotificationStreamProgress(notificationTime);
       }
 
@@ -1109,6 +1102,7 @@ export class Account extends TypedEventEmitter<Events> {
         .push(async () => {
           this.logger.info(`Resuming message sending. ${getQueueLength()} messages to be sent`);
           await this.rehydrateMlsPendingProposalsTasksOnLiveTransition();
+          await this.service?.conversation.runDeferredEpochRecovery();
           resumeProposalProcessing();
           resumeMessageSending();
           resumeRejoiningMLSConversations();

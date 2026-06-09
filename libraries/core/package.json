@@ -25,6 +25,7 @@
     "./lib/cryptography/assetCryptography/crypto.node": "./lib/cryptography/assetCryptography/crypto.browser.js"
   },
   "dependencies": {
+    "@sindresorhus/is": "4.6.0",
     "@wireapp/api-client": "27.96.0",
     "@wireapp/core-crypto": "9.3.4",
     "@wireapp/cryptobox": "12.8.0",

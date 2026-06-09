@@ -49,6 +49,7 @@ jest.mock('./conversation', () => {
     constructor(..._args: any[]) {}
     // Return unhandled so NotificationService falls back to generic handling in tests
     handleEvent = jest.fn(async () => ({status: 'unhandled' as const}));
+    runDeferredEpochRecovery = jest.fn(async () => undefined);
   }
   return {
     ...actual,
@@ -56,7 +57,8 @@ jest.mock('./conversation', () => {
   };
 });
 
-import {Account, ConnectionState} from './account';
+import {Account} from './account';
+import {ConnectionState} from './connectionState/connectionState';
 import type {MLSService} from './messagingProtocols/mls';
 import {NotificationSource} from './notification';
 

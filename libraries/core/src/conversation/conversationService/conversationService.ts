@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {
   Conversation,
   DefaultConversationRoleName,
@@ -62,6 +63,7 @@ import {isMlsConversationNotFoundError} from '../../messagingProtocols/mls/mlsSe
 import {
   MlsRecoveryOrchestrator,
   MlsEpochRecoveryTrigger,
+  MlsEpochRecoveryDeferredError,
   MlsRecoveryOrchestratorImpl,
   OperationName,
   createDefaultMlsErrorMapper,
@@ -79,6 +81,12 @@ import {mapQualifiedUserClientIdsToFullyQualifiedClientIds} from '../../util/ful
 import {isSendingMessage, sendMessage} from '../message/messageSender';
 import {SubconversationService} from '../subconversationService/subconversationService';
 
+type DeferredEpochRecoveryEntry = {
+  conversationId: QualifiedId;
+  subconvId?: SUBCONVERSATION_ID;
+  trigger?: MlsEpochRecoveryTrigger;
+};
+
 type Events = {
   MLSConversationRecovered: {conversationId: QualifiedId};
   [MLSServiceEvents.MLS_EVENT_DISTRIBUTED]: {events: any; time: string};
@@ -90,6 +98,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
   // Track groups currently undergoing recovery due to key material update failure to prevent duplicate work
   private groupIdConversationMap: Map<string, Conversation> = new Map();
   private MLSRecoveryOrchestrator: MlsRecoveryOrchestrator;
+  private readonly deferredEpochRecoveries = new Map<string, DeferredEpochRecoveryEntry>();
 
   constructor(
     private readonly apiClient: APIClient,
@@ -102,6 +111,7 @@ export class ConversationService extends TypedEventEmitter<Events> {
     private readonly subconversationService: SubconversationService,
     private readonly isMLSConversationRecoveryEnabled: () => Promise<boolean>,
     private readonly _mlsService?: MLSService,
+    private readonly isConnectionLive: () => boolean = () => true,
   ) {
     super();
     this.messageTimer = new MessageTimer();
@@ -753,6 +763,37 @@ export class ConversationService extends TypedEventEmitter<Events> {
     return this.mlsService.wipeConversation(groupId);
   };
 
+  /**
+   * Runs epoch-mismatch recovery for conversations that deferred external commit during
+   * notification replay. Called when the connection transitions to LIVE.
+   */
+  public async runDeferredEpochRecovery(): Promise<void> {
+    if (is.emptySet(this.deferredEpochRecoveries)) {
+      this.logger.info('No deferred MLS epoch mismatch recoveries to run');
+      return;
+    }
+
+    this.logger.info('Running deferred MLS epoch mismatch recoveries after notification replay', {
+      count: this.deferredEpochRecoveries.size,
+    });
+
+    const entries = [...this.deferredEpochRecoveries.values()];
+    this.deferredEpochRecoveries.clear();
+
+    for (const {conversationId, subconvId, trigger} of entries) {
+      try {
+        await this.recoverMLSGroupFromEpochMismatch(conversationId, subconvId, trigger, {isForced: true});
+      } catch (error: unknown) {
+        this.logger.error('Failed to run deferred MLS epoch mismatch recovery', {
+          error,
+          conversationId,
+          subconvId,
+          trigger,
+        });
+      }
+    }
+  }
+
   public async handleConversationsEpochMismatch() {
     this.logger.warn(`There were some missed messages, handling possible epoch mismatch in MLS conversations.`);
 
@@ -1047,7 +1088,8 @@ export class ConversationService extends TypedEventEmitter<Events> {
    * Handle an inbound MLS message-add event with recovery.
    *
    * Policies (see MlsRecoveryOrchestrator):
-   * - WrongEpoch.handleMessageAdd → recover from epoch mismatch and re-run once.
+   * - WrongEpoch.handleMessageAdd → recover from epoch mismatch and re-run once (when LIVE).
+   * - WrongEpoch during notification replay → defer recovery until runDeferredEpochRecovery.
    * - GroupOutOfSync.handleMessageAdd → not handled here; the error bubbles.
    *
    * Returns the decrypted payload when available. Unknown or unrecoverable errors are logged
@@ -1070,6 +1112,14 @@ export class ConversationService extends TypedEventEmitter<Events> {
         },
       });
     } catch (error: unknown) {
+      if (error instanceof MlsEpochRecoveryDeferredError) {
+        this.logger.info('MLS message-add skipped until notification replay completes; returning null', {
+          conversationId: error.conversationId,
+          subconvId: error.subconvId,
+        });
+        return null;
+      }
+
       // For unmapped or unrecoverable errors, avoid surfacing exceptions from event handling
       // and instead log and return null so the event processing queue can continue safely.
       const isSafeMissingSubconversationGroup = event.subconv !== undefined && isMlsConversationNotFoundError(error);
@@ -1084,11 +1134,44 @@ export class ConversationService extends TypedEventEmitter<Events> {
     }
   }
 
+  private getDeferredEpochRecoveryKey(conversationId: QualifiedId, subconvId?: SUBCONVERSATION_ID): string {
+    return `${conversationId.id}@${conversationId.domain}:${subconvId ?? '-'}`;
+  }
+
+  private shouldDeferEpochRecovery(trigger?: MlsEpochRecoveryTrigger): boolean {
+    return trigger?.operationName === OperationName.handleMessageAdd && !this.isConnectionLive();
+  }
+
+  private deferEpochRecovery(
+    conversationId: QualifiedId,
+    subconvId?: SUBCONVERSATION_ID,
+    trigger?: MlsEpochRecoveryTrigger,
+  ): never {
+    const key = this.getDeferredEpochRecoveryKey(conversationId, subconvId);
+    if (!this.deferredEpochRecoveries.has(key)) {
+      this.deferredEpochRecoveries.set(key, {conversationId, subconvId, trigger});
+    }
+
+    this.logger.info('Deferring MLS epoch mismatch recovery until notification replay completes', {
+      conversationId,
+      subconvId,
+      trigger,
+      deferredCount: this.deferredEpochRecoveries.size,
+    });
+
+    throw new MlsEpochRecoveryDeferredError(conversationId, subconvId);
+  }
+
   private async recoverMLSGroupFromEpochMismatch(
     conversationId: QualifiedId,
     subconversationId?: SUBCONVERSATION_ID,
     trigger?: MlsEpochRecoveryTrigger,
+    options: {isForced: boolean} = {isForced: false},
   ) {
+    if (!options.isForced && this.shouldDeferEpochRecovery(trigger)) {
+      this.deferEpochRecovery(conversationId, subconversationId, trigger);
+    }
+
     this.logger.info(`Recovering MLS group from epoch mismatch`, {conversationId, subconversationId, trigger});
     if (subconversationId !== undefined) {
       const parentGroupId = await this.groupIdFromConversationId(conversationId);
