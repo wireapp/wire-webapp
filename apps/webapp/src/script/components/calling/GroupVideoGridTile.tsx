@@ -22,13 +22,14 @@ import {KeyboardEvent} from 'react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {VIDEO_STATE} from '@wireapp/avs';
-import {TabIndex} from '@wireapp/react-ui-kit';
+import {Loading, TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import {
   groupVideoActiveSpeaker,
   groupVideoActiveSpeakerTile,
-  groupVideoElementVideo,
+  groupVideoBackgroundInitializingOverlay,
+  getGroupVideoElementStyles,
   groupVideoParticipantAudioStatus,
   groupVideoParticipantName,
   groupVideoParticipantNameWrapper,
@@ -41,6 +42,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
+import {useShowLoadingOverlay} from './useShowLoadingOverlay';
 import {Video} from './Video';
 
 interface GroupVideoGridTileProps {
@@ -82,11 +84,18 @@ const GroupVideoGridTile = ({
 
   const {name} = useKoSubscribableChildren(participant?.user, ['name']);
 
+  const isSelfParticipant = participant === selfParticipant;
   const sharesScreen = videoState === VIDEO_STATE.SCREENSHARE;
   const sharesCamera = [VIDEO_STATE.STARTED, VIDEO_STATE.PAUSED].includes(videoState);
   const hasPausedVideo = videoState === VIDEO_STATE.PAUSED;
   const doVideoReconnecting = videoState === VIDEO_STATE.RECONNECTING;
   const hasActiveVideo = (sharesCamera || sharesScreen) && !!videoStream;
+
+  const {showLoadingOverlay, onVideoCanPlay} = useShowLoadingOverlay(
+    isSelfParticipant,
+    hasActiveVideo,
+    processedVideoStream,
+  );
 
   const handleTileClick = () => onTileDoubleClick(participant?.user.qualifiedId, participant?.clientId);
 
@@ -127,9 +136,7 @@ const GroupVideoGridTile = ({
       onKeyDown={handleEnterTileClick}
       role="button"
       // minimized is passed only from CallingCell where we don't want to focus individual the tile on the tab press
-      tabIndex={
-        (!minimized || isMaximized) && participant !== selfParticipant ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE
-      }
+      tabIndex={(!minimized || isMaximized) && !isSelfParticipant ? TabIndex.FOCUSABLE : TabIndex.UNFOCUSABLE}
       aria-label={`Focus video ${participant?.user.id}`}
     >
       {hasActiveVideo ? (
@@ -144,7 +151,8 @@ const GroupVideoGridTile = ({
             muted
             srcObject={processedVideoStream?.stream ?? videoStream}
             className="group-video-grid__element-video"
-            css={groupVideoElementVideo(isMaximized || sharesScreen, participant === selfParticipant && sharesCamera)}
+            css={getGroupVideoElementStyles(isMaximized || sharesScreen, isSelfParticipant && sharesCamera)}
+            onCanPlay={onVideoCanPlay}
           />
         </div>
       ) : (
@@ -154,6 +162,16 @@ const GroupVideoGridTile = ({
             participant={participant?.user}
             hideAvailabilityStatus
           />
+        </div>
+      )}
+
+      {showLoadingOverlay && (
+        <div
+          aria-busy={showLoadingOverlay}
+          css={groupVideoBackgroundInitializingOverlay}
+          data-uie-name="background-effect-initializing"
+        >
+          <Loading size={32} />
         </div>
       )}
 

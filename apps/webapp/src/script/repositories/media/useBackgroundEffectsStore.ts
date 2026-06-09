@@ -44,6 +44,7 @@ export type BackgroundEffectsState = {
   model: string;
   lastVirtualBackgroundId: string;
   isHighQualityBlurEnabled: boolean;
+  isInitializing: boolean;
 
   setIsFeatureEnabled(value: boolean): void;
   setPreferredEffect(effect: BackgroundEffectSelection): void;
@@ -51,6 +52,7 @@ export type BackgroundEffectsState = {
   setMetrics(metrics: RenderMetrics | undefined): void;
   setModel(model: string | undefined): void;
   setIsHighQualityBlurEnabled(value: boolean): void;
+  setIsInitializing(value: boolean): void;
 };
 
 export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
@@ -89,6 +91,12 @@ export const backgroundEffectsStore = createStore<BackgroundEffectsState>()(
     setIsHighQualityBlurEnabled: value =>
       set(state => {
         state.isHighQualityBlurEnabled = value;
+      }),
+
+    isInitializing: false,
+    setIsInitializing: value =>
+      set(state => {
+        state.isInitializing = value;
       }),
   })),
 );
