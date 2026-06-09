@@ -1,0 +1,129 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Lead" renders (dark theme) 1`] = `
+.emotion-0 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: #fff;
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-align: center;
+  text-transform: none;
+  margin-bottom: 56px;
+  margin-top: 0;
+}
+
+@media (max-width: 639px) {
+  .emotion-1 {
+    font-size: 1.125rem;
+  }
+}
+
+<div
+  className="emotion-0"
+>
+  <p
+    className="emotion-1"
+  >
+    Lead
+  </p>
+</div>
+`;
+
+exports[`"Lead" renders 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-align: center;
+  text-transform: none;
+  margin-bottom: 56px;
+  margin-top: 0;
+}
+
+@media (max-width: 639px) {
+  .emotion-1 {
+    font-size: 1.125rem;
+  }
+}
+
+<div
+  className="emotion-0"
+>
+  <p
+    className="emotion-1"
+  >
+    Lead
+  </p>
+</div>
+`;
+
+exports[`"Paragraph" renders (dark theme) 1`] = `
+.emotion-0 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: #fff;
+  display: block;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+<div
+  className="emotion-0"
+>
+  <p
+    className="emotion-1"
+  >
+    Paragraph
+  </p>
+</div>
+`;
+
+exports[`"Paragraph" renders 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: block;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+  margin-bottom: 16px;
+  margin-top: 0;
+}
+
+<div
+  className="emotion-0"
+>
+  <p
+    className="emotion-1"
+  >
+    Paragraph
+  </p>
+</div>
+`;

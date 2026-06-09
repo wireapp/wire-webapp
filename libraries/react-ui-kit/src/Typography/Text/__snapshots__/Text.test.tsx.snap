@@ -1,0 +1,461 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`"Text" renders (dark theme) 1`] = `
+.emotion-0 {
+  background: #000;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: #fff;
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders as block 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: block;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders bold 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders centered 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: center;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders light 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 200;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders muted 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: #696c6e;
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders no wrap 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders with color 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: #0772de;
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders with size 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 2px;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders with textTransform 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Text
+  </span>
+</div>
+`;
+
+exports[`"Text" renders with truncation 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  </span>
+</div>
+`;
+
+exports[`Utility components renders Bold 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Bold
+  </span>
+</div>
+`;
+
+exports[`Utility components renders Large 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 48px;
+  font-weight: 200;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Large
+  </span>
+</div>
+`;
+
+exports[`Utility components renders Muted 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: #696c6e;
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Muted
+  </span>
+</div>
+`;
+
+exports[`Utility components renders Small 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 12px;
+  font-weight: 400;
+  text-align: left;
+  text-transform: none;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Small
+  </span>
+</div>
+`;
+
+exports[`Utility components renders Uppercase 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  color: rgb(29, 30, 31);
+  display: inline;
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+<div
+  className="emotion-0"
+>
+  <span
+    className="emotion-1"
+  >
+    Uppercase
+  </span>
+</div>
+`;
