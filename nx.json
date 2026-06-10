@@ -24,7 +24,8 @@
       "inputs": ["default", "^production"]
     },
     "watch": {
-      "continuous": true
+      "continuous": true,
+      "dependsOn": ["build"]
     }
   },
   "namedInputs": {

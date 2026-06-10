@@ -1814,9 +1814,9 @@ yarn dev
 
 This runs `nx serve server`, which:
 
-1. Builds upstream libraries once (`^build` via `server:build`)
+1. Builds each upstream library once before its watcher starts (`watch` → `dependsOn: ["build"]` in `nx.json`)
 2. Starts `watch` on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch` — `tsc --watch` or `vite build --watch`)
-3. Starts the Express server with webpack-dev-middleware in watch mode
+3. Starts the Express server with webpack-dev-middleware in watch mode (`server:build-dev` — server only, no `^build` or `webapp:build`)
 
 Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → webpack detects `@wireapp/*` changes → full page reload (`webpack-hot-middleware/client?reload=true`).
 
@@ -1826,7 +1826,7 @@ Configuration:
 
 - [`nx.json`](../nx.json) — `targetDefaults.watch.continuous: true` (long-running watchers)
 - [`apps/webapp/project.json`](../apps/webapp/project.json) — `watch-deps` starts `^watch` on webapp's upstream libraries
-- [`apps/server/project.json`](../apps/server/project.json) — `serve.continuous: true`, `serve.dependsOn: ["webapp:watch-deps"]`
+- [`apps/server/project.json`](../apps/server/project.json) — `serve.continuous: true`, `serve.dependsOn: ["webapp:watch-deps"]`, `serve` uses `server:build-dev` (not `server:build`) to avoid racing lib `clean` with `watch`
 
 ### TypeScript Path Mappings for Import Resolution
 

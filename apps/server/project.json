@@ -13,6 +13,14 @@
         "parallel": false
       }
     },
+    "build-dev": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "commands": ["rimraf {projectRoot}/dist", "tsc -p {projectRoot}/tsconfig.json", "node {projectRoot}/bin/generateVersionFile.js", "node {projectRoot}/bin/copy_server_assets.js"],
+        "parallel": false
+      }
+    },
     "package": {
       "executor": "nx:run-commands",
       "dependsOn": ["^build"],
@@ -27,7 +35,7 @@
       "dependsOn": ["webapp:watch-deps"],
       "executor": "@nx/js:node",
       "options": {
-        "buildTarget": "server:build",
+        "buildTarget": "server:build-dev",
         "buildTargetOptions": {
           "outputPath": "{projectRoot}/dist",
           "outputFileName": "index.js"
