@@ -140,7 +140,7 @@ const qualitySelectOptions = QUALITY_OPTIONS.map(option => ({
 }));
 
 export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: PerformancePanelProps) => {
-  const isFeatureEnabled = useBackgroundEffectsStore(state => state.isFeatureEnabled);
+  const isPerformancePanelEnabled = useBackgroundEffectsStore(state => state.isPerformancePanelEnabled);
 
   const [selectedQuality, setSelectedQuality] = useState<QualityMode>(() => backgroundEffectsHandler.getQuality());
   const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -152,17 +152,17 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
   );
 
   useEffect(() => {
-    if (!isFeatureEnabled || !isPanelOpen) {
+    if (!isPerformancePanelEnabled || !isPanelOpen) {
       setCapabilityInfo(null);
       return;
     }
 
     setCapabilityInfo(backgroundEffectsHandler.getCapabilityInfo());
-  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
+  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
 
   // Quality polling (fallback for non-reactive quality)
   useEffect((): void | (() => void) => {
-    if (!isFeatureEnabled || !isPanelOpen) {
+    if (!isPerformancePanelEnabled || !isPanelOpen) {
       return;
     }
 
@@ -175,11 +175,11 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     return () => {
       clearInterval(interval);
     };
-  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
+  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
 
   // Capability polling (controller updates these after pipeline start)
   useEffect((): void | (() => void) => {
-    if (!isFeatureEnabled || !isPanelOpen) {
+    if (!isPerformancePanelEnabled || !isPanelOpen) {
       setCapabilityInfo(null);
       return;
     }
@@ -196,14 +196,14 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     return () => {
       clearInterval(interval);
     };
-  }, [backgroundEffectsHandler, isFeatureEnabled, isPanelOpen]);
+  }, [backgroundEffectsHandler, isPerformancePanelEnabled, isPanelOpen]);
 
   // Auto close if disabled
   useEffect(() => {
-    if (!isFeatureEnabled && isPanelOpen) {
+    if (!isPerformancePanelEnabled && isPanelOpen) {
       setIsPanelOpen(false);
     }
-  }, [isFeatureEnabled, isPanelOpen]);
+  }, [isPerformancePanelEnabled, isPanelOpen]);
 
   const togglePerformancePanel = () => {
     setIsPanelOpen(prev => !prev);
@@ -228,7 +228,7 @@ export const VideoBackgroundPerformancePanel = ({backgroundEffectsHandler}: Perf
     backgroundEffectsHandler.applyQuality(defaultQuality);
   }, [backgroundEffectsHandler]);
 
-  if (!isFeatureEnabled) {
+  if (!isPerformancePanelEnabled) {
     return null;
   }
 

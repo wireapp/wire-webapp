@@ -104,7 +104,9 @@ export class BackgroundEffectsHandler {
     private readonly teamState = container.resolve(TeamState),
   ) {
     this.storage = getStorage();
-    backgroundEffectsStore.getState().setIsFeatureEnabled(this.readFeatureEnabledStateFromStore());
+    const isFeatureEnabled = this.readFeatureEnabledStateFromStore();
+    backgroundEffectsStore.getState().setIsFeatureEnabled(isFeatureEnabled);
+    backgroundEffectsStore.getState().setIsPerformancePanelEnabled(this.readDebugFeatureEnabledStateFromStore());
 
     this.teamState.isBackgroundEffectsEnabled.subscribe(() => {
       backgroundEffectsStore.getState().setIsFeatureEnabled(this.readFeatureEnabledStateFromStore());
@@ -225,6 +227,10 @@ export class BackgroundEffectsHandler {
       return true;
     }
 
+    return this.readDebugFeatureEnabledStateFromStore();
+  }
+
+  private readDebugFeatureEnabledStateFromStore(): boolean {
     if (this.storage === undefined) {
       return false;
     }
@@ -241,6 +247,7 @@ export class BackgroundEffectsHandler {
     const isEnabled = this.teamState.isBackgroundEffectsEnabled() || flag;
 
     backgroundEffectsStore.getState().setIsFeatureEnabled(isEnabled);
+    backgroundEffectsStore.getState().setIsPerformancePanelEnabled(flag);
 
     if (this.storage === undefined) {
       return false;

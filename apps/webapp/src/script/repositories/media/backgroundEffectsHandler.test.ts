@@ -65,6 +65,7 @@ describe('BackgroundEffectsHandler', () => {
 
   afterEach(() => {
     backgroundEffectsStore.getState().setIsFeatureEnabled(false);
+    backgroundEffectsStore.getState().setIsPerformancePanelEnabled(false);
     backgroundEffectsStore.getState().setPreferredEffect({type: 'none'});
     backgroundEffectsStore.getState().setMetrics(undefined);
     backgroundEffectsStore.getState().setLastVirtualBackgroundId(DEFAULT_BUILTIN_BACKGROUND_ID);
@@ -218,6 +219,7 @@ describe('BackgroundEffectsHandler', () => {
 
     expect(mockStorage.setItem).toHaveBeenCalledWith('video-background-effects-feature-enabled', 'true');
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
   });
 
   it('reads feature flag from storage', () => {
@@ -226,6 +228,7 @@ describe('BackgroundEffectsHandler', () => {
     new BackgroundEffectsHandler(mockController);
 
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
   });
 
   it('releases processed stream correctly', async () => {
@@ -409,6 +412,7 @@ describe('BackgroundEffectsHandler', () => {
     new BackgroundEffectsHandler(mockController, teamState);
 
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 
   it('enables feature from TeamState even when storage flag is false', () => {
@@ -430,6 +434,7 @@ describe('BackgroundEffectsHandler', () => {
     new BackgroundEffectsHandler(mockController, teamState);
 
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 
   it('falls back to storage flag when TeamState background effects feature is not enabled', () => {
@@ -445,6 +450,7 @@ describe('BackgroundEffectsHandler', () => {
     new BackgroundEffectsHandler(mockController, teamState);
 
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(true);
   });
 
   it('disables feature when neither TeamState nor storage flag is enabled', () => {
@@ -460,6 +466,7 @@ describe('BackgroundEffectsHandler', () => {
     new BackgroundEffectsHandler(mockController, teamState);
 
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(false);
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 
   it('updates feature enabled state when TeamState background effects feature changes', () => {
@@ -468,6 +475,7 @@ describe('BackgroundEffectsHandler', () => {
     new BackgroundEffectsHandler(mockController, teamState);
 
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(false);
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
 
     const features: Partial<FeatureList> = {
       backgroundEffects: {
@@ -478,5 +486,6 @@ describe('BackgroundEffectsHandler', () => {
     teamState.teamFeatures(features);
 
     expect(backgroundEffectsStore.getState().isFeatureEnabled).toBe(true);
+    expect(backgroundEffectsStore.getState().isPerformancePanelEnabled).toBe(false);
   });
 });
