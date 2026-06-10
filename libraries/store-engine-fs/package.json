@@ -1,0 +1,36 @@
+{
+  "name": "@wireapp/store-engine-fs",
+  "license": "GPL-3.0",
+  "description": "Store Engine implementation for Node.js' File System.",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-fs",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index",
+  "peerDependencies": {
+    "@wireapp/store-engine": "5.x.x"
+  },
+  "dependencies": {
+    "fs-extra": "11.3.3"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.3.10",
+    "@swc/jest": "^0.2.23",
+    "@types/fs-extra": "11.0.4",
+    "@types/jest": "^29.2.0",
+    "@types/node": "^22.0.0",
+    "@wireapp/store-engine": "5.1.19",
+    "jest": "^29.2.1",
+    "rimraf": "6.1.2",
+    "ts-node": "10.9.2",
+    "typescript": "^5.0.4"
+  },
+  "scripts": {
+    "build": "yarn clean && tsc",
+    "clean": "rimraf lib",
+    "dist": "yarn build",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "version": "3.1.22"
+}
