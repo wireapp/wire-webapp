@@ -87,7 +87,7 @@ test.describe('Connections', () => {
       await test.step('B sends a connection request to C via the group conversation', async () => {
         await memberBPages.conversationList().getConversation('Group').open();
         await memberBPages.conversation().conversationInfoButton.click();
-        await memberBPages.conversationDetails().openParticipantDetails(memberC.fullName);
+        await memberBPages.conversationDetails().getParticipant(memberC.fullName).openDetails();
         await memberBPages.participantDetails().sendConnectRequest();
       });
 

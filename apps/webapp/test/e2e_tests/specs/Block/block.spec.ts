@@ -59,7 +59,7 @@ export async function blockUserFromProfileView(pageManager: PageManager) {
 export async function blockUserFromOpenGroupProfileView(pageManager: PageManager, userToBlock: User) {
   const {pages, modals} = pageManager.webapp;
   await pages.conversation().clickConversationTitle();
-  await pages.conversationDetails().openParticipantDetails(userToBlock.fullName);
+  await pages.conversationDetails().getParticipant(userToBlock.fullName).openDetails();
   await pages.participantDetails().blockUser();
   await modals.confirm().actionButton.click();
 }

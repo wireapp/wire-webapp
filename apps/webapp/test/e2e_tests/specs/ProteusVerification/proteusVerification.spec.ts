@@ -338,7 +338,8 @@ test.describe('Proteus verification', () => {
           await pages.conversation().clickConversationInfoButton();
           await pages
             .conversationDetails()
-            .openParticipantDetails(pages === userAPages ? userB.fullName : userA.fullName);
+            .getParticipant(pages === userAPages ? userB.fullName : userA.fullName)
+            .openDetails();
           await pages.participantDetails().devicesButton.click();
           await expect(pages.participantDevices().activeDevices).toHaveCount(1);
 
@@ -365,7 +366,7 @@ test.describe('Proteus verification', () => {
       });
 
       await test.step('Action: User A verifies User C`s device', async () => {
-        await userAPages.conversationDetails().openParticipantDetails(userC.fullName);
+        await userAPages.conversationDetails().getParticipant(userC.fullName).openDetails();
         await userAPages.participantDetails().devicesButton.click();
 
         await expect(userAPages.participantDevices().activeDevices).toHaveCount(1);
