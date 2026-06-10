@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useCallback, useMemo, useState} from 'react';
+import {useEffect, useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
 
@@ -53,15 +53,16 @@ export const useGetAllCellsNodes = ({
   const [offset, setOffset] = useState(0);
 
   const {domain, id} = conversationQualifiedId;
-  const conversationPath = useMemo(() => getCellsApiPath({conversationQualifiedId: {domain, id}}), [domain, id]);
 
   const fetchNodes = useCallback(async () => {
     try {
       setError(null);
       setStatus('loading');
 
+      // Resolve the path fresh on every fetch (not memoized) so folder navigation works.
+      // Memoizing on [domain, id] froze it to the conversation root and broke navigation.
       const result = await cellsRepository.getAllNodes({
-        path: conversationPath,
+        path: getCellsApiPath({conversationQualifiedId: {domain, id}}),
         limit: pageSize,
         offset,
         deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
@@ -94,7 +95,7 @@ export const useGetAllCellsNodes = ({
     }
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversationPath, id, offset, pageSize, setError, setNodes, setPagination, setStatus]);
+  }, [domain, id, offset, pageSize, setError, setNodes, setPagination, setStatus]);
 
   const handleHashChange = useCallback((): void => {
     if (enabled !== true) {
