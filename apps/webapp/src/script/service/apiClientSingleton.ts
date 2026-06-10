@@ -21,6 +21,7 @@ import {singleton} from 'tsyringe';
 
 import {APIClient as APIClientUnconfigured} from '@wireapp/api-client';
 
+import {WallClock, createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
 
 const wireClientHeaderName = 'Wire-Client';
@@ -31,9 +32,19 @@ type RetryBackoffResettableHttpClient = {
   readonly resetRetryBackoff: () => void;
 };
 
+type APIClientProperties = {
+  readonly isReliableWebsocketConnectionEnabled: boolean;
+  readonly wallClock: WallClock;
+};
+
 @singleton()
 export class APIClient extends APIClientUnconfigured {
-  constructor() {
+  constructor(
+    {isReliableWebsocketConnectionEnabled, wallClock}: APIClientProperties = {
+      isReliableWebsocketConnectionEnabled: false,
+      wallClock: createWallClock(),
+    },
+  ) {
     const webAppConfiguration = Config.getConfig();
 
     const unconfiguredApiClientConfiguration = {
@@ -46,6 +57,8 @@ export class APIClient extends APIClientUnconfigured {
         rest: webAppConfiguration.BACKEND_REST,
         ws: webAppConfiguration.BACKEND_WS,
       },
+      isReliableWebsocketConnectionEnabled,
+      wallClock,
     };
 
     super(unconfiguredApiClientConfiguration);

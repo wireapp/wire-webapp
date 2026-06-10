@@ -54,7 +54,7 @@ import {ObfuscationUtil} from './obfuscation';
 import {SelfAPI} from './self/';
 import {ServiceProviderAPI} from './serviceProvider';
 import {ServicesAPI} from './services';
-import {OnConnect, WebSocketClient} from './tcp/';
+import {OnConnect, ReconnectingWebsocketWallClock, WebSocketClient} from './tcp/';
 import {
   FeatureAPI,
   IdentityProviderAPI,
@@ -83,8 +83,20 @@ enum TOPIC {
 }
 
 const defaultConfig = {
+  isReliableWebsocketConnectionEnabled: false,
+  wallClock: {
+    clearInterval: globalThis.clearInterval.bind(globalThis),
+    clearTimeout: globalThis.clearTimeout.bind(globalThis),
+
+    get currentTimestampInMilliseconds() {
+      return Date.now();
+    },
+
+    setInterval: globalThis.setInterval.bind(globalThis),
+    setTimeout: globalThis.setTimeout.bind(globalThis),
+  },
   urls: Backend.PRODUCTION,
-} as Config;
+} as Config & APIClientConfiguration;
 
 export interface APIClient {
   on(event: TOPIC.ON_LOGOUT, listener: (error: InvalidTokenError) => void): this;
@@ -94,9 +106,12 @@ export interface APIClient {
   on(event: TOPIC.ACCESS_TOKEN_REFRESH, listener: (accessToken: AccessTokenData) => void): this;
 }
 
-export type APIClientConfiguration = {};
+export type APIClientConfiguration = {
+  readonly isReliableWebsocketConnectionEnabled: boolean;
+  readonly wallClock: ReconnectingWebsocketWallClock;
+};
 
-export type APIClientConstructorConfiguration = Config & APIClientConfiguration;
+export type APIClientConstructorConfiguration = Config & Partial<APIClientConfiguration>;
 
 type Apis = {
   account: AccountAPI;
@@ -166,7 +181,7 @@ export class APIClient extends EventEmitter {
   private readonly accessTokenStore: AccessTokenStore;
   public context?: Context;
   public transport: {http: HttpClient; ws: WebSocketClient};
-  public config: Config;
+  public config: Config & APIClientConfiguration;
   public backendFeatures: BackendFeatures;
 
   // Store reference to cookie listener for cleanup
@@ -192,7 +207,10 @@ export class APIClient extends EventEmitter {
     this.logger = LogFactory.getLogger('@wireapp/api-client/Client');
 
     const httpClient = new HttpClient(this.config, this.accessTokenStore);
-    const webSocket = new WebSocketClient(this.config.urls.ws, httpClient);
+    const webSocket = new WebSocketClient(this.config.urls.ws, httpClient, {
+      isReliableWebsocketConnectionEnabled: this.config.isReliableWebsocketConnectionEnabled,
+      wallClock: this.config.wallClock,
+    });
 
     const onInvalidCredentials = async (error: InvalidTokenError | MissingCookieError) => {
       try {

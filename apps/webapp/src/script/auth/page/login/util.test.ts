@@ -24,6 +24,7 @@ import {StatusCodes} from 'http-status-codes';
 import {Dispatch} from 'redux';
 
 import {APIClient} from 'src/script/service/apiClientSingleton';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 
 import {actionRoot as ROOT_ACTIONS} from '../../module/action';
 import {ROUTE} from '../../route';
@@ -151,7 +152,10 @@ describe('Login util', () => {
       dispatch = dispatchSpy;
       navigate = jest.fn();
       loginWithSSO = jest.fn().mockResolvedValue(undefined);
-      apiClient = new APIClient();
+      apiClient = new APIClient({
+        isReliableWebsocketConnectionEnabled: false,
+        wallClock: createDeterministicWallClock(),
+      });
       jest.spyOn(ROOT_ACTIONS.authAction, 'pushAccountRegistrationData').mockImplementation(() => {
         return () => Promise.resolve();
       });
