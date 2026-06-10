@@ -1,3 +1,4 @@
+---
 name: Publish and deploy webapp
 
 on:
@@ -273,14 +274,30 @@ jobs:
             echo "targets=${deployment_targets_json}" >> "$GITHUB_ENV"
           fi
 
+  release_critical_flow:
+    name: Playwright Critical Flow (release)
+    needs: [build]
+    if: ${{ github.repository == 'wireapp/wire-webapp' && github.ref_type == 'tag' && (contains(github.ref_name, 'staging') || contains(github.ref_name, 'production')) }}
+    uses: ./.github/workflows/precommit-slot-run.yml
+    with:
+      env_name: wire-webapp-precommit-3
+      backendUrl: https://staging-nginz-https.zinfra.io/
+      grep: '@crit-flow-web'
+      notify_deployoholics_on_failure: true
+    secrets:
+      OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+      WEBTEAM_AWS_ACCESS_KEY_ID: ${{ secrets.WEBTEAM_AWS_ACCESS_KEY_ID }}
+      WEBTEAM_AWS_SECRET_ACCESS_KEY: ${{ secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY }}
+      WIRE_DEPLOYOHOLICS_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+
   deploy_to_aws:
     name: 'Deploy to live environments'
     runs-on: ubuntu-24.04
     env:
       AWS_REGION: eu-central-1
     environment: ${{ matrix.target }}
-    needs: [build, set_deployment_targets]
-    if: ${{needs.set_deployment_targets.outputs.deployment_targets}}
+    needs: [build, set_deployment_targets, release_critical_flow]
+    if: ${{ always() && needs.build.result == 'success' && needs.set_deployment_targets.result == 'success' && needs.set_deployment_targets.outputs.deployment_targets && (needs.release_critical_flow.result == 'success' || needs.release_critical_flow.result == 'skipped') }}
 
     strategy:
       matrix:
