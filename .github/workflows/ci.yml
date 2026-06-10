@@ -130,7 +130,9 @@ jobs:
 
       - name: Lint (PR)
         if: ${{ github.event_name == 'pull_request' }}
-        run: yarn nx affected -t lint --base=${{ github.base_ref }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: yarn nx affected -t lint --base="origin/${BASE_REF}"
 
       - name: Lint (non-PR)
         if: ${{ github.event_name != 'pull_request' }}
