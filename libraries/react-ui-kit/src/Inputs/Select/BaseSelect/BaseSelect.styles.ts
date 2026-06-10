@@ -87,9 +87,9 @@ export const baseControlStyles = ({
       boxShadow: `0 0 0 1px ${getSelectAccentColor(theme)}`,
     },
   }),
-  cursor: !selectProps.isDisabled && 'pointer',
+  cursor: selectProps.isDisabled ? undefined : 'pointer',
   '&:focus:visible, active': {
-    boxShadow: !selectProps.isDisabled && `0 0 0 1px ${getSelectAccentColor(theme)}`,
+    boxShadow: selectProps.isDisabled ? undefined : `0 0 0 1px ${getSelectAccentColor(theme)}`,
   },
   ...controlCSS,
 });
@@ -106,7 +106,7 @@ export const baseDropdownIndicatorStyles = ({
   const isSelectDisabled = selectProps.isDisabled;
   return {
     '& > svg': {
-      fill: isSelectDisabled && theme.Input.placeholderColor,
+      fill: isSelectDisabled ? theme.Input.placeholderColor : undefined,
     },
   };
 };

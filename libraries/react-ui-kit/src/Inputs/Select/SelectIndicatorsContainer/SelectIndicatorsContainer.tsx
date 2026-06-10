@@ -17,11 +17,17 @@
  *
  */
 
-import {components, IndicatorsContainerProps} from 'react-select';
+import {components, GroupBase, IndicatorsContainerProps} from 'react-select';
 
 import {Option} from '../Select';
 
-export const SelectIndicatorsContainer = ({children, ...restProps}: IndicatorsContainerProps<Option>) => {
+export const SelectIndicatorsContainer = <
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+>({
+  children,
+  ...restProps
+}: IndicatorsContainerProps<Option, IsMulti, Group>) => {
   const value = restProps.getValue();
   const displaySelectedOptionsCount = Array.isArray(value) && value.length > 1;
 

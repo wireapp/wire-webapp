@@ -37,7 +37,7 @@ export const ShakeBox = React.forwardRef<ShakeBoxRef, ShakeBoxProps>(
     const [offset, setOffset] = useState(0);
     let requestAnimationId = 0;
 
-    const shakeLoop = (targetOffset, currentOffset = 0) => {
+    const shakeLoop = (targetOffset: number, currentOffset = 0) => {
       if (targetOffset > 0 && currentOffset < targetOffset) {
         currentOffset += speed;
       } else if (targetOffset < 0 && currentOffset > targetOffset) {

@@ -20,6 +20,8 @@
 import * as React from 'react';
 import {useEffect, useRef} from 'react';
 
+import is from '@sindresorhus/is';
+
 export interface IsInViewportProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   checkViewportOnce?: boolean;
   disabled?: boolean;
@@ -34,26 +36,25 @@ export const IsInViewport = ({
 }: IsInViewportProps) => {
   const element = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    let observer = undefined;
-    if (onEnterViewport && !disabled) {
+    let observer: IntersectionObserver | undefined;
+    const elementNode = element.current;
+    if (!is.undefined(onEnterViewport) && !disabled && !is.nullOrUndefined(elementNode)) {
       observer = new IntersectionObserver(([{isIntersecting}]) => {
         if (isIntersecting) {
           if (checkViewportOnce) {
-            observer.disconnect();
+            observer?.disconnect();
           }
-          if (onEnterViewport && !disabled) {
+          if (!is.undefined(onEnterViewport) && !disabled) {
             onEnterViewport();
           }
         }
       });
-      observer.observe(element.current);
+      observer.observe(elementNode);
     }
 
     return () => {
-      if (observer) {
-        observer.disconnect();
-      }
+      observer?.disconnect();
     };
-  }, [onEnterViewport]);
+  }, [onEnterViewport, disabled, checkViewportOnce]);
   return <div ref={element} {...props} />;
 };

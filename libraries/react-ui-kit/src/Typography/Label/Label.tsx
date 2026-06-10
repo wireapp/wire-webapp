@@ -36,7 +36,7 @@ const labelStyle: <T>(theme: Theme, props: LabelProps<T>) => CSSObject = (
   '&:focus-within': {
     color: COLOR.BLUE,
   },
-  color: markInvalid ? COLOR.RED : 'initial',
+  color: markInvalid === true ? COLOR.RED : 'initial',
   width: '100%',
 });
 
@@ -47,13 +47,15 @@ export const Label = (props: LabelProps) => (
 
 export type LabelLinkProps<T = HTMLAnchorElement> = LinkProps<T>;
 
-const labelLinkStyle: <T>(theme, props: LabelLinkProps<T>) => CSSObject = (
+const labelLinkStyle: <T>(theme: Theme, props: LabelLinkProps<T>) => CSSObject = (
   theme,
   {fontSize = theme.fontSizes.small, ...props},
 ) => ({
   ...linkStyle(theme, {fontSize, ...props}),
 });
 
-export const LabelLink = (props: LabelProps<HTMLAnchorElement>) => (
-  <a css={(theme: Theme) => labelLinkStyle(theme, props)} {...filterTextProps(props)} />
+export const LabelLink = ({children, ...props}: LabelProps<HTMLAnchorElement>) => (
+  <a css={(theme: Theme) => labelLinkStyle(theme, props)} {...filterTextProps(props)}>
+    {children}
+  </a>
 );

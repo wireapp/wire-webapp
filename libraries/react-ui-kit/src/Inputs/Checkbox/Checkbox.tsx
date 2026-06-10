@@ -43,8 +43,8 @@ const StyledLabel = ({
     <label
       css={(theme: Theme) => ({
         [`.${INPUT_CLASSNAME}:checked + &::before`]: {
-          background: `${disabled ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor}`,
-          borderColor: disabled ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor,
+          background: `${disabled === true ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor}`,
+          borderColor: disabled === true ? theme.Checkbox.disablecheckedBgColor : theme.general.primaryColor,
         },
         [`.${INPUT_CLASSNAME}:checked + & > svg`]: {
           fill: theme.general.backgroundColor,
@@ -54,7 +54,7 @@ const StyledLabel = ({
           position: 'absolute',
           top: '50%',
           transform: 'translateY(-50%)',
-          ...(labelBeforeCheckbox
+          ...(labelBeforeCheckbox === true
             ? {
                 right: '11px',
               }
@@ -62,18 +62,19 @@ const StyledLabel = ({
                 left: '4px',
               }),
         },
-        ...(!disabled && {
+        ...(disabled !== true && {
           [`.${INPUT_CLASSNAME}:hover + &::before`]: {
             borderColor: theme.general.primaryColor,
           },
         }),
         [`.${INPUT_CLASSNAME} + &::before`]: {
-          background: disabled ? theme.Checkbox.disableBgColor : theme.Checkbox.background,
-          ...(!disabled
+          background: disabled === true ? theme.Checkbox.disableBgColor : theme.Checkbox.background,
+          ...(disabled !== true
             ? {
-                border: markInvalid
-                  ? `2px solid ${theme.Checkbox.invalidBorderColor}`
-                  : `2px solid ${theme.Checkbox.border}`,
+                border:
+                  markInvalid === true
+                    ? `2px solid ${theme.Checkbox.invalidBorderColor}`
+                    : `2px solid ${theme.Checkbox.border}`,
               }
             : {
                 border: `2px solid ${theme.Checkbox.disableBorderColor}`,
@@ -88,18 +89,18 @@ const StyledLabel = ({
           margin: '0 8px 0 0px',
           color: theme.general.color,
         },
-        ...(labelBeforeCheckbox && {
+        ...(labelBeforeCheckbox === true && {
           flexDirection: 'row-reverse',
           justifyContent: 'space-between',
         }),
         alignItems: 'center',
         position: 'relative',
         margin: '0 0 0 -16px',
-        width: aligncenter ? 'auto' : '100%',
+        width: aligncenter === true ? 'auto' : '100%',
         lineHeight: '1.4rem',
         display: 'flex',
-        opacity: disabled ? 0.56 : 1,
-        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled === true ? 0.56 : 1,
+        cursor: disabled === true ? 'not-allowed' : 'pointer',
         borderRadius: '4px',
       })}
       {...props}
@@ -161,7 +162,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
             marginBottom: '0',
             opacity: 0,
             width: '22px',
-            cursor: disabled ? 'not-allowed' : 'pointer',
+            cursor: disabled === true ? 'not-allowed' : 'pointer',
           }}
           disabled={disabled}
           ref={ref}

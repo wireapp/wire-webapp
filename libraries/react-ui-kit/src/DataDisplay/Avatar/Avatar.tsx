@@ -20,6 +20,7 @@
 import {useEffect, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 
 import {COLOR} from '../../Identity/colors/colors';
 import {DURATION, EASE} from '../../Identity/motions/motions';
@@ -49,18 +50,18 @@ const avatarStyle: <T>(props: AvatarProps<T>) => CSSObject = ({
 }) => {
   const BORDER_SIZE_LIMIT = 32;
   const borderSize = size > BORDER_SIZE_LIMIT ? 2 : 1;
-  const borderWidth = url ? 0 : borderSize;
+  const borderWidth = is.nonEmptyString(url) ? 0 : borderSize;
   const fontSize = `${Math.ceil(size / 2.2)}px`;
 
   return {
     alignItems: 'center',
     backgroundColor: backgroundColor,
-    borderRadius: isAvatarGridItem ? '0' : '50%',
-    boxShadow: isAvatarGridItem ? 'none' : `inset 0 0 0 ${borderWidth}px ${borderColor}`,
+    borderRadius: isAvatarGridItem === true ? '0' : '50%',
+    boxShadow: isAvatarGridItem === true ? 'none' : `inset 0 0 0 ${borderWidth}px ${borderColor}`,
     color,
     display: 'flex',
     fontSize,
-    fontWeight: isAvatarGridItem ? 700 : 400,
+    fontWeight: isAvatarGridItem === true ? 700 : 400,
     height: `${size}px`,
     justifyContent: 'center',
     minHeight: `${size}px`,
@@ -86,7 +87,7 @@ export const Avatar = (props: AvatarProps) => {
   const {url, forceInitials, name, fetchImage, isAvatarGridItem} = props;
   const [scale, setScale] = useState(0);
   useEffect(() => {
-    if (url) {
+    if (is.nonEmptyString(url)) {
       requestAnimationFrame(() => setScale(1));
     }
   }, [url]);
@@ -96,26 +97,28 @@ export const Avatar = (props: AvatarProps) => {
       .filter(Boolean)
       .map(([initial]) => initial.toUpperCase())
       .join('')
-      .substring(0, isAvatarGridItem ? 1 : 2);
+      .substring(0, isAvatarGridItem === true ? 1 : 2);
 
   return (
     <IsInViewport
       checkViewportOnce
       onEnterViewport={fetchImage}
-      disabled={!!url}
+      disabled={is.nonEmptyString(url)}
       css={avatarStyle(props)}
-      data-uie-name={!forceInitials && url ? 'element-avatar-image' : 'element-avatar-initials'}
+      data-uie-name={
+        forceInitials !== true && is.nonEmptyString(url) ? 'element-avatar-image' : 'element-avatar-initials'
+      }
       {...filteredAvatarProps(props)}
     >
-      {forceInitials || !url ? (
+      {forceInitials === true || !is.nonEmptyString(url) ? (
         getInitials(name)
       ) : (
         <div
           css={{
-            backgroundImage: url && `url(${url})`,
+            backgroundImage: `url(${url})`,
             backgroundPosition: 'center',
             backgroundSize: 'cover',
-            borderRadius: isAvatarGridItem ? '0' : '50%',
+            borderRadius: isAvatarGridItem === true ? '0' : '50%',
             minHeight: '100%',
             minWidth: '100%',
             opacity: scale,

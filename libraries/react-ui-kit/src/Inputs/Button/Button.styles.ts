@@ -18,6 +18,7 @@
  */
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 
 import {ButtonProps, ButtonVariant} from './Button';
 
@@ -25,66 +26,83 @@ import {COLOR, COLOR_V2, Theme} from '../../Identity';
 import {defaultTransition} from '../../Identity/motions';
 import {textStyle} from '../../Typography';
 
+const getButtonTheme = (theme: Theme): NonNullable<Theme['Button']> => {
+  if (is.undefined(theme.Button)) {
+    throw new Error('Button theme tokens are not defined');
+  }
+  return theme.Button;
+};
+
 const buttonPrimaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+  const button = getButtonTheme(theme);
   const activeStyles = {
-    backgroundColor: theme.Button.primaryActiveBg,
-    border: `1px solid ${theme.Button.primaryActiveBorder}`,
+    backgroundColor: button.primaryActiveBg,
+    border: `1px solid ${button.primaryActiveBorder}`,
     color: COLOR.WHITE,
   };
 
   return {
-    ...(isActive
+    ...(isActive === true
       ? activeStyles
       : {
-          color: disabled ? theme.Button.primaryDisabledText : theme.general.contrastColor,
-          backgroundColor: backgroundColor || disabled ? theme.Button.primaryDisabledBg : theme.Button.primaryBg,
+          color: disabled === true ? button.primaryDisabledText : theme.general.contrastColor,
+          backgroundColor:
+            is.nonEmptyString(backgroundColor) || disabled === true ? button.primaryDisabledBg : button.primaryBg,
         }),
 
-    ...(!disabled && {
-      '&:hover, &:focus': {
-        backgroundColor: theme.Button.primaryHoverBg,
-      },
-      '&:focus': {
-        border: `1px solid ${theme.Button.primaryFocusBorder}`,
-      },
-      '&:active': activeStyles,
-    }),
+    ...(disabled !== true
+      ? {
+          '&:hover, &:focus': {
+            backgroundColor: button.primaryHoverBg,
+          },
+          '&:focus': {
+            border: `1px solid ${button.primaryFocusBorder}`,
+          },
+          '&:active': activeStyles,
+        }
+      : {}),
   };
 };
 
 const buttonSecondaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+  const button = getButtonTheme(theme);
   const activeStyles = {
-    backgroundColor: theme.Button.secondaryActiveBg,
-    border: `1px solid ${theme.Button.secondaryActiveBorder}`,
+    backgroundColor: button.secondaryActiveBg,
+    border: `1px solid ${button.secondaryActiveBorder}`,
     color: theme.general.primaryColor,
   };
 
   return {
     border: `1px solid ${theme.IconButton.primaryBorderColor}`,
 
-    ...(isActive
+    ...(isActive === true
       ? activeStyles
       : {
-          color: disabled ? theme.Input.placeholderColor : theme.general.color,
+          color: disabled === true ? theme.Input.placeholderColor : theme.general.color,
           backgroundColor:
-            backgroundColor || disabled ? theme.IconButton.primaryDisabledBgColor : theme.IconButton.primaryBgColor,
+            is.nonEmptyString(backgroundColor) || disabled === true
+              ? theme.IconButton.primaryDisabledBgColor
+              : theme.IconButton.primaryBgColor,
         }),
 
-    ...(!disabled && {
-      '&:hover, &:focus': {
-        border: `1px solid ${theme.Button.secondaryHoverBorder}`,
-      },
-      '&:focus': {
-        color: theme.IconButton.primaryActiveFillColor,
-      },
-      '&:active': activeStyles,
-    }),
+    ...(disabled !== true
+      ? {
+          '&:hover, &:focus': {
+            border: `1px solid ${button.secondaryHoverBorder}`,
+          },
+          '&:focus': {
+            color: theme.IconButton.primaryActiveFillColor,
+          },
+          '&:active': activeStyles,
+        }
+      : {}),
   };
 };
 
 const buttonTertiaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isActive}: ButtonProps<T>) => {
+  const button = getButtonTheme(theme);
   const activeStyles = {
-    backgroundColor: theme.Button.tertiaryActiveBg,
+    backgroundColor: button.tertiaryActiveBg,
     color: theme.IconButton.primaryActiveFillColor,
     '& > svg > path': {
       fill: theme.IconButton.primaryActiveFillColor,
@@ -92,33 +110,36 @@ const buttonTertiaryStyles = <T>(theme: Theme, {backgroundColor, disabled, isAct
   };
 
   return {
-    border: disabled ? `1px solid ${theme.Button.tertiaryDisabledBorder}` : `1px solid ${theme.Button.tertiaryBorder}`,
+    border: disabled === true ? `1px solid ${button.tertiaryDisabledBorder}` : `1px solid ${button.tertiaryBorder}`,
     borderRadius: '12px',
     fontSize: theme.fontSizes.medium,
     fontWeight: 700,
     lineHeight: '1.5rem',
     padding: '4px 8px',
     '& > svg > path': {
-      fill: disabled ? theme.Input.placeholderColor : theme.general.color,
+      fill: disabled === true ? theme.Input.placeholderColor : theme.general.color,
     },
 
-    ...(isActive
+    ...(isActive === true
       ? activeStyles
       : {
-          color: disabled ? theme.Input.placeholderColor : theme.general.color,
-          backgroundColor: backgroundColor || disabled ? theme.Button.tertiarydisabledBg : theme.Button.tertiaryBg,
+          color: disabled === true ? theme.Input.placeholderColor : theme.general.color,
+          backgroundColor:
+            is.nonEmptyString(backgroundColor) || disabled === true ? button.tertiarydisabledBg : button.tertiaryBg,
         }),
 
-    ...(!disabled && {
-      '&:hover, &:focus': {
-        backgroundColor: theme.Button.tertiaryHoverBg,
-        border: `1px solid ${theme.Button.tertiaryHoverBorder}`,
-      },
-      '&:focus': {
-        border: `1px solid ${theme.general.focusColor}`,
-      },
-      '&:active': activeStyles,
-    }),
+    ...(disabled !== true
+      ? {
+          '&:hover, &:focus': {
+            backgroundColor: button.tertiaryHoverBg,
+            border: `1px solid ${button.tertiaryHoverBorder}`,
+          },
+          '&:focus': {
+            border: `1px solid ${theme.general.focusColor}`,
+          },
+          '&:active': activeStyles,
+        }
+      : {}),
   };
 };
 
@@ -130,22 +151,24 @@ const buttonQuaternaryStyles = <T>({backgroundColor, disabled, isActive}: Button
   return {
     lineHeight: '1.5rem',
 
-    ...(isActive
+    ...(isActive === true
       ? activeStyles
       : {
-          color: disabled ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
-          backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_50 : COLOR_V2.GREEN,
+          color: disabled === true ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
+          backgroundColor: is.nonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_50 : COLOR_V2.GREEN,
         }),
 
-    ...(!disabled && {
-      '&:hover, &:focus': {
-        backgroundColor: COLOR_V2.GREEN_LIGHT_600,
-      },
-      '&:focus': {
-        border: `1px solid ${COLOR_V2.GREEN_LIGHT_700}`,
-      },
-      '&:active': activeStyles,
-    }),
+    ...(disabled !== true
+      ? {
+          '&:hover, &:focus': {
+            backgroundColor: COLOR_V2.GREEN_LIGHT_600,
+          },
+          '&:focus': {
+            border: `1px solid ${COLOR_V2.GREEN_LIGHT_700}`,
+          },
+          '&:active': activeStyles,
+        }
+      : {}),
   };
 };
 
@@ -157,22 +180,24 @@ const buttonCancelStyles = <T>({backgroundColor, disabled, isActive}: ButtonProp
   return {
     lineHeight: '1.5rem',
 
-    ...(isActive
+    ...(isActive === true
       ? activeStyles
       : {
-          color: disabled ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
-          backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_50 : COLOR_V2.RED,
+          color: disabled === true ? COLOR_V2.GRAY_80 : COLOR_V2.WHITE,
+          backgroundColor: is.nonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_50 : COLOR_V2.RED,
         }),
 
-    ...(!disabled && {
-      '&:hover, &:focus': {
-        backgroundColor: COLOR_V2.RED_LIGHT_600,
-      },
-      '&:focus': {
-        border: `1px solid ${COLOR_V2.RED_LIGHT_700}`,
-      },
-      '&:active': activeStyles,
-    }),
+    ...(disabled !== true
+      ? {
+          '&:hover, &:focus': {
+            backgroundColor: COLOR_V2.RED_LIGHT_600,
+          },
+          '&:focus': {
+            border: `1px solid ${COLOR_V2.RED_LIGHT_700}`,
+          },
+          '&:active': activeStyles,
+        }
+      : {}),
   };
 };
 
@@ -184,21 +209,23 @@ const buttonSendStyles = <T>({backgroundColor, disabled, isActive}: ButtonProps<
   return {
     width: '40px',
 
-    ...(isActive
+    ...(isActive === true
       ? activeStyles
       : {
-          backgroundColor: backgroundColor || disabled ? COLOR_V2.GRAY_70 : COLOR_V2.BLUE,
+          backgroundColor: is.nonEmptyString(backgroundColor) || disabled === true ? COLOR_V2.GRAY_70 : COLOR_V2.BLUE,
         }),
 
-    ...(!disabled && {
-      '&:hover, &:focus': {
-        backgroundColor: COLOR_V2.BLUE_LIGHT_600,
-      },
-      '&:focus': {
-        border: `1px solid ${COLOR_V2.BLUE_LIGHT_800}`,
-      },
-      '&:active': activeStyles,
-    }),
+    ...(disabled !== true
+      ? {
+          '&:hover, &:focus': {
+            backgroundColor: COLOR_V2.BLUE_LIGHT_600,
+          },
+          '&:focus': {
+            border: `1px solid ${COLOR_V2.BLUE_LIGHT_800}`,
+          },
+          '&:active': activeStyles,
+        }
+      : {}),
   };
 };
 
@@ -231,7 +258,7 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
       ...props,
     }),
     border: 0,
-    cursor: props.disabled ? 'not-allowed' : 'pointer',
+    cursor: props.disabled === true ? 'not-allowed' : 'pointer',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -264,15 +291,17 @@ export const buttonStyle: <T>(theme: Theme, props: ButtonProps<T>) => CSSObject 
     ...(variant === ButtonVariant.CANCEL && buttonCancelStyles(props)),
     ...(variant === ButtonVariant.SEND && buttonSendStyles(props)),
 
-    ...(group && {
-      borderRadius: '0',
+    ...(group === true
+      ? {
+          borderRadius: '0',
 
-      '&:first-of-type': {
-        borderRadius: '12px 0 0 12px',
-      },
-      '&:last-of-type': {
-        borderRadius: '0 12px 12px 0',
-      },
-    }),
+          '&:first-of-type': {
+            borderRadius: '12px 0 0 12px',
+          },
+          '&:last-of-type': {
+            borderRadius: '0 12px 12px 0',
+          },
+        }
+      : {}),
   };
 };

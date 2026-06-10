@@ -28,7 +28,7 @@ import {noop} from '../../utils/util';
 
 export type OverlayWrapperProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-export const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => CSSObject = () => ({
+export const overlayWrapperStyle: CSSObject = {
   bottom: 0,
   display: 'flex',
   left: 0,
@@ -38,7 +38,7 @@ export const overlayWrapperStyle: <T>(props: OverlayWrapperProps<T>) => CSSObjec
   right: 0,
   top: 0,
   zIndex: 9997,
-});
+};
 
 export const OverlayWrapper = (props: OverlayWrapperProps) => <div css={overlayWrapperStyle} {...props} />;
 
@@ -68,7 +68,7 @@ export const OverlayContent = (props: React.HTMLProps<HTMLDivElement>) => (
 
 export type OverlayBackgroundProps<T = HTMLDivElement> = React.HTMLProps<T>;
 
-export const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => CSSObject = () => ({
+export const overlayBackgroundStyle: CSSObject = {
   animation: `${ANIMATION.fadeIn} ${DURATION.PROACTIVE_SLOW}ms ${EASE.QUART}`,
   background: 'rgba(0, 0, 0, 0.88)',
   height: '100vh',
@@ -77,7 +77,7 @@ export const overlayBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => CS
   top: 0,
   width: '100vw',
   zIndex: 9998,
-});
+};
 
 export const OverlayBackground = (props: OverlayBackgroundProps) => <div css={overlayBackgroundStyle} {...props} />;
 

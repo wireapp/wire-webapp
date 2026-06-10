@@ -24,6 +24,13 @@ import {QUERY, QueryKeys} from '../../utils';
 
 type Query = string | QueryKeys;
 
+const resolveMediaQuery = (query: Query): string => {
+  if (typeof query !== 'string') {
+    return QUERY[query];
+  }
+  return (Object.values(QueryKeys) as string[]).includes(query) ? QUERY[query as QueryKeys] : query;
+};
+
 export interface MatchMediaProps extends React.HTMLProps<ReactFragment> {
   not?: boolean;
   query: Query;
@@ -50,8 +57,8 @@ export const useMatchMedia = (query: Query, customWindowObj?: Window) => {
 };
 
 export const MatchMedia: React.FC<MatchMediaProps> = ({query, children, not}) => {
-  const matchQuery = useMatchMedia(QUERY[query] || query);
-  const isMatching = not ? !matchQuery : matchQuery;
+  const matchQuery = useMatchMedia(resolveMediaQuery(query));
+  const isMatching = not === true ? !matchQuery : matchQuery;
   return isMatching ? <>{children}</> : null;
 };
 

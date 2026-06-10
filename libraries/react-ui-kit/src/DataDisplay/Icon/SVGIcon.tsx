@@ -20,6 +20,7 @@
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 
 import {Theme} from '../../Identity/Theme';
 
@@ -48,22 +49,22 @@ export const SVGIcon = ({
   realWidth,
   realHeight,
   scale = 1,
-  width = null,
-  height = null,
+  width,
+  height,
   shadow,
   children,
   fill,
   ...props
 }: InternalSVGIconProps) => {
   let newScale = scale;
-  if (width || height) {
-    const widthScale = width ? width / realWidth : Infinity;
-    const heightScale = height ? height / realHeight : Infinity;
+  if (!is.undefined(width) || !is.undefined(height)) {
+    const widthScale = !is.undefined(width) ? width / realWidth : Infinity;
+    const heightScale = !is.undefined(height) ? height / realHeight : Infinity;
     newScale = Math.min(widthScale, heightScale);
   }
   const newWidth = Math.ceil(realWidth * newScale);
   const newHeight = Math.ceil(realHeight * newScale);
-  const shadowId = shadow && Math.random().toString();
+  const shadowId = shadow === true ? Math.random().toString() : undefined;
   return (
     <svg
       css={(theme: Theme) => svgIconStyle(theme, fill === 'none' ? {color: 'transparent'} : props)}
@@ -72,7 +73,7 @@ export const SVGIcon = ({
       height={newHeight}
       {...props}
     >
-      {shadow && (
+      {!is.undefined(shadowId) && (
         <defs>
           <filter id={shadowId} x="-50%" y="-50%" width="200%" height="200%">
             <feOffset result="offOut" in="SourceAlpha" dx="0" dy="0" />
@@ -81,7 +82,7 @@ export const SVGIcon = ({
           </filter>
         </defs>
       )}
-      <g filter={shadow && `url(#${shadowId})`}>{children}</g>
+      <g filter={!is.undefined(shadowId) ? `url(#${shadowId})` : undefined}>{children}</g>
     </svg>
   );
 };

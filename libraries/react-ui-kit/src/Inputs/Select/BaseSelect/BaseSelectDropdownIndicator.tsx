@@ -17,11 +17,17 @@
  *
  */
 
-import {components, DropdownIndicatorProps} from 'react-select';
+import {components, DropdownIndicatorProps, GroupBase} from 'react-select';
 
 import {ArrowDown} from '../../../DataDisplay/Icon/ArrowDown';
 
-export const BaseSelectDropdownIndicator = (props: DropdownIndicatorProps) => {
+export const BaseSelectDropdownIndicator = <
+  Option = unknown,
+  IsMulti extends boolean = boolean,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+>(
+  props: DropdownIndicatorProps<Option, IsMulti, Group>,
+) => {
   const {menuIsOpen} = props.selectProps;
 
   return (

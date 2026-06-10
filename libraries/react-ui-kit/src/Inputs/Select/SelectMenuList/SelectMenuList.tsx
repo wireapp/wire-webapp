@@ -17,39 +17,46 @@
  *
  */
 
-import {components, MenuListProps} from 'react-select';
+import is from '@sindresorhus/is';
+import {components, GroupBase, MenuListProps} from 'react-select';
 
 import {closeButtonStyles, headingContainerStyles} from './SelectMenuList.styles';
 
 import {CloseIcon} from '../../../DataDisplay/Icon';
 import {Theme} from '../../../Identity/Theme';
+import {Option} from '../Select';
 
-// eslint-disable-next-line react/display-name
-export const SelectMenuList = (menuListHeading: string, dataUieName: string) => (props: MenuListProps) => {
-  const {selectProps, children} = props;
+export const SelectMenuList = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
+  menuListHeading: string,
+  dataUieName: string,
+) => {
+  function SelectMenuListComponent(props: MenuListProps<Option, IsMulti, Group>) {
+    const {selectProps, children} = props;
 
-  const handleClose = () => {
-    if (selectProps && selectProps.onMenuClose) {
-      selectProps.onMenuClose();
-    }
-  };
+    const handleClose = () => {
+      if (!is.nullOrUndefined(selectProps.onMenuClose)) {
+        selectProps.onMenuClose();
+      }
+    };
 
-  return (
-    <components.MenuList {...props}>
-      <div
-        {...(dataUieName && {
-          'data-uie-name': `menu-list-${dataUieName}`,
-        })}
-      >
-        <div css={(theme: Theme) => headingContainerStyles(theme)}>
-          {menuListHeading}
-          <button onClick={handleClose} css={closeButtonStyles} aria-label={`Close: ${menuListHeading}`}>
-            <CloseIcon width={16} height={16} />
-          </button>
+    return (
+      <components.MenuList {...props}>
+        <div
+          {...(is.nonEmptyString(dataUieName) && {
+            'data-uie-name': `menu-list-${dataUieName}`,
+          })}
+        >
+          <div css={(theme: Theme) => headingContainerStyles(theme)}>
+            {menuListHeading}
+            <button onClick={handleClose} css={closeButtonStyles} aria-label={`Close: ${menuListHeading}`}>
+              <CloseIcon width={16} height={16} />
+            </button>
+          </div>
+          {children}
         </div>
-        {children}
-      </div>
-    </components.MenuList>
-  );
+      </components.MenuList>
+    );
+  }
+  SelectMenuListComponent.displayName = 'SelectMenuList';
+  return SelectMenuListComponent;
 };
-SelectMenuList.displayName = 'SelectMenuList';

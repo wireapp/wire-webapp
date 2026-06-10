@@ -20,7 +20,8 @@
 import {useMemo} from 'react';
 
 import {CSSObject, useTheme} from '@emotion/react';
-import BaseSelect, {components, MenuPosition, MultiValueRemoveProps, NoticeProps} from 'react-select';
+import is from '@sindresorhus/is';
+import BaseSelect, {components, MenuPosition, MultiValue, MultiValueRemoveProps, NoticeProps} from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
 import {
@@ -87,7 +88,7 @@ export const ComboboxSelect = ({
 }: ComboboxSelectProps) => {
   return (
     <div css={wrapperStyles} data-uie-name={dataUieName}>
-      {label && (
+      {is.nonEmptyString(label) && (
         <InputLabel htmlFor={id} isRequired={required} labelCSS={labelCSS({isVisuallyHidden: labelVisuallyHidden})}>
           {label}
         </InputLabel>
@@ -134,24 +135,32 @@ const Select = ({
 }: ComboboxSelectProps & {creatable?: boolean}) => {
   const theme = useTheme() as Theme;
 
+  const handleChange = (newValue: MultiValue<ComboboxSelectOption>) => {
+    onChange?.([...newValue]);
+  };
+
   const components = useMemo(() => {
     return {
       ClearIndicator: () => null,
       DropdownIndicator: BaseSelectDropdownIndicator,
-      MultiValueRemove: (props: MultiValueRemoveProps) => <MultiValueRemove {...props} />,
-      NoOptionsMessage: (props: NoticeProps) => <NoOptionsMessage {...props} message={noOptionsMessage} />,
-      LoadingMessage: (props: NoticeProps) => <LoadingMessage {...props} message={loadingMessage} />,
+      MultiValueRemove: (props: MultiValueRemoveProps<ComboboxSelectOption, true>) => <MultiValueRemove {...props} />,
+      NoOptionsMessage: (props: NoticeProps<ComboboxSelectOption, true>) => (
+        <NoOptionsMessage {...props} message={noOptionsMessage} />
+      ),
+      LoadingMessage: (props: NoticeProps<ComboboxSelectOption, true>) => (
+        <LoadingMessage {...props} message={loadingMessage ?? ''} />
+      ),
     };
   }, [loadingMessage, noOptionsMessage]);
 
   if (!creatable) {
     return (
-      <BaseSelect
+      <BaseSelect<ComboboxSelectOption, true>
         id={id}
         inputId={id}
         options={options}
         value={value}
-        onChange={onChange}
+        onChange={handleChange}
         isMulti
         isSearchable
         isDisabled={isDisabled}
@@ -167,12 +176,12 @@ const Select = ({
   }
 
   return (
-    <CreatableSelect
+    <CreatableSelect<ComboboxSelectOption, true>
       id={id}
       inputId={id}
       options={options}
       value={value}
-      onChange={onChange}
+      onChange={handleChange}
       isMulti
       isSearchable
       isDisabled={isDisabled}
@@ -190,19 +199,19 @@ const Select = ({
   );
 };
 
-const MultiValueRemove = (props: MultiValueRemoveProps) => (
+const MultiValueRemove = (props: MultiValueRemoveProps<ComboboxSelectOption, true>) => (
   <components.MultiValueRemove {...props}>
     <CloseIcon width={10} height={10} />
   </components.MultiValueRemove>
 );
 
-const NoOptionsMessage = ({message, ...props}: NoticeProps & {message: string}) => (
+const NoOptionsMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption, true> & {message: string}) => (
   <components.NoOptionsMessage {...props}>
     <div css={noOptionsMessageStyles}>{message}</div>
   </components.NoOptionsMessage>
 );
 
-const LoadingMessage = ({message, ...props}: NoticeProps & {message: string}) => (
+const LoadingMessage = ({message, ...props}: NoticeProps<ComboboxSelectOption, true> & {message: string}) => (
   <components.LoadingMessage {...props}>
     <div css={loadingMessageStyles}>{message}</div>
   </components.LoadingMessage>

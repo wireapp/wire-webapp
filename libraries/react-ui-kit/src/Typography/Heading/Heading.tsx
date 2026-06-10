@@ -58,8 +58,10 @@ export const h1Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   },
 });
 
-export const H1 = (props: HeadingProps) => (
-  <h1 css={(theme: Theme) => h1Style(theme, props)} {...filterTextProps(props)} />
+export const H1 = ({children, ...props}: HeadingProps) => (
+  <h1 css={(theme: Theme) => h1Style(theme, props)} {...filterTextProps(props)}>
+    {children}
+  </h1>
 );
 
 export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
@@ -80,8 +82,10 @@ export const h2Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   },
 });
 
-export const H2 = (props: HeadingProps) => (
-  <h2 css={(theme: Theme) => h2Style(theme, props)} {...filterTextProps(props)} />
+export const H2 = ({children, ...props}: HeadingProps) => (
+  <h2 css={(theme: Theme) => h2Style(theme, props)} {...filterTextProps(props)}>
+    {children}
+  </h2>
 );
 
 export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
@@ -94,8 +98,10 @@ export const h3Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   marginBottom: '16px',
 });
 
-export const H3 = (props: HeadingProps) => (
-  <h3 css={(theme: Theme) => h3Style(theme, props)} {...filterTextProps(props)} />
+export const H3 = ({children, ...props}: HeadingProps) => (
+  <h3 css={(theme: Theme) => h3Style(theme, props)} {...filterTextProps(props)}>
+    {children}
+  </h3>
 );
 
 export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
@@ -109,6 +115,8 @@ export const h4Style: <T>(theme: Theme, props: HeadingProps<T>) => CSSObject = (
   marginTop: '20px',
 });
 
-export const H4 = (props: HeadingProps) => (
-  <h3 css={(theme: Theme) => h4Style(theme, props)} {...filterTextProps(props)} />
+export const H4 = ({children, ...props}: HeadingProps) => (
+  <h3 css={(theme: Theme) => h4Style(theme, props)} {...filterTextProps(props)}>
+    {children}
+  </h3>
 );

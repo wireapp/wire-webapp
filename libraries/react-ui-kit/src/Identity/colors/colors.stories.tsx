@@ -113,13 +113,16 @@ export const ComponentColors = () => {
 
 export const AllColorVariants = () => {
   const baseColors = Object.entries(COLOR)
-    .filter(([key, value]) => typeof value === 'string' && !key.includes('_'))
-    .reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
+    .filter((entry): entry is [string, string] => typeof entry[1] === 'string' && !entry[0].includes('_'))
+    .reduce<Record<string, string>>((acc, [key, value]) => ({...acc, [key]: value}), {});
 
   const colorsByBase = Object.keys(baseColors).map(baseColor => {
     const variants = Object.entries(COLOR)
-      .filter(([key, value]) => typeof value === 'string' && key.startsWith(baseColor) && key !== baseColor)
-      .reduce((acc, [key, value]) => ({...acc, [key]: value}), {});
+      .filter(
+        (entry): entry is [string, string] =>
+          typeof entry[1] === 'string' && entry[0].startsWith(baseColor) && entry[0] !== baseColor,
+      )
+      .reduce<Record<string, string>>((acc, [key, value]) => ({...acc, [key]: value}), {});
 
     return {
       base: baseColor,

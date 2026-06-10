@@ -47,6 +47,10 @@ export const ButtonLink = ({
   ...props
 }: ButtonProps<HTMLAnchorElement>) => (
   <a css={(theme: Theme) => buttonLinkStyle(theme, props)} {...filterButtonLinkProps(props)}>
-    {showLoading ? <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} /> : children}
+    {showLoading === true ? (
+      <Loading size={30} color={loadingColor} style={{display: 'flex', margin: 'auto'}} />
+    ) : (
+      children
+    )}
   </a>
 );

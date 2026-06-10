@@ -21,6 +21,7 @@ import {ReactElement, useState} from 'react';
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 import type {Property} from 'csstype';
 
 import {ErrorIcon, HideIcon, ShowIcon} from '../../DataDisplay/Icon';
@@ -72,7 +73,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
       ...placeholderStyle,
     },
     '&:hover': {
-      boxShadow: !disabled && hoverBoxShadow,
+      boxShadow: disabled ? undefined : hoverBoxShadow,
     },
     '&:focus-visible, &:focus, &:active': {
       boxShadow: activeBoxShadow,
@@ -86,7 +87,7 @@ export const inputStyle: <T>(theme: Theme, props: InputProps<T>, hasError?: bool
       boxShadow: `${defaultBoxShadow}, ${autocompleteBoxShadow}`,
       '-webkit-text-fill-color': theme.general.color,
       '&:hover': {
-        boxShadow: !disabled && `${hoverBoxShadow}, ${autocompleteBoxShadow}`,
+        boxShadow: disabled ? undefined : `${hoverBoxShadow}, ${autocompleteBoxShadow}`,
       },
       '&:focus-visible, &:focus, &:active': {
         boxShadow: `${activeBoxShadow}, ${autocompleteBoxShadow}`,
@@ -162,13 +163,13 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
           ...wrapperCSS,
         })}
       >
-        {label && (
+        {is.nonEmptyString(label) ? (
           <InputLabel htmlFor={props.id} isRequired={props.required} markInvalid={props.markInvalid}>
             {label}
           </InputLabel>
-        )}
+        ) : null}
 
-        <div css={{marginBottom: hasError && '8px', position: 'relative'}}>
+        <div css={{marginBottom: hasError ? '8px' : undefined, position: 'relative'}}>
           {startContent}
 
           <input
@@ -205,7 +206,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
           )}
         </div>
 
-        {!hasError && helperText && (
+        {!hasError && is.nonEmptyString(helperText) ? (
           <p
             css={(theme: Theme) => ({
               fontSize: theme.fontSizes.small,
@@ -216,7 +217,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps<HTMLInputElem
           >
             {helperText}
           </p>
-        )}
+        ) : null}
 
         {error}
       </div>

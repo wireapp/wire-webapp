@@ -21,7 +21,7 @@ import Color from 'color';
 
 export type ColorParam = Color | string | ArrayLike<number> | number | Record<string, any>;
 
-const steps = [];
+const steps: number[] = [];
 const percent = 100;
 
 for (let index = 8; index < percent; index += 8) {

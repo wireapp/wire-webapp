@@ -51,10 +51,23 @@ export const HeaderMenu = ({children, logoElement = null, centerElement = null, 
     }
   };
 
+  const onLogoKeyDown: React.KeyboardEventHandler<HTMLDivElement> = event => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      closeMenu();
+    }
+  };
+
   return (
     <div css={{height: '64px'}} {...props} data-uie-name="element-header-menu">
       <MenuContent open={isOpen}>
-        <div css={{alignSelf: 'center', display: 'flex', zIndex: 2}} onClick={closeMenu}>
+        <div
+          css={{alignSelf: 'center', display: 'flex', zIndex: 2}}
+          role="button"
+          tabIndex={0}
+          onClick={closeMenu}
+          onKeyDown={onLogoKeyDown}
+        >
           {logoElement}
         </div>
         <div css={{alignSelf: 'center', display: 'flex'}}>{centerElement}</div>

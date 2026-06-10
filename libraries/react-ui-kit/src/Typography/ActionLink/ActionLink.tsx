@@ -21,6 +21,7 @@ import * as React from 'react';
 import {forwardRef} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 
 import {styles as actionLinkButtonStyles} from './ActionLinkButton.style';
 
@@ -66,15 +67,15 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
           textTransform,
         } as LinkProps),
         ...actionLinkButtonStyles.link.base,
-        ...(disabled ? actionLinkButtonStyles.link.disabled : actionLinkButtonStyles.link.enabled),
+        ...(disabled === true ? actionLinkButtonStyles.link.disabled : actionLinkButtonStyles.link.enabled),
       }) satisfies CSSObject;
 
-    if ('href' in restProps && restProps.href) {
+    if ('href' in restProps && is.nonEmptyString(restProps.href)) {
       const {href, target, onClick, ...anchorProps} = restProps;
       const linkProps = filterLinkProps(anchorProps as unknown as LinkProps);
 
       const handleAnchorClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
-        if (disabled) {
+        if (disabled === true) {
           e.preventDefault();
           e.stopPropagation();
           return;
@@ -89,8 +90,8 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
           css={(theme: Theme) => baseCss(theme)}
           target={target}
           rel={target === '_blank' ? 'noopener noreferrer' : undefined}
-          aria-disabled={disabled || undefined}
-          tabIndex={disabled ? -1 : undefined}
+          aria-disabled={disabled === true ? true : undefined}
+          tabIndex={disabled === true ? -1 : undefined}
           onClick={handleAnchorClick}
           {...linkProps}
         >
@@ -104,7 +105,7 @@ export const ActionLinkButton = forwardRef<HTMLAnchorElement | HTMLButtonElement
       <button
         ref={ref as React.Ref<HTMLButtonElement>}
         type="button"
-        disabled={disabled || btnProps.disabled}
+        disabled={disabled === true || btnProps.disabled === true}
         onClick={onClick}
         css={(theme: Theme) => [actionLinkButtonStyles.buttonReset, baseCss(theme)]}
         {...btnProps}

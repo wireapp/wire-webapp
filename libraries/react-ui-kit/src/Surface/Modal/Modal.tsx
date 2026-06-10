@@ -91,12 +91,12 @@ const ModalContent: React.FC<React.HTMLProps<HTMLDivElement>> = props => (
   />
 );
 
-const modalBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => CSSObject = props => ({
-  ...overlayBackgroundStyle(props),
+const modalBackgroundStyle: CSSObject = {
+  ...overlayBackgroundStyle,
   backgroundColor: 'rgba(50, 54, 57, 0.4)',
-});
+};
 
-const ModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyle(props)} {...props} />;
+const ModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyle} {...props} />;
 
 export interface ModalActionItem {
   bold?: boolean;
@@ -146,13 +146,21 @@ const modalActionStyles: ({bold}: {bold: boolean}) => CSSObject = ({bold}) => ({
   padding: '8px 0',
 });
 
-const ModalActions: React.FC<ModalActions> = ({actions}) => (
+const ModalActions: React.FC<ModalActions> = ({actions = []}) => (
   <div css={modalActionsWrapperStyles()}>
     {actions.map(action => (
       <div
         key={action.title}
+        role="button"
+        tabIndex={0}
         onClick={action.onClick}
-        css={modalActionStyles({bold: action.bold})}
+        onKeyDown={event => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            action.onClick(event as unknown as React.MouseEvent<HTMLElement>);
+          }
+        }}
+        css={modalActionStyles({bold: action.bold ?? false})}
         data-uie-name={action.dataUieName}
       >
         {action.title}
@@ -184,7 +192,7 @@ export const Modal: React.FC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
       {onClose !== noop && <ModalClose onClick={onClose} data-uie-name="do-close" />}
       {actions.length > 0 && <ModalActions actions={actions} data-uie-name="modal-actions" />}
     </ModalBody>
-    {!fullscreen && (
+    {fullscreen !== true && (
       <ModalBackground
         onClick={onBackgroundClick === noop ? onClose : onBackgroundClick}
         data-uie-name="modal-background"

@@ -19,11 +19,13 @@
 
 import {useEffect, useRef} from 'react';
 
+import is from '@sindresorhus/is';
+
 const useTimeout = (onTimeoutStop: () => void, duration: number) => {
   const timerRef = useRef<number | null>(null);
 
   const removeTimeout = () => {
-    if (timerRef.current) {
+    if (!is.nullOrUndefined(timerRef.current)) {
       window.clearTimeout(timerRef.current);
       timerRef.current = null;
     }

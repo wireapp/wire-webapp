@@ -17,17 +17,27 @@
  *
  */
 
-import {ReactNode} from 'react';
+import {Children, ReactNode} from 'react';
 
-import {components, ValueContainerProps} from 'react-select';
+import {components, GroupBase, ValueContainerProps} from 'react-select';
 
 import {Option} from '../Select';
 
-export const SelectValueContainer = ({children, ...restProps}: ValueContainerProps<Option>) => (
-  <components.ValueContainer {...restProps}>
-    {renderValue(children[0])} {children[1]}
-  </components.ValueContainer>
-);
+export const SelectValueContainer = <
+  IsMulti extends boolean = false,
+  Group extends GroupBase<Option> = GroupBase<Option>,
+>({
+  children,
+  ...restProps
+}: ValueContainerProps<Option, IsMulti, Group>) => {
+  const childArray = Children.toArray(children);
+
+  return (
+    <components.ValueContainer {...restProps}>
+      {renderValue(childArray[0])} {childArray[1]}
+    </components.ValueContainer>
+  );
+};
 
 const renderValue = (value: ReactNode) => {
   if (Array.isArray(value)) {

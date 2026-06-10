@@ -20,6 +20,8 @@
 import {CSSObject} from '@emotion/react';
 import {StylesConfig} from 'react-select';
 
+import type {ComboboxSelectOption} from './ComboboxSelect';
+
 import {Theme} from '../../Identity/Theme';
 import {visuallyHidden} from '../../utils';
 import {
@@ -57,7 +59,7 @@ export const selectStyles = ({
   controlCSS = {},
   containerCSS = {},
   menuListCSS = {},
-}: SelectStylesParams): StylesConfig => ({
+}: SelectStylesParams): StylesConfig<ComboboxSelectOption, true> => ({
   indicatorSeparator: () => baseIndicatorSeparatorStyles(),
   indicatorsContainer: provided => provided,
   container: provided => ({

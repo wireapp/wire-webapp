@@ -18,21 +18,30 @@
  */
 
 import {CSSObject} from '@emotion/react';
-import {components, MenuProps} from 'react-select';
+import is from '@sindresorhus/is';
+import {components, GroupBase, MenuProps} from 'react-select';
 
-// eslint-disable-next-line react/display-name
-export const SelectMenu = (dataUieName: string, css?: CSSObject) => (props: MenuProps) => {
-  const {children} = props;
+import {Option} from '../Select';
 
-  return (
-    <components.Menu {...props} css={css}>
-      <div
-        {...(dataUieName && {
-          'data-uie-name': `dropdown-${dataUieName}`,
-        })}
-      >
-        {children}
-      </div>
-    </components.Menu>
-  );
+export const SelectMenu = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
+  dataUieName: string,
+  css?: CSSObject,
+) => {
+  function SelectMenuComponent(props: MenuProps<Option, IsMulti, Group>) {
+    const {children} = props;
+
+    return (
+      <components.Menu {...props} css={css}>
+        <div
+          {...(is.nonEmptyString(dataUieName) && {
+            'data-uie-name': `dropdown-${dataUieName}`,
+          })}
+        >
+          {children}
+        </div>
+      </components.Menu>
+    );
+  }
+  SelectMenuComponent.displayName = 'SelectMenu';
+  return SelectMenuComponent;
 };

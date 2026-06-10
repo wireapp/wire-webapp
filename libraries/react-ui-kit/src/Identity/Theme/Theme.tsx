@@ -19,7 +19,7 @@
 
 import * as React from 'react';
 
-import {ThemeProvider as EmotionThemeProvider, Theme as ETheme} from '@emotion/react';
+import {ThemeProvider as EmotionThemeProvider} from '@emotion/react';
 
 import {COLOR} from '../colors';
 import {COLOR_V2, BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '../colors-v2';
@@ -31,7 +31,7 @@ export enum THEME_ID {
   DEFAULT = 'THEME_DEFAULT',
 }
 
-export interface Theme extends ETheme {
+export interface Theme {
   fontSizes: {
     extraSmall: string;
     small: string;
@@ -375,4 +375,6 @@ export interface ThemeProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   children: React.ReactNode;
 }
 
-export const ThemeProvider = (props: ThemeProps) => <EmotionThemeProvider {...props} theme={props.theme} />;
+export const ThemeProvider = ({theme = themes[THEME_ID.DEFAULT], ...props}: ThemeProps) => (
+  <EmotionThemeProvider theme={theme} {...props} />
+);

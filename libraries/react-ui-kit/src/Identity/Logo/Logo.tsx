@@ -34,7 +34,7 @@ const logoStyle: <T>(theme: Theme, props: LogoProps<T>) => CSSObject = (
   {hover, color = theme.general.color},
 ) => ({
   '&:hover path': {
-    fill: hover ? COLOR.shade(color, 0.06) : undefined,
+    fill: hover === true ? COLOR.shade(color, 0.06) : undefined,
   },
   path: {
     fill: color,

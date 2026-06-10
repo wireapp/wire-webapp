@@ -17,69 +17,75 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import {components, GroupBase, OptionProps, OptionsOrGroups} from 'react-select';
 
 import {CheckIcon} from '../../../DataDisplay/Icon';
 import {Theme} from '../../../Identity/Theme';
 import {Option} from '../Select';
 
-// eslint-disable-next-line react/display-name
-export const SelectOption = (dataUieName: string) => (props: OptionProps<Option>) => {
-  const {children, data, isMulti, isSelected, options} = props;
+export const SelectOption = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
+  dataUieName: string,
+) => {
+  function SelectOptionComponent(props: OptionProps<Option, IsMulti, Group>) {
+    const {children, data, isMulti, isSelected, options} = props;
 
-  return (
-    <components.Option {...props}>
-      <div
-        css={{
-          ...((isMulti || isGroup(options)) && {
-            display: 'grid',
-            gridTemplateAreas: `"checkbox label"
+    return (
+      <components.Option {...props}>
+        <div
+          css={{
+            ...((isMulti === true || isGroup(options)) && {
+              display: 'grid',
+              gridTemplateAreas: `"checkbox label"
                                 ". description"`,
-            gridTemplateColumns: '22px 1fr',
-            columnGap: isGroup(options) ? '5px' : '10px',
-          }),
-        }}
-        {...(dataUieName && {
-          'data-uie-name': `option-${dataUieName}`,
-          'data-uie-value': (options as Option[]).find(option => option.label === children)?.value,
-          'data-uie-selected': isSelected,
-        })}
-      >
-        {isMulti && (
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={() => null}
-            css={{gridArea: 'checkbox', width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}
-          />
-        )}
+              gridTemplateColumns: '22px 1fr',
+              columnGap: isGroup(options) ? '5px' : '10px',
+            }),
+          }}
+          {...(is.nonEmptyString(dataUieName) && {
+            'data-uie-name': `option-${dataUieName}`,
+            'data-uie-value': (options as Option[]).find(option => option.label === children)?.value,
+            'data-uie-selected': isSelected,
+          })}
+        >
+          {isMulti === true && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={() => null}
+              css={{gridArea: 'checkbox', width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}
+            />
+          )}
 
-        {isGroup(options) && (
-          //includes a checkmark character if it is selected and a group
-          <div css={{width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}>
-            {isSelected ? <CheckIcon /> : null}
-          </div>
-        )}
+          {isGroup(options) && (
+            //includes a checkmark character if it is selected and a group
+            <div css={{width: 22, height: 22, cursor: 'pointer', placeSelf: 'center'}}>
+              {isSelected ? <CheckIcon /> : null}
+            </div>
+          )}
 
-        <div css={{gridArea: 'label', overflowWrap: 'break-word', overflow: 'hidden'}}>{children}</div>
+          <div css={{gridArea: 'label', overflowWrap: 'break-word', overflow: 'hidden'}}>{children}</div>
 
-        {data && data.description && (
-          <p
-            css={(theme: Theme) => ({
-              marginBottom: 0,
-              fontSize: theme.fontSizes.medium,
-              color: isSelected ? theme.Select.focusedDescriptionColor : theme.Input.labelColor,
-              gridArea: 'description',
-            })}
-          >
-            {data.description}
-          </p>
-        )}
-      </div>
-    </components.Option>
-  );
+          {is.nonEmptyString(data.description) && (
+            <p
+              css={(theme: Theme) => ({
+                marginBottom: 0,
+                fontSize: theme.fontSizes.medium,
+                color: isSelected ? theme.Select.focusedDescriptionColor : theme.Input.labelColor,
+                gridArea: 'description',
+              })}
+            >
+              {data.description}
+            </p>
+          )}
+        </div>
+      </components.Option>
+    );
+  }
+  SelectOptionComponent.displayName = 'SelectOption';
+  return SelectOptionComponent;
 };
 
 export const isGroup = (options: OptionsOrGroups<Option, GroupBase<Option>>): options is GroupBase<Option>[] => {
-  return options?.length > 0 && 'options' in options[0];
+  return is.nonEmptyArray(options) && 'options' in options[0];
 };

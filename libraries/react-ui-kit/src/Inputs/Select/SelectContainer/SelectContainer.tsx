@@ -17,11 +17,14 @@
  *
  */
 
-import {components, ContainerProps} from 'react-select';
+import {components, ContainerProps, GroupBase} from 'react-select';
 
 import {TabIndex} from '../../../utils/enums';
+import {Option} from '../Select';
 
-export const SelectContainer = (props: ContainerProps) => {
+export const SelectContainer = <IsMulti extends boolean = false, Group extends GroupBase<Option> = GroupBase<Option>>(
+  props: ContainerProps<Option, IsMulti, Group>,
+) => {
   return (
     <components.SelectContainer {...props}>
       <div tabIndex={TabIndex.FOCUSABLE}>{props.children}</div>

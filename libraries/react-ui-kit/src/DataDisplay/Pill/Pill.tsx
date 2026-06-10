@@ -20,6 +20,7 @@
 import * as React from 'react';
 
 import {CSSObject, keyframes} from '@emotion/react';
+import is from '@sindresorhus/is';
 
 import {COLOR} from '../../Identity';
 import {DURATION, EASE} from '../../Identity/motions/motions';
@@ -46,7 +47,7 @@ export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => CSSObject = (
     [PILL_TYPE.success]: COLOR.GREEN_OPAQUE_32,
     [PILL_TYPE.warning]: COLOR.YELLOW_OPAQUE_32,
   };
-  const backgroundColor = active ? '#eee' : type ? backgroundColors[type] : 'transparent';
+  const backgroundColor = active ? '#eee' : !is.nullOrUndefined(type) ? backgroundColors[type] : 'transparent';
   const pillAnimation = keyframes`
     0% {
       background-color: transparent;
@@ -70,7 +71,7 @@ export const pillStyle: <T>(theme: Theme, props: PillProps<T>) => CSSObject = (
     display: 'inline-block',
     fontSize: theme.fontSizes.small,
     lineHeight: '1rem',
-    margin: type ? '12px 0 0 0' : '0 8px',
+    margin: !is.nullOrUndefined(type) ? '12px 0 0 0' : '0 8px',
     minHeight: '32px',
     padding: '8px 24px',
     textAlign: 'center',

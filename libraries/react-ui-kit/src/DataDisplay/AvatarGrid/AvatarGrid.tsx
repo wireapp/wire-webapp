@@ -20,6 +20,7 @@
 import * as React from 'react';
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 
 import {COLOR} from '../../Identity/colors/colors';
 import {IsInViewport} from '../../utils';
@@ -61,9 +62,11 @@ const avatarGridStyle: <T>(props: Props<T>) => CSSObject = ({
 const filteredAvatarGridProps = (props: Props) =>
   filterProps(props, ['backgroundColor', 'borderColor', 'items', 'size', 'borderWidth']);
 
+type AvatarGridItem = Props['items'][number] | null;
+
 export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, fetchImages, ...props}: Props) => {
   const allProps = {borderWidth, items, size, ...props};
-  const slicedItems = items.slice(0, 4);
+  const slicedItems: AvatarGridItem[] = items.slice(0, 4);
   const missing = 4 - slicedItems.length;
   for (let index = 0; index < missing; index++) {
     slicedItems.push(null);
@@ -76,10 +79,10 @@ export const AvatarGrid = ({borderWidth = 1, size = DEFAULT_AVATAR_SIZE, items, 
       {...filteredAvatarGridProps(allProps)}
     >
       {slicedItems.map(item =>
-        item ? (
+        !is.nullOrUndefined(item) ? (
           <Avatar
             key={Math.random().toString()}
-            backgroundColor={item.backgroundColor || COLOR.GRAY_DARKEN_80}
+            backgroundColor={item.backgroundColor ?? COLOR.GRAY_DARKEN_80}
             url={item.url}
             color={item.color}
             forceInitials={item.forceInitials}

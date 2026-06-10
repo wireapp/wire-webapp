@@ -28,14 +28,14 @@ import {QueryKeys, media} from '../../utils';
 import {noop} from '../../utils/util';
 import {OverlayBackgroundProps, OverlayWrapperProps, overlayBackgroundStyle} from '../Modal/Overlay';
 
-const menuModalWrapperStyle: <T>(props: OverlayWrapperProps<T>) => CSSObject = props => ({
-  ...overlayBackgroundStyle(props),
+const menuModalWrapperStyle: CSSObject = {
+  ...overlayBackgroundStyle,
   alignItems: 'flex-end',
   alignSelf: 'flex-end',
   display: 'flex',
   overflowY: 'hidden',
   padding: 0,
-});
+};
 
 const MenuModalWrapper = (props: OverlayWrapperProps) => <div css={menuModalWrapperStyle} {...props} />;
 
@@ -80,10 +80,10 @@ const MenuModalContent = (props: React.HTMLProps<HTMLUListElement>) => (
   />
 );
 
-const modalBackgroundStyle: <T>(props: OverlayBackgroundProps<T>) => CSSObject = props => ({
-  ...overlayBackgroundStyle(props),
+const modalBackgroundStyle: CSSObject = {
+  ...overlayBackgroundStyle,
   background: 'rgba(50, 54, 57, 0.4)',
-});
+};
 
 const MenuModalBackground = (props: OverlayBackgroundProps) => <div css={modalBackgroundStyle} {...props} />;
 

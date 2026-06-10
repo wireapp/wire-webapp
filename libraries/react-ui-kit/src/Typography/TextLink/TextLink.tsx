@@ -32,6 +32,8 @@ export const textLinkStyle: <T>(theme: Theme, props: TextLinkProps<T>) => CSSObj
   ...linkStyle(theme, {bold, color, fontSize, textTransform, ...props}),
 });
 
-export const TextLink = (props: TextLinkProps<HTMLAnchorElement>) => (
-  <a css={(theme: Theme) => textLinkStyle(theme, props)} rel="noopener noreferrer" {...filterLinkProps(props)}></a>
+export const TextLink = ({children, ...props}: TextLinkProps<HTMLAnchorElement>) => (
+  <a css={(theme: Theme) => textLinkStyle(theme, props)} rel="noopener noreferrer" {...filterLinkProps(props)}>
+    {children}
+  </a>
 );

@@ -76,10 +76,12 @@ export const MENU_LINK_CLASSNAME = 'menu-link';
 export const filterMenuLinkProps = (props: MenuLinkProps) =>
   filterProps(filterLinkProps(props) as MenuLinkProps, ['button']);
 
-export const MenuLink = (props: MenuLinkProps) => (
+export const MenuLink = ({children, ...props}: MenuLinkProps) => (
   <a
     className={MENU_LINK_CLASSNAME}
     css={(theme: Theme) => menuLinkStyle(theme, props)}
     {...filterMenuLinkProps(props)}
-  />
+  >
+    {children}
+  </a>
 );

@@ -20,7 +20,8 @@
 import {ReactElement} from 'react';
 
 import {CSSObject, useTheme} from '@emotion/react';
-import ReactSelect, {GroupBase, StylesConfig} from 'react-select';
+import is from '@sindresorhus/is';
+import ReactSelect, {GroupBase, SelectComponentsConfig, StylesConfig} from 'react-select';
 import type {StateManagerProps} from 'react-select/dist/declarations/src/stateManager';
 
 import {BaseSelectDropdownIndicator} from './BaseSelect/BaseSelectDropdownIndicator';
@@ -114,7 +115,7 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
       })}
       data-uie-name={dataUieName}
     >
-      {label && (
+      {is.nonEmptyString(label) && (
         <InputLabel htmlFor={id} markInvalid={markInvalid} isRequired={required}>
           {label}
         </InputLabel>
@@ -132,31 +133,33 @@ export const Select = <IsMulti extends boolean = false, Group extends GroupBase<
             groupCSS: selectGroupCSS,
             groupHeadingCSS: selectGroupHeadingCSS,
             menuPortalCSS: selectMenuPortalCSS,
-          }) as StylesConfig
+          }) as StylesConfig<Option, IsMulti, Group>
         }
-        components={{
-          SelectContainer: SelectContainer,
-          DropdownIndicator: BaseSelectDropdownIndicator,
-          Option: SelectOption(dataUieName),
-          Menu: SelectMenu(dataUieName, menuCSS),
-          ValueContainer: SelectValueContainer,
-          IndicatorsContainer: SelectIndicatorsContainer,
-          ...(hideControl && {Control: () => null}),
-          ...(menuListHeading && {MenuList: SelectMenuList(menuListHeading, dataUieName)}),
-        }}
+        components={
+          {
+            SelectContainer: SelectContainer,
+            DropdownIndicator: BaseSelectDropdownIndicator,
+            Option: SelectOption(dataUieName),
+            Menu: SelectMenu(dataUieName, menuCSS),
+            ValueContainer: SelectValueContainer,
+            IndicatorsContainer: SelectIndicatorsContainer,
+            ...(hideControl && {Control: () => null}),
+            ...(is.nonEmptyString(menuListHeading) && {MenuList: SelectMenuList(menuListHeading, dataUieName)}),
+          } as Partial<SelectComponentsConfig<Option, IsMulti, Group>>
+        }
         inputId={id}
         tabIndex={TabIndex.UNFOCUSABLE}
         isDisabled={disabled}
         hideSelectedOptions={false}
         isSearchable={isSearchable}
         isClearable={false}
-        closeMenuOnSelect={!isMulti}
+        closeMenuOnSelect={isMulti !== true}
         isMulti={isMulti}
         options={options}
         {...props}
       />
 
-      {!hasError && helperText && (
+      {!hasError && !is.nullOrUndefined(helperText) && (
         <p
           css={(theme: Theme) => ({
             fontSize: theme.fontSizes.small,

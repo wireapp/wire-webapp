@@ -20,6 +20,7 @@
 import {HTMLProps, PropsWithRef, forwardRef, useMemo} from 'react';
 
 import {CSSObject} from '@emotion/react';
+import is from '@sindresorhus/is';
 
 import {containerStyles, dataListOption, headingStyle, rangeStyles} from './IndicatorRangeInput.styles';
 
@@ -74,17 +75,17 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
       return `${((valueNum - minNum) * 100) / (maxNum - minNum)}% 100%`;
     }, [isCustomSlider, valueNum, minNum, maxNum, listLength]);
 
-    const valueText = dataListOptions[valueNum]?.heading
+    const valueText = !is.undefined(dataListOptions[valueNum]?.heading)
       ? `${dataListOptions[valueNum].label} (${dataListOptions[valueNum].heading})`
       : dataListOptions[valueNum].label;
 
     return (
       <div css={{wrapperCSS, width: '100%'}}>
-        {label && (
+        {is.nonEmptyString(label) ? (
           <InputLabel css={(theme: Theme) => ({fontSize: theme.fontSizes.base})} htmlFor={id}>
             {label}
           </InputLabel>
-        )}
+        ) : null}
 
         <div css={containerStyles}>
           {isCustomSlider && (
@@ -93,9 +94,19 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
                 <div
                   key={dataListOption.value}
                   css={(theme: Theme) => headingStyle(listLength, theme)}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => {
-                    if (dataListOption?.heading) {
+                    if (!is.undefined(dataListOption?.heading) && !is.undefined(onOptionClick)) {
                       onOptionClick(index);
+                    }
+                  }}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      if (!is.undefined(dataListOption?.heading) && !is.undefined(onOptionClick)) {
+                        onOptionClick(index);
+                      }
                     }
                   }}
                 >
@@ -129,7 +140,7 @@ export const IndicatorRangeInput = forwardRef<HTMLInputElement, IndicatorRangeIn
                   key={index}
                   value={dataListOption.value}
                   label={dataListOption.label}
-                  onClick={() => onOptionClick(index)}
+                  onClick={() => onOptionClick?.(index)}
                 />
               ))}
             </datalist>

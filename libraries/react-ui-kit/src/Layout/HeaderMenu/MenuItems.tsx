@@ -40,7 +40,7 @@ export const menuItemsStyle: <T>(theme: Theme, props: MenuItemsProps<T>) => CSSO
     position: 'fixed',
     right: 0,
     top: 0,
-    transform: props.open ? 'translateX(0)' : 'translateX(110%)',
+    transform: props.open === true ? 'translateX(0)' : 'translateX(110%)',
     transition: 'transform 0.25s ease',
     zIndex: 1,
   },

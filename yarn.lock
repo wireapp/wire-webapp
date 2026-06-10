@@ -10919,6 +10919,7 @@ __metadata:
     "@emotion/react": "npm:11.14.0"
     "@radix-ui/react-accordion": "npm:1.2.11"
     "@radix-ui/react-dropdown-menu": "npm:2.1.14"
+    "@sindresorhus/is": "npm:4.6.0"
     "@storybook/addon-essentials": "npm:^8.5.2"
     "@storybook/addon-interactions": "npm:^8.5.2"
     "@storybook/addon-onboarding": "npm:^8.5.2"
