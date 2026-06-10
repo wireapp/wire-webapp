@@ -32,6 +32,7 @@ import type {TeamData} from '@wireapp/api-client/lib/team/team/teamData';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+import {loadDataUrl} from 'Util/util';
 
 import {Runtime, TypedEventEmitter} from '@wireapp/commons';
 import {Availability} from '@wireapp/protocol-messaging';
@@ -52,7 +53,6 @@ import {Environment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {loadDataUrl} from 'Util/util';
 
 import {TeamEntity} from './TeamEntity';
 import {TeamMapper} from './TeamMapper';

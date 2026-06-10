@@ -18,6 +18,7 @@
  */
 
 import {container} from 'tsyringe';
+import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {
   BadgesWithTooltip,
@@ -39,7 +40,6 @@ import {useFileHistoryModal} from 'Components/Modals/FileHistoryModal/hooks/useF
 import {useRelativeTimestamp} from 'Hooks/useRelativeTimestamp';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
-import {forcedDownloadFile, getFileNameWithExtension} from 'Util/util';
 
 import {
   headerStyles,

@@ -2,13 +2,18 @@
   "name": "@wireapp/store-engine-dexie",
   "license": "GPL-3.0",
   "description": "Store Engine implementation for the browser's IndexedDB.",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-dexie",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/store-engine-dexie"
+  },
   "files": [
     "lib"
   ],
   "main": "lib/index",
+  "types": "lib/index.d.ts",
   "peerDependencies": {
-    "@wireapp/store-engine": "5.x.x"
+    "@wireapp/store-engine": "workspace:^"
   },
   "dependencies": {
     "dexie": ">3.2.0"
@@ -19,7 +24,7 @@
     "@types/jest": "^29.2.0",
     "@types/node": "^22.0.0",
     "@types/uuid": "9.0.8",
-    "@wireapp/store-engine": "5.1.19",
+    "@wireapp/store-engine": "workspace:^",
     "core-js": "^3.36.0",
     "fake-indexeddb": "^5.0.2",
     "jest": "^29.2.1",
@@ -30,11 +35,13 @@
     "uuid": "9.0.1"
   },
   "scripts": {
-    "build": "yarn clean && tsc",
-    "clean": "rimraf lib",
-    "dist": "yarn build",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "build": "nx run store-engine-dexie-lib:build",
+    "clean": "nx run store-engine-dexie-lib:clean",
+    "dist": "nx run store-engine-dexie-lib:dist",
+    "test": "nx run store-engine-dexie-lib:test",
+    "test:coverage": "nx run store-engine-dexie-lib:test:coverage",
+    "test:watch": "nx run store-engine-dexie-lib:test --watch"
   },
-  "version": "2.1.24"
+  "version": "2.1.24",
+  "private": true
 }

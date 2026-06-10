@@ -95,7 +95,7 @@ export class IndexedDBEngine implements CRUDEngine {
   }
 
   public async isStoragePersisted(): Promise<boolean> {
-    if (navigator.storage?.persisted) {
+    if (typeof navigator.storage?.persisted === 'function') {
       const isPersisted = await navigator.storage.persisted();
       return isPersisted;
     }
@@ -111,7 +111,7 @@ export class IndexedDBEngine implements CRUDEngine {
   }
 
   public purge(): Promise<void> {
-    return this.db ? this.db.delete() : Dexie.delete(this.storeName);
+    return this.storeName !== '' ? this.db.delete() : Dexie.delete(this.storeName);
   }
 
   private mapDatabaseError<PrimaryKey = string>(error: DexieError, tableName: string, primaryKey: PrimaryKey): Error {
@@ -135,7 +135,7 @@ export class IndexedDBEngine implements CRUDEngine {
     primaryKey: PrimaryKey,
     entity: EntityType,
   ): Promise<PrimaryKey> {
-    if (entity) {
+    if (entity !== undefined && entity !== null) {
       try {
         const newPrimaryKey = await this.db.table<EntityType, PrimaryKey>(tableName).add(entity, primaryKey);
         return newPrimaryKey;
@@ -189,7 +189,7 @@ export class IndexedDBEngine implements CRUDEngine {
    * @see https://developers.google.com/web/updates/2016/06/persistent-storage
    */
   public async registerPersistentStorage(): Promise<boolean> {
-    if (!navigator || !navigator.storage || !navigator.storage.persist) {
+    if (typeof navigator?.storage?.persist !== 'function') {
       return false;
     }
 

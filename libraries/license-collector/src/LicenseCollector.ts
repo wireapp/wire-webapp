@@ -56,6 +56,8 @@ interface Repository {
   url: string;
 }
 
+const CLONE_DIR_ID_BYTE_LENGTH = 10;
+
 const defaultOptions: Required<CollectorOptions> = {
   devDependencies: true,
   filter: [],
@@ -105,14 +107,14 @@ export class LicenseCollector {
   private async clone(): Promise<void> {
     const gitUrlRegex = new RegExp('/(?<name>(.+?))(?:\\.git)?/?$', 'i');
 
-    for (const index in this.repositories) {
-      const {url} = this.repositories[index];
-      const id = crypto.randomBytes(10).toString('hex');
+    for (const repository of this.repositories) {
+      const {url} = repository;
+      const id = crypto.randomBytes(CLONE_DIR_ID_BYTE_LENGTH).toString('hex');
       const cloneDir = path.join(this.TMP_DIR, id);
       const name = gitUrlRegex.exec(url) || ['', url];
-      this.repositories[index].name = name[1];
+      repository.name = name[1]!;
 
-      this.repositories[index].dir = cloneDir;
+      repository.dir = cloneDir;
 
       this.logger.info(`${name[1]}: Cloning "${url}" into "${cloneDir}" ...`);
 
@@ -150,8 +152,8 @@ export class LicenseCollector {
   }
 
   private async findRepositories(): Promise<void> {
-    for (const index in this.repositories) {
-      const {dir: cloneDir, name} = this.repositories[index];
+    for (const repository of this.repositories) {
+      const {dir: cloneDir, name} = repository;
 
       this.logger.info(`${name}: Discovering "package.json" files ...`);
 
@@ -161,22 +163,29 @@ export class LicenseCollector {
       this.logger.info(`${name}: Found "${packageFileNames.join('", "')}"`);
       this.logger.info(`${name}: Discovering direct dependencies ...`);
 
-      for (const index in packageFiles) {
-        let packageJson;
+      for (const packageFile of packageFiles) {
+        let packageJson: {dependencies?: Record<string, string>; devDependencies?: Record<string, string>} | undefined;
 
         try {
-          packageJson = await fs.readJSON(packageFiles[index]);
-        } catch (error) {}
+          packageJson = await fs.readJSON(packageFile);
+        } catch {
+          // skip invalid package.json files
+        }
+
+        if (!packageJson) {
+          continue;
+        }
 
         const dependencies = Object.keys(packageJson.dependencies || []).filter(Boolean);
         const devDependencies = Object.keys(packageJson.devDependencies || []).filter(Boolean);
 
         const plural = (length: number) => (length === 1 ? 'y' : 'ies');
+        const packageFileName = packageFile.replace(new RegExp(cloneDir, 'gm'), '');
 
         this.logger.info(
           `${name}: Found ${dependencies.length} production dependenc${plural(dependencies.length)} and ${
             devDependencies.length
-          } dev dependenc${plural(devDependencies.length)} in "${packageFileNames[index]}".`,
+          } dev dependenc${plural(devDependencies.length)} in "${packageFileName}".`,
         );
 
         for (const dependency of dependencies) {
@@ -198,17 +207,17 @@ export class LicenseCollector {
 
   private format(result: CrawlerResult): License[] {
     const licenses = [];
-    const packages = Object.keys(result.data).sort();
+    const packages = Object.keys(result.data).toSorted();
 
     this.logger.info(`Extracted ${packages.length} licenses.`);
 
     for (const packageName of packages) {
-      const currentPackage = result.data[packageName];
+      const currentPackage = result.data[packageName]!;
 
-      const link = currentPackage.homepage || (currentPackage.repository ? currentPackage.repository.url : 'none');
+      const link = currentPackage.homepage ?? currentPackage.repository?.url ?? 'none';
 
       const license: License = {
-        license: currentPackage.license || 'none',
+        license: currentPackage.license ?? 'none',
         link,
         package: packageName,
         platform: 'web/desktop',

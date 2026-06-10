@@ -21,6 +21,7 @@ import React, {KeyboardEvent as ReactKeyBoardEvent, MouseEvent as ReactMouseEven
 
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
+import {noop, setContextMenuPosition} from 'Util/util';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -37,7 +38,6 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isKey, isOneOfKeys, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
-import {noop, setContextMenuPosition} from 'Util/util';
 
 import {StatusIcon} from './components/StatusIcon';
 

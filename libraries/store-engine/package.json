@@ -2,11 +2,16 @@
   "name": "@wireapp/store-engine",
   "license": "GPL-3.0",
   "description": "Provides a storage wrapper API to unify access to different storage technologies.",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/store-engine"
+  },
   "files": [
     "lib"
   ],
   "main": "lib/index",
+  "types": "lib/index.d.ts",
   "keywords": [
     "generic",
     "persistence",
@@ -14,6 +19,9 @@
     "transient",
     "wrapper"
   ],
+  "dependencies": {
+    "@sindresorhus/is": "4.6.0"
+  },
   "devDependencies": {
     "@swc/core": "^1.3.10",
     "@swc/jest": "^0.2.23",
@@ -25,11 +33,13 @@
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "build": "yarn clean && tsc",
-    "clean": "rimraf lib",
-    "dist": "yarn build",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "build": "nx run store-engine-lib:build",
+    "clean": "nx run store-engine-lib:clean",
+    "dist": "nx run store-engine-lib:dist",
+    "test": "nx run store-engine-lib:test",
+    "test:coverage": "nx run store-engine-lib:test:coverage",
+    "test:watch": "nx run store-engine-lib:test --watch"
   },
-  "version": "5.1.19"
+  "version": "5.1.19",
+  "private": true
 }

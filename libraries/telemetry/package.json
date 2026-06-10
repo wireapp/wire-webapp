@@ -1,7 +1,11 @@
 {
   "name": "@wireapp/telemetry",
   "license": "GPL-3.0",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/telemetry",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/telemetry"
+  },
   "files": [
     "lib"
   ],
@@ -22,11 +26,12 @@
     "vite-plugin-dts": "^4.3.0"
   },
   "scripts": {
-    "build": "yarn clean && vite build",
-    "clean": "rimraf lib",
-    "dist": "yarn build"
+    "build": "nx run telemetry-lib:build",
+    "clean": "nx run telemetry-lib:clean",
+    "dist": "nx run telemetry-lib:dist"
   },
   "dependencies": {
     "countly-sdk-web": "24.11.4"
-  }
+  },
+  "private": true
 }

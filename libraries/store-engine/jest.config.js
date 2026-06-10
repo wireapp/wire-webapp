@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2022 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,19 @@
  *
  */
 
-const baseConfig = require('../../jest.config.base');
-
 module.exports = {
-  ...baseConfig,
+  displayName: 'store-engine-lib',
+  testEnvironment: 'node',
+  clearMocks: true,
+  transform: {
+    '^.+\\.(ts|tsx)$': '@swc/jest',
+    '^.+\\.(js|jsx)$': '@swc/jest',
+  },
+  coverageDirectory: '../../coverage/libraries/store-engine',
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.[jt]s?(x)',
+    '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)',
+    '<rootDir>/spec/**/*.[jt]s?(x)',
+  ],
+  moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
 };

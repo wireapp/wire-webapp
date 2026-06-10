@@ -1,0 +1,22 @@
+{
+  "name": "prettier-config-lib",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'No build required'",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint --config eslint.config.ts --max-warnings=1289 --no-error-on-unmatched-pattern --ext .js,.ts {projectRoot}"
+      }
+    }
+  },
+  "tags": ["type:lib", "scope:prettier-config"]
+}

@@ -21,6 +21,7 @@ import {AssetAuditData, AssetOptions, AssetRetentionPolicy} from '@wireapp/api-c
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import ko from 'knockout';
 import {container, singleton} from 'tsyringe';
+import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
 import {NIL as NilUuid} from 'uuid';
 
 import {GenericMessage, LegalHoldStatus} from '@wireapp/protocol-messaging';
@@ -31,7 +32,6 @@ import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {stripImageExifData} from 'Util/imageUtil';
 import {getLogger, Logger} from 'Util/logger';
-import {downloadBlob, loadFileBuffer, loadImage} from 'Util/util';
 import {WebWorker} from 'Util/worker';
 
 import {AssetError} from './assetError';

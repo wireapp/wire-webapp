@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import ansiRegex from 'ansi-regex';
 import * as fs from 'fs-extra';
 import logdown from 'logdown';
@@ -66,7 +67,7 @@ export class LogFactory {
   }
 
   static addTimestamp(logTransport: logdown.TransportOptions): void {
-    const formattedDate = new Date().toISOString().split('.')[0].replace('T', ' ');
+    const formattedDate = new Date().toISOString().split('.')[0]!.replace('T', ' ');
     logTransport.args.unshift(`[${formattedDate}]`);
   }
 
@@ -74,7 +75,7 @@ export class LogFactory {
     const [time] = logTransport.args;
     const logMessage = `${time} ${logTransport.msg}`;
 
-    if (this.logFilePath) {
+    if (is.nonEmptyString(this.logFilePath)) {
       await LogFactory.writeMessage(logMessage, this.logFilePath);
     }
   }
@@ -115,7 +116,7 @@ export class LogFactory {
       prefixColor: config.color,
     });
 
-    if (config.forceEnable) {
+    if (config.forceEnable === true) {
       logger.state.isEnabled = true;
     }
 

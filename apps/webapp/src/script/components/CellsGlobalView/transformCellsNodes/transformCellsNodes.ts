@@ -20,12 +20,12 @@
 import is from '@sindresorhus/is';
 import {parseQualifiedId} from '@wireapp/core/lib/util/qualifiedIdUtil';
 import {RestNode} from 'cells-sdk-ts';
+import {formatBytes, getFileExtension, getName} from 'Util/util';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {formatBytes, getFileExtension, getName} from 'Util/util';
 
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 

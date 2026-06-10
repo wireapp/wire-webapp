@@ -54,7 +54,8 @@ export function paramsToRecord(params: string): Record<string, any> {
  * @returns the first found parameter or an empty string
  */
 export function getURLParameter(parameterName: string, search = window.location.search): string {
-  return new URLSearchParams(search).get(parameterName) || '';
+  const value = new URLSearchParams(search).get(parameterName);
+  return value ?? '';
 }
 
 /**
@@ -68,7 +69,7 @@ export function getURLParameterFromHash(parameterName: string, hash = window.loc
   if (hash.length <= 1 || hash[0] !== '#') {
     return '';
   }
-  return new URLSearchParams(hash.substring(1)).get(parameterName) || '';
+  return new URLSearchParams(hash.substring(1)).get(parameterName) ?? '';
 }
 
 /**

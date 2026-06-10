@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {CRUDEngine} from './CRUDEngine';
 import {RecordAlreadyExistsError, RecordNotFoundError, RecordTypeError} from './error';
 
@@ -27,12 +29,20 @@ export class MemoryEngine implements CRUDEngine {
   private readonly stores: MemoryStore = {};
   private autoIncrementedPrimaryKey: number = 1;
 
+  private get store(): Record<string, Record<string, any>> {
+    return this.stores[this.storeName]!;
+  }
+
+  private getTable(tableName: string): Record<PropertyKey, any> {
+    return this.store[tableName]! as Record<PropertyKey, any>;
+  }
+
   create<EntityType, PrimaryKey = string>(
     tableName: string,
     primaryKey: PrimaryKey,
     entity: EntityType,
   ): Promise<PrimaryKey> {
-    if (entity) {
+    if (!is.nullOrUndefined(entity)) {
       this.prepareTable(tableName);
 
       if (primaryKey === undefined) {
@@ -40,15 +50,16 @@ export class MemoryEngine implements CRUDEngine {
         this.autoIncrementedPrimaryKey += 1;
       }
 
-      const record = this.stores[this.storeName][tableName][primaryKey];
+      const table = this.getTable(tableName);
+      const record = table[primaryKey as PropertyKey];
 
-      if (record) {
+      if (!is.nullOrUndefined(record)) {
         const message = `Record "${primaryKey}" already exists in "${tableName}". You need to delete the record first if you want to overwrite it.`;
         const error = new RecordAlreadyExistsError(message);
         return Promise.reject(error);
       }
 
-      this.stores[this.storeName][tableName][primaryKey] = entity;
+      table[primaryKey as PropertyKey] = entity;
 
       return Promise.resolve(primaryKey);
     }
@@ -64,12 +75,12 @@ export class MemoryEngine implements CRUDEngine {
 
   public async delete<PrimaryKey = string>(tableName: string, primaryKey: PrimaryKey): Promise<PrimaryKey> {
     this.prepareTable(tableName);
-    delete this.stores[this.storeName][tableName][primaryKey];
+    delete this.getTable(tableName)[primaryKey as PropertyKey];
     return primaryKey;
   }
 
   public async deleteAll(tableName: string): Promise<boolean> {
-    delete this.stores[this.storeName][tableName];
+    delete this.store[tableName];
     return true;
   }
 
@@ -83,7 +94,7 @@ export class MemoryEngine implements CRUDEngine {
 
   private assignDb<ObjectType = Object>(storeName: string, object: ObjectType): MemoryStore {
     this.storeName = storeName;
-    this.stores[this.storeName] = this.stores[this.storeName] || object;
+    this.stores[this.storeName] = (this.stores[this.storeName] || object) as Record<string, Record<string, any>>;
     return this.stores;
   }
 
@@ -100,8 +111,9 @@ export class MemoryEngine implements CRUDEngine {
     primaryKey: PrimaryKey,
   ): Promise<EntityType> {
     this.prepareTable(tableName);
-    if (this.stores[this.storeName][tableName].hasOwnProperty(primaryKey)) {
-      return Promise.resolve(this.stores[this.storeName][tableName][primaryKey]);
+    const table = this.getTable(tableName);
+    if (Object.prototype.hasOwnProperty.call(table, primaryKey as PropertyKey)) {
+      return Promise.resolve(table[primaryKey as PropertyKey]);
     }
     const message = `Record "${primaryKey}" in "${tableName}" could not be found.`;
     return Promise.reject(new RecordNotFoundError(message));
@@ -111,7 +123,7 @@ export class MemoryEngine implements CRUDEngine {
     this.prepareTable(tableName);
     const promises: Promise<T>[] = [];
 
-    for (const primaryKey of Object.keys(this.stores[this.storeName][tableName])) {
+    for (const primaryKey of Object.keys(this.getTable(tableName))) {
       promises.push(this.read(tableName, primaryKey));
     }
 
@@ -120,7 +132,7 @@ export class MemoryEngine implements CRUDEngine {
 
   public readAllPrimaryKeys(tableName: string): Promise<string[]> {
     this.prepareTable(tableName);
-    return Promise.resolve(Object.keys(this.stores[this.storeName][tableName]));
+    return Promise.resolve(Object.keys(this.getTable(tableName)));
   }
 
   public async update<PrimaryKey = string, ChangesType = Object>(
@@ -131,7 +143,7 @@ export class MemoryEngine implements CRUDEngine {
     this.prepareTable(tableName);
     const entity = await this.read(tableName, primaryKey);
     const updatedEntity = {...entity, ...changes};
-    this.stores[this.storeName][tableName][primaryKey] = updatedEntity;
+    this.getTable(tableName)[primaryKey as PropertyKey] = updatedEntity;
     return primaryKey;
   }
 
@@ -157,8 +169,8 @@ export class MemoryEngine implements CRUDEngine {
     if (!this.stores[this.storeName]) {
       this.stores[this.storeName] = {};
     }
-    if (!this.stores[this.storeName][tableName]) {
-      this.stores[this.storeName][tableName] = {};
+    if (!this.store[tableName]) {
+      this.store[tableName] = {};
     }
   }
 }

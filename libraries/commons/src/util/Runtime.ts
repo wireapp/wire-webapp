@@ -17,6 +17,7 @@
  *
  */
 
+import is from '@sindresorhus/is';
 import platform from 'platform';
 
 import {BROWSER, WEBAPP_SUPPORTED_BROWSERS} from '../config/CommonConfig';
@@ -44,8 +45,7 @@ export interface BrowserVersion {
 
 export class Runtime {
   public static getPlatform(): typeof platform {
-    const unsetPlatform = {} as unknown as typeof platform;
-    return platform || unsetPlatform;
+    return platform;
   }
 
   public static getOSFamily(): OperatingSystem {
@@ -69,11 +69,14 @@ export class Runtime {
    * NOTE: This converts the browser name to lowercase.
    */
   public static getBrowserName(): string {
-    return (Runtime.getPlatform().name || UNKNOWN_PROPERTY).toLowerCase();
+    const name = Runtime.getPlatform().name;
+    return is.nonEmptyString(name) ? name.toLowerCase() : UNKNOWN_PROPERTY;
   }
 
   public static getBrowserVersion(): BrowserVersion {
-    const [majorVersion, minorVersion] = (Runtime.getPlatform().version || UNKNOWN_PROPERTY).split('.');
+    const version = Runtime.getPlatform().version;
+    const versionString = is.nonEmptyString(version) ? version : UNKNOWN_PROPERTY;
+    const [majorVersion = UNKNOWN_PROPERTY, minorVersion = UNKNOWN_PROPERTY] = versionString.split('.');
     return {major: parseInt(majorVersion, 10), minor: parseInt(minorVersion, 10)};
   }
 
@@ -81,7 +84,8 @@ export class Runtime {
    * NOTE: This converts the User-Agent to lowercase.
    */
   public static getUserAgent(): string {
-    return (Runtime.getPlatform().ua || UNKNOWN_PROPERTY).toLowerCase();
+    const userAgent = Runtime.getPlatform().ua;
+    return is.nonEmptyString(userAgent) ? userAgent.toLowerCase() : UNKNOWN_PROPERTY;
   }
 
   public static isWebappSupportedBrowser(): boolean {
@@ -111,19 +115,19 @@ export class Runtime {
   public static isSupportingWebSockets = (): boolean => {
     try {
       return 'WebSocket' in window;
-    } catch (error) {
+    } catch {
       return false;
     }
   };
 
   public static isSupportingClipboard = (): boolean => {
-    return !!navigator.clipboard;
+    return navigator.clipboard !== undefined;
   };
 
   public static isSupportingIndexedDb = (): boolean => {
     try {
-      return !!window.indexedDB;
-    } catch (error) {
+      return window.indexedDB !== undefined;
+    } catch {
       return false;
     }
   };
@@ -165,7 +169,10 @@ export class Runtime {
     if (!Runtime.isSupportingRTCPeerConnection()) {
       return false;
     }
-    return !!(window.RTCPeerConnection.prototype && window.RTCPeerConnection.prototype.createDataChannel);
+    return (
+      window.RTCPeerConnection.prototype !== undefined &&
+      window.RTCPeerConnection.prototype.createDataChannel !== undefined
+    );
   };
 
   public static isSupportingUserMedia = (): boolean => {
@@ -177,14 +184,14 @@ export class Runtime {
   };
 
   public static isSupportingScreensharing = (): boolean => {
+    const desktopCapturer = (window as unknown as {desktopCapturer?: unknown}).desktopCapturer;
     const hasScreenCaptureAPI =
-      !!(window as unknown as any).desktopCapturer ||
-      (Runtime.isSupportingUserMedia() && Runtime.isSupportingDisplayMedia());
+      !is.nullOrUndefined(desktopCapturer) || (Runtime.isSupportingUserMedia() && Runtime.isSupportingDisplayMedia());
     return hasScreenCaptureAPI || Runtime.isFirefox();
   };
 
   public static isSupportingPermissions = (): boolean => {
-    return !!navigator.permissions;
+    return navigator.permissions !== undefined;
   };
 
   public static isSupportingNotifications = (): boolean => {

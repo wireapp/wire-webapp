@@ -17,12 +17,13 @@
  *
  */
 
+import {base64ToArray} from 'Util/util';
+
 import {Quote} from '@wireapp/protocol-messaging';
 
 import {MessageAddEvent, MultipartMessageAddEvent, QuoteData} from 'Repositories/conversation/EventBuilder';
 import {StoredEvent} from 'Repositories/storage/record/eventRecord';
 import {getLogger, Logger} from 'Util/logger';
-import {base64ToArray} from 'Util/util';
 
 import {QuoteEntity} from '../../../message/QuoteEntity';
 import {ClientEvent} from '../Client';

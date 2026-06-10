@@ -20,6 +20,7 @@
 import {useState, useRef} from 'react';
 
 import cx from 'classnames';
+import {validateProfileImageResolution} from 'Util/util';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -31,7 +32,6 @@ import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {isErrorWithType} from 'Util/typePredicateUtil';
-import {validateProfileImageResolution} from 'Util/util';
 
 import {FileInput} from './FileInput';
 

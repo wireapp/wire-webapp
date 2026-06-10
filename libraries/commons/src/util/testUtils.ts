@@ -17,7 +17,15 @@
  *
  */
 
-export const advanceJestTimersWithPromise = async (time: number) => {
+declare const jest: {
+  advanceTimersByTime: (time: number) => void;
+  requireActual: <T>(moduleName: string) => T;
+};
+
+export const advanceJestTimersWithPromise = async (time: number): Promise<void> => {
   jest.advanceTimersByTime(time);
-  return new Promise(jest.requireActual('timers').setImmediate);
+  const timers = jest.requireActual<{setImmediate: (callback: () => void) => void}>('timers');
+  return new Promise<void>(resolve => {
+    timers.setImmediate(resolve);
+  });
 };

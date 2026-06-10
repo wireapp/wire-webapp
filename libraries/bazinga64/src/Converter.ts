@@ -24,7 +24,7 @@ export class Converter {
     try {
       const string = this.arrayBufferViewToString(arrayBufferView);
       return string;
-    } catch (error) {
+    } catch {
       if (typeof window === 'object' && 'TextDecoder' in window) {
         return new TextDecoder('utf-8').decode(arrayBufferView);
       }
@@ -66,7 +66,7 @@ export class Converter {
 
     for (const key in objectSource) {
       if (objectSource.hasOwnProperty(key)) {
-        arrayBufferView[parseInt(key, 10)] = objectSource[key];
+        arrayBufferView[parseInt(key, 10)] = objectSource[key]!;
       }
     }
 
@@ -78,7 +78,7 @@ export class Converter {
     const arrayBufferView = new Uint8Array(arrayBuffer);
 
     for (let i = 0; i < arrayBufferView.length; i++) {
-      arrayBufferView[i] = array[i];
+      arrayBufferView[i] = array[i]!;
     }
 
     return arrayBufferView;

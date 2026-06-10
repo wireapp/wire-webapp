@@ -176,27 +176,27 @@ export const initialize = (config: InitializeConfig): void => {
   window.Countly.require_consent = config.provider.requireConsent ?? true;
   window.Countly.enable_orientation_tracking = config.provider.enableOrientationTracking ?? false;
 
-  if (config.provider.autoSessionTracking) {
+  if (config.provider.autoSessionTracking === true) {
     window.Countly.q.push(['track_sessions']);
   }
 
-  if (config.provider.autoPageViewTracking) {
+  if (config.provider.autoPageViewTracking === true) {
     window.Countly.q.push(['track_pageview']);
   }
 
-  if (config.provider.autoClickTracking) {
+  if (config.provider.autoClickTracking === true) {
     window.Countly.q.push(['track_clicks']);
   }
 
-  if (config.provider.autoScrollTracking) {
+  if (config.provider.autoScrollTracking === true) {
     window.Countly.q.push(['track_scrolls']);
   }
 
-  if (config.provider.autoLinksTracking) {
+  if (config.provider.autoLinksTracking === true) {
     window.Countly.q.push(['track_links']);
   }
 
-  if (config.provider.autoErrorTracking) {
+  if (config.provider.autoErrorTracking === true) {
     window.Countly.q.push(['track_errors']);
   }
 
@@ -207,7 +207,7 @@ export const initialize = (config: InitializeConfig): void => {
  * Checks if the analytics provider has been successfully loaded and is available for use.
  */
 export const isLoaded = (): boolean => {
-  const loaded = !!window.Countly && !!window.Countly.q;
+  const loaded = 'Countly' in window;
   if (!loaded) {
     console.warn('Countly is not available');
   }

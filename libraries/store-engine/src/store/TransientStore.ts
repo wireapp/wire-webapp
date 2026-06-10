@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {EventEmitter} from 'events';
 
 import {ExpiredBundle} from './ExpiredBundle';
@@ -51,8 +53,8 @@ export class TransientStore extends EventEmitter {
 
   public deleteFromCache(cacheKey: string): string {
     const timeoutID = this.bundles[cacheKey]?.timeoutID;
-    if (timeoutID) {
-      clearTimeout(timeoutID as number);
+    if (!is.nullOrUndefined(timeoutID)) {
+      clearTimeout(timeoutID);
     }
     delete this.bundles[cacheKey];
     return cacheKey;
@@ -86,8 +88,8 @@ export class TransientStore extends EventEmitter {
     const bundles = await Promise.all(readBundles);
 
     for (const index in bundles) {
-      const bundle = bundles[index];
-      const cacheKey = cacheKeys[index];
+      const bundle = bundles[index]!;
+      const cacheKey = cacheKeys[index]!;
       await this.startTimer(cacheKey);
       this.bundles[cacheKey] = bundle;
     }
@@ -144,7 +146,7 @@ export class TransientStore extends EventEmitter {
   private async expireBundle(cacheKey: string): Promise<ExpiredBundle> {
     const expiredBundle: ExpiredBundle = {
       cacheKey: cacheKey,
-      payload: this.bundles[cacheKey].payload,
+      payload: this.bundles[cacheKey]!.payload,
       primaryKey: this.constructPrimaryKey(cacheKey),
     };
 
@@ -152,7 +154,7 @@ export class TransientStore extends EventEmitter {
     return expiredBundle;
   }
 
-  private getFromCache(primaryKey: string): Promise<TransientBundle> {
+  private getFromCache(primaryKey: string): Promise<TransientBundle | undefined> {
     const cacheBundle = this.bundles[this.constructCacheKey(primaryKey)];
     return Promise.resolve(cacheBundle);
   }
@@ -187,7 +189,7 @@ export class TransientStore extends EventEmitter {
     const timespan: number = expires - Date.now();
     if (expires <= 0) {
       await this.expireBundle(cacheKey);
-    } else if (!timeoutID) {
+    } else if (is.nullOrUndefined(timeoutID)) {
       bundle.timeoutID = setTimeout(async () => {
         const expiredBundle = await this.expireBundle(cacheKey);
         this.emit(TransientStore.TOPIC.EXPIRED, expiredBundle);

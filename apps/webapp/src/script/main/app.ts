@@ -31,6 +31,7 @@ import pWaitFor from 'p-wait-for';
 import platform from 'platform';
 import {pdfjs} from 'react-pdf';
 import {container} from 'tsyringe';
+import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -94,7 +95,6 @@ import {Environment} from 'Util/environment';
 import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
-import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
 
 import '../../style/default.less';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';

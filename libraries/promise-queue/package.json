@@ -2,26 +2,36 @@
   "name": "@wireapp/promise-queue",
   "license": "GPL-3.0",
   "description": "A Promise-based dynamic queue runner.",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/promise-queue",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/promise-queue"
+  },
   "files": [
     "lib"
   ],
   "main": "lib/index",
+  "types": "lib/index.d.ts",
+  "dependencies": {
+    "@sindresorhus/is": "4.6.0",
+    "@wireapp/commons": "workspace:^"
+  },
   "devDependencies": {
     "@swc/core": "^1.3.10",
     "@swc/jest": "^0.2.23",
     "@types/jest": "^29.2.0",
-    "@wireapp/commons": "workspace:^",
     "jest": "^29.2.1",
     "rimraf": "6.1.2",
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "build": "yarn clean && tsc -b",
-    "clean": "rimraf lib",
-    "dist": "yarn build",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "build": "nx run promise-queue-lib:build",
+    "clean": "nx run promise-queue-lib:clean",
+    "dist": "nx run promise-queue-lib:dist",
+    "test": "nx run promise-queue-lib:test",
+    "test:coverage": "nx run promise-queue-lib:test:coverage",
+    "test:watch": "nx run promise-queue-lib:test --watch"
   },
-  "version": "2.4.13"
+  "version": "2.4.13",
+  "private": true
 }

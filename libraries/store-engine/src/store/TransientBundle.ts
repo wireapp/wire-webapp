@@ -20,5 +20,5 @@
 export class TransientBundle {
   public expires: number = 0;
   public payload: any;
-  public timeoutID?: number | NodeJS.Timer; // Note: Only cached values have a "timeoutID"
+  public timeoutID?: ReturnType<typeof setTimeout>; // Note: Only cached values have a "timeoutID"
 }

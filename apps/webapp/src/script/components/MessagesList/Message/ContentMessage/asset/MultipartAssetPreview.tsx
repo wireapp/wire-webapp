@@ -20,6 +20,7 @@
 import {FC, useState} from 'react';
 
 import {container} from 'tsyringe';
+import {getFileExtension, getName} from 'Util/util';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 import {MultipleFilesIcon, PlayIcon} from '@wireapp/react-ui-kit';
@@ -28,7 +29,6 @@ import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileType
 import {FileFullscreenModal} from 'Components/FileFullscreenModal/FileFullscreenModal';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {isPreviewableImage} from 'Util/imageUtil';
-import {getFileExtension, getName} from 'Util/util';
 
 import {useGetMultipartAsset} from './MultipartAssets/useGetMultipartAsset/useGetMultipartAsset';
 

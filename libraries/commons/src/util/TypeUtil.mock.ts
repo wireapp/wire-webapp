@@ -17,8 +17,6 @@
  *
  */
 
-/* eslint-disable no-unused-expressions */
-
 import {RecursivePartial, OptionalKeys, RequiredKeys, XOR} from './TypeUtil';
 
 interface UserSettings {

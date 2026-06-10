@@ -21,6 +21,7 @@ import {FC, useCallback, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import ko from 'knockout';
+import {setContextMenuPosition} from 'Util/util';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
@@ -30,7 +31,6 @@ import {ContextMenuEntry, showContextMenu} from 'src/script/ui/ContextMenu';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey, isTabKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {setContextMenuPosition} from 'Util/util';
 
 import {useMessageActionsState} from './MessageActions.state';
 import {

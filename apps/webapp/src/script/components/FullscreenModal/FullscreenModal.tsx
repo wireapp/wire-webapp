@@ -20,9 +20,9 @@
 import {useEffect, useCallback, ReactNode, useState} from 'react';
 
 import {createPortal} from 'react-dom';
+import {preventFocusOutside} from 'Util/util';
 
 import {handleEscDown} from 'Util/keyboardUtil';
-import {preventFocusOutside} from 'Util/util';
 
 import {modalStyles, contentStyles} from './FullscreenModal.styles';
 

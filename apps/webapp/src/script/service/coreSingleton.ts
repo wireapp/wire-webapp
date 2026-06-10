@@ -18,10 +18,9 @@
  */
 
 import {container, singleton} from 'tsyringe';
+import {supportsMLS} from 'Util/util';
 
 import {Account} from '@wireapp/core';
-
-import {supportsMLS} from 'Util/util';
 
 import {APIClient} from './apiClientSingleton';
 import {createStorageEngine, DatabaseTypes} from './storeEngineProvider';

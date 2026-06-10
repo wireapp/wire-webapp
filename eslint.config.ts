@@ -62,6 +62,7 @@ const ignores = [
   'libraries/core/src/test/',
   'libraries/config/lib/',
   'libraries/react-ui-kit/lib/',
+  'libraries/*/lib/',
   '**/jest.setup.ts',
 ];
 
@@ -249,6 +250,8 @@ const config: Linter.Config[] = [
     files: ['apps/webapp/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': 'off',
+      // Webapp path aliases (Util/*, Components/*, …) resolve to lowercase dirs on disk.
+      'import/no-unresolved': ['error', {caseSensitive: false}],
     },
   },
   {

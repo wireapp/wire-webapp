@@ -86,6 +86,9 @@ export class CopyConfig {
       .split(';')
       .map(fileTuple => String.raw`${fileTuple}`.split(/:(?!\\)/))
       .forEach(([source, dest]) => {
+        if (source === undefined || source === '' || dest === undefined) {
+          return;
+        }
         let destination: string | string[] = dest;
         if (fileArrayRegex.test(destination)) {
           destination = dest.replace(fileArrayRegex, '$1').split(',');
@@ -104,6 +107,9 @@ export class CopyConfig {
 
     filesArray.forEach(source => {
       const destination = this.options.files[source];
+      if (destination === undefined) {
+        return;
+      }
 
       const joinedSource = path.join(this.options.baseDir, source);
       const resolvedDestination =
@@ -160,8 +166,8 @@ export class CopyConfig {
 
   private async clone(): Promise<void> {
     const repositoryData = this.options.repositoryUrl.split('#');
-    let bareUrl = repositoryData[0];
-    const branch = repositoryData[1] || 'master';
+    let bareUrl = repositoryData[0] ?? '';
+    const branch = repositoryData[1] ?? 'master';
     const {stderr: stderrVersion} = await utils.execAsync('git --version');
 
     if (!this.noCleanup) {
@@ -208,10 +214,13 @@ export class CopyConfig {
 
     for (const file in this.options.files) {
       const destination = this.options.files[file];
+      if (destination === undefined) {
+        continue;
+      }
       if (destination instanceof Array) {
         const results = await Promise.all(destination.map(dest => this.copyDirOrFile(file, dest)));
         results.forEach(result => (copiedFiles = copiedFiles.concat(result)));
-      } else {
+      } else if (typeof destination === 'string') {
         const result = await this.copyDirOrFile(file, destination);
         copiedFiles = copiedFiles.concat(result);
       }
@@ -221,6 +230,6 @@ export class CopyConfig {
       await this.removeBasedir();
     }
 
-    return copiedFiles.sort();
+    return copiedFiles.toSorted();
   }
 }

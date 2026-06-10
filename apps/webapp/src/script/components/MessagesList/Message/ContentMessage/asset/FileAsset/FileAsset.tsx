@@ -19,6 +19,7 @@
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
+import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {RestrictedFile} from 'Components/MessagesList/Message/ContentMessage/asset/FileAsset/RestrictedFile/RestrictedFile';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
@@ -28,7 +29,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {useMessageFocusedTabIndex} from '../../../util';
 import {AssetHeader} from '../common/AssetHeader/AssetHeader';

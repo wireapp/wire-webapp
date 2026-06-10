@@ -18,7 +18,7 @@
  */
 
 export function randomArrayElement<T>(array: T[]): T {
-  return array[randomInt(array.length - 1)];
+  return array[randomInt(array.length - 1)]!;
 }
 
 export function randomInt(max: number): number {

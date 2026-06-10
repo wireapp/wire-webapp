@@ -17,6 +17,8 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 import {Config} from './Config';
 import {Item} from './Item';
 import {Priority} from './Priority';
@@ -81,11 +83,11 @@ export class PriorityQueue {
   }
 
   public get first(): Item {
-    return this.queue[0];
+    return this.queue[0]!;
   }
 
   public get last(): Item {
-    return this.queue[this.queue.length - 1];
+    return this.queue[this.queue.length - 1]!;
   }
 
   public get size(): number {
@@ -95,7 +97,7 @@ export class PriorityQueue {
   private async processList(): Promise<void> {
     const item = this.queue.shift();
 
-    if (!item) {
+    if (!is.object(item)) {
       this.isRunning = false;
       return;
     }

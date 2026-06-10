@@ -21,6 +21,7 @@ import {useEffect, useId, useState} from 'react';
 
 import type {RichInfoField} from '@wireapp/api-client/lib/user/richInfo';
 import {container} from 'tsyringe';
+import {noop} from 'Util/util';
 
 import {Availability} from '@wireapp/protocol-messaging';
 
@@ -29,7 +30,6 @@ import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
 import {availabilityStatus, availabilityTranslationKeys} from 'Util/availabilityStatus';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
-import {noop} from 'Util/util';
 
 interface EnrichedFieldsProps {
   onFieldsLoaded?: (richFields: RichInfoField[]) => void;

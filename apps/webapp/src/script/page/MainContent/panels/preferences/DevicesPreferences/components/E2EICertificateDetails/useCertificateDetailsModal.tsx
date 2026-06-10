@@ -19,10 +19,11 @@
 
 import {useState, useEffect} from 'react';
 
+import {downloadFile} from 'Util/util';
+
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {t} from 'Util/localizerUtil';
-import {downloadFile} from 'Util/util';
 
 const COPY_MESSAGE_TIMEOUT = 3000;
 const DOWNLOAD_CERTIFICATE_TIMEOUT = 500;

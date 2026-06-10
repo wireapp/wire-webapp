@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-
 /*
  * Wire
  * Copyright (C) 2019 Wire Swiss GmbH
@@ -19,8 +18,6 @@
  *
  */
 
-/* eslint-disable header/header */
-
 import {cosmiconfig} from 'cosmiconfig';
 import logdown from 'logdown';
 
@@ -31,7 +28,7 @@ import {CopyConfig, CopyConfigOptions} from './';
   const configFile = await configExplorer.search();
   const config: CopyConfigOptions | undefined = configFile ? configFile.config : undefined;
 
-  const logLevel = config?.logLevel || 'info';
+  const logLevel = config?.logLevel ?? 'info';
   const logger = logLevel !== 'silent' ? logdown('@wireapp/copy-config', {markdown: false}) : undefined;
   if (logger) {
     logger.state.isEnabled = true;
@@ -47,7 +44,7 @@ import {CopyConfig, CopyConfigOptions} from './';
   const copiedFiles = await new CopyConfig(config, logger).copy();
   const copyMessage = copiedFiles.length ? `Copied ${copiedFiles.length}` : "Didn't copy any";
   logger?.info(`${copyMessage} file${copiedFiles.length === 1 ? '' : 's'}.`);
-})().catch(error => {
+})().catch((error: unknown) => {
   console.error(error);
   process.exit(1);
 });

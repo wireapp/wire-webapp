@@ -17,12 +17,14 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
 export function capitalize(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export function pluralize(text: string, times: number, options?: {postfix: string}) {
-  const postfix = options?.postfix || 's';
+  const postfix = is.nonEmptyString(options?.postfix) ? options.postfix : 's';
   return `${text}${times === 1 ? '' : postfix}`;
 }
 

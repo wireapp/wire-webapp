@@ -19,12 +19,12 @@
 
 import is from '@sindresorhus/is';
 import {RestNode, RestPagination} from 'cells-sdk-ts';
+import {formatBytes, getFileExtension} from 'Util/util';
 
 import {CellPagination} from 'Components/Conversation/ConversationCells/common/cellPagination/cellPagination';
 import {User} from 'Repositories/entity/User';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {formatBytes, getFileExtension} from 'Util/util';
 
 import {getUserQualifiedIdFromNode} from '../common/getUserQualifiedIdFromNode/getUserQualifiedIdFromNode';
 

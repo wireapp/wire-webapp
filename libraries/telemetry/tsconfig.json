@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "module": "ESNext",
     "esModuleInterop": true,
@@ -10,8 +10,16 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "outDir": "lib",
-    "target": "es5"
+    "target": "es5",
+    "rootDir": "src"
   },
-  "exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.test.tsx", "src/test/**/*"],
-  "include": ["src/**/*"]
+  "exclude": [
+    "node_modules",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/test/**/*"
+  ],
+  "include": [
+    "src/**/*"
+  ]
 }

@@ -18,6 +18,7 @@
  */
 
 import {container} from 'tsyringe';
+import {downloadBlob} from 'Util/util';
 
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
@@ -26,7 +27,6 @@ import type {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 import {getCurrentDate} from 'Util/timeUtil';
-import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../../../../Config';
 import {PreferencesSection} from '../components/PreferencesSection';

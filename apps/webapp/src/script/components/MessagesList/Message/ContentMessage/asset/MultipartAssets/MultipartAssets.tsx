@@ -20,6 +20,7 @@
 import {useEffect} from 'react';
 
 import {container} from 'tsyringe';
+import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {ICellAsset} from '@wireapp/protocol-messaging';
 
@@ -28,7 +29,6 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isPreviewableImage} from 'Util/imageUtil';
 import {t} from 'Util/localizerUtil';
-import {formatBytes, getFileExtension, trimFileExtension} from 'Util/util';
 
 import {MediaFilePreviewCard} from './common/MediaFilePreviewCard/MediaFilePreviewCard';
 import {FileAssetCard} from './FileAssetCard/FileAssetCard';

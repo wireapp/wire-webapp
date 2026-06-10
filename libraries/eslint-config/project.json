@@ -1,0 +1,22 @@
+{
+  "name": "eslint-config-lib",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'No build required'",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "eslint --config eslint.config.ts --max-warnings=1289 --ext .js,.ts {projectRoot} --ignore-pattern '**/eslintrc.js' --no-error-on-unmatched-pattern --no-warn-ignored"
+      }
+    }
+  },
+  "tags": ["type:lib", "scope:eslint-config"]
+}

@@ -21,9 +21,9 @@ import {ReactNode} from 'react';
 
 import cx from 'classnames';
 import {DropzoneInputProps, DropzoneRootProps} from 'react-dropzone/.';
+import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {DropFileArea} from 'Components/DropFileArea';
-import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {FileDropzone} from './FileDropzone/FileDropzone';
 

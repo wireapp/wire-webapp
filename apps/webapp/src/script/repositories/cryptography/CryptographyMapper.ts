@@ -25,6 +25,7 @@ import {
 import {GenericMessageType} from '@wireapp/core/lib/conversation';
 import {MultiPartContent} from '@wireapp/core/lib/conversation/content';
 import {container} from 'tsyringe';
+import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {
   Asset,
@@ -61,7 +62,6 @@ import {ClientEvent, CONVERSATION} from 'Repositories/event/Client';
 import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {toError} from 'Util/toError';
-import {base64ToArray, arrayToBase64} from 'Util/util';
 
 import {PROTO_MESSAGE_TYPE} from './ProtoMessageType';
 

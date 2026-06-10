@@ -26,7 +26,9 @@ import path from 'path';
 import * as utils from './utils';
 
 import {CopyConfig} from '.';
-const TEMP_DIR = path.resolve(__dirname, '..', '.temp');
+const LIB_ROOT = path.resolve(__dirname, '..');
+const TEMP_DIR = path.resolve(LIB_ROOT, '.temp');
+const SPEC_HELPERS = './spec/helpers';
 
 jest.mock('./utils', () => ({
   ...jest.requireActual('./utils'),
@@ -39,7 +41,7 @@ describe('CopyConfig', () => {
   describe('constructor', () => {
     it('can be configured using environment variables', async () => {
       process.env.WIRE_CONFIGURATION_EXTERNAL_DIR = 'externalDir';
-      process.env.WIRE_CONFIGURATION_FILES = `./spec/helpers/**:${TEMP_DIR};./spec/helpers/test1.txt:[${TEMP_DIR}/test1.txt,${TEMP_DIR}/test2.txt]`;
+      process.env.WIRE_CONFIGURATION_FILES = `${SPEC_HELPERS}/**:${TEMP_DIR};${SPEC_HELPERS}/test1.txt:[${TEMP_DIR}/test1.txt,${TEMP_DIR}/test2.txt]`;
 
       const copyConfig = new CopyConfig({
         files: {},
@@ -50,8 +52,8 @@ describe('CopyConfig', () => {
       expect(copyConfig.options.externalDir.endsWith('externalDir')).toBe(true);
       // @ts-ignore
       expect(copyConfig.options.files).toEqual({
-        './spec/helpers/**': TEMP_DIR,
-        './spec/helpers/test1.txt': [`${TEMP_DIR}/test1.txt`, `${TEMP_DIR}/test2.txt`],
+        [`${SPEC_HELPERS}/**`]: TEMP_DIR,
+        [`${SPEC_HELPERS}/test1.txt`]: [`${TEMP_DIR}/test1.txt`, `${TEMP_DIR}/test2.txt`],
       });
 
       delete process.env.WIRE_CONFIGURATION_EXTERNAL_DIR;
@@ -62,9 +64,9 @@ describe('CopyConfig', () => {
   describe('copy', () => {
     it('copies a single file', async () => {
       const copyConfig = new CopyConfig({
-        externalDir: '.',
+        externalDir: LIB_ROOT,
         files: {
-          './spec/helpers/test1.txt': `${TEMP_DIR}/test1.txt`,
+          [`${SPEC_HELPERS}/test1.txt`]: `${TEMP_DIR}/test1.txt`,
         },
         repositoryUrl: '',
       });
@@ -79,9 +81,9 @@ describe('CopyConfig', () => {
 
     it('copies dot files', async () => {
       const copyConfig = new CopyConfig({
-        externalDir: '.',
+        externalDir: LIB_ROOT,
         files: {
-          './spec/helpers/.env.test': `${TEMP_DIR}/.env`,
+          [`${SPEC_HELPERS}/.env.test`]: `${TEMP_DIR}/.env`,
         },
         repositoryUrl: '',
       });
@@ -93,9 +95,9 @@ describe('CopyConfig', () => {
 
     it('copies all files', async () => {
       const copyConfig = new CopyConfig({
-        externalDir: '.',
+        externalDir: LIB_ROOT,
         files: {
-          './spec/helpers/**': TEMP_DIR,
+          [`${SPEC_HELPERS}/**`]: TEMP_DIR,
         },
         repositoryUrl: '',
       });
@@ -112,7 +114,7 @@ describe('CopyConfig', () => {
 
     it('reports errors', async () => {
       const copyConfig = new CopyConfig({
-        externalDir: '.',
+        externalDir: LIB_ROOT,
         files: {
           'non-existant': TEMP_DIR,
         },
@@ -134,9 +136,9 @@ describe('CopyConfig', () => {
       await writeFile(path.join(TEMP_DIR, 'test1.txt'), '');
 
       const copyConfig = new CopyConfig({
-        externalDir: '.',
+        externalDir: LIB_ROOT,
         files: {
-          './spec/helpers/test1.txt': `${TEMP_DIR}/test1.txt`,
+          [`${SPEC_HELPERS}/test1.txt`]: `${TEMP_DIR}/test1.txt`,
         },
         repositoryUrl: '',
       });
@@ -197,7 +199,7 @@ describe('CopyConfig', () => {
       const copyString = 'C:\\source:D:\\target';
 
       const copyConfig = new CopyConfig({
-        externalDir: '.',
+        externalDir: LIB_ROOT,
         files: {},
         repositoryUrl: '',
       });

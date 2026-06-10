@@ -22,6 +22,7 @@ import {useContext, useEffect, useState} from 'react';
 import is from '@sindresorhus/is';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
+import {downloadBlob} from 'Util/util';
 
 import {Button, ButtonVariant, FlexBox} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -37,7 +38,6 @@ import {ContentState} from 'src/script/page/useAppState';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {getCurrentDate} from 'Util/timeUtil';
-import {downloadBlob} from 'Util/util';
 
 import {Config} from '../../Config';
 import {RootContext} from '../../page/RootProvider';

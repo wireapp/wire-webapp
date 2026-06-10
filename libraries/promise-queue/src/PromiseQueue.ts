@@ -17,6 +17,10 @@
  *
  */
 
+import is from '@sindresorhus/is';
+
+import {LogFactory, Logger} from '@wireapp/commons';
+
 import {PromiseQueueOptions} from './PromiseQueueOptions';
 import {QueueEntry, Task} from './QueueEntry';
 
@@ -50,7 +54,7 @@ export class PromiseQueue {
   private runningTasks: number;
   private paused: boolean;
   private readonly concurrent: number;
-  private readonly logger?: {warn: (...args: any[]) => void};
+  private readonly logger?: Logger;
   private readonly queue: QueueEntry<any>[];
   private readonly timeout: number;
 
@@ -61,6 +65,9 @@ export class PromiseQueue {
     this.paused = options?.paused ?? defaultOptions.paused;
     this.queue = [];
     this.timeout = options?.timeout ?? defaultOptions.timeout;
+    this.logger =
+      options?.logger ??
+      (is.nonEmptyString(options?.name) ? LogFactory.getLogger(`@wireapp/promise-queue/${options.name}`) : undefined);
   }
 
   /**
@@ -72,7 +79,7 @@ export class PromiseQueue {
     }
 
     const queueEntry = this.queue.shift();
-    if (!queueEntry) {
+    if (!is.object(queueEntry)) {
       return;
     }
 
@@ -87,8 +94,8 @@ export class PromiseQueue {
      * the timer until it fires. For many tasks this means we'll have thousands of useless timers still pending in memory.
      * In long queues (like app startup notifications) it can lead to memory bloat and unnecessary wake-ups in the event loop.
      */
-    let timeoutId: ReturnType<typeof setTimeout>;
-    const timeoutPromise = new Promise<never>((_, reject) => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const timeoutPromise = new Promise<never>((_resolve, reject) => {
       timeoutId = setTimeout(() => {
         this.logger?.warn?.(
           `Promise queue task timed-out after ${this.timeout}ms, rejecting and advancing to the next task in queue`,
@@ -102,12 +109,12 @@ export class PromiseQueue {
 
     Promise.race([queueEntry.fn(), timeoutPromise])
       .then(result => queueEntry.resolveFn(result as any))
-      .catch(err => {
+      .catch((err: unknown) => {
         queueEntry.resolveFn = () => {};
         queueEntry.rejectFn(err);
       })
       .finally(() => {
-        if (timeoutId) {
+        if (timeoutId !== undefined) {
           clearTimeout(timeoutId);
         }
         this.runningTasks--;
@@ -178,7 +185,7 @@ export class PromiseQueue {
   flush(reason: Error = PromiseQueue.createFlushError()): void {
     while (this.queue.length > 0) {
       const entry = this.queue.shift();
-      if (entry) {
+      if (is.object(entry)) {
         // Prevent accidental resolve if the task ever runs
         entry.resolveFn = () => {};
         entry.rejectFn(reason);

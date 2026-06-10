@@ -5,30 +5,25 @@ module.exports = {
     browser: true,
     es6: true,
     node: true,
-    jest: true
+    jest: true,
   },
   extends: [
-    "plugin:jest/recommended",
-    "plugin:jsx-a11y/recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "prettier",
-    "plugin:import/recommended",
-    "plugin:import/typescript",
+    'plugin:jest/recommended',
+    'plugin:jsx-a11y/recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'prettier',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
     'plugin:react/recommended',
     'plugin:no-unsanitized/DOM',
     'plugin:react/jsx-runtime',
   ],
-  ignorePatterns: [
-    ".git/",
-    "docs/",
-    "bin/",
-    "**/node_modules/",
-  ],
-  parser: "@typescript-eslint/parser",
+  ignorePatterns: ['.git/', 'docs/', 'bin/', '**/node_modules/'],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    tsconfigRootDir: ".",
-    sourceType: "module",
-    project: ["./tsconfig.json"]
+    tsconfigRootDir: '.',
+    sourceType: 'module',
+    project: ['./tsconfig.json'],
   },
   plugins: [
     'jsdoc',
@@ -37,13 +32,13 @@ module.exports = {
     'react',
     'react-hooks',
     'header',
-    "import",
-    "react-hooks",
-    "eslint-plugin-testing-library",
-    "@typescript-eslint",
+    'import',
+    'react-hooks',
+    'eslint-plugin-testing-library',
+    '@typescript-eslint',
     'unused-imports',
-    "eslint-plugin-jest-dom",
-    "better-styled-components"
+    'eslint-plugin-jest-dom',
+    'better-styled-components',
   ],
   rules: {
     'constructor-super': 'error',
@@ -89,11 +84,14 @@ module.exports = {
     'no-else-return': 'error',
     'no-inner-declarations': 'error',
     'no-lonely-if': 'error',
-    "no-magic-numbers": ["warn", {
-      "ignore": [-1, 0, 1],
-      "ignoreArrayIndexes": true,
-      "ignoreDefaultValues": true
-    }],
+    'no-magic-numbers': [
+      'warn',
+      {
+        ignore: [-1, 0, 1],
+        ignoreArrayIndexes: true,
+        ignoreDefaultValues: true,
+      },
+    ],
     'no-restricted-globals': [
       'warn',
       {
@@ -127,51 +125,51 @@ module.exports = {
     'prefer-spread': 'error',
     'prefer-template': 'error',
     'prettier/prettier': 'error',
-    "jest/no-jasmine-globals": "error",
-    "jest/no-identical-title": "warn",
-    "jest/no-done-callback": "warn",
-    "jest/no-disabled-tests": "warn",
-    "jest/no-conditional-expect": "warn",
-    "jsx-a11y/media-has-caption": "warn",
-    "jsx-a11y/no-noninteractive-tabindex": "warn",
+    'jest/no-jasmine-globals': 'error',
+    'jest/no-identical-title': 'warn',
+    'jest/no-done-callback': 'warn',
+    'jest/no-disabled-tests': 'warn',
+    'jest/no-conditional-expect': 'warn',
+    'jsx-a11y/media-has-caption': 'warn',
+    'jsx-a11y/no-noninteractive-tabindex': 'warn',
     'react/jsx-uses-react': 'error',
     'react/jsx-uses-vars': 'error',
     'react/prefer-stateless-function': 'error',
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
-    "react/no-unknown-property": ["error", { "ignore": ["css"] }],
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+    'react/no-unknown-property': ['error', {ignore: ['css']}],
     'sort-vars': 'error',
-    "@typescript-eslint/require-array-sort-compare": "warn",
+    '@typescript-eslint/require-array-sort-compare': 'warn',
     strict: ['error', 'global'],
-    "unused-imports/no-unused-imports": "error",
-    "import/no-unresolved": "error",
-    "import/no-default-export": "error",
-    "import/order": [
-      "error",
+    'unused-imports/no-unused-imports': 'error',
+    'import/no-unresolved': 'error',
+    'import/no-default-export': 'error',
+    'import/order': [
+      'error',
       {
-        "groups": ["external", "builtin", "internal", "sibling", "parent", "index"],
-        "pathGroups": [
+        groups: ['external', 'builtin', 'internal', 'sibling', 'parent', 'index'],
+        pathGroups: [
           {
-            "pattern": "react",
-            "group": "external",
-            "position": "before"
+            pattern: 'react',
+            group: 'external',
+            position: 'before',
           },
           {
-            "pattern": "@wireapp/*",
-            "group": "internal",
-            "position": "before"
-          }
+            pattern: '@wireapp/*',
+            group: 'internal',
+            position: 'before',
+          },
         ],
-        "pathGroupsExcludedImportTypes": ["react", "@wireapp/*"],
-        "newlines-between": "always",
-        "alphabetize": {
-          "order": "asc",
-          "caseInsensitive": true
+        pathGroupsExcludedImportTypes: ['react', '@wireapp/*'],
+        'newlines-between': 'always',
+        alphabetize: {
+          order: 'asc',
+          caseInsensitive: true,
         },
-        "warnOnUnassignedImports": true
-      }
+        warnOnUnassignedImports: true,
+      },
     ],
-    "better-styled-components/sort-declarations-alphabetically": 2,
+    'better-styled-components/sort-declarations-alphabetically': 2,
     'valid-jsdoc': [
       'error',
       {
@@ -192,17 +190,17 @@ module.exports = {
   },
   settings: {
     react: {
-      version: "detect"
+      version: 'detect',
     },
-    "import/parsers": {
-      "@typescript-eslint/parser": [".js", ".jsx", ".ts", ".tsx"]
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.js', '.jsx', '.ts', '.tsx'],
     },
-    "import/resolver": {
+    'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
         // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
-        paths: "./tsconfig.json"
-      }
-    }
+        paths: './tsconfig.json',
+      },
+    },
   },
-}
+};

@@ -2,11 +2,16 @@
   "name": "bazinga64",
   "license": "GPL-3.0",
   "description": "Base64 encoding and decoding with ASCII string representation.",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/bazinga64",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/bazinga64"
+  },
   "files": [
     "lib"
   ],
   "main": "lib/index",
+  "types": "lib/index.d.ts",
   "keywords": [
     "array",
     "ascii",
@@ -34,11 +39,13 @@
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "build": "yarn clean && tsc",
-    "clean": "rimraf lib",
-    "dist": "yarn build",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "build": "nx run bazinga64-lib:build",
+    "clean": "nx run bazinga64-lib:clean",
+    "dist": "nx run bazinga64-lib:dist",
+    "test": "nx run bazinga64-lib:test",
+    "test:coverage": "nx run bazinga64-lib:test:coverage",
+    "test:watch": "nx run bazinga64-lib:test --watch"
   },
-  "version": "6.5.13"
+  "version": "6.5.13",
+  "private": true
 }

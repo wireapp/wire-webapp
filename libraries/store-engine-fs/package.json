@@ -2,13 +2,18 @@
   "name": "@wireapp/store-engine-fs",
   "license": "GPL-3.0",
   "description": "Store Engine implementation for Node.js' File System.",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/store-engine-fs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/store-engine-fs"
+  },
   "files": [
     "lib"
   ],
   "main": "lib/index",
+  "types": "lib/index.d.ts",
   "peerDependencies": {
-    "@wireapp/store-engine": "5.x.x"
+    "@wireapp/store-engine": "workspace:^"
   },
   "dependencies": {
     "fs-extra": "11.3.3"
@@ -19,18 +24,20 @@
     "@types/fs-extra": "11.0.4",
     "@types/jest": "^29.2.0",
     "@types/node": "^22.0.0",
-    "@wireapp/store-engine": "5.1.19",
+    "@wireapp/store-engine": "workspace:^",
     "jest": "^29.2.1",
     "rimraf": "6.1.2",
     "ts-node": "10.9.2",
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "build": "yarn clean && tsc",
-    "clean": "rimraf lib",
-    "dist": "yarn build",
-    "test": "jest",
-    "test:coverage": "jest --coverage"
+    "build": "nx run store-engine-fs-lib:build",
+    "clean": "nx run store-engine-fs-lib:clean",
+    "dist": "nx run store-engine-fs-lib:dist",
+    "test": "nx run store-engine-fs-lib:test",
+    "test:coverage": "nx run store-engine-fs-lib:test:coverage",
+    "test:watch": "nx run store-engine-fs-lib:test --watch"
   },
-  "version": "3.1.22"
+  "version": "3.1.22",
+  "private": true
 }

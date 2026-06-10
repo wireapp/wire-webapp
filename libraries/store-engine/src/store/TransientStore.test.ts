@@ -37,10 +37,6 @@ describe('store.TransientStore', () => {
     await store.init(TABLE_NAME);
   });
 
-  afterEach(() => {
-    window.localStorage.clear();
-  });
-
   describe('set', () => {
     const entity = {
       access_token: 'iJCRCjc8oROO-dkrkqCXOade997oa8Jhbz6awMUQPBQo80VenWqp_oNvfY6AnU5BxEsdDPOBfBP-uz_b0gAKBQ==',

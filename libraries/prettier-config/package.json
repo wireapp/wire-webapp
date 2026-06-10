@@ -2,10 +2,18 @@
   "name": "@wireapp/prettier-config",
   "license": "GPL-3.0",
   "description": "Wire Prettier config",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/prettier-config",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/prettier-config"
+  },
   "main": "index.json",
   "version": "0.6.11",
   "devDependencies": {
     "typescript": "^5.0.4"
+  },
+  "private": true,
+  "scripts": {
+    "lint": "nx run prettier-config-lib:lint"
   }
 }

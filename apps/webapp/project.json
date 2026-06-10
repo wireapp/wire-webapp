@@ -101,6 +101,7 @@
     },
     "configure": {
       "executor": "nx:run-commands",
+      "dependsOn": ["copy-config-lib:build"],
       "options": {
         "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts",
         "cwd": "{projectRoot}"

@@ -30,7 +30,6 @@ export interface FileEngineOptions {
 }
 
 export class FileEngine implements CRUDEngine {
-  // eslint-disable-next-line no-undef
   [index: string]: any;
 
   private autoIncrementedPrimaryKey: number = 1;
@@ -99,7 +98,7 @@ export class FileEngine implements CRUDEngine {
     primaryKey: PrimaryKey,
     entity: EntityType,
   ): Promise<PrimaryKey> {
-    if (entity) {
+    if (entity !== undefined && entity !== null) {
       if (primaryKey === undefined) {
         primaryKey = this.autoIncrementedPrimaryKey as unknown as PrimaryKey;
         this.autoIncrementedPrimaryKey += 1;
@@ -139,7 +138,7 @@ export class FileEngine implements CRUDEngine {
     try {
       await fs.remove(directory);
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -163,7 +162,7 @@ export class FileEngine implements CRUDEngine {
 
     try {
       data = JSON.parse(data);
-    } catch (error) {
+    } catch {
       // No JSON found but that's okay
     }
 
@@ -234,7 +233,7 @@ export class FileEngine implements CRUDEngine {
     const tableNamePath = FileEngine.enforcePathRestrictions(this.storeName, tableName);
     const primaryKeyPath = FileEngine.enforcePathRestrictions(
       tableNamePath,
-      primaryKey ? `${primaryKey}${this.options.fileExtension}` : '',
+      primaryKey !== undefined && primaryKey !== null ? `${primaryKey}${this.options.fileExtension}` : '',
     );
 
     return primaryKeyPath;

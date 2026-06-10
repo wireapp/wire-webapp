@@ -2,16 +2,22 @@
   "name": "@wireapp/commons",
   "license": "GPL-3.0",
   "description": "Collection of common components that are used across Wire web applications.",
-  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/commons",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/commons"
+  },
   "files": [
     "lib"
   ],
   "main": "lib/index",
+  "types": "lib/index.d.ts",
   "keywords": [
     "commons",
     "utils"
   ],
   "dependencies": {
+    "@sindresorhus/is": "4.6.0",
     "ansi-regex": "5.0.1",
     "fs-extra": "11.3.3",
     "logdown": "3.3.1",
@@ -28,12 +34,13 @@
     "typescript": "^5.0.4"
   },
   "scripts": {
-    "build": "yarn clean && tsc",
-    "clean": "rimraf lib",
-    "dist": "yarn build",
-    "test": "jest",
-    "test:coverage": "yarn test",
-    "test:watch": "yarn jest --watch"
+    "build": "nx run commons-lib:build",
+    "clean": "nx run commons-lib:clean",
+    "dist": "nx run commons-lib:dist",
+    "test": "nx run commons-lib:test",
+    "test:coverage": "nx run commons-lib:test:coverage",
+    "test:watch": "nx run commons-lib:test --watch"
   },
-  "version": "5.4.13"
+  "version": "5.4.13",
+  "private": true
 }

@@ -17,15 +17,17 @@
  *
  */
 
+import {Logger} from '@wireapp/commons';
+
 export interface PromiseQueueOptions {
   /** Concurrent promise execution. Default is 1. */
   concurrent?: number;
   /** Name for Promise queue */
-  name: string;
+  name?: string;
   /** Initial paused state. Default is `false`. */
   paused?: boolean;
   /** Timeout in ms. Default is 1000 (1 minute). */
   timeout?: number;
   /** logger used to log errors */
-  logger?: {warn: (...args: any[]) => void};
+  logger?: Logger;
 }

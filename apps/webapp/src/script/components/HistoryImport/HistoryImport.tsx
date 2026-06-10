@@ -19,6 +19,8 @@
 
 import {useEffect, useState} from 'react';
 
+import {loadFileBuffer} from 'Util/util';
+
 import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
@@ -37,7 +39,6 @@ import {ContentState} from 'src/script/page/useAppState';
 import {checkBackupEncryption} from 'Util/backupUtil';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
-import {loadFileBuffer} from 'Util/util';
 
 import {BackupFileUpload} from './BackupFileUpload';
 

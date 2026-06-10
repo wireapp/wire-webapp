@@ -26,13 +26,13 @@
   },
   "dependencies": {
     "@sindresorhus/is": "4.6.0",
-    "@wireapp/api-client": "27.96.0",
+    "@wireapp/api-client": "workspace:^",
     "@wireapp/core-crypto": "9.3.4",
     "@wireapp/cryptobox": "12.8.0",
-    "@wireapp/priority-queue": "2.1.19",
-    "@wireapp/promise-queue": "2.4.13",
+    "@wireapp/priority-queue": "workspace:^",
+    "@wireapp/promise-queue": "workspace:^",
     "@wireapp/protocol-messaging": "1.56.0",
-    "@wireapp/store-engine": "5.1.19",
+    "@wireapp/store-engine": "workspace:^",
     "hash.js": "1.1.7",
     "idb": "8.0.3",
     "lodash": "4.18.1"
