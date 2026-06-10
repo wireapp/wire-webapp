@@ -1,0 +1,21 @@
+{
+  "name": "@wireapp/webapp-events",
+  "license": "GPL-3.0",
+  "description": "Events shared between Wire's web app and desktop app.",
+  "repository": "https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events",
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index",
+  "devDependencies": {
+    "rimraf": "6.1.2",
+    "typescript": "^5.0.4"
+  },
+  "scripts": {
+    "build": "yarn clean && tsc",
+    "clean": "rimraf lib",
+    "dist": "yarn build",
+    "test": "exit 0"
+  },
+  "version": "0.29.2"
+}
