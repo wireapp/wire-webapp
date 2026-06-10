@@ -104,7 +104,6 @@ export const useConversationSearchFiles = ({
           path: conversationPath,
           sortBy: shouldSort ? 'mtime' : undefined,
           sortDirection: shouldSort ? 'desc' : undefined,
-          type: 'file',
           deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
           ...searchParams,
         });
