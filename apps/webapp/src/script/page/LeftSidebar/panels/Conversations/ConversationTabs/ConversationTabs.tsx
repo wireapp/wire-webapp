@@ -20,6 +20,7 @@
 import {container} from 'tsyringe';
 
 import {
+  CallIcon,
   ChannelIcon,
   CollectionIcon,
   ExternalLinkIcon,
@@ -104,7 +105,10 @@ export const ConversationTabs = ({
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
-  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
+  const {isCellsEnabled: isCellsEnabledForTeam, isMeetingsEnabled} = useKoSubscribableChildren(teamState, [
+    'isCellsEnabled',
+    'isMeetingsEnabled',
+  ]);
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
     favoriteConversation.hasUnread(),
@@ -313,6 +317,27 @@ export const ConversationTabs = ({
               conversationTabIndex={visibleConversationTabs.length + 2}
               dataUieName="go-cells"
               isActive={currentTab === SidebarTabs.CELLS}
+            />
+          </>
+        )}
+
+        {isMeetingsEnabled && (
+          <>
+            <div className="conversations-sidebar-divider" />
+
+            <div className="conversations-sidebar-title" css={{marginBlock: '32px 0'}}>
+              {t('meetings.navigation.parent.label')}
+            </div>
+
+            <ConversationTab
+              title={t('meetings.navigation.title')}
+              label={t('meetings.navigation.label')}
+              type={SidebarTabs.MEETINGS}
+              Icon={<CallIcon />}
+              onChangeTab={onChangeTab}
+              conversationTabIndex={visibleConversationTabs.length + 3}
+              dataUieName="go-meetings"
+              isActive={currentTab === SidebarTabs.MEETINGS}
             />
           </>
         )}

@@ -19,6 +19,7 @@
 
 import {ComponentType, CSSProperties, ReactNode, SVGProps, useEffect, useMemo, useRef, useState} from 'react';
 
+import {CSSObject} from '@emotion/react';
 import cx from 'classnames';
 import {createRoot, Root} from 'react-dom/client';
 
@@ -35,6 +36,7 @@ import {useActiveWindowState} from '../hooks/useActiveWindow';
 export interface ContextMenuEntry {
   availability?: Availability.Type;
   click?: (event?: MouseEvent) => void;
+  css?: CSSObject;
   icon?: ComponentType<SVGProps<SVGSVGElement>>;
   identifier?: string;
   isChecked?: boolean;
@@ -282,6 +284,7 @@ const ContextMenu = ({
                     type="button"
                     data-uie-name={entry.identifier || defaultIdentifier}
                     title={entry.title || entry.label}
+                    {...(entry.css ? {css: entry.css} : {})}
                     {...(entry.isDisabled
                       ? undefined
                       : {
