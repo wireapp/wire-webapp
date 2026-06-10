@@ -8993,12 +8993,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/color-convert@npm:*":
-  version: 2.0.3
-  resolution: "@types/color-convert@npm:2.0.3"
+"@types/color-convert@npm:1":
+  version: 1.9.0
+  resolution: "@types/color-convert@npm:1.9.0"
   dependencies:
     "@types/color-name": "npm:*"
-  checksum: 10/39fe4036c0fb27e796f962eb19e4640aaa7f55cdb05cb8d4b21ef48d4a6f82fc281c06a6664ef1dfb11d9d6d2051a988a0ffa0b7a2f71b3a9418ebced12a9f38
+  checksum: 10/d1613d638ef339469cd7182f66356406c8f1d5eadd10984e2d6446e63e5b2998f416668f80bd8626411fe0f5d1f29b829a1453dea5034b6791ebfacbdff02608
   languageName: node
   linkType: hard
 
@@ -9009,12 +9009,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/color@npm:3.0.6":
-  version: 3.0.6
-  resolution: "@types/color@npm:3.0.6"
+"@types/color@npm:3.0.7":
+  version: 3.0.7
+  resolution: "@types/color@npm:3.0.7"
   dependencies:
-    "@types/color-convert": "npm:*"
-  checksum: 10/0f16dcf4e202896d5425019c44a1f99713fca998052ab2fd836cdd38048398a0caf5b79a2efe560e41fca4b9401e8d8f6f02ed541cfea30cca3a8cb1b50b80f7
+    "@types/color-convert": "npm:1"
+  checksum: 10/0530364fed840562da9a7c9488b6a25e7f3406e8be767febdb72410f5d1c5d4b506e1c6af6be8b5a49045fa9831ec00bc1b093fef38c53a187fd9791d95c426f
   languageName: node
   linkType: hard
 
@@ -10956,7 +10956,7 @@ __metadata:
     "@testing-library/jest-dom": "npm:6.9.1"
     "@testing-library/react": "npm:16.3.2"
     "@testing-library/user-event": "npm:14.6.1"
-    "@types/color": "npm:3.0.6"
+    "@types/color": "npm:3.0.7"
     "@types/jest": "npm:30.0.0"
     "@types/node": "npm:24.13.1"
     "@types/react": "npm:18.3.31"
