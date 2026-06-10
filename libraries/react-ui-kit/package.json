@@ -17,7 +17,7 @@
     "@radix-ui/react-accordion": "1.2.13",
     "@radix-ui/react-dropdown-menu": "2.1.17",
     "@sindresorhus/is": "4.6.0",
-    "@types/color": "3.0.6",
+    "@types/color": "3.0.7",
     "color": "4.2.3",
     "emotion-normalize": "11.0.1",
     "react-select": "5.10.2",
