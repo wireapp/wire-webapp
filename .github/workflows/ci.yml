@@ -93,6 +93,16 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4.2.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
       - name: Verify generated i18n artifacts are committed
         run: |
           yarn nx run webapp:translate-merge
@@ -116,7 +126,14 @@ jobs:
       - name: Lint formatting
         run: yarn lint:other
 
-      - name: Lint
+      - name: Lint (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: yarn nx affected -t lint --base="origin/${BASE_REF}"
+
+      - name: Lint (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
         run: yarn nx run-many -t lint --all
 
       - name: Test

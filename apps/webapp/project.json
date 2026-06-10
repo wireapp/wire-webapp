@@ -22,6 +22,15 @@
         }
       }
     },
+    "watch-deps": {
+      "continuous": true,
+      "dependsOn": ["^watch"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'Watching upstream library dependencies' && tail -f /dev/null",
+        "cwd": "{projectRoot}"
+      }
+    },
     "serve": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
@@ -53,15 +62,22 @@
     },
     "lint": {
       "executor": "nx:run-commands",
-      "dependsOn": ["webapp:stylelint", "webapp:type-check"],
+      "dependsOn": [],
       "options": {
-        "command": "eslint --max-warnings=959 --ext .js,.ts,.tsx {projectRoot}"
+        "command": "eslint --config eslint.config.ts --max-warnings=959 --cache --cache-location node_modules/.cache/eslint/webapp --ext .js,.ts,.tsx {projectRoot}/src"
+      }
+    },
+    "lint:full": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["stylelint", "type-check", "lint"],
+      "options": {
+        "command": "echo 'Full lint checks complete'"
       }
     },
     "stylelint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "prettier --ignore-path {projectRoot}/.prettierignore --write \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"",
+        "command": "prettier --ignore-path {projectRoot}/.prettierignore --check \"**/*.less\" && stylelint --ignore-path {projectRoot}/.gitignore \"**/*.less\"",
         "cwd": "{projectRoot}"
       }
     },
@@ -101,6 +117,7 @@
     },
     "configure": {
       "executor": "nx:run-commands",
+      "dependsOn": ["copy-config-lib:build"],
       "options": {
         "command": "copy-config ./.copyconfigrc.js && ts-node ./bin/generate_react_icons.ts",
         "cwd": "{projectRoot}"

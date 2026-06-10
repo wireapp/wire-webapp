@@ -1,0 +1,39 @@
+{
+  "name": "@wireapp/license-collector",
+  "license": "GPL-3.0",
+  "description": "Wire's internal license collection tool",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/license-collector"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "lib/index",
+  "types": "lib/index.d.ts",
+  "bin": {
+    "collect-licenses": "src/cli.js"
+  },
+  "dependencies": {
+    "fs-extra": "11.3.3",
+    "logdown": "3.3.1",
+    "npm-license-crawler": "0.2.1",
+    "npm-registry-package-info": "1.0.5"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "11.0.4",
+    "@types/license-checker": "^25",
+    "@types/npm-registry-package-info": "1.0.4",
+    "license-checker": "^25.0.1",
+    "rimraf": "6.1.2",
+    "typescript": "^5.0.4"
+  },
+  "scripts": {
+    "build": "nx run license-collector-lib:build",
+    "clean": "nx run license-collector-lib:clean",
+    "dist": "nx run license-collector-lib:dist"
+  },
+  "version": "0.12.22",
+  "private": true
+}

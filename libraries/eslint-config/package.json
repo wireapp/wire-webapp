@@ -1,0 +1,46 @@
+{
+  "name": "@wireapp/eslint-config",
+  "license": "GPL-3.0",
+  "description": "Wire ESLint config",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/eslint-config"
+  },
+  "main": "eslintrc.js",
+  "version": "3.1.9",
+  "peerDependencies": {
+    "eslint": "^8",
+    "prettier": "^3"
+  },
+  "dependencies": {
+    "@types/eslint": "^8",
+    "@types/prettier": "^3",
+    "@typescript-eslint/eslint-plugin": "7.17.0",
+    "@typescript-eslint/parser": "7.17.0",
+    "eslint": "^8",
+    "eslint-config-prettier": "^10",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-better-styled-components": "^1.1.2",
+    "eslint-plugin-header": "^3.1.1",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-jest": "^29.0.1",
+    "eslint-plugin-jest-dom": "^5.0.2",
+    "eslint-plugin-jsdoc": "^50.0.1",
+    "eslint-plugin-jsx-a11y": "^6.6.1",
+    "eslint-plugin-no-unsanitized": "^4.0.1",
+    "eslint-plugin-prettier": "^5",
+    "eslint-plugin-react": "^7.31.10",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "eslint-plugin-testing-library": "^7.0.0",
+    "eslint-plugin-unused-imports": "^4",
+    "prettier": "^3",
+    "typescript": "^5"
+  },
+  "private": true,
+  "scripts": {
+    "lint": "nx run eslint-config-lib:lint"
+  }
+}
