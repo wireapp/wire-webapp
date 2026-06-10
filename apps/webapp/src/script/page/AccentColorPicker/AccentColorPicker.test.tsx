@@ -23,8 +23,11 @@ import ko from 'knockout';
 import {AccentColor} from '@wireapp/commons';
 
 import {User} from 'Repositories/entity/User';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {AccentColorPicker, AccentColorPickerProps} from './AccentColorPicker';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('AccentColorPicker', () => {
   it('shows expected accent colors', async () => {
@@ -34,7 +37,7 @@ describe('AccentColorPicker', () => {
         accent_id: ko.observable(AccentColor.BRIGHT_ORANGE.id),
       } as User,
     };
-    const {container} = render(<AccentColorPicker {...props} />);
+    const {container} = render(<AccentColorPicker {...props} />, {wrapper: rootProviderWrapper});
 
     expect(container.querySelectorAll('[data-uie-name="do-set-accent-color"]').length).toBe(
       AccentColor.ACCENT_COLORS.length,
@@ -49,7 +52,7 @@ describe('AccentColorPicker', () => {
         accent_id: ko.observable(selectedAccentColorId),
       } as User,
     };
-    const {container} = render(<AccentColorPicker {...props} />);
+    const {container} = render(<AccentColorPicker {...props} />, {wrapper: rootProviderWrapper});
 
     const input: HTMLInputElement = container.querySelector(
       `[data-uie-name="do-set-accent-color"][data-uie-value="${selectedAccentColorId}"]`,
@@ -65,7 +68,7 @@ describe('AccentColorPicker', () => {
         accent_id: ko.observable(0),
       } as User,
     };
-    const {container} = render(<AccentColorPicker {...props} />);
+    const {container} = render(<AccentColorPicker {...props} />, {wrapper: rootProviderWrapper});
 
     AccentColor.ACCENT_COLORS.forEach(accentColor => {
       act(() => {
@@ -86,7 +89,7 @@ describe('AccentColorPicker', () => {
         accent_id: ko.observable(0),
       } as User,
     };
-    const {container} = render(<AccentColorPicker {...props} />);
+    const {container} = render(<AccentColorPicker {...props} />, {wrapper: rootProviderWrapper});
 
     AccentColor.ACCENT_COLORS.forEach(accentColor => {
       act(() => {

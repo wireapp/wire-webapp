@@ -17,10 +17,12 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {wrapper} from './UserBlockedBadge.styles';
 
 export const UserBlockedBadge = () => {
-  return <span css={wrapper}>{t('userBlockedConnectionBadge')}</span>;
+  const {translate} = useApplicationContext();
+
+  return <span css={wrapper}>{translate('userBlockedConnectionBadge')}</span>;
 };

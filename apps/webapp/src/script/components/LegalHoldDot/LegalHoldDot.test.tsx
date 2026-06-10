@@ -20,16 +20,21 @@
 import {render} from '@testing-library/react';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('LegalHoldDot', () => {
   it('shows a pending icon', () => {
-    const {getByTestId} = render(<LegalHoldDot isPending />);
+    const {getByTestId} = render(<LegalHoldDot isPending />, {wrapper: rootProviderWrapper});
     expect(getByTestId('legal-hold-dot-pending-icon')).not.toBeNull();
   });
 
   it('is not interactive dot', async () => {
     const interactiveUieData = 'legal-hold-dot';
-    const {getByTestId} = await render(<LegalHoldDot dataUieName={interactiveUieData} />);
+    const {getByTestId} = await render(<LegalHoldDot dataUieName={interactiveUieData} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     const button = getByTestId(interactiveUieData);
     expect(button.getAttribute('disabled')).toBeDefined();
@@ -37,7 +42,9 @@ describe('LegalHoldDot', () => {
 
   it('is interactive dot', async () => {
     const interactiveUieData = 'legal-hold-dot';
-    const {getByTestId} = await render(<LegalHoldDot isInteractive dataUieName={interactiveUieData} />);
+    const {getByTestId} = await render(<LegalHoldDot isInteractive dataUieName={interactiveUieData} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     const button = getByTestId(interactiveUieData);
     expect(button.getAttribute('disabled')).toBeNull();

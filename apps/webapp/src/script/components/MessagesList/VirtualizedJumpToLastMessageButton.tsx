@@ -23,16 +23,17 @@ import {
   jumpToLastMessageButtonStyles,
   jumpToLastMessageChevronStyles,
 } from 'Components/MessagesList/MessageList.styles';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface VirtualizedJumpToLastMessageButtonProps {
   onGoToLastMessage: () => void;
 }
 
 export const VirtualizedJumpToLastMessageButton = ({onGoToLastMessage}: VirtualizedJumpToLastMessageButtonProps) => {
+  const {translate} = useApplicationContext();
   return (
     <IconButton
-      aria-label={t('jumpToLastMessage')}
+      aria-label={translate('jumpToLastMessage')}
       data-uie-name="jump-to-last-message-button"
       onClick={onGoToLastMessage}
       css={jumpToLastMessageButtonStyles}

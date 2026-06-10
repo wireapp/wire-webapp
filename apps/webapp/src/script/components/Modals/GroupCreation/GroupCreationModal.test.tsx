@@ -125,10 +125,10 @@ describe('GroupCreationModal', () => {
 
       if (expectedAppsEnabled) {
         expect(servicesCheckbox).toBeEnabled();
-        expect(servicesToggleContainer).not.toHaveTextContent("Your team doesn't use apps yet");
+        expect(servicesToggleContainer).not.toHaveTextContent('servicesNotEnabledNoteTitle');
       } else {
         expect(servicesCheckbox).toBeDisabled();
-        expect(servicesToggleContainer).toHaveTextContent("Your team doesn't use apps yet");
+        expect(servicesToggleContainer).toHaveTextContent('servicesNotEnabledNoteTitle');
       }
     },
   );

@@ -18,12 +18,14 @@
  */
 
 import {Note} from 'Components/Note/Note';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 const AppsDisabledNote = () => {
+  const {translate} = useApplicationContext();
+
   return (
-    <Note title={t('servicesNotEnabledNoteTitle')}>
-      <span className={'subline'}>{t('servicesNotEnabledBody')}</span>
+    <Note title={translate('servicesNotEnabledNoteTitle')}>
+      <span className={'subline'}>{translate('servicesNotEnabledBody')}</span>
     </Note>
   );
 };

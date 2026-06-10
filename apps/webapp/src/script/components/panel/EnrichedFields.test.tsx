@@ -22,9 +22,12 @@ import type {RichInfo} from '@wireapp/api-client/lib/user/';
 
 import {User} from 'Repositories/entity/User';
 import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {EnrichedFields} from './EnrichedFields';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 const richInfo: Partial<RichInfo> = {
   fields: [
@@ -48,7 +51,7 @@ describe('EnrichedFields', () => {
 
     const props = {richProfileRepository, user};
 
-    const {getAllByTestId} = render(<EnrichedFields {...props} />);
+    const {getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => getAllByTestId('item-enriched-key'));
 
@@ -62,7 +65,7 @@ describe('EnrichedFields', () => {
 
     const props = {richProfileRepository, user};
 
-    const {getAllByTestId} = render(<EnrichedFields {...props} />);
+    const {getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => getAllByTestId('item-enriched-key'));
 
@@ -76,7 +79,7 @@ describe('EnrichedFields', () => {
 
     const props = {richProfileRepository, showDomain: true, user};
 
-    const {container, getAllByTestId} = render(<EnrichedFields {...props} />);
+    const {container, getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => getAllByTestId('item-enriched-key'));
 
@@ -94,7 +97,7 @@ describe('EnrichedFields', () => {
 
     const props = {richProfileRepository, user};
 
-    const {container, getAllByTestId} = render(<EnrichedFields {...props} />);
+    const {container, getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => getAllByTestId('item-enriched-key'));
 
@@ -112,7 +115,7 @@ describe('EnrichedFields', () => {
 
     const props = {onFieldsLoaded, richProfileRepository, user};
 
-    const {getAllByTestId} = render(<EnrichedFields {...props} />);
+    const {getAllByTestId} = render(<EnrichedFields {...props} />, {wrapper: rootProviderWrapper});
 
     await waitFor(() => getAllByTestId('item-enriched-key'));
 

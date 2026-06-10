@@ -21,6 +21,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 
 import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {Giphy, GiphyState} from '.';
 
@@ -32,18 +33,20 @@ const getDefaultProps = () => ({
 });
 
 const closeButtonId = 'do-close-giphy-modal';
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('Giphy', () => {
   it('rendered modal', async () => {
     const {getByText, getByTestId} = render(
       withTheme(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.RESULT} />),
+      {wrapper: rootProviderWrapper},
     );
     await waitFor(() => getByTestId(closeButtonId));
     expect(getByText(inputValue)).not.toBeNull();
   });
 
   it('closes giphy modal', async () => {
-    const {getByTestId} = render(withTheme(<Giphy {...getDefaultProps()} />));
+    const {getByTestId} = render(withTheme(<Giphy {...getDefaultProps()} />), {wrapper: rootProviderWrapper});
     await waitFor(() => getByTestId(closeButtonId));
     const closeButton = getByTestId(closeButtonId);
 
@@ -54,6 +57,7 @@ describe('Giphy', () => {
   it('no giphys found', async () => {
     const {getByText, getByTestId} = render(
       withTheme(<Giphy {...getDefaultProps()} defaultGiphyState={GiphyState.ERROR} />),
+      {wrapper: rootProviderWrapper},
     );
 
     await waitFor(() => getByTestId(closeButtonId));

@@ -20,7 +20,7 @@
 import cx from 'classnames';
 
 import * as Icon from 'Components/icon';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 interface RestrictedImageProps {
   isSmall?: boolean;
@@ -29,13 +29,17 @@ interface RestrictedImageProps {
 }
 
 const RestrictedImage = ({showMessage = true, isSmall = false, className}: RestrictedImageProps) => {
+  const {translate} = useApplicationContext();
+
   return (
     <div className={cx('image-restricted', className, {'image-restricted--small': isSmall})}>
       <div className="image-restricted--container">
         <div className="flex-center" data-uie-name="file-icon">
           <Icon.ImageIcon />
         </div>
-        {showMessage && <div className="image-restricted--message">{t('conversationImageAssetRestricted')}</div>}
+        {showMessage && (
+          <div className="image-restricted--message">{translate('conversationImageAssetRestricted')}</div>
+        )}
       </div>
     </div>
   );

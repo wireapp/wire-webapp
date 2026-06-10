@@ -20,8 +20,11 @@
 import {render} from '@testing-library/react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ErrorFallback} from './ErrorFallback';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('ErrorFallback', () => {
   it('Correctly prints the error', () => {
@@ -29,7 +32,9 @@ describe('ErrorFallback', () => {
     jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => action());
     const resetErrorBoundary = jest.fn();
 
-    render(<ErrorFallback error={new Error('failed to render')} resetErrorBoundary={resetErrorBoundary} />);
+    render(<ErrorFallback error={new Error('failed to render')} resetErrorBoundary={resetErrorBoundary} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(action).toHaveBeenCalled();
   });

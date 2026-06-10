@@ -108,7 +108,7 @@ export const AccountPreferences = ({
     Config.getConfig().FEATURE.ENABLE_TEAM_CREATION &&
     core.backendFeatures.version >= Config.getConfig().MIN_TEAM_CREATION_SUPPORTED_API_VERSION;
 
-  const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false});
+  const richFields = useEnrichedFields(selfUser, {addDomain: showDomain, addEmail: false}, translate);
   const domain = selfUser.domain;
 
   const clickOnLeaveGuestRoom = (): void => {
