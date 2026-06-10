@@ -29,7 +29,6 @@ jobs:
     env:
       BUILD_DIR: apps/server/dist/s3/
       BUILD_ARTIFACT: ebs.zip
-      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Checkout

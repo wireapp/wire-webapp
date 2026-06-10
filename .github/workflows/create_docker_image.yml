@@ -24,7 +24,6 @@ jobs:
 
     env:
       UNIT_TEST_REPORT_FILE: './unit-tests.log'
-      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Checkout

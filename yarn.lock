@@ -15746,10 +15746,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:17.4.2":
-  version: 17.4.2
-  resolution: "dotenv@npm:17.4.2"
-  checksum: 10/ca1b6f54d58e39914901e1518958e86083aca8deb5aa2e7f2a51acd53291d97852479b0ab26ed949b6a45a0e9adcc7b0d1c3c72375e8ea670f7005e341c6daba
+"dotenv@npm:16.4.7":
+  version: 16.4.7
+  resolution: "dotenv@npm:16.4.7"
+  checksum: 10/f13bfe97db88f0df4ec505eeffb8925ec51f2d56a3d0b6d916964d8b4af494e6fb1633ba5d09089b552e77ab2a25de58d70259b2c5ed45ec148221835fc99a0c
   languageName: node
   linkType: hard
 
@@ -32178,7 +32178,7 @@ __metadata:
     axios: "npm:1.17.0"
     babel-jest: "npm:30.4.1"
     cross-env: "npm:10.1.0"
-    dotenv: "npm:17.4.2"
+    dotenv: "npm:16.4.7"
     dotenv-extended: "npm:2.9.0"
     dpdm: "npm:3.15.1"
     eslint: "npm:9.39.4"

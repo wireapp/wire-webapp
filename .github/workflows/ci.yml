@@ -57,8 +57,6 @@ jobs:
     name: test
     permissions:
       contents: read
-    env:
-      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Checkout (pull_request)

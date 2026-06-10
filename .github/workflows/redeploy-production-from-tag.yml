@@ -49,8 +49,6 @@ jobs:
     name: Rebuild tagged release artifact
     runs-on: ubuntu-24.04
     needs: validate_request
-    env:
-      DOTENV_CONFIG_QUIET: 'true'
     outputs:
       commit_sha: ${{ steps.git_metadata.outputs.commit_sha }}
       commit_url: ${{ steps.git_metadata.outputs.commit_url }}

@@ -15,8 +15,6 @@ jobs:
   create-release-pr:
     name: Create Release PR
     runs-on: ubuntu-24.04
-    env:
-      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Checkout
