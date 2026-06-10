@@ -11358,7 +11358,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/jest": "npm:^29.2.0"
     "@types/node": "npm:^22.0.0"
-    axios: "npm:1.13.3"
+    axios: "npm:1.16.0"
     copy: "npm:0.3.2"
     cosmiconfig: "npm:9.0.0"
     fs-extra: "npm:11.3.3"
