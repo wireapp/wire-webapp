@@ -20,7 +20,6 @@
 import {ReactElement} from 'react';
 
 import is from '@sindresorhus/is';
-import {forcedDownloadFile} from 'Util/util';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
@@ -28,6 +27,7 @@ import {openFolder} from 'Components/CellsGlobalView/common/openFolder/openFolde
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {t} from 'Util/localizerUtil';
+import {forcedDownloadFile} from 'Util/util';
 
 import {buttonStyles, iconStyles, textStyles} from './CellsTableRowOptions.styles';
 

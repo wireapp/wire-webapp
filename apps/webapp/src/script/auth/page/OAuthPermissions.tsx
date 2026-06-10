@@ -24,7 +24,6 @@ import {OAuthClient} from '@wireapp/api-client/lib/oauth/oAuthClient';
 import {FormattedMessage} from 'react-intl';
 import {connect} from 'react-redux';
 import {container} from 'tsyringe';
-import {loadDataUrl} from 'Util/util';
 
 import {
   Button,
@@ -47,6 +46,7 @@ import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {handleEscDown, handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {toError} from 'Util/toError';
+import {loadDataUrl} from 'Util/util';
 
 import {
   boxCSS,

@@ -21,13 +21,13 @@ import {useEffect, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {connect} from 'react-redux';
-import {afterRender} from 'Util/util';
 
 import {Runtime, UrlUtil} from '@wireapp/commons';
 import {COLOR, ContainerXS, FlexBox, Text} from '@wireapp/react-ui-kit';
 
 import {LogoIcon} from 'Components/icon';
 import {t} from 'Util/localizerUtil';
+import {afterRender} from 'Util/util';
 
 import {Page} from './Page';
 

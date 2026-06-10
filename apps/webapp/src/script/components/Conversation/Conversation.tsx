@@ -21,7 +21,6 @@ import {UIEvent, useCallback, useEffect, useState} from 'react';
 
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
-import {formatBytes} from 'Util/util';
 
 import {useMatchMedia} from '@wireapp/react-ui-kit';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -55,6 +54,7 @@ import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
+import {formatBytes} from 'Util/util';
 
 import {
   searchResultsHeadingStyles,

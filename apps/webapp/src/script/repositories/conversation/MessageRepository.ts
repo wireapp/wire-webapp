@@ -46,7 +46,6 @@ import {amplify} from 'amplify';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {container} from 'tsyringe';
 import {partition} from 'underscore';
-import {loadUrlBlob, supportsMLS} from 'Util/util';
 
 import {Asset, Availability, Confirmation, GenericMessage} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -95,6 +94,7 @@ import {matchQualifiedIds} from 'Util/qualifiedId';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {isBackendError, isErrorWithCode} from 'Util/typePredicateUtil';
+import {loadUrlBlob, supportsMLS} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {findDeletedClients} from './ClientMismatchUtil';

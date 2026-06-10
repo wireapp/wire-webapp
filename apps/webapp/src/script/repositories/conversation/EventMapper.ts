@@ -19,7 +19,6 @@
 
 import {CONVERSATION_EVENT, ConversationEvent, ConversationProtocolUpdateEvent} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
-import {base64ToArray} from 'Util/util';
 
 import {LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
@@ -67,6 +66,7 @@ import {getLogger, Logger} from 'Util/logger';
 import {userReactionMapToReactionMap} from 'Util/reactionUtil';
 import {toError} from 'Util/toError';
 import {isErrorWithType} from 'Util/typePredicateUtil';
+import {base64ToArray} from 'Util/util';
 
 import {
   ClientConversationEvent,

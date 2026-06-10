@@ -17,10 +17,9 @@
  *
  */
 
-import {trimFileExtension} from 'Util/util';
-
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {t} from 'Util/localizerUtil';
+import {trimFileExtension} from 'Util/util';
 
 interface RestrictedFileProps {
   asset?: FileAsset;

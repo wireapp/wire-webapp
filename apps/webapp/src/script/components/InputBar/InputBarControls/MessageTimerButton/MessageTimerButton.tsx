@@ -21,7 +21,6 @@ import {MouseEvent, KeyboardEvent} from 'react';
 
 import cx from 'classnames';
 import {container} from 'tsyringe';
-import {setContextMenuPosition} from 'Util/util';
 
 import * as Icon from 'Components/icon';
 import {Conversation} from 'Repositories/entity/Conversation';
@@ -32,6 +31,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isSpaceOrEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {DurationUnit, formatDuration} from 'Util/timeUtil';
+import {setContextMenuPosition} from 'Util/util';
 
 interface MessageTimerButtonProps {
   conversation: Conversation;

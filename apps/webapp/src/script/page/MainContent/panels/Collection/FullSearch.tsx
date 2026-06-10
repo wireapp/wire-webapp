@@ -21,7 +21,6 @@ import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import {useDebouncedCallback} from 'use-debounce';
-import {noop} from 'Util/util';
 
 import {CloseIcon, Input, InputSubmitCombo, SearchIcon} from '@wireapp/react-ui-kit';
 
@@ -31,6 +30,7 @@ import {getSearchRegex} from 'Repositories/search/fullTextSearch';
 import {t} from 'Util/localizerUtil';
 import {isScrolledBottom} from 'Util/scrollHelpers';
 import {useEffectRef} from 'Util/useEffectRef';
+import {noop} from 'Util/util';
 
 import {FullSearchItem} from './fullSearch/FullSearchItem';
 

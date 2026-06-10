@@ -23,7 +23,6 @@ import is from '@sindresorhus/is';
 import cx from 'classnames';
 import {CSSTransition, SwitchTransition} from 'react-transition-group';
 import {container} from 'tsyringe';
-import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {CellsGlobalView} from 'Components/CellsGlobalView/CellsGlobalView';
 import {ConnectRequests} from 'Components/ConnectRequests';
@@ -41,6 +40,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
+import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {Collection} from './panels/Collection';
 import {AboutPreferences} from './panels/preferences/AboutPreferences';

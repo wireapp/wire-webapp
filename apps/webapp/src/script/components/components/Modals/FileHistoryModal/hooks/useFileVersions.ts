@@ -21,10 +21,10 @@ import {useCallback, useEffect, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
-import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {t} from 'Util/localizerUtil';
+import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
 import {FileInfo, FileVersion} from '../types';
 import {groupVersionsByDate} from '../utils/fileVersionUtils';

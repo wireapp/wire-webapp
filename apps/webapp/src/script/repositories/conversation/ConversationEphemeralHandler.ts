@@ -19,7 +19,6 @@
 
 import {ConversationMessageTimerUpdateEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import ko from 'knockout';
-import {arrayToBase64, noop} from 'Util/util';
 
 import {Article, LinkPreview} from '@wireapp/protocol-messaging';
 
@@ -34,6 +33,7 @@ import {getLogger, Logger} from 'Util/logger';
 import {clamp} from 'Util/numberUtil';
 import {obfuscate} from 'Util/stringUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {arrayToBase64, noop} from 'Util/util';
 
 import {AbstractConversationEventHandler} from './AbstractConversationEventHandler';
 import {ConversationMapper} from './ConversationMapper';

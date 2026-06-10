@@ -20,7 +20,6 @@
 import {useEffect, useState} from 'react';
 
 import {Maybe} from 'true-myth';
-import {getFileExtensionFromUrl} from 'Util/util';
 
 import {isInRecycleBin} from 'Components/Conversation/ConversationCells/common/recycleBin/recycleBin';
 import {PDFViewer} from 'Components/FileFullscreenModal/PdfViewer/PdfViewer';
@@ -28,6 +27,7 @@ import {FullscreenModal} from 'Components/FullscreenModal/FullscreenModal';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {getFileTypeFromExtension} from 'Util/getFileTypeFromExtension/getFileTypeFromExtension';
 import {getBestPreviewSource} from 'Util/imageUtil';
+import {getFileExtensionFromUrl} from 'Util/util';
 
 import {FileEditor} from './FileEditor/FileEditor';
 import {FileHeader} from './FileHeader/FileHeader';

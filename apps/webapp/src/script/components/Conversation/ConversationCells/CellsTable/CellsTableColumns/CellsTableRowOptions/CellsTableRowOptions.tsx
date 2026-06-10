@@ -20,7 +20,6 @@
 import {useCallback, useState} from 'react';
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {forcedDownloadFile} from 'Util/util';
 
 import {DropdownMenu, MoreIcon} from '@wireapp/react-ui-kit';
 
@@ -35,6 +34,7 @@ import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 import {isFileEditable} from 'Util/fileTypeUtil';
 import {t} from 'Util/localizerUtil';
+import {forcedDownloadFile} from 'Util/util';
 
 import {CellsMoveNodeModal} from './CellsMoveNodeModal/CellsMoveNodeModal';
 import {CellsRenameNodeModal} from './CellsRenameNodeModal/CellsRenameNodeModal';

@@ -22,7 +22,6 @@ import {ChangeEvent, useEffect, useRef, useState} from 'react';
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
 import {container} from 'tsyringe';
-import {preventFocusOutside} from 'Util/util';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 import {
@@ -63,6 +62,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
 import {handleKeyDown, isTabKey, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
+import {preventFocusOutside} from 'Util/util';
 
 import {CallingParticipantList} from './CallingCell/CallIngParticipantList';
 import {Duration} from './Duration';

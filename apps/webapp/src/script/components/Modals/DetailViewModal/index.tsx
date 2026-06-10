@@ -21,7 +21,6 @@ import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from '
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
-import {preventFocusOutside} from 'Util/util';
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 import {WebAppEvents} from '@wireapp/webapp-events';
@@ -37,6 +36,7 @@ import {User} from 'Repositories/entity/User';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
+import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';
 
 import {DetailViewModalFooter} from './DetailViewModalFooter';

@@ -19,8 +19,6 @@
 
 import React from 'react';
 
-import {setContextMenuPosition} from 'Util/util';
-
 import {TabIndex} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
@@ -30,6 +28,7 @@ import {Participant} from 'Repositories/calling/Participant';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
+import {setContextMenuPosition} from 'Util/util';
 
 import {CallParticipantItemContent} from './CallParticipantItemContent';
 import {
