@@ -245,7 +245,7 @@ test.describe('Group Conversation', () => {
 
       await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
 
-      await pages.conversationDetails().openParticipantDetails(userB.fullName);
+      await pages.conversationDetails().getParticipant(userB.fullName).openDetails();
       await pages.participantDetails().removeFromGroup();
 
       await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).not.toBeVisible();
@@ -266,7 +266,7 @@ test.describe('Group Conversation', () => {
       await pages.conversation().toggleGroupInformation();
 
       await expect(pages.conversationDetails().groupMembers.filter({hasText: userB.fullName})).toBeVisible();
-      await pages.conversationDetails().openParticipantDetails(userB.fullName);
+      await pages.conversationDetails().getParticipant(userB.fullName).openDetails();
       await expect(pages.conversation().makeAdminToggle).toBeVisible();
     },
   );
@@ -285,7 +285,7 @@ test.describe('Group Conversation', () => {
       await userBPages.conversation().toggleGroupInformation();
 
       await expect(userBPages.conversationDetails().groupAdmins.filter({hasText: userA.fullName})).toBeVisible();
-      await userBPages.conversationDetails().openParticipantDetails(userA.fullName);
+      await userBPages.conversationDetails().getParticipant(userA.fullName).openDetails();
       await expect(userBPages.conversation().makeAdminToggle).not.toBeVisible();
     },
   );

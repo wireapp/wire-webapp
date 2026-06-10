@@ -1,3 +1,4 @@
+---
 name: precommit-slot-run
 
 on:
@@ -12,6 +13,10 @@ on:
       grep:
         type: string
         required: false
+      notify_deployoholics_on_failure:
+        type: boolean
+        required: false
+        default: false
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN:
         required: true
@@ -19,6 +24,8 @@ on:
         required: true
       WEBTEAM_AWS_SECRET_ACCESS_KEY:
         required: true
+      WIRE_DEPLOYOHOLICS_WEBHOOK_URL:
+        required: false
     outputs:
       precommit_url:
         description: URL of the deployed precommit environment
@@ -49,6 +56,19 @@ jobs:
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
         with:
           name: build-artifact
+
+      - name: Validate precommit environment
+        env:
+          ENV_NAME: ${{ inputs.env_name }}
+        run: |
+          case "$ENV_NAME" in
+            wire-webapp-precommit|wire-webapp-precommit-1|wire-webapp-precommit-2|wire-webapp-precommit-3)
+              ;;
+            *)
+              echo "Invalid precommit environment: $ENV_NAME"
+              exit 1
+              ;;
+          esac
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37
@@ -99,3 +119,28 @@ jobs:
       grep: ${{ inputs.grep }}
     secrets:
       OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+  notify_deployoholics:
+    name: Notify Deployoholics about failed critical flow
+    runs-on: ubuntu-24.04
+    needs: [deploy_to_aws, e2e_tests]
+    if: ${{ always() && inputs.notify_deployoholics_on_failure && needs.e2e_tests.result == 'failure' }}
+
+    steps:
+      - name: Announce failed critical flow
+        uses: 8398a7/action-slack@293f8dc0f9731ac35321056641cdef895f4f65f8
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.WIRE_DEPLOYOHOLICS_WEBHOOK_URL }}
+        with:
+          status: failure
+          text: |
+            ❌ Playwright Critical Flow failed ❌
+
+            Workflow: ${{ github.workflow }}
+            Triggered by: ${{ github.actor }}
+            Event: ${{ github.event_name }}
+            Ref: ${{ github.ref_name }}
+            Commit: ${{ github.sha }}
+            Environment: ${{ inputs.env_name }}
+            Build log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            Report: ${{ needs.e2e_tests.outputs.reportUrl || 'unavailable' }}
