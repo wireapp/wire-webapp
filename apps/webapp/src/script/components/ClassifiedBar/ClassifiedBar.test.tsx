@@ -21,9 +21,12 @@ import {render} from '@testing-library/react';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationClassifiedBar} from './ClassifiedBar';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('ClassifiedBar', () => {
   const conversation = new Conversation();
@@ -34,7 +37,9 @@ describe('ClassifiedBar', () => {
 
   it.each([[[sameDomainUser]], [[sameDomainUser, otherDomainUser]]])('is empty if no domains are given', users => {
     conversation.participating_user_ets(users);
-    const {container} = render(<ConversationClassifiedBar conversation={conversation} conversationDomain="test" />);
+    const {container} = render(<ConversationClassifiedBar conversation={conversation} conversationDomain="test" />, {
+      wrapper: rootProviderWrapper,
+    });
 
     expect(container.querySelector('[data-uie-name=classified-label]')).toBe(null);
   });
@@ -49,6 +54,7 @@ describe('ClassifiedBar', () => {
           conversation={conversation}
           classifiedDomains={classifiedDomains}
         />,
+        {wrapper: rootProviderWrapper},
       );
 
       expect(getByText('conversationClassified')).not.toBe(null);
@@ -68,6 +74,7 @@ describe('ClassifiedBar', () => {
         conversation={conversation}
         classifiedDomains={classifiedDomains}
       />,
+      {wrapper: rootProviderWrapper},
     );
 
     expect(queryByText('conversationClassified')).toBe(null);

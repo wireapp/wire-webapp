@@ -25,8 +25,8 @@ import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {isValidPassword} from 'Util/stringUtil';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
@@ -46,6 +46,7 @@ import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
 
 export const PrimaryModalComponent: FC = () => {
+  const {translate} = useApplicationContext();
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, setPasswordValue] = useState<string>('');
   const [passwordInput, updatePasswordWithRules] = useState<string>('');
@@ -207,7 +208,9 @@ export const PrimaryModalComponent: FC = () => {
     }
   };
 
-  const secondaryActions = Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
+  const secondaryActions = useMemo(() => {
+    return Array.isArray(secondaryAction) ? secondaryAction : [secondaryAction];
+  }, [secondaryAction]);
 
   const closeAction = useCallback(() => {
     if (hasPasswordWithRules) {
@@ -292,7 +295,7 @@ export const PrimaryModalComponent: FC = () => {
   const buttons = primaryBtnFirst ? [primaryButton, ...secondaryButtons] : [...secondaryButtons, primaryButton];
   const isPasswordFieldValid = isFormSubmitted && passwordValueRef.current?.validity.valid === false;
 
-  const backupPasswordHint = t('backupPasswordHint', {
+  const backupPasswordHint = translate('backupPasswordHint', {
     minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
   });
 
@@ -338,8 +341,8 @@ export const PrimaryModalComponent: FC = () => {
           <CopyToClipboardButton
             disabled={!passwordGuestLinkActionEnabled}
             textToCopy={passwordValue}
-            displayText={t('guestOptionsPasswordCopyToClipboard')}
-            copySuccessText={t('guestOptionsPasswordCopyToClipboardSuccess')}
+            displayText={translate('guestOptionsPasswordCopyToClipboard')}
+            copySuccessText={translate('guestOptionsPasswordCopyToClipboardSuccess')}
             onCopySuccess={() => setDidCopyPassword(true)}
           />
         )}

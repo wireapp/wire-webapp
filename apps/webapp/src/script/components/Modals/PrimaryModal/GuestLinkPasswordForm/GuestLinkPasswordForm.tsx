@@ -24,7 +24,7 @@ import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {errorMessageStyles} from './GuestLinkPasswordForm.styles';
 
@@ -51,6 +51,7 @@ export const GuestLinkPasswordForm = ({
   onPasswordConfirmationChange,
   isPasswordConfirmationMarkInvalid,
 }: GuestLinkPasswordFormProps) => {
+  const {translate} = useApplicationContext();
   return (
     <>
       <PasswordGeneratorButton
@@ -67,16 +68,16 @@ export const GuestLinkPasswordForm = ({
           name="guest-link-password"
           data-uie-name="guest-link-password"
           required
-          placeholder={t('modalGuestLinkJoinPlaceholder')}
-          label={t('modalGuestLinkJoinLabel')}
-          helperText={t('modalGuestLinkJoinHelperText', {
+          placeholder={translate('modalGuestLinkJoinPlaceholder')}
+          label={translate('modalGuestLinkJoinLabel')}
+          helperText={translate('modalGuestLinkJoinHelperText', {
             minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
           })}
           id="modal_pswd"
           className="modal__input"
           type="password"
-          showTogglePasswordLabel={t('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+          showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+          hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
           autoComplete="off"
           value={passwordValue}
           ref={passwordValueRef}
@@ -89,12 +90,12 @@ export const GuestLinkPasswordForm = ({
           name="guest-link-password-confirm"
           data-uie-name="guest-link-password-confirm"
           required
-          placeholder={t('modalGuestLinkJoinConfirmPlaceholder')}
-          label={t('modalGuestLinkJoinConfirmLabel')}
+          placeholder={translate('modalGuestLinkJoinConfirmPlaceholder')}
+          label={translate('modalGuestLinkJoinConfirmLabel')}
           className="modal__input"
           type="password"
-          showTogglePasswordLabel={t('showTogglePasswordLabel')}
-          hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+          showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+          hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
           id="modal_pswd_confirmation"
           autoComplete="off"
           value={passwordConfirmationValue}
@@ -107,9 +108,10 @@ export const GuestLinkPasswordForm = ({
 };
 
 const GuestLinkPasswordModalErrorMessage = () => {
+  const {translate} = useApplicationContext();
   return (
     <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
-      {t('modalGuestLinkJoinHelperText', {
+      {translate('modalGuestLinkJoinHelperText', {
         minPasswordLength: Config.getConfig().MINIMUM_PASSWORD_LENGTH.toString(),
       })}
     </ErrorMessage>

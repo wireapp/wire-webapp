@@ -22,7 +22,7 @@ import type {FormEvent} from 'react';
 import {COLOR, Form, Link, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {labelStyles, inputStyles, linkStyles, linkTextStyles} from './JoinGuestLinkPasswordForm.styles';
 
@@ -33,6 +33,7 @@ interface JoinGuestLinkPasswordFormProps {
 }
 
 export const JoinGuestLinkPasswordForm = ({onSubmit, inputValue, onInputChange}: JoinGuestLinkPasswordFormProps) => {
+  const {translate} = useApplicationContext();
   return (
     <Form
       name="guest-password-join-form"
@@ -41,7 +42,7 @@ export const JoinGuestLinkPasswordForm = ({onSubmit, inputValue, onInputChange}:
       autoComplete="off"
     >
       <label css={labelStyles} htmlFor="modal_pswd">
-        {t('guestLinkPasswordModal.passwordInputLabel')}
+        {translate('guestLinkPasswordModal.passwordInputLabel')}
       </label>
 
       <input
@@ -50,13 +51,13 @@ export const JoinGuestLinkPasswordForm = ({onSubmit, inputValue, onInputChange}:
         className="modal__input"
         type="password"
         value={inputValue}
-        placeholder={t('guestLinkPasswordModal.passwordInputPlaceholder')}
+        placeholder={translate('guestLinkPasswordModal.passwordInputPlaceholder')}
         onChange={event => onInputChange(event.target.value)}
       />
 
       <Link css={linkStyles} href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">
         <Text block color={COLOR.BLUE} css={linkTextStyles}>
-          {t('guestLinkPasswordModal.learnMoreLink')}
+          {translate('guestLinkPasswordModal.learnMoreLink')}
         </Text>
       </Link>
     </Form>

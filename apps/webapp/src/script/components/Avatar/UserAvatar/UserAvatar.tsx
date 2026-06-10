@@ -28,8 +28,8 @@ import {AvailabilityIcon} from 'Components/AvailabilityIcon';
 import {useUserName} from 'Components/UserName';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import {AvatarBackground} from '../AvatarBackground';
@@ -80,9 +80,11 @@ export const UserAvatar = ({
   onAvatarInteraction,
   hideAvailabilityStatus = false,
   hideProfilePicture = false,
-  teamState = container.resolve(TeamState),
+  teamState: _teamState = container.resolve(TeamState),
   ...props
 }: UserAvatarProps) => {
+  const {translate} = useApplicationContext();
+  void _teamState;
   const isImageGrey = noFilter !== true && [STATE.BLOCKED, STATE.IGNORED, STATE.PENDING, STATE.UNKNOWN].includes(state);
   const isBlocked = state === STATE.BLOCKED;
   const backgroundColor = state === STATE.UNKNOWN ? COLOR.GRAY : undefined;
@@ -101,7 +103,7 @@ export const UserAvatar = ({
     'initials',
   ]);
 
-  const avatarImgAlt = avatarAlt ? avatarAlt : `${t('userProfileImageAlt')} ${name}`;
+  const avatarImgAlt = avatarAlt ? avatarAlt : `${translate('userProfileImageAlt')} ${name}`;
 
   const hasAvailabilityState = typeof availability === 'number' && availability !== AvailabilityType.Type.NONE;
 

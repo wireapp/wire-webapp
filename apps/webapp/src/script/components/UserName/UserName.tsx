@@ -18,6 +18,7 @@
  */
 
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -30,8 +31,9 @@ interface UserNameProps {
  * @param user the user to get the name for
  */
 export function useUserName(user: User) {
+  const {translate} = useApplicationContext();
   const {isAvailable, name} = useKoSubscribableChildren(user, ['isAvailable', 'name']);
-  return isAvailable ? name : t('unavailableUser');
+  return isAvailable ? name : translate('unavailableUser');
 }
 
 /**

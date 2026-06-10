@@ -24,12 +24,14 @@ import {fireEvent, render} from '@testing-library/react';
 import {UserList} from 'Components/UserList/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {withTheme} from '../../auth/util/test/TestUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 beforeAll(() => {
   testFactory.exposeConversationActors().then(factory => {
@@ -53,7 +55,7 @@ describe('UserList', () => {
       isSelectable: true,
     };
 
-    const {getByTestId} = render(withTheme(<UserList {...props} />));
+    const {getByTestId} = render(withTheme(<UserList {...props} />), {wrapper: rootProviderWrapper});
     const selectedSearchList = getByTestId('selected-search-list');
     expect(selectedSearchList.getAttribute('data-uie-value')).toEqual('4');
   });
@@ -80,7 +82,7 @@ describe('UserList', () => {
       isSelectable: true,
     };
 
-    const {getAllByTestId} = render(withTheme(<UserList {...props} />));
+    const {getAllByTestId} = render(withTheme(<UserList {...props} />), {wrapper: rootProviderWrapper});
     const contactsList = getAllByTestId('item-user');
 
     expect(contactsList).toHaveLength(4);

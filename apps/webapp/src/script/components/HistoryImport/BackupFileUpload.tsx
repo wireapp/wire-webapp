@@ -22,8 +22,8 @@ import {useRef} from 'react';
 import {TabIndex, Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import {CONFIG as HistoryExportConfig} from 'Components/HistoryExport';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 interface BackupFileUploadProps {
   onFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -38,6 +38,7 @@ const BackupFileUpload = ({
   variant,
   cssClassName = 'button button-secondary',
 }: BackupFileUploadProps) => {
+  const {translate} = useApplicationContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fileInputClick = () => fileInputRef.current?.click();
@@ -85,7 +86,7 @@ const BackupFileUpload = ({
         tabIndex={TabIndex.FOCUSABLE}
         onKeyDown={event => handleKeyDown({event, callback: fileInputClick, keys: [KEY.ENTER, KEY.SPACE]})}
         onClick={() => fileInputRef.current?.click()}
-        aria-label={t('backupImportRestoreHistory')}
+        aria-label={translate('backupImportRestoreHistory')}
       >
         <span>{backupImportHeadLine}</span>
       </Button>

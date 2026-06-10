@@ -20,11 +20,14 @@
 import {render, fireEvent, act} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {PrimaryModalComponent} from './PrimaryModal';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
 import {PrimaryModal, removeCurrentModal} from '.';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('PrimaryModal', () => {
   beforeEach(() => {
@@ -33,7 +36,7 @@ describe('PrimaryModal', () => {
 
   describe('Confirm', () => {
     it('does not render when no item is in the queue', async () => {
-      const {getByTestId} = render(<PrimaryModalComponent />);
+      const {getByTestId} = render(<PrimaryModalComponent />, {wrapper: rootProviderWrapper});
       const primaryModalWrapper = getByTestId('primary-modals-container');
       expect(primaryModalWrapper.children).toHaveLength(0);
     });
@@ -144,7 +147,9 @@ const renderPrimaryModal = (
   secondaryAction = () => {},
   hideCloseBtn = false,
 ) => {
-  const {getByTestId, queryByTestId, getByLabelText} = render(withTheme(<PrimaryModalComponent />));
+  const {getByTestId, queryByTestId, getByLabelText} = render(withTheme(<PrimaryModalComponent />), {
+    wrapper: rootProviderWrapper,
+  });
   act(() => {
     PrimaryModal.show(type, {
       primaryAction: {

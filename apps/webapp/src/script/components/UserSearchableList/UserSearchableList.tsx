@@ -31,7 +31,6 @@ import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {partition} from 'Util/arrayUtil';
-import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {sortByPriority} from 'Util/stringUtil';
 
@@ -56,6 +55,8 @@ export type UserListProps = React.ComponentProps<typeof UserList> & {
   filterRemoteTeamUsers?: boolean;
 };
 
+const SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS = 300;
+
 export const UserSearchableList = ({
   onUpdateSelectedUsers,
   filterRemoteTeamUsers = false,
@@ -69,7 +70,7 @@ export const UserSearchableList = ({
   teamState = container.resolve(TeamState),
   ...props
 }: UserListProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const {searchRepository, teamRepository, selfFirst, ...userListProps} = props;
   const {conversationState = container.resolve(ConversationState)} = props;
 
@@ -96,7 +97,7 @@ export const UserSearchableList = ({
     setRemoteTeamMembers(
       filterRemoteTeamUsers ? await teamRepository.filterRemoteDomainUsers(nonExternalMembers) : nonExternalMembers,
     );
-  }, 300);
+  }, SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS);
 
   // Filter all list items if a filter is provided
 
@@ -136,7 +137,19 @@ export const UserSearchableList = ({
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await setUsers(concatUsers);
     });
-  }, [filter, fireAndForgetInvoker, users.length]);
+  }, [
+    allowRemoteSearch,
+    conversationState,
+    fetchMembersFromBackend,
+    filter,
+    filterRemoteTeamUsers,
+    fireAndForgetInvoker,
+    searchRepository,
+    selfFirst,
+    selfInTeam,
+    teamRepository,
+    users,
+  ]);
 
   const foundUserEntities = () => {
     if (!remoteTeamMembers.length) {
@@ -172,7 +185,7 @@ export const UserSearchableList = ({
     <div className="user-list-wrapper" data-uie-name={dataUieName} role="list">
       {isEmptyUserList ? (
         <p className="user-list__no-results" data-uie-name={noResultsDataUieName}>
-          {t(noResultsTranslationText)}
+          {translate(noResultsTranslationText)}
         </p>
       ) : (
         <UserList

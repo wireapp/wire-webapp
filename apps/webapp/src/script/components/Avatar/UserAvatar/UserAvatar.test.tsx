@@ -23,10 +23,13 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {UserAvatar} from './UserAvatar';
 
 import {AVATAR_SIZE, STATE} from '../Avatar';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {
@@ -39,7 +42,7 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     };
 
-    const {getByText} = render(<UserAvatar {...props} />);
+    const {getByText} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByText('AB')).not.toBeNull();
   });
@@ -54,7 +57,7 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     };
 
-    const {getByText} = render(<UserAvatar {...props} />);
+    const {getByText} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     expect(getByText('A')).not.toBeNull();
   });
@@ -69,7 +72,7 @@ describe('UserAvatar', () => {
       state: STATE.NONE,
     };
 
-    const {queryByTestId} = render(<UserAvatar {...props} />);
+    const {queryByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     expect(queryByTestId('element-avatar-user-badge-icon')).toBeNull();
   });
 
@@ -83,7 +86,7 @@ describe('UserAvatar', () => {
       state: STATE.BLOCKED,
     };
 
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     const badgeIcon = getByTestId('element-avatar-user-badge-icon');
 
     expect(badgeIcon.getAttribute('data-uie-value')).toEqual(STATE.BLOCKED);
@@ -99,7 +102,7 @@ describe('UserAvatar', () => {
       state: STATE.PENDING,
     };
 
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     const badgeIcon = getByTestId('element-avatar-user-badge-icon');
 
     expect(badgeIcon.getAttribute('data-uie-value')).toEqual(STATE.PENDING);
@@ -115,7 +118,7 @@ describe('UserAvatar', () => {
     };
 
     participant.availability(Availability.Type.AVAILABLE);
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('available');
@@ -133,7 +136,7 @@ describe('UserAvatar', () => {
 
     participant.availability(Availability.Type.AWAY);
 
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('away');
@@ -151,7 +154,7 @@ describe('UserAvatar', () => {
 
     participant.availability(Availability.Type.BUSY);
 
-    const {getByTestId} = render(<UserAvatar {...props} />);
+    const {getByTestId} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
 
     const statusAvailabilityIcon = getByTestId('status-availability-icon');
     expect(statusAvailabilityIcon.getAttribute('data-uie-value')).toEqual('busy');
@@ -198,7 +201,9 @@ describe('UserAvatar', () => {
     };
 
     participant.availability(Availability.Type.AVAILABLE);
-    const {queryByTestId} = render(<UserAvatar {...props} hideAvailabilityStatus={true} />);
+    const {queryByTestId} = render(<UserAvatar {...props} hideAvailabilityStatus={true} />, {
+      wrapper: rootProviderWrapper,
+    });
 
     const statusAvailabilityIcon = queryByTestId('status-availability-icon');
     expect(statusAvailabilityIcon).toBeNull();

@@ -23,6 +23,8 @@ import {render, fireEvent} from '@testing-library/react';
 
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {CellsShareModalContent} from './CellsShareModalContent';
 
 jest.mock('@wireapp/react-ui-kit', () => {
@@ -51,6 +53,7 @@ jest.mock('src/script/Config', () => ({
 }));
 
 const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 // Mock child components that have complex dependencies
 jest.mock('Components/Cells/ShareModal/CellsShareExpirationFields', () => ({
@@ -154,7 +157,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByTestId, queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByTestId, queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       // Should show the view mode with change password button
       expect(getByTestId('cells-share-password-view-mode')).toBeTruthy();
@@ -175,7 +180,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByTestId, queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByTestId, queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       // Should show password input content
       expect(getByTestId('cells-share-password-content')).toBeTruthy();
@@ -196,7 +203,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByTestId, queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByTestId, queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       // Should show password input content
       expect(getByTestId('cells-share-password-content')).toBeTruthy();
@@ -219,7 +228,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       const changePasswordButton = getByTestId('do-change-password');
       fireEvent.click(changePasswordButton);
@@ -237,7 +248,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       // Should NOT show any password content
       expect(queryByTestId('cells-share-password-view-mode')).toBeNull();
@@ -255,7 +268,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       expect(getByTestId('change-password-icon')).toBeTruthy();
     });
@@ -272,7 +287,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       const generateButton = getByTestId('do-generate-password');
       fireEvent.click(generateButton);
@@ -284,7 +301,9 @@ describe('CellsShareModalContent', () => {
 
   describe('public link section', () => {
     it('should render public link when enabled and status is success', () => {
-      const {getByDisplayValue} = render(withTheme(<CellsShareModalContent {...defaultProps} />));
+      const {getByDisplayValue} = render(withTheme(<CellsShareModalContent {...defaultProps} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       expect(getByDisplayValue('https://example.com/link')).toBeTruthy();
     });
@@ -298,7 +317,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       expect(getByTestId('cells-table-loader')).toBeTruthy();
     });
@@ -312,7 +333,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByText} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByText} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       expect(getByText('cells.shareModal.error.loadingLink')).toBeTruthy();
     });
@@ -328,7 +351,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {getByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       expect(getByTestId('cells-share-expiration-content')).toBeTruthy();
       expect(getByTestId('expiration-fields')).toBeTruthy();
@@ -343,7 +368,9 @@ describe('CellsShareModalContent', () => {
         },
       };
 
-      const {queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />));
+      const {queryByTestId} = render(withTheme(<CellsShareModalContent {...props} />), {
+        wrapper: rootProviderWrapper,
+      });
 
       expect(queryByTestId('cells-share-expiration-content')).toBeNull();
     });

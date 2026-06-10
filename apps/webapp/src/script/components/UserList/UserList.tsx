@@ -30,9 +30,9 @@ import {ConversationState} from 'Repositories/conversation/ConversationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isEnterKey, isSpaceKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 import {UserListItem} from './components/UserListItem';
 
@@ -95,6 +95,7 @@ export const UserList = ({
   selfUser,
   filterDeletedUsers = true,
 }: UserListProps) => {
+  const {translate} = useApplicationContext();
   const [maxShownUsers, setMaxShownUsers] = useState(USER_CHUNK_SIZE);
 
   // filter out deleted users
@@ -116,17 +117,23 @@ export const UserList = ({
   const isCompactMode = mode === UserlistMode.COMPACT;
   const cssClasses = isCompactMode ? 'search-list-sm' : 'search-list-lg';
 
-  const onUserKeyPressed = (userEntity: User, event: KeyboardEvent) => {
-    if (isSpaceKey(event) || isEnterKey(event)) {
-      onClickOrKeyPressed(userEntity, event);
-    }
-    return true;
-  };
+  const onClickOrKeyPressed = useCallback(
+    (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => {
+      onSelectUser?.(userEntity);
+      onClick?.(userEntity, event);
+    },
+    [onClick, onSelectUser],
+  );
 
-  const onClickOrKeyPressed = (userEntity: User, event: MouseEvent | KeyboardEvent | ChangeEvent) => {
-    onSelectUser?.(userEntity);
-    onClick?.(userEntity, event);
-  };
+  const onUserKeyPressed = useCallback(
+    (userEntity: User, event: KeyboardEvent) => {
+      if (isSpaceKey(event) || isEnterKey(event)) {
+        onClickOrKeyPressed(userEntity, event);
+      }
+      return true;
+    },
+    [onClickOrKeyPressed],
+  );
 
   const renderListItem = useCallback(
     (user: User, isLastItem: boolean = false) => {
@@ -154,7 +161,21 @@ export const UserList = ({
         </li>
       );
     },
-    [highlightedUserIds, isSelectable, isSelfVerified, mode, noSelfInteraction, selectedUsers, teamState],
+    [
+      conversation?.groupId,
+      highlightedUserIds,
+      infos,
+      isSelectable,
+      isSelfVerified,
+      mode,
+      noSelfInteraction,
+      noUnderline,
+      onClickOrKeyPressed,
+      onUserKeyPressed,
+      selectedUsers,
+      showArrow,
+      teamState,
+    ],
   );
 
   const adminsHeaderId = useId();
@@ -191,7 +212,7 @@ export const UserList = ({
         {(admins.length > 0 || showEmptyAdmin) && (
           <>
             <h3 id={adminsHeaderId} className="user-list__header" data-uie-name="label-conversation-admins">
-              {t('searchListAdmins', {count: adminCount})}
+              {translate('searchListAdmins', {count: adminCount})}
             </h3>
 
             {admins.length > 0 && (
@@ -206,7 +227,7 @@ export const UserList = ({
 
             {!(admins.length > 0) && (
               <div className="user-list__no-admin" data-uie-name="status-no-admins">
-                {t('searchListNoAdmins')}
+                {translate('searchListNoAdmins')}
               </div>
             )}
           </>
@@ -215,7 +236,7 @@ export const UserList = ({
         {members.length > 0 && maxShownUsers > admins.length && (
           <>
             <h3 id={membersHeaderId} className="user-list__header" data-uie-name="label-conversation-members">
-              {t('searchListMembers', {count: memberCount})}
+              {translate('searchListMembers', {count: memberCount})}
             </h3>
 
             <ul
@@ -259,7 +280,7 @@ export const UserList = ({
                 <Icon.DiscloseIcon width={16} height={16} />
               </span>
 
-              {t('userListSelectedContacts', {selectedContacts: selectedUsersCount})}
+              {translate('userListSelectedContacts', {selectedContacts: selectedUsersCount})}
             </button>
 
             <ul
@@ -287,7 +308,7 @@ export const UserList = ({
               <Icon.DiscloseIcon width={16} height={16} />
             </span>
 
-            {t('userListContacts')}
+            {translate('userListContacts')}
           </button>
         )}
 
