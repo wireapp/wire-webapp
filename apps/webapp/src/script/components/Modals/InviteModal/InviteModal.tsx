@@ -24,7 +24,7 @@ import {Runtime} from '@wireapp/commons';
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {renderElement} from 'Util/renderElement';
 
 import {Config} from '../../../Config';
@@ -37,16 +37,17 @@ interface InviteModalProps {
 const {BRAND_NAME: brandName} = Config.getConfig();
 
 const InviteModal = ({selfUser, onClose}: InviteModalProps) => {
+  const {translate} = useApplicationContext();
   const [isInviteMessageSelected, setIsInviteMessageSelected] = useState<boolean>(false);
   const userName = selfUser.username();
   const inviteMessage = userName
-    ? t('inviteMessage', {brandName: brandName, username: `@${userName}`})
-    : t('inviteMessageNoEmail', {brandName});
+    ? translate('inviteMessage', {brandName: brandName, username: `@${userName}`})
+    : translate('inviteMessageNoEmail', {brandName});
 
-  const metaKey = Runtime.isMacOS() ? t('inviteMetaKeyMac') : t('inviteMetaKeyPc');
+  const metaKey = Runtime.isMacOS() ? translate('inviteMetaKeyMac') : translate('inviteMetaKeyPc');
   const inviteHint = isInviteMessageSelected
-    ? t('inviteHintSelected', {metaKey})
-    : t('inviteHintUnselected', {metaKey});
+    ? translate('inviteHintSelected', {metaKey})
+    : translate('inviteHintUnselected', {metaKey});
 
   const onTextClick = () => setIsInviteMessageSelected(true);
   const onBlur = () => setIsInviteMessageSelected(false);
@@ -71,7 +72,7 @@ const InviteModal = ({selfUser, onClose}: InviteModalProps) => {
     >
       <div className="modal__header">
         <h2 className="modal__header__title" data-uie-name="status-modal-title">
-          {t('inviteHeadline', {brandName})}
+          {translate('inviteHeadline', {brandName})}
         </h2>
 
         <button type="button" className="modal__header__button" onClick={onClose} data-uie-name="do-close">

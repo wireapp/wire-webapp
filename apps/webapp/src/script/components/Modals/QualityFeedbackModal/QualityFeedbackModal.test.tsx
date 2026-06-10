@@ -34,7 +34,7 @@ import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {UserState} from 'Repositories/user/userState';
 import {TestFactory} from 'test/helper/TestFactory';
-import {t} from 'Util/localizerUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 
@@ -51,6 +51,7 @@ jest.mock('Repositories/tracking/telemetry.helpers', () => ({
 }));
 
 describe('QualityFeedbackModal', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
   let callingRepository: CallingRepository;
   let call: Call;
   const testFactory = new TestFactory();
@@ -83,7 +84,9 @@ describe('QualityFeedbackModal', () => {
   });
 
   const renderQualityFeedbackModal = () =>
-    render(withTheme(withIntl(<QualityFeedbackModal callingRepository={callingRepository} />)));
+    render(withTheme(withIntl(<QualityFeedbackModal callingRepository={callingRepository} />)), {
+      wrapper: rootProviderWrapper,
+    });
 
   it('should not render if qualityFeedbackModalShown is false', () => {
     renderQualityFeedbackModal();
@@ -122,7 +125,7 @@ describe('QualityFeedbackModal', () => {
       },
     });
 
-    fireEvent.click(getByText(t('qualityFeedback.skip')));
+    fireEvent.click(getByText('qualityFeedback.skip'));
 
     expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
@@ -173,7 +176,7 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
-    const checkbox = getByText(t('qualityFeedback.doNotAskAgain'));
+    const checkbox = getByText('qualityFeedback.doNotAskAgain');
     fireEvent.click(checkbox);
     fireEvent.click(getByText('5'));
 

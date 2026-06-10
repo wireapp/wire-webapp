@@ -37,9 +37,9 @@ import {ReplyButton} from 'Components/MessagesList/Message/ContentMessage/Messag
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isTabKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 
 interface DetailViewModalFooterProps {
   messageEntity: ContentMessage;
@@ -63,6 +63,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
   selfId,
   fireAndForgetInvoker,
 }) => {
+  const {translate} = useApplicationContext();
   const {isSelfUserRemoved} = useKoSubscribableChildren(conversationEntity, ['isSelfUserRemoved']);
   const [currentMsgActionName, setCurrentMsgAction] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -166,7 +167,7 @@ const DetailViewModalFooter: FC<DetailViewModalFooterProps> = ({
           className="detail-view-action-button"
         >
           <span className="icon-download" />
-          <span>{t('conversationContextMenuDownload')}</span>
+          <span>{translate('conversationContextMenuDownload')}</span>
         </DownloadButton>
       )}
     </footer>

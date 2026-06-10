@@ -5,16 +5,15 @@ import {GroupCreationModal} from 'Components/Modals/GroupCreation/GroupCreationM
 import {act, getByRole} from '@testing-library/react';
 import {UserState} from 'Repositories/user/userState';
 import {User} from 'Repositories/entity/User';
-import {RootContext, RootContextValue} from '../../../page/RootProvider';
 import {amplify} from 'amplify';
 import {WebAppEvents} from '@wireapp/webapp-events';
 import {mountComponent} from '../../../auth/util/test/TestUtil';
 import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
-import {t} from 'Util/localizerUtil';
 import {TypeUtil} from '@wireapp/commons';
 import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {RootProvider} from 'src/script/page/RootProvider';
 
 type TeamStateDateSet = {
   isAppsEnabled: boolean;
@@ -93,7 +92,7 @@ describe('GroupCreationModal', () => {
             },
           },
         },
-      } as RootContextValue;
+      };
       const rootContextValue = createRootContextValueForTest({
         mainViewModel: mockRootContext.mainViewModel,
         wallClock: createDeterministicWallClock(),
@@ -101,9 +100,9 @@ describe('GroupCreationModal', () => {
 
       // Act
       const {getByTestId} = mountComponent(
-        <RootContext.Provider value={rootContextValue}>
+        <RootProvider value={rootContextValue}>
           <GroupCreationModal userState={mockUserState} teamState={mockTeamState as TeamState} />
-        </RootContext.Provider>,
+        </RootProvider>,
         mockStoreFactory()({
           ...initialRootState,
           authState: {
@@ -126,10 +125,10 @@ describe('GroupCreationModal', () => {
 
       if (expectedAppsEnabled) {
         expect(servicesCheckbox).toBeEnabled();
-        expect(servicesToggleContainer).not.toHaveTextContent(t('servicesNotEnabledNoteTitle'));
+        expect(servicesToggleContainer).not.toHaveTextContent("Your team doesn't use apps yet");
       } else {
         expect(servicesCheckbox).toBeDisabled();
-        expect(servicesToggleContainer).toHaveTextContent(t('servicesNotEnabledNoteTitle'));
+        expect(servicesToggleContainer).toHaveTextContent("Your team doesn't use apps yet");
       }
     },
   );

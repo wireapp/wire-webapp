@@ -17,9 +17,8 @@
  *
  */
 
-import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 
-import is from '@sindresorhus/is';
 import {RECEIPT_MODE} from '@wireapp/api-client/lib/conversation/data/conversationReceiptModeUpdateData';
 import {CONVERSATION_PROTOCOL, mapToConversationProtocol} from '@wireapp/api-client/lib/team';
 import {isNonFederatingBackendsError} from '@wireapp/core/lib/errors';
@@ -49,17 +48,17 @@ import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {generateConversationUrl} from 'src/script/router/routeGenerator';
 import {createNavigate, createNavigateKeyboard} from 'src/script/router/routerBindings';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {checkAppsFeatureAvailability} from 'Util/featureUtil';
 import {handleEnterDown, handleEscDown, isKeyboardEvent} from 'Util/keyboardUtil';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {replaceLink} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 
 import {Config} from '../../../Config';
 import {isProtocolOption, ProtocolOption} from '../../../guards/Protocol';
-import {RootContext} from '../../../page/RootProvider';
 import {PrimaryModal} from '../PrimaryModal';
 
 interface GroupCreationModalProps {
@@ -76,6 +75,7 @@ const GroupCreationModal = ({
   userState = container.resolve(UserState),
   teamState = container.resolve(TeamState),
 }: GroupCreationModalProps) => {
+  const {mainViewModel, translate} = useApplicationContext();
   const {
     isTeam,
     isMLSEnabled: isMLSEnabledForTeam,
@@ -98,14 +98,16 @@ const GroupCreationModal = ({
     ? mapToConversationProtocol(teamState.teamFeatures()?.mls?.config.defaultProtocol)
     : CONVERSATION_PROTOCOL.PROTEUS;
 
-  const protocolOptions: ProtocolOption[] = ([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS] as const).map(
-    protocol => ({
-      label: `${t(`modalCreateGroupProtocolSelect.${protocol}`)}${
-        protocol === defaultProtocol ? t(`modalCreateGroupProtocolSelect.default`) : ''
-      }`,
-      value: protocol,
-    }),
-  );
+  const protocolOptions: ProtocolOption[] = useMemo(() => {
+    return ([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS] as const).map(protocol => {
+      return {
+        label: `${translate(`modalCreateGroupProtocolSelect.${protocol}`)}${
+          protocol === defaultProtocol ? translate(`modalCreateGroupProtocolSelect.default`) : ''
+        }`,
+        value: protocol,
+      };
+    });
+  }, [defaultProtocol, translate]);
 
   const initialProtocol = protocolOptions.find(protocol => protocol.value === defaultProtocol)!;
 
@@ -142,25 +144,29 @@ const GroupCreationModal = ({
     GroupCreationModalState.DEFAULT,
   );
 
-  const rootContext = useContext(RootContext);
-
   useEffect(() => {
-    const showCreateGroup = (_: string, userEntity?: User) => {
+    const showCreateGroup = (_eventName: string, userEntity?: User) => {
       setEnableReadReceipts(isTeam);
       setIsShown(true);
       setGroupCreationState(GroupCreationModalState.PREFERENCES);
 
       if (userEntity !== undefined) {
-        setSelectedContacts([...selectedContacts, userEntity]);
+        setSelectedContacts(previousSelectedContacts => {
+          return [...previousSelectedContacts, userEntity];
+        });
       }
     };
 
     amplify.subscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
-  }, []);
+
+    return () => {
+      amplify.unsubscribe(WebAppEvents.CONVERSATION.CREATE_GROUP, showCreateGroup);
+    };
+  }, [isTeam]);
 
   useEffect(() => {
     setSelectedProtocol(protocolOptions.find(protocol => protocol.value === selectedProtocol.value)!);
-  }, [defaultProtocol]);
+  }, [protocolOptions, selectedProtocol.value]);
 
   const stateIsPreferences = groupCreationState === GroupCreationModalState.PREFERENCES;
   const stateIsParticipants = groupCreationState === GroupCreationModalState.PARTICIPANTS;
@@ -213,11 +219,7 @@ const GroupCreationModal = ({
     };
   }, [stateIsParticipants]);
 
-  if (is.null_(rootContext)) {
-    return null;
-  }
-
-  const contentViewModel = rootContext.mainViewModel.content;
+  const contentViewModel = mainViewModel.content;
   const conversationRepository = contentViewModel.repositories.conversation;
   const searchRepository = contentViewModel.repositories.search;
   const teamRepository = contentViewModel.repositories.team;
@@ -278,7 +280,7 @@ const GroupCreationModal = ({
           return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
             preventClose: true,
             primaryAction: {
-              text: t('groupCreationPreferencesNonFederatingEditList'),
+              text: translate('groupCreationPreferencesNonFederatingEditList'),
               action: () => {
                 setGroupName(tempName);
                 setIsShown(true);
@@ -287,18 +289,18 @@ const GroupCreationModal = ({
               },
             },
             secondaryAction: {
-              text: t('groupCreationPreferencesNonFederatingLeave'),
+              text: translate('groupCreationPreferencesNonFederatingLeave'),
               action: () => {
                 setIsCreatingConversation(false);
               },
             },
             text: {
-              htmlMessage: t(
+              htmlMessage: translate(
                 'groupCreationPreferencesNonFederatingMessage',
                 {backends: backendString},
                 replaceBackends,
               ),
-              title: t('groupCreationPreferencesNonFederatingHeadline'),
+              title: translate('groupCreationPreferencesNonFederatingHeadline'),
             },
           });
         }
@@ -319,11 +321,11 @@ const GroupCreationModal = ({
 
     setGroupName(value);
     if (nameTooLong) {
-      return setNameError(t('groupCreationPreferencesErrorNameLong'));
+      return setNameError(translate('groupCreationPreferencesErrorNameLong'));
     }
 
     if (nameTooShort) {
-      return setNameError(t('groupCreationPreferencesErrorNameShort'));
+      return setNameError(translate('groupCreationPreferencesErrorNameShort'));
     }
     setNameError('');
   };
@@ -366,8 +368,8 @@ const GroupCreationModal = ({
   };
 
   const participantsActionText = selectedContacts.length
-    ? t('groupCreationParticipantsActionCreate')
-    : t('groupCreationParticipantsActionSkip');
+    ? translate('groupCreationParticipantsActionCreate')
+    : translate('groupCreationParticipantsActionSkip');
   const isInputValid = groupNameLength && !nameError.length;
 
   return (
@@ -387,7 +389,7 @@ const GroupCreationModal = ({
               className="button-reset-default"
               type="button"
               onClick={clickOnBack}
-              aria-label={t('accessibility.groupCreationParticipantsActionBack')}
+              aria-label={translate('accessibility.groupCreationParticipantsActionBack')}
               data-uie-name="go-back"
             >
               <Icon.ArrowLeftIcon aria-hidden="true" className="modal__header__button" />
@@ -395,8 +397,8 @@ const GroupCreationModal = ({
 
             <h2 id="group-creation-label" className="modal__header__title" data-uie-name="status-people-selected">
               {selectedContacts.length
-                ? t('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
-                : t('groupCreationParticipantsHeader')}
+                ? translate('groupCreationParticipantsHeaderWithCounter', {number: selectedContacts.length})
+                : translate('groupCreationParticipantsHeader')}
             </h2>
 
             <Button
@@ -418,14 +420,14 @@ const GroupCreationModal = ({
               className="button-reset-default"
               type="button"
               onClick={() => setIsShown(false)}
-              aria-label={t('accessibility.groupCreationActionCloseModal')}
+              aria-label={translate('accessibility.groupCreationActionCloseModal')}
               data-uie-name="do-close"
             >
               <Icon.CloseIcon aria-hidden="true" className="modal__header__button" />
             </button>
 
             <h2 id="group-creation-label" className="modal__header__title">
-              {t('groupCreationPreferencesHeader')}
+              {translate('groupCreationPreferencesHeader')}
             </h2>
 
             <Button
@@ -438,11 +440,11 @@ const GroupCreationModal = ({
               disabled={isInputValid !== true}
               type="button"
               onClick={clickOnNext}
-              aria-label={t('groupCreationPreferencesAction')}
+              aria-label={translate('groupCreationPreferencesAction')}
               data-uie-name="go-next"
               variant={ButtonVariant.TERTIARY}
             >
-              {t('groupCreationPreferencesAction')}
+              {translate('groupCreationPreferencesAction')}
             </Button>
           </>
         )}
@@ -453,7 +455,7 @@ const GroupCreationModal = ({
             input={participantsInput}
             setInput={setParticipantsInput}
             selectedUsers={selectedContacts}
-            placeholder={t('groupCreationParticipantsPlaceholder')}
+            placeholder={translate('groupCreationParticipantsPlaceholder')}
             onEnter={clickOnCreate}
           />
         )}
@@ -483,8 +485,8 @@ const GroupCreationModal = ({
             <div className="modal-input-wrapper">
               <TextInput
                 autoFocus
-                label={t('groupCreationPreferencesPlaceholder')}
-                placeholder={t('groupCreationPreferencesPlaceholder')}
+                label={translate('groupCreationPreferencesPlaceholder')}
+                placeholder={translate('groupCreationPreferencesPlaceholder')}
                 uieName="enter-group-name"
                 name="enter-group-name"
                 errorUieName="error-group-name"
@@ -511,7 +513,7 @@ const GroupCreationModal = ({
                   style={{visibility: hasNameError ? 'hidden' : 'visible'}}
                   data-uie-name="status-group-size-info"
                 >
-                  {t('groupSizeInfo', {count: maxSize})}
+                  {translate('groupSizeInfo', {count: maxSize})}
                 </p>
                 <hr className="group-creation__modal__separator" />
                 <InfoToggle
@@ -520,8 +522,8 @@ const GroupCreationModal = ({
                   isChecked={isGuestEnabled}
                   setIsChecked={clickOnToggleGuestMode}
                   isDisabled={false}
-                  name={t('guestOptionsTitle')}
-                  info={t('guestRoomToggleInfo')}
+                  name={translate('guestOptionsTitle')}
+                  info={translate('guestRoomToggleInfo')}
                 />
                 <InfoToggle
                   className="modal-style"
@@ -529,8 +531,8 @@ const GroupCreationModal = ({
                   isChecked={isServicesEnabled}
                   setIsChecked={clickOnToggleServicesMode}
                   isDisabled={!isAppsFeatureAvailable}
-                  name={t('servicesOptionsTitle')}
-                  info={t('servicesRoomToggleInfo')}
+                  name={translate('servicesOptionsTitle')}
+                  info={translate('servicesRoomToggleInfo')}
                   footer={!isAppsFeatureAvailable && <AppsDisabledNote />}
                 />
 
@@ -538,11 +540,11 @@ const GroupCreationModal = ({
                   <InfoToggle
                     className="modal-style"
                     dataUieName="read-receipts"
-                    info={t('readReceiptsToggleInfo')}
+                    info={translate('readReceiptsToggleInfo')}
                     isChecked={enableReadReceipts}
                     setIsChecked={setEnableReadReceipts}
                     isDisabled={false}
-                    name={t('readReceiptsToggleName')}
+                    name={translate('readReceiptsToggleName')}
                   />
                 )}
                 {enableCellsToggle && (
@@ -552,8 +554,8 @@ const GroupCreationModal = ({
                     isChecked={isCellsOptionEnabled}
                     setIsChecked={setIsCellsOptionEnabled}
                     isDisabled={false}
-                    name={t('modalCreateGroupCellsToggleHeading')}
-                    info={t('modalCreateGroupCellsToggleInfo')}
+                    name={translate('modalCreateGroupCellsToggleHeading')}
+                    info={translate('modalCreateGroupCellsToggleInfo')}
                   />
                 )}
                 {enableMLSToggle && (
@@ -564,12 +566,12 @@ const GroupCreationModal = ({
                       dataUieName="select-protocol"
                       options={protocolOptions}
                       value={selectedProtocol}
-                      label={t('modalCreateGroupProtocolHeading')}
+                      label={translate('modalCreateGroupProtocolHeading')}
                       menuPosition="absolute"
                       wrapperCSS={{marginBottom: 0}}
                     />
                     <p className="modal__info" data-uie-name="status-group-protocol-info">
-                      {t('modalCreateGroupProtocolInfo')}
+                      {translate('modalCreateGroupProtocolInfo')}
                     </p>
                   </>
                 )}

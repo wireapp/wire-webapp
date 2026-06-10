@@ -23,12 +23,15 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
 
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';
 
 describe('UserModal', () => {
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
     const refreshUser = jest.fn(async (id: QualifiedId) => {
@@ -44,7 +47,7 @@ describe('UserModal', () => {
       selfUser: new User(),
     };
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
-    const {getByTestId} = render(<UserModal {...props} />);
+    const {getByTestId} = render(<UserModal {...props} />, {wrapper: rootProviderWrapper});
     await waitFor(() => getByTestId('do-close'));
 
     expect(refreshUser).toHaveBeenCalledTimes(1);
@@ -69,7 +72,7 @@ describe('UserModal', () => {
 
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
 
-    const {getByTestId} = render(<UserModal {...props} />);
+    const {getByTestId} = render(<UserModal {...props} />, {wrapper: rootProviderWrapper});
 
     expect(refreshUser).toHaveBeenCalledTimes(1);
 

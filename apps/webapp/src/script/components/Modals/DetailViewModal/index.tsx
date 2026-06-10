@@ -17,7 +17,7 @@
  *
  */
 
-import {KeyboardEvent as ReactKeyboardEvent, useEffect, useRef, useState} from 'react';
+import {KeyboardEvent as ReactKeyboardEvent, useCallback, useEffect, useRef, useState} from 'react';
 
 import {amplify} from 'amplify';
 import cx from 'classnames';
@@ -33,8 +33,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';
@@ -65,6 +65,8 @@ export const DetailViewModal = ({
   onClose,
   selfUser,
 }: DetailViewModalProps) => {
+  const IMAGE_CLOSE_ANIMATION_DELAY_MILLISECONDS = 150;
+  const {translate} = useApplicationContext();
   const currentMessageEntityId = useRef<string>(currentMessageEntity.id);
 
   const [conversationEntity, setConversationEntity] = useState<Conversation | null>(null);
@@ -74,18 +76,16 @@ export const DetailViewModal = ({
   const [isImageVisible, setIsImageVisible] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>('');
 
-  const onCloseClick = () => {
-    document.removeEventListener('keydown', onKeyDownLightBox);
-
+  const onCloseClick = useCallback(() => {
     setIsImageVisible(false);
     window.URL.revokeObjectURL(imageSrc);
     setItems([]);
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       setImageSrc('');
       onClose?.();
-    }, 150);
-  };
+    }, IMAGE_CLOSE_ANIMATION_DELAY_MILLISECONDS);
+  }, [imageSrc, onClose]);
 
   const handleOnClosePress = (event: KeyboardEvent | ReactKeyboardEvent<HTMLButtonElement>) => {
     handleKeyDown({
@@ -108,111 +108,142 @@ export const DetailViewModal = ({
     onCloseClick();
   };
 
-  const onDownloadClick = (message: ContentMessage) => message.download(assetRepository);
-
-  const loadImage = (contentMessage: ContentMessage) => {
-    setIsImageVisible(false);
-
-    assetRepository.load((contentMessage.getFirstAsset() as MediumImage).resource()).then(blob => {
-      if (blob) {
-        setImageSrc(window.URL.createObjectURL(blob));
-        setIsImageVisible(true);
-      }
-    });
+  const onDownloadClick = (message: ContentMessage) => {
+    return message.download(assetRepository);
   };
 
-  const iterateImage = (reverse = false) => {
-    const currentIndex = items.findIndex(item => item.id === currentMessageEntityId.current);
+  const loadImage = useCallback(
+    (contentMessage: ContentMessage) => {
+      setIsImageVisible(false);
 
-    if (currentIndex === -1) {
-      return;
-    }
+      void assetRepository.load((contentMessage.getFirstAsset() as MediumImage).resource()).then(blob => {
+        if (blob) {
+          setImageSrc(window.URL.createObjectURL(blob));
+          setIsImageVisible(true);
+        }
+      });
+    },
+    [assetRepository],
+  );
 
-    const lastIndex = items.length - 1;
-    let nextIndex = currentIndex;
+  const iterateImage = useCallback(
+    (reverse = false) => {
+      const currentIndex = items.findIndex(item => item.id === currentMessageEntityId.current);
 
-    if (reverse) {
-      nextIndex = nextIndex === 0 ? lastIndex : currentIndex - 1;
-    } else {
-      nextIndex = nextIndex === lastIndex ? 0 : currentIndex + 1;
-    }
-
-    const newMessageEntity = items[nextIndex];
-
-    currentMessageEntityId.current = newMessageEntity.id;
-    loadImage(newMessageEntity);
-    setMessageEntity(newMessageEntity);
-  };
-
-  const clickOnShowNext = (event: MouseEvent | KeyboardEvent) => {
-    event.stopPropagation();
-    iterateImage(true);
-  };
-
-  const clickOnShowPrevious = (event: MouseEvent | KeyboardEvent) => {
-    event.stopPropagation();
-    iterateImage();
-  };
-
-  const onKeyDownLightBox = async (keyboardEvent: KeyboardEvent) => {
-    switch (keyboardEvent.key) {
-      case KEY.ESC: {
-        onCloseClick();
-        break;
-      }
-
-      case KEY.ARROW_DOWN:
-      case KEY.ARROW_RIGHT: {
-        clickOnShowNext(keyboardEvent);
-        break;
-      }
-
-      case KEY.ARROW_LEFT:
-      case KEY.ARROW_UP: {
-        clickOnShowPrevious(keyboardEvent);
-        break;
-      }
-      default:
-        break;
-    }
-  };
-
-  const messageRemoved = (messageId: string, conversationId: string) => {
-    if (conversationEntity?.id === conversationId) {
-      if (currentMessageEntity.id === messageId) {
-        onCloseClick();
-
+      if (currentIndex === -1) {
         return;
       }
 
-      setItems(prevState => prevState.filter(message => message.id !== messageId));
-    }
-  };
+      const lastIndex = items.length - 1;
+      let nextIndex = currentIndex;
 
-  const messageAdded = (message: ContentMessage) => {
-    const isCurrentConversation = conversationEntity?.id === message.conversation_id;
-    const isImage = isOfCategory('images', message) === true;
+      if (reverse) {
+        nextIndex = nextIndex === 0 ? lastIndex : currentIndex - 1;
+      } else {
+        nextIndex = nextIndex === lastIndex ? 0 : currentIndex + 1;
+      }
 
-    if (isCurrentConversation && isImage) {
-      setItems(prevState => [...prevState, message]);
-    }
-  };
+      const newMessageEntity = items[nextIndex];
 
-  const messageExpired = (message: ContentMessage) => messageRemoved(message.id, message.conversation_id);
+      currentMessageEntityId.current = newMessageEntity.id;
+      loadImage(newMessageEntity);
+      setMessageEntity(newMessageEntity);
+    },
+    [items, loadImage],
+  );
 
-  const getAllImages = async (conversation: Conversation) => {
-    const conversationItems = await conversationRepository.getEventsForCategory(conversation, MessageCategory.IMAGE);
-    const filteredImages = conversationItems.filter(message => {
-      return isContentMessage(message) && isOfCategory('images', message) === true;
-    });
+  const clickOnShowNext = useCallback(
+    (event: MouseEvent | KeyboardEvent) => {
+      event.stopPropagation();
+      iterateImage(true);
+    },
+    [iterateImage],
+  );
 
-    const contentMessages = filteredImages.reduce<ContentMessage[]>(
-      (contentMessages, message) => (isContentMessage(message) ? [...contentMessages, message] : contentMessages),
-      [],
-    );
+  const clickOnShowPrevious = useCallback(
+    (event: MouseEvent | KeyboardEvent) => {
+      event.stopPropagation();
+      iterateImage();
+    },
+    [iterateImage],
+  );
 
-    setItems(contentMessages);
-  };
+  const onKeyDownLightBox = useCallback(
+    (keyboardEvent: KeyboardEvent) => {
+      switch (keyboardEvent.key) {
+        case KEY.ESC: {
+          onCloseClick();
+          break;
+        }
+
+        case KEY.ARROW_DOWN:
+        case KEY.ARROW_RIGHT: {
+          clickOnShowNext(keyboardEvent);
+          break;
+        }
+
+        case KEY.ARROW_LEFT:
+        case KEY.ARROW_UP: {
+          clickOnShowPrevious(keyboardEvent);
+          break;
+        }
+        default:
+          break;
+      }
+    },
+    [clickOnShowNext, clickOnShowPrevious, onCloseClick],
+  );
+
+  const messageRemoved = useCallback(
+    (messageId: string, conversationId: string) => {
+      if (conversationEntity?.id === conversationId) {
+        if (currentMessageEntity.id === messageId) {
+          onCloseClick();
+
+          return;
+        }
+
+        setItems(prevState => prevState.filter(message => message.id !== messageId));
+      }
+    },
+    [conversationEntity?.id, currentMessageEntity.id, onCloseClick],
+  );
+
+  const messageAdded = useCallback(
+    (message: ContentMessage) => {
+      const isCurrentConversation = conversationEntity?.id === message.conversation_id;
+      const isImage = isOfCategory('images', message) === true;
+
+      if (isCurrentConversation && isImage) {
+        setItems(prevState => [...prevState, message]);
+      }
+    },
+    [conversationEntity?.id],
+  );
+
+  const messageExpired = useCallback(
+    (message: ContentMessage) => {
+      messageRemoved(message.id, message.conversation_id);
+    },
+    [messageRemoved],
+  );
+
+  const getAllImages = useCallback(
+    async (conversation: Conversation) => {
+      const conversationItems = await conversationRepository.getEventsForCategory(conversation, MessageCategory.IMAGE);
+      const filteredImages = conversationItems.filter(message => {
+        return isContentMessage(message) && isOfCategory('images', message) === true;
+      });
+
+      const contentMessages = filteredImages.reduce<ContentMessage[]>(
+        (contentMessages, message) => (isContentMessage(message) ? [...contentMessages, message] : contentMessages),
+        [],
+      );
+
+      setItems(contentMessages);
+    },
+    [conversationRepository],
+  );
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.EPHEMERAL_MESSAGE_TIMEOUT, messageExpired);
@@ -226,25 +257,25 @@ export const DetailViewModal = ({
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.ADDED, messageAdded);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.MESSAGE.REMOVED, messageRemoved);
     };
-  }, [conversationEntity]);
+  }, [currentMessageEntity, loadImage, messageAdded, messageExpired, messageRemoved]);
 
   useEffect(() => {
     document.addEventListener('keydown', onKeyDownLightBox);
 
     return () => document.removeEventListener('keydown', onKeyDownLightBox);
-  }, [items]);
+  }, [onKeyDownLightBox]);
 
   useEffect(() => {
     const conversationId = currentMessageEntity.conversation_id;
     const isExpectedId = conversationEntity ? conversationId === conversationEntity.id : false;
 
     if (!isExpectedId) {
-      conversationRepository.getConversationById({domain: '', id: conversationId}).then(conversation => {
+      void conversationRepository.getConversationById({domain: '', id: conversationId}).then(conversation => {
         setConversationEntity(conversation);
-        getAllImages(conversation);
+        void getAllImages(conversation);
       });
     }
-  }, []);
+  }, [conversationEntity, conversationRepository, currentMessageEntity.conversation_id, getAllImages]);
 
   const modalId = 'detail-view';
 
@@ -273,7 +304,7 @@ export const DetailViewModal = ({
           <button
             className="detail-view-main button-reset-default"
             onKeyDown={handleOnClosePress}
-            aria-label={t('accessibility.conversationDetailsCloseLabel')}
+            aria-label={translate('accessibility.conversationDetailsCloseLabel')}
           >
             <ZoomableImage key={currentMessageEntityId.current} src={imageSrc} data-uie-name="status-picture" />
           </button>

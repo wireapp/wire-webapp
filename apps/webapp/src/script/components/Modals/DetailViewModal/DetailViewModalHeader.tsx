@@ -21,8 +21,8 @@ import {FC} from 'react';
 
 import * as Icon from 'Components/icon';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
 
 interface DetailViewModalHeaderProps {
@@ -31,6 +31,7 @@ interface DetailViewModalHeaderProps {
 }
 
 const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, onCloseClick}) => {
+  const {translate} = useApplicationContext();
   const {user, timestamp, unsafeSenderName} = useKoSubscribableChildren(messageEntity, [
     'user',
     'timestamp',
@@ -57,7 +58,7 @@ const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, o
       <button
         type="button"
         className="detail-view-header-close-button icon-button"
-        aria-label={t('accessibility.conversationDetailsCloseLabel')}
+        aria-label={translate('accessibility.conversationDetailsCloseLabel')}
         onClick={onCloseClick}
         data-uie-name="do-close-detail-view"
       >
