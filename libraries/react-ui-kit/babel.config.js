@@ -18,7 +18,15 @@
  */
 
 module.exports = {
-  presets: [['@babel/preset-react', {
-    runtime: 'automatic',
-  }], '@babel/preset-typescript', '@babel/preset-env', '@emotion/babel-preset-css-prop'],
+  presets: [
+    [
+      '@babel/preset-react',
+      {
+        runtime: 'automatic',
+      },
+    ],
+    '@babel/preset-typescript',
+    '@babel/preset-env',
+    '@emotion/babel-preset-css-prop',
+  ],
 };
