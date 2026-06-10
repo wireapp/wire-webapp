@@ -20,8 +20,8 @@
 import {CSSObject} from '@emotion/react';
 
 import {Theme} from '../../Identity/Theme';
-import {QueryKeys, media} from '../../utils';
-import {TextProps, filterTextProps, textStyle} from '../Text';
+import {media, QueryKeys} from '../../utils';
+import {filterTextProps, TextProps, textStyle} from '../Text';
 
 export type ParagraphProps<T = HTMLParagraphElement> = TextProps<T>;
 
@@ -35,7 +35,7 @@ export const paragraphStyle: <T>(theme: Theme, props: ParagraphProps<T>) => CSSO
 });
 
 export const Paragraph = (props: ParagraphProps) => (
-  <p css={(theme: Theme) => paragraphStyle(theme, props)} {...filterTextProps(props)} />
+  <p css={theme => paragraphStyle(theme, props)} {...filterTextProps(props)} />
 );
 
 export type LeadProps<T = HTMLParagraphElement> = TextProps<T>;
@@ -53,5 +53,5 @@ export const leadStyle: <T>(theme: Theme, props: LeadProps<T>) => CSSObject = (
 });
 
 export const Lead = (props: LeadProps) => (
-  <p css={(theme: Theme) => leadStyle(theme, props)} {...filterTextProps(props)} />
+  <p css={theme => leadStyle(theme as Theme, props)} {...filterTextProps(props)} />
 );

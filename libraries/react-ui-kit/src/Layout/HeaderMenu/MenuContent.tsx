@@ -35,10 +35,10 @@ export const menuContentStyle: <T>(props: MenuContentProps<T>) => CSSObject = pr
   gridTemplateColumns: '1fr auto 1fr',
   height: '64px',
   justifyContent: 'space-between',
-  left: props.open ? 0 : undefined,
-  position: props.open ? 'fixed' : undefined,
-  width: props.open ? '100%' : undefined,
-  zIndex: props.open ? 10000 : undefined,
+  left: props.open === true ? 0 : undefined,
+  position: props.open === true ? 'fixed' : undefined,
+  width: props.open === true ? '100%' : undefined,
+  zIndex: props.open === true ? 10000 : undefined,
 });
 
 const filterMenuContentProps = (props: MenuContentProps) => filterProps(props, ['open']);

@@ -24,7 +24,7 @@ import {useTheme} from '@emotion/react';
 import {inputStyles, labelStyles, loadingStyles, switchDotStyles, switchStyles, wrapperStyles} from './Switch.styles';
 
 import {Loading} from '../../DataDisplay';
-import {COLOR, THEME_ID, Theme} from '../../Identity';
+import {COLOR, Theme, THEME_ID} from '../../Identity';
 import {InputProps} from '../Input';
 
 export interface SwitchProps<T = HTMLInputElement> extends InputProps<T> {
@@ -78,7 +78,7 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
       '#d2d2d2';
     const resolvedDisabledColor =
       (isDarkTheme ? (disabledColorDark ?? disabledColor) : disabledColor) ?? switchTheme?.disabledColor;
-    const isInteractionDisabled = Boolean(disabled || showLoading);
+    const isInteractionDisabled = Boolean(disabled === true || showLoading);
     const handleToggle = (nextChecked: boolean) => {
       if (isInteractionDisabled) {
         return;
@@ -105,21 +105,21 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(
           css={inputStyles}
           data-uie-name={dataUieName}
         />
-        <label htmlFor={id} css={labelStyles(disabled, showLoading)}>
+        <label htmlFor={id} css={labelStyles(disabled === true, showLoading === true)}>
           <span
             css={switchStyles({
-              disabled,
-              showLoading,
+              disabled: disabled === true,
+              showLoading: showLoading === true,
               checked,
               activatedColor: resolvedActivatedColor,
               deactivatedColor: resolvedDeactivatedColor,
               disabledColor: resolvedDisabledColor,
             })}
           />
-          {showLoading ? (
+          {showLoading === true ? (
             <Loading size={21} color={loadingColor} css={loadingStyles} />
           ) : (
-            <span css={switchDotStyles(disabled, checked)} />
+            <span css={switchDotStyles(disabled === true, checked)} />
           )}
         </label>
       </div>
