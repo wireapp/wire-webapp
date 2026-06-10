@@ -13,7 +13,7 @@ on:
       timezone: Europe/Berlin
 
 concurrency:
-  group: critical-flow-${{ github.event_name }}-${{ github.ref }}
+  group: precommit-crit-flows-${{ github.event_name }}
   cancel-in-progress: true
 
 jobs:
