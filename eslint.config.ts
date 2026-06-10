@@ -3,7 +3,6 @@
  * Flat ESLint configuration (ESLint 9+)
  */
 
-import path from 'path';
 import {FlatCompat} from '@eslint/eslintrc';
 // @ts-ignore - No types available for @emotion/eslint-plugin with ESLint 9
 import emotionPlugin from '@emotion/eslint-plugin';
@@ -51,6 +50,9 @@ const ignores = [
   'apps/webapp/src/script/components/icon.tsx',
   '**/*.test.*',
   '**/*.spec.*',
+  '**/*.stories.*',
+  '**/storybook-static/',
+  '**/.storybook/',
   '*.js',
   'apps/webapp/src/types/i18n.d.ts',
   'apps/webapp/playwright-report/',
@@ -59,6 +61,7 @@ const ignores = [
   'libraries/core/.tmp/',
   'libraries/core/src/test/',
   'libraries/config/lib/',
+  'libraries/react-ui-kit/lib/',
   '**/jest.setup.ts',
 ];
 
@@ -246,6 +249,12 @@ const config: Linter.Config[] = [
     files: ['apps/webapp/**/*.{ts,tsx}'],
     rules: {
       '@typescript-eslint/strict-boolean-expressions': 'off',
+    },
+  },
+  {
+    files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
+    rules: {
+      'import/no-default-export': 'off',
     },
   },
   {
