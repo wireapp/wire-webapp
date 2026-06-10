@@ -23,6 +23,6 @@ import {BaseModal} from './base.modal';
 
 export class ReadReceiptModal extends BaseModal {
   constructor(page: Page) {
-    super(page, 'modal-account-read-receipts-changed');
+    super(page);
   }
 }
