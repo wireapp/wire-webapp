@@ -23,7 +23,7 @@ import {CSSObject} from '@emotion/react';
 
 import {Theme} from '../../Identity';
 import {COLOR_V2} from '../../Identity/colors-v2/colors-v2';
-import {QueryKeys, media, filterProps} from '../../utils';
+import {filterProps, media, QueryKeys} from '../../utils';
 
 export interface MenuOpenButtonProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   open?: boolean;
@@ -53,14 +53,14 @@ export const menuOpenButtonStyle: <T>(theme: Theme, props: MenuOpenButtonProps<T
     width: '16px',
   },
   'div:nth-of-type(1)': {
-    transform: open ? 'translateY(6px) rotate(-45deg)' : undefined,
+    transform: open === true ? 'translateY(6px) rotate(-45deg)' : undefined,
   },
   'div:nth-of-type(2)': {
-    opacity: open ? 0 : undefined,
-    transform: open ? 'scale(0, 1)' : undefined,
+    opacity: open === true ? 0 : undefined,
+    transform: open === true ? 'scale(0, 1)' : undefined,
   },
   'div:nth-of-type(3)': {
-    transform: open ? 'translateY(-6px) rotate(45deg)' : undefined,
+    transform: open === true ? 'translateY(-6px) rotate(45deg)' : undefined,
   },
   [media[QueryKeys.DESKTOP]]: {
     display: 'none',
@@ -84,7 +84,7 @@ export const MenuOpenButton = ({
       tabIndex={0}
       aria-haspopup="menu"
       aria-expanded={open}
-      aria-label={open ? closeMenuLabel : openMenuLabel}
+      aria-label={open === true ? closeMenuLabel : openMenuLabel}
       css={(theme: Theme) => menuOpenButtonStyle(theme, menuBtnProps)}
       onKeyDown={onKeyDown}
       onClick={onClick}

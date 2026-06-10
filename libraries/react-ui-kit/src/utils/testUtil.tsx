@@ -23,7 +23,6 @@ import {create} from 'react-test-renderer';
 import {THEME_ID} from '../Identity';
 import {StyledApp} from '../Layout';
 
-/* eslint-disable no-unsanitized/method */
 // @ts-ignore
 export const matchComponent = (component: JSX.Element, themeId = THEME_ID.LIGHT) =>
   (expect as any)(create(<StyledApp themeId={themeId}>{component}</StyledApp>).toJSON()).toMatchSnapshot();

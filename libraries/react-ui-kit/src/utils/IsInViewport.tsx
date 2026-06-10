@@ -17,8 +17,8 @@
  *
  */
 
-import {useEffect, useRef} from 'react';
 import * as React from 'react';
+import {useEffect, useRef} from 'react';
 
 export interface IsInViewportProps<T = HTMLDivElement> extends React.HTMLProps<T> {
   checkViewportOnce?: boolean;
@@ -32,7 +32,7 @@ export const IsInViewport = ({
   checkViewportOnce = false,
   ...props
 }: IsInViewportProps) => {
-  const element = useRef<HTMLDivElement>();
+  const element = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let observer = undefined;
     if (onEnterViewport && !disabled) {

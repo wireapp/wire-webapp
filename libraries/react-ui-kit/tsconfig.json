@@ -2,11 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "esModuleInterop": true,
-    "strict": false,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "noImplicitReturns": false,
-    "noUnusedLocals": false,
     "outDir": "lib",
     "rootDir": "src",
     "skipLibCheck": true,
@@ -17,14 +12,13 @@
     "moduleResolution": "node",
     "target": "es2020",
     "lib": ["dom", "es2024"],
-    "types": ["node"]
+    "types": ["node", "jest"]
   },
   "exclude": [
     "node_modules",
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
-    "src/test/**/*",
-    "src/utils/testUtil.tsx"
+    "src/test/**/*"
   ],
-  "include": ["src"]
+  "include": ["src", "emotion.d.ts"]
 }

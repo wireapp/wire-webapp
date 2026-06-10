@@ -50,6 +50,7 @@
     "@types/node": "24.13.1",
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
+    "@types/react-test-renderer": "18.3.1",
     "@types/webpack-env": "1.18.8",
     "babel-jest": "30.4.1",
     "babel-loader": "10.0.0",
@@ -83,7 +84,9 @@
     "test": "nx run react-ui-kit-lib:test",
     "test:coverage": "nx run react-ui-kit-lib:test:coverage",
     "test:watch": "nx run react-ui-kit-lib:test --watch",
-    "test:update": "nx run react-ui-kit-lib:test --updateSnapshot"
+    "test:update": "nx run react-ui-kit-lib:test --updateSnapshot",
+    "lint": "nx lint react-ui-kit-lib",
+    "lint:fix": "nx lint react-ui-kit-lib --fix"
   },
   "version": "9.77.0"
 }

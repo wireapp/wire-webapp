@@ -9516,6 +9516,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-test-renderer@npm:18.3.1":
+  version: 18.3.1
+  resolution: "@types/react-test-renderer@npm:18.3.1"
+  dependencies:
+    "@types/react": "npm:^18"
+  checksum: 10/f8cc23cc8decdb6068cdc8f8c306e189eab8e569443ce97b216e757ee42eb20b18d2280ef41e2955668413f14be92765a3ba86cfcfeeae6b20c965acd9674786
+  languageName: node
+  linkType: hard
+
 "@types/react-transition-group@npm:4.4.12, @types/react-transition-group@npm:^4.4.0":
   version: 4.4.12
   resolution: "@types/react-transition-group@npm:4.4.12"
@@ -10929,6 +10938,7 @@ __metadata:
     "@types/node": "npm:24.13.1"
     "@types/react": "npm:18.3.31"
     "@types/react-dom": "npm:18.3.7"
+    "@types/react-test-renderer": "npm:18.3.1"
     "@types/webpack-env": "npm:1.18.8"
     babel-jest: "npm:30.4.1"
     babel-loader: "npm:10.0.0"

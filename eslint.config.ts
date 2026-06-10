@@ -3,7 +3,6 @@
  * Flat ESLint configuration (ESLint 9+)
  */
 
-import path from 'path';
 import {FlatCompat} from '@eslint/eslintrc';
 // @ts-ignore - No types available for @emotion/eslint-plugin with ESLint 9
 import emotionPlugin from '@emotion/eslint-plugin';
@@ -60,8 +59,6 @@ const ignores = [
   'libraries/core/src/test/',
   'libraries/config/lib/',
   'libraries/react-ui-kit/lib/',
-  'libraries/react-ui-kit/storybook-static/',
-  'libraries/react-ui-kit/src/utils/testUtil.tsx',
   '**/jest.setup.ts',
 ];
 
@@ -254,14 +251,7 @@ const config: Linter.Config[] = [
   {
     files: ['libraries/react-ui-kit/**/*.{ts,tsx}'],
     rules: {
-      '@typescript-eslint/strict-boolean-expressions': 'off',
       'import/no-default-export': 'off',
-      'import/no-unresolved': 'off',
-      'jsx-a11y/heading-has-content': 'off',
-      'jsx-a11y/click-events-have-key-events': 'off',
-      'jsx-a11y/no-static-element-interactions': 'off',
-      'jsx-a11y/anchor-has-content': 'off',
-      'no-restricted-syntax': 'off',
     },
   },
   {
