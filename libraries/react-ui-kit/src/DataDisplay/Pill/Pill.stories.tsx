@@ -58,7 +58,7 @@ export const Active: Story = {
   },
 };
 
-export const Error: Story = {
+export const ErrorStory: Story = {
   args: {
     children: 'Error Pill',
     type: PILL_TYPE.error,
