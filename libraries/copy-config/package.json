@@ -14,7 +14,7 @@
   "types": "lib/index.d.ts",
   "bin": "lib/cli.js",
   "dependencies": {
-    "axios": "1.13.3",
+    "axios": "1.16.0",
     "copy": "0.3.2",
     "cosmiconfig": "9.0.0",
     "fs-extra": "11.3.3",
