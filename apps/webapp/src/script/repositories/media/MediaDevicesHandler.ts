@@ -115,7 +115,7 @@ export class MediaDevicesHandler {
       );
     });
 
-    void this.initializeMediaDevices(false);
+    void this.initializeMediaDevices(false, false);
   }
 
   private initializeDeviceState = (supportsUserMedia: boolean) => {
@@ -152,13 +152,13 @@ export class MediaDevicesHandler {
   /**
    * Initialize the list of MediaDevices and subscriptions.
    * @camera: boolean, Only when the camera is queried can the entire device list be accessed.
+   * @refreshMediaStreams: boolean, Only when the refreshMediaStreams is true entire media streams are recreated.
    */
-  public async initializeMediaDevices(camera = false) {
+  public async initializeMediaDevices(camera = false, refreshMediaStreams = false) {
     if (!Runtime.isSupportingUserMedia() || this.devicesAreInit) {
       return;
     }
-
-    await this.refreshMediaDevices(camera);
+    await this.refreshMediaDevices(refreshMediaStreams);
     this.subscribeToDevices();
 
     if (camera) {
@@ -214,10 +214,10 @@ export class MediaDevicesHandler {
 
   /**
    * Update list of available MediaDevices.
-   * @param [camera=false] If `camera=true`, a video track is also created when the device list is read.
+   * @param [refreshMediaStreams=false] If `refreshMediaStreams=true`, a video track is also created when the device list is read.
    * This ensures that the video device labels can also be read. This is necessary for initializing the entire device list.
    */
-  public async refreshMediaDevices(camera = false) {
+  public async refreshMediaDevices(refreshMediaStreams = true) {
     try {
       this.removeAllDevices();
       const mediaDevices = await window.navigator.mediaDevices.enumerateDevices();
@@ -263,7 +263,9 @@ export class MediaDevicesHandler {
         [MediaDeviceType.VIDEO_INPUT]: cameras.length,
       };
 
-      this.onMediaDevicesRefresh?.();
+      if (refreshMediaStreams) {
+        this.onMediaDevicesRefresh?.();
+      }
 
       return mediaDevices;
     } catch (error: unknown) {

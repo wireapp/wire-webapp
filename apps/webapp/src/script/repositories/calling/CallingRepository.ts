@@ -1927,8 +1927,10 @@ export class CallingRepository {
         }
 
         return this.mediaDevicesHandler
-          .initializeMediaDevices(camera)
-          .then(() => stream)
+          .initializeMediaDevices(camera, false)
+          .then(() => {
+            return stream;
+          })
           .catch((error: unknown) => {
             this.logger.warn('Failed to initialize media devices:', error);
             return stream;

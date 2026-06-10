@@ -35,7 +35,7 @@ export const useInitializeMediaDevices = (devicesHandler: MediaDevicesHandler, s
       if (stream) {
         stream.getTracks().forEach(track => track.stop());
       }
-      await devicesHandler?.initializeMediaDevices();
+      await devicesHandler?.initializeMediaDevices(true, true);
       setAreMediaDevicesInitialized(true);
     } catch (error: unknown) {
       logger.warn(`Initialization of media devices failed:`, error);
