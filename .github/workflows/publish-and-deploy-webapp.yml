@@ -33,6 +33,7 @@ jobs:
       COMMIT_URL: ${{github.event.head_commit.url}}
       COMMITTER: ${{github.event.head_commit.committer.name}}
       CHANGELOG_FILE: './changelog.md'
+      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Checkout

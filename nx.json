@@ -14,7 +14,7 @@
       "inputs": ["default", "^production", "{workspaceRoot}/jest.preset.js"]
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "cache": true,
       "inputs": ["default", "{workspaceRoot}/eslint.config.ts"]
     },

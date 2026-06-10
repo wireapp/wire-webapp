@@ -14,7 +14,7 @@
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --ext .js,.ts {projectRoot} --ignore-pattern '**/eslintrc.js' --no-error-on-unmatched-pattern --no-warn-ignored"
+        "command": "eslint --config eslint.config.ts --cache --cache-location node_modules/.cache/eslint/eslint-config --max-warnings=1289 --ext .js,.ts {projectRoot} --ignore-pattern '**/eslintrc.js' --no-error-on-unmatched-pattern --no-warn-ignored"
       }
     }
   },

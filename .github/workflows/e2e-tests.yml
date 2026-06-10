@@ -100,6 +100,8 @@ jobs:
   compute_shards:
     name: Compute number of shards to use
     runs-on: ubuntu-24.04
+    env:
+      DOTENV_CONFIG_QUIET: 'true'
 
     outputs:
       matrixShards: ${{ steps.computeShards.outputs.matrixShards }}
@@ -131,6 +133,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     needs: [bootstrap_smoke_test, compute_shards]
+    env:
+      DOTENV_CONFIG_QUIET: 'true'
     container:
       image: mcr.microsoft.com/playwright:v1.60.0-noble
       options: --ipc=host

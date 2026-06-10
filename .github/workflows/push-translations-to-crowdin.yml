@@ -12,6 +12,8 @@ concurrency:
 jobs:
   push_to_crowdin:
     runs-on: ubuntu-24.04
+    env:
+      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Checkout

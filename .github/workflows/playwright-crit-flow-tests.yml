@@ -11,6 +11,8 @@ jobs:
     if: github.repository == 'wireapp/wire-webapp'
     runs-on: [self-hosted, Linux, X64, office]
     timeout-minutes: 45
+    env:
+      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Checkout repository

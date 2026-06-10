@@ -24,6 +24,7 @@ jobs:
       AWS_APPLICATION_NAME: Webapp
       AWS_BUILD_ZIP_PATH: apps/server/dist/s3/ebs.zip
       AWS_REGION: eu-central-1
+      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Print environment variables

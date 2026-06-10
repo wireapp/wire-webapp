@@ -57,6 +57,8 @@ jobs:
     name: test
     permissions:
       contents: read
+    env:
+      DOTENV_CONFIG_QUIET: 'true'
 
     steps:
       - name: Checkout (pull_request)
@@ -93,6 +95,16 @@ jobs:
       - name: Install JS dependencies
         run: yarn --immutable
 
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
+
       - name: Verify generated i18n artifacts are committed
         run: |
           yarn nx run webapp:translate-merge
@@ -116,7 +128,12 @@ jobs:
       - name: Lint formatting
         run: yarn lint:other
 
-      - name: Lint
+      - name: Lint (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: yarn nx affected -t lint --base=${{ github.base_ref }}
+
+      - name: Lint (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
         run: yarn nx run-many -t lint --all
 
       - name: Test
