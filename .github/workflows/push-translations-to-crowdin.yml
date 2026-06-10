@@ -19,6 +19,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -31,10 +34,10 @@ jobs:
         run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        run: yarn --immutable
+        run: ./bin/yarn --immutable
 
       - name: Merge translations
-        run: yarn nx run webapp:translate-merge
+        run: ./bin/yarn nx run webapp:translate-merge
 
       - name: Upload sources to Crowdin
         uses: crowdin/github-action@7ca9c452bfe9197d3bb7fa83a4d7e2b0c9ae835d

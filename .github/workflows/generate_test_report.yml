@@ -35,6 +35,9 @@ jobs:
         with:
           access_token: ${{github.token}}
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -47,7 +50,7 @@ jobs:
         run: echo -e "machine github.com\n  login ${GH_TOKEN}" > ~/.netrc
 
       - name: Install JS dependencies
-        run: yarn --immutable
+        run: ./bin/yarn --immutable
 
       - name: Test
         run: |

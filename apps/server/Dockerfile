@@ -1,18 +1,19 @@
 FROM node:24-alpine
 
 # For some extra dependencies...
-RUN apk add --no-cache dumb-init git bash && corepack enable
+RUN apk add --no-cache dumb-init git bash
 
 WORKDIR /app
 
 # Yarn berry workspace metadata
 COPY package.json yarn.lock .yarnrc.yml .npmrc* ./
+COPY bin/yarn ./bin/yarn
 COPY .yarn ./.yarn
 COPY apps/server/package.json ./apps/server/package.json
 COPY libraries/config/package.json ./libraries/config/package.json
 
 # Install only server production deps
-RUN yarn workspaces focus @wireapp/server --production
+RUN ./bin/yarn workspaces focus @wireapp/server --production
 
 # Copy built config library artifacts
 COPY libraries/config/lib ./libraries/config/lib
