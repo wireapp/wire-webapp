@@ -1909,9 +1909,12 @@ declare module 'I18n/en-US.json' {
     'setEmail.emailPlaceholder': `Email`;
     'setEmail.headline': `Set email`;
     'setEmail.tryAgain': `Try again`;
+    'setEntropy.a11yInstruction': `Move your mouse or finger on your trackpad as randomly as possible until the process is complete.`;
     'setEntropy.continue': `Continue`;
     'setEntropy.headline': `Increase your account’s security`;
     'setEntropy.moreEntropyNeeded': `Please continue moving your mouse within the window and use the entire area for this purpose.`;
+    'setEntropy.progressAnnouncement': `Entropy collection progress {percent}%.`;
+    'setEntropy.progressAriaLabel': `Entropy collection progress`;
     'setEntropy.subheadline': `Move your mouse as randomly as possible in the white window until the progress bar is 100% full. In this way, you will help improve the quality of the random numbers used to create the long-term cryptographic secrets of this device and thus increase the security of your account.`;
     'setEntropy.success': `Thanks for your support!`;
     'setPassword.button': `Set password`;

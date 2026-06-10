@@ -20,18 +20,27 @@
 import type {CSSProperties} from 'react';
 
 interface ProgressProps {
+  ariaLabel?: string;
   width: number;
   percent: number;
   error?: boolean;
   style?: CSSProperties;
 }
 
-export const ProgressBar = ({width, percent, error, style}: ProgressProps) => {
+export const ProgressBar = ({ariaLabel, width, percent, error, style}: ProgressProps) => {
+  const normalizedPercent = Math.min(100, Math.max(0, Math.floor(percent)));
   const progress = (percent / 100) * width;
 
   return (
     <div
       data-uie-name="element-progess-bar"
+      role="progressbar"
+      tabIndex={0}
+      aria-label={ariaLabel}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={normalizedPercent}
+      aria-valuetext={`${normalizedPercent}%`}
       style={{
         alignSelf: 'center',
         backgroundColor: 'white',

@@ -17,16 +17,21 @@
  *
  */
 
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 import {Button, CheckRoundIcon, ContainerSM, H1, Muted, Text} from '@wireapp/react-ui-kit';
 
 import {handleEnterDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
+import {styles} from './EntropyContainer.styles';
+
 import {EntropyData} from '../../util/entropy';
 import {EntropyCanvas} from '../component/EntropyCanvas';
 import {ProgressBar} from '../component/ProgressBar';
+
+const PROGRESS_COMPLETE_PERCENT = 100;
+const PROGRESS_MILESTONE_STEP = 25;
 
 interface Props extends React.HTMLProps<HTMLDivElement> {
   onSetEntropy: (entropyData: Uint8Array) => void;
@@ -37,6 +42,22 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
   const [entropy, setEntropy] = useState<EntropyData>(new EntropyData());
   const [pause, setPause] = useState<boolean | undefined>(undefined);
   const [percent, setPercent] = useState(0);
+  const [progressAnnouncement, setProgressAnnouncement] = useState('');
+  const [lastAnnouncedMilestone, setLastAnnouncedMilestone] = useState(0);
+
+  const entropyInstruction = t('setEntropy.a11yInstruction');
+
+  useEffect(() => {
+    const clampedPercent = Math.min(PROGRESS_COMPLETE_PERCENT, Math.max(0, percent));
+    const milestone = Math.floor(clampedPercent / PROGRESS_MILESTONE_STEP) * PROGRESS_MILESTONE_STEP;
+
+    if (milestone < PROGRESS_MILESTONE_STEP || milestone <= lastAnnouncedMilestone) {
+      return;
+    }
+
+    setLastAnnouncedMilestone(milestone);
+    setProgressAnnouncement(t('setEntropy.progressAnnouncement', {percent: milestone}));
+  }, [lastAnnouncedMilestone, percent]);
 
   const onProgress = (entropyData: EntropyData, percentage: number, pause: boolean) => {
     setEntropy(entropyData);
@@ -51,28 +72,18 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
   };
 
   return (
-    <ContainerSM
-      centerText
-      verticalCenter
-      style={{
-        alignItems: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        minHeight: 428,
-      }}
-    >
-      <H1 center css={{marginBottom: 16}}>
+    <ContainerSM centerText verticalCenter style={styles.container}>
+      <H1 center css={styles.headline}>
         {t('setEntropy.headline')}
       </H1>
-      {percent >= 100 ? (
+      {percent >= PROGRESS_COMPLETE_PERCENT ? (
         <>
-          <CheckRoundIcon width={64} height={64} css={{alignSelf: 'center', marginBottom: 64}} />
-          <Muted center style={{marginBottom: 40}}>
+          <CheckRoundIcon width={64} height={64} css={styles.successIcon} />
+          <Muted center style={styles.successText}>
             {t('setEntropy.success')}
           </Muted>
           <Button
-            css={{width: '70%'}}
+            css={styles.continueButton}
             onClick={() => forwardEntropy(entropy.entropyData)}
             data-uie-name="do-entropy-confirm"
             onKeyDown={event => handleEnterDown(event, () => forwardEntropy(entropy.entropyData))}
@@ -82,19 +93,28 @@ const EntropyContainer = ({onSetEntropy, containerSize = 400}: Props) => {
         </>
       ) : (
         <>
-          <Muted center css={{marginBottom: '24px'}}>
+          <Muted center css={styles.subheadline}>
             {t('setEntropy.subheadline')}
           </Muted>
           <EntropyCanvas
-            css={{border: pause === true ? 'red 2px solid' : 'black 2px solid'}}
+            css={styles.entropyCanvas(pause === true)}
             data-uie-name="element-entropy-canvas"
+            ariaLabel={entropyInstruction}
             sizeX={containerSize}
             sizeY={containerSize}
             onProgress={onProgress}
             minEntropyBits={1024}
             minFrames={300}
           />
-          <ProgressBar error={pause === true} width={containerSize} percent={percent} />
+          <ProgressBar
+            error={pause === true}
+            width={containerSize}
+            percent={percent}
+            ariaLabel={t('setEntropy.progressAriaLabel')}
+          />
+          <div aria-live="polite" aria-atomic="true" style={styles.screenReaderOnly}>
+            {progressAnnouncement}
+          </div>
           <Text data-uie-name="element-entropy-percent" center>
             {percent}%
           </Text>

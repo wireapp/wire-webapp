@@ -25,6 +25,7 @@ import {usePausableInterval} from '../../hooks/usePausableInterval';
 import {EntropyData} from '../../util/entropy';
 
 interface CanvasProps {
+  ariaLabel?: string;
   css?: CSSObject;
   'data-uie-name'?: string;
   onProgress: (entropyData: EntropyData, percent: number, pause: boolean) => void;
@@ -44,7 +45,7 @@ type Point = {
 };
 
 const EntropyCanvas = (props: CanvasProps) => {
-  const {sizeX, sizeY, onProgress, css, minEntropyBits, minFrames, ...rest} = props;
+  const {sizeX, sizeY, onProgress, css, minEntropyBits, minFrames, ariaLabel, ...rest} = props;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [percent, setPercent] = useState(0);
   const [entropy] = useState<EntropyData>(new EntropyData());
@@ -118,6 +119,9 @@ const EntropyCanvas = (props: CanvasProps) => {
       data-uie-name={props['data-uie-name'] ?? 'element-entropy-canvas'}
       height={sizeY}
       width={sizeX}
+      tabIndex={0}
+      role="img"
+      aria-label={ariaLabel}
       css={{
         ...css,
         alignSelf: 'center',
