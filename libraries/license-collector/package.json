@@ -26,7 +26,7 @@
     "@types/license-checker": "^25",
     "@types/npm-registry-package-info": "1.0.4",
     "license-checker": "^25.0.1",
-    "rimraf": "6.1.2",
+    "rimraf": "6.1.3",
     "typescript": "^5.0.4"
   },
   "scripts": {
