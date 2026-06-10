@@ -20,6 +20,13 @@
         "cwd": "{projectRoot}"
       }
     },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --watch",
+        "cwd": "{projectRoot}"
+      }
+    },
     "dist": {
       "executor": "nx:run-commands",
       "dependsOn": ["build"],

@@ -51,6 +51,14 @@
         "coverage": true
       }
     },
+    "watch": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/lib"],
+      "options": {
+        "command": "vite build --watch",
+        "cwd": "{projectRoot}"
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {

@@ -1804,17 +1804,29 @@ stage('Wait for GitHub action to finish') {
 
 ## Local Development - Watching Libraries
 
-### Nx Watch Mode
+### Single-command dev server
 
-Nx automatically watches all projects in the workspace. When you add a new library, Nx will automatically detect it and include it in the dependency graph.
+Start the full dev stack with one command:
 
 ```bash
-# Start dev server with watch mode
-nx serve webapp --watch
-
-# Start multiple dev servers
-nx run-many -t serve --parallel --watch
+yarn dev
 ```
+
+This runs `nx serve server`, which:
+
+1. Builds upstream libraries once (`^build` via `server:build`)
+2. Starts `watch` on every upstream library in the webapp dependency graph (`webapp:watch-deps` → `^watch` — `tsc --watch` or `vite build --watch`)
+3. Starts the Express server with webpack-dev-middleware in watch mode
+
+Library changes flow: `libraries/*/src` → `watch` recompiles `lib/` → webpack detects `@wireapp/*` changes → full page reload (`webpack-hot-middleware/client?reload=true`).
+
+Only libraries reachable from the server/webapp dependency graph are watched (e.g. `core`, `api-client`, `commons`, `store-engine*`). Config-only packages (`eslint-config`, `prettier-config`) are excluded — they are not part of the webapp bundle.
+
+Configuration:
+
+- [`nx.json`](../nx.json) — `targetDefaults.watch.continuous: true` (long-running watchers)
+- [`apps/webapp/project.json`](../apps/webapp/project.json) — `watch-deps` starts `^watch` on webapp's upstream libraries
+- [`apps/server/project.json`](../apps/server/project.json) — `serve.continuous: true`, `serve.dependsOn: ["webapp:watch-deps"]`
 
 ### TypeScript Path Mappings for Import Resolution
 
@@ -1850,18 +1862,13 @@ In [`apps/webapp/package.json`](apps/webapp/package.json):
 ```
 
 The `workspace:^` protocol ensures:
-- Local workspace packages are linked (no symlinks needed)
+- Local workspace packages are linked via Yarn workspaces
 - Version is automatically resolved to the local workspace version
-- Changes to the library trigger rebuilds of dependent projects
+- Webpack consumes compiled `lib/` output; `watch` targets keep `lib/` in sync during dev
 
 ### Nx Daemon for Fast Rebuilds
 
-Nx runs a daemon process that:
-- Watches file changes
-- Maintains the project graph in memory
-- Provides instant dependency resolution
-
-The daemon is located at `.nx/workspace-data/` and runs automatically.
+Nx runs a daemon process that maintains the project graph in memory and provides instant dependency resolution. The daemon is located at `.nx/workspace-data/` and runs automatically.
 
 ---
 
@@ -1885,8 +1892,8 @@ nx lint <project>                     # Lint specific project
 nx run-many -t lint --all             # Lint all projects
 
 # Development
-nx serve <project>                    # Start dev server
-nx run-many -t serve --parallel       # Start multiple dev servers
+yarn dev                              # Dev server + upstream lib watchers
+nx serve server                       # Same as yarn dev / yarn start
 
 # Graph & Analysis
 nx graph                              # Visualize dependency graph
@@ -1929,7 +1936,7 @@ nx run-many -t test --projects=tag:lib
 8. **Update [`.github/labeler.yml`](.github/labeler.yml)** - Add label rules for new projects
 9. **Check `nx graph`** - Visualize dependencies before making changes
 10. **CI uses Nx** - All GitHub workflows use Nx commands
-11. **Nx watches all projects** - No manual symlink setup needed for library watching
+11. **`yarn dev` watches upstream libs** - `server:serve` depends on `webapp:watch-deps`, which starts `^watch` on webapp's library dependencies
 12. **Path mappings enable clean imports** - Use TypeScript paths for library imports
 13. **`typesVersions` in libraries** - Maps `lib/*` imports to `src/*` for source-based type resolution
 14. **`paths` in tsconfig.eslint.json** - Required for ESLint TypeScript Project Service to resolve imports during linting

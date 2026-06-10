@@ -23,6 +23,8 @@
       }
     },
     "serve": {
+      "continuous": true,
+      "dependsOn": ["webapp:watch-deps"],
       "executor": "@nx/js:node",
       "options": {
         "buildTarget": "server:build",

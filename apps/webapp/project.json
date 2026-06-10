@@ -22,6 +22,15 @@
         }
       }
     },
+    "watch-deps": {
+      "continuous": true,
+      "dependsOn": ["^watch"],
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "echo 'Watching upstream library dependencies' && tail -f /dev/null",
+        "cwd": "{projectRoot}"
+      }
+    },
     "serve": {
       "executor": "nx:run-commands",
       "defaultConfiguration": "development",
