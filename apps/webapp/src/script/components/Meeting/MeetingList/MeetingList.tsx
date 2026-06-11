@@ -40,7 +40,7 @@ export interface Meeting {
   schedule: string;
   conversation_id: string;
   title: string;
-  // Ask iOS and Android about how to identify this status
+  // TODO: Ask iOS and Android about how to identify this status
   attending?: boolean;
 }
 
