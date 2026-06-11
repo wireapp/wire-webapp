@@ -22,28 +22,33 @@ import {amplify} from 'amplify';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
-import {t} from 'Util/localizerUtil';
-
 import {ContextMenuEntry, showContextMenu} from './ContextMenu';
 
+type AvailabilityLabels = {
+  readonly none: string;
+  readonly available: string;
+  readonly busy: string;
+  readonly away: string;
+};
+
 export const AvailabilityContextMenu = {
-  show: (event: MouseEvent, elementName: string): void => {
+  show: (event: MouseEvent, elementName: string, labels: AvailabilityLabels): void => {
     const entries: ContextMenuEntry[] = [
       {
         click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.NONE),
-        label: t('userAvailabilityNone'),
+        label: labels.none,
       },
       {
         click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AVAILABLE),
-        label: t('userAvailabilityAvailable'),
+        label: labels.available,
       },
       {
         click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.BUSY),
-        label: t('userAvailabilityBusy'),
+        label: labels.busy,
       },
       {
         click: () => amplify.publish(WebAppEvents.USER.SET_AVAILABILITY, Availability.Type.AWAY),
-        label: t('userAvailabilityAway'),
+        label: labels.away,
       },
     ];
 

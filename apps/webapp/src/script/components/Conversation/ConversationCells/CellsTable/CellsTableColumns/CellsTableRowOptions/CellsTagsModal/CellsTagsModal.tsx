@@ -62,6 +62,7 @@ export const CellsTagsModal = ({
       onClose();
       onRefresh();
     },
+    commaValidationError: translate('cells.tagsModal.validationError.comma'),
   });
 
   const handleSave = async () => {

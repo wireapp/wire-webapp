@@ -25,7 +25,8 @@ import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {Config} from 'src/script/Config';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {Declension, joinNames, replaceLink, t} from 'Util/localizerUtil';
+import {useApplicationContext, type RootContextValue} from 'src/script/page/RootProvider';
+import {Declension, joinNames, replaceLink} from 'Util/localizerUtil';
 import {replaceReactComponents} from 'Util/localizerUtil/reactLocalizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
@@ -59,7 +60,7 @@ function ShowMoreButton({children, onClick}: {children: React.ReactNode; onClick
   );
 }
 
-function getContent(message: MemberMessageEntity) {
+function getContent(message: MemberMessageEntity, translate: RootContextValue['translate']) {
   if (!message.hasUsers()) {
     return '';
   }
@@ -85,33 +86,33 @@ function getContent(message: MemberMessageEntity) {
         if (message.allTeamMembers && exceedsMaxTeam) {
           const guestCount = targetedUsers.filter(userEntity => userEntity.isGuest()).length;
           if (!guestCount) {
-            return t('conversationCreateTeam');
+            return translate('conversationCreateTeam');
           }
 
           const hasSingleGuest = guestCount === 1;
           return hasSingleGuest
-            ? t('conversationCreateTeamGuest')
-            : t('conversationCreateTeamGuests', {count: guestCount});
+            ? translate('conversationCreateTeamGuest')
+            : translate('conversationCreateTeamGuests', {count: guestCount});
         }
 
         return exceedsMaxVisibleUsers
-          ? t('conversationCreateWithMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
-          : t('conversationCreateWith', {users: dativeUsers}, {}, true);
+          ? translate('conversationCreateWithMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
+          : translate('conversationCreateWith', {users: dativeUsers}, {}, true);
       }
 
       if (actor.isMe) {
         return exceedsMaxVisibleUsers
-          ? t('conversationCreatedYouMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
-          : t('conversationCreatedYou', {users: dativeUsers}, {}, true);
+          ? translate('conversationCreatedYouMore', {count: hiddenUsersCount.toString(), users: dativeUsers}, {}, true)
+          : translate('conversationCreatedYou', {users: dativeUsers}, {}, true);
       }
 
       return exceedsMaxVisibleUsers
-        ? t('conversationCreatedMore', {count: hiddenUsersCount.toString(), name, users: dativeUsers}, {}, true)
-        : t('conversationCreated', {name, users: dativeUsers}, {}, true);
+        ? translate('conversationCreatedMore', {count: hiddenUsersCount.toString(), name, users: dativeUsers}, {}, true)
+        : translate('conversationCreated', {name, users: dativeUsers}, {}, true);
     }
 
     case SystemMessageType.CONVERSATION_RESUME: {
-      return t('conversationResume', {users: generateNames(targetedUsers, Declension.DATIVE, false)}, {}, true);
+      return translate('conversationResume', {users: generateNames(targetedUsers, Declension.DATIVE, false)}, {}, true);
     }
 
     default:
@@ -123,23 +124,28 @@ function getContent(message: MemberMessageEntity) {
       const senderJoined = matchQualifiedIds(message.otherUser(), actor);
       if (senderJoined) {
         return message.user().isMe
-          ? t('conversationMemberJoinedSelfYou')
-          : t('conversationMemberJoinedSelf', {name: message.senderName()}, {}, true);
+          ? translate('conversationMemberJoinedSelfYou')
+          : translate('conversationMemberJoinedSelf', {name: message.senderName()}, {}, true);
       }
 
       if (message.user().isMe) {
         return exceedsMaxVisibleUsers
-          ? t('conversationMemberJoinedYouMore', {count: hiddenUsersCount.toString(), users: accusativeUsers}, {}, true)
-          : t('conversationMemberJoinedYou', {users: accusativeUsers}, {}, true);
+          ? translate(
+              'conversationMemberJoinedYouMore',
+              {count: hiddenUsersCount.toString(), users: accusativeUsers},
+              {},
+              true,
+            )
+          : translate('conversationMemberJoinedYou', {users: accusativeUsers}, {}, true);
       }
       return exceedsMaxVisibleUsers
-        ? t(
+        ? translate(
             'conversationMemberJoinedMore',
             {count: hiddenUsersCount.toString(), name, users: accusativeUsers},
             {},
             true,
           )
-        : t('conversationMemberJoined', {name, users: accusativeUsers}, {}, true);
+        : translate('conversationMemberJoined', {name, users: accusativeUsers}, {}, true);
     }
 
     case CONVERSATION_EVENT.MEMBER_LEAVE: {
@@ -150,47 +156,49 @@ function getContent(message: MemberMessageEntity) {
           'read-more-legal-hold',
         );
         if (message.userEntities().some(user => user.isMe)) {
-          return t('conversationYouRemovedMissingLegalHoldConsent', undefined, replaceLinkLegalHold);
+          return translate('conversationYouRemovedMissingLegalHoldConsent', undefined, replaceLinkLegalHold);
         }
         const users = generateNames(targetedUsers);
 
         if (message.userEntities().length === 1) {
-          return t('conversationMemberRemovedMissingLegalHoldConsent', {user: users}, replaceLinkLegalHold);
+          return translate('conversationMemberRemovedMissingLegalHoldConsent', {user: users}, replaceLinkLegalHold);
         }
         if (exceedsMaxVisibleUsers) {
-          return t(
+          return translate(
             'conversationMultipleMembersRemovedMissingLegalHoldConsentMore',
             {
-              count: hiddenUsersCount.toString(10),
+              count: hiddenUsersCount.toString(),
               users,
             },
             replaceLinkLegalHold,
             true,
           );
         }
-        return t('conversationMultipleMembersRemovedMissingLegalHoldConsent', {users}, replaceLinkLegalHold);
+        return translate('conversationMultipleMembersRemovedMissingLegalHoldConsent', {users}, replaceLinkLegalHold);
       }
       const temporaryGuestRemoval = message.otherUser().isMe && message.otherUser().isTemporaryGuest();
       if (temporaryGuestRemoval) {
-        return t('temporaryGuestLeaveMessage');
+        return translate('temporaryGuestLeaveMessage');
       }
 
       const senderLeft = matchQualifiedIds(message.otherUser(), actor);
       if (senderLeft) {
-        return message.user().isMe ? t('conversationMemberLeftYou') : t('conversationMemberLeft', {name}, {}, true);
+        return message.user().isMe
+          ? translate('conversationMemberLeftYou')
+          : translate('conversationMemberLeft', {name}, {}, true);
       }
 
       const allUsers = generateNames(targetedUsers);
       if (!actor.id) {
-        return t('conversationMemberWereRemoved', {users: allUsers}, {}, true);
+        return translate('conversationMemberWereRemoved', {users: allUsers}, {}, true);
       }
       return actor.isMe
-        ? t('conversationMemberRemovedYou', {users: allUsers}, {}, true)
-        : t('conversationMemberRemoved', {name, users: allUsers}, {}, true);
+        ? translate('conversationMemberRemovedYou', {users: allUsers}, {}, true)
+        : translate('conversationMemberRemoved', {name, users: allUsers}, {}, true);
     }
 
     case ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE: {
-      return t('conversationTeamLeft', {name}, {}, true);
+      return translate('conversationTeamLeft', {name}, {}, true);
     }
 
     default:
@@ -206,7 +214,8 @@ export function MessageContent({
   message: MemberMessageEntity;
   onClickParticipants: (participants: User[]) => void;
 }) {
-  const htmlCaption = getContent(message);
+  const {translate} = useApplicationContext();
+  const htmlCaption = getContent(message, translate);
   const content = replaceReactComponents(htmlCaption, [
     {start: '<strong>', end: '</strong>', render: text => <strong key={text}>{text}</strong>},
     {

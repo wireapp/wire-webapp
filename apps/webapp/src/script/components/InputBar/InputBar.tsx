@@ -47,6 +47,7 @@ import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndica
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
+import {getFileExtension} from 'Util/util';
 
 import {MessageContent} from './common/messageContent/messageContent';
 import {FilePreviews} from './FilePreviews/FilePreviews';
@@ -209,6 +210,11 @@ export const InputBar = ({
     uploadDroppedFiles,
     uploadImages,
     isFileNameKept: isCellsEnabled,
+    createPastedFileName(date, originalFileName) {
+      return `${translate('conversationSendPastedFile', {date})}.${getFileExtension(originalFileName)}`;
+    },
+    restrictedFileSharingMessage: translate('conversationModalRestrictedFileSharingDescription'),
+    restrictedFileSharingTitle: translate('conversationModalRestrictedFileSharingHeadline'),
   });
 
   const showMarkdownPreview = useUserPropertyValue<boolean>(
@@ -241,6 +247,7 @@ export const InputBar = ({
     editorRef,
     pastedFile: fileHandling.pastedFile,
     sendPastedFile: fileHandling.sendPastedFile,
+    translate,
   });
 
   if (fileHandling.pastedFile && !!isCellsEnabled) {
@@ -252,6 +259,10 @@ export const InputBar = ({
     conversation,
     messageRepository,
     is1to1,
+    pingActionText: translate('tooltipConversationPing'),
+    confirmationTitle: translate('conversationPingConfirmTitle', {
+      memberCount: conversation.participating_user_ets().length.toString(),
+    }),
   });
 
   const giphy = useGiphy({

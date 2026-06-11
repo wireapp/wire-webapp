@@ -209,6 +209,7 @@ export const CallingCell = ({
     toggleMute,
     isMuted: isCurrentlyMuted,
     enabled: isPressSpaceToUnmuteEnabled,
+    notificationMessage: translate('videoCallParticipantPressSpaceToUnmuteNotification'),
   });
 
   const screenSharingEndedNotification = useAppNotification({

@@ -48,6 +48,11 @@ export const CellsRenameNodeModal = ({
       onClose();
       onRefresh();
     },
+    renameNodeCopy: {
+      error: translate('cells.renameNodeModal.error'),
+      invalidCharacters: translate('cells.renameNodeModal.invalidCharacters'),
+      nameRequired: translate('cells.renameNodeModal.nameRequired'),
+    },
   });
 
   return (

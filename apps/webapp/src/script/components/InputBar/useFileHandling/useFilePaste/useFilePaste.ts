@@ -20,16 +20,24 @@
 import {useCallback, useEffect} from 'react';
 
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
-import {t} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
-import {getFileExtension, sanitizeFilename} from 'Util/util';
+import {sanitizeFilename} from 'Util/util';
 
 interface UseFilePasteParams {
   onFilePasted: (file: File) => void;
   isFileNameKept?: boolean;
+  createPastedFileName: (date: string, originalFileName: string) => string;
+  restrictedFileSharingMessage: string;
+  restrictedFileSharingTitle: string;
 }
 
-export const useFilePaste = ({onFilePasted, isFileNameKept}: UseFilePasteParams) => {
+export const useFilePaste = ({
+  onFilePasted,
+  isFileNameKept,
+  createPastedFileName,
+  restrictedFileSharingMessage,
+  restrictedFileSharingTitle,
+}: UseFilePasteParams) => {
   const processClipboardFiles = useCallback(
     (files: FileList | File[]): void => {
       const pastedFile = Array.isArray(files) ? files[0] : files.item(0);
@@ -40,10 +48,7 @@ export const useFilePaste = ({onFilePasted, isFileNameKept}: UseFilePasteParams)
       const {lastModified} = pastedFile;
 
       const date = formatLocale(lastModified > 0 ? lastModified : new Date(), 'PP, pp');
-      const rawFileName =
-        isFileNameKept === true
-          ? pastedFile.name
-          : `${t('conversationSendPastedFile', {date})}.${getFileExtension(pastedFile.name)}`;
+      const rawFileName = isFileNameKept === true ? pastedFile.name : createPastedFileName(date, pastedFile.name);
 
       // Sanitize the filename to avoid encoding issues with locale-specific characters
       const fileName = sanitizeFilename(rawFileName);
@@ -54,7 +59,7 @@ export const useFilePaste = ({onFilePasted, isFileNameKept}: UseFilePasteParams)
 
       onFilePasted(newFile);
     },
-    [onFilePasted, isFileNameKept],
+    [createPastedFileName, isFileNameKept, onFilePasted],
   );
 
   const handlePasteEvent = useCallback(
@@ -67,11 +72,14 @@ export const useFilePaste = ({onFilePasted, isFileNameKept}: UseFilePasteParams)
       const files = event.clipboardData?.files;
 
       if (files !== undefined && files.length > 0) {
-        const permissionHandler = checkFileSharingPermission(processClipboardFiles);
+        const permissionHandler = checkFileSharingPermission(processClipboardFiles, {
+          title: restrictedFileSharingTitle,
+          message: restrictedFileSharingMessage,
+        });
         permissionHandler(files);
       }
     },
-    [processClipboardFiles],
+    [processClipboardFiles, restrictedFileSharingMessage, restrictedFileSharingTitle],
   );
 
   useEffect(() => {

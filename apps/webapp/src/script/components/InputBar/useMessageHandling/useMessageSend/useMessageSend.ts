@@ -39,8 +39,8 @@ import {ConversationError} from 'src/script/error/conversationError';
 import {MentionEntity} from 'src/script/message/MentionEntity';
 import {MessageHasher} from 'src/script/message/MessageHasher';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
+import type {RootContextValue} from 'src/script/page/RootProvider';
 import {isErrorWithType} from 'src/script/util/typePredicateUtil';
-import {t} from 'Util/localizerUtil';
 
 import {useSendFiles} from './useSendFiles/useSendFiles';
 
@@ -62,6 +62,7 @@ interface UseMessageSendProps {
   pastedFile: File | null;
   sendPastedFile: () => void;
   messageContent: MessageContent;
+  translate: RootContextValue['translate'];
 }
 
 export const useMessageSend = ({
@@ -80,6 +81,7 @@ export const useMessageSend = ({
   pastedFile,
   sendPastedFile,
   messageContent,
+  translate,
 }: UseMessageSendProps) => {
   const {getFiles, clearAll} = useFileUploadState();
   const files = getFiles({conversationId: conversation.id});
@@ -88,7 +90,13 @@ export const useMessageSend = ({
     sendFiles,
     clearFiles,
     isLoading: filesSendingLoading,
-  } = useSendFiles({files, clearAllFiles: clearAll, cellsRepository, conversationId: conversation.id});
+  } = useSendFiles({
+    files,
+    clearAllFiles: clearAll,
+    cellsRepository,
+    conversationId: conversation.id,
+    sendFilesErrorMessage: translate('conversationSendFilesError'),
+  });
 
   const cellsEnabled = Config.getConfig().FEATURE.ENABLE_CELLS;
 
@@ -215,8 +223,8 @@ export const useMessageSend = ({
 
     if (isMessageTextTooLong) {
       showWarningModal(
-        t('modalConversationMessageTooLongHeadline'),
-        t('modalConversationMessageTooLongMessage', {number: config.MAXIMUM_MESSAGE_LENGTH}),
+        translate('modalConversationMessageTooLongHeadline'),
+        translate('modalConversationMessageTooLongMessage', {number: config.MAXIMUM_MESSAGE_LENGTH}),
       );
 
       return;
@@ -245,6 +253,7 @@ export const useMessageSend = ({
     isSendingDisabled,
     sendFiles,
     clearFiles,
+    translate,
   ]);
 
   const handleSendMessage = useCallback(async () => {
@@ -258,21 +267,21 @@ export const useMessageSend = ({
             conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
             void sendMessage();
           },
-          text: t('conversation.E2EISendAnyway'),
+          text: translate('conversation.E2EISendAnyway'),
         },
         primaryAction: {
           action: () => {},
-          text: t('conversation.E2EICancel'),
+          text: translate('conversation.E2EICancel'),
         },
         text: {
-          message: t('conversation.E2EIDegradedNewMessage'),
-          title: t('conversation.E2EIConversationNoLongerVerified'),
+          message: translate('conversation.E2EIDegradedNewMessage'),
+          title: translate('conversation.E2EIConversationNoLongerVerified'),
         },
       });
     } else {
       void sendMessage();
     }
-  }, [conversation, conversationRepository, sendMessage]);
+  }, [conversation, conversationRepository, sendMessage, translate]);
 
   return {
     sendMessage: handleSendMessage,

@@ -17,7 +17,7 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -29,9 +29,19 @@ interface UseFileHandlingProps {
   uploadDroppedFiles: (files: File[]) => void;
   uploadImages: (images: File[]) => void;
   isFileNameKept?: boolean;
+  createPastedFileName: (date: string, originalFileName: string) => string;
+  restrictedFileSharingMessage: string;
+  restrictedFileSharingTitle: string;
 }
 
-export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKept}: UseFileHandlingProps) => {
+export const useFileHandling = ({
+  uploadDroppedFiles,
+  uploadImages,
+  isFileNameKept,
+  createPastedFileName,
+  restrictedFileSharingMessage,
+  restrictedFileSharingTitle,
+}: UseFileHandlingProps) => {
   const [pastedFile, setPastedFile] = useState<File | null>(null);
 
   useFilePaste({
@@ -39,22 +49,30 @@ export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKep
       setPastedFile(file);
     },
     isFileNameKept,
+    createPastedFileName,
+    restrictedFileSharingMessage,
+    restrictedFileSharingTitle,
   });
 
-  const clearPastedFile = () => setPastedFile(null);
+  const clearPastedFile = useCallback(() => {
+    setPastedFile(null);
+  }, []);
 
-  const sendPastedFile = () => {
+  const sendPastedFile = useCallback(() => {
     if (pastedFile) {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
-  };
+  }, [clearPastedFile, pastedFile, uploadDroppedFiles]);
 
-  const sendImageOnEnterClick = (event: KeyboardEvent) => {
-    if (event.key === 'Enter' && !event.shiftKey && !event.altKey && !event.metaKey) {
-      sendPastedFile();
-    }
-  };
+  const sendImageOnEnterClick = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && !event.shiftKey && !event.altKey && !event.metaKey) {
+        void sendPastedFile();
+      }
+    },
+    [sendPastedFile],
+  );
 
   useEffect(() => {
     if (!pastedFile) {
@@ -66,7 +84,7 @@ export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKep
     return () => {
       window.removeEventListener('keydown', sendImageOnEnterClick);
     };
-  }, [pastedFile]);
+  }, [pastedFile, sendImageOnEnterClick]);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
@@ -74,7 +92,7 @@ export const useFileHandling = ({uploadDroppedFiles, uploadImages, isFileNameKep
     return () => {
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
     };
-  }, []);
+  }, [uploadImages]);
 
   return {
     pastedFile,

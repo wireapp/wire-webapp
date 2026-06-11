@@ -26,7 +26,7 @@ import {MenuItem} from 'Components/panel/PanelActions';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import * as UserPermission from 'Repositories/user/userPermission';
-import {t} from 'Util/localizerUtil';
+import type {RootContextValue} from 'src/script/page/RootProvider';
 
 import {Config} from '../../../../Config';
 import {ActionsViewModel} from '../../../../view_model/ActionsViewModel';
@@ -39,6 +39,7 @@ interface GetConversationActionsParams {
   isServiceMode?: boolean;
   isTeam?: boolean;
   isParticipantBlocked?: boolean;
+  translate: RootContextValue['translate'];
 }
 
 const getConversationActions = ({
@@ -49,6 +50,7 @@ const getConversationActions = ({
   isServiceMode = false,
   isTeam = false,
   isParticipantBlocked = false,
+  translate,
 }: GetConversationActionsParams): MenuItem[] => {
   if (!conversationEntity) {
     return [];
@@ -70,7 +72,7 @@ const getConversationActions = ({
         click: () => amplify.publish(WebAppEvents.CONVERSATION.CREATE_GROUP, 'conversation_details', userEntity),
         Icon: Icon.GroupIcon,
         identifier: 'go-create-group',
-        label: t('conversationDetailsActionCreateGroup'),
+        label: translate('conversationDetailsActionCreateGroup'),
       },
     },
     {
@@ -79,7 +81,7 @@ const getConversationActions = ({
         click: async () => actionsViewModel.archiveConversation(conversationEntity),
         Icon: Icon.ArchiveIcon,
         identifier: 'do-archive',
-        label: t('conversationDetailsActionArchive'),
+        label: translate('conversationDetailsActionArchive'),
       },
     },
     {
@@ -88,7 +90,7 @@ const getConversationActions = ({
         click: async () => actionsViewModel.unarchiveConversation(conversationEntity),
         Icon: Icon.ArchiveIcon,
         identifier: 'do-unarchive',
-        label: t('conversationsPopoverUnarchive'),
+        label: translate('conversationsPopoverUnarchive'),
       },
     },
     {
@@ -102,7 +104,7 @@ const getConversationActions = ({
         },
         Icon: Icon.CloseIcon,
         identifier: 'do-cancel-request',
-        label: t('conversationDetailsActionCancelRequest'),
+        label: translate('conversationDetailsActionCancelRequest'),
       },
     },
     {
@@ -111,7 +113,7 @@ const getConversationActions = ({
         click: () => actionsViewModel.clearConversation(conversationEntity),
         Icon: Icon.EraserIcon,
         identifier: 'do-clear',
-        label: t('conversationDetailsActionClear'),
+        label: translate('conversationDetailsActionClear'),
       },
     },
     {
@@ -125,7 +127,7 @@ const getConversationActions = ({
         },
         Icon: Icon.BlockIcon,
         identifier: 'do-block',
-        label: t('conversationDetailsActionBlock'),
+        label: translate('conversationDetailsActionBlock'),
       },
     },
     {
@@ -139,7 +141,7 @@ const getConversationActions = ({
         },
         Icon: Icon.BlockIcon,
         identifier: 'do-unblock',
-        label: t('conversationDetailsActionUnblock'),
+        label: translate('conversationDetailsActionUnblock'),
       },
     },
     {
@@ -148,7 +150,9 @@ const getConversationActions = ({
         click: async () => actionsViewModel.leaveConversation(conversationEntity),
         Icon: Icon.LeaveIcon,
         identifier: 'do-leave',
-        label: conversationEntity.isChannel() ? t('channelDetailsActionLeave') : t('groupDetailsActionLeave'),
+        label: conversationEntity.isChannel()
+          ? translate('channelDetailsActionLeave')
+          : translate('groupDetailsActionLeave'),
       },
     },
     {
@@ -162,7 +166,9 @@ const getConversationActions = ({
         click: () => actionsViewModel.deleteConversation(conversationEntity),
         Icon: Icon.DeleteIcon,
         identifier: 'do-delete',
-        label: conversationEntity.isChannel() ? t('channelDetailsActionDelete') : t('groupDetailsActionDelete'),
+        label: conversationEntity.isChannel()
+          ? translate('channelDetailsActionDelete')
+          : translate('groupDetailsActionDelete'),
       },
     },
     {
@@ -174,7 +180,7 @@ const getConversationActions = ({
         click: () => actionsViewModel.removeConversation(conversationEntity),
         Icon: Icon.CloseIcon,
         identifier: 'do-remove',
-        label: t('conversationDetailsActionDeleteForMe'),
+        label: translate('conversationDetailsActionDeleteForMe'),
       },
     },
   ];

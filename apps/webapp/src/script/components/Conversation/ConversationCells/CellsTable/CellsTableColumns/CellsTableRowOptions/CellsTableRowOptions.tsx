@@ -129,6 +129,7 @@ const CellsTableRowOptionsContent = ({
   const {deleteNode} = useDeleteNode({
     conversationQualifiedId,
     cellsRepository,
+    deleteNodeFailedMessage: translate('cells.deleteModal.error'),
   });
 
   const isRootRecycleBin = isRootRecycleBinPath();

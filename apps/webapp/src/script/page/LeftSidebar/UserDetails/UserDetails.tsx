@@ -37,12 +37,17 @@ import {AvailabilityContextMenu} from '../../../ui/AvailabilityContextMenu';
 interface AvailabilityStateButtonWrapperProps {
   children: React.ReactElement;
   isTeam: boolean;
+  showAvailabilityContextMenu: (event: MouseEvent) => void;
 }
 
-const AvailabilityStateButtonWrapper = ({children, isTeam = false}: AvailabilityStateButtonWrapperProps) => {
+const AvailabilityStateButtonWrapper = ({
+  children,
+  isTeam = false,
+  showAvailabilityContextMenu,
+}: AvailabilityStateButtonWrapperProps) => {
   return isTeam ? (
     <button
-      onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
+      onClick={event => showAvailabilityContextMenu(event.nativeEvent)}
       className="button-reset-default user-details-avatar"
     >
       {children}
@@ -70,9 +75,18 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
 
   const showLegalHold = isOnLegalHold || hasPendingLegalHold;
 
+  const showAvailabilityContextMenu = (event: MouseEvent) => {
+    AvailabilityContextMenu.show(event, 'left-list-availability-menu', {
+      none: translate('userAvailabilityNone'),
+      available: translate('userAvailabilityAvailable'),
+      busy: translate('userAvailabilityBusy'),
+      away: translate('userAvailabilityAway'),
+    });
+  };
+
   return (
     <div css={styles.wrapper(isSideBarOpen)}>
-      <AvailabilityStateButtonWrapper isTeam={isTeam}>
+      <AvailabilityStateButtonWrapper isTeam={isTeam} showAvailabilityContextMenu={showAvailabilityContextMenu}>
         <Avatar
           className={cx('see-through', {'user-details-avatar': !isTeam})}
           participant={user}
@@ -85,10 +99,7 @@ const UserDetailsComponent = ({user, isTeam = false, groupId, isSideBarOpen = fa
         {isTeam ? (
           <>
             <div css={styles.userDetails} data-uie-name="status-availability">
-              <button
-                css={styles.userFullName}
-                onClick={event => AvailabilityContextMenu.show(event.nativeEvent, 'left-list-availability-menu')}
-              >
+              <button css={styles.userFullName} onClick={event => showAvailabilityContextMenu(event.nativeEvent)}>
                 <span data-uie-name="status-label" css={{...styles.userName, ...styles.textEllipsis}} title={userName}>
                   {userName}
                 </span>

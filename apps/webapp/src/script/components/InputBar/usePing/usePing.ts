@@ -24,16 +24,19 @@ import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 interface UsePingProps {
   conversation: Conversation;
   messageRepository: MessageRepository;
   is1to1: boolean;
+  confirmationTitle: string;
+  pingActionText: string;
 }
 
-export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps) => {
+const pingResetDelaySeconds = 2;
+
+export const usePing = ({conversation, messageRepository, is1to1, confirmationTitle, pingActionText}: UsePingProps) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const [isPingDisabled, setIsPingDisabled] = useState(false);
 
@@ -44,7 +47,7 @@ export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps)
     setIsPingDisabled(true);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await messageRepository.sendPing(conversation);
-      window.setTimeout(() => setIsPingDisabled(false), TIME_IN_MILLIS.SECOND * 2);
+      window.setTimeout(() => setIsPingDisabled(false), TIME_IN_MILLIS.SECOND * pingResetDelaySeconds);
     });
   };
 
@@ -60,10 +63,10 @@ export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps)
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: pingConversation,
-          text: t('tooltipConversationPing'),
+          text: pingActionText,
         },
         text: {
-          title: t('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
+          title: confirmationTitle,
         },
       });
     }

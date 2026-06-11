@@ -91,6 +91,13 @@ export const CellsMoveNodeModal = ({
     },
     currentPath,
     isOpen,
+    validationCopy: {
+      genericError: translate('cells.newItemMenuModalForm.genericError'),
+      alreadyExistsError: translate('cells.newItemMenuModalForm.alreadyExistsError'),
+      invalidCharactersError: translate('cells.newItemMenuModalForm.invalidCharactersError'),
+      maxLengthError: translate('cells.newItemMenuModalForm.maxLengthError'),
+      nameRequired: translate('cells.newItemMenuModalForm.nameRequired'),
+    },
   });
 
   useEffect(() => {

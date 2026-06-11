@@ -51,7 +51,7 @@ import {useApplicationContext, useMainViewModel} from 'src/script/page/RootProvi
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
-import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
+import {CONCURRENT_UPLOAD_LIMIT, isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {getLogger} from 'Util/logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
 import {formatBytes} from 'Util/util';
@@ -144,6 +144,9 @@ export const Conversation = ({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
+  const uploadLimitMessage = translate('modalAssetParallelUploadsMessage', {number: CONCURRENT_UPLOAD_LIMIT});
+  const uploadLimitTitle = translate('modalAssetParallelUploadsHeadline');
+
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
   useEffect(() => {
@@ -156,7 +159,10 @@ export const Conversation = ({
 
   const uploadImages = useCallback(
     (images: File[]) => {
-      if (!activeConversation || isHittingUploadLimit(images, repositories.asset)) {
+      if (
+        !activeConversation ||
+        isHittingUploadLimit(images, repositories.asset, {message: uploadLimitMessage, title: uploadLimitTitle})
+      ) {
         return;
       }
 
@@ -177,7 +183,7 @@ export const Conversation = ({
 
       repositories.message.uploadImages(activeConversation, images);
     },
-    [activeConversation, repositories.asset, repositories.message, translate],
+    [activeConversation, repositories.asset, repositories.message, translate, uploadLimitMessage, uploadLimitTitle],
   );
 
   const uploadFiles = useCallback(
@@ -207,7 +213,7 @@ export const Conversation = ({
 
       const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-      if (!isHittingUploadLimit(files, repositories.asset)) {
+      if (!isHittingUploadLimit(files, repositories.asset, {message: uploadLimitMessage, title: uploadLimitTitle})) {
         for (const file of fileArray) {
           const isFileTooLarge = file.size > uploadLimit;
 
@@ -234,6 +240,8 @@ export const Conversation = ({
       repositories.message,
       selfUser,
       translate,
+      uploadLimitMessage,
+      uploadLimitTitle,
     ],
   );
 
@@ -242,7 +250,12 @@ export const Conversation = ({
       const images: File[] = [];
       const files: File[] = [];
 
-      if (!isHittingUploadLimit(droppedFiles, repositories.asset)) {
+      if (
+        !isHittingUploadLimit(droppedFiles, repositories.asset, {
+          message: uploadLimitMessage,
+          title: uploadLimitTitle,
+        })
+      ) {
         Array.from(droppedFiles).forEach(file => {
           const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type);
 
@@ -257,7 +270,7 @@ export const Conversation = ({
         uploadFiles(files);
       }
     },
-    [repositories.asset, uploadFiles, uploadImages],
+    [repositories.asset, uploadFiles, uploadImages, uploadLimitMessage, uploadLimitTitle],
   );
 
   const openGiphy = (text: string) => {
@@ -586,7 +599,10 @@ export const Conversation = ({
       isCellsEnabled={isCellsEnabled}
       isConversationLoaded={isConversationLoaded}
       activeConversationId={activeConversation?.id}
-      onFileDropped={checkFileSharingPermission(uploadDroppedFiles)}
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles, {
+        title: translate('conversationModalRestrictedFileSharingHeadline'),
+        message: translate('conversationModalRestrictedFileSharingDescription'),
+      })}
       rootProps={getRootProps()}
       inputProps={getInputProps()}
     >
@@ -716,7 +732,10 @@ export const Conversation = ({
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
-                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile)}
+                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile, {
+                    title: translate('conversationModalRestrictedFileSharingHeadline'),
+                    message: translate('conversationModalRestrictedFileSharingDescription'),
+                  })}
                   onCellImageUpload={openImageFilesView}
                   onCellAssetUpload={openAllFilesView}
                 />

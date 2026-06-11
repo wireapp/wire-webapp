@@ -119,6 +119,7 @@ const ConversationDetailsOptions = ({
     isServiceMode,
     isTeam,
     isParticipantBlocked,
+    translate,
   });
 
   const isActiveGroupParticipant = isGroupOrChannel && !isSelfUserRemoved;

@@ -74,13 +74,19 @@ export const useFilesUploadDropzone = ({
     noKeyboard: true,
     disabled: isDisabled,
     accept,
-    onDrop: checkFileSharingPermission((acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-      void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
-        (error: unknown) => {
-          logger.error('Processing incoming files failed', error);
-        },
-      );
-    }),
+    onDrop: checkFileSharingPermission(
+      (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+        void processIncomingFiles(acceptedFiles, rejectedFiles, files, MAX_SIZE, MAX_FILES, conversation.id).catch(
+          (error: unknown) => {
+            logger.error('Processing incoming files failed', error);
+          },
+        );
+      },
+      {
+        title: translate('conversationModalRestrictedFileSharingHeadline'),
+        message: translate('conversationModalRestrictedFileSharingDescription'),
+      },
+    ),
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);
       showFileDropzoneErrorModal({
