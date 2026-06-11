@@ -187,7 +187,7 @@ export const Modal: React.FC<ModalProps & React.HTMLProps<HTMLDivElement>> = ({
   ...props
 }) => (
   <OverlayWrapper {...props} data-uie-name="modal">
-    <ModalBody fullscreen={fullscreen} style={bodyStyle}>
+    <ModalBody fullscreen={fullscreen} style={bodyStyle} role="dialog">
       <ModalContent>{children}</ModalContent>
       {onClose !== noop && <ModalClose onClick={onClose} data-uie-name="do-close" />}
       {actions.length > 0 && <ModalActions actions={actions} data-uie-name="modal-actions" />}
