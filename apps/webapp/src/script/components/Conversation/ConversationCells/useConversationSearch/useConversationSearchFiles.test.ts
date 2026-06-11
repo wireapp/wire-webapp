@@ -17,7 +17,7 @@
  *
  */
 
-import {act, renderHook} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import {RestNodeCollection} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
@@ -27,13 +27,14 @@ import {CellNode, CellNodeType} from 'src/script/types/cellNode';
 
 import {useConversationSearchFiles} from './useConversationSearchFiles';
 
+import type {ConversationDriveFiltersState} from '../common/driveFilters/driveFilters';
 import {useCellsStore} from '../common/useCellsStore/useCellsStore';
 
 const CONV_ID = 'conv-abc';
 const DOMAIN = 'staging.zinfra.io';
 const QUALIFIED_ID = {id: CONV_ID, domain: DOMAIN};
 
-const emptyFilters = {
+const emptyFilters: ConversationDriveFiltersState = {
   selectedTagIds: [],
   selectedFileTypeIds: [],
   selectedCreatorIds: [],
@@ -80,12 +81,14 @@ function renderSearchHook({
   enabled = true,
   onClear = jest.fn(),
   fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
+  filters = emptyFilters,
 }: {
   cellsRepository?: FakeCellsRepository;
   userRepository?: FakeUserRepository;
   enabled?: boolean;
   onClear?: () => void;
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
+  filters?: ConversationDriveFiltersState;
 } = {}) {
   return {
     fireAndForgetInvoker,
@@ -97,7 +100,7 @@ function renderSearchHook({
         conversationQualifiedId: QUALIFIED_ID,
         enabled,
         fireAndForgetInvoker,
-        filters: emptyFilters,
+        filters,
         onClear,
       }),
     ),
@@ -125,7 +128,7 @@ describe('useConversationSearchFiles', () => {
     expect(cellsRepository.searchNodes).not.toHaveBeenCalled();
   });
 
-  it('loads the conversation root when opening search from inside a folder', async () => {
+  it('uses the current folder as the search root when opening search from inside a folder', async () => {
     window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/MyFolder`;
     const cellsRepository = createFakeCellsRepository();
     const {fireAndForgetInvoker} = renderSearchHook({cellsRepository});
@@ -133,7 +136,7 @@ describe('useConversationSearchFiles', () => {
 
     expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
       expect.objectContaining({
-        path: `${CONV_ID}@${DOMAIN}`,
+        path: `${CONV_ID}@${DOMAIN}/MyFolder`,
         recursive: false,
         deleted: false,
         sortBy: undefined,
@@ -206,6 +209,49 @@ describe('useConversationSearchFiles', () => {
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(0);
+  });
+
+  it('searches recursively within the current folder when the user types a query', async () => {
+    window.location.hash = `#/conversation/${CONV_ID}/${DOMAIN}/files/Arjita`;
+    const cellsRepository = createFakeCellsRepository();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const {result} = renderSearchHook({cellsRepository, fireAndForgetInvoker});
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => result.current.handleSearch('doc'));
+
+    await waitFor(() =>
+      expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
+        expect.objectContaining({
+          query: 'doc',
+          recursive: true,
+          path: `${CONV_ID}@${DOMAIN}/Arjita`,
+        }),
+      ),
+    );
+  });
+
+  it('searches recursively when an active filter is applied without a text query', async () => {
+    const cellsRepository = createFakeCellsRepository();
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+
+    renderSearchHook({
+      cellsRepository,
+      fireAndForgetInvoker,
+      filters: {
+        ...emptyFilters,
+        selectedFileTypeIds: ['pictures'],
+      },
+    });
+
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(cellsRepository.searchNodes).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recursive: true,
+      }),
+    );
   });
 
   it('calls onClear when the search input is emptied', async () => {

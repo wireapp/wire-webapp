@@ -33,6 +33,7 @@ import {
   hasActiveSearchParams,
   toConversationDriveSearchParams,
 } from '../common/driveFilters/driveFilters';
+import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {LOAD_MORE_INCREMENT, LOAD_MORE_INITIAL_SIZE} from '../common/loadMorePagination/loadMorePagination';
 import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
@@ -108,12 +109,15 @@ export const useConversationSearchFiles = ({
         // recency sort for searches inside the recycle bin only
         const forceRecencySort = isRecycleBin && hasQuery;
 
+        // search scopes to the folder the user is browsing
+        const searchRootPath = getCellsApiPath({conversationQualifiedId: {id, domain}});
+
         const result = await cellsRepository.searchNodes({
           query,
           recursive: isSearchingOrFiltering,
           limit: append ? LOAD_MORE_INCREMENT : LOAD_MORE_INITIAL_SIZE,
           offset,
-          path: `${id}@${domain}`,
+          path: searchRootPath,
           sortBy: forceRecencySort ? 'mtime' : undefined,
           sortDirection: forceRecencySort ? 'desc' : undefined,
           deleted: isRecycleBin,
