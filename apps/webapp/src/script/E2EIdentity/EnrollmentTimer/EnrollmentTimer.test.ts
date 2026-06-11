@@ -20,7 +20,7 @@
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
 
-import {getEnrollmentTimer, messageRetentionTime} from './EnrollmentTimer';
+import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './EnrollmentTimer';
 
 import {MLSStatuses} from '../E2EIdentityVerification';
 
@@ -98,5 +98,21 @@ describe('e2ei delays', () => {
 
     expect(isSnoozable).toBeTruthy();
     expect(firingDate).toBe(gracePeriodStartingPoint);
+  });
+
+  it.each([
+    TimeInMillis.HOUR,
+    TimeInMillis.HOUR * 6,
+    TimeInMillis.HOUR * 12,
+    TimeInMillis.HOUR * 24,
+    TimeInMillis.WEEK,
+  ])('should keep full remaining grace period for first enrollment: %i ms', grace => {
+    const remainingDelay = getRemainingGracePeriodDelay(
+      undefined,
+      Date.now(),
+      grace,
+    );
+
+    expect(remainingDelay).toBe(grace);
   });
 });

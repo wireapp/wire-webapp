@@ -102,6 +102,15 @@ export function getEnrollmentTimer(
   return {isSnoozable: nextTick > 0, firingDate: Date.now() + nextTick};
 }
 
+export function getRemainingGracePeriodDelay(
+  identity: WireIdentity | undefined,
+  e2eiActivatedAt: number,
+  teamGracePeriodDuration: number,
+): number {
+  const {end} = getGracePeriod(identity, e2eiActivatedAt, teamGracePeriodDuration);
+  return Math.max(0, end - Date.now());
+}
+
 export function hasGracePeriodStartedForSelfClient(
   identity: WireIdentity | undefined,
   e2eiActivatedAt: number,
