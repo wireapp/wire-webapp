@@ -137,12 +137,9 @@ const useSidebarStore = create<SidebarStore>()(
       storage: createJSONStorage(() => localStorage),
       partialize: state => ({
         status: state.status,
-        currentTab: [
-          SidebarTabs.PREFERENCES,
-          SidebarTabs.CONNECT,
-          SidebarTabs.CELLS,
-          SidebarTabs.MEETINGS,
-        ].includes(state.currentTab)
+        currentTab: [SidebarTabs.PREFERENCES, SidebarTabs.CONNECT, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(
+          state.currentTab,
+        )
           ? SidebarTabs.RECENT
           : state.currentTab,
         visibleTabs: state.visibleTabs,

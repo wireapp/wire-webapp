@@ -74,9 +74,10 @@ const MeetingListItemGroupComponent = ({
 
       {groupBy === MeetingGroupBy.NONE && (
         <div>
-          {nonEmptyGroups.flatMap(([, items]) => items.map(item => (
-            <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
-          )),
+          {nonEmptyGroups.flatMap(([, items]) =>
+            items.map(item => (
+              <MeetingListItem key={`meeting-list-item-${item.title}-${item.start_date}`} nowMs={nowMs} {...item} />
+            )),
           )}
         </div>
       )}

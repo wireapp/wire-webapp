@@ -20,7 +20,10 @@
 import {memo, useMemo} from 'react';
 
 import {TodayAndOngoingSectionProps} from 'Components/Meeting/MeetingList/MeetingList';
-import {MeetingGroupBy, MeetingListItemGroup} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
+import {
+  MeetingGroupBy,
+  MeetingListItemGroup,
+} from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
 import {groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {getOnGoingMeetingsAt} from 'Components/Meeting/utils/MeetingStatusUtil';
 
