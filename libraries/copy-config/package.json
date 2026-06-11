@@ -16,7 +16,7 @@
   "dependencies": {
     "axios": "1.17.0",
     "copy": "0.3.2",
-    "cosmiconfig": "9.0.0",
+    "cosmiconfig": "9.0.2",
     "fs-extra": "11.3.5",
     "jszip": "3.10.1",
     "logdown": "3.3.1",
