@@ -93,7 +93,7 @@ export class ReconnectingWebsocket {
 
   private readonly logger: logdown.Logger;
   private socket?: ReconnectingWebsocketWrapper;
-  private pingerId?: ReturnType<typeof globalThis.setInterval>;
+  private pingerId?: IntervalIdentifier;
   private readonly PING_INTERVAL = TimeUtil.TimeInMillis.SECOND * 20;
   private hasUnansweredPing: boolean;
   private onOpen?: (event: Event) => void;
