@@ -28,6 +28,8 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 
+import {createRequestVersionGate} from './requestVersionGate';
+
 import {
   ConversationDriveFiltersState,
   hasActiveSearchParams,
@@ -73,6 +75,7 @@ export const useConversationSearchFiles = ({
   const shouldPerformSearch = useRef(false);
   const hasFiredInitialFetchRef = useRef(false);
   const wasEnabledRef = useRef(false);
+  const requestVersionGate = useRef(createRequestVersionGate());
   // Prevents stale in-flight responses from overwriting the store after the search view closes.
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
@@ -84,6 +87,12 @@ export const useConversationSearchFiles = ({
   const hadActiveSearchParamsRef = useRef(hasActiveParams);
 
   const {id, domain} = conversationQualifiedId;
+
+  const isCurrentSearchRequest = useCallback((requestVersion: number): boolean => {
+    return (
+      (enabledRef.current || allowSearchWhenDisabledRef.current) && !requestVersionGate.current.isStale(requestVersion)
+    );
+  }, []);
 
   const searchNodes = useCallback(
     async ({
@@ -97,6 +106,8 @@ export const useConversationSearchFiles = ({
       offset?: number;
       append?: boolean;
     }) => {
+      const requestVersion = requestVersionGate.current.next();
+
       try {
         setError(null);
         setStatus(append ? 'fetchingMore' : 'loading');
@@ -128,8 +139,7 @@ export const useConversationSearchFiles = ({
           ...searchParams,
         });
 
-        // Search may have closed while the lookup request was in flight.
-        if (!enabledRef.current && !allowSearchWhenDisabledRef.current) {
+        if (!isCurrentSearchRequest(requestVersion)) {
           return;
         }
 
@@ -144,8 +154,7 @@ export const useConversationSearchFiles = ({
 
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
-        // Search may also close while resolving node owners.
-        if (!enabledRef.current && !allowSearchWhenDisabledRef.current) {
+        if (!isCurrentSearchRequest(requestVersion)) {
           return;
         }
 
@@ -163,6 +172,10 @@ export const useConversationSearchFiles = ({
         setPagination({conversationId: id, pagination});
         setStatus('success');
       } catch (error) {
+        if (!isCurrentSearchRequest(requestVersion)) {
+          return;
+        }
+
         const wrappedError = error instanceof Error ? error : new Error('Failed to load files', {cause: error});
         setError(wrappedError);
 
@@ -179,7 +192,7 @@ export const useConversationSearchFiles = ({
     },
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain],
+    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isCurrentSearchRequest],
   );
 
   useLayoutEffect(() => {
@@ -231,6 +244,7 @@ export const useConversationSearchFiles = ({
     preserveInputValue = false,
   }: {preserveFilters?: boolean; preserveInputValue?: boolean} = {}) => {
     searchNodesDebounced.cancel();
+    requestVersionGate.current.invalidate();
     if (!preserveInputValue) {
       setSearchValue('');
     }

@@ -18,7 +18,7 @@
  */
 
 import {act, renderHook, waitFor} from '@testing-library/react';
-import {RestNodeCollection} from 'cells-sdk-ts';
+import {RestNode, RestNodeCollection} from 'cells-sdk-ts';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
@@ -55,6 +55,10 @@ const staleFolderNode: CellNode = {
   presignedUrlExpiresAt: null,
   user: null,
 };
+
+function createRestNode(name: string, uuid = name): RestNode {
+  return {Path: `${CONV_ID}@${DOMAIN}/${name}`, Type: 'LEAF', Uuid: uuid};
+}
 
 type FakeCellsRepository = jest.Mocked<Pick<CellsRepository, 'searchNodes'>>;
 type FakeUserRepository = jest.Mocked<Pick<UserRepository, 'getUsersById'>>;
@@ -287,5 +291,33 @@ describe('useConversationSearchFiles', () => {
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     expect(onClear).toHaveBeenCalled();
+  });
+
+  it('does not write stale search results after the search input is cleared', async () => {
+    const staleSearch = createDeferred<RestNodeCollection>();
+    const cellsRepository = createFakeCellsRepository();
+    cellsRepository.searchNodes.mockImplementation(({query}) => {
+      if (query === 'stale') {
+        return staleSearch.promise;
+      }
+      return Promise.resolve({Nodes: []});
+    });
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const {result} = renderSearchHook({cellsRepository, fireAndForgetInvoker});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    act(() => result.current.handleSearch('stale'));
+    await waitFor(() =>
+      expect(cellsRepository.searchNodes).toHaveBeenCalledWith(expect.objectContaining({query: 'stale'})),
+    );
+
+    act(() => result.current.handleSearch(''));
+
+    act(() => {
+      staleSearch.resolve({Nodes: [createRestNode('stale-file.txt')]});
+    });
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toEqual([]);
   });
 });
