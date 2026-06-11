@@ -49,21 +49,9 @@ type Fixtures = {
   /**
    * Creates a team and the associated owner, optionally adding members to it
    * Note: The team and owner are automatically deleted when the test completes.
-   * @param options.withMembers Can either be the number of team members to create or an array of existing members to add to the team
-   * @returns an object containing the teams owner and an array of members. The size of the members array matches the number or array length passed to `withMembers`
+   * @returns an object containing the teams owner and an array of users.
    */
-  createTeam: (
-    teamName: string,
-    options?: {
-      users?: (User | {user: User; role?: keyof typeof Role})[];
-      features?: {
-        conferenceCalling?: boolean;
-        channels?: boolean;
-        mls?: boolean | Parameters<BrigRepositoryE2E['configureMLSFeature']>[1];
-        cells?: boolean;
-      };
-    },
-  ) => Promise<Team>;
+  createTeam: (...args: Parameters<typeof createTeam> extends [any, ...infer Args] ? Args : never) => Promise<Team>;
 };
 
 export type Team = {
@@ -76,9 +64,15 @@ export type Team = {
 export {expect} from '@playwright/test';
 
 export const test = baseTest.extend<Fixtures>({
+  // Create a new instance of ApiManager for each test
   api: async ({}, use) => {
-    // Create a new instance of ApiManager for each test
-    await use(new ApiManagerE2E());
+    const backendUrl = process.env.BACKEND_URL;
+    if (backendUrl === undefined) throw new Error('Missing environment variable BACKEND_URL');
+
+    const basicAuth = process.env.BASIC_AUTH;
+    if (basicAuth === undefined) throw new Error('Missing environment variable BASIC_AUTH');
+
+    await use(new ApiManagerE2E({backendUrl, basicAuth}));
   },
   pageManager: async ({page}, use) => {
     // Create a new instance of PageManager for each test
@@ -134,71 +128,9 @@ export const test = baseTest.extend<Fixtures>({
     const teamOwners: User[] = [];
 
     await use(async (teamName, options) => {
-      const owner = await createUser(api);
-
-      const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
-      owner.teamId = teamId;
-
-      teamOwners.push(owner);
-
-      const addTeamMember: Team['addTeamMember'] = async (member, options) => {
-        const invitationId = await api.team.inviteUserToTeam(member.email, owner, Role[options?.role ?? 'MEMBER']);
-        const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
-        await api.team.acceptTeamInvitation(invitationCode, member);
-      };
-
-      if (options?.users) {
-        await Promise.all(
-          options.users.map(user => {
-            if ('user' in user) {
-              return addTeamMember(user.user, {role: user.role});
-            } else {
-              return addTeamMember(user);
-            }
-          }),
-        );
-      }
-
-      if (options?.features && Object.values(options.features).some(Boolean)) {
-        // The team will be reset right after initialization, so we need to wait a short time for it to finish
-        // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
-        await new Promise(resolve => setTimeout(resolve, 5000));
-
-        if (options.features.conferenceCalling) {
-          await api.enableConferenceCallingFeature(teamId);
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
-        }
-
-        if (options.features.mls) {
-          await api.brig.configureMLSFeature(
-            owner.teamId,
-            options.features.mls === true
-              ? {status: 'enabled', defaultProtocol: 'mls', supportedProtocols: ['mls', 'proteus']}
-              : options.features.mls,
-          );
-        }
-
-        if (options.features.channels) {
-          // Creating channels depends on MLS to be enabled
-          await api.brig.configureMLSFeature(owner.teamId, {
-            defaultProtocol: 'mls',
-            supportedProtocols: ['mls', 'proteus'],
-          });
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
-
-          await api.brig.unlockChannelFeature(teamId);
-          await api.brig.enableChannelsFeature(teamId);
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
-        }
-
-        if (options.features.cells) {
-          await api.brig.unlockCellsFeature(teamId);
-          await api.brig.enableCells(teamId);
-          await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, teamId, owner.token);
-        }
-      }
-
-      return {teamId, owner, addTeamMember};
+      const team = await createTeam(api, teamName, options);
+      teamOwners.push(team.owner);
+      return team;
     });
 
     // Deletes each created team and the owner / members associated with it
@@ -211,10 +143,10 @@ export const LOGIN_TIMEOUT = 40_000;
 
 /** PagePlugin to log in as the given user */
 export const withLogin =
-  (user: User | Promise<User>, options?: {confirmNewHistory?: boolean}): PagePlugin =>
+  (user: User | Promise<User>, options?: {baseUrl?: string; confirmNewHistory?: boolean}): PagePlugin =>
   async page => {
     const pageManager = PageManager.from(page);
-    await pageManager.openLoginPage();
+    await pageManager.openLoginPage(options?.baseUrl);
     await pageManager.webapp.pages.login().login(await user);
 
     if (options?.confirmNewHistory) {
@@ -246,7 +178,7 @@ export const withGuestUser =
     await pageManager.webapp.pages.conversation().conversationTitle.waitFor({state: 'visible', timeout: LOGIN_TIMEOUT});
   };
 
-const createUser = async (
+export const createUser = async (
   api: ApiManagerE2E,
   options?: {disableTelemetry?: boolean} & Parameters<typeof getUser>[0],
 ) => {
@@ -261,4 +193,82 @@ const createUser = async (
   }
 
   return user;
+};
+
+export const createTeam = async (
+  api: ApiManagerE2E,
+  teamName: string,
+  options?: {
+    users?: (User | {user: User; role?: keyof typeof Role})[];
+    features?: {
+      conferenceCalling?: boolean;
+      channels?: boolean;
+      mls?: boolean | Parameters<BrigRepositoryE2E['configureMLSFeature']>[1];
+      cells?: boolean;
+    };
+  },
+) => {
+  const owner = await createUser(api);
+
+  const {teamId} = await api.auth.upgradeUserToTeamOwner(owner, teamName);
+  owner.teamId = teamId;
+
+  const addTeamMember: Team['addTeamMember'] = async (member, options) => {
+    const invitationId = await api.team.inviteUserToTeam(member.email, owner, Role[options?.role ?? 'MEMBER']);
+    const invitationCode = await api.brig.getTeamInvitationCodeForEmail(owner.teamId, invitationId);
+    await api.team.acceptTeamInvitation(invitationCode, member);
+  };
+
+  if (options?.users) {
+    await Promise.all(
+      options.users.map(user => {
+        if ('user' in user) {
+          return addTeamMember(user.user, {role: user.role});
+        } else {
+          return addTeamMember(user);
+        }
+      }),
+    );
+  }
+
+  if (options?.features && Object.values(options.features).some(Boolean)) {
+    // The team will be reset right after initialization, so we need to wait a short time for it to finish
+    // before changing feature configs since they would otherwise be overwritten (See WPB-23698)
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    if (options.features.conferenceCalling) {
+      await api.enableConferenceCallingFeature(teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CONFERENCE_CALLING, teamId, owner.token);
+    }
+
+    if (options.features.mls) {
+      await api.brig.configureMLSFeature(
+        owner.teamId,
+        options.features.mls === true
+          ? {status: 'enabled', defaultProtocol: 'mls', supportedProtocols: ['mls', 'proteus']}
+          : options.features.mls,
+      );
+    }
+
+    if (options.features.channels) {
+      // Creating channels depends on MLS to be enabled
+      await api.brig.configureMLSFeature(owner.teamId, {
+        defaultProtocol: 'mls',
+        supportedProtocols: ['mls', 'proteus'],
+      });
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.MLS, teamId, owner.token);
+
+      await api.brig.unlockChannelFeature(teamId);
+      await api.brig.enableChannelsFeature(teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CHANNELS, teamId, owner.token);
+    }
+
+    if (options.features.cells) {
+      await api.brig.unlockCellsFeature(teamId);
+      await api.brig.enableCells(teamId);
+      await api.waitForFeatureToBeEnabled(FEATURE_KEY.CELLS, teamId, owner.token);
+    }
+  }
+
+  return {teamId, owner, addTeamMember};
 };

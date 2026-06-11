@@ -74,14 +74,17 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - run: yarn --immutable
+      - run: ./bin/yarn --immutable
 
-      - run: yarn playwright install --only-shell --with-deps chromium
+      - run: ./bin/yarn playwright install --only-shell --with-deps chromium
       - uses: 1password/install-cli-action@8d006a0d0a4fd505af7f7ce589e7f768385ff5e4
 
       - name: Generate env file
@@ -94,7 +97,7 @@ jobs:
           WEBAPP_URL: ${{ inputs.webappUrl }}
           BACKEND_URL: ${{ inputs.backendUrl }}
           TEST_SERVICE_URL: http://localhost:8080
-        run: yarn playwright test -c apps/webapp/playwright.config.ts apps/webapp/test/e2e_tests/specs/CriticalFlow/startupHasNoConsoleErrors.spec.ts
+        run: ./bin/yarn playwright test -c apps/webapp/playwright.config.ts apps/webapp/test/e2e_tests/specs/CriticalFlow/startupHasNoConsoleErrors.spec.ts
 
   # Since not always all e2e tests are run the number of shards to start up is computed dynamically from the amount of tests which will run
   compute_shards:
@@ -109,18 +112,21 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
-      - run: yarn --immutable
+      - run: ./bin/yarn --immutable
 
       - name: Compute shards
         id: computeShards
         env:
           GREP: ${{ inputs.grep }}
         run: |
-          NUMBER_OF_TESTS=$(yarn nx run webapp:e2e --list --grep=\"$GREP\" | grep 'Total:' | awk '{print $2}')
+          NUMBER_OF_TESTS=$(./bin/yarn nx run webapp:e2e --list --grep=\"$GREP\" | grep 'Total:' | awk '{print $2}')
           NUMBER_OF_SHARDS=$(( $NUMBER_OF_TESTS > 64 ? 64 : $NUMBER_OF_TESTS )) # Limit the number of shards to 64
           MATRIX_SHARDS=$(jq -nc --argjson len "$NUMBER_OF_SHARDS" '[range(1; $len + 1)]')
           echo "matrixShards=$MATRIX_SHARDS" >> $GITHUB_OUTPUT
@@ -153,16 +159,16 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn --immutable
-        env:
-          # Installation from cache is preferred to avoid hitting rate limits from npm
-          YARN_ENABLE_OFFLINE_MODE: 1
+        run: ./bin/yarn --immutable
 
       - name: Install 1Password CLI
         run: |
@@ -184,7 +190,7 @@ jobs:
           TEST_SERVICE_URL: http://testservice:8080
           PLAYWRIGHT_BLOB_OUTPUT_DIR: apps/webapp/playwright-report/blob-reports
           GREP: ${{ inputs.grep }}
-        run: yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
+        run: ./bin/yarn nx run webapp:e2e --shard=${{ matrix.shard }}/${{ strategy.job-total }} --reporter=blob --grep=\"$GREP\"
 
       - name: Upload blob report
         if: ${{ !cancelled() }}
@@ -213,12 +219,15 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - run: yarn --immutable
+      - run: ./bin/yarn --immutable
 
       - name: Download blob reports
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
@@ -230,7 +239,7 @@ jobs:
       - name: Merge playwright reports
         working-directory: apps/webapp
         run: |
-          yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
+          ../../bin/yarn playwright merge-reports --config ./playwright.config.ts playwright-report/blob-reports
           rm -rf playwright-report/blob-reports
 
       - name: Upload test report

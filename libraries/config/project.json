@@ -40,10 +40,17 @@
         "command": "tsc --project {projectRoot}/tsconfig.json --noEmit"
       }
     },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --watch",
+        "cwd": "{projectRoot}"
+      }
+    },
     "lint": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "eslint --config eslint.config.ts --max-warnings=1289 --ext .js,.ts {projectRoot}"
+        "command": "eslint --config eslint.config.ts --cache --cache-location node_modules/.cache/eslint/config --max-warnings=1289 --ext .js,.ts {projectRoot}"
       }
     }
   },

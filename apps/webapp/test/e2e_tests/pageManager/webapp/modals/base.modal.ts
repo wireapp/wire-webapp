@@ -26,8 +26,8 @@ export abstract class BaseModal {
   readonly actionButton: Locator;
   readonly cancelButton: Locator;
 
-  constructor(page: Page, modalLocator: string) {
-    this.modal = page.getByTestId(modalLocator);
+  constructor(page: Page) {
+    this.modal = page.getByRole('dialog');
     this.modalTitle = this.modal.getByTestId('status-modal-title');
     this.modalText = this.modal.getByTestId('status-modal-text');
     this.actionButton = this.modal.getByTestId('do-action');

@@ -34,6 +34,8 @@ import {UserRepositoryE2E} from './userRepository.e2e';
 
 import {User} from '../data/user';
 
+const TEST_API_VERSION = `v13`;
+
 export class ApiManagerE2E {
   user: UserRepositoryE2E;
   auth: AuthRepositoryE2E;
@@ -47,18 +49,21 @@ export class ApiManagerE2E {
   callingService: CallingServiceClientE2E;
   properties: PropertiesRepositoryE2E;
 
-  constructor() {
-    this.user = new UserRepositoryE2E();
-    this.auth = new AuthRepositoryE2E();
-    this.brig = new BrigRepositoryE2E();
-    this.testService = new TestServiceClientE2E();
-    this.team = new TeamRepositoryE2E();
-    this.conversation = new ConversationRepositoryE2E();
-    this.featureConfig = new FeatureConfigRepositoryE2E();
+  constructor(config: {backendUrl: string; basicAuth: string}) {
+    const backendConfig = {backendUrl: config.backendUrl, apiVersion: TEST_API_VERSION};
+
     this.inbucket = new InbucketClientE2E();
-    this.connection = new ConnectionRepositoryE2E();
+    this.testService = new TestServiceClientE2E();
     this.callingService = new CallingServiceClientE2E();
-    this.properties = new PropertiesRepositoryE2E();
+
+    this.user = new UserRepositoryE2E(backendConfig);
+    this.auth = new AuthRepositoryE2E(backendConfig);
+    this.brig = new BrigRepositoryE2E({...backendConfig, basicAuth: config.basicAuth});
+    this.team = new TeamRepositoryE2E(backendConfig);
+    this.conversation = new ConversationRepositoryE2E(backendConfig);
+    this.featureConfig = new FeatureConfigRepositoryE2E(backendConfig);
+    this.connection = new ConnectionRepositoryE2E(backendConfig);
+    this.properties = new PropertiesRepositoryE2E(backendConfig);
   }
 
   async addDevicesToUser(user: User, numberOfDevices: number) {

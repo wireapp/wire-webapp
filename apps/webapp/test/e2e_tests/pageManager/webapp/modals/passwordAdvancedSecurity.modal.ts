@@ -19,15 +19,13 @@
 
 import {Locator, Page} from '@playwright/test';
 
-import {PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
-
 import {BaseModal} from './base.modal';
 
 export class PasswordAdvancedSecurityModal extends BaseModal {
   readonly passwordInput: Locator;
 
   constructor(page: Page) {
-    super(page, PrimaryModalType.PASSWORD_ADVANCED_SECURITY);
+    super(page);
 
     this.passwordInput = this.modal.getByRole('textbox');
   }

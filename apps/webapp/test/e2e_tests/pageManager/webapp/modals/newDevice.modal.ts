@@ -23,6 +23,6 @@ import {BaseModal} from './base.modal';
 
 export class NewDeviceModal extends BaseModal {
   constructor(page: Page) {
-    super(page, 'modal-account-new-devices');
+    super(page);
   }
 }

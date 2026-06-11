@@ -17,7 +17,7 @@
  *
  */
 
-import {ReactNode, useEffect, useRef} from 'react';
+import {ReactNode, useEffect} from 'react';
 
 import {Runtime} from '@wireapp/commons';
 
@@ -48,8 +48,6 @@ export const PrimaryModalShell = ({
   size,
   container,
 }: PrimaryModalShellProps) => {
-  const modalsRef = useRef<HTMLDivElement | null>(null);
-
   // Make detached window background inert when modal is shown
   useEffect(() => {
     if (!container) {
@@ -95,15 +93,7 @@ export const PrimaryModalShell = ({
   }, [isShown, container]);
 
   return (
-    <div
-      id="modals"
-      data-uie-name="primary-modals-container"
-      role="dialog"
-      aria-modal="true"
-      aria-label={title}
-      tabIndex={-1}
-      ref={modalsRef}
-    >
+    <div id="modals" data-uie-name="primary-modals-container" aria-label={title}>
       <ModalComponent
         isShown={isShown}
         onClosed={onClose}

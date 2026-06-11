@@ -164,7 +164,7 @@ test.describe('Guestroom', () => {
       await pages.conversation().toggleGroupInformation();
       await expect(pages.conversationDetails().groupMembers.filter({hasText: guestUser.firstName})).toBeVisible();
 
-      await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
+      await pages.conversationDetails().getParticipant(guestUser.firstName).openDetails();
       await verify(pages);
     });
   });
@@ -395,7 +395,7 @@ test.describe('Guestroom', () => {
         await expect(guestMember).toBeVisible({timeout: LOGIN_TIMEOUT});
 
         await userAPage.waitForTimeout(60_000);
-        await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
+        await pages.conversationDetails().getParticipant(guestUser.firstName).openDetails();
         await expect(pages.participantDetails().userStatus).toBeVisible();
       });
 
@@ -417,7 +417,7 @@ test.describe('Guestroom', () => {
       const createdLink = await generateGroupGuestsLink(pages, groupName);
 
       await createPage(withGuestUser(createdLink, guestUser.firstName));
-      await expect(pages.conversation().guestsIndicator).toBeVisible();
+      await expect(pages.conversation().statusIndicator).toContainText('Guests are present');
     },
   );
 
@@ -571,7 +571,7 @@ test.describe('Guestroom', () => {
       await test.step('User A sees guest details (to trigger access validation) after 1 minute', async () => {
         await pages.conversation().toggleGroupInformation();
         await userAPage.waitForTimeout(60_000);
-        await pages.conversationDetails().openParticipantDetails(guestUser.firstName);
+        await pages.conversationDetails().getParticipant(guestUser.firstName).openDetails();
         await expect(pages.participantDetails().userStatus).toBeVisible();
       });
 

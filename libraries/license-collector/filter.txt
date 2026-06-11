@@ -1,0 +1,4 @@
+babel-plugin-remove-jsx-attributes
+bazinga64
+grunt-npm-bower
+wire-web-config-default

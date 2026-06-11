@@ -28,7 +28,7 @@ export class JoinGuestLinkPasswordModal extends BaseModal {
   readonly joinForm: Locator;
 
   constructor(page: Page) {
-    super(page, 'modal');
+    super(page);
 
     this.passwordInput = this.modal.getByRole('textbox', {name: 'Conversation password'});
     this.submitButton = this.modal.getByRole('button', {name: 'Join conversation'});

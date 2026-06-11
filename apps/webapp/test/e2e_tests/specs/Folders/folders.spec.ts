@@ -309,7 +309,7 @@ test.describe('Folders', () => {
 
         await expect(userBPages.conversationDetails().groupMembers.filter({hasText: userA.fullName})).toBeVisible();
 
-        await userBPages.conversationDetails().openParticipantDetails(userA.fullName);
+        await userBPages.conversationDetails().getParticipant(userA.fullName).openDetails();
         await userBPages.participantDetails().removeFromGroup();
       });
 
