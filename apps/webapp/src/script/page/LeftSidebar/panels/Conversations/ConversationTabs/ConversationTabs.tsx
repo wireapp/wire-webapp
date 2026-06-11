@@ -242,6 +242,9 @@ export const ConversationTabs = ({
   const replaceWireLink = replaceLink('https://app.wire.com', '', '');
 
   const showCellsTab = Config.getConfig().FEATURE.ENABLE_CELLS && isCellsEnabledForTeam;
+  const connectTabIndex = visibleConversationTabs.length + 1;
+  const cellsTabIndex = connectTabIndex + 1;
+  const meetingsTabIndex = connectTabIndex + 1 + (showCellsTab ? 1 : 0);
 
   return (
     <>
@@ -294,7 +297,7 @@ export const ConversationTabs = ({
           type={SidebarTabs.CONNECT}
           Icon={<Icon.AddParticipantsIcon />}
           onChangeTab={onChangeTab}
-          conversationTabIndex={visibleConversationTabs.length + 1}
+          conversationTabIndex={connectTabIndex}
           dataUieName="go-people"
           isActive={currentTab === SidebarTabs.CONNECT}
         />
@@ -313,7 +316,7 @@ export const ConversationTabs = ({
               type={SidebarTabs.CELLS}
               Icon={<CollectionIcon />}
               onChangeTab={onChangeTab}
-              conversationTabIndex={visibleConversationTabs.length + 2}
+              conversationTabIndex={cellsTabIndex}
               dataUieName="go-cells"
               isActive={currentTab === SidebarTabs.CELLS}
             />
@@ -334,7 +337,7 @@ export const ConversationTabs = ({
               type={SidebarTabs.MEETINGS}
               Icon={<CallIcon />}
               onChangeTab={onChangeTab}
-              conversationTabIndex={visibleConversationTabs.length + 3}
+              conversationTabIndex={meetingsTabIndex}
               dataUieName="go-meetings"
               isActive={currentTab === SidebarTabs.MEETINGS}
             />

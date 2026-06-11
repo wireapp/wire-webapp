@@ -29,9 +29,14 @@ export enum MeetingStatuses {
 }
 
 /**
+ * Threshold in minutes to determine if a meeting is starting soon.
+ */
+const STARTING_SOON_THRESHOLD_MINUTES = 5;
+
+/**
  * Threshold in milliseconds to determine if a meeting is starting soon.
  */
-export const STARTING_SOON_THRESHOLD_MS = 5 * TIME_IN_MILLIS.MINUTE;
+export const STARTING_SOON_THRESHOLD_MS = STARTING_SOON_THRESHOLD_MINUTES * TIME_IN_MILLIS.MINUTE;
 
 /**
  * Filters the list of meetings to return only those that are ongoing at the specified time.
