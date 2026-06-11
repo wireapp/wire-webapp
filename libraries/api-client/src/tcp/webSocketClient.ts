@@ -19,13 +19,19 @@
 
 import logdown from 'logdown';
 import {ErrorEvent} from 'reconnecting-websocket';
+import {Maybe} from 'true-myth';
 
 import {EventEmitter} from 'events';
 
 import {LogFactory} from '@wireapp/commons';
 
 import {AcknowledgeType} from './acknowledgeEvent.types';
-import {LongRunningRetryDetails, ReconnectingWebsocket, WEBSOCKET_STATE} from './reconnectingWebsocket';
+import {
+  LongRunningRetryDetails,
+  ReconnectingWebsocket,
+  ReconnectingWebsocketWallClock,
+  WEBSOCKET_STATE,
+} from './reconnectingWebsocket';
 
 import {InvalidTokenError, MissingCookieAndTokenError, MissingCookieError} from '../auth/';
 import {MINIMUM_API_VERSION} from '../config';
@@ -56,6 +62,11 @@ export interface WebSocketClient {
 
 export type OnConnect = (abortHandler: AbortController) => void;
 
+export type WebSocketClientOptions = {
+  readonly isReliableWebsocketConnectionEnabled: boolean;
+  readonly wallClock: ReconnectingWebsocketWallClock;
+};
+
 export class WebSocketClient extends EventEmitter {
   private clientId?: string;
   private isRefreshingAccessToken: boolean;
@@ -73,7 +84,7 @@ export class WebSocketClient extends EventEmitter {
 
   private useLegacySocket: boolean = true;
 
-  constructor(baseUrl: string, client: HttpClient) {
+  constructor(baseUrl: string, client: HttpClient, options: WebSocketClientOptions) {
     super();
 
     this.bufferedMessages = [];
@@ -81,7 +92,13 @@ export class WebSocketClient extends EventEmitter {
     this.baseUrl = baseUrl;
     this.client = client;
     this.isRefreshingAccessToken = false;
-    this.socket = new ReconnectingWebsocket(this.onReconnect);
+    this.socket = new ReconnectingWebsocket(this.onReconnect, {
+      backFromSleepHandler: Maybe.nothing(),
+      isReliableWebsocketConnectionEnabled: options.isReliableWebsocketConnectionEnabled,
+      pingInterval: Maybe.nothing(),
+      wallClock: options.wallClock,
+      websocketFactory: Maybe.nothing(),
+    });
     this.websocketState = this.socket.getState();
 
     this.logger = LogFactory.getLogger('@wireapp/api-client/tcp/WebSocketClient');

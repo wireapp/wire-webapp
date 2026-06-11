@@ -39,18 +39,21 @@ import {configureStore} from './configureStore';
 import {actionRoot} from './module/action';
 import {Root} from './page/Root';
 
+import {createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
 import {updateApiVersion} from '../lifecycle/updateRemoteConfigs';
 import {setAppLocale} from '../localization/Localizer';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {createAPIClient} from '../service/createApiClient';
 
 exposeWrapperGlobals();
 
 const mainId = 'main';
 
-const apiClient = createAPIClient();
+const apiClient = new APIClient({
+  isReliableWebsocketConnectionEnabled: false,
+  wallClock: createWallClock(),
+});
 container.registerInstance(APIClient, apiClient);
 const core = container.resolve(Core);
 
@@ -112,4 +115,4 @@ if (enforceDesktopApplication) {
   window.location.replace(unSupportedPageUrl);
 }
 
-runApp();
+void runApp();

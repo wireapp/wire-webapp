@@ -42,11 +42,11 @@ import {createApplicationServices} from './createApplicationServices';
 import {SIGN_OUT_REASON} from '../auth/SignOutReason';
 import {createWallClock} from '../clock/wallClock';
 import {Config} from '../Config';
+import {reliableWebsocketConnectionFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {createStartupFeatureTogglesFromLocationSearch} from '../featureToggles/startupFeatureToggles';
 import {createIncrementalHttpRetryBackoffReset} from '../lifecycle/createIncrementalHttpRetryBackoffReset';
 import {APIClient} from '../service/apiClientSingleton';
 import {Core} from '../service/coreSingleton';
-import {createAPIClient} from '../service/createApiClient';
 
 document.addEventListener('DOMContentLoaded', async () => {
   const config = Config.getConfig();
@@ -84,7 +84,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   const {isFeatureToggleEnabled} = startupFeatureToggles;
   const {fireAndForgetInvoker, wallClock} = applicationServices;
-  const apiClient = createAPIClient();
+  const apiClient = new APIClient({
+    isReliableWebsocketConnectionEnabled: isFeatureToggleEnabled(reliableWebsocketConnectionFeatureToggleName),
+    wallClock,
+  });
   const core = new Core(apiClient);
   const cleanupIncrementalHttpRetryBackoffReset = createIncrementalHttpRetryBackoffReset({
     apiClient,
