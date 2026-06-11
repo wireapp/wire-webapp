@@ -633,6 +633,7 @@ export const Conversation = ({
                         setIsSharedDriveSearchViewOpen(true);
                       }
                     }}
+                    onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
                   />
                 )}
               </ConversationTabPanel>

@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
@@ -33,7 +33,6 @@ import {
   hasActiveSearchParams,
   toConversationDriveSearchParams,
 } from '../common/driveFilters/driveFilters';
-import {getCellsApiPath} from '../common/getCellsApiPath/getCellsApiPath';
 import {getCellsFilesPath} from '../common/getCellsFilesPath/getCellsFilesPath';
 import {LOAD_MORE_INCREMENT, LOAD_MORE_INITIAL_SIZE} from '../common/loadMorePagination/loadMorePagination';
 import {RECYCLE_BIN_PATH} from '../common/recycleBin/recycleBin';
@@ -52,7 +51,8 @@ interface UseConversationSearchFilesProps {
 }
 
 const DEBOUNCE_TIME = 300;
-const FETCH_ALL_QUERY = '*';
+
+const normalizeSearchQuery = (query: string): string => (is.nonEmptyStringAndNotWhitespace(query) ? query.trim() : '');
 
 export const useConversationSearchFiles = ({
   cellsRepository,
@@ -67,16 +67,18 @@ export const useConversationSearchFiles = ({
 
   const [searchValue, setSearchValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
   const hasFiredInitialFetchRef = useRef(false);
+  const wasEnabledRef = useRef(false);
+  // Prevents stale in-flight responses from overwriting the store after the search view closes.
+  const enabledRef = useRef(enabled);
+  enabledRef.current = enabled;
 
   const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
   const hasActiveParams = hasActiveSearchParams(searchParams);
   const hadActiveSearchParamsRef = useRef(hasActiveParams);
 
-  const {id} = conversationQualifiedId;
-  const conversationPath = getCellsApiPath({conversationQualifiedId});
+  const {id, domain} = conversationQualifiedId;
 
   const searchNodes = useCallback(
     async ({
@@ -94,19 +96,34 @@ export const useConversationSearchFiles = ({
         setError(null);
         setStatus(append ? 'fetchingMore' : 'loading');
 
-        const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
         const searchParams = toConversationDriveSearchParams(filtersParam);
+
+        // Recurse only when actually searching so the empty search view
+        // matches the browse view: folders first, then files.
+        const hasQuery = query.length > 0;
+        const hasFilters = hasActiveSearchParams(searchParams);
+        const isRecycleBin = getCellsFilesPath() === RECYCLE_BIN_PATH;
+        const isSearchingOrFiltering = hasQuery || hasFilters;
+
+        // recency sort for searches inside the recycle bin only
+        const forceRecencySort = isRecycleBin && hasQuery;
 
         const result = await cellsRepository.searchNodes({
           query,
+          recursive: isSearchingOrFiltering,
           limit: append ? LOAD_MORE_INCREMENT : LOAD_MORE_INITIAL_SIZE,
           offset,
-          path: conversationPath,
-          sortBy: shouldSort ? 'mtime' : undefined,
-          sortDirection: shouldSort ? 'desc' : undefined,
-          deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
+          path: `${id}@${domain}`,
+          sortBy: forceRecencySort ? 'mtime' : undefined,
+          sortDirection: forceRecencySort ? 'desc' : undefined,
+          deleted: isRecycleBin,
           ...searchParams,
         });
+
+        // Search may have closed while the lookup request was in flight.
+        if (!enabledRef.current) {
+          return;
+        }
 
         if (result.Nodes === undefined || result.Nodes.length === 0) {
           if (!append) {
@@ -119,13 +136,14 @@ export const useConversationSearchFiles = ({
 
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
+        // Search may also close while resolving node owners.
+        if (!enabledRef.current) {
+          return;
+        }
+
         // filter out draft nodes from results
         const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
-
-        const transformedNodes = transformDataToCellsNodes({
-          nodes: filteredNodes,
-          users,
-        });
+        const transformedNodes = transformDataToCellsNodes({nodes: filteredNodes, users});
 
         if (append) {
           appendNodes({conversationId: id, nodes: transformedNodes});
@@ -135,11 +153,6 @@ export const useConversationSearchFiles = ({
 
         const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
         setPagination({conversationId: id, pagination});
-
-        if (isInitialLoad.current) {
-          isInitialLoad.current = false;
-        }
-
         setStatus('success');
       } catch (error) {
         const wrappedError = error instanceof Error ? error : new Error('Failed to load files', {cause: error});
@@ -158,8 +171,25 @@ export const useConversationSearchFiles = ({
     },
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendNodes, setNodes, setPagination, setStatus, setError, id, conversationPath],
+    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain],
   );
+
+  useLayoutEffect(() => {
+    if (!enabled) {
+      wasEnabledRef.current = false;
+      return;
+    }
+
+    if (wasEnabledRef.current) {
+      return;
+    }
+
+    wasEnabledRef.current = true;
+
+    // Clear stale browse rows before paint when the search view takes ownership of the shared store.
+    clearAll({conversationId: id});
+    setStatus('loading');
+  }, [clearAll, enabled, id, setStatus]);
 
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
     shouldPerformSearch.current = false;
@@ -201,7 +231,7 @@ export const useConversationSearchFiles = ({
 
     if (preserveFilters && hasActiveParams) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-        await searchNodes({query: FETCH_ALL_QUERY, filters});
+        await searchNodes({query: '', filters});
       });
       return;
     }
@@ -212,7 +242,7 @@ export const useConversationSearchFiles = ({
   const handleReload = useCallback(async (): Promise<void> => {
     setStatus('loading');
     clearAll({conversationId: id});
-    await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
+    await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
   }, [clearAll, filters, id, searchNodes, searchQuery, setStatus]);
 
   useEffect(() => {
@@ -228,7 +258,7 @@ export const useConversationSearchFiles = ({
     }
 
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
+      await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
     });
   }, [searchNodes, searchQuery, enabled, filters, hasActiveParams, fireAndForgetInvoker]);
 
@@ -245,10 +275,7 @@ export const useConversationSearchFiles = ({
     }
     hasFiredInitialFetchRef.current = true;
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodes({
-        query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY,
-        filters,
-      });
+      await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
     });
   }, [enabled, searchNodes, searchQuery, filters, fireAndForgetInvoker]);
 
@@ -263,12 +290,7 @@ export const useConversationSearchFiles = ({
 
   const loadMore = useCallback(
     async (offset: number): Promise<void> => {
-      await searchNodes({
-        query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY,
-        filters,
-        offset,
-        append: true,
-      });
+      await searchNodes({query: normalizeSearchQuery(searchQuery), filters, offset, append: true});
     },
     [filters, searchNodes, searchQuery],
   );

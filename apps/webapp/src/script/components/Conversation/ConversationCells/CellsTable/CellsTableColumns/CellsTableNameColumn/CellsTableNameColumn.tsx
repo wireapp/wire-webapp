@@ -17,8 +17,6 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user/';
-
 import {FolderIcon, PlayIcon} from '@wireapp/react-ui-kit';
 
 import {FileTypeIcon} from 'Components/Conversation/common/FileTypeIcon/FileTypeIcon';
@@ -39,10 +37,10 @@ import {useCellsFilePreviewModal} from '../../common/CellsFilePreviewModalContex
 
 interface CellsTableNameColumnProps {
   node: CellNode;
-  conversationQualifiedId: QualifiedId;
+  onCloseSearchView?: () => void;
 }
 
-export const CellsTableNameColumn = ({node, conversationQualifiedId}: CellsTableNameColumnProps) => {
+export const CellsTableNameColumn = ({node, onCloseSearchView}: CellsTableNameColumnProps) => {
   return (
     <>
       <span css={mobileNameStyles}>{node.name}</span>
@@ -50,7 +48,7 @@ export const CellsTableNameColumn = ({node, conversationQualifiedId}: CellsTable
         {node.type === CellNodeType.FILE ? (
           <FileNameColumn file={node} />
         ) : (
-          <FolderNameColumn name={node.name} conversationQualifiedId={conversationQualifiedId} />
+          <FolderNameColumn name={node.name} path={node.path} onCloseSearchView={onCloseSearchView} />
         )}
       </div>
     </>
@@ -91,14 +89,22 @@ const FileNameColumn = ({file}: {file: CellFile}) => {
   );
 };
 
-const FolderNameColumn = ({name, conversationQualifiedId}: {name: string; conversationQualifiedId: QualifiedId}) => {
+const FolderNameColumn = ({
+  name,
+  path,
+  onCloseSearchView,
+}: {
+  name: string;
+  path: string;
+  onCloseSearchView?: () => void;
+}) => {
   return (
     <>
       <FolderIcon width={24} height={24} />
       <button
         type="button"
         css={desktopNameStyles}
-        onClick={event => openFolder({conversationQualifiedId, name, event})}
+        onClick={event => openFolder({path, event, onBeforeNavigate: onCloseSearchView})}
       >
         {name}
       </button>
