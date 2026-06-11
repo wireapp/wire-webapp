@@ -84,6 +84,9 @@ jobs:
             echo "commit_subject=${commit_subject}"
           } >> "$GITHUB_OUTPUT"
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -91,13 +94,13 @@ jobs:
           cache: 'yarn'
 
       - name: Install JS dependencies
-        run: yarn --immutable
+        run: ./bin/yarn --immutable
 
       - name: Update configuration
-        run: yarn nx run webapp:configure
+        run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package
-        run: yarn nx run server:package
+        run: ./bin/yarn nx run server:package
 
       - name: Upload build artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a

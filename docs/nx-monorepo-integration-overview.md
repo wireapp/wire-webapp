@@ -1003,7 +1003,7 @@ If you see errors about missing library files during deployment:
 If deployment fails due to version issues:
 1. Check that [`libraries/{lib}/package.json`](libraries/core/package.json) has correct versions
 2. Verify [`apps/server/package.json`](apps/server/package.json) uses `workspace:^` for workspace deps
-3. Run `yarn install` to update local workspace resolution
+3. Run `./bin/yarn install` to update local workspace resolution
 
 **Asset Copy Failures:**
 
@@ -1406,7 +1406,7 @@ Nx will:
 **What happens when you run webpack directly:**
 
 ```bash
-cd apps/webapp && yarn build
+cd apps/webapp && ../../bin/yarn build
 ```
 
 You might get:
@@ -1554,24 +1554,24 @@ Running underlying tools directly (webpack, jest, tsc, eslint) can cause several
 
 ### Common Pitfalls
 
-**Running `yarn build` directly:**
+**Running package `build` scripts directly:**
 
 ```bash
 # DON'T DO THIS
-cd apps/webapp && yarn build
+cd apps/webapp && ../../bin/yarn build
 
 # INSTEAD DO THIS
-nx build webapp
+./bin/yarn nx build webapp
 ```
 
-**Running `yarn test` directly:**
+**Running package `test` scripts directly:**
 
 ```bash
 # DON'T DO THIS
-cd apps/webapp && yarn test
+cd apps/webapp && ../../bin/yarn test
 
 # INSTEAD DO THIS
-nx test webapp
+./bin/yarn nx test webapp
 ```
 
 **Running `tsc` directly:**
@@ -1622,16 +1622,16 @@ nx affected -t lint
 # 1. Make changes to code
 
 # 2. Build everything manually
-cd apps/webapp && yarn build
-cd apps/server && yarn build
+cd apps/webapp && ../../bin/yarn build
+cd apps/server && ../../bin/yarn build
 
 # 3. Test everything manually
-cd apps/webapp && yarn test
-cd apps/server && yarn test
+cd apps/webapp && ../../bin/yarn test
+cd apps/server && ../../bin/yarn test
 
 # 4. Lint everything manually
-cd apps/webapp && yarn lint
-cd apps/server && yarn lint
+cd apps/webapp && ../../bin/yarn lint
+cd apps/server && ../../bin/yarn lint
 ```
 
 The incorrect workflow:
@@ -1719,7 +1719,6 @@ nx show project webapp
   uses: actions/setup-node@v6
   with:
     node-version-file: '.nvmrc'
-    cache: 'yarn'  # Yarn cache for node_modules
 ```
 
 **Note**: Nx cache is local by default. For CI cache persistence, consider:

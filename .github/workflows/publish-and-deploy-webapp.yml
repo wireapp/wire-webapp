@@ -41,6 +41,9 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - name: Setup Node.js
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
@@ -66,13 +69,13 @@ jobs:
           echo -e "COMMITTER = ${COMMITTER}"
 
       - name: Install JS dependencies
-        run: yarn --immutable
+        run: ./bin/yarn --immutable
 
       - name: Update configuration
-        run: yarn nx run webapp:configure
+        run: ./bin/yarn nx run webapp:configure
 
       - name: Build and package
-        run: yarn nx run server:package
+        run: ./bin/yarn nx run server:package
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
@@ -92,7 +95,7 @@ jobs:
         id: generate_changelog
         if: ${{ env.changelog_type }}
         run: |
-          yarn nx run workspace-tools:changelog-${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
+          ./bin/yarn nx run workspace-tools:changelog-${{ env.changelog_type }} > ${{ env.CHANGELOG_FILE }}
           echo "changelog=${{ env.CHANGELOG_FILE }}" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
@@ -109,7 +112,7 @@ jobs:
           aws_secret_key: ${{secrets.WEBTEAM_AWS_SECRET_ACCESS_KEY}}
         run: |
           version_tag="${TAG:-$BRANCH_NAME}"
-          yarn docker "$version_tag" ./image_tag.txt
+          ./bin/yarn docker "$version_tag" ./image_tag.txt
 
           image_tag="$(cat ./image_tag.txt)"
           echo "image_tag=$image_tag" >> $GITHUB_OUTPUT

@@ -37,19 +37,17 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - name: Install pinned package manager
-        env:
-          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
-        run: corepack install
-
-      - run: yarn --immutable
-      - run: yarn nx run webapp:configure
-      - run: yarn nx run server:package
+      - run: ./bin/yarn --immutable
+      - run: ./bin/yarn nx run webapp:configure
+      - run: ./bin/yarn nx run server:package
 
       - name: Compute target EB environment
         id: slot
