@@ -68,6 +68,7 @@ import {ContentState, useAppState} from './useAppState';
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {WallClock} from '../clock/wallClock';
+import {meetingsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -256,7 +257,10 @@ export const AppMain = (properties: AppMainProps) => {
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
-      '/meetings': () => (teamState.isMeetingsEnabled() ? mainView.list.openMeetingsList() : navigate('/')),
+      '/meetings': () =>
+        teamState.isMeetingsEnabled() && isFeatureToggleEnabled(meetingsFeatureToggleName)
+          ? mainView.list.openMeetingsList()
+          : navigate('/'),
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,

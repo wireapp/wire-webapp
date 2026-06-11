@@ -41,6 +41,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
+import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {Collection} from './panels/Collection';
@@ -84,7 +85,7 @@ const MainContent = ({
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
-  const {isMeetingsEnabled} = useKoSubscribableChildren(teamState, ['isMeetingsEnabled']);
+  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 

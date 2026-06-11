@@ -51,6 +51,7 @@ import {isDataDogEnabled} from 'Util/dataDog';
 import {getWebEnvironment} from 'Util/environment';
 import {replaceLink, t} from 'Util/localizerUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {
   conversationsTitleWrapper,
@@ -105,10 +106,8 @@ export const ConversationTabs = ({
   const teamState = container.resolve(TeamState);
   const totalUnreadConversations = unreadConversations.length;
   const {teamRole} = useKoSubscribableChildren(selfUser, ['teamRole']);
-  const {isCellsEnabled: isCellsEnabledForTeam, isMeetingsEnabled} = useKoSubscribableChildren(teamState, [
-    'isCellsEnabled',
-    'isMeetingsEnabled',
-  ]);
+  const {isCellsEnabled: isCellsEnabledForTeam} = useKoSubscribableChildren(teamState, ['isCellsEnabled']);
+  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
 
   const totalUnreadFavoriteConversations = favoriteConversations.filter(favoriteConversation =>
     favoriteConversation.hasUnread(),

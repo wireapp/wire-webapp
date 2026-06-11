@@ -48,6 +48,7 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';
 import {ConversationHeader} from './ConversationHeader';
@@ -112,7 +113,7 @@ export const Conversations = ({
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
-  const {isMeetingsEnabled: isMeetingsEnabled} = useKoSubscribableChildren(teamState, ['isMeetingsEnabled']);
+  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
