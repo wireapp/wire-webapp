@@ -35,8 +35,8 @@ import {AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {SIGN_OUT_REASON} from 'src/script/auth/SignOutReason';
 import {Config} from 'src/script/Config';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
 
 import {applockStyles} from './Applock.styles';
 
@@ -50,6 +50,7 @@ export enum APPLOCK_STATE {
 }
 
 const DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC = 60;
+const ONE_SECOND_IN_MILLISECONDS = 1000;
 
 const passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH));
 const passwordRegexDigit = /(?=.*[0-9])/;
@@ -71,6 +72,7 @@ const AppLock = ({
   appLockState = container.resolve(AppLockState),
   appLockRepository = container.resolve(AppLockRepository),
 }: AppLockProps) => {
+  const {translate} = useApplicationContext();
   const [localAppLockState, setLocalAppLockState] = useState<APPLOCK_STATE>(APPLOCK_STATE.NONE);
   const [unlockError, setUnlockError] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -107,25 +109,30 @@ const AppLock = ({
     }),
   );
 
-  const getInactivityAppLockTimeoutInSeconds = () => {
+  const getInactivityAppLockTimeoutInSeconds = useCallback(() => {
     const backendTimeout = appLockState.appLockInactivityTimeoutSecs();
     return Number.isFinite(backendTimeout) ? backendTimeout : DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
-  };
+  }, [appLockState]);
 
-  const getScheduledAppLockTimeoutInSeconds = () => {
+  const getScheduledAppLockTimeoutInSeconds = useCallback(() => {
     const configTimeout = Config.getConfig().FEATURE?.APPLOCK_SCHEDULED_TIMEOUT;
     return Number.isFinite(configTimeout) ? configTimeout : null;
-  };
+  }, []);
 
-  const isScheduledAppLockEnabled = () => {
+  const isScheduledAppLockEnabled = useCallback(() => {
     return getScheduledAppLockTimeoutInSeconds() !== null;
-  };
+  }, [getScheduledAppLockTimeoutInSeconds]);
+
+  const showAppLock = useCallback(() => {
+    setLocalAppLockState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setIsVisible(true);
+  }, [appLockState]);
 
   const startAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
-    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * 1000);
+    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * ONE_SECOND_IN_MILLISECONDS);
     setInactivityTimeoutId(id);
-  }, [inactivityTimeoutId]);
+  }, [getInactivityAppLockTimeoutInSeconds, inactivityTimeoutId, showAppLock]);
 
   const clearAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
@@ -141,7 +148,7 @@ const AppLock = ({
     } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
     }
-  }, [isAppLockEnabled]);
+  }, [appLockRepository, appLockState, isAppLockEnabled, showAppLock]);
 
   useEffect(() => {
     if (isAppLockActivated) {
@@ -176,12 +183,7 @@ const AppLock = ({
       modalObserver.disconnect();
       appObserver.disconnect();
     };
-  }, [localAppLockState, isVisible]);
-
-  const showAppLock = () => {
-    setLocalAppLockState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
-    setIsVisible(true);
-  };
+  }, [appObserver, isVisible, localAppLockState, modalObserver]);
 
   const onUnlock = async (event: FormEvent) => {
     event.preventDefault();
@@ -192,7 +194,7 @@ const AppLock = ({
       startScheduledTimeout();
       return;
     }
-    setUnlockError(t('modalAppLockLockedError'));
+    setUnlockError(translate('modalAppLockLockedError'));
   };
 
   const startScheduledTimeout = () => {
@@ -202,7 +204,9 @@ const AppLock = ({
       if (scheduledAppLockTimeoutInSeconds === null) {
         return;
       }
-      setScheduledTimeoutId(window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * 1000));
+      setScheduledTimeoutId(
+        window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * ONE_SECOND_IN_MILLISECONDS),
+      );
     }
   };
 
@@ -252,15 +256,15 @@ const AppLock = ({
   const headerText = () => {
     switch (localAppLockState) {
       case APPLOCK_STATE.SETUP_CHANGE:
-        return t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME});
+        return translate('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME});
       case APPLOCK_STATE.SETUP:
-        return t('modalAppLockSetupTitle');
+        return translate('modalAppLockSetupTitle');
       case APPLOCK_STATE.LOCKED:
-        return t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME});
+        return translate('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME});
       case APPLOCK_STATE.LOGOUT:
-        return t('modalAccountLogoutHeadline');
+        return translate('modalAccountLogoutHeadline');
       case APPLOCK_STATE.FORGOT:
-        return t('modalAppLockForgotTitle');
+        return translate('modalAppLockForgotTitle');
       default:
         return '';
     }
@@ -275,7 +279,7 @@ const AppLock = ({
             className="modal__header__button"
             onClick={onCancelAppLock}
             data-uie-name="do-close"
-            aria-label={t('modalAppLockSetupCloseBtn')}
+            aria-label={translate('modalAppLockSetupCloseBtn')}
           >
             <span className="modal__header__icon" aria-hidden="true">
               <Icon.CloseIcon />
@@ -293,18 +297,18 @@ const AppLock = ({
           <form onSubmit={onSetCode}>
             <p
               className="modal__text"
-              dangerouslySetInnerHTML={{__html: t('modalAppLockSetupMessage', undefined, {br: '<br><br>'})}}
+              dangerouslySetInnerHTML={{__html: translate('modalAppLockSetupMessage', undefined, {br: '<br><br>'})}}
               data-uie-name="label-applock-set-text"
             />
 
             {/* eslint jsx-a11y/no-autofocus : "off" */}
             <Input
-              aria-label={t('modalAppLockSetupTitle')}
+              aria-label={translate('modalAppLockSetupTitle')}
               autoFocus
               className="modal__input"
-              label={t('modalAppLockPasscode')}
+              label={translate('modalAppLockPasscode')}
               type="password"
-              placeholder={t('modalAppLockInputPlaceholder')}
+              placeholder={translate('modalAppLockInputPlaceholder')}
               value={setupPassphrase}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
@@ -318,7 +322,7 @@ const AppLock = ({
               data-uie-status={isSetupPassphraseLength ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-charnumber"
             >
-              {t('modalAppLockSetupLong', {
+              {translate('modalAppLockSetupLong', {
                 minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
               })}
             </p>
@@ -328,7 +332,7 @@ const AppLock = ({
               data-uie-status={isSetupPassphraseLower ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-lowercase"
             >
-              {t('modalAppLockSetupLower')}
+              {translate('modalAppLockSetupLower')}
             </p>
 
             <p
@@ -336,7 +340,7 @@ const AppLock = ({
               data-uie-status={isSetupPassphraseUpper ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-uppercase"
             >
-              {t('modalAppLockSetupUppercase')}
+              {translate('modalAppLockSetupUppercase')}
             </p>
 
             <p
@@ -344,7 +348,7 @@ const AppLock = ({
               data-uie-status={isSetupPassphraseDigit ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-digit"
             >
-              {t('modalAppLockSetupDigit')}
+              {translate('modalAppLockSetupDigit')}
             </p>
 
             <p
@@ -352,7 +356,7 @@ const AppLock = ({
               data-uie-status={isSetupPassphraseSpecial ? 'valid' : 'invalid'}
               data-uie-name="passcode-validation-specialchar"
             >
-              {t('modalAppLockSetupSpecial')}
+              {translate('modalAppLockSetupSpecial')}
             </p>
 
             <div css={applockStyles.buttonGroupStyle}>
@@ -364,7 +368,7 @@ const AppLock = ({
                   data-uie-name="do-cancel-applock"
                   onClick={onCancelAppLock}
                 >
-                  {t('modalConfirmSecondary')}
+                  {translate('modalConfirmSecondary')}
                 </Button>
               )}
 
@@ -375,7 +379,7 @@ const AppLock = ({
                 data-uie-name="do-action"
                 disabled={!isSetupPassphraseValid}
               >
-                {t('modalAppLockSetupAcceptButton')}
+                {translate('modalAppLockSetupAcceptButton')}
               </Button>
             </div>
           </form>
@@ -386,7 +390,7 @@ const AppLock = ({
             <div
               className="modal__text"
               dangerouslySetInnerHTML={{
-                __html: t(
+                __html: translate(
                   'modalAppLockSetupChangeMessage',
                   {brandName: Config.getConfig().BRAND_NAME},
                   {br: '<br><br>'},
@@ -396,12 +400,12 @@ const AppLock = ({
             />
 
             <Input
-              aria-label={t('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME})}
+              aria-label={translate('modalAppLockSetupChangeTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               className="modal__input"
-              label={t('modalAppLockPasscode')}
+              label={translate('modalAppLockPasscode')}
               type="password"
-              placeholder={t('modalAppLockInputPlaceholder')}
+              placeholder={translate('modalAppLockInputPlaceholder')}
               value={setupPassphrase}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => setSetupPassphrase(event.target.value)}
               data-uie-status={isSetupPassphraseValid ? 'valid' : 'invalid'}
@@ -410,30 +414,30 @@ const AppLock = ({
             />
 
             <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLength})}>
-              {t('modalAppLockSetupLong', {
+              {translate('modalAppLockSetupLong', {
                 minPasswordLength: Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH.toString(),
               })}
             </p>
 
             <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseLower})}>
-              {t('modalAppLockSetupLower')}
+              {translate('modalAppLockSetupLower')}
             </p>
 
             <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseUpper})}>
-              {t('modalAppLockSetupUppercase')}
+              {translate('modalAppLockSetupUppercase')}
             </p>
 
             <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseDigit})}>
-              {t('modalAppLockSetupDigit')}
+              {translate('modalAppLockSetupDigit')}
             </p>
 
             <p className={cx('modal__passcode__info', {'modal__passcode__info--valid': isSetupPassphraseSpecial})}>
-              {t('modalAppLockSetupSpecial')}
+              {translate('modalAppLockSetupSpecial')}
             </p>
 
             <div className="modal__buttons">
               <Button block type="submit" data-uie-name="do-action" disabled={!isSetupPassphraseValid}>
-                {t('modalAppLockSetupAcceptButton')}
+                {translate('modalAppLockSetupAcceptButton')}
               </Button>
             </div>
           </form>
@@ -442,13 +446,13 @@ const AppLock = ({
         {localAppLockState === APPLOCK_STATE.LOCKED && (
           <form onSubmit={onUnlock}>
             <label htmlFor="input-applock-unlock" data-uie-name="label-applock-unlock-text">
-              {t('modalAppLockPasscode')}
+              {translate('modalAppLockPasscode')}
             </label>
             <Input
-              aria-label={t('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME})}
+              aria-label={translate('modalAppLockLockedTitle', {brandName: Config.getConfig().BRAND_NAME})}
               autoFocus
               type="password"
-              placeholder={t('modalAppLockInputPlaceholder')}
+              placeholder={translate('modalAppLockInputPlaceholder')}
               id="input-applock-unlock"
               name="password"
               onKeyDown={clearUnlockError}
@@ -459,7 +463,7 @@ const AppLock = ({
             />
 
             <Button block type="submit" data-uie-name="do-action" css={applockStyles.unlockButtonStyle}>
-              {t('modalAppLockLockedUnlockButton')}
+              {translate('modalAppLockLockedUnlockButton')}
             </Button>
 
             <Link
@@ -470,16 +474,16 @@ const AppLock = ({
               data-uie-name="go-forgot-passphrase"
               onClick={onClickForgot}
             >
-              {t('modalAppLockLockedForgotCTA')}
+              {translate('modalAppLockLockedForgotCTA')}
             </Link>
           </form>
         )}
 
         {localAppLockState === APPLOCK_STATE.FORGOT && (
           <Fragment>
-            <p>{t('modalAppLockForgotMessage')}</p>
+            <p>{translate('modalAppLockForgotMessage')}</p>
             <br />
-            <p>{t('modalAppLockForgotSecondMessage')}</p>
+            <p>{translate('modalAppLockForgotSecondMessage')}</p>
             <div css={applockStyles.buttonGroupStyle}>
               <Button
                 css={applockStyles.buttonStyle}
@@ -487,10 +491,10 @@ const AppLock = ({
                 onClick={onGoBack}
                 data-uie-name="do-go-back"
               >
-                {t('modalAppLockForgotGoBackButton')}
+                {translate('modalAppLockForgotGoBackButton')}
               </Button>
               <Button css={applockStyles.buttonStyle} onClick={onClickLogout} data-uie-name="go-proceed-to-logout">
-                {t('modalAccountLogoutAction')}
+                {translate('modalAccountLogoutAction')}
               </Button>
             </div>
           </Fragment>
@@ -508,7 +512,7 @@ const AppLock = ({
               }}
             >
               <CheckboxLabel className="label-xs" htmlFor="clear-data-checkbox">
-                {t('modalAccountLogoutOption')}
+                {translate('modalAccountLogoutOption')}
               </CheckboxLabel>
             </Checkbox>
 
@@ -519,11 +523,11 @@ const AppLock = ({
                 onClick={onGoBack}
                 data-uie-name="do-go-back"
               >
-                {t('modalAppLockLogoutCancelButton')}
+                {translate('modalAppLockLogoutCancelButton')}
               </Button>
 
               <Button css={applockStyles.buttonStyle} onClick={() => onLogout(clearData)} data-uie-name="do-action">
-                {t('modalAccountLogoutAction')}
+                {translate('modalAccountLogoutAction')}
               </Button>
             </div>
           </Fragment>
