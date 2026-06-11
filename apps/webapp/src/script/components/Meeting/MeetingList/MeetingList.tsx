@@ -31,6 +31,7 @@ import {
 import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
 import {MEETINGS_PAST, MEETINGS_TODAY, MEETINGS_TOMORROW} from 'Components/Meeting/mocks/MeetingMocks';
 import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
@@ -52,12 +53,13 @@ export interface TodayAndOngoingSectionProps {
 }
 
 export const MeetingList = () => {
-  const [nowMs, setNowMs] = useState(() => Date.now());
+  const {wallClock} = useApplicationContext();
+  const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
 
   useEffect(() => {
-    const id = window.setInterval(() => setNowMs(Date.now()), TIME_IN_MILLIS.SECOND);
-    return () => window.clearInterval(id);
-  }, []);
+    const id = wallClock.setInterval(() => setNowMs(wallClock.currentTimestampInMilliseconds), TIME_IN_MILLIS.SECOND);
+    return () => wallClock.clearInterval(id);
+  }, [wallClock]);
 
   const {today, tomorrow} = getTodayTomorrowLabels();
   const headerForOnGoing = `${t('meetings.list.onGoing.header')}`;
