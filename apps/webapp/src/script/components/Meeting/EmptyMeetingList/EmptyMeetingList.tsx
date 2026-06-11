@@ -27,27 +27,19 @@ import {
 } from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {t} from 'Util/localizerUtil';
 
-interface EmptyMeetingListProps {
-  showCallingButton?: boolean;
-  text?: string;
-  helperText?: string;
-}
-
-export const EmptyMeetingList = ({text, helperText, showCallingButton = true}: EmptyMeetingListProps) => {
+export const EmptyMeetingList = () => {
   return (
     <div css={emptyListStyles}>
-      <div>{text ?? t('meetings.noMeetingsText')}</div>
-      <div css={emptyListHelpStyles}>{helperText ?? t('meetings.startMeetingHelp')}</div>
-      {showCallingButton && (
-        <div css={emptyListActionButtonContainerStyles}>
-          <Button variant={ButtonVariant.TERTIARY}>
-            <CallIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.meetNow')}
-          </Button>
-          <Button variant={ButtonVariant.TERTIARY}>
-            <CalendarIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.scheduleMeeting')}
-          </Button>
-        </div>
-      )}
+      <div>{t('meetings.noMeetingsText')}</div>
+      <div css={emptyListHelpStyles}>{t('meetings.startMeetingHelp')}</div>
+      <div css={emptyListActionButtonContainerStyles}>
+        <Button variant={ButtonVariant.TERTIARY}>
+          <CallIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.meetNow')}
+        </Button>
+        <Button variant={ButtonVariant.TERTIARY}>
+          <CalendarIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.scheduleMeeting')}
+        </Button>
+      </div>
     </div>
   );
 };
