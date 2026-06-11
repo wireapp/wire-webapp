@@ -62,7 +62,7 @@ export class ConversationDetailsPage {
     this.selectedSearchList = this.page.getByTestId('selected-search-list');
     this.searchPeopleInput = page.getByRole('textbox', {name: 'Search by name'});
     this.searchList = this.page.locator('#add-participants').getByRole('list');
-    this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
+    this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete conversation'});
     this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
     this.devicesButton = this.page.getByRole('button', {name: 'Devices'});
     this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
