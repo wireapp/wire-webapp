@@ -21,6 +21,7 @@
 
 import is from '@sindresorhus/is';
 import {once} from 'events';
+import type {CloseEvent, ErrorEvent, Event as ReconnectingWebsocketEvent} from 'reconnecting-websocket';
 import {Maybe} from 'true-myth';
 import {Server as WebSocketServer} from 'ws';
 
@@ -42,6 +43,43 @@ type TimeoutRegistration = {
 type DeterministicTimeoutWallClock = ReconnectingWebsocketWallClock & {
   readonly advanceByMilliseconds: (delayInMilliseconds: number) => void;
 };
+
+type MockReconnectingWebsocketWrapper = {
+  binaryType: BinaryType;
+  close: jest.Mock;
+  onclose: ((event: CloseEvent) => void) | null;
+  onerror: ((event: ErrorEvent) => void) | null;
+  onmessage: ((event: MessageEvent) => void) | null;
+  onopen: ((event: ReconnectingWebsocketEvent) => void) | null;
+  readyState: WEBSOCKET_STATE;
+  reconnect: jest.Mock;
+  send: jest.Mock;
+};
+
+function createMockReconnectingWebsocketWrapper(readyState: WEBSOCKET_STATE): MockReconnectingWebsocketWrapper {
+  const socket: MockReconnectingWebsocketWrapper = {
+    binaryType: 'blob',
+    close: jest.fn(() => {
+      socket.readyState = WEBSOCKET_STATE.CLOSED;
+    }),
+    onclose: null,
+    onerror: null,
+    onmessage: null,
+    onopen: null,
+    readyState,
+    reconnect: jest.fn(),
+    send: jest.fn(),
+  };
+
+  return socket;
+}
+
+function expectSocketHandlersToBeBound(socket: MockReconnectingWebsocketWrapper): void {
+  expect(socket.onclose).toEqual(expect.any(Function));
+  expect(socket.onerror).toEqual(expect.any(Function));
+  expect(socket.onmessage).toEqual(expect.any(Function));
+  expect(socket.onopen).toEqual(expect.any(Function));
+}
 
 function createDeterministicTimeoutWallClock(
   initialCurrentTimestampInMilliseconds: number,
@@ -227,33 +265,90 @@ describe('ReconnectingWebsocket', () => {
 
   it('reconnects in place when connect is called on an open socket', () => {
     const onReconnect = jest.fn().mockReturnValue(getServerAddress());
-    const RWS = createRWS(onReconnect);
-
-    const socket = {
-      readyState: WEBSOCKET_STATE.OPEN,
-      close: jest.fn(),
-      reconnect: jest.fn(),
-      send: jest.fn(),
-      onmessage: undefined,
-      onerror: undefined,
-      onopen: undefined,
-      onclose: undefined,
-    };
-
-    const getSocketSpy = jest.spyOn(
-      RWS as unknown as {getReconnectingWebsocket: () => typeof RWS},
-      'getReconnectingWebsocket',
-    );
-    getSocketSpy.mockReturnValueOnce(socket as unknown as typeof RWS);
+    const socket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.OPEN);
+    const websocketFactory = jest.fn(() => {
+      return socket;
+    });
+    const RWS = createRWS(onReconnect, {
+      ...defaultReconnectingWebsocketTestOptions,
+      websocketFactory: Maybe.just(websocketFactory),
+    });
 
     RWS.connect();
     RWS.connect();
 
-    expect(getSocketSpy).toHaveBeenCalledTimes(1);
+    expect(websocketFactory).toHaveBeenCalledTimes(1);
     expect(socket.reconnect).toHaveBeenCalledTimes(1);
     expect(socket.reconnect).toHaveBeenCalledWith(CloseEventCode.NORMAL_CLOSURE);
     expect(socket.close).not.toHaveBeenCalled();
     expect(RWS['socket']).toBe(socket);
+
+    RWS.disconnect();
+  });
+
+  it('creates a fresh wrapper when connect is called on an existing closed socket', () => {
+    const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+    const closedSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CLOSED);
+    const nextSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+    const sockets = [closedSocket, nextSocket];
+    const websocketFactory = jest.fn(() => {
+      const socket = sockets[websocketFactory.mock.calls.length - 1];
+
+      if (!socket) {
+        throw new Error('Unexpected websocketFactory call');
+      }
+
+      return socket;
+    });
+    const RWS = createRWS(onReconnect, {
+      ...defaultReconnectingWebsocketTestOptions,
+      websocketFactory: Maybe.just(websocketFactory),
+    });
+
+    RWS.connect();
+    expect(RWS['socket']).toBe(closedSocket);
+
+    RWS.connect();
+
+    expect(closedSocket.reconnect).not.toHaveBeenCalled();
+    expect(websocketFactory).toHaveBeenCalledTimes(2);
+    expect(RWS['socket']).toBe(nextSocket);
+    expectSocketHandlersToBeBound(nextSocket);
+
+    RWS.disconnect();
+  });
+
+  it('creates a fresh wrapper when reconnecting after disconnect left the existing socket closed', () => {
+    const onReconnect = jest.fn().mockReturnValue(getServerAddress());
+    const firstSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.OPEN);
+    const secondSocket = createMockReconnectingWebsocketWrapper(WEBSOCKET_STATE.CONNECTING);
+    const sockets = [firstSocket, secondSocket];
+    const websocketFactory = jest.fn(() => {
+      const socket = sockets[websocketFactory.mock.calls.length - 1];
+
+      if (!socket) {
+        throw new Error('Unexpected websocketFactory call');
+      }
+
+      return socket;
+    });
+    const RWS = createRWS(onReconnect, {
+      ...defaultReconnectingWebsocketTestOptions,
+      websocketFactory: Maybe.just(websocketFactory),
+    });
+
+    RWS.connect();
+    RWS.disconnect();
+
+    expect(firstSocket.close).toHaveBeenCalledWith(CloseEventCode.NORMAL_CLOSURE, 'Closed by client');
+    expect(firstSocket.readyState).toBe(WEBSOCKET_STATE.CLOSED);
+
+    RWS.connect();
+
+    expect(firstSocket.reconnect).not.toHaveBeenCalled();
+    expect(websocketFactory).toHaveBeenCalledTimes(2);
+    expect(RWS['socket']).toBe(secondSocket);
+    expectSocketHandlersToBeBound(secondSocket);
 
     RWS.disconnect();
   });

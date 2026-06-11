@@ -290,16 +290,28 @@ export class ReconnectingWebsocket {
     this.resetLongRunningRetrySequence();
     this.stopPinging();
 
-    if (!is.undefined(this.socket)) {
-      if (this.socket.readyState !== WEBSOCKET_STATE.CLOSED) {
-        this.logger.warn(
-          `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[this.socket.readyState]} (${this.socket.readyState}); reconnecting in place`,
-        );
-      }
-      this.reconnectInPlace(this.socket);
+    const existingSocket = this.socket;
+
+    if (!is.undefined(existingSocket) && !this.isExistingSocketClosed(existingSocket)) {
+      this.logger.warn(
+        `Existing WebSocket instance detected in state ${WEBSOCKET_STATE[existingSocket.readyState]} (${existingSocket.readyState}); reconnecting in place`,
+      );
+      this.reconnectInPlace(existingSocket);
       return;
     }
 
+    if (!is.undefined(existingSocket)) {
+      this.logger.info('Existing WebSocket wrapper is CLOSED, creating a fresh wrapper');
+    }
+
+    this.createAndBindSocketWrapper();
+  }
+
+  private isExistingSocketClosed(socket: ReconnectingWebsocketWrapper): boolean {
+    return socket.readyState === WEBSOCKET_STATE.CLOSED;
+  }
+
+  private createAndBindSocketWrapper(): void {
     const nextSocket = this.getReconnectingWebsocket();
     this.socket = nextSocket;
     this.bindSocketHandlers(nextSocket);
