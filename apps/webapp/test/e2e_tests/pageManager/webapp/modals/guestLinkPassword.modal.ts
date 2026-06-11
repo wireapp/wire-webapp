@@ -28,7 +28,7 @@ export class GuestLinkPasswordModal extends BaseModal {
   readonly errorMessage: Locator;
 
   constructor(page: Page) {
-    super(page, 'modal-template-guest-link-password');
+    super(page);
 
     this.setPasswordInput = this.modal.getByRole('textbox', {name: 'Set password'});
     this.confirmPasswordInput = this.modal.getByRole('textbox', {name: 'Confirm password'});

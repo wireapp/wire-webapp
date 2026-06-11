@@ -130,10 +130,10 @@ const ModalComponent = ({
           {showLoading ? (
             <LoadingIcon width="48" height="48" css={{path: {fill: 'var(--modal-bg)'}}} />
           ) : (
+            // eslint-disable-next-line jsx-a11y/no-static-element-interactions --- tabIndex is already set to -1 through enum value
             <div
               id={trapId}
               onClick={event => event.stopPropagation()}
-              role="button"
               tabIndex={TabIndex.UNFOCUSABLE}
               onKeyDown={event => (onKeyDown ? onKeyDown(event) : event.stopPropagation())}
               css={{...(hasVisibleClass ? ModalContentVisibleStyles : ModalContentStyles), ...wrapperCSS}}

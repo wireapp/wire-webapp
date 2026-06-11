@@ -23,6 +23,6 @@ import {BaseModal} from './base.modal';
 
 export class WithoutTitle extends BaseModal {
   constructor(page: Page) {
-    super(page, 'modal-without-title');
+    super(page);
   }
 }
