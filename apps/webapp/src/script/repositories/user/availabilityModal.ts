@@ -20,12 +20,20 @@
 import {Availability} from '@wireapp/protocol-messaging';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {t} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
 const initialKey = 'hide_initial_modal';
 
-function showModal(storageKey: string, title: string, message: string): void {
+type Translate = (
+  key: TranslationKey,
+  substitutions?: Substitutions,
+  dangerousSubstitutions?: Record<string, string>,
+  skipEscaping?: boolean,
+) => string;
+
+function showModal(storageKey: string, title: string, message: string, translate: Translate): void {
   const hideModal = loadValue(storageKey);
   if (!hideModal) {
     PrimaryModal.show(
@@ -39,13 +47,13 @@ function showModal(storageKey: string, title: string, message: string): void {
               storeValue(storageKey, 'true');
             }
           },
-          text: t('modalAcknowledgeAction'),
+          text: translate('modalAcknowledgeAction'),
         },
         text: {
           message,
-          option: t('modalAvailabilityDontShowAgain'),
+          option: translate('modalAvailabilityDontShowAgain'),
           title,
-          closeBtnLabel: t('modalAvailabilityRemoveBtn'),
+          closeBtnLabel: translate('modalAvailabilityRemoveBtn'),
         },
       },
       'availability',
@@ -53,32 +61,52 @@ function showModal(storageKey: string, title: string, message: string): void {
   }
 }
 
-export function showAvailabilityModal(availability: Availability.Type): void {
+export function showAvailabilityModal(availability: Availability.Type, translate: Translate = t): void {
   if (availability !== Availability.Type.NONE) {
     storeValue(initialKey, 'true');
   }
   switch (availability) {
     case Availability.Type.AWAY: {
-      showModal('hide_away_modal', t('modalAvailabilityAwayTitle'), t('modalAvailabilityAwayMessage'));
+      showModal(
+        'hide_away_modal',
+        translate('modalAvailabilityAwayTitle'),
+        translate('modalAvailabilityAwayMessage'),
+        translate,
+      );
       break;
     }
     case Availability.Type.BUSY: {
-      showModal('hide_busy_modal', t('modalAvailabilityBusyTitle'), t('modalAvailabilityBusyMessage'));
+      showModal(
+        'hide_busy_modal',
+        translate('modalAvailabilityBusyTitle'),
+        translate('modalAvailabilityBusyMessage'),
+        translate,
+      );
       break;
     }
     case Availability.Type.AVAILABLE: {
-      showModal('hide_available_modal', t('modalAvailabilityAvailableTitle'), t('modalAvailabilityAvailableMessage'));
+      showModal(
+        'hide_available_modal',
+        translate('modalAvailabilityAvailableTitle'),
+        translate('modalAvailabilityAvailableMessage'),
+        translate,
+      );
       break;
     }
     case Availability.Type.NONE: {
-      showModal('hide_none_modal', t('modalAvailabilityNoneTitle'), t('modalAvailabilityNoneMessage'));
+      showModal(
+        'hide_none_modal',
+        translate('modalAvailabilityNoneTitle'),
+        translate('modalAvailabilityNoneMessage'),
+        translate,
+      );
     }
   }
 }
 
-export function showInitialModal(availability: Availability.Type): void {
+export function showInitialModal(availability: Availability.Type, translate: Translate = t): void {
   const hideInitialModal = loadValue(initialKey);
   if (!hideInitialModal && availability !== Availability.Type.NONE) {
-    showAvailabilityModal(availability);
+    showAvailabilityModal(availability, translate);
   }
 }

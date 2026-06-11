@@ -24,6 +24,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions, PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from 'src/script/Config';
+import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {replaceLink, t} from 'Util/localizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};
@@ -58,15 +59,23 @@ interface GetModalOptions {
     isGracePeriodOver?: boolean;
   };
 }
-export const getModalOptions = ({
-  type,
-  primaryActionFn,
-  secondaryActionFn,
-  hidePrimary = false,
-  hideSecondary = false,
-  hideClose = true,
-  extraParams,
-}: GetModalOptions) => {
+export const getModalOptions = (
+  {
+    type,
+    primaryActionFn,
+    secondaryActionFn,
+    hidePrimary = false,
+    hideSecondary = false,
+    hideClose = true,
+    extraParams,
+  }: GetModalOptions,
+  translate: (
+    key: TranslationKey,
+    substitutions?: Substitutions,
+    dangerousSubstitutions?: Record<string, string>,
+    skipEscaping?: boolean,
+  ) => string = t,
+) => {
   if (!secondaryActionFn) {
     hideSecondary = true;
   }
@@ -83,7 +92,7 @@ export const getModalOptions = ({
 
   const supportUrl = Config.getConfig().URL.SUPPORT.E2EI_VERIFICATION_CERTIFICATE;
 
-  const gracePeriodOverParagraph = t(
+  const gracePeriodOverParagraph = translate(
     'acme.settingsChanged.gracePeriodOver.paragraph',
     {url: supportUrl},
     {
@@ -92,7 +101,7 @@ export const getModalOptions = ({
     },
   );
 
-  const settingsChangedParagraph = t(
+  const settingsChangedParagraph = translate(
     'acme.settingsChanged.paragraph',
     {url: supportUrl},
     {
@@ -105,17 +114,17 @@ export const getModalOptions = ({
     case ModalType.ENROLL:
       options = {
         text: {
-          closeBtnLabel: t('acme.settingsChanged.button.close'),
+          closeBtnLabel: translate('acme.settingsChanged.button.close'),
           htmlMessage: extraParams?.isGracePeriodOver === true ? gracePeriodOverParagraph : settingsChangedParagraph,
-          title: t('acme.settingsChanged.headline.alt'),
+          title: translate('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
           action: primaryActionFn,
-          text: t('acme.settingsChanged.button.primary'),
+          text: translate('acme.settingsChanged.button.primary'),
         },
         secondaryAction: {
           action: secondaryActionFn,
-          text: t('acme.settingsChanged.button.secondary'),
+          text: translate('acme.settingsChanged.button.secondary'),
         },
         ...hideCloseBtn,
       };
@@ -128,20 +137,20 @@ export const getModalOptions = ({
     case ModalType.CERTIFICATE_RENEWAL:
       options = {
         text: {
-          closeBtnLabel: t('acme.renewCertificate.button.close'),
+          closeBtnLabel: translate('acme.renewCertificate.button.close'),
           htmlMessage:
             extraParams?.isGracePeriodOver === true
-              ? t('acme.renewCertificate.gracePeriodOver.paragraph', {url: supportUrl})
-              : t('acme.renewCertificate.paragraph', {url: supportUrl}),
-          title: t('acme.renewCertificate.headline.alt'),
+              ? translate('acme.renewCertificate.gracePeriodOver.paragraph', {url: supportUrl})
+              : translate('acme.renewCertificate.paragraph', {url: supportUrl}),
+          title: translate('acme.renewCertificate.headline.alt'),
         },
         primaryAction: {
           action: primaryActionFn,
-          text: t('acme.renewCertificate.button.primary'),
+          text: translate('acme.renewCertificate.button.primary'),
         },
         secondaryAction: {
           action: secondaryActionFn,
-          text: t('acme.renewCertificate.button.secondary'),
+          text: translate('acme.renewCertificate.button.secondary'),
         },
         ...hideCloseBtn,
       };
@@ -154,14 +163,14 @@ export const getModalOptions = ({
     case ModalType.SELF_CERTIFICATE_REVOKED:
       options = {
         text: {
-          htmlMessage: t('acme.selfCertificateRevoked.text'),
-          title: t('acme.selfCertificateRevoked.title'),
+          htmlMessage: translate('acme.selfCertificateRevoked.text'),
+          title: translate('acme.selfCertificateRevoked.title'),
         },
         primaryAction: {
           action: primaryActionFn,
-          text: t('acme.selfCertificateRevoked.button.primary'),
+          text: translate('acme.selfCertificateRevoked.button.primary'),
         },
-        confirmCancelBtnLabel: t('acme.selfCertificateRevoked.button.cancel'),
+        confirmCancelBtnLabel: translate('acme.selfCertificateRevoked.button.cancel'),
         allButtonsFullWidth: true,
         primaryBtnFirst: true,
       };
@@ -171,16 +180,16 @@ export const getModalOptions = ({
     case ModalType.SNOOZE_REMINDER:
       options = {
         text: {
-          closeBtnLabel: t('acme.settingsChanged.button.close'),
-          htmlMessage: t('acme.remindLater.paragraph', {
+          closeBtnLabel: translate('acme.settingsChanged.button.close'),
+          htmlMessage: translate('acme.remindLater.paragraph', {
             delayTime: extraParams?.delayTime ?? 0,
             url: supportUrl,
           }),
-          title: t('acme.settingsChanged.headline.alt'),
+          title: translate('acme.settingsChanged.headline.alt'),
         },
         primaryAction: {
           action: primaryActionFn,
-          text: t('acme.remindLater.button.primary'),
+          text: translate('acme.remindLater.button.primary'),
         },
         ...hideCloseBtn,
       };
@@ -193,20 +202,20 @@ export const getModalOptions = ({
     case ModalType.ERROR:
       options = {
         text: {
-          closeBtnLabel: t('acme.error.button.close'),
+          closeBtnLabel: translate('acme.error.button.close'),
           htmlMessage:
             extraParams?.isGracePeriodOver === true
-              ? t('acme.error.gracePeriod.paragraph', undefined, {br: '<br>'})
-              : t('acme.error.paragraph', undefined, {br: '<br>'}),
-          title: t('acme.error.headline'),
+              ? translate('acme.error.gracePeriod.paragraph', undefined, {br: '<br>'})
+              : translate('acme.error.paragraph', undefined, {br: '<br>'}),
+          title: translate('acme.error.headline'),
         },
         primaryAction: {
           action: primaryActionFn,
-          text: t('acme.error.button.primary'),
+          text: translate('acme.error.button.primary'),
         },
         secondaryAction: {
           action: secondaryActionFn,
-          text: t('acme.error.button.secondary'),
+          text: translate('acme.error.button.secondary'),
         },
       };
       modalType =
@@ -219,7 +228,9 @@ export const getModalOptions = ({
       options = {
         text: {
           title:
-            extraParams?.isRenewal === true ? t('acme.renewal.inProgress.headline') : t('acme.inProgress.headline'),
+            extraParams?.isRenewal === true
+              ? translate('acme.renewal.inProgress.headline')
+              : translate('acme.inProgress.headline'),
         },
         ...hideCloseBtn,
       };
@@ -230,21 +241,22 @@ export const getModalOptions = ({
     case ModalType.SUCCESS:
       options = {
         text: {
-          closeBtnLabel: t('acme.done.button.close'),
+          closeBtnLabel: translate('acme.done.button.close'),
           htmlMessage: `<div style="text-align: center">${svgHtml}${
             extraParams?.isRenewal === true
-              ? t('acme.renewal.done.paragraph', {url: supportUrl})
-              : t('acme.done.paragraph', {url: supportUrl})
+              ? translate('acme.renewal.done.paragraph', {url: supportUrl})
+              : translate('acme.done.paragraph', {url: supportUrl})
           }</div>`,
-          title: extraParams?.isRenewal === true ? t('acme.renewal.done.headline') : t('acme.done.headline'),
+          title:
+            extraParams?.isRenewal === true ? translate('acme.renewal.done.headline') : translate('acme.done.headline'),
         },
         primaryAction: {
           action: primaryActionFn,
-          text: t('acme.done.button'),
+          text: translate('acme.done.button'),
         },
         secondaryAction: {
           action: secondaryActionFn,
-          text: t('acme.done.button.secondary'),
+          text: translate('acme.done.button.secondary'),
         },
         ...hideCloseBtn,
       };
@@ -256,9 +268,9 @@ export const getModalOptions = ({
         hideCloseBtn: true,
         preventClose: true,
         text: {
-          htmlMessage: t('featureConfigChangeModalDownloadPathEnabled'),
+          htmlMessage: translate('featureConfigChangeModalDownloadPathEnabled'),
 
-          title: t('featureConfigChangeModalDownloadPathHeadline', {
+          title: translate('featureConfigChangeModalDownloadPathHeadline', {
             brandName: Config.getConfig().BRAND_NAME,
           }),
         },

@@ -20,25 +20,30 @@
 import {PlusIcon} from 'Components/icon';
 import type {ConversationLabelRepository} from 'Repositories/conversation/ConversationLabelRepository';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
 
 import {ContextMenuEntry, showContextMenu} from './ContextMenu';
+
+type LabelContextMenuCopy = {
+  readonly newFolder: string;
+  readonly noCustomFolders: string;
+};
 
 export const showLabelContextMenu = (
   event: MouseEvent | React.MouseEvent<Element, MouseEvent>,
   conversation: Conversation,
   labelRepository: ConversationLabelRepository,
+  labelContextMenuCopy: LabelContextMenuCopy,
 ): void => {
   const newLabel: ContextMenuEntry = {
     click: () => labelRepository.addConversationToNewLabel(conversation),
     icon: PlusIcon,
-    label: t('conversationsPopoverNewFolder'),
+    label: labelContextMenuCopy.newFolder,
   };
   const separator: ContextMenuEntry = {isSeparator: true};
 
   const noLabels: ContextMenuEntry = {
     isDisabled: true,
-    label: t('conversationsPopoverNoCustomFolders'),
+    label: labelContextMenuCopy.noCustomFolders,
   };
 
   const conversationLabel = labelRepository.getConversationCustomLabel(conversation);

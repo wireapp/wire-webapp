@@ -23,6 +23,7 @@ import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHold
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
+import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
 import {t} from 'Util/localizerUtil';
 
 import {ConversationError} from '../error/conversationError';
@@ -31,6 +32,12 @@ import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
 export const showLegalHoldWarningModal = (
   conversationEntity: Conversation,
   conversationDegraded: boolean,
+  translate: (
+    key: TranslationKey,
+    substitutions?: Substitutions,
+    dangerousSubstitutions?: Record<string, string>,
+    skipEscaping?: boolean,
+  ) => string = t,
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     const secondaryAction = [
@@ -39,14 +46,14 @@ export const showLegalHoldWarningModal = (
           const {showUsers} = useLegalHoldModalState.getState();
           showUsers(false, conversationEntity);
         },
-        text: t('legalHoldWarningSecondaryInformation'),
+        text: translate('legalHoldWarningSecondaryInformation'),
       },
     ];
 
     if (conversationDegraded) {
       secondaryAction.push({
         action: () => amplify.publish(OPEN_CONVERSATION_DETAILS),
-        text: t('legalHoldWarningSecondaryVerify'),
+        text: translate('legalHoldWarningSecondaryVerify'),
       });
     }
 
@@ -67,12 +74,12 @@ export const showLegalHoldWarningModal = (
           }
           resolve();
         },
-        text: t('legalHoldWarningPrimary'),
+        text: translate('legalHoldWarningPrimary'),
       },
       secondaryAction,
       text: {
-        htmlMessage: t('legalHoldWarningMessage', undefined, {br: '<br>'}),
-        title: t('legalHoldWarningTitle'),
+        htmlMessage: translate('legalHoldWarningMessage', undefined, {br: '<br>'}),
+        title: translate('legalHoldWarningTitle'),
       },
     });
   });

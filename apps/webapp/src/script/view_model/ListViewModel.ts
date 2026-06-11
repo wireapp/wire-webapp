@@ -403,7 +403,11 @@ export class ListViewModel {
       }
 
       entries.push({
-        click: () => showLabelContextMenu(event, conversationEntity, conversationLabelRepository),
+        click: () =>
+          showLabelContextMenu(event, conversationEntity, conversationLabelRepository, {
+            newFolder: t('conversationsPopoverNewFolder'),
+            noCustomFolders: t('conversationsPopoverNoCustomFolders'),
+          }),
         label: t('conversationsPopoverMoveTo'),
       });
     }
@@ -479,7 +483,7 @@ export class ListViewModel {
 
   readonly clickToArchive = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (this.isActivatedAccount() && conversationEntity !== undefined) {
-      this.actionsViewModel.archiveConversation(conversationEntity);
+      void this.actionsViewModel.archiveConversation(conversationEntity);
     }
   };
 
@@ -509,22 +513,22 @@ export class ListViewModel {
     const hideConversation = this.shouldHideConversation(conversationEntity);
     const nextConversationEntity = this.conversationRepository.getNextConversation(conversationEntity);
 
-    this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
+    void this.actionsViewModel.cancelConnectionRequest(userEntity, hideConversation, nextConversationEntity);
   };
 
   readonly clickToClear = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (conversationEntity !== undefined) {
-      this.actionsViewModel.clearConversation(conversationEntity);
+      void this.actionsViewModel.clearConversation(conversationEntity);
     }
   };
 
   readonly clickToLeave = (conversationEntity: Conversation): void => {
-    this.actionsViewModel.leaveConversation(conversationEntity);
+    void this.actionsViewModel.leaveConversation(conversationEntity);
   };
 
   readonly clickToToggleMute = (conversationEntity = this.conversationState.activeConversation()): void => {
     if (conversationEntity !== undefined) {
-      this.actionsViewModel.toggleMuteConversation(conversationEntity);
+      void this.actionsViewModel.toggleMuteConversation(conversationEntity);
     }
   };
 
@@ -535,7 +539,7 @@ export class ListViewModel {
   };
 
   readonly clickToUnarchive = (conversationEntity: Conversation): void => {
-    this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
+    void this.conversationRepository.unarchiveConversation(conversationEntity, true, 'manual un-archive').then(() => {
       if (!this.conversationState.archivedConversations().length) {
         this.switchList(ListState.CONVERSATIONS);
       }
