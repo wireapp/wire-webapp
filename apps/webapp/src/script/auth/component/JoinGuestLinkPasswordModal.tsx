@@ -24,7 +24,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Button, COLOR, Container, ErrorMessage, Form, H2, Input, Link, Modal, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {Config} from '../../Config';
 
@@ -43,6 +43,7 @@ const JoinGuestLinkPasswordModal = ({
   conversationName,
   onSubmitPassword,
 }: JoinGuestLinkPasswordModalProps) => {
+  const {translate} = useApplicationContext();
   const [passwordValue, setPasswordValue] = useState<string>('');
 
   const onSubmit = (event: FormEvent<HTMLFormElement | HTMLButtonElement>) => {
@@ -52,7 +53,7 @@ const JoinGuestLinkPasswordModal = ({
 
   const Error = () => {
     if (error?.code === HTTP_STATUS.FORBIDDEN || error?.code === HTTP_STATUS.BAD_REQUEST) {
-      return <ErrorMessage>{t('guestLinkPasswordModal.passwordIncorrect')}</ErrorMessage>;
+      return <ErrorMessage>{translate('guestLinkPasswordModal.passwordIncorrect')}</ErrorMessage>;
     }
     return null;
   };
@@ -62,11 +63,11 @@ const JoinGuestLinkPasswordModal = ({
       <Container style={{maxWidth: '400px'}}>
         <H2 style={{whiteSpace: 'break-spaces', fontWeight: 500, marginTop: '10px', textAlign: 'center'}}>
           {is.nonEmptyString(conversationName)
-            ? t('guestLinkPasswordModal.headline', {conversationName})
-            : t('guestLinkPasswordModal.headlineDefault')}
+            ? translate('guestLinkPasswordModal.headline', {conversationName})
+            : translate('guestLinkPasswordModal.headlineDefault')}
         </H2>
         <Text block fontSize="var(--font-size-base)" style={{marginBottom: 24}}>
-          {t('guestLinkPasswordModal.description')}
+          {translate('guestLinkPasswordModal.description')}
         </Text>
         <Form
           name="guest-password-join-form"
@@ -79,13 +80,13 @@ const JoinGuestLinkPasswordModal = ({
             data-uie-name="guest-link-join-password-input"
             name="guest-join-password"
             required
-            placeholder={t('guestLinkPasswordModal.passwordInputLabel')}
-            label={t('guestLinkPasswordModal.passwordInputLabel')}
+            placeholder={translate('guestLinkPasswordModal.passwordInputLabel')}
+            label={translate('guestLinkPasswordModal.passwordInputLabel')}
             id="guest_link_join_password"
             className="modal__input"
             type="password"
-            showTogglePasswordLabel={t('showTogglePasswordLabel')}
-            hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+            showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+            hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
             autoComplete="off"
             value={passwordValue}
             onChange={event => setPasswordValue(event.currentTarget.value)}
@@ -93,7 +94,7 @@ const JoinGuestLinkPasswordModal = ({
         </Form>
         <Link href={Config.getConfig().URL.SUPPORT.LEARN_MORE_ABOUT_GUEST_LINKS} target="_blank">
           <Text block color={COLOR.BLUE} style={{textDecoration: 'underline', marginBottom: 24}}>
-            {t('guestLinkPasswordModal.learnMoreLink')}
+            {translate('guestLinkPasswordModal.learnMoreLink')}
           </Text>
         </Link>
         <Button
@@ -104,7 +105,7 @@ const JoinGuestLinkPasswordModal = ({
           onClick={(event: FormEvent<HTMLButtonElement>) => onSubmit(event)}
           data-uie-name="guest-link-join-submit-button"
         >
-          {t('guestLinkPasswordModal.joinConversation')}
+          {translate('guestLinkPasswordModal.joinConversation')}
         </Button>
       </Container>
     </Modal>

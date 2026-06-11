@@ -47,8 +47,8 @@ import {
 import {WebAppEvents} from '@wireapp/webapp-events';
 
 import {LogoFullIcon} from 'Components/icon';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
-import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {SingleSignOnForm} from './singleSignOnForm';
@@ -67,6 +67,7 @@ type Props = React.HTMLAttributes<HTMLDivElement>;
 const logger = getLogger('SingleSignOn');
 
 const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
   const ssoWindowRef = useRef<Window | null>(null);
   const params = useParams<{code?: string}>();
   const isTablet = useMatchMedia(QUERY[QueryKeys.TABLET_DOWN]);
@@ -201,14 +202,14 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
         <Overlay>
           <Container centerText style={{color: COLOR.WHITE, maxWidth: '330px'}}>
             <div style={{alignItems: 'center', display: 'flex', justifyContent: 'center', marginBottom: '30px'}}>
-              <Logo height={24} color={COLOR.WHITE} ariaLabel={t('accessibility.logo.wire')} />
+              <Logo height={24} color={COLOR.WHITE} ariaLabel={translate('accessibility.logo.wire')} />
             </div>
             <Text
               style={{fontSize: '0.875rem', fontWeight: 400, marginTop: '32px'}}
               color={COLOR.WHITE}
               data-uie-name="status-overlay-description"
             >
-              {t('ssoLogin.overlayDescription')}
+              {translate('ssoLogin.overlayDescription')}
             </Text>
             <Link
               block
@@ -224,7 +225,7 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
               onClick={focusChildWindow}
               data-uie-name="do-focus-child-window"
             >
-              {t('ssoLogin.overlayFocusLink')}
+              {translate('ssoLogin.overlayFocusLink')}
             </Link>
           </Container>
         </Overlay>
@@ -276,36 +277,36 @@ const SingleSignOnComponent = ({hasDefaultSSOCode}: Props & ConnectedProps & Dis
                       tabIndex={-1}
                     >
                       <span id="sso-login-heading-label" style={srOnlyStyle}>
-                        {t('authLoginTitle')}
+                        {translate('authLoginTitle')}
                       </span>
                       <span id="sso-login-heading-text">
-                        {t('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
+                        {translate('index.welcome', {brandName: Config.getConfig().BACKEND_NAME})}
                       </span>
                     </div>
 
                     <Text block center data-uie-name="status-email-or-sso-code">
-                      {t('ssoLogin.subheadCodeOrEmail')}
+                      {translate('ssoLogin.subheadCodeOrEmail')}
                     </Text>
 
                     <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
                   </>
                 ) : (
                   <>
-                    <H1 center>{t('ssoLogin.headline')}</H1>
+                    <H1 center>{translate('ssoLogin.headline')}</H1>
                     {Config.getConfig().FEATURE.ENABLE_DOMAIN_DISCOVERY ? (
                       <>
                         <Muted block center data-uie-name="status-email-or-sso-code">
-                          {t('ssoLogin.subheadCodeOrEmail')}
+                          {translate('ssoLogin.subheadCodeOrEmail')}
                         </Muted>
 
                         <Muted block center data-uie-name="status-email-environment-switch-warning">
-                          {t('ssoLogin.subheadEmailEnvironmentSwitchWarning', {
+                          {translate('ssoLogin.subheadEmailEnvironmentSwitchWarning', {
                             brandName: Config.getConfig().BRAND_NAME,
                           })}
                         </Muted>
                       </>
                     ) : (
-                      <Muted data-uie-name="status-sso-code">{t('ssoLogin.subheadCode')}</Muted>
+                      <Muted data-uie-name="status-sso-code">{translate('ssoLogin.subheadCode')}</Muted>
                     )}
                     <SingleSignOnForm doLogin={handleSSOWindow} initialCode={params.code} />
                   </>

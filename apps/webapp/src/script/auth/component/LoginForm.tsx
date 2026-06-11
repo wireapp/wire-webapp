@@ -25,7 +25,7 @@ import {useSelector} from 'react-redux';
 
 import {Button, Input, Loading} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isValidEmail, isValidUsername} from 'Util/validationUtil';
 
 import {useAutoFocus} from '../hooks/useAutoFocus';
@@ -39,6 +39,7 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
+  const {translate} = useApplicationContext();
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
 
@@ -119,7 +120,7 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         markInvalid={!validEmailInput}
         value={email}
         autoComplete="username email"
-        placeholder={t('login.emailPlaceholder')}
+        placeholder={translate('login.emailPlaceholder')}
         maxLength={128}
         type="text"
         required
@@ -137,12 +138,12 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
         value={password}
         autoComplete="section-login password"
         type="password"
-        placeholder={t('login.passwordPlaceholder')}
+        placeholder={translate('login.passwordPlaceholder')}
         pattern={'.{1,1024}'}
         required
         data-uie-name="enter-password"
-        showTogglePasswordLabel={t('showTogglePasswordLabel')}
-        hideTogglePasswordLabel={t('hideTogglePasswordLabel')}
+        showTogglePasswordLabel={translate('showTogglePasswordLabel')}
+        hideTogglePasswordLabel={translate('hideTogglePasswordLabel')}
       />
 
       {isFetching ? (
@@ -154,10 +155,10 @@ const LoginForm = ({isFetching, onSubmit}: LoginFormProps) => {
           disabled={!is.nonEmptyString(email) || !is.nonEmptyString(password)}
           formNoValidate
           onClick={handleSubmit}
-          aria-label={t('login.headline')}
+          aria-label={translate('login.headline')}
           data-uie-name="do-sign-in"
         >
-          {t('login.headline')}
+          {translate('login.headline')}
         </Button>
       )}
     </div>

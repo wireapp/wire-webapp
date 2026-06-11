@@ -29,8 +29,8 @@ import {Runtime} from '@wireapp/commons';
 import {Button, ContainerXS, Form, Input, InputBlock, InputSubmitCombo, Text} from '@wireapp/react-ui-kit';
 
 import {StorageKey} from 'Repositories/storage';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {navigate} from 'src/script/router/Router';
-import {t} from 'Util/localizerUtil';
 import {storeValue} from 'Util/storageUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
@@ -61,6 +61,8 @@ const SetHandleComponent = ({
   name,
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
+  const {translate} = useApplicationContext();
+  const minimumHandleLength = 2;
   const [error, setError] = useState<unknown>(null);
   const [handle, setHandle] = useState('');
   const {state} = useLocation();
@@ -73,22 +75,22 @@ const SetHandleComponent = ({
         window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
       }
     }
-  }, [hasSelfHandle]);
+  }, [hasSelfHandle, isNewAccount, removeLocalStorage]);
 
   useEffect(() => {
-    (async () => {
-      doGetConsents();
+    void (async () => {
+      await doGetConsents();
       try {
         const suggestions = createSuggestions(name ?? '');
-        const handle = await checkHandles(suggestions);
-        setHandle(handle);
+        const availableHandle = await checkHandles(suggestions);
+        setHandle(availableHandle);
       } catch (error: unknown) {
         setError(error);
       }
     })();
 
     trackTelemetryPageView(PageView.ACCOUNT_USERNAME_SCREEN_3);
-  }, []);
+  }, [checkHandles, doGetConsents, name]);
 
   const updateConsent = (consentType: ConsentType, value: number): Promise<void> => doSetConsent(consentType, value);
 
@@ -103,7 +105,11 @@ const SetHandleComponent = ({
         navigate(ROUTE.SUCCESS);
       }
     } catch (error: unknown) {
-      if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_HANDLE && handle.trim().length < 2) {
+      if (
+        isBackendError(error) &&
+        error.label === BackendErrorLabel.INVALID_HANDLE &&
+        handle.trim().length < minimumHandleLength
+      ) {
         error.label = SyntheticErrorLabel.HANDLE_TOO_SHORT;
       }
       setError(error);
@@ -117,12 +123,12 @@ const SetHandleComponent = ({
 
   const handleAcceptNewletterConsent = () => {
     void updateConsent(ConsentType.MARKETING, 1);
-    storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, true);
+    void storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, true);
   };
 
   const handleDeclineNewletterConsent = () => {
     void updateConsent(ConsentType.MARKETING, 0);
-    storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, false);
+    void storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, false);
   };
 
   if (hasSelfHandle) {
@@ -134,10 +140,10 @@ const SetHandleComponent = ({
       <AccountRegistrationLayout>
         <ContainerXS centerText verticalCenter style={{display: 'flex', flexDirection: 'column', padding: '16px'}}>
           <Text fontSize="24px" css={{fontWeight: '500', marginBottom: '8px'}} center>
-            {t('chooseHandle.headline')}
+            {translate('chooseHandle.headline')}
           </Text>
           <Text block center>
-            {t('chooseHandle.subhead')}
+            {translate('chooseHandle.subhead')}
           </Text>
           <Form style={{marginTop: 24}} onSubmit={onSetHandle}>
             <InputBlock>
@@ -148,7 +154,7 @@ const SetHandleComponent = ({
                 <Input
                   id="handle"
                   name="handle"
-                  placeholder={t('chooseHandle.handlePlaceholder')}
+                  placeholder={translate('chooseHandle.handlePlaceholder')}
                   type="text"
                   onChange={onHandleChange}
                   value={handle}
@@ -162,7 +168,7 @@ const SetHandleComponent = ({
               data-uie-name="do-send-handle"
               block
             >
-              {t('chooseHandle.submitButton')}
+              {translate('chooseHandle.submitButton')}
             </Button>
           </Form>
           {error !== null ? parseError(error) : null}

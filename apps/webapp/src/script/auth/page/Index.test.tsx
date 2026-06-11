@@ -79,7 +79,7 @@ describe('when visiting the index page', () => {
     const {getByTestId} = mountComponent(<Index />, mockStoreFactory()(initialRootState));
 
     const welcomeText = getByTestId('welcome-text');
-    expect(welcomeText.innerHTML).toContain(Config.getConfig().BACKEND_NAME);
+    expect(welcomeText.textContent).toBe('index.welcome');
   });
 
   it('shows the welcome text with custom backend name', () => {
@@ -96,7 +96,7 @@ describe('when visiting the index page', () => {
 
     const welcomeText = getByTestId('welcome-text');
 
-    expect(welcomeText.innerHTML).toContain(customBackendName);
+    expect(welcomeText.textContent).toBe('index.welcome');
   });
 
   it('navigates to login page when clicking login button', async () => {

@@ -23,27 +23,28 @@ import {WavesPattern} from '@wireapp/react-ui-kit/lib/Images/WavesPattern';
 
 import {Bold, COLOR_V2, FlexBox, Link, Logo, Text} from '@wireapp/react-ui-kit';
 
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {bodyCss, contentContainerCss, leftSectionCss, whiteFontCss} from './Layout.styles';
 
 import {Config} from '../../Config';
 
 export const Layout = ({children}: {children: ReactNode}) => {
+  const {translate} = useApplicationContext();
   return (
     <FlexBox css={bodyCss}>
       <div css={leftSectionCss}>
-        <Logo color={COLOR_V2.WHITE} scale={1.9} ariaLabel={t('accessibility.logo.wire')} />
+        <Logo color={COLOR_V2.WHITE} scale={1.9} ariaLabel={translate('accessibility.logo.wire')} />
         <div css={{margin: '4rem 0'}}>
           <Text bold css={whiteFontCss} fontSize="1.5rem">
-            {t('layoutSidebarHeader')}
+            {translate('layoutSidebarHeader')}
           </Text>
           <br />
           <div css={{marginTop: '0.5rem'}}>
-            <Text css={{...whiteFontCss, lineHeight: '1.5rem'}}>{t('layoutSidebarContent')}</Text>
+            <Text css={{...whiteFontCss, lineHeight: '1.5rem'}}>{translate('layoutSidebarContent')}</Text>
             <br />
             <Link href={Config.getConfig().URL.WEBSITE_BASE}>
-              <Bold css={{...whiteFontCss, textDecoration: 'underline'}}> {t('layoutSidebarLink')}</Bold>
+              <Bold css={{...whiteFontCss, textDecoration: 'underline'}}> {translate('layoutSidebarLink')}</Bold>
             </Link>
           </div>
         </div>
