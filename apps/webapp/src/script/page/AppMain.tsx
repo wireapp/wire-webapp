@@ -68,6 +68,7 @@ import {ContentState, useAppState} from './useAppState';
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {WallClock} from '../clock/wallClock';
+import {meetingsFeatureToggleName} from '../featureToggles/startupFeatureToggleNames';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
 import {App} from '../main/app';
 import {initialiseMLSMigrationFlow} from '../mls/MLSMigration';
@@ -256,6 +257,10 @@ export const AppMain = (properties: AppMainProps) => {
       '/preferences/av': () => mainView.list.openPreferencesAudioVideo(),
       '/preferences/devices': () => mainView.list.openPreferencesDevices(),
       '/preferences/options': () => mainView.list.openPreferencesOptions(),
+      '/meetings': () =>
+        teamState.isMeetingsEnabled() && isFeatureToggleEnabled(meetingsFeatureToggleName)
+          ? mainView.list.openMeetingsList()
+          : navigate('/'),
       '/user/:userId/:domain': showUserProfile,
       '/user/:domain/:userId': showUserProfile,
       '/user/:userId': showUserProfile,
@@ -304,7 +309,11 @@ export const AppMain = (properties: AppMainProps) => {
   useE2EIFeatureConfigUpdate(repositories.team);
 
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
-  const showMainContent = currentTab === SidebarTabs.CELLS || !isMobileView || isMobileCentralColumnView;
+  const showMainContent =
+    currentTab === SidebarTabs.CELLS ||
+    currentTab === SidebarTabs.MEETINGS ||
+    !isMobileView ||
+    isMobileCentralColumnView;
   return (
     <StyledApp
       themeId={THEME_ID.DEFAULT}
@@ -344,7 +353,8 @@ export const AppMain = (properties: AppMainProps) => {
             <div
               id="app"
               className={cx('app', {
-                'app--hide-main-content-on-mobile': currentTab !== SidebarTabs.CELLS,
+                'app--hide-main-content-on-mobile':
+                  currentTab !== SidebarTabs.CELLS && currentTab !== SidebarTabs.MEETINGS,
               })}
             >
               {showLeftSidebar && (

@@ -17,16 +17,13 @@
  *
  */
 
-export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
-export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
-export const meetingsFeatureToggleName = 'meetings';
+import {CSSObject} from '@emotion/react';
 
-export const startupFeatureToggleNames = [
-  reliableWebsocketConnectionFeatureToggleName,
-  applockRefactoredFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
-  meetingsFeatureToggleName,
-] as const;
+export const dropdownIconStyles = (isMenuOpen: boolean): CSSObject => ({
+  transform: isMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+  transition: 'transform 150ms ease',
+});
 
-export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];
+export const callingButtonGroupStyles = {
+  margin: '7px 0',
+};

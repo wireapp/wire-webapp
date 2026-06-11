@@ -17,16 +17,15 @@
  *
  */
 
-export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
-export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
-export const meetingsFeatureToggleName = 'meetings';
+import {actionsStyles, headingStyles, wrapperStyles} from 'Components/Meeting/MeetingHeader/MeetingHeader.styles';
+import {MeetNowMultiActionButton} from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton';
+import {t} from 'Util/localizerUtil';
 
-export const startupFeatureToggleNames = [
-  reliableWebsocketConnectionFeatureToggleName,
-  applockRefactoredFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
-  meetingsFeatureToggleName,
-] as const;
-
-export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];
+export const MeetingHeader = () => (
+  <header css={wrapperStyles}>
+    <h2 css={headingStyles}>{t('meetings.navigation.title')}</h2>
+    <div css={actionsStyles}>
+      <MeetNowMultiActionButton />
+    </div>
+  </header>
+);

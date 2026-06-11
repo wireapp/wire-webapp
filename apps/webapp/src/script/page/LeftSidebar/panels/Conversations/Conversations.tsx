@@ -48,6 +48,7 @@ import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState, ListState} from 'src/script/page/useAppState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
+import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 
 import {ConversationCallingView} from './ConversationCallingView/ConversationCallingView';
 import {ConversationHeader} from './ConversationHeader';
@@ -112,6 +113,7 @@ export const Conversations = ({
   const {isChannelsEnabled} = useChannelsFeatureFlag();
   const [conversationsFilter, setConversationsFilter] = useState<string>('');
   const {classifiedDomains, isTeam} = useKoSubscribableChildren(teamState, ['classifiedDomains', 'isTeam']);
+  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
   const {connectRequests} = useKoSubscribableChildren(userState, ['connectRequests']);
   const {notifications} = useKoSubscribableChildren(preferenceNotificationRepository, ['notifications']);
 
@@ -154,6 +156,7 @@ export const Conversations = ({
 
   const isPreferences = currentTab === SidebarTabs.PREFERENCES;
   const isCells = currentTab === SidebarTabs.CELLS;
+  const isMeetings = currentTab === SidebarTabs.MEETINGS;
 
   const showSearchInput = [
     SidebarTabs.RECENT,
@@ -303,13 +306,21 @@ export const Conversations = ({
         void conversationRepository.updateArchivedConversations();
       }
 
-      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(nextTab)) {
+      if (![SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(nextTab)) {
         onExitPreferences();
       }
 
       if (nextTab === SidebarTabs.CELLS) {
         switchList(ListState.CELLS);
         switchContent(ContentState.CELLS);
+      }
+
+      if (nextTab === SidebarTabs.MEETINGS) {
+        if (!isMeetingsEnabled) {
+          return;
+        }
+        switchList(ListState.MEETINGS);
+        switchContent(ContentState.MEETINGS);
       }
 
       clearConversationFilter();
@@ -321,6 +332,7 @@ export const Conversations = ({
       onExitPreferences,
       switchList,
       switchContent,
+      isMeetingsEnabled,
       clearConversationFilter,
       setCurrentTab,
     ],
@@ -341,6 +353,14 @@ export const Conversations = ({
       resetDisabledFeatureTabs();
     }
   }, [isAdvancedFiltersEnabled, resetDisabledFeatureTabs]);
+
+  useEffect(() => {
+    if (!isMeetingsEnabled && currentTab === SidebarTabs.MEETINGS) {
+      setCurrentTab(SidebarTabs.RECENT);
+      switchList(ListState.CONVERSATIONS);
+      switchContent(ContentState.CONVERSATION);
+    }
+  }, [currentTab, isMeetingsEnabled, setCurrentTab, switchContent, switchList]);
 
   const onClickPreferences = useCallback(
     (itemId: ContentState) => {
@@ -438,7 +458,7 @@ export const Conversations = ({
           />
         }
       >
-        {isCells ? null : isPreferences ? (
+        {isCells || isMeetings ? null : isPreferences ? (
           <Preferences
             onPreferenceItemClick={onClickPreferences}
             teamRepository={teamRepository}

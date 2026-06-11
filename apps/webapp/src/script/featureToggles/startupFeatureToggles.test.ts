@@ -24,6 +24,7 @@ import {
 } from './startupFeatureToggles';
 import {
   applockRefactoredFeatureToggleName,
+  meetingsFeatureToggleName,
   reliableWebsocketConnectionFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
   startupFeatureToggleNames,
@@ -33,6 +34,7 @@ const featureToggleNamesWithDedicatedExistenceTests = [
   reliableWebsocketConnectionFeatureToggleName,
   applockRefactoredFeatureToggleName,
   sharedDriveSearchAndFiltersFeatureToggleName,
+  meetingsFeatureToggleName,
 ] as const;
 
 describe('startupFeatureToggles', function () {
@@ -93,6 +95,14 @@ describe('startupFeatureToggles', function () {
     expect(startupFeatureToggles.isFeatureToggleEnabled(sharedDriveSearchAndFiltersFeatureToggleName)).toBe(true);
   });
 
+  it('enables the meetings feature toggle when present in the query parameter', () => {
+    const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
+      `?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`,
+    );
+
+    expect(startupFeatureToggles.isFeatureToggleEnabled(meetingsFeatureToggleName)).toBe(true);
+  });
+
   it('trims whitespace around feature toggle names', () => {
     const startupFeatureToggles = createStartupFeatureTogglesFromLocationSearch(
       `?${startupFeatureToggleQueryParameterName}= ${reliableWebsocketConnectionFeatureToggleName} `,
@@ -134,6 +144,7 @@ describe('startupFeatureToggles', function () {
       reliableWebsocketConnectionFeatureToggleName,
       applockRefactoredFeatureToggleName,
       sharedDriveSearchAndFiltersFeatureToggleName,
+      meetingsFeatureToggleName,
     ]);
   });
 

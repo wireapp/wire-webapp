@@ -17,16 +17,32 @@
  *
  */
 
-export const reliableWebsocketConnectionFeatureToggleName = 'reliable-websocket-connection';
-export const applockRefactoredFeatureToggleName = 'applock-refactored';
-export const sharedDriveSearchAndFiltersFeatureToggleName = 'shared-drive-search-and-filters';
-export const meetingsFeatureToggleName = 'meetings';
+import {CSSObject} from '@emotion/react';
 
-export const startupFeatureToggleNames = [
-  reliableWebsocketConnectionFeatureToggleName,
-  applockRefactoredFeatureToggleName,
-  sharedDriveSearchAndFiltersFeatureToggleName,
-  meetingsFeatureToggleName,
-] as const;
+export const wrapperStyles: CSSObject = {
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+  borderBottom: '1px solid var(--border-color)',
+  minHeight: 'var(--content-title-bar-height)',
+  padding: '0 8px',
+};
 
-export type StartupFeatureToggleName = (typeof startupFeatureToggleNames)[number];
+export const headingStyles: CSSObject = {
+  position: 'absolute',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  margin: 0,
+  color: 'var(--main-color)',
+  fontWeight: 'var(--font-weight-semibold)',
+  fontSize: 'var(--font-size-medium)',
+};
+
+export const actionsStyles: CSSObject = {
+  marginLeft: 'auto',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+  zIndex: 1,
+};

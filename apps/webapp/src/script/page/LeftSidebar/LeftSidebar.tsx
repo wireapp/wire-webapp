@@ -61,7 +61,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
       id="left-column"
       className={cx('left-column', {
         'left-column--light-theme': !isActivatedAccount,
-        'left-column--shrinked': listState === ListState.CELLS,
+        'left-column--shrinked': [ListState.CELLS, ListState.MEETINGS].includes(listState),
       })}
     >
       {[
@@ -70,6 +70,7 @@ export const LeftSidebar = ({listViewModel, selfUser, isActivatedAccount}: LeftS
         ListState.PREFERENCES,
         ListState.ARCHIVE,
         ListState.CELLS,
+        ListState.MEETINGS,
       ].includes(listState) && (
         <Conversations
           selfUser={selfUser}
