@@ -293,6 +293,24 @@ describe('useConversationSearchFiles', () => {
     expect(onClear).toHaveBeenCalled();
   });
 
+  it('clears search-owned rows before handing control back to browse mode', async () => {
+    const onClear = jest.fn();
+    const {result, fireAndForgetInvoker} = renderSearchHook({onClear});
+    await act(() => fireAndForgetInvoker.waitUntilAllSettled());
+
+    useCellsStore.getState().setNodes({
+      conversationId: CONV_ID,
+      nodes: [staleFolderNode],
+    });
+    useCellsStore.getState().setStatus('success');
+
+    act(() => result.current.handleSearch(''));
+
+    expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toEqual([]);
+    expect(useCellsStore.getState().getPagination({conversationId: CONV_ID})).toBeNull();
+    expect(onClear).toHaveBeenCalled();
+  });
+
   it('does not write stale search results after the search input is cleared', async () => {
     const staleSearch = createDeferred<RestNodeCollection>();
     const cellsRepository = createFakeCellsRepository();

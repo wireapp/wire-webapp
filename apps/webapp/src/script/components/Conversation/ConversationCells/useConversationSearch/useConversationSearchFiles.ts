@@ -251,13 +251,18 @@ export const useConversationSearchFiles = ({
     setSearchQuery('');
     shouldPerformSearch.current = false;
 
-    if (preserveFilters && hasActiveParams) {
+    const shouldRefreshSearchResults = preserveFilters && hasActiveParams;
+
+    if (shouldRefreshSearchResults) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await searchNodes({query: '', filters});
       });
       return;
     }
 
+    // Search and browse share the same store. Clear search-owned rows before browse
+    // takes control again so stale search results cannot render with browse pagination.
+    clearAll({conversationId: id});
     onClear?.();
   };
 
