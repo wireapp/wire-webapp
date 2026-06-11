@@ -11277,7 +11277,7 @@ __metadata:
     "@types/node": "npm:^22.0.0"
     jest: "npm:^29.2.1"
     jsrsasign: "npm:11.1.1"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     ts-node: "npm:^10.9.1"
     typescript: "npm:^5.0.4"
   languageName: unknown
@@ -11298,7 +11298,7 @@ __metadata:
     jest: "npm:^29.2.1"
     logdown: "npm:3.3.1"
     platform: "npm:1.3.6"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
@@ -11330,7 +11330,7 @@ __metadata:
     jest: "npm:^29.2.1"
     jszip: "npm:3.10.1"
     logdown: "npm:3.3.1"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     typescript: "npm:^5.0.4"
   bin:
     copy-config: lib/cli.js
@@ -11442,7 +11442,7 @@ __metadata:
     logdown: "npm:3.3.1"
     npm-license-crawler: "npm:0.2.1"
     npm-registry-package-info: "npm:1.0.5"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     typescript: "npm:^5.0.4"
   bin:
     collect-licenses: src/cli.js
@@ -11483,7 +11483,7 @@ __metadata:
     "@types/jest": "npm:^29.2.0"
     "@types/node": "npm:^22.0.0"
     jest: "npm:^29.2.1"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     ts-node: "npm:^10.9.1"
     typescript: "npm:^5.0.4"
   languageName: unknown
@@ -11499,7 +11499,7 @@ __metadata:
     "@types/jest": "npm:^29.2.0"
     "@wireapp/commons": "workspace:^"
     jest: "npm:^29.2.1"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
@@ -11638,7 +11638,7 @@ __metadata:
     fake-indexeddb: "npm:^5.0.2"
     jest: "npm:^29.2.1"
     logdown: "npm:3.3.1"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     ts-node: "npm:^10.9.1"
     typescript: "npm:^5.0.4"
     uuid: "npm:9.0.1"
@@ -11659,7 +11659,7 @@ __metadata:
     "@wireapp/store-engine": "workspace:^"
     fs-extra: "npm:11.3.3"
     jest: "npm:^29.2.1"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     ts-node: "npm:10.9.2"
     typescript: "npm:^5.0.4"
   peerDependencies:
@@ -11686,7 +11686,7 @@ __metadata:
     "@types/jest": "npm:^29.2.0"
     "@types/node": "npm:^22.0.0"
     jest: "npm:^29.2.1"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     ts-node: "npm:10.9.2"
     typescript: "npm:^5.0.4"
   languageName: unknown
@@ -11698,7 +11698,7 @@ __metadata:
   dependencies:
     "@types/node": "npm:^22.0.0"
     countly-sdk-web: "npm:24.11.4"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     typescript: "npm:^5.0.4"
     vite: "npm:^6.0.1"
     vite-plugin-dts: "npm:^4.3.0"
@@ -11709,7 +11709,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/webapp-events@workspace:libraries/webapp-events"
   dependencies:
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     typescript: "npm:^5.0.4"
   languageName: unknown
   linkType: soft
@@ -13103,7 +13103,7 @@ __metadata:
     cross-env: "npm:10.1.0"
     jest: "npm:^29.2.1"
     libsodium-wrappers-sumo: "npm:0.8.4"
-    rimraf: "npm:6.1.2"
+    rimraf: "npm:6.1.3"
     ts-node: "npm:10.9.2"
     typescript: "npm:^5.0.4"
   languageName: unknown
@@ -18382,17 +18382,6 @@ __metadata:
   bin:
     glob: dist/esm/bin.mjs
   checksum: 10/da4501819633daff8822c007bb3f93d5c4d2cbc7b15a8e886660f4497dd251a1fb4f53a85fba1e760b31704eff7164aeb2c7a82db10f9f2c362d12c02fe52cf3
-  languageName: node
-  linkType: hard
-
-"glob@npm:^13.0.0":
-  version: 13.0.0
-  resolution: "glob@npm:13.0.0"
-  dependencies:
-    minimatch: "npm:^10.1.1"
-    minipass: "npm:^7.1.2"
-    path-scurry: "npm:^2.0.0"
-  checksum: 10/de390721d29ee1c9ea41e40ec2aa0de2cabafa68022e237dc4297665a5e4d650776f2573191984ea1640aba1bf0ea34eddef2d8cbfbfc2ad24b5fb0af41d8846
   languageName: node
   linkType: hard
 
@@ -27342,18 +27331,6 @@ __metadata:
   version: 1.0.4
   resolution: "reusify@npm:1.0.4"
   checksum: 10/14222c9e1d3f9ae01480c50d96057228a8524706db79cdeb5a2ce5bb7070dd9f409a6f84a02cbef8cdc80d39aef86f2dd03d155188a1300c599b05437dcd2ffb
-  languageName: node
-  linkType: hard
-
-"rimraf@npm:6.1.2":
-  version: 6.1.2
-  resolution: "rimraf@npm:6.1.2"
-  dependencies:
-    glob: "npm:^13.0.0"
-    package-json-from-dist: "npm:^1.0.1"
-  bin:
-    rimraf: dist/esm/bin.mjs
-  checksum: 10/add8e566fe903f59d7b55c6c2382320c48302778640d1951baf247b3b451af496c2dee7195c204a8c646fd6327feadd1f5b61ce68c1362d4898075a726d83cc6
   languageName: node
   linkType: hard
 
