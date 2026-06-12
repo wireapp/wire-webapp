@@ -11823,7 +11823,6 @@ __metadata:
     speakingurl: "npm:14.0.1"
     style-loader: "npm:4.0.0"
     svg-inline-loader: "npm:0.8.2"
-    text-encoding: "npm:0.7.0"
     tsyringe: "npm:4.10.0"
     underscore: "npm:1.13.8"
     use-debounce: "npm:10.1.1"
@@ -29587,13 +29586,6 @@ __metadata:
     glob: "npm:^7.1.4"
     minimatch: "npm:^3.0.4"
   checksum: 10/8fccb2cb6c8fcb6bb4115394feb833f8b6cf4b9503ec2485c2c90febf435cac62abe882a0c5c51a37b9bbe70640cdd05acf5f45e486ac4583389f4b0855f69e5
-  languageName: node
-  linkType: hard
-
-"text-encoding@npm:0.7.0":
-  version: 0.7.0
-  resolution: "text-encoding@npm:0.7.0"
-  checksum: 10/c61b7a59a54c58f0714da0ef4c1f65732821bb1f761e6f21c3e681e51c6dd56fdefa4fcfccd3254bf47132d87420fbc9898da21a804c89e87861f4e1478d5f18
   languageName: node
   linkType: hard
 
