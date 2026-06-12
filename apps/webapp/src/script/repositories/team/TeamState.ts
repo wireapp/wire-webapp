@@ -48,6 +48,7 @@ export class TeamState {
   public readonly isVideoCallingEnabled: ko.PureComputed<boolean>;
   public readonly isMLSEnabled: ko.PureComputed<boolean>;
   public readonly isProtocolToggleEnabledForUser: ko.PureComputed<boolean>;
+  public readonly isBackgroundEffectsEnabled: ko.PureComputed<boolean>;
   public readonly isGuestLinkEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnabled: ko.PureComputed<boolean>;
   public readonly isSelfDeletingMessagesEnforced: ko.PureComputed<boolean>;
@@ -132,6 +133,10 @@ export class TeamState {
     this.isConferenceCallingEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conferenceCalling?.status === FEATURE_STATUS.ENABLED,
     );
+
+    this.isBackgroundEffectsEnabled = ko.pureComputed(() => {
+      return this.teamFeatures()?.backgroundEffects?.status === FEATURE_STATUS.ENABLED;
+    });
 
     this.isGuestLinkEnabled = ko.pureComputed(
       () => this.teamFeatures()?.conversationGuestLinks?.status === FEATURE_STATUS.ENABLED,
