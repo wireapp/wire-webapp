@@ -59,8 +59,8 @@ async function buildUserRepository(translate: typeof t = t) {
   const userService = new UserService(storageRepo['storageService']);
   const assetRepository = new AssetRepository();
   const selfService = new SelfService();
-  const clientRepository = new ClientRepository({} as any, {} as any);
-  const propertyRepository = new PropertiesRepository({} as any, {} as any);
+  const clientRepository = new ClientRepository({} as any, {} as any, t);
+  const propertyRepository = new PropertiesRepository({} as any, {} as any, t);
   const userState = new UserState();
   const teamState = new TeamState();
 

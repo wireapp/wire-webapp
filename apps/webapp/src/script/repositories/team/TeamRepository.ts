@@ -97,7 +97,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     assetRepository: AssetRepository,
     private readonly onMemberDetete: () => Promise<void>,
     readonly teamService: TeamService = new TeamService(),
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {

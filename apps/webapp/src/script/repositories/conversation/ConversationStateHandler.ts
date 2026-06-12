@@ -43,7 +43,7 @@ export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
   private readonly translate: typeof t;
 
-  constructor(conversationService: ConversationService, translate: typeof t = t) {
+  constructor(conversationService: ConversationService, translate: typeof t) {
     super();
     const eventHandlingConfig: EventHandlingConfig = {
       [CONVERSATION_EVENT.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),

@@ -181,7 +181,7 @@ export class MessageRepository {
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),

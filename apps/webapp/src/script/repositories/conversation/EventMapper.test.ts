@@ -26,6 +26,7 @@ import {EventBuilder} from 'Repositories/conversation/EventBuilder';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {MentionEntity} from 'src/script/message/MentionEntity';
+import {t} from 'Util/localizerUtil';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
@@ -33,7 +34,7 @@ import {EventMapper} from './EventMapper';
 
 describe('Event Mapper', () => {
   let conversation: Conversation;
-  const eventMapper = new EventMapper();
+  const eventMapper = new EventMapper(undefined, t);
 
   beforeEach(() => {
     conversation = new Conversation(createUuid());

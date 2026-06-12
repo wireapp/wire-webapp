@@ -87,7 +87,7 @@ function buildNotificationRepository(translate: typeof t = t) {
 describe('NotificationRepository', () => {
   const userState = container.resolve(UserState);
   let notificationRepository: NotificationRepository;
-  const userMapper = new UserMapper({} as any);
+  const userMapper = new UserMapper({} as any, t);
   let conversation: Conversation;
   let message: Message;
   let user: User;

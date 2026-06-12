@@ -31,6 +31,7 @@ import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
@@ -65,7 +66,7 @@ describe('fullscreenVideoCall', () => {
       conversation: conversation,
       isChoosingScreen: false,
       isMuted: false,
-      propertiesRepository: new PropertiesRepository({} as PropertiesService, {} as SelfService),
+      propertiesRepository: new PropertiesRepository({} as PropertiesService, {} as SelfService, t),
       mediaDevicesHandler: buildMediaDevicesHandler(),
       callingRepository: buildCallingRepository(),
       videoGrid: {grid: [], thumbnail: null} as Grid,

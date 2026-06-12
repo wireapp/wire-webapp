@@ -39,7 +39,7 @@ export class UserMapper {
    */
   constructor(
     private readonly serverTimeHandler: ServerTimeHandler,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
   ) {
     this.logger = getLogger('UserMapper');
   }

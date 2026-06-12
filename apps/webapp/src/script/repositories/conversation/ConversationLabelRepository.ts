@@ -87,7 +87,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     private readonly allConversations: ko.ObservableArray<Conversation>,
     private readonly conversations: ko.PureComputed<Conversation[]>,
     private readonly propertiesService: PropertiesService,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
   ) {
     super();
     this.labels = ko.observableArray([]);

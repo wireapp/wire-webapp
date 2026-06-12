@@ -25,12 +25,13 @@ import {User} from 'Repositories/entity/User';
 import {ACCENT_ID} from 'src/script/Config';
 import {serverTimeHandler} from 'src/script/time/serverTimeHandler';
 import {entities, payload} from 'test/api/payloads';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {UserMapper} from './userMapper';
 
 describe('User Mapper', () => {
-  const mapper = new UserMapper(serverTimeHandler);
+  const mapper = new UserMapper(serverTimeHandler, t);
 
   let self_user_payload: any = null;
 

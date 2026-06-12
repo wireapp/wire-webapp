@@ -234,7 +234,7 @@ export class ConversationRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),

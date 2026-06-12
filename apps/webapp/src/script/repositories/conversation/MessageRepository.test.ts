@@ -101,7 +101,7 @@ async function buildMessageRepository(
     conversationRepository: () => ({}) as ConversationRepository,
     cryptographyRepository: new CryptographyRepository({} as any),
     eventRepository: new EventRepository(new EventService({} as any), {} as any, {} as any, {} as any),
-    propertiesRepository: new PropertiesRepository({} as any, {} as any),
+    propertiesRepository: new PropertiesRepository({} as any, {} as any, t),
     serverTimeHandler: serverTimeHandler,
     userRepository: {
       findUserById: jest.fn(),

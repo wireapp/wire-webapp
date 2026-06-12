@@ -101,7 +101,7 @@ export class EventMapper {
    */
   constructor(
     private readonly apiClient = container.resolve(APIClient),
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
   ) {
     this.logger = getLogger('EventMapper');
   }

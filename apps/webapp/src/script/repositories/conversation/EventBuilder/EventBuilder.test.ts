@@ -25,6 +25,7 @@ import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {SuperType} from 'src/script/message/SuperType';
 import {VerificationMessageType} from 'src/script/message/VerificationMessageType';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {EventBuilder} from './EventBuilder';
@@ -43,7 +44,7 @@ describe('EventBuilder', () => {
     conversation_et = new Conversation(createUuid());
     conversation_et.selfUser(self_user_et);
 
-    event_mapper = new EventMapper();
+    event_mapper = new EventMapper(undefined, t);
   });
 
   it('buildAllVerified', () => {

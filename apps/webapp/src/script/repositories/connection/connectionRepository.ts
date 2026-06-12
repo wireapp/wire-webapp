@@ -62,7 +62,7 @@ export class ConnectionRepository {
     userRepository: UserRepository,
     private readonly selfService: SelfService,
     private readonly teamService: TeamService,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
     private readonly connectionState = container.resolve(ConnectionState),
     private readonly userState = container.resolve(UserState),
   ) {

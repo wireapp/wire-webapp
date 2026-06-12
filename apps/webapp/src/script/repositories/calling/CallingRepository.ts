@@ -195,7 +195,7 @@ export class CallingRepository {
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly backgroundEffectsHandler: BackgroundEffectsHandler,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),

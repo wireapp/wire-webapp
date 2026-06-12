@@ -129,7 +129,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     private readonly clientRepository: ClientRepository,
     serverTimeHandler: ServerTimeHandler,
     private readonly propertyRepository: PropertiesRepository,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {

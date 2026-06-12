@@ -74,7 +74,7 @@ export class PropertiesRepository {
   constructor(
     propertiesService: PropertiesService,
     selfService: SelfService,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
   ) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;

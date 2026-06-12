@@ -72,7 +72,7 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
