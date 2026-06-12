@@ -269,6 +269,7 @@ export class App {
       repositories.user,
       repositories.asset,
       repositories.audio,
+      t,
     );
 
     repositories.calling = new CallingRepository(
@@ -311,6 +312,7 @@ export class App {
       repositories.conversation,
       repositories.audio,
       repositories.calling,
+      t,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 

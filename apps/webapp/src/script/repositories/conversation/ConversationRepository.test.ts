@@ -3530,3 +3530,41 @@ describe('onMLSResetMessage', () => {
     expect(conversation.epoch).toBe(5);
   });
 });
+
+describe('translation migration', () => {
+  it('passes injected translate to conversation label modal copy', () => {
+    const translate = ((translationKey: string) => `translated:${translationKey}`) as typeof t;
+    const [conversationRepository] = buildConversationRepository(translate);
+    const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
+
+    conversationRepository.conversationLabelRepository.addConversationToNewLabel(new Conversation(createUuid()));
+
+    expect(showModalSpy).toHaveBeenCalledTimes(1);
+
+    const [, modalOptions] = showModalSpy.mock.calls[0];
+    expect(modalOptions.primaryAction.text).toBe('translated:modalCreateFolderAction');
+    expect(modalOptions.text.closeBtnLabel).toBe('translated:modalNewFolderCloseBtn');
+    expect(modalOptions.text.input).toBe('translated:modalCreateFolderPlaceholder');
+    expect(modalOptions.text.message).toBe('translated:modalCreateFolderMessage');
+    expect(modalOptions.text.title).toBe('translated:modalCreateFolderHeadline');
+  });
+
+  it('passes injected translate to access code error modals', async () => {
+    const translate = ((translationKey: string) => `translated:${translationKey}`) as typeof t;
+    const [conversationRepository, {conversationService}] = buildConversationRepository(translate);
+    const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
+    const conversation = new Conversation(createUuid());
+
+    conversationService.getConversationCode = jest.fn().mockRejectedValue(new Error('boom'));
+
+    await conversationRepository.stateHandler.getAccessCode(conversation);
+
+    expect(showModalSpy).toHaveBeenCalled();
+
+    const matchingCall = showModalSpy.mock.calls.find(([, modalOptions]) => {
+      return modalOptions.text.message === 'translated:modalConversationGuestOptionsGetCodeMessage';
+    });
+
+    expect(matchingCall).toBeDefined();
+  });
+});

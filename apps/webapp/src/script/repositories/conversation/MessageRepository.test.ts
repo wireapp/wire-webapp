@@ -27,6 +27,7 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AudioRepository} from 'Repositories/audio/audioRepository';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
@@ -47,11 +48,13 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {ConversationError} from 'src/script/error/conversationError';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
 import {ConversationState} from './ConversationState';
 import {MessageRepository} from './MessageRepository';
+import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {StatusType} from '../../message/StatusType';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';
@@ -73,12 +76,15 @@ type MessageRepositoryDependencies = {
   eventRepository: EventRepository;
   propertiesRepository: PropertiesRepository;
   serverTimeHandler: ServerTimeHandler;
+  translate: typeof t;
   userRepository: UserRepository;
   userState: UserState;
   conversationState: ConversationState;
 };
 
-async function buildMessageRepository(): Promise<[MessageRepository, MessageRepositoryDependencies]> {
+async function buildMessageRepository(
+  translate: typeof t = t,
+): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
   userState.self(selfUser);
   const clientState = new ClientState();
@@ -103,6 +109,7 @@ async function buildMessageRepository(): Promise<[MessageRepository, MessageRepo
     } as unknown as UserRepository,
     assetRepository: {} as AssetRepository,
     audioRepository: new AudioRepository(),
+    translate,
     userState,
     clientState,
     conversationState,
@@ -158,6 +165,33 @@ describe('MessageRepository', () => {
         targetMode: undefined,
         userIds: expect.any(Object),
       });
+    });
+  });
+
+  describe('requestUserSendingPermission', () => {
+    it('uses injected translate for degraded conversation modal copy', async () => {
+      const translate = ((translationKey: string) => `translated:${translationKey}`) as typeof t;
+      const [messageRepository] = await buildMessageRepository(translate);
+      const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
+      const conversation = generateConversation();
+      const unverifiedUser = new User(createUuid());
+
+      unverifiedUser.name('Alice');
+      conversation.getUsersWithUnverifiedClients = () => [unverifiedUser];
+      conversation.verification_state(ConversationVerificationState.DEGRADED);
+
+      const permissionPromise = messageRepository.requestUserSendingPermission(conversation, false);
+
+      expect(showModalSpy).toHaveBeenCalledTimes(1);
+
+      const [, modalOptions] = showModalSpy.mock.calls[0];
+      expect(modalOptions.primaryAction.text).toBe('translated:modalConversationNewDeviceAction');
+      expect(modalOptions.text.message).toBe('translated:modalConversationNewDeviceMessage');
+      expect(modalOptions.text.title).toBe('translated:modalConversationNewDeviceHeadlineOne');
+
+      modalOptions.close();
+
+      await expect(permissionPromise).resolves.toBe(false);
     });
   });
 

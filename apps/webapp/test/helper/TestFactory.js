@@ -278,6 +278,7 @@ export class TestFactory {
       this.user_repository,
       this.assetRepository,
       new AudioRepository(),
+      undefined,
       this.user_repository['userState'],
       clientState,
     );

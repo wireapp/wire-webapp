@@ -341,7 +341,7 @@ export class ConversationRepository {
 
     this.initSubscriptions();
 
-    this.stateHandler = new ConversationStateHandler(this.conversationService);
+    this.stateHandler = new ConversationStateHandler(this.conversationService, this.translate);
     this.ephemeralHandler = new ConversationEphemeralHandler(this.eventService, {
       onMessageTimeout: this.handleMessageExpiration,
     });
@@ -350,6 +350,7 @@ export class ConversationRepository {
       this.conversationState.conversations,
       this.conversationState.visibleConversations,
       propertyRepository.propertiesService,
+      this.translate,
     );
 
     this.conversationRoleRepository = new ConversationRoleRepository(this.teamRepository, this.conversationService);

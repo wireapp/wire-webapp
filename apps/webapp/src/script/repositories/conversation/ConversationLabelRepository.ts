@@ -87,6 +87,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     private readonly allConversations: ko.ObservableArray<Conversation>,
     private readonly conversations: ko.PureComputed<Conversation[]>,
     private readonly propertiesService: PropertiesService,
+    private readonly translate: typeof t = t,
   ) {
     super();
     this.labels = ko.observableArray([]);
@@ -415,13 +416,13 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
           this.saveLabels();
           setCurrentTab(SidebarTabs.FOLDER);
         },
-        text: t('modalCreateFolderAction'),
+        text: this.translate('modalCreateFolderAction'),
       },
       text: {
-        closeBtnLabel: t('modalNewFolderCloseBtn'),
-        input: t('modalCreateFolderPlaceholder'),
-        message: t('modalCreateFolderMessage'),
-        title: t('modalCreateFolderHeadline'),
+        closeBtnLabel: this.translate('modalNewFolderCloseBtn'),
+        input: this.translate('modalCreateFolderPlaceholder'),
+        message: this.translate('modalCreateFolderMessage'),
+        title: this.translate('modalCreateFolderHeadline'),
       },
     });
   };

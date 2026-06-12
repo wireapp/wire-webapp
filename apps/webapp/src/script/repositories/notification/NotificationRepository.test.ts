@@ -67,12 +67,13 @@ import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
-function buildNotificationRepository() {
+function buildNotificationRepository(translate: typeof t = t) {
   const userState = container.resolve(UserState);
   const notificationRepository = new NotificationRepository(
     {} as any,
     new AudioRepository(),
     {} as CallingRepository,
+    translate,
     userState,
     container.resolve(ConversationState),
     container.resolve(CallState),
@@ -98,6 +99,15 @@ describe('NotificationRepository', () => {
   let calculateTitleLength: (sectionString: string) => number;
 
   let notification_content: any;
+
+  it('uses injected translate for obfuscated notification titles', () => {
+    const translate = ((translationKey: string) => `translated:${translationKey}`) as typeof t;
+    const [notificationRepository] = buildNotificationRepository(translate);
+
+    const actualTitle = notificationRepository['createTitleObfuscated']();
+
+    expect(actualTitle).toBe('translated:notificationObfuscatedTitle');
+  });
 
   beforeEach(() => {
     [notificationRepository] = buildNotificationRepository();

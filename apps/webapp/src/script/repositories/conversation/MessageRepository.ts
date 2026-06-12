@@ -181,6 +181,7 @@ export class MessageRepository {
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
+    private readonly translate: typeof t = t,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -536,11 +537,11 @@ export class MessageRepository {
     quoteEntity?: OutgoingQuote,
   ): Promise<void> {
     if (!tag) {
-      tag = t('extensionsGiphyRandom');
+      tag = this.translate('extensionsGiphyRandom');
     }
 
     const blob = await loadUrlBlob(url);
-    const textMessage = t('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
+    const textMessage = this.translate('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
     this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity});
     return this.uploadImages(conversationEntity, [blob]);
   }
@@ -859,22 +860,25 @@ export class MessageRepository {
 
     const [actionString, messageString] = {
       [CONSENT_TYPE.INCOMING_CALL]: [
-        t('modalConversationNewDeviceIncomingCallAction'),
-        t('modalConversationNewDeviceIncomingCallMessage'),
+        this.translate('modalConversationNewDeviceIncomingCallAction'),
+        this.translate('modalConversationNewDeviceIncomingCallMessage'),
       ],
       [CONSENT_TYPE.OUTGOING_CALL]: [
-        t('modalConversationNewDeviceOutgoingCallAction'),
-        t('modalConversationNewDeviceOutgoingCallMessage'),
+        this.translate('modalConversationNewDeviceOutgoingCallAction'),
+        this.translate('modalConversationNewDeviceOutgoingCallMessage'),
       ],
-      [CONSENT_TYPE.MESSAGE]: [t('modalConversationNewDeviceAction'), t('modalConversationNewDeviceMessage')],
+      [CONSENT_TYPE.MESSAGE]: [
+        this.translate('modalConversationNewDeviceAction'),
+        this.translate('modalConversationNewDeviceMessage'),
+      ],
     }[consentType];
 
     const baseTitle =
       users.length > 1
-        ? t('modalConversationNewDeviceHeadlineMany', {users: titleSubstitutions})
-        : t('modalConversationNewDeviceHeadlineOne', {user: titleSubstitutions});
+        ? this.translate('modalConversationNewDeviceHeadlineMany', {users: titleSubstitutions})
+        : this.translate('modalConversationNewDeviceHeadlineOne', {user: titleSubstitutions});
     const titleString = users[0].isMe
-      ? t('modalConversationNewDeviceHeadlineYou', {user: titleSubstitutions})
+      ? this.translate('modalConversationNewDeviceHeadlineYou', {user: titleSubstitutions})
       : baseTitle;
 
     return new Promise(resolve => {
@@ -1330,7 +1334,7 @@ export class MessageRepository {
       .some(user => matchQualifiedIds(senderId, user.qualifiedId));
 
     if (!senderInConversation) {
-      message.setButtonError(buttonId, t('buttonActionError'));
+      message.setButtonError(buttonId, this.translate('buttonActionError'));
       message.waitingButtonId(undefined);
       return;
     }
@@ -1348,7 +1352,7 @@ export class MessageRepository {
       await this.eventService.updateEventSequentially({primary_key: messageEntity.primary_key, ...changes});
     } catch (error: unknown) {
       message.waitingButtonId(undefined);
-      return message.setButtonError(buttonId, t('buttonActionError'));
+      return message.setButtonError(buttonId, this.translate('buttonActionError'));
     }
   }
 
