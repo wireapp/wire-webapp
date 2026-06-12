@@ -167,10 +167,10 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
         return translate('cells.selfDeletingMessage.info');
       }
       if (isSelfDeletingMessagesEnforced) {
-        return formatDuration(getEnforcedSelfDeletingMessagesTimeout).text;
+        return formatDuration(getEnforcedSelfDeletingMessagesTimeout, translate).text;
       }
       if (hasTimer && globalMessageTimer) {
-        return formatDuration(globalMessageTimer).text;
+        return formatDuration(globalMessageTimer, translate).text;
       }
       return translate('ephemeralUnitsNone');
     }

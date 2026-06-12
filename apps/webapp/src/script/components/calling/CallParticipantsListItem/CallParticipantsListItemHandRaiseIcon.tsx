@@ -38,7 +38,7 @@ export function CallParticipantsListItemHandRaiseIcon({handRaisedAt}: CallPartic
 
   useEffect(() => {
     const timerId = setTimeout(() => {
-      setDuration(formatDuration(Date.now() - handRaisedAt + TimeInMillis.SECOND).text);
+      setDuration(formatDuration(Date.now() - handRaisedAt + TimeInMillis.SECOND, translate).text);
     }, TimeInMillis.SECOND);
 
     return () => {

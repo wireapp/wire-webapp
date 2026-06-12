@@ -36,15 +36,7 @@ export function useUserName(user: User) {
   return isAvailable ? name : translate('unavailableUser');
 }
 
-/**
- * same as above, but using the current value of isAvailable and name instead of the knockout subscribable
- * @param user the user to get the name for
- */
-export function getUserName(user: User) {
-  return getUserNameWithTranslate(user);
-}
-
-export function getUserNameWithTranslate(user: User, translate: typeof t = t) {
+export function getUserNameWithTranslate(user: User, translate: typeof t) {
   return user.isAvailable() ? user.name() : translate('unavailableUser');
 }
 

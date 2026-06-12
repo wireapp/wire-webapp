@@ -50,7 +50,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
   ]);
   const hasMessageTimer = !!messageTimer;
   const isTimerDisabled = isSelfDeletingMessagesEnforced || hasGlobalMessageTimer;
-  const duration = hasMessageTimer ? formatDuration(messageTimer) : ({} as DurationUnit);
+  const duration = hasMessageTimer ? formatDuration(messageTimer, translate) : ({} as DurationUnit);
 
   const setEntries = () =>
     [
@@ -60,7 +60,7 @@ const MessageTimerButton = ({conversation, teamState = container.resolve(TeamSta
       },
     ].concat(
       EphemeralTimings.VALUES.map(milliseconds => {
-        const {text} = formatDuration(milliseconds);
+        const {text} = formatDuration(milliseconds, translate);
 
         return {
           click: () => conversation.localMessageTimer(milliseconds),

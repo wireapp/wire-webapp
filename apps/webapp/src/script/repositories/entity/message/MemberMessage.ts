@@ -87,7 +87,7 @@ export class MemberMessage extends SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : getUserName(this.user(), Declension.NOMINATIVE, true);
+      return isTeamMemberLeave ? this.name() : getUserName(this.user(), Declension.NOMINATIVE, true, this.translate);
     });
 
     this.showNamedCreation = ko.pureComputed(() => {
@@ -95,7 +95,7 @@ export class MemberMessage extends SystemMessage {
     });
 
     this.otherUser = ko.pureComputed(() => {
-      return this.hasUsers() ? this.userEntities()[0] : new User('', '');
+      return this.hasUsers() ? this.userEntities()[0] : new User('', '', this.translate);
     });
 
     this.htmlGroupCreationHeader = ko.pureComputed(() => {

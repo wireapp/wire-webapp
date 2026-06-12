@@ -28,6 +28,7 @@ import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/StatusType';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {Conversation} from './Conversation';
@@ -966,7 +967,7 @@ describe('Conversation', () => {
 
       const connectionEntity = ConnectionMapper.mapConnectionFromJson(payload_connection);
 
-      const [new_conversation] = ConversationMapper.mapConversations([payload_conversation]);
+      const [new_conversation] = ConversationMapper.mapConversations([payload_conversation], 1, t);
       new_conversation.connection(connectionEntity);
 
       expect(new_conversation.participating_user_ids().length).toBe(1);

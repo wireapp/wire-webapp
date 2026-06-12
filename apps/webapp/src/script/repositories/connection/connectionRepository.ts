@@ -458,7 +458,7 @@ export class ConnectionRepository {
     if (showNotification) {
       // TODO(Federation): Update code once connections are implemented on the backend
       const userEntity = await this.userRepository.getUserById(connectionEntity.userId);
-      const messageEntity = new MemberMessage();
+      const messageEntity = new MemberMessage(this.translate);
       messageEntity.user(userEntity);
 
       if (connectionEntity.isConnected()) {

@@ -115,7 +115,7 @@ describe('NotificationRepository', () => {
 
     // Create entities
     user = userMapper.mapUserFromJson(payload.users.get.one[0], '');
-    [conversation] = ConversationMapper.mapConversations([entities.conversation]);
+    [conversation] = ConversationMapper.mapConversations([entities.conversation], 1, t);
     const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
     selfUserEntity.teamId = createUuid();

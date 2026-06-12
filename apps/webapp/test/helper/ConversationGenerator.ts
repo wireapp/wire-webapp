@@ -35,6 +35,7 @@ import {ConversationStatus} from 'Repositories/conversation/ConversationStatus';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 interface GenerateAPIConversationParams {
@@ -110,7 +111,7 @@ export function generateConversation({
 }: GenerateConversationParams = {}): Conversation {
   const apiConversation = generateAPIConversation({id, type, protocol, name, overwites});
 
-  const conversation = ConversationMapper.mapConversations([apiConversation as ConversationDatabaseData])[0];
+  const conversation = ConversationMapper.mapConversations([apiConversation as ConversationDatabaseData], 1, t)[0];
   const connectionEntity = new ConnectionEntity();
   connectionEntity.conversationId = conversation.qualifiedId;
   connectionEntity.status(status);

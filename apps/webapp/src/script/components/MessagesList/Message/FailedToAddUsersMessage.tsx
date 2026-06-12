@@ -25,7 +25,7 @@ import {container} from 'tsyringe';
 import {Button, ButtonVariant, Link, LinkVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
-import {getUserName} from 'Components/UserName';
+import {getUserNameWithTranslate} from 'Components/UserName';
 import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Repositories/entity/message/FailedToAddUsersMessage';
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
@@ -138,33 +138,33 @@ const MessageDetails = ({failure, isMessageFocused, allUsers, translate}: Messag
     if (baseTranslationKey === 'failedToAddParticipantsSingularDetails') {
       if (translationLabel === 'OfflineBackend') {
         return translate(singularDetailsTranslationKeyByReason[reason], {
-          name: getUserName(users[0]),
+          name: getUserNameWithTranslate(users[0], translate),
           domain: domainStr as string,
         });
       }
 
       return translate(singularDetailsTranslationKeyByReason[reason], {
-        name: getUserName(users[0]),
+        name: getUserNameWithTranslate(users[0], translate),
       });
     }
 
     if (baseTranslationKey === 'failedToAddParticipantsPluralDetails') {
       if (translationLabel === 'OfflineBackend') {
         return translate(pluralDetailsTranslationKeyByReason[reason], {
-          name: getUserName(users[0]),
+          name: getUserNameWithTranslate(users[0], translate),
           names: users
             .slice(1)
-            .map(user => getUserName(user))
+            .map(user => getUserNameWithTranslate(user, translate))
             .join(', '),
           domain: domainStr as string,
         });
       }
 
       return translate(pluralDetailsTranslationKeyByReason[reason], {
-        name: getUserName(users[0]),
+        name: getUserNameWithTranslate(users[0], translate),
         names: users
           .slice(1)
-          .map(user => getUserName(user))
+          .map(user => getUserNameWithTranslate(user, translate))
           .join(', '),
       });
     }
@@ -249,7 +249,7 @@ const FailedToAddUsersMessage = ({
                 css={warning}
                 dangerouslySetInnerHTML={{
                   __html: translate(singularTranslationKeyByReason[failures[0].reason], {
-                    name: getUserName(firstUser),
+                    name: getUserNameWithTranslate(firstUser, translate),
                     domain: firstUser.domain,
                   }),
                 }}

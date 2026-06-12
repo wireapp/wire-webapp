@@ -88,7 +88,7 @@ export class ConversationMapper {
   static mapConversations(
     conversationsData: ConversationDatabaseData[],
     timestamp: number = 1,
-    translate: typeof t = t,
+    translate: typeof t,
   ): Conversation[] {
     if (conversationsData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -243,7 +243,7 @@ export class ConversationMapper {
   private static createConversationEntity(
     conversationData: ConversationDatabaseData,
     initialTimestamp?: number,
-    translate: typeof t = t,
+    translate: typeof t,
   ): Conversation {
     if (conversationData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);

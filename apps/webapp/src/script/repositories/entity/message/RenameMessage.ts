@@ -43,7 +43,7 @@ export class RenameMessage extends SystemMessage {
     if (userId) {
       this.from = userId;
       this.fromDomain = userDomain;
-      this.user(new User(userId, userDomain));
+      this.user(new User(userId, userDomain, this.translate));
     }
 
     this.caption = this.generateCaption();

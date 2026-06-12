@@ -129,7 +129,7 @@ const PrivacySection = ({
           </Checkbox>
           <p className="preferences-detail preferences-detail-intended">
             {translate('preferencesAccountAppLockDetail', {
-              locktime: formatDurationCaption(appLockInactivityTimeoutSecs * TIME_IN_MILLIS.SECOND),
+              locktime: formatDurationCaption(appLockInactivityTimeoutSecs * TIME_IN_MILLIS.SECOND, translate),
             })}
           </p>
         </div>

@@ -426,7 +426,7 @@ const _getStateUserName: ConversationCellStateDefinition = {
 
 export const generateCellState = (
   conversationEntity: Conversation,
-  translate: typeof t = t,
+  translate: typeof t,
 ): {description: string; icon: ConversationStatusIcon | void} => {
   const states = [
     _getStateRemoved,

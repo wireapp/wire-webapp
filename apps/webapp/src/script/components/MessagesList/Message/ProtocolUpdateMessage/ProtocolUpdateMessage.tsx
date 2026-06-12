@@ -24,7 +24,7 @@ import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories
 import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/RootProvider';
-import {replaceLink} from 'Util/localizerUtil';
+import {replaceLink, t} from 'Util/localizerUtil';
 
 import {SystemMessageBase} from '../SystemMessage/SystemMessageBase';
 
@@ -32,8 +32,8 @@ interface ProtocolUpdateMessageProps {
   message: ProtocolUpdateMessageEntity;
 }
 
-const createSystemMessage = (caption: string) => {
-  const message = new SystemMessage();
+const createSystemMessage = (caption: string, translate: typeof t) => {
+  const message = new SystemMessage(translate);
   message.caption = caption;
   return message;
 };
@@ -49,7 +49,7 @@ export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => 
       ),
       translate('conversationProtocolUpdatedToMixedPart2'),
     ];
-    const messages = captions.map(createSystemMessage);
+    const messages = captions.map(caption => createSystemMessage(caption, translate));
     return (
       <>
         {messages.map(message => (
@@ -65,6 +65,7 @@ export const ProtocolUpdateMessage = ({message}: ProtocolUpdateMessageProps) => 
       undefined,
       replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
     ),
+    translate,
   );
   return <SystemMessageBase message={migratedToMLSMessage} icon={<Icon.InfoIcon />} />;
 };

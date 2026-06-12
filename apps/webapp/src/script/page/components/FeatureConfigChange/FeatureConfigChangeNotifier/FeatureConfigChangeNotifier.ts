@@ -208,7 +208,7 @@ const createFeatureNotifications = (
         htmlMessage: isFeatureEnabled
           ? isEnforced
             ? translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnforced', {
-                timeout: formatDuration(newTimeout).text,
+                timeout: formatDuration(newTimeout, translate).text,
               })
             : translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemEnabled')
           : translate('featureConfigChangeModalSelfDeletingMessagesDescriptionItemDisabled'),

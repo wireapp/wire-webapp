@@ -25,6 +25,7 @@ import {
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {t} from 'Util/localizerUtil';
 
 import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -76,7 +77,7 @@ describe('ConversationFilter', () => {
         verification_state: ConversationVerificationState.UNVERIFIED,
         mlsVerificationState: ConversationVerificationState.UNVERIFIED,
       };
-      const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, t);
       expect(conversationEntity.is1to1()).toBeFalsy();
       expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();
@@ -131,7 +132,7 @@ describe('ConversationFilter', () => {
         verification_state: ConversationVerificationState.UNVERIFIED,
         mlsVerificationState: ConversationVerificationState.UNVERIFIED,
       };
-      const [conversationEntity] = ConversationMapper.mapConversations([conversationData]);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversationData], 1, t);
       expect(conversationEntity.is1to1()).toBeTruthy();
       expect(conversationEntity['isProteusTeam1to1']()).toBeFalsy();
       expect(conversationEntity.isGroup()).toBeFalsy();

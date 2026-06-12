@@ -78,8 +78,8 @@ import {
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent} from 'test/helper/EventGenerator';
 import {matchQualifiedIds} from 'Util/qualifiedId';
-import {escapeRegex} from 'Util/sanitizationUtil';
 import {t} from 'Util/localizerUtil';
+import {escapeRegex} from 'Util/sanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -566,7 +566,7 @@ describe('ConversationRepository', () => {
 
       const [newConversationEntity] = ConversationMapper.mapConversations([
         team1to1Conversation as ConversationDatabaseData,
-      ]);
+      ], 1, t);
       conversationRepository['conversationState'].conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;

@@ -134,7 +134,7 @@ export class Message {
     this.primary_key = undefined;
     this.status = ko.observable(StatusType.UNSPECIFIED);
     this.type = '';
-    this.user = ko.observable(new User('', ''));
+    this.user = ko.observable(new User('', '', this.translate));
     this.version = 1;
     this.visible = ko.observable(true);
 
@@ -145,7 +145,7 @@ export class Message {
     // MessageCategory
     this.category = undefined;
 
-    this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true));
+    this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true, this.translate));
     this.senderName = ko.pureComputed(() => {
       return this.user().name();
     });

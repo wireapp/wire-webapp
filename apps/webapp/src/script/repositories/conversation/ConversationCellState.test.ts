@@ -46,19 +46,19 @@ describe('ConversationCellState', () => {
     it('returns empty state if notifications are set to everything', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
-      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'none'});
+      expect(generateCellState(conversationEntity, t)).toEqual({description: '', icon: 'none'});
     });
 
     it('returns the muted icon if state is set to mentions and replies', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
 
-      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'muted'});
+      expect(generateCellState(conversationEntity, t)).toEqual({description: '', icon: 'muted'});
     });
 
     it('returns the muted icon if no notifications are allowed', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
 
-      expect(generateCellState(conversationEntity)).toEqual({description: '', icon: 'muted'});
+      expect(generateCellState(conversationEntity, t)).toEqual({description: '', icon: 'muted'});
     });
   });
 
@@ -146,7 +146,7 @@ describe('ConversationCellState', () => {
     tests.forEach(({description, expected, messages}) => {
       const expectedOne2One = expected.one2one || expected;
       conversationEntity.messages_unordered(messages);
-      const state = generateCellState(conversationEntity);
+      const state = generateCellState(conversationEntity, t);
 
       it(`${description} (1:1)`, () => {
         expect(state).toEqual(expectedOne2One);
@@ -157,7 +157,7 @@ describe('ConversationCellState', () => {
     tests.forEach(({description, expected, messages}) => {
       const expectedGroup = expected.group || expected;
       conversationEntity.messages_unordered(messages);
-      const state = generateCellState(conversationEntity);
+      const state = generateCellState(conversationEntity, t);
 
       it(`${description} (group)`, () => {
         expect(state).toEqual(expectedGroup);
