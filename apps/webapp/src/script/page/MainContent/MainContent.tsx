@@ -30,6 +30,7 @@ import {Conversation} from 'Components/Conversation';
 import {HistoryExport} from 'Components/HistoryExport';
 import {HistoryImport} from 'Components/HistoryImport';
 import * as Icon from 'Components/icon';
+import {Meetings} from 'Components/Meeting/Meetings';
 import {useLegalHoldModalState} from 'Components/Modals/LegalHoldModal/LegalHoldModal.state';
 import {ClientState} from 'Repositories/client/ClientState';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
@@ -40,6 +41,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
+import {useMeetingsFeatureFlag} from 'Util/useMeetingsFeatureFlag';
 import {incomingCssClass, removeAnimationsClass} from 'Util/util';
 
 import {Collection} from './panels/Collection';
@@ -83,6 +85,7 @@ const MainContent = ({
   const userState = container.resolve(UserState);
   const teamState = container.resolve(TeamState);
   const {showRequestModal} = useLegalHoldModalState();
+  const {isMeetingsEnabled} = useMeetingsFeatureFlag();
 
   const {isActivatedAccount} = useKoSubscribableChildren(selfUser, ['isActivatedAccount']);
 
@@ -279,6 +282,8 @@ const MainContent = ({
                 conversationRepository={repositories.conversation}
               />
             )}
+
+            {contentState === ContentState.MEETINGS && isMeetingsEnabled && <Meetings />}
           </>
         </Animated>
       </SwitchTransition>

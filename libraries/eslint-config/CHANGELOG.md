@@ -1,0 +1,419 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [3.1.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.7...@wireapp/eslint-config@3.1.9) (2026-01-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.1.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.6...@wireapp/eslint-config@3.1.7) (2025-10-23)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.1.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.5...@wireapp/eslint-config@3.1.6) (2025-10-23)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.1.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.4...@wireapp/eslint-config@3.1.5) (2025-10-23)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.1.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.3...@wireapp/eslint-config@3.1.4) (2025-10-23)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.1.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.2...@wireapp/eslint-config@3.1.3) (2025-09-25)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.1...@wireapp/eslint-config@3.1.2) (2025-08-05)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.1.0...@wireapp/eslint-config@3.1.1) (2025-08-04)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# [3.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.21...@wireapp/eslint-config@3.1.0) (2025-06-24)
+
+### Features
+
+* Async Notification implementation [WPB-17183] ([#7066](https://github.com/wireapp/wire-web-packages/issues/7066)) ([594ba87](https://github.com/wireapp/wire-web-packages/commit/594ba87b0b27b8a24a11c002357e748eebd6a6dd))
+
+## [3.0.21](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.20...@wireapp/eslint-config@3.0.21) (2025-01-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.20](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.19...@wireapp/eslint-config@3.0.20) (2024-11-25)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.19](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.18...@wireapp/eslint-config@3.0.19) (2024-10-16)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.18](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.17...@wireapp/eslint-config@3.0.18) (2024-08-13)
+
+### Reverts
+
+* Revert "chore: Publish [skip ci]" (#6450) ([a822cc9](https://github.com/wireapp/wire-web-packages/commit/a822cc90c5295543f780dec06ad12ceab06c6882)), closes [#6450](https://github.com/wireapp/wire-web-packages/issues/6450)
+
+## [3.0.17](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.16...@wireapp/eslint-config@3.0.17) (2024-07-31)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.16](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.15...@wireapp/eslint-config@3.0.16) (2024-07-22)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.15](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.14...@wireapp/eslint-config@3.0.15) (2024-07-16)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.14](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.13...@wireapp/eslint-config@3.0.14) (2024-07-01)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.13](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.12...@wireapp/eslint-config@3.0.13) (2024-06-26)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.11...@wireapp/eslint-config@3.0.12) (2024-06-17)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.10...@wireapp/eslint-config@3.0.11) (2024-06-10)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.9...@wireapp/eslint-config@3.0.10) (2024-06-06)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.8...@wireapp/eslint-config@3.0.9) (2024-05-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.7...@wireapp/eslint-config@3.0.8) (2024-04-11)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.6...@wireapp/eslint-config@3.0.7) (2024-02-19)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.5...@wireapp/eslint-config@3.0.6) (2024-02-13)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.4...@wireapp/eslint-config@3.0.5) (2024-01-08)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.3...@wireapp/eslint-config@3.0.4) (2023-09-06)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.2...@wireapp/eslint-config@3.0.3) (2023-09-06)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.1...@wireapp/eslint-config@3.0.2) (2023-09-06)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [3.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@3.0.0...@wireapp/eslint-config@3.0.1) (2023-08-14)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# [3.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.2.3...@wireapp/eslint-config@3.0.0) (2023-08-07)
+
+### Bug Fixes
+
+* **eslint-config:** make eslint plugins direct dependencies ([#5368](https://github.com/wireapp/wire-web-packages/issues/5368)) ([fe70da4](https://github.com/wireapp/wire-web-packages/commit/fe70da4e118350cb6b7594845ecbd75a4404f81c))
+
+### BREAKING CHANGES
+
+* **eslint-config:** upgraded major version of prettier and some eslint plugins
+
+## [2.2.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.2.2...@wireapp/eslint-config@2.2.3) (2023-07-24)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [2.2.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.2.1...@wireapp/eslint-config@2.2.2) (2023-06-05)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [2.2.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.2.0...@wireapp/eslint-config@2.2.1) (2023-05-16)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# [2.2.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.1.2...@wireapp/eslint-config@2.2.0) (2023-05-04)
+
+### Features
+
+* update typescript ([#5115](https://github.com/wireapp/wire-web-packages/issues/5115)) ([f1f39de](https://github.com/wireapp/wire-web-packages/commit/f1f39dee4d5985980b187dc00199beeb1e849f55))
+
+## [2.1.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.1.1...@wireapp/eslint-config@2.1.2) (2023-04-26)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [2.1.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.1.0...@wireapp/eslint-config@2.1.1) (2022-12-14)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# [2.1.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.0.3...@wireapp/eslint-config@2.1.0) (2022-11-08)
+
+### Features
+
+* update peer-dependencies of eslint-package ([#4606](https://github.com/wireapp/wire-web-packages/issues/4606)) ([8f4c49d](https://github.com/wireapp/wire-web-packages/commit/8f4c49dc65b4c5ffacdd9050c68ccc737ea5edc9))
+
+## [2.0.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.0.2...@wireapp/eslint-config@2.0.3) (2022-11-08)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [2.0.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.0.0...@wireapp/eslint-config@2.0.2) (2022-11-08)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [2.0.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@2.1.0...@wireapp/eslint-config@2.0.1) (2022-11-08)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# [2.0.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.12...@wireapp/eslint-config@2.0.0) (2022-10-26)
+
+### Code Refactoring
+
+* produce output of packages in lib folders ([#4561](https://github.com/wireapp/wire-web-packages/issues/4561)) ([2b7ea4c](https://github.com/wireapp/wire-web-packages/commit/2b7ea4c13f244bad5fe3cbcb80f82b5de6741db7))
+
+### BREAKING CHANGES
+
+* Imports that point to @wireapp/packageName/src/** need to be changed to @wireapp/packageName/lib/**
+
+* feat: changed api-client, bazinga64, certificate-check, cli-client
+
+* feat: cleanup commons
+
+* feat: change copy-config
+
+* feat: change core
+
+* feat: update license-collector
+
+* fix: update @wireapp/protocol-messaging, long and @types/node no longer needed
+
+* fix: update @wireapp/protocol-messaging, long and @types/node no longer needed
+
+* fix: node modules and yarn.lock
+
+* fix: add @types/node again to get rid of yarn resolution warnings
+
+* fix: add @types/node again to get rid of yarn resolution warnings
+
+* chore: update lockfile
+
+* fix: core tests
+
+* feat: update priority-queue
+
+* feat: update promise-queue
+
+* feat: update react-ui-kit
+
+* fix: add long back into core
+
+* feat: update store-engine
+
+* feat: update store-engine-dexie
+
+* feat: update store-engine-fs
+
+* feat: update webapp-events
+
+* fix: eslint
+
+* chore: cleanup last bits. everything changed to /lib/
+
+* fix: add typescript to our packages for users that dont have ts available globally (tsc not found)
+
+* fix: read old gitignore rules for now to avoid problems (unexpected commits) for existing local environments
+
+* chore: remove not needed gitignore entries
+
+* fix: formatting for package.json
+
+* chore: let tests execute in parallel
+
+## [1.12.12](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.11...@wireapp/eslint-config@1.12.12) (2022-10-18)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [1.12.11](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.10...@wireapp/eslint-config@1.12.11) (2022-09-22)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [1.12.10](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.9...@wireapp/eslint-config@1.12.10) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [1.12.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.8...@wireapp/eslint-config@1.12.9) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [1.12.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.7...@wireapp/eslint-config@1.12.8) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [1.12.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.6...@wireapp/eslint-config@1.12.7) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [1.12.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/eslint-config@1.12.5...@wireapp/eslint-config@1.12.6) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [1.12.5](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.12.4...@wireapp/eslint-config@1.12.5) (2022-09-19)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+## [1.12.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.12.3...@wireapp/eslint-config@1.12.4) (2022-04-21)
+
+### Bug Fixes
+
+* **eslint-config:** Reference to main file ([8978754](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/8978754f280e9eb9961c0fdbcb07b3ade6fd689a))
+
+## [1.12.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.12.2...@wireapp/eslint-config@1.12.3) (2022-04-21)
+
+### Bug Fixes
+
+* **estlint-config:** fix file format ([5b94ef5](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/5b94ef5011fbbe08ba3d27d7bb8f8e63d09b8bad))
+
+## [1.12.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.12.1...@wireapp/eslint-config@1.12.2) (2022-04-21)
+
+### Bug Fixes
+
+* **eslint-config:** Automatically add date to header ([2dcbd2d](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/2dcbd2d2193fdadc38c47af811af7592ddb8546f))
+
+## [1.12.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.12.0...@wireapp/eslint-config@1.12.1) (2022-04-21)
+
+### Bug Fixes
+
+* upgrade eslint config ([aee7821](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/aee78219d07847dc5ab8dd6dfbc1b03a8beabe86))
+
+# [1.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.11.2...@wireapp/eslint-config@1.12.0) (2021-12-02)
+
+### Features
+
+* **react-ui-kit:** Add link icon ([#4189](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/4189)) ([9104140](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/9104140d7671dbcd36a3fbdbafbbb860e5a2b374))
+
+## [1.11.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.11.0...@wireapp/eslint-config@1.11.2) (2021-05-12)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# [1.11.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.10.0...@wireapp/eslint-config@1.11.0) (2021-04-23)
+
+### Features
+
+* **eslint-config:** Automatically add license header ([#3749](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/3749)) ([6941d33](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/6941d33733addd98d15a4ebc584a1fddb3de54c5))
+
+# [1.10.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.9.0...@wireapp/eslint-config@1.10.0) (2021-04-01)
+
+### Features
+
+* **eslint-config:** Automatically remove unused imports ([#3700](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/3700)) ([f7a7a9f](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/f7a7a9fce2c2f2be82db56a94e52c802241761c0))
+
+# [1.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.8.0...@wireapp/eslint-config@1.9.0) (2021-04-01)
+
+### Features
+
+* **eslint-config:** Add return-await rule ([#3703](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/3703)) ([e1c3086](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/e1c3086399bdb75b3bc435ec2149aaa41d7fe6d4))
+
+# 1.8.0 (2020-08-27)
+
+### Features
+
+* **eslint-config:** Disallow assignment operators in conditional statements ([#3198](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/3198)) ([f4006e7](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/f4006e72b80dc9ccf892e7170c97e074b33052d5))
+
+## 1.7.1 (2020-06-02)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# [1.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.6.0...@wireapp/eslint-config@1.7.0) (2020-05-11)
+
+### Features
+
+* **eslint-config:** Warn when using fdescribe or fit ([#3027](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/3027)) ([5045c96](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/5045c968b49430d630faeb66976ab536ac15051c))
+
+# [1.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.5.0...@wireapp/eslint-config@1.6.0) (2020-04-28)
+
+### Features
+
+* **eslint-config:** Don't prefer uppercase when sorting ([#2986](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/2986)) ([3d71f5d](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/3d71f5d7f65b5d79e18b75be7ea22092dbb40e3e))
+
+# 1.5.0 (2020-04-28)
+
+### Features
+
+* **eslint-config:** Add eslint-plugin-typescript-sort-keys plugin (WEBAPP-6829) ([#2983](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/2983)) ([0e177e6](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/0e177e65b789e49d7187bcaffb6e375b8818d21b))
+
+# 1.4.0 (2020-01-08)
+
+### Features
+
+* **eslint-config:** Add support for TypeScript files in ESLint… ([#2648](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/2648)) ([e55d69e](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/e55d69e300cff8eeb7596e6231c6e832d1219e8d))
+
+# [1.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.2.1...@wireapp/eslint-config@1.3.0) (2019-06-24)
+
+### Features
+
+* **eslint-config:** Sort imports and keys automatically ([#1971](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/1971)) ([c7954c8](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/c7954c8))
+
+## [1.2.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.2.0...@wireapp/eslint-config@1.2.1) (2019-06-24)
+
+### Bug Fixes
+
+* **eslint-config:** Change warn to error for trailing space ([#1969](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/1969)) ([0af78a3](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/0af78a3))
+
+# [1.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.1.1...@wireapp/eslint-config@1.2.0) (2019-06-20)
+
+### Features
+
+* **eslint,tslint:** Disallow trailing whitespace ([#1966](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/1966)) ([e1a3c56](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/e1a3c56))
+
+## 1.1.1 (2019-06-19)
+
+### Bug Fixes
+
+* **eslint-config:** Use latest React version ([#1959](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/1959)) ([c403d69](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/c403d69))
+* **store-engine-sqleet,store-engine-fs:** Streamline dependencies ([#1924](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/1924)) ([93f3a73](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/93f3a73))
+
+# [1.1.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.0.1...@wireapp/eslint-config@1.1.0) (2019-05-13)
+
+### Features
+
+* **tslint-config:** Enforce type definitions to exist ([#1786](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/1786)) ([be7c254](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/be7c254))
+
+## [1.0.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@1.0.0...@wireapp/eslint-config@1.0.1) (2019-04-24)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# [1.0.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@0.1.1...@wireapp/eslint-config@1.0.0) (2019-04-23)
+
+### Features
+
+* Remove default exports [BREAKING] ([#1776](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/1776)) ([7f14a39](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/7f14a39))
+
+### BREAKING CHANGES
+
+* All default exports were refactored into named exports.
+
+## [0.1.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/compare/@wireapp/eslint-config@0.1.0...@wireapp/eslint-config@0.1.1) (2019-04-17)
+
+**Note:** Version bump only for package @wireapp/eslint-config
+
+# 0.1.0 (2019-04-16)
+
+### Features
+
+* **eslint-config:** Add eslint-config for wireapp ([#1758](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/issues/1758)) ([e80e844](https://github.com/wireapp/wire-web-packages/tree/main/packages/eslint-config/commit/e80e844))

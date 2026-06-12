@@ -23,6 +23,6 @@ import {BaseModal} from './base.modal';
 
 export class ConfirmModal extends BaseModal {
   constructor(page: Page) {
-    super(page, 'modal-template-confirm');
+    super(page);
   }
 }

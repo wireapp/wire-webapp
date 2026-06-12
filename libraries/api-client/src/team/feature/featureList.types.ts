@@ -17,9 +17,9 @@
  *
  */
 
-import type {
-  FeatureAppLock,
+import {
   FeatureAllowedGlobalOperations,
+  FeatureAppLock,
   FeatureApps,
   FeatureAssetAuditLog,
   FeatureCells,
@@ -36,6 +36,7 @@ import type {
   FeatureFileSharing,
   FeatureLegalhold,
   FeatureLimitedEventFanout,
+  FeatureMeeting,
   FeatureMLS,
   FeatureMLSE2EId,
   FeatureMLSMigration,
@@ -91,6 +92,7 @@ export enum FEATURE_KEY {
   VIDEO_CALLING = 'videoCalling',
   PREVENT_ADMIN_LESS_GROUPS = 'preventAdminlessGroups',
   BACKGROUND_EFFECTS = 'backgroundEffects',
+  MEETINGS = 'meetings',
 }
 
 export enum FEATURE_LOCK_STATUS {
@@ -172,6 +174,7 @@ export type FeatureList = {
   [FEATURE_KEY.VIDEO_CALLING]?: FeatureVideoCalling;
   [FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]?: FeaturePreventAdminLessGroups;
   [FEATURE_KEY.BACKGROUND_EFFECTS]?: FeatureBackgroundEffects;
+  [FEATURE_KEY.MEETINGS]?: FeatureMeeting;
   // Allow additional unknown features from newer API versions (matches Zod schema .passthrough())
   [key: string]: unknown;
 };

@@ -476,8 +476,7 @@ test.describe('Status', () => {
       // User B should see the BUSY status in the searchable group participant list
       await userBPages.conversationList().getConversation(groupName).open();
       await userBPages.conversation().clickConversationInfoButton();
-      await expect(userBPages.conversationDetails().getUserAvailabilityIcon(userA.fullName)).toBeVisible();
-      await expect(userBPages.conversationDetails().getUserAvailabilityIcon(userA.fullName)).toHaveAttribute(
+      await expect(userBPages.conversationDetails().getParticipant(userA.fullName).availabilityIcon).toHaveAttribute(
         'data-uie-value',
         'busy',
       );

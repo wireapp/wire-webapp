@@ -36,7 +36,7 @@ Trigger: **Manual** (`workflow_dispatch`) from the [Create Library Release PR](h
 What it does:
 
 1. Checks out `dev` and creates a release branch (`chore/library-release-<run_id>`).
-2. Installs dependencies (`yarn --immutable`).
+2. Installs dependencies (`./bin/yarn --immutable`).
 3. Lints, tests, and builds **all** libraries (`tag:type:lib`).
 4. Runs `nx release version` which:
    - Reads conventional commits since the last release tag.
@@ -110,13 +110,13 @@ Preview what a release would do without publishing:
 
 ```bash
 # Full dry run (version + publish simulation)
-yarn release:dry-run
+./bin/yarn release:dry-run
 
 # Version only (no publish)
-yarn release:version
+./bin/yarn release:version
 
 # Publish already-versioned packages
-yarn release:publish
+./bin/yarn release:publish
 ```
 
 ---
@@ -182,7 +182,7 @@ For each `npm:public` package on [npmjs.com](https://www.npmjs.com/):
 
 | Problem | What to Check |
 |---------|---------------|
-| **Version not incrementing** | Verify commits use conventional commit format. Run `yarn release:dry-run` locally. |
+| **Version not incrementing** | Verify commits use conventional commit format. Run `./bin/yarn release:dry-run` locally. |
 | **Release PR not created** | No new conventional commits since the last release tag — nothing to bump. |
 | **Publish fails with 403** | The npm package may not have a trusted publisher configured for `wireapp/wire-webapp` + `publish-libraries-on-merge.yml`. |
 | **Publish fails with missing tags** | The PR was squash-merged instead of merge-committed. Re-tag manually or re-run the release PR workflow. |
@@ -198,7 +198,7 @@ cd libraries/api-client
 npm version patch  # or minor / major
 
 # 2. Build
-yarn nx build api-client-lib
+../../bin/yarn nx build api-client-lib
 
 # 3. Publish with provenance
 npm publish --provenance --access public

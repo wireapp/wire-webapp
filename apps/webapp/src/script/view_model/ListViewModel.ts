@@ -195,7 +195,7 @@ export class ListViewModel {
     if (
       isEscapeKey(keyboardEvent) &&
       currentModalId === null &&
-      ![SidebarTabs.PREFERENCES, SidebarTabs.CELLS].includes(currentTab)
+      ![SidebarTabs.PREFERENCES, SidebarTabs.CELLS, SidebarTabs.MEETINGS].includes(currentTab)
     ) {
       const newState = this.isActivatedAccount() ? ListState.CONVERSATIONS : ListState.TEMPORARY_GUEST;
       this.switchList(newState);
@@ -283,6 +283,12 @@ export class ListViewModel {
 
   readonly openStartUI = (): void => {
     this.switchList(ListState.START_UI);
+  };
+
+  readonly openMeetingsList = (): void => {
+    this.switchListAndSetTab(ListState.MEETINGS, SidebarTabs.MEETINGS);
+
+    return this.contentViewModel.switchContent(ContentState.MEETINGS);
   };
 
   readonly switchList = (newListState: ListState, loadPreviousContent = true): void => {

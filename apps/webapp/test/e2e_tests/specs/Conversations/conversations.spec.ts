@@ -146,7 +146,7 @@ test.describe('Conversations', () => {
 
       await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().clickConversationInfoButton();
-      await expect(adminPages.conversationDetails().getUserRoleIcon(guestUser.fullName)).toHaveAttribute(
+      await expect(adminPages.conversationDetails().getParticipant(guestUser.fullName).roleIcon).toHaveAttribute(
         'data-uie-name',
         'status-guest',
       );
@@ -273,7 +273,7 @@ test.describe('Conversations', () => {
       await adminPages.conversationList().getConversation(groupName).open();
       await adminPages.conversation().clickConversationInfoButton();
       await expect(adminPages.conversation().membersList).toBeVisible();
-      await expect(adminPages.conversationDetails().getUserRoleIcon(externalUser.fullName)).toHaveAttribute(
+      await expect(adminPages.conversationDetails().getParticipant(externalUser.fullName).roleIcon).toHaveAttribute(
         'data-uie-name',
         'status-external',
       );

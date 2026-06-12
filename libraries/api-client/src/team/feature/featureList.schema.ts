@@ -205,6 +205,7 @@ export const allFeaturesResponseSchema = z
     [FEATURE_KEY.VIDEO_CALLING]: baseFeatureWithoutConfigSchema.optional(),
     [FEATURE_KEY.PREVENT_ADMIN_LESS_GROUPS]: preventAdminLessGroupsFeatureSchema,
     [FEATURE_KEY.BACKGROUND_EFFECTS]: baseFeatureWithoutConfigSchema.optional(),
+    [FEATURE_KEY.MEETINGS]: baseFeatureWithoutConfigSchema.optional(),
   })
   .passthrough(); // Allow unknown features from newer backend versions
 
@@ -258,3 +259,4 @@ export type FeatureStealthUsers = FeatureWithoutConfig;
 export type FeatureValidateSAMLEmails = FeatureWithoutConfig;
 export type FeatureVideoCalling = FeatureWithoutConfig;
 export type FeatureBackgroundEffects = FeatureWithoutConfig;
+export type FeatureMeeting = FeatureWithoutConfig;

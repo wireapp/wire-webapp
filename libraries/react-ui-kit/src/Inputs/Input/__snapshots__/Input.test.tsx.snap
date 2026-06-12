@@ -1,0 +1,403 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`"Input" renders 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  position: relative;
+}
+
+.emotion-3 {
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px #dce0e3;
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  height: 48px;
+  line-height: 1.5rem;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.emotion-3::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-3::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-3::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-3:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-3:focus-visible,
+.emotion-3:focus,
+.emotion-3:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-3:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-3:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-3:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:focus-visible,
+.emotion-3:-webkit-autofill:focus,
+.emotion-3:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="input-group emotion-1"
+  >
+    <div
+      className="emotion-2"
+    >
+      <input
+        className="wireinput emotion-3"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"Input" renders as disabled 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  position: relative;
+}
+
+.emotion-3 {
+  background: #edeff0;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px #dce0e3;
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  height: 48px;
+  line-height: 1.5rem;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.emotion-3::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-3::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-3::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-3:focus-visible,
+.emotion-3:focus,
+.emotion-3:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-3:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-3:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-3:-webkit-autofill:focus-visible,
+.emotion-3:-webkit-autofill:focus,
+.emotion-3:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="input-group emotion-1"
+  >
+    <div
+      className="emotion-2"
+    >
+      <input
+        className="wireinput emotion-3"
+        disabled={true}
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"Input" renders as invalid 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  position: relative;
+}
+
+.emotion-3 {
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px var(--danger-color);
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  height: 48px;
+  line-height: 1.5rem;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.emotion-3::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-3::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-3::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-3:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-3:focus-visible,
+.emotion-3:focus,
+.emotion-3:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-3:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-3:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:focus-visible,
+.emotion-3:-webkit-autofill:focus,
+.emotion-3:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="input-group emotion-1"
+  >
+    <div
+      className="emotion-2"
+    >
+      <input
+        className="wireinput emotion-3"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"Input" renders with placeholderTextTransform 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  position: relative;
+}
+
+.emotion-3 {
+  background: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px #dce0e3;
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  height: 48px;
+  line-height: 1.5rem;
+  outline: none;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.emotion-3::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: uppercase;
+  opacity: 1;
+}
+
+.emotion-3::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.emotion-3::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.emotion-3:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-3:focus-visible,
+.emotion-3:focus,
+.emotion-3:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-3:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-3:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-3:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:focus-visible,
+.emotion-3:-webkit-autofill:focus,
+.emotion-3:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-3:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="input-group emotion-1"
+  >
+    <div
+      className="emotion-2"
+    >
+      <input
+        className="wireinput emotion-3"
+        placeholder="Input"
+      />
+    </div>
+  </div>
+</div>
+`;

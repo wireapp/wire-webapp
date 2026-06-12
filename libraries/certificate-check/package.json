@@ -1,0 +1,39 @@
+{
+  "name": "@wireapp/certificate-check",
+  "license": "GPL-3.0",
+  "description": "Utilities to check that Wire's domains use the expected certificate.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wireapp/wire-webapp",
+    "directory": "libraries/certificate-check"
+  },
+  "files": [
+    "lib"
+  ],
+  "main": "lib/CertUtil",
+  "types": "lib/CertUtil.d.ts",
+  "dependencies": {
+    "jsrsasign": "11.1.3"
+  },
+  "devDependencies": {
+    "@swc/core": "^1.3.10",
+    "@swc/jest": "^0.2.23",
+    "@types/jest": "^29.2.0",
+    "@types/jsrsasign": "10.5.15",
+    "@types/node": "^22.0.0",
+    "jest": "^29.2.1",
+    "rimraf": "6.1.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
+  },
+  "scripts": {
+    "build": "nx run certificate-check-lib:build",
+    "clean": "nx run certificate-check-lib:clean",
+    "dist": "nx run certificate-check-lib:dist",
+    "test": "nx run certificate-check-lib:test",
+    "test:coverage": "nx run certificate-check-lib:test:coverage",
+    "test:watch": "nx run certificate-check-lib:test --watch"
+  },
+  "version": "0.7.27",
+  "private": true
+}

@@ -62,7 +62,7 @@ export class ConversationDetailsPage {
     this.selectedSearchList = this.page.getByTestId('selected-search-list');
     this.searchPeopleInput = page.getByRole('textbox', {name: 'Search by name'});
     this.searchList = this.page.locator('#add-participants').getByRole('list');
-    this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete group'});
+    this.deleteGroupButton = this.page.getByRole('button', {name: 'Delete conversation'});
     this.notificationsButton = this.page.getByRole('button', {name: 'Notifications'});
     this.devicesButton = this.page.getByRole('button', {name: 'Devices'});
     this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
@@ -123,16 +123,17 @@ export class ConversationDetailsPage {
     return userLocator.isVisible();
   }
 
-  async openParticipantDetails(fullName: string) {
-    await this.getLocatorByUser(fullName).click();
-  }
+  getParticipant(fullName: string) {
+    const baseLocator = this.getLocatorByUser(fullName);
 
-  getUserRoleIcon(fullName: string) {
-    return this.getLocatorByUser(fullName).getByTestId(/^status-(external|guest|admin)$/);
-  }
-
-  getUserAvailabilityIcon(fullName: string) {
-    return this.getLocatorByUser(fullName).getByTestId('status-availability-icon');
+    return Object.assign(baseLocator, {
+      roleIcon: baseLocator.getByTestId(/^status-(external|guest|admin)$/),
+      availabilityIcon: baseLocator.getByTestId('status-availability-icon'),
+      federatedIcon: baseLocator.getByTestId('status-federated-user'),
+      openDetails: async () => {
+        await baseLocator.click();
+      },
+    });
   }
 
   getLocatorByUser(fullName: string) {

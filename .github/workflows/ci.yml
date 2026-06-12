@@ -79,24 +79,33 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
+
+      - name: Add repository Yarn wrapper to PATH
+        run: echo "$GITHUB_WORKSPACE/bin" >> "$GITHUB_PATH"
+
       - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version-file: '.nvmrc'
           cache: 'yarn'
 
-      - name: Install pinned package manager
-        env:
-          COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
-        run: corepack install
-
       - name: Install JS dependencies
-        run: yarn --immutable
+        run: ./bin/yarn --immutable
+
+      - name: Restore Nx and ESLint caches
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: |
+            .nx/cache
+            node_modules/.cache/eslint
+          key: lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-${{ github.sha }}
+          restore-keys: |
+            lint-${{ runner.os }}-${{ hashFiles('eslint.config.ts', 'yarn.lock') }}-
 
       - name: Verify generated i18n artifacts are committed
         run: |
-          yarn nx run webapp:translate-merge
-          yarn nx run webapp:translate-generate-types
+          ./bin/yarn nx run webapp:translate-merge
+          ./bin/yarn nx run webapp:translate-generate-types
 
           if ! test -z "$(git status --porcelain)"; then
             echo "Repository is not clean after generation. Run generation locally and commit the changes."
@@ -105,25 +114,32 @@ jobs:
           fi
 
       - name: Build libraries
-        run: yarn nx run-many -t build --projects=tag:type:lib
+        run: ./bin/yarn nx run-many -t build --projects=tag:type:lib
 
       - name: Type check
-        run: yarn type-check
+        run: ./bin/yarn type-check
 
       - name: Lint file names
-        run: yarn lint:fileNames
+        run: ./bin/yarn lint:fileNames
 
       - name: Lint formatting
-        run: yarn lint:other
+        run: ./bin/yarn lint:other
 
-      - name: Lint
-        run: yarn nx run-many -t lint --all
+      - name: Lint (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: ./bin/yarn nx affected -t lint --base="origin/${BASE_REF}"
+
+      - name: Lint (non-PR)
+        if: ${{ github.event_name != 'pull_request' }}
+        run: ./bin/yarn nx run-many -t lint --all
 
       - name: Test
-        run: ./bin/run-with-network-isolation.sh yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
+        run: ./bin/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
       - name: Upload webapp coverage to Codecov
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
         with:
           fail_ci_if_error: false
           files: ./apps/webapp/coverage/lcov.info
@@ -131,7 +147,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload server coverage to Codecov
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
         with:
           fail_ci_if_error: false
           files: ./apps/server/coverage/lcov.info
@@ -139,7 +155,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload core library coverage to Codecov
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
         with:
           fail_ci_if_error: false
           files: ./coverage/libraries/core/lcov.info
@@ -147,7 +163,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Upload api-client library coverage to Codecov
-        uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
         with:
           fail_ci_if_error: false
           files: ./coverage/libraries/api-client/lcov.info
@@ -156,7 +172,7 @@ jobs:
 
       - name: Build and package
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
-        run: yarn nx run server:package
+        run: ./bin/yarn nx run server:package
 
       - name: Verify Quay credentials availability
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}
@@ -177,4 +193,4 @@ jobs:
           PR_TAG: pr-${{ github.event.pull_request.number }}
           GITHUB_SHA: ${{ github.event.pull_request.head.sha }}
         # The third and fourth positional parameters are uniqueTagOut and commitSha; they are intentionally left empty here.
-        run: yarn docker "$PR_TAG" "" "" --pr
+        run: ./bin/yarn docker "$PR_TAG" "" "" --pr

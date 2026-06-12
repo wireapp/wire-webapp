@@ -19,14 +19,12 @@
 
 import axios, {AxiosInstance} from 'axios';
 
-// ToDo: Fix via export from api-client
-const TEST_API_VERSION = `v13`;
 export class BackendClientE2E {
   readonly axiosInstance: AxiosInstance;
 
-  constructor() {
+  constructor(config: {backendUrl: string; apiVersion: string}) {
     this.axiosInstance = axios.create({
-      baseURL: `${process.env.BACKEND_URL}${TEST_API_VERSION}/`,
+      baseURL: `${config.backendUrl}${config.apiVersion}/`,
       withCredentials: true,
       headers: {
         'Content-Type': 'application/json',

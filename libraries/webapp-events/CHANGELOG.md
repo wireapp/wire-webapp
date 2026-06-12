@@ -1,0 +1,416 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.29.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.29.0...@wireapp/webapp-events@0.29.2) (2026-01-21)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.29.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.6...@wireapp/webapp-events@0.29.0) (2025-12-20)
+
+### Features
+
+* **webapp-events:** add event for remote muted state ([#7724](https://github.com/wireapp/wire-web-packages/issues/7724)) ([7f7148e](https://github.com/wireapp/wire-web-packages/commit/7f7148ee6008ce90d9309c4553153c4dc22224e8))
+
+## [0.28.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.5...@wireapp/webapp-events@0.28.6) (2025-12-02)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.28.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.4...@wireapp/webapp-events@0.28.5) (2025-10-23)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.28.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.3...@wireapp/webapp-events@0.28.4) (2025-10-23)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.28.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.2...@wireapp/webapp-events@0.28.3) (2025-10-23)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.28.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.1...@wireapp/webapp-events@0.28.2) (2025-10-23)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.28.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.28.0...@wireapp/webapp-events@0.28.1) (2025-09-25)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.28.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.27.0...@wireapp/webapp-events@0.28.0) (2025-01-02)
+
+### Features
+
+* markdown preview events ([#6773](https://github.com/wireapp/wire-web-packages/issues/6773)) ([7e0745b](https://github.com/wireapp/wire-web-packages/commit/7e0745b182f8a468af6651628b60f28a090a2acd))
+
+# [0.27.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.26.1...@wireapp/webapp-events@0.27.0) (2024-12-16)
+
+### Features
+
+* **webapp-events:** add enable press space to unmute event ([#6757](https://github.com/wireapp/wire-web-packages/issues/6757)) ([a37ffd7](https://github.com/wireapp/wire-web-packages/commit/a37ffd754a7cc20f1a4f9d54bc78b89d651c1c8b))
+
+## [0.26.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.26.0...@wireapp/webapp-events@0.26.1) (2024-12-13)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.26.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.25.0...@wireapp/webapp-events@0.26.0) (2024-12-13)
+
+### Features
+
+* **webapp-events:** add enable press space to unmute event ([#6753](https://github.com/wireapp/wire-web-packages/issues/6753)) ([6299a4f](https://github.com/wireapp/wire-web-packages/commit/6299a4f555df4d198bc42af87c9254329f3617fc))
+
+# [0.25.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.24.3...@wireapp/webapp-events@0.25.0) (2024-12-12)
+
+### Features
+
+* **webapp-events:** add call hand raised and screen sharing ended events [WPB-8580] ([#6750](https://github.com/wireapp/wire-web-packages/issues/6750)) ([07938bc](https://github.com/wireapp/wire-web-packages/commit/07938bc540853db83ff9b0c7a6540562d963eb6b))
+
+## [0.24.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.24.0...@wireapp/webapp-events@0.24.3) (2024-10-16)
+
+### Bug Fixes
+
+* **core, api-client:** Add abort controller to notifications api call (WPB-11013) ([#6577](https://github.com/wireapp/wire-web-packages/issues/6577)) ([3a5a308](https://github.com/wireapp/wire-web-packages/commit/3a5a30820ae03d589019ffe99f5b4587cf0e52f3))
+
+# [0.24.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.23.0...@wireapp/webapp-events@0.24.0) (2024-08-13)
+
+### Features
+
+* **privacy:** streamline the structure of privacy related events ([#6451](https://github.com/wireapp/wire-web-packages/issues/6451)) ([b0a1bb5](https://github.com/wireapp/wire-web-packages/commit/b0a1bb536fadbbef37693d3ae9deec31055f1cd4))
+
+# [0.23.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.22.1...@wireapp/webapp-events@0.23.0) (2024-07-22)
+
+### Features
+
+* remove phone login ([#6382](https://github.com/wireapp/wire-web-packages/issues/6382)) ([22d5637](https://github.com/wireapp/wire-web-packages/commit/22d56370b213058f9663bb024a0d3daadd01d759))
+
+## [0.22.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.22.0...@wireapp/webapp-events@0.22.1) (2024-07-16)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.22.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.21.1...@wireapp/webapp-events@0.22.0) (2024-06-10)
+
+### Features
+
+* **webapp-events:** add search shortcut ([#6288](https://github.com/wireapp/wire-web-packages/issues/6288)) ([ef84080](https://github.com/wireapp/wire-web-packages/commit/ef84080e389b3fac2bbc43955ba8a66efb08922d))
+
+## [0.21.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.21.0...@wireapp/webapp-events@0.21.1) (2024-05-21)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.21.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.20.1...@wireapp/webapp-events@0.21.0) (2024-04-03)
+
+### Features
+
+* add call push to talk properties events ([#6121](https://github.com/wireapp/wire-web-packages/issues/6121)) ([9c713d6](https://github.com/wireapp/wire-web-packages/commit/9c713d6f2600e7ff5a49df5b556c7c557efdaf05))
+
+## [0.20.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.20.0...@wireapp/webapp-events@0.20.1) (2024-01-12)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.20.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.19.0...@wireapp/webapp-events@0.20.0) (2024-01-11)
+
+### Features
+
+* add a redirected event to the apps lifecycle (for oauth) ([#5861](https://github.com/wireapp/wire-web-packages/issues/5861)) ([2756f41](https://github.com/wireapp/wire-web-packages/commit/2756f41d56f3a4514ec8ba70ef005d52cabab25f))
+
+# [0.19.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.18.3...@wireapp/webapp-events@0.19.0) (2024-01-09)
+
+### Features
+
+* update types for download path ([#5813](https://github.com/wireapp/wire-web-packages/issues/5813)) ([f4e5472](https://github.com/wireapp/wire-web-packages/commit/f4e547237b178e16631b98dae2e24fbf33a6e598))
+
+## [0.18.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.18.2...@wireapp/webapp-events@0.18.3) (2023-09-06)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.18.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.18.1...@wireapp/webapp-events@0.18.2) (2023-09-06)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.18.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.18.0...@wireapp/webapp-events@0.18.1) (2023-09-06)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.18.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.17.0...@wireapp/webapp-events@0.18.0) (2023-08-14)
+
+### Features
+
+* **api-client, webapp-events:** add federation delete & connection remove events (WPB-203) ([#5340](https://github.com/wireapp/wire-web-packages/issues/5340)) ([64df685](https://github.com/wireapp/wire-web-packages/commit/64df68520865fb70fc952a0db1ca631ba4799149))
+
+# [0.17.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.16.0...@wireapp/webapp-events@0.17.0) (2023-05-04)
+
+### Features
+
+* update typescript ([#5115](https://github.com/wireapp/wire-web-packages/issues/5115)) ([f1f39de](https://github.com/wireapp/wire-web-packages/commit/f1f39dee4d5985980b187dc00199beeb1e849f55))
+
+# [0.16.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.15.2...@wireapp/webapp-events@0.16.0) (2022-11-16)
+
+### Features
+
+* add a user setting for font sizes [ACC-302] ([#4612](https://github.com/wireapp/wire-web-packages/issues/4612)) ([ab9a81d](https://github.com/wireapp/wire-web-packages/commit/ab9a81dd272b51dc28de920dd7bf254880582039))
+
+## [0.15.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.15.1...@wireapp/webapp-events@0.15.2) (2022-11-08)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.15.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.15.0...@wireapp/webapp-events@0.15.1) (2022-11-08)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.15.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.9...@wireapp/webapp-events@0.15.0) (2022-10-26)
+
+### Code Refactoring
+
+* produce output of packages in lib folders ([#4561](https://github.com/wireapp/wire-web-packages/issues/4561)) ([2b7ea4c](https://github.com/wireapp/wire-web-packages/commit/2b7ea4c13f244bad5fe3cbcb80f82b5de6741db7))
+
+### BREAKING CHANGES
+
+* Imports that point to @wireapp/packageName/src/** need to be changed to @wireapp/packageName/lib/**
+
+* feat: changed api-client, bazinga64, certificate-check, cli-client
+
+* feat: cleanup commons
+
+* feat: change copy-config
+
+* feat: change core
+
+* feat: update license-collector
+
+* fix: update @wireapp/protocol-messaging, long and @types/node no longer needed
+
+* fix: update @wireapp/protocol-messaging, long and @types/node no longer needed
+
+* fix: node modules and yarn.lock
+
+* fix: add @types/node again to get rid of yarn resolution warnings
+
+* fix: add @types/node again to get rid of yarn resolution warnings
+
+* chore: update lockfile
+
+* fix: core tests
+
+* feat: update priority-queue
+
+* feat: update promise-queue
+
+* feat: update react-ui-kit
+
+* fix: add long back into core
+
+* feat: update store-engine
+
+* feat: update store-engine-dexie
+
+* feat: update store-engine-fs
+
+* feat: update webapp-events
+
+* fix: eslint
+
+* chore: cleanup last bits. everything changed to /lib/
+
+* fix: add typescript to our packages for users that dont have ts available globally (tsc not found)
+
+* fix: read old gitignore rules for now to avoid problems (unexpected commits) for existing local environments
+
+* chore: remove not needed gitignore entries
+
+* fix: formatting for package.json
+
+* chore: let tests execute in parallel
+
+## [0.14.9](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.8...@wireapp/webapp-events@0.14.9) (2022-10-20)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.14.8](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.7...@wireapp/webapp-events@0.14.8) (2022-10-19)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.14.7](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.6...@wireapp/webapp-events@0.14.7) (2022-10-18)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.14.6](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.5...@wireapp/webapp-events@0.14.6) (2022-09-22)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.14.5](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.4...@wireapp/webapp-events@0.14.5) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.14.4](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.3...@wireapp/webapp-events@0.14.4) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.14.3](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.2...@wireapp/webapp-events@0.14.3) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.14.2](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.1...@wireapp/webapp-events@0.14.2) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.14.1](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.14.0...@wireapp/webapp-events@0.14.1) (2022-09-21)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.14.0](https://github.com/wireapp/wire-web-packages/compare/@wireapp/webapp-events@0.13.2...@wireapp/webapp-events@0.14.0) (2022-09-21)
+
+### Features
+
+* update yarn to v2, update typescript ([#4402](https://github.com/wireapp/wire-web-packages/issues/4402)) ([9b1cf1f](https://github.com/wireapp/wire-web-packages/commit/9b1cf1f56a6f1a410a6175b080ec78d73a60586c))
+
+## [0.13.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.13.1...@wireapp/webapp-events@0.13.2) (2022-05-24)
+
+### Reverts
+
+* Revert "fix(webapp-events): Add new event for catching deeplinks (SQSERVICES-1415) (#4270)" (#4271) ([f806f78](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/f806f78adfbe2dc33479c47c14d69dd09644f2af)), closes [#4270](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/4270) [#4271](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/4271)
+
+## [0.13.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.13.0...@wireapp/webapp-events@0.13.1) (2022-05-24)
+
+### Bug Fixes
+
+* **webapp-events:** Add new event for catching deeplinks (SQSERVICES-1415) ([#4270](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/4270)) ([5eefbf5](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/5eefbf5963e698ade37146364c1b1950b181494f))
+
+# [0.13.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.12.0...@wireapp/webapp-events@0.13.0) (2022-02-25)
+
+### Features
+
+* **api-client,webapp-events:** Add new event for soundless incoming calls (SQCALL-471) ([#4231](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/4231)) ([abaccfc](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/abaccfcebe5284160624b6ff1b6c8dc67a15c250))
+
+# [0.12.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.11.3...@wireapp/webapp-events@0.12.0) (2022-02-07)
+
+### Features
+
+* **webapp-events:** Add sso events for desktop app ([#4222](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/4222)) ([7662df3](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/7662df305ccf0e83293445588e088b2d84e4292b))
+
+## [0.11.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.11.2...@wireapp/webapp-events@0.11.3) (2021-08-30)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.11.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.11.1...@wireapp/webapp-events@0.11.2) (2021-07-12)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.11.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.11.0...@wireapp/webapp-events@0.11.1) (2021-07-06)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.11.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.10.4...@wireapp/webapp-events@0.11.0) (2021-06-16)
+
+### Features
+
+* **webapp-events:** Add conversation join event ([#3959](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3959)) ([e488bad](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/e488bad58cffa7069d099b515d81bc48f101d356))
+
+## [0.10.4](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.10.2...@wireapp/webapp-events@0.10.4) (2021-05-12)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.10.2](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.10.1...@wireapp/webapp-events@0.10.2) (2021-04-09)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.10.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.10.0...@wireapp/webapp-events@0.10.1) (2021-03-23)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.10.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.9.0...@wireapp/webapp-events@0.10.0) (2021-03-11)
+
+### Features
+
+* **webapp-events:** Add INJECT_CALLING_MESSAGE conversation event ([#3636](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3636)) ([40aad0c](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/40aad0c5e2aa787047f520b792b5d5bbd04c1fe0))
+
+# [0.9.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.8.0...@wireapp/webapp-events@0.9.0) (2020-10-19)
+
+### Features
+
+* **webapp-events:** Add events to show preferences ([#3281](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3281)) ([c28fe06](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/c28fe069f06a93e6345d6a59961628d3e44e6c09))
+
+# [0.8.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.7.0...@wireapp/webapp-events@0.8.0) (2020-09-30)
+
+### Features
+
+* **api-client, webapp-events:** Remove SFT beta related stuff ([#3243](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3243)) ([03bfcc8](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/03bfcc805e5cd07891c99dd36ac33a933116b3b4))
+
+# [0.7.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.6.1...@wireapp/webapp-events@0.7.0) (2020-09-28)
+
+### Features
+
+* **webapp-events:** Add CONVERSATION.VERIFICATION_STATE_CHANGED (WEBAPP-7106) ([#3242](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3242)) ([faad6ca](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/faad6ca36d4615621e138067c4d0d13bdbe9f9d9))
+
+## [0.6.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.6.0...@wireapp/webapp-events@0.6.1) (2020-09-21)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# [0.6.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.5.3...@wireapp/webapp-events@0.6.0) (2020-09-01)
+
+### Features
+
+* **webapp-events:** Add telemetry sharing update event ([#3208](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3208)) ([d094c3c](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/d094c3ce8e3af354f830a3040598a550462b17a5))
+
+## [0.5.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.5.2...@wireapp/webapp-events@0.5.3) (2020-08-19)
+
+### Bug Fixes
+
+* **webapp-events:** Upload TypeScript definition files to npmjs ([#3189](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3189)) ([26c9e85](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/26c9e85e0152afea6c2816d5bdba761148a3ab1a))
+
+## 0.5.2 (2020-08-19)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.5.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.5.0...@wireapp/webapp-events@0.5.1) (2020-08-03)
+
+### Bug Fixes
+
+* **webapp-events:** Remove unused SUPER_PROPERTY ([#3140](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3140)) ([4f0f1e8](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/4f0f1e842f8486339a8655905849c68cd57454de))
+
+# [0.5.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.4.1...@wireapp/webapp-events@0.5.0) (2020-07-21)
+
+### Features
+
+* **webapp-events:** Add ENABLE_SFT_CALLING update event ([#3133](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3133)) ([710cd8a](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/710cd8ac6bd6561147d92619d200663ec3ac5a44))
+
+## [0.4.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.4.0...@wireapp/webapp-events@0.4.1) (2020-07-16)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# 0.4.0 (2020-07-14)
+
+### Features
+
+* **webapp-events:** Add Analytics events ([#3112](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/3112)) ([53324ab](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/53324ab5bd0598ae73d0c7e186fe7de76483f6eb))
+
+# [0.3.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.2.0...@wireapp/webapp-events@0.3.0) (2020-06-03)
+
+### Features
+
+* **webapp-events:** Add variable bitrate encoding call setting ([fc9f656](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/fc9f6566a762db9d7ad5147bc1a0df07f98bc0de))
+
+# [0.2.0](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.1.3...@wireapp/webapp-events@0.2.0) (2020-05-18)
+
+### Features
+
+* **webapp-events:** Add view folders interface setting ([a152db3](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/a152db32e7f5044490ce16a785cb64d235935b16))
+
+## [0.1.3](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.1.2...@wireapp/webapp-events@0.1.3) (2020-05-07)
+
+### Bug Fixes
+
+* **webapp-events:** Typo in extensions.giphy ([f35fec5](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/f35fec573b78b13fb425330543fef097ed5e23ce))
+
+## 0.1.2 (2020-05-06)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+## [0.1.1](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/compare/@wireapp/webapp-events@0.1.0...@wireapp/webapp-events@0.1.1) (2020-03-09)
+
+**Note:** Version bump only for package @wireapp/webapp-events
+
+# 0.1.0 (2020-02-10)
+
+### Features
+
+* **webapp-events:** Expose webapp events ([#2827](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/issues/2827)) ([5a72c8e](https://github.com/wireapp/wire-web-packages/tree/main/packages/webapp-events/commit/5a72c8ee724c72054ca2e6fcb012d436f3cc2eec))
