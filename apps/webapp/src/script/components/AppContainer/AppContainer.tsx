@@ -65,7 +65,7 @@ export const AppContainer = (properties: AppProps) => {
   const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, wallClock} = properties;
   setAppLocale();
   const app = useMemo(() => {
-    return new App(container.resolve(Core), container.resolve(APIClient), config);
+    return new App(container.resolve(Core), container.resolve(APIClient), config, t);
   }, [config]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 

@@ -92,7 +92,7 @@ export class CallingViewModel {
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),

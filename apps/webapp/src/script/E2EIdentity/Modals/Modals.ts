@@ -25,7 +25,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ModalOptions, PrimaryModalType} from 'Components/Modals/PrimaryModal/PrimaryModalTypes';
 import {Config} from 'src/script/Config';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {replaceLink} from 'Util/localizerUtil';
 
 const hideSecondaryBtn = {hideSecondary: true};
 const hideCloseBtn = {hideCloseBtn: true, preventClose: true};
@@ -74,7 +74,7 @@ export const getModalOptions = (
     substitutions?: Substitutions,
     dangerousSubstitutions?: Record<string, string>,
     skipEscaping?: boolean,
-  ) => string = t,
+  ) => string,
 ) => {
   if (!secondaryActionFn) {
     hideSecondary = true;

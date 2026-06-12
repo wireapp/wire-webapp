@@ -38,6 +38,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
 import 'src/script/util/test/mock/localStorageMock';
 import {createUuid} from 'Util/uuid';
 
@@ -91,7 +92,9 @@ const getDefaultParams = () => {
       {} as IntegrationRepository,
       {} as MessageRepository,
       {} as UserState,
+      {} as TeamState,
       {} as MainViewModel,
+      t,
     ),
     conversationRepository: {
       expectReadReceipt: () => true,

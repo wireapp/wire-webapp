@@ -846,7 +846,7 @@ export class MessageRepository {
   ): Promise<boolean> {
     const conversationDegraded = conversation.verification_state() === ConversationVerificationState.DEGRADED;
     if (showLegalHoldWarning) {
-      return showLegalHoldWarningModal(conversation, conversationDegraded)
+      return showLegalHoldWarningModal(conversation, conversationDegraded, this.translate)
         .then(() => true)
         .catch(() => false);
     }

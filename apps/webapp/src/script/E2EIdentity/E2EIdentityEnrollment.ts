@@ -30,6 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
+import {t} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {removeUrlParameters} from 'Util/urlUtil';
@@ -356,30 +357,36 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
   }
 
   private showLoadingMessage(isCertificateRenewal = false): void {
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.LOADING,
-      hideClose: true,
-      extraParams: {
-        isRenewal: isCertificateRenewal,
+    const {modalOptions, modalType} = getModalOptions(
+      {
+        type: ModalType.LOADING,
+        hideClose: true,
+        extraParams: {
+          isRenewal: isCertificateRenewal,
+        },
       },
-    });
+      t,
+    );
     PrimaryModal.show(modalType, modalOptions);
   }
 
   private async showSuccessMessage(isCertificateRenewal = false) {
     return new Promise<void>(resolve => {
-      const {modalOptions, modalType} = getModalOptions({
-        type: ModalType.SUCCESS,
-        hideClose: false,
-        extraParams: {
-          isRenewal: isCertificateRenewal,
+      const {modalOptions, modalType} = getModalOptions(
+        {
+          type: ModalType.SUCCESS,
+          hideClose: false,
+          extraParams: {
+            isRenewal: isCertificateRenewal,
+          },
+          primaryActionFn: resolve,
+          secondaryActionFn: () => {
+            amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
+            resolve();
+          },
         },
-        primaryActionFn: resolve,
-        secondaryActionFn: () => {
-          amplify.publish(WebAppEvents.PREFERENCES.MANAGE_DEVICES);
-          resolve();
-        },
-      });
+        t,
+      );
       PrimaryModal.show(modalType, modalOptions);
     });
   }
@@ -393,25 +400,28 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     await this.coreE2EIService.clearAllProgress();
 
     return new Promise<void>(resolve => {
-      const {modalOptions, modalType} = getModalOptions({
-        type: ModalType.ERROR,
-        hideClose: true,
-        hideSecondary: !snoozable,
-        primaryActionFn: async () => {
-          await this.enroll({snoozable});
-          resolve();
+      const {modalOptions, modalType} = getModalOptions(
+        {
+          type: ModalType.ERROR,
+          hideClose: true,
+          hideSecondary: !snoozable,
+          primaryActionFn: async () => {
+            await this.enroll({snoozable});
+            resolve();
+          },
+          secondaryActionFn: async () => {
+            const {nextReminderDelay, remainingGracePeriodDelay} = await this.startTimers();
+            if (nextReminderDelay > 0) {
+              this.showSnoozeConfirmationModal(remainingGracePeriodDelay);
+            }
+            resolve();
+          },
+          extraParams: {
+            isGracePeriodOver: !snoozable,
+          },
         },
-        secondaryActionFn: async () => {
-          const {nextReminderDelay, remainingGracePeriodDelay} = await this.startTimers();
-          if (nextReminderDelay > 0) {
-            this.showSnoozeConfirmationModal(remainingGracePeriodDelay);
-          }
-          resolve();
-        },
-        extraParams: {
-          isGracePeriodOver: !snoozable,
-        },
-      });
+        t,
+      );
 
       PrimaryModal.show(modalType, modalOptions);
     });
@@ -423,40 +433,46 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
     onUserAction?: () => void,
   ): Promise<void> {
     return new Promise<void>(resolve => {
-      const {modalOptions, modalType: determinedModalType} = getModalOptions({
-        hideSecondary: !snoozable,
-        primaryActionFn: async () => {
-          onUserAction?.();
-          await this.enroll({snoozable});
-          resolve();
+      const {modalOptions, modalType: determinedModalType} = getModalOptions(
+        {
+          hideSecondary: !snoozable,
+          primaryActionFn: async () => {
+            onUserAction?.();
+            await this.enroll({snoozable});
+            resolve();
+          },
+          secondaryActionFn: async () => {
+            onUserAction?.();
+            const {nextReminderDelay, remainingGracePeriodDelay} = await this.startTimers();
+            if (nextReminderDelay > 0) {
+              this.showSnoozeConfirmationModal(remainingGracePeriodDelay);
+            }
+            resolve();
+          },
+          extraParams: {
+            isGracePeriodOver: !snoozable,
+          },
+          type: modalType,
+          hideClose: true,
         },
-        secondaryActionFn: async () => {
-          onUserAction?.();
-          const {nextReminderDelay, remainingGracePeriodDelay} = await this.startTimers();
-          if (nextReminderDelay > 0) {
-            this.showSnoozeConfirmationModal(remainingGracePeriodDelay);
-          }
-          resolve();
-        },
-        extraParams: {
-          isGracePeriodOver: !snoozable,
-        },
-        type: modalType,
-        hideClose: true,
-      });
+        t,
+      );
       PrimaryModal.show(determinedModalType, modalOptions);
     });
   }
 
   private showSnoozeConfirmationModal(delay: number) {
     // Show the modal with the provided modal type
-    const {modalOptions, modalType: determinedModalType} = getModalOptions({
-      type: ModalType.SNOOZE_REMINDER,
-      hideClose: true,
-      extraParams: {
-        delayTime: formatDelayTime(delay),
+    const {modalOptions, modalType: determinedModalType} = getModalOptions(
+      {
+        type: ModalType.SNOOZE_REMINDER,
+        hideClose: true,
+        extraParams: {
+          delayTime: formatDelayTime(delay),
+        },
       },
-    });
+      t,
+    );
     PrimaryModal.show(determinedModalType, modalOptions);
   }
 }

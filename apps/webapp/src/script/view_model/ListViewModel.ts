@@ -83,7 +83,7 @@ export class ListViewModel {
   constructor(
     mainViewModel: MainViewModel,
     repositories: ViewModelRepositories,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
   ) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);

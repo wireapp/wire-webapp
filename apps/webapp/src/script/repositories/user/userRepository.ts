@@ -500,7 +500,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     if (hasAvailabilityChanged) {
       await this.updateUser(selfUser.qualifiedId, {availability});
       amplify.publish(WebAppEvents.TEAM.UPDATE_INFO);
-      showAvailabilityModal(availability);
+      showAvailabilityModal(availability, this.translate);
     }
   };
 

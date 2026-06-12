@@ -21,7 +21,6 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
-import {t} from 'Util/localizerUtil';
 import {loadValue, storeValue} from 'Util/storageUtil';
 
 const initialKey = 'hide_initial_modal';
@@ -61,7 +60,7 @@ function showModal(storageKey: string, title: string, message: string, translate
   }
 }
 
-export function showAvailabilityModal(availability: Availability.Type, translate: Translate = t): void {
+export function showAvailabilityModal(availability: Availability.Type, translate: Translate): void {
   if (availability !== Availability.Type.NONE) {
     storeValue(initialKey, 'true');
   }
@@ -104,7 +103,7 @@ export function showAvailabilityModal(availability: Availability.Type, translate
   }
 }
 
-export function showInitialModal(availability: Availability.Type, translate: Translate = t): void {
+export function showInitialModal(availability: Availability.Type, translate: Translate): void {
   const hideInitialModal = loadValue(initialKey);
   if (!hideInitialModal && availability !== Availability.Type.NONE) {
     showAvailabilityModal(availability, translate);

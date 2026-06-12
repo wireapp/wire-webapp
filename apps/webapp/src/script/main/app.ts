@@ -171,7 +171,7 @@ export class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -494,7 +494,7 @@ export class App {
       }
 
       const e2eiHandler = await configureE2EI(teamFeatures);
-      configureDownloadPath(teamFeatures);
+      configureDownloadPath(teamFeatures, this.translate);
 
       this.core.configureCoreCallbacks({
         groupIdFromConversationId: async conversationId => {
@@ -891,10 +891,13 @@ export class App {
   };
 
   private readonly showClientCertificateRevokedWarning = async () => {
-    const {modalOptions, modalType} = getModalOptions({
-      type: ModalType.SELF_CERTIFICATE_REVOKED,
-      primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
-    });
+    const {modalOptions, modalType} = getModalOptions(
+      {
+        type: ModalType.SELF_CERTIFICATE_REVOKED,
+        primaryActionFn: () => void this.repository.lifeCycle.logout(SIGN_OUT_REASON.APP_INIT, false),
+      },
+      this.translate,
+    );
 
     PrimaryModal.show(modalType, modalOptions);
   };

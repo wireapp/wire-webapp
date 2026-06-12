@@ -82,7 +82,7 @@ export class ContentViewModel {
   constructor(
     mainViewModel: MainViewModel,
     public repositories: ViewModelRepositories,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
   ) {
     this.userState = container.resolve(UserState);
     this.conversationState = container.resolve(ConversationState);

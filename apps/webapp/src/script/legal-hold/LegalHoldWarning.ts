@@ -24,7 +24,6 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
-import {t} from 'Util/localizerUtil';
 
 import {ConversationError} from '../error/conversationError';
 import {OPEN_CONVERSATION_DETAILS} from '../page/RightSidebar/RightSidebar';
@@ -37,7 +36,7 @@ export const showLegalHoldWarningModal = (
     substitutions?: Substitutions,
     dangerousSubstitutions?: Record<string, string>,
     skipEscaping?: boolean,
-  ) => string = t,
+  ) => string,
 ): Promise<void> => {
   return new Promise((resolve, reject) => {
     const secondaryAction = [

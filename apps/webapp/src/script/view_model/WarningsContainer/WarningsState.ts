@@ -25,7 +25,6 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AppPermissionState} from 'Repositories/notification/AppPermissionState';
 import type {Substitutions, TranslationKey} from 'Util/localizerUtil';
-import {t} from 'Util/localizerUtil';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
 import {TYPE} from './WarningsTypes';
@@ -89,7 +88,7 @@ const showWarning = (type: TYPE, info?: {name: string}) => {
  * Close warning.
  * @note Used to close a warning banner by clicking the close button
  */
-const closeWarning = (translate: Translate = t): void => {
+const closeWarning = (translate: Translate): void => {
   const {warnings, removeWarning} = useWarningsState.getState();
   const visibleWarning = warnings[warnings.length - 1];
   const warningToClose = visibleWarning;

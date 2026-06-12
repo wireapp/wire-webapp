@@ -104,7 +104,7 @@ export class MainViewModel {
     return this.core.backendFeatures.isFederated;
   }
 
-  constructor(repositories: ViewModelRepositories, translate: typeof t = t) {
+  constructor(repositories: ViewModelRepositories, translate: typeof t) {
     this.translate = translate;
     const userState = container.resolve(UserState);
     const teamState = container.resolve(TeamState);

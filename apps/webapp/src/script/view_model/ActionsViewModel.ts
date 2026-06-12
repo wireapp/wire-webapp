@@ -60,7 +60,7 @@ export class ActionsViewModel {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly mainViewModel: MainViewModel,
-    private readonly translate: typeof t = t,
+    private readonly translate: typeof t,
   ) {}
 
   readonly acceptConnectionRequest = (userEntity: User): Promise<void> => {
