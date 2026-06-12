@@ -92,6 +92,7 @@ export class CallingViewModel {
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
+    private readonly translate: typeof t = t,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
@@ -150,9 +151,9 @@ export class CallingViewModel {
 
     const startCall = async (conversation: Conversation): Promise<void> => {
       const canStart = await this.canInitiateCall(conversation.qualifiedId, {
-        action: t('modalCallSecondOutgoingAction'),
-        message: t('modalCallSecondOutgoingMessage'),
-        title: t('modalCallSecondOutgoingHeadline'),
+        action: this.translate('modalCallSecondOutgoingAction'),
+        message: this.translate('modalCallSecondOutgoingMessage'),
+        title: this.translate('modalCallSecondOutgoingHeadline'),
       });
 
       if (!canStart) {
@@ -169,9 +170,9 @@ export class CallingViewModel {
 
     const answerCall = async (call: Call) => {
       const canAnswer = await this.canInitiateCall(call.conversation.qualifiedId, {
-        action: t('modalCallSecondIncomingAction'),
-        message: t('modalCallSecondIncomingMessage'),
-        title: t('modalCallSecondIncomingHeadline'),
+        action: this.translate('modalCallSecondIncomingAction'),
+        message: this.translate('modalCallSecondIncomingMessage'),
+        title: this.translate('modalCallSecondIncomingHeadline'),
       });
       if (!canAnswer) {
         return;
@@ -209,15 +210,15 @@ export class CallingViewModel {
               await startCall(conversationEntity);
             }
           },
-          text: t('conversation.E2EICallAnyway'),
+          text: this.translate('conversation.E2EICallAnyway'),
         },
         secondaryAction: {
           action: () => {},
-          text: t('conversation.E2EICancel'),
+          text: this.translate('conversation.E2EICancel'),
         },
         text: {
-          message: t('conversation.E2EIDegradedInitiateCall'),
-          title: t('conversation.E2EIConversationNoLongerVerified'),
+          message: this.translate('conversation.E2EIDegradedInitiateCall'),
+          title: this.translate('conversation.E2EIConversationNoLongerVerified'),
         },
       });
     };
@@ -229,16 +230,16 @@ export class CallingViewModel {
         preventClose: true,
         primaryAction: {
           action: async () => await startCall(conversationEntity),
-          text: t('groupCallModalPrimaryBtnName'),
+          text: this.translate('groupCallModalPrimaryBtnName'),
         },
         secondaryAction: {
-          text: t('modalConfirmSecondary'),
+          text: this.translate('modalConfirmSecondary'),
         },
         text: {
           htmlMessage: `<div class="modal-description">
-            ${t('groupCallConfirmationModalTitle', {memberCount})}
+            ${this.translate('groupCallConfirmationModalTitle', {memberCount})}
           </div>`,
-          closeBtnLabel: t('groupCallModalCloseBtnLabel'),
+          closeBtnLabel: this.translate('groupCallModalCloseBtnLabel'),
         },
       });
     };
@@ -266,10 +267,10 @@ export class CallingViewModel {
               },
             },
             text: {
-              message: `${t('modalConferenceCallNotSupportedMessage')} ${t(
+              message: `${this.translate('modalConferenceCallNotSupportedMessage')} ${this.translate(
                 'modalConferenceCallNotSupportedJoinMessage',
               )}`,
-              title: t('modalConferenceCallNotSupportedHeadline'),
+              title: this.translate('modalConferenceCallNotSupportedHeadline'),
             },
           });
         } else {
@@ -414,32 +415,32 @@ export class CallingViewModel {
             action: () => {
               safeWindowOpen(Config.getConfig().URL.TEAMS_BILLING);
             },
-            text: t('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
+            text: this.translate('callingRestrictedConferenceCallOwnerModalUpgradeButton'),
           },
           text: {
-            htmlMessage: t(
+            htmlMessage: this.translate(
               'callingRestrictedConferenceCallOwnerModalDescription',
               {brandName: Config.getConfig().BRAND_NAME},
               replaceEnterprise,
             ),
-            title: t('callingRestrictedConferenceCallOwnerModalTitle'),
+            title: this.translate('callingRestrictedConferenceCallOwnerModalTitle'),
           },
         });
       } else {
         PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
           text: {
-            message: t('callingRestrictedConferenceCallTeamMemberModalDescription'),
-            title: t('callingRestrictedConferenceCallTeamMemberModalTitle'),
+            message: this.translate('callingRestrictedConferenceCallTeamMemberModalDescription'),
+            title: this.translate('callingRestrictedConferenceCallTeamMemberModalTitle'),
           },
         });
       }
     } else {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
-          htmlMessage: t('callingRestrictedConferenceCallPersonalModalDescription', {
+          htmlMessage: this.translate('callingRestrictedConferenceCallPersonalModalDescription', {
             brandName: Config.getConfig().BRAND_NAME,
           }),
-          title: t('callingRestrictedConferenceCallPersonalModalTitle'),
+          title: this.translate('callingRestrictedConferenceCallPersonalModalTitle'),
         },
       });
     }

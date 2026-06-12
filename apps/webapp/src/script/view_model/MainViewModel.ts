@@ -133,6 +133,7 @@ export class MainViewModel {
       repositories.team,
       repositories.properties,
       userState.self,
+      this.translate,
     );
     this.content = new ContentViewModel(this, repositories, this.translate);
     this.list = new ListViewModel(this, repositories);

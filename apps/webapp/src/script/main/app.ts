@@ -242,6 +242,7 @@ export class App {
       repositories.user,
       selfService,
       teamService,
+      t,
     );
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(repositories.user);

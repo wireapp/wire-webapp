@@ -22,13 +22,17 @@ import {STATE} from '@wireapp/avs';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from './CallingViewModel.mocks';
 
 describe('CallingViewModel', () => {
+  const originalPrimaryModalShow = PrimaryModal.show;
+
   afterEach(() => {
     callState.calls.removeAll();
+    PrimaryModal.show = originalPrimaryModalShow;
     jest.clearAllMocks();
   });
 
@@ -94,6 +98,33 @@ describe('CallingViewModel', () => {
   describe('MLS conference call', () => {
     beforeAll(() => {
       jest.useRealTimers();
+    });
+
+    it('uses the injected translate function for second-call warning copy', () => {
+      const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+      const [callingViewModel] = buildCallingViewModel(translate);
+      const joinedCall = buildCall(new Conversation('conversation1', ''));
+      const primaryModalShow = jest.fn();
+
+      joinedCall.state(STATE.MEDIA_ESTAB);
+      callState.calls.push(joinedCall);
+      PrimaryModal.show = primaryModalShow;
+
+      void callingViewModel.callActions.startAudio(new Conversation('conversation2', ''));
+
+      expect(translate).toHaveBeenCalledWith('modalCallSecondOutgoingAction');
+      expect(translate).toHaveBeenCalledWith('modalCallSecondOutgoingMessage');
+      expect(translate).toHaveBeenCalledWith('modalCallSecondOutgoingHeadline');
+      expect(primaryModalShow).toHaveBeenCalledWith(
+        PrimaryModal.type.CONFIRM,
+        expect.objectContaining({
+          primaryAction: expect.objectContaining({text: 'translated:modalCallSecondOutgoingAction'}),
+          text: expect.objectContaining({
+            message: 'translated:modalCallSecondOutgoingMessage',
+            title: 'translated:modalCallSecondOutgoingHeadline',
+          }),
+        }),
+      );
     });
   });
 });

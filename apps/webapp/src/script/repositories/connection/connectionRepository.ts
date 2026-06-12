@@ -62,6 +62,7 @@ export class ConnectionRepository {
     userRepository: UserRepository,
     private readonly selfService: SelfService,
     private readonly teamService: TeamService,
+    private readonly translate: typeof t = t,
     private readonly connectionState = container.resolve(ConnectionState),
     private readonly userState = container.resolve(UserState),
   ) {
@@ -216,8 +217,12 @@ export class ConnectionRepository {
             );
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
-                htmlMessage: t('modalUserCannotSendConnectionLegalHoldMessage', undefined, replaceLinkLegalHold),
-                title: t('modalUserCannotConnectHeadline'),
+                htmlMessage: this.translate(
+                  'modalUserCannotSendConnectionLegalHoldMessage',
+                  undefined,
+                  replaceLinkLegalHold,
+                ),
+                title: this.translate('modalUserCannotConnectHeadline'),
               },
             });
             break;
@@ -226,8 +231,10 @@ export class ConnectionRepository {
           case BackendErrorLabel.FEDERATION_NOT_ALLOWED: {
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
-                htmlMessage: t('modalUserCannotSendConnectionNotFederatingMessage', {username: userEntity.name()}),
-                title: t('modalUserCannotConnectHeadline'),
+                htmlMessage: this.translate('modalUserCannotSendConnectionNotFederatingMessage', {
+                  username: userEntity.name(),
+                }),
+                title: this.translate('modalUserCannotConnectHeadline'),
               },
             });
             break;
@@ -237,8 +244,8 @@ export class ConnectionRepository {
             this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
             PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
               text: {
-                htmlMessage: t('modalUserCannotSendConnectionMessage'),
-                title: t('modalUserCannotConnectHeadline'),
+                htmlMessage: this.translate('modalUserCannotSendConnectionMessage'),
+                title: this.translate('modalUserCannotConnectHeadline'),
               },
             });
             break;
@@ -359,8 +366,8 @@ export class ConnectionRepository {
         case ConnectionStatus.ACCEPTED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             text: {
-              htmlMessage: t('modalUserCannotAcceptConnectionMessage'),
-              title: t('modalUserCannotConnectHeadline'),
+              htmlMessage: this.translate('modalUserCannotAcceptConnectionMessage'),
+              title: this.translate('modalUserCannotConnectHeadline'),
             },
           });
           break;
@@ -368,8 +375,8 @@ export class ConnectionRepository {
         case ConnectionStatus.CANCELLED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             text: {
-              htmlMessage: t('modalUserCannotCancelConnectionMessage'),
-              title: t('modalUserCannotConnectHeadline'),
+              htmlMessage: this.translate('modalUserCannotCancelConnectionMessage'),
+              title: this.translate('modalUserCannotConnectHeadline'),
             },
           });
           break;
@@ -377,8 +384,8 @@ export class ConnectionRepository {
         case ConnectionStatus.IGNORED: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             text: {
-              htmlMessage: t('modalUserCannotIgnoreConnectionMessage'),
-              title: t('modalUserCannotConnectHeadline'),
+              htmlMessage: this.translate('modalUserCannotIgnoreConnectionMessage'),
+              title: this.translate('modalUserCannotConnectHeadline'),
             },
           });
           break;
@@ -386,7 +393,7 @@ export class ConnectionRepository {
         default: {
           PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
             text: {
-              title: t('modalUserCannotConnectHeadline'),
+              title: this.translate('modalUserCannotConnectHeadline'),
             },
           });
           break;

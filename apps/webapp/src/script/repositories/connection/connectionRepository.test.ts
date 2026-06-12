@@ -25,11 +25,13 @@ import {StatusCodes} from 'http-status-codes';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
@@ -37,14 +39,14 @@ import {ConnectionRepository} from './connectionRepository';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 
-function buildConnectionRepository() {
+function buildConnectionRepository(translate: typeof t = t) {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
   const selfService = new SelfService();
   const teamService = new TeamService();
   const userRepository = {refreshUser: jest.fn()} as unknown as UserRepository;
   return [
-    new ConnectionRepository(connectionService, userRepository, selfService, teamService, connectionState),
+    new ConnectionRepository(connectionService, userRepository, selfService, teamService, translate, connectionState),
     {connectionState, userRepository, connectionService},
   ] as const;
 }
@@ -59,6 +61,13 @@ function createConnection() {
 }
 
 describe('ConnectionRepository', () => {
+  const originalPrimaryModalShow = PrimaryModal.show;
+
+  afterEach(() => {
+    PrimaryModal.show = originalPrimaryModalShow;
+    jest.clearAllMocks();
+  });
+
   describe('cancelRequest', () => {
     const [connectionRepository, {connectionService, userRepository}] = buildConnectionRepository();
 
@@ -141,6 +150,36 @@ describe('ConnectionRepository', () => {
       });
 
       expect(storedConnection?.from).toEqual(connectionRequest.from);
+    });
+  });
+
+  describe('createConnection', () => {
+    it('uses the injected translate function for modal copy', async () => {
+      const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+      const [connectionRepository, {connectionService}] = buildConnectionRepository(translate);
+      const user = generateUser();
+      const primaryModalShow = jest.fn();
+
+      connectionService.postConnections = jest.fn().mockRejectedValueOnce(
+        new BackendError('', BackendErrorLabel.FEDERATION_NOT_ALLOWED, StatusCodes.FORBIDDEN),
+      ) as any;
+      PrimaryModal.show = primaryModalShow;
+
+      await connectionRepository.createConnection(user);
+
+      expect(translate).toHaveBeenCalledWith('modalUserCannotSendConnectionNotFederatingMessage', {
+        username: user.name(),
+      });
+      expect(translate).toHaveBeenCalledWith('modalUserCannotConnectHeadline');
+      expect(primaryModalShow).toHaveBeenCalledWith(
+        PrimaryModal.type.ACKNOWLEDGE,
+        expect.objectContaining({
+          text: expect.objectContaining({
+            htmlMessage: 'translated:modalUserCannotSendConnectionNotFederatingMessage',
+            title: 'translated:modalUserCannotConnectHeadline',
+          }),
+        }),
+      );
     });
   });
 });
