@@ -67,7 +67,7 @@ const WarningsContainer = ({onRefresh}: WarningProps) => {
       type="button"
       data-uie-name="do-close-warning"
       className="warning-bar-close icon-close button-round button-round-dark button-reset-default"
-      onClick={closeWarning}
+      onClick={() => closeWarning(translate)}
     />
   );
 

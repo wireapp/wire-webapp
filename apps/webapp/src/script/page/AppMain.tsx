@@ -110,6 +110,7 @@ export const AppMain = (properties: AppMainProps) => {
     wallClock,
     locked,
   } = properties;
+  const translate = t;
   const [doesApplicationNeedForceReload, setDoesApplicationNeedForceReload] = useState(false);
   const clientVersion = Config.getConfig().VERSION;
   const runApplicationPeriodicCheck: () => void = useCallback(() => {
@@ -296,7 +297,7 @@ export const AppMain = (properties: AppMainProps) => {
 
   useEffect(() => {
     PrimaryModal.init();
-    showInitialModal(userAvailability);
+    showInitialModal(userAvailability, translate);
     // userAvailability not needed for dependency
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -331,7 +332,7 @@ export const AppMain = (properties: AppMainProps) => {
           wallClock,
           doesApplicationNeedForceReload,
           isFeatureToggleEnabled,
-          translate: t,
+          translate,
           applicationNavigation: {
             get currentPathname(): string {
               return window.location.pathname;
