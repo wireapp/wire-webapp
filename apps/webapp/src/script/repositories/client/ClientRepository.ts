@@ -72,6 +72,7 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
+    private readonly translate: typeof t = t,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {
@@ -318,11 +319,11 @@ export class ClientRepository {
             action: (clearData: boolean) => {
               return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
             },
-            text: t('modalAccountLogoutAction'),
+            text: this.translate('modalAccountLogoutAction'),
           },
           text: {
-            option: t('modalAccountLogoutOption'),
-            title: t('modalAccountLogoutHeadline'),
+            option: this.translate('modalAccountLogoutOption'),
+            title: this.translate('modalAccountLogoutHeadline'),
           },
         });
       }
@@ -594,8 +595,8 @@ export class ClientRepository {
         PrimaryModal.type.ACKNOWLEDGE,
         {
           text: {
-            message: t('modalLegalHoldDeactivatedMessage'),
-            title: t('modalLegalHoldDeactivatedTitle'),
+            message: this.translate('modalLegalHoldDeactivatedMessage'),
+            title: this.translate('modalLegalHoldDeactivatedTitle'),
           },
         },
         'legalHoldDeactivated',

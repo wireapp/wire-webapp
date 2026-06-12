@@ -50,6 +50,7 @@ import {container} from 'tsyringe';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
@@ -78,6 +79,7 @@ import {
 import {createDeleteEvent} from 'test/helper/EventGenerator';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {escapeRegex} from 'Util/sanitizationUtil';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
@@ -101,7 +103,7 @@ import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mock
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/coreSingleton';
 
-function buildConversationRepository() {
+function buildConversationRepository(translate: typeof t = t) {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -141,6 +143,7 @@ function buildConversationRepository() {
     {} as any,
     callingRepository,
     {} as any,
+    translate,
     userState,
     teamState,
     conversationState,
@@ -165,6 +168,7 @@ function buildConversationRepository() {
 }
 
 describe('ConversationRepository', () => {
+  const originalPrimaryModalShow = PrimaryModal.show;
   const testFactory = new TestFactory();
 
   let conversation_et = _generateConversation();
@@ -216,8 +220,42 @@ describe('ConversationRepository', () => {
   });
 
   afterEach(() => {
+    PrimaryModal.show = originalPrimaryModalShow;
+  });
+
+  afterEach(() => {
     const conversationRepository = testFactory.conversation_repository!;
     conversationRepository['conversationState'].conversations.removeAll();
+  });
+
+  describe('translation injection', () => {
+    it('uses the injected translate function for delete conversation error modal copy', async () => {
+      const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+      const [conversationRepository, {conversationService, teamState}] = buildConversationRepository(translate);
+      const primaryModalShow = jest.fn();
+      const conversation = new Conversation(createUuid());
+
+      conversation.name('Example conversation');
+      teamState.team({id: createUuid()} as any);
+      conversationService.deleteConversation = jest.fn().mockRejectedValue(new Error('Expected unit test error')) as any;
+      PrimaryModal.show = primaryModalShow;
+
+      await conversationRepository.deleteConversation(conversation);
+
+      expect(translate).toHaveBeenCalledWith('modalConversationDeleteErrorMessage', {
+        name: conversation.name(),
+      });
+      expect(translate).toHaveBeenCalledWith('modalConversationDeleteErrorHeadline');
+      expect(primaryModalShow).toHaveBeenCalledWith(
+        PrimaryModal.type.ACKNOWLEDGE,
+        expect.objectContaining({
+          text: expect.objectContaining({
+            message: 'translated:modalConversationDeleteErrorMessage',
+            title: 'translated:modalConversationDeleteErrorHeadline',
+          }),
+        }),
+      );
+    });
   });
 
   afterAll(async () => {

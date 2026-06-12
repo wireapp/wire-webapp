@@ -215,6 +215,7 @@ export class TestFactory {
       this.assetRepository,
       () => Promise.resolve(),
       this.team_service,
+      undefined,
       this.user_repository['userState'],
       new TeamState(this.user_repository['userState']),
     );
@@ -292,6 +293,7 @@ export class TestFactory {
       this.propertyRepository,
       this.calling_repository,
       serverTimeHandler,
+      undefined,
       this.user_repository['userState'],
       this.team_repository['teamState'],
       conversationState,
@@ -318,6 +320,7 @@ export class TestFactory {
       mediaStreamHandler,
       mediaDevicesHandler,
       serverTimeHandler,
+      undefined,
       undefined,
       this.conversation_repository['conversationState'],
     );

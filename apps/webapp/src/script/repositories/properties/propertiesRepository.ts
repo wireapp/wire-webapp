@@ -71,7 +71,11 @@ export class PropertiesRepository {
   private readonly selfUser: ko.Observable<User | undefined>;
   public properties: WebappProperties;
 
-  constructor(propertiesService: PropertiesService, selfService: SelfService) {
+  constructor(
+    propertiesService: PropertiesService,
+    selfService: SelfService,
+    private readonly translate: typeof t = t,
+  ) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;
     this.logger = getLogger('PropertiesRepository');
@@ -156,17 +160,21 @@ export class PropertiesRepository {
 
     PrimaryModal.show(PrimaryModalType.CONFIRM, {
       text: {
-        title: t('dataSharingModalTitle'),
-        htmlMessage: t('dataSharingModalDescription', undefined, replaceLink(Config.getConfig().URL.PRIVACY_POLICY)),
-        closeBtnLabel: t('dataSharingModalCloseBtnTitle'),
+        title: this.translate('dataSharingModalTitle'),
+        htmlMessage: this.translate(
+          'dataSharingModalDescription',
+          undefined,
+          replaceLink(Config.getConfig().URL.PRIVACY_POLICY),
+        ),
+        closeBtnLabel: this.translate('dataSharingModalCloseBtnTitle'),
       },
       primaryAction: {
-        text: t('dataSharingModalAgree'),
+        text: this.translate('dataSharingModalAgree'),
         action: () => toggleTelemetrySharing(true),
         runActionOnEnterClick: true,
       },
       secondaryAction: {
-        text: t('dataSharingModalDecline'),
+        text: this.translate('dataSharingModalDecline'),
         action: () => toggleTelemetrySharing(false),
       },
       closeOnSecondaryAction: true,

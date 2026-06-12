@@ -97,6 +97,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     assetRepository: AssetRepository,
     private readonly onMemberDetete: () => Promise<void>,
     readonly teamService: TeamService = new TeamService(),
+    private readonly translate: typeof t = t,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
@@ -115,7 +116,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
   }
 
   getRoleBadge(userId: string): string {
-    return this.teamState.isExternal(userId) ? t('rolePartner') : '';
+    return this.teamState.isExternal(userId) ? this.translate('rolePartner') : '';
   }
 
   isSelfConnectedTo(userId: string): boolean {
@@ -237,11 +238,11 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
         action: () => window.location.reload(),
-        text: t('mlsWasEnabledReload'),
+        text: this.translate('mlsWasEnabledReload'),
       },
       text: {
-        htmlMessage: t('mlsWasEnabledDescription', undefined, replaceLinkMls),
-        title: t('mlsWasEnabledTitle'),
+        htmlMessage: this.translate('mlsWasEnabledDescription', undefined, replaceLinkMls),
+        title: this.translate('mlsWasEnabledTitle'),
       },
     });
   };

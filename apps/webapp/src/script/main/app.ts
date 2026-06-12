@@ -221,12 +221,12 @@ export class App {
     repositories.asset = container.resolve(AssetRepository);
 
     repositories.giphy = new GiphyRepository(new GiphyService());
-    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService);
+    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService, t);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, t);
     repositories.audio = new AudioRepository();
 
     repositories.user = new UserRepository(
@@ -252,6 +252,7 @@ export class App {
       repositories.asset,
       () => this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
       teamService,
+      t,
     );
 
     repositories.message = new MessageRepository(
@@ -278,6 +279,7 @@ export class App {
       mediaDevicesHandler,
       serverTimeHandler,
       backgroundEffectsHandler,
+      t,
     );
 
     repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
@@ -293,6 +295,7 @@ export class App {
       repositories.properties,
       repositories.calling,
       serverTimeHandler,
+      t,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message, this.apiClient);

@@ -80,7 +80,11 @@ export class ListViewModel {
     return this.mainViewModel.isFederated;
   }
 
-  constructor(mainViewModel: MainViewModel, repositories: ViewModelRepositories) {
+  constructor(
+    mainViewModel: MainViewModel,
+    repositories: ViewModelRepositories,
+    private readonly translate: typeof t = t,
+  ) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);
     this.conversationState = container.resolve(ConversationState);
@@ -160,8 +164,10 @@ export class ListViewModel {
     if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
       return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
-          message: `${t('modalConferenceCallNotSupportedMessage')} ${t('modalConferenceCallNotSupportedJoinMessage')}`,
-          title: t('modalConferenceCallNotSupportedHeadline'),
+          message: `${this.translate('modalConferenceCallNotSupportedMessage')} ${this.translate(
+            'modalConferenceCallNotSupportedJoinMessage',
+          )}`,
+          title: this.translate('modalConferenceCallNotSupportedHeadline'),
         },
       });
     }
@@ -357,16 +363,16 @@ export class ListViewModel {
       if (this.isProAccount()) {
         entries.push({
           click: () => this.clickToOpenNotificationSettings(conversationEntity),
-          label: t('conversationsPopoverNotificationSettings'),
-          title: t('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
+          label: this.translate('conversationsPopoverNotificationSettings'),
+          title: this.translate('tooltipConversationsNotifications', {shortcut: notificationsShortcut}),
         });
       } else {
         const label = conversationEntity.showNotificationsNothing()
-          ? t('conversationsPopoverNotify')
-          : t('conversationsPopoverSilence');
+          ? this.translate('conversationsPopoverNotify')
+          : this.translate('conversationsPopoverSilence');
         const title = conversationEntity.showNotificationsNothing()
-          ? t('tooltipConversationsNotify', {shortcut: notificationsShortcut})
-          : t('tooltipConversationsSilence', {shortcut: notificationsShortcut});
+          ? this.translate('tooltipConversationsNotify', {shortcut: notificationsShortcut})
+          : this.translate('tooltipConversationsSilence', {shortcut: notificationsShortcut});
 
         entries.push({
           click: () => this.clickToToggleMute(conversationEntity),
@@ -384,12 +390,12 @@ export class ListViewModel {
           click: () => {
             conversationLabelRepository.addConversationToFavorites(conversationEntity);
           },
-          label: t('conversationPopoverFavorite'),
+          label: this.translate('conversationPopoverFavorite'),
         });
       } else {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromFavorites(conversationEntity),
-          label: t('conversationPopoverUnfavorite'),
+          label: this.translate('conversationPopoverUnfavorite'),
         });
       }
 
@@ -398,46 +404,46 @@ export class ListViewModel {
       if (customLabel) {
         entries.push({
           click: () => conversationLabelRepository.removeConversationFromLabel(customLabel, conversationEntity),
-          label: t('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
+          label: this.translate('conversationsPopoverRemoveFrom', {name: customLabel.name}, {}, true),
         });
       }
 
       entries.push({
         click: () =>
           showLabelContextMenu(event, conversationEntity, conversationLabelRepository, {
-            newFolder: t('conversationsPopoverNewFolder'),
-            noCustomFolders: t('conversationsPopoverNoCustomFolders'),
+            newFolder: this.translate('conversationsPopoverNewFolder'),
+            noCustomFolders: this.translate('conversationsPopoverNoCustomFolders'),
           }),
-        label: t('conversationsPopoverMoveTo'),
+        label: this.translate('conversationsPopoverMoveTo'),
       });
     }
 
     if (conversationEntity.is_archived()) {
       entries.push({
         click: () => this.clickToUnarchive(conversationEntity),
-        label: t('conversationsPopoverUnarchive'),
+        label: this.translate('conversationsPopoverUnarchive'),
       });
     } else {
       const shortcut = Shortcut.getShortcutTooltip(ShortcutType.ARCHIVE);
 
       entries.push({
         click: () => this.clickToArchive(conversationEntity),
-        label: t('conversationsPopoverArchive'),
-        title: t('tooltipConversationsArchive', {shortcut}),
+        label: this.translate('conversationsPopoverArchive'),
+        title: this.translate('tooltipConversationsArchive', {shortcut}),
       });
     }
 
     if (conversationEntity.isRequest()) {
       entries.push({
         click: () => this.clickToCancelRequest(conversationEntity),
-        label: t('conversationsPopoverCancel'),
+        label: this.translate('conversationsPopoverCancel'),
       });
     }
 
     if (conversationEntity.isClearable()) {
       entries.push({
         click: () => this.clickToClear(conversationEntity),
-        label: t('conversationsPopoverClear'),
+        label: this.translate('conversationsPopoverClear'),
       });
     }
 
@@ -449,12 +455,12 @@ export class ListViewModel {
       if (canBlock) {
         entries.push({
           click: () => this.clickToBlock(conversationEntity),
-          label: t('conversationsPopoverBlock'),
+          label: this.translate('conversationsPopoverBlock'),
         });
       } else if (canUnblock) {
         entries.push({
           click: () => this.clickToUnblock(conversationEntity),
-          label: t('conversationsPopoverUnblock'),
+          label: this.translate('conversationsPopoverUnblock'),
         });
       }
     }
@@ -462,7 +468,9 @@ export class ListViewModel {
     if (conversationEntity.isLeavable()) {
       entries.push({
         click: () => this.clickToLeave(conversationEntity),
-        label: conversationEntity.isChannel() ? t('channelsPopoverLeave') : t('groupsPopoverLeave'),
+        label: conversationEntity.isChannel()
+          ? this.translate('channelsPopoverLeave')
+          : this.translate('groupsPopoverLeave'),
         identifier: 'conversation-leave',
       });
     }
@@ -474,7 +482,7 @@ export class ListViewModel {
     ) {
       entries.push({
         click: () => this.actionsViewModel.removeConversation(conversationEntity),
-        label: t('conversationsPopoverDeleteForMe'),
+        label: this.translate('conversationsPopoverDeleteForMe'),
       });
     }
 

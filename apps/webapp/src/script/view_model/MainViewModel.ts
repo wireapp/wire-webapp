@@ -89,6 +89,7 @@ export class MainViewModel {
   content: ContentViewModel;
   list: ListViewModel;
   private readonly core = container.resolve(Core);
+  readonly translate: typeof t;
 
   static get CONFIG() {
     return {
@@ -103,10 +104,8 @@ export class MainViewModel {
     return this.core.backendFeatures.isFederated;
   }
 
-  constructor(
-    repositories: ViewModelRepositories,
-    private readonly translate: typeof t = t,
-  ) {
+  constructor(repositories: ViewModelRepositories, translate: typeof t = t) {
+    this.translate = translate;
     const userState = container.resolve(UserState);
     const teamState = container.resolve(TeamState);
     const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
@@ -136,6 +135,6 @@ export class MainViewModel {
       this.translate,
     );
     this.content = new ContentViewModel(this, repositories, this.translate);
-    this.list = new ListViewModel(this, repositories);
+    this.list = new ListViewModel(this, repositories, this.translate);
   }
 }

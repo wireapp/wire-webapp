@@ -21,10 +21,12 @@ import {ClientClassification, ClientType} from '@wireapp/api-client/lib/client/'
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {Runtime} from '@wireapp/commons';
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage/record/clientRecord';
 import {ClientError} from 'src/script/error/clientError';
+import {t} from 'Util/localizerUtil';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
@@ -32,6 +34,7 @@ import {entities} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 
 describe('ClientRepository', () => {
+  const originalPrimaryModalShow = PrimaryModal.show;
   const testFactory = new TestFactory();
   const clientId = '5021d77752286cac';
   let userId: string = undefined;
@@ -50,6 +53,11 @@ describe('ClientRepository', () => {
   });
 
   beforeEach(() => testFactory.storage_repository.clearStores());
+
+  afterEach(() => {
+    PrimaryModal.show = originalPrimaryModalShow;
+    jest.clearAllMocks();
+  });
 
   describe('getClientsByUserIds', () => {
     it('maps client entities from client payloads by the backend', async () => {
@@ -292,6 +300,38 @@ describe('ClientRepository', () => {
       const functionCall = () => testFactory.client_repository['isCurrentClient'](undefined, clientId);
 
       expect(functionCall).toThrow(ClientError);
+    });
+  });
+
+  describe('logoutClient', () => {
+    it('uses the injected translate function for the logout modal copy', async () => {
+      const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+      const primaryModalShow = jest.fn();
+      const clientRepository = new ClientRepository(
+        {} as any,
+        {} as any,
+        translate,
+        {currentClient: {isTemporary: () => false}} as any,
+        {} as any,
+      );
+
+      PrimaryModal.show = primaryModalShow;
+
+      await clientRepository.logoutClient();
+
+      expect(translate).toHaveBeenCalledWith('modalAccountLogoutAction');
+      expect(translate).toHaveBeenCalledWith('modalAccountLogoutOption');
+      expect(translate).toHaveBeenCalledWith('modalAccountLogoutHeadline');
+      expect(primaryModalShow).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.objectContaining({
+          primaryAction: expect.objectContaining({text: 'translated:modalAccountLogoutAction'}),
+          text: expect.objectContaining({
+            option: 'translated:modalAccountLogoutOption',
+            title: 'translated:modalAccountLogoutHeadline',
+          }),
+        }),
+      );
     });
   });
 });

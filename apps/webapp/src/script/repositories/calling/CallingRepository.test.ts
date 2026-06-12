@@ -28,6 +28,7 @@ import {CALL_TYPE, CONV_TYPE, QUALITY, REASON, STATE as CALL_STATE, VIDEO_STATE,
 import {Runtime} from '@wireapp/commons';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {CallingEvent} from 'Repositories/event/CallingEvent';
@@ -366,6 +367,39 @@ describe('CallingRepository', () => {
       await callingRepository.answerCall(incomingCall);
 
       expect(container.resolve(Core).service?.subconversation.subscribeToEpochUpdates).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('showNoAudioInputModal', () => {
+    it('uses the injected translate function', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const isolatedCallingRepository = new CallingRepository(
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        {} as any,
+        translate,
+      );
+
+      const showModal = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined as never);
+
+      isolatedCallingRepository['showNoAudioInputModal']();
+
+      expect(showModal).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          primaryAction: expect.objectContaining({text: 'translated:modalAcknowledgeAction'}),
+          secondaryAction: expect.objectContaining({text: 'translated:modalNoAudioInputAction'}),
+          text: expect.objectContaining({
+            closeBtnLabel: 'translated:modalNoAudioCloseBtn',
+            message: 'translated:modalNoAudioInputMessage',
+            title: 'translated:modalNoAudioInputTitle',
+          }),
+        }),
+      );
     });
   });
 
@@ -768,6 +802,7 @@ describe('CallingRepository ISO', () => {
           toServerTimestamp: jest.fn().mockImplementation(() => Date.now()),
         } as any, // ServerTimeHandler
         {} as any, // BackgroundEffectsHandler
+        undefined,
         {} as any, // APIClient
         {
           findConversation: jest.fn().mockImplementation(() => conversation),
@@ -892,6 +927,7 @@ describe.skip('E2E audio call', () => {
     {} as any,
     {} as any,
     {} as any,
+    undefined,
   );
   const user = new User('user-1');
   let remoteWuser: number;
@@ -1035,6 +1071,7 @@ describe('NotificationHandlingState', () => {
     mediaDevicesHandler,
     {} as any,
     {} as any,
+    undefined,
   );
   const user = new User('user-1');
   let wCall: Wcall;
@@ -1096,6 +1133,7 @@ describe('init AVS state', () => {
     mediaDevicesHandler,
     {} as any,
     {} as any,
+    undefined,
   );
   const user = new User('user-1');
   beforeEach(() => {

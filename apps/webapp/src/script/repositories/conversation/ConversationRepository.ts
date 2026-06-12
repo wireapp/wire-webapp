@@ -234,6 +234,7 @@ export class ConversationRepository {
     private readonly propertyRepository: PropertiesRepository,
     private readonly callingRepository: CallingRepository,
     private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly translate: typeof t = t,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly conversationState = container.resolve(ConversationState),
@@ -609,7 +610,7 @@ export class ConversationRepository {
    * Create a guest room.
    */
   public createGuestRoom(): Promise<Conversation | undefined> {
-    const groupName = t('guestRoomConversationName');
+    const groupName = this.translate('guestRoomConversationName');
     return this.createGroupConversation([], groupName, ACCESS_STATE.TEAM.GUESTS_SERVICES);
   }
 
@@ -1222,8 +1223,8 @@ export class ConversationRepository {
 
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
-          message: t('modalConversationDeleteErrorMessage', {name: conversationEntity.name()}),
-          title: t('modalConversationDeleteErrorHeadline'),
+          message: this.translate('modalConversationDeleteErrorMessage', {name: conversationEntity.name()}),
+          title: this.translate('modalConversationDeleteErrorHeadline'),
         },
       });
     }
@@ -1566,13 +1567,13 @@ export class ConversationRepository {
     const resolvedDomain = domain ?? this.userState.self()?.domain ?? 'wire.com';
 
     const showNoConversationModal = () => {
-      const titleText = t('modalConversationJoinNotFoundHeadline');
-      const messageText = t('modalConversationJoinNotFoundMessage');
+      const titleText = this.translate('modalConversationJoinNotFoundHeadline');
+      const messageText = this.translate('modalConversationJoinNotFoundMessage');
       this.showModal(messageText, titleText);
     };
     const showTooManyMembersModal = () => {
-      const titleText = t('modalConversationJoinFullHeadline');
-      const messageText = t('modalConversationJoinFullMessage');
+      const titleText = this.translate('modalConversationJoinFullHeadline');
+      const messageText = this.translate('modalConversationJoinFullMessage');
       this.showModal(messageText, titleText);
     };
 
@@ -1628,15 +1629,15 @@ export class ConversationRepository {
               }
             }
           },
-          text: t('guestLinkPasswordModal.joinConversation'),
+          text: this.translate('guestLinkPasswordModal.joinConversation'),
         },
         text: {
           message: hasPassword
-            ? t('guestLinkPasswordModal.conversationPasswordProtected')
-            : t('modalConversationJoinMessage', {conversationName}),
+            ? this.translate('guestLinkPasswordModal.conversationPasswordProtected')
+            : this.translate('modalConversationJoinMessage', {conversationName}),
           title: hasPassword
-            ? t('guestLinkPasswordModal.headline', {conversationName})
-            : t('modalConversationJoinHeadline'),
+            ? this.translate('guestLinkPasswordModal.headline', {conversationName})
+            : this.translate('modalConversationJoinHeadline'),
         },
       });
     } catch (error: unknown) {
@@ -2670,8 +2671,8 @@ export class ConversationRepository {
     } catch (error: unknown) {
       PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
         text: {
-          message: t('modalIntegrationUnavailableMessage'),
-          title: t('modalIntegrationUnavailableHeadline'),
+          message: this.translate('modalIntegrationUnavailableMessage'),
+          title: this.translate('modalIntegrationUnavailableHeadline'),
         },
       });
       throw error;
@@ -2744,8 +2745,8 @@ export class ConversationRepository {
       case BackendErrorLabel.SERVER_ERROR:
       case BackendErrorLabel.SERVICE_DISABLED:
       case BackendErrorLabel.TOO_MANY_SERVICES: {
-        const messageText = t('modalServiceUnavailableMessage');
-        const titleText = t('modalServiceUnavailableHeadline');
+        const messageText = this.translate('modalServiceUnavailableMessage');
+        const titleText = this.translate('modalServiceUnavailableHeadline');
 
         this.showModal(messageText, titleText);
         break;
@@ -3251,20 +3252,20 @@ export class ConversationRepository {
       number2: Math.max(0, openSpots).toString(10),
     };
 
-    const messageText = t('modalConversationTooManyMembersMessage', substitutions);
-    const titleText = t('modalConversationTooManyMembersHeadline');
+    const messageText = this.translate('modalConversationTooManyMembersMessage', substitutions);
+    const titleText = this.translate('modalConversationTooManyMembersHeadline');
     this.showModal(messageText, titleText);
   }
 
   private async handleUsersNotConnected(userIds: QualifiedId[] = []): Promise<void> {
-    const titleText = t('modalConversationNotConnectedHeadline');
+    const titleText = this.translate('modalConversationNotConnectedHeadline');
 
     if (userIds.length > 1) {
-      this.showModal(t('modalConversationNotConnectedMessageMany'), titleText);
+      this.showModal(this.translate('modalConversationNotConnectedMessageMany'), titleText);
     } else {
       // TODO(Federation): Update code once connections are implemented on the backend
       const userEntity = await this.userRepository.getUserById(userIds[0]);
-      this.showModal(t('modalConversationNotConnectedMessageOne', {name: userEntity.name()}), titleText);
+      this.showModal(this.translate('modalConversationNotConnectedMessageOne', {name: userEntity.name()}), titleText);
     }
   }
 
@@ -3284,8 +3285,12 @@ export class ConversationRepository {
       'read-more-legal-hold',
     );
 
-    const messageText = t('modalLegalHoldConversationMissingConsentMessage', undefined, replaceLinkLegalHold);
-    const titleText = t('modalUserCannotBeAddedHeadline');
+    const messageText = this.translate(
+      'modalLegalHoldConversationMissingConsentMessage',
+      undefined,
+      replaceLinkLegalHold,
+    );
+    const titleText = this.translate('modalUserCannotBeAddedHeadline');
 
     PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
       text: {
