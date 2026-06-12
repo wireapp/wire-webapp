@@ -22,6 +22,7 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
 import {User} from 'Repositories/entity/User';
 import {UserRecord} from 'Repositories/storage';
+import {t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 
 import {isSelfAPIUser} from './userGuards';
@@ -36,16 +37,19 @@ export class UserMapper {
    * Construct a new User Mapper.
    * @param serverTimeHandler Handles time shift between server and client
    */
-  constructor(private readonly serverTimeHandler: ServerTimeHandler) {
+  constructor(
+    private readonly serverTimeHandler: ServerTimeHandler,
+    private readonly translate: typeof t = t,
+  ) {
     this.logger = getLogger('UserMapper');
   }
 
   mapUserFromJson(userData: UserRecord, localDomain: string): User {
-    return this.updateUserFromObject(new User('', ''), userData, localDomain);
+    return this.updateUserFromObject(new User('', '', this.translate), userData, localDomain);
   }
 
   mapSelfUserFromJson(userData: UserRecord): User {
-    const userEntity = this.updateUserFromObject(new User('', ''), userData, '');
+    const userEntity = this.updateUserFromObject(new User('', '', this.translate), userData, '');
     userEntity.isMe = true;
 
     if (isSelfAPIUser(userData)) {

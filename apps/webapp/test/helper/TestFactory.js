@@ -170,6 +170,7 @@ export class TestFactory {
       this.client_repository,
       serverTimeHandler,
       this.propertyRepository,
+      undefined,
       userState,
     );
 

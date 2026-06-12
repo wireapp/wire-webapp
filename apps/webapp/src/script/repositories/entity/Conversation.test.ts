@@ -138,6 +138,18 @@ describe('Conversation', () => {
     });
   });
 
+  describe('translation injection', () => {
+    it('uses the injected translate function for unavailable 1:1 display names', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const conversation = new Conversation('', '', undefined, translate);
+
+      conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+      conversation.participating_user_ets([new User('', '')]);
+
+      expect(conversation.display_name()).toBe('translated:unavailableUser');
+    });
+  });
+
   describe('add message', () => {
     let initial_message_et: Message = undefined;
 

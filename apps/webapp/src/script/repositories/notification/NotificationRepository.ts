@@ -359,7 +359,7 @@ export class NotificationRepository {
       const [otherUserEntity] = messageEntity.userEntities();
 
       const declension = Declension.ACCUSATIVE;
-      const nameOfJoinedUser = getUserName(otherUserEntity, declension);
+      const nameOfJoinedUser = getUserName(otherUserEntity, declension, false, this.translate);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {
@@ -473,7 +473,7 @@ export class NotificationRepository {
       );
 
       if (messageTimer) {
-        const timeString = formatDuration(messageTimer).text;
+        const timeString = formatDuration(messageTimer, this.translate).text;
         const substitutions = {time: timeString, user: messageEntity.user().name()};
         return this.translate('notificationConversationMessageTimerUpdate', substitutions, {}, true);
       }

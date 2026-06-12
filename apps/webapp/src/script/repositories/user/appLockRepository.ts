@@ -69,6 +69,7 @@ export class AppLockRepository {
     private readonly userState = container.resolve(UserState),
     private readonly appLockState = container.resolve(AppLockState),
     private readonly appLockCrypto: AppLockCrypto = defaultAppLockCrypto,
+    private readonly translate: typeof t = t,
   ) {
     this.getPassphraseStorageKey = (): string => `${APP_LOCK_STORAGE}_${this.userState.self().id}`;
     this.getEnabledStorageKey = (): string => `${APP_LOCK_ENABLED_STORAGE}_${this.userState.self().id}`;
@@ -122,14 +123,14 @@ export class AppLockRepository {
       PrimaryModal.show(PrimaryModal.type.CONFIRM, {
         primaryAction: {
           action: this.disableFeature,
-          text: t('AppLockDisableTurnOff'),
+          text: this.translate('AppLockDisableTurnOff'),
         },
         secondaryAction: {
-          text: t('AppLockDisableCancel'),
+          text: this.translate('AppLockDisableCancel'),
         },
         text: {
-          title: t('ApplockDisableHeadline'),
-          message: t('AppLockDisableInfo'),
+          title: this.translate('ApplockDisableHeadline'),
+          message: this.translate('AppLockDisableInfo'),
         },
       });
     } else {

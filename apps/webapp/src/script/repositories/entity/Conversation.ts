@@ -203,6 +203,7 @@ export class Conversation {
     conversation_id: string = '',
     domain: string = '',
     public readonly protocol = CONVERSATION_PROTOCOL.PROTEUS,
+    private readonly translate: typeof t = t,
     teamState = container.resolve(TeamState),
   ) {
     this.teamState = teamState;
@@ -587,7 +588,7 @@ export class Conversation {
       if (this.isRequest() || this.is1to1()) {
         const [userEntity] = this.participating_user_ets();
         const userName = userEntity?.name();
-        return userName || t('unavailableUser');
+        return userName || this.translate('unavailableUser');
       }
 
       if (this.isGroupOrChannel()) {
@@ -609,7 +610,7 @@ export class Conversation {
 
         const hasUserIds = !!this.participating_user_ids().length;
         if (!hasUserIds) {
-          return t('conversationsEmptyConversation');
+          return this.translate('conversationsEmptyConversation');
         }
       }
 

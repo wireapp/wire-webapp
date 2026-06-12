@@ -326,7 +326,7 @@ export class ConversationRepository {
 
     this.logger = getLogger('ConversationRepository');
 
-    this.event_mapper = new EventMapper();
+    this.event_mapper = new EventMapper(undefined, this.translate);
 
     // we register and store a handler, that we can manually trigger for incoming events from proteus and mixed conversations
     this.proteusVerificationStateHandler = new ProteusConversationVerificationStateHandler(
@@ -1244,7 +1244,7 @@ export class ConversationRepository {
       amplify.publish(WebAppEvents.CONVERSATION.SHOW, nextConversation, {});
     }
     if (!skipNotification) {
-      const deletionMessage = new DeleteConversationMessage(conversationEntity);
+      const deletionMessage = new DeleteConversationMessage(conversationEntity, this.translate);
       amplify.publish(WebAppEvents.NOTIFICATION.NOTIFY, deletionMessage);
     }
     if (this.conversationLabelRepository.getConversationCustomLabel(conversationEntity, true)) {
@@ -2400,7 +2400,11 @@ export class ConversationRepository {
     payload: (BackendConversation | ConversationDatabaseData)[],
     initialTimestamp = this.getLatestEventTimestamp(true),
   ): Conversation[] {
-    const entities = ConversationMapper.mapConversations(payload as ConversationDatabaseData[], initialTimestamp);
+    const entities = ConversationMapper.mapConversations(
+      payload as ConversationDatabaseData[],
+      initialTimestamp,
+      this.translate,
+    );
     entities.forEach(conversationEntity => {
       this._mapGuestStatusSelf(conversationEntity);
       conversationEntity.selfUser(this.userState.self());

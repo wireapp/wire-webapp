@@ -26,19 +26,19 @@ import {SystemMessage} from './SystemMessage';
 import {SystemMessageType} from '../../../message/SystemMessageType';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  constructor(isReceiptEnabled: boolean) {
-    super();
+  constructor(isReceiptEnabled: boolean, translate: typeof t = t) {
+    super(translate);
 
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_RECEIPT_MODE_UPDATE;
 
-    this.caption = getCaption(isReceiptEnabled, this.user().isMe);
+    this.caption = getCaption(isReceiptEnabled, this.user().isMe, this.translate);
   }
 }
 
-const getCaption = (isReceiptEnabled: boolean, isSelfUser: boolean) => {
+const getCaption = (isReceiptEnabled: boolean, isSelfUser: boolean, translate: typeof t = t) => {
   if (isReceiptEnabled) {
-    return isSelfUser ? t('conversationReceiptsOnYou') : t('conversationReceiptsOn');
+    return isSelfUser ? translate('conversationReceiptsOnYou') : translate('conversationReceiptsOn');
   }
-  return isSelfUser ? t('conversationReceiptsOffYou') : t('conversationReceiptsOff');
+  return isSelfUser ? translate('conversationReceiptsOffYou') : translate('conversationReceiptsOff');
 };

@@ -33,15 +33,17 @@ export class CallMessage extends Message {
   public readonly caption?: ko.PureComputed<string>;
   public readonly finished_reason?: TERMINATION_REASON;
 
-  constructor(type: CALL_MESSAGE_TYPE, reason?: TERMINATION_REASON, duration: number = 0) {
-    super();
+  constructor(type: CALL_MESSAGE_TYPE, reason?: TERMINATION_REASON, duration: number = 0, translate: typeof t = t) {
+    super(undefined, undefined, translate);
     this.super_type = SuperType.CALL;
     this.call_message_type = type;
     this.finished_reason = reason;
     this.duration = duration;
 
     this.caption = ko.pureComputed(() =>
-      this.user().isMe ? t('conversationVoiceChannelDeactivateYou') : t('conversationVoiceChannelDeactivate'),
+      this.user().isMe
+        ? this.translate('conversationVoiceChannelDeactivateYou')
+        : this.translate('conversationVoiceChannelDeactivate'),
     );
   }
 

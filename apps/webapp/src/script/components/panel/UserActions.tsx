@@ -86,7 +86,11 @@ interface UserActionsProps {
   conversationState?: ConversationState;
 }
 
-function createPlaceholder1to1Conversation(user: User, selfUser: User) {
+function createPlaceholder1to1Conversation(
+  user: User,
+  selfUser: User,
+  translate: ReturnType<typeof useApplicationContext>['translate'],
+) {
   const userConnection = user.connection();
 
   if (!userConnection) {
@@ -94,7 +98,7 @@ function createPlaceholder1to1Conversation(user: User, selfUser: User) {
   }
 
   const {id, domain} = userConnection.conversationId;
-  const conversation = new Conversation(id, domain);
+  const conversation = new Conversation(id, domain, undefined, translate);
   conversation.name(user.name());
   conversation.selfUser(selfUser);
   conversation.type(CONVERSATION_TYPE.CONNECT);
@@ -288,7 +292,7 @@ const UserActions = ({
             // before the other user has accepted the request.
             const connectionConversation =
               connectionStatus === ConnectionStatus.SENT
-                ? createPlaceholder1to1Conversation(user, selfUser)
+                ? createPlaceholder1to1Conversation(user, selfUser, translate)
                 : await actionsViewModel.getConversationById(conversationId);
 
             const savedConversation = await actionsViewModel.saveConversation(connectionConversation);

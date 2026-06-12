@@ -171,6 +171,7 @@ export class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
+    private readonly translate: typeof t = t,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>
@@ -236,6 +237,7 @@ export class App {
       repositories.client,
       serverTimeHandler,
       repositories.properties,
+      t,
     );
     repositories.connection = new ConnectionRepository(
       new ConnectionService(),
@@ -446,7 +448,7 @@ export class App {
       const eventLogger = new InitializationEventLogger(selfUser.id);
       eventLogger.log(AppInitializationStep.AppInitialize);
 
-      onProgress(t('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
+      onProgress(this.translate('initReceivedSelfUser', {user: selfUser.name()}, {}, true));
 
       try {
         await this.core.init(clientType);
@@ -523,7 +525,7 @@ export class App {
       const clientEntity = await this._initiateSelfUserClients(selfUser, clientRepository);
       callingRepository.initAvs(selfUser, clientEntity.id);
 
-      onProgress(t('initValidatedClient'));
+      onProgress(this.translate('initValidatedClient'));
 
       telemetry.timeStep(AppInitTimingsStep.VALIDATED_CLIENT);
       telemetry.addStatistic(AppInitStatisticsValue.CLIENT_TYPE, clientEntity.type ?? clientType);
@@ -552,7 +554,7 @@ export class App {
         );
       }
 
-      onProgress(t('initReceivedUserData'));
+      onProgress(this.translate('initReceivedUserData'));
       telemetry.addStatistic(AppInitStatisticsValue.CONVERSATIONS, conversations.length, 50);
       this._subscribeToUnloadEvents(selfUser);
       this._subscribeToBeforeUnload();
@@ -635,7 +637,7 @@ export class App {
       eventLogger.log(AppInitializationStep.SetupMLS);
       telemetry.timeStep(AppInitTimingsStep.UPDATED_FROM_NOTIFICATIONS);
       telemetry.addStatistic(AppInitStatisticsValue.NOTIFICATIONS, totalNotifications, 100);
-      onProgress(t('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
+      onProgress(this.translate('initUpdatedFromNotifications', {brandName: this.config.BRAND_NAME}));
 
       const clientEntities = await clientRepository.updateClientsForSelf();
 
@@ -912,11 +914,11 @@ export class App {
         action: async () => {
           await this.repository.lifeCycle.logout(reason, false);
         },
-        text: t('modalAccountLogoutAction'),
+        text: this.translate('modalAccountLogoutAction'),
       },
       text: {
-        title: t('unknownApplicationErrorTitle'),
-        message: t('modalUnableToReceiveMessages'),
+        title: this.translate('unknownApplicationErrorTitle'),
+        message: this.translate('modalUnableToReceiveMessages'),
       },
     });
   };

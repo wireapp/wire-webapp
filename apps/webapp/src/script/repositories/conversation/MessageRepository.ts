@@ -191,7 +191,7 @@ export class MessageRepository {
     this.logger = getLogger('MessageRepository');
 
     this.eventService = eventRepository.eventService;
-    this.event_mapper = new EventMapper();
+    this.event_mapper = new EventMapper(undefined, this.translate);
 
     this.isBlockingNotificationHandling = true;
 

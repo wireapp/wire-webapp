@@ -19,10 +19,13 @@
 
 import {Article, LinkPreview, Mention} from '@wireapp/protocol-messaging';
 
-import {AssetType} from 'Repositories/assets/assetType';
-import {Conversation} from 'Repositories/entity/Conversation';
-import {MentionEntity} from 'src/script/message/MentionEntity';
 import {createMessageAddEvent} from 'test/helper/EventGenerator';
+
+import {AssetType} from 'Repositories/assets/assetType';
+import {EventBuilder} from 'Repositories/conversation/EventBuilder';
+import {Conversation} from 'Repositories/entity/Conversation';
+import {User} from 'Repositories/entity/User';
+import {MentionEntity} from 'src/script/message/MentionEntity';
 import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
@@ -217,6 +220,19 @@ describe('Event Mapper', () => {
       const mentions = messageEntity.getFirstAsset().mentions();
 
       expect(mentions.length).toBe(2);
+    });
+
+    it('uses the injected translate function for team member leave fallback names', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const teamMember = new User(createUuid());
+      const mapperWithTranslate = new EventMapper(undefined, translate);
+      const event = EventBuilder.buildTeamMemberLeave(conversation, teamMember, Date.now());
+      event.data.name = '';
+
+      const messageEntity = mapperWithTranslate.mapJsonEvent(event, conversation) as any;
+
+      expect(messageEntity.name()).toBe('translated:conversationSomeone');
+      expect(translate).toHaveBeenCalledWith('conversationSomeone');
     });
   });
 

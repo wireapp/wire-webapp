@@ -17,7 +17,7 @@
  *
  */
 
-import {useState, FC} from 'react';
+import {useMemo, FC} from 'react';
 
 import {TabIndex} from '@wireapp/react-ui-kit';
 
@@ -45,11 +45,13 @@ const Notifications: FC<NotificationsProps> = ({activeConversation, onGoBack, on
     void repositories.conversation.setNotificationState(activeConversation, value);
   };
 
-  const [settings] = useState(
-    Object.values(NOTIFICATION_STATE).map(status => ({
-      label: getNotificationText(status),
-      value: status,
-    })),
+  const settings = useMemo(
+    () =>
+      Object.values(NOTIFICATION_STATE).map(status => ({
+        label: getNotificationText(status, translate),
+        value: status,
+      })),
+    [translate],
   );
 
   return (

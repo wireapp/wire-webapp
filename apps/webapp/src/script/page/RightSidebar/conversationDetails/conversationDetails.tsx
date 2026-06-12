@@ -161,7 +161,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const isCellsConversation = !!cellsState && cellsState !== CONVERSATION_CELLS_STATE.DISABLED;
 
-    const notificationStatusText = getNotificationText(notificationState);
+    const notificationStatusText = getNotificationText(notificationState, translate);
     function getTimedMessagesText(): string {
       if (isCellsConversation) {
         return translate('cells.selfDeletingMessage.info');

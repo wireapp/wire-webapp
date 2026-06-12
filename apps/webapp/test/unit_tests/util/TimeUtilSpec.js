@@ -287,6 +287,16 @@ describe('TimeUtil', () => {
         value: 2,
       });
     });
+
+    it('uses an injected translate function', () => {
+      const translate = translationKey => `translated:${translationKey}`;
+
+      expect(formatDuration(ONE_SECOND_IN_MILLIS, translate)).toEqual({
+        symbol: 's',
+        text: '1 translated:ephemeralUnitsSecond',
+        value: 1,
+      });
+    });
   });
 
   describe('"formatDurationCaption"', () => {
@@ -314,6 +324,14 @@ describe('TimeUtil', () => {
       caption = formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS);
 
       expect(caption).toEqual(`3 ${t('ephemeralUnitsWeeks')} and 1 ${t('ephemeralUnitsDay')}`);
+    });
+
+    it('uses an injected translate function', () => {
+      caption = formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS, translationKey => {
+        return `translated:${translationKey}`;
+      });
+
+      expect(caption).toEqual('3 translated:ephemeralUnitsWeeks translated:and 1 translated:ephemeralUnitsDay');
     });
   });
 
@@ -361,6 +379,12 @@ describe('TimeUtil', () => {
 
       // Explicit 30s case
       expect(formatCoarseDuration(30 * ONE_SECOND_IN_MILLIS)).toBe(t('initProgressMinutesSingular', {time: 1}));
+    });
+
+    it('uses an injected translate function', () => {
+      expect(formatCoarseDuration(ONE_DAY_IN_MILLIS, translationKey => `translated:${translationKey}`)).toBe(
+        'translated:initProgressDaysSingular',
+      );
     });
   });
 

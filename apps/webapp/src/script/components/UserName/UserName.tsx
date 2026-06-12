@@ -41,7 +41,11 @@ export function useUserName(user: User) {
  * @param user the user to get the name for
  */
 export function getUserName(user: User) {
-  return user.isAvailable() ? user.name() : t('unavailableUser');
+  return getUserNameWithTranslate(user);
+}
+
+export function getUserNameWithTranslate(user: User, translate: typeof t = t) {
+  return user.isAvailable() ? user.name() : translate('unavailableUser');
 }
 
 /**

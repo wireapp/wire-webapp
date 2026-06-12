@@ -28,6 +28,10 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Availability} from '@wireapp/protocol-messaging';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {entities} from 'test/api/payloads';
+import {TestFactory} from 'test/helper/TestFactory';
+import {generateAPIUser} from 'test/helper/UserGenerator';
+
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ClientRepository} from 'Repositories/client';
 import {ClientMapper} from 'Repositories/client/ClientMapper';
@@ -37,10 +41,9 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamState} from 'Repositories/team/TeamState';
-import {entities} from 'test/api/payloads';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
+import {t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
+import {createUuid} from 'Util/uuid';
 
 import {ConsentValue} from './consentValue';
 import {UserRepository} from './userRepository';
@@ -50,7 +53,7 @@ import {UserState} from './userState';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 const testFactory = new TestFactory();
-async function buildUserRepository() {
+async function buildUserRepository(translate: typeof t = t) {
   const storageRepo = await testFactory.exposeStorageActors();
 
   const userService = new UserService(storageRepo['storageService']);
@@ -68,6 +71,7 @@ async function buildUserRepository() {
     clientRepository,
     serverTimeHandler,
     propertyRepository,
+    translate,
     userState,
     teamState,
   );
@@ -217,6 +221,16 @@ describe('UserRepository', () => {
         const userEntity = userRepository.findUserById({id: '1', domain: ''});
 
         expect(userEntity).toBe(undefined);
+      });
+
+      it('uses the injected translate function for local-only deleted users', async () => {
+        const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+        const [translatedRepository] = await buildUserRepository(translate);
+
+        const deletedUser = await translatedRepository.getUserById({id: createUuid(), domain: ''}, {localOnly: true});
+
+        expect(deletedUser.name()).toBe('translated:deletedUser');
+        expect(translate).toHaveBeenCalledWith('deletedUser');
       });
     });
 

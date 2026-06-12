@@ -163,5 +163,21 @@ describe('ConversationCellState', () => {
         expect(state).toEqual(expectedGroup);
       });
     });
+
+    it('uses the injected translate function for generated summary copy', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+
+      conversationEntity.type(CONVERSATION_TYPE.ONE_TO_ONE);
+      conversationEntity.messages_unordered([callMessage, callMessage]);
+
+      const actualState = generateCellState(conversationEntity, translate);
+      const expectedState = {
+        description: 'translated:conversationsSecondaryLineSummaryMissedCalls',
+        icon: ConversationStatusIcon.MISSED_CALL,
+      };
+
+      expect(actualState).toEqual(expectedState);
+      expect(translate).toHaveBeenCalledWith('conversationsSecondaryLineSummaryMissedCalls', {number: 2});
+    });
   });
 });

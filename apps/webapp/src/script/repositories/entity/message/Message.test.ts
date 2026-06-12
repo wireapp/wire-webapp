@@ -22,12 +22,46 @@ import {AssetType} from 'Repositories/assets/assetType';
 import {ContentMessage} from './ContentMessage';
 import {FileAsset} from './FileAsset';
 import {Message} from './Message';
+import {MessageTimerUpdateMessage} from './MessageTimerUpdateMessage';
 import {Multipart} from './Multipart';
+import {PingMessage} from './PingMessage';
 import {Text} from './Text';
 
 import {SuperType} from '../../../message/SuperType';
 
 describe('Message', () => {
+  describe('translation injection', () => {
+    it('uses the injected translate function for ephemeral captions', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const message = new Message('message-id', undefined, translate);
+
+      message.ephemeral_remaining(1000);
+
+      expect(message.ephemeralCaption()).toBe(
+        '1 translated:ephemeralUnitsSecond translated:ephemeralRemaining',
+      );
+    });
+
+    it('uses the injected translate function for ping captions', () => {
+      const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+      const message = new PingMessage(translate);
+
+      expect(message.caption()).toBe('translated:conversationPing');
+    });
+
+    it('uses the injected translate function for timer update captions', () => {
+      const translate = jest.fn((translationKey: string, substitutions?: Record<string, string | number>) => {
+        if (translationKey === 'conversationUpdatedTimer') {
+          return `translated:${translationKey}:${substitutions?.time}`;
+        }
+        return `translated:${translationKey}`;
+      });
+      const message = new MessageTimerUpdateMessage(1000, translate as any);
+
+      expect(message.caption).toBe('translated:conversationUpdatedTimer:1 translated:ephemeralUnitsSecond');
+    });
+  });
+
   describe('getMultipartAssets', () => {
     it('returns multipart assets from a content message', () => {
       const message = new ContentMessage();

@@ -25,11 +25,11 @@ export const NOTIFICATION_STATE = {
   NOTHING: 0b11,
 };
 
-export const getNotificationText = (status: number) => {
+export const getNotificationText = (status: number, translate: typeof t = t) => {
   const statusTexts: Record<number, string> = {
-    [NOTIFICATION_STATE.EVERYTHING]: t('notificationSettingsEverything'),
-    [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: t('notificationSettingsMentionsAndReplies'),
-    [NOTIFICATION_STATE.NOTHING]: t('notificationSettingsNothing'),
+    [NOTIFICATION_STATE.EVERYTHING]: translate('notificationSettingsEverything'),
+    [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: translate('notificationSettingsMentionsAndReplies'),
+    [NOTIFICATION_STATE.NOTHING]: translate('notificationSettingsNothing'),
   };
   return statusTexts[status];
 };

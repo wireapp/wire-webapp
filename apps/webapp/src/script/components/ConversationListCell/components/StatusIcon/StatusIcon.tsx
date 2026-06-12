@@ -40,7 +40,7 @@ export const StatusIcon = ({conversation}: Props) => {
   void mutedState;
   void isRequest;
 
-  const cellState = useMemo(() => generateCellState(conversation), [conversation]);
+  const cellState = useMemo(() => generateCellState(conversation, translate), [conversation, translate]);
 
   return (
     <>

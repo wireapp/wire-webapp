@@ -17,7 +17,10 @@
  *
  */
 
+import {removeCurrentModal} from 'Components/Modals/PrimaryModal';
+import {usePrimaryModalState} from 'Components/Modals/PrimaryModal/PrimaryModalState';
 import {User} from 'Repositories/entity/User/User';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {AppLockCrypto, AppLockRepository} from './appLockRepository';
@@ -27,7 +30,7 @@ import {UserState} from './userState';
 const mockCryptoPwhashStr = jest.fn();
 const mockCryptoPwhashStrVerify = jest.fn();
 
-const createAppLockRepository = (): AppLockRepository => {
+const createAppLockRepository = (translate: typeof t = t): AppLockRepository => {
   const userState = new UserState();
   const appLockState = new AppLockState();
   const appLockCrypto: AppLockCrypto = {
@@ -41,7 +44,7 @@ const createAppLockRepository = (): AppLockRepository => {
 
   userState.self(new User(createUuid(), ''));
 
-  return new AppLockRepository(userState, appLockState, appLockCrypto);
+  return new AppLockRepository(userState, appLockState, appLockCrypto, translate);
 };
 
 describe('AppLockRepository', () => {
@@ -49,6 +52,7 @@ describe('AppLockRepository', () => {
     mockCryptoPwhashStr.mockReset();
     mockCryptoPwhashStrVerify.mockReset();
     globalThis.localStorage.clear();
+    removeCurrentModal();
   });
 
   it('stores the pwhash output directly when libsodium returns a string', async () => {
@@ -68,5 +72,25 @@ describe('AppLockRepository', () => {
 
     await expect(repository.setCode('ValidPassword123!')).rejects.toThrow('Unexpected crypto_pwhash_str output type');
     expect(repository.getStoredPassphrase()).toBeNull();
+  });
+
+  it('uses the injected translate function for the disable confirmation modal copy', async () => {
+    const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
+    const repository = createAppLockRepository(translate);
+    mockCryptoPwhashStr.mockReturnValue('$argon2id$mocked');
+
+    await repository.setCode('ValidPassword123!');
+    repository.setEnabled(false);
+
+    const {currentModalContent} = usePrimaryModalState.getState();
+    const secondaryActionButtons = Array.isArray(currentModalContent.secondaryAction)
+      ? currentModalContent.secondaryAction
+      : [currentModalContent.secondaryAction];
+    const [cancelActionButton] = secondaryActionButtons;
+
+    expect(currentModalContent.primaryAction?.text).toBe('translated:AppLockDisableTurnOff');
+    expect(cancelActionButton?.text).toBe('translated:AppLockDisableCancel');
+    expect(currentModalContent.titleText).toBe('translated:ApplockDisableHeadline');
+    expect(currentModalContent.message).toBe('translated:AppLockDisableInfo');
   });
 });

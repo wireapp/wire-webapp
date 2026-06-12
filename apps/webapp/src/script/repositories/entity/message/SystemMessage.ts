@@ -17,6 +17,8 @@
  *
  */
 
+import {t} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 import {RenameMessage} from './RenameMessage';
 
@@ -27,8 +29,8 @@ export class SystemMessage extends Message {
   public caption?: string;
   public system_message_type: SystemMessageType;
 
-  constructor() {
-    super();
+  constructor(translate: typeof t = t) {
+    super(undefined, undefined, translate);
     this.super_type = SuperType.SYSTEM;
     this.system_message_type = SystemMessageType.NORMAL;
   }

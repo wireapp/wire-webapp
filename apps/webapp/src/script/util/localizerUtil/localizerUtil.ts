@@ -39,19 +39,28 @@ export const DEFAULT_LOCALE = 'en';
 let locale = DEFAULT_LOCALE;
 let strings: Record<string, Record<string, string>> = {};
 
-export const getSelfName = (declension = Declension.NOMINATIVE, bypassSanitization = false) => {
+export const getSelfName = (
+  declension = Declension.NOMINATIVE,
+  bypassSanitization = false,
+  translate: typeof t = t,
+) => {
   const selfNameDeclensions = {
-    [Declension.NOMINATIVE]: t('conversationYouNominative'),
-    [Declension.DATIVE]: t('conversationYouDative'),
-    [Declension.ACCUSATIVE]: t('conversationYouAccusative'),
+    [Declension.NOMINATIVE]: translate('conversationYouNominative'),
+    [Declension.DATIVE]: translate('conversationYouDative'),
+    [Declension.ACCUSATIVE]: translate('conversationYouAccusative'),
   };
   const selfName = selfNameDeclensions[declension];
   return bypassSanitization ? selfName : escape(selfName);
 };
 
-export const getUserName = (userEntity: User, declension?: string, bypassSanitization: boolean = false): string => {
+export const getUserName = (
+  userEntity: User,
+  declension?: string,
+  bypassSanitization: boolean = false,
+  translate: typeof t = t,
+): string => {
   if (userEntity.isMe) {
-    return getSelfName(declension, bypassSanitization);
+    return getSelfName(declension, bypassSanitization, translate);
   }
   return bypassSanitization ? userEntity.name() : escape(userEntity.name());
 };
@@ -92,7 +101,13 @@ const replaceSubstitute = (
 };
 
 export const LocalizerUtil = {
-  joinNames: (userEntities: User[], declension = Declension.ACCUSATIVE, skipAnd = false, boldNames = false) => {
+  joinNames: (
+    userEntities: User[],
+    declension = Declension.ACCUSATIVE,
+    skipAnd = false,
+    boldNames = false,
+    translate: typeof t = t,
+  ) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.isMe);
     if (containsSelfUser) {
       userEntities = userEntities.filter(userEntity => !userEntity.isMe);
@@ -104,7 +119,7 @@ export const LocalizerUtil = {
     });
 
     if (containsSelfUser) {
-      userNames.push(getSelfName(declension));
+      userNames.push(getSelfName(declension, false, translate));
     }
 
     const numberOfNames = userNames.length;
@@ -116,8 +131,8 @@ export const LocalizerUtil = {
 
       const exactlyTwoNames = numberOfNames === 2;
       const additionalNames = exactlyTwoNames
-        ? `${secondLastName} ${t('and')} ${lastName}`
-        : `${secondLastName}${t('enumerationAnd')}${lastName}`;
+        ? `${secondLastName} ${translate('and')} ${lastName}`
+        : `${secondLastName}${translate('enumerationAnd')}${lastName}`;
       userNamesWithoutFinalPair.push(additionalNames);
       return userNamesWithoutFinalPair.join(', ');
     }

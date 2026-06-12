@@ -23,9 +23,9 @@ import {t} from 'Util/localizerUtil';
 import {SystemMessage} from './SystemMessage';
 
 export class MLSMigrationFinalisationOngoingCallMessage extends SystemMessage {
-  constructor() {
-    super();
+  constructor(translate: typeof t = t) {
+    super(translate);
     this.system_message_type = SystemMessageType.MLS_MIGRATION_ONGOING_CALL;
-    this.caption = t('conversationMLSMigrationFinalisationOngoingCall');
+    this.caption = this.translate('conversationMLSMigrationFinalisationOngoingCall');
   }
 }

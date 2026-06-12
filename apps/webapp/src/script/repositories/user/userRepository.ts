@@ -129,13 +129,14 @@ export class UserRepository extends TypedEventEmitter<Events> {
     private readonly clientRepository: ClientRepository,
     serverTimeHandler: ServerTimeHandler,
     private readonly propertyRepository: PropertiesRepository,
+    private readonly translate: typeof t = t,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {
     super();
     this.logger = getLogger('UserRepository');
 
-    this.userMapper = new UserMapper(serverTimeHandler);
+    this.userMapper = new UserMapper(serverTimeHandler, this.translate);
 
     this.getTeamMembersFromUsers = async (_: User[]) => undefined;
 
@@ -605,7 +606,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       };
     }
 
-    return {...user, name: t('deletedUser')};
+    return {...user, name: this.translate('deletedUser')};
   }
 
   private mapUserResponse(found: APIClientUser[], failed: QualifiedId[], dbUsers: UserRecord[]): User[] {
@@ -626,7 +627,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
       }
 
       // Otherwise, we generate placeholder users locally with some default values.
-      return new User(userId.id, userId.domain);
+      return new User(userId.id, userId.domain, this.translate);
     });
 
     const mappedUsers = this.userMapper.mapUsersFromJson(found, selfDomain).concat(failedToLoad);
@@ -701,9 +702,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
       return user;
     }
     if (localOnly) {
-      const deletedUser = new User(userId.id, userId.domain);
+      const deletedUser = new User(userId.id, userId.domain, this.translate);
       deletedUser.isDeleted = true;
-      deletedUser.name(t('deletedUser'));
+      deletedUser.name(this.translate('deletedUser'));
       return deletedUser;
     }
     try {
@@ -919,9 +920,9 @@ export class UserRepository extends TypedEventEmitter<Events> {
   }
 
   private createDeletedUser(userId: QualifiedId): User {
-    const userEntity = new User(userId.id, userId.domain);
+    const userEntity = new User(userId.id, userId.domain, this.translate);
     userEntity.isDeleted = true;
-    userEntity.name(t('nonexistentUser'));
+    userEntity.name(this.translate('nonexistentUser'));
     return userEntity;
   }
 

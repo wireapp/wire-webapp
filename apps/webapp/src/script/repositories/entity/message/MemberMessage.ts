@@ -51,8 +51,8 @@ export class MemberMessage extends SystemMessage {
   /** this can be used to check uniqueness of the message. It's computed using the timestamp + users involved in the event */
   public readonly hash: ko.PureComputed<string>;
 
-  constructor() {
-    super();
+  constructor(translate: typeof t = t) {
+    super(translate);
 
     this.super_type = SuperType.MEMBER;
     this.memberMessageType = SystemMessageType.NORMAL;
@@ -101,12 +101,12 @@ export class MemberMessage extends SystemMessage {
     this.htmlGroupCreationHeader = ko.pureComputed(() => {
       if (this.showNamedCreation()) {
         if (this.user().isTemporaryGuest()) {
-          return t('conversationCreateTemporary');
+          return this.translate('conversationCreateTemporary');
         }
 
         const groupCreationString = this.user().isMe
-          ? t('conversationCreatedNameYou')
-          : t('conversationCreatedName', {name: this.senderName()});
+          ? this.translate('conversationCreatedNameYou')
+          : this.translate('conversationCreatedName', {name: this.senderName()});
         return capitalizeFirstChar(groupCreationString);
       }
       return '';

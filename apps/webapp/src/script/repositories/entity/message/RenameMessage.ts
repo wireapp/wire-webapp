@@ -33,8 +33,8 @@ export class RenameMessage extends SystemMessage {
   public readonly name: string;
   private readonly userState = container.resolve(UserState);
 
-  constructor(name: string, userId?: string, userDomain?: string) {
-    super();
+  constructor(name: string, userId?: string, userDomain?: string, translate: typeof t = t) {
+    super(translate);
 
     this.type = CONVERSATION_EVENT.RENAME;
     this.system_message_type = SystemMessageType.CONVERSATION_RENAME;
@@ -51,11 +51,11 @@ export class RenameMessage extends SystemMessage {
 
   private generateCaption(): string {
     if (!this.user()) {
-      return t('conversationRename');
+      return this.translate('conversationRename');
     }
 
     return matchQualifiedIds(this.user().qualifiedId, this.userState.self()?.qualifiedId)
-      ? t('conversationRenameYou')
-      : t('conversationRename');
+      ? this.translate('conversationRenameYou')
+      : this.translate('conversationRename');
   }
 }

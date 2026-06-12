@@ -234,7 +234,7 @@ export const PeopleTab = ({
             {translate('searchFederatedDomainNotAvailable')}
           </span>
           {/*@todo: re-enable when federation article is available
-                <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: t('searchFederatedDomainNotAvailableLearnMore')"></a>
+                <a className="start-ui-fed-domain-unavailable__link" rel="nofollow noopener noreferrer" target="_blank" data-bind="attr: {href: ''}, text: translate('searchFederatedDomainNotAvailableLearnMore')}"></a>
             */}
         </div>
       )}
@@ -288,7 +288,7 @@ export const PeopleTab = ({
               <div className="start-ui-fed-wrapper__button">
                 {/*@todo: re-enable when federation article is available
                 <button type="button" data-bind="click: () => {}" data-uie-name="do-search-learn-more">
-                  {t('searchTrySearchLearnMore')}
+                  {translate('searchTrySearchLearnMore')}
                 </button>
           */}
               </div>

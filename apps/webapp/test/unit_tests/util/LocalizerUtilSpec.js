@@ -17,7 +17,7 @@
  *
  */
 
-import {t, setStrings, joinNames} from 'Util/localizerUtil';
+import {getSelfName, t, setStrings, joinNames} from 'Util/localizerUtil';
 
 describe('LocalizerUtil', () => {
   describe('t', () => {
@@ -181,6 +181,21 @@ describe('LocalizerUtil', () => {
       ];
 
       expect(joinNames(beatles)).toBe('John, Paul, Ringo, and you');
+    });
+
+    it('uses an injected translate function', () => {
+      const translate = translationKey => `translated:${translationKey}`;
+      const beatles = [{name: () => 'John'}, {name: () => 'Paul'}];
+
+      expect(joinNames(beatles, undefined, false, false, translate)).toBe('John translated:and Paul');
+    });
+  });
+
+  describe('getSelfName', () => {
+    it('uses an injected translate function', () => {
+      const translate = translationKey => `translated:${translationKey}`;
+
+      expect(getSelfName(undefined, true, translate)).toBe('translated:conversationYouNominative');
     });
   });
 });

@@ -19,6 +19,7 @@
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ACCENT_ID} from 'src/script/Config';
+import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {User} from './User';
 
@@ -111,6 +112,19 @@ describe('User', () => {
       userEntity.accent_id(undefined);
 
       expect(userEntity.accent_color()).toBe(User.ACCENT_COLOR[ACCENT_ID.BLUE]);
+    });
+  });
+
+  describe('translation injection', () => {
+    it('uses the injected translate function for temporary guest expiration text', () => {
+      const translate = jest.fn((translationKey: string, replacements?: {time: number}) => {
+        return `translated:${translationKey}:${replacements?.time}`;
+      });
+      const user = new User('', '', translate);
+
+      user.setGuestExpiration(Date.now() + 30 * TIME_IN_MILLIS.MINUTE);
+
+      expect(user.expirationText()).toBe('translated:userRemainingTimeMinutes:30');
     });
   });
 });

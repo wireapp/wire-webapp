@@ -54,6 +54,7 @@ import {SuperType} from '../../../message/SuperType';
 import {User} from '../User';
 
 export class Message {
+  protected readonly translate: typeof t;
   private messageTimerStarted: boolean;
   protected readonly affect_order: ko.Observable<boolean>;
   public category?: MessageCategory;
@@ -85,12 +86,15 @@ export class Message {
   public type: string;
   public version: number;
 
-  constructor(id: string = '0', super_type?: SuperType) {
+  constructor(id: string = '0', super_type?: SuperType, translate: typeof t = t) {
     this.id = id;
+    this.translate = translate;
     this.super_type = super_type ?? SuperType.SYSTEM;
     this.ephemeralCaption = ko.pureComputed(() => {
       const remainingTime = this.ephemeral_remaining();
-      return remainingTime > 0 ? `${formatDurationCaption(remainingTime)} ${t('ephemeralRemaining')}` : '';
+      return remainingTime > 0
+        ? `${formatDurationCaption(remainingTime, this.translate)} ${this.translate('ephemeralRemaining')}`
+        : '';
     });
     this.ephemeral_remaining = ko.observable(0);
     this.ephemeral_expires = ko.observable(false);

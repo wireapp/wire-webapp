@@ -30,25 +30,25 @@ import {SystemMessageType} from '../../../message/SystemMessageType';
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;
 
-  constructor(messageTimer: number | null) {
-    super();
+  constructor(messageTimer: number | null, translate: typeof t = t) {
+    super(translate);
 
     this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
     this.system_message_type = SystemMessageType.CONVERSATION_MESSAGE_TIMER_UPDATE;
 
     this.message_timer = ConversationEphemeralHandler.validateTimer(messageTimer);
 
-    this.caption = getCaption(this.message_timer, this.user().isMe);
+    this.caption = getCaption(this.message_timer, this.user().isMe, this.translate);
   }
 }
 
-const getCaption = (messageTimer: number | null, isSelfUser: boolean) => {
+const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: typeof t = t) => {
   if (messageTimer) {
-    const timeString = formatDuration(messageTimer).text;
+    const timeString = formatDuration(messageTimer, translate).text;
     return isSelfUser
-      ? t('conversationUpdatedTimerYou', {time: timeString})
-      : t('conversationUpdatedTimer', {time: timeString});
+      ? translate('conversationUpdatedTimerYou', {time: timeString})
+      : translate('conversationUpdatedTimer', {time: timeString});
   }
 
-  return isSelfUser ? t('conversationResetTimerYou') : t('conversationResetTimer');
+  return isSelfUser ? translate('conversationResetTimerYou') : translate('conversationResetTimer');
 };
