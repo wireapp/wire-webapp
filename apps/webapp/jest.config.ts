@@ -30,6 +30,14 @@ const config: Config = {
   displayName: 'webapp',
   preset: '../../jest.preset.js',
   collectCoverageFrom: ['src/script/**/*.{ts,tsx}', '!src/script/util/test/**/*.*'],
+  coverageThreshold: {
+    global: {
+      branches: 39,
+      functions: 43,
+      lines: 48,
+      statements: 48,
+    },
+  },
   moduleDirectories: ['node_modules', __dirname],
   // Must be in sync with tsconfig.json >> paths
   moduleNameMapper: {

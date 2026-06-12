@@ -138,37 +138,18 @@ jobs:
       - name: Test
         run: ./bin/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
-      - name: Upload webapp coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          fail_ci_if_error: false
-          files: ./apps/webapp/coverage/lcov.info
-          flags: app_webapp
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload server coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
-        with:
-          fail_ci_if_error: false
-          files: ./apps/server/coverage/lcov.info
-          flags: app_server
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload core library coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
-        with:
-          fail_ci_if_error: false
-          files: ./coverage/libraries/core/lcov.info
-          flags: lib_core
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload api-client library coverage to Codecov
-        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v6.0.2
-        with:
-          fail_ci_if_error: false
-          files: ./coverage/libraries/api-client/lcov.info
-          flags: lib_api_client
-          token: ${{ secrets.CODECOV_TOKEN }}
+          name: coverage-reports
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            apps/webapp/coverage
+            apps/server/coverage
+            coverage/libraries/core
+            coverage/libraries/api-client
 
       - name: Build and package
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository }}

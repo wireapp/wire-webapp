@@ -38,7 +38,7 @@
         "ci": {
           "ci": true,
           "coverage": true,
-          "coverageReporters": ["lcov", "text"]
+          "coverageReporters": ["html", "lcov", "text"]
         }
       }
     },
