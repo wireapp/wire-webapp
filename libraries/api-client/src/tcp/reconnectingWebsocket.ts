@@ -74,7 +74,6 @@ export type ReconnectingWebsocketWallClock = {
 
 type ReconnectingWebsocketOptions = {
   readonly backFromSleepHandler: Maybe<BackFromSleepHandler>;
-  readonly isReliableWebsocketConnectionEnabled: boolean;
   readonly pingInterval: Maybe<number>;
   readonly wallClock: ReconnectingWebsocketWallClock;
   readonly websocketFactory: Maybe<() => ReconnectingWebsocketWrapper>;
@@ -144,17 +143,9 @@ export class ReconnectingWebsocket {
      * the internal setInterval and must be called when disconnecting to prevent memory leaks.
      * **/
     const backFromSleepHandler = this.options.backFromSleepHandler.unwrapOr(onBackFromSleep);
-    const backFromSleepRegistration: Parameters<BackFromSleepHandler>[0] = this.options
-      .isReliableWebsocketConnectionEnabled
-      ? {
-          callback: this.handleBackFromSleep,
-        }
-      : {
-          callback: this.handleBackFromSleep,
-          isDisconnected: () => {
-            return this.getState() === WEBSOCKET_STATE.CLOSED;
-          },
-        };
+    const backFromSleepRegistration: Parameters<BackFromSleepHandler>[0] = {
+      callback: this.handleBackFromSleep,
+    };
 
     this.stopBackFromSleepHandler = Maybe.just(backFromSleepHandler(backFromSleepRegistration));
   }

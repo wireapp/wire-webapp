@@ -51,7 +51,6 @@ exposeWrapperGlobals();
 const mainId = 'main';
 
 const apiClient = new APIClient({
-  isReliableWebsocketConnectionEnabled: false,
   wallClock: createWallClock(),
 });
 container.registerInstance(APIClient, apiClient);

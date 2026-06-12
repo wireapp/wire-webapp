@@ -17,10 +17,7 @@
  *
  */
 
-import {
-  applockRefactoredFeatureToggleName,
-  reliableWebsocketConnectionFeatureToggleName,
-} from './startupFeatureToggleNames';
+import {applockRefactoredFeatureToggleName, meetingsFeatureToggleName} from './startupFeatureToggleNames';
 import {startupFeatureToggleQueryParameterName} from './startupFeatureToggles';
 import {updateLocationSearchForStartupFeatureToggle} from './startupFeatureToggleQueryParameters';
 
@@ -28,31 +25,29 @@ describe('updateLocationSearchForStartupFeatureToggle', () => {
   it('adds a feature toggle to an existing query string and preserves unrelated parameters', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
       locationSearch: '?foo=bar',
-      featureToggleName: reliableWebsocketConnectionFeatureToggleName,
+      featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: true,
     });
 
     expect(updatedLocationSearch).toBe(
-      `?foo=bar&${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName}`,
+      `?foo=bar&${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
     );
   });
 
   it('removes a feature toggle and preserves other enabled toggles', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName},${applockRefactoredFeatureToggleName}`,
-      featureToggleName: reliableWebsocketConnectionFeatureToggleName,
+      locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${meetingsFeatureToggleName}`,
+      featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: false,
     });
 
-    expect(updatedLocationSearch).toBe(
-      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
-    );
+    expect(updatedLocationSearch).toBe(`?${startupFeatureToggleQueryParameterName}=${meetingsFeatureToggleName}`);
   });
 
   it('removes only the startup feature parameter when the last feature toggle is disabled', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName}&foo=bar`,
-      featureToggleName: reliableWebsocketConnectionFeatureToggleName,
+      locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}&foo=bar`,
+      featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: false,
     });
 
@@ -61,8 +56,8 @@ describe('updateLocationSearchForStartupFeatureToggle', () => {
 
   it('returns an empty search string when the last query parameter is removed', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName}`,
-      featureToggleName: reliableWebsocketConnectionFeatureToggleName,
+      locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
+      featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: false,
     });
 
@@ -72,24 +67,24 @@ describe('updateLocationSearchForStartupFeatureToggle', () => {
   it('ignores unknown feature names already present in query parameter when enabling a new toggle', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
       locationSearch: `?${startupFeatureToggleQueryParameterName}=unknown-feature`,
-      featureToggleName: reliableWebsocketConnectionFeatureToggleName,
+      featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: true,
     });
 
     expect(updatedLocationSearch).toBe(
-      `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
     );
   });
 
   it('deduplicates feature toggles when enabling an already enabled toggle', () => {
     const updatedLocationSearch = updateLocationSearchForStartupFeatureToggle({
-      locationSearch: `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName},${reliableWebsocketConnectionFeatureToggleName}`,
-      featureToggleName: reliableWebsocketConnectionFeatureToggleName,
+      locationSearch: `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName},${applockRefactoredFeatureToggleName}`,
+      featureToggleName: applockRefactoredFeatureToggleName,
       shouldEnableFeatureToggle: true,
     });
 
     expect(updatedLocationSearch).toBe(
-      `?${startupFeatureToggleQueryParameterName}=${reliableWebsocketConnectionFeatureToggleName}`,
+      `?${startupFeatureToggleQueryParameterName}=${applockRefactoredFeatureToggleName}`,
     );
   });
 });
