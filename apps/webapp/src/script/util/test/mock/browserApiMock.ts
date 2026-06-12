@@ -17,10 +17,39 @@
  *
  */
 
-const encoding = require('text-encoding');
+import {TextDecoder, TextEncoder} from 'node:util';
 
-window.TextEncoder = encoding.TextEncoder;
-window.TextDecoder = encoding.TextDecoder;
+function BrowserTextEncoder() {
+  const textEncoder = new TextEncoder();
+
+  return {
+    get encoding() {
+      return textEncoder.encoding;
+    },
+    encode(input?: string) {
+      return Uint8Array.from(textEncoder.encode(input));
+    },
+    encodeInto(source: string, destination: Uint8Array) {
+      return textEncoder.encodeInto(source, destination);
+    },
+  };
+}
+
+const textEncodingProperties = {
+  TextDecoder: {
+    configurable: true,
+    value: TextDecoder,
+    writable: true,
+  },
+  TextEncoder: {
+    configurable: true,
+    value: BrowserTextEncoder,
+    writable: true,
+  },
+};
+
+Object.defineProperties(globalThis, textEncodingProperties);
+Object.defineProperties(window, textEncodingProperties);
 
 window.z = {userPermission: {}};
 
