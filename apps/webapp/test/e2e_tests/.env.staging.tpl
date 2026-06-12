@@ -47,7 +47,7 @@ WEBAPP_URL=op://Test Automation/BackendConnection staging/webappUrl
 DOMAIN=op://Test Automation/BackendConnection staging/domain
 BASIC_AUTH=op://Test Automation/BackendConnection staging/basicAuth
 
-FEDERATION_BACKEND_URL=op://Test Automation/BackendConnection anta/backendUrl
-FEDERATION_WEBAPP_URL=op://Test Automation/BackendConnection anta/webappUrl
-FEDERATION_DOMAIN=op://Test Automation/BackendConnection anta/domain
-FEDERATION_BASIC_AUTH=op://Test Automation/BackendConnection anta/basicAuth
+FEDERATION_BACKEND_URL=op://Test Automation/BackendConnection qa-federation-a/backendUrl
+FEDERATION_WEBAPP_URL=op://Test Automation/BackendConnection qa-federation-a/webappUrl
+FEDERATION_DOMAIN=op://Test Automation/BackendConnection qa-federation-a/domain
+FEDERATION_BASIC_AUTH=op://Test Automation/BackendConnection qa-federation-a/basicAuth
