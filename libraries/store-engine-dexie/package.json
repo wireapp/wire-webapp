@@ -23,7 +23,6 @@
     "@swc/jest": "^0.2.23",
     "@types/jest": "^29.2.0",
     "@types/node": "^22.0.0",
-    "@types/uuid": "9.0.8",
     "@wireapp/store-engine": "workspace:^",
     "core-js": "^3.36.0",
     "fake-indexeddb": "^5.0.2",

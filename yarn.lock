@@ -9241,15 +9241,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/axios@npm:^0.14.0":
-  version: 0.14.4
-  resolution: "@types/axios@npm:0.14.4"
-  dependencies:
-    axios: "npm:*"
-  checksum: 10/51defed1e76e3fa7e63ae999c2e8c7c253be9b1a1fa3006f4413a0c461234a7e9e7e5df1bb2f64be221617fa94ed2272345ef19724dd550ad01a090510714275
-  languageName: node
-  linkType: hard
-
 "@types/babel__core@npm:^7.18.0, @types/babel__core@npm:^7.20.5":
   version: 7.20.5
   resolution: "@types/babel__core@npm:7.20.5"
@@ -9762,15 +9753,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/libsodium-wrappers-sumo@npm:0.8.2":
-  version: 0.8.2
-  resolution: "@types/libsodium-wrappers-sumo@npm:0.8.2"
-  dependencies:
-    libsodium-wrappers-sumo: "npm:*"
-  checksum: 10/f70926d40f4e7301738ab66e8d7a8c72c12ab89ea30cd036e4b0a852315b0ed7e787940ded66b49788d96cbd8e60deab3b2274c7cf0c963b4ca455f3a9ecfbfe
-  languageName: node
-  linkType: hard
-
 "@types/libsodium-wrappers@npm:*":
   version: 0.7.14
   resolution: "@types/libsodium-wrappers@npm:0.7.14"
@@ -9914,15 +9896,6 @@ __metadata:
   version: 1.3.6
   resolution: "@types/platform@npm:1.3.6"
   checksum: 10/2982111c489014170d941827c2c6eefc79ca313194aef3323fe735090d70f6a98d056965806b841b137c9429ebf4d53dbbf52407b6c2f2e3d8c342871d4be7fb
-  languageName: node
-  linkType: hard
-
-"@types/prettier@npm:^3":
-  version: 3.0.0
-  resolution: "@types/prettier@npm:3.0.0"
-  dependencies:
-    prettier: "npm:*"
-  checksum: 10/a2a512d304e5bcf78f38089dc88ad19215e6ab871d435a17aef3ce538a63b07c0e359c18db23989dc1ed9fff96d99eee1f680416080184df5c7e0e3bf767e165
   languageName: node
   linkType: hard
 
@@ -10174,7 +10147,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/uuid@npm:9.0.8, @types/uuid@npm:^9.0.1":
+"@types/uuid@npm:^9.0.1":
   version: 9.0.8
   resolution: "@types/uuid@npm:9.0.8"
   checksum: 10/b8c60b7ba8250356b5088302583d1704a4e1a13558d143c549c408bf8920535602ffc12394ede77f8a8083511b023704bc66d1345792714002bfa261b17c5275
@@ -11318,7 +11291,6 @@ __metadata:
   dependencies:
     "@swc/core": "npm:^1.3.10"
     "@swc/jest": "npm:^0.2.23"
-    "@types/axios": "npm:^0.14.0"
     "@types/copy": "npm:0.3.5"
     "@types/fs-extra": "npm:11.0.4"
     "@types/jest": "npm:^29.2.0"
@@ -11388,7 +11360,6 @@ __metadata:
   resolution: "@wireapp/eslint-config@workspace:libraries/eslint-config"
   dependencies:
     "@types/eslint": "npm:^8"
-    "@types/prettier": "npm:^3"
     "@typescript-eslint/eslint-plugin": "npm:7.18.0"
     "@typescript-eslint/parser": "npm:7.18.0"
     eslint: "npm:^8"
@@ -11631,7 +11602,6 @@ __metadata:
     "@swc/jest": "npm:^0.2.23"
     "@types/jest": "npm:^29.2.0"
     "@types/node": "npm:^22.0.0"
-    "@types/uuid": "npm:9.0.8"
     "@wireapp/store-engine": "workspace:^"
     core-js: "npm:^3.36.0"
     dexie: "npm:>3.2.0"
@@ -13089,7 +13059,6 @@ __metadata:
     "@swc/core": "npm:^1.3.10"
     "@swc/jest": "npm:^0.2.23"
     "@types/jest": "npm:^29.2.0"
-    "@types/libsodium-wrappers-sumo": "npm:0.8.2"
     "@types/node": "npm:^22.0.0"
     cross-env: "npm:10.1.0"
     jest: "npm:^29.2.1"
@@ -21929,21 +21898,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"libsodium-wrappers-sumo@npm:*, libsodium-wrappers-sumo@npm:0.8.4":
-  version: 0.8.4
-  resolution: "libsodium-wrappers-sumo@npm:0.8.4"
-  dependencies:
-    libsodium-sumo: "npm:^0.8.0"
-  checksum: 10/026dfca86f7497ad7572491105c1eb11a423694c5742d29f38f4cdcd8f7ca76c083fc18a7448da0dfaec2fb764086e65775157f197474416598df41f8f419c8e
-  languageName: node
-  linkType: hard
-
 "libsodium-wrappers-sumo@npm:0.7.9":
   version: 0.7.9
   resolution: "libsodium-wrappers-sumo@npm:0.7.9"
   dependencies:
     libsodium-sumo: "npm:^0.7.0"
   checksum: 10/b0e3beae34d17bdb3a7054eef772c4da4bc5205a32f95e7df7ec7c13092950e89b49644dcbb9066fde965b6209430fcfb76861269cda298f812b9b52830d9f05
+  languageName: node
+  linkType: hard
+
+"libsodium-wrappers-sumo@npm:0.8.4":
+  version: 0.8.4
+  resolution: "libsodium-wrappers-sumo@npm:0.8.4"
+  dependencies:
+    libsodium-sumo: "npm:^0.8.0"
+  checksum: 10/026dfca86f7497ad7572491105c1eb11a423694c5742d29f38f4cdcd8f7ca76c083fc18a7448da0dfaec2fb764086e65775157f197474416598df41f8f419c8e
   languageName: node
   linkType: hard
 
@@ -25839,21 +25808,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:*, prettier@npm:^3":
-  version: 3.8.4
-  resolution: "prettier@npm:3.8.4"
-  bin:
-    prettier: bin/prettier.cjs
-  checksum: 10/54684a3cc6689238692b29fab541c01934af7677be94c02293ba49981a1ac121c8bebe2a865f0c3b963e99d208f847c53aed354cc0ce8750e2d45791d64506c5
-  languageName: node
-  linkType: hard
-
 "prettier@npm:3.8.3":
   version: 3.8.3
   resolution: "prettier@npm:3.8.3"
   bin:
     prettier: bin/prettier.cjs
   checksum: 10/4b3b12cbb29e4c96bed936e5d070167552500c18d37676fb3e0caae6199c42860662608e4dc116230698f6e2bb0267ef2548158224c92d40f188d309d72fdd6f
+  languageName: node
+  linkType: hard
+
+"prettier@npm:^3":
+  version: 3.8.4
+  resolution: "prettier@npm:3.8.4"
+  bin:
+    prettier: bin/prettier.cjs
+  checksum: 10/54684a3cc6689238692b29fab541c01934af7677be94c02293ba49981a1ac121c8bebe2a865f0c3b963e99d208f847c53aed354cc0ce8750e2d45791d64506c5
   languageName: node
   linkType: hard
 
