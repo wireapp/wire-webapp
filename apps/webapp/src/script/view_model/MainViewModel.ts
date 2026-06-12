@@ -46,6 +46,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import type {EventTrackingRepository} from 'Repositories/tracking/eventTrackingRepository';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {t} from 'Util/localizerUtil';
 
 import {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
@@ -102,7 +103,10 @@ export class MainViewModel {
     return this.core.backendFeatures.isFederated;
   }
 
-  constructor(repositories: ViewModelRepositories) {
+  constructor(
+    repositories: ViewModelRepositories,
+    private readonly translate: typeof t = t,
+  ) {
     const userState = container.resolve(UserState);
     const teamState = container.resolve(TeamState);
     const mediaDevicesHandler = container.resolve(MediaDevicesHandler);
@@ -118,6 +122,7 @@ export class MainViewModel {
       userState,
       teamState,
       this,
+      this.translate,
     );
 
     this.calling = new CallingViewModel(
@@ -129,7 +134,7 @@ export class MainViewModel {
       repositories.properties,
       userState.self,
     );
-    this.content = new ContentViewModel(this, repositories);
+    this.content = new ContentViewModel(this, repositories, this.translate);
     this.list = new ListViewModel(this, repositories);
   }
 }

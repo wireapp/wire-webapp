@@ -60,6 +60,7 @@ export class ActionsViewModel {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly mainViewModel: MainViewModel,
+    private readonly translate: typeof t = t,
   ) {}
 
   readonly acceptConnectionRequest = (userEntity: User): Promise<void> => {
@@ -95,12 +96,12 @@ export class ActionsViewModel {
             await this.connectionRepository.blockUser(userEntity);
             resolve();
           },
-          text: t('modalUserBlockAction'),
+          text: this.translate('modalUserBlockAction'),
         },
 
         text: {
-          message: t('modalUserBlockMessage', {user: userEntity.name()}),
-          title: t('modalUserBlockHeadline', {user: userEntity.name()}),
+          message: this.translate('modalUserBlockMessage', {user: userEntity.name()}),
+          title: this.translate('modalUserBlockHeadline', {user: userEntity.name()}),
         },
       });
     });
@@ -129,14 +130,14 @@ export class ActionsViewModel {
             await this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
             resolve();
           },
-          text: t('modalConnectCancelAction'),
+          text: this.translate('modalConnectCancelAction'),
         },
         secondaryAction: {
-          text: t('modalConnectCancelSecondary'),
+          text: this.translate('modalConnectCancelSecondary'),
         },
         text: {
-          message: t('modalConnectCancelMessage', {user: userEntity.name()}, {}, true),
-          title: t('modalConnectCancelHeadline'),
+          message: this.translate('modalConnectCancelMessage', {user: userEntity.name()}, {}, true),
+          title: this.translate('modalConnectCancelHeadline'),
         },
       });
     });
@@ -163,12 +164,12 @@ export class ActionsViewModel {
           action: async (leave = false) => {
             await this.leaveOrClearConversation(conversationEntity, {clear: true, leave: leave});
           },
-          text: t('modalConversationClearAction'),
+          text: this.translate('modalConversationClearAction'),
         },
         text: {
-          message: t('modalConversationClearMessage'),
-          option: t('modalConversationClearOption'),
-          title: t('modalConversationClearHeadline'),
+          message: this.translate('modalConversationClearMessage'),
+          option: this.translate('modalConversationClearOption'),
+          title: this.translate('modalConversationClearHeadline'),
         },
       });
     }
@@ -184,8 +185,8 @@ export class ActionsViewModel {
 
     return new Promise<void>(resolve => {
       const expectedErrors = {
-        [BackendErrorLabel.BAD_REQUEST]: t('BackendError.LABEL.BAD_REQUEST'),
-        [BackendErrorLabel.INVALID_CREDENTIALS]: t('BackendError.LABEL.INVALID_CREDENTIALS'),
+        [BackendErrorLabel.BAD_REQUEST]: this.translate('BackendError.LABEL.BAD_REQUEST'),
+        [BackendErrorLabel.INVALID_CREDENTIALS]: this.translate('BackendError.LABEL.INVALID_CREDENTIALS'),
       };
       let isSending = false;
       PrimaryModal.show(
@@ -218,13 +219,13 @@ export class ActionsViewModel {
                 }
               }
             },
-            text: t('modalAccountRemoveDeviceAction'),
+            text: this.translate('modalAccountRemoveDeviceAction'),
           },
           text: {
-            closeBtnLabel: t('modalRemoveDeviceCloseBtn', {name: clientEntity.model as string}),
-            input: t('modalAccountRemoveDevicePlaceholder'),
-            message: t('modalAccountRemoveDeviceMessage'),
-            title: t('modalAccountRemoveDeviceHeadline', {device: clientEntity.model as string}),
+            closeBtnLabel: this.translate('modalRemoveDeviceCloseBtn', {name: clientEntity.model as string}),
+            input: this.translate('modalAccountRemoveDevicePlaceholder'),
+            message: this.translate('modalAccountRemoveDeviceMessage'),
+            title: this.translate('modalAccountRemoveDeviceHeadline', {device: clientEntity.model as string}),
           },
         },
         undefined,
@@ -241,12 +242,12 @@ export class ActionsViewModel {
               await this.messageRepository.deleteMessage(conversationEntity, messageEntity);
               resolve();
             },
-            text: t('modalConversationDeleteMessageAction'),
+            text: this.translate('modalConversationDeleteMessageAction'),
           },
           text: {
-            closeBtnLabel: t('modalConversationDeleteMessageCloseBtn'),
-            message: t('modalConversationDeleteMessageMessage'),
-            title: t('modalConversationDeleteMessageHeadline'),
+            closeBtnLabel: this.translate('modalConversationDeleteMessageCloseBtn'),
+            message: this.translate('modalConversationDeleteMessageMessage'),
+            title: this.translate('modalConversationDeleteMessageHeadline'),
           },
         });
       });
@@ -273,12 +274,12 @@ export class ActionsViewModel {
               await deleteMessage();
               resolve();
             },
-            text: t('modalConversationDeleteMessageEveryoneAction'),
+            text: this.translate('modalConversationDeleteMessageEveryoneAction'),
           },
           text: {
-            closeBtnLabel: t('modalConversationDeleteMessageAllCloseBtn'),
-            message: t('modalConversationDeleteMessageEveryoneMessage'),
-            title: t('modalConversationDeleteMessageEveryoneHeadline'),
+            closeBtnLabel: this.translate('modalConversationDeleteMessageAllCloseBtn'),
+            message: this.translate('modalConversationDeleteMessageEveryoneMessage'),
+            title: this.translate('modalConversationDeleteMessageEveryoneHeadline'),
           },
         });
       });
@@ -357,13 +358,13 @@ export class ActionsViewModel {
             await this.leaveOrClearConversation(conversation, {clear: clearContent, leave: true});
             resolve();
           },
-          text: t('modalConversationLeaveAction'),
+          text: this.translate('modalConversationLeaveAction'),
         },
         text: {
-          closeBtnLabel: t('modalConversationLeaveMessageCloseBtn', {name: conversation.display_name()}),
-          message: t('modalConversationLeaveMessage'),
-          option: t('modalConversationLeaveOption'),
-          title: t('modalConversationLeaveHeadline', {name: conversation.display_name()}),
+          closeBtnLabel: this.translate('modalConversationLeaveMessageCloseBtn', {name: conversation.display_name()}),
+          message: this.translate('modalConversationLeaveMessage'),
+          option: this.translate('modalConversationLeaveOption'),
+          title: this.translate('modalConversationLeaveHeadline', {name: conversation.display_name()}),
         },
       });
     });
@@ -373,13 +374,13 @@ export class ActionsViewModel {
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
         action: () => this.conversationRepository.deleteConversation(conversationEntity),
-        text: t('modalConversationDeleteGroupAction'),
+        text: this.translate('modalConversationDeleteGroupAction'),
       },
       text: {
-        message: t('modalConversationDeleteGroupMessage'),
+        message: this.translate('modalConversationDeleteGroupMessage'),
         title: conversationEntity.isChannel()
-          ? t('modalChannelDeleteGroupHeadline')
-          : t('modalGroupDeleteGroupHeadline'),
+          ? this.translate('modalChannelDeleteGroupHeadline')
+          : this.translate('modalGroupDeleteGroupHeadline'),
       },
     });
   };
@@ -392,11 +393,13 @@ export class ActionsViewModel {
     PrimaryModal.show(PrimaryModal.type.CONFIRM, {
       primaryAction: {
         action: () => this.conversationRepository.deleteConversationLocally(conversationEntity, true),
-        text: t('modalConversationRemoveGroupAction'),
+        text: this.translate('modalConversationRemoveGroupAction'),
       },
       text: {
-        message: t('modalConversationRemoveGroupMessage'),
-        title: t('modalConversationRemoveGroupHeadline', {conversation: conversationEntity.display_name()}),
+        message: this.translate('modalConversationRemoveGroupMessage'),
+        title: this.translate('modalConversationRemoveGroupHeadline', {
+          conversation: conversationEntity.display_name(),
+        }),
       },
     });
   };
@@ -479,12 +482,12 @@ export class ActionsViewModel {
                 reject(error);
               }
             },
-            text: t('modalConversationRemoveAction'),
+            text: this.translate('modalConversationRemoveAction'),
           },
           text: {
-            closeBtnLabel: t('modalConversationRemoveCloseBtn'),
-            message: t('modalConversationRemoveMessage', {user: userEntity.name()}),
-            title: t('modalConversationRemoveHeadline'),
+            closeBtnLabel: this.translate('modalConversationRemoveCloseBtn'),
+            message: this.translate('modalConversationRemoveMessage', {user: userEntity.name()}),
+            title: this.translate('modalConversationRemoveHeadline'),
           },
         });
       });
@@ -530,11 +533,11 @@ export class ActionsViewModel {
               await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
             }
           },
-          text: t('modalUserUnblockAction'),
+          text: this.translate('modalUserUnblockAction'),
         },
         text: {
-          message: t('modalUserUnblockMessage', {user: userEntity.name()}),
-          title: t('modalUserUnblockHeadline'),
+          message: this.translate('modalUserUnblockMessage', {user: userEntity.name()}),
+          title: this.translate('modalUserUnblockHeadline'),
         },
       });
     });

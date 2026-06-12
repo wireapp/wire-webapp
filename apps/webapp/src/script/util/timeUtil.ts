@@ -77,6 +77,7 @@ export interface DurationUnit {
 export enum TIME_IN_MILLIS {
   SECOND = 1000,
   MINUTE = SECOND * 60,
+  FIVE_MINUTES = MINUTE * 5,
   HOUR = MINUTE * 60,
   DAY = HOUR * 24,
   WEEK = DAY * 7,

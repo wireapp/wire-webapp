@@ -34,6 +34,7 @@ import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
+import {t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ActionsViewModel} from './ActionsViewModel';
@@ -63,11 +64,13 @@ function buildActionsViewModel({
   teamFeatures = undefined as any,
   setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
   leaveConversationMock = jest.fn().mockResolvedValue(undefined),
+  translate = t,
 }: {
   selfUser?: User;
   teamFeatures?: any;
   setMemberConversationRole?: jest.Mock;
   leaveConversationMock?: jest.Mock;
+  translate?: typeof t;
 } = {}) {
   const mockUserState = {self: ko.observable(selfUser)} as unknown as UserState;
   const mockTeamState = {teamFeatures: ko.observable(teamFeatures)} as unknown as TeamState;
@@ -88,6 +91,7 @@ function buildActionsViewModel({
     mockUserState,
     mockTeamState,
     {} as MainViewModel,
+    translate,
   );
 
   return {vm, setMemberConversationRole, leaveConversationMock};
@@ -105,6 +109,30 @@ describe('ActionsViewModel.leaveConversation', () => {
   });
 
   afterEach(() => jest.restoreAllMocks());
+
+  it('uses the injected translate function for modal copy', () => {
+    const selfUser = new User('self-id', 'example.com');
+    const userToBlock = makeEligibleUser('blocked-user');
+    const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+
+    const {vm} = buildActionsViewModel({selfUser, translate});
+
+    void vm.blockUser(userToBlock);
+
+    expect(translate).toHaveBeenCalledWith('modalUserBlockAction');
+    expect(translate).toHaveBeenCalledWith('modalUserBlockMessage', {user: userToBlock.name()});
+    expect(translate).toHaveBeenCalledWith('modalUserBlockHeadline', {user: userToBlock.name()});
+    expect(PrimaryModal.show).toHaveBeenCalledWith(
+      PrimaryModal.type.CONFIRM,
+      expect.objectContaining({
+        primaryAction: expect.objectContaining({text: 'translated:modalUserBlockAction'}),
+        text: expect.objectContaining({
+          message: 'translated:modalUserBlockMessage',
+          title: 'translated:modalUserBlockHeadline',
+        }),
+      }),
+    );
+  });
 
   describe('feature flag off', () => {
     it('shows the standard PrimaryModal leave flow when PREVENT_ADMIN_LESS_GROUPS is disabled', () => {

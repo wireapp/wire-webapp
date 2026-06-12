@@ -121,7 +121,7 @@ export const AppMain = (properties: AppMainProps) => {
   useEffect(() => {
     return startApplicationPeriodicChecks({
       wallClock,
-      periodicChecksIntervalDelayInMilliseconds: TIME_IN_MILLIS.MINUTE * 5,
+      periodicChecksIntervalDelayInMilliseconds: TIME_IN_MILLIS.FIVE_MINUTES,
       runPeriodicCheck: runApplicationPeriodicCheck,
     });
   }, [wallClock, runApplicationPeriodicCheck]);
@@ -304,8 +304,10 @@ export const AppMain = (properties: AppMainProps) => {
 
   useLayoutEffect(() => {
     if (!locked) {
-      initializeApp();
+      void initializeApp();
     }
+    // `initializeApp` is intentionally invoked only when the lock state changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locked]);
 
   useE2EIFeatureConfigUpdate(repositories.team);

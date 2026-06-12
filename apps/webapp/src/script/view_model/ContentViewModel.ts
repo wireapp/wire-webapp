@@ -82,6 +82,7 @@ export class ContentViewModel {
   constructor(
     mainViewModel: MainViewModel,
     public repositories: ViewModelRepositories,
+    private readonly translate: typeof t = t,
   ) {
     this.userState = container.resolve(UserState);
     this.conversationState = container.resolve(ConversationState);
@@ -211,8 +212,8 @@ export class ContentViewModel {
       PrimaryModal.type.ACKNOWLEDGE,
       {
         text: {
-          message: t('conversationNotFoundMessage'),
-          title: t('conversationNotFoundTitle', {brandName: Config.getConfig().BRAND_NAME}),
+          message: this.translate('conversationNotFoundMessage'),
+          title: this.translate('conversationNotFoundTitle', {brandName: Config.getConfig().BRAND_NAME}),
         },
       },
       undefined,
