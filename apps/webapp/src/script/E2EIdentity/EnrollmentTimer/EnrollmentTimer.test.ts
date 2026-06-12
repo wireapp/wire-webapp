@@ -19,10 +19,34 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
+import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 
-import {getEnrollmentTimer, messageRetentionTime} from './EnrollmentTimer';
+import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './EnrollmentTimer';
 
-import {MLSStatuses} from '../E2EIdentityVerification';
+import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
+
+const generateWireIdentity = (
+  credentialType: CredentialType = CredentialType.X509,
+  status: MLSStatuses = MLSStatuses.NOT_ACTIVATED,
+): WireIdentity => ({
+  x509Identity: {
+    free: jest.fn(),
+    certificate: '',
+    displayName: 'John Doe',
+    domain: 'domain',
+    handle: 'johndoe',
+    notAfter: BigInt(0),
+    notBefore: BigInt(0),
+    serialNumber: '',
+    [Symbol.dispose]: () => {},
+  },
+  thumbprint: '',
+  credentialType,
+  status,
+  clientId: 'client-id',
+  deviceId: 'client-id',
+  qualifiedUserId: {id: 'user-id', domain: 'domain'},
+});
 
 describe('e2ei delays', () => {
   const gracePeriod = 7 * TimeInMillis.DAY;
@@ -98,5 +122,61 @@ describe('e2ei delays', () => {
 
     expect(isSnoozable).toBeTruthy();
     expect(firingDate).toBe(gracePeriodStartingPoint);
+  });
+
+  it.each([
+    TimeInMillis.HOUR,
+    TimeInMillis.HOUR * 6,
+    TimeInMillis.HOUR * 12,
+    TimeInMillis.HOUR * 24,
+    TimeInMillis.WEEK,
+  ])('should keep full remaining grace period for first enrollment: %i ms', grace => {
+    const remainingDelay = getRemainingGracePeriodDelay(undefined, Date.now(), grace);
+
+    expect(remainingDelay).toBe(grace);
+  });
+
+  it('should return a deterministic full grace-period delay when identity is undefined', () => {
+    const deterministicWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
+    });
+    const grace = TimeInMillis.HOUR * 12;
+
+    const remainingDelay = getRemainingGracePeriodDelay(
+      undefined,
+      deterministicWallClock.currentTimestampInMilliseconds,
+      grace,
+      deterministicWallClock,
+    );
+
+    expect(remainingDelay).toBe(grace);
+  });
+
+  it('should return only the remaining grace-period delay when first enrollment started in the past', () => {
+    const deterministicWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
+    });
+    const grace = TimeInMillis.DAY * 7;
+    const e2eiActivatedAt = deterministicWallClock.currentTimestampInMilliseconds - TimeInMillis.DAY * 2;
+
+    const remainingDelay = getRemainingGracePeriodDelay(undefined, e2eiActivatedAt, grace, deterministicWallClock);
+
+    expect(remainingDelay).toBe(TimeInMillis.DAY * 5);
+  });
+
+  it('should treat NOT_ACTIVATED identity as first enrollment', () => {
+    const deterministicWallClock = createDeterministicWallClock({
+      initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
+    });
+    const grace = TimeInMillis.HOUR * 6;
+
+    const remainingDelay = getRemainingGracePeriodDelay(
+      generateWireIdentity(CredentialType.X509, MLSStatuses.NOT_ACTIVATED),
+      deterministicWallClock.currentTimestampInMilliseconds,
+      grace,
+      deterministicWallClock,
+    );
+
+    expect(remainingDelay).toBe(grace);
   });
 });

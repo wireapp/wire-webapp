@@ -41,7 +41,7 @@ import {
   MLSStatuses,
 } from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
-import {getEnrollmentTimer, hasGracePeriodStartedForSelfClient} from './EnrollmentTimer';
+import {getEnrollmentTimer, getRemainingGracePeriodDelay, hasGracePeriodStartedForSelfClient} from './EnrollmentTimer';
 import {getModalOptions, ModalType} from './Modals';
 import {OIDCService} from './OIDCService';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
@@ -230,7 +230,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         intervalDelay: TIME_IN_MILLIS.SECOND * 10,
       });
     }
-    return firingDate - Date.now();
+    return {
+      nextReminderDelay: firingDate - Date.now(),
+      remainingGracePeriodDelay: getRemainingGracePeriodDelay(identity, e2eActivatedAt, this.config.gracePeriodInMs),
+    };
   }
 
   private async processEnrollmentUponExpiry(snoozable: boolean, onUserAction: () => void) {
@@ -399,9 +402,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           resolve();
         },
         secondaryActionFn: async () => {
-          const delay = await this.startTimers();
-          if (delay > 0) {
-            this.showSnoozeConfirmationModal(delay);
+          const {nextReminderDelay, remainingGracePeriodDelay} = await this.startTimers();
+          if (nextReminderDelay > 0) {
+            this.showSnoozeConfirmationModal(remainingGracePeriodDelay);
           }
           resolve();
         },
@@ -429,9 +432,9 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         secondaryActionFn: async () => {
           onUserAction?.();
-          const delay = await this.startTimers();
-          if (delay > 0) {
-            this.showSnoozeConfirmationModal(delay);
+          const {nextReminderDelay, remainingGracePeriodDelay} = await this.startTimers();
+          if (nextReminderDelay > 0) {
+            this.showSnoozeConfirmationModal(remainingGracePeriodDelay);
           }
           resolve();
         },
