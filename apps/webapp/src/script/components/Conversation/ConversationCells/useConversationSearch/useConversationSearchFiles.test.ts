@@ -79,6 +79,7 @@ function renderSearchHook({
   cellsRepository = createFakeCellsRepository(),
   userRepository = createFakeUserRepository(),
   enabled = true,
+  allowSearchWhenDisabled = false,
   onClear = jest.fn(),
   fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest(),
   filters = emptyFilters,
@@ -86,6 +87,7 @@ function renderSearchHook({
   cellsRepository?: FakeCellsRepository;
   userRepository?: FakeUserRepository;
   enabled?: boolean;
+  allowSearchWhenDisabled?: boolean;
   onClear?: () => void;
   fireAndForgetInvoker?: ReturnType<typeof createExecutingFireAndForgetInvokerForTest>;
   filters?: ConversationDriveFiltersState;
@@ -99,6 +101,7 @@ function renderSearchHook({
         userRepository: userRepository as unknown as UserRepository,
         conversationQualifiedId: QUALIFIED_ID,
         enabled,
+        allowSearchWhenDisabled,
         fireAndForgetInvoker,
         filters,
         onClear,
@@ -126,6 +129,24 @@ describe('useConversationSearchFiles', () => {
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
     expect(cellsRepository.searchNodes).not.toHaveBeenCalled();
+  });
+
+  it('supports legacy inline searches while the dedicated search view is disabled', async () => {
+    const cellsRepository = createFakeCellsRepository({
+      Nodes: [{Path: `${CONV_ID}@${DOMAIN}/doc.pdf`, Type: 'LEAF', Uuid: 'doc.pdf'}],
+    });
+    const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
+    const {result} = renderSearchHook({
+      cellsRepository,
+      enabled: false,
+      allowSearchWhenDisabled: true,
+      fireAndForgetInvoker,
+    });
+
+    act(() => result.current.handleSearch('doc'));
+
+    await waitFor(() => expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})).toHaveLength(1));
+    expect(useCellsStore.getState().status).toBe('success');
   });
 
   it('uses the current folder as the search root when opening search from inside a folder', async () => {

@@ -46,6 +46,7 @@ interface UseConversationSearchFilesProps {
   userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
+  allowSearchWhenDisabled?: boolean;
   fireAndForgetInvoker: FireAndForgetInvoker;
   filters: ConversationDriveFiltersState;
   onClear?: () => void;
@@ -60,6 +61,7 @@ export const useConversationSearchFiles = ({
   userRepository,
   conversationQualifiedId,
   enabled,
+  allowSearchWhenDisabled = false,
   fireAndForgetInvoker,
   filters,
   onClear,
@@ -74,6 +76,8 @@ export const useConversationSearchFiles = ({
   // Prevents stale in-flight responses from overwriting the store after the search view closes.
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
+  const allowSearchWhenDisabledRef = useRef(allowSearchWhenDisabled);
+  allowSearchWhenDisabledRef.current = allowSearchWhenDisabled;
 
   const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
   const hasActiveParams = hasActiveSearchParams(searchParams);
@@ -125,7 +129,7 @@ export const useConversationSearchFiles = ({
         });
 
         // Search may have closed while the lookup request was in flight.
-        if (!enabledRef.current) {
+        if (!enabledRef.current && !allowSearchWhenDisabledRef.current) {
           return;
         }
 
@@ -141,7 +145,7 @@ export const useConversationSearchFiles = ({
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
         // Search may also close while resolving node owners.
-        if (!enabledRef.current) {
+        if (!enabledRef.current && !allowSearchWhenDisabledRef.current) {
           return;
         }
 

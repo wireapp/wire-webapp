@@ -58,6 +58,7 @@ interface ConversationCellsProps {
   userRepository: UserRepository;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
+  isSharedDriveSearchAndFiltersEnabled: boolean;
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
   onCloseSearchView: () => void;
@@ -69,6 +70,7 @@ export const ConversationCells = memo(
     userRepository,
     activeConversation,
     conversationRepository,
+    isSharedDriveSearchAndFiltersEnabled,
     isSearchViewOpen,
     onOpenSearchView,
     onCloseSearchView,
@@ -116,6 +118,7 @@ export const ConversationCells = memo(
       cellsRepository,
       conversationQualifiedId,
       enabled: isCellsStateReady && isSearchViewOpen,
+      allowSearchWhenDisabled: !isSharedDriveSearchAndFiltersEnabled,
       fireAndForgetInvoker,
       userRepository,
       filters: filterState,
