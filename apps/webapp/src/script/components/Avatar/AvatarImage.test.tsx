@@ -23,10 +23,26 @@ import {AVATAR_SIZE} from 'Components/Avatar';
 import {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {User} from 'Repositories/entity/User';
+import {viewportObserver} from 'Util/DOM/viewportObserver';
 
 import {AvatarImage} from './AvatarImage';
 
 describe('AvatarImage', () => {
+  let originalTrackElement: typeof viewportObserver.trackElement;
+
+  beforeEach(() => {
+    originalTrackElement = viewportObserver.trackElement;
+
+    viewportObserver.trackElement = (element, onVisibilityChange) => {
+      onVisibilityChange(true, true);
+    };
+  });
+
+  afterEach(() => {
+    viewportObserver.trackElement = originalTrackElement;
+    jest.resetAllMocks();
+  });
+
   it('fetches full avatar image for large avatars', async () => {
     const assetRepoSpy = {
       getObjectUrl: jasmine.createSpy().and.returnValue(Promise.resolve()),
