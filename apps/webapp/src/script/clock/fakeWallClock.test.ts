@@ -69,5 +69,4 @@ describe('createFakeWallClock', () => {
     expect(firstCurrentDate.getTime()).toBe(100);
     expect(secondCurrentDate.getTime()).toBe(100);
   });
-
 });

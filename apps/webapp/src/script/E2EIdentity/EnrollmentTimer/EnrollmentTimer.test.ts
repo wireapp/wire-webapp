@@ -19,11 +19,11 @@
 
 import {TimeInMillis} from '@wireapp/commons/lib/util/TimeUtil';
 import {CredentialType} from '@wireapp/core/lib/messagingProtocols/mls';
-import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 
 import {getEnrollmentTimer, getRemainingGracePeriodDelay, messageRetentionTime} from './EnrollmentTimer';
 
 import {MLSStatuses, WireIdentity} from '../E2EIdentityVerification';
+import {createFakeWallClock} from 'src/script/clock/fakeWallClock';
 
 const generateWireIdentity = (
   credentialType: CredentialType = CredentialType.X509,
@@ -137,7 +137,7 @@ describe('e2ei delays', () => {
   });
 
   it('should return a deterministic full grace-period delay when identity is undefined', () => {
-    const deterministicWallClock = createDeterministicWallClock({
+    const deterministicWallClock = createFakeWallClock({
       initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
     });
     const grace = TimeInMillis.HOUR * 12;
@@ -153,7 +153,7 @@ describe('e2ei delays', () => {
   });
 
   it('should return only the remaining grace-period delay when first enrollment started in the past', () => {
-    const deterministicWallClock = createDeterministicWallClock({
+    const deterministicWallClock = createFakeWallClock({
       initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
     });
     const grace = TimeInMillis.DAY * 7;
@@ -165,7 +165,7 @@ describe('e2ei delays', () => {
   });
 
   it('should treat NOT_ACTIVATED identity as first enrollment', () => {
-    const deterministicWallClock = createDeterministicWallClock({
+    const deterministicWallClock = createFakeWallClock({
       initialCurrentTimestampInMilliseconds: 1_700_000_000_000,
     });
     const grace = TimeInMillis.HOUR * 6;
