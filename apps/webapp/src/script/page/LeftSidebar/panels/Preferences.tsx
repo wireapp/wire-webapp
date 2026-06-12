@@ -54,7 +54,11 @@ interface PreferencesItemProps {
   uieName: string;
 }
 
-const showNotification = (type: string, aggregatedNotifications: Notification[]) => {
+const showNotification = (
+  type: string,
+  aggregatedNotifications: Notification[],
+  translate: ReturnType<typeof useApplicationContext>['translate'],
+) => {
   switch (type) {
     case PreferenceNotificationRepository.CONFIG.NOTIFICATION_TYPES.NEW_CLIENT: {
       PrimaryModal.show(
@@ -69,6 +73,7 @@ const showNotification = (type: string, aggregatedNotifications: Notification[])
           },
         },
         undefined,
+        translate,
       );
       break;
     }
@@ -81,6 +86,7 @@ const showNotification = (type: string, aggregatedNotifications: Notification[])
           preventClose: true,
         },
         undefined,
+        translate,
       );
       break;
     }
@@ -129,9 +135,9 @@ const Preferences = ({
     if (NEW_DEVICE_NOTIFICATION_STATES.includes(contentState)) {
       void preferenceNotificationRepository
         .getNotifications()
-        .forEach(({type, notification}) => showNotification(type, notification));
+        .forEach(({type, notification}) => showNotification(type, notification, translate));
     }
-  }, [contentState, preferenceNotificationRepository]);
+  }, [contentState, preferenceNotificationRepository, translate]);
 
   const supportsCalling = Runtime.isSupportingLegacyCalling();
 

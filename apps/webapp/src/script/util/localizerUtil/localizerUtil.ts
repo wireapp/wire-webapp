@@ -32,6 +32,7 @@ export type TranslationKey = keyof TranslationStrings;
 export type StringIdentifer = TranslationKey;
 
 type TranslationSubstitutions = Record<string, string | number>;
+export type Substitutions = TranslationSubstitutions;
 
 export const DEFAULT_LOCALE = 'en';
 

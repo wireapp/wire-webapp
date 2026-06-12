@@ -463,7 +463,7 @@ export const Conversation = ({
   const onSessionResetClick = async (messageEntity: DecryptErrorMessage): Promise<void> => {
     const resetProgress = () => {
       setTimeout(() => {
-        PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {});
+        PrimaryModal.show(PrimaryModal.type.SESSION_RESET, {}, undefined, translate);
       }, MotionDuration.LONG);
     };
 

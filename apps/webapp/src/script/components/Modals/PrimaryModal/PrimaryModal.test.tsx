@@ -75,6 +75,19 @@ describe('PrimaryModal', () => {
 
       expect(getCloseButton()).toBeFalsy();
     });
+
+    it('uses the provided translate function for default secondary action copy', async () => {
+      const translate = (translationKey: string) => `translated:${translationKey}`;
+      const {getSecondaryActionButton} = renderPrimaryModal(
+        PrimaryModalType.CONFIRM,
+        jest.fn(),
+        jest.fn(),
+        false,
+        translate,
+      );
+
+      expect(getSecondaryActionButton()).toHaveTextContent('translated:modalConfirmSecondary');
+    });
   });
 
   describe('Input', () => {
@@ -139,6 +152,22 @@ describe('PrimaryModal', () => {
       expect(action).toHaveBeenCalledWith(password, false);
     });
   });
+
+  describe('SessionReset', () => {
+    it('uses the provided translate function for generated modal content', async () => {
+      const translate = (translationKey: string) => `translated:${translationKey}`;
+      const {getByText} = render(withTheme(<PrimaryModalComponent />), {
+        wrapper: rootProviderWrapper,
+      });
+
+      act(() => {
+        PrimaryModal.show(PrimaryModalType.SESSION_RESET, {}, undefined, translate);
+      });
+
+      expect(getByText('translated:modalSessionResetHeadline')).toBeTruthy();
+      expect(getByText('translated:modalAcknowledgeAction')).toBeTruthy();
+    });
+  });
 });
 
 const renderPrimaryModal = (
@@ -146,6 +175,7 @@ const renderPrimaryModal = (
   primaryAction = () => {},
   secondaryAction = () => {},
   hideCloseBtn = false,
+  translate?: (translationKey: string) => string,
 ) => {
   const {getByTestId, queryByTestId, getByLabelText} = render(withTheme(<PrimaryModalComponent />), {
     wrapper: rootProviderWrapper,
@@ -169,7 +199,7 @@ const renderPrimaryModal = (
       copyPassword: true,
       closeOnConfirm: true,
       preventClose: false,
-    });
+    }, undefined, translate);
   });
 
   return {

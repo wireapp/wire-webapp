@@ -31,11 +31,12 @@ import {createUuid} from 'Util/uuid';
 import {
   ButtonAction,
   ModalContent,
-  ModalItem,
   ModalOptions,
   ModalQueue,
   PrimaryModalType,
+  QueuedModalItem,
   Text,
+  Translate,
 } from './PrimaryModalTypes';
 
 import {Config} from '../../../Config';
@@ -45,10 +46,10 @@ type PrimaryModalState = {
   queue: ModalQueue;
   currentModalContent: ModalContent;
   currentModalId: string | null;
-  existsInQueue: (modalItem: ModalItem) => boolean;
-  addToQueue: (modalItem: ModalItem) => void;
+  existsInQueue: (modalItem: QueuedModalItem) => boolean;
+  addToQueue: (modalItem: QueuedModalItem) => void;
   removeFirstItemInQueue: () => void;
-  replaceInQueue: (modalItem: ModalItem) => void;
+  replaceInQueue: (modalItem: QueuedModalItem) => void;
   updateCurrentModalId: (nextCurrentModalId: string | null) => void;
   updateErrorMessage: (nextErrorMessage: string | null) => void;
   updateCurrentModalContent: (nextCurrentModaContent: ModalContent) => void;
@@ -73,15 +74,15 @@ const defaultContent: ModalContent = {
 const logger = getLogger('PrimaryModalState');
 
 const usePrimaryModalState = create<PrimaryModalState>((set, get) => ({
-  addToQueue: (modalItem: ModalItem) => set(state => ({...state, queue: [...state.queue, modalItem]})),
+  addToQueue: (modalItem: QueuedModalItem) => set(state => ({...state, queue: [...state.queue, modalItem]})),
   currentModalContent: defaultContent,
   currentModalId: null,
   errorMessage: null,
-  existsInQueue: (modalItem: ModalItem): boolean =>
+  existsInQueue: (modalItem: QueuedModalItem): boolean =>
     get().queue.findIndex(queueItem => queueItem.id === modalItem.id) !== -1,
   queue: [],
   removeFirstItemInQueue: () => set(state => ({...state, queue: state.queue.slice(1)})),
-  replaceInQueue: (modalItem: ModalItem) =>
+  replaceInQueue: (modalItem: QueuedModalItem) =>
     set(state => ({
       ...state,
       queue: state.queue.map(queueItem => (queueItem.id === modalItem.id ? modalItem : queueItem)),
@@ -93,14 +94,19 @@ const usePrimaryModalState = create<PrimaryModalState>((set, get) => ({
   updateErrorMessage: nextErrorMessage => set(state => ({...state, errorMessage: nextErrorMessage})),
 }));
 
-const addNewModalToQueue = (type: PrimaryModalType, options: ModalOptions, modalId = createUuid()): void => {
+const addNewModalToQueue = (
+  type: PrimaryModalType,
+  options: ModalOptions,
+  modalId = createUuid(),
+  translate: Translate = t,
+): void => {
   const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = usePrimaryModalState.getState();
 
   const alreadyOpen = modalId === currentModalId;
   if (alreadyOpen) {
     return showNextModalInQueue();
   }
-  const newModal = {id: modalId, options, type};
+  const newModal = {id: modalId, options, type, translate};
   const found = modalId !== '' && existsInQueue(newModal);
   if (found) {
     replaceInQueue(newModal);
@@ -119,13 +125,18 @@ const showNextModalInQueue = (): void => {
   }
   if (queue.length > 0) {
     const nextModalToShow = queue[0];
-    const {type, options, id} = nextModalToShow;
-    updateCurrentModalContent(type, options, id);
+    const {type, options, id, translate} = nextModalToShow;
+    updateCurrentModalContent(type, options, id, translate);
     removeFirstItemInQueue();
   }
 };
 
-const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions = {}, id?: string): void => {
+const updateCurrentModalContent = (
+  type: PrimaryModalType,
+  options: ModalOptions = {},
+  id?: string,
+  translate: Translate = t,
+): void => {
   if (!Object.values(PrimaryModalType).includes(type)) {
     return logger.warn(`Modal of type '${type}' is not supported`);
   }
@@ -177,14 +188,14 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
 
   switch (type) {
     case PrimaryModalType.ACCOUNT_NEW_DEVICES: {
-      content.titleText = t('modalAccountNewDevicesHeadline');
-      content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-      content.secondaryAction = {...secondaryAction, text: t('modalAccountNewDevicesSecondary')};
+      content.titleText = translate('modalAccountNewDevicesHeadline');
+      content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
+      content.secondaryAction = {...secondaryAction, text: translate('modalAccountNewDevicesSecondary')};
       const deviceList = (data as ClientNotificationData[]).map(device => {
         const deviceDate = new Date(device.time);
         const deviceTime = isValid(deviceDate) ? new Date(deviceDate) : new Date();
         const formattedDate = formatLocale(deviceTime, 'PP, p');
-        const deviceModel = `${t('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
+        const deviceModel = `${translate('modalAccountNewDevicesFrom')} ${escape(device.model)}`;
         return (
           <>
             <div>{formattedDate} - UTC</div>
@@ -195,23 +206,23 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
       content.message = (
         <>
           <div className="modal__content__device-list">{deviceList}</div>
-          {t('modalAccountNewDevicesMessage')}
+          {translate('modalAccountNewDevicesMessage')}
         </>
       );
       break;
     }
     case PrimaryModalType.ACCOUNT_READ_RECEIPTS_CHANGED: {
-      content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
+      content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
       content.titleText =
         data !== undefined && data !== null
-          ? t('modalAccountReadReceiptsChangedOnHeadline')
-          : t('modalAccountReadReceiptsChangedOffHeadline');
-      content.message = t('modalAccountReadReceiptsChangedMessage');
+          ? translate('modalAccountReadReceiptsChangedOnHeadline')
+          : translate('modalAccountReadReceiptsChangedOffHeadline');
+      content.message = translate('modalAccountReadReceiptsChangedMessage');
       break;
     }
     case PrimaryModalType.ACKNOWLEDGE: {
-      content.primaryAction = {text: t('modalAcknowledgeAction'), ...primaryAction};
-      content.titleText = text.title ?? t('modalAcknowledgeHeadline');
+      content.primaryAction = {text: translate('modalAcknowledgeAction'), ...primaryAction};
+      content.titleText = text.title ?? translate('modalAcknowledgeHeadline');
       content.message = text.htmlMessage === undefined || text.htmlMessage === '' ? (text.message ?? '') : '';
       break;
     }
@@ -222,7 +233,7 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     }
     case PrimaryModalType.CONFIRM: {
       content.secondaryAction = {
-        text: content.confirmCancelBtnLabel ?? t('modalConfirmSecondary'),
+        text: content.confirmCancelBtnLabel ?? translate('modalConfirmSecondary'),
         ...content.secondaryAction,
       };
       break;
@@ -231,15 +242,15 @@ const updateCurrentModalContent = (type: PrimaryModalType, options: ModalOptions
     case PrimaryModalType.PASSWORD:
     case PrimaryModalType.OPTION: {
       if (hideSecondary !== true) {
-        content.secondaryAction = {text: t('modalOptionSecondary'), ...content.secondaryAction};
+        content.secondaryAction = {text: translate('modalOptionSecondary'), ...content.secondaryAction};
         content.modalUie = PrimaryModalType.OPTION;
       }
       break;
     }
     case PrimaryModalType.SESSION_RESET: {
-      content.titleText = t('modalSessionResetHeadline');
-      content.primaryAction = {...primaryAction, text: t('modalAcknowledgeAction')};
-      content.messageHtml = t(
+      content.titleText = translate('modalSessionResetHeadline');
+      content.primaryAction = {...primaryAction, text: translate('modalAcknowledgeAction')};
+      content.messageHtml = translate(
         'modalSessionResetMessage',
         undefined,
         replaceLink(Config.getConfig().URL.SUPPORT.BUG_REPORT),
