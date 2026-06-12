@@ -24,11 +24,16 @@ import {VIDEO_STATE} from '@wireapp/avs';
 import {Participant} from 'Repositories/calling/Participant';
 import {User} from 'Repositories/entity/User';
 import {backgroundEffectsStore} from 'Repositories/media/useBackgroundEffectsStore';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
 
 const loadingOverlaySelector = '[data-uie-name="background-effect-initializing"]';
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 const createParticipant = (name: string) => {
   const user = new User(createUuid());
@@ -63,6 +68,7 @@ const renderComponent = ({
       isMaximized={false}
       onTileDoubleClick={jest.fn()}
     />,
+    {wrapper: rootProviderWrapper},
   );
 
 describe('GroupVideoGridTile', () => {

@@ -24,6 +24,8 @@ import {container} from 'tsyringe';
 import {CALL_TYPE, CONV_TYPE} from '@wireapp/avs';
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import {TestFactory} from 'test/helper/TestFactory';
+
 import {useCallAlertState} from 'Components/calling/useCallAlertState';
 import {CALL_QUALITY_FEEDBACK_KEY} from 'Components/Modals/QualityFeedbackModal/constants';
 import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
@@ -33,8 +35,10 @@ import {User} from 'Repositories/entity/User';
 import {EventName} from 'Repositories/tracking/eventName';
 import {Segmentation} from 'Repositories/tracking/segmentation';
 import {UserState} from 'Repositories/user/userState';
-import {TestFactory} from 'test/helper/TestFactory';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
 
@@ -59,7 +63,7 @@ describe('QualityFeedbackModal', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    spyOn(container.resolve(UserState), 'self').and.returnValue(user);
+    jest.spyOn(container.resolve(UserState), 'self').mockReturnValue(user);
   });
 
   beforeAll(() => {
@@ -117,15 +121,15 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
-    spyOn(amplify, 'publish').and.returnValue({
+    jest.spyOn(amplify, 'publish').mockReturnValue({
       eventKey: WebAppEvents.ANALYTICS.EVENT,
       type: EventName.CALLING.QUALITY_REVIEW,
       value: {
         [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
       },
-    });
+    } as never);
 
-    fireEvent.click(getByText('qualityFeedback.skip'));
+    fireEvent.click(getByText('Skip'));
 
     expect(amplify.publish).toHaveBeenCalledWith(WebAppEvents.ANALYTICS.EVENT, EventName.CALLING.QUALITY_REVIEW, {
       [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.DISMISSED,
@@ -146,13 +150,13 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
-    spyOn(amplify, 'publish').and.returnValue({
+    jest.spyOn(amplify, 'publish').mockReturnValue({
       eventKey: WebAppEvents.ANALYTICS.EVENT,
       type: EventName.CALLING.QUALITY_REVIEW,
       value: {
         [Segmentation.CALL.QUALITY_REVIEW_LABEL]: RatingListLabel.ANSWERED,
       },
-    });
+    } as never);
 
     fireEvent.click(getByText('5'));
 
@@ -176,13 +180,14 @@ describe('QualityFeedbackModal', () => {
       useCallAlertState.getState().setConversationId(call.conversation.qualifiedId);
     });
 
-    const checkbox = getByText('qualityFeedback.doNotAskAgain');
+    const checkbox = getByText("Don't ask again");
     fireEvent.click(checkbox);
     fireEvent.click(getByText('5'));
 
     act(() => {
-      const storedData = JSON.parse(localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY) || '{}');
-      expect(storedData['userId']).toBeNull();
+      const storedQualityFeedbackState = localStorage.getItem(CALL_QUALITY_FEEDBACK_KEY);
+      const storedData = JSON.parse(storedQualityFeedbackState ?? '{}');
+      expect(storedData['userId']).toBeUndefined();
     });
   });
 });

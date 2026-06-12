@@ -17,8 +17,9 @@
  *
  */
 
-import {render, waitFor} from '@testing-library/react';
 import {act, ReactNode} from 'react';
+
+import {render, waitFor} from '@testing-library/react';
 
 import {CALL_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
@@ -40,9 +41,21 @@ import {CallingCell, CallingCellProps} from './CallingCell';
 
 import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
 
+const mockCallAlertState = {
+  clearShowAlert: jest.fn(),
+  showAlert: false,
+};
+
+jest.mock('Components/calling/useCallAlertState', () => ({
+  useCallAlertState: jest.fn(() => mockCallAlertState),
+}));
+
 jest.mock('Components/InViewport', () => ({
   InViewport: ({onVisible, children}: {onVisible: () => void; children: ReactNode}) => {
-    setTimeout(onVisible);
+    require('react').useEffect(() => {
+      onVisible();
+    }, [onVisible]);
+
     return <div>{children}</div>;
   },
   __esModule: true,
@@ -90,6 +103,10 @@ const createProps = async () => {
 describe('ConversationListCallingCell', () => {
   const rootContextValue = createRootContextValueForTest({});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
+  beforeEach(() => {
+    mockCallAlertState.clearShowAlert.mockClear();
+  });
 
   it('displays an incoming ringing call', async () => {
     const props = await createProps();

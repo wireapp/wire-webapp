@@ -265,6 +265,7 @@ export const CellsShareModal = (properties: CellsShareModalProps): ReactElement 
 
   return (
     <CellsShareModalContent
+      translate={translate}
       publicLinkDescription={translate(
         type === 'file'
           ? 'cells.shareModal.enablePublicLink.file.description'

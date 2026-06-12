@@ -23,7 +23,10 @@ import {Availability} from '@wireapp/protocol-messaging';
 
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {UserAvatar} from './UserAvatar';
 
@@ -171,7 +174,7 @@ describe('UserAvatar', () => {
       hideProfilePicture: true,
     };
 
-    const {queryByRole} = render(<UserAvatar {...props} />);
+    const {queryByRole} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     expect(queryByRole('img')).toBeNull();
   });
 
@@ -186,7 +189,7 @@ describe('UserAvatar', () => {
       hideProfilePicture: false,
     };
 
-    const {getByRole} = render(<UserAvatar {...props} />);
+    const {getByRole} = render(<UserAvatar {...props} />, {wrapper: rootProviderWrapper});
     expect(getByRole('img')).not.toBeNull();
   });
 

@@ -20,7 +20,10 @@
 import {render, fireEvent, act} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {PrimaryModalComponent} from './PrimaryModal';
 import {PrimaryModalType} from './PrimaryModalTypes';
@@ -84,6 +87,7 @@ describe('PrimaryModal', () => {
         jest.fn(),
         false,
         translate,
+        null,
       );
 
       expect(getSecondaryActionButton()).toHaveTextContent('translated:modalConfirmSecondary');
@@ -176,30 +180,41 @@ const renderPrimaryModal = (
   secondaryAction = () => {},
   hideCloseBtn = false,
   translate?: (translationKey: string) => string,
+  secondaryActionText: string | null = 'secondary-text',
 ) => {
   const {getByTestId, queryByTestId, getByLabelText} = render(withTheme(<PrimaryModalComponent />), {
     wrapper: rootProviderWrapper,
   });
   act(() => {
-    PrimaryModal.show(type, {
-      primaryAction: {
-        action: primaryAction,
-        text: 'test-text2',
+    PrimaryModal.show(
+      type,
+      {
+        primaryAction: {
+          action: primaryAction,
+          text: 'test-text2',
+        },
+        secondaryAction:
+          secondaryActionText === null
+            ? {
+                action: secondaryAction,
+              }
+            : {
+                action: secondaryAction,
+                text: secondaryActionText,
+              },
+        text: {
+          message: 'test-message',
+          title: 'test-title',
+          input: 'test-input',
+        },
+        hideCloseBtn,
+        copyPassword: true,
+        closeOnConfirm: true,
+        preventClose: false,
       },
-      secondaryAction: {
-        action: secondaryAction,
-        text: 'secondary-text',
-      },
-      text: {
-        message: 'test-message',
-        title: 'test-title',
-        input: 'test-input',
-      },
-      hideCloseBtn,
-      copyPassword: true,
-      closeOnConfirm: true,
-      preventClose: false,
-    }, undefined, translate);
+      undefined,
+      translate,
+    );
   });
 
   return {

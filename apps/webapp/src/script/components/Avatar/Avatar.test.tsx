@@ -21,8 +21,14 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {ServiceEntity} from 'Repositories/integration/ServiceEntity';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {Avatar} from './Avatar';
+
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
 
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {
@@ -30,11 +36,11 @@ describe('Avatar', () => {
     participant.name('Anton Bertha');
 
     const props = {
-      onAvatarClick: jasmine.createSpy(),
+      onAvatarClick: jest.fn(),
       participant,
     };
 
-    const {getByTestId} = render(<Avatar {...props} />);
+    const {getByTestId} = render(<Avatar {...props} />, {wrapper: rootProviderWrapper});
 
     const userAvatar = getByTestId('element-avatar-user');
     fireEvent.click(userAvatar);
@@ -47,7 +53,7 @@ describe('Avatar', () => {
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
-    const {getByTestId} = render(<Avatar participant={participant} />);
+    const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('element-avatar-temporary-guest')).not.toBeNull();
   });
 
@@ -55,7 +61,7 @@ describe('Avatar', () => {
     const participant = new ServiceEntity({id: 'id'});
     participant.name('Anton Bertha');
 
-    const {getByTestId} = render(<Avatar participant={participant} />);
+    const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('element-avatar-service')).not.toBeNull();
   });
 
@@ -67,7 +73,7 @@ describe('Avatar', () => {
     participant.name('Anton Bertha');
     participant.isService = true;
 
-    const {getByTestId} = render(<Avatar participant={participant} />);
+    const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('element-avatar-service')).not.toBeNull();
   });
 
@@ -75,7 +81,7 @@ describe('Avatar', () => {
     const participant = new User('id');
     participant.name('Anton Bertha');
 
-    const {getByTestId} = render(<Avatar participant={participant} />);
+    const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});
     expect(getByTestId('element-avatar-user')).not.toBeNull();
   });
 });

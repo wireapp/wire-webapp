@@ -17,7 +17,7 @@
  *
  */
 
-import {ComponentProps} from 'react';
+import {ComponentProps, useContext} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import is from '@sindresorhus/is';
@@ -43,7 +43,7 @@ import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClip
 import * as Icon from 'Components/icon';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import {RootContext, type RootContextValue} from 'src/script/page/RootProvider';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
@@ -106,6 +106,7 @@ interface CellsShareModalContentLabels {
 }
 
 interface CellsShareModalContentProps {
+  translate?: RootContextValue['translate'];
   publicLinkDescription: string;
   labels?: Partial<CellsShareModalContentLabels>;
   publicLink: {
@@ -149,9 +150,7 @@ const DEFAULT_SWITCH_COLORS: SwitchColorProps = {
   disabledColorDark: COLOR_V2.GRAY_60,
 };
 
-const getDefaultLabels = (
-  translate: ReturnType<typeof useApplicationContext>['translate'],
-): CellsShareModalContentLabels => ({
+const getDefaultLabels = (translate: RootContextValue['translate']): CellsShareModalContentLabels => ({
   enablePublicLink: translate('cells.shareModal.enablePublicLink'),
   password: translate('cells.shareModal.password'),
   passwordDescription: translate('cells.shareModal.password.description'),
@@ -178,6 +177,7 @@ const getDefaultLabels = (
 });
 
 export const CellsShareModalContent = ({
+  translate: explicitTranslate,
   publicLinkDescription,
   labels,
   publicLink,
@@ -187,7 +187,13 @@ export const CellsShareModalContent = ({
   styles,
   switchColors,
 }: CellsShareModalContentProps) => {
-  const {translate} = useApplicationContext();
+  const rootContextValue = useContext(RootContext);
+  const translate = explicitTranslate ?? rootContextValue?.translate;
+
+  if (!translate) {
+    throw new Error('RootContext has not been set');
+  }
+
   const resolvedLabels = {...getDefaultLabels(translate), ...labels};
   const hasPublicLink = is.nonEmptyString(publicLink.link);
   const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && hasPublicLink;

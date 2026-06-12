@@ -21,13 +21,14 @@ import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
 import {container} from 'tsyringe';
 import {omit} from 'underscore';
 
+import {generateConversation} from 'test/helper/ConversationGenerator';
+import {TestFactory} from 'test/helper/TestFactory';
+import {generateAPIUser} from 'test/helper/UserGenerator';
+
 import {User} from 'Repositories/entity/User';
 import {ClientEvent} from 'Repositories/event/Client';
 import {StorageService} from 'Repositories/storage';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {generateConversation} from 'test/helper/ConversationGenerator';
-import {TestFactory} from 'test/helper/TestFactory';
-import {generateAPIUser} from 'test/helper/UserGenerator';
 import {noop} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 import {WebWorker} from 'Util/worker';
@@ -38,8 +39,10 @@ import {BackupRepository} from './backupRepository';
 import {BackupService} from './backupService';
 import {CancelError, DifferentAccountError, IncompatiblePlatformError} from './error';
 import {createMetaData} from './legacyBackup.helper';
+import {preprocessEvents} from './recordPreprocessors';
 import {handleZipEvent} from './zipWorker';
 
+import {Config} from '../../Config';
 import {DatabaseTypes, createStorageEngine} from '../../service/storeEngineProvider';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
@@ -104,6 +107,14 @@ describe('BackupRepository', () => {
     jest.spyOn(WebWorker.prototype, 'post').mockImplementation(handleZipEvent as any);
   });
 
+  beforeEach(() => {
+    jest.spyOn(Config, 'getConfig').mockReturnValue({
+      FEATURE: {
+        ENABLE_CROSS_PLATFORM_BACKUP_EXPORT: false,
+      },
+    } as ReturnType<typeof Config.getConfig>);
+  });
+
   describe('createMetaData', () => {
     it('creates backup metadata', async () => {
       const [, {backupService}] = await buildBackupRepository();
@@ -128,9 +139,6 @@ describe('BackupRepository', () => {
     const eventStoreName = StorageSchemata.OBJECT_STORE.EVENTS;
 
     it('ignores verification events in the backup', async () => {
-      const user = new User('user1');
-      const password = '';
-      const [backupRepository, {storageService, backupService}] = await buildBackupRepository();
       const verificationEvent = {
         conversation: conversationId,
         type: ClientEvent.CONVERSATION.VERIFICATION,
@@ -139,18 +147,8 @@ describe('BackupRepository', () => {
         conversation: conversationId,
         type: ClientEvent.CONVERSATION.MESSAGE_ADD,
       };
-      const importSpy = jest.spyOn(backupService, 'importEntities');
 
-      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, '', verificationEvent);
-      await storageService.save(StorageSchemata.OBJECT_STORE.EVENTS, '', textEvent);
-      const blob = await backupRepository.generateHistory(user, 'client1', noop, password);
-
-      await backupRepository.importHistory(new User('user1'), blob, noop, noop);
-
-      expect(importSpy).toHaveBeenCalledWith(eventStoreName, [omit(textEvent, 'primary_key')], {
-        generateId: expect.any(Function),
-      });
-      expect(importSpy).not.toHaveBeenCalledWith(eventStoreName, [verificationEvent], expect.any(Object));
+      expect(preprocessEvents([verificationEvent, textEvent] as any)).toEqual([textEvent]);
     });
 
     it('cancels export', async () => {
@@ -159,12 +157,13 @@ describe('BackupRepository', () => {
       await Promise.all([
         ...messages.map(message => storageService.save(eventStoreName, '', message)),
         storageService.save('conversations', conversationId, conversation),
+        storageService.save(StorageSchemata.OBJECT_STORE.USERS, 'user-1', generateAPIUser()),
       ]);
 
       const exportPromise = backupRepository.generateHistory(new User(), 'client1', noop, password);
       backupRepository.cancelAction();
 
-      await expect(exportPromise).rejects.toThrow(jasmine.any(CancelError));
+      await expect(exportPromise).rejects.toThrow(CancelError);
     });
   });
 
@@ -279,9 +278,19 @@ describe('BackupRepository', () => {
       jest.spyOn(BackUpHeader.prototype, 'encodeHeader').mockImplementation(mockEncodeHeader);
       jest.spyOn(BackUpHeader.prototype, 'generateChaCha20Key').mockImplementation(mockGenerateChaCha20Key);
       jest.spyOn(BackUpHeader.prototype, 'readBackupHeader').mockImplementation(mockReadBackupHeader);
+      jest.spyOn(WebWorker.prototype, 'post').mockResolvedValue(new Uint8Array([1, 2, 3]));
 
       const [backupRepository] = await buildBackupRepository();
-      await backupRepository.generateHistory(user, clientId, noop, password);
+      await (backupRepository as any).compressHistoryFiles(
+        user,
+        clientId,
+        {
+          [StorageSchemata.OBJECT_STORE.CONVERSATIONS]: [conversation],
+          [StorageSchemata.OBJECT_STORE.EVENTS]: messages,
+          [StorageSchemata.OBJECT_STORE.USERS]: [generateAPIUser()],
+        },
+        password,
+      );
 
       // // Assert the expected function calls
       expect(mockEncodeHeader).toHaveBeenCalled();
@@ -298,14 +307,24 @@ describe('BackupRepository', () => {
       const clientId = 'ClientId';
       const user = new User('user1');
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
-      const mockGenerateChaCha20Key = jest.fn().mockImplementation(header => new Uint8Array(32));
+      const mockGenerateChaCha20Key = jest.fn().mockImplementation(_header => new Uint8Array(32));
 
       // Mock the behavior of BackUpHeader methods
       jest.spyOn(BackUpHeader.prototype, 'encodeHeader').mockImplementation(mockEncodeHeader);
       jest.spyOn(BackUpHeader.prototype, 'generateChaCha20Key').mockImplementation(mockGenerateChaCha20Key);
+      jest.spyOn(WebWorker.prototype, 'post').mockResolvedValue(new Uint8Array([1, 2, 3]));
 
       const [backupRepository] = await buildBackupRepository();
-      await backupRepository.generateHistory(user, clientId, noop, password);
+      await (backupRepository as any).compressHistoryFiles(
+        user,
+        clientId,
+        {
+          [StorageSchemata.OBJECT_STORE.CONVERSATIONS]: [conversation],
+          [StorageSchemata.OBJECT_STORE.EVENTS]: messages,
+          [StorageSchemata.OBJECT_STORE.USERS]: [generateAPIUser()],
+        },
+        password,
+      );
 
       // Assert the expected function calls
       expect(mockEncodeHeader).not.toHaveBeenCalled();
@@ -317,9 +336,19 @@ describe('BackupRepository', () => {
       const password = 'Password';
       const clientId = 'ClientId';
       const user = new User('user1');
+      jest.spyOn(WebWorker.prototype, 'post').mockResolvedValue(new Uint8Array([1, 2, 3]));
 
       const [backupRepository] = await buildBackupRepository();
-      const result = await backupRepository.generateHistory(user, clientId, noop, password);
+      const result = await (backupRepository as any).compressHistoryFiles(
+        user,
+        clientId,
+        {
+          [StorageSchemata.OBJECT_STORE.CONVERSATIONS]: [conversation],
+          [StorageSchemata.OBJECT_STORE.EVENTS]: messages,
+          [StorageSchemata.OBJECT_STORE.USERS]: [generateAPIUser()],
+        },
+        password,
+      );
 
       expect(result).toBeInstanceOf(Blob);
       expect(result.type).toBe('application/zip');
