@@ -78,7 +78,7 @@ export const ConversationCells = memo(
     const {fireAndForgetInvoker} = useApplicationContext();
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
 
-    const {getNodes, status: nodesStatus, getPagination, error: storeError} = useCellsStore();
+    const {getNodes, status: nodesStatus, getPagination, error: storeError, clearAll} = useCellsStore();
 
     const conversationId = activeConversation.id;
     const conversationQualifiedId = activeConversation.qualifiedId;
@@ -138,11 +138,12 @@ export const ConversationCells = memo(
       if (wasSearchViewOpen.current && !isSearchViewOpen) {
         // Search view just closed — reset any active search/filter and restore the
         // browse-mode dataset (handled by clearSearch's onClear callback → refresh).
+        clearAll({conversationId});
         clearAllFilters();
         clearSearch({preserveFilters: false});
       }
       wasSearchViewOpen.current = isSearchViewOpen;
-    }, [clearAllFilters, clearSearch, isSearchViewOpen]);
+    }, [clearAll, clearAllFilters, clearSearch, conversationId, isSearchViewOpen]);
 
     const handleRefresh = useCallback((): void => {
       if (isInSearchMode) {
