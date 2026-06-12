@@ -27,6 +27,14 @@ module.exports = {
   },
   transformIgnorePatterns: ['/node_modules/(?!(true-myth|p-timeout|p-cancelable|uuid)/)'],
   coverageDirectory: '../../coverage/libraries/api-client',
+  coverageThreshold: {
+    global: {
+      branches: 50,
+      functions: 40,
+      lines: 53,
+      statements: 53,
+    },
+  },
   testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
 };

@@ -19,7 +19,25 @@
 
 module.exports = {
   preset: '../../jest.preset.js',
-  collectCoverageFrom: ['src/**/*.{js,ts}', '!src/**/*.d.ts', '!src/**/*.test.{js,ts}'],
+  collectCoverageFrom: [
+    '*.{js,ts}',
+    'routes/**/*.{js,ts}',
+    'util/**/*.{js,ts}',
+    '!**/*.d.ts',
+    '!**/*.test.{js,ts}',
+    '!babel.config.js',
+    '!jest.config.js',
+    '!dist/**',
+    '!bin/**',
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 20,
+      functions: 13,
+      lines: 18,
+      statements: 18,
+    },
+  },
   moduleDirectories: ['node_modules', __dirname],
   testEnvironment: 'node',
   testPathIgnorePatterns: ['<rootDir>/dist'],

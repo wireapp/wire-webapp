@@ -78,8 +78,7 @@ graph LR
         G[nx.json]
         H[tsconfig.base.json]
         I[eslint.config.ts]
-        J[codecov.yml]
-        K[.github/labeler.yml]
+        J[.github/labeler.yml]
     end
 
     A --> E2
@@ -110,7 +109,6 @@ wire-webapp/
 ├── tsconfig.eslint.json # ESLint TypeScript config
 ├── eslint.config.ts     # ESLint 9+ flat config
 ├── jest.preset.js       # Shared Jest preset
-├── codecov.yml          # Codecov configuration
 ├── Jenkinsfile          # Jenkins deployment pipeline
 └── .nx/                # Nx cache & workspace data
     ├── cache/            # Local cache storage
@@ -132,7 +130,6 @@ wire-webapp/
 | [`jest.preset.js`](jest.preset.js) | Shared Jest configuration | ⭐⭐⭐ Critical |
 | [`eslint.config.ts`](eslint.config.ts) | ESLint 9+ flat config | ⭐⭐⭐ Critical |
 | [`package.json`](package.json) | Root package with workspaces | ⭐⭐⭐ Critical |
-| [`codecov.yml`](codecov.yml) | Codecov coverage configuration | ⭐⭐⭐ Critical |
 | [`.github/labeler.yml`](.github/labeler.yml) | PR auto-labeling | ⭐⭐ High |
 
 ### Project-Specific Files
@@ -308,60 +305,9 @@ The `typesVersions` field is a TypeScript feature that maps type resolution path
 
 Without `typesVersions`, consumers would get type errors or no IntelliSense when importing subpaths like `@wireapp/core/lib/connection`.
 
-### [`codecov.yml`](codecov.yml) - Coverage Configuration
+### Jest/Nx Coverage Configuration
 
-```yaml
-codecov:
-  require_ci_to_pass: yes
-
-  coverage:
-    precision: 2
-    round: down
-    range: '45...80'
-    status:
-      project:
-        default:
-          target: auto
-        app_webapp:
-          target: auto
-          flags:
-            - app_webapp
-        app_server:
-          target: auto
-          flags:
-            - app_server
-        lib_core:
-          target: auto
-          flags:
-            - lib_core
-        lib_api_client:
-          target: auto
-          flags:
-            - lib_api_client
-
-  flags:
-    app_webapp:
-      paths:
-        - 'apps/webapp/**'
-      carryforward: false
-    app_server:
-      paths:
-        - 'apps/server/**'
-      carryforward: true
-    lib_core:
-      paths:
-        - 'libraries/core/**'
-      carryforward: true
-    lib_api_client:
-      paths:
-        - 'libraries/api-client/**'
-      carryforward: true
-
-  github_checks:
-    annotations: false
-```
-
-**Note:** The `lib_config` library does not have a separate Codecov flag as it is a smaller utility library. Its coverage is tracked through the default project coverage.
+Project Jest configs define `coverageThreshold` for CI coverage enforcement. The `ci` test target in each covered Nx project enables coverage and keeps `text`, `lcov`, and `html` reporters so GitHub Actions logs show a coverage table and the workflow can upload browsable coverage artifacts.
 
 ### [`.github/labeler.yml`](.github/labeler.yml) - PR Auto-Labeling
 
@@ -410,7 +356,7 @@ codecov:
 | [`apps/new-app/tsconfig.json`](apps/new-app/tsconfig.json) | **Create** | TypeScript config |
 | [`tsconfig.json`](tsconfig.json) | **Modify** | Add project reference |
 | [`tsconfig.eslint.json`](tsconfig.eslint.json) | **Modify** | Add to include array |
-| [`codecov.yml`](codecov.yml) | **Modify** | Add new flag for coverage |
+| [`apps/new-app/jest.config.js`](apps/new-app/jest.config.js) | **Create/Modify** | Configure project coverage thresholds when tests are added |
 | [`.github/labeler.yml`](.github/labeler.yml) | **Modify** | Add app label rule |
 
 #### For a New Library (e.g., `libraries/new-lib`)
@@ -423,7 +369,7 @@ codecov:
 | [`tsconfig.json`](tsconfig.json) | **Modify** | Add project reference |
 | [`tsconfig.eslint.json`](tsconfig.eslint.json) | **Modify** | Add to include array & paths |
 | [`tsconfig.base.json`](tsconfig.base.json) | **Modify** | Add path mapping (optional) |
-| [`codecov.yml`](codecov.yml) | **Modify** | Add new flag for coverage |
+| [`libraries/new-lib/jest.config.js`](libraries/new-lib/jest.config.js) | **Create/Modify** | Configure project coverage thresholds when tests are added |
 | [`.github/labeler.yml`](.github/labeler.yml) | **Modify** | Add library label rule |
 
 ### Example: New Library `libraries/ui-kit`
@@ -522,23 +468,17 @@ codecov:
 }
 ```
 
-**Step 5: Update [`codecov.yml`](codecov.yml)**
+**Step 5: Add coverage thresholds to `libraries/ui-kit/jest.config.js` when tests are added**
 
-```yaml
-flags:
-  # ... existing flags
-  lib_ui_kit:
-    paths:
-      - 'libraries/ui-kit/**'
-    carryforward: true
-
-status:
-  project:
-    # ... existing projects
-    lib_ui_kit:
-      target: auto
-      flags:
-        - lib_ui_kit
+```js
+coverageThreshold: {
+  global: {
+    branches: 80,
+    functions: 80,
+    lines: 80,
+    statements: 80,
+  },
+},
 ```
 
 **Step 6: Update [`.github/labeler.yml`](.github/labeler.yml)**
@@ -1738,34 +1678,26 @@ nx show project webapp
 | [`precommit.yml`](.github/workflows/precommit.yml) | `nx run webapp:configure`, `nx run server:package` |
 | [`publish-and-deploy-webapp.yml`](.github/workflows/publish-and-deploy-webapp.yml) | `nx run webapp:configure`, `nx run-many -t test --all`, `nx run server:package` |
 
-### Codecov Upload in CI
+### Coverage in CI
 
 From [`.github/workflows/ci.yml`](.github/workflows/ci.yml):
 
 ```yaml
-- name: Upload webapp coverage to Codecov
-  uses: codecov/codecov-action@v5.5.2
-  with:
-    fail_ci_if_error: false
-    files: ./apps/webapp/coverage/lcov.info
-    flags: app_webapp
-    token: ${{ secrets.CODECOV_TOKEN }}
+- name: Test
+  run: ./bin/run-with-network-isolation.sh ./bin/yarn nx run-many -t test --all --configuration=ci --detectOpenHandles=false
 
-- name: Upload server coverage to Codecov
-  uses: codecov/codecov-action@v5.5.2
+- name: Upload coverage reports
+  if: always()
+  uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
   with:
-    fail_ci_if_error: false
-    files: ./apps/server/coverage/lcov.info
-    flags: app_server
-    token: ${{ secrets.CODECOV_TOKEN }}
-
-- name: Upload core library coverage to Codecov
-  uses: codecov/codecov-action@v5.5.2
-  with:
-    fail_ci_if_error: false
-    files: ./coverage/libraries/core/lcov.info
-    flags: lib_core
-    token: ${{ secrets.CODECOV_TOKEN }}
+    name: coverage-reports
+    if-no-files-found: warn
+    retention-days: 14
+    path: |
+      apps/webapp/coverage
+      apps/server/coverage
+      coverage/libraries/core
+      coverage/libraries/api-client
 ```
 
 ### Common Nx CI Patterns
@@ -1931,7 +1863,7 @@ nx run-many -t test --projects=tag:lib
 4. **Add projects to [`tsconfig.json`](tsconfig.json)** - Project references are required
 5. **Update [`tsconfig.eslint.json`](tsconfig.eslint.json)** - For type-aware linting to work
 6. **Use `workspace:^`** - For local workspace dependencies in package.json
-7. **Update [`codecov.yml`](codecov.yml)** - Add new flags for new libraries/apps
+7. **Configure Jest coverage thresholds** - Add realistic project-local baselines when new libraries/apps add tests
 8. **Update [`.github/labeler.yml`](.github/labeler.yml)** - Add label rules for new projects
 9. **Check `nx graph`** - Visualize dependencies before making changes
 10. **CI uses Nx** - All GitHub workflows use Nx commands

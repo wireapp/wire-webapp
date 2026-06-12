@@ -106,13 +106,13 @@ After updating the environment variables, the app will be available at the corre
 
 ## Testing
 
-[![codecov](https://codecov.io/gh/wireapp/wire-webapp/branch/dev/graph/badge.svg?token=9ELBEPM793)](https://codecov.io/gh/wireapp/wire-webapp)
-
 To launch the full test suite:
 
 ```bash
 ./bin/yarn nx run-many -t test --all
 ```
+
+CI runs the Nx/Jest test targets with `--configuration=ci`, which generates coverage, prints the coverage table to the GitHub Actions logs, and fails the `Test` step when project coverage drops below the configured Jest thresholds. Coverage reports are also uploaded as a GitHub Actions artifact for inspection.
 
 Other useful tasks:
 

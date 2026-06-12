@@ -54,7 +54,7 @@ Before:                    After:
 
 6. **CI/CD Updates**
    - Update all GitHub workflows to use Nx commands
-   - Update Codecov configuration for new coverage paths
+   - Update coverage output paths for Nx project layouts
    - Update Jenkinsfile for Nx-based builds
 
 ## Consequences
