@@ -24,7 +24,6 @@ import {APIClient} from './apiClientSingleton';
 describe('APIClientSingleton', () => {
   it('configures wire client metadata headers for backend requests', () => {
     const apiClient = new APIClient({
-      isReliableWebsocketConnectionEnabled: false,
       wallClock: createDeterministicWallClock(),
     });
 
@@ -40,7 +39,6 @@ describe('APIClientSingleton', () => {
 
   it('uses the incremental http retry backoff http client by default', () => {
     const apiClient = new APIClient({
-      isReliableWebsocketConnectionEnabled: false,
       wallClock: createDeterministicWallClock(),
     });
 

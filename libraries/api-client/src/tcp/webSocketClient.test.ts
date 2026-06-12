@@ -77,7 +77,6 @@ function createWebSocketClient(
   client: ConstructorParameters<typeof WebSocketClient>[1],
 ): WebSocketClient {
   return new WebSocketClient(baseUrl, client, {
-    isReliableWebsocketConnectionEnabled: true,
     wallClock: testWallClock,
   });
 }

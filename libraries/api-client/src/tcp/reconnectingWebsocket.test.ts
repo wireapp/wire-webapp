@@ -197,7 +197,6 @@ describe('ReconnectingWebsocket', () => {
   };
   const defaultReconnectingWebsocketTestOptions = {
     backFromSleepHandler: Maybe.nothing(),
-    isReliableWebsocketConnectionEnabled: true,
     pingInterval: Maybe.nothing<number>(),
     wallClock: testWallClock,
     websocketFactory: Maybe.nothing(),
@@ -854,7 +853,6 @@ describe('ReconnectingWebsocket', () => {
       const customInterval = 10000;
       const RWS = createRWS(onReconnect, {
         backFromSleepHandler: Maybe.nothing(),
-        isReliableWebsocketConnectionEnabled: true,
         pingInterval: Maybe.just(customInterval),
         wallClock: testWallClock,
         websocketFactory: Maybe.nothing(),
@@ -1052,7 +1050,6 @@ describe('ReconnectingWebsocket', () => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect, {
         backFromSleepHandler: Maybe.nothing(),
-        isReliableWebsocketConnectionEnabled: true,
         pingInterval: Maybe.just(200),
         wallClock: testWallClock,
         websocketFactory: Maybe.nothing(),
@@ -1075,7 +1072,6 @@ describe('ReconnectingWebsocket', () => {
       const onReconnect = jest.fn().mockReturnValue(getServerAddress());
       const RWS = createRWS(onReconnect, {
         backFromSleepHandler: Maybe.nothing(),
-        isReliableWebsocketConnectionEnabled: true,
         pingInterval: Maybe.just(100),
         wallClock: testWallClock,
         websocketFactory: Maybe.nothing(),

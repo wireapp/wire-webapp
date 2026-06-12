@@ -33,15 +33,13 @@ type RetryBackoffResettableHttpClient = {
 };
 
 type APIClientProperties = {
-  readonly isReliableWebsocketConnectionEnabled: boolean;
   readonly wallClock: WallClock;
 };
 
 @singleton()
 export class APIClient extends APIClientUnconfigured {
   constructor(
-    {isReliableWebsocketConnectionEnabled, wallClock}: APIClientProperties = {
-      isReliableWebsocketConnectionEnabled: false,
+    {wallClock}: APIClientProperties = {
       wallClock: createWallClock(),
     },
   ) {
@@ -57,7 +55,6 @@ export class APIClient extends APIClientUnconfigured {
         rest: webAppConfiguration.BACKEND_REST,
         ws: webAppConfiguration.BACKEND_WS,
       },
-      isReliableWebsocketConnectionEnabled,
       wallClock,
     };
 

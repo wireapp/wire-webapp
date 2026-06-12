@@ -116,7 +116,6 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
 
     new ReconnectingWebsocket(jest.fn(), {
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
-      isReliableWebsocketConnectionEnabled: true,
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
       websocketFactory: Maybe.nothing(),
@@ -126,35 +125,11 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     expect(getLatestBackFromSleepRegistration(registrations)).not.toHaveProperty('isDisconnected');
   });
 
-  it('registers onBackFromSleep with an isDisconnected gate when reliable websocket connection is disabled', () => {
-    const {backFromSleepHandler, registrations} = createBackFromSleepHandlerTestDependencies();
-
-    new ReconnectingWebsocket(jest.fn(), {
-      backFromSleepHandler: Maybe.just(backFromSleepHandler),
-      isReliableWebsocketConnectionEnabled: false,
-      pingInterval: Maybe.nothing(),
-      wallClock: createTestWallClock(0),
-      websocketFactory: Maybe.nothing(),
-    });
-
-    const registration = getLatestBackFromSleepRegistration(registrations);
-
-    expect(backFromSleepHandler).toHaveBeenCalledTimes(1);
-    expect(registration).toHaveProperty('isDisconnected');
-
-    if (!('isDisconnected' in registration)) {
-      throw new Error('Expected onBackFromSleep to be registered with an isDisconnected gate');
-    }
-
-    expect(registration.isDisconnected()).toBe(true);
-  });
-
   it('reconnects in place when back from sleep is detected while the socket is OPEN', () => {
     const {backFromSleepHandler, registrations} = createBackFromSleepHandlerTestDependencies();
     const socket = createMockSocket(WEBSOCKET_STATE.OPEN);
     const websocket = new ReconnectingWebsocket(jest.fn(), {
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
-      isReliableWebsocketConnectionEnabled: true,
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
       websocketFactory: Maybe.just(() => {
@@ -176,7 +151,6 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const socket = createMockSocket(WEBSOCKET_STATE.CLOSED);
     const websocket = new ReconnectingWebsocket(jest.fn(), {
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
-      isReliableWebsocketConnectionEnabled: true,
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
       websocketFactory: Maybe.just(() => {
@@ -195,7 +169,6 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const {backFromSleepHandler, registrations} = createBackFromSleepHandlerTestDependencies();
     new ReconnectingWebsocket(jest.fn(), {
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
-      isReliableWebsocketConnectionEnabled: true,
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
       websocketFactory: Maybe.nothing(),
@@ -209,7 +182,6 @@ describe('ReconnectingWebsocket back from sleep handling', () => {
     const socket = createMockSocket(WEBSOCKET_STATE.OPEN);
     const websocket = new ReconnectingWebsocket(jest.fn(), {
       backFromSleepHandler: Maybe.just(backFromSleepHandler),
-      isReliableWebsocketConnectionEnabled: true,
       pingInterval: Maybe.nothing(),
       wallClock: createTestWallClock(0),
       websocketFactory: Maybe.just(() => {

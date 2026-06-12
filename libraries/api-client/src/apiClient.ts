@@ -83,7 +83,6 @@ enum TOPIC {
 }
 
 const defaultConfig = {
-  isReliableWebsocketConnectionEnabled: false,
   wallClock: {
     clearInterval: globalThis.clearInterval.bind(globalThis),
     clearTimeout: globalThis.clearTimeout.bind(globalThis),
@@ -107,7 +106,6 @@ export interface APIClient {
 }
 
 export type APIClientConfiguration = {
-  readonly isReliableWebsocketConnectionEnabled: boolean;
   readonly wallClock: ReconnectingWebsocketWallClock;
 };
 
@@ -208,7 +206,6 @@ export class APIClient extends EventEmitter {
 
     const httpClient = new HttpClient(this.config, this.accessTokenStore);
     const webSocket = new WebSocketClient(this.config.urls.ws, httpClient, {
-      isReliableWebsocketConnectionEnabled: this.config.isReliableWebsocketConnectionEnabled,
       wallClock: this.config.wallClock,
     });
 

@@ -153,7 +153,6 @@ describe('Login util', () => {
       navigate = jest.fn();
       loginWithSSO = jest.fn().mockResolvedValue(undefined);
       apiClient = new APIClient({
-        isReliableWebsocketConnectionEnabled: false,
         wallClock: createDeterministicWallClock(),
       });
       jest.spyOn(ROOT_ACTIONS.authAction, 'pushAccountRegistrationData').mockImplementation(() => {

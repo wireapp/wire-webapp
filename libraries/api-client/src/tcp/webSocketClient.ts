@@ -63,7 +63,6 @@ export interface WebSocketClient {
 export type OnConnect = (abortHandler: AbortController) => void;
 
 export type WebSocketClientOptions = {
-  readonly isReliableWebsocketConnectionEnabled: boolean;
   readonly wallClock: ReconnectingWebsocketWallClock;
 };
 
@@ -94,7 +93,6 @@ export class WebSocketClient extends EventEmitter {
     this.isRefreshingAccessToken = false;
     this.socket = new ReconnectingWebsocket(this.onReconnect, {
       backFromSleepHandler: Maybe.nothing(),
-      isReliableWebsocketConnectionEnabled: options.isReliableWebsocketConnectionEnabled,
       pingInterval: Maybe.nothing(),
       wallClock: options.wallClock,
       websocketFactory: Maybe.nothing(),
