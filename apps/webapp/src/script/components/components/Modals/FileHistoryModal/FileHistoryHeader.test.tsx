@@ -19,6 +19,7 @@
 
 import {render, screen, fireEvent} from '@testing-library/react';
 
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileHistoryHeader} from './FileHistoryHeader';
@@ -27,7 +28,7 @@ import {useFileHistoryModal} from './hooks/useFileHistoryModal';
 jest.mock('./hooks/useFileHistoryModal');
 
 const mockedUseFileHistoryModal = jest.mocked(useFileHistoryModal);
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('FileHistoryHeader', () => {
   const mockHideModal = jest.fn();

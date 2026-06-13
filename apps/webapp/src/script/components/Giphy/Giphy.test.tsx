@@ -21,6 +21,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 
 import {GiphyRepository} from 'Repositories/extension/GiphyRepository';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {Giphy, GiphyState} from '.';
@@ -33,7 +34,7 @@ const getDefaultProps = () => ({
 });
 
 const closeButtonId = 'do-close-giphy-modal';
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('Giphy', () => {
   it('rendered modal', async () => {

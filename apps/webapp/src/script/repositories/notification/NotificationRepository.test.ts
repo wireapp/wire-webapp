@@ -19,6 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 import {NotificationPreference} from '@wireapp/api-client/lib/user/data';
 import {amplify} from 'amplify';
@@ -67,8 +68,9 @@ import {truncate} from 'Util/stringUtil';
 import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
 
-function buildNotificationRepository(translate: Translate = translateForTest) {
+function buildNotificationRepository(translate: Translate) {
   const userState = container.resolve(UserState);
   const notificationRepository = new NotificationRepository(
     {} as any,
@@ -110,7 +112,7 @@ describe('NotificationRepository', () => {
   });
 
   beforeEach(() => {
-    [notificationRepository] = buildNotificationRepository();
+    [notificationRepository] = buildNotificationRepository(translateForTest);
     amplify.publish(WebAppEvents.EVENT.NOTIFICATION_HANDLING_STATE, NOTIFICATION_HANDLING_STATE.WEB_SOCKET);
 
     // Create entities
@@ -789,7 +791,7 @@ describe('NotificationRepository', () => {
       selfUserEntity.isMe = true;
       selfUserEntity.teamId = createUuid();
 
-      conversationEntity = new Conversation(createUuid());
+      conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.selfUser(selfUserEntity);
 
       messageEntity = new ContentMessage(createUuid(), translateForTest);

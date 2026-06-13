@@ -28,13 +28,14 @@ import {
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 
 import {ChooseScreen} from './ChooseScreen';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Util/modalFocusUtil', () => ({
   captureModalFocusContext: jest.fn(),
 }));
 
 describe('ChooseScreen', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
   const screens = [
     {
       id: 'screen:first',

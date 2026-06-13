@@ -20,6 +20,7 @@
 import {render} from '@testing-library/react';
 
 import {Conversation} from 'Repositories/entity/Conversation';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
@@ -52,7 +53,7 @@ const allButtonTitles = [
   'extensionsBubbleButtonGif',
 ];
 
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('ControlButtons', () => {

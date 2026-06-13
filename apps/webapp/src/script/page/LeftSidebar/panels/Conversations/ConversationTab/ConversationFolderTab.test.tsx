@@ -22,12 +22,15 @@ import {render} from '@testing-library/react';
 import * as Icon from 'Components/icon';
 import {createLabel, LabelType} from 'Repositories/conversation/ConversationLabelRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {ConversationFolderTab} from './ConversationFolderTab';
 
 import {SidebarTabs} from '../useSidebarStore';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const getProps = async (conversations: Conversation[] = []) => {
   const testFactory = new TestFactory();
@@ -52,7 +55,7 @@ const getProps = async (conversations: Conversation[] = []) => {
 };
 
 describe('ConversationFolderTab', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
   it('should render empty folders list', async () => {
     const {props} = await getProps();
     const {getByText} = render(<ConversationFolderTab {...props} />, {wrapper: rootProviderWrapper});
@@ -61,10 +64,10 @@ describe('ConversationFolderTab', () => {
   });
 
   it('should list custom folders only', async () => {
-    const favoriteConversation = new Conversation('id', 'domain');
+    const favoriteConversation = createConversationForTest('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     favoriteConversation.name('favoriteConversation');
 
-    const customFolderConversation = new Conversation('id2', 'domain2');
+    const customFolderConversation = createConversationForTest('id2', 'domain2', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     customFolderConversation.name('customFolderConversation');
 
     const {props, conversationRepository} = await getProps([favoriteConversation, customFolderConversation]);

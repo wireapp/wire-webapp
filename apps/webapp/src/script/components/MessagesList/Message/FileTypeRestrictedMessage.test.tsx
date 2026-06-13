@@ -20,11 +20,12 @@
 import {render} from '@testing-library/react';
 
 import {FileTypeRestrictedMessage as FileTypeRestrictedMessageEntity} from 'Repositories/entity/message/FileTypeRestrictedMessage';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {FileTypeRestrictedMessage} from './FileTypeRestrictedMessage';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const createFileTypeRestrictedMessage = (
   partialFileTypeRestrictedMessage: Partial<FileTypeRestrictedMessageEntity>,

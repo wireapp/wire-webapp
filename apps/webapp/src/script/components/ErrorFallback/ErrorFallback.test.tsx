@@ -20,11 +20,12 @@
 import {render} from '@testing-library/react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ErrorFallback} from './ErrorFallback';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('ErrorFallback', () => {
   it('Correctly prints the error', () => {

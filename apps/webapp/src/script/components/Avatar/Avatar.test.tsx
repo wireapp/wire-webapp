@@ -27,8 +27,9 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {Avatar} from './Avatar';
+import {translateForTest} from 'Util/test/translateForTest';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {

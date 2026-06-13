@@ -25,9 +25,10 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TextMessageRenderer} from './TextMessageRenderer';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('TextMessageRenderer', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
   it('renders a text message', () => {
     const onClickElement = jest.fn();

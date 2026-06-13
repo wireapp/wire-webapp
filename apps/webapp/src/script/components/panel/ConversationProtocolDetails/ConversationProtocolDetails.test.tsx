@@ -22,11 +22,12 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Ciphersuite} from '@wireapp/core';
 
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ConversationProtocolDetails} from './ConversationProtocolDetails';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('ConversationProtocolDetails', () => {
   it('renders the correct infos for the conversation with mls protocol', () => {

@@ -25,7 +25,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 
 import {EphemeralTimer} from './EphemeralTimer';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('EphemeralTimer', () => {
   it('shows the icon', () => {

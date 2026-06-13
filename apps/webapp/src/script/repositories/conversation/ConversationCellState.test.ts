@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CallMessage} from 'Repositories/entity/message/CallMessage';
@@ -34,10 +35,11 @@ import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
 
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {
-    const conversationEntity = new Conversation(createUuid());
+    const conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
@@ -64,7 +66,7 @@ describe('ConversationCellState', () => {
   });
 
   describe('Second line description for conversations', () => {
-    const conversationEntity = new Conversation(createUuid());
+    const conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;

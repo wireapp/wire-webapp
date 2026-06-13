@@ -20,6 +20,7 @@
 import {render} from '@testing-library/react';
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {CONVERSATION_READONLY_STATE} from 'Repositories/conversation/ConversationRepository';
@@ -28,13 +29,15 @@ import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const generateConversation = (
   readOnlyState: CONVERSATION_READONLY_STATE | null = null,
   is1To1WithBlockedUser = false,
   userName = 'John Doe',
 ) => {
-  const conversation = new Conversation();
+  const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
   conversation.readOnlyState(readOnlyState);
 

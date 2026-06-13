@@ -31,6 +31,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {MultipartAssets} from './MultipartAssets';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Hooks/useInView/useInView', () => ({
   useInView: (): {elementRef: {current: null}; hasBeenInView: boolean} => ({
@@ -65,7 +66,7 @@ type RenderMultipartAssetsProperties = {
 describe('MultipartAssets', () => {
   let mockCellsRepository: jest.Mocked<CellsRepository>;
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker});
+  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeEach(() => {

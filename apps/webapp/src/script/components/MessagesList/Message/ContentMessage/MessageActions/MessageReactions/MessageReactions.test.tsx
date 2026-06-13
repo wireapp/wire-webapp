@@ -30,11 +30,12 @@ import {translate} from 'Util/localizerUtil';
 import {MessageReactions, MessageReactionsProps} from './MessageReactions';
 
 import {MessageActionsId} from '../MessageActions';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const thumbsUpEmoji = '👍';
 const likeEmoji = '❤️';
 const wrapperRef = React.createRef<HTMLDivElement>();
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 const defaultProps: MessageReactionsProps = {
   handleReactionClick: jest.fn(),
   messageFocusedTabIndex: 0,

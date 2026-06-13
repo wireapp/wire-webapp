@@ -29,6 +29,7 @@ import {
 
 import {TeamCreationModal} from './TeamCreationModal';
 import {useTeamCreationModal} from './useTeamCreationModal';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Repositories/team/TeamService');
 jest.mock('@wireapp/react-ui-kit', () => {
@@ -55,7 +56,7 @@ describe('TeamCreationModal', () => {
   const onCloseMock = jest.fn();
   const onSuccessMock = jest.fn();
   const userName = 'testUser';
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   const renderTeamCreationModal = () => {

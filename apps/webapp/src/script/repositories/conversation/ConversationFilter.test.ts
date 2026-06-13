@@ -31,11 +31,13 @@ import {ConversationFilter} from './ConversationFilter';
 import {ConversationDatabaseData, ConversationMapper} from './ConversationMapper';
 import {ConversationStatus} from './ConversationStatus';
 import {ConversationVerificationState} from './ConversationVerificationState';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ConversationFilter', () => {
   describe('showCallControls', () => {
     it('defines when to show audio/video call buttons in the UI', () => {
-      const conversationEntity = new Conversation();
+      const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       const showCallControls = ConversationFilter.showCallControls(conversationEntity, false);
       expect(showCallControls).toBeFalsy();
     });

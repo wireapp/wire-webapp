@@ -34,7 +34,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {FileAsset as FileAssetComponent} from './FileAsset';
 
 describe('FileAssetComponent', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
   function mockContentMessage(): ContentMessage {
     const asset = new FileAsset();

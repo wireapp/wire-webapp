@@ -31,7 +31,7 @@ import {UserState} from './userState';
 const mockCryptoPwhashStr = jest.fn();
 const mockCryptoPwhashStrVerify = jest.fn();
 
-const createAppLockRepository = (translate: Translate = translateForTest): AppLockRepository => {
+const createAppLockRepository = (translate: Translate): AppLockRepository => {
   const userState = new UserState();
   const appLockState = new AppLockState();
   const appLockCrypto: AppLockCrypto = {
@@ -57,7 +57,7 @@ describe('AppLockRepository', () => {
   });
 
   it('stores the pwhash output directly when libsodium returns a string', async () => {
-    const repository = createAppLockRepository();
+    const repository = createAppLockRepository(translateForTest);
     const storedHash = '$argon2id$mocked';
     mockCryptoPwhashStr.mockReturnValue(storedHash);
 
@@ -67,7 +67,7 @@ describe('AppLockRepository', () => {
   });
 
   it('throws when libsodium returns a non-string hash', async () => {
-    const repository = createAppLockRepository();
+    const repository = createAppLockRepository(translateForTest);
     const hashedBytes = new Uint8Array([1, 2, 3]);
     mockCryptoPwhashStr.mockReturnValue(hashedBytes);
 

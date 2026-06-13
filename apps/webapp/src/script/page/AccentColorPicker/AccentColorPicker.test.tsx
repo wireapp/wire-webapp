@@ -23,11 +23,12 @@ import ko from 'knockout';
 import {AccentColor} from '@wireapp/commons';
 
 import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {AccentColorPicker, AccentColorPickerProps} from './AccentColorPicker';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('AccentColorPicker', () => {
   it('shows expected accent colors', async () => {

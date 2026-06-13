@@ -24,7 +24,6 @@ import {noop} from 'noop-esm';
 import {FireAndForgetInvoker} from '@wireapp/core';
 
 import type {Translate} from 'Util/localizerUtil';
-import {translateForTest} from 'Util/test/translateForTest';
 
 import {WallClock, createWallClock} from '../../clock/wallClock';
 import {StartupFeatureToggleName} from '../../featureToggles/startupFeatureToggles';
@@ -36,7 +35,7 @@ type CreateRootContextValueForTestParameters = {
   readonly fireAndForgetInvoker?: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled?: (featureName: StartupFeatureToggleName) => boolean;
   readonly mainViewModel?: MainViewModel;
-  readonly translate?: Translate;
+  readonly translate: Translate;
   readonly wallClock?: WallClock;
 };
 
@@ -96,7 +95,7 @@ export function createRootContextValueForTest(parameters: CreateRootContextValue
     fireAndForgetInvoker = createFireAndForgetInvokerForTest(),
     isFeatureToggleEnabled = isFeatureToggleDisabledForTest,
     mainViewModel = createMainViewModelForTest(),
-    translate = translateForTest,
+    translate,
     wallClock = createWallClock(),
   } = parameters;
 

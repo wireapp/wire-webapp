@@ -4,6 +4,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {CONVERSATION_PROTOCOL, FEATURE_STATUS} from '@wireapp/api-client/lib/team/feature/';
 import ko from 'knockout';
 import {container} from 'tsyringe';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {
   createRootContextValueForTest,
@@ -18,7 +19,7 @@ type TeamStateDateSet = {
 };
 
 describe('Preference', () => {
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeEach(() => {

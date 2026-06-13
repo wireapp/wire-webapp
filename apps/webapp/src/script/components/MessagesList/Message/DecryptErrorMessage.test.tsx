@@ -23,11 +23,12 @@ import {ProteusErrors} from '@wireapp/core/lib/messagingProtocols/proteus';
 
 import {DecryptErrorMessage as DecryptErrorMessageEntity} from 'Repositories/entity/message/DecryptErrorMessage';
 import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {DecryptErrorMessage} from './DecryptErrorMessage';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 function createError(code: number) {
   const error = new DecryptErrorMessageEntity('client', code);

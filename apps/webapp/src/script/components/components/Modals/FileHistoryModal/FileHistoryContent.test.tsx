@@ -20,26 +20,18 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {FileHistoryContent} from './FileHistoryContent';
 import {FileVersion} from './types';
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string, replacements?: Record<string, string>) => {
-    if (replacements) {
-      let result = key;
-      Object.entries(replacements).forEach(([replaceKey, value]) => {
-        result = result.replace(new RegExp(`\\{${replaceKey}\\}`, 'g'), value);
-      });
-      return result;
-    }
-    return key;
-  },
-}));
-
 describe('FileHistoryContent', () => {
   const mockHandleDownload = jest.fn().mockResolvedValue(undefined);
   const mockHandleRestore = jest.fn();
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
 
   const mockFileVersions: Record<string, FileVersion[]> = {
     '8 Dec 2023': [
@@ -82,6 +74,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     expect(screen.getByText('8 Dec 2023')).toBeInTheDocument();
@@ -97,6 +90,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     expect(screen.getByText(/10:30 AM/)).toBeInTheDocument();
@@ -116,6 +110,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     // Check that 'current' label appears - text is split by whitespace so use partial matching
@@ -134,6 +129,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     const downloadButtons = screen.getAllByText('cells.versionHistory.download');
@@ -149,6 +145,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     const restoreButtons = screen.getAllByText('cells.versionHistory.restore');
@@ -165,6 +162,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     // All versions should have download buttons
@@ -185,6 +183,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     const downloadButtons = screen.getAllByText('cells.versionHistory.download');
@@ -215,6 +214,7 @@ describe('FileHistoryContent', () => {
       withTheme(
         <FileHistoryContent fileVersions={{}} handleDownload={mockHandleDownload} handleRestore={mockHandleRestore} />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     const dateHeadings = container.querySelectorAll('h3');
@@ -230,6 +230,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     // Check that download buttons have aria-labels
@@ -253,6 +254,7 @@ describe('FileHistoryContent', () => {
           handleRestore={mockHandleRestore}
         />,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     // Check that restore buttons have aria-labels

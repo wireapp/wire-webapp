@@ -30,12 +30,15 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {KEY} from 'Util/keyboardUtil';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
 
@@ -44,17 +47,17 @@ jest.mock('@wireapp/react-ui-kit', () => ({
   useMatchMedia: jest.fn(),
 }));
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
-    const conversation = new Conversation();
+    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User('');
     selfUser.isMe = true;
     const call = new Call(
       {domain: '', id: ''},
-      new Conversation('', ''),
+      createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
       0,
       new Participant(selfUser, ''),
       0,

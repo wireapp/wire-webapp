@@ -59,7 +59,6 @@ import tr from 'I18n/tr-TR.json';
 import uk from 'I18n/uk-UA.json';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {Participant} from 'Repositories/calling/Participant';
-import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
 import {BackgroundEffectsController} from 'Repositories/media/backgroundEffects/backgroundEffectsController';
 import {BackgroundEffectsHandler} from 'Repositories/media/backgroundEffectsHandler';
@@ -69,6 +68,8 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from 'Util/localizerUtil';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {mapLanguage} from '../../localeConfig';
@@ -174,7 +175,7 @@ export const createConversation = (
   conversationId: QualifiedId = {id: createUuid(), domain: ''},
   groupId = 'group-id',
 ) => {
-  const conversation = new Conversation(conversationId.id, conversationId.domain, protocol);
+  const conversation = createConversationForTest(conversationId.id, conversationId.domain, protocol, translateForTest);
   conversation.participating_user_ets.push(new User(createUuid()));
   conversation.type(type);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {

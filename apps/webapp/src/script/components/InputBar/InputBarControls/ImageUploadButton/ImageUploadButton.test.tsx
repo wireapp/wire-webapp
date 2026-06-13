@@ -19,6 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ImageUploadButton} from './ImageUploadButton';
@@ -26,7 +27,7 @@ import {ImageUploadButton} from './ImageUploadButton';
 const ALLOWED_IMAGE_TYPES = ['image/gif', 'image/avif'];
 
 const pngFile = new File(['(⌐□_□)'], 'chucknorris.png', {type: 'image/png'});
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('ImageUploadButton', () => {

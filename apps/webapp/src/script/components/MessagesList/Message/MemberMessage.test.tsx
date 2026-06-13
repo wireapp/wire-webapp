@@ -26,6 +26,7 @@ import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateUser} from 'test/helper/UserGenerator';
 
@@ -39,7 +40,7 @@ jest.mock('Components/Avatar', () => ({
   Avatar: () => <div data-uie-name="mock-avatar" />,
 }));
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
   const message = new MemberMessageEntity();

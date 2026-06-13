@@ -31,9 +31,10 @@ import {
 import {createUuid} from 'Util/uuid';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const loadingOverlaySelector = '[data-uie-name="background-effect-initializing"]';
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const createParticipant = (name: string) => {
   const user = new User(createUuid());

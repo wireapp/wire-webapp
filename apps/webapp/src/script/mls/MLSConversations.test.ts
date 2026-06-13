@@ -35,6 +35,8 @@ import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {
   classifyLocal,
@@ -47,7 +49,7 @@ import {
 } from './MLSConversations';
 
 function createMLSConversation(type?: CONVERSATION_TYPE, epoch = 0): MLSConversation {
-  const conversation = new Conversation(randomUUID(), '', CONVERSATION_PROTOCOL.MLS);
+  const conversation = createConversationForTest(randomUUID(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
   conversation.groupId = `groupid-${randomUUID()}`;
   conversation.epoch = epoch;
   if (type !== undefined) {

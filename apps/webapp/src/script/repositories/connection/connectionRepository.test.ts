@@ -39,8 +39,10 @@ import {ConnectionEntity} from './connectionEntity';
 import {ConnectionRepository} from './connectionRepository';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-function buildConnectionRepository(translate: Translate = translateForTest) {
+function buildConnectionRepository(translate: Translate) {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
   const selfService = new SelfService();
@@ -70,7 +72,7 @@ describe('ConnectionRepository', () => {
   });
 
   describe('cancelRequest', () => {
-    const [connectionRepository, {connectionService, userRepository}] = buildConnectionRepository();
+    const [connectionRepository, {connectionService, userRepository}] = buildConnectionRepository(translateForTest);
 
     it('sets the connection status to cancelled', () => {
       const user = createConnection();
@@ -87,7 +89,7 @@ describe('ConnectionRepository', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
-      return connectionRepository.cancelRequest(user, true, new Conversation()).then(() => {
+      return connectionRepository.cancelRequest(user, true, createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest)).then(() => {
         expect(connectionService.putConnections).toHaveBeenCalled();
         expect(amplifySpy).toHaveBeenCalled();
       });
@@ -114,7 +116,7 @@ describe('ConnectionRepository', () => {
   });
 
   describe('getConnectionByConversationId', () => {
-    const [connectionRepository] = buildConnectionRepository();
+    const [connectionRepository] = buildConnectionRepository(translateForTest);
 
     it('should return the expected connection for the given conversation id', () => {
       const userA = createConnection();
@@ -130,7 +132,7 @@ describe('ConnectionRepository', () => {
   });
 
   describe('getConnections', () => {
-    const [connectionRepository, {connectionService}] = buildConnectionRepository();
+    const [connectionRepository, {connectionService}] = buildConnectionRepository(translateForTest);
     it('de-duplicates connection requests', async () => {
       const connectionRequest = {
         conversation: '45c8f986-6c8f-465b-9ac9-bd5405e8c944',

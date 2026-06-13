@@ -21,6 +21,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection/';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation/';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionMapper} from 'Repositories/connection/connectionMapper';
@@ -29,6 +30,7 @@ import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting'
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/StatusType';
 import {translate} from 'Util/localizerUtil';
+import {createConversationForTest as createBaseConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
@@ -57,13 +59,21 @@ describe('Conversation', () => {
     return new Message(id, undefined, translateForTest);
   }
 
+  function createLocalizedConversationForTest(
+    conversationId: Parameters<typeof createBaseConversationForTest>[0] = '',
+    domain: Parameters<typeof createBaseConversationForTest>[1] = '',
+    protocol: Parameters<typeof createBaseConversationForTest>[2] = CONVERSATION_PROTOCOL.PROTEUS,
+  ) {
+    return createBaseConversationForTest(conversationId, domain, protocol, translate);
+  }
+
   beforeEach(() => {
-    conversation_et = new Conversation();
+    conversation_et = createLocalizedConversationForTest();
     other_user = new User(entities.user.jane_roe.id, null);
   });
 
   describe('type checks', () => {
-    beforeEach(() => (conversation_et = new Conversation()));
+    beforeEach(() => (conversation_et = createLocalizedConversationForTest()));
 
     it('should return the expected value for personal conversations', () => {
       conversation_et.type(CONVERSATION_TYPE.CONNECT);
@@ -147,7 +157,7 @@ describe('Conversation', () => {
   describe('translation injection', () => {
     it('uses the injected translate function for unavailable 1:1 display names', () => {
       const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
-      const conversation = new Conversation('', '', undefined, translate);
+      const conversation = createBaseConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translate);
 
       conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
       conversation.participating_user_ets([new User('', '')]);
@@ -638,7 +648,7 @@ describe('Conversation', () => {
 
   describe('hasGuest', () => {
     it('detects conversations with guest', () => {
-      conversation_et = new Conversation(createUuid());
+      conversation_et = createLocalizedConversationForTest(createUuid());
       const selfUserEntity = new User(createUuid(), null);
       selfUserEntity.isMe = true;
       selfUserEntity.teamId = createUuid();
@@ -684,7 +694,7 @@ describe('Conversation', () => {
   describe('federation', () => {
     it('is considered a team conversation when teamId and domain are equal', () => {
       const teamId = 'team1';
-      const conversation = new Conversation(createUuid(), 'domain.test');
+      const conversation = createLocalizedConversationForTest(createUuid(), 'domain.test');
       conversation.teamId = teamId;
       const selfUser = new User(createUuid(), 'domain.test');
       selfUser.isMe = true;
@@ -697,7 +707,7 @@ describe('Conversation', () => {
     // @SF.Federation @SF.Separation @TSFI.UserInterface @S0.2
     it('is not considered a team conversation when teamId are equal but domains differ', () => {
       const teamId = 'team1';
-      const conversation = new Conversation(createUuid(), 'otherdomain.test');
+      const conversation = createLocalizedConversationForTest(createUuid(), 'otherdomain.test');
       conversation.teamId = teamId;
       const selfUser = new User(createUuid(), 'domain.test');
       selfUser.isMe = true;
@@ -712,7 +722,7 @@ describe('Conversation', () => {
     it('detects conversations with services', () => {
       const userEntity = new User(createUuid(), null);
 
-      conversation_et = new Conversation(createUuid());
+      conversation_et = createLocalizedConversationForTest(createUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -741,7 +751,7 @@ describe('Conversation', () => {
     it('detects conversations with apps', () => {
       const userEntity = new User(createUuid(), null);
 
-      conversation_et = new Conversation(createUuid());
+      conversation_et = createLocalizedConversationForTest(createUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
       expect(conversation_et.hasApps()).toBe(false);
@@ -983,7 +993,7 @@ describe('Conversation', () => {
   describe('notificationState', () => {
     it('returns expected values', () => {
       const NOTIFICATION_STATES = NOTIFICATION_STATE;
-      const conversationEntity = new Conversation(createUuid());
+      const conversationEntity = createLocalizedConversationForTest(createUuid());
       const selfUserEntity = new User(createUuid(), undefined);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);

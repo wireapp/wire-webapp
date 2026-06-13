@@ -28,27 +28,15 @@ import {
 
 import {FileHistoryContent} from './FileHistoryContent';
 import {FileVersion} from './types';
+import {translateForTest} from 'Util/test/translateForTest';
 
 type RenderFileHistoryContent = (fileVersions: Record<string, FileVersion[]>) => ReturnType<typeof render>;
-
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string, replacements?: Record<string, string>) => {
-    if (replacements) {
-      let result = key;
-      Object.entries(replacements).forEach(([replaceKey, value]) => {
-        result = result.replace(new RegExp(`\\{${replaceKey}\\}`, 'g'), value);
-      });
-      return result;
-    }
-    return key;
-  },
-}));
 
 describe('FileHistoryContent', () => {
   const mockHandleDownload = jest.fn().mockResolvedValue(undefined);
   const mockHandleRestore = jest.fn();
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker});
+  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   const mockFileVersions: Record<string, FileVersion[]> = {

@@ -43,7 +43,7 @@ jest.mock('Components/InViewport', () => ({
 }));
 
 describe('image-asset', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
   const fakeImageUrl = 'https://test.com/image.png';
   const mockUser = new User('user-id', 'test-domain.wire.com');
 

@@ -103,8 +103,9 @@ import {TestFactory} from '../../../../test/helper/TestFactory';
 import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mockHttpServer';
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/coreSingleton';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
 
-function buildConversationRepository(translate: Translate = translateForTest) {
+function buildConversationRepository(translate: Translate) {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -234,7 +235,7 @@ describe('ConversationRepository', () => {
       const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
       const [conversationRepository, {conversationService, teamState}] = buildConversationRepository(translate);
       const primaryModalShow = jest.fn();
-      const conversation = new Conversation(createUuid());
+      const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       conversation.name('Example conversation');
       teamState.team({id: createUuid()} as any);
@@ -1276,12 +1277,12 @@ describe('ConversationRepository', () => {
 
   describe('create1to1ConversationWithService', () => {
     it('creates a 1:1 conversation with a service', async () => {
-      const [conversationRepository, {conversationService}] = buildConversationRepository();
+      const [conversationRepository, {conversationService}] = buildConversationRepository(translateForTest);
 
       const serviceId = 'service-id';
       const providerId = 'provider-id';
 
-      const createdConversation = new Conversation('id', 'domain');
+      const createdConversation = createConversationForTest('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       const memberJoinEvent: ConversationMemberJoinEvent = {
         conversation: conversation_et.id,
@@ -1302,7 +1303,7 @@ describe('ConversationRepository', () => {
     });
 
     it('deletes the conversation when adding a service failed', async () => {
-      const [conversationRepository, {teamState, conversationService}] = buildConversationRepository();
+      const [conversationRepository, {teamState, conversationService}] = buildConversationRepository(translateForTest);
 
       const serviceId = 'service-id';
       const providerId = 'provider-id';
@@ -1311,7 +1312,7 @@ describe('ConversationRepository', () => {
 
       teamState.team({id: teamId} as any);
 
-      const createdConversation = new Conversation('id', 'domain');
+      const createdConversation = createConversationForTest('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       jest.spyOn(conversationRepository, 'createGroupConversation').mockResolvedValueOnce(createdConversation);
       jest.spyOn(conversationService, 'postBots').mockRejectedValueOnce(new Error(''));
@@ -1428,7 +1429,7 @@ describe('ConversationRepository', () => {
       const selfUser = generateUser();
       spyOn(testFactory.conversation_repository['userState'], 'self').and.returnValue(selfUser);
 
-      const conversation = new Conversation(createUuid());
+      const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       const messageWithoutTime = {
         conversation: `${conversation.id}`,
         data: {content: 'Hello World :)', nonce: 'aeac8355-739b-4dfc-a119-891a52c6a8dc'},
@@ -1870,7 +1871,7 @@ describe('ConversationRepository', () => {
       beforeEach(() => {
         spyOn(testFactory.conversation_repository as any, 'onCreate').and.callThrough();
         spyOn(testFactory.conversation_repository, 'mapConversations').and.returnValue([
-          new Conversation(createUuid()),
+          createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
         ]);
         spyOn(testFactory.conversation_repository, 'updateParticipatingUserEntities').and.returnValue(true);
         spyOn(testFactory.conversation_repository as any, 'saveConversation').and.returnValue(false);
@@ -2339,7 +2340,7 @@ describe('ConversationRepository', () => {
           type: CONVERSATION_EVENT.DELETE,
         };
 
-        const conversationEntity = new Conversation();
+        const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
         spyOn(conversationEntity, 'removeMessageById');
 
         const conversationRepository = testFactory.conversation_repository;
@@ -2362,7 +2363,7 @@ describe('ConversationRepository', () => {
     beforeEach(() => {
       conversationRepository = testFactory.conversation_repository;
 
-      const conversationEntities = conversationIds.map(id => new Conversation(id));
+      const conversationEntities = conversationIds.map(id => createConversationForTest(id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
       conversationRepository['conversationState'].conversations(conversationEntities);
     });
 
@@ -3383,7 +3384,7 @@ describe('leaveConversation', () => {
   it.each([CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MIXED, CONVERSATION_PROTOCOL.MLS])(
     'should leave %s conversation',
     async protocol => {
-      const [conversationRepository, {userState, core, eventRepository}] = buildConversationRepository();
+      const [conversationRepository, {userState, core, eventRepository}] = buildConversationRepository(translateForTest);
 
       const conversation = _generateConversation({protocol});
 
@@ -3408,7 +3409,7 @@ describe('leaveConversation', () => {
 
 describe('deleteConversation', () => {
   it('should delete conversation on backend and locally', async () => {
-    const [conversationRepository, {teamState, conversationState, conversationService}] = buildConversationRepository();
+    const [conversationRepository, {teamState, conversationState, conversationService}] = buildConversationRepository(translateForTest);
     const teamId = createUuid();
 
     teamState.team({id: teamId} as any);
@@ -3429,7 +3430,7 @@ describe('deleteConversation', () => {
   });
 
   it('should still delete conversation locally if it is deleted on backend already', async () => {
-    const [conversationRepository, {conversationState, conversationService}] = buildConversationRepository();
+    const [conversationRepository, {conversationState, conversationService}] = buildConversationRepository(translateForTest);
     const teamId = createUuid();
 
     jest.spyOn(conversationRepository['teamState'], 'team').mockReturnValue({id: teamId} as any);
@@ -3462,7 +3463,7 @@ describe('onMLSResetMessage', () => {
   });
 
   it('should handle MLS reset message by updating groupId & epoch of the conversation and deleting the old groupId from core crypto', async () => {
-    const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository();
+    const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository(translateForTest);
 
     const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'old-group-id'});
 
@@ -3495,7 +3496,7 @@ describe('onMLSResetMessage', () => {
   });
 
   it('Should get epoch from core crypto if new groupId already exists locally', async () => {
-    const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository();
+    const [conversationRepository, {conversationState, conversationService, core}] = buildConversationRepository(translateForTest);
 
     const conversation = _generateConversation({protocol: CONVERSATION_PROTOCOL.MLS, groupId: 'old-group-id'});
     conversation.epoch = 1;
@@ -3538,7 +3539,7 @@ describe('translation migration', () => {
     const [conversationRepository] = buildConversationRepository(translate);
     const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
 
-    conversationRepository.conversationLabelRepository.addConversationToNewLabel(new Conversation(createUuid()));
+    conversationRepository.conversationLabelRepository.addConversationToNewLabel(createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
 
     expect(showModalSpy).toHaveBeenCalledTimes(1);
 
@@ -3554,7 +3555,7 @@ describe('translation migration', () => {
     const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
     const [conversationRepository, {conversationService}] = buildConversationRepository(translate);
     const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
-    const conversation = new Conversation(createUuid());
+    const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     conversationService.getConversationCode = jest.fn().mockRejectedValue(new Error('boom'));
 

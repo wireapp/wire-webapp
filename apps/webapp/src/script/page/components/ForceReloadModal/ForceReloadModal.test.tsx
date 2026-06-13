@@ -31,6 +31,7 @@ import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {RootProvider} from 'src/script/page/RootProvider';
 import {createRootContextValueForTest} from '../../testSupport/rootContextTestSupport';
 import {ForceReloadModal} from './ForceReloadModal';
+import {translateForTest} from 'Util/test/translateForTest';
 
 interface ForceReloadModalTestContextValue {
   readonly doesApplicationNeedForceReload: boolean;
@@ -76,6 +77,7 @@ function createForceReloadModalTestElement(contextValue: ForceReloadModalTestCon
   return (
     <RootProvider
       value={createRootContextValueForTest({
+        translate: translateForTest,
         doesApplicationNeedForceReload,
         isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
         mainViewModel: createMainViewModelForTest(),

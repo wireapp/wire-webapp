@@ -26,6 +26,9 @@ import {createUuid} from 'Util/uuid';
 
 import {ServiceMiddleware} from './ServiceMiddleware';
 import {UserType} from '@wireapp/api-client/lib/user';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildServiceMiddleware() {
   const selfUser = new User(createUuid());
@@ -39,7 +42,7 @@ function buildServiceMiddleware() {
 }
 
 describe('ServiceMiddleware', () => {
-  const conversation = new Conversation(createUuid());
+  const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
   describe('processEvent', () => {
     describe('conversation.member-join events', () => {

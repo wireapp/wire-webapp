@@ -25,10 +25,11 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {PanelHeader} from './panelHeader';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const goBackUie = 'back-button';
 const closeUie = 'do-close';
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('PanelHeader', () => {

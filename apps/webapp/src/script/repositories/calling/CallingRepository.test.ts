@@ -52,6 +52,8 @@ import {buildMediaDevicesHandler, createConversation, createSelfParticipant} fro
 import {Core} from '../../service/coreSingleton';
 import {Warnings} from '../../view_model/WarningsContainer';
 import {z} from 'zod';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('CallingRepository', () => {
   const testFactory = new TestFactory();
@@ -786,7 +788,7 @@ describe('CallingRepository ISO', () => {
       const selfUser = new User(createUuid());
       selfUser.isMe = true;
 
-      const conversation = new Conversation(createUuid());
+      const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       const callingRepo = new CallingRepository(
         {

@@ -32,10 +32,13 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {Notifications} from './notifications';
 
 import {ViewModelRepositories} from '../../../view_model/MainViewModel';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 beforeAll(async () => {
@@ -52,7 +55,7 @@ const getDefaultParams = () => {
 
 describe('Notifications', () => {
   it('has the correct input checked', () => {
-    const conversation = new Conversation();
+    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     Object.defineProperty(conversation, 'notificationState', {
       value: ko.observable(NOTIFICATION_STATE.MENTIONS_AND_REPLIES),
     });
@@ -62,7 +65,7 @@ describe('Notifications', () => {
   });
 
   it('sets the correct new value on the ative conversation', () => {
-    const conversation = new Conversation();
+    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const conversationRepository = {
       setNotificationState: jest.fn(),
     } as Partial<ConversationRepository>;

@@ -20,13 +20,14 @@
 import {act} from 'react';
 import {render} from '@testing-library/react';
 
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {PasswordGeneratorButton} from './PasswordGeneratorButton';
 
 import {withTheme} from '../../auth/util/test/TestUtil';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('PasswordGeneratorButton', () => {
   it('calls onGeneratePassword prop with a random password when clicked', () => {

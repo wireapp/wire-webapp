@@ -30,6 +30,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useGetAssetUrl} from './useGetAssetUrl';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Util/logger', () => ({
   getLogger: jest.fn(() => ({
@@ -44,7 +45,7 @@ type UseGetAssetUrlEnabledState = {
 
 describe('useGetAssetUrl', () => {
   const fireAndForgetInvoker = createExecutingFireAndForgetInvokerForTest();
-  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker});
+  const rootContextValue = createRootContextValueForTest({fireAndForgetInvoker, translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
   const mockAssetUrl = {url: 'mock-asset-url', dispose: jest.fn()};
   const mockGetAssetUrl = jest.fn().mockResolvedValue(mockAssetUrl);

@@ -12,6 +12,7 @@ import {mockStoreFactory} from '../../../auth/util/test/mockStoreFactory';
 import {initialRootState} from '../../../auth/module/reducer';
 import {TypeUtil} from '@wireapp/commons';
 import {createDeterministicWallClock} from 'src/script/clock/deterministicWallClock';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {RootProvider} from 'src/script/page/RootProvider';
 
@@ -94,6 +95,7 @@ describe('GroupCreationModal', () => {
         },
       };
       const rootContextValue = createRootContextValueForTest({
+        translate: translateForTest,
         mainViewModel: mockRootContext.mainViewModel,
         wallClock: createDeterministicWallClock(),
       });

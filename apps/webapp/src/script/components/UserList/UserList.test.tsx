@@ -24,6 +24,7 @@ import {fireEvent, render} from '@testing-library/react';
 import {UserList} from 'Components/UserList/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
@@ -31,7 +32,7 @@ import {withTheme} from '../../auth/util/test/TestUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 beforeAll(() => {
   testFactory.exposeConversationActors().then(factory => {

@@ -22,12 +22,13 @@ import type {RichInfo} from '@wireapp/api-client/lib/user/';
 
 import {User} from 'Repositories/entity/User';
 import {RichProfileRepository} from 'Repositories/user/richProfileRepository';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {EnrichedFields} from './EnrichedFields';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const richInfo: Partial<RichInfo> = {
   fields: [

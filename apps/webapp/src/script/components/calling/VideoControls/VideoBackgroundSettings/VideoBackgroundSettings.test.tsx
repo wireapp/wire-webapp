@@ -20,12 +20,13 @@
 import {fireEvent, render} from '@testing-library/react';
 
 import type {BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from '../../../../auth/util/test/TestUtil';
 
 import {getBackgroundEffectLabel, VideoBackgroundSettings} from './VideoBackgroundSettings';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('VideoBackgroundSettings', () => {
   const backgrounds = [

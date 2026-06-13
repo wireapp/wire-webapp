@@ -21,6 +21,7 @@ import {render} from '@testing-library/react';
 
 import {Runtime} from '@wireapp/commons';
 
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {Preferences} from './Preferences';
@@ -31,7 +32,7 @@ describe('Preferences', () => {
     preferenceNotificationRepository: {getNotifications: jest.fn()},
     onPreferenceItemClick: jest.fn(),
   };
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
   it('renders the right preferences items', () => {
     jest.spyOn(Runtime, 'isDesktopApp').mockReturnValue(false);

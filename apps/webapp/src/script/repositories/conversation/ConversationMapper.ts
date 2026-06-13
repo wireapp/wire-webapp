@@ -30,6 +30,7 @@ import {
   ADD_PERMISSION,
   CONVERSATION_CELLS_STATE,
 } from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import ko from 'knockout';
 import {isObject} from 'underscore';
@@ -276,12 +277,10 @@ export class ConversationMapper {
       cells_state,
     } = conversationData;
 
-    let conversationEntity = new Conversation(
-      id,
-      conversationData.domain ?? conversationData.qualified_id?.domain,
-      protocol,
-      translate,
-    );
+    const conversationDomain = conversationData.domain ?? conversationData.qualified_id?.domain ?? '';
+    const conversationProtocol = protocol ?? CONVERSATION_PROTOCOL.PROTEUS;
+
+    let conversationEntity = new Conversation(id, conversationDomain, conversationProtocol, translate);
     conversationEntity.roles(this.computeRoles(conversationData));
 
     conversationEntity.creator = creator;

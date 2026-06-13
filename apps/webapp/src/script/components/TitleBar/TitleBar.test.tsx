@@ -39,6 +39,9 @@ import {ContentState} from 'src/script/page/useAppState';
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {PanelState} from '../../page/RightSidebar/RightSidebar';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('@wireapp/react-ui-kit', () => ({
   ...(jest.requireActual('@wireapp/react-ui-kit') as any),
@@ -97,7 +100,7 @@ const getDefaultProps = (callingRepository: CallingRepository, conversation: Con
 describe('TitleBar', () => {
   it('subscribes to shortcut PEOPLE and add ADD_PEOPLE events on mount', async () => {
     spyOn(amplify, 'subscribe').and.returnValue(undefined);
-    const conversation = new Conversation();
+    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     await render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
     await waitFor(() => {
@@ -108,7 +111,7 @@ describe('TitleBar', () => {
 
   it("doesn't show conversation search button for user with activated account", async () => {
     const selfUser = createUser(false);
-    const conversation = new Conversation();
+    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const {queryByText} = render(
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
@@ -119,7 +122,7 @@ describe('TitleBar', () => {
 
   it('opens search area after search button click', async () => {
     const selfUser = createUser(true);
-    const conversation = new Conversation();
+    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const {getByText} = render(
       withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} selfUser={selfUser} />),
@@ -167,7 +170,7 @@ describe('TitleBar', () => {
 
   it('hide info button and search button on scaled down view', async () => {
     mockedUiKit.useMatchMedia.mockReturnValue(true);
-    const conversation = new Conversation();
+    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const {queryByLabelText} = render(withTheme(<TitleBar {...getDefaultProps(callingRepository, conversation)} />));
 
@@ -313,6 +316,6 @@ function createTeamState(team?: Partial<TeamState>) {
 }
 
 function createConversationEntity(conversation?: Partial<Conversation>) {
-  const conversationEntity = new Conversation();
+  const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   return Object.assign(conversationEntity, conversation) as Conversation;
 }

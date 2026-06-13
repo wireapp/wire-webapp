@@ -21,12 +21,13 @@ import {render} from '@testing-library/react';
 
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {DeleteMessage} from './DeleteMessage';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const createDeleteMessage = (sender: User) => {
   const deleteMessage = new DeleteMessageEntity();

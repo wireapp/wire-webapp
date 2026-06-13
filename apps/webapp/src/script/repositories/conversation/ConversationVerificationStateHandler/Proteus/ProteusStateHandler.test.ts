@@ -28,6 +28,9 @@ import {TestFactory} from '../../../../../../test/helper/TestFactory';
 import {ConversationRepository} from '../../ConversationRepository';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
 import {EventBuilder} from '../../EventBuilder';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('ProteusConversationVerificationStateHandler', () => {
   const testFactory = new TestFactory();
@@ -51,9 +54,9 @@ describe('ProteusConversationVerificationStateHandler', () => {
       conversationRepository = _conversation_repository;
       stateHandler = conversationRepository.proteusVerificationStateHandler;
 
-      conversationAB = new Conversation(createUuid());
-      conversationB = new Conversation(createUuid());
-      conversationC = new Conversation(createUuid());
+      conversationAB = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      conversationB = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      conversationC = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       selfUserEntity = new User(createUuid(), null);
       selfUserEntity.isMe = true;

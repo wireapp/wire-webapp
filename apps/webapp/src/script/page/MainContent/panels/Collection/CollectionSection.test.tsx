@@ -28,7 +28,7 @@ import {createUuid} from 'Util/uuid';
 import {CollectionSection} from './CollectionSection';
 
 const NUMBER_OF_ASSETS = 5;
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => new ContentMessage(createUuid(), translateForTest));
 

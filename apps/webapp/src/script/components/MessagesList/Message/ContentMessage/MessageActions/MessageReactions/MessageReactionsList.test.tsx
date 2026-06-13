@@ -29,6 +29,7 @@ import {
 import {generateQualifiedId} from 'test/helper/UserGenerator';
 
 import {MessageReactionsList, MessageReactionsListProps} from './MessageReactionsList';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const user1 = new User();
 const user2 = new User();
@@ -50,7 +51,7 @@ const defaultProps: MessageReactionsListProps = {
   selfUserId: generateQualifiedId(),
   users: [user1, user2, user3],
 };
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('MessageReactionsList', () => {
   afterEach(() => {

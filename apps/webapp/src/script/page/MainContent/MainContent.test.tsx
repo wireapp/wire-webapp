@@ -31,6 +31,7 @@ import {createDeterministicWallClock} from '../../clock/deterministicWallClock';
 import {createRootContextValueForTest} from '../testSupport/rootContextTestSupport';
 import {RootProvider} from '../RootProvider';
 import {ContentState, useAppState} from '../useAppState';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('./panels/preferences/AccountPreferences', () => ({
   AccountPreferences: () => <span>AccountPreferences</span>,
@@ -82,6 +83,7 @@ describe('Preferences', () => {
       withTheme(
         <RootProvider
           value={createRootContextValueForTest({
+            translate: translateForTest,
             isFeatureToggleEnabled: isFeatureToggleDisabledForTest,
             mainViewModel,
             wallClock,

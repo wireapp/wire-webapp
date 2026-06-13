@@ -25,8 +25,9 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {UserStatusBadges} from './UserStatusBadges';
+import {translateForTest} from 'Util/test/translateForTest';
 
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('UserBadges', () => {

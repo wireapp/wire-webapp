@@ -65,14 +65,14 @@ function buildActionsViewModel({
   teamFeatures = undefined as any,
   setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
   leaveConversationMock = jest.fn().mockResolvedValue(undefined),
-  translate = translateForTest,
+  translate,
 }: {
   selfUser?: User;
   teamFeatures?: any;
   setMemberConversationRole?: jest.Mock;
   leaveConversationMock?: jest.Mock;
-  translate?: Translate;
-} = {}) {
+  translate: Translate;
+}) {
   const mockUserState = {self: ko.observable(selfUser)} as unknown as UserState;
   const mockTeamState = {teamFeatures: ko.observable(teamFeatures)} as unknown as TeamState;
 
@@ -141,7 +141,7 @@ describe('ActionsViewModel.leaveConversation', () => {
       const conversation = generateConversation({users: [makeEligibleUser()]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: undefined});
+      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: undefined});
 
       void vm.leaveConversation(conversation);
 
@@ -161,7 +161,7 @@ describe('ActionsViewModel.leaveConversation', () => {
         [otherAdmin.id]: DefaultConversationRoleName.WIRE_ADMIN,
       });
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: featureWithPreventAdminLessGroups});
 
       void vm.leaveConversation(conversation);
 
@@ -174,7 +174,7 @@ describe('ActionsViewModel.leaveConversation', () => {
       const conversation = generateConversation({users: [makeEligibleUser()]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: featureWithPreventAdminLessGroups});
 
       await vm.leaveConversation(conversation);
 
@@ -189,7 +189,7 @@ describe('ActionsViewModel.leaveConversation', () => {
       const conversation = generateConversation({users: [otherUser]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: featureWithPreventAdminLessGroups});
 
       await vm.leaveConversation(conversation);
 
@@ -207,7 +207,7 @@ describe('ActionsViewModel.leaveConversation', () => {
       const conversation = generateConversation({users: [federatedUser]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: featureWithPreventAdminLessGroups});
 
       await vm.leaveConversation(conversation);
 
@@ -230,6 +230,7 @@ describe('ActionsViewModel.leaveConversation', () => {
         teamFeatures: featureWithPreventAdminLessGroups,
         setMemberConversationRole,
         leaveConversationMock,
+        translate: translateForTest,
       });
 
       await vm.leaveConversation(conversation);
@@ -259,6 +260,7 @@ describe('ActionsViewModel.leaveConversation', () => {
         teamFeatures: featureWithPreventAdminLessGroups,
         setMemberConversationRole,
         leaveConversationMock,
+        translate: translateForTest,
       });
 
       await vm.leaveConversation(conversation);

@@ -37,6 +37,8 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {Collection} from './Collection';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('./CollectionDetails', () => ({
   CollectionDetails: () => <div>CollectionDetails</div>,
@@ -83,8 +85,8 @@ const createAudioMessage = () => {
 };
 
 describe('Collection', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
-  const conversation = new Conversation();
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const messages = [createImageMessage(), createLinkMessage(), createAudioMessage(), createFileMessage()];
   const mockConversationRepository = {
     getEventsForCategory: jest.fn().mockResolvedValue(messages),

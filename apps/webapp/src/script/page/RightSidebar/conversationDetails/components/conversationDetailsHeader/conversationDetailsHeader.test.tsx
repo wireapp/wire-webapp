@@ -19,6 +19,7 @@
 
 import {render, fireEvent} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
@@ -30,14 +31,16 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ConversationDetailsHeader} from './conversationDetailsHeader';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const participant = new User('id');
 const service = new ServiceEntity({id: 'id'});
-const conversation = new Conversation(createUuid());
+const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 conversation.name('Group Chat');
 conversation.type(CONVERSATION_TYPE.REGULAR);
 
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 const getDefaultProps = () => ({

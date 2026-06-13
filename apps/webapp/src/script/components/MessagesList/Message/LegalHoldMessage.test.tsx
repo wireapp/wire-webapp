@@ -20,11 +20,12 @@
 import {render} from '@testing-library/react';
 
 import {LegalHoldMessage as LegalHoldMessageEntity} from 'Repositories/entity/message/LegalHoldMessage';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LegalHoldMessage} from './LegalHoldMessage';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const createLegalHoldMessage = (partialLegalHoldMessage: Partial<LegalHoldMessageEntity>) => {
   const legalHoldMessage: Partial<LegalHoldMessageEntity> = {

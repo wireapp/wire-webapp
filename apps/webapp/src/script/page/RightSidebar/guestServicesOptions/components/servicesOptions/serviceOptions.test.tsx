@@ -27,6 +27,7 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
+import {translateForTest} from 'Util/test/translateForTest';
 
 type TestData = {
   protocol: CONVERSATION_PROTOCOL;
@@ -36,7 +37,7 @@ type TestData = {
   expectedToggleToBeVisible: boolean;
 };
 
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('serviceOptions', () => {

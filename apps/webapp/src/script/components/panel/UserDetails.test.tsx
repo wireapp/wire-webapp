@@ -23,6 +23,7 @@ import {render} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {RootProvider} from 'src/script/page/RootProvider';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
@@ -35,7 +36,7 @@ jest.mock('Components/Avatar', () => ({
 }));
 
 function renderWithRootProvider(element: ReactElement) {
-  return render(<RootProvider value={createRootContextValueForTest({})}>{element}</RootProvider>);
+  return render(<RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>);
 }
 
 describe('UserDetails', () => {

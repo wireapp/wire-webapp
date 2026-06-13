@@ -19,6 +19,7 @@
 
 import {ConnectionStatus} from '@wireapp/api-client/lib/connection';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {ClientMLSError, ClientMLSErrorLabel} from '@wireapp/core/lib/messagingProtocols/mls';
 import {amplify} from 'amplify';
 import {container} from 'tsyringe';
@@ -98,7 +99,7 @@ function createPlaceholder1to1Conversation(
   }
 
   const {id, domain} = userConnection.conversationId;
-  const conversation = new Conversation(id, domain, undefined, translate);
+  const conversation = new Conversation(id, domain, CONVERSATION_PROTOCOL.PROTEUS, translate);
   conversation.name(user.name());
   conversation.selfUser(selfUser);
   conversation.type(CONVERSATION_TYPE.CONNECT);

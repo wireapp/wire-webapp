@@ -27,9 +27,11 @@ import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
 import {finaliseMigrationOfMixedConversations} from './migrationFinaliser';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const createMixedConversation = (): MixedConversation => {
-  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED);
+  const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.MIXED, translateForTest);
   const mockGroupId = 'groupId';
   conversation.groupId = mockGroupId;
   conversation.type(CONVERSATION_TYPE.REGULAR);

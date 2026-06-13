@@ -19,6 +19,7 @@
 
 import {render, screen} from '@testing-library/react';
 
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
@@ -27,7 +28,7 @@ import {ConnectionRequests} from './ConnectionRequests';
 import {generateUser} from '../../../../../../../test/helper/UserGenerator';
 
 const mockOnConnectionRequestClick = jest.fn();
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('ConnectionRequests', () => {
   afterEach(() => {

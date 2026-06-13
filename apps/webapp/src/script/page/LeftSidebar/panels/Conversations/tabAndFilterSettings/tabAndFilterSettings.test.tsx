@@ -21,6 +21,7 @@ import {fireEvent, render, waitFor} from '@testing-library/react';
 
 import {Config} from 'src/script/Config';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 
@@ -49,7 +50,7 @@ jest.mock('Components/icon', () => ({
 }));
 
 describe('TabAndFilterSettings', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
   beforeEach(() => {
     jest.mocked(useChannelsFeatureFlag).mockReturnValue({

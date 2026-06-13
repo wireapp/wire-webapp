@@ -17,7 +17,7 @@
  *
  */
 
-import {ComponentProps, useContext} from 'react';
+import {ComponentProps} from 'react';
 
 import {CSSObject} from '@emotion/react';
 import is from '@sindresorhus/is';
@@ -43,7 +43,7 @@ import {CopyToClipboardButton} from 'Components/CopyToClipboardButton/CopyToClip
 import * as Icon from 'Components/icon';
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {RootContext, type RootContextValue} from 'src/script/page/RootProvider';
+import {type RootContextValue} from 'src/script/page/RootProvider';
 
 type PublicLinkStatus = 'idle' | 'loading' | 'error' | 'success';
 
@@ -106,7 +106,7 @@ interface CellsShareModalContentLabels {
 }
 
 interface CellsShareModalContentProps {
-  translate?: RootContextValue['translate'];
+  translate: RootContextValue['translate'];
   publicLinkDescription: string;
   labels?: Partial<CellsShareModalContentLabels>;
   publicLink: {
@@ -177,7 +177,7 @@ const getDefaultLabels = (translate: RootContextValue['translate']): CellsShareM
 });
 
 export const CellsShareModalContent = ({
-  translate: explicitTranslate,
+  translate,
   publicLinkDescription,
   labels,
   publicLink,
@@ -187,13 +187,6 @@ export const CellsShareModalContent = ({
   styles,
   switchColors,
 }: CellsShareModalContentProps) => {
-  const rootContextValue = useContext(RootContext);
-  const translate = explicitTranslate ?? rootContextValue?.translate;
-
-  if (!translate) {
-    throw new Error('RootContext has not been set');
-  }
-
   const resolvedLabels = {...getDefaultLabels(translate), ...labels};
   const hasPublicLink = is.nonEmptyString(publicLink.link);
   const shouldShowLink = publicLink.isEnabled && publicLink.status === 'success' && hasPublicLink;

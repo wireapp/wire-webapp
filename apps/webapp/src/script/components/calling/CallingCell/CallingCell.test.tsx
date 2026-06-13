@@ -40,6 +40,9 @@ import {createUuid} from 'Util/uuid';
 import {CallingCell, CallingCellProps} from './CallingCell';
 
 import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const mockCallAlertState = {
   clearShowAlert: jest.fn(),
@@ -65,7 +68,7 @@ const createCall = (state: CALL_STATE, selfUser = new User(createUuid()), selfCl
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call(
     {domain: '', id: ''},
-    new Conversation('', ''),
+    createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     0,
     selfParticipant,
     CALL_TYPE.NORMAL,
@@ -84,7 +87,7 @@ const createProps = async () => {
   const mockTeamState = new TeamState();
   jest.spyOn(mockTeamState, 'isExternal').mockReturnValue(false);
 
-  const conversation = new Conversation();
+  const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   conversation.participating_user_ets([new User('id')]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
@@ -101,7 +104,7 @@ const createProps = async () => {
 };
 
 describe('ConversationListCallingCell', () => {
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeEach(() => {

@@ -23,6 +23,7 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
 
@@ -30,7 +31,7 @@ import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';
 
 describe('UserModal', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();

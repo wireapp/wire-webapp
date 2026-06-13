@@ -24,6 +24,7 @@ import {act, fireEvent, render, waitFor} from '@testing-library/react';
 import {User} from 'Repositories/entity/User';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LeaveGroupAdminModal} from './LeaveGroupAdminModal';
@@ -34,7 +35,7 @@ jest.mock('./AdminSearchInput', () => ({
 }));
 
 const renderModal = () => render(withTheme(<LeaveGroupAdminModal />));
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const renderModalWithRootProvider = () => render(withTheme(<LeaveGroupAdminModal />), {wrapper: rootProviderWrapper});
 

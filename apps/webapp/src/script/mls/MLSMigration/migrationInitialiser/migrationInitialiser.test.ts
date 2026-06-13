@@ -29,11 +29,13 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {initialiseMigrationOfProteusConversations} from '.';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const selfUserId = {id: 'self-user-id', domain: 'local.wire.link'};
 
 const createProteusConversation = (userIds: QualifiedId[] = []): ProteusConversation => {
-  const conversation = new Conversation(createUuid(), 'local.wire.link', CONVERSATION_PROTOCOL.PROTEUS);
+  const conversation = createConversationForTest(createUuid(), 'local.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   conversation.participating_user_ids.push(...userIds);
   conversation.type(CONVERSATION_TYPE.REGULAR);
   return conversation as ProteusConversation;

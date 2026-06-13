@@ -34,13 +34,16 @@ import {translate} from 'Util/localizerUtil';
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
 import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('Components/Avatar', () => ({
   AVATAR_SIZE: {MEDIUM: 'medium', LARGE: 'large'},
   Avatar: () => <div data-testid="mock-avatar" />,
 }));
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 const createMockParticipant = (
   userId: string,
@@ -59,7 +62,7 @@ const createMockParticipant = (
 const createMockCall = () => {
   return new Call(
     {domain: '', id: ''},
-    new Conversation('', ''),
+    createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     0,
     new Participant(new User(''), ''),
     CALL_TYPE.NORMAL,

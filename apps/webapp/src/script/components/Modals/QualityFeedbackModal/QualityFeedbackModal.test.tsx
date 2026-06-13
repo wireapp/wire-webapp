@@ -41,6 +41,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {QualityFeedbackModal} from './QualityFeedbackModal';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {
   buildMediaDevicesHandler,
@@ -55,7 +56,7 @@ jest.mock('Repositories/tracking/telemetry.helpers', () => ({
 }));
 
 describe('QualityFeedbackModal', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
   let callingRepository: CallingRepository;
   let call: Call;
   const testFactory = new TestFactory();

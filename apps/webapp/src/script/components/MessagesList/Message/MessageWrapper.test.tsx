@@ -19,22 +19,25 @@
 
 import {render} from '@testing-library/react';
 import {CONVERSATION_CELLS_STATE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {MemberMessage as MemberMessageEntity} from 'Repositories/entity/message/MemberMessage';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateUser} from 'test/helper/UserGenerator';
 import {createUuid} from 'Util/uuid';
 
 import {MessageWrapper} from './MessageWrapper';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 function createMemberMessage(systemType: SystemMessageType, users?: User[]) {
-  const message = new MemberMessageEntity();
+  const message = new MemberMessageEntity(translateForTest);
   message.memberMessageType = systemType;
   const actor = generateUser();
   message.user(actor);
@@ -92,7 +95,7 @@ const createBaseProps = (conversation: Conversation, message: MemberMessageEntit
 describe('MessageWrapper', () => {
   describe('Cells conversation logic', () => {
     it('computes isCellsConversation as true when cellsState is READY', () => {
-      const conversation = new Conversation(createUuid(), 'test.wire.link');
+      const conversation = createConversationForTest(createUuid(), 'test.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
 
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
@@ -104,7 +107,7 @@ describe('MessageWrapper', () => {
     });
 
     it('computes isCellsConversation as true when cellsState is PENDING', () => {
-      const conversation = new Conversation(createUuid(), 'test.wire.link');
+      const conversation = createConversationForTest(createUuid(), 'test.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.cellsState(CONVERSATION_CELLS_STATE.PENDING);
 
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
@@ -116,7 +119,7 @@ describe('MessageWrapper', () => {
     });
 
     it('computes isCellsConversation as false when cellsState is DISABLED', () => {
-      const conversation = new Conversation(createUuid(), 'test.wire.link');
+      const conversation = createConversationForTest(createUuid(), 'test.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.cellsState(CONVERSATION_CELLS_STATE.DISABLED);
 
       const message = createMemberMessage(SystemMessageType.CONVERSATION_CREATE, [generateUser()]);
@@ -130,7 +133,7 @@ describe('MessageWrapper', () => {
 
   describe('Self-deleting messages off logic', () => {
     it('computes isSelfDeletingMessagesOff as true when isCellsConversation is true (even with hasGlobalMessageTimer)', () => {
-      const conversation = new Conversation(createUuid(), 'test.wire.link');
+      const conversation = createConversationForTest(createUuid(), 'test.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.cellsState(CONVERSATION_CELLS_STATE.READY);
       conversation.globalMessageTimer(60000);
 
@@ -143,7 +146,7 @@ describe('MessageWrapper', () => {
     });
 
     it('computes isSelfDeletingMessagesOff as true when hasGlobalMessageTimer is false', () => {
-      const conversation = new Conversation(createUuid(), 'test.wire.link');
+      const conversation = createConversationForTest(createUuid(), 'test.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.cellsState(CONVERSATION_CELLS_STATE.DISABLED);
       conversation.globalMessageTimer(0);
 
@@ -156,7 +159,7 @@ describe('MessageWrapper', () => {
     });
 
     it('computes isSelfDeletingMessagesOff as false only when hasGlobalMessageTimer is true AND isCellsConversation is false', () => {
-      const conversation = new Conversation(createUuid(), 'test.wire.link');
+      const conversation = createConversationForTest(createUuid(), 'test.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.cellsState(CONVERSATION_CELLS_STATE.DISABLED);
       conversation.globalMessageTimer(60000);
 
@@ -169,7 +172,7 @@ describe('MessageWrapper', () => {
     });
 
     it('shows both banners when Cells is enabled with PENDING state', () => {
-      const conversation = new Conversation(createUuid(), 'test.wire.link');
+      const conversation = createConversationForTest(createUuid(), 'test.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.cellsState(CONVERSATION_CELLS_STATE.PENDING);
       conversation.globalMessageTimer(60000);
 

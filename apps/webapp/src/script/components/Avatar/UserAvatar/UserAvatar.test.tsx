@@ -31,8 +31,9 @@ import {
 import {UserAvatar} from './UserAvatar';
 
 import {AVATAR_SIZE, STATE} from '../Avatar';
+import {translateForTest} from 'Util/test/translateForTest';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {

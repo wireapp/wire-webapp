@@ -38,13 +38,15 @@ import {ConversationLabel, ConversationLabelRepository} from 'Repositories/conve
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 
 import {ConversationsList} from './ConversationsList';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
 
 const create1to1Conversation = (userName: string) => {
-  const conversation = new Conversation('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS);
+  const conversation = createConversationForTest('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const user = new User('id', 'domain');
   user.name(userName);
   conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -54,7 +56,7 @@ const create1to1Conversation = (userName: string) => {
 };
 
 describe('ConversationsList', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
   let listViewModel: ListViewModel;
   let connectRequests: User[];
   let conversationState: ConversationState;

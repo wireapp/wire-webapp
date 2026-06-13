@@ -34,6 +34,7 @@ import {Core} from 'src/script/service/coreSingleton';
 import {generateAPIConversation} from 'test/helper/ConversationGenerator';
 
 import {E2EICertificateDetails} from './E2EICertificateDetails';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X509): WireIdentity => ({
   status,
@@ -61,7 +62,7 @@ const generateIdentity = (status: MLSStatuses, credentialType = CredentialType.X
 const core = container.resolve(Core);
 
 describe('E2EICertificateDetails', () => {
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   beforeAll(async () => {

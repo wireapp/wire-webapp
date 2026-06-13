@@ -19,6 +19,7 @@
 
 import {act, render} from '@testing-library/react';
 import {CONVERSATION_TYPE} from '@wireapp/api-client/lib/conversation';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {ConnectionRepository} from 'Repositories/connection/connectionRepository';
@@ -47,6 +48,8 @@ import {ConversationDetails} from './conversationDetails';
 import {TestFactory} from '../../../../../test/helper/TestFactory';
 import {ActionsViewModel} from '../../../view_model/ActionsViewModel';
 import {MainViewModel} from '../../../view_model/MainViewModel';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('Components/panel/EnrichedFields', () => ({
   useEnrichedFields: (): never[] => [],
@@ -61,7 +64,7 @@ jest.mock('Components/panel/UserDetails', () => ({
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
 let searchRepository: SearchRepository;
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 beforeAll(async () => {
@@ -98,7 +101,7 @@ const getDefaultParams = () => {
     ),
     conversationRepository: {
       expectReadReceipt: () => true,
-      getNextConversation: () => Promise.resolve(new Conversation()),
+      getNextConversation: () => Promise.resolve(createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest)),
       refreshUnavailableParticipants: () => Promise.resolve(),
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
     } as unknown as ConversationRepository,
@@ -118,7 +121,7 @@ const getDefaultParams = () => {
 
 describe('ConversationDetails', () => {
   it("returns the right actions depending on the conversation's type for non group creators", () => {
-    const conversation = new Conversation();
+    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const otherUser = new User('other-user');
     jest.spyOn(otherUser as any, 'isConnected').mockReturnValue(true);
     jest.spyOn(conversation as any, 'isClearable').mockReturnValue(true);

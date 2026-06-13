@@ -28,6 +28,7 @@ import {
 
 import {TypingIndicator, TypingIndicatorProps} from './TypingIndicator';
 import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndicatorState';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function createUser(id: string, name: string): User {
   const user = new User(id);
@@ -35,7 +36,7 @@ function createUser(id: string, name: string): User {
   return user;
 }
 
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('TypingIndicator', () => {

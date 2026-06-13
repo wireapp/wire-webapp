@@ -27,6 +27,7 @@ import {applockRefactoredFeatureToggleName} from '../featureToggles/startupFeatu
 import {MainViewModel} from '../view_model/MainViewModel';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from './testSupport/rootContextTestSupport';
 import {RootContext, RootContextValue, RootProvider, useApplicationContext, useMainViewModel} from './RootProvider';
+import {translateForTest} from 'Util/test/translateForTest';
 
 interface WrapperProperties {
   children: ReactNode;
@@ -53,6 +54,7 @@ function createRootProviderWrapper(
 
   const isFeatureToggleEnabled = jest.fn(isFeatureToggleEnabledForTest);
   const rootContextValue = createRootContextValueForTest({
+    translate: translateForTest,
     doesApplicationNeedForceReload,
     isFeatureToggleEnabled,
     mainViewModel,

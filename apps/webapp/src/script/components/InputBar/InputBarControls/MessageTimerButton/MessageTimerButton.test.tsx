@@ -22,13 +22,14 @@ import ko from 'knockout';
 
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 import * as Context from 'src/script/ui/ContextMenu';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {MessageTimerButton} from './MessageTimerButton';
 
-const rootContextValue = createRootContextValueForTest({});
+const rootContextValue = createRootContextValueForTest({translate: translateForTest});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 describe('MessageTimerButton', () => {

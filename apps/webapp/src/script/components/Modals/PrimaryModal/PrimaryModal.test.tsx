@@ -29,8 +29,9 @@ import {PrimaryModalComponent} from './PrimaryModal';
 import {PrimaryModalType} from './PrimaryModalTypes';
 
 import {PrimaryModal, removeCurrentModal} from '.';
+import {translateForTest} from 'Util/test/translateForTest';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('PrimaryModal', () => {
   beforeEach(() => {
@@ -46,7 +47,14 @@ describe('PrimaryModal', () => {
 
     it('correctly calls action callback', async () => {
       const actionCallback = jest.fn();
-      const {getPrimaryActionButton} = renderPrimaryModal(PrimaryModalType.CONFIRM, actionCallback);
+      const {getPrimaryActionButton} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: actionCallback,
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.CONFIRM,
+      });
 
       fireEvent.click(getPrimaryActionButton());
 
@@ -56,11 +64,14 @@ describe('PrimaryModal', () => {
     it('correctly calls secondary action callback', async () => {
       const secondaryActionCallback = jest.fn();
 
-      const {getSecondaryActionButton} = renderPrimaryModal(
-        PrimaryModalType.CONFIRM,
-        jest.fn(),
-        secondaryActionCallback,
-      );
+      const {getSecondaryActionButton} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: jest.fn(),
+        secondaryAction: secondaryActionCallback,
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.CONFIRM,
+      });
 
       fireEvent.click(getSecondaryActionButton());
 
@@ -68,27 +79,41 @@ describe('PrimaryModal', () => {
     });
 
     it('shows close button by default', async () => {
-      const {getCloseButton} = renderPrimaryModal(PrimaryModalType.CONFIRM);
+      const {getCloseButton} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: jest.fn(),
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.CONFIRM,
+      });
 
       expect(getCloseButton()).toBeTruthy();
     });
 
     it('hides close button when hideCloseBtn is true', async () => {
-      const {getCloseButton} = renderPrimaryModal(PrimaryModalType.CONFIRM, jest.fn(), jest.fn(), true);
+      const {getCloseButton} = renderPrimaryModal({
+        hideCloseButton: true,
+        primaryAction: jest.fn(),
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.CONFIRM,
+      });
 
       expect(getCloseButton()).toBeFalsy();
     });
 
     it('uses the provided translate function for default secondary action copy', async () => {
       const translate = (translationKey: string) => `translated:${translationKey}`;
-      const {getSecondaryActionButton} = renderPrimaryModal(
-        PrimaryModalType.CONFIRM,
-        jest.fn(),
-        jest.fn(),
-        false,
+      const {getSecondaryActionButton} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: jest.fn(),
+        secondaryAction: jest.fn(),
+        secondaryActionText: null,
         translate,
-        null,
-      );
+        type: PrimaryModalType.CONFIRM,
+      });
 
       expect(getSecondaryActionButton()).toHaveTextContent('translated:modalConfirmSecondary');
     });
@@ -96,7 +121,14 @@ describe('PrimaryModal', () => {
 
   describe('Input', () => {
     it('should disable the primary button while the input is empty', async () => {
-      const {getPrimaryActionButton, getInput} = renderPrimaryModal(PrimaryModalType.INPUT);
+      const {getPrimaryActionButton, getInput} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: jest.fn(),
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.INPUT,
+      });
       expect(getPrimaryActionButton()).toHaveProperty('disabled', true);
 
       fireEvent.change(getInput(), {target: {value: 'Test'}});
@@ -108,16 +140,27 @@ describe('PrimaryModal', () => {
     const action = jest.fn().mockImplementation();
 
     it('should show the active primary button', async () => {
-      const {getPrimaryActionButton} = renderPrimaryModal(PrimaryModalType.GUEST_LINK_PASSWORD, action);
+      const {getPrimaryActionButton} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: action,
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.GUEST_LINK_PASSWORD,
+      });
 
       expect(getPrimaryActionButton()).toHaveProperty('disabled', false);
     });
 
     it('should fire validation on submit click', async () => {
-      const {getErrorMessage, getPrimaryActionButton} = renderPrimaryModal(
-        PrimaryModalType.GUEST_LINK_PASSWORD,
-        action,
-      );
+      const {getErrorMessage, getPrimaryActionButton} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: action,
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.GUEST_LINK_PASSWORD,
+      });
 
       fireEvent.click(getPrimaryActionButton());
 
@@ -125,10 +168,14 @@ describe('PrimaryModal', () => {
     });
 
     it('should fill password fields when generate password button clicked', async () => {
-      const {getGeneratePasswordButton, getConfirmPasswordInput, getPasswordInput} = renderPrimaryModal(
-        PrimaryModalType.GUEST_LINK_PASSWORD,
-        action,
-      );
+      const {getGeneratePasswordButton, getConfirmPasswordInput, getPasswordInput} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: action,
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.GUEST_LINK_PASSWORD,
+      });
 
       fireEvent.click(getGeneratePasswordButton());
 
@@ -139,10 +186,14 @@ describe('PrimaryModal', () => {
     });
 
     it('should call the action when form submitted successfully', async () => {
-      const {getGeneratePasswordButton, getPrimaryActionButton, getPasswordInput} = renderPrimaryModal(
-        PrimaryModalType.GUEST_LINK_PASSWORD,
-        action,
-      );
+      const {getGeneratePasswordButton, getPrimaryActionButton, getPasswordInput} = renderPrimaryModal({
+        hideCloseButton: false,
+        primaryAction: action,
+        secondaryAction: jest.fn(),
+        secondaryActionText: 'secondary-text',
+        translate: translateForTest,
+        type: PrimaryModalType.GUEST_LINK_PASSWORD,
+      });
 
       const generatePasswordButton = getGeneratePasswordButton();
 
@@ -174,14 +225,23 @@ describe('PrimaryModal', () => {
   });
 });
 
-const renderPrimaryModal = (
-  type: PrimaryModalType = PrimaryModalType.CONFIRM,
-  primaryAction = () => {},
-  secondaryAction = () => {},
-  hideCloseBtn = false,
-  translate?: (translationKey: string) => string,
-  secondaryActionText: string | null = 'secondary-text',
-) => {
+type RenderPrimaryModalParameters = {
+  hideCloseButton: boolean;
+  primaryAction: () => void;
+  secondaryAction: () => void;
+  secondaryActionText: string | null;
+  translate: (translationKey: string) => string;
+  type: PrimaryModalType;
+};
+
+const renderPrimaryModal = ({
+  hideCloseButton,
+  primaryAction,
+  secondaryAction,
+  secondaryActionText,
+  translate,
+  type,
+}: RenderPrimaryModalParameters) => {
   const {getByTestId, queryByTestId, getByLabelText} = render(withTheme(<PrimaryModalComponent />), {
     wrapper: rootProviderWrapper,
   });
@@ -207,7 +267,7 @@ const renderPrimaryModal = (
           title: 'test-title',
           input: 'test-input',
         },
-        hideCloseBtn,
+        hideCloseBtn: hideCloseButton,
         copyPassword: true,
         closeOnConfirm: true,
         preventClose: false,

@@ -44,6 +44,9 @@ import {
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('Components/Avatar', () => ({
   AVATAR_SIZE: {X_LARGE: 'avatar-xl'},
@@ -80,12 +83,12 @@ beforeAll(async () => {
 
 describe('InputBar', () => {
   let propertiesRepository: PropertiesRepository;
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
-    conversation: new Conversation(createUuid()),
+    conversation: createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     cellsRepository: new CellsRepository(),
     files: [] as FileWithPreview[],
     conversationRepository: {

@@ -25,6 +25,7 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {useFileVersions} from './useFileVersions';
+import {translateForTest} from 'Util/test/translateForTest';
 
 // Mock the dependencies
 const mockGetNode = jest.fn();
@@ -70,7 +71,7 @@ jest.mock('../utils/fileVersionUtils', () => ({
 }));
 
 describe('useFileVersions', () => {
-  const rootContextValue = createRootContextValueForTest({});
+  const rootContextValue = createRootContextValueForTest({translate: translateForTest});
   const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
   const mockNode = {

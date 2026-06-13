@@ -30,6 +30,9 @@ import {createUuid} from 'Util/uuid';
 import {QuotedMessageMiddleware} from './QuoteDecoderMiddleware';
 
 import {EventService} from '../EventService';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildQuotedMessageMiddleware() {
   const eventService = {
@@ -43,7 +46,7 @@ function buildQuotedMessageMiddleware() {
 }
 
 describe('QuotedMessageMiddleware', () => {
-  const conversation = new Conversation(createUuid());
+  const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   conversation.selfUser(new User());
 
   describe('processEvent', () => {

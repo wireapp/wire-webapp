@@ -26,6 +26,9 @@ import {type Translate, translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from './CallingViewModel.mocks';
+import {createConversationForTest} from 'Util/test/createConversationForTest';
+import {translateForTest} from 'Util/test/translateForTest';
+import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('CallingViewModel', () => {
   const originalPrimaryModalShow = PrimaryModal.show;
@@ -38,8 +41,8 @@ describe('CallingViewModel', () => {
 
   describe('answerCall', () => {
     it('answers a call directly if no call is ongoing', async () => {
-      const [callingViewModel] = buildCallingViewModel();
-      const conversation = new Conversation('conversation1', '');
+      const [callingViewModel] = buildCallingViewModel(translateForTest);
+      const conversation = createConversationForTest('conversation1', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       const call = buildCall(conversation);
       await callingViewModel.callActions.answer(call);
       expect(mockCallingRepository.answerCall).toHaveBeenCalledWith(call);
@@ -47,13 +50,13 @@ describe('CallingViewModel', () => {
 
     it('lets the user leave previous call before answering a new one', async () => {
       jest.useFakeTimers();
-      const [callingViewModel] = buildCallingViewModel();
-      const joinedCall = buildCall(new Conversation('conversation1', ''));
+      const [callingViewModel] = buildCallingViewModel(translateForTest);
+      const joinedCall = buildCall(createConversationForTest('conversation1', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
 
       jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => payload.primaryAction?.action?.());
-      const newCall = buildCall(new Conversation('conversation2', ''));
+      const newCall = buildCall(createConversationForTest('conversation2', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
       Promise.resolve().then(() => {
         jest.runAllTimers();
       });
@@ -68,21 +71,21 @@ describe('CallingViewModel', () => {
 
   describe('startCall', () => {
     it('starts a call directly if no call is ongoing', async () => {
-      const [callingViewModel] = buildCallingViewModel();
-      const conversation = new Conversation(createUuid());
+      const [callingViewModel] = buildCallingViewModel(translateForTest);
+      const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       await callingViewModel.callActions.startAudio(conversation);
       expect(mockCallingRepository.startCall).toHaveBeenCalledWith(conversation);
     });
 
     it('lets the user leave previous call before starting a new one', async () => {
       jest.useFakeTimers();
-      const [callingViewModel] = buildCallingViewModel();
-      const joinedCall = buildCall(new Conversation('conversation1', ''));
+      const [callingViewModel] = buildCallingViewModel(translateForTest);
+      const joinedCall = buildCall(createConversationForTest('conversation1', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
 
       jest.spyOn(PrimaryModal, 'show').mockImplementation((_, payload) => payload.primaryAction?.action?.());
-      const conversation = new Conversation('conversation2');
+      const conversation = createConversationForTest('conversation2', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       Promise.resolve().then(() => {
         jest.runAllTimers();
       });
@@ -103,14 +106,14 @@ describe('CallingViewModel', () => {
     it('uses the injected translate function for second-call warning copy', () => {
       const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
       const [callingViewModel] = buildCallingViewModel(translate);
-      const joinedCall = buildCall(new Conversation('conversation1', ''));
+      const joinedCall = buildCall(createConversationForTest('conversation1', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
       const primaryModalShow = jest.fn();
 
       joinedCall.state(STATE.MEDIA_ESTAB);
       callState.calls.push(joinedCall);
       PrimaryModal.show = primaryModalShow;
 
-      void callingViewModel.callActions.startAudio(new Conversation('conversation2', ''));
+      void callingViewModel.callActions.startAudio(createConversationForTest('conversation2', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest));
 
       expect(translate).toHaveBeenCalledWith('modalCallSecondOutgoingAction');
       expect(translate).toHaveBeenCalledWith('modalCallSecondOutgoingMessage');

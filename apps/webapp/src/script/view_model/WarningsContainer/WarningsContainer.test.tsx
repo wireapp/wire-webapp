@@ -19,13 +19,14 @@
 
 import {act, fireEvent, render} from '@testing-library/react';
 
+import {translateForTest} from 'Util/test/translateForTest';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {WarningsContainer} from './WarningsContainer';
 
 import {Warnings} from '.';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
 
 describe('WarningsContainer', () => {
   it('does not render when no warning is in the queue', async () => {
