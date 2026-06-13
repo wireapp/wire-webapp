@@ -45,10 +45,6 @@ jest.mock('tsyringe', () => ({
   injectable: () => () => {},
 }));
 
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
-
 jest.mock('Util/util', () => ({
   forcedDownloadFile: (args: any) => mockForcedDownloadFile(args),
   getFileExtension: (path: string) => {
