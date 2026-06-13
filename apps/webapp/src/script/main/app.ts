@@ -91,7 +91,7 @@ import {UserService} from 'Repositories/user/userService';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
-import {type Translate, t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
@@ -222,12 +222,12 @@ export class App {
     repositories.asset = container.resolve(AssetRepository);
 
     repositories.giphy = new GiphyRepository(new GiphyService());
-    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService, t);
+    repositories.properties = new PropertiesRepository(new PropertiesService(), selfService, this.translate);
     repositories.serverTime = serverTimeHandler;
     repositories.storage = new StorageRepository();
 
     repositories.cryptography = new CryptographyRepository();
-    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, t);
+    repositories.client = new ClientRepository(new ClientService(), repositories.cryptography, this.translate);
     repositories.audio = new AudioRepository();
 
     repositories.user = new UserRepository(
@@ -237,14 +237,14 @@ export class App {
       repositories.client,
       serverTimeHandler,
       repositories.properties,
-      t,
+      this.translate,
     );
     repositories.connection = new ConnectionRepository(
       new ConnectionService(),
       repositories.user,
       selfService,
       teamService,
-      t,
+      this.translate,
     );
     repositories.event = new EventRepository(this.service.event, this.service.notification, serverTimeHandler);
     repositories.search = new SearchRepository(repositories.user);
@@ -254,7 +254,7 @@ export class App {
       repositories.asset,
       () => this.repository.lifeCycle.logout(SIGN_OUT_REASON.ACCOUNT_DELETED, true),
       teamService,
-      t,
+      this.translate,
     );
 
     repositories.message = new MessageRepository(
@@ -271,7 +271,7 @@ export class App {
       repositories.user,
       repositories.asset,
       repositories.audio,
-      t,
+      this.translate,
     );
 
     repositories.calling = new CallingRepository(
@@ -282,7 +282,7 @@ export class App {
       mediaDevicesHandler,
       serverTimeHandler,
       backgroundEffectsHandler,
-      t,
+      this.translate,
     );
 
     repositories.self = new SelfRepository(selfService, repositories.user, repositories.team, repositories.client);
@@ -298,7 +298,7 @@ export class App {
       repositories.properties,
       repositories.calling,
       serverTimeHandler,
-      t,
+      this.translate,
     );
 
     repositories.eventTracker = new EventTrackingRepository(repositories.message, this.apiClient);
@@ -314,7 +314,7 @@ export class App {
       repositories.conversation,
       repositories.audio,
       repositories.calling,
-      t,
+      this.translate,
     );
     repositories.preferenceNotification = new PreferenceNotificationRepository(repositories.user['userState'].self);
 

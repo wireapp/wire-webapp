@@ -68,7 +68,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, t} from 'Util/localizerUtil';
+import {setStrings, translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {mapLanguage} from '../../localeConfig';
@@ -109,7 +109,7 @@ const withRouter = (component: React.ReactNode) => (
   <Router future={{v7_relativeSplatPath: true, v7_startTransition: true}}>{component}</Router>
 );
 
-const rootContextValue = createRootContextValueForTest({translate: t});
+const rootContextValue = createRootContextValueForTest({translate});
 const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
 
 const loadLanguage = (language: string) => {

@@ -30,7 +30,7 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {PrimaryModal, removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {UserState} from 'Repositories/user/userState';
 import {Core} from 'src/script/service/coreSingleton';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatDelayTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {removeUrlParameters} from 'Util/urlUtil';
@@ -365,7 +365,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           isRenewal: isCertificateRenewal,
         },
       },
-      t,
+      translate,
     );
     PrimaryModal.show(modalType, modalOptions);
   }
@@ -385,7 +385,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
             resolve();
           },
         },
-        t,
+        translate,
       );
       PrimaryModal.show(modalType, modalOptions);
     });
@@ -420,7 +420,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
             isGracePeriodOver: !snoozable,
           },
         },
-        t,
+        translate,
       );
 
       PrimaryModal.show(modalType, modalOptions);
@@ -455,7 +455,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
           type: modalType,
           hideClose: true,
         },
-        t,
+        translate,
       );
       PrimaryModal.show(determinedModalType, modalOptions);
     });
@@ -468,10 +468,10 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         type: ModalType.SNOOZE_REMINDER,
         hideClose: true,
         extraParams: {
-          delayTime: formatDelayTime(delay),
+          delayTime: formatDelayTime(delay, translate),
         },
       },
-      t,
+      translate,
     );
     PrimaryModal.show(determinedModalType, modalOptions);
   }

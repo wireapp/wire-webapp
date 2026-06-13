@@ -49,7 +49,7 @@ import {ConversationVerificationState} from 'Repositories/conversation/Conversat
 import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
 import {TeamState} from 'Repositories/team/TeamState';
-import {type Translate, t} from 'Util/localizerUtil';
+import {type Translate, translate as defaultTranslate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {truncate} from 'Util/stringUtil';
@@ -203,7 +203,7 @@ export class Conversation {
     conversation_id: string = '',
     domain: string = '',
     public readonly protocol = CONVERSATION_PROTOCOL.PROTEUS,
-    private readonly translate: Translate = t,
+    private readonly translate: Translate = defaultTranslate,
     teamState = container.resolve(TeamState),
   ) {
     this.teamState = teamState;

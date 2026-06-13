@@ -22,7 +22,7 @@ import {escape} from 'underscore';
 import {create} from 'zustand';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {replaceLink, translate as defaultTranslate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatLocale} from 'Util/timeUtil';
 import {noop} from 'Util/util';
@@ -98,7 +98,7 @@ const addNewModalToQueue = (
   type: PrimaryModalType,
   options: ModalOptions,
   modalId = createUuid(),
-  translate: Translate = t,
+  translate: Translate = defaultTranslate,
 ): void => {
   const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = usePrimaryModalState.getState();
 
@@ -135,7 +135,7 @@ const updateCurrentModalContent = (
   type: PrimaryModalType,
   options: ModalOptions = {},
   id?: string,
-  translate: Translate = t,
+  translate: Translate = defaultTranslate,
 ): void => {
   if (!Object.values(PrimaryModalType).includes(type)) {
     return logger.warn(`Modal of type '${type}' is not supported`);

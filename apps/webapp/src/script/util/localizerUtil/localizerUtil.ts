@@ -39,15 +39,24 @@ export const DEFAULT_LOCALE = 'en';
 let locale = DEFAULT_LOCALE;
 let strings: Record<string, Record<string, string>> = {};
 
+export function translate<Id extends TranslationKey>(
+  identifier: Id,
+  substitutions?: TranslationSubstitutions,
+  dangerousSubstitutions?: Record<string, string>,
+  skipEscape?: boolean,
+): string {
+  return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions, skipEscape);
+}
+
 export const getSelfName = (
   declension = Declension.NOMINATIVE,
   bypassSanitization = false,
-  translate: typeof t = t,
+  translation = translate,
 ) => {
   const selfNameDeclensions = {
-    [Declension.NOMINATIVE]: translate('conversationYouNominative'),
-    [Declension.DATIVE]: translate('conversationYouDative'),
-    [Declension.ACCUSATIVE]: translate('conversationYouAccusative'),
+    [Declension.NOMINATIVE]: translation('conversationYouNominative'),
+    [Declension.DATIVE]: translation('conversationYouDative'),
+    [Declension.ACCUSATIVE]: translation('conversationYouAccusative'),
   };
   const selfName = selfNameDeclensions[declension];
   return bypassSanitization ? selfName : escape(selfName);
@@ -57,10 +66,10 @@ export const getUserName = (
   userEntity: User,
   declension?: string,
   bypassSanitization: boolean = false,
-  translate: typeof t = t,
+  translation = translate,
 ): string => {
   if (userEntity.isMe) {
-    return getSelfName(declension, bypassSanitization, translate);
+    return getSelfName(declension, bypassSanitization, translation);
   }
   return bypassSanitization ? userEntity.name() : escape(userEntity.name());
 };
@@ -106,7 +115,7 @@ export const LocalizerUtil = {
     declension = Declension.ACCUSATIVE,
     skipAnd = false,
     boldNames = false,
-    translate: typeof t = t,
+    translation = translate,
   ) => {
     const containsSelfUser = userEntities.some(userEntity => userEntity.isMe);
     if (containsSelfUser) {
@@ -119,7 +128,7 @@ export const LocalizerUtil = {
     });
 
     if (containsSelfUser) {
-      userNames.push(getSelfName(declension, false, translate));
+      userNames.push(getSelfName(declension, false, translation));
     }
 
     const numberOfNames = userNames.length;
@@ -131,8 +140,8 @@ export const LocalizerUtil = {
 
       const exactlyTwoNames = numberOfNames === 2;
       const additionalNames = exactlyTwoNames
-        ? `${secondLastName} ${translate('and')} ${lastName}`
-        : `${secondLastName}${translate('enumerationAnd')}${lastName}`;
+        ? `${secondLastName} ${translation('and')} ${lastName}`
+        : `${secondLastName}${translation('enumerationAnd')}${lastName}`;
       userNamesWithoutFinalPair.push(additionalNames);
       return userNamesWithoutFinalPair.join(', ');
     }
@@ -178,14 +187,7 @@ export const setStrings = (newStrings: typeof strings): void => {
   strings = newStrings;
 };
 
-export const t = <Id extends TranslationKey>(
-  identifier: Id,
-  substitutions?: TranslationSubstitutions,
-  dangerousSubstitutions?: Record<string, string>,
-  skipEscape?: boolean,
-): string => {
-  return LocalizerUtil.translate(identifier, substitutions, dangerousSubstitutions, skipEscape);
-};
+export const t = translate;
 
 export const joinNames = LocalizerUtil.joinNames;
 

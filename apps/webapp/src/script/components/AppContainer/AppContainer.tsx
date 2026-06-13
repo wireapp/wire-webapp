@@ -37,7 +37,7 @@ import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
@@ -65,13 +65,13 @@ export const AppContainer = (properties: AppProps) => {
   const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, wallClock} = properties;
   setAppLocale();
   const app = useMemo(() => {
-    return new App(container.resolve(Core), container.resolve(APIClient), config, t);
+    return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
   }, [config]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 
   // Publishing application on the global scope for debug and testing purposes.
   window.wire.app = app;
-  const mainView = new MainViewModel(app.repository, t);
+  const mainView = new MainViewModel(app.repository, translate);
   useTheme(() => app.repository.properties.getPreference(PROPERTIES_TYPE.INTERFACE.THEME));
   useAccentColor();
   const themePreference = useUserPropertyValue(

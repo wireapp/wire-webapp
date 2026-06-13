@@ -31,7 +31,7 @@ import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {createWallClock} from 'src/script/clock/wallClock';
 import {RootProvider} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
+import {translate as defaultTranslate} from 'Util/localizerUtil';
 
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';
@@ -101,7 +101,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
       isFeatureToggleEnabled() {
         return false;
       },
-      translate: t,
+      translate: defaultTranslate,
       applicationNavigation: {
         get currentPathname(): string {
           return window.location.pathname;
