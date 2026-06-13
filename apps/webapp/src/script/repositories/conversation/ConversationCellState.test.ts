@@ -25,7 +25,7 @@ import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {PingMessage} from 'Repositories/entity/message/PingMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
@@ -47,19 +47,19 @@ describe('ConversationCellState', () => {
     it('returns empty state if notifications are set to everything', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
-      expect(generateCellState(conversationEntity, t)).toEqual({description: '', icon: 'none'});
+      expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'none'});
     });
 
     it('returns the muted icon if state is set to mentions and replies', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.MENTIONS_AND_REPLIES);
 
-      expect(generateCellState(conversationEntity, t)).toEqual({description: '', icon: 'muted'});
+      expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'muted'});
     });
 
     it('returns the muted icon if no notifications are allowed', () => {
       conversationEntity.mutedState(NOTIFICATION_STATE.NOTHING);
 
-      expect(generateCellState(conversationEntity, t)).toEqual({description: '', icon: 'muted'});
+      expect(generateCellState(conversationEntity, translate)).toEqual({description: '', icon: 'muted'});
     });
   });
 
@@ -91,7 +91,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of missed calls',
         expected: {
-          description: t('conversationsSecondaryLineSummaryMissedCalls', {number: 2}),
+          description: translate('conversationsSecondaryLineSummaryMissedCalls', {number: 2}),
           icon: ConversationStatusIcon.MISSED_CALL,
         },
         messages: [callMessage, callMessage],
@@ -107,7 +107,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of pings',
         expected: {
-          description: t('conversationsSecondaryLineSummaryPings', {number: 2}),
+          description: translate('conversationsSecondaryLineSummaryPings', {number: 2}),
           icon: ConversationStatusIcon.UNREAD_PING,
         },
         messages: [pingMessage, pingMessage],
@@ -115,7 +115,7 @@ describe('ConversationCellState', () => {
       {
         description: 'returns the number of mentions',
         expected: {
-          description: t('conversationsSecondaryLineSummaryMentions', {number: 2}),
+          description: translate('conversationsSecondaryLineSummaryMentions', {number: 2}),
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         messages: [mention, mention],
@@ -123,10 +123,10 @@ describe('ConversationCellState', () => {
       {
         description: 'prioritizes mentions, calls, pings and messages',
         expected: {
-          description: `${t('conversationsSecondaryLineSummaryMentions', {number: 2})}, ${t(
+          description: `${translate('conversationsSecondaryLineSummaryMentions', {number: 2})}, ${translate(
             'conversationsSecondaryLineSummaryMissedCalls',
             {number: 2},
-          )}, ${t('conversationsSecondaryLineSummaryPings', {number: 2})}, ${t('conversationsSecondaryLineSummaryMessages', {number: 2})}`,
+          )}, ${translate('conversationsSecondaryLineSummaryPings', {number: 2})}, ${translate('conversationsSecondaryLineSummaryMessages', {number: 2})}`,
           icon: ConversationStatusIcon.UNREAD_MENTION,
         },
         messages: [
@@ -147,7 +147,7 @@ describe('ConversationCellState', () => {
     tests.forEach(({description, expected, messages}) => {
       const expectedOne2One = expected.one2one || expected;
       conversationEntity.messages_unordered(messages);
-      const state = generateCellState(conversationEntity, t);
+      const state = generateCellState(conversationEntity, translate);
 
       it(`${description} (1:1)`, () => {
         expect(state).toEqual(expectedOne2One);
@@ -158,7 +158,7 @@ describe('ConversationCellState', () => {
     tests.forEach(({description, expected, messages}) => {
       const expectedGroup = expected.group || expected;
       conversationEntity.messages_unordered(messages);
-      const state = generateCellState(conversationEntity, t);
+      const state = generateCellState(conversationEntity, translate);
 
       it(`${description} (group)`, () => {
         expect(state).toEqual(expectedGroup);

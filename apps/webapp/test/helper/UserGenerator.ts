@@ -22,7 +22,7 @@ import {QualifiedId, UserAssetType} from '@wireapp/api-client/lib/user';
 import type {User as APIClientUser} from '@wireapp/api-client/lib/user';
 import type {User} from 'Repositories/entity/User';
 import {UserMapper} from 'Repositories/user/userMapper';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {serverTimeHandler} from '../../src/script/time/serverTimeHandler';
@@ -63,5 +63,5 @@ export function generateAPIUser(
 
 export function generateUser(id?: QualifiedId, overwites?: Partial<APIClientUser>): User {
   const apiUser = generateAPIUser(id, overwites);
-  return new UserMapper(serverTimeHandler, t).mapUserFromJson(apiUser, '');
+  return new UserMapper(serverTimeHandler, translate).mapUserFromJson(apiUser, '');
 }

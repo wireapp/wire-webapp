@@ -34,7 +34,7 @@ import ko from 'knockout';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {BaseError} from 'src/script/error/baseError';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ACCESS_STATE} from './AccessState';
@@ -53,7 +53,7 @@ describe('ConversationMapper', () => {
 
       expect(functionCallUndefinedParam).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
-      const functionCallEmtpyArray = () => ConversationMapper.mapConversations([], 1, t);
+      const functionCallEmtpyArray = () => ConversationMapper.mapConversations([], 1, translate);
 
       expect(functionCallEmtpyArray).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
@@ -62,7 +62,7 @@ describe('ConversationMapper', () => {
 
       expect(functionCallWrongType).toThrow(BaseError.MESSAGE.INVALID_PARAMETER);
 
-      const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined], 1, t);
+      const functionCallUndefinedInArray = () => ConversationMapper.mapConversations([undefined], 1, translate);
 
       expect(functionCallUndefinedInArray).toThrow(BaseError.MESSAGE.MISSING_PARAMETER);
 
@@ -75,7 +75,7 @@ describe('ConversationMapper', () => {
     it('maps a single conversation', () => {
       const conversation = entities.conversation;
       const initialTimestamp = Date.now();
-      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp, t);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp, translate);
 
       const expectedParticipantIds: QualifiedId[] = [
         conversation.members.others[0].id,
@@ -120,7 +120,7 @@ describe('ConversationMapper', () => {
       };
 
       const initialTimestamp = Date.now();
-      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp, t);
+      const [conversationEntity] = ConversationMapper.mapConversations([conversation], initialTimestamp, translate);
 
       expect(conversationEntity.roles()).toEqual({
         [conversation.members.self.id]: DefaultConversationRoleName.WIRE_ADMIN,
@@ -131,7 +131,7 @@ describe('ConversationMapper', () => {
 
     it('maps multiple conversations', () => {
       const conversations = payload.conversations.get.conversations;
-      const conversationEntities = ConversationMapper.mapConversations(conversations, 1, t);
+      const conversationEntities = ConversationMapper.mapConversations(conversations, 1, translate);
 
       expect(conversationEntities.length).toBe(conversations.length);
 
@@ -174,7 +174,7 @@ describe('ConversationMapper', () => {
         type: 0,
       };
 
-      const [conversationEntity] = ConversationMapper.mapConversations([payload] as ConversationDatabaseData[], 1, t);
+      const [conversationEntity] = ConversationMapper.mapConversations([payload] as ConversationDatabaseData[], 1, translate);
 
       expect(conversationEntity.name()).toBe(payload.name);
       expect(conversationEntity.teamId).toBe(payload.team);
@@ -185,7 +185,7 @@ describe('ConversationMapper', () => {
     it('can update the properties of a conversation', () => {
       const creatorId = createUuid();
       const conversationsData = [payload.conversations.get.conversations[0]];
-      const [conversationEntity] = ConversationMapper.mapConversations(conversationsData, 1, t);
+      const [conversationEntity] = ConversationMapper.mapConversations(conversationsData, 1, translate);
       const data: Partial<Record<keyof Conversation, string>> = {
         creator: creatorId,
         id: 'd5a39ffb-6ce3-4cc8-9048-0123456789abc',
@@ -223,7 +223,7 @@ describe('ConversationMapper', () => {
 
     beforeEach(() => {
       const conversationsData = [payload.conversations.get.conversations[0]];
-      [conversationEntity] = ConversationMapper.mapConversations(conversationsData, 1, t);
+      [conversationEntity] = ConversationMapper.mapConversations(conversationsData, 1, translate);
     });
 
     it('returns without updating if conversation entity does not exist', () => {

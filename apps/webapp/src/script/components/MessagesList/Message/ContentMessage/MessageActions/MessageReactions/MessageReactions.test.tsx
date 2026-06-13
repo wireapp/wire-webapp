@@ -25,7 +25,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 
 import {MessageReactions, MessageReactionsProps} from './MessageReactions';
 
@@ -65,7 +65,7 @@ describe('MessageReactions', () => {
       {wrapper: rootProviderWrapper},
     );
 
-    const emojiButton = getByLabelText(t('accessibility.messageActionsMenuEmoji'));
+    const emojiButton = getByLabelText(translate('accessibility.messageActionsMenuEmoji'));
 
     act(() => {
       fireEvent.click(emojiButton);
@@ -88,8 +88,8 @@ describe('MessageReactions', () => {
   test('should call handleReactionClick on reaction click', () => {
     const {getByLabelText} = render(<MessageReactions {...defaultProps} />, {wrapper: rootProviderWrapper});
 
-    const thumbsUpButton = getByLabelText(t('accessibility.messageActionsMenuThumbsUp'));
-    const likeButton = getByLabelText(t('accessibility.messageActionsMenuLike'));
+    const thumbsUpButton = getByLabelText(translate('accessibility.messageActionsMenuThumbsUp'));
+    const likeButton = getByLabelText(translate('accessibility.messageActionsMenuLike'));
 
     fireEvent.click(thumbsUpButton);
     fireEvent.click(likeButton);

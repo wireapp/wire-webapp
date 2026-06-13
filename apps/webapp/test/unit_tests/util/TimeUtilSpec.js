@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {
   formatDayMonth,
   formatDayMonthNumeral,
@@ -45,43 +45,43 @@ describe('TimeUtil', () => {
     it('formats durations in seconds', () => {
       expect(formatDuration(ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 's',
-        text: `1 ${t('ephemeralUnitsSecond')}`,
+        text: `1 ${translate('ephemeralUnitsSecond')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_SECOND_IN_MILLIS + 300)).toEqual({
         symbol: 's',
-        text: `1 ${t('ephemeralUnitsSecond')}`,
+        text: `1 ${translate('ephemeralUnitsSecond')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_SECOND_IN_MILLIS * 2)).toEqual({
         symbol: 's',
-        text: `2 ${t('ephemeralUnitsSeconds')}`,
+        text: `2 ${translate('ephemeralUnitsSeconds')}`,
         value: 2,
       });
 
       expect(formatDuration(ONE_SECOND_IN_MILLIS * 2 + 300)).toEqual({
         symbol: 's',
-        text: `2 ${t('ephemeralUnitsSeconds')}`,
+        text: `2 ${translate('ephemeralUnitsSeconds')}`,
         value: 2,
       });
 
       expect(formatDuration(5000)).toEqual({
         symbol: 's',
-        text: `5 ${t('ephemeralUnitsSeconds')}`,
+        text: `5 ${translate('ephemeralUnitsSeconds')}`,
         value: 5,
       });
 
       expect(formatDuration(15000)).toEqual({
         symbol: 's',
-        text: `15 ${t('ephemeralUnitsSeconds')}`,
+        text: `15 ${translate('ephemeralUnitsSeconds')}`,
         value: 15,
       });
 
       expect(formatDuration(800)).toEqual({
         symbol: 's',
-        text: `0 ${t('ephemeralUnitsSeconds')}`,
+        text: `0 ${translate('ephemeralUnitsSeconds')}`,
         value: 0,
       });
     });
@@ -89,55 +89,55 @@ describe('TimeUtil', () => {
     it('formats durations in minutes', () => {
       expect(formatDuration(ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'm',
-        text: `1 ${t('ephemeralUnitsMinute')}`,
+        text: `1 ${translate('ephemeralUnitsMinute')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_SECOND_IN_MILLIS * 60)).toEqual({
         symbol: 'm',
-        text: `1 ${t('ephemeralUnitsMinute')}`,
+        text: `1 ${translate('ephemeralUnitsMinute')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_MINUTE_IN_MILLIS * 5)).toEqual({
         symbol: 'm',
-        text: `5 ${t('ephemeralUnitsMinutes')}`,
+        text: `5 ${translate('ephemeralUnitsMinutes')}`,
         value: 5,
       });
 
       expect(formatDuration(ONE_MINUTE_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'm',
-        text: `1 ${t('ephemeralUnitsMinute')}`,
+        text: `1 ${translate('ephemeralUnitsMinute')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_MINUTE_IN_MILLIS + 29 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'm',
-        text: `1 ${t('ephemeralUnitsMinute')}`,
+        text: `1 ${translate('ephemeralUnitsMinute')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_MINUTE_IN_MILLIS + 30 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'm',
-        text: `2 ${t('ephemeralUnitsMinutes')}`,
+        text: `2 ${translate('ephemeralUnitsMinutes')}`,
         value: 2,
       });
 
       expect(formatDuration(ONE_MINUTE_IN_MILLIS * 2 + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'm',
-        text: `2 ${t('ephemeralUnitsMinutes')}`,
+        text: `2 ${translate('ephemeralUnitsMinutes')}`,
         value: 2,
       });
 
       expect(formatDuration(60000)).toEqual({
         symbol: 'm',
-        text: `1 ${t('ephemeralUnitsMinute')}`,
+        text: `1 ${translate('ephemeralUnitsMinute')}`,
         value: 1,
       });
 
       expect(formatDuration(900000)).toEqual({
         symbol: 'm',
-        text: `15 ${t('ephemeralUnitsMinutes')}`,
+        text: `15 ${translate('ephemeralUnitsMinutes')}`,
         value: 15,
       });
     });
@@ -145,49 +145,49 @@ describe('TimeUtil', () => {
     it('formats durations in hours', () => {
       expect(formatDuration(ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'h',
-        text: `1 ${t('ephemeralUnitsHour')}`,
+        text: `1 ${translate('ephemeralUnitsHour')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_MINUTE_IN_MILLIS * 60)).toEqual({
         symbol: 'h',
-        text: `1 ${t('ephemeralUnitsHour')}`,
+        text: `1 ${translate('ephemeralUnitsHour')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_HOUR_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'h',
-        text: `1 ${t('ephemeralUnitsHour')}`,
+        text: `1 ${translate('ephemeralUnitsHour')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_HOUR_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'h',
-        text: `1 ${t('ephemeralUnitsHour')}`,
+        text: `1 ${translate('ephemeralUnitsHour')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_HOUR_IN_MILLIS + 29 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'h',
-        text: `1 ${t('ephemeralUnitsHour')}`,
+        text: `1 ${translate('ephemeralUnitsHour')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_HOUR_IN_MILLIS + 30 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'h',
-        text: `2 ${t('ephemeralUnitsHours')}`,
+        text: `2 ${translate('ephemeralUnitsHours')}`,
         value: 2,
       });
 
       expect(formatDuration(ONE_HOUR_IN_MILLIS * 2 + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'h',
-        text: `2 ${t('ephemeralUnitsHours')}`,
+        text: `2 ${translate('ephemeralUnitsHours')}`,
         value: 2,
       });
 
       expect(formatDuration(ONE_HOUR_IN_MILLIS * 2 + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'h',
-        text: `2 ${t('ephemeralUnitsHours')}`,
+        text: `2 ${translate('ephemeralUnitsHours')}`,
         value: 2,
       });
     });
@@ -195,61 +195,61 @@ describe('TimeUtil', () => {
     it('formats durations in days', () => {
       expect(formatDuration(ONE_DAY_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `1 ${t('ephemeralUnitsDay')}`,
+        text: `1 ${translate('ephemeralUnitsDay')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_HOUR_IN_MILLIS * 24)).toEqual({
         symbol: 'd',
-        text: `1 ${t('ephemeralUnitsDay')}`,
+        text: `1 ${translate('ephemeralUnitsDay')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_DAY_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `1 ${t('ephemeralUnitsDay')}`,
+        text: `1 ${translate('ephemeralUnitsDay')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_DAY_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `1 ${t('ephemeralUnitsDay')}`,
+        text: `1 ${translate('ephemeralUnitsDay')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_DAY_IN_MILLIS + 3 * ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `1 ${t('ephemeralUnitsDay')}`,
+        text: `1 ${translate('ephemeralUnitsDay')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_DAY_IN_MILLIS + 11 * ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `1 ${t('ephemeralUnitsDay')}`,
+        text: `1 ${translate('ephemeralUnitsDay')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_DAY_IN_MILLIS + 12 * ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `2 ${t('ephemeralUnitsDays')}`,
+        text: `2 ${translate('ephemeralUnitsDays')}`,
         value: 2,
       });
 
       expect(formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_SECOND_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `2 ${t('ephemeralUnitsDays')}`,
+        text: `2 ${translate('ephemeralUnitsDays')}`,
         value: 2,
       });
 
       expect(formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_MINUTE_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `2 ${t('ephemeralUnitsDays')}`,
+        text: `2 ${translate('ephemeralUnitsDays')}`,
         value: 2,
       });
 
       expect(formatDuration(2 * ONE_DAY_IN_MILLIS + 3 * ONE_HOUR_IN_MILLIS)).toEqual({
         symbol: 'd',
-        text: `2 ${t('ephemeralUnitsDays')}`,
+        text: `2 ${translate('ephemeralUnitsDays')}`,
         value: 2,
       });
     });
@@ -257,19 +257,19 @@ describe('TimeUtil', () => {
     it('formats durations in weeks', () => {
       expect(formatDuration(ONE_WEEK_IN_MILLIS)).toEqual({
         symbol: 'w',
-        text: `1 ${t('ephemeralUnitsWeek')}`,
+        text: `1 ${translate('ephemeralUnitsWeek')}`,
         value: 1,
       });
 
       expect(formatDuration(ONE_WEEK_IN_MILLIS * 26)).toEqual({
         symbol: 'w',
-        text: `26 ${t('ephemeralUnitsWeeks')}`,
+        text: `26 ${translate('ephemeralUnitsWeeks')}`,
         value: 26,
       });
 
       expect(formatDuration(ONE_WEEK_IN_MILLIS * 27)).toEqual({
         symbol: 'w',
-        text: `27 ${t('ephemeralUnitsWeeks')}`,
+        text: `27 ${translate('ephemeralUnitsWeeks')}`,
         value: 27,
       });
     });
@@ -277,13 +277,13 @@ describe('TimeUtil', () => {
     it('formats durations in years', () => {
       expect(formatDuration(ONE_YEAR_IN_MILLIS)).toEqual({
         symbol: 'y',
-        text: `1 ${t('ephemeralUnitsYear')}`,
+        text: `1 ${translate('ephemeralUnitsYear')}`,
         value: 1,
       });
 
       expect(formatDuration(2 * ONE_YEAR_IN_MILLIS)).toEqual({
         symbol: 'y',
-        text: `2 ${t('ephemeralUnitsYears')}`,
+        text: `2 ${translate('ephemeralUnitsYears')}`,
         value: 2,
       });
     });
@@ -311,19 +311,19 @@ describe('TimeUtil', () => {
     it('renders days and hours:minutes', () => {
       caption = formatDurationCaption(ONE_DAY_IN_MILLIS + ONE_HOUR_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
 
-      expect(caption).toEqual(`1 ${t('ephemeralUnitsDay')} and 01:01`);
+      expect(caption).toEqual(`1 ${translate('ephemeralUnitsDay')} and 01:01`);
     });
 
     it('renders just the days if hours are 0', () => {
       caption = formatDurationCaption(2 * ONE_DAY_IN_MILLIS + ONE_MINUTE_IN_MILLIS);
 
-      expect(caption).toEqual(`2 ${t('ephemeralUnitsDays')}`);
+      expect(caption).toEqual(`2 ${translate('ephemeralUnitsDays')}`);
     });
 
     it('renders weeks and days', () => {
       caption = formatDurationCaption(3 * ONE_WEEK_IN_MILLIS + ONE_DAY_IN_MILLIS);
 
-      expect(caption).toEqual(`3 ${t('ephemeralUnitsWeeks')} and 1 ${t('ephemeralUnitsDay')}`);
+      expect(caption).toEqual(`3 ${translate('ephemeralUnitsWeeks')} and 1 ${translate('ephemeralUnitsDay')}`);
     });
 
     it('uses an injected translate function', () => {
@@ -337,48 +337,48 @@ describe('TimeUtil', () => {
 
   describe('"formatCoarseDuration"', () => {
     it('formats durations in days (singular & plural)', () => {
-      expect(formatCoarseDuration(ONE_DAY_IN_MILLIS)).toBe(t('initProgressDaysSingular', {time: 1}));
+      expect(formatCoarseDuration(ONE_DAY_IN_MILLIS)).toBe(translate('initProgressDaysSingular', {time: 1}));
 
       // Floor should keep it at 1 day
       expect(formatCoarseDuration(ONE_DAY_IN_MILLIS + 11 * ONE_HOUR_IN_MILLIS)).toBe(
-        t('initProgressDaysSingular', {time: 1}),
+        translate('initProgressDaysSingular', {time: 1}),
       );
 
-      expect(formatCoarseDuration(2 * ONE_DAY_IN_MILLIS)).toBe(t('initProgressDaysPlural', {time: 2}));
+      expect(formatCoarseDuration(2 * ONE_DAY_IN_MILLIS)).toBe(translate('initProgressDaysPlural', {time: 2}));
       expect(formatCoarseDuration(2 * ONE_DAY_IN_MILLIS + 5 * ONE_HOUR_IN_MILLIS)).toBe(
-        t('initProgressDaysPlural', {time: 2}),
+        translate('initProgressDaysPlural', {time: 2}),
       );
     });
 
     it('formats durations in hours (singular & plural)', () => {
-      expect(formatCoarseDuration(ONE_HOUR_IN_MILLIS)).toBe(t('initProgressHoursSingular', {time: 1}));
+      expect(formatCoarseDuration(ONE_HOUR_IN_MILLIS)).toBe(translate('initProgressHoursSingular', {time: 1}));
 
       // Floor keeps it at 1 hour
       expect(formatCoarseDuration(ONE_HOUR_IN_MILLIS + 59 * ONE_MINUTE_IN_MILLIS)).toBe(
-        t('initProgressHoursSingular', {time: 1}),
+        translate('initProgressHoursSingular', {time: 1}),
       );
 
-      expect(formatCoarseDuration(2 * ONE_HOUR_IN_MILLIS)).toBe(t('initProgressHoursPlural', {time: 2}));
+      expect(formatCoarseDuration(2 * ONE_HOUR_IN_MILLIS)).toBe(translate('initProgressHoursPlural', {time: 2}));
       expect(formatCoarseDuration(2 * ONE_HOUR_IN_MILLIS + 30 * ONE_MINUTE_IN_MILLIS)).toBe(
-        t('initProgressHoursPlural', {time: 2}),
+        translate('initProgressHoursPlural', {time: 2}),
       );
     });
 
     it('formats durations in minutes (singular & plural)', () => {
-      expect(formatCoarseDuration(ONE_MINUTE_IN_MILLIS)).toBe(t('initProgressMinutesSingular', {time: 1}));
+      expect(formatCoarseDuration(ONE_MINUTE_IN_MILLIS)).toBe(translate('initProgressMinutesSingular', {time: 1}));
 
       // Floor keeps it at 1 minute
       expect(formatCoarseDuration(ONE_MINUTE_IN_MILLIS + 59 * ONE_SECOND_IN_MILLIS)).toBe(
-        t('initProgressMinutesSingular', {time: 1}),
+        translate('initProgressMinutesSingular', {time: 1}),
       );
 
-      expect(formatCoarseDuration(2 * ONE_MINUTE_IN_MILLIS)).toBe(t('initProgressMinutesPlural', {time: 2}));
+      expect(formatCoarseDuration(2 * ONE_MINUTE_IN_MILLIS)).toBe(translate('initProgressMinutesPlural', {time: 2}));
 
       // Sub-minute durations should be treated as 1 minute (singular)
-      expect(formatCoarseDuration(59 * ONE_SECOND_IN_MILLIS)).toBe(t('initProgressMinutesSingular', {time: 1}));
+      expect(formatCoarseDuration(59 * ONE_SECOND_IN_MILLIS)).toBe(translate('initProgressMinutesSingular', {time: 1}));
 
       // Explicit 30s case
-      expect(formatCoarseDuration(30 * ONE_SECOND_IN_MILLIS)).toBe(t('initProgressMinutesSingular', {time: 1}));
+      expect(formatCoarseDuration(30 * ONE_SECOND_IN_MILLIS)).toBe(translate('initProgressMinutesSingular', {time: 1}));
     });
 
     it('uses an injected translate function', () => {

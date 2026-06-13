@@ -18,7 +18,7 @@
  */
 
 import {User} from 'Repositories/entity/User';
-import {Declension, LocalizerUtil, t, getSelfName, getUserName} from 'Util/localizerUtil';
+import {Declension, LocalizerUtil, translate, getSelfName, getUserName} from 'Util/localizerUtil';
 
 import {escapeRegex, safeWindowOpen} from './sanitizationUtil';
 
@@ -44,7 +44,7 @@ describe('sanitizationUtil', () => {
       userEntity.isMe = true;
       const escapedSelfName = getUserName(userEntity);
 
-      expect(escapedSelfName).toEqual(t('conversationYouNominative'));
+      expect(escapedSelfName).toEqual(translate('conversationYouNominative'));
     });
   });
 
@@ -52,15 +52,15 @@ describe('sanitizationUtil', () => {
     it('will return the self name in the given declension', () => {
       const escapedNominativeName = getSelfName(Declension.NOMINATIVE);
 
-      expect(escapedNominativeName).toEqual(t('conversationYouNominative'));
+      expect(escapedNominativeName).toEqual(translate('conversationYouNominative'));
 
       const unescapedNominativeName = getSelfName(Declension.NOMINATIVE, true);
 
-      expect(unescapedNominativeName).toEqual(t('conversationYouNominative'));
+      expect(unescapedNominativeName).toEqual(translate('conversationYouNominative'));
 
       const escapedDativeName = getSelfName(Declension.DATIVE);
 
-      expect(escapedDativeName).toEqual(t('conversationYouDative'));
+      expect(escapedDativeName).toEqual(translate('conversationYouDative'));
 
       spyOn(LocalizerUtil, 'translate').and.returnValue('<script>you</script>');
       const escapedAccusativeName = getSelfName(Declension.DATIVE);

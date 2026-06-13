@@ -41,7 +41,7 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamState} from 'Repositories/team/TeamState';
-import {type Translate, t} from 'Util/localizerUtil';
+import {type Translate, translate as defaultTranslate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {createUuid} from 'Util/uuid';
 
@@ -53,14 +53,14 @@ import {UserState} from './userState';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 const testFactory = new TestFactory();
-async function buildUserRepository(translate: Translate = t) {
+async function buildUserRepository(translate: Translate = defaultTranslate) {
   const storageRepo = await testFactory.exposeStorageActors();
 
   const userService = new UserService(storageRepo['storageService']);
   const assetRepository = new AssetRepository();
   const selfService = new SelfService();
-  const clientRepository = new ClientRepository({} as any, {} as any, t);
-  const propertyRepository = new PropertiesRepository({} as any, {} as any, t);
+  const clientRepository = new ClientRepository({} as any, {} as any, translate);
+  const propertyRepository = new PropertiesRepository({} as any, {} as any, translate);
   const userState = new UserState();
   const teamState = new TeamState();
 

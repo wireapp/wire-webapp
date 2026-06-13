@@ -28,12 +28,12 @@ import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, t} from 'Util/localizerUtil';
+import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
 
 setStrings({en});
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: t}));
+const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translate}));
 
 function withTheme(component: React.ReactNode): React.ReactElement {
   return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children: component})}</StyledApp>;

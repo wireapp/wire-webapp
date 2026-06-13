@@ -25,7 +25,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import en from 'I18n/en-US.json';
 import {TeamState} from 'Repositories/team/TeamState';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {setStrings, t} from 'Util/localizerUtil';
+import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FeatureConfigChangeNotifier} from './FeatureConfigChangeNotifier';
 
@@ -33,7 +33,7 @@ setStrings({en});
 
 describe('FeatureConfigChangeNotifier', () => {
   const showModalSpy = jest.spyOn(PrimaryModal, 'show');
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: t}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translate}));
 
   beforeEach(() => {
     showModalSpy.mockClear();

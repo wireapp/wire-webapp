@@ -26,7 +26,7 @@ import {ConversationDatabaseData, ConversationMapper} from 'Repositories/convers
 import {User} from 'Repositories/entity/User';
 import {Core} from 'src/script/service/coreSingleton';
 import {TestFactory} from 'test/helper/TestFactory';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {joinConversationsAfterMigrationFinalisation} from '.';
@@ -105,7 +105,7 @@ const createConversation = (
 ) => {
   const conversationRecord = createMockedDBConversationEntry(id, domain, initialProtocol, protocol, type);
 
-  const [conversation] = ConversationMapper.mapConversations([conversationRecord], 1, t);
+  const [conversation] = ConversationMapper.mapConversations([conversationRecord], 1, translate);
   conversation.type(type);
 
   if (protocol === CONVERSATION_PROTOCOL.MLS) {

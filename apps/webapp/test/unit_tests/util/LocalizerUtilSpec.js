@@ -17,13 +17,13 @@
  *
  */
 
-import {getSelfName, t, setStrings, joinNames} from 'Util/localizerUtil';
+import {getSelfName, translate, setStrings, joinNames} from 'Util/localizerUtil';
 
 describe('LocalizerUtil', () => {
-  describe('t', () => {
+  describe('translate', () => {
     it('can get localized strings', () => {
       setStrings({en: {wire: 'Wire'}});
-      const result = t('wire');
+      const result = translate('wire');
 
       expect(result).toBe('Wire');
     });
@@ -31,21 +31,21 @@ describe('LocalizerUtil', () => {
     it('can replace placeholders in localized strings using shorthand string version', () => {
       setStrings({en: {hey: 'Hey {name}'}});
 
-      const result = t('hey', 'Tod');
+      const result = translate('hey', 'Tod');
 
       expect(result).toBe('Hey Tod');
     });
 
     it('can replace placeholders in localized strings using shorthand number version', () => {
       setStrings({en: {text: 'Number {name} is alive'}});
-      const result = t('text', 5);
+      const result = translate('text', 5);
 
       expect(result).toBe('Number 5 is alive');
     });
 
     it('can replace placeholders in localized strings using an object', () => {
       setStrings({en: {hey: 'Hey {name}'}});
-      const result = t('hey', {name: 'Tod'});
+      const result = translate('hey', {name: 'Tod'});
 
       expect(result).toBe('Hey Tod');
     });
@@ -53,14 +53,14 @@ describe('LocalizerUtil', () => {
     it('can replace placeholders in localized strings using a more complex object', () => {
       setStrings({en: {greeting: '{greeting} {name}'}});
 
-      const result = t('greeting', {greeting: 'Hey', name: 'Tod'});
+      const result = translate('greeting', {greeting: 'Hey', name: 'Tod'});
 
       expect(result).toBe('Hey Tod');
     });
 
     it('can replace duplicate placeholders in localized strings using a more complex object', () => {
       setStrings({en: {greeting: '{greeting} {greeting} {name}'}});
-      const result = t('greeting', {greeting: 'Hey', name: 'Tod'});
+      const result = translate('greeting', {greeting: 'Hey', name: 'Tod'});
 
       expect(result).toBe('Hey Hey Tod');
     });
@@ -68,12 +68,12 @@ describe('LocalizerUtil', () => {
     it('returns the identifier if translation or locale cannot be found', () => {
       setStrings({});
       const identifier = 'unfound';
-      const noLocaleResult = t(identifier, {greeting: 'Hey', name: 'Tod'});
+      const noLocaleResult = translate(identifier, {greeting: 'Hey', name: 'Tod'});
 
       expect(noLocaleResult).toBe(identifier);
 
       setStrings({en: {found: 'found'}});
-      const noStringResult = t(identifier, {greeting: 'Hey', name: 'Tod'});
+      const noStringResult = translate(identifier, {greeting: 'Hey', name: 'Tod'});
 
       expect(noStringResult).toBe(identifier);
     });
@@ -87,9 +87,9 @@ describe('LocalizerUtil', () => {
         },
       });
 
-      expect(t('test1')).toBe('<script>alert("fail")</script>');
-      expect(t('test2')).toBe('');
-      expect(t('test3')).toBe('félix');
+      expect(translate('test1')).toBe('<script>alert("fail")</script>');
+      expect(translate('test2')).toBe('');
+      expect(translate('test3')).toBe('félix');
     });
 
     it('escapes raw substitutions string or number', () => {
@@ -99,8 +99,8 @@ describe('LocalizerUtil', () => {
         },
       });
 
-      const result1 = t('test', '<script>alert("felix")</script>');
-      const result2 = t('test', 12);
+      const result1 = translate('test', '<script>alert("felix")</script>');
+      const result2 = translate('test', 12);
 
       expect(result1).toBe('<scri>alert("&lt;script&gt;alert(&quot;felix&quot;)&lt;/script&gt;")</scri>');
 
@@ -116,9 +116,9 @@ describe('LocalizerUtil', () => {
         },
       });
 
-      const result1 = t('test1', {user: '<script>alert("felix")</script>'});
-      const result2 = t('test2', {user: 'nan'});
-      const result3 = t('test3', {status: '<script>a pickle</script>', user: 'Rick'});
+      const result1 = translate('test1', {user: '<script>alert("felix")</script>'});
+      const result2 = translate('test2', {user: 'nan'});
+      const result3 = translate('test3', {status: '<script>a pickle</script>', user: 'Rick'});
 
       expect(result1).toBe('<scri>alert("&lt;script&gt;alert(&quot;felix&quot;)&lt;/script&gt;")</scri>');
 
@@ -134,8 +134,8 @@ describe('LocalizerUtil', () => {
         },
       });
 
-      const result1 = t('test', 'Huey, Dewey, & Louie', {}, true);
-      const result2 = t('test', {user: 'Huey, Dewey, & Louie'}, {}, true);
+      const result1 = translate('test', 'Huey, Dewey, & Louie', {}, true);
+      const result2 = translate('test', {user: 'Huey, Dewey, & Louie'}, {}, true);
 
       expect(result1).toBe('Hello Huey, Dewey, & Louie');
       expect(result2).toBe(result1);
@@ -149,8 +149,8 @@ describe('LocalizerUtil', () => {
         },
       });
 
-      const result1 = t('test1', {}, {'/user': '</user>', user: '<user>'});
-      const result2 = t('test2', {user: '<script>alert("felix")</script>'}, {user: '<user>'});
+      const result1 = translate('test1', {}, {'/user': '</user>', user: '<user>'});
+      const result2 = translate('test2', {user: '<script>alert("felix")</script>'}, {user: '<user>'});
 
       expect(result1).toBe('<user>Felix</user>');
       expect(result2).toBe('<user>&lt;script&gt;alert(&quot;felix&quot;)&lt;/script&gt;<user>');
@@ -159,7 +159,7 @@ describe('LocalizerUtil', () => {
     it('replaces default known tags', () => {
       setStrings({en: {test: '[bold]Felix[/bold] is [bold]a[/bold] [italic]pickle[/italic]'}});
 
-      expect(t('test')).toBe('<strong>Felix</strong> is <strong>a</strong> <i>pickle</i>');
+      expect(translate('test')).toBe('<strong>Felix</strong> is <strong>a</strong> <i>pickle</i>');
     });
   });
 

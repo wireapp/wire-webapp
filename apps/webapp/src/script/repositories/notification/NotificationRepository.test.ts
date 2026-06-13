@@ -61,14 +61,14 @@ import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {entities, payload} from 'test/api/payloads';
-import {type Translate, t} from 'Util/localizerUtil';
+import {type Translate, translate as defaultTranslate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {truncate} from 'Util/stringUtil';
 import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
-function buildNotificationRepository(translate: Translate = t) {
+function buildNotificationRepository(translate: Translate = defaultTranslate) {
   const userState = container.resolve(UserState);
   const notificationRepository = new NotificationRepository(
     {} as any,
@@ -88,7 +88,7 @@ function buildNotificationRepository(translate: Translate = t) {
 describe('NotificationRepository', () => {
   const userState = container.resolve(UserState);
   let notificationRepository: NotificationRepository;
-  const userMapper = new UserMapper({} as any, t);
+  const userMapper = new UserMapper({} as any, defaultTranslate);
   let conversation: Conversation;
   let message: Message;
   let user: User;
@@ -116,7 +116,7 @@ describe('NotificationRepository', () => {
 
     // Create entities
     user = userMapper.mapUserFromJson(payload.users.get.one[0], '');
-    [conversation] = ConversationMapper.mapConversations([entities.conversation], 1, t);
+    [conversation] = ConversationMapper.mapConversations([entities.conversation], 1, defaultTranslate);
     const selfUserEntity = new User(createUuid());
     selfUserEntity.isMe = true;
     selfUserEntity.teamId = createUuid();
@@ -195,9 +195,9 @@ describe('NotificationRepository', () => {
         expect(notificationRepository['showNotification']).toHaveBeenCalledTimes(1);
 
         const trigger = notificationRepository['createTrigger'](message, undefined, conversation);
-        notification_content.options.body = t('notificationObfuscated');
+        notification_content.options.body = defaultTranslate('notificationObfuscated');
         notification_content.options.data.messageType = _message.type;
-        notification_content.title = t('notificationObfuscatedTitle');
+        notification_content.title = defaultTranslate('notificationObfuscatedTitle');
         notification_content.trigger = trigger;
 
         const [firstResultArgs] = showNotificationSpy.mock.calls[0];
@@ -215,11 +215,11 @@ describe('NotificationRepository', () => {
 
         const obfuscateMessage = _setting === NotificationPreference.OBFUSCATE_MESSAGE;
         if (obfuscateMessage) {
-          notification_content.options.body = t('notificationObfuscated');
+          notification_content.options.body = defaultTranslate('notificationObfuscated');
           notification_content.title = createTruncatedTitle(_message.user().name(), _conversation.display_name());
         } else {
-          notification_content.options.body = t('notificationObfuscated');
-          notification_content.title = t('notificationObfuscatedTitle');
+          notification_content.options.body = defaultTranslate('notificationObfuscated');
+          notification_content.title = defaultTranslate('notificationObfuscatedTitle');
         }
         notification_content.options.data.messageType = _message.type;
 
@@ -408,7 +408,7 @@ describe('NotificationRepository', () => {
 
   describe('shows a well-formed call notification', () => {
     describe('for an incoming call', () => {
-      const expected_body = t('notificationVoiceChannelActivate');
+      const expected_body = defaultTranslate('notificationVoiceChannelActivate');
 
       beforeEach(() => {
         message = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0, translateForTest) as any;
@@ -426,7 +426,7 @@ describe('NotificationRepository', () => {
     });
 
     describe('for a missed call', () => {
-      const expected_body = t('notificationVoiceChannelDeactivate');
+      const expected_body = defaultTranslate('notificationVoiceChannelDeactivate');
 
       beforeEach(() => {
         message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.MISSED, 0, translateForTest) as any;
@@ -485,7 +485,7 @@ describe('NotificationRepository', () => {
     describe('for a picture', () => {
       beforeEach(() => {
         textMessage.assets.push(new MediumImage('image'));
-        expected_body = t('notificationAssetAdd');
+        expected_body = defaultTranslate('notificationAssetAdd');
       });
 
       it('in a 1:1 conversation', () => {
@@ -513,7 +513,7 @@ describe('NotificationRepository', () => {
     describe('for a location', () => {
       beforeEach(() => {
         textMessage.assets.push(new Location());
-        expected_body = t('notificationSharedLocation');
+        expected_body = defaultTranslate('notificationSharedLocation');
       });
 
       it('in a 1:1 conversation', () => {
@@ -591,7 +591,7 @@ describe('NotificationRepository', () => {
       message = new MessageTimerUpdateMessage(5000, translateForTest);
       message.user(user);
 
-      const expectedBody = `${user.name()} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
+      const expectedBody = `${user.name()} set the message timer to 5 ${defaultTranslate('ephemeralUnitsSeconds')}`;
       expect(expectedBody).toBeDefined();
       return verifyNotificationSystem(conversation, message, expectedBody);
     });
@@ -711,7 +711,7 @@ describe('NotificationRepository', () => {
       connectionEntity.status(ConnectionStatus.PENDING);
       memberMessage.memberMessageType = SystemMessageType.CONNECTION_REQUEST;
 
-      const expected_body = t('notificationConnectionRequest');
+      const expected_body = defaultTranslate('notificationConnectionRequest');
       expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation, memberMessage, expected_body, expected_title);
     });
@@ -719,7 +719,7 @@ describe('NotificationRepository', () => {
     it('if your connection request was accepted', () => {
       memberMessage.memberMessageType = SystemMessageType.CONNECTION_ACCEPTED;
 
-      const expected_body = t('notificationConnectionAccepted');
+      const expected_body = defaultTranslate('notificationConnectionAccepted');
       expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation, memberMessage, expected_body, expected_title);
     });
@@ -727,14 +727,14 @@ describe('NotificationRepository', () => {
     it('if you are automatically connected', () => {
       memberMessage.memberMessageType = SystemMessageType.CONNECTION_CONNECTED;
 
-      const expected_body = t('notificationConnectionConnected');
+      const expected_body = defaultTranslate('notificationConnectionConnected');
       expect(expected_body).toBeDefined();
       return verifyNotificationSystem(conversation, memberMessage, expected_body, expected_title);
     });
   });
 
   describe('shows a well-formed ping notification', () => {
-    const expected_body = t('notificationPing');
+    const expected_body = defaultTranslate('notificationPing');
 
     beforeAll(() => {
       user = userMapper.mapUserFromJson(payload.users.get.one[0], '');

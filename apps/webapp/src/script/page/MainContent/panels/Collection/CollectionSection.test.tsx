@@ -21,7 +21,7 @@ import {fireEvent, render} from '@testing-library/react';
 
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 

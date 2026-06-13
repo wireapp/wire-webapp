@@ -34,7 +34,7 @@ import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
-import {type Translate, t} from 'Util/localizerUtil';
+import {type Translate, translate as defaultTranslate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ActionsViewModel} from './ActionsViewModel';
@@ -64,7 +64,7 @@ function buildActionsViewModel({
   teamFeatures = undefined as any,
   setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
   leaveConversationMock = jest.fn().mockResolvedValue(undefined),
-  translate = t,
+  translate = defaultTranslate,
 }: {
   selfUser?: User;
   teamFeatures?: any;

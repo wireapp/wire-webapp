@@ -25,7 +25,7 @@ import {render} from '@testing-library/react';
 import {usePrimaryModalState} from 'Components/Modals/PrimaryModal';
 import {createDeterministicWallClock, DeterministicWallClock} from 'src/script/clock/deterministicWallClock';
 import {MainViewModel} from 'src/script/view_model/MainViewModel';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {RootProvider} from 'src/script/page/RootProvider';
@@ -199,9 +199,9 @@ describe('ForceReloadModal', () => {
     const currentModalIdentifierBeforeBackgroundClick = currentModalId;
 
     expect(currentModalContent.hideCloseBtn).toBe(true);
-    expect(currentModalContent.messageHtml).toBe(t('forceReloadModalMessage'));
-    expect(currentModalContent.primaryAction?.text).toBe(t('forceReloadModalAction'));
-    expect(currentModalContent.titleText).toBe(t('forceReloadModalTitle'));
+    expect(currentModalContent.messageHtml).toBe(translate('forceReloadModalMessage'));
+    expect(currentModalContent.primaryAction?.text).toBe(translate('forceReloadModalAction'));
+    expect(currentModalContent.titleText).toBe(translate('forceReloadModalTitle'));
 
     currentModalContent.onBgClick();
     expect(usePrimaryModalState.getState().currentModalId).toBe(currentModalIdentifierBeforeBackgroundClick);

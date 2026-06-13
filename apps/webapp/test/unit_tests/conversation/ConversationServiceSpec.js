@@ -19,7 +19,7 @@
 
 import {ConversationMapper} from 'Repositories/conversation/ConversationMapper';
 import {StorageSchemata} from 'Repositories/storage/storageSchemata';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 
 import {TestFactory} from '../../helper/TestFactory';
 
@@ -71,7 +71,7 @@ describe('ConversationService', () => {
         name: 'Michael',
         type: 2,
       };
-      const [conversation_et] = ConversationMapper.mapConversations([conversation_payload], 1, t);
+      const [conversation_et] = ConversationMapper.mapConversations([conversation_payload], 1, translate);
 
       return conversation_service.saveConversationStateInDb(conversation_et).then(conversation_record => {
         expect(conversation_record.name()).toBe(conversation_payload.name);

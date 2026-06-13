@@ -31,7 +31,7 @@ import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
-import {type Translate, t} from 'Util/localizerUtil';
+import {type Translate, translate as defaultTranslate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
@@ -39,7 +39,7 @@ import {ConnectionRepository} from './connectionRepository';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 
-function buildConnectionRepository(translate: Translate = t) {
+function buildConnectionRepository(translate: Translate = defaultTranslate) {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
   const selfService = new SelfService();

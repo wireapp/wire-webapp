@@ -22,7 +22,7 @@ import {STATE} from '@wireapp/avs';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {type Translate, t} from 'Util/localizerUtil';
+import {type Translate, translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from './CallingViewModel.mocks';

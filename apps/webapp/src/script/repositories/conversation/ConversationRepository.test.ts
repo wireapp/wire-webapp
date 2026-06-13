@@ -78,7 +78,7 @@ import {
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent} from 'test/helper/EventGenerator';
 import {matchQualifiedIds} from 'Util/qualifiedId';
-import {type Translate, t} from 'Util/localizerUtil';
+import {type Translate, translate as defaultTranslate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {escapeRegex} from 'Util/sanitizationUtil';
 import {createUuid} from 'Util/uuid';
@@ -104,7 +104,7 @@ import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mock
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/coreSingleton';
 
-function buildConversationRepository(translate: Translate = t) {
+function buildConversationRepository(translate: Translate = defaultTranslate) {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -567,7 +567,7 @@ describe('ConversationRepository', () => {
 
       const [newConversationEntity] = ConversationMapper.mapConversations([
         team1to1Conversation as ConversationDatabaseData,
-      ], 1, t);
+      ], 1, defaultTranslate);
       conversationRepository['conversationState'].conversations.push(newConversationEntity);
 
       const teamId = team1to1Conversation.team;

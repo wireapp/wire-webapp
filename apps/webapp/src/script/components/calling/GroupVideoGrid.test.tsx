@@ -29,7 +29,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
@@ -209,6 +209,6 @@ describe('GroupVideoGrid', () => {
     };
 
     const {getAllByText} = render(<GroupVideoGrid {...props} />, {wrapper: rootProviderWrapper});
-    expect(getAllByText(t('videoCallParticipantConnecting'))).toHaveLength(2);
+    expect(getAllByText(translate('videoCallParticipantConnecting'))).toHaveLength(2);
   });
 });

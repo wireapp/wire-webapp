@@ -23,14 +23,14 @@ import {EventMapper} from 'Repositories/conversation/EventMapper';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/Message';
 import {createGroupCreationEvent, createMessageAddEvent} from 'test/helper/EventGenerator';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {getRandomNumber} from 'Util/numberUtil';
 import {createUuid} from 'Util/uuid';
 
 import {GroupedMessage, groupMessagesBySenderAndTime, isMarker} from './virtualizedMessagesGroup';
 
 describe('MessagesGroup', () => {
-  const eventMapper = new EventMapper(undefined, t);
+  const eventMapper = new EventMapper(undefined, translate);
   const conversation = new Conversation(createUuid(), 'domain');
 
   it('should group messages by sender', () => {

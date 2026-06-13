@@ -24,7 +24,7 @@ import {render} from '@testing-library/react';
 import {User} from 'Repositories/entity/User';
 import {RootProvider} from 'src/script/page/RootProvider';
 import {createRootContextValueForTest} from 'src/script/page/testSupport/rootContextTestSupport';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {UserDetails} from './UserDetails';
@@ -116,6 +116,6 @@ describe('UserDetails', () => {
 
     const {getByTestId} = renderWithRootProvider(<UserDetails {...props} />);
 
-    expect(getByTestId('status-name').textContent).toBe(t('unavailableUser'));
+    expect(getByTestId('status-name').textContent).toBe(translate('unavailableUser'));
   });
 });

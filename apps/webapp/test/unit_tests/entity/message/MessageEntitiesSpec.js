@@ -22,7 +22,7 @@ import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Text} from 'Repositories/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('Message Entities', () => {

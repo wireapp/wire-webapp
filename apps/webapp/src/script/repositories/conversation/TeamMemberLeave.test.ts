@@ -30,7 +30,7 @@ import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {generateUser} from 'test/helper/UserGenerator';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 
 jest.mock('./EventMapper', () => ({EventMapper: jest.fn().mockReturnValue({})}));
 
@@ -108,7 +108,7 @@ function buildConversationRepository() {
     propertiesRepository,
     callingRepository,
     serverTimeHandler,
-    t,
+    translate,
     userState,
     teamState,
     conversationState,

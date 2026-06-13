@@ -36,7 +36,7 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {Config} from 'src/script/Config';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
@@ -113,7 +113,7 @@ describe('InputBar', () => {
   beforeEach(() => {
     const propertiesService = new PropertiesService();
     const selfService = new SelfService();
-    propertiesRepository = new PropertiesRepository(propertiesService, selfService, t);
+    propertiesRepository = new PropertiesRepository(propertiesService, selfService, translate);
   });
 
   afterEach(() => {

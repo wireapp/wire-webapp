@@ -25,7 +25,7 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
@@ -48,16 +48,16 @@ describe('MessageActions', () => {
   });
   test('renders the message actions menu', () => {
     const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />, {wrapper: rootProviderWrapper});
-    const messageActionsMenu = getByLabelText(t('accessibility.messageActionsMenuLabel'));
+    const messageActionsMenu = getByLabelText(translate('accessibility.messageActionsMenuLabel'));
     expect(messageActionsMenu).toBeDefined();
   });
 
   test('renders the message actions buttons', () => {
     const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />, {wrapper: rootProviderWrapper});
-    const thumbsUpButton = getByLabelText(t('accessibility.messageActionsMenuThumbsUp'));
-    const likeButton = getByLabelText(t('accessibility.messageActionsMenuLike'));
-    const emojiButton = getByLabelText(t('accessibility.messageActionsMenuEmoji'));
-    const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
+    const thumbsUpButton = getByLabelText(translate('accessibility.messageActionsMenuThumbsUp'));
+    const likeButton = getByLabelText(translate('accessibility.messageActionsMenuLike'));
+    const emojiButton = getByLabelText(translate('accessibility.messageActionsMenuEmoji'));
+    const optionsButton = getByLabelText(translate('accessibility.conversationContextMenuOpenLabel'));
     expect(thumbsUpButton).toBeDefined();
     expect(likeButton).toBeDefined();
     expect(emojiButton).toBeDefined();
@@ -68,7 +68,7 @@ describe('MessageActions', () => {
     const {getByLabelText, getByText, queryByText} = render(<MessageActionsMenu {...defaultProps} />, {
       wrapper: rootProviderWrapper,
     });
-    const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
+    const optionsButton = getByLabelText(translate('accessibility.conversationContextMenuOpenLabel'));
     fireEvent.click(optionsButton);
     expect(getByText('option1')).toBeDefined();
     expect(queryByText('option2')).toBeNull();
@@ -78,15 +78,15 @@ describe('MessageActions', () => {
     const {getByLabelText, getByText} = render(<MessageActionsMenu {...defaultProps} />, {
       wrapper: rootProviderWrapper,
     });
-    const optionsButton = getByLabelText(t('accessibility.conversationContextMenuOpenLabel'));
+    const optionsButton = getByLabelText(translate('accessibility.conversationContextMenuOpenLabel'));
     fireEvent.click(optionsButton);
     expect(getByText('option1')).toBeDefined();
   });
 
   test('toggles the active message action on click of any action button', () => {
     const {getByLabelText} = render(<MessageActionsMenu {...defaultProps} />, {wrapper: rootProviderWrapper});
-    const thumbsUpButton = getByLabelText(t('accessibility.messageActionsMenuThumbsUp'));
-    const likeButton = getByLabelText(t('accessibility.messageActionsMenuLike'));
+    const thumbsUpButton = getByLabelText(translate('accessibility.messageActionsMenuThumbsUp'));
+    const likeButton = getByLabelText(translate('accessibility.messageActionsMenuLike'));
 
     fireEvent.click(thumbsUpButton);
     expect(thumbsUpButton.getAttribute('aria-pressed')).toBe('true');

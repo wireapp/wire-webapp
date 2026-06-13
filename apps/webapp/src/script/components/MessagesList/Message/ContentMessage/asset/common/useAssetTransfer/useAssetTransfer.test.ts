@@ -25,7 +25,7 @@ import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {FileAsset} from 'Repositories/entity/message/FileAsset';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 

@@ -21,7 +21,7 @@ import {PropertiesRepository} from 'Repositories/properties/propertiesRepository
 import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {t} from 'Util/localizerUtil';
+import {translate} from 'Util/localizerUtil';
 
 describe('PropertiesRepository', () => {
   let propertiesRepository = undefined;
@@ -29,7 +29,7 @@ describe('PropertiesRepository', () => {
   beforeEach(() => {
     const propertiesService = new PropertiesService();
     const selfService = new SelfService();
-    propertiesRepository = new PropertiesRepository(propertiesService, selfService, t);
+    propertiesRepository = new PropertiesRepository(propertiesService, selfService, translate);
   });
 
   describe('deleteProperty', () => {

@@ -187,8 +187,6 @@ export const setStrings = (newStrings: typeof strings): void => {
   strings = newStrings;
 };
 
-export const t = translate;
-
 export const joinNames = LocalizerUtil.joinNames;
 
 export const replaceLink = (href: string, className: string = '', uieName: string = '') => ({
