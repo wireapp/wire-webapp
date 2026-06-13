@@ -855,7 +855,7 @@ export class MessageRepository {
     }
 
     const users = conversation.getUsersWithUnverifiedClients();
-    const userNames = joinNames(users, Declension.NOMINATIVE);
+    const userNames = joinNames(users, this.translate, Declension.NOMINATIVE);
     const titleSubstitutions = capitalizeFirstChar(userNames);
 
     const [actionString, messageString] = {

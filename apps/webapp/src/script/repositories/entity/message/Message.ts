@@ -145,7 +145,7 @@ export class Message {
     // MessageCategory
     this.category = undefined;
 
-    this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), undefined, true, this.translate));
+    this.unsafeSenderName = ko.pureComputed(() => getUserName(this.user(), this.translate, undefined, true));
     this.senderName = ko.pureComputed(() => {
       return this.user().name();
     });

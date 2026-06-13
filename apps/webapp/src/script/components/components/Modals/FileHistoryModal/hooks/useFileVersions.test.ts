@@ -19,6 +19,11 @@
 
 import {renderHook, waitFor, act} from '@testing-library/react';
 
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
+
 import {useFileVersions} from './useFileVersions';
 
 // Mock the dependencies
@@ -65,6 +70,9 @@ jest.mock('../utils/fileVersionUtils', () => ({
 }));
 
 describe('useFileVersions', () => {
+  const rootContextValue = createRootContextValueForTest({});
+  const rootProviderWrapper = createRootProviderWrapperForTest(rootContextValue);
+
   const mockNode = {
     Path: '/test/document.txt',
     PreSignedGET: {
@@ -99,7 +107,7 @@ describe('useFileVersions', () => {
 
   describe('Initialization', () => {
     it('should initialize with default state', () => {
-      const {result} = renderHook(() => useFileVersions());
+      const {result} = renderHook(() => useFileVersions(), {wrapper: rootProviderWrapper});
 
       expect(result.current.fileInfo).toBeUndefined();
       expect(result.current.fileVersions).toEqual({});
@@ -109,7 +117,7 @@ describe('useFileVersions', () => {
     });
 
     it('should not load versions when nodeUuid is not provided', () => {
-      renderHook(() => useFileVersions());
+      renderHook(() => useFileVersions(), {wrapper: rootProviderWrapper});
 
       expect(mockGetNode).not.toHaveBeenCalled();
       expect(mockGetNodeVersions).not.toHaveBeenCalled();
@@ -118,7 +126,7 @@ describe('useFileVersions', () => {
 
   describe('Loading File Versions', () => {
     it('should load file info and versions when nodeUuid is provided', async () => {
-      const {result} = renderHook(() => useFileVersions('test-uuid'));
+      const {result} = renderHook(() => useFileVersions('test-uuid'), {wrapper: rootProviderWrapper});
 
       expect(result.current.isLoading).toBe(true);
 
@@ -145,7 +153,7 @@ describe('useFileVersions', () => {
     it('should handle error when node data is invalid', async () => {
       mockGetNode.mockResolvedValue({Path: null});
 
-      const {result} = renderHook(() => useFileVersions('test-uuid'));
+      const {result} = renderHook(() => useFileVersions('test-uuid'), {wrapper: rootProviderWrapper});
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -160,7 +168,7 @@ describe('useFileVersions', () => {
       const error = new Error('Network error');
       mockGetNodeVersions.mockRejectedValue(error);
 
-      const {result} = renderHook(() => useFileVersions('test-uuid'));
+      const {result} = renderHook(() => useFileVersions('test-uuid'), {wrapper: rootProviderWrapper});
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -172,6 +180,7 @@ describe('useFileVersions', () => {
     it('should reset state when nodeUuid changes to undefined', async () => {
       const {result, rerender} = renderHook(({uuid}) => useFileVersions(uuid), {
         initialProps: {uuid: 'test-uuid' as string | undefined},
+        wrapper: rootProviderWrapper,
       });
 
       await waitFor(() => {
@@ -187,6 +196,7 @@ describe('useFileVersions', () => {
     it('should reload versions when nodeUuid changes', async () => {
       const {rerender} = renderHook(({uuid}) => useFileVersions(uuid), {
         initialProps: {uuid: 'test-uuid-1' as string | undefined},
+        wrapper: rootProviderWrapper,
       });
 
       await waitFor(() => {
@@ -207,7 +217,9 @@ describe('useFileVersions', () => {
     it('should restore a file version successfully', async () => {
       const onClose = jest.fn();
       const onRestore = jest.fn();
-      const {result} = renderHook(() => useFileVersions('test-uuid', onClose, onRestore));
+      const {result} = renderHook(() => useFileVersions('test-uuid', onClose, onRestore), {
+        wrapper: rootProviderWrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -241,7 +253,7 @@ describe('useFileVersions', () => {
     });
 
     it('should not restore when toBeRestoredVersionId is not set', async () => {
-      const {result} = renderHook(() => useFileVersions('test-uuid'));
+      const {result} = renderHook(() => useFileVersions('test-uuid'), {wrapper: rootProviderWrapper});
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -255,7 +267,7 @@ describe('useFileVersions', () => {
     });
 
     it('should not restore when nodeUuid is not set', async () => {
-      const {result} = renderHook(() => useFileVersions());
+      const {result} = renderHook(() => useFileVersions(), {wrapper: rootProviderWrapper});
 
       act(() => {
         result.current.setToBeRestoredVersionId('version-1');
@@ -274,7 +286,9 @@ describe('useFileVersions', () => {
 
       const onClose = jest.fn();
       const onRestore = jest.fn();
-      const {result} = renderHook(() => useFileVersions('test-uuid', onClose, onRestore));
+      const {result} = renderHook(() => useFileVersions('test-uuid', onClose, onRestore), {
+        wrapper: rootProviderWrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false);
@@ -301,7 +315,9 @@ describe('useFileVersions', () => {
     it('should reset all state after successful restore', async () => {
       const onClose = jest.fn();
       const onRestore = jest.fn();
-      const {result} = renderHook(() => useFileVersions('test-uuid', onClose, onRestore));
+      const {result} = renderHook(() => useFileVersions('test-uuid', onClose, onRestore), {
+        wrapper: rootProviderWrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.fileInfo).toBeDefined();
@@ -326,7 +342,7 @@ describe('useFileVersions', () => {
 
   describe('File Download', () => {
     it('should download file successfully', async () => {
-      const {result} = renderHook(() => useFileVersions('test-uuid'));
+      const {result} = renderHook(() => useFileVersions('test-uuid'), {wrapper: rootProviderWrapper});
 
       await waitFor(() => {
         expect(result.current.fileInfo).toBeDefined();
@@ -343,7 +359,7 @@ describe('useFileVersions', () => {
     });
 
     it('should use default filename when fileInfo is not available', async () => {
-      const {result} = renderHook(() => useFileVersions());
+      const {result} = renderHook(() => useFileVersions(), {wrapper: rootProviderWrapper});
 
       await act(async () => {
         await result.current.handleDownload('https://example.com/file.txt');
@@ -359,7 +375,7 @@ describe('useFileVersions', () => {
   describe('Callback Handling', () => {
     it('should call onClose callback during reset', async () => {
       const onClose = jest.fn();
-      const {result} = renderHook(() => useFileVersions('test-uuid', onClose));
+      const {result} = renderHook(() => useFileVersions('test-uuid', onClose), {wrapper: rootProviderWrapper});
 
       await waitFor(() => {
         expect(result.current.fileInfo).toBeDefined();
@@ -380,7 +396,9 @@ describe('useFileVersions', () => {
 
     it('should call onRestore callback during reset', async () => {
       const onRestore = jest.fn();
-      const {result} = renderHook(() => useFileVersions('test-uuid', undefined, onRestore));
+      const {result} = renderHook(() => useFileVersions('test-uuid', undefined, onRestore), {
+        wrapper: rootProviderWrapper,
+      });
 
       await waitFor(() => {
         expect(result.current.fileInfo).toBeDefined();
@@ -400,7 +418,7 @@ describe('useFileVersions', () => {
     });
 
     it('should not throw error when callbacks are not provided', async () => {
-      const {result} = renderHook(() => useFileVersions('test-uuid'));
+      const {result} = renderHook(() => useFileVersions('test-uuid'), {wrapper: rootProviderWrapper});
 
       await waitFor(() => {
         expect(result.current.fileInfo).toBeDefined();

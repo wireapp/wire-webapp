@@ -57,7 +57,7 @@ import {
   uk,
 } from 'date-fns/locale';
 
-import {type Translate, translate as defaultTranslate} from './localizerUtil';
+import type {Translate} from './localizerUtil';
 import {zeroPadding} from './util';
 
 export type FnDate = number | Date;
@@ -118,7 +118,7 @@ export const formatDayMonthNumeral = (date: FnDate | string | number) =>
     .replace(/[0-9]{4}/g, '')
     .replace(locale === de ? /^\s*|\s*$/g : /^\W|\W$|\W\W/, '');
 
-const durationUnits = (translate: Translate = defaultTranslate) => [
+const durationUnits = (translate: Translate) => [
   {
     plural: translate('ephemeralUnitsYears'),
     singular: translate('ephemeralUnitsYear'),
@@ -164,7 +164,7 @@ const durationUnits = (translate: Translate = defaultTranslate) => [
  * @param rounded should the units be rounded as opposed to floored
  * @returns calculated time units
  */
-const mapUnits = (duration: number, rounded: boolean, translate: Translate = defaultTranslate): DiscreteTimeUnit[] => {
+const mapUnits = (duration: number, rounded: boolean, translate: Translate): DiscreteTimeUnit[] => {
   const mappedUnits = durationUnits(translate).map((unit, index, units) => {
     let value = duration;
     if (index > 0) {
@@ -187,7 +187,7 @@ const mapUnits = (duration: number, rounded: boolean, translate: Translate = def
  * @param duration Duration to format in milliseconds
  * @returns Unit, value and localized string
  */
-export const formatDuration = (duration: number, translate: Translate = defaultTranslate): DurationUnit => {
+export const formatDuration = (duration: number, translate: Translate): DurationUnit => {
   const mappedUnits = mapUnits(duration, true, translate);
   const firstNonZeroUnit = mappedUnits.find(unit => unit.value > 0);
 
@@ -213,7 +213,7 @@ export const formatDuration = (duration: number, translate: Translate = defaultT
  * @param duration the remaining time in milliseconds
  * @returns readable representation of the remaining time
  */
-export const formatDurationCaption = (duration: number, translate: Translate = defaultTranslate): string => {
+export const formatDurationCaption = (duration: number, translate: Translate): string => {
   const mappedUnits = mapUnits(duration, false, translate);
   const hours = mappedUnits.find(unit => unit.symbol === 'h');
   const minutes = mappedUnits.find(unit => unit.symbol === 'm');
@@ -309,7 +309,7 @@ export const weeksPassedSinceDate = (date: Date): number => {
   return Math.max(1, Math.ceil(diffInWeeks));
 };
 
-export const formatDelayTime = (delayTimeInMS: number, translate: Translate = defaultTranslate): string => {
+export const formatDelayTime = (delayTimeInMS: number, translate: Translate): string => {
   if (delayTimeInMS >= TIME_IN_MILLIS.WEEK) {
     const weeks = Math.floor(delayTimeInMS / TIME_IN_MILLIS.WEEK);
     return `${weeks} ${translate(`ephemeralUnitsWeek${weeks === 1 ? '' : 's'}`)}`;
@@ -341,7 +341,7 @@ export const formatDelayTime = (delayTimeInMS: number, translate: Translate = de
  * @param duration - Duration in milliseconds
  * @returns Localized string of the coarsest applicable unit
  */
-export const formatCoarseDuration = (duration: number, translate: Translate = defaultTranslate) => {
+export const formatCoarseDuration = (duration: number, translate: Translate) => {
   if (duration >= TIME_IN_MILLIS.DAY) {
     const days = Math.floor(duration / TIME_IN_MILLIS.DAY);
     return translate(`initProgressDays${days === 1 ? 'Singular' : 'Plural'}`, {time: days});
@@ -363,7 +363,7 @@ export const formatCoarseDuration = (duration: number, translate: Translate = de
  * ```ts
  * const startedAt = "2025-06-01T00:00:00Z";
  * const elapsed = durationFrom(startedAt); // e.g. 2592000000 (30 days in ms)
- * formatDuration(elapsed);                // e.g. "1 month"
+ * formatDuration(elapsed, translate);     // e.g. "1 month"
  * ```
  *
  * @param date - The past date to compare (Date or timestamp).
@@ -383,7 +383,7 @@ export const calculateDaysDifference = (date1: Date, date2: Date): number => {
 /**
  * Get the day prefix for a version based on days difference
  */
-export const getDayPrefix = (daysDiff: number, timestamp: number, translate: Translate = defaultTranslate): string => {
+export const getDayPrefix = (daysDiff: number, timestamp: number, translate: Translate): string => {
   if (daysDiff === 0) {
     return translate('fileHistoryModal.today');
   }

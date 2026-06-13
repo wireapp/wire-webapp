@@ -359,7 +359,7 @@ export class NotificationRepository {
       const [otherUserEntity] = messageEntity.userEntities();
 
       const declension = Declension.ACCUSATIVE;
-      const nameOfJoinedUser = getUserName(otherUserEntity, declension, false, this.translate);
+      const nameOfJoinedUser = getUserName(otherUserEntity, this.translate, declension, false);
 
       const senderJoined = messageEntity.user().id === otherUserEntity.id;
       if (senderJoined) {

@@ -63,7 +63,7 @@ export const useFileVersions = (
   onRestore?: () => void,
   fileHistoryCopy?: FileHistoryCopy,
 ): UseFileVersionsResult => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const failedToLoadVersions = fileHistoryCopy?.failedToLoadVersions ?? 'fileHistoryModal.failedToLoadVersions';
   const failedToRestore = fileHistoryCopy?.failedToRestore ?? 'fileHistoryModal.failedToRestore';
   const invalidNodeData = fileHistoryCopy?.invalidNodeData ?? 'fileHistoryModal.invalidNodeData';
@@ -109,7 +109,7 @@ export const useFileVersions = (
 
         const nodeVersions = versions ?? [];
         const ownerNamesByUserIdMap = getOwnerNamesByUserIdMap(nodeVersions);
-        const groupedVersions = groupVersionsByDate(nodeVersions, version => {
+        const groupedVersions = groupVersionsByDate(nodeVersions, translate, version => {
           const ownerQualifiedId = parseOwnerQualifiedId(version.OwnerUuid);
           if (is.undefined(ownerQualifiedId)) {
             return undefined;
@@ -127,7 +127,7 @@ export const useFileVersions = (
     }
 
     fireAndForgetInvoker.fireAndForget(loadFileVersions);
-  }, [failedToLoadVersions, fireAndForgetInvoker, invalidNodeData, nodeUuid]);
+  }, [failedToLoadVersions, fireAndForgetInvoker, invalidNodeData, nodeUuid, translate]);
 
   const reset = useCallback(() => {
     setFileInfo(undefined);

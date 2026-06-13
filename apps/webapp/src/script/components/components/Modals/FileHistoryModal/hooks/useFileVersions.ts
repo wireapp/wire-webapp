@@ -23,6 +23,7 @@ import is from '@sindresorhus/is';
 import {container} from 'tsyringe';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 import {forcedDownloadFile, getFileExtension, getName} from 'Util/util';
 
 import {FileInfo, FileVersion} from '../types';
@@ -43,6 +44,7 @@ export const useFileVersions = (
   onRestore?: () => void,
   fileHistoryCopy?: FileHistoryCopy,
 ) => {
+  const {translate} = useApplicationContext();
   const failedToLoadVersions = fileHistoryCopy?.failedToLoadVersions ?? 'fileHistoryModal.failedToLoadVersions';
   const failedToRestore = fileHistoryCopy?.failedToRestore ?? 'fileHistoryModal.failedToRestore';
   const invalidNodeData = fileHistoryCopy?.invalidNodeData ?? 'fileHistoryModal.invalidNodeData';
@@ -85,7 +87,7 @@ export const useFileVersions = (
 
         setFileInfo(info);
 
-        const groupedVersions = groupVersionsByDate(versions ?? []);
+        const groupedVersions = groupVersionsByDate(versions ?? [], translate);
         setFileVersions(groupedVersions);
       } catch (err: unknown) {
         const errorMessage = err instanceof Error ? err.message : failedToLoadVersions;
@@ -96,7 +98,7 @@ export const useFileVersions = (
     };
 
     void loadFileVersions();
-  }, [failedToLoadVersions, hasValidNodeUuid, invalidNodeData, nodeUuid]);
+  }, [failedToLoadVersions, hasValidNodeUuid, invalidNodeData, nodeUuid, translate]);
 
   const reset = useCallback(() => {
     setFileInfo(undefined);

@@ -45,9 +45,9 @@ const VerificationMessage = ({message}: VerificationMessageProps) => {
   );
 
   const nameList = useMemo(() => {
-    const namesString = joinNames(userEntities, Declension.NOMINATIVE);
+    const namesString = joinNames(userEntities, translate, Declension.NOMINATIVE);
     return capitalizeFirstChar(namesString);
-  }, [userEntities]);
+  }, [translate, userEntities]);
 
   const {setCurrentTab} = useSidebarStore();
 

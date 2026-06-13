@@ -22,14 +22,14 @@ import {escape} from 'underscore';
 import type {User} from 'Repositories/entity/User';
 
 import {Declension} from './localizerUtil.types';
-import {translate} from './translate';
+import type {Translate} from './translationTypes';
 
 import {sortUsersByPriority} from '../stringUtil';
 
 export function getSelfName(
+  translation: Translate,
   declension = Declension.NOMINATIVE,
   bypassSanitization = false,
-  translation = translate,
 ): string {
   const selfNameDeclensions = {
     [Declension.NOMINATIVE]: translation('conversationYouNominative'),
@@ -42,22 +42,22 @@ export function getSelfName(
 
 export function getUserName(
   userEntity: User,
+  translation: Translate,
   declension?: string,
   bypassSanitization: boolean = false,
-  translation = translate,
 ): string {
   if (userEntity.isMe) {
-    return getSelfName(declension, bypassSanitization, translation);
+    return getSelfName(translation, declension, bypassSanitization);
   }
   return bypassSanitization ? userEntity.name() : escape(userEntity.name());
 }
 
 export function joinNames(
   userEntities: User[],
+  translation: Translate,
   declension = Declension.ACCUSATIVE,
   skipAnd = false,
   boldNames = false,
-  translation = translate,
 ): string {
   const containsSelfUser = userEntities.some(userEntity => userEntity.isMe);
   if (containsSelfUser) {
@@ -70,7 +70,7 @@ export function joinNames(
   });
 
   if (containsSelfUser) {
-    userNames.push(getSelfName(declension, false, translation));
+    userNames.push(getSelfName(translation, declension, false));
   }
 
   const numberOfNames = userNames.length;

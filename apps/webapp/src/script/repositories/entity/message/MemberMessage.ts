@@ -87,7 +87,7 @@ export class MemberMessage extends SystemMessage {
 
     this.senderName = ko.pureComputed(() => {
       const isTeamMemberLeave = this.type === ClientEvent.CONVERSATION.TEAM_MEMBER_LEAVE;
-      return isTeamMemberLeave ? this.name() : getUserName(this.user(), Declension.NOMINATIVE, true, this.translate);
+      return isTeamMemberLeave ? this.name() : getUserName(this.user(), this.translate, Declension.NOMINATIVE, true);
     });
 
     this.showNamedCreation = ko.pureComputed(() => {

@@ -36,9 +36,14 @@ export const CONFIG = {
   REDUCED_USERS_COUNT: 15,
 } as const;
 
-function generateNames(users: User[], declension = Declension.ACCUSATIVE, hasExtra = false) {
+function generateNames(
+  users: User[],
+  translate: RootContextValue['translate'],
+  declension = Declension.ACCUSATIVE,
+  hasExtra = false,
+) {
   const visibleUsers = hasExtra ? getVisibleUsers(users) : users;
-  return joinNames(visibleUsers, declension, hasExtra, true);
+  return joinNames(visibleUsers, translate, declension, hasExtra, true);
 }
 
 function getVisibleUsers(users: User[]) {
@@ -75,8 +80,8 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
   /** the number of users that will not be displayed on screen */
   const hiddenUsersCount = exceedsMaxVisibleUsers ? targetedUsers.length - CONFIG.REDUCED_USERS_COUNT : 0;
 
-  const dativeUsers = generateNames(targetedUsers, Declension.DATIVE, exceedsMaxVisibleUsers);
-  const accusativeUsers = generateNames(targetedUsers, Declension.ACCUSATIVE, exceedsMaxVisibleUsers);
+  const dativeUsers = generateNames(targetedUsers, translate, Declension.DATIVE, exceedsMaxVisibleUsers);
+  const accusativeUsers = generateNames(targetedUsers, translate, Declension.ACCUSATIVE, exceedsMaxVisibleUsers);
   const name = message.senderName();
 
   switch (message.memberMessageType) {
@@ -112,7 +117,12 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
     }
 
     case SystemMessageType.CONVERSATION_RESUME: {
-      return translate('conversationResume', {users: generateNames(targetedUsers, Declension.DATIVE, false)}, {}, true);
+      return translate(
+        'conversationResume',
+        {users: generateNames(targetedUsers, translate, Declension.DATIVE)},
+        {},
+        true,
+      );
     }
 
     default:
@@ -158,7 +168,7 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
         if (message.userEntities().some(user => user.isMe)) {
           return translate('conversationYouRemovedMissingLegalHoldConsent', undefined, replaceLinkLegalHold);
         }
-        const users = generateNames(targetedUsers);
+        const users = generateNames(targetedUsers, translate);
 
         if (message.userEntities().length === 1) {
           return translate('conversationMemberRemovedMissingLegalHoldConsent', {user: users}, replaceLinkLegalHold);
@@ -188,7 +198,7 @@ function getContent(message: MemberMessageEntity, translate: RootContextValue['t
           : translate('conversationMemberLeft', {name}, {}, true);
       }
 
-      const allUsers = generateNames(targetedUsers);
+      const allUsers = generateNames(targetedUsers, translate);
       if (!actor.id) {
         return translate('conversationMemberWereRemoved', {users: allUsers}, {}, true);
       }
