@@ -32,6 +32,7 @@ import {createFireAndForgetInvoker} from '@wireapp/core';
 import {AppContainer} from 'Components/AppContainer/AppContainer';
 import {doSimpleRedirect} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {StorageKey} from 'Repositories/storage';
+import {translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {enableLogging} from 'Util/loggerUtil';
 import {loadValue} from 'Util/storageUtil';
@@ -119,6 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       clientType={shouldPersist ? ClientType.PERMANENT : ClientType.TEMPORARY}
       fireAndForgetInvoker={fireAndForgetInvoker}
       isFeatureToggleEnabled={isFeatureToggleEnabled}
+      translate={translate}
       wallClock={wallClock}
     />,
   );

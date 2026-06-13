@@ -77,7 +77,7 @@ export class ClientRepository {
     private readonly core = container.resolve(Core),
   ) {
     this.cryptographyRepository = cryptographyRepository;
-    this.selfUser = ko.observable(new User('', ''));
+    this.selfUser = ko.observable(new User('', '', this.translate));
     this.logger = getLogger('ClientRepository');
 
     amplify.subscribe(WebAppEvents.LIFECYCLE.ASK_TO_CLEAR_DATA, this.logoutClient);

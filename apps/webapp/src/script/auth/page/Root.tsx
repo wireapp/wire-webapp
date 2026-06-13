@@ -31,7 +31,7 @@ import {ContainerXS, Loading, StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {createWallClock} from 'src/script/clock/wallClock';
 import {RootProvider} from 'src/script/page/RootProvider';
-import {translate as defaultTranslate} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {ClientManager} from './ClientManager';
 import {ConversationJoin} from './ConversationJoin';
@@ -64,7 +64,9 @@ import * as LanguageSelector from '../module/selector/LanguageSelector';
 import {ROUTE} from '../route';
 import {getOAuthQueryString} from '../util/oauthUtil';
 
-interface RootProps {}
+interface RootProps {
+  translate: Translate;
+}
 
 const authFireAndForgetInvoker: FireAndForgetInvoker = {
   fireAndForget(asyncAction) {
@@ -91,6 +93,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
   language,
   isFetchingSSOSettings,
   doGetSSOSettings,
+  translate,
 }) => {
   const rootContextValue = useMemo(() => {
     return {
@@ -101,7 +104,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
       isFeatureToggleEnabled() {
         return false;
       },
-      translate: defaultTranslate,
+      translate,
       applicationNavigation: {
         get currentPathname(): string {
           return window.location.pathname;
@@ -117,9 +120,7 @@ const RootComponent: FC<RootProps & ConnectedProps & DispatchProps> = ({
         },
       },
     };
-  }, []);
-  const {translate} = rootContextValue;
-
+  }, [translate]);
   // Injects the helper class used by useRouteA11y so programmatic focus targets (for screen readers)
   // lose their outlines while the focus trap is active.
   useEffect(() => {

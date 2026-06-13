@@ -37,7 +37,7 @@ import {useAppSoftLock} from 'src/script/hooks/useAppSoftLock';
 import {useSingleInstance} from 'src/script/hooks/useSingleInstance';
 import {useUserPropertyValue} from 'src/script/hooks/useUserProperty';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {translate} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {useAccentColor} from './hooks/useAccentColor';
 import {useTheme} from './hooks/useTheme';
@@ -58,11 +58,12 @@ type AppProps = {
   readonly clientType: ClientType;
   readonly fireAndForgetInvoker: FireAndForgetInvoker;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
+  readonly translate: Translate;
   readonly wallClock: WallClock;
 };
 
 export const AppContainer = (properties: AppProps) => {
-  const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, wallClock} = properties;
+  const {config, clientType, fireAndForgetInvoker, isFeatureToggleEnabled, translate, wallClock} = properties;
   setAppLocale();
   const app = useMemo(() => {
     return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
