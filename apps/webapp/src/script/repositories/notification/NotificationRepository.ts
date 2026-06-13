@@ -52,7 +52,7 @@ import {getPermissionState, setPermissionState} from 'Repositories/permission/pe
 import {normalizePermissionState} from 'Repositories/permission/Permissions.types';
 import {PermissionType} from 'Repositories/permission/PermissionType';
 import {UserState} from 'Repositories/user/userState';
-import {Declension, t, getUserName} from 'Util/localizerUtil';
+import {type Translate, Declension, getUserName} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {truncate} from 'Util/stringUtil';
@@ -119,7 +119,7 @@ export class NotificationRepository {
     conversationRepository: ConversationRepository,
     private readonly audioRepository: AudioRepository,
     private readonly callingRepository: CallingRepository,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),

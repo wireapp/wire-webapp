@@ -27,6 +27,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 
@@ -39,7 +41,7 @@ describe('LinkPreviewAssetComponent', () => {
     asset.text = url;
     asset.previews([linkPreviewEntity]);
 
-    const message = new ContentMessage();
+    const message = new ContentMessage(undefined, translateForTest);
     message.addAsset(asset);
 
     return message;
@@ -58,7 +60,7 @@ describe('LinkPreviewAssetComponent', () => {
     asset.text = 'https://twitter.com/jack/status/20';
     asset.previews([linkPreviewEntity]);
 
-    const message = new ContentMessage();
+    const message = new ContentMessage(undefined, translateForTest);
     message.addAsset(asset);
 
     return message;

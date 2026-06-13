@@ -49,7 +49,7 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {Config} from 'src/script/Config';
 import {Environment} from 'Util/environment';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 import {loadDataUrl} from 'Util/util';
@@ -97,7 +97,7 @@ export class TeamRepository extends TypedEventEmitter<Events> {
     assetRepository: AssetRepository,
     private readonly onMemberDetete: () => Promise<void>,
     readonly teamService: TeamService = new TeamService(),
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {

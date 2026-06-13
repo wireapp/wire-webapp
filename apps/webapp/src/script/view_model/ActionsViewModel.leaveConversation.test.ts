@@ -34,7 +34,7 @@ import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {generateConversation} from 'test/helper/ConversationGenerator';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ActionsViewModel} from './ActionsViewModel';
@@ -70,7 +70,7 @@ function buildActionsViewModel({
   teamFeatures?: any;
   setMemberConversationRole?: jest.Mock;
   leaveConversationMock?: jest.Mock;
-  translate?: typeof t;
+  translate?: Translate;
 } = {}) {
   const mockUserState = {self: ko.observable(selfUser)} as unknown as UserState;
   const mockTeamState = {teamFeatures: ko.observable(teamFeatures)} as unknown as TeamState;
@@ -113,7 +113,7 @@ describe('ActionsViewModel.leaveConversation', () => {
   it('uses the injected translate function for modal copy', () => {
     const selfUser = new User('self-id', 'example.com');
     const userToBlock = makeEligibleUser('blocked-user');
-    const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+    const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
 
     const {vm} = buildActionsViewModel({selfUser, translate});
 

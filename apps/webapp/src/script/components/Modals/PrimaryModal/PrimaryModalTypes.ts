@@ -20,7 +20,7 @@
 import React from 'react';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
-import type {t} from 'Util/localizerUtil';
+import type {Translate as TranslationFunction} from 'Util/localizerUtil';
 
 export interface ButtonAction {
   action?: Function;
@@ -40,7 +40,7 @@ export interface Text {
 }
 
 export type ModalSize = 'small' | 'medium' | 'large';
-export type Translate = typeof t;
+export type Translate = TranslationFunction;
 
 export interface ModalOptions {
   close?: () => void;

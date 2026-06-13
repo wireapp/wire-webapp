@@ -36,7 +36,7 @@ import {
   PrimaryModalType,
   QueuedModalItem,
   Text,
-  Translate,
+  type Translate,
 } from './PrimaryModalTypes';
 
 import {Config} from '../../../Config';

@@ -26,7 +26,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage/record/clientRecord';
 import {ClientError} from 'src/script/error/clientError';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
 
 import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
@@ -305,7 +305,7 @@ describe('ClientRepository', () => {
 
   describe('logoutClient', () => {
     it('uses the injected translate function for the logout modal copy', async () => {
-      const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
       const primaryModalShow = jest.fn();
       const clientRepository = new ClientRepository(
         {} as any,

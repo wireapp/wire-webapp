@@ -44,7 +44,7 @@ import type {ServiceEntity} from 'Repositories/integration/ServiceEntity';
 import {SelfRepository} from 'Repositories/self/SelfRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {isBackendError} from 'Util/typePredicateUtil';
 
 import type {MainViewModel} from './MainViewModel';
@@ -60,7 +60,7 @@ export class ActionsViewModel {
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
     private readonly mainViewModel: MainViewModel,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
   ) {}
 
   readonly acceptConnectionRequest = (userEntity: User): Promise<void> => {

@@ -28,7 +28,7 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import type {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SidebarTabs, useSidebarStore} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {fixWebsocketString} from 'Util/stringUtil';
 import {TypedEventTarget} from 'Util/typedEventTarget';
@@ -87,7 +87,7 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
     private readonly allConversations: ko.ObservableArray<Conversation>,
     private readonly conversations: ko.PureComputed<Conversation[]>,
     private readonly propertiesService: PropertiesService,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
   ) {
     super();
     this.labels = ko.observableArray([]);

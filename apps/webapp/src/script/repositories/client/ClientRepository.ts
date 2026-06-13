@@ -34,7 +34,7 @@ import type {CryptographyRepository} from 'Repositories/cryptography/Cryptograph
 import {User} from 'Repositories/entity/User';
 import {ClientRecord} from 'Repositories/storage';
 import {StorageKey} from 'Repositories/storage/storageKey';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {loadValue} from 'Util/storageUtil';
@@ -72,7 +72,7 @@ export class ClientRepository {
   constructor(
     public readonly clientService: ClientService,
     public readonly cryptographyRepository: CryptographyRepository,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
     private readonly clientState = container.resolve(ClientState),
     private readonly core = container.resolve(Core),
   ) {

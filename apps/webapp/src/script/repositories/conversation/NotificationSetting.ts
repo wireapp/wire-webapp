@@ -17,7 +17,7 @@
  *
  */
 
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 export const NOTIFICATION_STATE = {
   EVERYTHING: 0b00,
@@ -25,7 +25,7 @@ export const NOTIFICATION_STATE = {
   NOTHING: 0b11,
 };
 
-export const getNotificationText = (status: number, translate: typeof t) => {
+export const getNotificationText = (status: number, translate: Translate) => {
   const statusTexts: Record<number, string> = {
     [NOTIFICATION_STATE.EVERYTHING]: translate('notificationSettingsEverything'),
     [NOTIFICATION_STATE.MENTIONS_AND_REPLIES]: translate('notificationSettingsMentionsAndReplies'),

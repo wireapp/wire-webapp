@@ -25,7 +25,7 @@ import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {AssetType} from 'Repositories/assets/assetType';
 import type {ReadReceipt} from 'Repositories/storage/record/eventRecord';
-import {t, getUserName} from 'Util/localizerUtil';
+import {type Translate, t, getUserName} from 'Util/localizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
@@ -54,7 +54,7 @@ import {SuperType} from '../../../message/SuperType';
 import {User} from '../User';
 
 export class Message {
-  protected readonly translate: typeof t;
+  protected readonly translate: Translate;
   private messageTimerStarted: boolean;
   protected readonly affect_order: ko.Observable<boolean>;
   public category?: MessageCategory;
@@ -86,7 +86,7 @@ export class Message {
   public type: string;
   public version: number;
 
-  constructor(id: string = '0', super_type?: SuperType, translate: typeof t = t) {
+  constructor(id: string = '0', super_type?: SuperType, translate: Translate = t) {
     this.id = id;
     this.translate = translate;
     this.super_type = super_type ?? SuperType.SYSTEM;

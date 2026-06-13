@@ -61,7 +61,7 @@ import {Text} from 'Repositories/entity/message/Text';
 import {VerificationMessage} from 'Repositories/entity/message/VerificationMessage';
 import {ClientEvent} from 'Repositories/event/Client';
 import type {EventRecord, LegacyEventRecord} from 'Repositories/storage';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {userReactionMapToReactionMap} from 'Util/reactionUtil';
 import {toError} from 'Util/toError';
@@ -101,7 +101,7 @@ export class EventMapper {
    */
   constructor(
     private readonly apiClient = container.resolve(APIClient),
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
   ) {
     this.logger = getLogger('EventMapper');
   }
@@ -741,7 +741,7 @@ export class EventMapper {
 
   private _mapEventCompositeMessageAdd(event: CompositeMessageAddEvent) {
     const {data: eventData} = event;
-    const messageEntity = new CompositeMessage();
+    const messageEntity = new CompositeMessage(undefined, this.translate);
     const assets = this._mapAssetComposite(eventData);
     messageEntity.assets.push(...assets);
     messageEntity.replacing_message_id = eventData.replacing_message_id;
@@ -794,7 +794,7 @@ export class EventMapper {
    * Maps JSON data of `conversation.protocol-update` message into message entity.
    */
   private _mapEventProtocolUpdate(event: ConversationProtocolUpdateEvent): ProtocolUpdateMessage {
-    return new ProtocolUpdateMessage(event.data.protocol);
+    return new ProtocolUpdateMessage(event.data.protocol, this.translate);
   }
 
   /**

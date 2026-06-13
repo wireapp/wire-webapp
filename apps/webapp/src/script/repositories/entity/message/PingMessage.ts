@@ -20,7 +20,7 @@
 import ko from 'knockout';
 
 import {ReactionMap} from 'Repositories/storage';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {Message} from './Message';
 
@@ -31,7 +31,7 @@ export class PingMessage extends Message {
   public readonly iconClasses: ko.PureComputed<string>;
   readonly reactions = ko.observable<ReactionMap>([]);
 
-  constructor(translate: typeof t = t) {
+  constructor(translate: Translate) {
     super(undefined, undefined, translate);
     this.super_type = SuperType.PING;
 

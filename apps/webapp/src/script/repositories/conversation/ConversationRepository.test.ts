@@ -78,7 +78,8 @@ import {
 } from 'test/helper/ConversationGenerator';
 import {createDeleteEvent} from 'test/helper/EventGenerator';
 import {matchQualifiedIds} from 'Util/qualifiedId';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {escapeRegex} from 'Util/sanitizationUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -103,7 +104,7 @@ import {createMockHttpServer, MockHttpServer} from '../../../../test/helper/mock
 import {generateUser} from '../../../../test/helper/UserGenerator';
 import {Core} from '../../service/coreSingleton';
 
-function buildConversationRepository(translate: typeof t = t) {
+function buildConversationRepository(translate: Translate = t) {
   const teamState = new TeamState();
   const conversationState = new ConversationState();
   // @ts-ignore
@@ -230,7 +231,7 @@ describe('ConversationRepository', () => {
 
   describe('translation injection', () => {
     it('uses the injected translate function for delete conversation error modal copy', async () => {
-      const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
       const [conversationRepository, {conversationService, teamState}] = buildConversationRepository(translate);
       const primaryModalShow = jest.fn();
       const conversation = new Conversation(createUuid());
@@ -2526,7 +2527,7 @@ describe('ConversationRepository', () => {
         type: ClientEvent.CONVERSATION.BUTTON_ACTION_CONFIRMATION,
       };
 
-      const message = new CompositeMessage(buttonActionConfirmationEvent.data.messageId);
+      const message = new CompositeMessage(buttonActionConfirmationEvent.data.messageId, translateForTest);
       conversationEntity.addMessage(message);
 
       expect(message.selectedButtonId()).toBeFalsy();
@@ -2570,7 +2571,7 @@ describe('ConversationRepository', () => {
         type: ClientEvent.CONVERSATION.BUTTON_ACTION,
       };
 
-      const message = new CompositeMessage(buttonActionEvent.data.messageId);
+      const message = new CompositeMessage(buttonActionEvent.data.messageId, translateForTest);
       conversationEntity.addMessage(message);
 
       expect(message.selectedButtonId()).toBeFalsy();
@@ -2603,7 +2604,7 @@ describe('ConversationRepository', () => {
         type: ClientEvent.CONVERSATION.BUTTON_ACTION,
       };
 
-      const message = new CompositeMessage(buttonActionEvent.data.messageId);
+      const message = new CompositeMessage(buttonActionEvent.data.messageId, translateForTest);
       conversationEntity.addMessage(message);
 
       expect(message.selectedButtonId()).toBeFalsy();
@@ -3533,7 +3534,7 @@ describe('onMLSResetMessage', () => {
 
 describe('translation migration', () => {
   it('passes injected translate to conversation label modal copy', () => {
-    const translate = ((translationKey: string) => `translated:${translationKey}`) as typeof t;
+    const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
     const [conversationRepository] = buildConversationRepository(translate);
     const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
 
@@ -3550,7 +3551,7 @@ describe('translation migration', () => {
   });
 
   it('passes injected translate to access code error modals', async () => {
-    const translate = ((translationKey: string) => `translated:${translationKey}`) as typeof t;
+    const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
     const [conversationRepository, {conversationService}] = buildConversationRepository(translate);
     const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
     const conversation = new Conversation(createUuid());

@@ -26,12 +26,13 @@ import {
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
 import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {MessageActionsMenu, MessageActionsMenuProps} from './MessageActions';
 const defaultProps: MessageActionsMenuProps = {
   isMsgWithHeader: true,
-  message: new ContentMessage(createUuid()),
+  message: new ContentMessage(createUuid(), translateForTest),
   contextMenu: {entries: ko.observable([{label: 'option1', text: 'option1'}])},
   isMessageFocused: true,
   handleActionMenuVisibility: jest.fn(),

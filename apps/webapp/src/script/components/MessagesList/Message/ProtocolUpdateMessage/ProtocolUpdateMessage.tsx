@@ -24,7 +24,7 @@ import {ProtocolUpdateMessage as ProtocolUpdateMessageEntity} from 'Repositories
 import {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import {Config} from 'src/script/Config';
 import {useApplicationContext} from 'src/script/page/RootProvider';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 
 import {SystemMessageBase} from '../SystemMessage/SystemMessageBase';
 
@@ -32,7 +32,7 @@ interface ProtocolUpdateMessageProps {
   message: ProtocolUpdateMessageEntity;
 }
 
-const createSystemMessage = (caption: string, translate: typeof t) => {
+const createSystemMessage = (caption: string, translate: Translate) => {
   const message = new SystemMessage(translate);
   message.caption = caption;
   return message;

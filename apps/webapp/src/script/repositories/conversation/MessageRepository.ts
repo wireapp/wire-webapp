@@ -85,7 +85,7 @@ import {
   clearLinkPreviewSendingState,
   shouldSendLinkPreviewForMessage,
 } from 'Util/linkPreviewSender';
-import {Declension, joinNames, t} from 'Util/localizerUtil';
+import {type Translate, Declension, joinNames} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isMarkdownText} from 'Util/markdownUtil';
 import {areMentionsDifferent, isTextDifferent} from 'Util/messageComparator';
@@ -181,7 +181,7 @@ export class MessageRepository {
     private readonly userRepository: UserRepository,
     private readonly assetRepository: AssetRepository,
     private readonly audioRepository: AudioRepository,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly clientState = container.resolve(ClientState),
     private readonly conversationState = container.resolve(ConversationState),

@@ -37,7 +37,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {iterateItem} from 'Util/arrayUtil';
 import {isEscapeKey} from 'Util/keyboardUtil';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import type {ActionsViewModel} from './ActionsViewModel';
 import {CallingViewModel} from './CallingViewModel';
@@ -83,7 +83,7 @@ export class ListViewModel {
   constructor(
     mainViewModel: MainViewModel,
     repositories: ViewModelRepositories,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
   ) {
     this.userState = container.resolve(UserState);
     this.teamState = container.resolve(TeamState);

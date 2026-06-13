@@ -62,7 +62,7 @@ import type {SelfService} from 'Repositories/self/SelfService';
 import {UserRecord} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {chunk, partition} from 'Util/arrayUtil';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {fixWebsocketString} from 'Util/stringUtil';
@@ -129,7 +129,7 @@ export class UserRepository extends TypedEventEmitter<Events> {
     private readonly clientRepository: ClientRepository,
     serverTimeHandler: ServerTimeHandler,
     private readonly propertyRepository: PropertiesRepository,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly teamState = container.resolve(TeamState),
   ) {

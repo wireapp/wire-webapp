@@ -20,7 +20,7 @@
 import {removeCurrentModal} from 'Components/Modals/PrimaryModal';
 import {usePrimaryModalState} from 'Components/Modals/PrimaryModal/PrimaryModalState';
 import {User} from 'Repositories/entity/User/User';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {AppLockCrypto, AppLockRepository} from './appLockRepository';
@@ -30,7 +30,7 @@ import {UserState} from './userState';
 const mockCryptoPwhashStr = jest.fn();
 const mockCryptoPwhashStrVerify = jest.fn();
 
-const createAppLockRepository = (translate: typeof t = t): AppLockRepository => {
+const createAppLockRepository = (translate: Translate = t): AppLockRepository => {
   const userState = new UserState();
   const appLockState = new AppLockState();
   const appLockCrypto: AppLockCrypto = {

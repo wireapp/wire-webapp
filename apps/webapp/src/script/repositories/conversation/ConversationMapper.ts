@@ -38,7 +38,7 @@ import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {ConversationRecord} from 'Repositories/storage/record/conversationRecord';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {ACCESS_STATE} from './AccessState';
 import {ConversationStatus} from './ConversationStatus';
@@ -88,7 +88,7 @@ export class ConversationMapper {
   static mapConversations(
     conversationsData: ConversationDatabaseData[],
     timestamp: number = 1,
-    translate: typeof t,
+    translate: Translate,
   ): Conversation[] {
     if (conversationsData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);
@@ -97,7 +97,7 @@ export class ConversationMapper {
       throw new ConversationError(BASE_ERROR_TYPE.INVALID_PARAMETER, BaseError.MESSAGE.INVALID_PARAMETER);
     }
     return conversationsData.map((conversationData: ConversationDatabaseData, index: number) => {
-      return ConversationMapper.createConversationEntity(conversationData, timestamp + index, translate);
+      return ConversationMapper.createConversationEntity(conversationData, translate, timestamp + index);
     });
   }
 
@@ -242,8 +242,8 @@ export class ConversationMapper {
 
   private static createConversationEntity(
     conversationData: ConversationDatabaseData,
+    translate: Translate,
     initialTimestamp?: number,
-    translate: typeof t,
   ): Conversation {
     if (conversationData === undefined) {
       throw new ConversationError(BASE_ERROR_TYPE.MISSING_PARAMETER, BaseError.MESSAGE.MISSING_PARAMETER);

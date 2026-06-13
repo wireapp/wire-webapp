@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,11 @@
  *
  */
 
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {type Translate} from 'Util/localizerUtil';
+import type {Substitutions, TranslationKey} from './localizerUtil';
 
-import {SystemMessage} from './SystemMessage';
-
-export class MLSMigrationFinalisationOngoingCallMessage extends SystemMessage {
-  constructor(translate: Translate) {
-    super(translate);
-    this.system_message_type = SystemMessageType.MLS_MIGRATION_ONGOING_CALL;
-    this.caption = this.translate('conversationMLSMigrationFinalisationOngoingCall');
-  }
-}
+export type Translate = <Identifier extends TranslationKey>(
+  identifier: Identifier,
+  substitutions?: Substitutions,
+  dangerousSubstitutions?: Record<string, string>,
+  skipEscape?: boolean,
+) => string;

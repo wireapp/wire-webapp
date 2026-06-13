@@ -48,7 +48,8 @@ import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
 import {ConversationError} from 'src/script/error/conversationError';
 import {generateQualifiedId} from 'test/helper/UserGenerator';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {ConversationRepository} from './ConversationRepository';
@@ -76,14 +77,14 @@ type MessageRepositoryDependencies = {
   eventRepository: EventRepository;
   propertiesRepository: PropertiesRepository;
   serverTimeHandler: ServerTimeHandler;
-  translate: typeof t;
+  translate: Translate;
   userRepository: UserRepository;
   userState: UserState;
   conversationState: ConversationState;
 };
 
 async function buildMessageRepository(
-  translate: typeof t = t,
+  translate: Translate = t,
 ): Promise<[MessageRepository, MessageRepositoryDependencies]> {
   const userState = new UserState();
   userState.self(selfUser);
@@ -170,7 +171,7 @@ describe('MessageRepository', () => {
 
   describe('requestUserSendingPermission', () => {
     it('uses injected translate for degraded conversation modal copy', async () => {
-      const translate = ((translationKey: string) => `translated:${translationKey}`) as typeof t;
+      const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
       const [messageRepository] = await buildMessageRepository(translate);
       const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
       const conversation = generateConversation();
@@ -201,7 +202,7 @@ describe('MessageRepository', () => {
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       originalMessage.assets.push(new Text(createUuid(), 'old text'));
       const conversation = generateConversation();
       conversation.addMessage(originalMessage);
@@ -229,7 +230,7 @@ describe('MessageRepository', () => {
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       const attachments = [{cellAsset: {uuid: 'test-cell-id', contentType: 'application/vnd.wire-cells'}}];
       const multipartAsset = new Multipart({id: createUuid(), text: 'old text', attachments});
       originalMessage.assets.push(multipartAsset);
@@ -271,7 +272,7 @@ describe('MessageRepository', () => {
         {cellAsset: {uuid: cellId2, contentType: 'application/vnd.wire-cells'}},
       ];
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       const multipartAsset = new Multipart({id: createUuid(), text: 'original text', attachments});
       originalMessage.assets.push(multipartAsset);
 
@@ -302,7 +303,7 @@ describe('MessageRepository', () => {
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       jest.spyOn(eventRepository, 'injectEvent').mockResolvedValue(undefined);
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       const multipartAsset = new Multipart({id: createUuid(), text: 'original text', attachments: []});
       originalMessage.assets.push(multipartAsset);
 
@@ -343,7 +344,7 @@ describe('MessageRepository', () => {
         {cellAsset: {uuid: 'another-cell-id', contentType: 'application/vnd.wire-cells'}},
       ] as any;
 
-      const originalMessage = new ContentMessage(createUuid());
+      const originalMessage = new ContentMessage(createUuid(), translateForTest);
       const multipartAsset = new Multipart({id: createUuid(), text: 'original text', attachments});
       originalMessage.assets.push(multipartAsset);
 
@@ -384,7 +385,7 @@ describe('MessageRepository', () => {
         .mockResolvedValue(undefined);
 
       // Create a mock message entity with primary_key for updateEventSequentially
-      const mockMessageEntity = new CompositeMessage(createUuid());
+      const mockMessageEntity = new CompositeMessage(createUuid(), translateForTest);
       mockMessageEntity.primary_key = 'test-primary-key';
 
       const getMessageInConversationIdSpy = jest
@@ -398,7 +399,7 @@ describe('MessageRepository', () => {
 
       const buttonId = createUuid();
       const theNewButton = [new Button(buttonId, 'Button 1')];
-      const originalMessage = new CompositeMessage(createUuid());
+      const originalMessage = new CompositeMessage(createUuid(), translateForTest);
 
       // Set the sender properly, as sendButtonAction expects the message to have a senderId check
       originalMessage.user(selfUser);
@@ -453,7 +454,7 @@ describe('MessageRepository', () => {
         .mockResolvedValue(undefined);
 
       // Create a mock message entity with primary_key for updateEventSequentially
-      const mockMessageEntity = new CompositeMessage(createUuid());
+      const mockMessageEntity = new CompositeMessage(createUuid(), translateForTest);
       mockMessageEntity.primary_key = 'test-primary-key';
 
       jest.spyOn(messageRepository as any, 'getMessageInConversationById').mockResolvedValue(mockMessageEntity);
@@ -465,7 +466,7 @@ describe('MessageRepository', () => {
 
       const buttonId = createUuid();
       const theNewButton = [new Button(buttonId, 'Button 1')];
-      const originalMessage = new CompositeMessage(createUuid());
+      const originalMessage = new CompositeMessage(createUuid(), translateForTest);
 
       // Set the sender properly, as sendButtonAction expects the message to have a senderId check
       originalMessage.user(selfUser);

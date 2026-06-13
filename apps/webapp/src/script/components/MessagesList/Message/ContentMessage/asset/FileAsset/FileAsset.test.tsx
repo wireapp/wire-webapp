@@ -28,6 +28,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {FileAsset as FileAssetComponent} from './FileAsset';
 
@@ -39,7 +41,7 @@ describe('FileAssetComponent', () => {
     asset.file_name = 'test-file.log';
     asset.file_size = 10485760;
 
-    const message = new ContentMessage();
+    const message = new ContentMessage(undefined, translateForTest);
     message.addAsset(asset);
 
     return message;

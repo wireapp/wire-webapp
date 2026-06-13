@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,20 +17,8 @@
  *
  */
 
-import {Config} from 'src/script/Config';
-import {SystemMessageType} from 'src/script/message/SystemMessageType';
-import {type Translate, replaceLink} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
-import {SystemMessage} from './SystemMessage';
-
-export class JoinedAfterMLSMigrationFinalisationMessage extends SystemMessage {
-  constructor(translate: Translate) {
-    super(translate);
-    this.system_message_type = SystemMessageType.JOINED_AFTER_MLS_MIGRATION;
-    this.caption = this.translate(
-      'conversationJoinedAfterMLSMigrationFinalisation',
-      undefined,
-      replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE),
-    );
-  }
+export function translateForTest(translationKey: Parameters<Translate>[0]): string {
+  return translationKey;
 }

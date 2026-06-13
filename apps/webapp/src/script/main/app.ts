@@ -91,7 +91,7 @@ import {UserService} from 'Repositories/user/userService';
 import {initializeDataDog} from 'Util/dataDog';
 import {DebugUtil} from 'Util/debugUtil';
 import {Environment} from 'Util/environment';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {durationFrom, formatCoarseDuration, TIME_IN_MILLIS} from 'Util/timeUtil';
 import {AppInitializationStep, checkIndexedDb, InitializationEventLogger} from 'Util/util';
@@ -171,7 +171,7 @@ export class App {
     private readonly core: Core,
     private readonly apiClient: APIClient,
     private readonly config: Configuration,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
   ) {
     this.config = config;
     this.apiClient.on(APIClient.TOPIC.ON_LOGOUT, () =>

@@ -34,7 +34,7 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import type {Message} from 'Repositories/entity/message/Message';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {isConversationEntity} from 'Util/typePredicateUtil';
 
@@ -82,7 +82,7 @@ export class ContentViewModel {
   constructor(
     mainViewModel: MainViewModel,
     public repositories: ViewModelRepositories,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
   ) {
     this.userState = container.resolve(UserState);
     this.conversationState = container.resolve(ConversationState);

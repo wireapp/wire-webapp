@@ -20,7 +20,7 @@
 import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 interface UserNameProps {
   user: User;
@@ -36,7 +36,7 @@ export function useUserName(user: User) {
   return isAvailable ? name : translate('unavailableUser');
 }
 
-export function getUserNameWithTranslate(user: User, translate: typeof t) {
+export function getUserNameWithTranslate(user: User, translate: Translate) {
   return user.isAvailable() ? user.name() : translate('unavailableUser');
 }
 

@@ -23,7 +23,7 @@ import type {FileAsset} from 'Repositories/entity/message/FileAsset';
 import type {MemberMessage} from 'Repositories/entity/message/MemberMessage';
 import type {SystemMessage} from 'Repositories/entity/message/SystemMessage';
 import type {Text} from 'Repositories/entity/message/Text';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getRenderedTextContent} from 'Util/messageRenderer';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
@@ -41,14 +41,14 @@ enum ACTIVITY_TYPE {
 }
 
 type ConversationCellStateDefinition = {
-  description: (conversationEntity: Conversation, translate: typeof t) => string;
+  description: (conversationEntity: Conversation, translate: Translate) => string;
   icon: (conversationEntity: Conversation) => ConversationStatusIcon | void;
   match: (conversationEntity: Conversation) => boolean;
 };
 
 const _accumulateSummary = (
   conversationEntity: Conversation,
-  translate: typeof t,
+  translate: Translate,
   prioritizeMentionAndReply?: boolean,
 ): string => {
   const {
@@ -105,7 +105,7 @@ const _accumulateSummary = (
   return _generateSummaryDescription(activities, translate);
 };
 
-const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, translate: typeof t): string => {
+const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, translate: Translate): string => {
   return Object.entries(activities)
     .map(([activity, activityCount]): string | void => {
       if (activityCount) {
@@ -154,7 +154,7 @@ const _generateSummaryDescription = (activities: Record<ACTIVITY_TYPE, number>, 
 };
 
 const _getStateAlert: ConversationCellStateDefinition = {
-  description: (conversationEntity: Conversation, translate: typeof t) =>
+  description: (conversationEntity: Conversation, translate: Translate) =>
     _accumulateSummary(conversationEntity, translate, true),
   icon: (conversationEntity: Conversation): ConversationStatusIcon | void => {
     const {
@@ -202,7 +202,7 @@ const _getStateDefault: ConversationCellStateDefinition = {
 };
 
 const _getStateGroupActivity: ConversationCellStateDefinition = {
-  description: (conversationEntity: Conversation, translate: typeof t): string => {
+  description: (conversationEntity: Conversation, translate: Translate): string => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
     if (lastMessageEntity === undefined) {
       return '';
@@ -285,7 +285,7 @@ const _getStateGroupActivity: ConversationCellStateDefinition = {
 };
 
 const _getStateMuted: ConversationCellStateDefinition = {
-  description: (conversationEntity: Conversation, translate: typeof t) => {
+  description: (conversationEntity: Conversation, translate: Translate) => {
     return _accumulateSummary(conversationEntity, translate, conversationEntity.showNotificationsMentionsAndReplies());
   },
   icon: (conversationEntity: Conversation) => {
@@ -308,7 +308,7 @@ const _getStateMuted: ConversationCellStateDefinition = {
 };
 
 const _getStateRemoved: ConversationCellStateDefinition = {
-  description: (conversationEntity: Conversation, translate: typeof t) => {
+  description: (conversationEntity: Conversation, translate: Translate) => {
     const lastMessageEntity = conversationEntity.getNewestMessage();
     const selfUser = conversationEntity.selfUser();
     if (selfUser === undefined) {
@@ -335,7 +335,7 @@ const _getStateRemoved: ConversationCellStateDefinition = {
 };
 
 const _getStateUnreadMessage: ConversationCellStateDefinition = {
-  description: (conversationEntity: Conversation, translate: typeof t): string => {
+  description: (conversationEntity: Conversation, translate: Translate): string => {
     const unreadState = conversationEntity.unreadState();
 
     const {allMessages, systemMessages} = unreadState;
@@ -426,7 +426,7 @@ const _getStateUserName: ConversationCellStateDefinition = {
 
 export const generateCellState = (
   conversationEntity: Conversation,
-  translate: typeof t,
+  translate: Translate,
 ): {description: string; icon: ConversationStatusIcon | void} => {
   const states = [
     _getStateRemoved,

@@ -19,6 +19,8 @@
 
 import ko from 'knockout';
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {ContentMessage} from './ContentMessage';
 
 export class CompositeMessage extends ContentMessage {
@@ -27,8 +29,8 @@ export class CompositeMessage extends ContentMessage {
   selectedButtonId: ko.Observable<string | undefined>;
   waitingButtonId: ko.Observable<string | undefined>;
 
-  constructor(id?: string) {
-    super(id);
+  constructor(id: string | undefined, translate: Translate) {
+    super(id, translate);
     this.selectedButtonId = ko.observable();
     this.waitingButtonId = ko.observable();
     this.errorButtonId = ko.observable();

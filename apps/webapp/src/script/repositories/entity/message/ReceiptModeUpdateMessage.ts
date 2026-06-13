@@ -19,14 +19,14 @@
 
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 
 import {SystemMessage} from './SystemMessage';
 
 import {SystemMessageType} from '../../../message/SystemMessageType';
 
 export class ReceiptModeUpdateMessage extends SystemMessage {
-  constructor(isReceiptEnabled: boolean, translate: typeof t = t) {
+  constructor(isReceiptEnabled: boolean, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.RECEIPT_MODE_UPDATE;
@@ -36,7 +36,7 @@ export class ReceiptModeUpdateMessage extends SystemMessage {
   }
 }
 
-const getCaption = (isReceiptEnabled: boolean, isSelfUser: boolean, translate: typeof t = t) => {
+const getCaption = (isReceiptEnabled: boolean, isSelfUser: boolean, translate: Translate) => {
   if (isReceiptEnabled) {
     return isSelfUser ? translate('conversationReceiptsOnYou') : translate('conversationReceiptsOn');
   }

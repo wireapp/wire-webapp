@@ -61,13 +61,14 @@ import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {ContentState, useAppState} from 'src/script/page/useAppState';
 import {entities, payload} from 'test/api/payloads';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {truncate} from 'Util/stringUtil';
 import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
 
-function buildNotificationRepository(translate: typeof t = t) {
+function buildNotificationRepository(translate: Translate = t) {
   const userState = container.resolve(UserState);
   const notificationRepository = new NotificationRepository(
     {} as any,
@@ -101,7 +102,7 @@ describe('NotificationRepository', () => {
   let notification_content: any;
 
   it('uses injected translate for obfuscated notification titles', () => {
-    const translate = ((translationKey: string) => `translated:${translationKey}`) as typeof t;
+    const translate = ((translationKey: string) => `translated:${translationKey}`) as Translate;
     const [notificationRepository] = buildNotificationRepository(translate);
 
     const actualTitle = notificationRepository['createTitleObfuscated']();
@@ -252,7 +253,7 @@ describe('NotificationRepository', () => {
 
   describe('does not show a notification', () => {
     beforeEach(() => {
-      message = new PingMessage() as any;
+      message = new PingMessage(translateForTest) as any;
       message.user(user);
     });
 
@@ -302,7 +303,7 @@ describe('NotificationRepository', () => {
     });
 
     it('for a successfully completed call', () => {
-      message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.COMPLETED) as any;
+      message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.COMPLETED, 0, translateForTest) as any;
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
@@ -334,22 +335,22 @@ describe('NotificationRepository', () => {
     }
 
     beforeEach(() => {
-      const mentionMessage = new ContentMessage(createUuid());
+      const mentionMessage = new ContentMessage(createUuid(), translateForTest);
       mentionMessage.addAsset(generateTextAsset());
       spyOn(mentionMessage, 'isUserMentioned').and.returnValue(true);
 
-      const textMessage = new ContentMessage(createUuid());
+      const textMessage = new ContentMessage(createUuid(), translateForTest);
       textMessage.addAsset(generateTextAsset());
-      const compositeMessage = new CompositeMessage(createUuid());
+      const compositeMessage = new CompositeMessage(createUuid(), translateForTest);
       compositeMessage.addAsset(generateTextAsset());
 
-      const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED);
+      const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0, translateForTest);
       allMessageTypes = {
         call: callMessage,
         composite: compositeMessage,
         content: textMessage,
         mention: mentionMessage,
-        ping: new PingMessage(),
+        ping: new PingMessage(translateForTest),
       };
     });
 
@@ -410,7 +411,7 @@ describe('NotificationRepository', () => {
       const expected_body = t('notificationVoiceChannelActivate');
 
       beforeEach(() => {
-        message = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED) as any;
+        message = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0, translateForTest) as any;
         message.user(user);
       });
 
@@ -428,7 +429,7 @@ describe('NotificationRepository', () => {
       const expected_body = t('notificationVoiceChannelDeactivate');
 
       beforeEach(() => {
-        message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.MISSED) as any;
+        message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.MISSED, 0, translateForTest) as any;
         message.user(user);
       });
 
@@ -448,7 +449,7 @@ describe('NotificationRepository', () => {
     let textMessage: ContentMessage;
 
     beforeEach(() => {
-      textMessage = new ContentMessage();
+      textMessage = new ContentMessage(undefined, translateForTest);
       textMessage.user(user);
     });
 
@@ -567,7 +568,7 @@ describe('NotificationRepository', () => {
 
     it('if a group is created', () => {
       (conversation as any).from = payload.users.get.one[0].id;
-      message = new MemberMessage() as any;
+      message = new MemberMessage(translateForTest) as any;
       message.user(user);
       message.type = CONVERSATION_EVENT.CREATE;
       (message as any).memberMessageType = SystemMessageType.CONVERSATION_CREATE;
@@ -578,7 +579,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group is renamed', () => {
-      const renameMessage = new RenameMessage('Lorem Ipsum Conversation');
+      const renameMessage = new RenameMessage('Lorem Ipsum Conversation', undefined, undefined, translateForTest);
       renameMessage.user(user);
 
       const expected_body = `${user.name()} renamed the conversation to ${renameMessage.name}`;
@@ -587,7 +588,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group message timer is updated', () => {
-      message = new MessageTimerUpdateMessage(5000);
+      message = new MessageTimerUpdateMessage(5000, translateForTest);
       message.user(user);
 
       const expectedBody = `${user.name()} set the message timer to 5 ${t('ephemeralUnitsSeconds')}`;
@@ -596,7 +597,7 @@ describe('NotificationRepository', () => {
     });
 
     it('if a group message timer is reset', () => {
-      message = new MessageTimerUpdateMessage(null);
+      message = new MessageTimerUpdateMessage(null, translateForTest);
       message.user(user);
 
       const expectedBody = `${user.name()} turned off the message timer`;
@@ -610,7 +611,7 @@ describe('NotificationRepository', () => {
     let memberMessage: MemberMessage;
 
     beforeEach(() => {
-      memberMessage = new MemberMessage();
+      memberMessage = new MemberMessage(translateForTest);
       memberMessage.user(user);
       (memberMessage as any).memberMessageType = SystemMessageType.NORMAL;
       otherUser = userMapper.mapUserFromJson(payload.users.get.many[1], '');
@@ -702,7 +703,7 @@ describe('NotificationRepository', () => {
       conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
 
       connectionEntity = ConnectionMapper.mapConnectionFromJson(entities.connection);
-      memberMessage = new MemberMessage();
+      memberMessage = new MemberMessage(translateForTest);
       memberMessage.user(user);
     });
 
@@ -740,7 +741,7 @@ describe('NotificationRepository', () => {
     });
 
     beforeEach(() => {
-      message = new PingMessage();
+      message = new PingMessage(translateForTest);
       message.user(user);
     });
 
@@ -762,7 +763,7 @@ describe('NotificationRepository', () => {
   describe('shows a well-formed composite notification', () => {
     let compositeMessage: CompositeMessage;
     beforeEach(() => {
-      compositeMessage = new CompositeMessage();
+      compositeMessage = new CompositeMessage(undefined, translateForTest);
       compositeMessage.addAsset(new Text(createUuid(), '## headline!'));
     });
 
@@ -807,7 +808,7 @@ describe('NotificationRepository', () => {
       conversationEntity = new Conversation(createUuid());
       conversationEntity.selfUser(selfUserEntity);
 
-      messageEntity = new ContentMessage(createUuid());
+      messageEntity = new ContentMessage(createUuid(), translateForTest);
       messageEntity.user(selfUserEntity);
     });
 

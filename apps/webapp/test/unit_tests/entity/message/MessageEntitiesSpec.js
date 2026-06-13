@@ -22,34 +22,36 @@ import {FileAsset} from 'Repositories/entity/message/FileAsset';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Text} from 'Repositories/entity/message/Text';
 import {StatusType} from 'src/script/message/StatusType';
+import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('Message Entities', () => {
   let message_et = null;
 
   describe('isDownloadable', () => {
     it('message with text asset should not be downloadable', () => {
-      message_et = new ContentMessage();
+      message_et = new ContentMessage(undefined, translateForTest);
       message_et.assets.push(new Text());
 
       expect(message_et.isDownloadable()).toBeFalsy();
     });
 
     it('message with image asset should be downloadable', () => {
-      message_et = new ContentMessage();
+      message_et = new ContentMessage(undefined, translateForTest);
       message_et.assets.push(new MediumImage());
 
       expect(message_et.isDownloadable()).toBeTruthy();
     });
 
     it('message with file asset should be downloadable', () => {
-      message_et = new ContentMessage();
+      message_et = new ContentMessage(undefined, translateForTest);
       message_et.assets.push(new FileAsset());
 
       expect(message_et.isDownloadable()).toBeTruthy();
     });
 
     it('ephemeral message with image asset should be downloadable', () => {
-      message_et = new ContentMessage();
+      message_et = new ContentMessage(undefined, translateForTest);
       message_et.assets.push(new MediumImage());
       message_et.ephemeral_expires(12312123);
 
@@ -57,7 +59,7 @@ describe('Message Entities', () => {
     });
 
     it('expired ephemeral message with image asset should not be downloadable', () => {
-      message_et = new ContentMessage();
+      message_et = new ContentMessage(undefined, translateForTest);
       message_et.assets.push(new MediumImage());
       message_et.ephemeral_expires(true);
 
@@ -67,7 +69,7 @@ describe('Message Entities', () => {
 
   describe('ContentMessage', () => {
     beforeEach(() => {
-      message_et = new ContentMessage();
+      message_et = new ContentMessage(undefined, translateForTest);
     });
 
     describe('no asset', () => {

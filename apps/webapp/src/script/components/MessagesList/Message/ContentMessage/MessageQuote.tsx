@@ -35,7 +35,7 @@ import {User} from 'Repositories/entity/User';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {includesOnlyEmojis} from 'Util/emojiUtil';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {formatDateNumeral, formatTimeShort, isBeforeToday} from 'Util/timeUtil';
 import {isErrorWithType} from 'Util/typePredicateUtil';
 
@@ -51,7 +51,7 @@ import {ConversationError} from '../../../../error/conversationError';
 import {QuoteEntity} from '../../../../message/QuoteEntity';
 import {useMessageFocusedTabIndex} from '../util';
 
-function createPlaceholderMessage(translate: typeof t) {
+function createPlaceholderMessage(translate: Translate) {
   const message = new ContentMessage(undefined, translate);
   const user = new User('', '', translate);
   user.name(' ');

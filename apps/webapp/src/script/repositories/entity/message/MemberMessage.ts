@@ -23,7 +23,7 @@ import type {QualifiedId} from '@wireapp/api-client/lib/user/';
 import ko from 'knockout';
 
 import {ClientEvent} from 'Repositories/event/Client';
-import {Declension, getUserName, t} from 'Util/localizerUtil';
+import {type Translate, Declension, getUserName} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {capitalizeFirstChar} from 'Util/stringUtil';
 
@@ -51,7 +51,7 @@ export class MemberMessage extends SystemMessage {
   /** this can be used to check uniqueness of the message. It's computed using the timestamp + users involved in the event */
   public readonly hash: ko.PureComputed<string>;
 
-  constructor(translate: typeof t = t) {
+  constructor(translate: Translate) {
     super(translate);
 
     this.super_type = SuperType.MEMBER;

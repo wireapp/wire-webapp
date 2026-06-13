@@ -48,7 +48,7 @@ import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
 import type {TeamRepository} from 'Repositories/team/TeamRepository';
 import {TeamState} from 'Repositories/team/TeamState';
 import {ROLE} from 'Repositories/user/userPermission';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {safeWindowOpen} from 'Util/sanitizationUtil';
 
@@ -92,7 +92,7 @@ export class CallingViewModel {
     readonly teamRepository: TeamRepository,
     readonly propertiesRepository: PropertiesRepository,
     private readonly selfUser: ko.Observable<User>,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
     private readonly conversationState = container.resolve(ConversationState),
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),

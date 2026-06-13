@@ -22,7 +22,7 @@ import {STATE} from '@wireapp/avs';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
 import {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {buildCall, buildCallingViewModel, callState, mockCallingRepository} from './CallingViewModel.mocks';
@@ -101,7 +101,7 @@ describe('CallingViewModel', () => {
     });
 
     it('uses the injected translate function for second-call warning copy', () => {
-      const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
       const [callingViewModel] = buildCallingViewModel(translate);
       const joinedCall = buildCall(new Conversation('conversation1', ''));
       const primaryModalShow = jest.fn();

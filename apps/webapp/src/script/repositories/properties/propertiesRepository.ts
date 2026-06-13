@@ -36,7 +36,7 @@ import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndica
 import {Config} from 'src/script/Config';
 import {deepMerge} from 'Util/deepMerge';
 import {Environment} from 'Util/environment';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {loadValue} from 'Util/storageUtil';
 
@@ -74,7 +74,7 @@ export class PropertiesRepository {
   constructor(
     propertiesService: PropertiesService,
     selfService: SelfService,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
   ) {
     this.propertiesService = propertiesService;
     this.selfService = selfService;

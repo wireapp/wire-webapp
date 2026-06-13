@@ -23,9 +23,9 @@ import {Runtime} from '@wireapp/commons';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {ModalType, getModalOptions} from 'src/script/E2EIdentity/Modals';
-import {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
-export const configureDownloadPath = (teamFeatures: FeatureList, translate: typeof t) => {
+export const configureDownloadPath = (teamFeatures: FeatureList, translate: Translate) => {
   const downloadPathNotifier =
     teamFeatures[FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]?.status === 'enabled' &&
     localStorage.getItem('enforcedDownloadLocation') !==

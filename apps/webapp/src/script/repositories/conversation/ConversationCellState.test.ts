@@ -26,6 +26,7 @@ import {PingMessage} from 'Repositories/entity/message/PingMessage';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {generateCellState} from './ConversationCellState';
@@ -74,16 +75,16 @@ describe('ConversationCellState', () => {
 
     const sender = new User();
     sender.name('Felix');
-    const contentMessage = new ContentMessage();
+    const contentMessage = new ContentMessage(undefined, translateForTest);
     const text = new Text('id', 'Hello there');
     contentMessage.user(sender);
     contentMessage.assets([text]);
 
-    const pingMessage = new PingMessage();
+    const pingMessage = new PingMessage(translateForTest);
 
-    const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0);
+    const callMessage = new CallMessage(CALL_MESSAGE_TYPE.ACTIVATED, undefined, 0, translateForTest);
 
-    const mention = new ContentMessage();
+    const mention = new ContentMessage(undefined, translateForTest);
     jest.spyOn(mention, 'isUserMentioned').mockReturnValue(true);
 
     const tests = [

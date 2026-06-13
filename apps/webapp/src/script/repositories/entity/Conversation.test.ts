@@ -29,6 +29,7 @@ import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting'
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/StatusType';
 import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {Conversation} from './Conversation';
@@ -289,12 +290,12 @@ describe('Conversation', () => {
   describe('addMessages', () => {
     const reference_timestamp = Date.now();
 
-    const message1 = new ContentMessage();
+    const message1 = new ContentMessage(undefined, translateForTest);
     message1.id = createUuid();
     message1.timestamp(reference_timestamp - 10000);
     message1.user(self_user);
 
-    const message2 = new ContentMessage();
+    const message2 = new ContentMessage(undefined, translateForTest);
     message2.id = createUuid();
     message2.timestamp(reference_timestamp - 5000);
 
@@ -316,35 +317,35 @@ describe('Conversation', () => {
       const selfUserEntity = new User(createUuid(), null);
       selfUserEntity.isMe = true;
 
-      const sentMessageEntity = new ContentMessage(createUuid());
+      const sentMessageEntity = new ContentMessage(createUuid(), translateForTest);
       sentMessageEntity.user(selfUserEntity);
       sentMessageEntity.status(StatusType.SENT);
       conversation_et.addMessage(sentMessageEntity);
 
       expect(conversation_et.lastDeliveredMessage()).not.toBeDefined();
 
-      const deliveredMessageEntity = new ContentMessage(createUuid());
+      const deliveredMessageEntity = new ContentMessage(createUuid(), translateForTest);
       deliveredMessageEntity.user(selfUserEntity);
       deliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(deliveredMessageEntity);
 
       expect(conversation_et.lastDeliveredMessage()).toBe(deliveredMessageEntity);
 
-      const nextSentMessageEntity = new ContentMessage(createUuid());
+      const nextSentMessageEntity = new ContentMessage(createUuid(), translateForTest);
       nextSentMessageEntity.user(selfUserEntity);
       nextSentMessageEntity.status(StatusType.SENT);
       conversation_et.addMessage(nextSentMessageEntity);
 
       expect(conversation_et.lastDeliveredMessage()).toBe(deliveredMessageEntity);
 
-      const nextDeliveredMessageEntity = new ContentMessage(createUuid());
+      const nextDeliveredMessageEntity = new ContentMessage(createUuid(), translateForTest);
       nextDeliveredMessageEntity.user(selfUserEntity);
       nextDeliveredMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(nextDeliveredMessageEntity);
 
       expect(conversation_et.lastDeliveredMessage()).toBe(nextDeliveredMessageEntity);
 
-      const remoteMessageEntity = new ContentMessage(createUuid());
+      const remoteMessageEntity = new ContentMessage(createUuid(), translateForTest);
       remoteMessageEntity.user(remoteUserEntity);
       remoteMessageEntity.status(StatusType.DELIVERED);
       conversation_et.addMessage(remoteMessageEntity);
@@ -368,7 +369,7 @@ describe('Conversation', () => {
     });
 
     it('returns undefined if last message is not text and not added by self user', () => {
-      const message_et = new PingMessage();
+      const message_et = new PingMessage(translateForTest);
       message_et.id = createUuid();
       message_et.user(new User('', null));
       conversation_et.addMessage(message_et);
@@ -377,7 +378,7 @@ describe('Conversation', () => {
     });
 
     it('returns undefined if last message is not text and is added by self user', () => {
-      const message_et = new PingMessage();
+      const message_et = new PingMessage(translateForTest);
       message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
@@ -386,7 +387,7 @@ describe('Conversation', () => {
     });
 
     it('returns undefined if last message is text and not send by self user', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(new User('', null));
@@ -396,7 +397,7 @@ describe('Conversation', () => {
     });
 
     it('returns message if last message is text and send by self user', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(self_user_et);
@@ -406,13 +407,13 @@ describe('Conversation', () => {
     });
 
     it('returns last text message if last message is not text and send by self user', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
-      const ping_message_et = new PingMessage();
+      const ping_message_et = new PingMessage(translateForTest);
       ping_message_et.id = createUuid();
       ping_message_et.user(new User('', null));
       conversation_et.addMessage(ping_message_et);
@@ -422,13 +423,13 @@ describe('Conversation', () => {
     });
 
     it('returns last message if last message is text and send by self user', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
-      const next_message_et = new ContentMessage();
+      const next_message_et = new ContentMessage(undefined, translateForTest);
       next_message_et.addAsset(new Text());
       next_message_et.id = createUuid();
       next_message_et.user(self_user_et);
@@ -439,13 +440,13 @@ describe('Conversation', () => {
     });
 
     it('returns message if last message is text and ephemeral', () => {
-      const message_et = new ContentMessage();
+      const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
       message_et.user(self_user_et);
       conversation_et.addMessage(message_et);
 
-      const ephemeral_message_et = new ContentMessage();
+      const ephemeral_message_et = new ContentMessage(undefined, translateForTest);
       ephemeral_message_et.addAsset(new Text());
       ephemeral_message_et.id = createUuid();
       ephemeral_message_et.user(self_user_et);

@@ -41,7 +41,7 @@ import {EventRepository} from 'Repositories/event/EventRepository';
 import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
 import {SelfService} from 'Repositories/self/SelfService';
 import {TeamState} from 'Repositories/team/TeamState';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {createUuid} from 'Util/uuid';
 
@@ -53,7 +53,7 @@ import {UserState} from './userState';
 import {serverTimeHandler} from '../../time/serverTimeHandler';
 
 const testFactory = new TestFactory();
-async function buildUserRepository(translate: typeof t = t) {
+async function buildUserRepository(translate: Translate = t) {
   const storageRepo = await testFactory.exposeStorageActors();
 
   const userService = new UserService(storageRepo['storageService']);

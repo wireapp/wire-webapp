@@ -21,7 +21,7 @@ import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 import {container} from 'tsyringe';
 
 import {UserState} from 'Repositories/user/userState';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {SystemMessage} from './SystemMessage';
@@ -33,7 +33,7 @@ export class RenameMessage extends SystemMessage {
   public readonly name: string;
   private readonly userState = container.resolve(UserState);
 
-  constructor(name: string, userId?: string, userDomain?: string, translate: typeof t = t) {
+  constructor(name: string, userId: string | undefined, userDomain: string | undefined, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.RENAME;

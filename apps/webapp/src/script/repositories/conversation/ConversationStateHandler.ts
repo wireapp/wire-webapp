@@ -24,7 +24,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import type {Conversation} from 'Repositories/entity/Conversation';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {isErrorWithCode} from 'Util/typePredicateUtil';
 
 import {AbstractConversationEventHandler, EventHandlingConfig} from './AbstractConversationEventHandler';
@@ -41,9 +41,9 @@ import {ConversationEvent} from './EventBuilder';
 
 export class ConversationStateHandler extends AbstractConversationEventHandler {
   private readonly conversationService: ConversationService;
-  private readonly translate: typeof t;
+  private readonly translate: Translate;
 
-  constructor(conversationService: ConversationService, translate: typeof t) {
+  constructor(conversationService: ConversationService, translate: Translate) {
     super();
     const eventHandlingConfig: EventHandlingConfig = {
       [CONVERSATION_EVENT.ACCESS_UPDATE]: this._mapConversationAccessState.bind(this),

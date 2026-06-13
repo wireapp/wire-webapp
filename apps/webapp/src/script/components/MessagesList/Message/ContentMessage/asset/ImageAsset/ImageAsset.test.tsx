@@ -29,6 +29,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {ImageAsset, ImageAssetProps} from './ImageAsset';
 
@@ -46,7 +48,7 @@ describe('image-asset', () => {
   const mockUser = new User('user-id', 'test-domain.wire.com');
 
   const createDefaultMessage = () => {
-    const message = new ContentMessage();
+    const message = new ContentMessage(undefined, translateForTest);
     mockUser.name('Test User');
     message.user(mockUser);
     return message;

@@ -24,7 +24,7 @@ import ko from 'knockout';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import {ReactionMap, ReadReceipt} from 'Repositories/storage';
 import {copyText} from 'Util/clipboardUtil';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {formatLocale, formatTimeShort} from 'Util/timeUtil';
 
 import type {Asset} from './Asset';
@@ -51,7 +51,7 @@ export class ContentMessage extends Message {
   public super_type = SuperType.CONTENT;
   public readonly readReceipts = ko.observableArray<ReadReceipt>();
 
-  constructor(id?: string, translate: typeof t = t) {
+  constructor(id: string | undefined, translate: Translate) {
     super(id, undefined, translate);
     this.was_edited = ko.pureComputed(() => {
       return this.edited_timestamp() !== null;

@@ -18,6 +18,8 @@
  */
 
 import {AssetType} from 'Repositories/assets/assetType';
+import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {ContentMessage} from './ContentMessage';
 import {FileAsset} from './FileAsset';
@@ -64,7 +66,7 @@ describe('Message', () => {
 
   describe('getMultipartAssets', () => {
     it('returns multipart assets from a content message', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const multipartAsset = new Multipart({text: 'Hello world'});
       const textAsset = new Text();
 
@@ -79,7 +81,7 @@ describe('Message', () => {
     });
 
     it('returns multiple multipart assets when present', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const multipartAsset1 = new Multipart({text: 'First multipart'});
       const multipartAsset2 = new Multipart({text: 'Second multipart'});
       const textAsset = new Text();
@@ -96,7 +98,7 @@ describe('Message', () => {
     });
 
     it('returns empty array when message has no multipart assets', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const textAsset = new Text();
       const fileAsset = new FileAsset();
 
@@ -109,7 +111,7 @@ describe('Message', () => {
     });
 
     it('returns empty array when message has empty assets array', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
 
       const result = message.getMultipartAssets();
 
@@ -125,7 +127,7 @@ describe('Message', () => {
     });
 
     it('handles messages with only multipart assets', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const multipartAsset1 = new Multipart({text: 'First'});
       const multipartAsset2 = new Multipart({text: 'Second'});
       const multipartAsset3 = new Multipart({text: 'Third'});
@@ -141,7 +143,7 @@ describe('Message', () => {
     });
 
     it('filters out assets that are not multipart', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const multipartAsset = new Multipart({text: 'Multipart content'});
       const textAsset = new Text();
       const fileAsset = new FileAsset();
@@ -159,7 +161,7 @@ describe('Message', () => {
     });
 
     it('returns empty array when hasMultipartAsset returns false', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const textAsset = new Text();
 
       message.assets.push(textAsset);
@@ -173,7 +175,7 @@ describe('Message', () => {
     });
 
     it('returns multipart assets when hasMultipartAsset returns true', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const multipartAsset = new Multipart({text: 'Content'});
 
       message.assets.push(multipartAsset);
@@ -198,7 +200,7 @@ describe('Message', () => {
     });
 
     it('handles multipart assets with attachments', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       // Create multipart with valid attachments structure
       const multipartWithAttachments = new Multipart({
         text: 'Message with attachments',
@@ -224,7 +226,7 @@ describe('Message', () => {
     });
 
     it('handles multipart assets without attachments', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const multipartNoAttachments = new Multipart({
         text: 'Message without attachments',
         attachments: null,
@@ -242,7 +244,7 @@ describe('Message', () => {
 
   describe('hasMultipartAsset', () => {
     it('returns true when content message has multipart asset', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const multipartAsset = new Multipart({text: 'Test'});
 
       message.assets.push(multipartAsset);
@@ -251,7 +253,7 @@ describe('Message', () => {
     });
 
     it('returns false when content message has no multipart asset', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
       const textAsset = new Text();
 
       message.assets.push(textAsset);
@@ -266,7 +268,7 @@ describe('Message', () => {
     });
 
     it('returns false when assets array is empty', () => {
-      const message = new ContentMessage();
+      const message = new ContentMessage(undefined, translateForTest);
 
       expect(message.hasMultipartAsset()).toBe(false);
     });

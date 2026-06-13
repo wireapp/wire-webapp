@@ -22,7 +22,7 @@ import {UserType} from '@wireapp/api-client/lib/user';
 import {MappedAsset, mapProfileAssets, updateUserEntityAssets} from 'Repositories/assets/assetMapper';
 import {User} from 'Repositories/entity/User';
 import {UserRecord} from 'Repositories/storage';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 
 import {isSelfAPIUser} from './userGuards';
@@ -39,7 +39,7 @@ export class UserMapper {
    */
   constructor(
     private readonly serverTimeHandler: ServerTimeHandler,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
   ) {
     this.logger = getLogger('UserMapper');
   }

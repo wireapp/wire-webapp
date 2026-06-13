@@ -87,7 +87,7 @@ import type {UserRepository} from 'Repositories/user/userRepository';
 import {flatten} from 'Util/arrayUtil';
 import {calculateChildWindowPosition} from 'Util/DOM/caculateChildWindowPosition';
 import {isDetachedCallingFeatureEnabled} from 'Util/isDetachedCallingFeatureEnabled';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {captureModalFocusContext} from 'Util/modalFocusUtil';
 import {roundLogarithmic} from 'Util/numberUtil';
@@ -195,7 +195,7 @@ export class CallingRepository {
     private readonly mediaDevicesHandler: MediaDevicesHandler,
     private readonly serverTimeHandler: ServerTimeHandler,
     private readonly backgroundEffectsHandler: BackgroundEffectsHandler,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
     private readonly apiClient = container.resolve(APIClient),
     private readonly conversationState = container.resolve(ConversationState),
     private readonly callState = container.resolve(CallState),

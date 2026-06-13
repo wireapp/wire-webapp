@@ -21,7 +21,7 @@ import {ReactNode, ReactElement, createContext, useContext, useMemo} from 'react
 
 import {FireAndForgetInvoker} from '@wireapp/core';
 
-import type {t} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {WallClock} from '../clock/wallClock';
 import {StartupFeatureToggleName} from '../featureToggles/startupFeatureToggles';
@@ -41,7 +41,7 @@ export type RootContextValue = {
   readonly doesApplicationNeedForceReload: boolean;
   readonly isFeatureToggleEnabled: (featureName: StartupFeatureToggleName) => boolean;
   readonly applicationNavigation: ApplicationNavigation;
-  readonly translate: typeof t;
+  readonly translate: Translate;
 };
 
 export const RootContext = createContext<RootContextValue | null>(null);

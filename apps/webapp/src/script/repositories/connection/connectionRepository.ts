@@ -37,7 +37,7 @@ import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import type {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
-import {replaceLink, t} from 'Util/localizerUtil';
+import {type Translate, replaceLink} from 'Util/localizerUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 import {toError} from 'Util/toError';
@@ -62,7 +62,7 @@ export class ConnectionRepository {
     userRepository: UserRepository,
     private readonly selfService: SelfService,
     private readonly teamService: TeamService,
-    private readonly translate: typeof t,
+    private readonly translate: Translate,
     private readonly connectionState = container.resolve(ConnectionState),
     private readonly userState = container.resolve(UserState),
   ) {

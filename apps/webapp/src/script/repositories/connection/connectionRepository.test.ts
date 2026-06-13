@@ -31,7 +31,7 @@ import {SelfService} from 'Repositories/self/SelfService';
 import {TeamService} from 'Repositories/team/TeamService';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {generateUser} from 'test/helper/UserGenerator';
-import {t} from 'Util/localizerUtil';
+import {type Translate, t} from 'Util/localizerUtil';
 import {createUuid} from 'Util/uuid';
 
 import {ConnectionEntity} from './connectionEntity';
@@ -39,7 +39,7 @@ import {ConnectionRepository} from './connectionRepository';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
 
-function buildConnectionRepository(translate: typeof t = t) {
+function buildConnectionRepository(translate: Translate = t) {
   const connectionState = new ConnectionState();
   const connectionService = new ConnectionService();
   const selfService = new SelfService();
@@ -155,7 +155,7 @@ describe('ConnectionRepository', () => {
 
   describe('createConnection', () => {
     it('uses the injected translate function for modal copy', async () => {
-      const translate = jest.fn((translationKey: Parameters<typeof t>[0]) => `translated:${translationKey}`) as typeof t;
+      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
       const [connectionRepository, {connectionService}] = buildConnectionRepository(translate);
       const user = generateUser();
       const primaryModalShow = jest.fn();

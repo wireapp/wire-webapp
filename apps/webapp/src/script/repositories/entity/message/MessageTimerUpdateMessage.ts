@@ -20,7 +20,7 @@
 import {CONVERSATION_EVENT} from '@wireapp/api-client/lib/event/';
 
 import {ConversationEphemeralHandler} from 'Repositories/conversation/ConversationEphemeralHandler';
-import {t} from 'Util/localizerUtil';
+import {type Translate} from 'Util/localizerUtil';
 import {formatDuration} from 'Util/timeUtil';
 
 import {SystemMessage} from './SystemMessage';
@@ -30,7 +30,7 @@ import {SystemMessageType} from '../../../message/SystemMessageType';
 export class MessageTimerUpdateMessage extends SystemMessage {
   public readonly message_timer: number | null;
 
-  constructor(messageTimer: number | null, translate: typeof t = t) {
+  constructor(messageTimer: number | null, translate: Translate) {
     super(translate);
 
     this.type = CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE;
@@ -42,7 +42,7 @@ export class MessageTimerUpdateMessage extends SystemMessage {
   }
 }
 
-const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: typeof t = t) => {
+const getCaption = (messageTimer: number | null, isSelfUser: boolean, translate: Translate) => {
   if (messageTimer) {
     const timeString = formatDuration(messageTimer, translate).text;
     return isSelfUser

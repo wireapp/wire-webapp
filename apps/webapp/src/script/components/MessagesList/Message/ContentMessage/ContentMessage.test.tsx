@@ -27,6 +27,8 @@ import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
 import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
@@ -38,7 +40,7 @@ describe('message', () => {
   const textValue = 'hello';
 
   beforeEach(() => {
-    const message = new ContentMessage();
+    const message = new ContentMessage(undefined, translateForTest);
     message.user(new User(createUuid()));
     const textAsset = new Text('', textValue);
     spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
@@ -84,14 +86,14 @@ describe('message', () => {
   });
 
   it('displays a quoted message', async () => {
-    const quotedMessage = new ContentMessage(createUuid());
+    const quotedMessage = new ContentMessage(createUuid(), translateForTest);
     const quoteText = 'I am a quote';
     const quoteAsset = new Text('', textValue);
     spyOn(quoteAsset, 'render').and.returnValue(`<span>${quoteText}</span>`);
     quotedMessage.assets.push(quoteAsset);
     const findMessage = () => Promise.resolve(quotedMessage);
 
-    const message = new ContentMessage();
+    const message = new ContentMessage(undefined, translateForTest);
     message.user(new User(createUuid()));
     message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
 

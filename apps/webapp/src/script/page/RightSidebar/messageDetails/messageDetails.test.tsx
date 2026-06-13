@@ -31,6 +31,8 @@ import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
+import {t} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {MessageDetails} from './messageDetails';
@@ -73,7 +75,7 @@ describe('MessageDetails', () => {
     const user = new User(createUuid());
     user.name(userName);
 
-    const message = new ContentMessage(createUuid());
+    const message = new ContentMessage(createUuid(), translateForTest);
     message.timestamp(timestamp);
     message.user(user);
 
