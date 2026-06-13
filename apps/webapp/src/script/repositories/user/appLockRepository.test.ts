@@ -45,7 +45,7 @@ const createAppLockRepository = (translate: Translate = translateForTest): AppLo
 
   userState.self(new User(createUuid(), ''));
 
-  return new AppLockRepository(userState, appLockState, appLockCrypto, translate);
+  return new AppLockRepository(translate, userState, appLockState, appLockCrypto);
 };
 
 describe('AppLockRepository', () => {

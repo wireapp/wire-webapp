@@ -21,7 +21,7 @@ import sodium, {ready} from 'libsodium-wrappers-sumo';
 import {container, singleton} from 'tsyringe';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import {type Translate, translate as defaultTranslate} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {AppLockState} from './appLockState';
 import {UserState} from './userState';
@@ -66,10 +66,10 @@ export class AppLockRepository {
   getPassphraseStorageKey: () => string;
   getEnabledStorageKey: () => string;
   constructor(
+    private readonly translate: Translate,
     private readonly userState = container.resolve(UserState),
     private readonly appLockState = container.resolve(AppLockState),
     private readonly appLockCrypto: AppLockCrypto = defaultAppLockCrypto,
-    private readonly translate: Translate = defaultTranslate,
   ) {
     this.getPassphraseStorageKey = (): string => `${APP_LOCK_STORAGE}_${this.userState.self().id}`;
     this.getEnabledStorageKey = (): string => `${APP_LOCK_ENABLED_STORAGE}_${this.userState.self().id}`;

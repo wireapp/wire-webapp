@@ -30,6 +30,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {AppLockCrypto, AppLockRepository} from 'Repositories/user/appLockRepository';
 import {AppLockState} from 'Repositories/user/appLockState';
 import {UserState} from 'Repositories/user/userState';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {AppLock, APPLOCK_STATE} from './AppLock';
@@ -78,7 +79,7 @@ const createAppLockRepository = (appLockState?: AppLockState) => {
   const userState = new UserState();
   appLockState = appLockState ?? createAppLockState();
   userState.self(new User(createUuid(), ''));
-  const appLockRepository = new AppLockRepository(userState, appLockState, appLockCrypto);
+  const appLockRepository = new AppLockRepository(translateForTest, userState, appLockState, appLockCrypto);
   return appLockRepository;
 };
 describe('AppLock', () => {
