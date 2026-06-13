@@ -18,7 +18,7 @@
  */
 
 import {User} from 'Repositories/entity/User';
-import {Declension, LocalizerUtil, translate, getSelfName, getUserName} from 'Util/localizerUtil';
+import {Declension, translate, getSelfName, getUserName} from 'Util/localizerUtil';
 
 import {escapeRegex, safeWindowOpen} from './sanitizationUtil';
 
@@ -62,12 +62,12 @@ describe('sanitizationUtil', () => {
 
       expect(escapedDativeName).toEqual(translate('conversationYouDative'));
 
-      spyOn(LocalizerUtil, 'translate').and.returnValue('<script>you</script>');
-      const escapedAccusativeName = getSelfName(Declension.DATIVE);
+      const translateUnsafeSelfName = () => '<script>you</script>';
+      const escapedAccusativeName = getSelfName(Declension.DATIVE, false, translateUnsafeSelfName);
 
       expect(escapedAccusativeName).toEqual('&lt;script&gt;you&lt;/script&gt;');
 
-      const unescapedAccusativeName = getSelfName(Declension.DATIVE, true);
+      const unescapedAccusativeName = getSelfName(Declension.DATIVE, true, translateUnsafeSelfName);
 
       expect(unescapedAccusativeName).toEqual('<script>you</script>');
     });

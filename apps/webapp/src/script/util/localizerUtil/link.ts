@@ -1,6 +1,6 @@
 /*
  * Wire
- * Copyright (C) 2023 Wire Swiss GmbH
+ * Copyright (C) 2026 Wire Swiss GmbH
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,9 @@
  *
  */
 
-export * from './link';
-export * from './localizerUtil.types';
-export * from './translate';
-export * from './translationTypes';
-export * from './userName';
+export function replaceLink(href: string, className: string = '', uieName: string = '') {
+  return {
+    '/link': '</a>',
+    link: `<a href="${href}" data-uie-name="${uieName}" class="${className}" rel="nofollow noopener noreferrer" target="_blank">`,
+  };
+}

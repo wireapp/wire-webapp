@@ -17,7 +17,12 @@
  *
  */
 
-import type {Substitutions, TranslationKey} from './localizerUtil';
+import en from 'I18n/en-US.json';
+
+export type TranslationStrings = typeof en;
+export type TranslationKey = keyof TranslationStrings;
+export type StringIdentifier = TranslationKey;
+export type Substitutions = Record<string, string | number>;
 
 export type Translate = <Identifier extends TranslationKey>(
   identifier: Identifier,
