@@ -47,7 +47,7 @@ function buildQuotedMessageMiddleware() {
 
 describe('QuotedMessageMiddleware', () => {
   const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-  conversation.selfUser(new User());
+  conversation.selfUser(new User('', '', translateForTest));
 
   describe('processEvent', () => {
     it('ignores messages that do not have quotes', async () => {

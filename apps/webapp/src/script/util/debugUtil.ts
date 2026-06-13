@@ -59,6 +59,7 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {disableForcedErrorReporting} from 'Repositories/tracking/telemetry.helpers';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {UserState} from 'Repositories/user/userState';
+import {translate} from 'Util/localizerUtil';
 import {getStorage} from 'Util/localStorage';
 import {getLogger, Logger} from 'Util/logger';
 
@@ -188,7 +189,9 @@ export class DebugUtil {
       return;
     }
 
-    const participants = new Array(number).fill(0).map((_, i) => new Participant(new User(), `some-client-id-${i}`));
+    const participants = new Array(number)
+      .fill(0)
+      .map((_, i) => new Participant(new User('', '', translate), `some-client-id-${i}`));
     participants.forEach(participant => call.addParticipant(participant));
   }
 

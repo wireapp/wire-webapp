@@ -39,9 +39,14 @@ import {createConversationForTest} from 'Util/test/createConversationForTest';
 
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {
-    const conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversationEntity = createConversationForTest(
+      createUuid(),
+      '',
+      CONVERSATION_PROTOCOL.PROTEUS,
+      translateForTest,
+    );
 
-    const selfUserEntity = new User(createUuid());
+    const selfUserEntity = new User(createUuid(), '', translateForTest);
     selfUserEntity.isMe = true;
     selfUserEntity.teamId = createUuid();
     conversationEntity.selfUser(selfUserEntity);
@@ -66,16 +71,21 @@ describe('ConversationCellState', () => {
   });
 
   describe('Second line description for conversations', () => {
-    const conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversationEntity = createConversationForTest(
+      createUuid(),
+      '',
+      CONVERSATION_PROTOCOL.PROTEUS,
+      translateForTest,
+    );
 
-    const selfUserEntity = new User(createUuid());
+    const selfUserEntity = new User(createUuid(), '', translateForTest);
     selfUserEntity.isMe = true;
     selfUserEntity.teamId = createUuid();
     conversationEntity.selfUser(selfUserEntity);
 
     conversationEntity.mutedState(NOTIFICATION_STATE.EVERYTHING);
 
-    const sender = new User();
+    const sender = new User('', '', translateForTest);
     sender.name('Felix');
     const contentMessage = new ContentMessage(undefined, translateForTest);
     const text = new Text('id', 'Hello there');

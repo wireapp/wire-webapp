@@ -118,7 +118,7 @@ describe('NotificationRepository', () => {
     // Create entities
     user = userMapper.mapUserFromJson(payload.users.get.one[0], '');
     [conversation] = ConversationMapper.mapConversations([entities.conversation], 1, translateForTest);
-    const selfUserEntity = new User(createUuid());
+    const selfUserEntity = new User(createUuid(), '', translateForTest);
     selfUserEntity.isMe = true;
     selfUserEntity.teamId = createUuid();
     conversation.selfUser(selfUserEntity);
@@ -290,7 +290,12 @@ describe('NotificationRepository', () => {
     });
 
     it('for a successfully completed call', () => {
-      message = new CallMessage(CALL_MESSAGE_TYPE.DEACTIVATED, TERMINATION_REASON.COMPLETED, 0, translateForTest) as any;
+      message = new CallMessage(
+        CALL_MESSAGE_TYPE.DEACTIVATED,
+        TERMINATION_REASON.COMPLETED,
+        0,
+        translateForTest,
+      ) as any;
 
       return notificationRepository.notify(message, undefined, conversation).then(() => {
         expect(notificationRepository['showNotification']).not.toHaveBeenCalled();
@@ -787,7 +792,7 @@ describe('NotificationRepository', () => {
     }
 
     beforeEach(() => {
-      const selfUserEntity = new User(userId.id);
+      const selfUserEntity = new User(userId.id, '', translateForTest);
       selfUserEntity.isMe = true;
       selfUserEntity.teamId = createUuid();
 

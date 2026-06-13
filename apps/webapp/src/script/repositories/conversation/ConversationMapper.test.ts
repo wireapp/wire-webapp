@@ -177,7 +177,11 @@ describe('ConversationMapper', () => {
         type: 0,
       };
 
-      const [conversationEntity] = ConversationMapper.mapConversations([payload] as ConversationDatabaseData[], 1, translate);
+      const [conversationEntity] = ConversationMapper.mapConversations(
+        [payload] as ConversationDatabaseData[],
+        1,
+        translate,
+      );
 
       expect(conversationEntity.name()).toBe(payload.name);
       expect(conversationEntity.teamId).toBe(payload.team);
@@ -203,7 +207,12 @@ describe('ConversationMapper', () => {
 
     it('only updates existing properties', () => {
       const updatedName = 'Christmas 2017';
-      const conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const conversationEntity = createConversationForTest(
+        createUuid(),
+        '',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
       conversationEntity.name('Christmas 2016');
 
       expect(conversationEntity.name()).toBeDefined();
@@ -741,7 +750,12 @@ describe('ConversationMapper', () => {
         CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
       ];
 
-      const conversationEntity = createConversationForTest('conversation-id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const conversationEntity = createConversationForTest(
+        'conversation-id',
+        'domain',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
       conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);

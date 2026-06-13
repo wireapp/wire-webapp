@@ -26,7 +26,10 @@ import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {QuoteEntity} from 'src/script/message/QuoteEntity';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
@@ -35,7 +38,9 @@ import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
 import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('message', () => {
   let defaultParams: ContentMessageProps;
@@ -43,7 +48,7 @@ describe('message', () => {
 
   beforeEach(() => {
     const message = new ContentMessage(undefined, translateForTest);
-    message.user(new User(createUuid()));
+    message.user(new User(createUuid(), '', translateForTest));
     const textAsset = new Text('', textValue);
     spyOn(textAsset, 'render').and.returnValue(`<span>${textValue}</span>`);
     message.assets.push(textAsset);
@@ -96,7 +101,7 @@ describe('message', () => {
     const findMessage = () => Promise.resolve(quotedMessage);
 
     const message = new ContentMessage(undefined, translateForTest);
-    message.user(new User(createUuid()));
+    message.user(new User(createUuid(), '', translateForTest));
     message.quote(new QuoteEntity({messageId: quotedMessage.id, userId: ''}));
 
     const {getByText} = render(

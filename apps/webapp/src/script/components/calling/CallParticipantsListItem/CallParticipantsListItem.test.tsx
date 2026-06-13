@@ -54,7 +54,7 @@ const createMockParticipant = ({
   isExternal?: boolean;
   isAudioEstablished?: boolean;
 }) => {
-  const user = new User(createUuid());
+  const user = new User(createUuid(), '', translateForTest);
   user.name('user');
   user.isMe = isSelfUser;
   user.isGuest(isGuest);

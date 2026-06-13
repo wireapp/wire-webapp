@@ -31,7 +31,10 @@ import {PropertiesService} from 'Repositories/properties/propertiesService';
 import {SelfService} from 'Repositories/self/SelfService';
 import {buildCallingRepository, buildMediaDevicesHandler, withTheme} from 'src/script/auth/util/test/TestUtil';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
@@ -47,13 +50,15 @@ jest.mock('@wireapp/react-ui-kit', () => ({
   useMatchMedia: jest.fn(),
 }));
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
-    const selfUser = new User('');
+    const selfUser = new User('', '', translateForTest);
     selfUser.isMe = true;
     const call = new Call(
       {domain: '', id: ''},
@@ -86,7 +91,9 @@ describe('fullscreenVideoCall', () => {
   it('shows the calling timer', async () => {
     const props = createProps();
 
-    const {getByText} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)), {wrapper: rootProviderWrapper});
+    const {getByText} = render(withTheme(withTheme(<FullscreenVideoCall {...props} />)), {
+      wrapper: rootProviderWrapper,
+    });
     const now = Date.now();
 
     jest.setSystemTime(now);
@@ -116,10 +123,10 @@ describe('fullscreenVideoCall', () => {
     const props = createProps();
     props.setMaximizedParticipant = setMaximizedSpy;
     props.setActiveCallViewTab = () => {};
-    props.call.addParticipant(new Participant(new User('a'), 'a'));
-    props.call.addParticipant(new Participant(new User('b'), 'b'));
-    props.call.addParticipant(new Participant(new User('c'), 'd'));
-    props.call.addParticipant(new Participant(new User('e'), 'f'));
+    props.call.addParticipant(new Participant(new User('a', '', translateForTest), 'a'));
+    props.call.addParticipant(new Participant(new User('b', '', translateForTest), 'b'));
+    props.call.addParticipant(new Participant(new User('c', '', translateForTest), 'd'));
+    props.call.addParticipant(new Participant(new User('e', '', translateForTest), 'f'));
 
     const {getByTestId, getByText} = render(withTheme(<FullscreenVideoCall {...props} />), {
       wrapper: rootProviderWrapper,

@@ -41,7 +41,7 @@ describe('EventBuilder', () => {
   let self_user_et: User = undefined;
 
   beforeEach(() => {
-    self_user_et = new User(createUuid(), null);
+    self_user_et = new User(createUuid(), null, translateForTest);
     self_user_et.isMe = true;
 
     conversation_et = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);

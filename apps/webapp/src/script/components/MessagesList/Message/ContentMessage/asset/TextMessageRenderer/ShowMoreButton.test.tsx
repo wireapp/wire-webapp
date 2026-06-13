@@ -28,7 +28,9 @@ import {ShowMoreButton} from './ShowMoreButton';
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ShowMoreButton', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
 
   it('toggles button show more/show less for a quoted message', () => {
     let show = true;

@@ -144,7 +144,7 @@ export const mountComponent = (
 export function generateUsers(nbUsers: number, domain: string) {
   const users: User[] = [];
   for (let i = 0; i < nbUsers; i++) {
-    const user = new User(createUuid(), domain);
+    const user = new User(createUuid(), domain, translateForTest);
     user.name(`User ${i}`);
     users.push(user);
   }
@@ -176,7 +176,7 @@ export const createConversation = (
   groupId = 'group-id',
 ) => {
   const conversation = createConversationForTest(conversationId.id, conversationId.domain, protocol, translateForTest);
-  conversation.participating_user_ets.push(new User(createUuid()));
+  conversation.participating_user_ets.push(new User(createUuid(), '', translateForTest));
   conversation.type(type);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = groupId;
@@ -185,7 +185,7 @@ export const createConversation = (
 };
 
 export const createSelfParticipant = () => {
-  const selfUser = new User();
+  const selfUser = new User('', '', translateForTest);
   selfUser.isMe = true;
   return new Participant(selfUser, 'client1');
 };

@@ -154,7 +154,13 @@ describe('MLSConversations', () => {
 
       const conversationRepository = await testFactory.exposeConversationActors();
 
-      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'client-1', core);
+      await initialiseSelfAndTeamConversations(
+        conversations,
+        conversationRepository,
+        new User('', '', translateForTest),
+        'client-1',
+        core,
+      );
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(2);
     });
@@ -179,7 +185,13 @@ describe('MLSConversations', () => {
       jest.spyOn(repositoryCore.service!.conversation, 'mlsGroupExistsLocally').mockResolvedValue(true);
       mockSafeEpoch(core);
 
-      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'clientId', core);
+      await initialiseSelfAndTeamConversations(
+        conversations,
+        conversationRepository,
+        new User('', '', translateForTest),
+        'clientId',
+        core,
+      );
 
       expect(core.service!.mls!.registerConversation).toHaveBeenCalledTimes(0);
     });
@@ -216,7 +228,7 @@ describe('MLSConversations', () => {
       await initialiseSelfAndTeamConversations(
         conversations,
         conversationRepository,
-        new User(),
+        new User('', '', translateForTest),
         'clientId',
         repositoryCore,
       );
@@ -245,7 +257,13 @@ describe('MLSConversations', () => {
       const conversationRepository = await testFactory.exposeConversationActors();
       mockSafeEpoch(core);
 
-      await initialiseSelfAndTeamConversations(conversations, conversationRepository, new User(), 'clientId', core);
+      await initialiseSelfAndTeamConversations(
+        conversations,
+        conversationRepository,
+        new User('', '', translateForTest),
+        'clientId',
+        core,
+      );
 
       expect(core.service!.mls!.registerConversation).not.toHaveBeenCalled();
       expect(core.service!.conversation!.joinByExternalCommit).not.toHaveBeenCalled();

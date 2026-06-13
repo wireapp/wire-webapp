@@ -71,7 +71,7 @@ describe('DevicesPreferences', () => {
   const coreMock = container.resolve(Core);
   coreMock.isMLSActiveForClient = jest.fn().mockReturnValue(true);
 
-  const selfUser = new User(createUuid());
+  const selfUser = new User(createUuid(), '', translateForTest);
   selfUser.devices([createDevice(), createDevice()]);
 
   const clientState = new ClientState();

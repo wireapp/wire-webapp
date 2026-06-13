@@ -74,7 +74,7 @@ describe('MessageDetails', () => {
     const timestamp = new Date('2022-01-21T15:08:14.225Z').getTime();
     const userName = 'Jan Kowalski';
 
-    const user = new User(createUuid());
+    const user = new User(createUuid(), '', translateForTest);
     user.name(userName);
 
     const message = new ContentMessage(createUuid(), translateForTest);
@@ -82,7 +82,7 @@ describe('MessageDetails', () => {
     message.user(user);
 
     const findUsersByIds = jest.fn((ids: QualifiedId[]) => {
-      return ids.map(id => new User(id.id, 'test-domain.mock'));
+      return ids.map(id => new User(id.id, 'test-domain.mock', translateForTest));
     });
 
     const userRepository = {
@@ -93,7 +93,7 @@ describe('MessageDetails', () => {
     const {getByText} = render(
       <MessageDetails
         {...defaultProps}
-        selfUser={new User()}
+        selfUser={new User('', '', translateForTest)}
         togglePanel={() => undefined}
         activeConversation={conversation}
         messageEntity={message}

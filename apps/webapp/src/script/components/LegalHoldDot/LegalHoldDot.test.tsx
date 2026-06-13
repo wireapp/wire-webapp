@@ -21,9 +21,14 @@ import {render} from '@testing-library/react';
 
 import {LegalHoldDot} from 'Components/LegalHoldDot';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('LegalHoldDot', () => {
   it('shows a pending icon', () => {

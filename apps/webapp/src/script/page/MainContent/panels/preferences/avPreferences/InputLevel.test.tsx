@@ -19,7 +19,10 @@
 
 import {render} from '@testing-library/react';
 
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {InputLevel, MAX_AUDIO_BULLETS} from './InputLevel';
 

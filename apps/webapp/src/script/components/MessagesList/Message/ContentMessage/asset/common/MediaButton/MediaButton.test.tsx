@@ -31,7 +31,9 @@ import {MediaButton, MediaButtonProps} from './MediaButton';
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('MediaButton', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
 
   const getDefaultProps = (): MediaButtonProps => {
     const videoElement = document.createElement('video');

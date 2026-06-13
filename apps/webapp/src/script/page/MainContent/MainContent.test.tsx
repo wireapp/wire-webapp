@@ -70,7 +70,7 @@ describe('Preferences', () => {
 
   const defaultParams = {
     openRightSidebar: jest.fn(),
-    selfUser: new User('selfUser'),
+    selfUser: new User('selfUser', '', translateForTest),
     reloadApp: jest.fn(),
   };
   const wallClock = createDeterministicWallClock();

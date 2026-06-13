@@ -43,14 +43,16 @@ jest.mock('Components/Avatar', () => ({
   Avatar: () => <div data-testid="mock-avatar" />,
 }));
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createMockParticipant = (
   userId: string,
   clientId: string,
   {isMuted = false, isAudioEstablished = true}: {isMuted?: boolean; isAudioEstablished?: boolean},
 ) => {
-  const user = new User(userId);
+  const user = new User(userId, '', translateForTest);
 
   const participant = new Participant(user, clientId);
   participant.isMuted(isMuted);
@@ -64,7 +66,7 @@ const createMockCall = () => {
     {domain: '', id: ''},
     createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     0,
-    new Participant(new User(''), ''),
+    new Participant(new User('', '', translateForTest), ''),
     CALL_TYPE.NORMAL,
     buildMediaDevicesHandler(),
   );

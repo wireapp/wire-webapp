@@ -31,7 +31,7 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildServiceMiddleware() {
-  const selfUser = new User(createUuid());
+  const selfUser = new User(createUuid(), '', translateForTest);
   const conversationRepository = {getConversationById: jest.fn()} as unknown as jest.Mocked<ConversationRepository>;
   const userRepository = {getUsersById: jest.fn()} as unknown as jest.Mocked<UserRepository>;
 
@@ -50,11 +50,11 @@ describe('ServiceMiddleware', () => {
         const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
         const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
 
-        const service = new User();
+        const service = new User('', '', translateForTest);
         if (serviceType === 'services') service.isService = true;
         else service.type = UserType.APP;
 
-        const userEntities = [new User(), service];
+        const userEntities = [new User('', '', translateForTest), service];
         userRepository.getUsersById.mockResolvedValue(userEntities);
 
         const decoratedEvent: any = await serviceMiddleware.processEvent(event);
@@ -66,9 +66,9 @@ describe('ServiceMiddleware', () => {
         const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, [selfUser.qualifiedId]);
 
         conversationRepository.getConversationById.mockResolvedValue(conversation);
-        const service = new User();
+        const service = new User('', '', translateForTest);
         service.isService = true;
-        const userEntities = [new User(), service];
+        const userEntities = [new User('', '', translateForTest), service];
 
         userRepository.getUsersById.mockResolvedValue(userEntities);
 
@@ -79,7 +79,10 @@ describe('ServiceMiddleware', () => {
       it('does not modify events not containing any service', async () => {
         const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
         const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
-        userRepository.getUsersById.mockResolvedValue([new User(), new User()]);
+        userRepository.getUsersById.mockResolvedValue([
+          new User('', '', translateForTest),
+          new User('', '', translateForTest),
+        ]);
 
         const decoratedEvent: any = await serviceMiddleware.processEvent(event);
         expect(decoratedEvent.data.has_service).not.toBeDefined();
@@ -89,9 +92,9 @@ describe('ServiceMiddleware', () => {
         const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
         const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
 
-        const service = new User();
+        const service = new User('', '', translateForTest);
         service.isService = true;
-        const userEntities = [new User(), service];
+        const userEntities = [new User('', '', translateForTest), service];
         userRepository.getUsersById.mockResolvedValue(userEntities);
 
         const decoratedEvent: any = await serviceMiddleware.processEvent(event);
@@ -104,11 +107,11 @@ describe('ServiceMiddleware', () => {
         const [serviceMiddleware, {userRepository, selfUser}] = buildServiceMiddleware();
         const event = EventBuilder.buildMemberJoin(conversation, selfUser.qualifiedId, []);
 
-        const service = new User();
+        const service = new User('', '', translateForTest);
         if (serviceType === 'services') service.isService = true;
         else if (serviceType === 'apps') service.type = UserType.APP;
 
-        const userEntities = [new User(), service];
+        const userEntities = [new User('', '', translateForTest), service];
         userRepository.getUsersById.mockResolvedValue(userEntities);
 
         const decoratedEvent: any = await serviceMiddleware.processEvent(event);
@@ -129,9 +132,9 @@ describe('ServiceMiddleware', () => {
         const [serviceMiddleware, {userRepository}] = buildServiceMiddleware();
         const event = EventBuilder.build1to1Creation(conversation);
 
-        const service = new User();
+        const service = new User('', '', translateForTest);
         service.isService = true;
-        const userEntities = [new User(), service];
+        const userEntities = [new User('', '', translateForTest), service];
         userRepository.getUsersById.mockResolvedValue(userEntities);
 
         const decoratedEvent: any = await serviceMiddleware.processEvent(event);

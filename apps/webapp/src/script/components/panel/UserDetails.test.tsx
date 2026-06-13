@@ -36,14 +36,16 @@ jest.mock('Components/Avatar', () => ({
 }));
 
 function renderWithRootProvider(element: ReactElement) {
-  return render(<RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>);
+  return render(
+    <RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>,
+  );
 }
 
 describe('UserDetails', () => {
   it('renders the correct infos for a user', () => {
     const name = 'test-name';
     const userName = 'test-user-name';
-    const participant = new User(createUuid());
+    const participant = new User(createUuid(), '', translateForTest);
     participant.name(name);
     participant.username(userName);
 
@@ -68,7 +70,7 @@ describe('UserDetails', () => {
 
   it('renders the badge for a user', () => {
     const badge = 'badgeText';
-    const participant = new User(createUuid());
+    const participant = new User(createUuid(), '', translateForTest);
 
     const props = {
       badge,
@@ -85,7 +87,7 @@ describe('UserDetails', () => {
 
   it('renders the badge for a guest', () => {
     const expirationText = '1h remaining';
-    const participant = new User(createUuid());
+    const participant = new User(createUuid(), '', translateForTest);
     participant.isGuest(true);
     participant.name("I'm a guest");
     participant.isTemporaryGuest(true);
@@ -105,7 +107,7 @@ describe('UserDetails', () => {
   });
 
   it('renders the placeholder avatar for a user that could not be loaded', () => {
-    const participant = new User(createUuid());
+    const participant = new User(createUuid(), '', translateForTest);
     participant.name('');
 
     const props = {

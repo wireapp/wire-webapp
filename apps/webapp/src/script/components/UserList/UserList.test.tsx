@@ -25,14 +25,19 @@ import {UserList} from 'Components/UserList/UserList';
 import {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
 import {withTheme} from '../../auth/util/test/TestUtil';
 
 const testFactory = new TestFactory();
 let conversationRepository: ConversationRepository;
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 beforeAll(() => {
   testFactory.exposeConversationActors().then(factory => {
@@ -43,10 +48,10 @@ beforeAll(() => {
 
 describe('UserList', () => {
   it('lists all selected users', () => {
-    const user = new User('test-id');
+    const user = new User('test-id', '', translateForTest);
     user.isMe = true;
 
-    const users = ['1', '2', '3', '4'].map(id => new User(id));
+    const users = ['1', '2', '3', '4'].map(id => new User(id, '', translateForTest));
     const props = {
       conversationRepository,
       onSelectUser: (user: User) => jest.fn(),
@@ -62,7 +67,7 @@ describe('UserList', () => {
   });
 
   it('select user', async () => {
-    const user = new User('test-id');
+    const user = new User('test-id', '', translateForTest);
     user.isMe = true;
 
     const setStateMock = jest.fn();
@@ -73,7 +78,7 @@ describe('UserList', () => {
 
     const mockOnSelectUser = jest.fn((user: User) => setSelectedUsers(user));
 
-    const users = ['1', '2', '3', '4'].map(id => new User(id));
+    const users = ['1', '2', '3', '4'].map(id => new User(id, '', translateForTest));
     const props = {
       conversationRepository,
       onSelectUser: mockOnSelectUser,

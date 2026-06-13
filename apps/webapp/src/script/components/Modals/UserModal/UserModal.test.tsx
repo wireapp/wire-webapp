@@ -24,19 +24,24 @@ import {User} from 'Repositories/entity/User';
 import {TeamState} from 'Repositories/team/TeamState';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {Core} from 'src/script/service/coreSingleton';
 
 import {UserModal, UserModalProps} from './UserModal';
 import {showUserModal} from './UserModal.state';
 
 describe('UserModal', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
 
   it('correctly fetches user from user repository', async () => {
     jest.useFakeTimers();
     const refreshUser = jest.fn(async (id: QualifiedId) => {
-      return new User('mock-id', 'test-domain.mock');
+      return new User('mock-id', 'test-domain.mock', translateForTest);
     });
 
     const props: UserModalProps = {
@@ -45,7 +50,7 @@ describe('UserModal', () => {
       userRepository: {
         refreshUser,
       } as unknown as UserRepository,
-      selfUser: new User(),
+      selfUser: new User('', '', translateForTest),
     };
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});
     const {getByTestId} = render(<UserModal {...props} />, {wrapper: rootProviderWrapper});
@@ -57,7 +62,7 @@ describe('UserModal', () => {
   it('shows user not found when user is deleted', async () => {
     jest.useFakeTimers();
     const refreshUser = jest.fn(async (id: QualifiedId) => {
-      const user = new User('mock-id', 'test-domain.mock');
+      const user = new User('mock-id', 'test-domain.mock', translateForTest);
       user.isDeleted = true;
       return user;
     });
@@ -68,7 +73,7 @@ describe('UserModal', () => {
       userRepository: {
         refreshUser,
       } as unknown as UserRepository,
-      selfUser: new User(),
+      selfUser: new User('', '', translateForTest),
     };
 
     showUserModal({domain: 'test-domain.mock', id: 'mock-id'});

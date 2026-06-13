@@ -30,7 +30,7 @@ import type {AssetRemoteData} from 'Repositories/assets/assetRemoteData';
 import type {ClientEntity} from 'Repositories/client/ClientEntity';
 import {ConnectionEntity} from 'Repositories/connection/connectionEntity';
 import {ROLE as TEAM_ROLE} from 'Repositories/user/userPermission';
-import {type Translate, translate as defaultTranslate} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {clamp} from 'Util/numberUtil';
 import {getFirstChar} from 'Util/stringUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
@@ -134,9 +134,9 @@ export class User {
   }
 
   constructor(
-    id: string = '',
-    domain: string = '',
-    private readonly translate: Translate = defaultTranslate,
+    id: string,
+    domain: string,
+    private readonly translate: Translate,
   ) {
     this.id = id;
     this.domain = domain;

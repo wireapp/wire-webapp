@@ -20,7 +20,10 @@
 import {render, fireEvent} from '@testing-library/react';
 
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {AssetUploadButton} from './AssetUploadButton';
 

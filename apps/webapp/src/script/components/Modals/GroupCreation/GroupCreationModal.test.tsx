@@ -56,7 +56,7 @@ describe('GroupCreationModal', () => {
     'should result in expectedAppsEnabled=$expectedAppsEnabled when { protocol: $defaultProtocol, appsEnabled: $isAppsEnabled, whitelisted: $hasWhitelistedServices, mlsEnabled: $isMLSEnabled }',
     ({isAppsEnabled, isMLSEnabled, defaultProtocol, expectedAppsEnabled}) => {
       // Arrange
-      const mockUser = new User('user-id', 'test-domain.wire.com');
+      const mockUser = new User('user-id', 'test-domain.wire.com', translateForTest);
 
       const mockUserState: UserState = {
         self: ko.observable(mockUser),

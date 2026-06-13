@@ -61,9 +61,12 @@ describe('TeamCreationModal', () => {
 
   const renderTeamCreationModal = () => {
     useTeamCreationModal.setState({isModalOpen: true});
-    return render(withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />), {
-      wrapper: rootProviderWrapper,
-    });
+    return render(
+      withTheme(<TeamCreationModal onClose={onCloseMock} onSuccess={onSuccessMock} userName={userName} />),
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
   };
 
   beforeEach(() => {

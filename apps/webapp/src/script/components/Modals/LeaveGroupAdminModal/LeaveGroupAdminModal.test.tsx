@@ -25,7 +25,10 @@ import {User} from 'Repositories/entity/User';
 import {generateConversation} from 'test/helper/ConversationGenerator';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LeaveGroupAdminModal} from './LeaveGroupAdminModal';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
@@ -35,12 +38,14 @@ jest.mock('./AdminSearchInput', () => ({
 }));
 
 const renderModal = () => render(withTheme(<LeaveGroupAdminModal />));
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const renderModalWithRootProvider = () => render(withTheme(<LeaveGroupAdminModal />), {wrapper: rootProviderWrapper});
 
 const createEligibleUser = (id: string) => {
-  const user = new User(id, 'example.com');
+  const user = new User(id, 'example.com', translateForTest);
   user.name(`User ${id}`);
   user.username(`user.${id}`);
   return user;

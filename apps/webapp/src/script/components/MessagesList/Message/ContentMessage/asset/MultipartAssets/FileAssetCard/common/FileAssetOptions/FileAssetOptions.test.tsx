@@ -22,7 +22,10 @@ import type {ComponentProps} from 'react';
 import {render, screen} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {isFileEditable} from 'Util/fileTypeUtil';
 
 import {FileAssetOptions} from './FileAssetOptions';

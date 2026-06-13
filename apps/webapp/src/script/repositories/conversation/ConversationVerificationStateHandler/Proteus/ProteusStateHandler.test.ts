@@ -58,14 +58,14 @@ describe('ProteusConversationVerificationStateHandler', () => {
       conversationB = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationC = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
-      selfUserEntity = new User(createUuid(), null);
+      selfUserEntity = new User(createUuid(), null, translateForTest);
       selfUserEntity.isMe = true;
       selfUserEntity.devices().forEach(clientEntity => clientEntity.meta.isVerified(true));
 
       spyOn(conversationRepository['userState'], 'self').and.returnValue(selfUserEntity);
 
-      userA = new User(createUuid(), null);
-      userB = new User(createUuid(), null);
+      userA = new User(createUuid(), null, translateForTest);
+      userB = new User(createUuid(), null, translateForTest);
 
       clientA = new ClientEntity(false, null);
       clientA.meta.isVerified(true);
@@ -212,7 +212,7 @@ describe('ProteusConversationVerificationStateHandler', () => {
       const degradedEvent = {type: 'degraded'};
       spyOn(EventBuilder, 'buildDegraded').and.returnValue(degradedEvent);
 
-      const new_user = new User(createUuid(), null);
+      const new_user = new User(createUuid(), null, translateForTest);
       const new_client_b = new ClientEntity(false, null);
       new_client_b.meta.isVerified(false);
       new_user.devices.push(new_client_b);
@@ -234,7 +234,7 @@ describe('ProteusConversationVerificationStateHandler', () => {
     it('should not change state if new user with verified client was added to conversation', () => {
       spyOn(EventBuilder, 'buildDegraded');
 
-      const new_user = new User(createUuid(), null);
+      const new_user = new User(createUuid(), null, translateForTest);
       const new_client_b = new ClientEntity(false, null);
       new_client_b.meta.isVerified(true);
       new_user.devices.push(new_client_b);

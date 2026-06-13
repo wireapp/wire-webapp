@@ -35,7 +35,9 @@ jest.mock('Util/modalFocusUtil', () => ({
 }));
 
 describe('ChooseScreen', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   const screens = [
     {
       id: 'screen:first',

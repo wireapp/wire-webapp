@@ -30,7 +30,9 @@ import {
 import {PartialFailureToSendWarning} from './PartialFailureToSend';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('PartialFailureToSendWarning', () => {
   it('displays the number of users that did not get the message', () => {

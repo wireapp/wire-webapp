@@ -31,7 +31,7 @@ import {useTypingIndicatorState} from './useTypingIndicatorState/useTypingIndica
 import {translateForTest} from 'Util/test/translateForTest';
 
 function createUser(id: string, name: string): User {
-  const user = new User(id);
+  const user = new User(id, '', translateForTest);
   user.name(name);
   return user;
 }
@@ -113,7 +113,7 @@ describe('TypingIndicator', () => {
     expect(getAllByTestId('element-avatar-user')).toHaveLength(3);
 
     act(() => {
-      removeTypingUser(new User('test-id-3'), 'test-conversation-id');
+      removeTypingUser(new User('test-id-3', '', translateForTest), 'test-conversation-id');
     });
 
     expect(getAllByTestId('element-avatar-user')).toHaveLength(2);

@@ -32,7 +32,10 @@ import {SearchRepository} from 'Repositories/search/searchRepository';
 import {TeamRepository} from 'Repositories/team/TeamRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
@@ -43,7 +46,9 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 const userRepository = {} as UserRepository;
 const testFactory = new TestFactory();
 let callRepository: CallingRepository;
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 beforeAll(() => {
   testFactory.exposeCallingActors().then(injectedCallingRepository => {
@@ -63,7 +68,7 @@ const defaultProps = () => ({
   } as MessageRepository,
   searchRepository: new SearchRepository(userRepository),
   teamRepository: {} as TeamRepository,
-  selfUser: new User('mocked-id'),
+  selfUser: new User('mocked-id', '', translateForTest),
 });
 
 describe('LegalHoldModal', () => {
@@ -79,7 +84,12 @@ describe('LegalHoldModal', () => {
   it('is showUser', async () => {
     const props = defaultProps();
     await render(<LegalHoldModal {...props} />, {wrapper: rootProviderWrapper});
-    const selfConversation = createConversationForTest(props.selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const selfConversation = createConversationForTest(
+      props.selfUser.id,
+      '',
+      CONVERSATION_PROTOCOL.PROTEUS,
+      translateForTest,
+    );
 
     await act(() => {
       useLegalHoldModalState.getState().showUsers(false, selfConversation);

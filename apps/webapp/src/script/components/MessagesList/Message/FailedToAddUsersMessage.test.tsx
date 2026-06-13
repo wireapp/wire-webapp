@@ -27,10 +27,14 @@ import {FailedToAddUsersMessage as FailedToAddUsersMessageEntity} from 'Reposito
 import {User} from 'Repositories/entity/User';
 import {UserState} from 'Repositories/user/userState';
 import {generateQualifiedIds} from 'src/script/auth/util/test/TestUtil';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FailedToAddUsersMessage} from './FailedToAddUsersMessage';
+import {translateForTest} from 'Util/test/translateForTest';
 
 setStrings({en});
 const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translate}));
@@ -46,7 +50,7 @@ const createFailedToAddUsersMessages = (
 };
 
 function createUser(qualifiedId: QualifiedId, name: string) {
-  const user = new User(qualifiedId.id, qualifiedId.domain);
+  const user = new User(qualifiedId.id, qualifiedId.domain, translateForTest);
   user.name(name);
   return user;
 }

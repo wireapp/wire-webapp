@@ -32,11 +32,12 @@ import {TeamMemberEntity} from './TeamMemberEntity';
 import {TeamRepository} from './TeamRepository';
 import {TeamService} from './TeamService';
 import {TeamState} from './TeamState';
+import {translateForTest} from 'Util/test/translateForTest';
 
 function buildConnectionRepository() {
   const team = new TeamEntity(randomUUID());
   const userState = new UserState();
-  const selfUser = new User('self-id', 'self-domain');
+  const selfUser = new User('self-id', 'self-domain', translateForTest);
   selfUser.teamId = team.id;
   selfUser.isMe = true;
   selfUser.teamRole(ROLE.NONE);

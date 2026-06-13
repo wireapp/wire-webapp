@@ -31,7 +31,10 @@ import {Text} from 'Repositories/entity/message/Text';
 import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
@@ -85,7 +88,9 @@ const createAudioMessage = () => {
 };
 
 describe('Collection', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const messages = [createImageMessage(), createLinkMessage(), createAudioMessage(), createFileMessage()];
   const mockConversationRepository = {
@@ -94,7 +99,7 @@ describe('Collection', () => {
   };
   const mockAssetRepository = container.resolve(AssetRepository);
   const mockMessageRepository = {} as MessageRepository;
-  const mockSelfUser = new User(createUuid());
+  const mockSelfUser = new User(createUuid(), '', translateForTest);
 
   it('displays all image assets', async () => {
     const {getAllByText, getByText, queryByText} = render(

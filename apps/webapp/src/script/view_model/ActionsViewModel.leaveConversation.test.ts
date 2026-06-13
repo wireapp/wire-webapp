@@ -46,7 +46,7 @@ import {UserType} from '@wireapp/api-client/lib/user';
 
 /** Create a User that passes every eligibility criterion in leaveConversation. */
 function makeEligibleUser(id = createUuid()): User {
-  const user = new User(id, 'example.com');
+  const user = new User(id, 'example.com', translateForTest);
   user.name('Test User ' + id);
   user.username('testuser.' + id);
   user.isFederated = false;
@@ -61,7 +61,7 @@ const featureWithPreventAdminLessGroups = {
 } as any;
 
 function buildActionsViewModel({
-  selfUser = new User('self-id', 'example.com'),
+  selfUser = new User('self-id', 'example.com', translateForTest),
   teamFeatures = undefined as any,
   setMemberConversationRole = jest.fn().mockResolvedValue(undefined),
   leaveConversationMock = jest.fn().mockResolvedValue(undefined),
@@ -112,7 +112,7 @@ describe('ActionsViewModel.leaveConversation', () => {
   afterEach(() => jest.restoreAllMocks());
 
   it('uses the injected translate function for modal copy', () => {
-    const selfUser = new User('self-id', 'example.com');
+    const selfUser = new User('self-id', 'example.com', translateForTest);
     const userToBlock = makeEligibleUser('blocked-user');
     const translate = jest.fn(
       (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
@@ -141,7 +141,7 @@ describe('ActionsViewModel.leaveConversation', () => {
 
   describe('feature flag off', () => {
     it('shows the standard PrimaryModal leave flow when PREVENT_ADMIN_LESS_GROUPS is disabled', () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const conversation = generateConversation({users: [makeEligibleUser()]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
@@ -161,7 +161,7 @@ describe('ActionsViewModel.leaveConversation', () => {
 
   describe('feature flag on', () => {
     it('shows the standard PrimaryModal leave flow when the self user is not the last admin', () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const otherAdmin = makeEligibleUser('other-admin');
       const conversation = generateConversation({users: [otherAdmin]});
       // Both users are admins → self is NOT the last admin
@@ -188,7 +188,7 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('opens the LeaveGroupAdminModal when the self user is the last admin and eligible users exist', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const conversation = generateConversation({users: [makeEligibleUser()]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
@@ -205,7 +205,7 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('excludes the self user from the eligible users list passed to the modal', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       // participating_user_ets never includes self, but add an eligible other user
       const otherUser = makeEligibleUser('other-id');
       const conversation = generateConversation({users: [otherUser]});
@@ -224,9 +224,9 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('passes an empty eligibleUsers list to the modal when no participant meets eligibility criteria', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       // Federated users are ineligible
-      const federatedUser = new User('fed-id', 'external.com');
+      const federatedUser = new User('fed-id', 'external.com', translateForTest);
       federatedUser.isFederated = true;
       federatedUser.name('Fed User');
       federatedUser.username('fed.user');
@@ -246,7 +246,7 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('assigns the admin role to the selected user before calling leaveConversation', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const newAdmin = makeEligibleUser('new-admin-id');
       const conversation = generateConversation({users: [newAdmin]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
@@ -277,7 +277,7 @@ describe('ActionsViewModel.leaveConversation', () => {
     });
 
     it('does not call leaveConversation when role assignment fails', async () => {
-      const selfUser = new User('self-id', 'example.com');
+      const selfUser = new User('self-id', 'example.com', translateForTest);
       const newAdmin = makeEligibleUser('new-admin-id');
       const conversation = generateConversation({users: [newAdmin]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});

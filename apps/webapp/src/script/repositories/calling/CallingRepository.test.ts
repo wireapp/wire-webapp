@@ -60,7 +60,7 @@ describe('CallingRepository', () => {
   let callingRepository: CallingRepository;
   let wCall: Wcall;
   let wUser: number;
-  const selfUser = new User(createUuid());
+  const selfUser = new User(createUuid(), '', translateForTest);
   selfUser.isMe = true;
   const clientId = createUuid();
 
@@ -535,7 +535,7 @@ describe('CallingRepository', () => {
 
       const selfParticipant = createSelfParticipant();
 
-      const user = new User(userId);
+      const user = new User(userId, '', translateForTest);
 
       const remoteParticipant = new Participant(user, remoteClientId);
 
@@ -787,7 +787,7 @@ describe('CallingRepository ISO', () => {
     });
 
     it('creates and stores a new call when an incoming call arrives', async () => {
-      const selfUser = new User(createUuid());
+      const selfUser = new User(createUuid(), '', translateForTest);
       selfUser.isMe = true;
 
       const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
@@ -933,7 +933,7 @@ describe.skip('E2E audio call', () => {
     {} as any,
     undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   let remoteWuser: number;
   let wCall: Wcall;
 
@@ -1077,7 +1077,7 @@ describe('NotificationHandlingState', () => {
     {} as any,
     undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   let wCall: Wcall;
   let wUserNumber: number;
   //
@@ -1139,7 +1139,7 @@ describe('init AVS state', () => {
     {} as any,
     undefined,
   );
-  const user = new User('user-1');
+  const user = new User('user-1', '', translateForTest);
   beforeEach(() => {
     jest.useFakeTimers();
     jest.spyOn(Date, 'now');

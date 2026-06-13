@@ -23,7 +23,10 @@ import ko from 'knockout';
 import type {Conversation} from 'Repositories/entity/Conversation';
 import {TeamState} from 'Repositories/team/TeamState';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import * as Context from 'src/script/ui/ContextMenu';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 

@@ -36,7 +36,10 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {noop} from 'Util/util';
 
@@ -53,7 +56,9 @@ const getAllActions = (queryFunction: (id: string) => HTMLElement | null) =>
     .map(action => queryFunction(action))
     .filter(action => action !== null);
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 function renderWithRootProvider(node: React.ReactElement) {
   return render(node, {wrapper: rootProviderWrapper});
@@ -69,7 +74,7 @@ describe('UserActions', () => {
   });
 
   it('generates actions for self user profile', () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
     user.isMe = true;
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
@@ -97,7 +102,7 @@ describe('UserActions', () => {
   });
 
   it('generates actions for self user profile when user is not activated', () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
     user.isMe = true;
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
@@ -121,20 +126,22 @@ describe('UserActions', () => {
   });
 
   it('generates actions for another user profile to which I am connected', () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
     const connection = new ConnectionEntity();
 
     user.connection(connection);
     user.teamId = 'teamId';
 
-    const selfUser = new User('');
+    const selfUser = new User('', '', translateForTest);
     selfUser.teamId = 'teamId2';
 
     jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.connection(connection);
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
-    jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
+    jest
+      .spyOn(conversation, 'participating_user_ids')
+      .mockImplementation(ko.observableArray([new User('', '', translateForTest)]));
     user.connection()?.status(ConnectionStatus.ACCEPTED);
     connection.userId = user.qualifiedId;
 
@@ -164,13 +171,13 @@ describe('UserActions', () => {
   });
 
   it('generates actions for another user profile that I have blocked', () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
     const connection = new ConnectionEntity();
 
     user.connection(connection);
     user.teamId = 'teamId';
 
-    const selfUser = new User('');
+    const selfUser = new User('', '', translateForTest);
     selfUser.teamId = 'teamId2';
 
     jest.spyOn(user, 'isAvailable').mockImplementation(ko.pureComputed(() => true));
@@ -178,7 +185,9 @@ describe('UserActions', () => {
     conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
     conversation.connection(connection);
 
-    jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
+    jest
+      .spyOn(conversation, 'participating_user_ids')
+      .mockImplementation(ko.observableArray([new User('', '', translateForTest)]));
     user.connection()?.status(ConnectionStatus.BLOCKED);
     connection.userId = user.qualifiedId;
 
@@ -205,14 +214,14 @@ describe('UserActions', () => {
   });
 
   it("shows start conversation if there's no existing conversation between two users from the same team", () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
 
     const team = new TeamEntity('teamId');
     teamState.team(team);
 
     user.teamId = team.id;
 
-    const selfUser = new User('');
+    const selfUser = new User('', '', translateForTest);
     selfUser.teamId = team.id;
 
     userState.self(selfUser);
@@ -245,14 +254,14 @@ describe('UserActions', () => {
   });
 
   it('opens a no available keys modal if failed when trying to establish mls 1:1', async () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
 
     const team = new TeamEntity('teamId');
     teamState.team(team);
 
     user.teamId = team.id;
 
-    const selfUser = new User('');
+    const selfUser = new User('', '', translateForTest);
     selfUser.teamId = team.id;
 
     userState.self(selfUser);
@@ -294,14 +303,14 @@ describe('UserActions', () => {
 
   it("shows open conversation if there's an existing conversation between two users from the same team", () => {
     const teamDomain = 'team-domain';
-    const user = new User('userid1', teamDomain);
+    const user = new User('userid1', teamDomain, translateForTest);
 
     const team = new TeamEntity('teamId');
     teamState.team(team);
 
     user.teamId = team.id;
 
-    const selfUser = new User('userid2', teamDomain);
+    const selfUser = new User('userid2', teamDomain, translateForTest);
     selfUser.teamId = team.id;
 
     userState.self(selfUser);
@@ -310,7 +319,12 @@ describe('UserActions', () => {
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([user]));
 
-    const one2oneConversation = createConversationForTest('123', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const one2oneConversation = createConversationForTest(
+      '123',
+      'domain',
+      CONVERSATION_PROTOCOL.PROTEUS,
+      translateForTest,
+    );
     one2oneConversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
     one2oneConversation.participating_user_ids.push(user.qualifiedId);
     one2oneConversation.participating_user_ets.push(user);
@@ -341,10 +355,12 @@ describe('UserActions', () => {
   });
 
   it('only generates remove participant action for an unavailable user', () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     jest.spyOn(conversation, 'isGroup').mockImplementation(ko.pureComputed(() => true));
-    jest.spyOn(conversation, 'participating_user_ids').mockImplementation(ko.observableArray([new User()]));
+    jest
+      .spyOn(conversation, 'participating_user_ids')
+      .mockImplementation(ko.observableArray([new User('', '', translateForTest)]));
     user.connection()?.status(ConnectionStatus.ACCEPTED);
     const conversationRoleRepository: Partial<ConversationRoleRepository> = {canRemoveParticipants: () => true};
 
@@ -354,7 +370,7 @@ describe('UserActions', () => {
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
-      selfUser: new User(''),
+      selfUser: new User('', '', translateForTest),
       user,
     };
 
@@ -365,7 +381,7 @@ describe('UserActions', () => {
   });
 
   it('displays buttons instead of a list when a single action is available in user modal', () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const connection = new ConnectionEntity();
     user.connection(connection);
@@ -380,7 +396,7 @@ describe('UserActions', () => {
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
-      selfUser: new User(''),
+      selfUser: new User('', '', translateForTest),
       user,
       isModal: true,
     };
@@ -395,7 +411,7 @@ describe('UserActions', () => {
   });
 
   it('displays a list when a single action is available in sidebar', () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const connection = new ConnectionEntity();
     user.connection(connection);
@@ -410,7 +426,7 @@ describe('UserActions', () => {
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
-      selfUser: new User(''),
+      selfUser: new User('', '', translateForTest),
       user,
     };
 
@@ -424,7 +440,7 @@ describe('UserActions', () => {
   });
 
   it('displays a list when multiple actions are available in user modal', () => {
-    const user = new User('');
+    const user = new User('', '', translateForTest);
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const connection = new ConnectionEntity();
     user.connection(connection);
@@ -439,7 +455,7 @@ describe('UserActions', () => {
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
       isSelfActivated: true,
       onAction: noop,
-      selfUser: new User(''),
+      selfUser: new User('', '', translateForTest),
       user,
       isModal: true,
     };

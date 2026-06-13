@@ -111,7 +111,11 @@ export function generateConversation({
 }: GenerateConversationParams = {}): Conversation {
   const apiConversation = generateAPIConversation({id, type, protocol, name, overwites});
 
-  const conversation = ConversationMapper.mapConversations([apiConversation as ConversationDatabaseData], 1, translate)[0];
+  const conversation = ConversationMapper.mapConversations(
+    [apiConversation as ConversationDatabaseData],
+    1,
+    translate,
+  )[0];
   const connectionEntity = new ConnectionEntity();
   connectionEntity.conversationId = conversation.qualifiedId;
   connectionEntity.status(status);

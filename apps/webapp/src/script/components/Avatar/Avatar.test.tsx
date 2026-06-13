@@ -29,11 +29,13 @@ import {
 import {Avatar} from './Avatar';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('Avatar', () => {
   it('executes onClick with current participant', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -50,7 +52,7 @@ describe('Avatar', () => {
   });
 
   it('renders temporary guest avatar', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
     participant.isTemporaryGuest(true);
 
@@ -70,7 +72,7 @@ describe('Avatar', () => {
    * This behaviour exists in the message list for message avatars and in the conversation details in the services section.
    */
   it('renders service avatar with participant of type User but isService = true', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
     participant.isService = true;
 
@@ -79,7 +81,7 @@ describe('Avatar', () => {
   });
 
   it('renders user avatar', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const {getByTestId} = render(<Avatar participant={participant} />, {wrapper: rootProviderWrapper});

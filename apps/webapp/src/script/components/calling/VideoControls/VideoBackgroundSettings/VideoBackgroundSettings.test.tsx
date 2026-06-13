@@ -21,12 +21,17 @@ import {fireEvent, render} from '@testing-library/react';
 
 import type {BuiltinBackground} from 'Repositories/media/VideoBackgroundEffects';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from '../../../../auth/util/test/TestUtil';
 
 import {getBackgroundEffectLabel, VideoBackgroundSettings} from './VideoBackgroundSettings';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('VideoBackgroundSettings', () => {
   const backgrounds = [
@@ -265,26 +270,34 @@ describe('VideoBackgroundSettings', () => {
     });
 
     it('returns label for low blur', () => {
-      expect(getBackgroundEffectLabel({type: 'blur', level: 'low'}, backgrounds, translationKey => translationKey)).toBe(
-        'videoCallBackgroundBlurLow',
-      );
+      expect(
+        getBackgroundEffectLabel({type: 'blur', level: 'low'}, backgrounds, translationKey => translationKey),
+      ).toBe('videoCallBackgroundBlurLow');
     });
 
     it('returns label for high blur', () => {
-      expect(getBackgroundEffectLabel({type: 'blur', level: 'high'}, backgrounds, translationKey => translationKey)).toBe(
-        'videoCallBackgroundBlurHigh',
-      );
+      expect(
+        getBackgroundEffectLabel({type: 'blur', level: 'high'}, backgrounds, translationKey => translationKey),
+      ).toBe('videoCallBackgroundBlurHigh');
     });
 
     it('returns label for matching virtual background', () => {
       expect(
-        getBackgroundEffectLabel({type: 'virtual', backgroundId: 'office'}, backgrounds, translationKey => translationKey),
+        getBackgroundEffectLabel(
+          {type: 'virtual', backgroundId: 'office'},
+          backgrounds,
+          translationKey => translationKey,
+        ),
       ).toBe('videoCallBackgroundOffice1');
     });
 
     it('returns fallback label for unknown virtual background', () => {
       expect(
-        getBackgroundEffectLabel({type: 'virtual', backgroundId: 'missing'}, backgrounds, translationKey => translationKey),
+        getBackgroundEffectLabel(
+          {type: 'virtual', backgroundId: 'missing'},
+          backgrounds,
+          translationKey => translationKey,
+        ),
       ).toBe('videoCallBackgroundVirtual');
     });
 

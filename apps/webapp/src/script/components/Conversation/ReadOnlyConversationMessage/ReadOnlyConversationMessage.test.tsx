@@ -47,7 +47,7 @@ const generateConversation = (
     connection.status(ConnectionStatus.BLOCKED);
   }
 
-  const user = new User('user-id', 'user-domain');
+  const user = new User('user-id', 'user-domain', translateForTest);
   user.name(userName);
   conversation.participating_user_ets([user]);
   conversation.participating_user_ids([user.qualifiedId]);

@@ -32,6 +32,7 @@ import {ClientRepository, ClientMapper, ClientEntity} from './.';
 
 import {entities} from '../../../../test/api/payloads';
 import {TestFactory} from '../../../../test/helper/TestFactory';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ClientRepository', () => {
   const originalPrimaryModalShow = PrimaryModal.show;
@@ -42,7 +43,7 @@ describe('ClientRepository', () => {
   beforeAll(async () => {
     await testFactory.exposeClientActors();
 
-    const user = new User(entities.user.john_doe.id, null);
+    const user = new User(entities.user.john_doe.id, null, translateForTest);
     user.email(entities.user.john_doe.email);
     user.isMe = true;
     user.locale = entities.user.john_doe.locale;
@@ -258,7 +259,7 @@ describe('ClientRepository', () => {
       const clientEntity = new ClientEntity(false, null);
       clientEntity.id = clientId;
       testFactory.client_repository['clientState'].currentClient = clientEntity;
-      testFactory.client_repository.selfUser(new User(userId, null));
+      testFactory.client_repository.selfUser(new User(userId, null, translateForTest));
       const result = testFactory.client_repository['isCurrentClient']({domain: '', id: userId}, clientId);
 
       expect(result).toBeTruthy();

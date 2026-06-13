@@ -20,7 +20,10 @@
 import {render, screen, fireEvent} from '@testing-library/react';
 
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {FileHistoryContent} from './FileHistoryContent';

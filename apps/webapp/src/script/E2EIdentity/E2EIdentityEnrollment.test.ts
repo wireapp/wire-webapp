@@ -90,7 +90,7 @@ const modalMock = jest.spyOn(PrimaryModal, 'show');
 
 describe('E2EIHandler', () => {
   const params = {discoveryUrl: 'http://example.com', gracePeriodInSeconds: 30};
-  const user = new User('userId', 'domain');
+  const user = new User('userId', 'domain', translateForTest);
   user.name('John Doe');
   user.username('johndoe');
   user.teamId = 'team';

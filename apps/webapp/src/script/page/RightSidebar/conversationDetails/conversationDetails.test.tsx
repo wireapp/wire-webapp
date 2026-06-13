@@ -84,7 +84,7 @@ const getDefaultParams = () => {
     isUserGroupAdmin: () => true,
   };
 
-  const selfUserMock = new User(createUuid());
+  const selfUserMock = new User(createUuid(), '', translateForTest);
 
   return {
     actionsViewModel: new ActionsViewModel(
@@ -101,7 +101,8 @@ const getDefaultParams = () => {
     ),
     conversationRepository: {
       expectReadReceipt: () => true,
-      getNextConversation: () => Promise.resolve(createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest)),
+      getNextConversation: () =>
+        Promise.resolve(createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest)),
       refreshUnavailableParticipants: () => Promise.resolve(),
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
     } as unknown as ConversationRepository,
@@ -122,16 +123,19 @@ const getDefaultParams = () => {
 describe('ConversationDetails', () => {
   it("returns the right actions depending on the conversation's type for non group creators", () => {
     const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    const otherUser = new User('other-user');
+    const otherUser = new User('other-user', '', translateForTest);
     jest.spyOn(otherUser as any, 'isConnected').mockReturnValue(true);
     jest.spyOn(conversation as any, 'isClearable').mockReturnValue(true);
     conversation.participating_user_ets([otherUser]);
 
     const defaultProps = getDefaultParams();
 
-    const {rerender, getByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />, {
-      wrapper: rootProviderWrapper,
-    });
+    const {rerender, getByTestId} = render(
+      <ConversationDetails {...defaultProps} activeConversation={conversation} />,
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
 
     const tests = [
       {

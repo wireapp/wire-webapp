@@ -57,7 +57,7 @@ describe('E2EIVerificationMessage', () => {
   });
 
   describe('with degraded message', () => {
-    const user = new User('user1');
+    const user = new User('user1', '', translateForTest);
 
     it('show new unverified device added', async () => {
       const message = createVerificationMessage({

@@ -23,12 +23,17 @@ import ko from 'knockout';
 import {Message as MessageEntity} from 'Repositories/entity/message/Message';
 import {ReadReceipt} from 'Repositories/storage';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {formatTimeShort} from 'Util/timeUtil';
 
 import {ReadReceiptStatus} from './ReadReceiptStatus';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createReadReceiptMessage = (partialReadReceiptStatus: Partial<MessageEntity>) => {
   const readReceiptMessage: Partial<MessageEntity> = {

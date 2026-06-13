@@ -78,7 +78,7 @@ const createAppLockState = (teamState?: TeamState) => {
 const createAppLockRepository = (appLockState?: AppLockState) => {
   const userState = new UserState();
   appLockState = appLockState ?? createAppLockState();
-  userState.self(new User(createUuid(), ''));
+  userState.self(new User(createUuid(), '', translateForTest));
   const appLockRepository = new AppLockRepository(translateForTest, userState, appLockState, appLockCrypto);
   return appLockRepository;
 };

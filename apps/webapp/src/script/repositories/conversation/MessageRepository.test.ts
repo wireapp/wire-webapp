@@ -61,7 +61,7 @@ import {StatusType} from '../../message/StatusType';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';
 import {createConversationForTest} from 'Util/test/createConversationForTest';
 
-const selfUser = new User('selfid', '');
+const selfUser = new User('selfid', '', translateForTest);
 selfUser.isMe = true;
 
 const commonSendResponse = {
@@ -176,7 +176,7 @@ describe('MessageRepository', () => {
       const [messageRepository] = await buildMessageRepository(translate);
       const showModalSpy = jest.spyOn(PrimaryModal, 'show').mockImplementation(() => undefined);
       const conversation = generateConversation();
-      const unverifiedUser = new User(createUuid());
+      const unverifiedUser = new User(createUuid(), '', translateForTest);
 
       unverifiedUser.name('Alice');
       conversation.getUsersWithUnverifiedClients = () => [unverifiedUser];
@@ -493,7 +493,8 @@ describe('MessageRepository', () => {
 
   describe('sendTextWithLinkPreview', () => {
     it('sends a text message', async () => {
-      const [messageRepository, {eventRepository, core, propertiesRepository}] = await buildMessageRepository(translateForTest);
+      const [messageRepository, {eventRepository, core, propertiesRepository}] =
+        await buildMessageRepository(translateForTest);
       spyOn(propertiesRepository, 'getPreference').and.returnValue(false);
       jest.spyOn(core.service!.conversation, 'send').mockResolvedValue(successPayload);
       spyOn(eventRepository, 'injectEvent').and.returnValue(Promise.resolve());
@@ -513,7 +514,7 @@ describe('MessageRepository', () => {
   describe('deleteMessageForEveryone', () => {
     it('should not delete other users messages', async () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
-      const sender = new User('', '');
+      const sender = new User('', '', translateForTest);
       sender.isMe = false;
       const msgToDelete = new Message(createUuid(), undefined, translateForTest);
       msgToDelete.user(sender);
@@ -531,7 +532,7 @@ describe('MessageRepository', () => {
 
     it('should send delete and deletes message for own messages', async () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
-      conversation.participating_user_ets.push(new User('user1'));
+      conversation.participating_user_ets.push(new User('user1', '', translateForTest));
 
       const messageToDelete = new Message(createUuid(), undefined, translateForTest);
       messageToDelete.user(selfUser);
@@ -552,7 +553,7 @@ describe('MessageRepository', () => {
 
     it('should send delete and deletes message for own pending/gray messages', async () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
-      conversation.participating_user_ets.push(new User('user1'));
+      conversation.participating_user_ets.push(new User('user1', '', translateForTest));
 
       const messageToDelete = new Message(createUuid(), undefined, translateForTest);
       messageToDelete.user(selfUser);
@@ -586,8 +587,9 @@ describe('MessageRepository', () => {
     });
 
     it('unverifies device if fingerprint has changed', async () => {
-      const [messageRepository, {cryptographyRepository, userRepository, core}] = await buildMessageRepository(translateForTest);
-      const user = new User();
+      const [messageRepository, {cryptographyRepository, userRepository, core}] =
+        await buildMessageRepository(translateForTest);
+      const user = new User('', '', translateForTest);
       const clientId = 'client1';
 
       const device = new ClientEntity(false, 'domain', clientId);

@@ -33,7 +33,9 @@ jest.mock('./hooks/useFileHistoryModal');
 const mockedUseFileHistoryModal = jest.mocked(useFileHistoryModal);
 
 function renderWithRootProvider(element: ReactElement) {
-  return render(<RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>);
+  return render(
+    <RootProvider value={createRootContextValueForTest({translate: translateForTest})}>{element}</RootProvider>,
+  );
 }
 
 describe('FileHistoryHeader', () => {

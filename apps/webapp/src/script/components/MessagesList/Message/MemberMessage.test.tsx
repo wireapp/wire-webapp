@@ -27,7 +27,10 @@ import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {generateUser} from 'test/helper/UserGenerator';
 
 import {MemberMessage} from './MemberMessage';
@@ -40,7 +43,9 @@ jest.mock('Components/Avatar', () => ({
   Avatar: () => <div data-uie-name="mock-avatar" />,
 }));
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 function createMemberMessage({systemType, type}: {systemType?: SystemMessageType; type?: string}, users?: User[]) {
   const message = new MemberMessageEntity();
@@ -84,7 +89,9 @@ describe('MemberMessage', () => {
   it('shows connected message', async () => {
     const props = {
       ...baseProps,
-      message: createMemberMessage({systemType: SystemMessageType.CONNECTION_ACCEPTED}, [new User('id')]),
+      message: createMemberMessage({systemType: SystemMessageType.CONNECTION_ACCEPTED}, [
+        new User('id', '', translateForTest),
+      ]),
     };
 
     const {getByTestId} = render(withTheme(<MemberMessage {...props} />), {wrapper: rootProviderWrapper});

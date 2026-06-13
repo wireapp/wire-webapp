@@ -44,7 +44,7 @@ function buildRepliesUpdaterMiddleware() {
 
 describe('QuotedMessageMiddleware', () => {
   const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-  conversation.selfUser(new User());
+  conversation.selfUser(new User('', '', translateForTest));
 
   describe('processEvent', () => {
     it('updates quotes in DB when a message is edited', async () => {

@@ -21,6 +21,7 @@ import {User} from 'Repositories/entity/User';
 import {Declension, translate, getSelfName, getUserName} from 'Util/localizerUtil';
 
 import {escapeRegex, safeWindowOpen} from './sanitizationUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 describe('sanitizationUtil', () => {
   describe('escapeRegex', () => {
@@ -33,7 +34,7 @@ describe('sanitizationUtil', () => {
 
   describe('getUserName', () => {
     it('will return the name of the given user', () => {
-      const userEntity = new User();
+      const userEntity = new User('', '', translateForTest);
       userEntity.name(`<script>alert('Unsanitzed');</script>`);
       const escapedFirstName = getUserName(userEntity, translate);
 

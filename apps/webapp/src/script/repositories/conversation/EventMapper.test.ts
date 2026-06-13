@@ -169,7 +169,12 @@ describe('Event Mapper', () => {
       const validMention = new MentionEntity(text.indexOf('@'), mandy.length, createUuid());
       const outOfRangeMention = new MentionEntity(text.length, randy.length, createUuid());
 
-      const conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const conversationEntity = createConversationForTest(
+        createUuid(),
+        '',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
 
       const mentionArrays = [
         arrayToBase64(Mention.encode(validMention.toProto()).finish()),
@@ -204,7 +209,12 @@ describe('Event Mapper', () => {
       const overlappingStart = mandyStart + mandy.length - 1;
       const overlappingMention = new MentionEntity(overlappingStart, randy.length, createUuid());
 
-      const conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const conversationEntity = createConversationForTest(
+        createUuid(),
+        '',
+        CONVERSATION_PROTOCOL.PROTEUS,
+        translateForTest,
+      );
 
       const mentionArrays = [
         arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
@@ -228,7 +238,7 @@ describe('Event Mapper', () => {
 
     it('uses the injected translate function for team member leave fallback names', () => {
       const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
-      const teamMember = new User(createUuid());
+      const teamMember = new User(createUuid(), '', translateForTest);
       const mapperWithTranslate = new EventMapper(undefined, translate);
       const event = EventBuilder.buildTeamMemberLeave(conversation, teamMember, Date.now());
       event.data.name = '';

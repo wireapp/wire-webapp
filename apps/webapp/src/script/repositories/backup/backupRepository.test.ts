@@ -44,6 +44,7 @@ import {handleZipEvent} from './zipWorker';
 
 import {Config} from '../../Config';
 import {DatabaseTypes, createStorageEngine} from '../../service/storeEngineProvider';
+import {translateForTest} from 'Util/test/translateForTest';
 
 const conversationId = '35a9a89d-70dc-4d9e-88a2-4d8758458a6a';
 
@@ -124,7 +125,7 @@ describe('BackupRepository', () => {
       const userId = createUuid();
       const clientId = createUuid();
 
-      const metaDescription = createMetaData(new User(userId), clientId, backupService);
+      const metaDescription = createMetaData(new User(userId, '', translateForTest), clientId, backupService);
 
       expect(metaDescription.client_id).toBe(clientId);
       expect(metaDescription.creation_time).toBe(freezedTime.toISOString());
@@ -160,7 +161,12 @@ describe('BackupRepository', () => {
         storageService.save(StorageSchemata.OBJECT_STORE.USERS, 'user-1', generateAPIUser()),
       ]);
 
-      const exportPromise = backupRepository.generateHistory(new User(), 'client1', noop, password);
+      const exportPromise = backupRepository.generateHistory(
+        new User('', '', translateForTest),
+        'client1',
+        noop,
+        password,
+      );
       backupRepository.cancelAction();
 
       await expect(exportPromise).rejects.toThrow(CancelError);
@@ -184,7 +190,10 @@ describe('BackupRepository', () => {
     ])(`fails if metadata doesn't match`, async ({metaChanges, expectedError}) => {
       const [backupRepository, {backupService}] = await buildBackupRepository();
 
-      const meta = {...createMetaData(new User('user1'), 'client1', backupService), ...metaChanges};
+      const meta = {
+        ...createMetaData(new User('user1', '', translateForTest), 'client1', backupService),
+        ...metaChanges,
+      };
 
       const files = {
         [Filename.METADATA]: JSON.stringify(meta),
@@ -192,14 +201,14 @@ describe('BackupRepository', () => {
       const zip = (await handleZipEvent({type: 'zip', files})) as Uint8Array;
       const zipBlob = createBlobFromUint8Array(zip);
 
-      await expect(backupRepository.importHistory(new User('user1'), zipBlob, noop, noop)).rejects.toThrow(
-        expectedError,
-      );
+      await expect(
+        backupRepository.importHistory(new User('user1', '', translateForTest), zipBlob, noop, noop),
+      ).rejects.toThrow(expectedError);
     });
 
     it('successfully imports a backup', async () => {
       const [backupRepository, {backupService, conversationRepository}] = await buildBackupRepository();
-      const user = new User('user1');
+      const user = new User('user1', '', translateForTest);
       const mockedDBVersion = 20;
       jest.spyOn(backupService, 'getDatabaseVersion').mockReturnValue(mockedDBVersion);
       const importSpy = jest.spyOn(backupService, 'importEntities').mockResolvedValue(1);
@@ -257,7 +266,7 @@ describe('BackupRepository', () => {
       // Mocked values
       const password = 'Password';
       const clientId = 'ClientId';
-      const user = new User('user1');
+      const user = new User('user1', '', translateForTest);
       const mockHashedUserId = new Uint8Array(32);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
       const mockGenerateChaCha20Key = jest.fn().mockImplementation((header: DecodedHeader) => new Uint8Array(32));
@@ -305,7 +314,7 @@ describe('BackupRepository', () => {
       // Mocked values
       const password = '';
       const clientId = 'ClientId';
-      const user = new User('user1');
+      const user = new User('user1', '', translateForTest);
       const mockEncodeHeader = jest.fn().mockResolvedValue(new Uint8Array(63));
       const mockGenerateChaCha20Key = jest.fn().mockImplementation(_header => new Uint8Array(32));
 
@@ -335,7 +344,7 @@ describe('BackupRepository', () => {
       // Mocked values...
       const password = 'Password';
       const clientId = 'ClientId';
-      const user = new User('user1');
+      const user = new User('user1', '', translateForTest);
       jest.spyOn(WebWorker.prototype, 'post').mockResolvedValue(new Uint8Array([1, 2, 3]));
 
       const [backupRepository] = await buildBackupRepository();

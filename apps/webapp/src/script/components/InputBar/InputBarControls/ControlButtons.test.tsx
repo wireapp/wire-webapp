@@ -21,7 +21,10 @@ import {render} from '@testing-library/react';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {ControlButtons} from './ControlButtons';
@@ -62,7 +65,9 @@ describe('ControlButtons', () => {
     [{isEditing: true}, []],
   ])('renders the right buttons depending on props (%s)', (overrides, buttonTitles) => {
     const params = {...defaultParams, ...overrides};
-    const {getByTitle, queryByTitle} = render(withTheme(<ControlButtons {...params} />), {wrapper: rootProviderWrapper});
+    const {getByTitle, queryByTitle} = render(withTheme(<ControlButtons {...params} />), {
+      wrapper: rootProviderWrapper,
+    });
     // check that the relevant buttons are present
     buttonTitles.forEach(button => expect(getByTitle(button)).not.toBe(null));
 
@@ -76,7 +81,9 @@ describe('ControlButtons', () => {
     ['hello', ['extensionsBubbleButtonGif']],
   ])('Shows the right buttons depending on the input (input: %s)', (input, buttonTitles) => {
     const params = {...defaultParams, ...{input}};
-    const {getByTitle, queryByTitle} = render(withTheme(<ControlButtons {...params} />), {wrapper: rootProviderWrapper});
+    const {getByTitle, queryByTitle} = render(withTheme(<ControlButtons {...params} />), {
+      wrapper: rootProviderWrapper,
+    });
 
     // check that the relevant buttons are present
     buttonTitles.forEach(button => expect(getByTitle(button)).not.toBe(null));

@@ -43,7 +43,7 @@ const createAppLockRepository = (translate: Translate): AppLockRepository => {
     cryptoPwhashStrVerify: (hashedCode: string, code: string) => mockCryptoPwhashStrVerify(hashedCode, code),
   };
 
-  userState.self(new User(createUuid(), ''));
+  userState.self(new User(createUuid(), '', translateForTest));
 
   return new AppLockRepository(translate, userState, appLockState, appLockCrypto);
 };

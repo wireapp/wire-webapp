@@ -33,7 +33,9 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {LinkPreviewAsset} from './LinkPreviewAssetComponent';
 
 describe('LinkPreviewAssetComponent', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
 
   function mockLinkPreview(url = 'https://example.com'): ContentMessage {
     const linkPreviewEntity = new LinkPreview({title: 'Link Preview', url});

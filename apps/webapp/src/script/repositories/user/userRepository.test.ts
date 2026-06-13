@@ -208,7 +208,7 @@ describe('UserRepository', () => {
 
       beforeEach(async () => {
         [userRepository] = await buildUserRepository(translateForTest);
-        user = new User(entities.user.john_doe.id);
+        user = new User(entities.user.john_doe.id, '', translateForTest);
         return userRepository['saveUser'](user);
       });
 
@@ -238,7 +238,7 @@ describe('UserRepository', () => {
     describe('saveUser', () => {
       it('saves a user', async () => {
         const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-        const user = new User(entities.user.jane_roe.id);
+        const user = new User(entities.user.jane_roe.id, '', translateForTest);
 
         userRepository['saveUser'](user);
 
@@ -248,7 +248,7 @@ describe('UserRepository', () => {
 
       it('saves self user', async () => {
         const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-        const user = new User(entities.user.jane_roe.id);
+        const user = new User(entities.user.jane_roe.id, '', translateForTest);
 
         userRepository['saveUser'](user, true);
 
@@ -268,7 +268,7 @@ describe('UserRepository', () => {
         [userRepository, {userState, userService}] = await buildUserRepository(translateForTest);
         jest.resetAllMocks();
         jest.spyOn(userService, 'loadUsersFromDb').mockResolvedValue(localUsers);
-        const selfUser = new User('self');
+        const selfUser = new User('self', '', translateForTest);
         selfUser.isMe = true;
         userState.self(selfUser);
         userState.users([selfUser]);
@@ -280,7 +280,7 @@ describe('UserRepository', () => {
         const connections = createConnections(users);
         const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        await userRepository.loadUsers(new User('self'), connections, [], []);
+        await userRepository.loadUsers(new User('self', '', translateForTest), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(users.map(user => user.qualified_id!));
@@ -292,7 +292,7 @@ describe('UserRepository', () => {
         const connections = createConnections(users);
         jest.spyOn(userService, 'getUsers').mockResolvedValue({found: users});
 
-        await userRepository.loadUsers(new User('self'), connections, [], []);
+        await userRepository.loadUsers(new User('self', '', translateForTest), connections, [], []);
 
         expect(userState.users()).toHaveLength(users.length + 1);
         users.forEach(user => {
@@ -320,7 +320,7 @@ describe('UserRepository', () => {
         jest.spyOn(userRepository['userService'], 'loadUsersFromDb').mockResolvedValue(partialUsers as any);
         const fetchUserSpy = jest.spyOn(userService, 'getUsers').mockResolvedValue({found: localUsers});
 
-        await userRepository.loadUsers(new User('self'), connections, [], []);
+        await userRepository.loadUsers(new User('self', '', translateForTest), connections, [], []);
 
         expect(userState.users()).toHaveLength(localUsers.length + 1);
         expect(fetchUserSpy).toHaveBeenCalledWith(userIds);
@@ -333,8 +333,8 @@ describe('UserRepository', () => {
     describe('assignAllClients', () => {
       it('assigns all available clients to the users', async () => {
         const [userRepository, {clientRepository}] = await buildUserRepository(translateForTest);
-        const userJaneRoe = new User(entities.user.jane_roe.id);
-        const userJohnDoe = new User(entities.user.john_doe.id);
+        const userJaneRoe = new User(entities.user.jane_roe.id, '', translateForTest);
+        const userJohnDoe = new User(entities.user.john_doe.id, '', translateForTest);
 
         userRepository['saveUsers']([userJaneRoe, userJohnDoe]);
         const permanent_client = ClientMapper.mapClient(entities.clients.john_doe.permanent, false);
@@ -386,8 +386,8 @@ describe('UserRepository', () => {
   describe('updateUsers', () => {
     it('should update local users', async () => {
       const [userRepository, {userService, userState}] = await buildUserRepository(translateForTest);
-      userState.self(new User());
-      const user = new User(entities.user.jane_roe.id);
+      userState.self(new User('', '', translateForTest));
+      const user = new User(entities.user.jane_roe.id, '', translateForTest);
       user.name('initial name');
       user.isMe = true;
       userRepository['saveUser'](user);
@@ -408,7 +408,7 @@ describe('UserRepository', () => {
 
     it("should update user's supportedProtocols", async () => {
       const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-      const user = new User(generateUUID());
+      const user = new User(generateUUID(), '', translateForTest);
       userState.users.push(user);
       userState.self(user);
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS];
@@ -431,8 +431,8 @@ describe('UserRepository', () => {
 
     it("should emit supportedProtocolsUpdate event after user's supported protocols were updated", async () => {
       const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-      const user = new User(generateUUID());
-      const selfUser = new User(generateUUID());
+      const user = new User(generateUUID(), '', translateForTest);
+      const selfUser = new User(generateUUID(), '', translateForTest);
 
       userState.users.push(user);
       userState.self(selfUser);
@@ -464,10 +464,10 @@ describe('UserRepository', () => {
 
     it("should not emit supportedProtocolsUpdate event if user's supported protocols remain unchanged", async () => {
       const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-      const user = new User(generateUUID());
+      const user = new User(generateUUID(), '', translateForTest);
       userState.users.push(user);
 
-      const selfUser = new User(generateUUID());
+      const selfUser = new User(generateUUID(), '', translateForTest);
       userState.self(selfUser);
 
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];
@@ -494,10 +494,10 @@ describe('UserRepository', () => {
 
     it('should not emit supportedProtocolsUpdate event if the event did not contain supported protocols', async () => {
       const [userRepository, {userState}] = await buildUserRepository(translateForTest);
-      const user = new User(generateUUID());
+      const user = new User(generateUUID(), '', translateForTest);
       userState.users.push(user);
 
-      const selfUser = new User(generateUUID());
+      const selfUser = new User(generateUUID(), '', translateForTest);
       userState.self(selfUser);
 
       const initialSupportedProtocols = [CONVERSATION_PROTOCOL.PROTEUS, CONVERSATION_PROTOCOL.MLS];

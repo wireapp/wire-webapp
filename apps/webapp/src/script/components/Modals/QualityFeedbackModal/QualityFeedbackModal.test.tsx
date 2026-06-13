@@ -56,11 +56,13 @@ jest.mock('Repositories/tracking/telemetry.helpers', () => ({
 }));
 
 describe('QualityFeedbackModal', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   let callingRepository: CallingRepository;
   let call: Call;
   const testFactory = new TestFactory();
-  const user = new User('userId', 'domain');
+  const user = new User('userId', 'domain', translateForTest);
 
   beforeEach(() => {
     jest.clearAllMocks();

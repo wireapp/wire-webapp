@@ -109,7 +109,12 @@ export class TestFactory {
     await this.exposeCryptographyActors();
 
     this.client_service = new ClientService(this.storage_service);
-    this.client_repository = new ClientRepository(this.client_service, this.cryptography_repository, translate, new ClientState());
+    this.client_repository = new ClientRepository(
+      this.client_service,
+      this.cryptography_repository,
+      translate,
+      new ClientState(),
+    );
 
     const currentClient = new ClientEntity(false, null);
     currentClient.address = '62.96.148.44';
@@ -159,7 +164,7 @@ export class TestFactory {
     this.propertyRepository = new PropertiesRepository(new PropertiesService(), new SelfService(), translate);
 
     const userState = new UserState();
-    const selfUser = new User('self-id');
+    const selfUser = new User('self-id', '', translate);
     selfUser.isMe = true;
     userState.self(selfUser);
     userState.users([selfUser]);

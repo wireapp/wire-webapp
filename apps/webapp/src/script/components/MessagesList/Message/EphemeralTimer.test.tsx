@@ -20,12 +20,17 @@
 import {render} from '@testing-library/react';
 
 import {Message} from 'Repositories/entity/message/Message';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translateForTest} from 'Util/test/translateForTest';
 
 import {EphemeralTimer} from './EphemeralTimer';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('EphemeralTimer', () => {
   it('shows the icon', () => {

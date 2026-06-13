@@ -33,11 +33,13 @@ import {UserAvatar} from './UserAvatar';
 import {AVATAR_SIZE, STATE} from '../Avatar';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('UserAvatar', () => {
   it('shows participant initials if no avatar is defined', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -52,7 +54,7 @@ describe('UserAvatar', () => {
   });
 
   it('shows single initial character when avatar size is extra small', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -67,7 +69,7 @@ describe('UserAvatar', () => {
   });
 
   it('does not show avatar badge in default state', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -81,7 +83,7 @@ describe('UserAvatar', () => {
   });
 
   it('shows avatar badge for blocked user', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -97,7 +99,7 @@ describe('UserAvatar', () => {
   });
 
   it('shows avatar badge for connection request', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -112,7 +114,7 @@ describe('UserAvatar', () => {
     expect(badgeIcon.getAttribute('data-uie-value')).toEqual(STATE.PENDING);
   });
   it('renders available icon', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
@@ -129,7 +131,7 @@ describe('UserAvatar', () => {
   });
 
   it('renders away icon', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
@@ -147,7 +149,7 @@ describe('UserAvatar', () => {
   });
 
   it('renders busy icon', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,
@@ -165,7 +167,7 @@ describe('UserAvatar', () => {
   });
 
   it('does not render the profile picture image when hideProfilePicture is true', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -180,7 +182,7 @@ describe('UserAvatar', () => {
   });
 
   it('renders the profile picture image when hideProfilePicture is false', () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
     participant.name('Anton Bertha');
 
     const props = {
@@ -195,7 +197,7 @@ describe('UserAvatar', () => {
   });
 
   it('does not show availability icon if param is false', async () => {
-    const participant = new User('id');
+    const participant = new User('id', '', translateForTest);
 
     const props = {
       avatarSize: AVATAR_SIZE.LARGE,

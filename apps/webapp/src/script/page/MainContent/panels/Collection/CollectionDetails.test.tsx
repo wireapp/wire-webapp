@@ -26,7 +26,10 @@ import {LinkPreview} from 'Repositories/entity/message/LinkPreview';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {Text} from 'Repositories/entity/message/Text';
 import {MessageCategory} from 'src/script/message/MessageCategory';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
@@ -89,7 +92,9 @@ const createAudioMessage = () => {
 };
 
 describe('CollectionDetails', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   it('displays all image assets', async () => {
     const messages = [createImageMessage(), createImageMessage()];

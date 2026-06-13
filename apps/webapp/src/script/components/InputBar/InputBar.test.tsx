@@ -103,7 +103,7 @@ describe('InputBar', () => {
     storageRepository,
     isCellsEnabled: false,
     teamState: new TeamState(),
-    selfUser: new User('id'),
+    selfUser: new User('id', '', translateForTest),
     onShiftTab: jest.fn(),
     uploadDroppedFiles: jest.fn(),
     uploadImages: jest.fn(),

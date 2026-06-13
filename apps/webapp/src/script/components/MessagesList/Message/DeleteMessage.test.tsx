@@ -22,12 +22,17 @@ import {render} from '@testing-library/react';
 import {DeleteMessage as DeleteMessageEntity} from 'Repositories/entity/message/DeleteMessage';
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {createUuid} from 'Util/uuid';
 
 import {DeleteMessage} from './DeleteMessage';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createDeleteMessage = (sender: User) => {
   const deleteMessage = new DeleteMessageEntity();
@@ -37,7 +42,7 @@ const createDeleteMessage = (sender: User) => {
 
 describe('DeleteMessage', () => {
   it('shows sender name', async () => {
-    const sender = new User(createUuid());
+    const sender = new User(createUuid(), '', translateForTest);
     sender.name('felix');
     const message = createDeleteMessage(sender);
 

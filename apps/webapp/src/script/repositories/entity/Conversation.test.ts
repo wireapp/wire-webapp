@@ -48,7 +48,7 @@ describe('Conversation', () => {
   let conversation_et: Conversation = null;
   let other_user: User = null;
 
-  const self_user = new User(entities.user.john_doe.id, null);
+  const self_user = new User(entities.user.john_doe.id, null, translateForTest);
   self_user.isMe = true;
 
   const first_timestamp = new Date('2017-09-26T09:21:14.225Z').getTime();
@@ -69,7 +69,7 @@ describe('Conversation', () => {
 
   beforeEach(() => {
     conversation_et = createLocalizedConversationForTest();
-    other_user = new User(entities.user.jane_roe.id, null);
+    other_user = new User(entities.user.jane_roe.id, null, translateForTest);
   });
 
   describe('type checks', () => {
@@ -160,7 +160,7 @@ describe('Conversation', () => {
       const conversation = createBaseConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translate);
 
       conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
-      conversation.participating_user_ets([new User('', '')]);
+      conversation.participating_user_ets([new User('', '', translateForTest)]);
 
       expect(conversation.display_name()).toBe('translated:unavailableUser');
     });
@@ -327,8 +327,8 @@ describe('Conversation', () => {
     });
 
     it('returns last delivered message', () => {
-      const remoteUserEntity = new User(createUuid(), null);
-      const selfUserEntity = new User(createUuid(), null);
+      const remoteUserEntity = new User(createUuid(), null, translateForTest);
+      const selfUserEntity = new User(createUuid(), null, translateForTest);
       selfUserEntity.isMe = true;
 
       const sentMessageEntity = new ContentMessage(createUuid(), translateForTest);
@@ -372,7 +372,7 @@ describe('Conversation', () => {
     let self_user_et: User = undefined;
 
     beforeEach(() => {
-      self_user_et = new User('', null);
+      self_user_et = new User('', null, translateForTest);
       self_user_et.isMe = true;
     });
 
@@ -385,7 +385,7 @@ describe('Conversation', () => {
     it('returns undefined if last message is not text and not added by self user', () => {
       const message_et = new PingMessage(translateForTest);
       message_et.id = createUuid();
-      message_et.user(new User('', null));
+      message_et.user(new User('', null, translateForTest));
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
@@ -404,7 +404,7 @@ describe('Conversation', () => {
       const message_et = new ContentMessage(undefined, translateForTest);
       message_et.addAsset(new Text());
       message_et.id = createUuid();
-      message_et.user(new User('', null));
+      message_et.user(new User('', null, translateForTest));
       conversation_et.addMessage(message_et);
 
       expect(conversation_et.getLastEditableMessage()).not.toBeDefined();
@@ -429,7 +429,7 @@ describe('Conversation', () => {
 
       const ping_message_et = new PingMessage(translateForTest);
       ping_message_et.id = createUuid();
-      ping_message_et.user(new User('', null));
+      ping_message_et.user(new User('', null, translateForTest));
       conversation_et.addMessage(ping_message_et);
 
       expect(conversation_et.getLastEditableMessage()).toBeDefined();
@@ -517,7 +517,7 @@ describe('Conversation', () => {
     });
 
     it('displays a group conversation name with names from the participants', () => {
-      const third_user = new User(createUuid(), null);
+      const third_user = new User(createUuid(), null, translateForTest);
       third_user.name('Brad Delson');
       other_user.name(entities.user.jane_roe.name);
       conversation_et.participating_user_ets.push(other_user);
@@ -537,7 +537,7 @@ describe('Conversation', () => {
     });
 
     it('displays a fallback if no user name has been set for a group conversation', () => {
-      const user = new User(createUuid(), null);
+      const user = new User(createUuid(), null, translateForTest);
       conversation_et.type(CONVERSATION_TYPE.REGULAR);
       conversation_et.participating_user_ids.push({domain: '', id: other_user.id});
       conversation_et.participating_user_ids.push({domain: '', id: user.id});
@@ -568,11 +568,11 @@ describe('Conversation', () => {
       const third_client = new ClientEntity(false, null);
       third_client.id = '6c0daa855d6b8b6e';
 
-      const user_et = new User('', null);
+      const user_et = new User('', null, translateForTest);
       user_et.devices.push(first_client);
       user_et.devices.push(second_client);
 
-      const second_user_et = new User('', null);
+      const second_user_et = new User('', null, translateForTest);
       second_user_et.devices.push(third_client);
 
       conversation_et.participating_user_ets.push(user_et);
@@ -591,11 +591,11 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity(false, null);
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User(createUuid(), null);
+      const self_user_et = new User(createUuid(), null, translateForTest);
       self_user_et.isMe = true;
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User('', null, translateForTest);
       user_et.devices.push(verified_client_et);
       conversation_et.participating_user_ets.push(user_et);
 
@@ -607,16 +607,16 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity(false, null);
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User('', null);
+      const self_user_et = new User('', null, translateForTest);
       self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User('', null, translateForTest);
       user_et.devices.push(unverified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new User('', null);
+      const user_et_two = new User('', null, translateForTest);
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -628,16 +628,16 @@ describe('Conversation', () => {
       const verified_client_et = new ClientEntity(false, null);
       verified_client_et.meta.isVerified(true);
 
-      const self_user_et = new User('', null);
+      const self_user_et = new User('', null, translateForTest);
       self_user_et.isMe = true;
       self_user_et.devices.push(verified_client_et);
       conversation_et.selfUser(self_user_et);
 
-      const user_et = new User('', null);
+      const user_et = new User('', null, translateForTest);
       user_et.devices.push(verified_client_et);
       user_et.devices.push(verified_client_et);
 
-      const user_et_two = new User('', null);
+      const user_et_two = new User('', null, translateForTest);
       user_et_two.devices.push(verified_client_et);
 
       conversation_et.participating_user_ets.push(user_et, user_et_two);
@@ -649,13 +649,13 @@ describe('Conversation', () => {
   describe('hasGuest', () => {
     it('detects conversations with guest', () => {
       conversation_et = createLocalizedConversationForTest(createUuid());
-      const selfUserEntity = new User(createUuid(), null);
+      const selfUserEntity = new User(createUuid(), null, translateForTest);
       selfUserEntity.isMe = true;
       selfUserEntity.teamId = createUuid();
       conversation_et.selfUser(selfUserEntity);
 
       // Is false for conversations not containing a guest
-      const userEntity = new User(createUuid(), null);
+      const userEntity = new User(createUuid(), null, translateForTest);
       conversation_et.participating_user_ets.push(userEntity);
 
       conversation_et.type(CONVERSATION_TYPE.ONE_TO_ONE);
@@ -667,7 +667,7 @@ describe('Conversation', () => {
       expect(conversation_et.hasGuest()).toBe(false);
 
       // Is true for group conversations containing a guest
-      const secondUserEntity = new User(createUuid(), null);
+      const secondUserEntity = new User(createUuid(), null, translateForTest);
       secondUserEntity.isGuest(true);
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -696,7 +696,7 @@ describe('Conversation', () => {
       const teamId = 'team1';
       const conversation = createLocalizedConversationForTest(createUuid(), 'domain.test');
       conversation.teamId = teamId;
-      const selfUser = new User(createUuid(), 'domain.test');
+      const selfUser = new User(createUuid(), 'domain.test', translateForTest);
       selfUser.isMe = true;
       selfUser.teamId = teamId;
       conversation.selfUser(selfUser);
@@ -709,7 +709,7 @@ describe('Conversation', () => {
       const teamId = 'team1';
       const conversation = createLocalizedConversationForTest(createUuid(), 'otherdomain.test');
       conversation.teamId = teamId;
-      const selfUser = new User(createUuid(), 'domain.test');
+      const selfUser = new User(createUuid(), 'domain.test', translateForTest);
       selfUser.isMe = true;
       selfUser.teamId = teamId;
       conversation.selfUser(selfUser);
@@ -720,7 +720,7 @@ describe('Conversation', () => {
 
   describe('hasService', () => {
     it('detects conversations with services', () => {
-      const userEntity = new User(createUuid(), null);
+      const userEntity = new User(createUuid(), null, translateForTest);
 
       conversation_et = createLocalizedConversationForTest(createUuid());
       conversation_et.participating_user_ets.push(userEntity);
@@ -733,7 +733,7 @@ describe('Conversation', () => {
 
       expect(conversation_et.hasService()).toBe(false);
 
-      const secondUserEntity = new User(createUuid(), null);
+      const secondUserEntity = new User(createUuid(), null, translateForTest);
       secondUserEntity.isService = true;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -749,14 +749,14 @@ describe('Conversation', () => {
 
   describe('hasApps', () => {
     it('detects conversations with apps', () => {
-      const userEntity = new User(createUuid(), null);
+      const userEntity = new User(createUuid(), null, translateForTest);
 
       conversation_et = createLocalizedConversationForTest(createUuid());
       conversation_et.participating_user_ets.push(userEntity);
 
       expect(conversation_et.hasApps()).toBe(false);
 
-      const secondUserEntity = new User(createUuid(), null);
+      const secondUserEntity = new User(createUuid(), null, translateForTest);
       secondUserEntity.type = UserType.APP;
       conversation_et.participating_user_ets.push(secondUserEntity);
 
@@ -994,7 +994,7 @@ describe('Conversation', () => {
     it('returns expected values', () => {
       const NOTIFICATION_STATES = NOTIFICATION_STATE;
       const conversationEntity = createLocalizedConversationForTest(createUuid());
-      const selfUserEntity = new User(createUuid(), undefined);
+      const selfUserEntity = new User(createUuid(), undefined, translateForTest);
 
       expect(conversationEntity.notificationState()).toBe(NOTIFICATION_STATES.NOTHING);
 

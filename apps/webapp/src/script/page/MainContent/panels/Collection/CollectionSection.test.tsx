@@ -20,7 +20,10 @@
 import {fireEvent, render} from '@testing-library/react';
 
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {translate} from 'Util/localizerUtil';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
@@ -28,7 +31,9 @@ import {createUuid} from 'Util/uuid';
 import {CollectionSection} from './CollectionSection';
 
 const NUMBER_OF_ASSETS = 5;
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const messages = new Array(NUMBER_OF_ASSETS).fill(null).map(() => new ContentMessage(createUuid(), translateForTest));
 

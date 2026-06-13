@@ -39,9 +39,7 @@ describe('Message', () => {
 
       message.ephemeral_remaining(1000);
 
-      expect(message.ephemeralCaption()).toBe(
-        '1 translated:ephemeralUnitsSecond translated:ephemeralRemaining',
-      );
+      expect(message.ephemeralCaption()).toBe('1 translated:ephemeralUnitsSecond translated:ephemeralRemaining');
     });
 
     it('uses the injected translate function for ping captions', () => {

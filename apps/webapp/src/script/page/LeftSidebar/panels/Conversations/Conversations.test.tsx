@@ -31,6 +31,7 @@ import {ListState} from 'src/script/page/useAppState';
 import {TestFactory} from 'test/helper/TestFactory';
 
 import {Conversations} from './';
+import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('./ConversationSidebar/ConversationSidebar', () => ({
   ConversationSidebar: ({onClickPreferences}: {onClickPreferences: (contentState: number) => void}) => {
@@ -60,7 +61,7 @@ const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversat
   } as any,
   preferenceNotificationRepository: {notifications: observable([])} as any,
   propertiesRepository: {getPreference: jest.fn(), savePreference: jest.fn()} as any,
-  selfUser: new User(),
+  selfUser: new User('', '', translateForTest),
   integrationRepository: {integrations: observable([])} as any,
   teamRepository: {getTeam: jest.fn()} as any,
   userRepository: {users: observable([])} as any,

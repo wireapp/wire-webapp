@@ -93,7 +93,7 @@ const getDefaultProps = (callingRepository: CallingRepository, conversation: Con
     } as CallingRepository,
   } as ViewModelRepositories,
   teamState: new TeamState(),
-  selfUser: new User(),
+  selfUser: new User('', '', translateForTest),
   withBottomDivider: true,
 });
 
@@ -236,7 +236,7 @@ describe('TitleBar', () => {
   });
 
   it('starts audio call on audio call button click', async () => {
-    const firstUser = new User();
+    const firstUser = new User('', '', translateForTest);
     const conversation = createConversationEntity({
       firstUserEntity: ko.pureComputed(() => firstUser),
       is1to1: ko.pureComputed(() => true),
@@ -254,7 +254,7 @@ describe('TitleBar', () => {
   });
 
   it("doesn't show video call button when video calling is not enabled", async () => {
-    const firstUser = new User();
+    const firstUser = new User('', '', translateForTest);
     const conversation = createConversationEntity({
       firstUserEntity: ko.pureComputed(() => firstUser),
       is1to1: ko.pureComputed(() => true),
@@ -305,7 +305,7 @@ describe('TitleBar', () => {
 });
 
 function createUser(activated: boolean = true) {
-  const user = new User();
+  const user = new User('', '', translateForTest);
   user.isTemporaryGuest(!activated);
   return user;
 }

@@ -74,7 +74,7 @@ describe('E2EICertificateDetails', () => {
       }) as MLSConversation,
     );
 
-    const selfUser = new User('id', 'domain');
+    const selfUser = new User('id', 'domain', translateForTest);
     container.resolve(UserState).self(selfUser);
 
     const handler = E2EIHandler.getInstance();

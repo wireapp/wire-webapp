@@ -40,7 +40,9 @@ const defaultProps: MessageActionsMenuProps = {
   reactionsTotalCount: 0,
   isRemovedFromConversation: false,
 };
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('MessageActions', () => {
   afterEach(() => {

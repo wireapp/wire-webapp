@@ -31,7 +31,9 @@ import {PrimaryModalType} from './PrimaryModalTypes';
 import {PrimaryModal, removeCurrentModal} from '.';
 import {translateForTest} from 'Util/test/translateForTest';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 describe('PrimaryModal', () => {
   beforeEach(() => {

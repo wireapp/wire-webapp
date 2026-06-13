@@ -35,7 +35,12 @@ import {translateForTest} from 'Util/test/translateForTest';
 const selfUserId = {id: 'self-user-id', domain: 'local.wire.link'};
 
 const createProteusConversation = (userIds: QualifiedId[] = []): ProteusConversation => {
-  const conversation = createConversationForTest(createUuid(), 'local.wire.link', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = createConversationForTest(
+    createUuid(),
+    'local.wire.link',
+    CONVERSATION_PROTOCOL.PROTEUS,
+    translateForTest,
+  );
   conversation.participating_user_ids.push(...userIds);
   conversation.type(CONVERSATION_TYPE.REGULAR);
   return conversation as ProteusConversation;

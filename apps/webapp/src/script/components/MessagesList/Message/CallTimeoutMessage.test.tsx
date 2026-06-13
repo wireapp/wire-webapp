@@ -24,11 +24,16 @@ import {REASON} from '@wireapp/avs';
 
 import {CallingTimeoutMessage as CallTimeoutMessageEntity} from 'Repositories/entity/message/CallingTimeoutMessage';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {CallTimeoutMessage} from './CallTimeoutMessage';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createCallTimeoutMessage = (partialCallTimeoutMessage: Partial<CallTimeoutMessageEntity>) => {
   const callMessage: Partial<CallTimeoutMessageEntity> = {

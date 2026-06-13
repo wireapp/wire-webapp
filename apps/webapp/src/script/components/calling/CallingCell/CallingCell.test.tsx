@@ -64,7 +64,11 @@ jest.mock('Components/InViewport', () => ({
   __esModule: true,
 }));
 
-const createCall = (state: CALL_STATE, selfUser = new User(createUuid()), selfClientId = createUuid()) => {
+const createCall = (
+  state: CALL_STATE,
+  selfUser = new User(createUuid(), '', translateForTest),
+  selfClientId = createUuid(),
+) => {
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call(
     {domain: '', id: ''},
@@ -88,7 +92,7 @@ const createProps = async () => {
   jest.spyOn(mockTeamState, 'isExternal').mockReturnValue(false);
 
   const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-  conversation.participating_user_ets([new User('id')]);
+  conversation.participating_user_ets([new User('id', '', translateForTest)]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),
     callActions: {} as CallActions,

@@ -21,15 +21,20 @@ import {render, screen, waitFor} from '@testing-library/react';
 
 import {User} from 'Repositories/entity/User';
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {InviteModal} from './InviteModal';
 
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 test('proper render invite modal text', async () => {
   const userName = 'janek';
-  const user = new User();
+  const user = new User('', '', translateForTest);
 
   user.username(userName);
 

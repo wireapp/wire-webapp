@@ -24,7 +24,10 @@ import {render, fireEvent} from '@testing-library/react';
 import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
 
 import {translateForTest} from 'Util/test/translateForTest';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {CellsShareModalContent} from './CellsShareModalContent';
 
@@ -49,7 +52,9 @@ jest.mock('src/script/Config', () => ({
 }));
 
 const withTheme = (component: ReactNode) => <StyledApp themeId={THEME_ID.DEFAULT}>{component}</StyledApp>;
-const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 // Mock child components that have complex dependencies
 jest.mock('Components/Cells/ShareModal/CellsShareExpirationFields', () => ({

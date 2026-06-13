@@ -29,7 +29,9 @@ import {LocationAsset} from './LocationAsset';
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('LocationAsset', () => {
-  const rootProviderWrapper = createRootProviderWrapperForTest(createRootContextValueForTest({translate: translateForTest}));
+  const rootProviderWrapper = createRootProviderWrapperForTest(
+    createRootContextValueForTest({translate: translateForTest}),
+  );
   const location: Partial<Location> = {latitude: '52.31', longitude: '13.24', name: 'Berlin', zoom: '0'};
 
   it('sets the correct Google Maps link', () => {

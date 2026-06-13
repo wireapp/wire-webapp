@@ -30,7 +30,7 @@ import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('videoGridHandler', () => {
   const createCall = () => {
-    const selfUser = new User(createUuid());
+    const selfUser = new User(createUuid(), '', translateForTest);
 
     return new Call(
       {domain: '', id: ''},
@@ -43,7 +43,7 @@ describe('videoGridHandler', () => {
   };
 
   const createParticipant = (name: string) => {
-    const user = new User(createUuid());
+    const user = new User(createUuid(), '', translateForTest);
     user.name(name);
 
     return new Participant(user, `client-${name}`);
