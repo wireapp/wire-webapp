@@ -52,7 +52,7 @@ import {NonFederatingParticipantsModalCopy} from '../utils';
 
 export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFederatingParticipantsModalCopy) => {
   const [isLoading, setIsLoading] = useState(false);
-  const {mainViewModel} = useApplicationContext();
+  const {mainViewModel, translate} = useApplicationContext();
   const {
     conversationName,
     hideModal,
@@ -104,28 +104,33 @@ export const useCreateConversation = (nonFederatingParticipantsModalCopy: NonFed
     backendString: string,
     replaceBackends: Record<string, string>,
   ) => {
-    PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
-      preventClose: true,
-      primaryAction: {
-        text: nonFederatingParticipantsModalCopy.editParticipantsButtonText,
-        action: () => {
-          setConversationName(conversationName);
-          showModal();
-          setIsLoading(false);
-          setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
+    PrimaryModal.show(
+      PrimaryModal.type.MULTI_ACTIONS,
+      {
+        preventClose: true,
+        primaryAction: {
+          text: nonFederatingParticipantsModalCopy.editParticipantsButtonText,
+          action: () => {
+            setConversationName(conversationName);
+            showModal();
+            setIsLoading(false);
+            setConversationCreationStep(ConversationCreationStep.ParticipantsSelection);
+          },
+        },
+        secondaryAction: {
+          text: nonFederatingParticipantsModalCopy.leaveButtonText,
+          action: () => {
+            setIsLoading(false);
+          },
+        },
+        text: {
+          htmlMessage: nonFederatingParticipantsModalCopy.getMessageHtml(backendString, replaceBackends),
+          title: nonFederatingParticipantsModalCopy.titleText,
         },
       },
-      secondaryAction: {
-        text: nonFederatingParticipantsModalCopy.leaveButtonText,
-        action: () => {
-          setIsLoading(false);
-        },
-      },
-      text: {
-        htmlMessage: nonFederatingParticipantsModalCopy.getMessageHtml(backendString, replaceBackends),
-        title: nonFederatingParticipantsModalCopy.titleText,
-      },
-    });
+      undefined,
+      translate,
+    );
   };
 
   const handleException = (error: Error, conversationName: string) => {

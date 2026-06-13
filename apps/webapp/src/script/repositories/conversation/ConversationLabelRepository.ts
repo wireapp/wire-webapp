@@ -406,24 +406,29 @@ export class ConversationLabelRepository extends TypedEventTarget<{type: 'conver
 
   readonly addConversationToNewLabel = (conversation: Conversation) => {
     const {setCurrentTab} = useSidebarStore.getState();
-    PrimaryModal.show(PrimaryModal.type.INPUT, {
-      primaryAction: {
-        action: (name: string) => {
-          this.removeConversationFromAllLabels(conversation);
-          const newFolder = createLabel(name, [conversation]);
-          this.labels.push(newFolder);
-          amplify.publish(WebAppEvents.CONTENT.EXPAND_FOLDER, newFolder.id);
-          this.saveLabels();
-          setCurrentTab(SidebarTabs.FOLDER);
+    PrimaryModal.show(
+      PrimaryModal.type.INPUT,
+      {
+        primaryAction: {
+          action: (name: string) => {
+            this.removeConversationFromAllLabels(conversation);
+            const newFolder = createLabel(name, [conversation]);
+            this.labels.push(newFolder);
+            amplify.publish(WebAppEvents.CONTENT.EXPAND_FOLDER, newFolder.id);
+            this.saveLabels();
+            setCurrentTab(SidebarTabs.FOLDER);
+          },
+          text: this.translate('modalCreateFolderAction'),
         },
-        text: this.translate('modalCreateFolderAction'),
+        text: {
+          closeBtnLabel: this.translate('modalNewFolderCloseBtn'),
+          input: this.translate('modalCreateFolderPlaceholder'),
+          message: this.translate('modalCreateFolderMessage'),
+          title: this.translate('modalCreateFolderHeadline'),
+        },
       },
-      text: {
-        closeBtnLabel: this.translate('modalNewFolderCloseBtn'),
-        input: this.translate('modalCreateFolderPlaceholder'),
-        message: this.translate('modalCreateFolderMessage'),
-        title: this.translate('modalCreateFolderHeadline'),
-      },
-    });
+      undefined,
+      this.translate,
+    );
   };
 }

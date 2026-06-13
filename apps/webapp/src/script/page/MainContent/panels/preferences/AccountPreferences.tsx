@@ -133,6 +133,7 @@ export const AccountPreferences = ({
         },
       },
       undefined,
+      translate,
     );
   };
 

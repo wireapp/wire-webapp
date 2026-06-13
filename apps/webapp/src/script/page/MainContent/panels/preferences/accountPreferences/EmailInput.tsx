@@ -41,12 +41,17 @@ const EmailInput = ({email, canEditProfile, userRepository}: EmailInputProps) =>
 
   const changeEmail = async (enteredEmail: string): Promise<void> => {
     const showWarning = (title: string, message: string) => {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message,
-          title,
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message,
+            title,
+          },
         },
-      });
+        undefined,
+        translate,
+      );
     };
     try {
       await userRepository.changeEmail(enteredEmail);

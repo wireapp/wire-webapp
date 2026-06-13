@@ -108,6 +108,7 @@ export const showShareModal = ({
       },
     },
     modalId,
+    translate,
   );
 };
 

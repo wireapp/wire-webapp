@@ -31,29 +31,34 @@ export const showDeletePermanentlyModal = ({
   onDeletePermanently: (uuid: string) => void;
   translate: RootContextValue['translate'];
 }) => {
-  PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    primaryAction: {
-      action: () => onDeletePermanently(node.id),
-      text: translate('cells.deletePermanentlyModal.button'),
-    },
-    text: {
-      message: replaceReactComponents(
-        translate(
-          node.type === CellNodeType.FILE
-            ? 'cells.deletePermanentlyModal.file.description'
-            : 'cells.deletePermanentlyModal.folder.description',
-          {
-            name: '{name}',
-          },
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      primaryAction: {
+        action: () => onDeletePermanently(node.id),
+        text: translate('cells.deletePermanentlyModal.button'),
+      },
+      text: {
+        message: replaceReactComponents(
+          translate(
+            node.type === CellNodeType.FILE
+              ? 'cells.deletePermanentlyModal.file.description'
+              : 'cells.deletePermanentlyModal.folder.description',
+            {
+              name: '{name}',
+            },
+          ),
+          [
+            {
+              exactMatch: '{name}',
+              render: () => <b>{node.name}</b>,
+            },
+          ],
         ),
-        [
-          {
-            exactMatch: '{name}',
-            render: () => <b>{node.name}</b>,
-          },
-        ],
-      ),
-      title: translate('cells.deletePermanentlyModal.headline'),
+        title: translate('cells.deletePermanentlyModal.headline'),
+      },
     },
-  });
+    undefined,
+    translate,
+  );
 };

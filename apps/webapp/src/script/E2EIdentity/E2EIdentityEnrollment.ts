@@ -367,7 +367,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       },
       translate,
     );
-    PrimaryModal.show(modalType, modalOptions);
+    PrimaryModal.show(modalType, modalOptions, undefined, translate);
   }
 
   private async showSuccessMessage(isCertificateRenewal = false) {
@@ -387,7 +387,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         translate,
       );
-      PrimaryModal.show(modalType, modalOptions);
+      PrimaryModal.show(modalType, modalOptions, undefined, translate);
     });
   }
 
@@ -423,7 +423,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         translate,
       );
 
-      PrimaryModal.show(modalType, modalOptions);
+      PrimaryModal.show(modalType, modalOptions, undefined, translate);
     });
   }
 
@@ -457,7 +457,7 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
         },
         translate,
       );
-      PrimaryModal.show(determinedModalType, modalOptions);
+      PrimaryModal.show(determinedModalType, modalOptions, undefined, translate);
     });
   }
 
@@ -473,6 +473,6 @@ export class E2EIHandler extends TypedEventEmitter<Events> {
       },
       translate,
     );
-    PrimaryModal.show(determinedModalType, modalOptions);
+    PrimaryModal.show(determinedModalType, modalOptions, undefined, translate);
   }
 }

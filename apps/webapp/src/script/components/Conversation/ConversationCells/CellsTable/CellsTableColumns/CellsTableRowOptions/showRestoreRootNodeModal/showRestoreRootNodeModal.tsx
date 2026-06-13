@@ -31,32 +31,37 @@ export const showRestoreRootNodeModal = ({
   onRestoreNode: () => void;
   translate: RootContextValue['translate'];
 }) => {
-  PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    primaryAction: {
-      action: onRestoreNode,
-      text: translate('cells.restoreRootNodeModal.button'),
-    },
-    text: {
-      message: replaceReactComponents(
-        translate(
-          node.type === CellNodeType.FILE
-            ? 'cells.restoreRootNodeModal.file.description'
-            : 'cells.restoreRootNodeModal.folder.description',
-          {
-            name: '{name}',
-          },
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      primaryAction: {
+        action: onRestoreNode,
+        text: translate('cells.restoreRootNodeModal.button'),
+      },
+      text: {
+        message: replaceReactComponents(
+          translate(
+            node.type === CellNodeType.FILE
+              ? 'cells.restoreRootNodeModal.file.description'
+              : 'cells.restoreRootNodeModal.folder.description',
+            {
+              name: '{name}',
+            },
+          ),
+          [
+            {
+              exactMatch: '{name}',
+              render: () => <b>{node.name}</b>,
+            },
+          ],
         ),
-        [
-          {
-            exactMatch: '{name}',
-            render: () => <b>{node.name}</b>,
-          },
-        ],
-      ),
-      title:
-        node.type === CellNodeType.FILE
-          ? translate('cells.restoreRootNodeModal.file.headline')
-          : translate('cells.restoreRootNodeModal.folder.headline'),
+        title:
+          node.type === CellNodeType.FILE
+            ? translate('cells.restoreRootNodeModal.file.headline')
+            : translate('cells.restoreRootNodeModal.folder.headline'),
+      },
     },
-  });
+    undefined,
+    translate,
+  );
 };

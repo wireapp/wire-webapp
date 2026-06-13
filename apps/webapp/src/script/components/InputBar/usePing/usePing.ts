@@ -37,7 +37,7 @@ interface UsePingProps {
 const pingResetDelaySeconds = 2;
 
 export const usePing = ({conversation, messageRepository, is1to1, confirmationTitle, pingActionText}: UsePingProps) => {
-  const {fireAndForgetInvoker} = useApplicationContext();
+  const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [isPingDisabled, setIsPingDisabled] = useState(false);
 
   const maxUsersWithoutAlert = Config.getConfig().FEATURE.MAX_USERS_TO_PING_WITHOUT_ALERT;
@@ -60,15 +60,20 @@ export const usePing = ({conversation, messageRepository, is1to1, confirmationTi
     if (!enablePingConfirmation || is1to1 || totalConversationUsers < maxUsersWithoutAlert) {
       pingConversation();
     } else {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: pingConversation,
-          text: pingActionText,
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: pingConversation,
+            text: pingActionText,
+          },
+          text: {
+            title: confirmationTitle,
+          },
         },
-        text: {
-          title: confirmationTitle,
-        },
-      });
+        undefined,
+        translate,
+      );
     }
   };
 

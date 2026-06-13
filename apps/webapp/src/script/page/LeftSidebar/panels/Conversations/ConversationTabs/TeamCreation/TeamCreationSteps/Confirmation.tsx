@@ -62,29 +62,39 @@ export const Confirmation = ({onPreviousStep, onNextStep, teamName, goToFirstSte
       onNextStep();
     } catch (error: any) {
       if (error.code === StatusCodes.FORBIDDEN) {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          primaryAction: {
-            action: onSuccess,
-            text: translate('teamCreationAlreadyInTeamErrorActionText'),
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            primaryAction: {
+              action: onSuccess,
+              text: translate('teamCreationAlreadyInTeamErrorActionText'),
+            },
+            close: onSuccess,
+            text: {
+              message: translate('teamCreationAlreadyInTeamErrorMessage'),
+              title: translate('teamCreationAlreadyInTeamErrorTitle'),
+            },
           },
-          close: onSuccess,
-          text: {
-            message: translate('teamCreationAlreadyInTeamErrorMessage'),
-            title: translate('teamCreationAlreadyInTeamErrorTitle'),
-          },
-        });
+          undefined,
+          translate,
+        );
       } else {
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-          primaryAction: {
-            action: goToFirstStep,
-            text: translate('teamCreationGeneralErrorActionText'),
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            primaryAction: {
+              action: goToFirstStep,
+              text: translate('teamCreationGeneralErrorActionText'),
+            },
+            close: goToFirstStep,
+            text: {
+              message: translate('teamCreationGeneralErrorMessage'),
+              title: translate('teamCreationGeneralErrorTitle'),
+            },
           },
-          close: goToFirstStep,
-          text: {
-            message: translate('teamCreationGeneralErrorMessage'),
-            title: translate('teamCreationGeneralErrorTitle'),
-          },
-        });
+          undefined,
+          translate,
+        );
       }
     } finally {
       setLoading(false);

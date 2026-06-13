@@ -401,6 +401,8 @@ describe('CallingRepository', () => {
             title: 'translated:modalNoAudioInputTitle',
           }),
         }),
+        undefined,
+        translate,
       );
     });
   });

@@ -35,35 +35,40 @@ export const showRestoreNestedNodeModal = ({
   parentNodeName: string;
   translate: RootContextValue['translate'];
 }) => {
-  PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    size: 'large',
-    primaryAction: {
-      action: onRestoreNode,
-      text: translate('cells.restoreNestedNodeModal.button'),
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      size: 'large',
+      primaryAction: {
+        action: onRestoreNode,
+        text: translate('cells.restoreNestedNodeModal.button'),
+      },
+      text: {
+        message: (
+          <div css={modalContentStyles}>
+            <p>{translate('cells.restoreNestedNodeModal.description1')}</p>
+            <p>
+              {replaceReactComponents(
+                translate('cells.restoreNestedNodeModal.description2', {
+                  name: '{name}',
+                }),
+                [
+                  {
+                    exactMatch: '{name}',
+                    render: () => <b>{parentNodeName}</b>,
+                  },
+                ],
+              )}
+            </p>
+          </div>
+        ),
+        title:
+          node.type === CellNodeType.FILE
+            ? translate('cells.restoreNestedNodeModal.file.headline')
+            : translate('cells.restoreNestedNodeModal.folder.headline'),
+      },
     },
-    text: {
-      message: (
-        <div css={modalContentStyles}>
-          <p>{translate('cells.restoreNestedNodeModal.description1')}</p>
-          <p>
-            {replaceReactComponents(
-              translate('cells.restoreNestedNodeModal.description2', {
-                name: '{name}',
-              }),
-              [
-                {
-                  exactMatch: '{name}',
-                  render: () => <b>{parentNodeName}</b>,
-                },
-              ],
-            )}
-          </p>
-        </div>
-      ),
-      title:
-        node.type === CellNodeType.FILE
-          ? translate('cells.restoreNestedNodeModal.file.headline')
-          : translate('cells.restoreNestedNodeModal.folder.headline'),
-    },
-  });
+    undefined,
+    translate,
+  );
 };

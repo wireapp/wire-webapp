@@ -313,19 +313,24 @@ export class ClientRepository {
         await this.deleteLocalTemporaryClient();
         amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, true);
       } else {
-        PrimaryModal.show(PrimaryModal.type.OPTION, {
-          preventClose: true,
-          primaryAction: {
-            action: (clearData: boolean) => {
-              return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+        PrimaryModal.show(
+          PrimaryModal.type.OPTION,
+          {
+            preventClose: true,
+            primaryAction: {
+              action: (clearData: boolean) => {
+                return amplify.publish(WebAppEvents.LIFECYCLE.SIGN_OUT, SIGN_OUT_REASON.USER_REQUESTED, clearData);
+              },
+              text: this.translate('modalAccountLogoutAction'),
             },
-            text: this.translate('modalAccountLogoutAction'),
+            text: {
+              option: this.translate('modalAccountLogoutOption'),
+              title: this.translate('modalAccountLogoutHeadline'),
+            },
           },
-          text: {
-            option: this.translate('modalAccountLogoutOption'),
-            title: this.translate('modalAccountLogoutHeadline'),
-          },
-        });
+          undefined,
+          this.translate,
+        );
       }
     }
   };
@@ -600,6 +605,7 @@ export class ClientRepository {
           },
         },
         'legalHoldDeactivated',
+        this.translate,
       );
     }
     amplify.publish(WebAppEvents.CLIENT.REMOVE, this.selfUser().qualifiedId, clientId, source);

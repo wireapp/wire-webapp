@@ -225,6 +225,7 @@ export const useMessageSend = ({
       showWarningModal(
         translate('modalConversationMessageTooLongHeadline'),
         translate('modalConversationMessageTooLongMessage', {number: config.MAXIMUM_MESSAGE_LENGTH}),
+        translate,
       );
 
       return;
@@ -261,23 +262,28 @@ export const useMessageSend = ({
     const isE2EIDegraded = conversation.mlsVerificationState() === ConversationVerificationState.DEGRADED;
 
     if (isE2EIDegraded) {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        secondaryAction: {
-          action: () => {
-            conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-            void sendMessage();
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          secondaryAction: {
+            action: () => {
+              conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+              void sendMessage();
+            },
+            text: translate('conversation.E2EISendAnyway'),
           },
-          text: translate('conversation.E2EISendAnyway'),
+          primaryAction: {
+            action: () => {},
+            text: translate('conversation.E2EICancel'),
+          },
+          text: {
+            message: translate('conversation.E2EIDegradedNewMessage'),
+            title: translate('conversation.E2EIConversationNoLongerVerified'),
+          },
         },
-        primaryAction: {
-          action: () => {},
-          text: translate('conversation.E2EICancel'),
-        },
-        text: {
-          message: translate('conversation.E2EIDegradedNewMessage'),
-          title: translate('conversation.E2EIConversationNoLongerVerified'),
-        },
-      });
+        undefined,
+        translate,
+      );
     } else {
       void sendMessage();
     }

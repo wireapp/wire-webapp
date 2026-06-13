@@ -161,7 +161,12 @@ export const Conversation = ({
     (images: File[]) => {
       if (
         !activeConversation ||
-        isHittingUploadLimit(images, repositories.asset, {message: uploadLimitMessage, title: uploadLimitTitle})
+        isHittingUploadLimit(
+          images,
+          repositories.asset,
+          {message: uploadLimitMessage, title: uploadLimitTitle},
+          translate,
+        )
       ) {
         return;
       }
@@ -177,6 +182,7 @@ export const Conversation = ({
           return showWarningModal(
             translate(isGif ? 'modalGifTooLargeHeadline' : 'modalPictureTooLargeHeadline'),
             translate(isGif ? 'modalGifTooLargeMessage' : 'modalPictureTooLargeMessage', {number: maxSize}),
+            translate,
           );
         }
       }
@@ -213,7 +219,14 @@ export const Conversation = ({
 
       const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-      if (!isHittingUploadLimit(files, repositories.asset, {message: uploadLimitMessage, title: uploadLimitTitle})) {
+      if (
+        !isHittingUploadLimit(
+          files,
+          repositories.asset,
+          {message: uploadLimitMessage, title: uploadLimitTitle},
+          translate,
+        )
+      ) {
         for (const file of fileArray) {
           const isFileTooLarge = file.size > uploadLimit;
 
@@ -222,6 +235,7 @@ export const Conversation = ({
             showWarningModal(
               translate('modalAssetTooLargeHeadline'),
               translate('modalAssetTooLargeMessage', {number: fileSize}),
+              translate,
             );
 
             return;
@@ -251,10 +265,15 @@ export const Conversation = ({
       const files: File[] = [];
 
       if (
-        !isHittingUploadLimit(droppedFiles, repositories.asset, {
-          message: uploadLimitMessage,
-          title: uploadLimitTitle,
-        })
+        !isHittingUploadLimit(
+          droppedFiles,
+          repositories.asset,
+          {
+            message: uploadLimitMessage,
+            title: uploadLimitTitle,
+          },
+          translate,
+        )
       ) {
         Array.from(droppedFiles).forEach(file => {
           const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type);
@@ -270,7 +289,7 @@ export const Conversation = ({
         uploadFiles(files);
       }
     },
-    [repositories.asset, uploadFiles, uploadImages, uploadLimitMessage, uploadLimitTitle],
+    [repositories.asset, translate, uploadFiles, uploadImages, uploadLimitMessage, uploadLimitTitle],
   );
 
   const openGiphy = (text: string) => {
@@ -383,16 +402,21 @@ export const Conversation = ({
       );
       return false;
     }
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      primaryAction: {
-        action: () => safeWindowOpen(href),
-        text: translate('modalOpenLinkAction'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        primaryAction: {
+          action: () => safeWindowOpen(href),
+          text: translate('modalOpenLinkAction'),
+        },
+        text: {
+          htmlMessage: translate('modalOpenLinkMessage', {link: href}, {}, true),
+          title: translate('modalOpenLinkTitle'),
+        },
       },
-      text: {
-        htmlMessage: translate('modalOpenLinkMessage', {link: href}, {}, true),
-        title: translate('modalOpenLinkTitle'),
-      },
-    });
+      undefined,
+      translate,
+    );
     event.preventDefault();
     return false;
   };
@@ -599,10 +623,14 @@ export const Conversation = ({
       isCellsEnabled={isCellsEnabled}
       isConversationLoaded={isConversationLoaded}
       activeConversationId={activeConversation?.id}
-      onFileDropped={checkFileSharingPermission(uploadDroppedFiles, {
-        title: translate('conversationModalRestrictedFileSharingHeadline'),
-        message: translate('conversationModalRestrictedFileSharingDescription'),
-      })}
+      onFileDropped={checkFileSharingPermission(
+        uploadDroppedFiles,
+        {
+          title: translate('conversationModalRestrictedFileSharingHeadline'),
+          message: translate('conversationModalRestrictedFileSharingDescription'),
+        },
+        translate,
+      )}
       rootProps={getRootProps()}
       inputProps={getInputProps()}
     >
@@ -732,10 +760,14 @@ export const Conversation = ({
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
-                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile, {
-                    title: translate('conversationModalRestrictedFileSharingHeadline'),
-                    message: translate('conversationModalRestrictedFileSharingDescription'),
-                  })}
+                  uploadPastedFiles={checkFileSharingPermission(
+                    handlePastedFile,
+                    {
+                      title: translate('conversationModalRestrictedFileSharingHeadline'),
+                      message: translate('conversationModalRestrictedFileSharingDescription'),
+                    },
+                    translate,
+                  )}
                   onCellImageUpload={openImageFilesView}
                   onCellAssetUpload={openAllFilesView}
                 />

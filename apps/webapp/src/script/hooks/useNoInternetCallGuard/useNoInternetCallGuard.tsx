@@ -21,6 +21,7 @@ import {useCallback} from 'react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {styles} from 'Hooks/useNoInternetCallGuard/useNoInternetCallGuard.styles';
+import type {Translate} from 'Util/localizerUtil';
 
 import {useWarningsState} from '../../view_model/WarningsContainer/WarningsState';
 import {TYPE} from '../../view_model/WarningsContainer/WarningsTypes';
@@ -29,9 +30,11 @@ interface NoInternetCallGuardCopy {
   description: string;
   descriptionPoints: [string, string, string];
   title: string;
+  translate: Translate;
 }
 
 export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
+  const {translate} = noInternetCallGuardCopy;
   const warnings = useWarningsState(state => state.warnings);
   const visibleWarning = warnings[warnings.length - 1];
 
@@ -39,22 +42,27 @@ export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGu
     const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] =
       noInternetCallGuardCopy.descriptionPoints;
 
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        message: (
-          <span>
-            {noInternetCallGuardCopy.description}
-            <ul css={styles}>
-              <li>{firstDescriptionPoint}</li>
-              <li>{secondDescriptionPoint}</li>
-              <li>{thirdDescriptionPoint}</li>
-            </ul>
-          </span>
-        ),
-        title: noInternetCallGuardCopy.title,
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: (
+            <span>
+              {noInternetCallGuardCopy.description}
+              <ul css={styles}>
+                <li>{firstDescriptionPoint}</li>
+                <li>{secondDescriptionPoint}</li>
+                <li>{thirdDescriptionPoint}</li>
+              </ul>
+            </span>
+          ),
+          title: noInternetCallGuardCopy.title,
+        },
       },
-    });
-  }, [noInternetCallGuardCopy]);
+      undefined,
+      translate,
+    );
+  }, [noInternetCallGuardCopy, translate]);
 
   return useCallback(
     (startCall: () => void) => {

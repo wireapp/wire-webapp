@@ -22,7 +22,7 @@ import {escape} from 'underscore';
 import {create} from 'zustand';
 
 import {ClientNotificationData} from 'Repositories/notification/PreferenceNotificationRepository';
-import {replaceLink, translate as defaultTranslate} from 'Util/localizerUtil';
+import {replaceLink} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 import {formatLocale} from 'Util/timeUtil';
 import {noop} from 'Util/util';
@@ -97,17 +97,18 @@ const usePrimaryModalState = create<PrimaryModalState>((set, get) => ({
 const addNewModalToQueue = (
   type: PrimaryModalType,
   options: ModalOptions,
-  modalId = createUuid(),
-  translate: Translate = defaultTranslate,
+  modalId: string | undefined,
+  translate: Translate,
 ): void => {
+  const nextModalId = modalId ?? createUuid();
   const {currentModalId, existsInQueue, addToQueue, replaceInQueue} = usePrimaryModalState.getState();
 
-  const alreadyOpen = modalId === currentModalId;
+  const alreadyOpen = nextModalId === currentModalId;
   if (alreadyOpen) {
     return showNextModalInQueue();
   }
-  const newModal = {id: modalId, options, type, translate};
-  const found = modalId !== '' && existsInQueue(newModal);
+  const newModal = {id: nextModalId, options, type, translate};
+  const found = nextModalId !== '' && existsInQueue(newModal);
   if (found) {
     replaceInQueue(newModal);
   } else {
@@ -133,9 +134,9 @@ const showNextModalInQueue = (): void => {
 
 const updateCurrentModalContent = (
   type: PrimaryModalType,
-  options: ModalOptions = {},
-  id?: string,
-  translate: Translate = defaultTranslate,
+  options: ModalOptions,
+  id: string,
+  translate: Translate,
 ): void => {
   if (!Object.values(PrimaryModalType).includes(type)) {
     return logger.warn(`Modal of type '${type}' is not supported`);

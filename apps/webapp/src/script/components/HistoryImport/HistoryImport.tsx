@@ -151,30 +151,35 @@ const HistoryImport = ({user, backupRepository, file, switchContent}: HistoryImp
 
   const getBackUpPassword = useCallback((): Promise<string> => {
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
-        primaryAction: {
-          action: async (password: string) => {
-            resolve(password);
-          },
-          text: translate('backupDecryptionModalAction'),
-        },
-        secondaryAction: [
-          {
-            action: () => {
-              resolve('');
-              dismissImport();
+      PrimaryModal.show(
+        PrimaryModal.type.PASSWORD_ADVANCED_SECURITY,
+        {
+          primaryAction: {
+            action: async (password: string) => {
+              resolve(password);
             },
-            text: translate('backupEncryptionModalCloseBtn'),
+            text: translate('backupDecryptionModalAction'),
           },
-        ],
-        passwordOptional: false,
-        text: {
-          closeBtnLabel: translate('backupEncryptionModalCloseBtn'),
-          input: translate('backupDecryptionModalPlaceholder'),
-          message: translate('backupDecryptionModalMessage'),
-          title: translate('backupDecryptionModalTitle'),
+          secondaryAction: [
+            {
+              action: () => {
+                resolve('');
+                dismissImport();
+              },
+              text: translate('backupEncryptionModalCloseBtn'),
+            },
+          ],
+          passwordOptional: false,
+          text: {
+            closeBtnLabel: translate('backupEncryptionModalCloseBtn'),
+            input: translate('backupDecryptionModalPlaceholder'),
+            message: translate('backupDecryptionModalMessage'),
+            title: translate('backupDecryptionModalTitle'),
+          },
         },
-      });
+        undefined,
+        translate,
+      );
     });
   }, [dismissImport, translate]);
 

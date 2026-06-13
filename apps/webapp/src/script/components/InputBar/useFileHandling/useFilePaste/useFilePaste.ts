@@ -20,6 +20,7 @@
 import {useCallback, useEffect} from 'react';
 
 import {checkFileSharingPermission} from 'Components/Conversation/utils/checkFileSharingPermission';
+import type {Translate} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
 import {sanitizeFilename} from 'Util/util';
 
@@ -29,6 +30,7 @@ interface UseFilePasteParams {
   createPastedFileName: (date: string, originalFileName: string) => string;
   restrictedFileSharingMessage: string;
   restrictedFileSharingTitle: string;
+  translate: Translate;
 }
 
 export const useFilePaste = ({
@@ -37,6 +39,7 @@ export const useFilePaste = ({
   createPastedFileName,
   restrictedFileSharingMessage,
   restrictedFileSharingTitle,
+  translate,
 }: UseFilePasteParams) => {
   const processClipboardFiles = useCallback(
     (files: FileList | File[]): void => {
@@ -72,14 +75,18 @@ export const useFilePaste = ({
       const files = event.clipboardData?.files;
 
       if (files !== undefined && files.length > 0) {
-        const permissionHandler = checkFileSharingPermission(processClipboardFiles, {
-          title: restrictedFileSharingTitle,
-          message: restrictedFileSharingMessage,
-        });
+        const permissionHandler = checkFileSharingPermission(
+          processClipboardFiles,
+          {
+            title: restrictedFileSharingTitle,
+            message: restrictedFileSharingMessage,
+          },
+          translate,
+        );
         permissionHandler(files);
       }
     },
-    [processClipboardFiles, restrictedFileSharingMessage, restrictedFileSharingTitle],
+    [processClipboardFiles, restrictedFileSharingMessage, restrictedFileSharingTitle, translate],
   );
 
   useEffect(() => {

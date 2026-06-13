@@ -21,6 +21,7 @@ import {container} from 'tsyringe';
 
 import {showWarningModal} from 'Components/Modals/utils/showWarningModal';
 import {TeamState} from 'Repositories/team/TeamState';
+import type {Translate} from 'Util/localizerUtil';
 
 interface FileSharingPermissionWarningText {
   message: string;
@@ -37,6 +38,7 @@ interface FileSharingPermissionWarningText {
 export const checkFileSharingPermission = <T extends (...args: any[]) => void>(
   callback: T,
   warningText: FileSharingPermissionWarningText,
+  translate: Translate,
 ): T | (() => void) => {
   const teamState = container.resolve(TeamState);
 
@@ -44,6 +46,6 @@ export const checkFileSharingPermission = <T extends (...args: any[]) => void>(
     return callback;
   }
   return () => {
-    showWarningModal(warningText.title, warningText.message);
+    showWarningModal(warningText.title, warningText.message, translate);
   };
 };

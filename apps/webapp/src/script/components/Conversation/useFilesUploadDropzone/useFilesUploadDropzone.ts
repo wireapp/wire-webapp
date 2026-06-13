@@ -86,6 +86,7 @@ export const useFilesUploadDropzone = ({
         title: translate('conversationModalRestrictedFileSharingHeadline'),
         message: translate('conversationModalRestrictedFileSharingDescription'),
       },
+      translate,
     ),
     onError: (error: Error) => {
       logger.error('Dropping files failed', error);
@@ -93,6 +94,7 @@ export const useFilesUploadDropzone = ({
         title: translate('conversationFileUploadFailedHeading'),
         message: translate('conversationFileUploadFailedMessage'),
         invalidFiles: [],
+        translate,
       });
     },
     onFileDialogOpen() {
@@ -127,6 +129,7 @@ export const useFilesUploadDropzone = ({
         title: error.title,
         message: error.message,
         invalidFiles,
+        translate,
       });
       return;
     }

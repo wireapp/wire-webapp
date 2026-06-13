@@ -90,20 +90,25 @@ export class ActionsViewModel {
   readonly blockUser = (userEntity: User): Promise<void> => {
     // TODO: Does the promise resolve when there is no primary action (i.e. cancel button gets clicked)?
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: async () => {
-            await this.connectionRepository.blockUser(userEntity);
-            resolve();
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: async () => {
+              await this.connectionRepository.blockUser(userEntity);
+              resolve();
+            },
+            text: this.translate('modalUserBlockAction'),
           },
-          text: this.translate('modalUserBlockAction'),
-        },
 
-        text: {
-          message: this.translate('modalUserBlockMessage', {user: userEntity.name()}),
-          title: this.translate('modalUserBlockHeadline', {user: userEntity.name()}),
+          text: {
+            message: this.translate('modalUserBlockMessage', {user: userEntity.name()}),
+            title: this.translate('modalUserBlockHeadline', {user: userEntity.name()}),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
     });
   };
 
@@ -124,22 +129,27 @@ export class ActionsViewModel {
     }
 
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: async () => {
-            await this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
-            resolve();
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: async () => {
+              await this.connectionRepository.cancelRequest(userEntity, hideConversation, nextConversationEntity);
+              resolve();
+            },
+            text: this.translate('modalConnectCancelAction'),
           },
-          text: this.translate('modalConnectCancelAction'),
+          secondaryAction: {
+            text: this.translate('modalConnectCancelSecondary'),
+          },
+          text: {
+            message: this.translate('modalConnectCancelMessage', {user: userEntity.name()}, {}, true),
+            title: this.translate('modalConnectCancelHeadline'),
+          },
         },
-        secondaryAction: {
-          text: this.translate('modalConnectCancelSecondary'),
-        },
-        text: {
-          message: this.translate('modalConnectCancelMessage', {user: userEntity.name()}, {}, true),
-          title: this.translate('modalConnectCancelHeadline'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     });
   };
 
@@ -159,19 +169,24 @@ export class ActionsViewModel {
     if (conversationEntity !== undefined) {
       const modalType = conversationEntity.isLeavable() ? PrimaryModal.type.OPTION : PrimaryModal.type.CONFIRM;
 
-      PrimaryModal.show(modalType, {
-        primaryAction: {
-          action: async (leave = false) => {
-            await this.leaveOrClearConversation(conversationEntity, {clear: true, leave: leave});
+      PrimaryModal.show(
+        modalType,
+        {
+          primaryAction: {
+            action: async (leave = false) => {
+              await this.leaveOrClearConversation(conversationEntity, {clear: true, leave: leave});
+            },
+            text: this.translate('modalConversationClearAction'),
           },
-          text: this.translate('modalConversationClearAction'),
+          text: {
+            message: this.translate('modalConversationClearMessage'),
+            option: this.translate('modalConversationClearOption'),
+            title: this.translate('modalConversationClearHeadline'),
+          },
         },
-        text: {
-          message: this.translate('modalConversationClearMessage'),
-          option: this.translate('modalConversationClearOption'),
-          title: this.translate('modalConversationClearHeadline'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     }
   };
 
@@ -229,6 +244,7 @@ export class ActionsViewModel {
           },
         },
         undefined,
+        this.translate,
       );
     });
   };
@@ -236,20 +252,25 @@ export class ActionsViewModel {
   readonly deleteMessage = (conversationEntity?: Conversation, messageEntity?: Message): Promise<void> => {
     if (conversationEntity !== undefined && messageEntity !== undefined) {
       return new Promise(resolve => {
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: async () => {
-              await this.messageRepository.deleteMessage(conversationEntity, messageEntity);
-              resolve();
+        PrimaryModal.show(
+          PrimaryModal.type.CONFIRM,
+          {
+            primaryAction: {
+              action: async () => {
+                await this.messageRepository.deleteMessage(conversationEntity, messageEntity);
+                resolve();
+              },
+              text: this.translate('modalConversationDeleteMessageAction'),
             },
-            text: this.translate('modalConversationDeleteMessageAction'),
+            text: {
+              closeBtnLabel: this.translate('modalConversationDeleteMessageCloseBtn'),
+              message: this.translate('modalConversationDeleteMessageMessage'),
+              title: this.translate('modalConversationDeleteMessageHeadline'),
+            },
           },
-          text: {
-            closeBtnLabel: this.translate('modalConversationDeleteMessageCloseBtn'),
-            message: this.translate('modalConversationDeleteMessageMessage'),
-            title: this.translate('modalConversationDeleteMessageHeadline'),
-          },
-        });
+          undefined,
+          this.translate,
+        );
       });
     }
 
@@ -268,20 +289,25 @@ export class ActionsViewModel {
       };
 
       return new Promise(resolve => {
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: async () => {
-              await deleteMessage();
-              resolve();
+        PrimaryModal.show(
+          PrimaryModal.type.CONFIRM,
+          {
+            primaryAction: {
+              action: async () => {
+                await deleteMessage();
+                resolve();
+              },
+              text: this.translate('modalConversationDeleteMessageEveryoneAction'),
             },
-            text: this.translate('modalConversationDeleteMessageEveryoneAction'),
+            text: {
+              closeBtnLabel: this.translate('modalConversationDeleteMessageAllCloseBtn'),
+              message: this.translate('modalConversationDeleteMessageEveryoneMessage'),
+              title: this.translate('modalConversationDeleteMessageEveryoneHeadline'),
+            },
           },
-          text: {
-            closeBtnLabel: this.translate('modalConversationDeleteMessageAllCloseBtn'),
-            message: this.translate('modalConversationDeleteMessageEveryoneMessage'),
-            title: this.translate('modalConversationDeleteMessageEveryoneHeadline'),
-          },
-        });
+          undefined,
+          this.translate,
+        );
       });
     }
 
@@ -352,37 +378,47 @@ export class ActionsViewModel {
     }
 
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.OPTION, {
-        primaryAction: {
-          action: async (clearContent = false) => {
-            await this.leaveOrClearConversation(conversation, {clear: clearContent, leave: true});
-            resolve();
+      PrimaryModal.show(
+        PrimaryModal.type.OPTION,
+        {
+          primaryAction: {
+            action: async (clearContent = false) => {
+              await this.leaveOrClearConversation(conversation, {clear: clearContent, leave: true});
+              resolve();
+            },
+            text: this.translate('modalConversationLeaveAction'),
           },
-          text: this.translate('modalConversationLeaveAction'),
+          text: {
+            closeBtnLabel: this.translate('modalConversationLeaveMessageCloseBtn', {name: conversation.display_name()}),
+            message: this.translate('modalConversationLeaveMessage'),
+            option: this.translate('modalConversationLeaveOption'),
+            title: this.translate('modalConversationLeaveHeadline', {name: conversation.display_name()}),
+          },
         },
-        text: {
-          closeBtnLabel: this.translate('modalConversationLeaveMessageCloseBtn', {name: conversation.display_name()}),
-          message: this.translate('modalConversationLeaveMessage'),
-          option: this.translate('modalConversationLeaveOption'),
-          title: this.translate('modalConversationLeaveHeadline', {name: conversation.display_name()}),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     });
   };
 
   readonly deleteConversation = (conversationEntity: Conversation) => {
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      primaryAction: {
-        action: () => this.conversationRepository.deleteConversation(conversationEntity),
-        text: this.translate('modalConversationDeleteGroupAction'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        primaryAction: {
+          action: () => this.conversationRepository.deleteConversation(conversationEntity),
+          text: this.translate('modalConversationDeleteGroupAction'),
+        },
+        text: {
+          message: this.translate('modalConversationDeleteGroupMessage'),
+          title: conversationEntity.isChannel()
+            ? this.translate('modalChannelDeleteGroupHeadline')
+            : this.translate('modalGroupDeleteGroupHeadline'),
+        },
       },
-      text: {
-        message: this.translate('modalConversationDeleteGroupMessage'),
-        title: conversationEntity.isChannel()
-          ? this.translate('modalChannelDeleteGroupHeadline')
-          : this.translate('modalGroupDeleteGroupHeadline'),
-      },
-    });
+      undefined,
+      this.translate,
+    );
   };
 
   readonly removeConversation = (conversationEntity: Conversation) => {
@@ -390,18 +426,23 @@ export class ActionsViewModel {
       return;
     }
 
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      primaryAction: {
-        action: () => this.conversationRepository.deleteConversationLocally(conversationEntity, true),
-        text: this.translate('modalConversationRemoveGroupAction'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        primaryAction: {
+          action: () => this.conversationRepository.deleteConversationLocally(conversationEntity, true),
+          text: this.translate('modalConversationRemoveGroupAction'),
+        },
+        text: {
+          message: this.translate('modalConversationRemoveGroupMessage'),
+          title: this.translate('modalConversationRemoveGroupHeadline', {
+            conversation: conversationEntity.display_name(),
+          }),
+        },
       },
-      text: {
-        message: this.translate('modalConversationRemoveGroupMessage'),
-        title: this.translate('modalConversationRemoveGroupHeadline', {
-          conversation: conversationEntity.display_name(),
-        }),
-      },
-    });
+      undefined,
+      this.translate,
+    );
   };
 
   getConversationById = async (conversation: QualifiedId): Promise<Conversation> => {
@@ -472,24 +513,29 @@ export class ActionsViewModel {
       }
 
       return new Promise((resolve, reject) => {
-        PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-          primaryAction: {
-            action: async () => {
-              try {
-                await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
-                resolve();
-              } catch (error: unknown) {
-                reject(error);
-              }
+        PrimaryModal.show(
+          PrimaryModal.type.CONFIRM,
+          {
+            primaryAction: {
+              action: async () => {
+                try {
+                  await this.conversationRepository.removeMembers(conversationEntity, [userEntity.qualifiedId]);
+                  resolve();
+                } catch (error: unknown) {
+                  reject(error);
+                }
+              },
+              text: this.translate('modalConversationRemoveAction'),
             },
-            text: this.translate('modalConversationRemoveAction'),
+            text: {
+              closeBtnLabel: this.translate('modalConversationRemoveCloseBtn'),
+              message: this.translate('modalConversationRemoveMessage', {user: userEntity.name()}),
+              title: this.translate('modalConversationRemoveHeadline'),
+            },
           },
-          text: {
-            closeBtnLabel: this.translate('modalConversationRemoveCloseBtn'),
-            message: this.translate('modalConversationRemoveMessage', {user: userEntity.name()}),
-            title: this.translate('modalConversationRemoveHeadline'),
-          },
-        });
+          undefined,
+          this.translate,
+        );
       });
     }
 
@@ -521,25 +567,30 @@ export class ActionsViewModel {
    */
   readonly unblockUser = (userEntity: User): Promise<void> => {
     return new Promise(resolve => {
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: async () => {
-            await this.connectionRepository.unblockUser(userEntity);
-            const conversationEntity = await this.conversationRepository.resolve1To1Conversation(
-              userEntity.qualifiedId,
-            );
-            resolve();
-            if (conversationEntity) {
-              await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
-            }
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: async () => {
+              await this.connectionRepository.unblockUser(userEntity);
+              const conversationEntity = await this.conversationRepository.resolve1To1Conversation(
+                userEntity.qualifiedId,
+              );
+              resolve();
+              if (conversationEntity) {
+                await this.conversationRepository.updateParticipatingUserEntities(conversationEntity);
+              }
+            },
+            text: this.translate('modalUserUnblockAction'),
           },
-          text: this.translate('modalUserUnblockAction'),
+          text: {
+            message: this.translate('modalUserUnblockMessage', {user: userEntity.name()}),
+            title: this.translate('modalUserUnblockHeadline'),
+          },
         },
-        text: {
-          message: this.translate('modalUserUnblockMessage', {user: userEntity.name()}),
-          title: this.translate('modalUserUnblockHeadline'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     });
   };
 }

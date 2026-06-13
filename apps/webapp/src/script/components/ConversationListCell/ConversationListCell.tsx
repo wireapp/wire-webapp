@@ -102,6 +102,7 @@ export const ConversationListCell = ({
       translate('callNotEstablishedDescriptionPoint3'),
     ],
     title: translate('callNotEstablishedTitle'),
+    translate,
   });
   const {isCallConnecting} = useConversationCall(conversation);
 

@@ -23,6 +23,8 @@ import {amplify} from 'amplify';
 
 import {WebAppEvents} from '@wireapp/webapp-events';
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {useFilePaste} from './useFilePaste/useFilePaste';
 
 interface UseFileHandlingProps {
@@ -32,6 +34,7 @@ interface UseFileHandlingProps {
   createPastedFileName: (date: string, originalFileName: string) => string;
   restrictedFileSharingMessage: string;
   restrictedFileSharingTitle: string;
+  translate: Translate;
 }
 
 export const useFileHandling = ({
@@ -41,6 +44,7 @@ export const useFileHandling = ({
   createPastedFileName,
   restrictedFileSharingMessage,
   restrictedFileSharingTitle,
+  translate,
 }: UseFileHandlingProps) => {
   const [pastedFile, setPastedFile] = useState<File | null>(null);
 
@@ -52,6 +56,7 @@ export const useFileHandling = ({
     createPastedFileName,
     restrictedFileSharingMessage,
     restrictedFileSharingTitle,
+    translate,
   });
 
   const clearPastedFile = useCallback(() => {

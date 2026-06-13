@@ -71,6 +71,7 @@ const AccountSecuritySection = ({
         },
       },
       undefined,
+      translate,
     );
 
   return (

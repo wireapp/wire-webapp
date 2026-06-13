@@ -119,20 +119,25 @@ export const FileEditor = ({id}: FileEditorProps) => {
 
     hasShownErrorModal.current = true;
 
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      closeOnConfirm: false,
-      secondaryAction: {
-        text: translate('modalConfirmSecondary'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        closeOnConfirm: false,
+        secondaryAction: {
+          text: translate('modalConfirmSecondary'),
+        },
+        primaryAction: {
+          action: handleRetry,
+          text: translate('unknownApplicationErrorTryAgain'),
+        },
+        text: {
+          message: translate('fileFullscreenModal.editor.errorDescription'),
+          title: translate('fileFullscreenModal.editor.errorTitle'),
+        },
       },
-      primaryAction: {
-        action: handleRetry,
-        text: translate('unknownApplicationErrorTryAgain'),
-      },
-      text: {
-        message: translate('fileFullscreenModal.editor.errorDescription'),
-        title: translate('fileFullscreenModal.editor.errorTitle'),
-      },
-    });
+      undefined,
+      translate,
+    );
   }, [handleRetry, isError, isLoading, isRecycled, node, translate]);
 
   useEffect(() => {

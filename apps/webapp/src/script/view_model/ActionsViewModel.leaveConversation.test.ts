@@ -114,7 +114,9 @@ describe('ActionsViewModel.leaveConversation', () => {
   it('uses the injected translate function for modal copy', () => {
     const selfUser = new User('self-id', 'example.com');
     const userToBlock = makeEligibleUser('blocked-user');
-    const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
+    const translate = jest.fn(
+      (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
+    ) as Translate;
 
     const {vm} = buildActionsViewModel({selfUser, translate});
 
@@ -132,6 +134,8 @@ describe('ActionsViewModel.leaveConversation', () => {
           title: 'translated:modalUserBlockHeadline',
         }),
       }),
+      undefined,
+      translate,
     );
   });
 
@@ -145,7 +149,12 @@ describe('ActionsViewModel.leaveConversation', () => {
 
       void vm.leaveConversation(conversation);
 
-      expect(PrimaryModal.show).toHaveBeenCalledWith(PrimaryModal.type.OPTION, expect.any(Object));
+      expect(PrimaryModal.show).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.any(Object),
+        undefined,
+        translateForTest,
+      );
       expect(mockShow).not.toHaveBeenCalled();
     });
   });
@@ -161,11 +170,20 @@ describe('ActionsViewModel.leaveConversation', () => {
         [otherAdmin.id]: DefaultConversationRoleName.WIRE_ADMIN,
       });
 
-      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
 
       void vm.leaveConversation(conversation);
 
-      expect(PrimaryModal.show).toHaveBeenCalledWith(PrimaryModal.type.OPTION, expect.any(Object));
+      expect(PrimaryModal.show).toHaveBeenCalledWith(
+        PrimaryModal.type.OPTION,
+        expect.any(Object),
+        undefined,
+        translateForTest,
+      );
       expect(mockShow).not.toHaveBeenCalled();
     });
 
@@ -174,7 +192,11 @@ describe('ActionsViewModel.leaveConversation', () => {
       const conversation = generateConversation({users: [makeEligibleUser()]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
 
       await vm.leaveConversation(conversation);
 
@@ -189,7 +211,11 @@ describe('ActionsViewModel.leaveConversation', () => {
       const conversation = generateConversation({users: [otherUser]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
 
       await vm.leaveConversation(conversation);
 
@@ -207,7 +233,11 @@ describe('ActionsViewModel.leaveConversation', () => {
       const conversation = generateConversation({users: [federatedUser]});
       conversation.roles({[selfUser.id]: DefaultConversationRoleName.WIRE_ADMIN});
 
-      const {vm} = buildActionsViewModel({translate: translateForTest, selfUser, teamFeatures: featureWithPreventAdminLessGroups});
+      const {vm} = buildActionsViewModel({
+        translate: translateForTest,
+        selfUser,
+        teamFeatures: featureWithPreventAdminLessGroups,
+      });
 
       await vm.leaveConversation(conversation);
 

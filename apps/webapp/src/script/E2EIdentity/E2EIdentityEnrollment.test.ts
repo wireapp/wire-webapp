@@ -160,6 +160,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.settingsChanged.headline.alt'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -170,6 +172,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.done.headline'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -195,6 +199,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.LOADING,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.inProgress.headline'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -202,6 +208,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.done.headline'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -223,6 +231,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.settingsChanged.headline.alt'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -233,6 +243,8 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.done.headline'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -263,10 +275,14 @@ describe('E2EIHandler', () => {
       expect(modalMock).toHaveBeenCalledWith(
         PrimaryModalType.ACKNOWLEDGE,
         expect.objectContaining({text: expect.objectContaining({title: 'acme.error.headline'})}),
+        undefined,
+        expect.any(Function),
       );
       expect(modalMock).not.toHaveBeenCalledWith(
         PrimaryModalType.CONFIRM,
         expect.objectContaining({secondaryAction: expect.objectContaining({text: 'acme.error.button.secondary'})}),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -301,6 +317,8 @@ describe('E2EIHandler', () => {
           text: expect.objectContaining({title: 'acme.error.headline'}),
           secondaryAction: expect.objectContaining({text: 'acme.error.button.secondary'}),
         }),
+        undefined,
+        expect.any(Function),
       );
     });
 
@@ -313,7 +331,9 @@ describe('E2EIHandler', () => {
 
   it('registers a renew timer when device is enrolled', async () => {
     const conversationState = container.resolve(ConversationState);
-    jest.spyOn(conversationState, 'getSelfMLSConversation').mockReturnValue(createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest) as any);
+    jest
+      .spyOn(conversationState, 'getSelfMLSConversation')
+      .mockReturnValue(createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest) as any);
 
     const enrollmentStore = getEnrollmentStore({id: 'userId', domain: 'domain'}, 'clientId');
     enrollmentStore.store.e2eiActivatedAt(Date.now());

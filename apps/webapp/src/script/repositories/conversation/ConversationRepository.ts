@@ -1222,12 +1222,17 @@ export class ConversationRepository {
         return this.deleteConversationLocally(conversationEntity, true);
       }
 
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message: this.translate('modalConversationDeleteErrorMessage', {name: conversationEntity.name()}),
-          title: this.translate('modalConversationDeleteErrorHeadline'),
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: this.translate('modalConversationDeleteErrorMessage', {name: conversationEntity.name()}),
+            title: this.translate('modalConversationDeleteErrorHeadline'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
     }
   }
 
@@ -1592,55 +1597,60 @@ export class ConversationRepository {
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, knownConversation, {});
         return;
       }
-      PrimaryModal.show(hasPassword ? PrimaryModal.type.JOIN_GUEST_LINK_PASSWORD : PrimaryModal.type.CONFIRM, {
-        preventClose: false,
-        primaryAction: {
-          action: async (password?: string) => {
-            try {
-              const response = await this.conversationService.postConversationJoin(key, code, password);
-              const conversationEntity = await this.getConversationById({
-                domain: resolvedDomain,
-                id: conversationId,
-              });
-              if (response) {
-                await this.onMemberJoin(conversationEntity, response);
-                await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
-                amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
-              }
-            } catch (error: unknown) {
-              if (!isBackendError(error)) {
-                throw error;
-              }
-
-              switch (error.label) {
-                case BackendErrorLabel.ACCESS_DENIED:
-                case BackendErrorLabel.NO_CONVERSATION:
-                case BackendErrorLabel.NO_CONVERSATION_CODE: {
-                  showNoConversationModal();
-                  break;
+      PrimaryModal.show(
+        hasPassword ? PrimaryModal.type.JOIN_GUEST_LINK_PASSWORD : PrimaryModal.type.CONFIRM,
+        {
+          preventClose: false,
+          primaryAction: {
+            action: async (password?: string) => {
+              try {
+                const response = await this.conversationService.postConversationJoin(key, code, password);
+                const conversationEntity = await this.getConversationById({
+                  domain: resolvedDomain,
+                  id: conversationId,
+                });
+                if (response) {
+                  await this.onMemberJoin(conversationEntity, response);
+                  await this.addOtherSelfUserClientsToMLSConversation(conversationEntity);
+                  amplify.publish(WebAppEvents.CONVERSATION.SHOW, conversationEntity, {});
                 }
-                case BackendErrorLabel.TOO_MANY_MEMBERS: {
-                  showTooManyMembersModal();
-                  break;
-                }
-
-                default: {
+              } catch (error: unknown) {
+                if (!isBackendError(error)) {
                   throw error;
                 }
+
+                switch (error.label) {
+                  case BackendErrorLabel.ACCESS_DENIED:
+                  case BackendErrorLabel.NO_CONVERSATION:
+                  case BackendErrorLabel.NO_CONVERSATION_CODE: {
+                    showNoConversationModal();
+                    break;
+                  }
+                  case BackendErrorLabel.TOO_MANY_MEMBERS: {
+                    showTooManyMembersModal();
+                    break;
+                  }
+
+                  default: {
+                    throw error;
+                  }
+                }
               }
-            }
+            },
+            text: this.translate('guestLinkPasswordModal.joinConversation'),
           },
-          text: this.translate('guestLinkPasswordModal.joinConversation'),
+          text: {
+            message: hasPassword
+              ? this.translate('guestLinkPasswordModal.conversationPasswordProtected')
+              : this.translate('modalConversationJoinMessage', {conversationName}),
+            title: hasPassword
+              ? this.translate('guestLinkPasswordModal.headline', {conversationName})
+              : this.translate('modalConversationJoinHeadline'),
+          },
         },
-        text: {
-          message: hasPassword
-            ? this.translate('guestLinkPasswordModal.conversationPasswordProtected')
-            : this.translate('modalConversationJoinMessage', {conversationName}),
-          title: hasPassword
-            ? this.translate('guestLinkPasswordModal.headline', {conversationName})
-            : this.translate('modalConversationJoinHeadline'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     } catch (error: unknown) {
       if (!isBackendError(error)) {
         throw error;
@@ -2674,12 +2684,17 @@ export class ConversationRepository {
         throw error;
       }
     } catch (error: unknown) {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message: this.translate('modalIntegrationUnavailableMessage'),
-          title: this.translate('modalIntegrationUnavailableHeadline'),
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: this.translate('modalIntegrationUnavailableMessage'),
+            title: this.translate('modalIntegrationUnavailableHeadline'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
       throw error;
     }
   }
@@ -3275,12 +3290,17 @@ export class ConversationRepository {
   }
 
   private showModal(messageText: string, titleText: string) {
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        message: messageText,
-        title: titleText,
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: messageText,
+          title: titleText,
+        },
       },
-    });
+      undefined,
+      this.translate,
+    );
   }
 
   private showLegalHoldConsentError() {
@@ -3297,12 +3317,17 @@ export class ConversationRepository {
     );
     const titleText = this.translate('modalUserCannotBeAddedHeadline');
 
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        htmlMessage: messageText,
-        title: titleText,
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          htmlMessage: messageText,
+          title: titleText,
+        },
       },
-    });
+      undefined,
+      this.translate,
+    );
   }
 
   //##############################################################################

@@ -39,6 +39,6 @@ export const configureDownloadPath = (teamFeatures: FeatureList, translate: Tran
       teamFeatures[FEATURE_KEY.ENFORCE_DOWNLOAD_PATH]?.config.enforcedDownloadLocation ?? '',
     );
     const {modalOptions, modalType} = getModalOptions({type: ModalType.DOWNLOAD_PATH_CHANGED}, translate);
-    PrimaryModal.show(modalType, modalOptions);
+    PrimaryModal.show(modalType, modalOptions, undefined, translate);
   }
 };

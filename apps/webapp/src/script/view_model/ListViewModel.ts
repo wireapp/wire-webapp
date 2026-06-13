@@ -162,14 +162,19 @@ export class ListViewModel {
     }
 
     if (call.isConference && !this.callingRepository.supportsConferenceCalling) {
-      return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          message: `${this.translate('modalConferenceCallNotSupportedMessage')} ${this.translate(
-            'modalConferenceCallNotSupportedJoinMessage',
-          )}`,
-          title: this.translate('modalConferenceCallNotSupportedHeadline'),
+      return PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            message: `${this.translate('modalConferenceCallNotSupportedMessage')} ${this.translate(
+              'modalConferenceCallNotSupportedJoinMessage',
+            )}`,
+            title: this.translate('modalConferenceCallNotSupportedHeadline'),
+          },
         },
-      });
+        undefined,
+        this.translate,
+      );
     }
 
     return this.callingViewModel.callActions.answer(call);

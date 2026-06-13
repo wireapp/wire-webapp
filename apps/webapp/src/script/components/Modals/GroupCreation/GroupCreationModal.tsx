@@ -277,32 +277,37 @@ const GroupCreationModal = ({
             'modal__text__read-more',
             'read-more-backends',
           );
-          return PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
-            preventClose: true,
-            primaryAction: {
-              text: translate('groupCreationPreferencesNonFederatingEditList'),
-              action: () => {
-                setGroupName(tempName);
-                setIsShown(true);
-                setIsCreatingConversation(false);
-                setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
+          return PrimaryModal.show(
+            PrimaryModal.type.MULTI_ACTIONS,
+            {
+              preventClose: true,
+              primaryAction: {
+                text: translate('groupCreationPreferencesNonFederatingEditList'),
+                action: () => {
+                  setGroupName(tempName);
+                  setIsShown(true);
+                  setIsCreatingConversation(false);
+                  setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
+                },
+              },
+              secondaryAction: {
+                text: translate('groupCreationPreferencesNonFederatingLeave'),
+                action: () => {
+                  setIsCreatingConversation(false);
+                },
+              },
+              text: {
+                htmlMessage: translate(
+                  'groupCreationPreferencesNonFederatingMessage',
+                  {backends: backendString},
+                  replaceBackends,
+                ),
+                title: translate('groupCreationPreferencesNonFederatingHeadline'),
               },
             },
-            secondaryAction: {
-              text: translate('groupCreationPreferencesNonFederatingLeave'),
-              action: () => {
-                setIsCreatingConversation(false);
-              },
-            },
-            text: {
-              htmlMessage: translate(
-                'groupCreationPreferencesNonFederatingMessage',
-                {backends: backendString},
-                replaceBackends,
-              ),
-              title: translate('groupCreationPreferencesNonFederatingHeadline'),
-            },
-          });
+            undefined,
+            translate,
+          );
         }
         amplify.publish(WebAppEvents.CONVERSATION.SHOW, undefined, {});
         setIsCreatingConversation(false);

@@ -897,7 +897,7 @@ export class MessageRepository {
         },
       };
 
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, options, `degraded-${conversation.id}`);
+      PrimaryModal.show(PrimaryModal.type.CONFIRM, options, `degraded-${conversation.id}`, this.translate);
     });
   }
 

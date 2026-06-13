@@ -215,39 +215,54 @@ export class ConnectionRepository {
               '',
               'read-more-legal-hold',
             );
-            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-              text: {
-                htmlMessage: this.translate(
-                  'modalUserCannotSendConnectionLegalHoldMessage',
-                  undefined,
-                  replaceLinkLegalHold,
-                ),
-                title: this.translate('modalUserCannotConnectHeadline'),
+            PrimaryModal.show(
+              PrimaryModal.type.ACKNOWLEDGE,
+              {
+                text: {
+                  htmlMessage: this.translate(
+                    'modalUserCannotSendConnectionLegalHoldMessage',
+                    undefined,
+                    replaceLinkLegalHold,
+                  ),
+                  title: this.translate('modalUserCannotConnectHeadline'),
+                },
               },
-            });
+              undefined,
+              this.translate,
+            );
             break;
           }
 
           case BackendErrorLabel.FEDERATION_NOT_ALLOWED: {
-            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-              text: {
-                htmlMessage: this.translate('modalUserCannotSendConnectionNotFederatingMessage', {
-                  username: userEntity.name(),
-                }),
-                title: this.translate('modalUserCannotConnectHeadline'),
+            PrimaryModal.show(
+              PrimaryModal.type.ACKNOWLEDGE,
+              {
+                text: {
+                  htmlMessage: this.translate('modalUserCannotSendConnectionNotFederatingMessage', {
+                    username: userEntity.name(),
+                  }),
+                  title: this.translate('modalUserCannotConnectHeadline'),
+                },
               },
-            });
+              undefined,
+              this.translate,
+            );
             break;
           }
 
           default: {
             this.logger.error(`Failed to send connection request to user '${userEntity.id}': ${error.message}`, error);
-            PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-              text: {
-                htmlMessage: this.translate('modalUserCannotSendConnectionMessage'),
-                title: this.translate('modalUserCannotConnectHeadline'),
+            PrimaryModal.show(
+              PrimaryModal.type.ACKNOWLEDGE,
+              {
+                text: {
+                  htmlMessage: this.translate('modalUserCannotSendConnectionMessage'),
+                  title: this.translate('modalUserCannotConnectHeadline'),
+                },
               },
-            });
+              undefined,
+              this.translate,
+            );
             break;
           }
         }
@@ -364,38 +379,58 @@ export class ConnectionRepository {
       this.logger.error(`${logMessage} for '${userEntity.id}' failed: ${toError(error).message}`, error);
       switch (newStatus) {
         case ConnectionStatus.ACCEPTED: {
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            text: {
-              htmlMessage: this.translate('modalUserCannotAcceptConnectionMessage'),
-              title: this.translate('modalUserCannotConnectHeadline'),
+          PrimaryModal.show(
+            PrimaryModal.type.ACKNOWLEDGE,
+            {
+              text: {
+                htmlMessage: this.translate('modalUserCannotAcceptConnectionMessage'),
+                title: this.translate('modalUserCannotConnectHeadline'),
+              },
             },
-          });
+            undefined,
+            this.translate,
+          );
           break;
         }
         case ConnectionStatus.CANCELLED: {
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            text: {
-              htmlMessage: this.translate('modalUserCannotCancelConnectionMessage'),
-              title: this.translate('modalUserCannotConnectHeadline'),
+          PrimaryModal.show(
+            PrimaryModal.type.ACKNOWLEDGE,
+            {
+              text: {
+                htmlMessage: this.translate('modalUserCannotCancelConnectionMessage'),
+                title: this.translate('modalUserCannotConnectHeadline'),
+              },
             },
-          });
+            undefined,
+            this.translate,
+          );
           break;
         }
         case ConnectionStatus.IGNORED: {
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            text: {
-              htmlMessage: this.translate('modalUserCannotIgnoreConnectionMessage'),
-              title: this.translate('modalUserCannotConnectHeadline'),
+          PrimaryModal.show(
+            PrimaryModal.type.ACKNOWLEDGE,
+            {
+              text: {
+                htmlMessage: this.translate('modalUserCannotIgnoreConnectionMessage'),
+                title: this.translate('modalUserCannotConnectHeadline'),
+              },
             },
-          });
+            undefined,
+            this.translate,
+          );
           break;
         }
         default: {
-          PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-            text: {
-              title: this.translate('modalUserCannotConnectHeadline'),
+          PrimaryModal.show(
+            PrimaryModal.type.ACKNOWLEDGE,
+            {
+              text: {
+                title: this.translate('modalUserCannotConnectHeadline'),
+              },
             },
-          });
+            undefined,
+            this.translate,
+          );
           break;
         }
       }

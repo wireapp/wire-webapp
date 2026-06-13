@@ -308,24 +308,29 @@ export function FeatureConfigChangeNotifier({teamState, selfUserId}: Props): nul
           previous?.[featureKey],
         )}" to "${JSON.stringify(config[featureKey])}"`,
       );
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          htmlMessage: message.htmlMessage,
-          title: translate(message.title, {
-            brandName: Config.getConfig().BRAND_NAME,
-          }),
-        },
-        primaryAction: message.primaryAction,
-        hideCloseBtn: isEnforceDownloadPath,
-        preventClose: isEnforceDownloadPath,
-        close: isEnforceDownloadPath
-          ? () => {
-              if (Runtime.isDesktopApp() && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
-                amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            htmlMessage: message.htmlMessage,
+            title: translate(message.title, {
+              brandName: Config.getConfig().BRAND_NAME,
+            }),
+          },
+          primaryAction: message.primaryAction,
+          hideCloseBtn: isEnforceDownloadPath,
+          preventClose: isEnforceDownloadPath,
+          close: isEnforceDownloadPath
+            ? () => {
+                if (Runtime.isDesktopApp() && config[featureKey]?.status !== FEATURE_STATUS.DISABLED) {
+                  amplify.publish(WebAppEvents.LIFECYCLE.RESTART);
+                }
               }
-            }
-          : undefined,
-      });
+            : undefined,
+        },
+        undefined,
+        translate,
+      );
     }
   }, [config, featureNotifications, selfUserId, translate]);
 

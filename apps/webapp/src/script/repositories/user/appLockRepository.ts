@@ -120,19 +120,24 @@ export class AppLockRepository {
       this.appLockState.isActivatedInPreferences(true);
     } else if (this.appLockState.hasPassphrase()) {
       // If the user has set a passphrase we want to ask confirmation before disabling the feature
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        primaryAction: {
-          action: this.disableFeature,
-          text: this.translate('AppLockDisableTurnOff'),
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          primaryAction: {
+            action: this.disableFeature,
+            text: this.translate('AppLockDisableTurnOff'),
+          },
+          secondaryAction: {
+            text: this.translate('AppLockDisableCancel'),
+          },
+          text: {
+            title: this.translate('ApplockDisableHeadline'),
+            message: this.translate('AppLockDisableInfo'),
+          },
         },
-        secondaryAction: {
-          text: this.translate('AppLockDisableCancel'),
-        },
-        text: {
-          title: this.translate('ApplockDisableHeadline'),
-          message: this.translate('AppLockDisableInfo'),
-        },
-      });
+        undefined,
+        this.translate,
+      );
     } else {
       this.disableFeature();
     }

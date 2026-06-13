@@ -64,7 +64,7 @@ export const AvatarInput = ({
 
   const showUploadWarning = (title: string, message: string): Promise<never> => {
     const modalOptions = {text: {message, title}};
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, translate);
     return Promise.reject(new UserError(UserError.TYPE.INVALID_UPDATE, UserError.MESSAGE.INVALID_UPDATE));
   };
 

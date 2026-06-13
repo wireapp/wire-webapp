@@ -305,7 +305,9 @@ describe('ClientRepository', () => {
 
   describe('logoutClient', () => {
     it('uses the injected translate function for the logout modal copy', async () => {
-      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
+      const translate = jest.fn(
+        (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
+      ) as Translate;
       const primaryModalShow = jest.fn();
       const clientRepository = new ClientRepository(
         {} as any,
@@ -331,6 +333,8 @@ describe('ClientRepository', () => {
             title: 'translated:modalAccountLogoutHeadline',
           }),
         }),
+        undefined,
+        translate,
       );
     });
   });

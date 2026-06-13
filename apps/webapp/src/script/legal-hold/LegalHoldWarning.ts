@@ -56,30 +56,35 @@ export const showLegalHoldWarningModal = (
       });
     }
 
-    PrimaryModal.show(PrimaryModal.type.MULTI_ACTIONS, {
-      close: () => {
-        reject(
-          new ConversationError(
-            ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-            ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
-          ),
-        );
-      },
-      preventClose: true,
-      primaryAction: {
-        action: () => {
-          if (conversationDegraded) {
-            conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
-          }
-          resolve();
+    PrimaryModal.show(
+      PrimaryModal.type.MULTI_ACTIONS,
+      {
+        close: () => {
+          reject(
+            new ConversationError(
+              ConversationError.TYPE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+              ConversationError.MESSAGE.LEGAL_HOLD_CONVERSATION_CANCELLATION,
+            ),
+          );
         },
-        text: translate('legalHoldWarningPrimary'),
+        preventClose: true,
+        primaryAction: {
+          action: () => {
+            if (conversationDegraded) {
+              conversationEntity.verification_state(ConversationVerificationState.UNVERIFIED);
+            }
+            resolve();
+          },
+          text: translate('legalHoldWarningPrimary'),
+        },
+        secondaryAction,
+        text: {
+          htmlMessage: translate('legalHoldWarningMessage', undefined, {br: '<br>'}),
+          title: translate('legalHoldWarningTitle'),
+        },
       },
-      secondaryAction,
-      text: {
-        htmlMessage: translate('legalHoldWarningMessage', undefined, {br: '<br>'}),
-        title: translate('legalHoldWarningTitle'),
-      },
-    });
+      undefined,
+      translate,
+    );
   });
 };

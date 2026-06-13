@@ -20,6 +20,7 @@
 import {act, renderHook} from '@testing-library/react';
 
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
+import type {TranslationKey} from 'Util/localizerUtil';
 
 import {useNoInternetCallGuard} from './useNoInternetCallGuard';
 
@@ -33,9 +34,10 @@ jest.mock('Components/Modals/PrimaryModal', () => ({
     show: jest.fn(),
   },
 }));
-jest.mock('Util/localizerUtil', () => ({
-  t: (key: string) => key,
-}));
+
+function translateForTest(identifier: TranslationKey): string {
+  return identifier;
+}
 
 const mockedUseWarningsState = jest.mocked(useWarningsState);
 const noInternetCallGuardCopy = {
@@ -46,6 +48,7 @@ const noInternetCallGuardCopy = {
     'callNotEstablishedDescriptionPoint3',
   ] as [string, string, string],
   title: 'callNotEstablishedTitle',
+  translate: translateForTest,
 };
 
 describe('useNoInternetCallGuard', () => {
@@ -63,12 +66,17 @@ describe('useNoInternetCallGuard', () => {
     });
 
     expect(PrimaryModal.show).toHaveBeenCalledTimes(1);
-    expect(PrimaryModal.show).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
-      text: {
-        message: expect.any(Object),
-        title: 'callNotEstablishedTitle',
+    expect(PrimaryModal.show).toHaveBeenCalledWith(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        text: {
+          message: expect.any(Object),
+          title: 'callNotEstablishedTitle',
+        },
       },
-    });
+      undefined,
+      translateForTest,
+    );
     expect(startCall).not.toHaveBeenCalled();
   });
 

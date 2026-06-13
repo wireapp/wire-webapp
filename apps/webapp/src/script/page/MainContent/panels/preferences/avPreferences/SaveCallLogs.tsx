@@ -56,13 +56,18 @@ const SaveCallLogs = ({callingRepository, userState = container.resolve(UserStat
 
       downloadBlob(blob, filename);
     } else {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        text: {
-          closeBtnLabel: translate('modalCallEmptyLogCloseBtn'),
-          message: translate('modalCallEmptyLogMessage'),
-          title: translate('modalCallEmptyLogHeadline'),
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          text: {
+            closeBtnLabel: translate('modalCallEmptyLogCloseBtn'),
+            message: translate('modalCallEmptyLogMessage'),
+            title: translate('modalCallEmptyLogHeadline'),
+          },
         },
-      });
+        undefined,
+        translate,
+      );
     }
   };
   return (

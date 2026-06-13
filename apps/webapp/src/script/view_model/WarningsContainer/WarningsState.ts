@@ -100,18 +100,23 @@ const closeWarning = (translate: Translate): void => {
 
   switch (warningToClose) {
     case TYPE.REQUEST_MICROPHONE: {
-      PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-        primaryAction: {
-          action: () => {
-            safeWindowOpen(URL.SUPPORT.MICROPHONE_ACCESS_DENIED);
+      PrimaryModal.show(
+        PrimaryModal.type.ACKNOWLEDGE,
+        {
+          primaryAction: {
+            action: () => {
+              safeWindowOpen(URL.SUPPORT.MICROPHONE_ACCESS_DENIED);
+            },
+            text: translate('modalCallNoMicrophoneAction'),
           },
-          text: translate('modalCallNoMicrophoneAction'),
+          text: {
+            message: translate('modalCallNoMicrophoneMessage'),
+            title: translate('modalCallNoMicrophoneHeadline'),
+          },
         },
-        text: {
-          message: translate('modalCallNoMicrophoneMessage'),
-          title: translate('modalCallNoMicrophoneHeadline'),
-        },
-      });
+        undefined,
+        translate,
+      );
       break;
     }
 

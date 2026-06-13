@@ -215,6 +215,7 @@ export const InputBar = ({
     },
     restrictedFileSharingMessage: translate('conversationModalRestrictedFileSharingDescription'),
     restrictedFileSharingTitle: translate('conversationModalRestrictedFileSharingHeadline'),
+    translate,
   });
 
   const showMarkdownPreview = useUserPropertyValue<boolean>(

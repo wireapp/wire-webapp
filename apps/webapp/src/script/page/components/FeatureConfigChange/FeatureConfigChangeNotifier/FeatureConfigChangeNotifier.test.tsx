@@ -24,7 +24,10 @@ import {Runtime} from '@wireapp/commons/lib/util/Runtime';
 import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import en from 'I18n/en-US.json';
 import {TeamState} from 'Repositories/team/TeamState';
-import {createRootContextValueForTest, createRootProviderWrapperForTest} from 'src/script/page/testSupport/rootContextTestSupport';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {setStrings, translate} from 'Util/localizerUtil';
 
 import {FeatureConfigChangeNotifier} from './FeatureConfigChangeNotifier';
@@ -114,6 +117,8 @@ describe('FeatureConfigChangeNotifier', () => {
             htmlMessage: enabledString,
           }),
         }),
+        undefined,
+        translate,
       );
     });
 
@@ -139,6 +144,8 @@ describe('FeatureConfigChangeNotifier', () => {
               htmlMessage: disabledString,
             }),
           }),
+          undefined,
+          translate,
         );
       });
     }
@@ -204,14 +211,19 @@ describe('FeatureConfigChangeNotifier', () => {
 
       await waitFor(() => {
         expect(showModalSpy).toHaveBeenCalledTimes(1);
-        expect(showModalSpy).toHaveBeenCalledWith(PrimaryModal.type.ACKNOWLEDGE, {
-          hideCloseBtn: false,
-          primaryAction: undefined,
-          preventClose: false,
-          text: expect.objectContaining({
-            htmlMessage: expectedText,
-          }),
-        });
+        expect(showModalSpy).toHaveBeenCalledWith(
+          PrimaryModal.type.ACKNOWLEDGE,
+          {
+            hideCloseBtn: false,
+            primaryAction: undefined,
+            preventClose: false,
+            text: expect.objectContaining({
+              htmlMessage: expectedText,
+            }),
+          },
+          undefined,
+          translate,
+        );
       });
     },
   );

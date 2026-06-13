@@ -66,19 +66,24 @@ export const ForceReloadModal: FunctionComponent<ForceReloadModalProperties> = p
       reloadApplication();
     }
 
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      hideCloseBtn: true,
-      hideSecondary: true,
-      preventClose: true,
-      primaryAction: {
-        action: triggerReloadApplicationOnce,
-        text: translate('forceReloadModalAction'),
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        hideCloseBtn: true,
+        hideSecondary: true,
+        preventClose: true,
+        primaryAction: {
+          action: triggerReloadApplicationOnce,
+          text: translate('forceReloadModalAction'),
+        },
+        text: {
+          title: translate('forceReloadModalTitle'),
+          htmlMessage: translate('forceReloadModalMessage'),
+        },
       },
-      text: {
-        title: translate('forceReloadModalTitle'),
-        htmlMessage: translate('forceReloadModalMessage'),
-      },
-    });
+      undefined,
+      translate,
+    );
     forceReloadTimeoutIdentifier = Maybe.just(
       wallClock.setTimeout(triggerReloadApplicationOnce, forceReloadDelayInMilliseconds),
     );

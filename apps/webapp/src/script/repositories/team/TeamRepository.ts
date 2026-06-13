@@ -235,16 +235,21 @@ export class TeamRepository extends TypedEventEmitter<Events> {
 
   private showReloadAppModal = () => {
     const replaceLinkMls = replaceLink(Config.getConfig().URL.SUPPORT.MLS_LEARN_MORE, '', 'learn-more-mls');
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      primaryAction: {
-        action: () => window.location.reload(),
-        text: this.translate('mlsWasEnabledReload'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        primaryAction: {
+          action: () => window.location.reload(),
+          text: this.translate('mlsWasEnabledReload'),
+        },
+        text: {
+          htmlMessage: this.translate('mlsWasEnabledDescription', undefined, replaceLinkMls),
+          title: this.translate('mlsWasEnabledTitle'),
+        },
       },
-      text: {
-        htmlMessage: this.translate('mlsWasEnabledDescription', undefined, replaceLinkMls),
-        title: this.translate('mlsWasEnabledTitle'),
-      },
-    });
+      undefined,
+      this.translate,
+    );
   };
 
   private readonly scheduleReloadAppModal = async (): Promise<void> => {

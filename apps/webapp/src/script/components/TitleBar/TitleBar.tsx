@@ -109,6 +109,7 @@ export const TitleBar = ({
       translate('callNotEstablishedDescriptionPoint3'),
     ],
     title: translate('callNotEstablishedTitle'),
+    translate,
   });
   const {isCallConnecting, isCallActive} = useConversationCall(conversation);
 

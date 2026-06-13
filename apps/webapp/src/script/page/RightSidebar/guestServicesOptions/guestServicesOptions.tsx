@@ -86,19 +86,24 @@ const GuestServicesOptions: FC<GuestServicesOptionsProps> = ({
         return changeAccessState();
       }
 
-      PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-        preventClose: true,
-        primaryAction: {
-          action: changeAccessState,
-          text: translate('modalConversationRemoveGuestsOrServicesAction'),
+      PrimaryModal.show(
+        PrimaryModal.type.CONFIRM,
+        {
+          preventClose: true,
+          primaryAction: {
+            action: changeAccessState,
+            text: translate('modalConversationRemoveGuestsOrServicesAction'),
+          },
+          text: {
+            message,
+            title: isGuest
+              ? translate('modalConversationRemoveGuestsHeadline')
+              : translate('modalConversationRemoveServicesHeadline'),
+          },
         },
-        text: {
-          message,
-          title: isGuest
-            ? translate('modalConversationRemoveGuestsHeadline')
-            : translate('modalConversationRemoveServicesHeadline'),
-        },
-      });
+        undefined,
+        translate,
+      );
     }
   };
 

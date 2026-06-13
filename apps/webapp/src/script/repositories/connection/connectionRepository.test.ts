@@ -89,10 +89,12 @@ describe('ConnectionRepository', () => {
       const amplifySpy = jasmine.createSpy('conversation_show');
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
-      return connectionRepository.cancelRequest(user, true, createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest)).then(() => {
-        expect(connectionService.putConnections).toHaveBeenCalled();
-        expect(amplifySpy).toHaveBeenCalled();
-      });
+      return connectionRepository
+        .cancelRequest(user, true, createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest))
+        .then(() => {
+          expect(connectionService.putConnections).toHaveBeenCalled();
+          expect(amplifySpy).toHaveBeenCalled();
+        });
     });
 
     it('deletes connection request if the other user does not exist on backend anymore', async () => {
@@ -158,14 +160,18 @@ describe('ConnectionRepository', () => {
 
   describe('createConnection', () => {
     it('uses the injected translate function for modal copy', async () => {
-      const translate = jest.fn((translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`) as Translate;
+      const translate = jest.fn(
+        (translationKey: Parameters<Translate>[0]) => `translated:${translationKey}`,
+      ) as Translate;
       const [connectionRepository, {connectionService}] = buildConnectionRepository(translate);
       const user = generateUser();
       const primaryModalShow = jest.fn();
 
-      connectionService.postConnections = jest.fn().mockRejectedValueOnce(
-        new BackendError('', BackendErrorLabel.FEDERATION_NOT_ALLOWED, StatusCodes.FORBIDDEN),
-      ) as any;
+      connectionService.postConnections = jest
+        .fn()
+        .mockRejectedValueOnce(
+          new BackendError('', BackendErrorLabel.FEDERATION_NOT_ALLOWED, StatusCodes.FORBIDDEN),
+        ) as any;
       PrimaryModal.show = primaryModalShow;
 
       await connectionRepository.createConnection(user);
@@ -182,6 +188,8 @@ describe('ConnectionRepository', () => {
             title: 'translated:modalUserCannotConnectHeadline',
           }),
         }),
+        undefined,
+        translate,
       );
     });
   });

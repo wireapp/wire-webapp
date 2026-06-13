@@ -104,6 +104,7 @@ export const showShareModal = (properties: ShareModalParams): void => {
       },
     },
     modalId,
+    translate,
   );
 };
 

@@ -140,23 +140,28 @@ const GuestOptions: FC<GuestOptionsProps> = ({
   };
 
   const revokeAccessCode = () => {
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      preventClose: true,
-      primaryAction: {
-        action: async (): Promise<void> => {
-          if (!isRequestOngoing) {
-            setIsRequestOngoing(true);
-            await conversationRepository.stateHandler.revokeAccessCode(activeConversation);
-            setIsRequestOngoing(false);
-          }
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        preventClose: true,
+        primaryAction: {
+          action: async (): Promise<void> => {
+            if (!isRequestOngoing) {
+              setIsRequestOngoing(true);
+              await conversationRepository.stateHandler.revokeAccessCode(activeConversation);
+              setIsRequestOngoing(false);
+            }
+          },
+          text: translate('modalConversationRevokeLinkAction'),
         },
-        text: translate('modalConversationRevokeLinkAction'),
+        text: {
+          message: translate('modalConversationRevokeLinkMessage'),
+          title: translate('modalConversationRevokeLinkHeadline'),
+        },
       },
-      text: {
-        message: translate('modalConversationRevokeLinkMessage'),
-        title: translate('modalConversationRevokeLinkHeadline'),
-      },
-    });
+      undefined,
+      translate,
+    );
   };
 
   const openForcePasswordCopyModal = async (password: string) => {
@@ -178,6 +183,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
         },
       },
       undefined,
+      translate,
     );
   };
 
@@ -218,6 +224,7 @@ const GuestOptions: FC<GuestOptionsProps> = ({
         },
       },
       undefined,
+      translate,
     );
   };
 

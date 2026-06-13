@@ -901,7 +901,7 @@ export class App {
       this.translate,
     );
 
-    PrimaryModal.show(modalType, modalOptions);
+    PrimaryModal.show(modalType, modalOptions, undefined, this.translate);
   };
 
   // Todo: Move this to a separate hook or service
@@ -911,20 +911,25 @@ export class App {
     const e2eiHandler = E2EIHandler.getInstance();
     e2eiHandler.emit('deviceStatusUpdated', {status: 'locked'});
 
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-      hideCloseBtn: true,
-      preventClose: true,
-      hideSecondary: true,
-      primaryAction: {
-        action: async () => {
-          await this.repository.lifeCycle.logout(reason, false);
+    PrimaryModal.show(
+      PrimaryModal.type.ACKNOWLEDGE,
+      {
+        hideCloseBtn: true,
+        preventClose: true,
+        hideSecondary: true,
+        primaryAction: {
+          action: async () => {
+            await this.repository.lifeCycle.logout(reason, false);
+          },
+          text: this.translate('modalAccountLogoutAction'),
         },
-        text: this.translate('modalAccountLogoutAction'),
+        text: {
+          title: this.translate('unknownApplicationErrorTitle'),
+          message: this.translate('modalUnableToReceiveMessages'),
+        },
       },
-      text: {
-        title: this.translate('unknownApplicationErrorTitle'),
-        message: this.translate('modalUnableToReceiveMessages'),
-      },
-    });
+      undefined,
+      this.translate,
+    );
   };
 }

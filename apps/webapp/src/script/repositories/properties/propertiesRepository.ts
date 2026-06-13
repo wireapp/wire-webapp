@@ -158,27 +158,32 @@ export class PropertiesRepository {
       this.publishProperties();
     };
 
-    PrimaryModal.show(PrimaryModalType.CONFIRM, {
-      text: {
-        title: this.translate('dataSharingModalTitle'),
-        htmlMessage: this.translate(
-          'dataSharingModalDescription',
-          undefined,
-          replaceLink(Config.getConfig().URL.PRIVACY_POLICY),
-        ),
-        closeBtnLabel: this.translate('dataSharingModalCloseBtnTitle'),
+    PrimaryModal.show(
+      PrimaryModalType.CONFIRM,
+      {
+        text: {
+          title: this.translate('dataSharingModalTitle'),
+          htmlMessage: this.translate(
+            'dataSharingModalDescription',
+            undefined,
+            replaceLink(Config.getConfig().URL.PRIVACY_POLICY),
+          ),
+          closeBtnLabel: this.translate('dataSharingModalCloseBtnTitle'),
+        },
+        primaryAction: {
+          text: this.translate('dataSharingModalAgree'),
+          action: () => toggleTelemetrySharing(true),
+          runActionOnEnterClick: true,
+        },
+        secondaryAction: {
+          text: this.translate('dataSharingModalDecline'),
+          action: () => toggleTelemetrySharing(false),
+        },
+        closeOnSecondaryAction: true,
       },
-      primaryAction: {
-        text: this.translate('dataSharingModalAgree'),
-        action: () => toggleTelemetrySharing(true),
-        runActionOnEnterClick: true,
-      },
-      secondaryAction: {
-        text: this.translate('dataSharingModalDecline'),
-        action: () => toggleTelemetrySharing(false),
-      },
-      closeOnSecondaryAction: true,
-    });
+      undefined,
+      this.translate,
+    );
   }
 
   getPreference(propertiesType: string): any {

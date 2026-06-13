@@ -214,14 +214,19 @@ const UserActions = ({
               onAction(Actions.START_CONVERSATION);
             } catch (error: unknown) {
               if (error instanceof ClientMLSError && error.label === ClientMLSErrorLabel.NO_KEY_PACKAGES_AVAILABLE) {
-                return PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, {
-                  text: {
-                    title: translate('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
-                    htmlMessage: translate('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {
-                      name: user.name(),
-                    }),
+                return PrimaryModal.show(
+                  PrimaryModal.type.ACKNOWLEDGE,
+                  {
+                    text: {
+                      title: translate('modal1To1ConversationCreateErrorNoKeyPackagesHeadline'),
+                      htmlMessage: translate('modal1To1ConversationCreateErrorNoKeyPackagesMessage', {
+                        name: user.name(),
+                      }),
+                    },
                   },
-                });
+                  undefined,
+                  translate,
+                );
               }
               throw error;
             }

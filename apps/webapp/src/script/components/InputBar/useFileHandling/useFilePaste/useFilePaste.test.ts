@@ -20,6 +20,7 @@
 import {act, renderHook} from '@testing-library/react';
 
 import * as checkFileSharingPermissionModule from 'Components/Conversation/utils/checkFileSharingPermission';
+import {translate} from 'Util/localizerUtil';
 import * as TimeUtil from 'Util/timeUtil';
 
 import {useFilePaste} from './useFilePaste';
@@ -53,6 +54,7 @@ describe('useFilePaste', () => {
         },
         restrictedFileSharingMessage: 'conversationModalRestrictedFileSharingDescription',
         restrictedFileSharingTitle: 'conversationModalRestrictedFileSharingHeadline',
+        translate,
       }),
     );
 
@@ -79,6 +81,7 @@ describe('useFilePaste', () => {
         },
         restrictedFileSharingMessage: 'conversationModalRestrictedFileSharingDescription',
         restrictedFileSharingTitle: 'conversationModalRestrictedFileSharingHeadline',
+        translate,
       }),
     );
 
@@ -101,6 +104,7 @@ describe('useFilePaste', () => {
         },
         restrictedFileSharingMessage: 'conversationModalRestrictedFileSharingDescription',
         restrictedFileSharingTitle: 'conversationModalRestrictedFileSharingHeadline',
+        translate,
       }),
     );
 

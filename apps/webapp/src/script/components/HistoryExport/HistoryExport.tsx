@@ -201,28 +201,33 @@ const HistoryExport = ({switchContent, user, clientState = container.resolve(Cli
   );
 
   const showBackupModal = useCallback(() => {
-    PrimaryModal.show(PrimaryModal.type.PASSWORD_ADVANCED_SECURITY, {
-      preventClose: true,
-      primaryAction: {
-        action: async (password: string, hasMultipleAttempts: boolean) => {
-          await exportHistory(password, hasMultipleAttempts);
+    PrimaryModal.show(
+      PrimaryModal.type.PASSWORD_ADVANCED_SECURITY,
+      {
+        preventClose: true,
+        primaryAction: {
+          action: async (password: string, hasMultipleAttempts: boolean) => {
+            await exportHistory(password, hasMultipleAttempts);
+          },
+          text: translate('backupEncryptionModalAction'),
         },
-        text: translate('backupEncryptionModalAction'),
-      },
-      secondaryAction: [
-        {
-          action: () => onClose(),
-          text: translate('backupEncryptionModalCloseBtn'),
+        secondaryAction: [
+          {
+            action: () => onClose(),
+            text: translate('backupEncryptionModalCloseBtn'),
+          },
+        ],
+        passwordOptional: true,
+        text: {
+          closeBtnLabel: translate('backupEncryptionModalCloseBtn'),
+          input: translate('backupEncryptionModalPlaceholder'),
+          message: translate('backupEncryptionModalMessage'),
+          title: translate('backupEncryptionModalTitle'),
         },
-      ],
-      passwordOptional: true,
-      text: {
-        closeBtnLabel: translate('backupEncryptionModalCloseBtn'),
-        input: translate('backupEncryptionModalPlaceholder'),
-        message: translate('backupEncryptionModalMessage'),
-        title: translate('backupEncryptionModalTitle'),
       },
-    });
+      undefined,
+      translate,
+    );
   }, [exportHistory, onClose, translate]);
 
   useEffect(() => {

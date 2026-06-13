@@ -217,6 +217,7 @@ export class ContentViewModel {
         },
       },
       undefined,
+      this.translate,
     );
   }
 

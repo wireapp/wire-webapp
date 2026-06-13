@@ -257,7 +257,12 @@ export class CallingRepository {
           container,
         };
 
-        PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, `degraded-${activeConversation.id}`);
+        PrimaryModal.show(
+          PrimaryModal.type.ACKNOWLEDGE,
+          modalOptions,
+          `degraded-${activeConversation.id}`,
+          this.translate,
+        );
       }
     });
 
@@ -825,6 +830,7 @@ export class CallingRepository {
             container,
           },
           `degraded-${conversation.qualifiedId}`,
+          this.translate,
         );
       }
     }
@@ -858,6 +864,7 @@ export class CallingRepository {
         container,
       },
       'update-client-warning',
+      this.translate,
     );
   }
 
@@ -1528,25 +1535,30 @@ export class CallingRepository {
         const {container, restoreFocusCallback} = this.getModalContainerAndRestoreFocusCallback();
 
         userConsentWithDegradation = await new Promise(resolve =>
-          PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-            primaryAction: {
-              action: () => {
-                conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
-                resolve(true);
+          PrimaryModal.show(
+            PrimaryModal.type.CONFIRM,
+            {
+              primaryAction: {
+                action: () => {
+                  conversation.mlsVerificationState(ConversationVerificationState.UNVERIFIED);
+                  resolve(true);
+                },
+                text: this.translate('conversation.E2EIJoinAnyway'),
               },
-              text: this.translate('conversation.E2EIJoinAnyway'),
+              secondaryAction: {
+                action: () => resolve(false),
+                text: this.translate('conversation.E2EICancel'),
+              },
+              text: {
+                message: this.translate('conversation.E2EIDegradedJoinCall'),
+                title: this.translate('conversation.E2EIConversationNoLongerVerified'),
+              },
+              close: restoreFocusCallback(),
+              container,
             },
-            secondaryAction: {
-              action: () => resolve(false),
-              text: this.translate('conversation.E2EICancel'),
-            },
-            text: {
-              message: this.translate('conversation.E2EIDegradedJoinCall'),
-              title: this.translate('conversation.E2EIConversationNoLongerVerified'),
-            },
-            close: restoreFocusCallback(),
-            container,
-          }),
+            undefined,
+            this.translate,
+          ),
         );
       }
       const shouldContinueCall = userConsentWithDegradation && (await this.pushClients(call, true));
@@ -2897,7 +2909,7 @@ export class CallingRepository {
       close: restoreFocusCallback(),
       container,
     };
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.CONFIRM, modalOptions, undefined, this.translate);
   }
 
   private showNoCameraModal(): void {
@@ -2922,7 +2934,7 @@ export class CallingRepository {
       close: restoreFocusCallback(),
       container,
     };
-    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions);
+    PrimaryModal.show(PrimaryModal.type.ACKNOWLEDGE, modalOptions, undefined, this.translate);
   }
 
   /**

@@ -48,17 +48,22 @@ const TemporaryGuestConversations = ({selfUser, listViewModel, callingViewModel}
   };
 
   const createAccount = (): void => {
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      preventClose: true,
-      primaryAction: {
-        action: () => window.location.replace(`/auth/${location.search}`),
-        text: translate('modalAccountCreateAction'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        preventClose: true,
+        primaryAction: {
+          action: () => window.location.replace(`/auth/${location.search}`),
+          text: translate('modalAccountCreateAction'),
+        },
+        text: {
+          message: translate('modalAccountCreateMessage'),
+          title: translate('modalAccountCreateHeadline'),
+        },
       },
-      text: {
-        message: translate('modalAccountCreateMessage'),
-        title: translate('modalAccountCreateHeadline'),
-      },
-    });
+      undefined,
+      translate,
+    );
   };
 
   return (

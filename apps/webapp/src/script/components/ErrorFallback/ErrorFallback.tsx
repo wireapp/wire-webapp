@@ -34,21 +34,26 @@ export const ErrorFallback = ({error, resetErrorBoundary}: FallbackProps) => {
     const customError = new Error();
     logger.error({originalError: error, originalStack: error?.stack, fallbackInvocationStack: customError.stack});
 
-    PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-      preventClose: true,
-      secondaryAction: {
-        action: resetErrorBoundary,
-        text: translate('unknownApplicationErrorTryAgain'),
+    PrimaryModal.show(
+      PrimaryModal.type.CONFIRM,
+      {
+        preventClose: true,
+        secondaryAction: {
+          action: resetErrorBoundary,
+          text: translate('unknownApplicationErrorTryAgain'),
+        },
+        primaryAction: {
+          action: () => window.location.reload(),
+          text: translate('unknownApplicationErrorReload'),
+        },
+        text: {
+          message: translate('unknownApplicationErrorDescription'),
+          title: translate('unknownApplicationErrorTitle'),
+        },
       },
-      primaryAction: {
-        action: () => window.location.reload(),
-        text: translate('unknownApplicationErrorReload'),
-      },
-      text: {
-        message: translate('unknownApplicationErrorDescription'),
-        title: translate('unknownApplicationErrorTitle'),
-      },
-    });
+      undefined,
+      translate,
+    );
   }, [error, resetErrorBoundary, translate]);
 
   return <></>;

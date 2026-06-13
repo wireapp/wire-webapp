@@ -106,7 +106,7 @@ export const useCertificateDetailsModal = (certificate: string) => {
   const modalType = PrimaryModal.type.MULTI_ACTIONS;
 
   const showModal = useCallback(() => {
-    PrimaryModal.show(modalType, modalOptions);
+    PrimaryModal.show(modalType, modalOptions, undefined, translate);
   }, [modalOptions, modalType]);
 
   useEffect(() => {

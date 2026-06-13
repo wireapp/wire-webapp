@@ -56,6 +56,7 @@ function showModal(storageKey: string, title: string, message: string, translate
         },
       },
       'availability',
+      translate,
     );
   }
 }

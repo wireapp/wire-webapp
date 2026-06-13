@@ -31,32 +31,37 @@ export const showMoveToRecycleBinModal = ({
   onMoveToRecycleBin: (uuid: string) => void;
   translate: RootContextValue['translate'];
 }) => {
-  PrimaryModal.show(PrimaryModal.type.CONFIRM, {
-    primaryAction: {
-      action: () => onMoveToRecycleBin(node.id),
-      text: translate('cells.moveToRecycleBinModal.button'),
-    },
-    text: {
-      message: replaceReactComponents(
-        translate(
-          node.type === CellNodeType.FILE
-            ? 'cells.moveToRecycleBinModal.file.description'
-            : 'cellsMoveToRecycleBinModal.folder.description',
-          {
-            name: '{name}',
-          },
+  PrimaryModal.show(
+    PrimaryModal.type.CONFIRM,
+    {
+      primaryAction: {
+        action: () => onMoveToRecycleBin(node.id),
+        text: translate('cells.moveToRecycleBinModal.button'),
+      },
+      text: {
+        message: replaceReactComponents(
+          translate(
+            node.type === CellNodeType.FILE
+              ? 'cells.moveToRecycleBinModal.file.description'
+              : 'cellsMoveToRecycleBinModal.folder.description',
+            {
+              name: '{name}',
+            },
+          ),
+          [
+            {
+              exactMatch: '{name}',
+              render: () => <b>{node.name}</b>,
+            },
+          ],
         ),
-        [
-          {
-            exactMatch: '{name}',
-            render: () => <b>{node.name}</b>,
-          },
-        ],
-      ),
-      title:
-        node.type === CellNodeType.FILE
-          ? translate('cellsMoveToRecycleBinModal.file.headline')
-          : translate('cellsMoveToRecycleBinModal.folder.headline'),
+        title:
+          node.type === CellNodeType.FILE
+            ? translate('cellsMoveToRecycleBinModal.file.headline')
+            : translate('cellsMoveToRecycleBinModal.folder.headline'),
+      },
     },
-  });
+    undefined,
+    translate,
+  );
 };
