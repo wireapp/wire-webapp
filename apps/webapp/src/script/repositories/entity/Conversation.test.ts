@@ -53,6 +53,10 @@ describe('Conversation', () => {
   const second_timestamp = new Date('2017-09-26T10:27:18.837Z').getTime();
   const third_timestamp = new Date('2017-09-26T11:29:21.837Z').getTime();
 
+  function createMessageForTest(id: string = createUuid()) {
+    return new Message(id, undefined, translateForTest);
+  }
+
   beforeEach(() => {
     conversation_et = new Conversation();
     other_user = new User(entities.user.jane_roe.id, null);
@@ -156,7 +160,7 @@ describe('Conversation', () => {
     let initial_message_et: Message = undefined;
 
     beforeEach(() => {
-      initial_message_et = new Message(createUuid());
+      initial_message_et = createMessageForTest();
       initial_message_et.timestamp(first_timestamp);
       conversation_et.addMessage(initial_message_et);
     });
@@ -171,7 +175,7 @@ describe('Conversation', () => {
 
     it('does not add new message if it already exists in the message list', () => {
       const initialLength = conversation_et.messages().length;
-      const newMessageEntity = new Message(createUuid());
+      const newMessageEntity = createMessageForTest();
       newMessageEntity.id = initial_message_et.id;
 
       conversation_et.addMessage(newMessageEntity);
@@ -181,7 +185,7 @@ describe('Conversation', () => {
     });
 
     it('should add message with a newer timestamp', () => {
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       message_et.timestamp(second_timestamp);
 
       conversation_et.addMessage(message_et);
@@ -195,7 +199,7 @@ describe('Conversation', () => {
 
     it('should add message with an older timestamp', () => {
       const older_timestamp = first_timestamp - 100;
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       message_et.timestamp(older_timestamp);
 
       conversation_et.addMessage(message_et);
@@ -209,7 +213,7 @@ describe('Conversation', () => {
 
     describe('affects last_event_timestamp', () => {
       it('and adding a message should update it', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -221,7 +225,7 @@ describe('Conversation', () => {
       });
 
       it('and adding a message should not update it if affect_order is false', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
         //@ts-ignore
         message_et.affect_order(false);
@@ -235,7 +239,7 @@ describe('Conversation', () => {
       });
 
       it('and adding a message should not update it if timestamp is greater than the last server timestamp', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_event_timestamp(first_timestamp);
@@ -249,7 +253,7 @@ describe('Conversation', () => {
 
     describe('affects last_read_timestamp', () => {
       it('and adding a message should update it if sent by self user', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
         message_et.user(self_user);
 
@@ -262,7 +266,7 @@ describe('Conversation', () => {
       });
 
       it('should not update last read if last message was not send from self user', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_read_timestamp(first_timestamp);
@@ -274,7 +278,7 @@ describe('Conversation', () => {
       });
 
       it('should not update last read if timestamp is greater than the last server timestamp', () => {
-        const message_et = new Message(createUuid());
+        const message_et = createMessageForTest();
         message_et.timestamp(second_timestamp);
 
         conversation_et.last_read_timestamp(first_timestamp);
@@ -752,12 +756,12 @@ describe('Conversation', () => {
 
   describe('release', () => {
     it('if there are any incoming messages, they should be moved to regular messages', () => {
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       message_et.timestamp(second_timestamp);
       conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
 
-      const incomingMessage = new Message(createUuid());
+      const incomingMessage = createMessageForTest();
       conversation_et.last_event_timestamp(third_timestamp);
       conversation_et.addMessage(incomingMessage);
 
@@ -772,7 +776,7 @@ describe('Conversation', () => {
     });
 
     it('should release messages if conversation has no unread messages', () => {
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       message_et.timestamp(first_timestamp);
       conversation_et.addMessage(message_et);
       conversation_et.last_read_timestamp(first_timestamp);
@@ -792,7 +796,7 @@ describe('Conversation', () => {
     let message_id: string = undefined;
 
     beforeEach(() => {
-      const message_et = new Message(createUuid());
+      const message_et = createMessageForTest();
       conversation_et.addMessage(message_et);
       message_id = message_et.id;
     });
@@ -807,7 +811,7 @@ describe('Conversation', () => {
     });
 
     it('should remove all message with the same id', () => {
-      const duplicated_message_et = new Message(message_id);
+      const duplicated_message_et = createMessageForTest(message_id);
 
       expect(conversation_et.messages().length).toBe(1);
       conversation_et.addMessage(duplicated_message_et);
@@ -827,11 +831,11 @@ describe('Conversation', () => {
     let message_et = undefined;
 
     beforeEach(() => {
-      const first_message_et = new Message(createUuid());
+      const first_message_et = createMessageForTest();
       first_message_et.timestamp(first_timestamp);
       conversation_et.addMessage(first_message_et);
 
-      message_et = new Message(createUuid());
+      message_et = createMessageForTest();
       message_et.timestamp(second_timestamp);
       conversation_et.addMessage(message_et);
     });

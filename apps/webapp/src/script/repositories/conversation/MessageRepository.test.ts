@@ -514,7 +514,7 @@ describe('MessageRepository', () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
       const sender = new User('', '');
       sender.isMe = false;
-      const msgToDelete = new Message(createUuid());
+      const msgToDelete = new Message(createUuid(), undefined, translateForTest);
       msgToDelete.user(sender);
       conversation.addMessage(msgToDelete);
       const [messageRepository, {core}] = await buildMessageRepository();
@@ -532,7 +532,7 @@ describe('MessageRepository', () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
       conversation.participating_user_ets.push(new User('user1'));
 
-      const messageToDelete = new Message(createUuid());
+      const messageToDelete = new Message(createUuid(), undefined, translateForTest);
       messageToDelete.user(selfUser);
       conversation.addMessage(messageToDelete);
 
@@ -553,7 +553,7 @@ describe('MessageRepository', () => {
       const conversation = generateConversation(CONVERSATION_TYPE.REGULAR);
       conversation.participating_user_ets.push(new User('user1'));
 
-      const messageToDelete = new Message(createUuid());
+      const messageToDelete = new Message(createUuid(), undefined, translateForTest);
       messageToDelete.user(selfUser);
       messageToDelete.status(StatusType.SENDING);
       conversation.addMessage(messageToDelete);

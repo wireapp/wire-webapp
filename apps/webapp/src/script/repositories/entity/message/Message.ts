@@ -25,7 +25,7 @@ import type {LegalHoldStatus} from '@wireapp/protocol-messaging';
 import {AssetTransferState} from 'Repositories/assets/assetTransferState';
 import {AssetType} from 'Repositories/assets/assetType';
 import type {ReadReceipt} from 'Repositories/storage/record/eventRecord';
-import {type Translate, translate as defaultTranslate, getUserName} from 'Util/localizerUtil';
+import {type Translate, getUserName} from 'Util/localizerUtil';
 import {formatDateNumeral, formatDurationCaption, formatTimeShort, fromUnixTime, TIME_IN_MILLIS} from 'Util/timeUtil';
 
 import {CallingTimeoutMessage} from './CallingTimeoutMessage';
@@ -86,8 +86,8 @@ export class Message {
   public type: string;
   public version: number;
 
-  constructor(id: string = '0', super_type?: SuperType, translate: Translate = defaultTranslate) {
-    this.id = id;
+  constructor(id: string | undefined, super_type: SuperType | undefined, translate: Translate) {
+    this.id = id ?? '0';
     this.translate = translate;
     this.super_type = super_type ?? SuperType.SYSTEM;
     this.ephemeralCaption = ko.pureComputed(() => {

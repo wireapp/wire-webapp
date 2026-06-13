@@ -119,7 +119,7 @@ describe('Message', () => {
     });
 
     it('returns empty array for non-content messages', () => {
-      const message = new Message();
+      const message = new Message(undefined, undefined, translateForTest);
 
       const result = message.getMultipartAssets();
 
@@ -190,7 +190,7 @@ describe('Message', () => {
     });
 
     it('returns empty array when message super_type is not CONTENT', () => {
-      const message = new Message();
+      const message = new Message(undefined, undefined, translateForTest);
       // Manually set super_type to something other than CONTENT
       message.super_type = SuperType.CALL;
 
@@ -262,7 +262,7 @@ describe('Message', () => {
     });
 
     it('returns false for non-content messages', () => {
-      const message = new Message();
+      const message = new Message(undefined, undefined, translateForTest);
 
       expect(message.hasMultipartAsset()).toBe(false);
     });

@@ -21,6 +21,7 @@ import ko from 'knockout';
 
 import {QualifiedUserId} from '@wireapp/protocol-messaging';
 
+import type {Translate} from 'Util/localizerUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
 
 import {Message} from './Message';
@@ -35,8 +36,8 @@ export class VerificationMessage extends Message {
   public verificationMessageType: ko.Observable<VerificationMessageType | undefined>;
   public readonly isSelfClient: ko.PureComputed<boolean>;
 
-  constructor() {
-    super();
+  constructor(translate: Translate) {
+    super(undefined, undefined, translate);
 
     this.super_type = SuperType.VERIFICATION;
     this.affect_order(false);

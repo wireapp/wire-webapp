@@ -2150,7 +2150,7 @@ describe('ConversationRepository', () => {
       beforeEach(() => {
         conversation_et = _generateConversation();
         return testFactory.conversation_repository['saveConversation'](conversation_et).then(() => {
-          message_et = new Message(createUuid());
+          message_et = new Message(createUuid(), undefined, translateForTest);
           message_et.from = selfUser.id;
           conversation_et.addMessage(message_et);
 
@@ -2246,7 +2246,7 @@ describe('ConversationRepository', () => {
         conversation_et = _generateConversation();
 
         return testFactory.conversation_repository['saveConversation'](conversation_et).then(() => {
-          const messageToHideEt = new Message(createUuid());
+          const messageToHideEt = new Message(createUuid(), undefined, translateForTest);
           conversation_et.addMessage(messageToHideEt);
 
           messageId = messageToHideEt.id;

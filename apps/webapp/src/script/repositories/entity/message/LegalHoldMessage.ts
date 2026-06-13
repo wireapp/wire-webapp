@@ -19,6 +19,8 @@
 
 import {LegalHoldStatus} from '@wireapp/protocol-messaging';
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {SuperType} from '../../../message/SuperType';
@@ -30,8 +32,9 @@ export class LegalHoldMessage extends Message {
   constructor(
     public legalHoldStatus: LegalHoldStatus,
     timestamp: number,
+    translate: Translate,
   ) {
-    super();
+    super(undefined, undefined, translate);
     this.super_type = SuperType.LEGALHOLD;
     this.timestamp(timestamp);
   }

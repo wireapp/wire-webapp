@@ -17,6 +17,8 @@
  *
  */
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {SuperType} from '../../../message/SuperType';
@@ -27,8 +29,9 @@ export class FileTypeRestrictedMessage extends Message {
     public readonly name: string,
     public readonly fileExt: string,
     timestamp: number,
+    translate: Translate,
   ) {
-    super();
+    super(undefined, undefined, translate);
     this.super_type = SuperType.FILE_TYPE_RESTRICTED;
     this.timestamp(timestamp);
   }

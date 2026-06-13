@@ -19,6 +19,8 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
+import type {Translate} from 'Util/localizerUtil';
+
 import {Message} from './Message';
 
 import {E2EIVerificationMessageType} from '../../../message/E2EIVerificationMessageType';
@@ -28,8 +30,8 @@ export class E2EIVerificationMessage extends Message {
   public messageType: E2EIVerificationMessageType;
   public userIds?: QualifiedId[];
 
-  constructor(messageType: E2EIVerificationMessageType, userIds?: QualifiedId[]) {
-    super();
+  constructor(messageType: E2EIVerificationMessageType, userIds: QualifiedId[] | undefined, translate: Translate) {
+    super(undefined, undefined, translate);
 
     this.super_type = SuperType.E2EI_VERIFICATION;
     this.messageType = messageType;

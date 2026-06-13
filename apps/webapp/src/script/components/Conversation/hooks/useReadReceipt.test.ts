@@ -21,6 +21,7 @@ import {renderHook} from '@testing-library/react';
 
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/Message';
+import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {useReadReceiptSender} from './useReadReceipt';
@@ -45,7 +46,7 @@ describe('useReadReceipt', () => {
     ] as const;
 
     firstBatch.forEach(([conversation, sender]) => {
-      const message = new Message(createUuid());
+      const message = new Message(createUuid(), undefined, translateForTest);
       message.from = sender;
       result.current.addReadReceiptToBatch(conversation, message);
     });
@@ -54,7 +55,7 @@ describe('useReadReceipt', () => {
     jest.runAllTimers();
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
 
-    result.current.addReadReceiptToBatch(conversation1, new Message(createUuid()));
+    result.current.addReadReceiptToBatch(conversation1, new Message(createUuid(), undefined, translateForTest));
     expect(sendReadReceipt).toHaveBeenCalledTimes(2);
     jest.runAllTimers();
     expect(sendReadReceipt).toHaveBeenCalledTimes(3);
@@ -76,7 +77,7 @@ describe('useReadReceipt', () => {
     ] as const;
 
     firstBatch.forEach(([conversation, sender]) => {
-      const message = new Message(createUuid());
+      const message = new Message(createUuid(), undefined, translateForTest);
       message.from = sender;
       result.current.addReadReceiptToBatch(conversation, message);
     });
@@ -91,7 +92,7 @@ describe('useReadReceipt', () => {
     const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
     const conversation = new Conversation(createUuid());
 
-    const message = new Message(createUuid());
+    const message = new Message(createUuid(), undefined, translateForTest);
     message.from = createUuid();
 
     const firstBatch = [

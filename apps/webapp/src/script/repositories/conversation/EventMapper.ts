@@ -550,7 +550,7 @@ export class EventMapper {
    * @returns Delete message entity
    */
   private _mapEventDeleteEverywhere({data: eventData}: LegacyEventRecord) {
-    const messageEntity = new DeleteMessage();
+    const messageEntity = new DeleteMessage(this.translate);
     messageEntity.deleted_timestamp = new Date(eventData.deleted_time).getTime();
     return messageEntity;
   }
@@ -571,19 +571,19 @@ export class EventMapper {
   }
 
   _mapEventCallingTimeout({data, time}: LegacyEventRecord) {
-    return new CallingTimeoutMessage(data.reason, parseInt(time, 10));
+    return new CallingTimeoutMessage(data.reason, parseInt(time, 10), this.translate);
   }
 
   _mapEventFailedToAddUsers({data, time}: FailedToAddUsersMessageEvent) {
-    return new FailedToAddUsersMessage(data, parseInt(time, 10));
+    return new FailedToAddUsersMessage(data, parseInt(time, 10), this.translate);
   }
 
   _mapEventFederationStop({data, time}: FederationStopEvent) {
-    return new FederationStopMessage(data.domains, parseInt(time, 10));
+    return new FederationStopMessage(data.domains, parseInt(time, 10), this.translate);
   }
 
   _mapEventLegalHoldUpdate({data, timestamp}: LegacyEventRecord) {
-    return new LegalHoldMessage(data.legal_hold_status, timestamp ?? 0);
+    return new LegalHoldMessage(data.legal_hold_status, timestamp ?? 0, this.translate);
   }
 
   /**
@@ -752,7 +752,7 @@ export class EventMapper {
    * Maps JSON data of local missed message event to message entity.
    */
   private _mapEventMissedMessages(): MissedMessage {
-    return new MissedMessage();
+    return new MissedMessage(this.translate);
   }
 
   /**
@@ -849,7 +849,7 @@ export class EventMapper {
   private _mapEventUnableToDecrypt({error_code: errorCode, error}: ErrorEvent) {
     const code = typeof errorCode === 'string' ? parseInt(errorCode.split(' ')[0], 10) : errorCode;
     const clientId = error.replace(/\n/g, '').replace(/^.*\(([\w\d]+)\)$/g, '$1');
-    return new DecryptErrorMessage(clientId, code);
+    return new DecryptErrorMessage(clientId, code, this.translate);
   }
 
   /**
@@ -859,7 +859,7 @@ export class EventMapper {
    * @returns Verification message entity
    */
   private _mapEventVerification({data: eventData}: LegacyEventRecord) {
-    const messageEntity = new VerificationMessage();
+    const messageEntity = new VerificationMessage(this.translate);
     // Database can contain non-camelCased naming. For backwards compatibility reasons we handle both.
     messageEntity.userIds(eventData.userIds || eventData.user_ids);
     messageEntity.verificationMessageType(eventData.type);
@@ -871,7 +871,7 @@ export class EventMapper {
    * Maps JSON data of E2E Identity verification message event to message entity.
    */
   private _mapEventE2EIVerificationMessage({data: eventData}: E2EIVerificationEvent): MissedMessage {
-    return new E2EIVerificationMessage(eventData.type, eventData.userIds);
+    return new E2EIVerificationMessage(eventData.type, eventData.userIds, this.translate);
   }
 
   /**
@@ -1161,7 +1161,7 @@ export class EventMapper {
       data: {isIncoming, name, fileExt},
       time,
     } = event;
-    return new FileTypeRestrictedMessage(isIncoming, name, fileExt, +time);
+    return new FileTypeRestrictedMessage(isIncoming, name, fileExt, +time, this.translate);
   }
 }
 

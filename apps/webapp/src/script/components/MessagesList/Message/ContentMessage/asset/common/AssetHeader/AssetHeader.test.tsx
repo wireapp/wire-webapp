@@ -21,6 +21,7 @@ import {render} from '@testing-library/react';
 
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
+import {translateForTest} from 'Util/test/translateForTest';
 import * as TimeUtil from 'Util/timeUtil';
 import {createUuid} from 'Util/uuid';
 
@@ -36,7 +37,7 @@ describe('AssetHeader', () => {
     const user = new User(createUuid());
     user.name(userName);
 
-    const message = new Message(createUuid());
+    const message = new Message(createUuid(), undefined, translateForTest);
     message.timestamp(timestamp);
     message.user(user);
 
