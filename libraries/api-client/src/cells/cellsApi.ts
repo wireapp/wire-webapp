@@ -419,6 +419,7 @@ export class CellsAPI {
   async searchNodes({
     phrase,
     path = '/',
+    recursive,
     limit = DEFAULT_LIMIT,
     offset = DEFAULT_OFFSET,
     sortBy,
@@ -432,6 +433,7 @@ export class CellsAPI {
   }: {
     phrase: string;
     path?: string;
+    recursive?: boolean;
     limit?: number;
     offset?: number;
     sortBy?: string;
@@ -450,10 +452,15 @@ export class CellsAPI {
     const mimeOp: 'Should' | 'Must' = mimeTypes !== undefined && mimeTypes.length > 1 ? 'Should' : 'Must';
     const creatorOp: 'Should' | 'Must' = creatorIds !== undefined && creatorIds.length > 1 ? 'Should' : 'Must';
 
+    // `searchTerm == nil` drops the Text filter and sets `recursive = false`,
+    // making the empty search view behave exactly like the browse listing (folders-first natural order).
+    const hasPhrase = phrase.length > 0;
+    const isRecursive = recursive ?? hasPhrase;
+
     const request: RestLookupRequest = {
-      Scope: {Root: {Path: path}, Recursive: true},
+      Scope: {Root: {Path: path}, Recursive: isRecursive},
       Filters: {
-        Text: {SearchIn: 'BaseName', Term: phrase},
+        ...(hasPhrase ? {Text: {SearchIn: 'BaseName', Term: phrase}} : {}),
         Type: type || 'UNKNOWN',
         Status: {
           Deleted: deleted ? 'Only' : 'Not',

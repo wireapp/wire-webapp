@@ -58,8 +58,10 @@ interface ConversationCellsProps {
   userRepository: UserRepository;
   activeConversation: Conversation;
   conversationRepository: ConversationRepository;
+  isSharedDriveSearchAndFiltersEnabled: boolean;
   isSearchViewOpen: boolean;
   onOpenSearchView: () => void;
+  onCloseSearchView: () => void;
 }
 
 export const ConversationCells = memo(
@@ -68,8 +70,10 @@ export const ConversationCells = memo(
     userRepository,
     activeConversation,
     conversationRepository,
+    isSharedDriveSearchAndFiltersEnabled,
     isSearchViewOpen,
     onOpenSearchView,
+    onCloseSearchView,
   }: ConversationCellsProps) => {
     const {fireAndForgetInvoker} = useApplicationContext();
     const {cellsState: initialCellState, name} = useKoSubscribableChildren(activeConversation, ['cellsState', 'name']);
@@ -92,7 +96,9 @@ export const ConversationCells = memo(
     const {refresh, setOffset} = useGetAllCellsNodes({
       cellsRepository,
       conversationQualifiedId,
-      enabled: isCellsStateReady,
+      //Without this, the browse hook's hashchange handler would compete with
+      // (and flap against) search results.
+      enabled: isCellsStateReady && !isSearchViewOpen,
       fireAndForgetInvoker,
       userRepository,
     });
@@ -112,6 +118,7 @@ export const ConversationCells = memo(
       cellsRepository,
       conversationQualifiedId,
       enabled: isCellsStateReady && isSearchViewOpen,
+      allowSearchWhenDisabled: !isSharedDriveSearchAndFiltersEnabled,
       fireAndForgetInvoker,
       userRepository,
       filters: filterState,
@@ -164,6 +171,8 @@ export const ConversationCells = memo(
       });
     }, [loadMoreOffset, loadMoreSearchResults]);
 
+    const handleSearchViewClosure = isSearchViewOpen ? onCloseSearchView : undefined;
+
     useOnPresignedUrlExpired({conversationId, refreshCallback: handleRefresh});
 
     const isLoading = nodesStatus === 'loading';
@@ -208,6 +217,9 @@ export const ConversationCells = memo(
             conversationQualifiedId={conversationQualifiedId}
             conversationName={name}
             onRefresh={handleRefresh}
+            // opening a folder must close search view and open the browse view
+            // with that folder (and breadcrumbs)
+            onCloseSearchView={handleSearchViewClosure}
           />
         )}
         {isCellsStatePending && !isRefreshing && (

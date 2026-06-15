@@ -627,12 +627,14 @@ export const Conversation = ({
                     userRepository={repositories.user}
                     cellsRepository={repositories.cells}
                     conversationRepository={conversationRepository}
+                    isSharedDriveSearchAndFiltersEnabled={isSharedDriveSearchAndFiltersEnabled}
                     isSearchViewOpen={isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen}
                     onOpenSearchView={() => {
                       if (isSharedDriveSearchAndFiltersEnabled) {
                         setIsSharedDriveSearchViewOpen(true);
                       }
                     }}
+                    onCloseSearchView={() => setIsSharedDriveSearchViewOpen(false)}
                   />
                 )}
               </ConversationTabPanel>

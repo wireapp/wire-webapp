@@ -1873,7 +1873,7 @@ describe('CellsAPI', () => {
       expect(result).toEqual(mockResponse);
     });
 
-    it('handles empty search phrase', async () => {
+    it('omits the Text filter and lists non-recursively for an empty search phrase', async () => {
       const searchPhrase = '';
       const mockResponse: RestNodeCollection = {
         Nodes: [],
@@ -1884,9 +1884,8 @@ describe('CellsAPI', () => {
       const result = await cellsAPI.searchNodes({phrase: searchPhrase});
 
       expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith({
-        Scope: {Root: {Path: '/'}, Recursive: true},
+        Scope: {Root: {Path: '/'}, Recursive: false},
         Filters: {
-          Text: {SearchIn: 'BaseName', Term: searchPhrase},
           Type: 'UNKNOWN',
           Status: {
             Deleted: 'Not',
@@ -1896,8 +1895,23 @@ describe('CellsAPI', () => {
         Flags: ['WithPreSignedURLs'],
         Limit: '10',
         Offset: '0',
+        SortField: undefined,
+        SortDirDesc: undefined,
       });
       expect(result).toEqual(mockResponse);
+    });
+
+    it('recurses for an empty phrase when recursive is explicitly requested', async () => {
+      const mockResponse: RestNodeCollection = {Nodes: []} as RestNodeCollection;
+      mockNodeServiceApi.lookup.mockResolvedValueOnce(createMockResponse(mockResponse));
+
+      await cellsAPI.searchNodes({phrase: '', recursive: true});
+
+      expect(mockNodeServiceApi.lookup).toHaveBeenCalledWith(
+        expect.objectContaining({
+          Scope: {Root: {Path: '/'}, Recursive: true},
+        }),
+      );
     });
 
     it('filters by tags when provided', async () => {
