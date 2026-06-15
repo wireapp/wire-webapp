@@ -17,9 +17,9 @@
  *
  */
 
-import type {StringIdentifier} from 'Util/localizerUtil';
+import type {TranslationKey} from 'Util/localizerUtil';
 
-type QualityFeedbackTranslationKey = Extract<StringIdentifier, `qualityFeedback.${string}`>;
+type QualityFeedbackTranslationKey = Extract<TranslationKey, `qualityFeedback.${string}`>;
 
 export type RatingListItem = {
   value: number;

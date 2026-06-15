@@ -31,9 +31,9 @@ import {
   VideoFileIcon,
 } from '@wireapp/react-ui-kit';
 
-import type {StringIdentifier} from 'Util/localizerUtil';
+import type {TranslationKey} from 'Util/localizerUtil';
 
-type FileTypeLabelKey = Extract<StringIdentifier, `cells.fileType.${string}`>;
+type FileTypeLabelKey = Extract<TranslationKey, `cells.fileType.${string}`>;
 
 export interface FileTypeCatalogEntry {
   readonly id: string;
