@@ -205,6 +205,9 @@ jobs:
               },
               "q1-2026": {
                 "targets": "[\"2026-q1\"]"
+              },
+              "q2-2026": {
+                "targets": "[\"2026-q2\"]"
               }
             }
           export_to: log,output
