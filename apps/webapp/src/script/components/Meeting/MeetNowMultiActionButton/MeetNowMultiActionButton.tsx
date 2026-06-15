@@ -26,11 +26,12 @@ import {
   dropdownIconStyles,
 } from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton.styles';
 import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
-import {t} from 'Util/localizerUtil';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {showContextMenu} from '../../../ui/ContextMenu';
 
 export const MeetNowMultiActionButton = () => {
+  const {translate} = useApplicationContext();
   const [invertIcon, setInvertIcon] = useState(false);
   const {handleMeetNow, handleScheduleMeeting} = useMeetingActions();
 
@@ -43,16 +44,16 @@ export const MeetNowMultiActionButton = () => {
       offset: 0,
       entries: [
         {
-          title: t('meetings.action.meetNow'),
-          label: t('meetings.action.meetNow'),
+          title: translate('meetings.action.meetNow'),
+          label: translate('meetings.action.meetNow'),
           click: () => {
             handleMeetNow();
             resetIconInversion();
           },
         },
         {
-          title: t('meetings.action.scheduleMeeting'),
-          label: t('meetings.action.scheduleMeeting'),
+          title: translate('meetings.action.scheduleMeeting'),
+          label: translate('meetings.action.scheduleMeeting'),
           click: () => {
             handleScheduleMeeting();
             resetIconInversion();
@@ -74,7 +75,7 @@ export const MeetNowMultiActionButton = () => {
         icon={<CallIcon />}
         onClick={handleMeetNow}
       >
-        {t('meetings.action.createMeeting')}
+        {translate('meetings.action.createMeeting')}
       </ButtonGroup.Button>
       <ButtonGroup.Button
         css={callingButtonGroupStyles}

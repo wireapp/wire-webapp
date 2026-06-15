@@ -30,7 +30,6 @@ import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOng
 import {MEETINGS_PAST, MEETINGS_TODAY, MEETINGS_TOMORROW} from 'Components/Meeting/mocks/MeetingMocks';
 import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {useApplicationContext} from 'src/script/page/RootProvider';
-import {t} from 'Util/localizerUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
 
 export interface Meeting {
@@ -50,7 +49,7 @@ export interface TodayAndOngoingSectionProps {
 }
 
 export const MeetingList = () => {
-  const {wallClock} = useApplicationContext();
+  const {translate, wallClock} = useApplicationContext();
   const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
 
   useEffect(() => {
@@ -59,8 +58,8 @@ export const MeetingList = () => {
   }, [wallClock]);
 
   const {today, tomorrow} = getTodayTomorrowLabels();
-  const headerForToday = `${t('meetings.list.today')} (${today})`;
-  const headerForTomorrow = `${t('meetings.list.tomorrow')} (${tomorrow})`;
+  const headerForToday = `${translate('meetings.list.today')} (${today})`;
+  const headerForTomorrow = `${translate('meetings.list.tomorrow')} (${tomorrow})`;
 
   const groupedMeetingsTomorrow = groupByStartHour(MEETINGS_TOMORROW);
   const groupedMeetingsPast = groupByStartHour(MEETINGS_PAST);
