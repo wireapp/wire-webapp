@@ -19,6 +19,7 @@
 
 import {createColumnHelper} from '@tanstack/react-table';
 
+import {CellsTableSortableHeader} from 'Components/Conversation/ConversationCells/common/CellsTableSortableHeader/CellsTableSortableHeader';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -41,7 +42,7 @@ export const getCellsTableColumns = ({
   translate: RootContextValue['translate'];
 }) => [
   columnHelper.accessor('name', {
-    header: translate('cells.tableRow.name'),
+    header: () => <CellsTableSortableHeader label={t('cells.tableRow.name')} />,
     cell: info => <CellsTableNameColumn node={info.row.original} />,
   }),
   columnHelper.accessor('conversationName', {
@@ -60,12 +61,12 @@ export const getCellsTableColumns = ({
     size: 120,
   }),
   columnHelper.accessor('sizeMb', {
-    header: translate('cells.tableRow.size'),
+    header: () => <CellsTableSortableHeader label={t('cells.tableRow.size')} />,
     cell: info => info.getValue(),
     size: 100,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: translate('cells.tableRow.created'),
+    header: () => <CellsTableSortableHeader label={t('cells.tableRow.created')} />,
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),

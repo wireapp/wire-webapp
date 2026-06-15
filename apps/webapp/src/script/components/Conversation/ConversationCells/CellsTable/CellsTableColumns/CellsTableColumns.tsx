@@ -30,6 +30,8 @@ import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions'
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 import {CellsTagsColumn} from './CellsTagsColumn/CellsTagsColumn';
 
+import {CellsTableSortableHeader} from '../../common/CellsTableSortableHeader/CellsTableSortableHeader';
+
 const columnHelper = createColumnHelper<CellNode>();
 
 export const getCellsTableColumns = ({
@@ -56,7 +58,7 @@ export const getCellsTableColumns = ({
   onCloseSearchView?: () => void;
 }) => [
   columnHelper.accessor('name', {
-    header: labels.name,
+    header: () => <CellsTableSortableHeader label={t('cells.tableRow.name')} />,
     cell: info => <CellsTableNameColumn node={info.row.original} onCloseSearchView={onCloseSearchView} />,
   }),
   columnHelper.accessor('owner', {
@@ -65,7 +67,7 @@ export const getCellsTableColumns = ({
     size: 170,
   }),
   columnHelper.accessor('sizeMb', {
-    header: labels.size,
+    header: () => <CellsTableSortableHeader label={t('cells.tableRow.size')} />,
     cell: info => info.getValue(),
     size: 100,
   }),
@@ -75,7 +77,7 @@ export const getCellsTableColumns = ({
     size: 120,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: labels.created,
+    header: () => <CellsTableSortableHeader label={t('cells.tableRow.created')} />,
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),
