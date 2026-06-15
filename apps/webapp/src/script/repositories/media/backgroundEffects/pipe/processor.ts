@@ -97,5 +97,6 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
   }
 }
 
-const TrackProcessor = 'MediaStreamTrackProcessor' in window ? window.MediaStreamTrackProcessor : FallbackProcessor;
+const TrackProcessor =
+  'MediaStreamTrackProcessor' in globalThis ? (globalThis as any).MediaStreamTrackProcessor : FallbackProcessor;
 export {TrackProcessor};
