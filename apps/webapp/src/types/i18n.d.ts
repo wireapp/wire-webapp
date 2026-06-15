@@ -1272,8 +1272,6 @@ declare module 'I18n/en-US.json' {
     'meetings.action.meetNow': `Meet Now`;
     'meetings.action.scheduleMeeting': `Schedule Meeting`;
     'meetings.action.startMeeting': `Start meeting`;
-    'meetings.list.onGoing': `Ongoing`;
-    'meetings.list.onGoing.header': `Now`;
     'meetings.list.today': `Today`;
     'meetings.list.tomorrow': `Tomorrow`;
     'meetings.meetingStatus.participating': `Attending`;
@@ -1287,7 +1285,6 @@ declare module 'I18n/en-US.json' {
     'meetings.noPastMeetingsText': `No past meetings yet.`;
     'meetings.noScheduledMeetings': `No meetings scheduled.`;
     'meetings.noUpcomingMeetingsText': `No upcoming meetings yet.`;
-    'meetings.showAllLabel': `Show all things`;
     'meetings.startMeetingHelp': `Start a meeting with team members, guests, or external parties. Your communication is always end-to-end encrypted, offering the highest level of security.`;
     'meetings.tabs.ariaLabel': `Meetings tabs`;
     'meetings.tabs.next': `Next`;
