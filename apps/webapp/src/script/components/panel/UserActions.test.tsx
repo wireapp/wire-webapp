@@ -289,7 +289,7 @@ describe('UserActions', () => {
     const {getByTestId, getByText} = renderWithRootProvider(
       <>
         <UserActions {...props} />
-        <PrimaryModalComponent />
+        <PrimaryModalComponent translate={translateForTest} />
       </>,
     );
 

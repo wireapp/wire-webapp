@@ -25,8 +25,8 @@ import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
 
 import * as Icon from 'Components/icon';
 import {ModalComponent} from 'Components/Modals/ModalComponent';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleEscDown} from 'Util/keyboardUtil';
+import type {Translate} from 'Util/localizerUtil';
 
 import {AdminSearchInput} from './AdminSearchInput';
 import {
@@ -40,8 +40,11 @@ import {
 } from './styles';
 import {useLeaveGroupAdminModalStore} from './useLeaveGroupAdminModalStore';
 
-export const LeaveGroupAdminModal = () => {
-  const {translate} = useApplicationContext();
+interface LeaveGroupAdminModalProps {
+  readonly translate: Translate;
+}
+
+export const LeaveGroupAdminModal = ({translate}: LeaveGroupAdminModalProps) => {
   const {isOpen, params, selectedUser, clearContent, isLoading, hide, setSelectedUser, setClearContent, setIsLoading} =
     useLeaveGroupAdminModalStore();
 
@@ -117,6 +120,7 @@ export const LeaveGroupAdminModal = () => {
         </p>
         {hasEligibleUsers && (
           <AdminSearchInput
+            translate={translate}
             eligibleUsers={eligibleUsers}
             selectedUser={selectedUser}
             clearContent={clearContent}

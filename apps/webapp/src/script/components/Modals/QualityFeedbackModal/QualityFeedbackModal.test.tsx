@@ -56,6 +56,17 @@ jest.mock('Repositories/tracking/telemetry.helpers', () => ({
 }));
 
 describe('QualityFeedbackModal', () => {
+  function translateQualityFeedbackForTest(translationKey: Parameters<typeof translateForTest>[0]): string {
+    switch (translationKey) {
+      case 'qualityFeedback.skip':
+        return 'Skip';
+      case 'qualityFeedback.doNotAskAgain':
+        return "Don't ask again";
+      default:
+        return translateForTest(translationKey);
+    }
+  }
+
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
@@ -91,9 +102,16 @@ describe('QualityFeedbackModal', () => {
   });
 
   const renderQualityFeedbackModal = () =>
-    render(withTheme(withIntl(<QualityFeedbackModal callingRepository={callingRepository} />)), {
-      wrapper: rootProviderWrapper,
-    });
+    render(
+      withTheme(
+        withIntl(
+          <QualityFeedbackModal callingRepository={callingRepository} translate={translateQualityFeedbackForTest} />,
+        ),
+      ),
+      {
+        wrapper: rootProviderWrapper,
+      },
+    );
 
   it('should not render if qualityFeedbackModalShown is false', () => {
     renderQualityFeedbackModal();

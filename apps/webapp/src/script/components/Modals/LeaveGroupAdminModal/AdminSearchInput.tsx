@@ -24,7 +24,7 @@ import {Option, Select} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import type {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import type {Translate} from 'Util/localizerUtil';
 
 import {
   checkboxStyles,
@@ -42,6 +42,7 @@ import {
 } from './styles';
 
 interface AdminSearchInputProps {
+  readonly translate: Translate;
   clearContent: boolean;
   eligibleUsers: User[];
   selectedUser: User | null;
@@ -50,13 +51,13 @@ interface AdminSearchInputProps {
 }
 
 export const AdminSearchInput = ({
+  translate,
   clearContent,
   eligibleUsers,
   selectedUser,
   onClearContentChange,
   onUserSelect,
 }: AdminSearchInputProps) => {
-  const {translate} = useApplicationContext();
   const options: Option[] = eligibleUsers.map(user => ({value: user.id, label: user.name()}));
   const selectedOption = selectedUser ? (options.find(opt => opt.value === selectedUser.id) ?? null) : null;
 

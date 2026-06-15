@@ -22,18 +22,23 @@ import type {FormEvent} from 'react';
 import {COLOR, Form, Link, Text} from '@wireapp/react-ui-kit';
 
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import type {Translate} from 'Util/localizerUtil';
 
 import {labelStyles, inputStyles, linkStyles, linkTextStyles} from './JoinGuestLinkPasswordForm.styles';
 
 interface JoinGuestLinkPasswordFormProps {
+  readonly translate: Translate;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
   onInputChange: (value: string) => void;
 }
 
-export const JoinGuestLinkPasswordForm = ({onSubmit, inputValue, onInputChange}: JoinGuestLinkPasswordFormProps) => {
-  const {translate} = useApplicationContext();
+export const JoinGuestLinkPasswordForm = ({
+  translate,
+  onSubmit,
+  inputValue,
+  onInputChange,
+}: JoinGuestLinkPasswordFormProps) => {
   return (
     <Form
       name="guest-password-join-form"

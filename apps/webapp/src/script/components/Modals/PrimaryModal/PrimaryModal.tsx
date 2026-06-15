@@ -25,8 +25,8 @@ import {ErrorMessage} from '@wireapp/react-ui-kit';
 import {CopyToClipboardButton} from 'Components/CopyToClipboardButton';
 import {FadingScrollbar} from 'Components/FadingScrollbar';
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {isValidPassword} from 'Util/stringUtil';
 
 import {CheckboxOption} from './CheckboxOption/CheckboxOption';
@@ -45,8 +45,11 @@ import {usePrimaryModalState, showNextModalInQueue, defaultContent, removeCurren
 import {ButtonAction, PrimaryModalType} from './PrimaryModalTypes';
 import {SecondaryButton} from './SecondaryButton/SecondaryButton';
 
-export const PrimaryModalComponent: FC = () => {
-  const {translate} = useApplicationContext();
+interface PrimaryModalComponentProps {
+  readonly translate: Translate;
+}
+
+export const PrimaryModalComponent: FC<PrimaryModalComponentProps> = ({translate}) => {
   const [inputValue, updateInputValue] = useState<string>('');
   const [passwordValue, setPasswordValue] = useState<string>('');
   const [passwordInput, updatePasswordWithRules] = useState<string>('');
@@ -321,6 +324,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isGuestLinkPassword && (
           <GuestLinkPasswordForm
+            translate={translate}
             onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             onGeneratePassword={password => {
               setPasswordValue(password);
@@ -358,6 +362,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {isJoinGuestLinkPassword && (
           <JoinGuestLinkPasswordForm
+            translate={translate}
             onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             inputValue={passwordValue}
             onInputChange={setPasswordValue}
@@ -366,6 +371,7 @@ export const PrimaryModalComponent: FC = () => {
 
         {hasPasswordWithRules && (
           <PasswordAdvancedSecurityForm
+            translate={translate}
             onSubmit={performAction(confirm, closeOnConfirm ?? false)}
             inputValue={passwordInput}
             inputPlaceholder={inputPlaceholder}

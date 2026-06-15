@@ -30,8 +30,8 @@ import {RatingListLabel} from 'Components/Modals/QualityFeedbackModal/typings';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {trackCallQualityFeedback} from 'Repositories/tracking/helpers';
 import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {CALL_QUALITY_FEEDBACK_KEY, CALL_SURVEY_MUTE_INTERVAL, ratingListItems} from './constants';
@@ -50,10 +50,10 @@ const logger = getLogger('CallQualityFeedback');
 
 interface Props {
   callingRepository: CallingRepository;
+  translate: Translate;
 }
 
-export const QualityFeedbackModal = ({callingRepository}: Props) => {
-  const {translate} = useApplicationContext();
+export const QualityFeedbackModal = ({callingRepository, translate}: Props) => {
   const userState = container.resolve(UserState);
   const {conversationId} = useCallAlertState();
   const call = conversationId && callingRepository.findCall(conversationId);

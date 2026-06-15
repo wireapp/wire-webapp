@@ -42,7 +42,9 @@ describe('PrimaryModal', () => {
 
   describe('Confirm', () => {
     it('does not render when no item is in the queue', async () => {
-      const {getByTestId} = render(<PrimaryModalComponent />, {wrapper: rootProviderWrapper});
+      const {getByTestId} = render(<PrimaryModalComponent translate={translateForTest} />, {
+        wrapper: rootProviderWrapper,
+      });
       const primaryModalWrapper = getByTestId('primary-modals-container');
       expect(primaryModalWrapper.children).toHaveLength(0);
     });
@@ -213,7 +215,7 @@ describe('PrimaryModal', () => {
   describe('SessionReset', () => {
     it('uses the provided translate function for generated modal content', async () => {
       const translate = (translationKey: string) => `translated:${translationKey}`;
-      const {getByText} = render(withTheme(<PrimaryModalComponent />), {
+      const {getByText} = render(withTheme(<PrimaryModalComponent translate={translateForTest} />), {
         wrapper: rootProviderWrapper,
       });
 
@@ -244,9 +246,12 @@ const renderPrimaryModal = ({
   translate,
   type,
 }: RenderPrimaryModalParameters) => {
-  const {getByTestId, queryByTestId, getByLabelText} = render(withTheme(<PrimaryModalComponent />), {
-    wrapper: rootProviderWrapper,
-  });
+  const {getByTestId, queryByTestId, getByLabelText} = render(
+    withTheme(<PrimaryModalComponent translate={translateForTest} />),
+    {
+      wrapper: rootProviderWrapper,
+    },
+  );
   act(() => {
     PrimaryModal.show(
       type,

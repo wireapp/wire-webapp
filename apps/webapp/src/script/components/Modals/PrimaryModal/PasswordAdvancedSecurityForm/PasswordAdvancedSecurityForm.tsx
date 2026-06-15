@@ -21,9 +21,10 @@ import type {ReactElement, ChangeEvent, FormEvent} from 'react';
 
 import {Input} from '@wireapp/react-ui-kit';
 
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import type {Translate} from 'Util/localizerUtil';
 
 interface PasswordAdvancedSecurityFormProps {
+  readonly translate: Translate;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   inputValue: string;
   inputPlaceholder: string;
@@ -34,6 +35,7 @@ interface PasswordAdvancedSecurityFormProps {
 }
 
 export const PasswordAdvancedSecurityForm = ({
+  translate,
   onSubmit,
   inputValue,
   inputPlaceholder,
@@ -42,7 +44,6 @@ export const PasswordAdvancedSecurityForm = ({
   inputHelperText,
   error,
 }: PasswordAdvancedSecurityFormProps) => {
-  const {translate} = useApplicationContext();
   return (
     <form onSubmit={onSubmit}>
       <Input

@@ -137,9 +137,9 @@ export const AppContainer = (properties: AppProps) => {
       </AppLoader>
 
       <StyledApp themeId={themeId} css={{backgroundColor: 'unset', height: '100%'}}>
-        <PrimaryModalComponent />
-        <LeaveGroupAdminModal />
-        <QualityFeedbackModal callingRepository={app.repository.calling} />
+        <PrimaryModalComponent translate={translate} />
+        <LeaveGroupAdminModal translate={translate} />
+        <QualityFeedbackModal callingRepository={app.repository.calling} translate={translate} />
       </StyledApp>
 
       {isDetachedCallingFeatureEnabled() && (

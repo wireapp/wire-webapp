@@ -24,11 +24,12 @@ import {Form, Input, ErrorMessage} from '@wireapp/react-ui-kit';
 
 import {PasswordGeneratorButton} from 'Components/PasswordGeneratorButton';
 import {Config} from 'src/script/Config';
-import {useApplicationContext} from 'src/script/page/RootProvider';
+import type {Translate} from 'Util/localizerUtil';
 
 import {errorMessageStyles} from './GuestLinkPasswordForm.styles';
 
 interface GuestLinkPasswordFormProps {
+  readonly translate: Translate;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onGeneratePassword: (password: string) => void;
   passwordValue: string;
@@ -41,6 +42,7 @@ interface GuestLinkPasswordFormProps {
 }
 
 export const GuestLinkPasswordForm = ({
+  translate,
   onSubmit,
   onGeneratePassword,
   passwordValue,
@@ -51,7 +53,6 @@ export const GuestLinkPasswordForm = ({
   onPasswordConfirmationChange,
   isPasswordConfirmationMarkInvalid,
 }: GuestLinkPasswordFormProps) => {
-  const {translate} = useApplicationContext();
   return (
     <>
       <PasswordGeneratorButton
@@ -84,7 +85,7 @@ export const GuestLinkPasswordForm = ({
           onChange={event => onPasswordValueChange(event.currentTarget.value)}
           pattern={ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH)}
           markInvalid={isPasswordInputMarkInvalid}
-          error={isPasswordInputMarkInvalid ? <GuestLinkPasswordModalErrorMessage /> : undefined}
+          error={isPasswordInputMarkInvalid ? <GuestLinkPasswordModalErrorMessage translate={translate} /> : undefined}
         />
         <Input
           name="guest-link-password-confirm"
@@ -107,8 +108,11 @@ export const GuestLinkPasswordForm = ({
   );
 };
 
-const GuestLinkPasswordModalErrorMessage = () => {
-  const {translate} = useApplicationContext();
+interface GuestLinkPasswordModalErrorMessageProps {
+  readonly translate: Translate;
+}
+
+const GuestLinkPasswordModalErrorMessage = ({translate}: GuestLinkPasswordModalErrorMessageProps) => {
   return (
     <ErrorMessage data-uie-name="primary-modals-error-message" css={errorMessageStyles}>
       {translate('modalGuestLinkJoinHelperText', {

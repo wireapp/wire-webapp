@@ -37,12 +37,13 @@ jest.mock('./AdminSearchInput', () => ({
   AdminSearchInput: () => <div data-uie-name="admin-search-input" />,
 }));
 
-const renderModal = () => render(withTheme(<LeaveGroupAdminModal />));
+const renderModal = () => render(withTheme(<LeaveGroupAdminModal translate={translateForTest} />));
 const rootProviderWrapper = createRootProviderWrapperForTest(
   createRootContextValueForTest({translate: translateForTest}),
 );
 
-const renderModalWithRootProvider = () => render(withTheme(<LeaveGroupAdminModal />), {wrapper: rootProviderWrapper});
+const renderModalWithRootProvider = () =>
+  render(withTheme(<LeaveGroupAdminModal translate={translateForTest} />), {wrapper: rootProviderWrapper});
 
 const createEligibleUser = (id: string) => {
   const user = new User(id, 'example.com', translateForTest);
