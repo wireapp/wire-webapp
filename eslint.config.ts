@@ -301,6 +301,51 @@ const config: Linter.Config[] = [
   },
   {
     files: [
+      'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/LeaveGroupAdminModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'src/script/page/RootProvider',
+              importNames: ['useApplicationContext'],
+              message: 'This modal is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ['apps/webapp/src/script/page/components/WindowTitleUpdater.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'src/script/page/RootProvider',
+              importNames: ['useApplicationContext'],
+              message:
+                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+            {
+              name: '../RootProvider',
+              importNames: ['useApplicationContext'],
+              message:
+                'This component is rendered outside RootProvider. Pass required dependencies explicitly instead.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: [
       'apps/webapp/src/script/components/Badge/components/VerificationBadges/VerificationBadges.tsx',
       'apps/webapp/src/script/components/Cells/common/useCellPublicLink/useCellPublicLink.ts',
       'apps/webapp/src/script/components/CellsGlobalView/CellsGlobalView.tsx',
