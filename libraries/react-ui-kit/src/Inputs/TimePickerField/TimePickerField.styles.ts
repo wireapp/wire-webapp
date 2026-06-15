@@ -21,24 +21,19 @@ import {CSSObject} from '@emotion/react';
 
 export const timePickerWrapperStyles: CSSObject = {
   width: '100%',
+  minWidth: 0,
 };
 
 export const timeSelectStyles: CSSObject = {
   height: '48px',
   minHeight: '48px',
+  width: '100%',
+  minWidth: 0,
   borderRadius: '14px',
-  '& .css-1dimb5e-singleValue': {
-    color: 'var(--main-color)',
-  },
-  '& [class*="singleValue"]': {
-    color: 'var(--main-color)',
-  },
 };
 
 export const timeSelectMenuStyles: CSSObject = {
-  '& [role="option"]': {
-    color: 'var(--main-color)',
-  },
+  boxSizing: 'border-box',
 };
 
 export const timeSelectMenuPortalStyles: CSSObject = {

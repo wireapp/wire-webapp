@@ -19,7 +19,7 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '../../Identity';
+import {Theme} from '../../Identity/Theme';
 
 export const dateTimePickerContentStyles: CSSObject = {
   display: 'flex',
@@ -30,22 +30,49 @@ export const dateTimePickerContentStyles: CSSObject = {
 
 export const dateTimePickerFieldsRowStyles: CSSObject = {
   display: 'grid',
-  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 160px)',
+  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 140px)',
   gap: '12px',
   width: '100%',
+  alignItems: 'stretch',
   '@media (max-width: 520px)': {
     gridTemplateColumns: 'minmax(0, 1fr)',
   },
 };
 
-export const dateTimePickerFieldWrapperStyles: CSSObject = {
+export const dateTimePickerDateFieldWrapperStyles: CSSObject = {
   marginBottom: 0,
-};
-
-export const dateTimePickerErrorTextStyles: CSSObject = {
-  fontSize: 'var(--font-size-small)',
-  color: BASE_LIGHT_COLOR.RED,
-  'body.theme-dark &': {
-    color: BASE_DARK_COLOR.RED,
+  width: '100%',
+  minWidth: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  alignSelf: 'stretch',
+  '.react-aria-DatePicker': {
+    width: '100%',
+    minWidth: 0,
+    flex: 1,
+  },
+  '.react-aria-Group': {
+    width: '100%',
+    minWidth: 0,
+    maxWidth: '100%',
+    flex: 1,
+    boxSizing: 'border-box',
   },
 };
+
+export const dateTimePickerTimeFieldWrapperStyles: CSSObject = {
+  marginBottom: 0,
+  width: '100%',
+  minWidth: 0,
+  '& > div[data-uie-name]': {
+    marginBottom: 0,
+    width: '100%',
+    minWidth: 0,
+    maxWidth: '100%',
+  },
+};
+
+export const dateTimePickerErrorTextStyles = (theme: Theme): CSSObject => ({
+  fontSize: theme.fontSizes.small,
+  color: theme.general.dangerColor,
+});

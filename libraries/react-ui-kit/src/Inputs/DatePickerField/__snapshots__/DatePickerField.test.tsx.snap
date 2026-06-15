@@ -10,6 +10,19 @@ exports[`"DatePickerField" renders 1`] = `
 .emotion-1 {
   margin-bottom: 20px;
   width: 100%;
+  min-width: 0;
+}
+
+.emotion-1 .react-aria-DatePicker {
+  width: 100%;
+  min-width: 0;
+}
+
+.emotion-1 .react-aria-Group {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .emotion-1:focus-within label {
@@ -30,27 +43,25 @@ exports[`"DatePickerField" renders 1`] = `
   justify-content: space-between;
   gap: 8px;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  box-sizing: border-box;
   min-height: 48px;
   padding: 10px 14px;
   border-radius: 14px;
-  border: 1px solid var(--text-input-border);
-  background-color: var(--text-input-background);
-}
-
-body.theme-dark .emotion-2body.theme-dark .emotion-2[data-focus-visible] {
-  border-color: var(--accent-color);
-}
-
-.react-aria-DatePicker[data-open] body.theme-dark .emotion-2 {
-  border-color: var(--accent-color);
+  border: 1px solid #dce0e3;
+  background-color: #fff;
 }
 
 .emotion-2[data-focus-visible] {
-  border-color: var(--accent-color);
+  border-color: #0667c8;
 }
 
 .react-aria-DatePicker[data-open] .emotion-2 {
-  border-color: var(--accent-color);
+  border-color: #0667c8;
 }
 
 .emotion-3 {
@@ -63,11 +74,13 @@ body.theme-dark .emotion-2body.theme-dark .emotion-2[data-focus-visible] {
   -ms-flex-align: center;
   align-items: center;
   gap: 0;
-  font-size: var(--font-size-medium);
-  color: var(--main-color);
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+  font-size: 0.875rem;
+  color: rgb(29, 30, 31);
+  -webkit-flex: 1 1 0;
+  -ms-flex: 1 1 0;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .emotion-4 {
@@ -82,15 +95,11 @@ body.theme-dark .emotion-2body.theme-dark .emotion-2[data-focus-visible] {
 }
 
 .emotion-4[data-placeholder] {
-  color: var(--gray-60);
+  color: rgb(80, 82, 84);
 }
 
 .emotion-4[data-focused] {
-  background-color: var(--gray-20);
-}
-
-body.theme-dark .emotion-4[data-focused] {
-  background-color: var(--gray-80);
+  background-color: #edeff0;
 }
 
 .emotion-9 {
@@ -111,7 +120,7 @@ body.theme-dark .emotion-4[data-focused] {
   border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--main-color);
+  color: rgb(29, 30, 31);
   cursor: pointer;
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
@@ -120,16 +129,7 @@ body.theme-dark .emotion-4[data-focused] {
 
 .emotion-9:hover,
 .emotion-9[data-focus-visible] {
-  background-color: var(--gray-20);
-}
-
-body.theme-dark .emotion-9 {
-  color: var(--white);
-}
-
-body.theme-dark .emotion-9:hover,
-body.theme-dark .emotion-9[data-focus-visible] {
-  background-color: var(--gray-80);
+  background-color: #edeff0;
 }
 
 .emotion-10 {
@@ -440,6 +440,19 @@ exports[`"DatePickerField" renders as disabled 1`] = `
 .emotion-1 {
   margin-bottom: 20px;
   width: 100%;
+  min-width: 0;
+}
+
+.emotion-1 .react-aria-DatePicker {
+  width: 100%;
+  min-width: 0;
+}
+
+.emotion-1 .react-aria-Group {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .emotion-1:focus-within label {
@@ -460,29 +473,27 @@ exports[`"DatePickerField" renders as disabled 1`] = `
   justify-content: space-between;
   gap: 8px;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  box-sizing: border-box;
   min-height: 48px;
   padding: 10px 14px;
   border-radius: 14px;
-  border: 1px solid var(--text-input-border);
-  background-color: var(--text-input-background);
+  border: 1px solid #dce0e3;
+  background-color: #fff;
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-body.theme-dark .emotion-2body.theme-dark .emotion-2[data-focus-visible] {
-  border-color: var(--accent-color);
-}
-
-.react-aria-DatePicker[data-open] body.theme-dark .emotion-2 {
-  border-color: var(--accent-color);
-}
-
 .emotion-2[data-focus-visible] {
-  border-color: var(--accent-color);
+  border-color: #0667c8;
 }
 
 .react-aria-DatePicker[data-open] .emotion-2 {
-  border-color: var(--accent-color);
+  border-color: #0667c8;
 }
 
 .emotion-3 {
@@ -495,11 +506,13 @@ body.theme-dark .emotion-2body.theme-dark .emotion-2[data-focus-visible] {
   -ms-flex-align: center;
   align-items: center;
   gap: 0;
-  font-size: var(--font-size-medium);
-  color: var(--main-color);
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+  font-size: 0.875rem;
+  color: rgb(29, 30, 31);
+  -webkit-flex: 1 1 0;
+  -ms-flex: 1 1 0;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .emotion-4 {
@@ -514,15 +527,11 @@ body.theme-dark .emotion-2body.theme-dark .emotion-2[data-focus-visible] {
 }
 
 .emotion-4[data-placeholder] {
-  color: var(--gray-60);
+  color: rgb(80, 82, 84);
 }
 
 .emotion-4[data-focused] {
-  background-color: var(--gray-20);
-}
-
-body.theme-dark .emotion-4[data-focused] {
-  background-color: var(--gray-80);
+  background-color: #edeff0;
 }
 
 .emotion-9 {
@@ -543,7 +552,7 @@ body.theme-dark .emotion-4[data-focused] {
   border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--main-color);
+  color: rgb(29, 30, 31);
   cursor: pointer;
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
@@ -552,16 +561,7 @@ body.theme-dark .emotion-4[data-focused] {
 
 .emotion-9:hover,
 .emotion-9[data-focus-visible] {
-  background-color: var(--gray-20);
-}
-
-body.theme-dark .emotion-9 {
-  color: var(--white);
-}
-
-body.theme-dark .emotion-9:hover,
-body.theme-dark .emotion-9[data-focus-visible] {
-  background-color: var(--gray-80);
+  background-color: #edeff0;
 }
 
 .emotion-10 {
@@ -869,6 +869,19 @@ exports[`"DatePickerField" renders as invalid 1`] = `
 .emotion-1 {
   margin-bottom: 2px;
   width: 100%;
+  min-width: 0;
+}
+
+.emotion-1 .react-aria-DatePicker {
+  width: 100%;
+  min-width: 0;
+}
+
+.emotion-1 .react-aria-Group {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .emotion-1:focus-within label {
@@ -889,26 +902,28 @@ exports[`"DatePickerField" renders as invalid 1`] = `
   justify-content: space-between;
   gap: 8px;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  box-sizing: border-box;
   min-height: 48px;
   padding: 10px 14px;
   border-radius: 14px;
-  border: 1px solid var(--text-input-border);
-  background-color: var(--text-input-background);
-  border-color: #c20013;
+  border: 1px solid #dce0e3;
+  background-color: #fff;
+  border-color: var(--danger-color);
   box-shadow: none;
   outline: none;
 }
 
-body.theme-dark .emotion-2 {
-  border-color: #ff7770;
-}
-
 .emotion-2[data-focus-visible] {
-  border-color: var(--accent-color);
+  border-color: #0667c8;
 }
 
 .react-aria-DatePicker[data-open] .emotion-2 {
-  border-color: var(--accent-color);
+  border-color: #0667c8;
 }
 
 .emotion-3 {
@@ -921,11 +936,13 @@ body.theme-dark .emotion-2 {
   -ms-flex-align: center;
   align-items: center;
   gap: 0;
-  font-size: var(--font-size-medium);
-  color: var(--main-color);
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+  font-size: 0.875rem;
+  color: rgb(29, 30, 31);
+  -webkit-flex: 1 1 0;
+  -ms-flex: 1 1 0;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .emotion-4 {
@@ -940,15 +957,11 @@ body.theme-dark .emotion-2 {
 }
 
 .emotion-4[data-placeholder] {
-  color: var(--gray-60);
+  color: rgb(80, 82, 84);
 }
 
 .emotion-4[data-focused] {
-  background-color: var(--gray-20);
-}
-
-body.theme-dark .emotion-4[data-focused] {
-  background-color: var(--gray-80);
+  background-color: #edeff0;
 }
 
 .emotion-9 {
@@ -969,7 +982,7 @@ body.theme-dark .emotion-4[data-focused] {
   border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--main-color);
+  color: rgb(29, 30, 31);
   cursor: pointer;
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
@@ -978,16 +991,7 @@ body.theme-dark .emotion-4[data-focused] {
 
 .emotion-9:hover,
 .emotion-9[data-focus-visible] {
-  background-color: var(--gray-20);
-}
-
-body.theme-dark .emotion-9 {
-  color: var(--white);
-}
-
-body.theme-dark .emotion-9:hover,
-body.theme-dark .emotion-9[data-focus-visible] {
-  background-color: var(--gray-80);
+  background-color: #edeff0;
 }
 
 .emotion-10 {
@@ -1298,6 +1302,19 @@ exports[`"DatePickerField" renders with label 1`] = `
 .emotion-1 {
   margin-bottom: 20px;
   width: 100%;
+  min-width: 0;
+}
+
+.emotion-1 .react-aria-DatePicker {
+  width: 100%;
+  min-width: 0;
+}
+
+.emotion-1 .react-aria-Group {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .emotion-1:focus-within label {
@@ -1327,27 +1344,25 @@ exports[`"DatePickerField" renders with label 1`] = `
   justify-content: space-between;
   gap: 8px;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  box-sizing: border-box;
   min-height: 48px;
   padding: 10px 14px;
   border-radius: 14px;
-  border: 1px solid var(--text-input-border);
-  background-color: var(--text-input-background);
-}
-
-body.theme-dark .emotion-3body.theme-dark .emotion-3[data-focus-visible] {
-  border-color: var(--accent-color);
-}
-
-.react-aria-DatePicker[data-open] body.theme-dark .emotion-3 {
-  border-color: var(--accent-color);
+  border: 1px solid #dce0e3;
+  background-color: #fff;
 }
 
 .emotion-3[data-focus-visible] {
-  border-color: var(--accent-color);
+  border-color: #0667c8;
 }
 
 .react-aria-DatePicker[data-open] .emotion-3 {
-  border-color: var(--accent-color);
+  border-color: #0667c8;
 }
 
 .emotion-4 {
@@ -1360,11 +1375,13 @@ body.theme-dark .emotion-3body.theme-dark .emotion-3[data-focus-visible] {
   -ms-flex-align: center;
   align-items: center;
   gap: 0;
-  font-size: var(--font-size-medium);
-  color: var(--main-color);
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
+  font-size: 0.875rem;
+  color: rgb(29, 30, 31);
+  -webkit-flex: 1 1 0;
+  -ms-flex: 1 1 0;
+  flex: 1 1 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .emotion-5 {
@@ -1379,15 +1396,11 @@ body.theme-dark .emotion-3body.theme-dark .emotion-3[data-focus-visible] {
 }
 
 .emotion-5[data-placeholder] {
-  color: var(--gray-60);
+  color: rgb(80, 82, 84);
 }
 
 .emotion-5[data-focused] {
-  background-color: var(--gray-20);
-}
-
-body.theme-dark .emotion-5[data-focused] {
-  background-color: var(--gray-80);
+  background-color: #edeff0;
 }
 
 .emotion-10 {
@@ -1408,7 +1421,7 @@ body.theme-dark .emotion-5[data-focused] {
   border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
-  color: var(--main-color);
+  color: rgb(29, 30, 31);
   cursor: pointer;
   -webkit-flex-shrink: 0;
   -ms-flex-negative: 0;
@@ -1417,16 +1430,7 @@ body.theme-dark .emotion-5[data-focused] {
 
 .emotion-10:hover,
 .emotion-10[data-focus-visible] {
-  background-color: var(--gray-20);
-}
-
-body.theme-dark .emotion-10 {
-  color: var(--white);
-}
-
-body.theme-dark .emotion-10:hover,
-body.theme-dark .emotion-10[data-focus-visible] {
-  background-color: var(--gray-80);
+  background-color: #edeff0;
 }
 
 .emotion-11 {

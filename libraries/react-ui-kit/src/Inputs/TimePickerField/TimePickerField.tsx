@@ -101,7 +101,7 @@ export const TimePickerField = ({
         markInvalid={markInvalid}
         selectContainerCSS={timeSelectStyles}
         selectControlCSS={timeSelectStyles}
-        menuCSS={timeSelectMenuStyles}
+        selectMenuCSS={timeSelectMenuStyles}
         menuPlacement={menuPlacement}
         maxMenuHeight={maxMenuHeight}
         {...(portalTarget ? {menuPortalTarget: portalTarget} : {})}

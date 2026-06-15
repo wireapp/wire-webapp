@@ -112,19 +112,22 @@ export const DatePickerField = ({
 }: DatePickerFieldProps) => {
   const labelId = is.nonEmptyString(id) ? `${id}-label` : undefined;
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
-  const dateGroupStyles = useMemo(() => {
-    const styles = {...datePickerGroupStyles, ...datePickerGroupFocusStyles};
+  const getDateGroupStyles = useMemo(
+    () => (theme: Theme) => {
+      const styles = {...datePickerGroupStyles(theme), ...datePickerGroupFocusStyles(theme)};
 
-    if (markInvalid) {
-      return {...styles, ...datePickerGroupInvalidStyles};
-    }
+      if (markInvalid) {
+        return {...styles, ...datePickerGroupInvalidStyles(theme)};
+      }
 
-    if (disabled) {
-      return {...styles, ...datePickerGroupDisabledStyles};
-    }
+      if (disabled) {
+        return {...styles, ...datePickerGroupDisabledStyles};
+      }
 
-    return styles;
-  }, [disabled, markInvalid]);
+      return styles;
+    },
+    [disabled, markInvalid],
+  );
 
   return (
     <div
@@ -155,7 +158,7 @@ export const DatePickerField = ({
           minValue={minValue}
           maxValue={maxValue}
         >
-          <Group css={dateGroupStyles}>
+          <Group css={getDateGroupStyles}>
             <DateInput css={dateInputStyles}>
               {segment => (
                 <DateSegment segment={segment} css={dateSegmentStyles}>

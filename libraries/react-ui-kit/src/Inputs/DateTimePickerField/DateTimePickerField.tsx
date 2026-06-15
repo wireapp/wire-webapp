@@ -24,13 +24,14 @@ import is from '@sindresorhus/is';
 
 import {
   dateTimePickerContentStyles,
+  dateTimePickerDateFieldWrapperStyles,
   dateTimePickerErrorTextStyles,
-  dateTimePickerFieldWrapperStyles,
   dateTimePickerFieldsRowStyles,
+  dateTimePickerTimeFieldWrapperStyles,
 } from './DateTimePickerField.styles';
 import {combineDateAndTime, dateValueFromDate} from './dateTimeUtils';
 
-import {BASE_DARK_COLOR, BASE_LIGHT_COLOR} from '../../Identity';
+import {Theme} from '../../Identity/Theme';
 import {DatePickerField, DatePickerFieldLabels} from '../DatePickerField';
 import {InputLabel} from '../InputLabel';
 import {Option} from '../Select';
@@ -92,19 +93,10 @@ export const DateTimePickerField = ({
     [onChange, selectedDate],
   );
 
-  const labelStyles = markInvalid
-    ? {
-        color: BASE_LIGHT_COLOR.RED,
-        'body.theme-dark &': {
-          color: BASE_DARK_COLOR.RED,
-        },
-      }
-    : undefined;
-
   return (
     <div css={dateTimePickerContentStyles} data-uie-name={dataUieName}>
       {is.nonEmptyString(label) && (
-        <InputLabel markInvalid={markInvalid} id={labelId} labelCSS={labelStyles}>
+        <InputLabel markInvalid={markInvalid} id={labelId}>
           {label}
         </InputLabel>
       )}
@@ -125,7 +117,7 @@ export const DateTimePickerField = ({
           markInvalid={markInvalid}
           disabled={disabled}
           popoverPortalContainer={popoverPortalContainer}
-          wrapperCSS={dateTimePickerFieldWrapperStyles}
+          wrapperCSS={dateTimePickerDateFieldWrapperStyles}
         />
         <TimePickerField
           id={timeFieldId}
@@ -136,11 +128,13 @@ export const DateTimePickerField = ({
           markInvalid={markInvalid}
           disabled={disabled}
           menuPortalTarget={menuPortalTarget}
-          wrapperCSS={dateTimePickerFieldWrapperStyles}
+          wrapperCSS={dateTimePickerTimeFieldWrapperStyles}
         />
       </div>
 
-      {markInvalid && is.nonEmptyString(errorText) && <p css={dateTimePickerErrorTextStyles}>{errorText}</p>}
+      {markInvalid && is.nonEmptyString(errorText) && (
+        <p css={(theme: Theme) => dateTimePickerErrorTextStyles(theme)}>{errorText}</p>
+      )}
     </div>
   );
 };

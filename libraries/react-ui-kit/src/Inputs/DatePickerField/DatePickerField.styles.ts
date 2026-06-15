@@ -19,74 +19,79 @@
 
 import {CSSObject} from '@emotion/react';
 
-import {BASE_DARK_COLOR, BASE_LIGHT_COLOR, COLOR} from '../../Identity';
+import {Theme} from '../../Identity/Theme';
 import {overlayPortalZIndex} from '../../utils/overlayPortal';
 
 /** Must exceed react-aria's inline overlay z-index (100000). Applied via `style` on Popover. */
 export const calendarPopoverZIndex = overlayPortalZIndex;
 
+/** Minimum width for a 7-column calendar grid (7 × 36px cells + 24px popover padding). */
+export const calendarPopoverMinWidth = 276;
+
 export const datePickerWrapperStyles: CSSObject = {
   width: '100%',
+  minWidth: 0,
+  '.react-aria-DatePicker': {
+    width: '100%',
+    minWidth: 0,
+  },
+  '.react-aria-Group': {
+    width: '100%',
+    minWidth: 0,
+    maxWidth: '100%',
+    boxSizing: 'border-box',
+  },
 };
 
-export const datePickerGroupStyles: CSSObject = {
+export const datePickerGroupStyles = (theme: Theme): CSSObject => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: '8px',
   width: '100%',
+  minWidth: 0,
+  maxWidth: '100%',
+  alignSelf: 'stretch',
+  boxSizing: 'border-box',
   minHeight: '48px',
   padding: '10px 14px',
   borderRadius: '14px',
-  border: '1px solid var(--text-input-border)',
-  backgroundColor: 'var(--text-input-background)',
-  'body.theme-dark &': {
-    backgroundColor: COLOR.BLACK_LIGHTEN_24,
-    borderColor: 'var(--text-input-border)',
-  },
-};
+  border: `1px solid ${theme.Select.borderColor}`,
+  backgroundColor: theme.Input.backgroundColor,
+});
 
-export const datePickerGroupFocusStyles: CSSObject = {
+export const datePickerGroupFocusStyles = (theme: Theme): CSSObject => ({
   '&[data-focus-visible]': {
-    borderColor: 'var(--accent-color)',
+    borderColor: theme.general.primaryColor,
   },
   '.react-aria-DatePicker[data-open] &': {
-    borderColor: 'var(--accent-color)',
+    borderColor: theme.general.primaryColor,
   },
-  'body.theme-dark &': {
-    '&&[data-focus-visible]': {
-      borderColor: 'var(--accent-color)',
-    },
-    '.react-aria-DatePicker[data-open] &': {
-      borderColor: 'var(--accent-color)',
-    },
-  },
-};
+});
 
-export const datePickerGroupInvalidStyles: CSSObject = {
-  borderColor: BASE_LIGHT_COLOR.RED,
+export const datePickerGroupInvalidStyles = (theme: Theme): CSSObject => ({
+  borderColor: theme.general.dangerColor,
   boxShadow: 'none',
   outline: 'none',
-  'body.theme-dark &': {
-    borderColor: BASE_DARK_COLOR.RED,
-  },
-};
+});
 
 export const datePickerGroupDisabledStyles: CSSObject = {
   opacity: 0.5,
   cursor: 'not-allowed',
 };
 
-export const dateInputStyles: CSSObject = {
+export const dateInputStyles = (theme: Theme): CSSObject => ({
   display: 'flex',
   alignItems: 'center',
   gap: 0,
-  fontSize: 'var(--font-size-medium)',
-  color: 'var(--main-color)',
-  flex: 1,
-};
+  fontSize: theme.fontSizes.medium,
+  color: theme.general.color,
+  flex: '1 1 0',
+  minWidth: 0,
+  width: '100%',
+});
 
-export const dateSegmentStyles: CSSObject = {
+export const dateSegmentStyles = (theme: Theme): CSSObject => ({
   padding: '2px 0',
   borderRadius: '6px',
   margin: 0,
@@ -95,17 +100,14 @@ export const dateSegmentStyles: CSSObject = {
     margin: 0,
   },
   '&[data-placeholder]': {
-    color: 'var(--gray-60)',
+    color: theme.Input.placeholderColor,
   },
   '&[data-focused]': {
-    backgroundColor: 'var(--gray-20)',
+    backgroundColor: theme.IconButton.hoverPrimaryBgColor,
   },
-  'body.theme-dark &[data-focused]': {
-    backgroundColor: 'var(--gray-80)',
-  },
-};
+});
 
-export const calendarButtonStyles: CSSObject = {
+export const calendarButtonStyles = (theme: Theme): CSSObject => ({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -114,39 +116,31 @@ export const calendarButtonStyles: CSSObject = {
   borderRadius: '10px',
   border: '1px solid transparent',
   background: 'transparent',
-  color: 'var(--main-color)',
+  color: theme.general.color,
   cursor: 'pointer',
   flexShrink: 0,
   '&:hover, &[data-focus-visible]': {
-    backgroundColor: 'var(--gray-20)',
+    backgroundColor: theme.IconButton.hoverPrimaryBgColor,
   },
-  'body.theme-dark &': {
-    color: 'var(--white)',
-    '&:hover, &[data-focus-visible]': {
-      backgroundColor: 'var(--gray-80)',
-    },
-  },
-};
+});
 
 export const calendarIconStyles: CSSObject = {
   width: '18px',
   height: '18px',
 };
 
-export const calendarPopoverStyles: CSSObject = {
-  backgroundColor: COLOR.WHITE,
-  border: '1px solid var(--gray-40)',
+export const calendarPopoverStyles = (theme: Theme): CSSObject => ({
+  backgroundColor: theme.Input.backgroundColor,
+  border: `1px solid ${theme.Select.borderColor}`,
   borderRadius: '16px',
   padding: '12px',
   boxShadow: '0 12px 30px rgba(0, 0, 0, 0.12)',
-  width: 'var(--trigger-width)',
-  maxWidth: 'var(--trigger-width)',
+  minWidth: `${calendarPopoverMinWidth}px`,
+  width: `max(var(--trigger-width), ${calendarPopoverMinWidth}px)`,
+  maxWidth: `max(var(--trigger-width), ${calendarPopoverMinWidth}px)`,
   boxSizing: 'border-box',
-  'body.theme-dark &': {
-    backgroundColor: 'var(--gray-90)',
-    borderColor: 'var(--gray-100)',
-  },
-};
+  color: theme.general.color,
+});
 
 export const calendarHeaderStyles: CSSObject = {
   display: 'flex',
@@ -156,57 +150,51 @@ export const calendarHeaderStyles: CSSObject = {
   marginBottom: '10px',
 };
 
-export const calendarHeadingStyles: CSSObject = {
-  fontSize: 'var(--font-size-medium)',
-  fontWeight: 'var(--font-weight-semibold)',
-  color: 'var(--main-color)',
-};
+export const calendarHeadingStyles = (theme: Theme): CSSObject => ({
+  fontSize: theme.fontSizes.medium,
+  fontWeight: 600,
+  color: theme.general.color,
+});
 
-export const calendarNavButtonStyles: CSSObject = {
+export const calendarNavButtonStyles = (theme: Theme): CSSObject => ({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   width: '28px',
   height: '28px',
   borderRadius: '8px',
-  border: '1px solid var(--gray-30)',
-  backgroundColor: COLOR.WHITE,
+  border: `1px solid ${theme.Select.borderColor}`,
+  backgroundColor: theme.Input.backgroundColor,
+  color: theme.general.color,
   cursor: 'pointer',
   '&:hover, &[data-focus-visible]': {
-    backgroundColor: 'var(--gray-20)',
+    backgroundColor: theme.IconButton.hoverPrimaryBgColor,
   },
-  'body.theme-dark &': {
-    backgroundColor: 'var(--gray-90)',
-    borderColor: 'var(--gray-100)',
-    '&:hover, &[data-focus-visible]': {
-      backgroundColor: 'var(--gray-80)',
-    },
-  },
-};
+});
 
-export const calendarGridStyles: CSSObject = {
+export const calendarGridStyles = (theme: Theme): CSSObject => ({
   width: '100%',
   borderCollapse: 'collapse',
   tableLayout: 'fixed',
-  fontSize: 'var(--font-size-small)',
-  color: 'var(--main-color)',
-};
+  fontSize: theme.fontSizes.small,
+  color: theme.general.color,
+});
 
-export const calendarGridHeaderStyles: CSSObject = {
+export const calendarGridHeaderStyles = (theme: Theme): CSSObject => ({
   textTransform: 'uppercase',
-  fontSize: 'var(--font-size-small)',
-  color: 'var(--gray-70)',
-};
+  fontSize: theme.fontSizes.small,
+  color: theme.Input.placeholderColor,
+});
 
 export const calendarHeaderCellStyles: CSSObject = {
   paddingBottom: '6px',
   textAlign: 'center',
-  fontWeight: 'var(--font-weight-semibold)',
+  fontWeight: 600,
   verticalAlign: 'middle',
   width: '36px',
 };
 
-export const calendarCellStyles: CSSObject = {
+export const calendarCellStyles = (theme: Theme): CSSObject => ({
   width: '36px',
   height: '36px',
   textAlign: 'center',
@@ -217,19 +205,38 @@ export const calendarCellStyles: CSSObject = {
   justifyContent: 'center',
   margin: '0 auto',
   lineHeight: 1,
+  backgroundColor: 'transparent',
+  color: theme.general.color,
   '&[data-outside-month]': {
-    color: 'var(--gray-60)',
+    color: theme.Input.placeholderColor,
+  },
+  '&[data-hovered]': {
+    backgroundColor: theme.Select.optionHoverBg,
+    color: theme.general.color,
+  },
+  '&[data-outside-month][data-hovered]': {
+    color: theme.Input.placeholderColor,
   },
   '&[data-selected]': {
-    backgroundColor: 'var(--accent-color) !important',
-    color: 'var(--white) !important',
+    backgroundColor: theme.general.primaryColor,
+    color: theme.Select.contrastTextColor,
   },
-  '&[data-focus-visible]': {
-    outline: '2px solid var(--accent-color)',
-    outlineOffset: '2px',
+  '&[data-selected][data-hovered]': {
+    backgroundColor: theme.general.primaryColor,
+    color: theme.Select.contrastTextColor,
+  },
+  '&[data-focus-visible]:not([data-selected])': {
+    backgroundColor: theme.Select.optionHoverBg,
+    outline: `2px solid ${theme.general.primaryColor}`,
+    outlineOffset: '0',
+  },
+  '&[data-focus-visible][data-selected]': {
+    outline: `2px solid ${theme.Select.contrastTextColor}`,
+    outlineOffset: '0',
   },
   '&[data-disabled]': {
-    color: 'var(--gray-50)',
+    backgroundColor: 'transparent',
+    color: theme.Select.disabledColor,
     cursor: 'not-allowed',
   },
-};
+});
