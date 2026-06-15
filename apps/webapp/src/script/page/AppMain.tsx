@@ -325,7 +325,7 @@ export const AppMain = (properties: AppMainProps) => {
       data-uie-name="status-webapp"
       data-uie-value="is-loaded"
     >
-      {!locked && <WindowTitleUpdater />}
+      {!locked && <WindowTitleUpdater translate={translate} />}
       <RootProvider
         value={{
           fireAndForgetInvoker,

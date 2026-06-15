@@ -27,8 +27,8 @@ import {WebAppEvents} from '@wireapp/webapp-events';
 import {ConversationState} from 'Repositories/conversation/ConversationState';
 import {NOTIFICATION_HANDLING_STATE} from 'Repositories/event/NotificationHandlingState';
 import {UserState} from 'Repositories/user/userState';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {getLogger} from 'Util/logger';
 
 import {Config} from '../../Config';
@@ -39,7 +39,7 @@ const windowTitleLogger = getLogger('WindowTitlesViewModel');
 const MIN_UNREAD_COUNT = 0;
 const MIN_CONNECTION_REQUEST_COUNT = 1;
 
-const useWindowTitle = (translate: ReturnType<typeof useApplicationContext>['translate']) => {
+const useWindowTitle = (translate: Translate) => {
   const userState = container.resolve(UserState);
   const conversationState = container.resolve(ConversationState);
 
@@ -164,8 +164,13 @@ const useWindowTitle = (translate: ReturnType<typeof useApplicationContext>['tra
   }, [initiateTitleUpdates, updateNotificationState]);
 };
 
-export function WindowTitleUpdater(): null {
-  const {translate} = useApplicationContext();
+type WindowTitleUpdaterProps = {
+  readonly translate: Translate;
+};
+
+export function WindowTitleUpdater(properties: WindowTitleUpdaterProps): null {
+  const {translate} = properties;
+
   useWindowTitle(translate);
 
   return null;
