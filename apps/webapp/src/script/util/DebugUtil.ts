@@ -434,6 +434,20 @@ export class DebugUtil {
   }
 
   /**
+   * Used by QA/developers to fetch revocation data on demand.
+   * Available in console via window.wire.app.debug.refreshE2EIRevocationData().
+   */
+  async refreshE2EIRevocationData(): Promise<void> {
+    const e2eIdentityService = this.core.service?.e2eIdentity;
+
+    if (!e2eIdentityService) {
+      throw new Error('E2EI service is not available');
+    }
+
+    await e2eIdentityService.refreshRevocationData();
+  }
+
+  /**
    * Used by QA test automation: Will allow the webapp to generate fake link previews when sending a link in a message.
    */
   enableLinkPreviews(): void {

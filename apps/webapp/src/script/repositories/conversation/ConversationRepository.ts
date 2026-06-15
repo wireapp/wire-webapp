@@ -2222,13 +2222,24 @@ export class ConversationRepository {
   }): Promise<void> => {
     this.logger.info('Ensuring conversation exists', {conversationId, groupId, epoch});
     if (await this.conversationService.mlsGroupExistsLocally(groupId)) {
-      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch});
-      if (epoch === 0) {
+      const coreCryptoEpochNumber = await core.service?.mls?.getEpoch(groupId);
+      this.logger.info('Conversation already exists locally', {conversationId, groupId, epoch, coreCryptoEpochNumber});
+      if (coreCryptoEpochNumber === 0) {
         if (!retry) {
-          this.logger.error('Epoch is 0, but retry is false, not retrying again', {conversationId, groupId, epoch});
+          this.logger.error('Epoch is 0, but retry is false, not retrying again', {
+            conversationId,
+            groupId,
+            epoch,
+            coreCryptoEpochNumber,
+          });
           return;
         }
-        return this.recoverFromLocalUnestablishedMLSConversations({conversationId, groupId, epoch, core});
+        return this.recoverFromLocalUnestablishedMLSConversations({
+          conversationId,
+          groupId,
+          epoch: coreCryptoEpochNumber,
+          core,
+        });
       }
       return;
     }

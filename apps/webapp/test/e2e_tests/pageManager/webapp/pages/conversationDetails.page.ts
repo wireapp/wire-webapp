@@ -43,8 +43,8 @@ export class ConversationDetailsPage {
     this.archiveButton = this.conversationDetails.locator(selectByDataAttribute('do-archive'));
     this.blockConversationButton = this.conversationDetails.locator(selectByDataAttribute('do-block'));
     this.clearConversationContentButton = this.conversationDetails.getByRole('button', {name: 'Clear Content'});
-    this.selectedSearchList = this.page.locator(selectByDataAttribute('selected-search-list'));
-    this.searchList = this.page.locator(selectByDataAttribute('search-list'));
+    this.selectedSearchList = this.page.getByTestId('selected-search-list');
+    this.searchList = this.page.locator('#add-participants').getByRole('list');
   }
 
   async waitForSidebar() {

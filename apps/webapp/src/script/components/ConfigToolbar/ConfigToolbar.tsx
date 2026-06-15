@@ -309,6 +309,7 @@ export function ConfigToolbar() {
       <Button disabled={isResettingMLSConversation} onClick={resetMLSConversation}>
         Reset MLS Conversation
       </Button>
+      <Button onClick={() => window.wire?.app?.debug?.refreshE2EIRevocationData()}>Force CRL expiry</Button>
 
       <div>{renderAvsSwitch()}</div>
 
