@@ -22,21 +22,25 @@ import {Button, ButtonVariant, CalendarIcon, CallIcon} from '@wireapp/react-ui-k
 import {
   emptyListActionButtonContainerStyles,
   emptyListActionButtonsStyles,
-  emptyListHelpStyles,
+  emptyListBodyStyles,
+  emptyListHeadingStyles,
   emptyListStyles,
 } from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
+import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {t} from 'Util/localizerUtil';
 
 export const EmptyMeetingList = () => {
+  const {handleMeetNow, handleScheduleMeeting} = useMeetingActions();
+
   return (
-    <div css={emptyListStyles}>
-      <div>{t('meetings.noMeetingsText')}</div>
-      <div css={emptyListHelpStyles}>{t('meetings.startMeetingHelp')}</div>
+    <div css={emptyListStyles} data-uie-name="empty-meetings-list">
+      <p css={emptyListHeadingStyles}>{t('meetings.noMeetingsText')}</p>
+      <p css={emptyListBodyStyles}>{t('meetings.startMeetingHelp')}</p>
       <div css={emptyListActionButtonContainerStyles}>
-        <Button variant={ButtonVariant.TERTIARY}>
+        <Button variant={ButtonVariant.TERTIARY} onClick={handleMeetNow} data-uie-name="meet-now">
           <CallIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.meetNow')}
         </Button>
-        <Button variant={ButtonVariant.TERTIARY}>
+        <Button variant={ButtonVariant.TERTIARY} onClick={handleScheduleMeeting} data-uie-name="schedule-meeting">
           <CalendarIcon css={emptyListActionButtonsStyles} /> {t('meetings.action.scheduleMeeting')}
         </Button>
       </div>

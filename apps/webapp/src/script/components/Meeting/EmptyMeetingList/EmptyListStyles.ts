@@ -20,19 +20,29 @@
 import {CSSObject} from '@emotion/react';
 
 export const emptyListStyles: CSSObject = {
-  width: '550px',
+  maxWidth: '550px',
   textAlign: 'center',
-  display: 'grid',
-  gap: '12px',
-  '& > div:last-of-type': {
-    display: 'flex',
-    gap: '8px',
-    justifyContent: 'center',
-  },
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
 };
 
-export const emptyListHelpStyles: CSSObject = {
-  marginTop: '10px',
+export const emptyListHeadingStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontWeight: 'var(--font-weight-semibold)',
+  fontSize: 'var(--font-size-base)',
+  lineHeight: 'var(--line-height-md)',
+  letterSpacing: '0.05px',
+  margin: '0 0 10px',
+};
+
+export const emptyListBodyStyles: CSSObject = {
+  color: 'var(--main-color)',
+  fontWeight: 'var(--font-weight-regular)',
+  fontSize: 'var(--font-size-base)',
+  lineHeight: 'var(--line-height-md)',
+  letterSpacing: '0.05px',
+  margin: '0 0 30px',
 };
 
 export const emptyListActionButtonsStyles: CSSObject = {
@@ -40,7 +50,9 @@ export const emptyListActionButtonsStyles: CSSObject = {
 };
 
 export const emptyListActionButtonContainerStyles: CSSObject = {
-  marginTop: '30px',
+  display: 'flex',
+  gap: '8px',
+  justifyContent: 'center',
 };
 
 export const emptyTabsListContainerStyles: CSSObject = {
