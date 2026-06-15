@@ -37,6 +37,7 @@
     "@tanstack/react-virtual": "3.14.2",
     "@wireapp/avs": "10.4.5",
     "@wireapp/avs-debugger": "0.0.7",
+    "@wireapp/commons": "workspace:^",
     "@wireapp/config": "workspace:^",
     "@wireapp/core": "workspace:^",
     "@wireapp/kalium-backup": "0.0.4",
