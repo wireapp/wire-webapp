@@ -21,5 +21,5 @@ export * from './meeting';
 export * from './meetingEmailsInvitation';
 export * from './meetingRecurrence';
 export * from './meetingsApi';
-export * from './newMeeting';
+export * from './createMeeting';
 export * from './updateMeeting';

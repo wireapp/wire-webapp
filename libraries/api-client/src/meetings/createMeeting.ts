@@ -19,7 +19,7 @@
 
 import {MeetingRecurrence} from './meetingRecurrence';
 
-export interface NewMeeting {
+export interface CreateMeeting {
   end_time: string;
   invited_emails?: string[];
   recurrence?: MeetingRecurrence;

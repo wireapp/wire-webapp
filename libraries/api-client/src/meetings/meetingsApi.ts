@@ -19,9 +19,9 @@
 
 import {AxiosRequestConfig} from 'axios';
 
+import {CreateMeeting} from './createMeeting';
 import {Meeting} from './meeting';
 import {MeetingEmailsInvitation} from './meetingEmailsInvitation';
-import {NewMeeting} from './newMeeting';
 import {UpdateMeeting} from './updateMeeting';
 
 import {HttpClient} from '../http';
@@ -44,7 +44,7 @@ export class MeetingsAPI {
   /**
    * Create a new meeting.
    */
-  public async createMeeting(newMeeting: NewMeeting): Promise<Meeting> {
+  public async createMeeting(newMeeting: CreateMeeting): Promise<Meeting> {
     const config: AxiosRequestConfig = {
       data: newMeeting,
       method: 'post',
