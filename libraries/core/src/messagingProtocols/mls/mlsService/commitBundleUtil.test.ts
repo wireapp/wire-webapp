@@ -20,7 +20,7 @@
 import {mls} from '@wireapp/protocol-messaging/web/mls';
 import {Encoder} from 'bazinga64';
 
-import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType, Welcome, GroupInfo} from '@wireapp/core-crypto';
+import {CommitBundle, RatchetTreeType, GroupInfoEncryptionType, Welcome, GroupInfo} from '@wireapp/core-crypto/browser';
 
 import {toProtobufCommitBundle} from './commitBundleUtil';
 

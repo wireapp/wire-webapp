@@ -19,9 +19,8 @@
 
 import {MLSPublicKeyAlgorithmKeys, RegisteredClient} from '@wireapp/api-client/lib/client';
 
-import {Ciphersuite} from '@wireapp/core-crypto';
-
 import {ClientIdStringType, constructFullyQualifiedClientId} from '../../../../util/fullyQualifiedClientIdUtils';
+import {Ciphersuite} from '../../ciphersuite';
 
 export const jsonToByteArray = (data: any): Uint8Array => {
   const encoder = new TextEncoder();
@@ -44,7 +43,7 @@ export const getE2EIClientId = (clientId: string, userId: string, userDomain: st
 /**
  * depending on the ciphersuite used, the signature algorithm used is different. We need to keep a mapping of the ciphersuite to the signature algorithm
  */
-const ciphersuiteSignatureAlgorithmMap: Record<Ciphersuite, MLSPublicKeyAlgorithmKeys> = {
+const ciphersuiteSignatureAlgorithmMap: Partial<Record<Ciphersuite, MLSPublicKeyAlgorithmKeys>> = {
   [Ciphersuite.MLS_128_DHKEMP256_AES128GCM_SHA256_P256]: MLSPublicKeyAlgorithmKeys.ECDSA_SECP256R1_SHA256,
   [Ciphersuite.MLS_256_DHKEMP384_AES256GCM_SHA384_P384]: MLSPublicKeyAlgorithmKeys.ECDSA_SECP384R1_SHA384,
   [Ciphersuite.MLS_256_DHKEMP521_AES256GCM_SHA512_P521]: MLSPublicKeyAlgorithmKeys.ECDSA_SECP521R1_SHA512,
@@ -55,7 +54,11 @@ const ciphersuiteSignatureAlgorithmMap: Record<Ciphersuite, MLSPublicKeyAlgorith
 };
 
 export const getSignatureAlgorithmForCiphersuite = (ciphersuite: Ciphersuite): MLSPublicKeyAlgorithmKeys => {
-  return ciphersuiteSignatureAlgorithmMap[ciphersuite];
+  const signatureAlgorithm = ciphersuiteSignatureAlgorithmMap[ciphersuite];
+  if (signatureAlgorithm === undefined) {
+    throw new Error(`Unsupported MLS ciphersuite: ${ciphersuite}`);
+  }
+  return signatureAlgorithm;
 };
 
 export const isMLSDevice = ({mls_public_keys}: RegisteredClient, ciphersuite: Ciphersuite) => {

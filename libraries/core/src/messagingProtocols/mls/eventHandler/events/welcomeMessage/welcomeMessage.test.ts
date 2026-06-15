@@ -19,7 +19,7 @@
 
 import {ConversationMLSWelcomeEvent, CONVERSATION_EVENT} from '@wireapp/api-client/lib/event';
 
-import {Welcome} from '@wireapp/core-crypto';
+import {Welcome} from '@wireapp/core-crypto/browser';
 
 import {handleMLSWelcomeMessage} from './welcomeMessage';
 

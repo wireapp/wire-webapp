@@ -18,7 +18,7 @@
  */
 
 /**
- * A small, library-free Chain of Responsibility to normalize diverse MLS/core-crypto/backend
+ * A small, library-free Chain of Responsibility to normalize diverse MLS/core-crypto/browser/backend
  * errors into a closed {@link DomainMlsError} union. This module is side-effect free and only
  * classifies errors; recovery actions are implemented by a separate orchestrator.
  */
@@ -27,7 +27,7 @@ import {SUBCONVERSATION_ID, MLSStaleMessageError, MLSGroupOutOfSyncError} from '
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Encoder} from 'bazinga64';
 
-import {isMlsConversationAlreadyExistsError, isMlsOrphanWelcomeError, MlsErrorType} from '@wireapp/core-crypto';
+import {CoreCryptoError, MlsError} from '@wireapp/core-crypto/browser';
 
 // Reuse existing type-guards from the MLS layer
 import {
@@ -37,14 +37,26 @@ import {
   isBrokenMLSConversationError,
   getMLSGroupOutOfSyncErrorMissingUsers,
   ConversationAlreadyExistsError,
+  isCoreCryptoMLSConversationAlreadyExistsError,
 } from '../mlsService/coreCryptoMlsError';
+
+export const MlsErrorType = {
+  WrongEpoch: 'WrongEpoch',
+  ConversationAlreadyExists: 'ConversationAlreadyExists',
+  OrphanWelcome: 'OrphanWelcome',
+  Other: 'Other',
+} as const;
 
 /**
  * Domain error taxonomy used by policies and orchestrator.
  *
  * These are intentionally decoupled from concrete error classes to keep the orchestrator stable.
  */
-export type DomainMlsErrorType = MlsErrorType | 'KeyMaterialUpdateFailure' | 'GroupOutOfSync' | 'GroupNotEstablished';
+export type DomainMlsErrorType =
+  | (typeof MlsErrorType)[keyof typeof MlsErrorType]
+  | 'KeyMaterialUpdateFailure'
+  | 'GroupOutOfSync'
+  | 'GroupNotEstablished';
 
 /**
  * Normalized error shape produced by the mapper.
@@ -124,7 +136,7 @@ export class ChainedMlsErrorMapper implements MlsErrorMapper {
 
 /** ---------------------- Concrete handlers ---------------------- */
 
-/** Wrong epoch or stale message from MLS/core-crypto/backend. */
+/** Wrong epoch or stale message from MLS/core-crypto/browser/backend. */
 const WrongEpochHandler: ErrorHandler = {
   canHandle: err =>
     isCoreCryptoMLSWrongEpochError?.(err) || isMLSStaleMessageError?.(err) || err instanceof MLSStaleMessageError,
@@ -177,12 +189,12 @@ const GroupOutOfSyncHandler: ErrorHandler = {
 
 /** core-crypto indicates a local group already exists for the welcome's group id. */
 const ConversationAlreadyExistsHandler: ErrorHandler = {
-  canHandle: error => isMlsConversationAlreadyExistsError?.(error) === true,
+  canHandle: error => isCoreCryptoMLSConversationAlreadyExistsError(error),
   map: (error, context) => {
-    if (!isMlsConversationAlreadyExistsError(error)) {
+    if (!isCoreCryptoMLSConversationAlreadyExistsError(error)) {
       throw new Error('Error is not a ConversationAlreadyExists error');
     }
-    const groupId = tryExtractGroupIdFromCoreCryptoError(error);
+    const groupId = tryExtractGroupIdFromCoreCryptoError(error as ConversationAlreadyExistsError);
     return {
       type: MlsErrorType.ConversationAlreadyExists,
       message: 'Conversation already exists',
@@ -194,7 +206,7 @@ const ConversationAlreadyExistsHandler: ErrorHandler = {
 
 /** Orphan welcome (no matching state); caller should try to join. */
 const OrphanWelcomeHandler: ErrorHandler = {
-  canHandle: err => isMlsOrphanWelcomeError?.(err) === true,
+  canHandle: err => CoreCryptoError.Mls.instanceOf(err) && MlsError.OrphanWelcome.instanceOf(err.inner.mlsError),
   map: (err, context) => ({
     type: MlsErrorType.OrphanWelcome,
     message: 'Orphan welcome message',
@@ -239,12 +251,10 @@ export function createDefaultMlsErrorMapper(): MlsErrorMapper {
  */
 function tryExtractGroupIdFromCoreCryptoError(err: ConversationAlreadyExistsError): string | undefined {
   try {
-    // core-crypto error.context?.context?.conversationId is a byte array (number[])
-    const conversationIdArray = err?.context?.context?.conversationId;
-    if (conversationIdArray === undefined) {
+    if (!CoreCryptoError.Mls.instanceOf(err) || !MlsError.ConversationAlreadyExists.instanceOf(err.inner.mlsError)) {
       return undefined;
     }
-    return Encoder.toBase64(new Uint8Array(conversationIdArray)).asString;
+    return Encoder.toBase64(err.inner.mlsError.inner.conversationId).asString;
   } catch {
     return undefined;
   }

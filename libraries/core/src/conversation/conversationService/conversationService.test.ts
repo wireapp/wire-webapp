@@ -38,7 +38,7 @@ import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Result, task} from 'true-myth';
 
 import {APIClient} from '@wireapp/api-client';
-import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
+import {ErrorType, MlsErrorType} from '@wireapp/core-crypto/browser';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {AddUsersFailure, AddUsersFailureReasons, ConversationService, MessageSendingState} from '..';

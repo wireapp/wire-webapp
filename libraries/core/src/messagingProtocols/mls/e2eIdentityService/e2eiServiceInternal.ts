@@ -21,10 +21,10 @@ import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory} from '@wireapp/commons';
-import {ConversationId} from '@wireapp/core-crypto';
+import {ConversationId} from '@wireapp/core-crypto/browser';
 
 import {AcmeService} from './connection/acmeServer';
-import {AcmeDirectory, Ciphersuite, CoreCrypto, CredentialType, E2eiEnrollment} from './e2eiService.types';
+import {AcmeDirectory, CoreCrypto, CredentialType, E2eiEnrollment} from './e2eiService.types';
 import {isResponseStatusValid} from './helper';
 import {createNewAccount} from './steps/account';
 import {getAuthorizationChallenges} from './steps/authorization';
@@ -32,11 +32,10 @@ import {getCertificate} from './steps/certificate';
 import {doWireDpopChallenge} from './steps/dpopChallenge/dpopChallenge';
 import {doWireOidcChallenge} from './steps/oidcChallenge';
 import {createNewOrder, finalizeOrder} from './steps/order';
-import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 import {EnrollmentFlowData, InitialData, UnidentifiedEnrollmentFlowData} from './storage/e2eiStorage.schema';
 
 import {CoreDatabase} from '../../../storage/coreDb';
-import {toBufferSource} from '../../../util/bufferUtils';
+import {Ciphersuite} from '../ciphersuite';
 
 export type getTokenCallback = (challengesData?: {challenge: any; keyAuth: string}) => Promise<string | undefined>;
 
@@ -48,7 +47,6 @@ export type getAllConversationsCallback = () => Promise<
 export class E2EIServiceInternal {
   private readonly logger = LogFactory.getLogger('@wireapp/core/E2EIdentityServiceInternal');
   private acmeService: AcmeService;
-  private enrollmentStorage: ReturnType<typeof createE2EIEnrollmentStorage>;
 
   public constructor(
     coreDb: CoreDatabase,
@@ -61,7 +59,6 @@ export class E2EIServiceInternal {
   ) {
     const {discoveryUrl} = initialData;
     this.acmeService = new AcmeService(discoveryUrl);
-    this.enrollmentStorage = createE2EIEnrollmentStorage(coreDb);
   }
 
   /**
@@ -75,6 +72,8 @@ export class E2EIServiceInternal {
     getAllConversations: getAllConversationsCallback,
     ciphersuite: Ciphersuite,
   ) {
+    throw new Error('E2EI certificate generation must be migrated to CoreCrypto 10 X509CredentialAcquisition before use');
+    /*
     const stashedEnrollmentData = await this.enrollmentStorage.getPendingEnrollmentData();
 
     if (stashedEnrollmentData !== undefined) {
@@ -93,7 +92,7 @@ export class E2EIServiceInternal {
     const challengeData = {challenge: oidcChallenge, keyAuth: keyauth};
 
     // store auth data for continuing the flow later on (in case we are redirected to the identity provider)
-    const handle = await this.coreCryptoClient.transaction(cx => cx.e2eiEnrollmentStash(identity));
+    const handle = await this.coreCryptoClient.transaction(cx => (cx as any).e2eiEnrollmentStash(identity));
 
     const enrollmentData = {
       handle: toBufferSource(handle),
@@ -107,30 +106,31 @@ export class E2EIServiceInternal {
       throw new Error('No OAuthToken received for in initial enrollment process');
     }
     return this.continueCertificateGeneration(oAuthToken, enrollmentData, getAllConversations, ciphersuite);
+    */
   }
 
-  private async continueCertificateGeneration(
+  public async continueCertificateGeneration(
     oAuthToken: string,
     enrollmentData: EnrollmentFlowData,
     getAllConversations: getAllConversationsCallback,
     cipherSuite: Ciphersuite,
   ) {
     const handle = enrollmentData.handle;
-    const identity = await this.coreCryptoClient.transaction(cx => cx.e2eiEnrollmentStashPop(handle));
+    const identity = await this.coreCryptoClient.transaction(cx => (cx as any).e2eiEnrollmentStashPop(handle));
     return this.getKeyPackages(identity, oAuthToken, enrollmentData, getAllConversations, cipherSuite);
   }
 
   // ############ Internal Functions ############
 
-  private async initIdentity(hasActiveCertificate: boolean, ciphersuite: Ciphersuite) {
+  public async initIdentity(hasActiveCertificate: boolean, ciphersuite: Ciphersuite) {
     const {user} = this.initialData;
 
     return hasActiveCertificate
       ? this.coreCryptoClient.transaction(cx =>
-          cx.e2eiNewRotateEnrollment(this.certificateTtl, ciphersuite, user.displayName, user.handle, user.teamId),
+          (cx as any).e2eiNewRotateEnrollment(this.certificateTtl, ciphersuite, user.displayName, user.handle, user.teamId),
         )
       : this.coreCryptoClient.transaction(cx =>
-          cx.e2eiNewActivationEnrollment(user.displayName, user.handle, this.certificateTtl, ciphersuite, user.teamId),
+          (cx as any).e2eiNewActivationEnrollment(user.displayName, user.handle, this.certificateTtl, ciphersuite, user.teamId),
         );
   }
 
@@ -158,7 +158,7 @@ export class E2EIServiceInternal {
    *
    * @returns authData
    */
-  private async getEnrollmentChallenges(identity: E2eiEnrollment) {
+  public async getEnrollmentChallenges(identity: E2eiEnrollment) {
     // Get the directory
     const {acmeService: acmeService} = this;
     const directory = await this.getDirectory(identity, acmeService);
@@ -273,7 +273,7 @@ export class E2EIServiceInternal {
     // Step 10: Initialize MLS with the certificate
     return this.coreCryptoClient.transaction(async cx => {
       const conversations = await getAllConversations();
-      const newCrlDistributionPoints = await cx.saveX509Credential(identity, certificate);
+      const newCrlDistributionPoints = await (cx as any).saveX509Credential(identity, certificate);
       for (const conversation of conversations) {
         if (Boolean(conversation.group_id?.length)) {
           try {
@@ -283,7 +283,7 @@ export class E2EIServiceInternal {
             // Check if conversation exists before rotating
             const conversationExists = await cx.conversationExists(conversationId);
             if (conversationExists) {
-              await cx.e2eiRotate(conversationId);
+              await (cx as any).e2eiRotate(conversationId);
             }
           } catch (error) {
             // Log error but don't fail the entire enrollment if one conversation fails
@@ -294,9 +294,9 @@ export class E2EIServiceInternal {
         }
       }
 
-      await cx.deleteStaleKeyPackages(cipherSuite);
+      await (cx as any).deleteStaleKeyPackages(cipherSuite);
 
-      const keyPackages = await cx.clientKeypackages(cipherSuite, CredentialType.X509, this.keyPackagesAmount);
+      const keyPackages = await (cx as any).clientKeypackages(cipherSuite, CredentialType.X509, this.keyPackagesAmount);
 
       return {
         newCrlDistributionPoints,

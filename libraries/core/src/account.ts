@@ -48,7 +48,7 @@ import logdown from 'logdown';
 
 import {APIClient, BackendFeatures} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
-import type {CoreCryptoLogLevel} from '@wireapp/core-crypto';
+import type {CoreCryptoLogLevel} from '@wireapp/core-crypto/browser';
 import {PromiseQueue} from '@wireapp/promise-queue';
 import {CRUDEngine, MemoryEngine} from '@wireapp/store-engine';
 

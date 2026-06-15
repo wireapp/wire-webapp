@@ -19,7 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {CoreCryptoError, ErrorContext, ErrorType, isMlsMessageRejectedError, MlsErrorType} from '@wireapp/core-crypto';
+import {CoreCryptoError, MlsError} from '@wireapp/core-crypto/browser';
 
 export const CORE_CRYPTO_ERROR_NAMES = {
   MlsErrorConversationAlreadyExists: 'MlsErrorConversationAlreadyExists',
@@ -37,11 +37,11 @@ export const CORE_CRYPTO_ERROR_NAMES = {
 };
 
 export const isCoreCryptoMLSWrongEpochError = (error: unknown): boolean => {
-  return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorWrongEpoch;
+  return CoreCryptoError.Mls.instanceOf(error) && MlsError.WrongEpoch.instanceOf(error.inner.mlsError);
 };
 
 export const isCoreCryptoMLSConversationAlreadyExistsError = (error: unknown): boolean => {
-  return error instanceof Error && error.name === CORE_CRYPTO_ERROR_NAMES.MlsErrorConversationAlreadyExists;
+  return CoreCryptoError.Mls.instanceOf(error) && MlsError.ConversationAlreadyExists.instanceOf(error.inner.mlsError);
 };
 
 const mlsDecryptionErrorNamesToIgnore: string[] = [
@@ -66,7 +66,7 @@ const CONVERSATION_NOT_FOUND_MESSAGE = "Couldn't find conversation";
 
 /** Local MLS group was removed (e.g. after leaving a call subconversation). */
 export const isMlsConversationNotFoundError = (error: unknown): boolean => {
-  if (!(error instanceof Error) || error.name !== CORE_CRYPTO_ERROR_NAMES.MlsErrorOther) {
+  if (!CoreCryptoError.Mls.instanceOf(error) || !MlsError.Other.instanceOf(error.inner.mlsError)) {
     return false;
   }
 
@@ -74,14 +74,27 @@ export const isMlsConversationNotFoundError = (error: unknown): boolean => {
     return true;
   }
 
-  const nestedMessage = (error as {context?: {context?: {msg?: string}}}).context?.context?.msg;
-  return nestedMessage === CONVERSATION_NOT_FOUND_MESSAGE;
+  return error.inner.mlsError.inner.msg === CONVERSATION_NOT_FOUND_MESSAGE;
 };
 
 export const shouldMLSDecryptionErrorBeIgnored = (error: unknown): error is Error => {
-  return (
-    error instanceof Error && (mlsDecryptionErrorNamesToIgnore.includes(error.name) || isOtherErrorToIgnore(error))
-  );
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  if (CoreCryptoError.Mls.instanceOf(error)) {
+    const mlsError = error.inner.mlsError;
+    return (
+      MlsError.StaleCommit.instanceOf(mlsError) ||
+      MlsError.StaleProposal.instanceOf(mlsError) ||
+      MlsError.DuplicateMessage.instanceOf(mlsError) ||
+      MlsError.BufferedFutureMessage.instanceOf(mlsError) ||
+      MlsError.UnmergedPendingGroup.instanceOf(mlsError) ||
+      (MlsError.Other.instanceOf(mlsError) && mlsError.inner.msg.startsWith('Incoming message is a commit'))
+    );
+  }
+
+  return mlsDecryptionErrorNamesToIgnore.includes(error.name) || isOtherErrorToIgnore(error);
 };
 
 export const UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
@@ -91,28 +104,26 @@ export const UPLOAD_COMMIT_BUNDLE_ABORT_REASONS = {
   OTHER: 'OTHER',
 };
 
-export type ConversationAlreadyExistsError = CoreCryptoError<ErrorType.Mls> & {
-  context: Extract<
-    ErrorContext[ErrorType.Mls],
-    {
-      type: MlsErrorType.ConversationAlreadyExists;
-    }
-  >;
-};
+export type ConversationAlreadyExistsError = Extract<CoreCryptoError, {tag: 'Mls'}>;
 
-type MessageRejectedError = CoreCryptoError<ErrorType.Mls> & {
-  context: Extract<
-    ErrorContext[ErrorType.Mls],
-    {
-      type: MlsErrorType.MessageRejected;
-    }
-  >;
+type MessageRejectedError = Extract<CoreCryptoError, {tag: 'Mls'}>;
+
+export function isMlsMessageRejectedError(error: unknown): error is MessageRejectedError {
+  return CoreCryptoError.Mls.instanceOf(error) && MlsError.MessageRejected.instanceOf(error.inner.mlsError);
+}
+
+const getRejectedReason = (error: MessageRejectedError): string => {
+  const mlsError = error.inner.mlsError;
+  if (!MlsError.MessageRejected.instanceOf(mlsError)) {
+    throw new Error('Error is not MlsError.MessageRejected');
+  }
+  return mlsError.inner.reason;
 };
 
 export function isBrokenMLSConversationError(error: unknown): error is MessageRejectedError {
   return (
     isMlsMessageRejectedError(error) &&
-    deserializeAbortReason(error.context.context.reason).message ===
+    deserializeAbortReason(getRejectedReason(error)).message ===
       UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.BROKEN_MLS_CONVERSATION
   );
 }
@@ -120,7 +131,7 @@ export function isBrokenMLSConversationError(error: unknown): error is MessageRe
 export function isMLSStaleMessageError(error: unknown): error is MessageRejectedError {
   return (
     isMlsMessageRejectedError(error) &&
-    deserializeAbortReason(error.context.context.reason).message ===
+    deserializeAbortReason(getRejectedReason(error)).message ===
       UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_STALE_MESSAGE
   );
 }
@@ -128,14 +139,14 @@ export function isMLSStaleMessageError(error: unknown): error is MessageRejected
 export function isMLSGroupOutOfSyncError(error: unknown): error is MessageRejectedError {
   return (
     isMlsMessageRejectedError(error) &&
-    deserializeAbortReason(error.context.context.reason).message ===
+    deserializeAbortReason(getRejectedReason(error)).message ===
       UPLOAD_COMMIT_BUNDLE_ABORT_REASONS.MLS_GROUP_OUT_OF_SYNC
   );
 }
 
 export function getMLSGroupOutOfSyncErrorMissingUsers(error: unknown): QualifiedId[] {
   if (isMLSGroupOutOfSyncError(error)) {
-    const reason = deserializeAbortReason(error.context.context.reason);
+    const reason = deserializeAbortReason(getRejectedReason(error));
     return (reason as AbortReasonMLSGroupOutOfSync).missing_users;
   }
 

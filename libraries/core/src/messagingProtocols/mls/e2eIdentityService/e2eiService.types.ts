@@ -17,29 +17,19 @@
  *
  */
 
-import {
-  E2eiEnrollment,
-  Ciphersuite,
-  CoreCrypto,
-  WireIdentity,
-  E2eiConversationState,
-  DeviceStatus,
-  CredentialType,
-} from '@wireapp/core-crypto';
+import {CoreCrypto, WireIdentity, E2eiConversationState, DeviceStatus, CredentialType} from '@wireapp/core-crypto/browser';
 
 /**
  * Proxy types relevant to the E2EIService from CoreCrypto
  */
-type OmitFree<T> = Omit<T, 'free'>;
-type NewAcmeAuthzOriginal = OmitFree<Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>>;
-export type AcmeDirectory = OmitFree<Awaited<ReturnType<E2eiEnrollment['directoryResponse']>>>;
-export type AcmeChallenge = OmitFree<NonNullable<NewAcmeAuthzOriginal['challenge']>>;
-export type NewAcmeOrder = OmitFree<Awaited<ReturnType<E2eiEnrollment['newOrderResponse']>>>;
-export type NewAcmeAuthz = Pick<
-  Awaited<ReturnType<E2eiEnrollment['newAuthzResponse']>>,
-  'identifier' | 'keyauth' | 'challenge'
->;
-export {E2eiEnrollment, Ciphersuite, CoreCrypto, DeviceStatus, WireIdentity, E2eiConversationState, CredentialType};
+export type E2eiEnrollment = any;
+type NewAcmeAuthzOriginal = any;
+export type AcmeDirectory = any;
+export type AcmeChallenge = any;
+export type NewAcmeOrder = any;
+export type NewAcmeAuthz = any;
+export type {WireIdentity};
+export {CoreCrypto, DeviceStatus, E2eiConversationState, CredentialType};
 
 export type User = {
   id: string;

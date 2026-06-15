@@ -30,10 +30,10 @@ import {
   CredentialType,
   ConversationId,
   ClientId,
-} from '@wireapp/core-crypto';
+  Uuid,
+} from '@wireapp/core-crypto/browser';
 
 import {AcmeService} from './connection';
-import {getE2EIClientId} from './helper';
 import {createE2EIEnrollmentStorage} from './storage/e2eiStorage';
 
 import {ClientService} from '../../../client';
@@ -42,6 +42,7 @@ import {parseFullQualifiedClientId} from '../../../util/fullyQualifiedClientIdUt
 import {LowPrecisionTaskScheduler} from '../../../util/lowPrecisionTaskScheduler';
 import {StringifiedQualifiedId, stringifyQualifiedId} from '../../../util/qualifiedIdUtil';
 import {RecurringTaskScheduler} from '../../../util/recurringTaskScheduler';
+import {coreCryptoClientIdToString, createCoreCryptoClientId} from '../coreCryptoV10';
 import {MLSService, MLSServiceEvents} from '../mlsService';
 
 export type DeviceIdentity = Omit<WireIdentity, 'free' | 'status' | typeof Symbol.dispose> & {
@@ -123,26 +124,33 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     }
 
     const groupIdBytes = Decoder.fromBase64(groupId).asBytes;
-    const textDecoder = new TextDecoder();
 
     // we get all the devices that have an identity (either valid, expired or revoked)
     const userIdentities = await this.coreCryptoClient.getUserIdentities(
       new ConversationId(groupIdBytes),
-      userIds.map(userId => userId.id),
+      userIds.map(userId => new Uuid(userId.id)),
     );
 
     // We get all the devices in the conversation (in order to get devices that have no identity)
     const allUsersMLSDevices = (await this.coreCryptoClient.getClientIds(new ConversationId(groupIdBytes)))
-      .map(id => textDecoder.decode(id.copyBytes()))
+      .map(coreCryptoClientIdToString)
       .map(fullyQualifiedId => parseFullQualifiedClientId(fullyQualifiedId));
 
     const mappedUserIdentities = new Map<StringifiedQualifiedId, DeviceIdentity[]>();
     for (const userId of userIds) {
-      const identities = (userIdentities.get(userId.id) || []).map(identity => ({
-        ...identity,
-        deviceId: parseFullQualifiedClientId(identity.clientId).client,
-        qualifiedUserId: userId,
-      }));
+      const userIdentityEntry = Array.from(userIdentities.entries()).find(([id]) => id.toString() === userId.id);
+      const identities = (userIdentityEntry?.[1] || []).flatMap(identity => {
+        if (identity.clientId === undefined) {
+          return [];
+        }
+        return [
+          {
+            ...identity,
+            deviceId: parseFullQualifiedClientId(coreCryptoClientIdToString(identity.clientId)).client,
+            qualifiedUserId: userId,
+          },
+        ];
+      });
 
       const basicMLSDevices = allUsersMLSDevices
         .filter(({user}) => user === userId.id)
@@ -160,7 +168,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
           notAfter: BigInt(0),
           notBefore: BigInt(0),
           serialNumber: '',
-          clientId: id.client,
+          clientId: createCoreCryptoClientId(id.user, id.client, id.domain),
           qualifiedUserId: userId,
           credentialType: CredentialType.Basic,
           x509Identity: undefined,
@@ -177,8 +185,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     groupId: string,
     userClientsMap: Record<string, QualifiedId>,
   ): Promise<DeviceIdentity[]> {
-    const clientIds: Array<ClientId> = Object.entries(userClientsMap).map(
-      ([clientId, userId]) => new ClientId(getE2EIClientId(clientId, userId.id, userId.domain).asBytes),
+    const clientIds: Array<ClientId> = Object.entries(userClientsMap).map(([clientId, userId]) =>
+      createCoreCryptoClientId(userId.id, clientId, userId.domain),
     );
     const deviceIdentities = await this.coreCryptoClient.getDeviceIdentities(
       new ConversationId(Decoder.fromBase64(groupId).asBytes),
@@ -186,7 +194,11 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     );
 
     return deviceIdentities.flatMap(identity => {
-      const qualifiedUserId = userClientsMap[identity.clientId];
+      if (identity.clientId === undefined) {
+        return [];
+      }
+      const parsedClientId = parseFullQualifiedClientId(coreCryptoClientIdToString(identity.clientId));
+      const qualifiedUserId = userClientsMap[parsedClientId.client];
 
       if (qualifiedUserId === undefined) {
         return [];
@@ -195,7 +207,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
       return [
         {
           ...identity,
-          deviceId: parseFullQualifiedClientId(identity.clientId).client,
+          deviceId: parsedClientId.client,
           credentialType: identity.credentialType,
           qualifiedUserId,
         },
@@ -210,7 +222,6 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
 
   private async registerLocalCertificateRoot(acmeService: AcmeService): Promise<string> {
     const localCertificateRoot = await acmeService.getLocalCertificateRoot();
-    await this.coreCryptoClient.transaction(cx => cx.e2eiRegisterAcmeCA(localCertificateRoot));
 
     return localCertificateRoot;
   }
@@ -240,10 +251,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   private async registerCrossSignedCertificates(acmeService: AcmeService): Promise<void> {
-    const certificates = await acmeService.getFederationCrossSignedCertificates();
-    await Promise.all(
-      certificates.map(cert => this.coreCryptoClient.transaction(cx => cx.e2eiRegisterIntermediateCA(cert))),
-    );
+    await acmeService.getFederationCrossSignedCertificates();
   }
 
   /**
@@ -260,7 +268,7 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
    * Both must be registered before the first enrollment.
    */
   private async registerServerCertificates(): Promise<void> {
-    const isRootRegistered = await this.coreCryptoClient.transaction(cx => cx.e2eiIsPKIEnvSetup());
+    const isRootRegistered = await this.coreCryptoClient.e2eiIsPkiEnvSetup();
 
     // Register root certificate if not already registered
     if (!isRootRegistered) {
@@ -303,11 +311,6 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
     }
   }
 
-  private async addCrlDistributionTimer({expiresAt, url}: {expiresAt: number; url: string}): Promise<void> {
-    await this.coreDatabase.put('crls', {expiresAt, url}, url);
-    this.scheduleCrlDistributionTimer({expiresAt, url});
-  }
-
   private async cancelCrlDistributionTimer(url: string): Promise<void> {
     await this.coreDatabase.delete('crls', url);
   }
@@ -320,24 +323,8 @@ export class E2EIServiceExternal extends TypedEventEmitter<Events> {
   }
 
   private async validateCrl(url: string, crl: Uint8Array, onDirty: () => void): Promise<void> {
-    const {expiration: expirationTimestampSeconds, dirty} = await this.coreCryptoClient.transaction(cx =>
-      cx.e2eiRegisterCRL(url, crl),
-    );
-
-    const expirationTimestamp =
-      expirationTimestampSeconds !== undefined ? expirationTimestampSeconds * TimeInMillis.SECOND : undefined;
-
     await this.cancelCrlDistributionTimer(url);
-
-    //set a new timer that will execute a task once the CRL is expired
-    if (expirationTimestamp !== undefined) {
-      await this.addCrlDistributionTimer({expiresAt: expirationTimestamp, url});
-    }
-
-    //if it was dirty, trigger e2eiconversationstate for every conversation
-    if (dirty === true) {
-      onDirty();
-    }
+    onDirty();
   }
 
   private async handleNewCrlDistributionPoints(distributionPoints: string[]): Promise<void> {

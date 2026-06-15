@@ -19,7 +19,7 @@
 
 import {mls} from '@wireapp/protocol-messaging/web/mls';
 
-import {CommitBundle, GroupInfoEncryptionType, RatchetTreeType} from '@wireapp/core-crypto';
+import {CommitBundle, GroupInfoEncryptionType, RatchetTreeType} from '@wireapp/core-crypto/browser';
 
 const ratchetTreeMapping: Record<RatchetTreeType, mls.RatchetTreeType> = {
   [RatchetTreeType.Full]: mls.RatchetTreeType.FULL,
@@ -41,10 +41,10 @@ export function toProtobufCommitBundle({commit, welcome, groupInfo}: CommitBundl
   return mls.CommitBundle.encode({
     groupInfoBundle: {
       ratchetTreeType: ratchetTreeMapping[ratchetTreeType],
-      groupInfo: groupInfo.payload.copyBytes(),
+      groupInfo: groupInfo.payload,
       groupInfoType: groupInfoType[encryptionType],
     },
     commit,
-    welcome: welcome?.copyBytes(),
+    welcome: welcome?.serialize(),
   }).finish();
 }

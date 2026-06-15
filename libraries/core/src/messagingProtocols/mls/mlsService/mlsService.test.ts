@@ -37,7 +37,7 @@ import {
   CoreCryptoContext,
   DecryptedMessage,
   WelcomeBundle,
-} from '@wireapp/core-crypto';
+} from '@wireapp/core-crypto/browser';
 
 import {CORE_CRYPTO_ERROR_NAMES} from './coreCryptoMlsError';
 import {InitClientOptions, MLSService} from './mlsService';

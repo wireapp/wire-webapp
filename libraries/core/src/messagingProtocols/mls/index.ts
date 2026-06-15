@@ -20,3 +20,4 @@
 export * from './mlsService/';
 export * from './e2eIdentityService';
 export * from './types';
+export * from './ciphersuite';

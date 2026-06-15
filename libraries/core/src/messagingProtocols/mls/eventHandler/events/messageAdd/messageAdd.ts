@@ -22,13 +22,14 @@ import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Decoder} from 'bazinga64';
 
 import {LogFactory} from '@wireapp/commons';
-import {ConversationId} from '@wireapp/core-crypto';
+import {ConversationId} from '@wireapp/core-crypto/browser';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {queueProposal} from './incomingProposalsQueue';
 
 import {HandledEventPayload} from '../../../../../notification';
-import {MLSService, optionalToUint8Array} from '../../../mlsService/mlsService';
+import {coreCryptoClientIdToString} from '../../../coreCryptoV10';
+import {MLSService} from '../../../mlsService/mlsService';
 
 const logger = LogFactory.getLogger('@wireapp/core/mls/messageAdd');
 
@@ -75,9 +76,7 @@ export const handleMLSMessageAdd = async ({
   const {message, commitDelay, senderClientId: encodedSenderClientId} = decryptedMessage;
 
   if (encodedSenderClientId) {
-    const decoder = new TextDecoder();
-    const senderClientId = decoder.decode(optionalToUint8Array(encodedSenderClientId.copyBytes()));
-    event.senderClientId = senderClientId;
+    event.senderClientId = coreCryptoClientIdToString(encodedSenderClientId);
   }
 
   // Check if the message includes proposals

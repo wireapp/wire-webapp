@@ -19,7 +19,7 @@
 
 import axios from 'axios';
 
-import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto';
+import {ClientId, CoreCrypto, CoreCryptoContext, CredentialType, WireIdentity} from '@wireapp/core-crypto/browser';
 
 import {E2EIServiceExternal} from './e2eiServiceExternal';
 

@@ -45,7 +45,7 @@ import {Decoder} from 'bazinga64';
 
 import {APIClient} from '@wireapp/api-client';
 import {LogFactory, TypedEventEmitter} from '@wireapp/commons';
-import {ConversationId} from '@wireapp/core-crypto';
+import {ConversationId} from '@wireapp/core-crypto/browser';
 import {GenericMessage} from '@wireapp/protocol-messaging';
 
 import {

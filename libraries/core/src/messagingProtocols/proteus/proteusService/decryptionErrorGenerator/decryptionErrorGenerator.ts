@@ -19,13 +19,7 @@
 
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
-import {
-  isProteusDuplicateMessageError,
-  isProteusRemoteIdentityChangedError,
-  isProteusSessionNotFoundError,
-  isProteusError,
-  ProteusErrorType,
-} from '@wireapp/core-crypto';
+import {CoreCryptoError, ProteusError} from '@wireapp/core-crypto/browser';
 
 import {DecryptionError} from '../../../../errors/decryptionError';
 
@@ -49,20 +43,20 @@ const hasProteusErrorCode = (error: unknown): error is LegacyProteusError =>
 type SenderInfo = {clientId: string; userId: QualifiedId};
 
 function getErrorCode(error: unknown): number {
-  if (isProteusSessionNotFoundError(error)) {
-    return ProteusErrors.SessionNotFound;
-  }
-
-  if (isProteusRemoteIdentityChangedError(error)) {
-    return ProteusErrors.RemoteIdentityChanged;
-  }
-
-  if (isProteusDuplicateMessageError(error)) {
-    return ProteusErrors.DuplicateMessage;
-  }
-
-  if (isProteusError(error, ProteusErrorType.Other)) {
-    return ProteusErrors.Unknown;
+  if (CoreCryptoError.Proteus.instanceOf(error)) {
+    const proteusError = error.inner.exception;
+    if (ProteusError.SessionNotFound.instanceOf(proteusError)) {
+      return ProteusErrors.SessionNotFound;
+    }
+    if (ProteusError.RemoteIdentityChanged.instanceOf(proteusError)) {
+      return ProteusErrors.RemoteIdentityChanged;
+    }
+    if (ProteusError.DuplicateMessage.instanceOf(proteusError)) {
+      return ProteusErrors.DuplicateMessage;
+    }
+    if (ProteusError.Other.instanceOf(proteusError)) {
+      return proteusError.inner.errorCode;
+    }
   }
 
   if (hasProteusErrorCode(error)) {

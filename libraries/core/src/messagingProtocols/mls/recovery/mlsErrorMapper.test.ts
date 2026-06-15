@@ -21,7 +21,7 @@ import {MLSStaleMessageError} from '@wireapp/api-client/lib/conversation';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 import {Encoder} from 'bazinga64';
 
-import {ErrorType, MlsErrorType} from '@wireapp/core-crypto';
+import {ErrorType, MlsErrorType} from '@wireapp/core-crypto/browser';
 
 import {createDefaultMlsErrorMapper} from './mlsErrorMapper';
 

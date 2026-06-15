@@ -31,7 +31,9 @@ import {
   initWasmModule,
   migrateDatabaseKeyTypeToBytes,
   DatabaseKey,
-} from '@wireapp/core-crypto';
+  Database,
+  proteusLastResortPrekeyId,
+} from '@wireapp/core-crypto/browser';
 import type {CRUDEngine} from '@wireapp/store-engine';
 
 import {PrekeyTracker} from './prekeysTracker';
@@ -62,8 +64,8 @@ const logFunctions: Record<CoreCryptoLogLevel, Function> = {
 };
 
 const coreCryptoLogger = {
-  log: (level: CoreCryptoLogLevel, message: string, context: string) => {
-    logFunctions[level].call(logger, {message, context});
+  log: (level: CoreCryptoLogLevel, message: string, context: string | undefined) => {
+    logFunctions[level]?.call(logger, {message, context});
   },
 };
 
@@ -120,7 +122,8 @@ export const getCoreCryptoDbName = (storeEngine: CRUDEngine): string => {
 export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> => {
   const coreCryptoDbName = getCoreCryptoDbName(storeEngine);
   try {
-    await coreCryptoInstance?.close();
+    await coreCryptoDatabase?.close();
+    coreCryptoDatabase = undefined;
     await deleteDB(coreCryptoDbName);
     logger.log('info', 'CoreCrypto DB wiped successfully');
   } catch (error: unknown) {
@@ -128,7 +131,7 @@ export const wipeCoreCryptoDb = async (storeEngine: CRUDEngine): Promise<void> =
   }
 };
 
-let coreCryptoInstance: CoreCrypto | undefined;
+let coreCryptoDatabase: Database | undefined;
 export async function buildClient(
   storeEngine: CRUDEngine,
   {generateSecretKey, nbPrekeys, onNewPrekeys}: Config,
@@ -157,10 +160,8 @@ export async function buildClient(
           }
         }
 
-        coreCryptoInstance = await CoreCrypto.deferredInit({
-          databaseName: coreCryptoDbName,
-          key: key.key,
-        });
+        coreCryptoDatabase = await Database.open(coreCryptoDbName, key.key);
+        const coreCryptoInstance = CoreCrypto.new(coreCryptoDatabase);
 
         setLogger(coreCryptoLogger);
         setMaxLogLevel(CoreCryptoLogLevel.Info);
@@ -210,7 +211,7 @@ export class CoreCryptoWrapper implements CryptoClient {
 
   async create(nbPrekeys: number, entropy?: Uint8Array) {
     if (entropy) {
-      await this.coreCrypto.reseedRng(entropy);
+      await this.coreCrypto.reseed(entropy);
     }
     await this.init();
     const prekeys: PreKey[] = [];
@@ -221,7 +222,7 @@ export class CoreCryptoWrapper implements CryptoClient {
     const lastPrekeyBytes = await this.coreCrypto.transaction(cx => cx.proteusLastResortPrekey());
     const lastPrekey = Encoder.toBase64(lastPrekeyBytes).asString;
 
-    const lastPrekeyId = CoreCrypto.proteusLastResortPrekeyId();
+    const lastPrekeyId = proteusLastResortPrekeyId();
 
     return {
       prekeys,
