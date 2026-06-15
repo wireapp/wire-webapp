@@ -20,7 +20,11 @@
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
 import {CellsSortDirection} from 'Components/Conversation/ConversationCells/common/CellsSortIcon/CellsSortIcon';
-import {CellsSortField} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
+import {
+  CellsSortField,
+  SORTABLE_COLUMN_FIELD,
+  toAriaSort,
+} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -62,18 +66,22 @@ export const CellsTable = ({nodes, cellsRepository, getDirectionFor, onToggleSor
           <thead>
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
-                  <th
-                    key={header.id}
-                    css={headerCellStyles}
-                    colSpan={header.colSpan}
-                    style={{
-                      width: header.id == 'name' ? undefined : header.getSize(),
-                    }}
-                  >
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
+                {headerGroup.headers.map(header => {
+                  const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
+                  return (
+                    <th
+                      key={header.id}
+                      css={headerCellStyles}
+                      colSpan={header.colSpan}
+                      aria-sort={sortField ? toAriaSort(getDirectionFor(sortField)) : undefined}
+                      style={{
+                        width: header.id == 'name' ? undefined : header.getSize(),
+                      }}
+                    >
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </th>
+                  );
+                })}
               </tr>
             ))}
           </thead>

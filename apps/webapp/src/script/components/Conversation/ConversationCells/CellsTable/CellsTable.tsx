@@ -37,7 +37,7 @@ import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
 import {CellsSortDirection} from '../common/CellsSortIcon/CellsSortIcon';
-import {CellsSortField} from '../common/useCellsSorting/useCellsSorting';
+import {CellsSortField, SORTABLE_COLUMN_FIELD, toAriaSort} from '../common/useCellsSorting/useCellsSorting';
 
 interface CellsTableProps {
   nodes: Array<CellNode>;
@@ -94,10 +94,12 @@ export const CellsTable = ({
             {table.getHeaderGroups().map(headerGroup => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map(header => {
+                  const sortField = SORTABLE_COLUMN_FIELD[header.column.id];
                   return (
                     <th
                       key={header.id}
                       css={headerCellStyles}
+                      aria-sort={sortField ? toAriaSort(getDirectionFor(sortField)) : undefined}
                       style={{
                         width: header.id == 'name' ? undefined : header.getSize(),
                       }}

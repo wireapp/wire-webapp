@@ -36,6 +36,26 @@ const DEFAULT_DIRECTION: Record<CellsSortField, CellsSortDirection> = {
   size: 'asc',
 };
 
+// Maps a table column id (the accessor key) to its backend sort field. Columns absent
+// from this map are not sortable and receive no aria-sort.
+export const SORTABLE_COLUMN_FIELD: Record<string, CellsSortField> = {
+  name: 'name_ci',
+  sizeMb: 'size',
+  uploadedAtTimestamp: 'mtime',
+};
+
+// Translates a sort direction into the value the `aria-sort` attribute expects on a
+// sortable column header. A sortable-but-inactive column reports 'none'.
+export const toAriaSort = (direction: CellsSortDirection | undefined): 'ascending' | 'descending' | 'none' => {
+  if (direction === 'asc') {
+    return 'ascending';
+  }
+  if (direction === 'desc') {
+    return 'descending';
+  }
+  return 'none';
+};
+
 export const useCellsSorting = () => {
   const [sort, setSort] = useState<CellsSort | null>(null);
 
