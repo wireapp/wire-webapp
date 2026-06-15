@@ -60,6 +60,7 @@ const light: () => CSSObject = () => ({
 
   // Select
   '--select-focused-description': COLOR_V2.WHITE,
+  '--select-option-hover-bg': COLOR_V2.BLUE_LIGHT_50,
 
   // Range Input
   '--indicator-range-input-thumb': COLOR_V2.BLUE_LIGHT_700,
@@ -171,6 +172,7 @@ const dark: () => CSSObject = () => ({
 
   // Select
   '--select-focused-description': COLOR_V2.GRAY_40,
+  '--select-option-hover-bg': COLOR_V2.GRAY_80,
 
   // Range Input
   '--indicator-range-input-thumb': COLOR_V2.BLUE_DARK_300,

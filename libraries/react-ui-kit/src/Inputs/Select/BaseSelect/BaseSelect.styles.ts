@@ -160,11 +160,12 @@ export const baseOptionStyles = ({
       color: theme.Select.contrastTextColor,
       '&:hover': {
         backgroundColor: theme.Select.selectedActiveBg,
+        color: theme.Select.contrastTextColor,
       },
       '&:active': {
         backgroundColor: theme.general.primaryColor,
         boxShadow: `inset 0 0 0 1px ${theme.Select.selectedActiveBg}`,
-        color: theme.general.contrastColor,
+        color: theme.Select.contrastTextColor,
       },
     }),
   ...(isFocused &&

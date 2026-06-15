@@ -1,0 +1,1382 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`"TimePickerField" renders 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.emotion-3 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-3:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-4>div {
+  height: 48px;
+  min-height: 48px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  border-radius: 14px;
+}
+
+.emotion-4>div:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+.emotion-5 {
+  z-index: 9999;
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  overflow: hidden;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.emotion-7 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  padding: 0 16px;
+  height: 48px;
+  min-height: 48px;
+  background: #fff;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px #dce0e3;
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  line-height: 1.5rem;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.emotion-7::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-7::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-7::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-7:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-7:focus-visible,
+.emotion-7:focus,
+.emotion-7:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-7:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-7:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-7:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:-webkit-autofill:focus-visible,
+.emotion-7:-webkit-autofill:focus,
+.emotion-7:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:focus:visible,
+.emotion-7 active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: grid;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  -webkit-box-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.emotion-9 {
+  grid-area: 1/1/2/3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgb(29, 30, 31);
+  margin-left: 2px;
+  margin-right: 2px;
+  box-sizing: border-box;
+}
+
+.emotion-10 {
+  background: 0;
+  border: 0;
+  caret-color: transparent;
+  font-size: inherit;
+  grid-area: 1/1/2/3;
+  outline: 0;
+  padding: 0;
+  width: 1px;
+  color: transparent;
+  left: -100px;
+  opacity: 0;
+  position: relative;
+  -webkit-transform: scale(.01);
+  -moz-transform: scale(.01);
+  -ms-transform: scale(.01);
+  transform: scale(.01);
+}
+
+.emotion-11 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.emotion-12 {
+  display: none;
+}
+
+.emotion-13 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-transition: color 150ms;
+  transition: color 150ms;
+  color: hsl(0, 0%, 80%);
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.emotion-13:hover {
+  color: hsl(0, 0%, 60%);
+}
+
+.emotion-14 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  margin-top: 4px;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-1"
+    data-uie-name="time-picker-test"
+  >
+    <label
+      className="emotion-2"
+      htmlFor="time-picker-test"
+      id="time-picker-test-label"
+    >
+      Select time
+    </label>
+    <div
+      autoFocus={false}
+      className="emotion-3"
+      data-uie-name="time-picker-test"
+    >
+      <div
+        className="emotion-4"
+        onKeyDown={[Function]}
+      >
+        <div
+          tabIndex={0}
+        >
+          <span
+            className="emotion-5"
+            id="react-select-2-live-region"
+          />
+          <span
+            aria-atomic="false"
+            aria-live="polite"
+            aria-relevant="additions text"
+            className="emotion-5"
+            role="log"
+          />
+          <div
+            className="emotion-7"
+            onMouseDown={[Function]}
+            onTouchEnd={[Function]}
+          >
+            <div
+              className="emotion-8"
+            >
+              <div
+                className="emotion-9"
+              >
+                12:00 AM
+              </div>
+               
+              <input
+                aria-activedescendant=""
+                aria-autocomplete="list"
+                aria-expanded={false}
+                aria-haspopup={true}
+                aria-readonly={true}
+                className="emotion-10"
+                disabled={false}
+                id="time-picker-test"
+                inputMode="none"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                role="combobox"
+                tabIndex={-1}
+                value=""
+              />
+            </div>
+            <div
+              className="emotion-11"
+            >
+              <span
+                className="emotion-12"
+              />
+              <div
+                aria-hidden="true"
+                className="emotion-13"
+                onMouseDown={[Function]}
+                onTouchEnd={[Function]}
+              >
+                <svg
+                  className="emotion-14"
+                  height={16}
+                  viewBox="0 0 16 16"
+                  width={16}
+                >
+                  <g>
+                    <path
+                      d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"TimePickerField" renders as disabled 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.emotion-3 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-3:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-4>div {
+  height: 48px;
+  min-height: 48px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  border-radius: 14px;
+}
+
+.emotion-4>div:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+.emotion-5 {
+  z-index: 9999;
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  overflow: hidden;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.emotion-7 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  padding: 0 16px;
+  height: 48px;
+  min-height: 48px;
+  background: #edeff0;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px #dce0e3;
+  caret-color: #0667c8;
+  color: #676b71;
+  font-weight: 400;
+  line-height: 1.5rem;
+  outline: none;
+  width: 100%;
+  background-color: #edeff0;
+  min-width: 0;
+}
+
+.emotion-7::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-7::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-7::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-7:focus-visible,
+.emotion-7:focus,
+.emotion-7:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-7:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-7:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-7:-webkit-autofill:focus-visible,
+.emotion-7:-webkit-autofill:focus,
+.emotion-7:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: grid;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  -webkit-box-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.emotion-9 {
+  grid-area: 1/1/2/3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgb(80, 82, 84);
+  margin-left: 2px;
+  margin-right: 2px;
+  box-sizing: border-box;
+}
+
+.emotion-10 {
+  background: 0;
+  border: 0;
+  caret-color: transparent;
+  font-size: inherit;
+  grid-area: 1/1/2/3;
+  outline: 0;
+  padding: 0;
+  width: 1px;
+  color: transparent;
+  left: -100px;
+  opacity: 0;
+  position: relative;
+  -webkit-transform: scale(.01);
+  -moz-transform: scale(.01);
+  -ms-transform: scale(.01);
+  transform: scale(.01);
+}
+
+.emotion-11 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.emotion-12 {
+  display: none;
+}
+
+.emotion-13 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-transition: color 150ms;
+  transition: color 150ms;
+  color: hsl(0, 0%, 80%);
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.emotion-13:hover {
+  color: hsl(0, 0%, 60%);
+}
+
+.emotion-13>svg {
+  fill: rgb(80, 82, 84);
+}
+
+.emotion-14 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  margin-top: 4px;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-1"
+    data-uie-name="time-picker-test"
+  >
+    <label
+      className="emotion-2"
+      htmlFor="time-picker-test"
+      id="time-picker-test-label"
+    >
+      Select time
+    </label>
+    <div
+      autoFocus={false}
+      className="emotion-3"
+      data-uie-name="time-picker-test"
+    >
+      <div
+        className="emotion-4"
+        onKeyDown={[Function]}
+      >
+        <div
+          tabIndex={0}
+        >
+          <span
+            className="emotion-5"
+            id="react-select-5-live-region"
+          />
+          <span
+            aria-atomic="false"
+            aria-live="polite"
+            aria-relevant="additions text"
+            className="emotion-5"
+            role="log"
+          />
+          <div
+            aria-disabled={true}
+            className="emotion-7"
+            onMouseDown={[Function]}
+            onTouchEnd={[Function]}
+          >
+            <div
+              className="emotion-8"
+            >
+              <div
+                className="emotion-9"
+              >
+                12:00 AM
+              </div>
+               
+              <input
+                aria-activedescendant=""
+                aria-autocomplete="list"
+                aria-expanded={false}
+                aria-haspopup={true}
+                aria-readonly={true}
+                className="emotion-10"
+                disabled={true}
+                id="time-picker-test"
+                inputMode="none"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                role="combobox"
+                tabIndex={-1}
+                value=""
+              />
+            </div>
+            <div
+              className="emotion-11"
+            >
+              <span
+                className="emotion-12"
+              />
+              <div
+                aria-hidden="true"
+                className="emotion-13"
+                onMouseDown={[Function]}
+                onTouchEnd={[Function]}
+              >
+                <svg
+                  className="emotion-14"
+                  height={16}
+                  viewBox="0 0 16 16"
+                  width={16}
+                >
+                  <g>
+                    <path
+                      d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"TimePickerField" renders as invalid 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 2px;
+  width: 100%;
+  min-width: 0;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.emotion-3 {
+  margin-bottom: 2px;
+  width: 100%;
+}
+
+.emotion-3:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-4>div {
+  height: 48px;
+  min-height: 48px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  border-radius: 14px;
+}
+
+.emotion-4>div:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+.emotion-5 {
+  z-index: 9999;
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  overflow: hidden;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.emotion-7 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  padding: 0 16px;
+  height: 48px;
+  min-height: 48px;
+  background: #fff;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px var(--danger-color);
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  line-height: 1.5rem;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.emotion-7::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-7::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-7::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-7:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-7:focus-visible,
+.emotion-7:focus,
+.emotion-7:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-7:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-7:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:-webkit-autofill:focus-visible,
+.emotion-7:-webkit-autofill:focus,
+.emotion-7:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:focus:visible,
+.emotion-7 active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: grid;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  -webkit-box-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.emotion-9 {
+  grid-area: 1/1/2/3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgb(29, 30, 31);
+  margin-left: 2px;
+  margin-right: 2px;
+  box-sizing: border-box;
+}
+
+.emotion-10 {
+  background: 0;
+  border: 0;
+  caret-color: transparent;
+  font-size: inherit;
+  grid-area: 1/1/2/3;
+  outline: 0;
+  padding: 0;
+  width: 1px;
+  color: transparent;
+  left: -100px;
+  opacity: 0;
+  position: relative;
+  -webkit-transform: scale(.01);
+  -moz-transform: scale(.01);
+  -ms-transform: scale(.01);
+  transform: scale(.01);
+}
+
+.emotion-11 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.emotion-12 {
+  display: none;
+}
+
+.emotion-13 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-transition: color 150ms;
+  transition: color 150ms;
+  color: hsl(0, 0%, 80%);
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.emotion-13:hover {
+  color: hsl(0, 0%, 60%);
+}
+
+.emotion-14 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  margin-top: 4px;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-1"
+    data-uie-name="time-picker-test"
+  >
+    <label
+      className="emotion-2"
+      htmlFor="time-picker-test"
+      id="time-picker-test-label"
+    >
+      Select time
+    </label>
+    <div
+      autoFocus={false}
+      className="emotion-3"
+      data-uie-name="time-picker-test"
+    >
+      <div
+        className="emotion-4"
+        onKeyDown={[Function]}
+      >
+        <div
+          tabIndex={0}
+        >
+          <span
+            className="emotion-5"
+            id="react-select-4-live-region"
+          />
+          <span
+            aria-atomic="false"
+            aria-live="polite"
+            aria-relevant="additions text"
+            className="emotion-5"
+            role="log"
+          />
+          <div
+            className="emotion-7"
+            onMouseDown={[Function]}
+            onTouchEnd={[Function]}
+          >
+            <div
+              className="emotion-8"
+            >
+              <div
+                className="emotion-9"
+              >
+                12:00 AM
+              </div>
+               
+              <input
+                aria-activedescendant=""
+                aria-autocomplete="list"
+                aria-expanded={false}
+                aria-haspopup={true}
+                aria-readonly={true}
+                className="emotion-10"
+                disabled={false}
+                id="time-picker-test"
+                inputMode="none"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                role="combobox"
+                tabIndex={-1}
+                value=""
+              />
+            </div>
+            <div
+              className="emotion-11"
+            >
+              <span
+                className="emotion-12"
+              />
+              <div
+                aria-hidden="true"
+                className="emotion-13"
+                onMouseDown={[Function]}
+                onTouchEnd={[Function]}
+              >
+                <svg
+                  className="emotion-14"
+                  height={16}
+                  viewBox="0 0 16 16"
+                  width={16}
+                >
+                  <g>
+                    <path
+                      d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"TimePickerField" renders with label 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+  min-width: 0;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1rem;
+  color: #54585f;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.emotion-3 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-3:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-4>div {
+  height: 48px;
+  min-height: 48px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  border-radius: 14px;
+}
+
+.emotion-4>div:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
+
+.emotion-5 {
+  z-index: 9999;
+  border: 0;
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  width: 1px;
+  position: absolute;
+  overflow: hidden;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.emotion-7 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -ms-appearance: none;
+  appearance: none;
+  padding: 0 16px;
+  height: 48px;
+  min-height: 48px;
+  background: #fff;
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px #dce0e3;
+  caret-color: #0667c8;
+  color: rgb(29, 30, 31);
+  font-weight: 400;
+  line-height: 1.5rem;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.emotion-7::-moz-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+  opacity: 1;
+}
+
+.emotion-7::-ms-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-7::-webkit-input-placeholder {
+  color: rgb(80, 82, 84);
+  font-size: 1rem;
+  text-transform: none;
+}
+
+.emotion-7:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover);
+}
+
+.emotion-7:focus-visible,
+.emotion-7:focus,
+.emotion-7:active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-7:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3;
+}
+
+.emotion-7:-webkit-autofill {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+  -webkit-text-fill-color: rgb(29, 30, 31);
+}
+
+.emotion-7:-webkit-autofill:hover {
+  box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:-webkit-autofill:focus-visible,
+.emotion-7:-webkit-autofill:focus,
+.emotion-7:-webkit-autofill:active {
+  box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:-webkit-autofill:invalid:not(:focus, :hover) {
+  box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
+}
+
+.emotion-7:focus:visible,
+.emotion-7 active {
+  box-shadow: 0 0 0 1px #0667c8;
+}
+
+.emotion-8 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: grid;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  -webkit-box-flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.emotion-9 {
+  grid-area: 1/1/2/3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: rgb(29, 30, 31);
+  margin-left: 2px;
+  margin-right: 2px;
+  box-sizing: border-box;
+}
+
+.emotion-10 {
+  background: 0;
+  border: 0;
+  caret-color: transparent;
+  font-size: inherit;
+  grid-area: 1/1/2/3;
+  outline: 0;
+  padding: 0;
+  width: 1px;
+  color: transparent;
+  left: -100px;
+  opacity: 0;
+  position: relative;
+  -webkit-transform: scale(.01);
+  -moz-transform: scale(.01);
+  -ms-transform: scale(.01);
+  transform: scale(.01);
+}
+
+.emotion-11 {
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-align-self: stretch;
+  -ms-flex-item-align: stretch;
+  align-self: stretch;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.emotion-12 {
+  display: none;
+}
+
+.emotion-13 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-transition: color 150ms;
+  transition: color 150ms;
+  color: hsl(0, 0%, 80%);
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+.emotion-13:hover {
+  color: hsl(0, 0%, 60%);
+}
+
+.emotion-14 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  margin-top: 4px;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-1"
+    data-uie-name="time-picker-test"
+  >
+    <label
+      className="emotion-2"
+      htmlFor="time-picker-test"
+      id="time-picker-test-label"
+    >
+      Time
+    </label>
+    <div
+      autoFocus={false}
+      className="emotion-3"
+      data-uie-name="time-picker-test"
+    >
+      <div
+        className="emotion-4"
+        onKeyDown={[Function]}
+      >
+        <div
+          tabIndex={0}
+        >
+          <span
+            className="emotion-5"
+            id="react-select-3-live-region"
+          />
+          <span
+            aria-atomic="false"
+            aria-live="polite"
+            aria-relevant="additions text"
+            className="emotion-5"
+            role="log"
+          />
+          <div
+            className="emotion-7"
+            onMouseDown={[Function]}
+            onTouchEnd={[Function]}
+          >
+            <div
+              className="emotion-8"
+            >
+              <div
+                className="emotion-9"
+              >
+                12:00 AM
+              </div>
+               
+              <input
+                aria-activedescendant=""
+                aria-autocomplete="list"
+                aria-expanded={false}
+                aria-haspopup={true}
+                aria-readonly={true}
+                className="emotion-10"
+                disabled={false}
+                id="time-picker-test"
+                inputMode="none"
+                onBlur={[Function]}
+                onChange={[Function]}
+                onFocus={[Function]}
+                role="combobox"
+                tabIndex={-1}
+                value=""
+              />
+            </div>
+            <div
+              className="emotion-11"
+            >
+              <span
+                className="emotion-12"
+              />
+              <div
+                aria-hidden="true"
+                className="emotion-13"
+                onMouseDown={[Function]}
+                onTouchEnd={[Function]}
+              >
+                <svg
+                  className="emotion-14"
+                  height={16}
+                  viewBox="0 0 16 16"
+                  width={16}
+                >
+                  <g>
+                    <path
+                      d="M7.99963 12.5711L15.6565 4.91421L14.2423 3.5L7.99963 9.74264L1.75699 3.5L0.342773 4.91421L7.99963 12.5711Z"
+                    />
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;

@@ -28,6 +28,7 @@ import {
   baseMenuListStyles,
   baseMenuStyles,
   baseOptionStyles,
+  baseSingleValueStyles,
 } from './BaseSelect/BaseSelect.styles';
 import {Option} from './Select';
 import {isGroup} from './SelectOption/SelectOption';
@@ -78,11 +79,25 @@ export const customStyles = ({
       : baseContainerStyles(containerCSS),
   menu: (provided, {options}) => ({
     ...provided,
+    width: provided.width,
+    minWidth: provided.minWidth,
     ...baseMenuStyles({theme, menuPosition}),
     ...(isGroup(options) && {
       minWidth: '400px',
     }),
     ...menuCSS,
+  }),
+  singleValue: (provided, selectProps) => ({
+    ...provided,
+    ...baseSingleValueStyles({theme, selectProps}),
+  }),
+  input: provided => ({
+    ...provided,
+    color: theme.general.color,
+  }),
+  placeholder: provided => ({
+    ...provided,
+    color: theme.Input.placeholderColor,
   }),
   menuList: provided => ({
     ...provided,

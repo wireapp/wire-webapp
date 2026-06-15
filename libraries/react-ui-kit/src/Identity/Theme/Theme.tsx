@@ -182,7 +182,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       contrastTextColor: 'var(--text-input-background)',
       disabledColor: 'var(--text-input-placeholder)',
       focusedDescriptionColor: 'var(--select-focused-description)',
-      optionHoverBg: 'var(--accent-color-highlight)',
+      optionHoverBg: 'var(--select-option-hover-bg)',
       selectedActiveBg: 'var(--button-primary-hover)',
     },
     Tooltip: {
@@ -264,7 +264,7 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
       contrastTextColor: COLOR.WHITE,
       borderColor: COLOR_V2.GRAY_40,
       focusedDescriptionColor: COLOR_V2.WHITE,
-      optionHoverBg: 'var(--accent-color-highlight)',
+      optionHoverBg: 'var(--select-option-hover-bg)',
       selectedActiveBg: 'var(--button-primary-hover)',
     },
     Tooltip: {
@@ -343,10 +343,10 @@ export const themes: {[themeId in THEME_ID]: Theme} = {
     },
     Select: {
       disabledColor: COLOR_V2.GRAY_60,
-      contrastTextColor: COLOR.BLACK,
+      contrastTextColor: COLOR.WHITE,
       borderColor: COLOR_V2.GRAY_90,
       focusedDescriptionColor: COLOR_V2.GRAY_40,
-      optionHoverBg: 'var(--accent-color-highlight)',
+      optionHoverBg: COLOR_V2.GRAY_80,
       selectedActiveBg: 'var(--button-primary-active)',
     },
     Tooltip: {
