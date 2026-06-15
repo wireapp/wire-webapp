@@ -19,6 +19,8 @@
 
 import {flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 
+import {CellsSortDirection} from 'Components/Conversation/ConversationCells/common/CellsSortIcon/CellsSortIcon';
+import {CellsSortField} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {useApplicationContext} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -38,14 +40,16 @@ import {FilePreviewProvider} from './common/CellsFilePreviewModalContext/CellsFi
 interface CellsTableProps {
   nodes: CellNode[];
   cellsRepository: CellsRepository;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  onToggleSort: (field: CellsSortField) => void;
 }
 
-export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
+export const CellsTable = ({nodes, cellsRepository, getDirectionFor, onToggleSort}: CellsTableProps) => {
   const {translate} = useApplicationContext();
 
   const table = useReactTable({
     data: nodes,
-    columns: getCellsTableColumns({cellsRepository, translate}),
+    columns: getCellsTableColumns({cellsRepository, getDirectionFor, onToggleSort, translate}),
     getCoreRowModel: getCoreRowModel(),
   });
 
@@ -81,7 +85,9 @@ export const CellsTable = ({nodes, cellsRepository}: CellsTableProps) => {
                     <td
                       key={cell.id}
                       css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                      data-cell={
+                        typeof cell.column.columnDef.header === 'string' ? cell.column.columnDef.header : undefined
+                      }
                       style={{
                         width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
                       }}

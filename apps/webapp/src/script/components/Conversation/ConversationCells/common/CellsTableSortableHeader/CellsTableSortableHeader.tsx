@@ -24,13 +24,22 @@ import {CellsSortDirection, CellsSortIcon} from '../CellsSortIcon/CellsSortIcon'
 interface CellsTableSortableHeaderProps {
   label: string;
   direction?: CellsSortDirection;
+  onClick: () => void;
 }
 
-export const CellsTableSortableHeader = ({label, direction}: CellsTableSortableHeaderProps) => {
+export const CellsTableSortableHeader = ({label, direction, onClick}: CellsTableSortableHeaderProps) => {
+  const isActive = direction !== undefined;
+
   return (
-    <span css={sortableHeaderStyles}>
+    <button
+      type="button"
+      css={sortableHeaderStyles(isActive)}
+      onClick={onClick}
+      data-uie-name="cells-table-sortable-header"
+      data-uie-value={label}
+    >
       {label}
       <CellsSortIcon direction={direction} />
-    </span>
+    </button>
   );
 };

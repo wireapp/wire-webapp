@@ -30,7 +30,9 @@ import {CellsTableRowOptions} from './CellsTableRowOptions/CellsTableRowOptions'
 import {CellsTableSharedColumn} from './CellsTableSharedColumn/CellsTableSharedColumn';
 import {CellsTagsColumn} from './CellsTagsColumn/CellsTagsColumn';
 
+import {CellsSortDirection} from '../../common/CellsSortIcon/CellsSortIcon';
 import {CellsTableSortableHeader} from '../../common/CellsTableSortableHeader/CellsTableSortableHeader';
+import {CellsSortField} from '../../common/useCellsSorting/useCellsSorting';
 
 const columnHelper = createColumnHelper<CellNode>();
 
@@ -41,6 +43,8 @@ export const getCellsTableColumns = ({
   labels,
   onRefresh,
   onCloseSearchView,
+  getDirectionFor,
+  onToggleSort,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
@@ -56,9 +60,17 @@ export const getCellsTableColumns = ({
   };
   onRefresh: () => void;
   onCloseSearchView?: () => void;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  onToggleSort: (field: CellsSortField) => void;
 }) => [
   columnHelper.accessor('name', {
-    header: () => <CellsTableSortableHeader label={t('cells.tableRow.name')} />,
+    header: () => (
+      <CellsTableSortableHeader
+        label={t('cells.tableRow.name')}
+        direction={getDirectionFor('name_ci')}
+        onClick={() => onToggleSort('name_ci')}
+      />
+    ),
     cell: info => <CellsTableNameColumn node={info.row.original} onCloseSearchView={onCloseSearchView} />,
   }),
   columnHelper.accessor('owner', {
@@ -67,7 +79,13 @@ export const getCellsTableColumns = ({
     size: 170,
   }),
   columnHelper.accessor('sizeMb', {
-    header: () => <CellsTableSortableHeader label={t('cells.tableRow.size')} />,
+    header: () => (
+      <CellsTableSortableHeader
+        label={t('cells.tableRow.size')}
+        direction={getDirectionFor('size')}
+        onClick={() => onToggleSort('size')}
+      />
+    ),
     cell: info => info.getValue(),
     size: 100,
   }),
@@ -77,7 +95,13 @@ export const getCellsTableColumns = ({
     size: 120,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: () => <CellsTableSortableHeader label={t('cells.tableRow.created')} />,
+    header: () => (
+      <CellsTableSortableHeader
+        label={t('cells.tableRow.created')}
+        direction={getDirectionFor('mtime')}
+        onClick={() => onToggleSort('mtime')}
+      />
+    ),
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),

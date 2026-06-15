@@ -36,6 +36,9 @@ import {
 import {getCellsTableColumns} from './CellsTableColumns/CellsTableColumns';
 import {CellsFilePreviewModalProvider} from './common/CellsFilePreviewModalContext/CellsFilePreviewModalContext';
 
+import {CellsSortDirection} from '../common/CellsSortIcon/CellsSortIcon';
+import {CellsSortField} from '../common/useCellsSorting/useCellsSorting';
+
 interface CellsTableProps {
   nodes: Array<CellNode>;
   cellsRepository: CellsRepository;
@@ -43,6 +46,8 @@ interface CellsTableProps {
   conversationName: string;
   onRefresh: () => void;
   onCloseSearchView?: () => void;
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  onToggleSort: (field: CellsSortField) => void;
 }
 
 export const CellsTable = ({
@@ -52,6 +57,8 @@ export const CellsTable = ({
   conversationName,
   onRefresh,
   onCloseSearchView,
+  getDirectionFor,
+  onToggleSort,
 }: CellsTableProps) => {
   const {translate} = useApplicationContext();
   const table = useReactTable({
@@ -71,6 +78,8 @@ export const CellsTable = ({
       },
       onRefresh,
       onCloseSearchView,
+      getDirectionFor,
+      onToggleSort,
     }),
     getCoreRowModel: getCoreRowModel(),
   });
@@ -108,7 +117,9 @@ export const CellsTable = ({
                     <td
                       key={cell.id}
                       css={cell.column.id === 'id' ? tableActionsCellStyles : tableCellStyles}
-                      data-cell={cell.column.id === 'id' ? undefined : cell.column.columnDef.header}
+                      data-cell={
+                        typeof cell.column.columnDef.header === 'string' ? cell.column.columnDef.header : undefined
+                      }
                       style={{
                         width: cell.column.id == 'name' ? undefined : cell.column.getSize(),
                       }}

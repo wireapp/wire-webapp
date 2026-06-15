@@ -37,6 +37,7 @@ import {CellsStateInfo} from './CellsStateInfo/CellsStateInfo';
 import {CellsTable} from './CellsTable/CellsTable';
 import {getLoadMoreOffset} from './common/loadMorePagination/loadMorePagination';
 import {isInRecycleBin} from './common/recycleBin/recycleBin';
+import {useCellsSorting} from './common/useCellsSorting/useCellsSorting';
 import {useCellsStore} from './common/useCellsStore/useCellsStore';
 import {useConversationDriveFilters} from './common/useConversationDriveFilters/useConversationDriveFilters';
 import {
@@ -106,6 +107,8 @@ export const ConversationCells = memo(
       conversationRepository,
       translate,
     });
+
+    const {getDirectionFor, toggleSort} = useCellsSorting();
 
     const {
       searchValue,
@@ -220,6 +223,8 @@ export const ConversationCells = memo(
             // opening a folder must close search view and open the browse view
             // with that folder (and breadcrumbs)
             onCloseSearchView={handleSearchViewClosure}
+            getDirectionFor={getDirectionFor}
+            onToggleSort={toggleSort}
           />
         )}
         {isCellsStatePending && !isRefreshing && (

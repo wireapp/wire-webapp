@@ -19,7 +19,9 @@
 
 import {createColumnHelper} from '@tanstack/react-table';
 
+import {CellsSortDirection} from 'Components/Conversation/ConversationCells/common/CellsSortIcon/CellsSortIcon';
 import {CellsTableSortableHeader} from 'Components/Conversation/ConversationCells/common/CellsTableSortableHeader/CellsTableSortableHeader';
+import {CellsSortField} from 'Components/Conversation/ConversationCells/common/useCellsSorting/useCellsSorting';
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import type {RootContextValue} from 'src/script/page/rootProvider';
 import {CellNode} from 'src/script/types/cellNode';
@@ -37,12 +39,22 @@ const columnHelper = createColumnHelper<CellNode>();
 export const getCellsTableColumns = ({
   cellsRepository,
   translate,
+  getDirectionFor,
+  onToggleSort,
 }: {
   cellsRepository: CellsRepository;
   translate: RootContextValue['translate'];
+  getDirectionFor: (field: CellsSortField) => CellsSortDirection | undefined;
+  onToggleSort: (field: CellsSortField) => void;
 }) => [
   columnHelper.accessor('name', {
-    header: () => <CellsTableSortableHeader label={t('cells.tableRow.name')} />,
+    header: () => (
+      <CellsTableSortableHeader
+        label={t('cells.tableRow.name')}
+        direction={getDirectionFor('name_ci')}
+        onClick={() => onToggleSort('name_ci')}
+      />
+    ),
     cell: info => <CellsTableNameColumn node={info.row.original} />,
   }),
   columnHelper.accessor('conversationName', {
@@ -61,12 +73,24 @@ export const getCellsTableColumns = ({
     size: 120,
   }),
   columnHelper.accessor('sizeMb', {
-    header: () => <CellsTableSortableHeader label={t('cells.tableRow.size')} />,
+    header: () => (
+      <CellsTableSortableHeader
+        label={t('cells.tableRow.size')}
+        direction={getDirectionFor('size')}
+        onClick={() => onToggleSort('size')}
+      />
+    ),
     cell: info => info.getValue(),
     size: 100,
   }),
   columnHelper.accessor('uploadedAtTimestamp', {
-    header: () => <CellsTableSortableHeader label={t('cells.tableRow.created')} />,
+    header: () => (
+      <CellsTableSortableHeader
+        label={t('cells.tableRow.created')}
+        direction={getDirectionFor('mtime')}
+        onClick={() => onToggleSort('mtime')}
+      />
+    ),
     cell: info => <CellsTableDateColumn timestamp={info.getValue()} />,
     size: 125,
   }),
