@@ -104,7 +104,7 @@ export const defaultOpts = {
   smoothstepMax: 0.9,
   restartEvery: 0,
   bgBlur: 0,
-  bgBlurRadius: 5,
+  bgBlurRadius: 30,
 
   // Filter options.
   enableFilters: false,
