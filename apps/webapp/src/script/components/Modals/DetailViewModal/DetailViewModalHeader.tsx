@@ -21,17 +21,17 @@ import {FC} from 'react';
 
 import * as Icon from 'Components/icon';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {formatLocale} from 'Util/timeUtil';
 
 interface DetailViewModalHeaderProps {
   messageEntity: ContentMessage;
   onCloseClick: () => void;
+  translate: Translate;
 }
 
-const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, onCloseClick}) => {
-  const {translate} = useApplicationContext();
+const DetailViewModalHeader: FC<DetailViewModalHeaderProps> = ({messageEntity, onCloseClick, translate}) => {
   const {user, timestamp, unsafeSenderName} = useKoSubscribableChildren(messageEntity, [
     'user',
     'timestamp',

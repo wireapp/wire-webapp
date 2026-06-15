@@ -126,6 +126,25 @@ describe('useNoInternetCallGuard', () => {
     expect(startCall).toHaveBeenCalledTimes(1);
   });
 
+  it('should keep the same guard callback when copy values stay the same', () => {
+    mockedUseWarningsState.mockReturnValue([]);
+    const {result, rerender} = renderHook(({copy}) => useNoInternetCallGuard(copy), {
+      initialProps: {copy: noInternetCallGuardCopy},
+    });
+    const initialGuardCall = result.current;
+
+    rerender({
+      copy: {
+        description: noInternetCallGuardCopy.description,
+        descriptionPoints: noInternetCallGuardCopy.descriptionPoints,
+        title: noInternetCallGuardCopy.title,
+        translate: noInternetCallGuardCopy.translate,
+      },
+    });
+
+    expect(result.current).toBe(initialGuardCall);
+  });
+
   it('should work with different startCall implementations', () => {
     mockedUseWarningsState.mockReturnValue([]);
     const {result} = renderHook(() => useNoInternetCallGuard(noInternetCallGuardCopy));

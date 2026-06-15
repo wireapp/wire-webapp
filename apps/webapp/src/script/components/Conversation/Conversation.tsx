@@ -481,6 +481,7 @@ export const Conversation = ({
       fireAndForgetInvoker,
       messageRepository: repositories.message,
       selfUser,
+      translate,
     });
   };
 

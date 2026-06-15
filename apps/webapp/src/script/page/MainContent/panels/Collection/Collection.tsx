@@ -140,6 +140,7 @@ const Collection = ({
       fireAndForgetInvoker,
       messageRepository,
       selfUser,
+      translate,
     });
   };
 

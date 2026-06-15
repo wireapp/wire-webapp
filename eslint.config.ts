@@ -304,6 +304,7 @@ const config: Linter.Config[] = [
       'apps/webapp/src/script/components/Modals/PrimaryModal/**/*.{ts,tsx}',
       'apps/webapp/src/script/components/Modals/LeaveGroupAdminModal/**/*.{ts,tsx}',
       'apps/webapp/src/script/components/Modals/QualityFeedbackModal/**/*.{ts,tsx}',
+      'apps/webapp/src/script/components/Modals/DetailViewModal/**/*.{ts,tsx}',
     ],
     rules: {
       'no-restricted-imports': [

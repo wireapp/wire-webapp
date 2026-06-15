@@ -33,8 +33,8 @@ import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {MediumImage} from 'Repositories/entity/message/MediumImage';
 import {User} from 'Repositories/entity/User';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
+import type {Translate} from 'Util/localizerUtil';
 import {renderElement} from 'Util/renderElement';
 import {preventFocusOutside} from 'Util/util';
 import {waitFor} from 'Util/waitFor';
@@ -54,6 +54,7 @@ interface DetailViewModalProps {
   currentMessageEntity: ContentMessage;
   onClose?: () => void;
   selfUser: User;
+  translate: Translate;
 }
 
 export const DetailViewModal = ({
@@ -64,9 +65,9 @@ export const DetailViewModal = ({
   currentMessageEntity,
   onClose,
   selfUser,
+  translate,
 }: DetailViewModalProps) => {
   const IMAGE_CLOSE_ANIMATION_DELAY_MILLISECONDS = 150;
-  const {translate} = useApplicationContext();
   const currentMessageEntityId = useRef<string>(currentMessageEntity.id);
 
   const [conversationEntity, setConversationEntity] = useState<Conversation | null>(null);
@@ -299,7 +300,7 @@ export const DetailViewModal = ({
             'modal-content-anim-open': isImageVisible,
           })}
         >
-          <DetailViewModalHeader messageEntity={messageEntity} onCloseClick={onCloseClick} />
+          <DetailViewModalHeader messageEntity={messageEntity} onCloseClick={onCloseClick} translate={translate} />
 
           <button
             className="detail-view-main button-reset-default"
@@ -317,6 +318,7 @@ export const DetailViewModal = ({
             onReplyClick={onReplyClick}
             onDownloadClick={onDownloadClick}
             selfId={selfUser.qualifiedId}
+            translate={translate}
           />
         </div>
       )}
