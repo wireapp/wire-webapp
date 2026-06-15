@@ -27,14 +27,16 @@ import {Theme} from '../../Identity/Theme';
 export interface InputLabelProps {
   children: ReactNode | string;
   htmlFor?: string;
+  id?: string;
   markInvalid?: boolean;
   isRequired?: boolean;
   labelCSS?: CSSObject;
 }
 
-const InputLabel: FC<InputLabelProps> = ({htmlFor, markInvalid, isRequired, children, labelCSS, ...props}) => (
+const InputLabel: FC<InputLabelProps> = ({htmlFor, id, markInvalid, isRequired, children, labelCSS, ...props}) => (
   <label
     htmlFor={htmlFor}
+    id={id}
     css={(theme: Theme) => ({
       fontSize: theme.fontSizes.medium,
       fontWeight: 400,

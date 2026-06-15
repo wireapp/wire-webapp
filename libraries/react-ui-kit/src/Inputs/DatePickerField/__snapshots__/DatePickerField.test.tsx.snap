@@ -1,0 +1,1737 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`"DatePickerField" renders 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--text-input-border);
+  background-color: var(--text-input-background);
+}
+
+body.theme-dark .emotion-2body.theme-dark .emotion-2[data-focus-visible] {
+  border-color: var(--accent-color);
+}
+
+.react-aria-DatePicker[data-open] body.theme-dark .emotion-2 {
+  border-color: var(--accent-color);
+}
+
+.emotion-2[data-focus-visible] {
+  border-color: var(--accent-color);
+}
+
+.react-aria-DatePicker[data-open] .emotion-2 {
+  border-color: var(--accent-color);
+}
+
+.emotion-3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  gap: 0;
+  font-size: var(--font-size-medium);
+  color: var(--main-color);
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-4 {
+  padding: 2px 0;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.emotion-4[data-type="literal"] {
+  padding: 0;
+  margin: 0;
+}
+
+.emotion-4[data-placeholder] {
+  color: var(--gray-60);
+}
+
+.emotion-4[data-focused] {
+  background-color: var(--gray-20);
+}
+
+body.theme-dark .emotion-4[data-focused] {
+  background-color: var(--gray-80);
+}
+
+.emotion-9 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--main-color);
+  cursor: pointer;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+
+.emotion-9:hover,
+.emotion-9[data-focus-visible] {
+  background-color: var(--gray-20);
+}
+
+body.theme-dark .emotion-9 {
+  color: var(--white);
+}
+
+body.theme-dark .emotion-9:hover,
+body.theme-dark .emotion-9[data-focus-visible] {
+  background-color: var(--gray-80);
+}
+
+.emotion-10 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  width: 18px;
+  height: 18px;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-1"
+    data-uie-name="date-picker-test"
+  >
+    <div
+      className="react-aria-DatePicker"
+      data-rac=""
+      onBlur={[Function]}
+      onFocus={[Function]}
+    >
+      <div
+        aria-describedby="react-aria-description-0"
+        aria-disabled={null}
+        aria-label="Select date"
+        aria-labelledby="date-picker-test"
+        className="emotion-2"
+        data-rac=""
+        data-react-aria-pressable={true}
+        id="date-picker-test"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onDragStart={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchCancel={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        role="group"
+      >
+        <div
+          className="emotion-3"
+          data-rac=""
+          data-react-aria-pressable={true}
+          id="react-aria-:r2:"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onDragStart={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchCancel={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="presentation"
+          style={
+            {
+              "unicodeBidi": "isolate",
+            }
+          }
+        >
+          <span
+            aria-describedby="react-aria-description-0"
+            aria-label="Tag, Select date"
+            aria-valuemax={31}
+            aria-valuemin={1}
+            aria-valuenow={15}
+            aria-valuetext="15"
+            autoCorrect="off"
+            className="emotion-4"
+            contentEditable={true}
+            data-rac=""
+            data-type="day"
+            enterKeyHint="next"
+            id="react-aria-:rd:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            15
+          </span>
+          <span
+            aria-hidden={true}
+            className="emotion-4"
+            data-rac=""
+            data-type="literal"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onTouchStart={[Function]}
+          >
+            .
+          </span>
+          <span
+            aria-label="Monat, Select date"
+            aria-valuemax={12}
+            aria-valuemin={1}
+            aria-valuenow={6}
+            aria-valuetext="6 – Juni"
+            autoCorrect="off"
+            className="emotion-4"
+            contentEditable={true}
+            data-rac=""
+            data-type="month"
+            enterKeyHint="next"
+            id="react-aria-:rh:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            6
+          </span>
+          <span
+            aria-hidden={true}
+            className="emotion-4"
+            data-rac=""
+            data-type="literal"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onTouchStart={[Function]}
+          >
+            .
+          </span>
+          <span
+            aria-label="Jahr, Select date"
+            aria-valuemax={9999}
+            aria-valuemin={1}
+            aria-valuenow={2026}
+            aria-valuetext="2026"
+            autoCorrect="off"
+            className="emotion-4"
+            contentEditable={true}
+            data-rac=""
+            data-type="year"
+            enterKeyHint="next"
+            id="react-aria-:rl:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            2026
+          </span>
+        </div>
+        <input
+          data-rac=""
+          disabled={false}
+          hidden={true}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          type="text"
+          value="2026-06-15"
+        />
+        <button
+          aria-describedby="react-aria-description-0"
+          aria-expanded={false}
+          aria-haspopup="dialog"
+          aria-label="Open calendar"
+          aria-labelledby="react-aria-:r0: date-picker-test"
+          className="emotion-9"
+          data-rac=""
+          data-react-aria-pressable={true}
+          disabled={false}
+          id="react-aria-:r0:"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onDragStart={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchCancel={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={0}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="emotion-10"
+            height={16}
+            viewBox="0 0 16 16"
+            width={16}
+          >
+            <g>
+              <path
+                d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+              />
+            </g>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      aria-hidden={true}
+      data-a11y-ignore="aria-hidden-focus"
+      data-react-aria-prevent-focus={true}
+      data-testid="hidden-dateinput-container"
+      style={
+        {
+          "border": 0,
+          "clip": "rect(0 0 0 0)",
+          "clipPath": "inset(50%)",
+          "height": "1px",
+          "left": 0,
+          "margin": "-1px",
+          "overflow": "hidden",
+          "padding": 0,
+          "position": "fixed",
+          "top": 0,
+          "whiteSpace": "nowrap",
+          "width": "1px",
+        }
+      }
+    >
+      <input
+        disabled={false}
+        form=""
+        onChange={[Function]}
+        step={60}
+        tabIndex={-1}
+        type="date"
+        value="2026-06-15"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"DatePickerField" renders as disabled 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--text-input-border);
+  background-color: var(--text-input-background);
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+body.theme-dark .emotion-2body.theme-dark .emotion-2[data-focus-visible] {
+  border-color: var(--accent-color);
+}
+
+.react-aria-DatePicker[data-open] body.theme-dark .emotion-2 {
+  border-color: var(--accent-color);
+}
+
+.emotion-2[data-focus-visible] {
+  border-color: var(--accent-color);
+}
+
+.react-aria-DatePicker[data-open] .emotion-2 {
+  border-color: var(--accent-color);
+}
+
+.emotion-3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  gap: 0;
+  font-size: var(--font-size-medium);
+  color: var(--main-color);
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-4 {
+  padding: 2px 0;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.emotion-4[data-type="literal"] {
+  padding: 0;
+  margin: 0;
+}
+
+.emotion-4[data-placeholder] {
+  color: var(--gray-60);
+}
+
+.emotion-4[data-focused] {
+  background-color: var(--gray-20);
+}
+
+body.theme-dark .emotion-4[data-focused] {
+  background-color: var(--gray-80);
+}
+
+.emotion-9 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--main-color);
+  cursor: pointer;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+
+.emotion-9:hover,
+.emotion-9[data-focus-visible] {
+  background-color: var(--gray-20);
+}
+
+body.theme-dark .emotion-9 {
+  color: var(--white);
+}
+
+body.theme-dark .emotion-9:hover,
+body.theme-dark .emotion-9[data-focus-visible] {
+  background-color: var(--gray-80);
+}
+
+.emotion-10 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  width: 18px;
+  height: 18px;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-1"
+    data-uie-name="date-picker-test"
+  >
+    <div
+      className="react-aria-DatePicker"
+      data-disabled={true}
+      data-rac=""
+      onBlur={[Function]}
+      onFocus={[Function]}
+    >
+      <div
+        aria-describedby="react-aria-description-0"
+        aria-disabled={true}
+        aria-label="Select date"
+        aria-labelledby="date-picker-test"
+        className="emotion-2"
+        data-disabled={true}
+        data-rac=""
+        data-react-aria-pressable={true}
+        id="date-picker-test"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onDragStart={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchCancel={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        role="group"
+      >
+        <div
+          className="emotion-3"
+          data-disabled={true}
+          data-rac=""
+          data-react-aria-pressable={true}
+          id="react-aria-:r2d:"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onDragStart={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchCancel={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="presentation"
+          style={
+            {
+              "unicodeBidi": "isolate",
+            }
+          }
+        >
+          <span
+            aria-describedby="react-aria-description-0"
+            aria-disabled={true}
+            aria-label="Tag, Select date"
+            aria-valuemax={31}
+            aria-valuemin={1}
+            aria-valuenow={15}
+            aria-valuetext="15"
+            className="emotion-4"
+            contentEditable={false}
+            data-disabled={true}
+            data-rac=""
+            data-type="day"
+            id="react-aria-:r2o:"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={false}
+          >
+            15
+          </span>
+          <span
+            aria-hidden={true}
+            className="emotion-4"
+            data-disabled={true}
+            data-rac=""
+            data-type="literal"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onTouchStart={[Function]}
+          >
+            .
+          </span>
+          <span
+            aria-disabled={true}
+            aria-label="Monat, Select date"
+            aria-valuemax={12}
+            aria-valuemin={1}
+            aria-valuenow={6}
+            aria-valuetext="6 – Juni"
+            className="emotion-4"
+            contentEditable={false}
+            data-disabled={true}
+            data-rac=""
+            data-type="month"
+            id="react-aria-:r2s:"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={false}
+          >
+            6
+          </span>
+          <span
+            aria-hidden={true}
+            className="emotion-4"
+            data-disabled={true}
+            data-rac=""
+            data-type="literal"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onTouchStart={[Function]}
+          >
+            .
+          </span>
+          <span
+            aria-disabled={true}
+            aria-label="Jahr, Select date"
+            aria-valuemax={9999}
+            aria-valuemin={1}
+            aria-valuenow={2026}
+            aria-valuetext="2026"
+            className="emotion-4"
+            contentEditable={false}
+            data-disabled={true}
+            data-rac=""
+            data-type="year"
+            id="react-aria-:r30:"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={false}
+          >
+            2026
+          </span>
+        </div>
+        <input
+          data-disabled={true}
+          data-rac=""
+          disabled={true}
+          hidden={true}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          type="text"
+          value="2026-06-15"
+        />
+        <button
+          aria-describedby="react-aria-description-0"
+          aria-expanded={false}
+          aria-haspopup="dialog"
+          aria-label="Open calendar"
+          aria-labelledby="react-aria-:r2b: date-picker-test"
+          className="emotion-9"
+          data-disabled={true}
+          data-rac=""
+          data-react-aria-pressable={true}
+          disabled={true}
+          id="react-aria-:r2b:"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onDragStart={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchCancel={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="emotion-10"
+            height={16}
+            viewBox="0 0 16 16"
+            width={16}
+          >
+            <g>
+              <path
+                d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+              />
+            </g>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      aria-hidden={true}
+      data-a11y-ignore="aria-hidden-focus"
+      data-react-aria-prevent-focus={true}
+      data-testid="hidden-dateinput-container"
+      style={
+        {
+          "border": 0,
+          "clip": "rect(0 0 0 0)",
+          "clipPath": "inset(50%)",
+          "height": "1px",
+          "left": 0,
+          "margin": "-1px",
+          "overflow": "hidden",
+          "padding": 0,
+          "position": "fixed",
+          "top": 0,
+          "whiteSpace": "nowrap",
+          "width": "1px",
+        }
+      }
+    >
+      <input
+        disabled={true}
+        form=""
+        onChange={[Function]}
+        step={60}
+        tabIndex={-1}
+        type="date"
+        value="2026-06-15"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"DatePickerField" renders as invalid 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 2px;
+  width: 100%;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--text-input-border);
+  background-color: var(--text-input-background);
+  border-color: #c20013;
+  box-shadow: none;
+  outline: none;
+}
+
+body.theme-dark .emotion-2 {
+  border-color: #ff7770;
+}
+
+.emotion-2[data-focus-visible] {
+  border-color: var(--accent-color);
+}
+
+.react-aria-DatePicker[data-open] .emotion-2 {
+  border-color: var(--accent-color);
+}
+
+.emotion-3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  gap: 0;
+  font-size: var(--font-size-medium);
+  color: var(--main-color);
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-4 {
+  padding: 2px 0;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.emotion-4[data-type="literal"] {
+  padding: 0;
+  margin: 0;
+}
+
+.emotion-4[data-placeholder] {
+  color: var(--gray-60);
+}
+
+.emotion-4[data-focused] {
+  background-color: var(--gray-20);
+}
+
+body.theme-dark .emotion-4[data-focused] {
+  background-color: var(--gray-80);
+}
+
+.emotion-9 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--main-color);
+  cursor: pointer;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+
+.emotion-9:hover,
+.emotion-9[data-focus-visible] {
+  background-color: var(--gray-20);
+}
+
+body.theme-dark .emotion-9 {
+  color: var(--white);
+}
+
+body.theme-dark .emotion-9:hover,
+body.theme-dark .emotion-9[data-focus-visible] {
+  background-color: var(--gray-80);
+}
+
+.emotion-10 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  width: 18px;
+  height: 18px;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-1"
+    data-uie-name="date-picker-test"
+  >
+    <div
+      className="react-aria-DatePicker"
+      data-rac=""
+      onBlur={[Function]}
+      onFocus={[Function]}
+    >
+      <div
+        aria-describedby="react-aria-description-0"
+        aria-disabled={null}
+        aria-label="Select date"
+        aria-labelledby="date-picker-test"
+        className="emotion-2"
+        data-rac=""
+        data-react-aria-pressable={true}
+        id="date-picker-test"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onDragStart={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchCancel={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        role="group"
+      >
+        <div
+          className="emotion-3"
+          data-rac=""
+          data-react-aria-pressable={true}
+          id="react-aria-:r1k:"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onDragStart={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchCancel={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="presentation"
+          style={
+            {
+              "unicodeBidi": "isolate",
+            }
+          }
+        >
+          <span
+            aria-describedby="react-aria-description-0"
+            aria-label="Tag, Select date"
+            aria-valuemax={31}
+            aria-valuemin={1}
+            aria-valuenow={15}
+            aria-valuetext="15"
+            autoCorrect="off"
+            className="emotion-4"
+            contentEditable={true}
+            data-rac=""
+            data-type="day"
+            enterKeyHint="next"
+            id="react-aria-:r1v:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            15
+          </span>
+          <span
+            aria-hidden={true}
+            className="emotion-4"
+            data-rac=""
+            data-type="literal"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onTouchStart={[Function]}
+          >
+            .
+          </span>
+          <span
+            aria-label="Monat, Select date"
+            aria-valuemax={12}
+            aria-valuemin={1}
+            aria-valuenow={6}
+            aria-valuetext="6 – Juni"
+            autoCorrect="off"
+            className="emotion-4"
+            contentEditable={true}
+            data-rac=""
+            data-type="month"
+            enterKeyHint="next"
+            id="react-aria-:r23:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            6
+          </span>
+          <span
+            aria-hidden={true}
+            className="emotion-4"
+            data-rac=""
+            data-type="literal"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onTouchStart={[Function]}
+          >
+            .
+          </span>
+          <span
+            aria-label="Jahr, Select date"
+            aria-valuemax={9999}
+            aria-valuemin={1}
+            aria-valuenow={2026}
+            aria-valuetext="2026"
+            autoCorrect="off"
+            className="emotion-4"
+            contentEditable={true}
+            data-rac=""
+            data-type="year"
+            enterKeyHint="next"
+            id="react-aria-:r27:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            2026
+          </span>
+        </div>
+        <input
+          data-rac=""
+          disabled={false}
+          hidden={true}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          type="text"
+          value="2026-06-15"
+        />
+        <button
+          aria-describedby="react-aria-description-0"
+          aria-expanded={false}
+          aria-haspopup="dialog"
+          aria-label="Open calendar"
+          aria-labelledby="react-aria-:r1i: date-picker-test"
+          className="emotion-9"
+          data-rac=""
+          data-react-aria-pressable={true}
+          disabled={false}
+          id="react-aria-:r1i:"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onDragStart={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchCancel={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={0}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="emotion-10"
+            height={16}
+            viewBox="0 0 16 16"
+            width={16}
+          >
+            <g>
+              <path
+                d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+              />
+            </g>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      aria-hidden={true}
+      data-a11y-ignore="aria-hidden-focus"
+      data-react-aria-prevent-focus={true}
+      data-testid="hidden-dateinput-container"
+      style={
+        {
+          "border": 0,
+          "clip": "rect(0 0 0 0)",
+          "clipPath": "inset(50%)",
+          "height": "1px",
+          "left": 0,
+          "margin": "-1px",
+          "overflow": "hidden",
+          "padding": 0,
+          "position": "fixed",
+          "top": 0,
+          "whiteSpace": "nowrap",
+          "width": "1px",
+        }
+      }
+    >
+      <input
+        disabled={false}
+        form=""
+        onChange={[Function]}
+        step={60}
+        tabIndex={-1}
+        type="date"
+        value="2026-06-15"
+      />
+    </div>
+  </div>
+</div>
+`;
+
+exports[`"DatePickerField" renders with label 1`] = `
+.emotion-0 {
+  background: #edeff0;
+  -webkit-transition: background 0.15s;
+  transition: background 0.15s;
+}
+
+.emotion-1 {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.emotion-1:focus-within label {
+  color: #0667c8;
+}
+
+.emotion-2 {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1rem;
+  color: #54585f;
+  margin-bottom: 2px;
+  display: block;
+}
+
+.emotion-3 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--text-input-border);
+  background-color: var(--text-input-background);
+}
+
+body.theme-dark .emotion-3body.theme-dark .emotion-3[data-focus-visible] {
+  border-color: var(--accent-color);
+}
+
+.react-aria-DatePicker[data-open] body.theme-dark .emotion-3 {
+  border-color: var(--accent-color);
+}
+
+.emotion-3[data-focus-visible] {
+  border-color: var(--accent-color);
+}
+
+.react-aria-DatePicker[data-open] .emotion-3 {
+  border-color: var(--accent-color);
+}
+
+.emotion-4 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  gap: 0;
+  font-size: var(--font-size-medium);
+  color: var(--main-color);
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-5 {
+  padding: 2px 0;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.emotion-5[data-type="literal"] {
+  padding: 0;
+  margin: 0;
+}
+
+.emotion-5[data-placeholder] {
+  color: var(--gray-60);
+}
+
+.emotion-5[data-focused] {
+  background-color: var(--gray-20);
+}
+
+body.theme-dark .emotion-5[data-focused] {
+  background-color: var(--gray-80);
+}
+
+.emotion-10 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--main-color);
+  cursor: pointer;
+  -webkit-flex-shrink: 0;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+
+.emotion-10:hover,
+.emotion-10[data-focus-visible] {
+  background-color: var(--gray-20);
+}
+
+body.theme-dark .emotion-10 {
+  color: var(--white);
+}
+
+body.theme-dark .emotion-10:hover,
+body.theme-dark .emotion-10[data-focus-visible] {
+  background-color: var(--gray-80);
+}
+
+.emotion-11 {
+  fill: rgb(29, 30, 31);
+  overflow: visible;
+  width: 18px;
+  height: 18px;
+}
+
+<div
+  className="emotion-0"
+>
+  <div
+    className="emotion-1"
+    data-uie-name="date-picker-test"
+  >
+    <label
+      className="emotion-2"
+      htmlFor="date-picker-test"
+      id="date-picker-test-label"
+    >
+      Date
+    </label>
+    <div
+      className="react-aria-DatePicker"
+      data-rac=""
+      onBlur={[Function]}
+      onFocus={[Function]}
+    >
+      <div
+        aria-describedby="react-aria-description-0"
+        aria-disabled={null}
+        aria-labelledby="date-picker-test-label"
+        className="emotion-3"
+        data-rac=""
+        data-react-aria-pressable={true}
+        id="date-picker-test"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onDragStart={[Function]}
+        onFocus={[Function]}
+        onKeyDown={[Function]}
+        onKeyUp={[Function]}
+        onMouseDown={[Function]}
+        onMouseEnter={[Function]}
+        onMouseLeave={[Function]}
+        onMouseUp={[Function]}
+        onTouchCancel={[Function]}
+        onTouchEnd={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        role="group"
+      >
+        <div
+          className="emotion-4"
+          data-rac=""
+          data-react-aria-pressable={true}
+          id="react-aria-:rr:"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onDragStart={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchCancel={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          role="presentation"
+          style={
+            {
+              "unicodeBidi": "isolate",
+            }
+          }
+        >
+          <span
+            aria-describedby="react-aria-description-0"
+            aria-label="Tag, "
+            aria-labelledby="react-aria-:r16: date-picker-test-label"
+            aria-valuemax={31}
+            aria-valuemin={1}
+            aria-valuenow={15}
+            aria-valuetext="15"
+            autoCorrect="off"
+            className="emotion-5"
+            contentEditable={true}
+            data-rac=""
+            data-type="day"
+            enterKeyHint="next"
+            id="react-aria-:r16:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            15
+          </span>
+          <span
+            aria-hidden={true}
+            className="emotion-5"
+            data-rac=""
+            data-type="literal"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onTouchStart={[Function]}
+          >
+            .
+          </span>
+          <span
+            aria-label="Monat, "
+            aria-labelledby="react-aria-:r1a: date-picker-test-label"
+            aria-valuemax={12}
+            aria-valuemin={1}
+            aria-valuenow={6}
+            aria-valuetext="6 – Juni"
+            autoCorrect="off"
+            className="emotion-5"
+            contentEditable={true}
+            data-rac=""
+            data-type="month"
+            enterKeyHint="next"
+            id="react-aria-:r1a:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            6
+          </span>
+          <span
+            aria-hidden={true}
+            className="emotion-5"
+            data-rac=""
+            data-type="literal"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onTouchStart={[Function]}
+          >
+            .
+          </span>
+          <span
+            aria-label="Jahr, "
+            aria-labelledby="react-aria-:r1e: date-picker-test-label"
+            aria-valuemax={9999}
+            aria-valuemin={1}
+            aria-valuenow={2026}
+            aria-valuetext="2026"
+            autoCorrect="off"
+            className="emotion-5"
+            contentEditable={true}
+            data-rac=""
+            data-type="year"
+            enterKeyHint="next"
+            id="react-aria-:r1e:"
+            inputMode="numeric"
+            onBlur={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onPointerDown={[Function]}
+            onTouchStart={[Function]}
+            role="spinbutton"
+            spellCheck="false"
+            style={
+              {
+                "caretColor": "transparent",
+              }
+            }
+            suppressContentEditableWarning={true}
+            tabIndex={0}
+          >
+            2026
+          </span>
+        </div>
+        <input
+          data-rac=""
+          disabled={false}
+          hidden={true}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          type="text"
+          value="2026-06-15"
+        />
+        <button
+          aria-describedby="react-aria-description-0"
+          aria-expanded={false}
+          aria-haspopup="dialog"
+          aria-label="Open calendar"
+          aria-labelledby="react-aria-:rp: date-picker-test-label"
+          className="emotion-10"
+          data-rac=""
+          data-react-aria-pressable={true}
+          disabled={false}
+          id="react-aria-:rp:"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onDragStart={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onMouseDown={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseUp={[Function]}
+          onTouchCancel={[Function]}
+          onTouchEnd={[Function]}
+          onTouchMove={[Function]}
+          onTouchStart={[Function]}
+          tabIndex={0}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="emotion-11"
+            height={16}
+            viewBox="0 0 16 16"
+            width={16}
+          >
+            <g>
+              <path
+                d="M5.2 1v2.8M10.8 1v2.8M12.9 2.4H3.1a1.4 1.4 0 0 0-1.4 1.4v9.8A1.4 1.4 0 0 0 3.1 15h9.8a1.4 1.4 0 0 0 1.4-1.4V3.8a1.4 1.4 0 0 0-1.4-1.4M1.7 6.6h12.6"
+                fill="none"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+              />
+            </g>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div
+      aria-hidden={true}
+      data-a11y-ignore="aria-hidden-focus"
+      data-react-aria-prevent-focus={true}
+      data-testid="hidden-dateinput-container"
+      style={
+        {
+          "border": 0,
+          "clip": "rect(0 0 0 0)",
+          "clipPath": "inset(50%)",
+          "height": "1px",
+          "left": 0,
+          "margin": "-1px",
+          "overflow": "hidden",
+          "padding": 0,
+          "position": "fixed",
+          "top": 0,
+          "whiteSpace": "nowrap",
+          "width": "1px",
+        }
+      }
+    >
+      <input
+        disabled={false}
+        form=""
+        onChange={[Function]}
+        step={60}
+        tabIndex={-1}
+        type="date"
+        value="2026-06-15"
+      />
+    </div>
+  </div>
+</div>
+`;

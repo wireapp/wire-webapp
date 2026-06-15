@@ -14,12 +14,14 @@
   "types": "lib/index",
   "homepage": "https://wire-react-ui-kit.netlify.app/",
   "dependencies": {
+    "@internationalized/date": "3.12.2",
     "@radix-ui/react-accordion": "1.2.13",
     "@radix-ui/react-dropdown-menu": "2.1.17",
     "@sindresorhus/is": "4.6.0",
     "@types/color": "3.0.7",
     "color": "4.2.3",
     "emotion-normalize": "11.0.1",
+    "react-aria-components": "1.18.0",
     "react-select": "5.10.2",
     "react-transition-group": "4.4.5"
   },
