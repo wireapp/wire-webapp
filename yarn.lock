@@ -183,9 +183,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:3.1067.0":
-  version: 3.1067.0
-  resolution: "@aws-sdk/client-s3@npm:3.1067.0"
+"@aws-sdk/client-s3@npm:3.1068.0":
+  version: 3.1068.0
+  resolution: "@aws-sdk/client-s3@npm:3.1068.0"
   dependencies:
     "@aws-crypto/sha1-browser": "npm:5.2.0"
     "@aws-crypto/sha256-browser": "npm:5.2.0"
@@ -201,7 +201,7 @@ __metadata:
     "@smithy/node-http-handler": "npm:^4.7.6"
     "@smithy/types": "npm:^4.14.3"
     tslib: "npm:^2.6.2"
-  checksum: 10/d38c311001b61b4a2e85f13a4297fd6e2770f9f95c8fc9e6e3939de41332648cc0d4cc6c8d5b130d71943beee9ff3f3965a2e25be12e295409f9e6db80e46b76
+  checksum: 10/e32cfe20dec82e2ec8caeb4ebb60fc8a69c20b9ccbee3a083b3abe56d6ea8c5b44fff2706ab9fd5afa62dd34c7a615719112a0b92678218ca3f55666932de64a
   languageName: node
   linkType: hard
 
@@ -345,9 +345,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/lib-storage@npm:3.1067.0":
-  version: 3.1067.0
-  resolution: "@aws-sdk/lib-storage@npm:3.1067.0"
+"@aws-sdk/lib-storage@npm:3.1068.0":
+  version: 3.1068.0
+  resolution: "@aws-sdk/lib-storage@npm:3.1068.0"
   dependencies:
     "@smithy/core": "npm:^3.24.6"
     "@smithy/types": "npm:^4.14.3"
@@ -356,8 +356,8 @@ __metadata:
     stream-browserify: "npm:3.0.0"
     tslib: "npm:^2.6.2"
   peerDependencies:
-    "@aws-sdk/client-s3": ^3.1067.0
-  checksum: 10/187f9f8f51c945ce614c86a8f9eab6e017c64adec15ca97186b6ea34b0635f54f0ddedf9674e4ce57d3ca19845dd05f4e60b71a90008bf3ef56cd705cd2c036f
+    "@aws-sdk/client-s3": ^3.1068.0
+  checksum: 10/f0df3fab36a6a2a77ee4b737953076e91adf9f8cf4ec3278e2d5f5f584176666ce13a26808a66daa3f3e0ae7d5a667b042f0b38739f411c0aa920e5043ff2fcd
   languageName: node
   linkType: hard
 
@@ -11183,8 +11183,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@wireapp/api-client@workspace:libraries/api-client"
   dependencies:
-    "@aws-sdk/client-s3": "npm:3.1067.0"
-    "@aws-sdk/lib-storage": "npm:3.1067.0"
+    "@aws-sdk/client-s3": "npm:3.1068.0"
+    "@aws-sdk/lib-storage": "npm:3.1068.0"
     "@swc/core": "npm:1.15.41"
     "@swc/jest": "npm:0.2.39"
     "@types/jest": "npm:30.0.0"
