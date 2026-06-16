@@ -79,6 +79,8 @@ export class WebGLRenderer {
   private backgroundRenderInfo: BackgroundRenderInfo | null = null;
   private activeBackgroundSourceIdentifier: string | null = null;
 
+  private frameTexture: WebGLTexture | null = null;
+
   constructor(canvas: OffscreenCanvas) {
     this.canvas = canvas;
     const gl = this.canvas.getContext('webgl2', {
@@ -294,6 +296,8 @@ export class WebGLRenderer {
 
     this.fbo = gl.createFramebuffer();
 
+    this.frameTexture = gl.createTexture();
+
     this.running = true;
   }
 
@@ -448,9 +452,8 @@ export class WebGLRenderer {
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.useProgram(blendProgram);
 
-      const frameTexture = gl.createTexture();
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, frameTexture);
+      gl.bindTexture(gl.TEXTURE_2D, this.frameTexture);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoFrame);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
