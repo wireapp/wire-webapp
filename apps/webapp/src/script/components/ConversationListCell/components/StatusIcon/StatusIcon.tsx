@@ -37,10 +37,11 @@ export const StatusIcon = ({conversation}: Props) => {
     'mutedState',
     'isRequest',
   ]);
-  void mutedState;
-  void isRequest;
 
-  const cellState = useMemo(() => generateCellState(conversation, translate), [conversation, translate]);
+  const cellState = useMemo(
+    () => generateCellState(conversation, translate),
+    [conversation, isRequest, mutedState, translate, unreadState],
+  );
 
   return (
     <>

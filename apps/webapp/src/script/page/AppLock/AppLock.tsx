@@ -50,7 +50,6 @@ export enum APPLOCK_STATE {
 }
 
 const DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC = 60;
-const ONE_SECOND_IN_MILLISECONDS = 1000;
 
 const passwordRegex = new RegExp(ValidationUtil.getNewPasswordPattern(Config.getConfig().NEW_PASSWORD_MINIMUM_LENGTH));
 const passwordRegexDigit = /(?=.*[0-9])/;
@@ -109,30 +108,25 @@ const AppLock = ({
     }),
   );
 
-  const getInactivityAppLockTimeoutInSeconds = useCallback(() => {
+  const getInactivityAppLockTimeoutInSeconds = () => {
     const backendTimeout = appLockState.appLockInactivityTimeoutSecs();
     return Number.isFinite(backendTimeout) ? backendTimeout : DEFAULT_INACTIVITY_APP_LOCK_TIMEOUT_IN_SEC;
-  }, [appLockState]);
+  };
 
-  const getScheduledAppLockTimeoutInSeconds = useCallback(() => {
+  const getScheduledAppLockTimeoutInSeconds = () => {
     const configTimeout = Config.getConfig().FEATURE?.APPLOCK_SCHEDULED_TIMEOUT;
     return Number.isFinite(configTimeout) ? configTimeout : null;
-  }, []);
+  };
 
-  const isScheduledAppLockEnabled = useCallback(() => {
+  const isScheduledAppLockEnabled = () => {
     return getScheduledAppLockTimeoutInSeconds() !== null;
-  }, [getScheduledAppLockTimeoutInSeconds]);
-
-  const showAppLock = useCallback(() => {
-    setLocalAppLockState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
-    setIsVisible(true);
-  }, [appLockState]);
+  };
 
   const startAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
-    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * ONE_SECOND_IN_MILLISECONDS);
+    const id = window.setTimeout(showAppLock, getInactivityAppLockTimeoutInSeconds() * 1000);
     setInactivityTimeoutId(id);
-  }, [getInactivityAppLockTimeoutInSeconds, inactivityTimeoutId, showAppLock]);
+  }, [inactivityTimeoutId]);
 
   const clearAppLockTimeout = useCallback(() => {
     window.clearTimeout(inactivityTimeoutId);
@@ -148,7 +142,7 @@ const AppLock = ({
     } else if (appLockState.hasPassphrase()) {
       appLockRepository.removeCode();
     }
-  }, [appLockRepository, appLockState, isAppLockEnabled, showAppLock]);
+  }, [isAppLockEnabled]);
 
   useEffect(() => {
     if (isAppLockActivated) {
@@ -183,7 +177,12 @@ const AppLock = ({
       modalObserver.disconnect();
       appObserver.disconnect();
     };
-  }, [appObserver, isVisible, localAppLockState, modalObserver]);
+  }, [localAppLockState, isVisible]);
+
+  const showAppLock = () => {
+    setLocalAppLockState(appLockState.hasPassphrase() ? APPLOCK_STATE.LOCKED : APPLOCK_STATE.SETUP);
+    setIsVisible(true);
+  };
 
   const onUnlock = async (event: FormEvent) => {
     event.preventDefault();
@@ -204,9 +203,7 @@ const AppLock = ({
       if (scheduledAppLockTimeoutInSeconds === null) {
         return;
       }
-      setScheduledTimeoutId(
-        window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * ONE_SECOND_IN_MILLISECONDS),
-      );
+      setScheduledTimeoutId(window.setTimeout(showAppLock, scheduledAppLockTimeoutInSeconds * 1000));
     }
   };
 
