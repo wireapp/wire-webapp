@@ -35,12 +35,11 @@ interface NoInternetCallGuardCopy {
 
 export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGuardCopy) => {
   const {description, descriptionPoints, title, translate} = noInternetCallGuardCopy;
+  const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] = descriptionPoints;
   const warnings = useWarningsState(state => state.warnings);
   const visibleWarning = warnings[warnings.length - 1];
 
   const showCallNotEstablishedMessage = useCallback(() => {
-    const [firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint] = descriptionPoints;
-
     PrimaryModal.show(
       PrimaryModal.type.ACKNOWLEDGE,
       {
@@ -61,7 +60,7 @@ export const useNoInternetCallGuard = (noInternetCallGuardCopy: NoInternetCallGu
       undefined,
       translate,
     );
-  }, [description, descriptionPoints, title, translate]);
+  }, [description, firstDescriptionPoint, secondDescriptionPoint, thirdDescriptionPoint, title, translate]);
 
   return useCallback(
     (startCall: () => void) => {

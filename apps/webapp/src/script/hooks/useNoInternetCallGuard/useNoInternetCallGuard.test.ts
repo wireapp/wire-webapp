@@ -136,7 +136,11 @@ describe('useNoInternetCallGuard', () => {
     rerender({
       copy: {
         description: noInternetCallGuardCopy.description,
-        descriptionPoints: noInternetCallGuardCopy.descriptionPoints,
+        descriptionPoints: [
+          noInternetCallGuardCopy.descriptionPoints[0],
+          noInternetCallGuardCopy.descriptionPoints[1],
+          noInternetCallGuardCopy.descriptionPoints[2],
+        ],
         title: noInternetCallGuardCopy.title,
         translate: noInternetCallGuardCopy.translate,
       },
