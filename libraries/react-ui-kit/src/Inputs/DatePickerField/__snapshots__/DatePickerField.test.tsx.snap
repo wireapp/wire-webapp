@@ -208,8 +208,8 @@ exports[`"DatePickerField" renders 1`] = `
             aria-label="Tag, Select date"
             aria-valuemax={31}
             aria-valuemin={1}
-            aria-valuenow={15}
-            aria-valuetext="15"
+            aria-valuenow={16}
+            aria-valuetext="16"
             autoCorrect="off"
             className="emotion-4"
             contentEditable={true}
@@ -236,7 +236,7 @@ exports[`"DatePickerField" renders 1`] = `
             suppressContentEditableWarning={true}
             tabIndex={0}
           >
-            15
+            16
           </span>
           <span
             aria-hidden={true}
@@ -344,7 +344,7 @@ exports[`"DatePickerField" renders 1`] = `
           onMouseLeave={[Function]}
           onTouchStart={[Function]}
           type="text"
-          value="2026-06-15"
+          value="2026-06-16"
         />
         <button
           aria-describedby="react-aria-description-0"
@@ -423,7 +423,7 @@ exports[`"DatePickerField" renders 1`] = `
         step={60}
         tabIndex={-1}
         type="date"
-        value="2026-06-15"
+        value="2026-06-16"
       />
     </div>
   </div>
@@ -644,8 +644,8 @@ exports[`"DatePickerField" renders as disabled 1`] = `
             aria-label="Tag, Select date"
             aria-valuemax={31}
             aria-valuemin={1}
-            aria-valuenow={15}
-            aria-valuetext="15"
+            aria-valuenow={16}
+            aria-valuetext="16"
             className="emotion-4"
             contentEditable={false}
             data-disabled={true}
@@ -668,7 +668,7 @@ exports[`"DatePickerField" renders as disabled 1`] = `
             }
             suppressContentEditableWarning={false}
           >
-            15
+            16
           </span>
           <span
             aria-hidden={true}
@@ -773,7 +773,7 @@ exports[`"DatePickerField" renders as disabled 1`] = `
           onMouseLeave={[Function]}
           onTouchStart={[Function]}
           type="text"
-          value="2026-06-15"
+          value="2026-06-16"
         />
         <button
           aria-describedby="react-aria-description-0"
@@ -852,7 +852,7 @@ exports[`"DatePickerField" renders as disabled 1`] = `
         step={60}
         tabIndex={-1}
         type="date"
-        value="2026-06-15"
+        value="2026-06-16"
       />
     </div>
   </div>
@@ -1070,8 +1070,8 @@ exports[`"DatePickerField" renders as invalid 1`] = `
             aria-label="Tag, Select date"
             aria-valuemax={31}
             aria-valuemin={1}
-            aria-valuenow={15}
-            aria-valuetext="15"
+            aria-valuenow={16}
+            aria-valuetext="16"
             autoCorrect="off"
             className="emotion-4"
             contentEditable={true}
@@ -1098,7 +1098,7 @@ exports[`"DatePickerField" renders as invalid 1`] = `
             suppressContentEditableWarning={true}
             tabIndex={0}
           >
-            15
+            16
           </span>
           <span
             aria-hidden={true}
@@ -1206,7 +1206,7 @@ exports[`"DatePickerField" renders as invalid 1`] = `
           onMouseLeave={[Function]}
           onTouchStart={[Function]}
           type="text"
-          value="2026-06-15"
+          value="2026-06-16"
         />
         <button
           aria-describedby="react-aria-description-0"
@@ -1285,7 +1285,7 @@ exports[`"DatePickerField" renders as invalid 1`] = `
         step={60}
         tabIndex={-1}
         type="date"
-        value="2026-06-15"
+        value="2026-06-16"
       />
     </div>
   </div>
@@ -1516,8 +1516,8 @@ exports[`"DatePickerField" renders with label 1`] = `
             aria-labelledby="react-aria-:r16: date-picker-test-label"
             aria-valuemax={31}
             aria-valuemin={1}
-            aria-valuenow={15}
-            aria-valuetext="15"
+            aria-valuenow={16}
+            aria-valuetext="16"
             autoCorrect="off"
             className="emotion-5"
             contentEditable={true}
@@ -1544,7 +1544,7 @@ exports[`"DatePickerField" renders with label 1`] = `
             suppressContentEditableWarning={true}
             tabIndex={0}
           >
-            15
+            16
           </span>
           <span
             aria-hidden={true}
@@ -1654,7 +1654,7 @@ exports[`"DatePickerField" renders with label 1`] = `
           onMouseLeave={[Function]}
           onTouchStart={[Function]}
           type="text"
-          value="2026-06-15"
+          value="2026-06-16"
         />
         <button
           aria-describedby="react-aria-description-0"
@@ -1733,7 +1733,7 @@ exports[`"DatePickerField" renders with label 1`] = `
         step={60}
         tabIndex={-1}
         type="date"
-        value="2026-06-15"
+        value="2026-06-16"
       />
     </div>
   </div>
