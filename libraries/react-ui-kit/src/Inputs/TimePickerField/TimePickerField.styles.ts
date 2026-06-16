@@ -19,17 +19,28 @@
 
 import {CSSObject} from '@emotion/react';
 
+import {overlayPortalZIndex} from '../../utils/overlayPortal';
+
 export const timePickerWrapperStyles: CSSObject = {
   width: '100%',
   minWidth: 0,
 };
 
+/** Applied to the react-select container wrapper only — not the control. */
+export const timeSelectContainerStyles: CSSObject = {
+  minWidth: 0,
+  width: '100%',
+};
+
 export const timeSelectStyles: CSSObject = {
+  boxSizing: 'border-box',
   height: '48px',
   minHeight: '48px',
+  maxHeight: '48px',
   width: '100%',
   minWidth: 0,
   borderRadius: '14px',
+  padding: '0 14px',
 };
 
 export const timeSelectMenuStyles: CSSObject = {
@@ -37,7 +48,7 @@ export const timeSelectMenuStyles: CSSObject = {
 };
 
 export const timeSelectMenuPortalStyles: CSSObject = {
-  zIndex: 10000010,
+  zIndex: overlayPortalZIndex,
 };
 
 export const timeSelectLabelVisuallyHiddenStyles: CSSObject = {

@@ -28,47 +28,48 @@ export const dateTimePickerContentStyles: CSSObject = {
   width: '100%',
 };
 
+export const dateTimePickerTimeFieldWidth = '132px';
+
 export const dateTimePickerFieldsRowStyles: CSSObject = {
-  display: 'grid',
-  gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 140px)',
+  display: 'flex',
+  alignItems: 'stretch',
   gap: '12px',
   width: '100%',
-  alignItems: 'stretch',
   '@media (max-width: 520px)': {
-    gridTemplateColumns: 'minmax(0, 1fr)',
+    flexDirection: 'column',
   },
 };
 
 export const dateTimePickerDateFieldWrapperStyles: CSSObject = {
+  flex: '1 1 0',
   marginBottom: 0,
-  width: '100%',
   minWidth: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  alignSelf: 'stretch',
+  width: 'auto',
   '.react-aria-DatePicker': {
     width: '100%',
     minWidth: 0,
-    flex: 1,
   },
   '.react-aria-Group': {
     width: '100%',
     minWidth: 0,
     maxWidth: '100%',
-    flex: 1,
+    height: '48px',
     boxSizing: 'border-box',
   },
 };
 
 export const dateTimePickerTimeFieldWrapperStyles: CSSObject = {
+  flex: `0 0 ${dateTimePickerTimeFieldWidth}`,
   marginBottom: 0,
-  width: '100%',
-  minWidth: 0,
-  '& > div[data-uie-name]': {
-    marginBottom: 0,
-    width: '100%',
+  maxWidth: dateTimePickerTimeFieldWidth,
+  minWidth: dateTimePickerTimeFieldWidth,
+  position: 'relative',
+  width: dateTimePickerTimeFieldWidth,
+  '@media (max-width: 520px)': {
+    flex: '1 1 auto',
+    maxWidth: 'none',
     minWidth: 0,
-    maxWidth: '100%',
+    width: '100%',
   },
 };
 

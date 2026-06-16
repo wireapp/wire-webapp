@@ -39,6 +39,7 @@ interface CustomStylesParams {
   theme: Theme;
   markInvalid?: boolean;
   menuPosition?: 'absolute' | 'relative';
+  menuMatchControlWidth?: boolean;
   controlCSS: CSSObject;
   containerCSS: CSSObject;
   menuCSS: CSSObject;
@@ -51,13 +52,14 @@ export const customStyles = ({
   theme,
   markInvalid = false,
   menuPosition = 'absolute',
+  menuMatchControlWidth = false,
   controlCSS,
   containerCSS,
   menuCSS,
   groupCSS,
   groupHeadingCSS,
   menuPortalCSS,
-}: CustomStylesParams): StylesConfig<Option, false, GroupBase<Option>> => ({
+}: CustomStylesParams): StylesConfig<Option, boolean, GroupBase<Option>> => ({
   indicatorSeparator: baseIndicatorSeparatorStyles,
   indicatorsContainer: provided => provided,
   control: (_provided, {isDisabled, selectProps}) =>
@@ -77,19 +79,34 @@ export const customStyles = ({
           },
         }
       : baseContainerStyles(containerCSS),
-  menu: (provided, {options}) => ({
-    ...provided,
-    width: provided.width,
-    minWidth: provided.minWidth,
-    ...baseMenuStyles({theme, menuPosition}),
-    ...(isGroup(options) && {
-      minWidth: '400px',
-    }),
-    ...menuCSS,
-  }),
+  menu: (provided, {options}) => {
+    const styles: CSSObject = {
+      ...provided,
+      width: provided.width,
+      minWidth: provided.minWidth,
+      ...baseMenuStyles({theme, menuPosition}),
+      ...(isGroup(options) && {
+        minWidth: '400px',
+      }),
+      ...menuCSS,
+    };
+
+    if (menuMatchControlWidth) {
+      styles.minWidth = provided.width;
+      styles.maxWidth = provided.width;
+    }
+
+    return styles;
+  },
   singleValue: (provided, selectProps) => ({
     ...provided,
     ...baseSingleValueStyles({theme, selectProps}),
+    ...(menuMatchControlWidth && {
+      gridArea: 'unset',
+      maxWidth: '100%',
+      overflow: 'visible',
+      textOverflow: 'clip',
+    }),
   }),
   input: provided => ({
     ...provided,
@@ -134,11 +151,15 @@ export const customStyles = ({
         }),
     },
   }),
-  valueContainer: provided => ({
+  valueContainer: (provided, {selectProps}) => ({
     ...provided,
+    display: selectProps.isMulti === true ? 'grid' : 'flex',
     padding: 0,
-    width: '100%',
-    display: 'grid',
+    flex: 1,
+    minWidth: 0,
+    ...(selectProps.isMulti === true && {
+      width: '100%',
+    }),
   }),
   groupHeading: base => ({
     ...base,

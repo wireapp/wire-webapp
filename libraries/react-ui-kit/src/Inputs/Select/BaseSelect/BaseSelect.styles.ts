@@ -37,9 +37,11 @@ export const baseIndicatorSeparatorStyles = (): CSSObject => ({
 });
 
 export const baseContainerStyles = (containerCSS: CSSObject): CSSObject => ({
+  width: '100%',
+  minWidth: 0,
   '& > div': {
-    height: 'auto',
-    minHeight: '48px',
+    minWidth: 0,
+    width: '100%',
     '&:-moz-focusring': {
       color: 'transparent',
       textShadow: '0 0 0 #000',

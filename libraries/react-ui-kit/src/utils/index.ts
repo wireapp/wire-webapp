@@ -19,6 +19,7 @@
 
 export * from './childrenWithDefaultProps';
 export * from './enums';
+export * from './overlayPortal';
 export * from './IsInViewport';
 export * from './mediaQueries';
 export * from './useLongTouch';
