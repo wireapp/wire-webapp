@@ -77,7 +77,7 @@ jobs:
             ($tests | map(select(.status == "flaky")) | map("  ⚠️ " + .title) | unique | join("\n")) as $flaky_list |
             
             # Construct the final formatted message
-            "📋 **Playwright Test Run Summary**\n" +
+            "📋 **Web E2E Test Run Summary**\n" +
             "Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\n" +
             "======================================\n" +
             "**Total Tests:** \($total)\n" +
