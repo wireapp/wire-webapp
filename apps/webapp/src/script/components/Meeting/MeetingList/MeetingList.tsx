@@ -17,17 +17,20 @@
  *
  */
 
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
+
+import {Loading} from '@wireapp/react-ui-kit';
 
 import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
+import type {MeetingsListErrorKey} from 'Components/Meeting/loadMeetingsList';
 import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
 import {
   MeetingGroupBy,
   MeetingListItemGroup,
 } from 'Components/Meeting/MeetingList/MeetingListItemGroup/MeetingListItemGroup';
 import {TodayAndOngoingSection} from 'Components/Meeting/MeetingList/TodayAndOngoingSection/TodayAndOngoingSection';
-import {MEETINGS_PAST, MEETINGS_TODAY, MEETINGS_TOMORROW} from 'Components/Meeting/mocks/MeetingMocks';
+import {partitionMeetingsByDay} from 'Components/Meeting/partitionMeetingsByDay';
 import {getTodayTomorrowLabels, groupByStartHour} from 'Components/Meeting/utils/MeetingDatesUtil';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {t} from 'Util/localizerUtil';
@@ -49,7 +52,13 @@ export interface TodayAndOngoingSectionProps {
   nowMs: number;
 }
 
-export const MeetingList = () => {
+export interface MeetingListProps {
+  meetings: Meeting[];
+  isLoading: boolean;
+  errorKey?: MeetingsListErrorKey;
+}
+
+export const MeetingList = ({meetings, isLoading, errorKey}: MeetingListProps) => {
   const {wallClock} = useApplicationContext();
   const [nowMs, setNowMs] = useState(() => wallClock.currentTimestampInMilliseconds);
 
@@ -62,12 +71,34 @@ export const MeetingList = () => {
   const headerForToday = `${t('meetings.list.today')} (${today})`;
   const headerForTomorrow = `${t('meetings.list.tomorrow')} (${tomorrow})`;
 
-  const groupedMeetingsTomorrow = groupByStartHour(MEETINGS_TOMORROW);
-  const groupedMeetingsPast = groupByStartHour(MEETINGS_PAST);
+  const {
+    today: meetingsToday,
+    tomorrow: meetingsTomorrow,
+    past: meetingsPast,
+  } = useMemo(() => partitionMeetingsByDay(meetings, wallClock), [meetings, wallClock]);
 
-  const hasMeetingsToday = MEETINGS_TODAY.length > 0;
-  const hasMeetingsTomorrow = MEETINGS_TOMORROW.length > 0;
-  const hasMeetingsPast = MEETINGS_PAST.length > 0;
+  const groupedMeetingsTomorrow = groupByStartHour(meetingsTomorrow);
+  const groupedMeetingsPast = groupByStartHour(meetingsPast);
+
+  const hasMeetingsToday = meetingsToday.length > 0;
+  const hasMeetingsTomorrow = meetingsTomorrow.length > 0;
+  const hasMeetingsPast = meetingsPast.length > 0;
+
+  if (isLoading && meetings.length === 0) {
+    return (
+      <div css={emptyListContainerStyles} data-uie-name="meetings-list-loading">
+        <Loading data-uie-name="status-loading" />
+      </div>
+    );
+  }
+
+  if (errorKey !== undefined && meetings.length === 0) {
+    return (
+      <div css={meetingListContainerStyles} data-uie-name="meetings-list-error">
+        {t(errorKey)}
+      </div>
+    );
+  }
 
   if (!hasMeetingsToday && !hasMeetingsTomorrow && !hasMeetingsPast) {
     return (
@@ -81,7 +112,7 @@ export const MeetingList = () => {
     <div css={meetingListContainerStyles}>
       <>
         {hasMeetingsToday && (
-          <TodayAndOngoingSection meetingsToday={MEETINGS_TODAY} headerForToday={headerForToday} nowMs={nowMs} />
+          <TodayAndOngoingSection meetingsToday={meetingsToday} headerForToday={headerForToday} nowMs={nowMs} />
         )}
 
         {hasMeetingsTomorrow && (

@@ -17,22 +17,6 @@
  *
  */
 
-import {contentStyles} from 'Components/Meeting/Meeting.styles';
-import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
-import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
-import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useMeetingsList} from 'Components/Meeting/useMeetingsList';
-
-export const Meetings = () => {
-  const meetingsList = useMeetingsList();
-
-  return (
-    <>
-      <MeetingHeader />
-      <div css={contentStyles}>
-        <MeetingList {...meetingsList} />
-      </div>
-      <ScheduleMeetingModal onMeetingScheduled={meetingsList.fetchMeetings} />
-    </>
-  );
-};
+export * from './meetingsApiDataSource';
+export * from './meetingsDataSource';
+export * from './meetingsRepository';

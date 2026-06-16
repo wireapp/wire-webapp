@@ -35,6 +35,7 @@ import type {IntegrationRepository} from 'Repositories/integration/IntegrationRe
 import type {LifeCycleRepository} from 'Repositories/LifeCycleRepository/LifeCycleRepository';
 import {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
 import {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
+import type {MeetingsRepository} from 'Repositories/meetings/meetingsRepository';
 import type {NotificationRepository} from 'Repositories/notification/NotificationRepository';
 import type {PreferenceNotificationRepository} from 'Repositories/notification/PreferenceNotificationRepository';
 import type {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
@@ -70,6 +71,7 @@ export interface ViewModelRepositories {
   giphy: GiphyRepository;
   integration: IntegrationRepository;
   lifeCycle: LifeCycleRepository;
+  meetings: MeetingsRepository;
   message: MessageRepository;
   notification: NotificationRepository;
   preferenceNotification: PreferenceNotificationRepository;

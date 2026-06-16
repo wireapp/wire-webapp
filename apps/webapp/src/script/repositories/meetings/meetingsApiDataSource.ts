@@ -17,22 +17,18 @@
  *
  */
 
-import {contentStyles} from 'Components/Meeting/Meeting.styles';
-import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
-import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
-import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-import {useMeetingsList} from 'Components/Meeting/useMeetingsList';
+import type {MeetingsAPI} from '@wireapp/api-client/lib/meetings/meetingsApi';
 
-export const Meetings = () => {
-  const meetingsList = useMeetingsList();
+import type {MeetingsDataSource} from './meetingsDataSource';
 
-  return (
-    <>
-      <MeetingHeader />
-      <div css={contentStyles}>
-        <MeetingList {...meetingsList} />
-      </div>
-      <ScheduleMeetingModal onMeetingScheduled={meetingsList.fetchMeetings} />
-    </>
-  );
-};
+export class MeetingsApiDataSource implements MeetingsDataSource {
+  constructor(private readonly meetingsApi: MeetingsAPI) {}
+
+  createMeeting(...args: Parameters<MeetingsDataSource['createMeeting']>) {
+    return this.meetingsApi.createMeeting(...args);
+  }
+
+  getMeetingsList(...args: Parameters<MeetingsDataSource['getMeetingsList']>) {
+    return this.meetingsApi.getMeetingsList(...args);
+  }
+}
