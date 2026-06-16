@@ -19,11 +19,9 @@
 
 import {useEffect, useState} from 'react';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
-
 import {emptyListContainerStyles} from 'Components/Meeting/EmptyMeetingList/EmptyListStyles';
 import {EmptyMeetingList} from 'Components/Meeting/EmptyMeetingList/EmptyMeetingList';
-import {meetingListContainerStyles, showAllButtonStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
+import {meetingListContainerStyles} from 'Components/Meeting/MeetingList/MeetingList.styles';
 import {
   MeetingGroupBy,
   MeetingListItemGroup,
@@ -47,7 +45,6 @@ export interface Meeting {
 
 export interface TodayAndOngoingSectionProps {
   meetingsToday: Meeting[];
-  headerForOnGoing: string;
   headerForToday: string;
   nowMs: number;
 }
@@ -62,7 +59,6 @@ export const MeetingList = () => {
   }, [wallClock]);
 
   const {today, tomorrow} = getTodayTomorrowLabels();
-  const headerForOnGoing = `${t('meetings.list.onGoing.header')}`;
   const headerForToday = `${t('meetings.list.today')} (${today})`;
   const headerForTomorrow = `${t('meetings.list.tomorrow')} (${tomorrow})`;
 
@@ -85,12 +81,7 @@ export const MeetingList = () => {
     <div css={meetingListContainerStyles}>
       <>
         {hasMeetingsToday && (
-          <TodayAndOngoingSection
-            meetingsToday={MEETINGS_TODAY}
-            headerForOnGoing={headerForOnGoing}
-            headerForToday={headerForToday}
-            nowMs={nowMs}
-          />
+          <TodayAndOngoingSection meetingsToday={MEETINGS_TODAY} headerForToday={headerForToday} nowMs={nowMs} />
         )}
 
         {hasMeetingsTomorrow && (
@@ -99,12 +90,6 @@ export const MeetingList = () => {
 
         {hasMeetingsPast && (
           <MeetingListItemGroup groupedMeetings={groupedMeetingsPast} groupBy={MeetingGroupBy.NONE} nowMs={nowMs} />
-        )}
-
-        {(hasMeetingsToday || hasMeetingsTomorrow || hasMeetingsPast) && (
-          <div css={showAllButtonStyles}>
-            <Button variant={ButtonVariant.TERTIARY}>{t('meetings.showAllLabel')}</Button>
-          </div>
         )}
       </>
     </div>

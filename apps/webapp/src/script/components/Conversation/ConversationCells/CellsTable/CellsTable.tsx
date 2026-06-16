@@ -41,6 +41,7 @@ interface CellsTableProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onRefresh: () => void;
+  onCloseSearchView?: () => void;
 }
 
 export const CellsTable = ({
@@ -49,6 +50,7 @@ export const CellsTable = ({
   conversationQualifiedId,
   conversationName,
   onRefresh,
+  onCloseSearchView,
 }: CellsTableProps) => {
   const table = useReactTable({
     data: nodes,
@@ -57,6 +59,7 @@ export const CellsTable = ({
       conversationQualifiedId,
       conversationName,
       onRefresh,
+      onCloseSearchView,
     }),
     getCoreRowModel: getCoreRowModel(),
   });

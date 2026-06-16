@@ -25,12 +25,14 @@ import {
   callingButtonGroupStyles,
   dropdownIconStyles,
 } from 'Components/Meeting/MeetNowMultiActionButton/MeetNowMultiActionButton.styles';
+import {useMeetingActions} from 'Components/Meeting/useMeetingActions';
 import {t} from 'Util/localizerUtil';
 
 import {showContextMenu} from '../../../ui/ContextMenu';
 
 export const MeetNowMultiActionButton = () => {
   const [invertIcon, setInvertIcon] = useState(false);
+  const {handleMeetNow, handleScheduleMeeting} = useMeetingActions();
 
   const handleMeetingOptionButton = (event: MouseEvent<HTMLElement>) => {
     setInvertIcon(val => !val);
@@ -44,7 +46,7 @@ export const MeetNowMultiActionButton = () => {
           title: t('meetings.action.meetNow'),
           label: t('meetings.action.meetNow'),
           click: () => {
-            handleMeetingButton();
+            handleMeetNow();
             resetIconInversion();
           },
         },
@@ -52,7 +54,7 @@ export const MeetNowMultiActionButton = () => {
           title: t('meetings.action.scheduleMeeting'),
           label: t('meetings.action.scheduleMeeting'),
           click: () => {
-            // add scheduling functionality here
+            handleScheduleMeeting();
             resetIconInversion();
           },
         },
@@ -60,10 +62,6 @@ export const MeetNowMultiActionButton = () => {
       identifier: 'message-options-menu',
       resetMenuStates: resetIconInversion,
     });
-  };
-
-  const handleMeetingButton = () => {
-    // add calling functionality here
   };
 
   const resetIconInversion = () => setInvertIcon(false);
@@ -74,7 +72,7 @@ export const MeetNowMultiActionButton = () => {
         variant={ButtonVariant.TERTIARY}
         css={callingButtonGroupStyles}
         icon={<CallIcon />}
-        onClick={handleMeetingButton}
+        onClick={handleMeetNow}
       >
         {t('meetings.action.createMeeting')}
       </ButtonGroup.Button>

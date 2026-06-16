@@ -25,9 +25,9 @@
  * ---------------------------------------------------------------------------
  */
 import 'core-js/full/reflect';
-import 'intersection-observer';
 import 'core-js/stable/structured-clone';
 import 'fake-indexeddb/auto';
+import 'jest-canvas-mock';
 import '@testing-library/jest-dom';
 
 /**
@@ -37,6 +37,7 @@ import '@testing-library/jest-dom';
  */
 import 'src/script/util/test/mock/createObjectUrlMock';
 import 'src/script/util/test/mock/cryptoMock';
+import 'src/script/util/test/mock/intersectionObserverMock';
 import 'src/script/util/test/mock/matchMediaMock';
 import 'src/script/util/test/mock/mediaDevicesMock';
 import 'src/script/util/test/mock/navigatorPermissionsMock';

@@ -58,6 +58,7 @@ interface CellsTableRowOptionsProps {
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onRefresh: () => void;
+  onCloseSearchView?: () => void;
 }
 
 export const CellsTableRowOptions = ({
@@ -66,6 +67,7 @@ export const CellsTableRowOptions = ({
   conversationQualifiedId,
   conversationName,
   onRefresh,
+  onCloseSearchView,
 }: CellsTableRowOptionsProps) => {
   return (
     <DropdownMenu>
@@ -81,6 +83,7 @@ export const CellsTableRowOptions = ({
         conversationQualifiedId={conversationQualifiedId}
         conversationName={conversationName}
         onRefresh={onRefresh}
+        onCloseSearchView={onCloseSearchView}
       />
     </DropdownMenu>
   );
@@ -92,6 +95,7 @@ const CellsTableRowOptionsContent = ({
   conversationQualifiedId,
   conversationName,
   onRefresh,
+  onCloseSearchView,
 }: CellsTableRowOptionsProps) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const {handleOpenFile} = useCellsFilePreviewModal();
@@ -175,7 +179,7 @@ const CellsTableRowOptionsContent = ({
         <DropdownMenu.Item
           onClick={() =>
             node.type === CellNodeType.FOLDER
-              ? openFolder({conversationQualifiedId, name: node.name})
+              ? openFolder({path: node.path, onBeforeNavigate: onCloseSearchView})
               : handleOpenFile(node)
           }
         >

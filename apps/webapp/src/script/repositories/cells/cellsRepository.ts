@@ -239,6 +239,7 @@ export class CellsRepository {
 
   async searchNodes({
     query,
+    recursive,
     limit = DEFAULT_MAX_FILES_LIMIT,
     offset = 0,
     tags,
@@ -252,6 +253,7 @@ export class CellsRepository {
     deleted = false,
   }: {
     query: string;
+    recursive?: boolean;
     limit?: number;
     offset?: number;
     tags?: string[];
@@ -266,6 +268,7 @@ export class CellsRepository {
   }) {
     return this.apiClient.api.cells.searchNodes({
       phrase: query,
+      recursive,
       limit,
       offset,
       sortBy,

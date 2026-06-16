@@ -17,7 +17,7 @@
  *
  */
 
-import {Locator, Page} from '@playwright/test';
+import {expect, Locator, Page} from '@playwright/test';
 
 import {User} from 'test/e2e_tests/data/user';
 import {downloadAssetAndGetFilePath} from 'test/e2e_tests/utils/asset.util';
@@ -169,8 +169,11 @@ export class ConversationPage {
   }
 
   async replyToMessage(message: Locator) {
-    await message.hover();
-    await message.getByRole('group').getByTestId('do-reply-message').click();
+    // Allow full transaction of hovering and clicking to be retried
+    await expect(async () => {
+      await message.hover();
+      await message.getByRole('group').getByTestId('do-reply-message').click({timeout: 3_000});
+    }).toPass();
   }
 
   async enableSelfDeletingMessages() {

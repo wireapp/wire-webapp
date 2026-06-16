@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 
 import is from '@sindresorhus/is';
 import {QualifiedId} from '@wireapp/api-client/lib/user/';
@@ -27,6 +27,8 @@ import {FireAndForgetInvoker} from '@wireapp/core';
 
 import {CellsRepository} from 'Repositories/cells/cellsRepository';
 import {UserRepository} from 'Repositories/user/userRepository';
+
+import {createRequestVersionGate} from './requestVersionGate';
 
 import {
   ConversationDriveFiltersState,
@@ -46,19 +48,22 @@ interface UseConversationSearchFilesProps {
   userRepository: UserRepository;
   conversationQualifiedId: QualifiedId;
   enabled: boolean;
+  allowSearchWhenDisabled?: boolean;
   fireAndForgetInvoker: FireAndForgetInvoker;
   filters: ConversationDriveFiltersState;
   onClear?: () => void;
 }
 
 const DEBOUNCE_TIME = 300;
-const FETCH_ALL_QUERY = '*';
+
+const normalizeSearchQuery = (query: string): string => (is.nonEmptyStringAndNotWhitespace(query) ? query.trim() : '');
 
 export const useConversationSearchFiles = ({
   cellsRepository,
   userRepository,
   conversationQualifiedId,
   enabled,
+  allowSearchWhenDisabled = false,
   fireAndForgetInvoker,
   filters,
   onClear,
@@ -67,16 +72,27 @@ export const useConversationSearchFiles = ({
 
   const [searchValue, setSearchValue] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const isInitialLoad = useRef(true);
   const shouldPerformSearch = useRef(false);
   const hasFiredInitialFetchRef = useRef(false);
+  const wasEnabledRef = useRef(false);
+  const requestVersionGate = useRef(createRequestVersionGate());
+  // Prevents stale in-flight responses from overwriting the store after the search view closes.
+  const enabledRef = useRef(enabled);
+  enabledRef.current = enabled;
+  const allowSearchWhenDisabledRef = useRef(allowSearchWhenDisabled);
+  allowSearchWhenDisabledRef.current = allowSearchWhenDisabled;
 
   const searchParams = useMemo(() => toConversationDriveSearchParams(filters), [filters]);
   const hasActiveParams = hasActiveSearchParams(searchParams);
   const hadActiveSearchParamsRef = useRef(hasActiveParams);
 
-  const {id} = conversationQualifiedId;
-  const conversationPath = getCellsApiPath({conversationQualifiedId});
+  const {id, domain} = conversationQualifiedId;
+
+  const isCurrentSearchRequest = useCallback((requestVersion: number): boolean => {
+    return (
+      (enabledRef.current || allowSearchWhenDisabledRef.current) && !requestVersionGate.current.isStale(requestVersion)
+    );
+  }, []);
 
   const searchNodes = useCallback(
     async ({
@@ -90,24 +106,42 @@ export const useConversationSearchFiles = ({
       offset?: number;
       append?: boolean;
     }) => {
+      const requestVersion = requestVersionGate.current.next();
+
       try {
         setError(null);
         setStatus(append ? 'fetchingMore' : 'loading');
 
-        const shouldSort = query.length === 0 || query === FETCH_ALL_QUERY;
         const searchParams = toConversationDriveSearchParams(filtersParam);
+
+        // Recurse only when actually searching so the empty search view
+        // matches the browse view: folders first, then files.
+        const hasQuery = query.length > 0;
+        const hasFilters = hasActiveSearchParams(searchParams);
+        const isRecycleBin = getCellsFilesPath() === RECYCLE_BIN_PATH;
+        const isSearchingOrFiltering = hasQuery || hasFilters;
+
+        // recency sort for searches inside the recycle bin only
+        const forceRecencySort = isRecycleBin && hasQuery;
+
+        // search scopes to the folder the user is browsing
+        const searchRootPath = getCellsApiPath({conversationQualifiedId: {id, domain}});
 
         const result = await cellsRepository.searchNodes({
           query,
+          recursive: isSearchingOrFiltering,
           limit: append ? LOAD_MORE_INCREMENT : LOAD_MORE_INITIAL_SIZE,
           offset,
-          path: conversationPath,
-          sortBy: shouldSort ? 'mtime' : undefined,
-          sortDirection: shouldSort ? 'desc' : undefined,
-          type: 'file',
-          deleted: getCellsFilesPath() === RECYCLE_BIN_PATH,
+          path: searchRootPath,
+          sortBy: forceRecencySort ? 'mtime' : undefined,
+          sortDirection: forceRecencySort ? 'desc' : undefined,
+          deleted: isRecycleBin,
           ...searchParams,
         });
+
+        if (!isCurrentSearchRequest(requestVersion)) {
+          return;
+        }
 
         if (result.Nodes === undefined || result.Nodes.length === 0) {
           if (!append) {
@@ -120,13 +154,13 @@ export const useConversationSearchFiles = ({
 
         const users = await getUsersFromNodes({nodes: result.Nodes, userRepository});
 
+        if (!isCurrentSearchRequest(requestVersion)) {
+          return;
+        }
+
         // filter out draft nodes from results
         const filteredNodes = result.Nodes.filter(node => node.IsDraft !== true);
-
-        const transformedNodes = transformDataToCellsNodes({
-          nodes: filteredNodes,
-          users,
-        });
+        const transformedNodes = transformDataToCellsNodes({nodes: filteredNodes, users});
 
         if (append) {
           appendNodes({conversationId: id, nodes: transformedNodes});
@@ -136,13 +170,12 @@ export const useConversationSearchFiles = ({
 
         const pagination = result.Pagination !== undefined ? transformToCellPagination(result.Pagination) : null;
         setPagination({conversationId: id, pagination});
-
-        if (isInitialLoad.current) {
-          isInitialLoad.current = false;
-        }
-
         setStatus('success');
       } catch (error) {
+        if (!isCurrentSearchRequest(requestVersion)) {
+          return;
+        }
+
         const wrappedError = error instanceof Error ? error : new Error('Failed to load files', {cause: error});
         setError(wrappedError);
 
@@ -159,8 +192,25 @@ export const useConversationSearchFiles = ({
     },
     // cellsRepository and userRepository are not dependencies because they're singletons
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [appendNodes, setNodes, setPagination, setStatus, setError, id, conversationPath],
+    [appendNodes, setNodes, setPagination, setStatus, setError, id, domain, isCurrentSearchRequest],
   );
+
+  useLayoutEffect(() => {
+    if (!enabled) {
+      wasEnabledRef.current = false;
+      return;
+    }
+
+    if (wasEnabledRef.current) {
+      return;
+    }
+
+    wasEnabledRef.current = true;
+
+    // Clear stale browse rows before paint when the search view takes ownership of the shared store.
+    clearAll({conversationId: id});
+    setStatus('loading');
+  }, [clearAll, enabled, id, setStatus]);
 
   const searchNodesDebounced = useDebouncedCallback(async (value: string) => {
     shouldPerformSearch.current = false;
@@ -194,26 +244,32 @@ export const useConversationSearchFiles = ({
     preserveInputValue = false,
   }: {preserveFilters?: boolean; preserveInputValue?: boolean} = {}) => {
     searchNodesDebounced.cancel();
+    requestVersionGate.current.invalidate();
     if (!preserveInputValue) {
       setSearchValue('');
     }
     setSearchQuery('');
     shouldPerformSearch.current = false;
 
-    if (preserveFilters && hasActiveParams) {
+    const shouldRefreshSearchResults = preserveFilters && hasActiveParams;
+
+    if (shouldRefreshSearchResults) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-        await searchNodes({query: FETCH_ALL_QUERY, filters});
+        await searchNodes({query: '', filters});
       });
       return;
     }
 
+    // Search and browse share the same store. Clear search-owned rows before browse
+    // takes control again so stale search results cannot render with browse pagination.
+    clearAll({conversationId: id});
     onClear?.();
   };
 
   const handleReload = useCallback(async (): Promise<void> => {
     setStatus('loading');
     clearAll({conversationId: id});
-    await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
+    await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
   }, [clearAll, filters, id, searchNodes, searchQuery, setStatus]);
 
   useEffect(() => {
@@ -229,7 +285,7 @@ export const useConversationSearchFiles = ({
     }
 
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodes({query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY, filters});
+      await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
     });
   }, [searchNodes, searchQuery, enabled, filters, hasActiveParams, fireAndForgetInvoker]);
 
@@ -246,10 +302,7 @@ export const useConversationSearchFiles = ({
     }
     hasFiredInitialFetchRef.current = true;
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-      await searchNodes({
-        query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY,
-        filters,
-      });
+      await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
     });
   }, [enabled, searchNodes, searchQuery, filters, fireAndForgetInvoker]);
 
@@ -264,12 +317,7 @@ export const useConversationSearchFiles = ({
 
   const loadMore = useCallback(
     async (offset: number): Promise<void> => {
-      await searchNodes({
-        query: searchQuery.trim().length > 0 ? searchQuery : FETCH_ALL_QUERY,
-        filters,
-        offset,
-        append: true,
-      });
+      await searchNodes({query: normalizeSearchQuery(searchQuery), filters, offset, append: true});
     },
     [filters, searchNodes, searchQuery],
   );

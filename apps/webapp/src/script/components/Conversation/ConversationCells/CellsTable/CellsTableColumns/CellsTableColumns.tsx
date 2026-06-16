@@ -38,15 +38,17 @@ export const getCellsTableColumns = ({
   conversationQualifiedId,
   conversationName,
   onRefresh,
+  onCloseSearchView,
 }: {
   cellsRepository: CellsRepository;
   conversationQualifiedId: QualifiedId;
   conversationName: string;
   onRefresh: () => void;
+  onCloseSearchView?: () => void;
 }) => [
   columnHelper.accessor('name', {
     header: t('cells.tableRow.name'),
-    cell: info => <CellsTableNameColumn node={info.row.original} conversationQualifiedId={conversationQualifiedId} />,
+    cell: info => <CellsTableNameColumn node={info.row.original} onCloseSearchView={onCloseSearchView} />,
   }),
   columnHelper.accessor('owner', {
     header: t('cells.tableRow.owner'),
@@ -84,6 +86,7 @@ export const getCellsTableColumns = ({
           conversationQualifiedId={conversationQualifiedId}
           conversationName={conversationName}
           onRefresh={onRefresh}
+          onCloseSearchView={onCloseSearchView}
         />
       );
     },
