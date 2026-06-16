@@ -593,6 +593,7 @@ test.describe('Guestroom', () => {
     'I want to join guestroom invite with enterprise login',
     {tag: ['@TC-3477', '@regression']},
     async ({context, createPage}) => {
+      test.setTimeout(150_000); // Due to the two logins this test can sometimes take a bit longer
       const [userAPage, guestPage] = await Promise.all([createPage(withLogin(userA)), createPage(context)]);
 
       const userAPageManager = PageManager.from(userAPage).webapp;
