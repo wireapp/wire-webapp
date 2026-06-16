@@ -17,10 +17,7 @@
  *
  */
 
-import {
-  hasScheduleMeetingFormErrors,
-  validateScheduleMeetingForm,
-} from './scheduleMeetingValidation';
+import {hasScheduleMeetingFormErrors, validateScheduleMeetingForm} from './scheduleMeetingValidation';
 
 describe('scheduleMeetingValidation', () => {
   const start = new Date('2026-06-15T10:00:00');
