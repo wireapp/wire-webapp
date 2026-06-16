@@ -55,6 +55,8 @@ Prerequisites:
    - `127.0.0.1 local.imai.wire.link` (to connect with the imai backend)
 1. Run `yarn nx build webapp --configuration=development` to build static assets
 1. Run `yarn start` (runs `nx serve server`); the app will be available at https://local.zinfra.io:8081/auth/
+1. In case you're facing a CORS issue after login when the app tries to fetch `self/consent` from the backend, append
+   `fEATURE_CHECK_CONSENT="false"` to the env file
 
 #### Install Self-Signed Certificate
 
