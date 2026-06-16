@@ -36,12 +36,14 @@ import {CallState} from 'Repositories/calling/CallState';
 import {ConversationFilter} from 'Repositories/conversation/ConversationFilter';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {TeamState} from 'Repositories/team/TeamState';
 import {RightSidebarParams} from 'src/script/page/AppMain';
 import {PanelState} from 'src/script/page/RightSidebar';
 import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useAppMainState, ViewType} from 'src/script/page/state';
 import {ContentState} from 'src/script/page/useAppState';
 import {CallActions} from 'src/script/view_model/CallingViewModel';
+import {ViewModelRepositories} from 'src/script/view_model/MainViewModel';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {handleKeyDown, KEY} from 'Util/keyboardUtil';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -51,7 +53,9 @@ interface TitleBarProps {
   callActions: CallActions;
   conversation: Conversation;
   openRightSidebar: (panelState: PanelState, params: RightSidebarParams, compareEntityId?: boolean) => void;
+  repositories: ViewModelRepositories;
   selfUser: User;
+  teamState: TeamState;
   isRightSidebarOpen?: boolean;
   callState?: CallState;
   isReadOnlyConversation?: boolean;
@@ -61,12 +65,14 @@ interface TitleBarProps {
 }
 
 export const TitleBar = ({
+  repositories,
   conversation,
   callActions,
   selfUser,
   openRightSidebar,
   isRightSidebarOpen = false,
   callState = container.resolve(CallState),
+  teamState = container.resolve(TeamState),
   isReadOnlyConversation = false,
   withBottomDivider,
   isSharedDriveSearchViewOpen = false,
@@ -230,7 +236,7 @@ export const TitleBar = ({
         await callActions.startAudio(conversation);
         isStartingCallRef.current = false;
         showStartedCallAlert(isGroupOrChannel);
-      } catch {
+      } catch (error: unknown) {
         // Re-enable on error
         isStartingCallRef.current = false;
       }

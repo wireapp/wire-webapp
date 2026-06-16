@@ -21,27 +21,17 @@ import {PrimaryModal} from 'Components/Modals/PrimaryModal';
 import {AssetRepository} from 'Repositories/assets/assetRepository';
 import type {Translate} from 'Util/localizerUtil';
 
-export const CONCURRENT_UPLOAD_LIMIT = 10;
+const CONCURRENT_UPLOAD_LIMIT = 10;
 
-type UploadLimitCopy = {
-  readonly message: string;
-  readonly title: string;
-};
-
-const isHittingUploadLimit = (
-  files: File[],
-  assetRepository: AssetRepository,
-  uploadLimitCopy: UploadLimitCopy,
-  translate: Translate,
-): boolean => {
+const isHittingUploadLimit = (files: File[], assetRepository: AssetRepository, translate: Translate): boolean => {
   const concurrentUploads = files.length + assetRepository.getNumberOfOngoingUploads();
   const isHittingUploadLimit = concurrentUploads > CONCURRENT_UPLOAD_LIMIT;
 
   if (isHittingUploadLimit) {
     const modalOptions = {
       text: {
-        message: uploadLimitCopy.message,
-        title: uploadLimitCopy.title,
+        message: translate('modalAssetParallelUploadsMessage', {number: CONCURRENT_UPLOAD_LIMIT}),
+        title: translate('modalAssetParallelUploadsHeadline'),
       },
     };
 

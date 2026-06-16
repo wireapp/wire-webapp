@@ -62,7 +62,6 @@ const SetHandleComponent = ({
   removeLocalStorage,
 }: Props & ConnectedProps & DispatchProps) => {
   const {translate} = useApplicationContext();
-  const minimumHandleLength = 2;
   const [error, setError] = useState<unknown>(null);
   const [handle, setHandle] = useState('');
   const {state} = useLocation();
@@ -75,22 +74,22 @@ const SetHandleComponent = ({
         window.location.replace(pathWithParams(EXTERNAL_ROUTE.WEBAPP));
       }
     }
-  }, [hasSelfHandle, isNewAccount, removeLocalStorage]);
+  }, [hasSelfHandle]);
 
   useEffect(() => {
-    void (async () => {
-      await doGetConsents();
+    (async () => {
+      doGetConsents();
       try {
         const suggestions = createSuggestions(name ?? '');
-        const availableHandle = await checkHandles(suggestions);
-        setHandle(availableHandle);
+        const handle = await checkHandles(suggestions);
+        setHandle(handle);
       } catch (error: unknown) {
         setError(error);
       }
     })();
 
     trackTelemetryPageView(PageView.ACCOUNT_USERNAME_SCREEN_3);
-  }, [checkHandles, doGetConsents, name]);
+  }, []);
 
   const updateConsent = (consentType: ConsentType, value: number): Promise<void> => doSetConsent(consentType, value);
 
@@ -105,11 +104,7 @@ const SetHandleComponent = ({
         navigate(ROUTE.SUCCESS);
       }
     } catch (error: unknown) {
-      if (
-        isBackendError(error) &&
-        error.label === BackendErrorLabel.INVALID_HANDLE &&
-        handle.trim().length < minimumHandleLength
-      ) {
+      if (isBackendError(error) && error.label === BackendErrorLabel.INVALID_HANDLE && handle.trim().length < 2) {
         error.label = SyntheticErrorLabel.HANDLE_TOO_SHORT;
       }
       setError(error);
@@ -123,12 +118,12 @@ const SetHandleComponent = ({
 
   const handleAcceptNewletterConsent = () => {
     void updateConsent(ConsentType.MARKETING, 1);
-    void storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, true);
+    storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, true);
   };
 
   const handleDeclineNewletterConsent = () => {
     void updateConsent(ConsentType.MARKETING, 0);
-    void storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, false);
+    storeValue(StorageKey.INITIAL_MAKRETING_CONSENT_ACCEPTED, false);
   };
 
   if (hasSelfHandle) {

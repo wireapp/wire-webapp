@@ -30,13 +30,9 @@ interface UsePingProps {
   conversation: Conversation;
   messageRepository: MessageRepository;
   is1to1: boolean;
-  confirmationTitle: string;
-  pingActionText: string;
 }
 
-const pingResetDelaySeconds = 2;
-
-export const usePing = ({conversation, messageRepository, is1to1, confirmationTitle, pingActionText}: UsePingProps) => {
+export const usePing = ({conversation, messageRepository, is1to1}: UsePingProps) => {
   const {fireAndForgetInvoker, translate} = useApplicationContext();
   const [isPingDisabled, setIsPingDisabled] = useState(false);
 
@@ -47,7 +43,7 @@ export const usePing = ({conversation, messageRepository, is1to1, confirmationTi
     setIsPingDisabled(true);
     fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
       await messageRepository.sendPing(conversation);
-      window.setTimeout(() => setIsPingDisabled(false), TIME_IN_MILLIS.SECOND * pingResetDelaySeconds);
+      window.setTimeout(() => setIsPingDisabled(false), TIME_IN_MILLIS.SECOND * 2);
     });
   };
 
@@ -65,10 +61,10 @@ export const usePing = ({conversation, messageRepository, is1to1, confirmationTi
         {
           primaryAction: {
             action: pingConversation,
-            text: pingActionText,
+            text: translate('tooltipConversationPing'),
           },
           text: {
-            title: confirmationTitle,
+            title: translate('conversationPingConfirmTitle', {memberCount: totalConversationUsers.toString()}),
           },
         },
         undefined,

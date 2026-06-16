@@ -20,13 +20,13 @@
 import {act, renderHook} from '@testing-library/react';
 
 import * as checkFileSharingPermissionModule from 'Components/Conversation/utils/checkFileSharingPermission';
-import {translate} from 'Util/localizerUtil';
+import type {Translate} from 'Util/localizerUtil';
 import * as TimeUtil from 'Util/timeUtil';
 
 import {useFilePaste} from './useFilePaste';
 
 jest.mock('Components/Conversation/utils/checkFileSharingPermission', () => ({
-  checkFileSharingPermission: jest.fn((callback, _warningText) => callback),
+  checkFileSharingPermission: jest.fn(callback => callback),
 }));
 
 jest.mock('Util/timeUtil', () => ({
@@ -39,6 +39,12 @@ describe('useFilePaste', () => {
   const mockFormattedDate = '1 Jan 2024, 12:00';
   // After sanitization, commas and colons are replaced with hyphens
   const sanitizedFormattedDate = '1 Jan 2024-12-00';
+  const translate: Translate = (key, replacements) => {
+    if (key === 'conversationSendPastedFile' && replacements !== undefined && replacements.date) {
+      return `Pasted file from ${replacements.date}`;
+    }
+    return key;
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,11 +55,6 @@ describe('useFilePaste', () => {
     renderHook(() =>
       useFilePaste({
         onFilePasted: mockOnFilePasted,
-        createPastedFileName(date) {
-          return `Pasted file from ${date}.txt`;
-        },
-        restrictedFileSharingMessage: 'conversationModalRestrictedFileSharingDescription',
-        restrictedFileSharingTitle: 'conversationModalRestrictedFileSharingHeadline',
         translate,
       }),
     );
@@ -76,11 +77,6 @@ describe('useFilePaste', () => {
     renderHook(() =>
       useFilePaste({
         onFilePasted: mockOnFilePasted,
-        createPastedFileName(date) {
-          return `Pasted file from ${date}.txt`;
-        },
-        restrictedFileSharingMessage: 'conversationModalRestrictedFileSharingDescription',
-        restrictedFileSharingTitle: 'conversationModalRestrictedFileSharingHeadline',
         translate,
       }),
     );
@@ -99,11 +95,6 @@ describe('useFilePaste', () => {
     renderHook(() =>
       useFilePaste({
         onFilePasted: mockOnFilePasted,
-        createPastedFileName(date) {
-          return `Pasted file from ${date}.txt`;
-        },
-        restrictedFileSharingMessage: 'conversationModalRestrictedFileSharingDescription',
-        restrictedFileSharingTitle: 'conversationModalRestrictedFileSharingHeadline',
         translate,
       }),
     );

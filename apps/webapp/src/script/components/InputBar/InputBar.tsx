@@ -44,10 +44,8 @@ import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {EventName} from 'Repositories/tracking/eventName';
 import {CONVERSATION_TYPING_INDICATOR_MODE} from 'Repositories/user/typingIndicatorMode';
-import {useApplicationContext} from 'src/script/page/RootProvider';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {TIME_IN_MILLIS} from 'Util/timeUtil';
-import {getFileExtension} from 'Util/util';
 
 import {MessageContent} from './common/messageContent/messageContent';
 import {FilePreviews} from './FilePreviews/FilePreviews';
@@ -66,12 +64,11 @@ import {usePing} from './usePing/usePing';
 import {useTypingIndicator} from './useTypingIndicator/useTypingIndicator';
 
 import {Config} from '../../Config';
-
-const PING_TIMEOUT_MULTIPLIER = 2;
+import {useApplicationContext} from '../../page/RootProvider';
 
 const CONFIG = {
   ...Config.getConfig(),
-  PING_TIMEOUT: TIME_IN_MILLIS.SECOND * PING_TIMEOUT_MULTIPLIER,
+  PING_TIMEOUT: TIME_IN_MILLIS.SECOND * 2,
   GIPHY_TEXT_LENGTH: 256,
 };
 
@@ -210,11 +207,6 @@ export const InputBar = ({
     uploadDroppedFiles,
     uploadImages,
     isFileNameKept: isCellsEnabled,
-    createPastedFileName(date, originalFileName) {
-      return `${translate('conversationSendPastedFile', {date})}.${getFileExtension(originalFileName)}`;
-    },
-    restrictedFileSharingMessage: translate('conversationModalRestrictedFileSharingDescription'),
-    restrictedFileSharingTitle: translate('conversationModalRestrictedFileSharingHeadline'),
     translate,
   });
 
@@ -260,10 +252,6 @@ export const InputBar = ({
     conversation,
     messageRepository,
     is1to1,
-    pingActionText: translate('tooltipConversationPing'),
-    confirmationTitle: translate('conversationPingConfirmTitle', {
-      memberCount: conversation.participating_user_ets().length.toString(),
-    }),
   });
 
   const giphy = useGiphy({

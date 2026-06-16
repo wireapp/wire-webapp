@@ -17,7 +17,7 @@
  *
  */
 
-import {useCallback, useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {amplify} from 'amplify';
 
@@ -31,9 +31,6 @@ interface UseFileHandlingProps {
   uploadDroppedFiles: (files: File[]) => void;
   uploadImages: (images: File[]) => void;
   isFileNameKept?: boolean;
-  createPastedFileName: (date: string, originalFileName: string) => string;
-  restrictedFileSharingMessage: string;
-  restrictedFileSharingTitle: string;
   translate: Translate;
 }
 
@@ -41,9 +38,6 @@ export const useFileHandling = ({
   uploadDroppedFiles,
   uploadImages,
   isFileNameKept,
-  createPastedFileName,
-  restrictedFileSharingMessage,
-  restrictedFileSharingTitle,
   translate,
 }: UseFileHandlingProps) => {
   const [pastedFile, setPastedFile] = useState<File | null>(null);
@@ -53,31 +47,23 @@ export const useFileHandling = ({
       setPastedFile(file);
     },
     isFileNameKept,
-    createPastedFileName,
-    restrictedFileSharingMessage,
-    restrictedFileSharingTitle,
     translate,
   });
 
-  const clearPastedFile = useCallback(() => {
-    setPastedFile(null);
-  }, []);
+  const clearPastedFile = () => setPastedFile(null);
 
-  const sendPastedFile = useCallback(() => {
+  const sendPastedFile = () => {
     if (pastedFile) {
       uploadDroppedFiles([pastedFile]);
       clearPastedFile();
     }
-  }, [clearPastedFile, pastedFile, uploadDroppedFiles]);
+  };
 
-  const sendImageOnEnterClick = useCallback(
-    (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && !event.shiftKey && !event.altKey && !event.metaKey) {
-        void sendPastedFile();
-      }
-    },
-    [sendPastedFile],
-  );
+  const sendImageOnEnterClick = (event: KeyboardEvent) => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.altKey && !event.metaKey) {
+      sendPastedFile();
+    }
+  };
 
   useEffect(() => {
     if (!pastedFile) {
@@ -89,7 +75,7 @@ export const useFileHandling = ({
     return () => {
       window.removeEventListener('keydown', sendImageOnEnterClick);
     };
-  }, [pastedFile, sendImageOnEnterClick]);
+  }, [pastedFile]);
 
   useEffect(() => {
     amplify.subscribe(WebAppEvents.CONVERSATION.IMAGE.SEND, uploadImages);
@@ -97,7 +83,7 @@ export const useFileHandling = ({
     return () => {
       amplify.unsubscribeAll(WebAppEvents.CONVERSATION.IMAGE.SEND);
     };
-  }, [uploadImages]);
+  }, []);
 
   return {
     pastedFile,

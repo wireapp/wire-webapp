@@ -51,7 +51,7 @@ import {useApplicationContext, useMainViewModel} from 'src/script/page/RootProvi
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {isLastReceivedMessage} from 'Util/conversationMessages';
 import {allowsAllFiles, getFileExtensionOrName, hasAllowedExtension} from 'Util/fileTypeUtil';
-import {CONCURRENT_UPLOAD_LIMIT, isHittingUploadLimit} from 'Util/isHittingUploadLimit';
+import {isHittingUploadLimit} from 'Util/isHittingUploadLimit';
 import {getLogger} from 'Util/logger';
 import {safeMailOpen, safeWindowOpen} from 'Util/sanitizationUtil';
 import {formatBytes} from 'Util/util';
@@ -144,9 +144,6 @@ export const Conversation = ({
 
   const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const uploadLimitMessage = translate('modalAssetParallelUploadsMessage', {number: CONCURRENT_UPLOAD_LIMIT});
-  const uploadLimitTitle = translate('modalAssetParallelUploadsHeadline');
-
   const {addReadReceiptToBatch} = useReadReceiptSender(repositories.message);
 
   useEffect(() => {
@@ -159,15 +156,7 @@ export const Conversation = ({
 
   const uploadImages = useCallback(
     (images: File[]) => {
-      if (
-        !activeConversation ||
-        isHittingUploadLimit(
-          images,
-          repositories.asset,
-          {message: uploadLimitMessage, title: uploadLimitTitle},
-          translate,
-        )
-      ) {
+      if (!activeConversation || isHittingUploadLimit(images, repositories.asset, translate)) {
         return;
       }
 
@@ -189,7 +178,7 @@ export const Conversation = ({
 
       repositories.message.uploadImages(activeConversation, images);
     },
-    [activeConversation, repositories.asset, repositories.message, translate, uploadLimitMessage, uploadLimitTitle],
+    [activeConversation, repositories.asset, repositories.message, translate],
   );
 
   const uploadFiles = useCallback(
@@ -219,14 +208,7 @@ export const Conversation = ({
 
       const uploadLimit = inTeam ? CONFIG.MAXIMUM_ASSET_FILE_SIZE_TEAM : CONFIG.MAXIMUM_ASSET_FILE_SIZE_PERSONAL;
 
-      if (
-        !isHittingUploadLimit(
-          files,
-          repositories.asset,
-          {message: uploadLimitMessage, title: uploadLimitTitle},
-          translate,
-        )
-      ) {
+      if (!isHittingUploadLimit(files, repositories.asset, translate)) {
         for (const file of fileArray) {
           const isFileTooLarge = file.size > uploadLimit;
 
@@ -254,8 +236,6 @@ export const Conversation = ({
       repositories.message,
       selfUser,
       translate,
-      uploadLimitMessage,
-      uploadLimitTitle,
     ],
   );
 
@@ -264,17 +244,7 @@ export const Conversation = ({
       const images: File[] = [];
       const files: File[] = [];
 
-      if (
-        !isHittingUploadLimit(
-          droppedFiles,
-          repositories.asset,
-          {
-            message: uploadLimitMessage,
-            title: uploadLimitTitle,
-          },
-          translate,
-        )
-      ) {
+      if (!isHittingUploadLimit(droppedFiles, repositories.asset, translate)) {
         Array.from(droppedFiles).forEach(file => {
           const isSupportedImage = (CONFIG.ALLOWED_IMAGE_TYPES as ReadonlyArray<string>).includes(file.type);
 
@@ -289,7 +259,7 @@ export const Conversation = ({
         uploadFiles(files);
       }
     },
-    [repositories.asset, translate, uploadFiles, uploadImages, uploadLimitMessage, uploadLimitTitle],
+    [repositories.asset, translate, uploadFiles, uploadImages],
   );
 
   const openGiphy = (text: string) => {
@@ -507,22 +477,19 @@ export const Conversation = ({
     }
   };
 
-  const updateConversationLastRead = useCallback(
-    (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
-      const conversationLastRead = conversationEntity.last_read_timestamp();
-      const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
-      const needsUpdate = conversationLastRead < lastKnownTimestamp;
+  const updateConversationLastRead = (conversationEntity: ConversationEntity, messageEntity?: Message): void => {
+    const conversationLastRead = conversationEntity.last_read_timestamp();
+    const lastKnownTimestamp = conversationEntity.getLastKnownTimestamp(repositories.serverTime.toServerTimestamp());
+    const needsUpdate = conversationLastRead < lastKnownTimestamp;
 
-      // if no message provided it means we need to jump to the last message
-      if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
-        conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
-        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
-          await repositories.message.markAsRead(conversationEntity);
-        });
-      }
-    },
-    [fireAndForgetInvoker, repositories.message, repositories.serverTime],
-  );
+    // if no message provided it means we need to jump to the last message
+    if (needsUpdate && (!messageEntity || isLastReceivedMessage(messageEntity, conversationEntity))) {
+      conversationEntity.setTimestamp(lastKnownTimestamp, ConversationEntity.TIMESTAMP_TYPE.LAST_READ);
+      fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+        await repositories.message.markAsRead(conversationEntity);
+      });
+    }
+  };
 
   const getInViewportCallback = useCallback(
     (conversationEntity: ConversationEntity, messageEntity: Message) => {
@@ -624,24 +591,19 @@ export const Conversation = ({
       isCellsEnabled={isCellsEnabled}
       isConversationLoaded={isConversationLoaded}
       activeConversationId={activeConversation?.id}
-      onFileDropped={checkFileSharingPermission(
-        uploadDroppedFiles,
-        {
-          title: translate('conversationModalRestrictedFileSharingHeadline'),
-          message: translate('conversationModalRestrictedFileSharingDescription'),
-        },
-        translate,
-      )}
+      onFileDropped={checkFileSharingPermission(uploadDroppedFiles, translate)}
       rootProps={getRootProps()}
       inputProps={getInputProps()}
     >
       {activeConversation && (
-        <>
-          <TitleBar
-            conversation={activeConversation}
-            selfUser={selfUser}
-            callActions={mainViewModel.calling.callActions}
-            openRightSidebar={openRightSidebar}
+          <>
+            <TitleBar
+              repositories={repositories}
+              conversation={activeConversation}
+              selfUser={selfUser}
+              teamState={teamState}
+              callActions={mainViewModel.calling.callActions}
+              openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
             isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
             withBottomDivider={!isCellsEnabled || (isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen)}
@@ -761,14 +723,7 @@ export const Conversation = ({
                   uploadDroppedFiles={uploadDroppedFiles}
                   uploadImages={uploadImages}
                   uploadFiles={uploadFiles}
-                  uploadPastedFiles={checkFileSharingPermission(
-                    handlePastedFile,
-                    {
-                      title: translate('conversationModalRestrictedFileSharingHeadline'),
-                      message: translate('conversationModalRestrictedFileSharingDescription'),
-                    },
-                    translate,
-                  )}
+                  uploadPastedFiles={checkFileSharingPermission(handlePastedFile, translate)}
                   onCellImageUpload={openImageFilesView}
                   onCellAssetUpload={openAllFilesView}
                 />
