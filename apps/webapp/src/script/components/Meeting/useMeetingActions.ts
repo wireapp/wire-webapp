@@ -17,13 +17,17 @@
  *
  */
 
+import {useScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
+
 export const useMeetingActions = () => {
+  const openCreate = useScheduleMeetingModal(state => state.openCreate);
+
   const handleMeetNow = () => {
     // add calling functionality here
   };
 
   const handleScheduleMeeting = () => {
-    // add scheduling functionality here
+    openCreate();
   };
 
   return {handleMeetNow, handleScheduleMeeting};

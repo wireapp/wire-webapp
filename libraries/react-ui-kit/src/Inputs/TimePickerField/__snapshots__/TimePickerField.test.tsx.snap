@@ -30,7 +30,7 @@ exports[`"TimePickerField" renders 1`] = `
 }
 
 .emotion-3 {
-  margin-bottom: 20px;
+  margin-bottom: 0;
   width: 100%;
 }
 
@@ -38,13 +38,15 @@ exports[`"TimePickerField" renders 1`] = `
   color: #0667c8;
 }
 
-.emotion-4>div {
-  height: 48px;
-  min-height: 48px;
-  position: relative;
+.emotion-4 {
   width: 100%;
   min-width: 0;
-  border-radius: 14px;
+}
+
+.emotion-4>div {
+  min-width: 0;
+  width: 100%;
+  position: relative;
 }
 
 .emotion-4>div:-moz-focusring {
@@ -53,6 +55,11 @@ exports[`"TimePickerField" renders 1`] = `
 }
 
 .emotion-5 {
+  min-width: 0;
+  width: 100%;
+}
+
+.emotion-6 {
   z-index: 9999;
   border: 0;
   clip: rect(1px, 1px, 1px, 1px);
@@ -64,7 +71,7 @@ exports[`"TimePickerField" renders 1`] = `
   white-space: nowrap;
 }
 
-.emotion-7 {
+.emotion-8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -77,7 +84,7 @@ exports[`"TimePickerField" renders 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  padding: 0 16px;
+  padding: 0 14px;
   height: 48px;
   min-height: 48px;
   background: #fff;
@@ -91,72 +98,77 @@ exports[`"TimePickerField" renders 1`] = `
   outline: none;
   width: 100%;
   cursor: pointer;
+  box-sizing: border-box;
+  max-height: 48px;
   min-width: 0;
 }
 
-.emotion-7::-moz-placeholder {
+.emotion-8::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-7::-ms-input-placeholder {
+.emotion-8::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
 }
 
-.emotion-7::-webkit-input-placeholder {
+.emotion-8::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
 }
 
-.emotion-7:hover {
+.emotion-8:hover {
   box-shadow: 0 0 0 1px var(--text-input-border-hover);
 }
 
-.emotion-7:focus-visible,
-.emotion-7:focus,
-.emotion-7:active {
+.emotion-8:focus-visible,
+.emotion-8:focus,
+.emotion-8:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-7:invalid:not(:focus, :hover) {
+.emotion-8:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
-.emotion-7:-webkit-autofill {
+.emotion-8:-webkit-autofill {
   box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
   -webkit-text-fill-color: rgb(29, 30, 31);
 }
 
-.emotion-7:-webkit-autofill:hover {
+.emotion-8:-webkit-autofill:hover {
   box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:-webkit-autofill:focus-visible,
-.emotion-7:-webkit-autofill:focus,
-.emotion-7:-webkit-autofill:active {
+.emotion-8:-webkit-autofill:focus-visible,
+.emotion-8:-webkit-autofill:focus,
+.emotion-8:-webkit-autofill:active {
   box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:-webkit-autofill:invalid:not(:focus, :hover) {
+.emotion-8:-webkit-autofill:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:focus:visible,
-.emotion-7 active {
+.emotion-8:focus:visible,
+.emotion-8 active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-8 {
+.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  display: grid;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -169,14 +181,14 @@ exports[`"TimePickerField" renders 1`] = `
   overflow: hidden;
   padding: 0;
   box-sizing: border-box;
-  width: 100%;
+  min-width: 0;
 }
 
-.emotion-9 {
-  grid-area: 1/1/2/3;
+.emotion-10 {
+  grid-area: unset;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
   color: rgb(29, 30, 31);
   margin-left: 2px;
@@ -184,7 +196,7 @@ exports[`"TimePickerField" renders 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-10 {
+.emotion-11 {
   background: 0;
   border: 0;
   caret-color: transparent;
@@ -203,7 +215,7 @@ exports[`"TimePickerField" renders 1`] = `
   transform: scale(.01);
 }
 
-.emotion-11 {
+.emotion-12 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -221,11 +233,11 @@ exports[`"TimePickerField" renders 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-12 {
+.emotion-13 {
   display: none;
 }
 
-.emotion-13 {
+.emotion-14 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -237,11 +249,11 @@ exports[`"TimePickerField" renders 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-13:hover {
+.emotion-14:hover {
   color: hsl(0, 0%, 60%);
 }
 
-.emotion-14 {
+.emotion-15 {
   fill: rgb(29, 30, 31);
   overflow: visible;
   margin-top: 4px;
@@ -271,29 +283,30 @@ exports[`"TimePickerField" renders 1`] = `
         onKeyDown={[Function]}
       >
         <div
+          className="emotion-5"
           tabIndex={0}
         >
           <span
-            className="emotion-5"
+            className="emotion-6"
             id="react-select-2-live-region"
           />
           <span
             aria-atomic="false"
             aria-live="polite"
             aria-relevant="additions text"
-            className="emotion-5"
+            className="emotion-6"
             role="log"
           />
           <div
-            className="emotion-7"
+            className="emotion-8"
             onMouseDown={[Function]}
             onTouchEnd={[Function]}
           >
             <div
-              className="emotion-8"
+              className="emotion-9"
             >
               <div
-                className="emotion-9"
+                className="emotion-10"
               >
                 12:00 AM
               </div>
@@ -304,7 +317,7 @@ exports[`"TimePickerField" renders 1`] = `
                 aria-expanded={false}
                 aria-haspopup={true}
                 aria-readonly={true}
-                className="emotion-10"
+                className="emotion-11"
                 disabled={false}
                 id="time-picker-test"
                 inputMode="none"
@@ -317,19 +330,19 @@ exports[`"TimePickerField" renders 1`] = `
               />
             </div>
             <div
-              className="emotion-11"
+              className="emotion-12"
             >
               <span
-                className="emotion-12"
+                className="emotion-13"
               />
               <div
                 aria-hidden="true"
-                className="emotion-13"
+                className="emotion-14"
                 onMouseDown={[Function]}
                 onTouchEnd={[Function]}
               >
                 <svg
-                  className="emotion-14"
+                  className="emotion-15"
                   height={16}
                   viewBox="0 0 16 16"
                   width={16}
@@ -380,7 +393,7 @@ exports[`"TimePickerField" renders as disabled 1`] = `
 }
 
 .emotion-3 {
-  margin-bottom: 20px;
+  margin-bottom: 0;
   width: 100%;
 }
 
@@ -388,13 +401,15 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   color: #0667c8;
 }
 
-.emotion-4>div {
-  height: 48px;
-  min-height: 48px;
-  position: relative;
+.emotion-4 {
   width: 100%;
   min-width: 0;
-  border-radius: 14px;
+}
+
+.emotion-4>div {
+  min-width: 0;
+  width: 100%;
+  position: relative;
 }
 
 .emotion-4>div:-moz-focusring {
@@ -403,6 +418,11 @@ exports[`"TimePickerField" renders as disabled 1`] = `
 }
 
 .emotion-5 {
+  min-width: 0;
+  width: 100%;
+}
+
+.emotion-6 {
   z-index: 9999;
   border: 0;
   clip: rect(1px, 1px, 1px, 1px);
@@ -414,7 +434,7 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   white-space: nowrap;
 }
 
-.emotion-7 {
+.emotion-8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -427,7 +447,7 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  padding: 0 16px;
+  padding: 0 14px;
   height: 48px;
   min-height: 48px;
   background: #edeff0;
@@ -441,59 +461,64 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   outline: none;
   width: 100%;
   background-color: #edeff0;
+  box-sizing: border-box;
+  max-height: 48px;
   min-width: 0;
 }
 
-.emotion-7::-moz-placeholder {
+.emotion-8::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-7::-ms-input-placeholder {
+.emotion-8::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
 }
 
-.emotion-7::-webkit-input-placeholder {
+.emotion-8::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
 }
 
-.emotion-7:focus-visible,
-.emotion-7:focus,
-.emotion-7:active {
+.emotion-8:focus-visible,
+.emotion-8:focus,
+.emotion-8:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-7:invalid:not(:focus, :hover) {
+.emotion-8:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
-.emotion-7:-webkit-autofill {
+.emotion-8:-webkit-autofill {
   box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
   -webkit-text-fill-color: rgb(29, 30, 31);
 }
 
-.emotion-7:-webkit-autofill:focus-visible,
-.emotion-7:-webkit-autofill:focus,
-.emotion-7:-webkit-autofill:active {
+.emotion-8:-webkit-autofill:focus-visible,
+.emotion-8:-webkit-autofill:focus,
+.emotion-8:-webkit-autofill:active {
   box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:-webkit-autofill:invalid:not(:focus, :hover) {
+.emotion-8:-webkit-autofill:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-8 {
+.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  display: grid;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -506,14 +531,14 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   overflow: hidden;
   padding: 0;
   box-sizing: border-box;
-  width: 100%;
+  min-width: 0;
 }
 
-.emotion-9 {
-  grid-area: 1/1/2/3;
+.emotion-10 {
+  grid-area: unset;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
   color: rgb(80, 82, 84);
   margin-left: 2px;
@@ -521,7 +546,7 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-10 {
+.emotion-11 {
   background: 0;
   border: 0;
   caret-color: transparent;
@@ -540,7 +565,7 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   transform: scale(.01);
 }
 
-.emotion-11 {
+.emotion-12 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -558,11 +583,11 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-12 {
+.emotion-13 {
   display: none;
 }
 
-.emotion-13 {
+.emotion-14 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -574,15 +599,15 @@ exports[`"TimePickerField" renders as disabled 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-13:hover {
+.emotion-14:hover {
   color: hsl(0, 0%, 60%);
 }
 
-.emotion-13>svg {
+.emotion-14>svg {
   fill: rgb(80, 82, 84);
 }
 
-.emotion-14 {
+.emotion-15 {
   fill: rgb(29, 30, 31);
   overflow: visible;
   margin-top: 4px;
@@ -612,30 +637,31 @@ exports[`"TimePickerField" renders as disabled 1`] = `
         onKeyDown={[Function]}
       >
         <div
+          className="emotion-5"
           tabIndex={0}
         >
           <span
-            className="emotion-5"
+            className="emotion-6"
             id="react-select-5-live-region"
           />
           <span
             aria-atomic="false"
             aria-live="polite"
             aria-relevant="additions text"
-            className="emotion-5"
+            className="emotion-6"
             role="log"
           />
           <div
             aria-disabled={true}
-            className="emotion-7"
+            className="emotion-8"
             onMouseDown={[Function]}
             onTouchEnd={[Function]}
           >
             <div
-              className="emotion-8"
+              className="emotion-9"
             >
               <div
-                className="emotion-9"
+                className="emotion-10"
               >
                 12:00 AM
               </div>
@@ -646,7 +672,7 @@ exports[`"TimePickerField" renders as disabled 1`] = `
                 aria-expanded={false}
                 aria-haspopup={true}
                 aria-readonly={true}
-                className="emotion-10"
+                className="emotion-11"
                 disabled={true}
                 id="time-picker-test"
                 inputMode="none"
@@ -659,19 +685,19 @@ exports[`"TimePickerField" renders as disabled 1`] = `
               />
             </div>
             <div
-              className="emotion-11"
+              className="emotion-12"
             >
               <span
-                className="emotion-12"
+                className="emotion-13"
               />
               <div
                 aria-hidden="true"
-                className="emotion-13"
+                className="emotion-14"
                 onMouseDown={[Function]}
                 onTouchEnd={[Function]}
               >
                 <svg
-                  className="emotion-14"
+                  className="emotion-15"
                   height={16}
                   viewBox="0 0 16 16"
                   width={16}
@@ -722,7 +748,7 @@ exports[`"TimePickerField" renders as invalid 1`] = `
 }
 
 .emotion-3 {
-  margin-bottom: 2px;
+  margin-bottom: 0;
   width: 100%;
 }
 
@@ -730,13 +756,15 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   color: #0667c8;
 }
 
-.emotion-4>div {
-  height: 48px;
-  min-height: 48px;
-  position: relative;
+.emotion-4 {
   width: 100%;
   min-width: 0;
-  border-radius: 14px;
+}
+
+.emotion-4>div {
+  min-width: 0;
+  width: 100%;
+  position: relative;
 }
 
 .emotion-4>div:-moz-focusring {
@@ -745,6 +773,11 @@ exports[`"TimePickerField" renders as invalid 1`] = `
 }
 
 .emotion-5 {
+  min-width: 0;
+  width: 100%;
+}
+
+.emotion-6 {
   z-index: 9999;
   border: 0;
   clip: rect(1px, 1px, 1px, 1px);
@@ -756,7 +789,7 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   white-space: nowrap;
 }
 
-.emotion-7 {
+.emotion-8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -769,7 +802,7 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  padding: 0 16px;
+  padding: 0 14px;
   height: 48px;
   min-height: 48px;
   background: #fff;
@@ -783,64 +816,69 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   outline: none;
   width: 100%;
   cursor: pointer;
+  box-sizing: border-box;
+  max-height: 48px;
   min-width: 0;
 }
 
-.emotion-7::-moz-placeholder {
+.emotion-8::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-7::-ms-input-placeholder {
+.emotion-8::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
 }
 
-.emotion-7::-webkit-input-placeholder {
+.emotion-8::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
 }
 
-.emotion-7:hover {
+.emotion-8:hover {
   box-shadow: 0 0 0 1px var(--text-input-border-hover);
 }
 
-.emotion-7:focus-visible,
-.emotion-7:focus,
-.emotion-7:active {
+.emotion-8:focus-visible,
+.emotion-8:focus,
+.emotion-8:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-7:-webkit-autofill {
+.emotion-8:-webkit-autofill {
   box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
   -webkit-text-fill-color: rgb(29, 30, 31);
 }
 
-.emotion-7:-webkit-autofill:hover {
+.emotion-8:-webkit-autofill:hover {
   box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:-webkit-autofill:focus-visible,
-.emotion-7:-webkit-autofill:focus,
-.emotion-7:-webkit-autofill:active {
+.emotion-8:-webkit-autofill:focus-visible,
+.emotion-8:-webkit-autofill:focus,
+.emotion-8:-webkit-autofill:active {
   box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:focus:visible,
-.emotion-7 active {
+.emotion-8:focus:visible,
+.emotion-8 active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-8 {
+.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  display: grid;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -853,14 +891,14 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   overflow: hidden;
   padding: 0;
   box-sizing: border-box;
-  width: 100%;
+  min-width: 0;
 }
 
-.emotion-9 {
-  grid-area: 1/1/2/3;
+.emotion-10 {
+  grid-area: unset;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
   color: rgb(29, 30, 31);
   margin-left: 2px;
@@ -868,7 +906,7 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-10 {
+.emotion-11 {
   background: 0;
   border: 0;
   caret-color: transparent;
@@ -887,7 +925,7 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   transform: scale(.01);
 }
 
-.emotion-11 {
+.emotion-12 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -905,11 +943,11 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-12 {
+.emotion-13 {
   display: none;
 }
 
-.emotion-13 {
+.emotion-14 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -921,11 +959,11 @@ exports[`"TimePickerField" renders as invalid 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-13:hover {
+.emotion-14:hover {
   color: hsl(0, 0%, 60%);
 }
 
-.emotion-14 {
+.emotion-15 {
   fill: rgb(29, 30, 31);
   overflow: visible;
   margin-top: 4px;
@@ -955,29 +993,30 @@ exports[`"TimePickerField" renders as invalid 1`] = `
         onKeyDown={[Function]}
       >
         <div
+          className="emotion-5"
           tabIndex={0}
         >
           <span
-            className="emotion-5"
+            className="emotion-6"
             id="react-select-4-live-region"
           />
           <span
             aria-atomic="false"
             aria-live="polite"
             aria-relevant="additions text"
-            className="emotion-5"
+            className="emotion-6"
             role="log"
           />
           <div
-            className="emotion-7"
+            className="emotion-8"
             onMouseDown={[Function]}
             onTouchEnd={[Function]}
           >
             <div
-              className="emotion-8"
+              className="emotion-9"
             >
               <div
-                className="emotion-9"
+                className="emotion-10"
               >
                 12:00 AM
               </div>
@@ -988,7 +1027,7 @@ exports[`"TimePickerField" renders as invalid 1`] = `
                 aria-expanded={false}
                 aria-haspopup={true}
                 aria-readonly={true}
-                className="emotion-10"
+                className="emotion-11"
                 disabled={false}
                 id="time-picker-test"
                 inputMode="none"
@@ -1001,19 +1040,19 @@ exports[`"TimePickerField" renders as invalid 1`] = `
               />
             </div>
             <div
-              className="emotion-11"
+              className="emotion-12"
             >
               <span
-                className="emotion-12"
+                className="emotion-13"
               />
               <div
                 aria-hidden="true"
-                className="emotion-13"
+                className="emotion-14"
                 onMouseDown={[Function]}
                 onTouchEnd={[Function]}
               >
                 <svg
-                  className="emotion-14"
+                  className="emotion-15"
                   height={16}
                   viewBox="0 0 16 16"
                   width={16}
@@ -1061,7 +1100,7 @@ exports[`"TimePickerField" renders with label 1`] = `
 }
 
 .emotion-3 {
-  margin-bottom: 20px;
+  margin-bottom: 0;
   width: 100%;
 }
 
@@ -1069,13 +1108,15 @@ exports[`"TimePickerField" renders with label 1`] = `
   color: #0667c8;
 }
 
-.emotion-4>div {
-  height: 48px;
-  min-height: 48px;
-  position: relative;
+.emotion-4 {
   width: 100%;
   min-width: 0;
-  border-radius: 14px;
+}
+
+.emotion-4>div {
+  min-width: 0;
+  width: 100%;
+  position: relative;
 }
 
 .emotion-4>div:-moz-focusring {
@@ -1084,6 +1125,11 @@ exports[`"TimePickerField" renders with label 1`] = `
 }
 
 .emotion-5 {
+  min-width: 0;
+  width: 100%;
+}
+
+.emotion-6 {
   z-index: 9999;
   border: 0;
   clip: rect(1px, 1px, 1px, 1px);
@@ -1095,7 +1141,7 @@ exports[`"TimePickerField" renders with label 1`] = `
   white-space: nowrap;
 }
 
-.emotion-7 {
+.emotion-8 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1108,7 +1154,7 @@ exports[`"TimePickerField" renders with label 1`] = `
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  padding: 0 16px;
+  padding: 0 14px;
   height: 48px;
   min-height: 48px;
   background: #fff;
@@ -1122,72 +1168,77 @@ exports[`"TimePickerField" renders with label 1`] = `
   outline: none;
   width: 100%;
   cursor: pointer;
+  box-sizing: border-box;
+  max-height: 48px;
   min-width: 0;
 }
 
-.emotion-7::-moz-placeholder {
+.emotion-8::-moz-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
   opacity: 1;
 }
 
-.emotion-7::-ms-input-placeholder {
+.emotion-8::-ms-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
 }
 
-.emotion-7::-webkit-input-placeholder {
+.emotion-8::-webkit-input-placeholder {
   color: rgb(80, 82, 84);
   font-size: 1rem;
   text-transform: none;
 }
 
-.emotion-7:hover {
+.emotion-8:hover {
   box-shadow: 0 0 0 1px var(--text-input-border-hover);
 }
 
-.emotion-7:focus-visible,
-.emotion-7:focus,
-.emotion-7:active {
+.emotion-8:focus-visible,
+.emotion-8:focus,
+.emotion-8:active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-7:invalid:not(:focus, :hover) {
+.emotion-8:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3;
 }
 
-.emotion-7:-webkit-autofill {
+.emotion-8:-webkit-autofill {
   box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
   -webkit-text-fill-color: rgb(29, 30, 31);
 }
 
-.emotion-7:-webkit-autofill:hover {
+.emotion-8:-webkit-autofill:hover {
   box-shadow: 0 0 0 1px var(--text-input-border-hover),0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:-webkit-autofill:focus-visible,
-.emotion-7:-webkit-autofill:focus,
-.emotion-7:-webkit-autofill:active {
+.emotion-8:-webkit-autofill:focus-visible,
+.emotion-8:-webkit-autofill:focus,
+.emotion-8:-webkit-autofill:active {
   box-shadow: 0 0 0 1px #0667c8,0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:-webkit-autofill:invalid:not(:focus, :hover) {
+.emotion-8:-webkit-autofill:invalid:not(:focus, :hover) {
   box-shadow: 0 0 0 1px #dce0e3,0 0 0 24px #e7f0fa inset;
 }
 
-.emotion-7:focus:visible,
-.emotion-7 active {
+.emotion-8:focus:visible,
+.emotion-8 active {
   box-shadow: 0 0 0 1px #0667c8;
 }
 
-.emotion-8 {
+.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-  display: grid;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
   -webkit-flex: 1;
   -ms-flex: 1;
   flex: 1;
@@ -1200,14 +1251,14 @@ exports[`"TimePickerField" renders with label 1`] = `
   overflow: hidden;
   padding: 0;
   box-sizing: border-box;
-  width: 100%;
+  min-width: 0;
 }
 
-.emotion-9 {
-  grid-area: 1/1/2/3;
+.emotion-10 {
+  grid-area: unset;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
   color: rgb(29, 30, 31);
   margin-left: 2px;
@@ -1215,7 +1266,7 @@ exports[`"TimePickerField" renders with label 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-10 {
+.emotion-11 {
   background: 0;
   border: 0;
   caret-color: transparent;
@@ -1234,7 +1285,7 @@ exports[`"TimePickerField" renders with label 1`] = `
   transform: scale(.01);
 }
 
-.emotion-11 {
+.emotion-12 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -1252,11 +1303,11 @@ exports[`"TimePickerField" renders with label 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-12 {
+.emotion-13 {
   display: none;
 }
 
-.emotion-13 {
+.emotion-14 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -1268,11 +1319,11 @@ exports[`"TimePickerField" renders with label 1`] = `
   box-sizing: border-box;
 }
 
-.emotion-13:hover {
+.emotion-14:hover {
   color: hsl(0, 0%, 60%);
 }
 
-.emotion-14 {
+.emotion-15 {
   fill: rgb(29, 30, 31);
   overflow: visible;
   margin-top: 4px;
@@ -1302,29 +1353,30 @@ exports[`"TimePickerField" renders with label 1`] = `
         onKeyDown={[Function]}
       >
         <div
+          className="emotion-5"
           tabIndex={0}
         >
           <span
-            className="emotion-5"
+            className="emotion-6"
             id="react-select-3-live-region"
           />
           <span
             aria-atomic="false"
             aria-live="polite"
             aria-relevant="additions text"
-            className="emotion-5"
+            className="emotion-6"
             role="log"
           />
           <div
-            className="emotion-7"
+            className="emotion-8"
             onMouseDown={[Function]}
             onTouchEnd={[Function]}
           >
             <div
-              className="emotion-8"
+              className="emotion-9"
             >
               <div
-                className="emotion-9"
+                className="emotion-10"
               >
                 12:00 AM
               </div>
@@ -1335,7 +1387,7 @@ exports[`"TimePickerField" renders with label 1`] = `
                 aria-expanded={false}
                 aria-haspopup={true}
                 aria-readonly={true}
-                className="emotion-10"
+                className="emotion-11"
                 disabled={false}
                 id="time-picker-test"
                 inputMode="none"
@@ -1348,19 +1400,19 @@ exports[`"TimePickerField" renders with label 1`] = `
               />
             </div>
             <div
-              className="emotion-11"
+              className="emotion-12"
             >
               <span
-                className="emotion-12"
+                className="emotion-13"
               />
               <div
                 aria-hidden="true"
-                className="emotion-13"
+                className="emotion-14"
                 onMouseDown={[Function]}
                 onTouchEnd={[Function]}
               >
                 <svg
-                  className="emotion-14"
+                  className="emotion-15"
                   height={16}
                   viewBox="0 0 16 16"
                   width={16}

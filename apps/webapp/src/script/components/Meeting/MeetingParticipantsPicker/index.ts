@@ -17,17 +17,6 @@
  *
  */
 
-import {contentStyles} from 'Components/Meeting/Meeting.styles';
-import {MeetingHeader} from 'Components/Meeting/MeetingHeader/MeetingHeader';
-import {MeetingList} from 'Components/Meeting/MeetingList/MeetingList';
-import {ScheduleMeetingModal} from 'Components/Meeting/ScheduleMeetingModal';
-
-export const Meetings = () => (
-  <>
-    <MeetingHeader />
-    <div css={contentStyles}>
-      <MeetingList />
-    </div>
-    <ScheduleMeetingModal />
-  </>
-);
+export * from './MeetingParticipantsPicker';
+export * from './formatSelectedSummary';
+export * from './participantPickerUtils';
