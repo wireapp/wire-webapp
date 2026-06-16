@@ -27,6 +27,7 @@ import {ChevronDownIcon, getOverlayPortalContainer, InputLabel, SearchIcon} from
 import {UserList} from 'Components/UserList';
 import type {ConversationRepository} from 'Repositories/conversation/ConversationRepository';
 import type {User} from 'Repositories/entity/User';
+import {useApplicationContext} from 'src/script/page/RootProvider';
 
 import {formatSelectedSummary} from './formatSelectedSummary';
 import {
@@ -90,6 +91,7 @@ export const MeetingParticipantsPicker = ({
   noUnderline = true,
   popoverPortalContainer,
 }: MeetingParticipantsPickerProps) => {
+  const {translate} = useApplicationContext();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -97,7 +99,7 @@ export const MeetingParticipantsPicker = ({
   const portalContainer = popoverPortalContainer ?? getOverlayPortalContainer();
 
   const filteredUsers = useMemo(() => filterUsersByQuery(users, filter), [filter, users]);
-  const selectedSummary = formatSelectedSummary(selectedUsers);
+  const selectedSummary = formatSelectedSummary(selectedUsers, translate);
   const hasSelection = selectedUsers.length > 0;
   const showPlaceholder = !hasSelection && filter.length === 0;
 

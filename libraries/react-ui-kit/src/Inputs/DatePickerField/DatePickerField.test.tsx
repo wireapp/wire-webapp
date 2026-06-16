@@ -26,7 +26,7 @@ import {DatePickerField} from './DatePickerField';
 import {matchComponent} from '../../utils/testUtil';
 import React from 'react';
 
-const fixedDate = parseDate('2026-06-15');
+const fixedDate = parseDate('2026-06-16');
 
 const defaultLabels = {
   openCalendarLabel: 'Open calendar',

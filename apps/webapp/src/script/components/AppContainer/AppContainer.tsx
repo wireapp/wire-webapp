@@ -67,7 +67,7 @@ export const AppContainer = (properties: AppProps) => {
   setAppLocale();
   const app = useMemo(() => {
     return new App(container.resolve(Core), container.resolve(APIClient), config, translate);
-  }, [config]);
+  }, [config, translate]);
   const enableAutoLogin = Config.getConfig().FEATURE.ENABLE_AUTO_LOGIN;
 
   // Publishing application on the global scope for debug and testing purposes.

@@ -24,13 +24,22 @@ import userEvent from '@testing-library/user-event';
 
 import en from 'I18n/en-US.json';
 import {User} from 'Repositories/entity/User';
+import {
+  createRootContextValueForTest,
+  createRootProviderWrapperForTest,
+} from 'src/script/page/testSupport/rootContextTestSupport';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
-import {setStrings, t} from 'Util/localizerUtil';
+import {setStrings, translate} from 'Util/localizerUtil';
+import {translateForTest} from 'Util/test/translateForTest';
 
 import {MeetingParticipantsPicker} from './MeetingParticipantsPicker';
 import {formatSelectedSummary} from './formatSelectedSummary';
 
 setStrings({en});
+
+const rootProviderWrapper = createRootProviderWrapperForTest(
+  createRootContextValueForTest({translate: translateForTest}),
+);
 
 const createUser = (id: string, name: string, handle: string) => {
   const user = new User(id, 'example.com');
@@ -72,7 +81,7 @@ const ControlledPicker = ({
 
 describe('MeetingParticipantsPicker', () => {
   it('renders label and search input', () => {
-    render(withTheme(<ControlledPicker />));
+    render(withTheme(<ControlledPicker />), {wrapper: rootProviderWrapper});
 
     expect(screen.getByText('Participants')).toBeInTheDocument();
     expect(screen.getByLabelText('Enter a name')).toBeInTheDocument();
@@ -81,15 +90,15 @@ describe('MeetingParticipantsPicker', () => {
   it('shows truncated selected summary', () => {
     const selected = users.slice(0, 3);
 
-    render(withTheme(<ControlledPicker initialSelected={selected} />));
+    render(withTheme(<ControlledPicker initialSelected={selected} />), {wrapper: rootProviderWrapper});
 
     expect(screen.getByTestId('meeting-participants-picker-summary')).toHaveTextContent(
-      formatSelectedSummary(selected),
+      formatSelectedSummary(selected, translate),
     );
   });
 
   it('opens the menu and filters users locally', () => {
-    render(withTheme(<ControlledPicker />));
+    render(withTheme(<ControlledPicker />), {wrapper: rootProviderWrapper});
 
     fireEvent.change(screen.getByLabelText('Enter a name'), {target: {value: 'alice'}});
 
@@ -99,7 +108,7 @@ describe('MeetingParticipantsPicker', () => {
 
   it('allows typing in the search input to filter users', async () => {
     const user = userEvent.setup();
-    render(withTheme(<ControlledPicker />));
+    render(withTheme(<ControlledPicker />), {wrapper: rootProviderWrapper});
 
     const input = screen.getByLabelText('Enter a name');
     await user.click(input);
@@ -119,6 +128,7 @@ describe('MeetingParticipantsPicker', () => {
           <button type="button">Outside</button>
         </div>,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     const input = screen.getByLabelText('Enter a name');
@@ -142,6 +152,7 @@ describe('MeetingParticipantsPicker', () => {
           <button type="button">Outside</button>
         </div>,
       ),
+      {wrapper: rootProviderWrapper},
     );
 
     const input = screen.getByLabelText('Enter a name');
@@ -163,13 +174,6 @@ describe('formatSelectedSummary', () => {
   it('formats multiple selections with overflow count', () => {
     const selected = users.concat(createUser('4', 'Carol Chen', 'carol'), createUser('5', 'David Davis', 'david'));
 
-    expect(formatSelectedSummary(selected)).toBe(
-      t('meetings.scheduleModal.participantsSelectedSummaryOverflow', {
-        name1: 'Thomas Goodwin',
-        name2: 'Alice Anderson',
-        initial: 'B',
-        count: 3,
-      }),
-    );
+    expect(formatSelectedSummary(selected, translate)).toBe('Thomas Goodwin, Alice Anderson, B... +3 more');
   });
 });

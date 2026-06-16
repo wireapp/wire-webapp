@@ -596,14 +596,14 @@ export const Conversation = ({
       inputProps={getInputProps()}
     >
       {activeConversation && (
-          <>
-            <TitleBar
-              repositories={repositories}
-              conversation={activeConversation}
-              selfUser={selfUser}
-              teamState={teamState}
-              callActions={mainViewModel.calling.callActions}
-              openRightSidebar={openRightSidebar}
+        <>
+          <TitleBar
+            repositories={repositories}
+            conversation={activeConversation}
+            selfUser={selfUser}
+            teamState={teamState}
+            callActions={mainViewModel.calling.callActions}
+            openRightSidebar={openRightSidebar}
             isRightSidebarOpen={isRightSidebarOpen}
             isReadOnlyConversation={isReadOnlyConversation || isSelfUserRemoved}
             withBottomDivider={!isCellsEnabled || (isSharedDriveSearchAndFiltersEnabled && isSharedDriveSearchViewOpen)}
