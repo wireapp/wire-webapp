@@ -54,7 +54,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
       throw new Error('Failed to get 2D context from OffscreenCanvas');
     }
     let timestamp = 0;
-    let frameDuration = 1000 / 30;
+    let frameDuration = 1000 / 15;
     const close = () => {
       video.pause();
       video.srcObject = null;
@@ -63,7 +63,11 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
     this.readable = new ReadableStream({
       start: async () => {
         await this.startVideo(video);
-        frameDuration = 1000 / (track.getSettings().frameRate || 30);
+        const configuredFrameRate = track.getSettings().frameRate;
+
+        if (configuredFrameRate && configuredFrameRate > 0) {
+          frameDuration = 1000 / configuredFrameRate;
+        }
         timestamp = performance.now();
         this.logger.log(`[virtual-background] processor start frameDuration=${frameDuration}`);
       },
