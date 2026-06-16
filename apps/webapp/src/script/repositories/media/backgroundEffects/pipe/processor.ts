@@ -90,7 +90,12 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
           canvas.height = height;
         }
         ctx.drawImage(video, 0, 0);
-        controller.enqueue(new VideoFrame(canvas, {timestamp}));
+        try {
+          controller.enqueue( new VideoFrame(canvas, {timestamp: Math.round(performance.now() * 1000)})); // µs
+        } catch (e: unknown) {
+          running = false;
+          close();
+        }
       },
       cancel: reason => {
         this.logger.log(`[virtual-background] video processor cancelled: ${reason}`);
