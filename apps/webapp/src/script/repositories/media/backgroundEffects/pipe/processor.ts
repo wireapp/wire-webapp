@@ -62,7 +62,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
     };
     this.readable = new ReadableStream({
       start: async () => {
-        await Promise.all([video.play(), new Promise(r => video.addEventListener('loadeddata', r, {once: true}))]);
+        await this.startVideo(video);
         frameDuration = 1000 / (track.getSettings().frameRate || 30);
         timestamp = performance.now();
         this.logger.log(`[virtual-background] processor start frameDuration=${frameDuration}`);
@@ -94,6 +94,45 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
       trackStop();
       running = false;
     };
+  }
+
+  private async startVideo(video: HTMLVideoElement): Promise<void> {
+    const waitForLoadedData = (): Promise<void> => {
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        return Promise.resolve();
+      }
+
+      return new Promise<void>((resolve, reject) => {
+        const cleanup = () => {
+          video.removeEventListener('loadeddata', onLoaded);
+          video.removeEventListener('error', onError);
+        };
+
+        const onLoaded = () => {
+          cleanup();
+          resolve();
+        };
+
+        const onError = () => {
+          cleanup();
+          reject(video.error ?? new Error('Video failed to load'));
+        };
+
+        video.addEventListener('loadeddata', onLoaded, {once: true});
+        video.addEventListener('error', onError, {once: true});
+      });
+    };
+
+    const loaded = waitForLoadedData();
+
+    try {
+      await video.play();
+      await loaded;
+    } catch (error) {
+      video.pause();
+      video.srcObject = null;
+      throw error;
+    }
   }
 }
 
