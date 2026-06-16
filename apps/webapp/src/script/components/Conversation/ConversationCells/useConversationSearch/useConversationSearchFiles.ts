@@ -267,10 +267,9 @@ export const useConversationSearchFiles = ({
   };
 
   const handleReload = useCallback(async (): Promise<void> => {
-    setStatus('loading');
     clearAll({conversationId: id});
     await searchNodes({query: normalizeSearchQuery(searchQuery), filters});
-  }, [clearAll, filters, id, searchNodes, searchQuery, setStatus]);
+  }, [clearAll, filters, id, searchNodes, searchQuery]);
 
   useEffect(() => {
     if (!enabled) {
