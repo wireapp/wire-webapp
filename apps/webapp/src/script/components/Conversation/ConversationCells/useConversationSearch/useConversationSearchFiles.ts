@@ -251,7 +251,8 @@ export const useConversationSearchFiles = ({
     setSearchQuery('');
     shouldPerformSearch.current = false;
 
-    const shouldRefreshSearchResults = preserveFilters && hasActiveParams;
+    const shouldRefreshSearchResults =
+      preserveFilters && (enabledRef.current || (allowSearchWhenDisabledRef.current && hasActiveParams));
 
     if (shouldRefreshSearchResults) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
@@ -310,10 +311,16 @@ export const useConversationSearchFiles = ({
   // restore the default unfiltered file list.
   useEffect(() => {
     if (hadActiveSearchParamsRef.current && !hasActiveParams && !searchValue) {
-      onClear?.();
+      if (enabledRef.current || allowSearchWhenDisabledRef.current) {
+        fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
+          await searchNodes({query: '', filters});
+        });
+      } else {
+        onClear?.();
+      }
     }
     hadActiveSearchParamsRef.current = hasActiveParams;
-  }, [hasActiveParams, searchValue, onClear]);
+  }, [filters, fireAndForgetInvoker, hasActiveParams, onClear, searchNodes, searchValue]);
 
   const loadMore = useCallback(
     async (offset: number): Promise<void> => {
