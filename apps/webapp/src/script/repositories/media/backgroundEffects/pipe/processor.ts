@@ -78,8 +78,17 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
           await new Promise(r => setTimeout(r, frameDuration - delta));
         }
         timestamp = performance.now();
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+
+        if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || width === 0 || height === 0) {
+          return;
+        }
+
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+        }
         ctx.drawImage(video, 0, 0);
         controller.enqueue(new VideoFrame(canvas, {timestamp}));
       },
