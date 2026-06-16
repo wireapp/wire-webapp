@@ -471,7 +471,6 @@ export class WebGLRenderer {
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-      gl.deleteTexture(frameTexture);
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, null);
 
