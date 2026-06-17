@@ -519,7 +519,7 @@ const LoginComponent = ({
                       )}
                       <Text>{isEnterpriseLoginV2Enabled ? t('login.subheadsso') : t('login.subhead')}</Text>
                       <Form style={{marginTop: 30}} data-uie-name="login">
-                        <LoginForm isFetching={isFetching} onSubmit={handleSubmit} />
+                        <LoginForm isFetching={isFetching || conversationInfoFetching} onSubmit={handleSubmit} />
                         {validationErrors.length > 0
                           ? parseValidationErrors(validationErrors)
                           : authError !== null && authError !== undefined && <Exception errors={[authError]} />}
