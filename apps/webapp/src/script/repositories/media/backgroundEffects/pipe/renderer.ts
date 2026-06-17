@@ -80,6 +80,8 @@ export class WebGLRenderer {
   private activeBackgroundSourceIdentifier: string | null = null;
 
   private frameTexture: WebGLTexture | null = null;
+  private stateTextureWidth = 0;
+  private stateTextureHeight = 0;
 
   constructor(canvas: OffscreenCanvas) {
     this.canvas = canvas;
@@ -448,17 +450,26 @@ export class WebGLRenderer {
     const width = this.canvas.width;
     const height = this.canvas.height;
 
+    if (!this.frameTexture) {
+      return;
+    }
+
+    // Upload current video frame once per render.
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, this.frameTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoFrame);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
     if (!categoryTexture || !confidenceTexture) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.useProgram(blendProgram);
 
       gl.activeTexture(gl.TEXTURE0);
       gl.bindTexture(gl.TEXTURE_2D, this.frameTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoFrame);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
       gl.uniform1i(blendLocations.frameTexture, 0);
       gl.uniform1i(blendLocations.enabled, 0);
 
@@ -478,6 +489,17 @@ export class WebGLRenderer {
     }
 
     // Determine read/write indices for state ping-pong
+    if (width !== this.stateTextureWidth || height !== this.stateTextureHeight) {
+      for (const texture of storedStateTextures) {
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      }
+
+      this.currentStateIndex = 0;
+      this.stateTextureWidth = width;
+      this.stateTextureHeight = height;
+    }
+
     const readStateIndex = this.currentStateIndex;
     const writeStateIndex = (this.currentStateIndex + 1) % 2;
     const prevStateTexture = storedStateTextures[readStateIndex];
@@ -488,10 +510,6 @@ export class WebGLRenderer {
     // --- 1. State Update Pass (Calculates Moving Average) ---
     gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, newStateTexture, 0);
-
-    // Ensure state texture is correctly sized
-    gl.bindTexture(gl.TEXTURE_2D, newStateTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
 
     gl.viewport(0, 0, width, height);
     gl.useProgram(stateUpdateProgram);
@@ -531,25 +549,12 @@ export class WebGLRenderer {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     gl.useProgram(blendProgram);
 
-    // Bind Frame Texture (Unit 0)
-    const frameTexture = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, frameTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, videoFrame);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    gl.bindTexture(gl.TEXTURE_2D, this.frameTexture);
     gl.uniform1i(blendLocations.frameTexture, 0);
-    gl.uniform1f(blendLocations.borderSmooth, options.borderSmooth);
-    gl.uniform1f(blendLocations.bgBlur, options.bgBlur);
-    gl.uniform1f(blendLocations.bgBlurRadius, options.bgBlurRadius);
-    gl.uniform1i(blendLocations.enabled, 1);
 
-    // Bind Current State Texture (Unit 1)
-    const currentStateTexture = storedStateTextures[writeStateIndex]; // Use the *newly written* state
     gl.activeTexture(gl.TEXTURE1);
-    gl.bindTexture(gl.TEXTURE_2D, currentStateTexture);
+    gl.bindTexture(gl.TEXTURE_2D, newStateTexture);
     gl.uniform1i(blendLocations.currentStateTexture, 1);
 
     // Bind Background Texture (Unit 2)
@@ -571,7 +576,11 @@ export class WebGLRenderer {
       this.logger.warn('backgroundRenderInfo is null in render loop. Background may not render correctly.');
     }
 
-    // Set vertex attributes
+    gl.uniform1f(blendLocations.borderSmooth, options.borderSmooth);
+    gl.uniform1f(blendLocations.bgBlur, options.bgBlur);
+    gl.uniform1f(blendLocations.bgBlurRadius, options.bgBlurRadius);
+    gl.uniform1i(blendLocations.enabled, 1);
+
     gl.enableVertexAttribArray(blendLocations.position);
     gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
     gl.vertexAttribPointer(blendLocations.position, 2, gl.FLOAT, false, 0, 0);
@@ -579,18 +588,13 @@ export class WebGLRenderer {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
     gl.vertexAttribPointer(blendLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 
-    // Draw quad to blend onto canvas
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
-    // --- 3. Cleanup ---
-    gl.deleteTexture(frameTexture);
-    // Unbind textures (Units 0, 1, 2 used)
     for (let i = 0; i < 3; ++i) {
       gl.activeTexture(gl.TEXTURE0 + i);
       gl.bindTexture(gl.TEXTURE_2D, null);
     }
 
-    // Swap state index for next frame
     this.currentStateIndex = writeStateIndex;
   }
 
@@ -619,5 +623,9 @@ export class WebGLRenderer {
       this.backgroundRenderInfo = null;
     }
     this.activeBackgroundSourceIdentifier = null;
+    if (this.frameTexture) {
+      gl.deleteTexture(this.frameTexture);
+      this.frameTexture = null;
+    }
   }
 }
