@@ -836,7 +836,7 @@ test.describe('Calling', () => {
   );
 
   test(
-    'I want to see a group call timing out after 90s if I`m the last one left in the call',
+    "I want to see a group call timing out after 90s if I'm the last one left in the call",
     {tag: ['@TC-2937', '@regression']},
     async ({createPage}, testInfo) => {
       test.setTimeout(testInfo.timeout + 90_000);
