@@ -113,6 +113,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       firstUserEntity: firstParticipant,
       isGroupOrChannel,
       cellsState,
+      description,
     } = useKoSubscribableChildren(activeConversation, [
       'isMutable',
       'showNotificationsNothing',
@@ -131,6 +132,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
       'firstUserEntity',
       'isGroupOrChannel',
       'cellsState',
+      'description',
     ]);
 
     const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
@@ -242,6 +244,9 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     const showAllParticipants = () => togglePanel(PanelState.CONVERSATION_PARTICIPANTS, activeConversation);
 
+    const updateConversationDescription = (newDescription: string) =>
+      conversationRepository.updateConversationDescription(activeConversation, newDescription);
+
     const updateConversationReceiptMode = (receiptMode: RECEIPT_MODE) =>
       conversationRepository.updateConversationReceiptMode(activeConversation, {receipt_mode: receiptMode});
 
@@ -250,6 +255,11 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
 
     useEffect(() => {
       void conversationRepository.refreshUnavailableParticipants(activeConversation);
+    }, [activeConversation, conversationRepository]);
+
+    useEffect(() => {
+      // TODO: Remove when description is part of the API Conversation payload
+      conversationRepository.loadConversationDescription(activeConversation);
     }, [activeConversation, conversationRepository]);
 
     useEffect(() => {
@@ -326,10 +336,8 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
               />
 
               <ConversationDetailsDescription
-                description="This is a channel for the team to discuss and collaborate. Feel free to share ideas, ask questions, and keep the conversation going."
-                onDescriptionChange={() => {
-                  // TODO: integrate with API when description field is available
-                }}
+                description={description}
+                onDescriptionChange={updateConversationDescription}
               />
 
               {showActionAddParticipants && (

@@ -98,6 +98,8 @@ const getDefaultParams = () => {
       expectReadReceipt: () => true,
       getNextConversation: () => Promise.resolve(new Conversation()),
       refreshUnavailableParticipants: () => Promise.resolve(),
+      loadConversationDescription: () => {},
+      updateConversationDescription: () => Promise.resolve(),
       conversationRoleRepository: conversationRoleRepository as ConversationRoleRepository,
     } as unknown as ConversationRepository,
     integrationRepository: {getServiceFromUser: (): null => null} as unknown as IntegrationRepository,

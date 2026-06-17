@@ -165,6 +165,7 @@ export class Conversation {
   public readonly initialMessage: ko.Observable<Message | undefined>;
   public readonly messageTimer: ko.PureComputed<number>;
   public readonly name: ko.Observable<string>;
+  public readonly description: ko.Observable<string>;
   public readonly notificationState: ko.PureComputed<number>;
   public readonly participating_user_ets: ko.ObservableArray<User>;
   public readonly participating_user_ids: ko.ObservableArray<QualifiedId>;
@@ -217,6 +218,7 @@ export class Conversation {
     this.accessCodeHasPassword = ko.observable();
     this.creator = '';
     this.name = ko.observable('');
+    this.description = ko.observable('');
     this.teamId = '';
     this.type = ko.observable(CONVERSATION_TYPE.REGULAR);
     this.groupConversationType = ko.observable<GROUP_CONVERSATION_TYPE>(GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);

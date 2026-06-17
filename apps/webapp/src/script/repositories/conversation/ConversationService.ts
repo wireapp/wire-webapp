@@ -192,6 +192,32 @@ export class ConversationService {
   }
 
   /**
+   * Update the conversation description.
+   *
+   * @param conversationId ID of the conversation
+   * @param description new description text
+   * @returns Resolves when description is updated
+   */
+  async updateConversationDescription(conversationId: QualifiedId, description: string): Promise<void> {
+    // TODO: Replace localStorage mock with API call when backend endpoint is available
+    // e.g. this.apiClient.api.conversation.putConversationDescription(conversationId, {description});
+    const storageKey = `wire_conversation_description_${conversationId.id}`;
+    window.localStorage.setItem(storageKey, description);
+  }
+
+  /**
+   * Get the conversation description from local storage mock.
+   *
+   * @param conversationId ID of the conversation
+   * @returns The stored description or empty string
+   */
+  getConversationDescription(conversationId: QualifiedId): string {
+    // TODO: Remove when description comes from the API Conversation payload
+    const storageKey = `wire_conversation_description_${conversationId.id}`;
+    return window.localStorage.getItem(storageKey) ?? '';
+  }
+
+  /**
    * Update the conversation protocol.
    *
    * @see https://staging-nginz-https.zinfra.io/swagger-ui/#!/conversations/updateConversation

@@ -88,6 +88,7 @@ export interface Conversation {
   /** @deprecated Use access_role instead */
   access_role_v2?: CONVERSATION_ACCESS_ROLE[];
   name?: string;
+  description?: string;
   last_event?: string;
   last_event_time?: string;
   team?: UUID;

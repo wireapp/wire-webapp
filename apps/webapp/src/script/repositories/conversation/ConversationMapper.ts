@@ -284,6 +284,7 @@ export class ConversationMapper {
     conversationEntity.cipherSuite = cipher_suite;
     conversationEntity.type(type);
     conversationEntity.name(name ?? '');
+    conversationEntity.description(conversationData.description ?? '');
     conversationEntity.groupConversationType(group_conv_type ?? GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION);
     conversationEntity.conversationModerator(add_permission ?? ADD_PERMISSION.ADMINS);
     conversationEntity.cellsState(cells_state ?? CONVERSATION_CELLS_STATE.DISABLED);

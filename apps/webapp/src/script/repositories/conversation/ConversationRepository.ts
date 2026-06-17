@@ -2926,6 +2926,26 @@ export class ConversationRepository {
     return undefined;
   }
 
+  /**
+   * Update conversation description.
+   *
+   * @param conversationEntity Conversation to update
+   * @param description New description text
+   */
+  public async updateConversationDescription(conversationEntity: Conversation, description: string): Promise<void> {
+    await this.conversationService.updateConversationDescription(conversationEntity.qualifiedId, description);
+    conversationEntity.description(description);
+  }
+
+  /**
+   * Load conversation description from local mock storage.
+   * TODO: Remove when description is part of the API Conversation payload.
+   */
+  public loadConversationDescription(conversationEntity: Conversation): void {
+    const description = this.conversationService.getConversationDescription(conversationEntity.qualifiedId);
+    conversationEntity.description(description);
+  }
+
   private readonly inject1to1MigratedToMLS = async (conversation: Conversation) => {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const protocolUpdateEvent = EventBuilder.build1to1MigratedToMLS(conversation, currentTimestamp);
