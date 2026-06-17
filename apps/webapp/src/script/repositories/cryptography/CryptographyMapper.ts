@@ -393,18 +393,16 @@ export class CryptographyMapper {
 
     if (preview !== null && preview !== undefined) {
       const remote = preview.remote;
-      if (remote === null || remote === undefined) {
-        return {data, type: ClientEvent.CONVERSATION.ASSET_ADD};
+      if (remote !== null && remote !== undefined) {
+        data = {
+          ...data,
+          preview_domain: remote.assetDomain ?? undefined,
+          preview_key: remote.assetId ?? undefined,
+          preview_otr_key: new Uint8Array(remote.otrKey),
+          preview_sha256: new Uint8Array(remote.sha256),
+          preview_token: remote.assetToken ?? undefined,
+        };
       }
-
-      data = {
-        ...data,
-        preview_domain: remote.assetDomain ?? undefined,
-        preview_key: remote.assetId ?? undefined,
-        preview_otr_key: new Uint8Array(remote.otrKey),
-        preview_sha256: new Uint8Array(remote.sha256),
-        preview_token: remote.assetToken ?? undefined,
-      };
     }
 
     const isImage =
