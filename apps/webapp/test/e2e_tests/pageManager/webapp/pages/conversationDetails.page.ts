@@ -44,6 +44,12 @@ export class ConversationDetailsPage {
   readonly editConversationNameButton: Locator;
   readonly textFieldForConversationName: Locator;
 
+  readonly descriptionSection: Locator;
+  readonly descriptionContent: Locator;
+  readonly descriptionTextarea: Locator;
+  readonly descriptionEditIcon: Locator;
+  readonly descriptionHeading: Locator;
+
   readonly protocol: Locator;
 
   constructor(page: Page) {
@@ -67,6 +73,12 @@ export class ConversationDetailsPage {
     this.devicesButton = this.page.getByRole('button', {name: 'Devices'});
     this.editConversationNameButton = this.page.getByRole('button', {name: 'Change conversation name'});
     this.textFieldForConversationName = this.page.locator('textarea[data-uie-name="enter-name"]');
+
+    this.descriptionSection = this.conversationDetails.locator('[data-uie-name="conversation-details-description"]');
+    this.descriptionContent = this.conversationDetails.locator('[data-uie-name="description-content"]');
+    this.descriptionTextarea = this.conversationDetails.locator('[data-uie-name="description-textarea"]');
+    this.descriptionEditIcon = this.conversationDetails.locator('[data-uie-name="description-edit-icon"]');
+    this.descriptionHeading = this.descriptionSection.locator('.conversation-details__description-heading');
 
     this.protocol = this.conversationDetails.getByLabel('Protocol');
   }
@@ -244,5 +256,22 @@ export class ConversationDetailsPage {
     await this.editConversationNameButton.click();
     await this.textFieldForConversationName.fill(newConversationName);
     await this.textFieldForConversationName.press('Enter');
+  }
+
+  async setDescription(description: string) {
+    await this.descriptionContent.click();
+    await this.descriptionTextarea.fill(description);
+    await this.descriptionTextarea.press('Enter');
+  }
+
+  async clearDescription() {
+    await this.descriptionContent.click();
+    await this.descriptionTextarea.fill('');
+    await this.descriptionTextarea.press('Enter');
+  }
+
+  async cancelDescriptionEdit() {
+    await this.descriptionContent.click();
+    await this.descriptionTextarea.press('Escape');
   }
 }
