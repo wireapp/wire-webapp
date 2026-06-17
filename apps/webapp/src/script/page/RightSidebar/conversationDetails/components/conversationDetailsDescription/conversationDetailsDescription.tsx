@@ -20,7 +20,7 @@
 import {FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
 import * as Icon from 'Components/icon';
-import {isEnterKey} from 'Util/keyboardUtil';
+import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
 
 const MAX_DESCRIPTION_LENGTH = 200;
@@ -63,10 +63,20 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
     }
   };
 
+  const cancelEditing = () => {
+    setDraftValue(description);
+    setIsEditing(false);
+  };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (isEnterKey(event)) {
       event.preventDefault();
       saveDescription();
+    }
+
+    if (isEscapeKey(event)) {
+      event.preventDefault();
+      cancelEditing();
     }
   };
 

@@ -139,6 +139,22 @@ describe('ConversationDetailsDescription', () => {
       expect(onDescriptionChange).toHaveBeenCalledWith('Updated text');
     });
 
+    it('cancels editing on Escape key without saving', async () => {
+      const description = 'Original text';
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      await userEvent.click(screen.getByText(description));
+
+      const textarea = screen.getByTestId('description-textarea');
+      await userEvent.clear(textarea);
+      await userEvent.type(textarea, 'Changed text');
+      await userEvent.keyboard('{Escape}');
+
+      expect(onDescriptionChange).not.toHaveBeenCalled();
+      expect(screen.queryByTestId('description-textarea')).toBeNull();
+      expect(screen.getByText(description)).not.toBeNull();
+    });
+
     it('does not call onDescriptionChange when value is unchanged', async () => {
       const description = 'Same text';
       render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
