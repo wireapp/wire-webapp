@@ -8,6 +8,8 @@ on:
         description: Why this critical flow run was started
         required: false
         type: string
+  pull_request:
+    types: [labeled, opened, synchronize, reopened]
   schedule:
     - cron: '17 8,20 * * *'
       timezone: Europe/Berlin
@@ -18,7 +20,7 @@ concurrency:
 
 jobs:
   build:
-    if: ${{ github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ github.repository == 'wireapp/wire-webapp' && (github.event_name != "pull_request" || contains(github.event.pull_request.labels.*.name, "run-e2e")) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 20
 
@@ -52,7 +54,10 @@ jobs:
       - name: Compute target EB environment
         id: slot
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # If the PR was labelled with "run-e2e" execute the workflow against a third environment
+            echo "env_name=wire-webapp-precommit-3" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             # Keep manual runs away from the scheduled critical-flow slot.
             echo "env_name=wire-webapp-precommit-2" >> "$GITHUB_OUTPUT"
           else
@@ -108,7 +113,7 @@ jobs:
   e2e-report:
     name: Generate test summary
     needs: [build, deploy_and_run_e2e]
-    if: ${{ always() && github.repository == 'wireapp/wire-webapp' }}
+    if: ${{ always() && github.repository == 'wireapp/wire-webapp' && (github.event_name == "workflow_dispatch" || github.event_name == "schedule") }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
