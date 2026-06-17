@@ -325,7 +325,12 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 conversation={activeConversation}
               />
 
-              <ConversationDetailsDescription description="This is a channel for the team to discuss and collaborate. Feel free to share ideas, ask questions, and keep the conversation going." />
+              <ConversationDetailsDescription
+                description="This is a channel for the team to discuss and collaborate. Feel free to share ideas, ask questions, and keep the conversation going."
+                onDescriptionChange={() => {
+                  // TODO: integrate with API when description field is available
+                }}
+              />
 
               {showActionAddParticipants && (
                 <div className="conversation-details__participant-options">

@@ -706,7 +706,8 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsCloseLabel': `Close image details view`;
     'conversationDetailsGroupAdmin': `Group Admin`;
     'conversationDetailsGroupAdminInfo': `When this is on, the admin can add or remove people and apps, update group settings, and change a participant’s role.`;
-    'conversationDetailsDescription': `Channel description`;
+    'conversationDetailsDescription': `Description (optional)`;
+    'conversationDetailsDescriptionPlaceholder': `Enter a description (maximum 200 characters)`;
     'conversationDetailsOff': `Off`;
     'conversationDetailsOn': `On`;
     'conversationDetailsOptions': `Options`;

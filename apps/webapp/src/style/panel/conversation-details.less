@@ -129,6 +129,12 @@
     margin-top: 16px;
     margin-bottom: 8px;
 
+    &-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     &-heading {
       margin: 0;
       color: var(--background);
@@ -137,12 +143,59 @@
       line-height: var(--line-height-md);
     }
 
+    &-edit-icon {
+      width: 12px;
+      height: 12px;
+
+      path {
+        fill: var(--foreground-fade-56);
+      }
+    }
+
+    &-content {
+      display: block;
+      width: 100%;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      text-align: left;
+    }
+
     &-text {
       margin: 4px 0 0;
       color: var(--foreground-fade-56);
       font-size: var(--font-size-small);
       line-height: var(--line-height-md);
       word-break: break-word;
+    }
+
+    &-placeholder {
+      margin: 4px 0 0;
+      color: var(--foreground-fade-40);
+      font-size: var(--font-size-small);
+      font-style: italic;
+      line-height: var(--line-height-md);
+    }
+
+    &-input {
+      width: 100%;
+      min-height: 64px;
+      padding: 8px;
+      border: 1px solid var(--gray-60);
+      border-radius: 8px;
+      margin-top: 4px;
+      background-color: var(--app-bg);
+      color: var(--background);
+      font-family: inherit;
+      font-size: var(--font-size-small);
+      line-height: var(--line-height-md);
+      outline: none;
+      resize: vertical;
+
+      &:focus {
+        border-color: var(--accent-color);
+      }
     }
   }
 

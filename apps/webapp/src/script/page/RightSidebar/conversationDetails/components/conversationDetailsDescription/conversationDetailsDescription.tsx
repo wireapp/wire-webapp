@@ -17,23 +17,105 @@
  *
  */
 
-import {FC} from 'react';
+import {FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
 
+import * as Icon from 'Components/icon';
+import {isEnterKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
+
+const MAX_DESCRIPTION_LENGTH = 200;
 
 interface ConversationDetailsDescriptionProps {
   description?: string;
+  onDescriptionChange: (description: string) => void;
 }
 
-const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = ({description}) => {
-  if (!description) {
-    return null;
-  }
+const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = ({
+  description = '',
+  onDescriptionChange,
+}) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [draftValue, setDraftValue] = useState(description);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setDraftValue(description);
+  }, [description]);
+
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isEditing]);
+
+  const startEditing = () => {
+    setDraftValue(description);
+    setIsEditing(true);
+  };
+
+  const saveDescription = () => {
+    setIsEditing(false);
+    const trimmed = draftValue.trim();
+
+    if (trimmed !== description) {
+      onDescriptionChange(trimmed);
+    }
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (isEnterKey(event)) {
+      event.preventDefault();
+      saveDescription();
+    }
+  };
+
+  const hasDescription = description.length > 0;
 
   return (
-    <div className="conversation-details__description" data-uie-name="conversation-details-description">
-      <h3 className="conversation-details__description-heading">{t('conversationDetailsDescription')}</h3>
-      <p className="conversation-details__description-text">{description}</p>
+    <div
+      className="conversation-details__description"
+      data-uie-name="conversation-details-description"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="conversation-details__description-label">
+        <h3 className="conversation-details__description-heading">{t('conversationDetailsDescription')}</h3>
+        {isHovered && !isEditing && hasDescription && (
+          <Icon.EditIcon
+            className="conversation-details__description-edit-icon"
+            data-uie-name="description-edit-icon"
+          />
+        )}
+      </div>
+
+      {isEditing ? (
+        <textarea
+          ref={textareaRef}
+          className="conversation-details__description-input"
+          data-uie-name="description-textarea"
+          value={draftValue}
+          maxLength={MAX_DESCRIPTION_LENGTH}
+          onChange={event => setDraftValue(event.target.value)}
+          onBlur={saveDescription}
+          onKeyDown={handleKeyDown}
+        />
+      ) : (
+        <button
+          type="button"
+          className="conversation-details__description-content"
+          onClick={startEditing}
+          data-uie-name="description-content"
+        >
+          {hasDescription ? (
+            <p className="conversation-details__description-text">{description}</p>
+          ) : (
+            <p className="conversation-details__description-placeholder">
+              {t('conversationDetailsDescriptionPlaceholder')}
+            </p>
+          )}
+        </button>
+      )}
     </div>
   );
 };

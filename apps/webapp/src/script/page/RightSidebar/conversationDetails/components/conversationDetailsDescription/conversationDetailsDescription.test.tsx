@@ -17,29 +17,134 @@
  *
  */
 
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
+import {userEvent} from '@testing-library/user-event';
 
 import {ConversationDetailsDescription} from './conversationDetailsDescription';
 
+const MAX_DESCRIPTION_LENGTH = 200;
+
 describe('ConversationDetailsDescription', () => {
-  it('renders the description heading and text', () => {
-    const description = 'This is the channel description';
+  const onDescriptionChange = jest.fn();
 
-    render(<ConversationDetailsDescription description={description} />);
-
-    expect(screen.getByText('conversationDetailsDescription')).not.toBeNull();
-    expect(screen.getByText(description)).not.toBeNull();
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('does not render when description is empty', () => {
-    const {container} = render(<ConversationDetailsDescription description="" />);
+  describe('filled state', () => {
+    it('renders the description heading and text', () => {
+      const description = 'This is the channel description';
 
-    expect(container.firstChild).toBeNull();
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      expect(screen.getByText('conversationDetailsDescription')).not.toBeNull();
+      expect(screen.getByText(description)).not.toBeNull();
+    });
   });
 
-  it('does not render when description is undefined', () => {
-    const {container} = render(<ConversationDetailsDescription />);
+  describe('empty state', () => {
+    it('renders the placeholder when description is empty', () => {
+      render(<ConversationDetailsDescription description="" onDescriptionChange={onDescriptionChange} />);
 
-    expect(container.firstChild).toBeNull();
+      expect(screen.getByTestId('conversation-details-description')).not.toBeNull();
+      expect(screen.getByText('conversationDetailsDescriptionPlaceholder')).not.toBeNull();
+    });
+
+    it('renders the placeholder when description is undefined', () => {
+      render(<ConversationDetailsDescription onDescriptionChange={onDescriptionChange} />);
+
+      expect(screen.getByText('conversationDetailsDescriptionPlaceholder')).not.toBeNull();
+    });
+  });
+
+  describe('hover state', () => {
+    it('shows the edit icon on hover when description exists', async () => {
+      const description = 'Some description';
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      const section = screen.getByTestId('conversation-details-description');
+
+      expect(screen.queryByTestId('description-edit-icon')).toBeNull();
+
+      fireEvent.mouseEnter(section);
+
+      expect(screen.getByTestId('description-edit-icon')).not.toBeNull();
+
+      fireEvent.mouseLeave(section);
+
+      expect(screen.queryByTestId('description-edit-icon')).toBeNull();
+    });
+  });
+
+  describe('editing state', () => {
+    it('enters edit mode when clicking the description text', async () => {
+      const description = 'Existing description';
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      const descriptionText = screen.getByText(description);
+      await userEvent.click(descriptionText);
+
+      const textarea = screen.getByTestId('description-textarea');
+      expect(textarea).not.toBeNull();
+      expect(textarea).toHaveValue(description);
+    });
+
+    it('enters edit mode when clicking the placeholder', async () => {
+      render(<ConversationDetailsDescription description="" onDescriptionChange={onDescriptionChange} />);
+
+      const placeholder = screen.getByText('conversationDetailsDescriptionPlaceholder');
+      await userEvent.click(placeholder);
+
+      expect(screen.getByTestId('description-textarea')).not.toBeNull();
+    });
+
+    it('saves on blur and calls onDescriptionChange', async () => {
+      const description = 'Old description';
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      await userEvent.click(screen.getByText(description));
+
+      const textarea = screen.getByTestId('description-textarea');
+      await userEvent.clear(textarea);
+      await userEvent.type(textarea, 'New description');
+
+      fireEvent.blur(textarea);
+
+      expect(onDescriptionChange).toHaveBeenCalledWith('New description');
+    });
+
+    it('saves on Enter key and calls onDescriptionChange', async () => {
+      const description = 'Old description';
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      await userEvent.click(screen.getByText(description));
+
+      const textarea = screen.getByTestId('description-textarea');
+      await userEvent.clear(textarea);
+      await userEvent.type(textarea, 'Updated text{Enter}');
+
+      expect(onDescriptionChange).toHaveBeenCalledWith('Updated text');
+    });
+
+    it('does not call onDescriptionChange when value is unchanged', async () => {
+      const description = 'Same text';
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      await userEvent.click(screen.getByText(description));
+
+      const textarea = screen.getByTestId('description-textarea');
+      fireEvent.blur(textarea);
+
+      expect(onDescriptionChange).not.toHaveBeenCalled();
+    });
+
+    it('enforces the max character limit', async () => {
+      render(<ConversationDetailsDescription description="" onDescriptionChange={onDescriptionChange} />);
+
+      await userEvent.click(screen.getByText('conversationDetailsDescriptionPlaceholder'));
+
+      const textarea = screen.getByTestId('description-textarea');
+      expect(textarea).toHaveAttribute('maxLength', String(MAX_DESCRIPTION_LENGTH));
+    });
   });
 });
