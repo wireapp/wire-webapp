@@ -115,6 +115,34 @@ const getDefaultParams = () => {
 };
 
 describe('ConversationDetails', () => {
+  it('renders the channel description section for group conversations', () => {
+    const conversation = new Conversation();
+    conversation.type(CONVERSATION_TYPE.REGULAR);
+    const otherUser = new User('other-user');
+    jest.spyOn(otherUser as any, 'isConnected').mockReturnValue(true);
+    conversation.participating_user_ets([otherUser]);
+
+    const defaultProps = getDefaultParams();
+
+    const {getByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+
+    expect(getByTestId('conversation-details-description')).toBeDefined();
+  });
+
+  it('does not render the channel description section for 1:1 conversations', () => {
+    const conversation = new Conversation();
+    conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
+    const otherUser = new User('other-user');
+    jest.spyOn(otherUser as any, 'isConnected').mockReturnValue(true);
+    conversation.participating_user_ets([otherUser]);
+
+    const defaultProps = getDefaultParams();
+
+    const {queryByTestId} = render(<ConversationDetails {...defaultProps} activeConversation={conversation} />);
+
+    expect(queryByTestId('conversation-details-description')).toBeNull();
+  });
+
   it("returns the right actions depending on the conversation's type for non group creators", () => {
     const conversation = new Conversation();
     const otherUser = new User('other-user');

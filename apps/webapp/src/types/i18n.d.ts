@@ -706,6 +706,7 @@ declare module 'I18n/en-US.json' {
     'conversationDetailsCloseLabel': `Close image details view`;
     'conversationDetailsGroupAdmin': `Group Admin`;
     'conversationDetailsGroupAdminInfo': `When this is on, the admin can add or remove people and apps, update group settings, and change a participant’s role.`;
+    'conversationDetailsDescription': `Channel description`;
     'conversationDetailsOff': `Off`;
     'conversationDetailsOn': `On`;
     'conversationDetailsOptions': `Options`;

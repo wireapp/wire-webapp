@@ -46,6 +46,7 @@ import {t} from 'Util/localizerUtil';
 import {sortUsersByPriority} from 'Util/stringUtil';
 import {formatDuration} from 'Util/timeUtil';
 
+import {ConversationDetailsDescription} from './components/conversationDetailsDescription';
 import {ConversationDetailsHeader} from './components/conversationDetailsHeader';
 import {ConversationDetailsOptions} from './components/conversationDetailsOptions';
 import {ConversationDetailsParticipants} from './components/conversationDetailsParticipants';
@@ -323,6 +324,8 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
                 isTeam={isTeam}
                 conversation={activeConversation}
               />
+
+              <ConversationDetailsDescription description="This is a channel for the team to discuss and collaborate. Feel free to share ideas, ask questions, and keep the conversation going." />
 
               {showActionAddParticipants && (
                 <div className="conversation-details__participant-options">
