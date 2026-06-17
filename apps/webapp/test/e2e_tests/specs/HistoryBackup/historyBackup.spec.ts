@@ -394,7 +394,7 @@ test.describe('History Backup', () => {
   );
 
   test(
-    'I shouldn`t be able to send messages in the group conversation that I previously left after backup',
+    "I shouldn't be able to send messages in the group conversation that I previously left after backup",
     {tag: ['@TC-10549', '@regression']},
     async ({createPage}, testInfo) => {
       const [userAPageManager, userBPageManager] = await Promise.all([
