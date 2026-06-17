@@ -153,6 +153,19 @@ type SubconversationData = {
   members: SubconversationEpochInfoMember[];
 };
 
+export const setupDetachedWindowExternalLinksClick = (detachedWindow: Window, openerWindow: Window): (() => void) => {
+  const handleClick = (event: MouseEvent) => {
+    const anchor = (event.target as HTMLElement).closest('a');
+    if (anchor?.target === '_blank' && anchor.href) {
+      event.preventDefault();
+      openerWindow.open(anchor.href);
+    }
+  };
+
+  detachedWindow.document.addEventListener('click', handleClick, true);
+  return () => detachedWindow.document.removeEventListener('click', handleClick, true);
+};
+
 export class CallingRepository {
   private readonly acceptVersionWarning: (conversationId: QualifiedId) => void;
   private readonly callLog: string[];
@@ -1497,6 +1510,8 @@ export class CallingRepository {
     detachedWindow.addEventListener('beforeunload', this.closeDetachedWindow);
     detachedWindow.addEventListener('pagehide', this.closeDetachedWindow);
     window.addEventListener('pagehide', this.onPageHide);
+
+    setupDetachedWindowExternalLinksClick(detachedWindow, window);
 
     amplify.subscribe(WebAppEvents.PROPERTIES.UPDATE.INTERFACE.THEME, this.handleThemeUpdateEvent);
 

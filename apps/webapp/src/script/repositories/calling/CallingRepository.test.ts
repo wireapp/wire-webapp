@@ -41,7 +41,7 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {Call} from './Call';
-import {CallingRepository} from './CallingRepository';
+import {CallingRepository, setupDetachedWindowExternalLinksClick} from './CallingRepository';
 import {CallState, MuteState} from './CallState';
 import {CALL_MESSAGE_TYPE} from './enum/CallMessageType';
 import {LEAVE_CALL_REASON} from './enum/LeaveCallReason';
@@ -1155,6 +1155,67 @@ describe('init AVS state', () => {
       expect(wCallInstance.setBackground).toThrow('AVS set background fails');
       done();
     });
+  });
+});
+
+describe('setupDetachedWindowExternalLinksClick', () => {
+  let detachedWindow: Window;
+  let openerWindow: Window;
+
+  beforeEach(() => {
+    detachedWindow = {
+      document: document.implementation.createHTMLDocument('detached-window'),
+    } as Window;
+
+    openerWindow = {
+      open: jest.fn(),
+    } as unknown as Window;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('opens _blank links in the opener window', () => {
+    detachedWindow.document.body.innerHTML = `
+      <a href="https://wire.com" target="_blank">Wire</a>
+    `;
+
+    const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
+    const link = detachedWindow.document.querySelector('a')!;
+
+    link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+    expect(openerWindow.open).toHaveBeenCalledWith('https://wire.com/');
+    cleanup();
+  });
+
+  it('does not handle non _blank links', () => {
+    detachedWindow.document.body.innerHTML = `
+      <a href="https://wire.com" target="_self">Wire</a>
+    `;
+
+    const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
+    const link = detachedWindow.document.querySelector('a')!;
+
+    link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+    expect(openerWindow.open).not.toHaveBeenCalled();
+    cleanup();
+  });
+
+  it('removes the click listener on cleanup', () => {
+    detachedWindow.document.body.innerHTML = `
+      <a href="https://wire.com" target="_blank">Wire</a>
+    `;
+
+    const cleanup = setupDetachedWindowExternalLinksClick(detachedWindow, openerWindow);
+    cleanup();
+
+    const link = detachedWindow.document.querySelector('a')!;
+    link.dispatchEvent(new MouseEvent('click', {bubbles: true, cancelable: true}));
+
+    expect(openerWindow.open).not.toHaveBeenCalled();
   });
 });
 
