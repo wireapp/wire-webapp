@@ -149,7 +149,7 @@
     "jest-jasmine2": "30.4.2",
     "jest-transform-stub": "2.0.0",
     "jsdom-worker": "0.3.0",
-    "less": "4.6.4",
+    "less": "4.6.6",
     "less-loader": "12.3.3",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
