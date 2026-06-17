@@ -192,29 +192,54 @@ export class ConversationService {
   }
 
   /**
-   * Update the conversation description.
+   * Get the conversation description.
+   *
+   * TODO: Replace localStorage mock with:
+   *   GET /conversations/:domain/:id/description
+   *   → { version, ciphertext } then decrypt ciphertext with MLS epoch secret
    *
    * @param conversationId ID of the conversation
-   * @param description new description text
-   * @returns Resolves when description is updated
+   * @returns The description plaintext and version
    */
-  async updateConversationDescription(conversationId: QualifiedId, description: string): Promise<void> {
-    // TODO: Replace localStorage mock with API call when backend endpoint is available
-    // e.g. this.apiClient.api.conversation.putConversationDescription(conversationId, {description});
+  getConversationDescription(conversationId: QualifiedId): {version: number; description: string} {
     const storageKey = `wire_conversation_description_${conversationId.id}`;
-    window.localStorage.setItem(storageKey, description);
+    const raw = window.localStorage.getItem(storageKey);
+
+    if (!raw) {
+      return {version: 0, description: ''};
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as {version: number; description: string};
+      return parsed;
+    } catch {
+      return {version: 0, description: ''};
+    }
   }
 
   /**
-   * Get the conversation description from local storage mock.
+   * Update the conversation description.
+   *
+   * TODO: Replace localStorage mock with:
+   *   1. Encrypt plaintext with MLS epoch secret → ciphertext
+   *   2. PUT /conversations/:domain/:id/description
+   *      { base_version, version: base_version + 1, ciphertext }
+   *   3. Handle 409 (stale version) by re-fetching and retrying
    *
    * @param conversationId ID of the conversation
-   * @returns The stored description or empty string
+   * @param description new description plaintext
+   * @param baseVersion current version for optimistic concurrency
+   * @returns The new version number
    */
-  getConversationDescription(conversationId: QualifiedId): string {
-    // TODO: Remove when description comes from the API Conversation payload
+  async updateConversationDescription(
+    conversationId: QualifiedId,
+    description: string,
+    baseVersion: number,
+  ): Promise<{version: number}> {
     const storageKey = `wire_conversation_description_${conversationId.id}`;
-    return window.localStorage.getItem(storageKey) ?? '';
+    const newVersion = baseVersion + 1;
+    window.localStorage.setItem(storageKey, JSON.stringify({version: newVersion, description}));
+    return {version: newVersion};
   }
 
   /**

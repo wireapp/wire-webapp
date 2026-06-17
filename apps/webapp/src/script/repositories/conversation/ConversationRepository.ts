@@ -2926,23 +2926,43 @@ export class ConversationRepository {
     return undefined;
   }
 
+  /** Tracks the current description version per conversation for optimistic concurrency. */
+  private readonly descriptionVersions = new Map<string, number>();
+
   /**
-   * Update conversation description.
+   * Load conversation description.
    *
-   * @param conversationEntity Conversation to update
-   * @param description New description text
+   * TODO: When the backend endpoint is live, this will:
+   *   1. GET /conversations/:domain/:id/description → { version, ciphertext }
+   *   2. Decrypt ciphertext with MLS epoch secret
+   *   3. Set plaintext on the entity
    */
-  public async updateConversationDescription(conversationEntity: Conversation, description: string): Promise<void> {
-    await this.conversationService.updateConversationDescription(conversationEntity.qualifiedId, description);
+  public loadConversationDescription(conversationEntity: Conversation): void {
+    const {version, description} = this.conversationService.getConversationDescription(conversationEntity.qualifiedId);
+    this.descriptionVersions.set(conversationEntity.id, version);
     conversationEntity.description(description);
   }
 
   /**
-   * Load conversation description from local mock storage.
-   * TODO: Remove when description is part of the API Conversation payload.
+   * Update conversation description.
+   *
+   * TODO: When the backend endpoint is live, this will:
+   *   1. Encrypt plaintext with MLS epoch secret → ciphertext
+   *   2. PUT /conversations/:domain/:id/description { base_version, version, ciphertext }
+   *   3. Handle 409 conflict by re-fetching and retrying
+   *   4. Inject conversation.description-update event
+   *
+   * @param conversationEntity Conversation to update
+   * @param description New description plaintext
    */
-  public loadConversationDescription(conversationEntity: Conversation): void {
-    const description = this.conversationService.getConversationDescription(conversationEntity.qualifiedId);
+  public async updateConversationDescription(conversationEntity: Conversation, description: string): Promise<void> {
+    const baseVersion = this.descriptionVersions.get(conversationEntity.id) ?? 0;
+    const {version} = await this.conversationService.updateConversationDescription(
+      conversationEntity.qualifiedId,
+      description,
+      baseVersion,
+    );
+    this.descriptionVersions.set(conversationEntity.id, version);
     conversationEntity.description(description);
   }
 

@@ -21,6 +21,7 @@ export * from './conversationAccessUpdateData';
 export * from './conversationCodeUpdateData';
 export * from './conversationConnectRequestData';
 export * from './conversationCreateData';
+export * from './conversationDescriptionData';
 export * from './conversationJoinData';
 export * from './conversationMemberJoinData';
 export * from './conversationMemberLeaveData';
