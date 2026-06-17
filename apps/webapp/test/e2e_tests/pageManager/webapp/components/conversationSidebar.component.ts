@@ -20,7 +20,6 @@
 import {Page, Locator} from '@playwright/test';
 
 export class ConversationSidebar {
-  readonly pageLoadingTimeout = 60_000;
   private readonly page: Page;
   readonly navigation: Locator;
   readonly personalStatusLabel: Locator;
@@ -68,10 +67,6 @@ export class ConversationSidebar {
 
   async clickConnectButton() {
     await this.connectButton.click();
-  }
-
-  async isPageLoaded() {
-    await this.preferencesButton.waitFor({state: 'visible', timeout: this.pageLoadingTimeout});
   }
 
   async clickArchive() {
