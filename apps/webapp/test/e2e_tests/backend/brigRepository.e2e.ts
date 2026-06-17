@@ -165,7 +165,7 @@ export class BrigRepositoryE2E {
     });
   }
 
-  public async claimDomain(domain: string, federation: {webappUrl: string, backendUrl: string}) {
+  public async claimDomain(domain: string, federation: {webappUrl: string; backendUrl: string}) {
     await this.axiosInstance.put(`i/domain-registration/${domain}`, {
       backend: {
         config_url: new URL('deeplink.json', federation.backendUrl),
