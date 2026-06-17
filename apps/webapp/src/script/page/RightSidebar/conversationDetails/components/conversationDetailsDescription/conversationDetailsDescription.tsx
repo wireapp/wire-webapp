@@ -82,10 +82,14 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
       <div className="conversation-details__description-label">
         <h3 className="conversation-details__description-heading">{t('conversationDetailsDescription')}</h3>
         {isHovered && !isEditing && hasDescription && (
-          <Icon.EditIcon
-            className="conversation-details__description-edit-icon"
+          <button
+            type="button"
+            className="conversation-details__description-edit-button"
             data-uie-name="description-edit-icon"
-          />
+            onClick={startEditing}
+          >
+            <Icon.EditIcon className="conversation-details__description-edit-icon" />
+          </button>
         )}
       </div>
 

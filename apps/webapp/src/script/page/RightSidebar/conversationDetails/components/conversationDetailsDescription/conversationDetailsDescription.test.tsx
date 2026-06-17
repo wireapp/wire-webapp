@@ -74,6 +74,19 @@ describe('ConversationDetailsDescription', () => {
 
       expect(screen.queryByTestId('description-edit-icon')).toBeNull();
     });
+
+    it('enters edit mode when clicking the edit icon', async () => {
+      const description = 'Some description';
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      const section = screen.getByTestId('conversation-details-description');
+      fireEvent.mouseEnter(section);
+
+      const editIcon = screen.getByTestId('description-edit-icon');
+      await userEvent.click(editIcon);
+
+      expect(screen.getByTestId('description-textarea')).not.toBeNull();
+    });
   });
 
   describe('editing state', () => {
