@@ -19,7 +19,7 @@
 
 /* eslint-disable jest/expect-expect */
 
-import {getLocalTimeZone, today} from '@internationalized/date';
+import {CalendarDate, getLocalTimeZone, today} from '@internationalized/date';
 
 import {DatePickerField} from './DatePickerField';
 
@@ -37,7 +37,7 @@ const defaultProps: React.ComponentProps<typeof DatePickerField> = {
   id: 'date-picker-test',
   labels: defaultLabels,
   ariaLabel: 'Select date',
-  value: today(getLocalTimeZone()),
+  value: new CalendarDate(2026, 6, 16),
   onChange: () => undefined,
 };
 
