@@ -54,7 +54,7 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
       throw new Error('Failed to get 2D context from OffscreenCanvas');
     }
     let timestamp = 0;
-    let frameDuration = 1000 / 30;
+    let frameDuration = 1000 / 15;
     const close = () => {
       video.pause();
       video.srcObject = null;
@@ -62,8 +62,12 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
     };
     this.readable = new ReadableStream({
       start: async () => {
-        await Promise.all([video.play(), new Promise(r => video.addEventListener('loadeddata', r, {once: true}))]);
-        frameDuration = 1000 / (track.getSettings().frameRate || 30);
+        await this.startVideo(video);
+        const configuredFrameRate = track.getSettings().frameRate;
+
+        if (configuredFrameRate && configuredFrameRate > 0) {
+          frameDuration = 1000 / configuredFrameRate;
+        }
         timestamp = performance.now();
         this.logger.log(`[virtual-background] processor start frameDuration=${frameDuration}`);
       },
@@ -78,10 +82,24 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
           await new Promise(r => setTimeout(r, frameDuration - delta));
         }
         timestamp = performance.now();
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        const width = video.videoWidth;
+        const height = video.videoHeight;
+
+        if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA || width === 0 || height === 0) {
+          return;
+        }
+
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+        }
         ctx.drawImage(video, 0, 0);
-        controller.enqueue(new VideoFrame(canvas, {timestamp}));
+        try {
+          controller.enqueue(new VideoFrame(canvas, {timestamp: Math.round(performance.now() * 1000)})); // µs
+        } catch (e: unknown) {
+          running = false;
+          close();
+        }
       },
       cancel: reason => {
         this.logger.log(`[virtual-background] video processor cancelled: ${reason}`);
@@ -95,7 +113,47 @@ class FallbackProcessor implements MediaStreamTrackProcessor {
       running = false;
     };
   }
+
+  private async startVideo(video: HTMLVideoElement): Promise<void> {
+    const waitForLoadedData = (): Promise<void> => {
+      if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        return Promise.resolve();
+      }
+
+      return new Promise<void>((resolve, reject) => {
+        const cleanup = () => {
+          video.removeEventListener('loadeddata', onLoaded);
+          video.removeEventListener('error', onError);
+        };
+
+        const onLoaded = () => {
+          cleanup();
+          resolve();
+        };
+
+        const onError = () => {
+          cleanup();
+          reject(video.error ?? new Error('Video failed to load'));
+        };
+
+        video.addEventListener('loadeddata', onLoaded, {once: true});
+        video.addEventListener('error', onError, {once: true});
+      });
+    };
+
+    const loaded = waitForLoadedData();
+
+    try {
+      await video.play();
+      await loaded;
+    } catch (error) {
+      video.pause();
+      video.srcObject = null;
+      throw error;
+    }
+  }
 }
 
-const TrackProcessor = 'MediaStreamTrackProcessor' in window ? window.MediaStreamTrackProcessor : FallbackProcessor;
+const TrackProcessor =
+  'MediaStreamTrackProcessor' in globalThis ? (globalThis as any).MediaStreamTrackProcessor : FallbackProcessor;
 export {TrackProcessor};
