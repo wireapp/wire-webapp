@@ -17,6 +17,8 @@
  *
  */
 
+const isContinuousIntegrationEnvironment = process.env.CI === 'true';
+
 module.exports = {
   displayName: 'api-client-lib',
   testEnvironment: 'node',
@@ -35,6 +37,8 @@ module.exports = {
       statements: 53,
     },
   },
+  coverageReporters: isContinuousIntegrationEnvironment ? ['html', 'lcov', 'text-summary'] : undefined,
   testMatch: ['<rootDir>/src/**/__tests__/**/*.[jt]s?(x)', '<rootDir>/src/**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleFileExtensions: ['js', 'json', 'ts', 'tsx'],
+  reporters: isContinuousIntegrationEnvironment ? ['github-actions', 'summary'] : ['default'],
 };
