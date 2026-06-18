@@ -20,8 +20,7 @@
 import {render, screen, waitFor} from '@testing-library/react';
 import ko from 'knockout';
 
-import {StyledApp, THEME_ID} from '@wireapp/react-ui-kit';
-
+import {withThemeAndRootContext} from 'src/script/auth/util/test/TestUtil';
 import {
   createExecutingFireAndForgetInvokerForTest,
   createRootContextValueForTest,
@@ -94,13 +93,6 @@ function createTeamState(): TeamState {
   };
 
   return teamState;
-}
-
-function withThemeAndRootContext(
-  element: React.ReactElement,
-  rootProviderWrapper: ReturnType<typeof createRootProviderWrapperForTest>,
-): React.ReactElement {
-  return <StyledApp themeId={THEME_ID.DEFAULT}>{rootProviderWrapper({children: element})}</StyledApp>;
 }
 
 describe('PeopleTab', () => {
