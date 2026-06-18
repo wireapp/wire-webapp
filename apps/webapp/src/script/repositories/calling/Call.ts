@@ -22,11 +22,10 @@ import ko from 'knockout';
 
 import {CALL_TYPE, CONV_TYPE, STATE as CALL_STATE} from '@wireapp/avs';
 
-import {AudioSpeakerFactory} from 'Repositories/calling/AudioSpeakerFactory';
+import {GlobalAudioContext} from 'Repositories/calling/AudioSpeakerFactory';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {CanvasMediaStreamMixer} from 'Repositories/media/CanvasMediaStreamMixer';
 import type {MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
 import {chunk, getDifference, partition} from 'Util/arrayUtil';
 import {getLogger, Logger} from 'Util/logger';
 import {matchQualifiedIds} from 'Util/qualifiedId';
@@ -37,6 +36,7 @@ import {MuteState} from './CallState';
 import type {ClientId, Participant} from './Participant';
 
 import {Config} from '../../Config';
+import {addRmsGraph, createRmsGraphPanel} from "Repositories/calling/audioGraph";
 
 export type SerializedConversationId = string;
 
@@ -45,6 +45,13 @@ interface ActiveSpeaker {
   levelNow: number;
   userId: QualifiedId;
 }
+
+type SpeakerNode = {
+  stream: MediaStream;
+  source: MediaStreamAudioSourceNode;
+  gain: GainNode;
+  analyser: AnalyserNode;
+};
 
 export class Call {
   private readonly logger: Logger = getLogger('Call');
@@ -63,6 +70,9 @@ export class Call {
   public readonly isConference: boolean;
   public readonly isGroupOrConference: boolean;
   public readonly activeSpeakers: ko.ObservableArray<Participant> = ko.observableArray([]);
+  public readonly speakers = new Map<string, SpeakerNode>();
+  public readonly panel: HTMLElement;
+  public trackIndex = 0;
   public blockMessages: boolean = false;
   public currentPage: ko.Observable<number> = ko.observable(0);
   public pages: ko.ObservableArray<Participant[]> = ko.observableArray();
@@ -111,10 +121,58 @@ export class Call {
     this.isActive = ko.pureComputed(() =>
       [CALL_STATE.OUTGOING, CALL_STATE.ANSWERED, CALL_STATE.MEDIA_ESTAB].includes(this.state()),
     );
+
+    this.panel = createRmsGraphPanel();
   }
 
   get hasWorkingAudioInput(): boolean {
     return !!this.selfParticipant.audioStream();
+  }
+
+  addTrackToContext(track: MediaStreamTrack) {
+    if (this.speakers.has(track.id)) {
+      return;
+    }
+
+    const context = GlobalAudioContext.get();
+    const stream = new MediaStream([track]);
+
+    // 2. Chrome WebRTC Fix: Unsichtbares Audio-Element zwingt den Stream zum Starten
+    const audioEl = new Audio();
+    audioEl.srcObject = stream;
+    audioEl.muted = true;
+    audioEl.play().catch((e: unknown) => console.warn("### Audio-Element Playback verzögert:", e));
+
+
+    const source = context.createMediaStreamSource(stream);
+    const gain = context.createGain();
+    const analyser = context.createAnalyser();
+
+    gain.gain.value = 2.0;
+
+    source.connect(gain);
+    gain.connect(analyser);
+    analyser.connect(context.destination);
+
+    this.speakers.set(track.id, {stream, source, gain, analyser});
+
+    const handle = addRmsGraph(this.panel, analyser, gain, track, this.trackIndex++);
+
+    const trackId = track.id;
+    track.onended = () => {
+      const speaker = this.speakers.get(trackId);
+      if (!speaker) {
+        return;
+      }
+
+      speaker.source.disconnect();
+      speaker.gain.disconnect();
+      speaker.analyser.disconnect();
+
+      this.speakers.delete(trackId);
+      this.trackIndex--;
+      handle.destroy();
+    };
   }
 
   getSelfParticipant(): Participant {
@@ -164,7 +222,7 @@ export class Call {
       }
 
       try {
-        audio.audioElement = AudioSpeakerFactory.createNewCallingAudioSpeaker(audio.stream);
+        //audio.audioElement = AudioSpeakerFactory.createNewCallingAudioSpeaker(audio.stream);
       } catch (e: unknown) {
         this.logger.warn('Fail to playAudioStreams:', e);
       }
@@ -173,14 +231,14 @@ export class Call {
   }
 
   updateAudioStreamsSink() {
-    const outputDeviceId = mediaDevicesStore.getState().audio.output.selectedId;
-    if (!outputDeviceId) {
-      return;
-    }
-
-    Object.values(this.audios).forEach(audio => {
-      audio.audioElement?.setSinkId?.(outputDeviceId).catch(console.warn);
-    });
+    // const outputDeviceId = mediaDevicesStore.getState().audio.output.selectedId;
+    // if (!outputDeviceId) {
+    //   return;
+    // }
+    //
+    // Object.values(this.audios).forEach(audio => {
+    //   audio.audioElement?.setSinkId?.(outputDeviceId).catch(console.warn);
+    // });
   }
 
   setActiveSpeakers(audioLevels: ActiveSpeaker[]): void {

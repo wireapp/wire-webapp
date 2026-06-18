@@ -17,9 +17,8 @@
  *
  */
 
-import {getLogger, Logger} from 'Util/logger';
 import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-
+import {getLogger, Logger} from 'Util/logger';
 
 export class GlobalAudioContext {
   private static context?: AudioContext;
@@ -34,7 +33,8 @@ export class GlobalAudioContext {
 
   static async resume(): Promise<void> {
     const context = this.get();
-    await context.setSinkId('a98fc8cb1a717976c4fea85b4455944d7667e9bc4b4e59cd7269eed3652043c4');
+    //const outputDeviceId = mediaDevicesStore.getState().audio.output.selectedId;
+    //context.setSinkId(outputDeviceId);
 
     if (context.state !== 'running') {
       console.log("### about to await context.resume");
@@ -57,8 +57,6 @@ export class AudioSpeakerFactory {
       AudioSpeakerFactory.logger.error('No audio base element exist in DOM!');
       throw new Error('Audio element could not be crated!');
     }
-
-
     console.log('### media devices', mediaDevicesStore.getState());
     console.log('### setting sink id', mediaDevicesStore.getState().audio.output.selectedId);
     //context.setSinkId(mediaDevicesStore.getState().audio.output.selectedId);

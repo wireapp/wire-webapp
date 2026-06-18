@@ -122,6 +122,12 @@ interface MediaStreamQuery {
   screen?: boolean;
 }
 
+type SpeakerNode = {
+  track: MediaStreamTrack;
+  source: MediaStreamAudioSourceNode;
+  gain: GainNode;
+};
+
 export type QualifiedWcallMember = Omit<WcallMember, 'userid'> & {
   userId: QualifiedId;
 };
@@ -441,7 +447,6 @@ export class CallingRepository {
     this.selfClientId = clientId;
     const callingInstance = await getAvsInstance();
 
-    await GlobalAudioContext.resume();
     this.wCall = this.configureCallingApi(callingInstance);
     this.wUser = this.createWUser(this.wCall, this.serializeQualifiedId(this.selfUser.qualifiedId), clientId);
 
@@ -1124,6 +1129,12 @@ export class CallingRepository {
   }
 
   async startCall(conversation: Conversation): Promise<void | Call> {
+    const context = GlobalAudioContext.get();
+
+    if (context.state !== 'running') {
+      await context.resume();
+    }
+    console.log('## AudioContext state after resume:', context.state);
     void this.setViewModeMinimized();
     if (!this.selfUser || !this.selfClientId) {
       this.logger.warn(
@@ -1506,6 +1517,7 @@ export class CallingRepository {
   }
 
   async answerCall(call: Call, callType?: CALL_TYPE): Promise<void> {
+    await GlobalAudioContext.get().resume();
     void this.setViewModeMinimized();
 
     // Temporary feature to toggle Rust SFT
@@ -1998,7 +2010,7 @@ export class CallingRepository {
     if (!activeCall) {
       return;
     }
-    activeCall.updateAudioStreamsSink();
+    //activeCall.updateAudioStreamsSink();
   }
 
   /**
@@ -2694,20 +2706,19 @@ export class CallingRepository {
   };
 
   private readonly updateActiveSpeakers = (wuser: number, convId: string, rawJson: string) => {
-    const call = this.findCall(this.parseQualifiedId(convId));
-    const activeSpeakers: ActiveSpeakers = JSON.parse(rawJson);
-    if (call && activeSpeakers) {
-      call.setActiveSpeakers(
-        activeSpeakers.audio_levels.map(({userid, clientid, audio_level_now}) => ({
-          clientId: clientid,
-          levelNow: audio_level_now,
-          userId: this.parseQualifiedId(userid),
-        })),
-      );
-    }
+    // const call = this.findCall(this.parseQualifiedId(convId));
+    // const activeSpeakers: ActiveSpeakers = JSON.parse(rawJson);
+    // if (call && activeSpeakers) {
+    //   call.setActiveSpeakers(
+    //     activeSpeakers.audio_levels.map(({userid, clientid, audio_level_now}) => ({
+    //       clientId: clientid,
+    //       levelNow: audio_level_now,
+    //       userId: this.parseQualifiedId(userid),
+    //     })),
+    //   );
+    // }
   };
 
-  static counter = 0;
   private readonly updateCallAudioStreams = (
     convId: SerializedConversationId,
     streamId: string,
@@ -2717,42 +2728,17 @@ export class CallingRepository {
     if (!call) {
       return;
     }
-    CallingRepository.counter += 1;
 
     if (streams === null || streams.length === 0) {
       return;
     }
-    const stream = streams[0];
 
-    console.log('### UPDATE');
-    //console.log('### media devices', mediaDevicesStore.getState());
-    //console.log('### setting sink id', mediaDevicesStore.getState().audio.output.selectedId);
-
-    const context = GlobalAudioContext.get();
-    console.log('### context state', context.state);
-    console.log('### global context:', context);
-
-    const source = context.createMediaStreamSource(stream);
-    //const dest = context.createMediaStreamDestination();
-
-    if (CallingRepository.counter == 2) {
-      source.connect(context.destination);
-    }
-
-    /*
-    console.log('### context dest', context.destination);
-    console.log('### len audio tracks', stream.getAudioTracks().length);
-    console.log('### ready state of 1st audio track', stream.getAudioTracks()[0]?.readyState);
-
-    dest.stream.getAudioTracks().forEach(track => {
-      console.log('### track', track.enabled);
-      console.log('### track', track.readyState);
-      console.log('### track', track.muted);
-    });
-    */
-
-
-
+    const track = streams[0].getAudioTracks()[0];
+    // if (track.muted) {
+    //   track.onunmute = () => call.addTrackToContext(track);
+    //   return;
+    // }
+    call.addTrackToContext(track);
   };
 
   private readonly updateParticipantVideoStream = (

@@ -228,7 +228,9 @@ export class CallingViewModel {
       PrimaryModal.show(PrimaryModal.type.WITHOUT_TITLE, {
         preventClose: true,
         primaryAction: {
-          action: async () => await startCall(conversationEntity),
+          action: async () => {
+            await startCall(conversationEntity);
+          },
           text: t('groupCallModalPrimaryBtnName'),
         },
         secondaryAction: {
