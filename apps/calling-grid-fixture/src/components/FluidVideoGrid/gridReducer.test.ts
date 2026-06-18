@@ -1,33 +1,46 @@
 import {GridConfig, GridParticipant, GridState, ParticipantTier, TileDescriptor} from './FluidVideoGrid.types';
-import {createGridReducer, createInitialState, _updateSlotMap, _computeLayout} from './gridReducer';
+import {createGridReducer, createInitialState, _updateSlotMap, _computeLayout, _selectFractionalLayout} from './gridReducer';
 
-// Config matching constants.ts defaults (minAR=0.67 so modes 2,3,6 can also work)
 const DEFAULT_CONFIG: GridConfig = {
   minTileHeight: 120,
   maxTileHeight: 600,
   minAspectRatio: 0.67,
   maxAspectRatio: 1.78,
-  maxSubRows: 2,
-  maxSubCols: 3,
   tileGap: 4,
 };
 
 const reducer = createGridReducer(DEFAULT_CONFIG);
+
+// Large container: capacity = 15 × 5 = 75
 const container1280x720 = {width: 1280, height: 720};
+
+// Small container: maxCols=3, maxRows=1 → capacity=3.
+// usableW=292, minTileWidth≈80.4 → floor((292+4)/(80.4+4))=3
+// usableH=130, minTileHeight=120 → floor((130+4)/(120+4))=1
+const smallContainer = {width: 300, height: 138};
+
+// Medium container used for optimal-layout tests.
+// Chosen so 6 tiles fit best in a 2-row layout, not 1-row.
+const container960x540 = {width: 960, height: 540};
 
 function makeParticipant(
   id: string,
   tier: ParticipantTier = 'passive-no-camera',
   speakingDuration = 0,
+  activatedAt?: number,
 ): GridParticipant {
-  return {id, name: `User ${id}`, tier, isMuted: false, speakingDuration};
+  return {id, name: `User ${id}`, tier, isMuted: false, speakingDuration, activatedAt};
 }
 
-function addAll(state: GridState, participants: GridParticipant[]): GridState {
+function addAll(state: GridState, participants: GridParticipant[], now = 0): GridState {
   return participants.reduce(
-    (s, p) => reducer(s, {type: 'ADD_PARTICIPANT', participant: p}),
+    (s, p) => reducer(s, {type: 'ADD_PARTICIPANT', participant: p, now}),
     state,
   );
+}
+
+function addAllSmall(participants: GridParticipant[], now = 0): GridState {
+  return addAll(createInitialState(smallContainer), participants, now);
 }
 
 type FullTile = Extract<TileDescriptor, {type: 'full'}>;
@@ -45,16 +58,27 @@ function fractionalTile(state: GridState): FractionalTileDescriptor | undefined 
     .find((t): t is FractionalTileDescriptor => t.type === 'fractional');
 }
 
+function subtileIds(state: GridState): string[] {
+  return (
+    fractionalTile(state)
+      ?.subtiles.filter(s => s.type === 'participant')
+      .map(s => s.participant!.id) ?? []
+  );
+}
+
+function overflowCount(state: GridState): number {
+  return fractionalTile(state)?.subtiles.find(s => s.type === 'overflow')?.count ?? 0;
+}
+
 // ── ADD_PARTICIPANT ────────────────────────────────────────────────────────────
 
 describe('ADD_PARTICIPANT', () => {
-  it('adds participant and recalculates layout', () => {
+  it('adds participant and produces a tile', () => {
     const state = createInitialState(container1280x720);
     const next = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'active-camera')});
     expect(next.participants).toHaveLength(1);
-    const tiles = next.layout.rows.flatMap(r => r.tiles);
-    expect(tiles).toHaveLength(1);
-    expect(tiles[0].type).toBe('full');
+    expect(next.layout.rows.flatMap(r => r.tiles)).toHaveLength(1);
+    expect(next.layout.rows.flatMap(r => r.tiles)[0].type).toBe('full');
   });
 
   it('is idempotent — duplicate id is ignored', () => {
@@ -64,47 +88,30 @@ describe('ADD_PARTICIPANT', () => {
     expect(s2.participants).toHaveLength(1);
   });
 
-  it('active participant lands in a full tile', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('active1', 'active-camera'),
-    ]);
-    expect(fullTiles(state)).toHaveLength(1);
-    expect(fullTiles(state)[0].participant?.id).toBe('active1');
-  });
-
-  it('passive participant goes into the fractional tile', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('active1', 'active-camera'),
-      makeParticipant('passive1', 'passive-no-camera'),
-    ]);
-    const frac = fractionalTile(state);
-    expect(frac).toBeDefined();
-    expect(frac?.subtiles?.[0].type).toBe('participant');
-    expect(frac?.subtiles?.[0].participant?.id).toBe('passive1');
-  });
-
-  it('screen-sharing participant lands in first full tile', () => {
+  it('screen-sharing participant lands in first full tile (before active-camera)', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('cam', 'active-camera'),
       makeParticipant('screen1', 'screen-sharing'),
     ]);
-    const tiles = fullTiles(state);
-    expect(tiles[0].participant?.id).toBe('screen1');
+    expect(fullTiles(state)[0].participant.id).toBe('screen1');
   });
 
-  it('multiple active participants each get their own full tile', () => {
+  it('multiple participants each get their own full tile when under capacity', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('s1', 'screen-sharing'),
-      makeParticipant('s2', 'screen-sharing'),
       makeParticipant('a1', 'active-camera'),
+      makeParticipant('p1', 'passive-no-camera'),
     ]);
     expect(fullTiles(state)).toHaveLength(3);
   });
 
   it('at most one fractional tile exists', () => {
-    const state = addAll(createInitialState(container1280x720), [
+    // smallContainer capacity=3, force fractional by adding 4 participants
+    const state = addAllSmall([
       makeParticipant('a1', 'active-camera'),
-      ...Array.from({length: 6}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+      makeParticipant('p0', 'passive-no-camera'),
+      makeParticipant('p1', 'passive-no-camera'),
+      makeParticipant('p2', 'passive-no-camera'),
     ]);
     const fracCount = state.layout.rows.flatMap(r => r.tiles).filter(t => t.type === 'fractional').length;
     expect(fracCount).toBeLessThanOrEqual(1);
@@ -115,7 +122,7 @@ describe('ADD_PARTICIPANT', () => {
 
 describe('REMOVE_PARTICIPANT', () => {
   it('removes participant and recalculates layout', () => {
-    let state = addAll(createInitialState(container1280x720), [
+    const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a', 'active-camera'),
       makeParticipant('b', 'passive-no-camera'),
     ]);
@@ -131,7 +138,7 @@ describe('REMOVE_PARTICIPANT', () => {
   });
 
   it('cleans up slot map for removed participant', () => {
-    let state = addAll(createInitialState(container1280x720), [
+    const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a', 'passive-no-camera'),
       makeParticipant('b', 'passive-no-camera'),
     ]);
@@ -140,12 +147,18 @@ describe('REMOVE_PARTICIPANT', () => {
     expect(next.slotMap['b']).toBeDefined();
   });
 
-  it('removing last passive removes fractional tile', () => {
-    let state = addAll(createInitialState(container1280x720), [
+  it('removing the last subtile participant removes the fractional tile', () => {
+    // In smallContainer capacity=3; 4 participants trigger fractional
+    const state = addAllSmall([
       makeParticipant('a1', 'active-camera'),
+      makeParticipant('p0', 'passive-no-camera'),
       makeParticipant('p1', 'passive-no-camera'),
+      makeParticipant('extra', 'passive-no-camera'),
     ]);
-    const next = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'p1'});
+    expect(fractionalTile(state)).toBeDefined();
+
+    const next = reducer(state, {type: 'REMOVE_PARTICIPANT', id: 'extra'});
+    // Now 3 participants = capacity → all full tiles, no fractional
     expect(fractionalTile(next)).toBeUndefined();
   });
 });
@@ -153,169 +166,519 @@ describe('REMOVE_PARTICIPANT', () => {
 // ── UPDATE_PARTICIPANT — tier upgrade ─────────────────────────────────────────
 
 describe('UPDATE_PARTICIPANT — tier upgrade', () => {
+  it('passive→active-camera: participant moves to higher-priority slot', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('a1', 'active-camera'),
+      makeParticipant('lazy', 'passive-no-camera'),
+    ]);
+    const slotBefore = state.slotMap['lazy'];
+    const upgraded = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'lazy',
+      changes: {tier: 'active-camera'},
+      now: 999,
+    });
+    expect(upgraded.slotMap['lazy']).toBeLessThan(slotBefore);
+  });
+
   it('passive→active-camera: participant appears in a full tile', () => {
-    let state = addAll(createInitialState(container1280x720), [
+    const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'active-camera'),
       makeParticipant('lazy', 'passive-no-camera'),
     ]);
-    const upgraded = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'lazy', changes: {tier: 'active-camera'}});
-    const ids = fullTiles(upgraded).map(t => t.participant?.id);
-    expect(ids).toContain('lazy');
+    const upgraded = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'lazy',
+      changes: {tier: 'active-camera'},
+      now: 999,
+    });
+    expect(fullTiles(upgraded).map(t => t.participant.id)).toContain('lazy');
   });
 
-  it('upgraded participant no longer appears in the fractional tile', () => {
-    let state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('lazy', 'passive-no-camera'),
-    ]);
-    const upgraded = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'lazy', changes: {tier: 'active-camera'}});
-    const subtileIds = fractionalTile(upgraded)?.subtiles
-      ?.filter(s => s.type === 'participant')
-      .map(s => s.participant?.id) ?? [];
-    expect(subtileIds).not.toContain('lazy');
-  });
-
-  it('unchanged participants keep their slot indices after an upgrade', () => {
-    let state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
+  it('upgrading to active-camera with higher now puts the upgraded participant before the older one', () => {
+    // a1 was added with now=0 (lower activatedAt); p1 upgrades with now=999 (higher activatedAt)
+    // → p1 should get lower slot than a1 (more recently active = higher priority)
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('a1', 'active-camera'),  // activatedAt = 0
       makeParticipant('p1', 'passive-no-camera'),
-      makeParticipant('p2', 'passive-no-camera'),
-    ]);
-    const slotBefore = state.slotMap['a1'];
-    const upgraded = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'p1', changes: {tier: 'active-camera'}});
-    expect(upgraded.slotMap['a1']).toBe(slotBefore);
+    ], 0);
+    const upgraded = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'p1',
+      changes: {tier: 'active-camera'},
+      now: 999,
+    });
+    // p1 (activatedAt=999) should have lower slot than a1 (activatedAt=0)
+    expect(upgraded.slotMap['p1']).toBeLessThan(upgraded.slotMap['a1']);
   });
 });
 
 // ── UPDATE_PARTICIPANT — tier downgrade ────────────────────────────────────────
 
 describe('UPDATE_PARTICIPANT — tier downgrade', () => {
-  it('active→passive: participant moves from full tile to fractional subtile', () => {
-    let state = addAll(createInitialState(container1280x720), [makeParticipant('a1', 'active-camera')]);
-    const downgraded = reducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'a1',
-      changes: {tier: 'passive-no-camera'},
-    });
-    expect(fullTiles(downgraded).some(t => t.participant?.id === 'a1')).toBe(false);
-    const subtileIds = fractionalTile(downgraded)?.subtiles
-      ?.filter(s => s.type === 'participant')
-      .map(s => s.participant?.id) ?? [];
-    expect(subtileIds).toContain('a1');
-  });
-
-  it('screen-sharing→passive: no longer gets a full tile', () => {
-    let state = addAll(createInitialState(container1280x720), [makeParticipant('screener', 'screen-sharing')]);
+  it('screen-sharing→passive-no-camera: no longer gets a priority slot', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('screener', 'screen-sharing'),
+      makeParticipant('cam', 'active-camera'),
+    ]);
     const next = reducer(state, {
       type: 'UPDATE_PARTICIPANT',
       id: 'screener',
       changes: {tier: 'passive-no-camera'},
     });
-    expect(fullTiles(next).every(t => t.participant?.id !== 'screener')).toBe(true);
+    // cam (active-camera) now has higher priority than screener (passive-no-camera)
+    expect(next.slotMap['cam']).toBeLessThan(next.slotMap['screener']);
+  });
+
+  it('downgrading a participant to passive moves it behind active-tier participants in subtiles', () => {
+    // smallContainer capacity=3; 4 participants trigger fractional (2 full + 2 subtile)
+    const state = addAllSmall([
+      makeParticipant('a1', 'active-camera'),
+      makeParticipant('a2', 'active-camera'),
+      makeParticipant('a3', 'active-camera'),
+      makeParticipant('a4', 'active-camera'),
+    ]);
+    // a1,a2 in full tiles; a3,a4 in subtiles (all same activatedAt=0, stable order)
+    expect(subtileIds(state)).toEqual(['a3', 'a4']);
+
+    // Downgrade a3 to passive-no-camera → a3 now behind a4 (active) in priority
+    const next = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'a3',
+      changes: {tier: 'passive-no-camera'},
+    });
+    const ids = subtileIds(next);
+    // a4 (active-camera) should appear before a3 (passive-no-camera) in subtile order
+    expect(ids.indexOf('a4')).toBeLessThan(ids.indexOf('a3'));
   });
 });
 
-// ── Sub-grid selection ────────────────────────────────────────────────────────
+// ── Tile dimension invariants ─────────────────────────────────────────────────
 
-describe('sub-grid selection', () => {
-  it('fractional tile has subRows ≤ maxSubRows and subCols ≤ maxSubCols', () => {
+describe('tile dimension invariants', () => {
+  const gap = DEFAULT_CONFIG.tileGap;
+
+  it('widest row tiles fit within usable container width', () => {
+    // The actual tile width is computed for the widest row in the layout,
+    // so nActualCols × tileWidth + (nActualCols-1) × gap ≤ usableW must hold.
+    for (const n of [1, 2, 5, 10, 20, 50]) {
+      const participants = Array.from({length: n}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera'));
+      const state = addAll(createInitialState(container1280x720), participants);
+      const {tileWidth, rows} = state.layout;
+      const nActualCols = Math.max(...rows.map(r => r.tiles.length), 0);
+      const usableW = container1280x720.width - 2 * gap;
+      expect(nActualCols * tileWidth + (nActualCols - 1) * gap).toBeLessThanOrEqual(usableW + 0.01);
+    }
+  });
+
+  it('all rows fit within usable container height', () => {
+    // nActualRows × tileHeight + (nActualRows-1) × gap ≤ usableH must hold.
+    for (const n of [1, 2, 5, 10, 20, 50]) {
+      const participants = Array.from({length: n}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera'));
+      const state = addAll(createInitialState(container1280x720), participants);
+      const {tileHeight, rows} = state.layout;
+      const nActualRows = rows.length;
+      const usableH = container1280x720.height - 2 * gap;
+      expect(nActualRows * tileHeight + (nActualRows - 1) * gap).toBeLessThanOrEqual(usableH + 0.01);
+    }
+  });
+
+  it('tileAspectRatio is within [minAR, maxAR]', () => {
+    for (const n of [1, 3, 6]) {
+      const participants = Array.from({length: n}, (_, i) => makeParticipant(`p${i}`, 'active-camera'));
+      const state = addAll(createInitialState(container960x540), participants);
+      expect(state.layout.tileAspectRatio).toBeGreaterThanOrEqual(DEFAULT_CONFIG.minAspectRatio - 0.01);
+      expect(state.layout.tileAspectRatio).toBeLessThanOrEqual(DEFAULT_CONFIG.maxAspectRatio + 0.01);
+    }
+  });
+
+  it('6 participants in 960×540 uses 2 rows (optimal layout, not 1-row portrait)', () => {
+    const state = addAll(
+      createInitialState(container960x540),
+      Array.from({length: 6}, (_, i) => makeParticipant(`p${i}`, 'active-camera')),
+    );
+    expect(state.layout.rows).toHaveLength(2);
+  });
+
+  it('tileHeight stays within configured bounds', () => {
+    const state = addAll(createInitialState({width: 320, height: 240}), [
+      makeParticipant('a', 'active-camera'),
+    ]);
+    expect(state.layout.tileHeight).toBeGreaterThanOrEqual(DEFAULT_CONFIG.minTileHeight);
+    expect(state.layout.tileHeight).toBeLessThanOrEqual(DEFAULT_CONFIG.maxTileHeight);
+  });
+});
+
+// ── 'you' tier ────────────────────────────────────────────────────────────────
+
+describe("'you' tier", () => {
+  it("'you' participant always has slot 0", () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('s1', 'screen-sharing'),
+      makeParticipant('me', 'you'),
+      makeParticipant('a1', 'active-camera'),
+    ]);
+    expect(state.slotMap['me']).toBe(0);
+  });
+
+  it("'you' participant appears as the first full tile", () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('s1', 'screen-sharing'),
+      makeParticipant('me', 'you'),
+      makeParticipant('a1', 'active-camera'),
+    ]);
+    expect(fullTiles(state)[0].participant.id).toBe('me');
+  });
+
+  it("'you' tile is stable when other participants change tier", () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('me', 'you'),
+      makeParticipant('a1', 'active-camera'),
+    ]);
+    const slotMe = state.slotMap['me'];
+    const next = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'a1',
+      changes: {tier: 'screen-sharing'},
+      now: 500,
+    });
+    expect(next.slotMap['me']).toBe(slotMe);
+  });
+});
+
+// ── Unified priority queue (passive in full tiles) ────────────────────────────
+
+describe('unified priority queue', () => {
+  it('passive participant gets a full tile when capacity allows', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a1', 'active-camera'),
       makeParticipant('p1', 'passive-no-camera'),
     ]);
-    const frac = fractionalTile(state);
-    expect(frac?.subRows).toBeGreaterThanOrEqual(1);
-    expect(frac?.subRows).toBeLessThanOrEqual(DEFAULT_CONFIG.maxSubRows);
-    expect(frac?.subCols).toBeGreaterThanOrEqual(1);
-    expect(frac?.subCols).toBeLessThanOrEqual(DEFAULT_CONFIG.maxSubCols);
+    // 2 participants well under capacity=75 → both full tiles
+    expect(fullTiles(state)).toHaveLength(2);
+    expect(fractionalTile(state)).toBeUndefined();
   });
 
-  it('subRows × subCols ≥ number of passive participants (when no overflow)', () => {
-    for (const n of [1, 2, 3, 4, 5, 6]) {
-      const state = addAll(
-        createInitialState(container1280x720),
-        [
-          makeParticipant('a1', 'active-camera'),
-          ...Array.from({length: n}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
-        ],
-      );
-      const frac = fractionalTile(state);
-      expect((frac?.subRows ?? 0) * (frac?.subCols ?? 0)).toBeGreaterThanOrEqual(n);
-    }
-  });
-
-  it('subtileAspectRatio is within [minAR, maxAR] when achievable', () => {
+  it('passive-camera has higher priority than passive-no-camera', () => {
     const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
+      makeParticipant('pc', 'passive-camera'),
+      makeParticipant('pn', 'passive-no-camera'),
+    ]);
+    expect(state.slotMap['pc']).toBeLessThan(state.slotMap['pn']);
+  });
+
+  it('tier priority order: you < screen-sharing < active-camera < active-no-camera < passive-camera < passive-no-camera', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('pn', 'passive-no-camera'),
+      makeParticipant('pc', 'passive-camera'),
+      makeParticipant('anc', 'active-no-camera'),
+      makeParticipant('ac', 'active-camera'),
+      makeParticipant('ss', 'screen-sharing'),
+      makeParticipant('me', 'you'),
+    ]);
+    const {slotMap} = state;
+    expect(slotMap['me']).toBeLessThan(slotMap['ss']);
+    expect(slotMap['ss']).toBeLessThan(slotMap['ac']);
+    expect(slotMap['ac']).toBeLessThan(slotMap['anc']);
+    expect(slotMap['anc']).toBeLessThan(slotMap['pc']);
+    expect(slotMap['pc']).toBeLessThan(slotMap['pn']);
+  });
+
+  it('full tile layout renders participants in slot order', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('pn', 'passive-no-camera'),
+      makeParticipant('ac', 'active-camera'),
+      makeParticipant('ss', 'screen-sharing'),
+    ]);
+    const ids = fullTiles(state).map(t => t.participant.id);
+    expect(ids).toEqual(['ss', 'ac', 'pn']);
+  });
+});
+
+// ── Recency ordering within active tiers ─────────────────────────────────────
+
+describe('recency ordering within active tiers', () => {
+  it('most recently activated active-camera participant gets the lower slot', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('old', 'active-camera'),  // activatedAt auto-set to now=0
+      makeParticipant('new', 'active-camera'),  // also now=0, but added after
+    ]);
+    // Both now=0, so tiebreak by prevSlotMap: 'old' was assigned first → lower slot
+    expect(state.slotMap['old']).toBeLessThan(state.slotMap['new']);
+  });
+
+  it('participant added with higher now gets a lower slot than earlier participant', () => {
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('early', 'active-camera'), now: 100});
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('late', 'active-camera'), now: 200});
+    // 'late' has activatedAt=200 > 100 → lower slot (higher recency priority)
+    expect(state.slotMap['late']).toBeLessThan(state.slotMap['early']);
+  });
+
+  it('passive tier does NOT use recency — stable (add) order is preserved', () => {
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p1', 'passive-no-camera'), now: 100});
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p2', 'passive-no-camera'), now: 200});
+    // p1 was added first → lower slot (stable/add order, NOT recency)
+    expect(state.slotMap['p1']).toBeLessThan(state.slotMap['p2']);
+  });
+
+  it('updating tier to active sets activatedAt and moves participant to recency slot', () => {
+    let state = addAll(createInitialState(container1280x720), [
+      makeParticipant('a_old', 'active-camera'),  // activatedAt=0
+      makeParticipant('lazy', 'passive-no-camera'),
+    ]);
+    const upgraded = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'lazy',
+      changes: {tier: 'active-camera'},
+      now: 999,
+    });
+    // lazy has activatedAt=999, a_old has activatedAt=0 → lazy is lower slot
+    expect(upgraded.slotMap['lazy']).toBeLessThan(upgraded.slotMap['a_old']);
+  });
+
+  it('updating non-tier field does not change activatedAt', () => {
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'active-camera'), now: 100});
+    const activatedAtBefore = state.participants[0].activatedAt;
+    state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'a', changes: {isMuted: true}});
+    expect(state.participants.find(p => p.id === 'a')!.activatedAt).toBe(activatedAtBefore);
+  });
+});
+
+// ── activatedAt management ────────────────────────────────────────────────────
+
+describe('activatedAt management', () => {
+  it('ADD_PARTICIPANT with active tier auto-sets activatedAt when not provided', () => {
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {
+      type: 'ADD_PARTICIPANT',
+      participant: makeParticipant('a', 'active-camera'),
+      now: 42,
+    });
+    expect(state.participants[0].activatedAt).toBe(42);
+  });
+
+  it('ADD_PARTICIPANT with passive tier does NOT set activatedAt', () => {
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {
+      type: 'ADD_PARTICIPANT',
+      participant: makeParticipant('p', 'passive-no-camera'),
+      now: 42,
+    });
+    expect(state.participants[0].activatedAt).toBeUndefined();
+  });
+
+  it('ADD_PARTICIPANT preserves explicit activatedAt on the participant', () => {
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {
+      type: 'ADD_PARTICIPANT',
+      participant: makeParticipant('a', 'active-camera', 0, 77),
+      now: 42,
+    });
+    // Explicit activatedAt=77 from participant object is preserved (not overwritten by now=42)
+    expect(state.participants[0].activatedAt).toBe(77);
+  });
+
+  it('UPDATE_PARTICIPANT changing tier refreshes activatedAt', () => {
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'passive-no-camera'), now: 10});
+    state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'a', changes: {tier: 'active-camera'}, now: 200});
+    expect(state.participants.find(p => p.id === 'a')!.activatedAt).toBe(200);
+  });
+
+  it('UPDATE_PARTICIPANT NOT changing tier preserves activatedAt', () => {
+    let state = createInitialState(container1280x720);
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('a', 'active-camera'), now: 100});
+    state = reducer(state, {type: 'UPDATE_PARTICIPANT', id: 'a', changes: {isMuted: true}, now: 999});
+    expect(state.participants.find(p => p.id === 'a')!.activatedAt).toBe(100);
+  });
+});
+
+// ── Fractional tile trigger ────────────────────────────────────────────────────
+//
+// smallContainer: capacity = 3.
+// Fractional tile appears when nParticipants > 3.
+
+describe('fractional tile trigger', () => {
+  it('no fractional tile when nP = capacity (all get full tiles)', () => {
+    const state = addAllSmall([
+      makeParticipant('p0', 'passive-no-camera'),
+      makeParticipant('p1', 'passive-no-camera'),
+      makeParticipant('p2', 'passive-no-camera'),
+    ]);
+    expect(fractionalTile(state)).toBeUndefined();
+    expect(fullTiles(state)).toHaveLength(3);
+  });
+
+  it('fractional tile appears when nP = capacity + 1', () => {
+    const state = addAllSmall([
+      makeParticipant('p0', 'passive-no-camera'),
       makeParticipant('p1', 'passive-no-camera'),
       makeParticipant('p2', 'passive-no-camera'),
       makeParticipant('p3', 'passive-no-camera'),
-      makeParticipant('p4', 'passive-no-camera'),
     ]);
-    const {subtileAspectRatio} = state.layout;
-    if (subtileAspectRatio !== null) {
-      expect(subtileAspectRatio).toBeGreaterThanOrEqual(DEFAULT_CONFIG.minAspectRatio - 0.01);
-      expect(subtileAspectRatio).toBeLessThanOrEqual(DEFAULT_CONFIG.maxAspectRatio + 0.01);
+    expect(fractionalTile(state)).toBeDefined();
+    expect(fullTiles(state)).toHaveLength(2); // capacity - 1 = 2
+  });
+
+  it('fractional tile contains the lower-priority participants (highest slots)', () => {
+    const state = addAllSmall([
+      makeParticipant('hi', 'screen-sharing'),
+      makeParticipant('mid', 'active-camera'),
+      makeParticipant('lo1', 'passive-no-camera'),
+      makeParticipant('lo2', 'passive-no-camera'),
+    ]);
+    // Full tiles = 2 highest priority: 'hi' and 'mid'
+    const fullIds = fullTiles(state).map(t => t.participant.id);
+    expect(fullIds).toContain('hi');
+    expect(fullIds).toContain('mid');
+    // Subtile = remaining: lo1, lo2
+    expect(subtileIds(state)).toContain('lo1');
+    expect(subtileIds(state)).toContain('lo2');
+  });
+
+  it('subtile count grows as more participants are added', () => {
+    let state = addAllSmall([
+      makeParticipant('p0', 'passive-no-camera'),
+      makeParticipant('p1', 'passive-no-camera'),
+      makeParticipant('p2', 'passive-no-camera'),
+      makeParticipant('p3', 'passive-no-camera'), // triggers fractional
+    ]);
+    expect(subtileIds(state)).toHaveLength(2); // slot 2 and slot 3 → 2 subtile participants, no overflow
+
+    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p4', 'passive-no-camera')});
+    expect(subtileIds(state).length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+// ── Fractional capacity restricted to {2, 3, 4, 6} ───────────────────────────
+
+describe('fractional capacity restricted to {2, 3, 4, 6}', () => {
+  const VALID_CAPS = new Set([2, 3, 4, 6]);
+
+  it('_selectFractionalLayout always returns a layout with cap in {2, 3, 4, 6}', () => {
+    const tileSizes = [
+      {w: 160, h: 90},
+      {w: 160, h: 120},
+      {w: 200, h: 200},
+      {w: 320, h: 180},
+    ];
+    for (const {w, h} of tileSizes) {
+      for (const n of [1, 2, 3, 4, 5, 6, 10]) {
+        const {subRows, subCols} = _selectFractionalLayout(n, w, h, DEFAULT_CONFIG);
+        expect(VALID_CAPS.has(subRows * subCols)).toBe(true);
+      }
+    }
+  });
+
+  it('fractional tile in smallContainer has cap in {2, 3, 4, 6}', () => {
+    // Use enough participants to trigger fractional
+    const state = addAllSmall(
+      Array.from({length: 6}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+    );
+    const frac = fractionalTile(state);
+    if (frac) {
+      expect(VALID_CAPS.has(frac.subRows * frac.subCols)).toBe(true);
+    }
+  });
+
+  it('subtile dimensions satisfy gap-corrected formula', () => {
+    // Force a fractional tile in smallContainer
+    const state = addAllSmall(
+      Array.from({length: 5}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+    );
+    const frac = fractionalTile(state);
+    const {tileWidth, tileHeight, subtileWidth, subtileHeight} = state.layout;
+    if (frac && subtileWidth !== null && subtileHeight !== null) {
+      const gap = DEFAULT_CONFIG.tileGap;
+      const expectedW = (tileWidth - gap * (frac.subCols - 1)) / frac.subCols;
+      const expectedH = (tileHeight - gap * (frac.subRows - 1)) / frac.subRows;
+      expect(subtileWidth).toBeCloseTo(expectedW, 5);
+      expect(subtileHeight).toBeCloseTo(expectedH, 5);
+    }
+  });
+
+  it('subtile height is at least minTileHeight / 2', () => {
+    const state = addAllSmall(
+      Array.from({length: 5}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+    );
+    const {subtileHeight} = state.layout;
+    if (subtileHeight !== null) {
+      expect(subtileHeight).toBeGreaterThanOrEqual(DEFAULT_CONFIG.minTileHeight / 2 - 0.01);
     }
   });
 });
 
-// ── Overflow tile ──────────────────────────────────────────────────────────────
+// ── Overflow ──────────────────────────────────────────────────────────────────
+//
+// smallContainer: capacity=3, nFullTiles=2 when fractional is active.
+// The maximum fractional cap in this container is 4 (2×2 layout when overflowing).
+// With fractCap=4 and needsOverflow: visibleParticipants = 3, overflow shows the rest.
+//
+// nSubtile = nTotal - 2 (full tiles)
+// overflow appears when nSubtile > fractCap (4 for this container)
+// i.e. nTotal > 6
 
 describe('overflow', () => {
-  const maxCap = DEFAULT_CONFIG.maxSubRows * DEFAULT_CONFIG.maxSubCols; // 6
-
-  it('no overflow when passive count ≤ maxSubRows × maxSubCols', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      ...Array.from({length: maxCap}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
-    ]);
-    const overflow = fractionalTile(state)?.subtiles?.find(s => s.type === 'overflow');
-    expect(overflow).toBeUndefined();
+  it('no overflow when subtile count ≤ fractCap', () => {
+    // 2 full + 4 subtiles = 6 total; fractCap=4 (exact fit)
+    const state = addAllSmall(
+      Array.from({length: 6}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+    );
+    expect(overflowCount(state)).toBe(0);
+    expect(fractionalTile(state)?.subtiles.find(s => s.type === 'overflow')).toBeUndefined();
   });
 
-  it('overflow tile appears when passive count > maxSubRows × maxSubCols', () => {
-    // maxCap = 6: slots 1-5 hold participants, slot 6 = overflow tile showing count=2
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      ...Array.from({length: maxCap + 1}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
-    ]);
-    const overflow = fractionalTile(state)?.subtiles?.find(s => s.type === 'overflow');
-    expect(overflow).toBeDefined();
-    // visibleCount = maxCap - 1 = 5; hidden = (maxCap + 1) - 5 = 2
-    expect(overflow?.count).toBe(2);
+  it('overflow tile appears when subtile count > fractCap', () => {
+    // 7 total: 2 full + 5 subtile participants > fractCap(4) → overflow
+    const state = addAllSmall(
+      Array.from({length: 7}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+    );
+    expect(fractionalTile(state)?.subtiles.find(s => s.type === 'overflow')).toBeDefined();
   });
 
-  it('overflow count equals passivesToPlace minus visible subtile slots', () => {
-    const extra = 4;
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      ...Array.from({length: maxCap + extra}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
-    ]);
-    const overflow = fractionalTile(state)?.subtiles?.find(s => s.type === 'overflow');
-    // visibleCount = maxCap - 1 = 5; hidden = (maxCap + extra) - 5
-    expect(overflow?.count).toBe(extra + 1);
+  it('overflow count equals number of hidden participants', () => {
+    // 7 total, nSubtile=5, fractCap=4 → 3 visible + overflow(2)
+    const state = addAllSmall(
+      Array.from({length: 7}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+    );
+    expect(overflowCount(state)).toBe(2);
+  });
+
+  it('adding one more participant increases overflow count by 1', () => {
+    const base = addAllSmall(
+      Array.from({length: 8}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+    );
+    const countBefore = overflowCount(base);
+    const next = reducer(base, {type: 'ADD_PARTICIPANT', participant: makeParticipant('extra', 'passive-no-camera')});
+    expect(overflowCount(next)).toBe(countBefore + 1);
   });
 
   it('overflow tile carries up to 3 avatar references', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      ...Array.from({length: maxCap + 5}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
-    ]);
-    const overflow = fractionalTile(state)?.subtiles?.find(s => s.type === 'overflow');
-    expect((overflow?.avatars?.length ?? 0)).toBeGreaterThan(0);
-    expect((overflow?.avatars?.length ?? 0)).toBeLessThanOrEqual(3);
+    const state = addAllSmall(
+      Array.from({length: 12}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+    );
+    const overflow = fractionalTile(state)?.subtiles.find(s => s.type === 'overflow');
+    expect(overflow?.avatars?.length).toBeGreaterThan(0);
+    expect(overflow?.avatars?.length).toBeLessThanOrEqual(3);
   });
 
-  it('adding one more passive increases overflow count by 1', () => {
-    const base = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      ...Array.from({length: maxCap + 2}, (_, i) => makeParticipant(`p${i}`, 'passive-no-camera')),
+  it('priority ordering is preserved in overflow — higher-priority participants are visible', () => {
+    // Mix passive-camera (higher priority) with passive-no-camera in overflow scenario
+    // smallContainer with 7 total: slots 0-1 = full tiles, slots 2-4 = subtiles, slots 5-6 = overflow
+    const state = addAllSmall([
+      makeParticipant('hi0', 'active-camera'),
+      makeParticipant('hi1', 'active-camera'),
+      makeParticipant('pc0', 'passive-camera'),   // passive-camera → lower slot than passive-no-camera
+      makeParticipant('pn0', 'passive-no-camera'),
+      makeParticipant('pn1', 'passive-no-camera'),
+      makeParticipant('pn2', 'passive-no-camera'),
+      makeParticipant('pn3', 'passive-no-camera'),
     ]);
-    const countBefore = fractionalTile(base)?.subtiles?.find(s => s.type === 'overflow')?.count ?? 0;
-    const next = reducer(base, {type: 'ADD_PARTICIPANT', participant: makeParticipant('extra', 'passive-no-camera')});
-    const countAfter = fractionalTile(next)?.subtiles?.find(s => s.type === 'overflow')?.count ?? 0;
-    expect(countAfter).toBe(countBefore + 1);
+    // 'pc0' has higher priority than 'pn*' → visible in subtile, not in overflow
+    expect(subtileIds(state)).toContain('pc0');
   });
 });
 
@@ -323,7 +686,7 @@ describe('overflow', () => {
 
 describe('SET_CONTAINER_SIZE', () => {
   it('recalculates layout without touching participant list or slot map', () => {
-    let state = addAll(createInitialState(container1280x720), [
+    const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a', 'active-camera'),
       makeParticipant('b', 'passive-no-camera'),
     ]);
@@ -350,50 +713,10 @@ describe('SET_CONTAINER_SIZE', () => {
     expect(Array.isArray(state.layout.rows)).toBe(true);
   });
 
-  it('maxCols and maxRows account for the tile gap', () => {
-    // With wider container more columns fit
+  it('wider container produces more maxCols', () => {
     const small = addAll(createInitialState({width: 400, height: 400}), [makeParticipant('a', 'active-camera')]);
     const large = addAll(createInitialState({width: 1600, height: 400}), [makeParticipant('a', 'active-camera')]);
     expect(large.layout.maxCols).toBeGreaterThan(small.layout.maxCols);
-  });
-
-  it('subtile dimensions satisfy gap-corrected formula', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-no-camera'),
-      makeParticipant('p2', 'passive-no-camera'),
-    ]);
-    const frac = fractionalTile(state);
-    const {tileWidth, tileHeight, subtileWidth, subtileHeight} = state.layout;
-    if (frac && subtileWidth !== null && subtileHeight !== null) {
-      const gap = DEFAULT_CONFIG.tileGap;
-      const expectedW = (tileWidth - gap * (frac.subCols - 1)) / frac.subCols;
-      const expectedH = (tileHeight - gap * (frac.subRows - 1)) / frac.subRows;
-      expect(subtileWidth).toBeCloseTo(expectedW, 5);
-      expect(subtileHeight).toBeCloseTo(expectedH, 5);
-    }
-  });
-});
-
-// ── No fractional tile when no passive participants ───────────────────────────
-
-describe('no passive participants', () => {
-  it('subtileWidth/Height/AR are null when there are no passives', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('a2', 'active-camera'),
-    ]);
-    expect(state.layout.subtileWidth).toBeNull();
-    expect(state.layout.subtileHeight).toBeNull();
-    expect(state.layout.subtileAspectRatio).toBeNull();
-  });
-
-  it('no fractional tile when all participants are active', () => {
-    const state = addAll(createInitialState(container1280x720), [
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('a2', 'screen-sharing'),
-    ]);
-    expect(fractionalTile(state)).toBeUndefined();
   });
 });
 
@@ -401,7 +724,7 @@ describe('no passive participants', () => {
 
 describe('stable slot assignment', () => {
   it('participant keeps its slot when only non-tier fields change', () => {
-    let state = addAll(createInitialState(container1280x720), [
+    const state = addAll(createInitialState(container1280x720), [
       makeParticipant('a', 'active-camera'),
       makeParticipant('b', 'passive-no-camera'),
     ]);
@@ -412,25 +735,78 @@ describe('stable slot assignment', () => {
     expect(next.slotMap['b']).toBe(slotB);
   });
 
-  it('relative order within a tier is preserved when a third participant is added', () => {
-    let state = addAll(createInitialState(container1280x720), [
+  it('passive tier preserves add-order when a new passive is added', () => {
+    const state = addAll(createInitialState(container1280x720), [
       makeParticipant('p1', 'passive-no-camera'),
       makeParticipant('p2', 'passive-no-camera'),
     ]);
     const slotP1 = state.slotMap['p1'];
     const slotP2 = state.slotMap['p2'];
-    state = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p3', 'passive-no-camera')});
-    expect(state.slotMap['p1']).toBe(slotP1);
-    expect(state.slotMap['p2']).toBe(slotP2);
-    expect(state.slotMap['p3']).toBeGreaterThan(state.slotMap['p2']);
+    const next = reducer(state, {type: 'ADD_PARTICIPANT', participant: makeParticipant('p3', 'passive-no-camera')});
+    expect(next.slotMap['p1']).toBe(slotP1);
+    expect(next.slotMap['p2']).toBe(slotP2);
+    expect(next.slotMap['p3']).toBeGreaterThan(next.slotMap['p2']);
   });
 
-  it('screen-sharing always has a lower slot than active-camera', () => {
+  it('screen-sharing always has lower slot than active-camera', () => {
     const state = addAll(createInitialState(container1280x720), [
       makeParticipant('cam1', 'active-camera'),
       makeParticipant('screen1', 'screen-sharing'),
     ]);
     expect(state.slotMap['screen1']).toBeLessThan(state.slotMap['cam1']);
+  });
+});
+
+// ── passive-camera priority over passive-no-camera ────────────────────────────
+
+describe('passive tier ordering', () => {
+  it('passive-camera participants always have lower slots than passive-no-camera', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('pn1', 'passive-no-camera'),
+      makeParticipant('pn2', 'passive-no-camera'),
+      makeParticipant('pc1', 'passive-camera'),
+      makeParticipant('pc2', 'passive-camera'),
+    ]);
+    expect(state.slotMap['pc1']).toBeLessThan(state.slotMap['pn1']);
+    expect(state.slotMap['pc1']).toBeLessThan(state.slotMap['pn2']);
+    expect(state.slotMap['pc2']).toBeLessThan(state.slotMap['pn1']);
+    expect(state.slotMap['pc2']).toBeLessThan(state.slotMap['pn2']);
+  });
+
+  it('turning camera on promotes passive participant above passive-no-camera peers', () => {
+    const state = addAll(createInitialState(container1280x720), [
+      makeParticipant('p1', 'passive-no-camera'),
+      makeParticipant('p2', 'passive-no-camera'),
+    ]);
+    const slotP1before = state.slotMap['p1'];
+    const slotP2before = state.slotMap['p2'];
+    const next = reducer(state, {
+      type: 'UPDATE_PARTICIPANT',
+      id: 'p2',
+      changes: {tier: 'passive-camera'},
+    });
+    // p2 now in passive-camera group → lower slot than p1 (passive-no-camera)
+    expect(next.slotMap['p2']).toBeLessThan(next.slotMap['p1']);
+    // p1 slot is re-indexed but still reflects passive-no-camera
+    expect(next.slotMap['p1']).toBeGreaterThan(next.slotMap['p2']);
+  });
+
+  it('in overflow scenario, passive-camera participant is visible over passive-no-camera', () => {
+    // smallContainer capacity=3, 7 total → 2 full + 5 subtile → 3 visible + overflow
+    // Add a passive-camera participant: it has higher priority, so it appears in subtile
+    const state = addAllSmall([
+      makeParticipant('a1', 'active-camera'),
+      makeParticipant('a2', 'active-camera'),
+      makeParticipant('pc', 'passive-camera'),    // higher priority than pn*
+      makeParticipant('pn0', 'passive-no-camera'),
+      makeParticipant('pn1', 'passive-no-camera'),
+      makeParticipant('pn2', 'passive-no-camera'),
+      makeParticipant('pn3', 'passive-no-camera'),
+    ]);
+    // 'pc' has higher priority than all pn* → visible in subtile
+    expect(subtileIds(state)).toContain('pc');
+    // At least one pn* is in overflow
+    expect(overflowCount(state)).toBeGreaterThan(0);
   });
 });
 
@@ -442,7 +818,7 @@ describe('_computeLayout internal', () => {
     expect(layout.rows).toHaveLength(0);
   });
 
-  it('single active participant produces one full tile in one row', () => {
+  it('single participant produces one full tile in one row', () => {
     const p = makeParticipant('a', 'active-camera');
     const layout = _computeLayout([p], {a: 0}, container1280x720, DEFAULT_CONFIG);
     expect(layout.rows).toHaveLength(1);
@@ -458,11 +834,11 @@ describe('_computeLayout internal', () => {
     expect(totalTiles).toBeLessThanOrEqual(layout.maxRows * layout.maxCols);
   });
 
-  it('tileAspectRatio equals the target midpoint of min and max AR', () => {
+  it('tileAspectRatio is within [minAR, maxAR]', () => {
     const p = makeParticipant('a', 'active-camera');
     const layout = _computeLayout([p], {a: 0}, container1280x720, DEFAULT_CONFIG);
-    const targetAR = (DEFAULT_CONFIG.minAspectRatio + DEFAULT_CONFIG.maxAspectRatio) / 2;
-    expect(layout.tileAspectRatio).toBeCloseTo(targetAR, 5);
+    expect(layout.tileAspectRatio).toBeGreaterThanOrEqual(DEFAULT_CONFIG.minAspectRatio - 0.01);
+    expect(layout.tileAspectRatio).toBeLessThanOrEqual(DEFAULT_CONFIG.maxAspectRatio + 0.01);
   });
 });
 
@@ -480,7 +856,18 @@ describe('_updateSlotMap internal', () => {
     expect(slotMap['active1']).toBeLessThan(slotMap['passive1']);
   });
 
-  it('new participant appended after existing peers in same tier', () => {
+  it("'you' participant has the absolute lowest slot", () => {
+    const participants: GridParticipant[] = [
+      makeParticipant('screen1', 'screen-sharing'),
+      makeParticipant('me', 'you'),
+      makeParticipant('active1', 'active-camera'),
+    ];
+    const slotMap = _updateSlotMap(participants, {});
+    expect(slotMap['me']).toBeLessThan(slotMap['screen1']);
+    expect(slotMap['me']).toBeLessThan(slotMap['active1']);
+  });
+
+  it('new passive participant is appended after existing peers in same tier', () => {
     const existing: GridParticipant[] = [
       makeParticipant('p1', 'passive-no-camera'),
       makeParticipant('p2', 'passive-no-camera'),
@@ -491,201 +878,13 @@ describe('_updateSlotMap internal', () => {
     expect(newMap['p3']).toBeGreaterThan(newMap['p1']);
     expect(newMap['p3']).toBeGreaterThan(newMap['p2']);
   });
-});
 
-// ── Passive sub-prioritisation (camera-on > camera-off in overflow) ───────────
-//
-// Rules:
-//   1. Participant already in a subtile turns camera on → stays in subtile,
-//      position unchanged (slot order within the visible set is preserved).
-//   2. Participant in overflow turns camera on → gets a subtile slot, displacing
-//      the lowest-priority (camera-off) participant visible in the tile.
-//   3. Without overflow the camera state of passives has no effect on ordering.
-
-describe('passive sub-prioritisation', () => {
-  // Use a tiny config so overflow is easy to trigger:
-  // maxSubRows=1, maxSubCols=2 → fractCap=2 → visibleCount=1, overflow at ≥3 passives.
-  const tinyConfig: GridConfig = {
-    ...DEFAULT_CONFIG,
-    maxSubRows: 1,
-    maxSubCols: 2,
-  };
-  const tinyReducer = createGridReducer(tinyConfig);
-
-  function subtileIds(state: GridState): string[] {
-    return (
-      fractionalTile(state)
-        ?.subtiles.filter(s => s.type === 'participant')
-        .map(s => s.participant!.id) ?? []
-    );
-  }
-
-  function overflowAvatarIds(state: GridState): string[] {
-    const ov = fractionalTile(state)?.subtiles.find(s => s.type === 'overflow');
-    return ov?.avatars.map(p => p.id) ?? [];
-  }
-
-  function addAllTiny(participants: GridParticipant[]): GridState {
-    return participants.reduce(
-      (s, p) => tinyReducer(s, {type: 'ADD_PARTICIPANT', participant: p}),
-      createInitialState(container1280x720),
-    );
-  }
-
-  // ── Rule 1: already visible, turns camera on → stays visible, same position ──
-
-  it('passive in subtile that turns camera on stays in the same subtile position', () => {
-    // fractCap=2, 2 passives — no overflow, both visible
-    let state = addAllTiny([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-no-camera'),
-      makeParticipant('p2', 'passive-no-camera'),
-    ]);
-    const positionBefore = subtileIds(state).indexOf('p1');
-
-    state = tinyReducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p1',
-      changes: {tier: 'passive-camera'},
-    });
-
-    expect(subtileIds(state)).toContain('p1');
-    expect(subtileIds(state).indexOf('p1')).toBe(positionBefore);
-  });
-
-  it('passive in subtile that turns camera on does not displace another visible participant', () => {
-    // 2 passives, no overflow — both should remain visible after tier change
-    let state = addAllTiny([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-no-camera'),
-      makeParticipant('p2', 'passive-no-camera'),
-    ]);
-    state = tinyReducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p1',
-      changes: {tier: 'passive-camera'},
-    });
-    expect(subtileIds(state)).toContain('p1');
-    expect(subtileIds(state)).toContain('p2');
-  });
-
-  // ── Rule 2: overflow + turns camera on → bumps into visible ──────────────────
-
-  it('passive in overflow that turns camera on gets a subtile slot', () => {
-    // fractCap=2: 3 passives → visibleCount=1, 2 hidden in overflow
-    // p1 slot=lowest → visible; p2, p3 → overflow
-    let state = addAllTiny([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-no-camera'), // slot 0 (added first)
-      makeParticipant('p2', 'passive-no-camera'), // slot 1
-      makeParticipant('p3', 'passive-no-camera'), // slot 2
-    ]);
-    // p1 visible, p2+p3 in overflow
-    expect(subtileIds(state)).toContain('p1');
-    expect(subtileIds(state)).not.toContain('p3');
-
-    // p3 turns camera on → should get a visible slot (over p1 which is camera-off)
-    state = tinyReducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p3',
-      changes: {tier: 'passive-camera'},
-    });
-
-    expect(subtileIds(state)).toContain('p3');
-  });
-
-  it('camera-off participant is displaced to overflow when a camera-on participant takes its slot', () => {
-    // p1 visible (cam-off), p2 + p3 overflow. p3 turns cam-on → p3 visible, p1 → overflow
-    let state = addAllTiny([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-no-camera'),
-      makeParticipant('p2', 'passive-no-camera'),
-      makeParticipant('p3', 'passive-no-camera'),
-    ]);
-    state = tinyReducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p3',
-      changes: {tier: 'passive-camera'},
-    });
-
-    // p3 (cam-on) now visible; p1 (cam-off, was visible) now in overflow
-    expect(subtileIds(state)).toContain('p3');
-    expect(subtileIds(state)).not.toContain('p1');
-    expect(overflowAvatarIds(state)).toContain('p1');
-  });
-
-  it('overflow count decreases by 1 when a camera-on passive bumps in', () => {
-    let state = addAllTiny([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-no-camera'),
-      makeParticipant('p2', 'passive-no-camera'),
-      makeParticipant('p3', 'passive-no-camera'),
-    ]);
-    const overflowBefore = fractionalTile(state)?.subtiles.find(s => s.type === 'overflow')?.count ?? 0;
-
-    state = tinyReducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p3',
-      changes: {tier: 'passive-camera'},
-    });
-
-    const overflowAfter = fractionalTile(state)?.subtiles.find(s => s.type === 'overflow')?.count ?? 0;
-    // p3 moved from overflow to visible; p1 moved from visible to overflow → net change = 0
-    expect(overflowAfter).toBe(overflowBefore);
-  });
-
-  it('camera-on passive in overflow does NOT bump another camera-on visible participant', () => {
-    // p1 visible (cam-on), p2 overflow (cam-off), p3 overflow (cam-off)
-    // p3 turns cam-on → p3 is cam-on, p1 is already cam-on: no free cam-off slot to displace
-    let state = addAllTiny([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-camera'),  // cam-on, visible
-      makeParticipant('p2', 'passive-no-camera'),
-      makeParticipant('p3', 'passive-no-camera'),
-    ]);
-    // p1 visible (cam-on), p2 or p3 in overflow
-    expect(subtileIds(state)).toContain('p1');
-
-    state = tinyReducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p3',
-      changes: {tier: 'passive-camera'},
-    });
-
-    // p1 should still be visible (it's cam-on, not displaceable by another cam-on)
-    expect(subtileIds(state)).toContain('p1');
-  });
-
-  // ── Rule 3: no overflow → camera state has no effect on ordering ─────────────
-
-  it('without overflow, camera state does not affect subtile order', () => {
-    // 2 passives fit in fractCap=2 — no overflow
-    // p1 and p2 share the same slot group regardless of camera state,
-    // so add order (slot order) determines position: p1 before p2.
-    const state = addAllTiny([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-no-camera'), // added first → lower slot
-      makeParticipant('p2', 'passive-camera'),    // added second → higher slot
-    ]);
-    const ids = subtileIds(state);
-    expect(ids[0]).toBe('p1');
-    expect(ids[1]).toBe('p2');
-  });
-
-  it('without overflow, turning camera on does not reorder subtiles', () => {
-    let state = addAllTiny([
-      makeParticipant('a1', 'active-camera'),
-      makeParticipant('p1', 'passive-no-camera'),
-      makeParticipant('p2', 'passive-no-camera'),
-    ]);
-    const orderBefore = subtileIds(state);
-
-    state = tinyReducer(state, {
-      type: 'UPDATE_PARTICIPANT',
-      id: 'p2',
-      changes: {tier: 'passive-camera'},
-    });
-
-    expect(subtileIds(state)).toEqual(orderBefore);
+  it('active tier: higher activatedAt → lower slot', () => {
+    const participants: GridParticipant[] = [
+      makeParticipant('old', 'active-camera', 0, 100),
+      makeParticipant('new', 'active-camera', 0, 200),
+    ];
+    const slotMap = _updateSlotMap(participants, {});
+    expect(slotMap['new']).toBeLessThan(slotMap['old']);
   });
 });

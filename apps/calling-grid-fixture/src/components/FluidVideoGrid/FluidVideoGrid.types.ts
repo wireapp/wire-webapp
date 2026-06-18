@@ -1,10 +1,11 @@
 import type {ReactNode} from 'react';
 
 export type ParticipantTier =
-  | 'screen-sharing' // 1 — shares screen
-  | 'active-camera' // 2 — speaking + camera on
+  | 'you'              // 0 — current user's own video
+  | 'screen-sharing'   // 1 — shares screen
+  | 'active-camera'    // 2 — speaking + camera on
   | 'active-no-camera' // 3 — speaking + camera off
-  | 'passive-camera' // 4 — silent + camera on
+  | 'passive-camera'   // 4 — silent + camera on
   | 'passive-no-camera'; // 5 — silent + camera off
 
 export interface GridParticipant {
@@ -16,6 +17,8 @@ export interface GridParticipant {
   tier: ParticipantTier;
   isMuted: boolean;
   speakingDuration: number;
+  /** Timestamp (ms) when this participant last entered their current tier. Drives recency ordering within active tiers. */
+  activatedAt?: number;
 }
 
 // ── Layout types ────────────────────────────────────────────────────────────
@@ -59,9 +62,9 @@ export interface GridState {
 }
 
 export type GridAction =
-  | {type: 'ADD_PARTICIPANT'; participant: GridParticipant}
+  | {type: 'ADD_PARTICIPANT'; participant: GridParticipant; now?: number}
   | {type: 'REMOVE_PARTICIPANT'; id: string}
-  | {type: 'UPDATE_PARTICIPANT'; id: string; changes: Partial<GridParticipant>}
+  | {type: 'UPDATE_PARTICIPANT'; id: string; changes: Partial<GridParticipant>; now?: number}
   | {type: 'SET_CONTAINER_SIZE'; width: number; height: number};
 
 export interface GridConfig {
@@ -69,10 +72,6 @@ export interface GridConfig {
   maxTileHeight: number;
   minAspectRatio: number;
   maxAspectRatio: number;
-  /** Maximum sub-rows inside the fractional tile */
-  maxSubRows: number;
-  /** Maximum sub-cols inside the fractional tile */
-  maxSubCols: number;
   /** Gap in px between tiles and between subtiles */
   tileGap: number;
 }
@@ -80,12 +79,14 @@ export interface GridConfig {
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 export const ACTIVE_TIERS: ReadonlySet<ParticipantTier> = new Set([
+  'you',
   'screen-sharing',
   'active-camera',
   'active-no-camera',
 ]);
 
 export const TIER_ORDER: ParticipantTier[] = [
+  'you',
   'screen-sharing',
   'active-camera',
   'active-no-camera',
@@ -98,10 +99,12 @@ export function isActiveTier(tier: ParticipantTier): boolean {
 }
 
 export function deriveParticipantTier(p: {
+  isYou: boolean;
   isSharingScreen: boolean;
   isSpeaking: boolean;
   hasCamera: boolean;
 }): ParticipantTier {
+  if (p.isYou) return 'you';
   if (p.isSharingScreen) return 'screen-sharing';
   if (p.isSpeaking && p.hasCamera) return 'active-camera';
   if (p.isSpeaking) return 'active-no-camera';

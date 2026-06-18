@@ -5,30 +5,31 @@ import {
   GridParticipant,
   GridState,
   isActiveTier,
+  ParticipantTier,
   RowLayout,
   SubtileDescriptor,
   TileDescriptor,
-  TIER_ORDER,
 } from './FluidVideoGrid.types';
 
 // ── Stable slot assignment ────────────────────────────────────────────────────
 
-// Both passive tiers are in a single slot group so that turning a camera on/off
-// never reorders a passive participant within the visible subtile set.
-// Sub-prioritisation (camera-on > camera-off) only kicks in during overflow
-// resolution, not during slot assignment.
+// Each tier is its own group to keep priority ordering exact.
+// Active tiers sort by activatedAt descending (most recent = lower slot).
+// Passive tiers use stable sort by prevSlotMap (add order preserved).
 const SLOT_GROUPS: ReadonlyArray<ReadonlyArray<ParticipantTier>> = [
+  ['you'],
   ['screen-sharing'],
   ['active-camera'],
   ['active-no-camera'],
-  ['passive-camera', 'passive-no-camera'],
+  ['passive-camera'],
+  ['passive-no-camera'],
 ];
 
 /**
  * Assigns a stable slot index to every participant.
- * Participants are grouped by tier priority (see SLOT_GROUPS), and within
- * each group their relative order from the previous render is preserved.
- * New participants are appended at the end of their group.
+ * Participants are grouped by tier priority (SLOT_GROUPS).
+ * Within active tiers, most recently activated (highest activatedAt) gets the lowest slot.
+ * Within passive tiers, relative order from the previous render is preserved.
  */
 function updateSlotMap(
   participants: GridParticipant[],
@@ -40,11 +41,20 @@ function updateSlotMap(
   for (const tiers of SLOT_GROUPS) {
     const group = participants.filter(p => (tiers as ParticipantTier[]).includes(p.tier));
 
-    group.sort((a, b) => {
-      const aSlot = prevSlotMap[a.id] ?? Infinity;
-      const bSlot = prevSlotMap[b.id] ?? Infinity;
-      return aSlot - bSlot;
-    });
+    if (isActiveTier(tiers[0])) {
+      // Most recently activated first; ties broken by previous slot (stable)
+      group.sort((a, b) => {
+        const aAt = a.activatedAt ?? 0;
+        const bAt = b.activatedAt ?? 0;
+        if (bAt !== aAt) return bAt - aAt;
+        return (prevSlotMap[a.id] ?? Infinity) - (prevSlotMap[b.id] ?? Infinity);
+      });
+    } else {
+      // Passive tiers: preserve previous order; new participants go last
+      group.sort((a, b) => {
+        return (prevSlotMap[a.id] ?? Infinity) - (prevSlotMap[b.id] ?? Infinity);
+      });
+    }
 
     for (const p of group) {
       newSlotMap[p.id] = cursor++;
@@ -54,75 +64,73 @@ function updateSlotMap(
   return newSlotMap;
 }
 
-// ── Sub-grid selection ────────────────────────────────────────────────────────
+// ── Fractional tile layout selection ─────────────────────────────────────────
+
+// Fixed set of (subRows × subCols) layouts producing capacities {2, 3, 4, 6}.
+const FRACTIONAL_CANDIDATES: ReadonlyArray<{subRows: number; subCols: number}> = [
+  {subRows: 1, subCols: 2}, // cap 2
+  {subRows: 2, subCols: 1}, // cap 2
+  {subRows: 1, subCols: 3}, // cap 3
+  {subRows: 3, subCols: 1}, // cap 3
+  {subRows: 2, subCols: 2}, // cap 4
+  {subRows: 2, subCols: 3}, // cap 6
+  {subRows: 3, subCols: 2}, // cap 6
+];
 
 /**
- * Given a fractional tile of tileW × tileH pixels and the number of
- * participants to place, find the best (subRows, subCols) arrangement:
- *   1. subRows ≤ maxSubRows, subCols ≤ maxSubCols
- *   2. subRows × subCols ≥ passivesToPlace  (fits everyone, possibly with overflow)
- *   3. subtileAspectRatio ∈ [minAR, maxAR]  (preferred; best-effort if impossible)
- *
- * Among valid pairs, the one with the smallest capacity (subRows × subCols) is
- * chosen to minimise empty subtile slots. Ties broken by AR closest to tileAR.
+ * Selects the best (subRows, subCols) for the fractional tile.
+ * Restricts to capacities {2, 3, 4, 6}.
+ * Picks the smallest capacity that fits subtileParticipantsNeeded,
+ * subject to minimum subtile size constraints.
+ * Falls back to the largest valid capacity when all are exceeded.
  */
-function selectSubGrid(
-  passivesToPlace: number,
+function selectFractionalLayout(
+  subtileParticipantsNeeded: number,
   tileW: number,
   tileH: number,
   config: GridConfig,
 ): {subRows: number; subCols: number} {
-  const {minAspectRatio, maxAspectRatio, maxSubRows, maxSubCols, tileGap: gap} = config;
-  const maxCap = maxSubRows * maxSubCols;
+  const {minTileHeight, minAspectRatio, maxAspectRatio, tileGap: gap} = config;
+
+  const minSubH = minTileHeight / 2;
+  const minSubW = minSubH * minAspectRatio;
   const tileAR = tileW / tileH;
 
-  // If passives exceed max capacity, we'll use overflow — fix at max subgrid.
-  const target = Math.min(passivesToPlace, maxCap);
+  // Filter candidates to those where subtiles meet the minimum size constraints
+  const valid = FRACTIONAL_CANDIDATES.filter(({subRows, subCols}) => {
+    const subW = (tileW - gap * (subCols - 1)) / subCols;
+    const subH = (tileH - gap * (subRows - 1)) / subRows;
+    return subW >= minSubW && subH >= minSubH;
+  });
 
-  let bestR = maxSubRows;
-  let bestC = maxSubCols;
-  let bestCap = maxCap;
-  let bestARDiff = Infinity;
-  let bestInBounds = false;
+  // Fall back to all candidates if none pass the size filter
+  const candidates = valid.length > 0 ? valid : [...FRACTIONAL_CANDIDATES];
 
-  for (let r = 1; r <= maxSubRows; r++) {
-    for (let c = 1; c <= maxSubCols; c++) {
-      const cap = r * c;
-      if (cap < target) continue; // doesn't fit all passives
+  // Prefer candidates that can hold all subtile participants
+  const thatFit = candidates.filter(({subRows, subCols}) => subRows * subCols >= subtileParticipantsNeeded);
+  const pool = thatFit.length > 0 ? thatFit : candidates;
 
-      const sw = (tileW - gap * (c - 1)) / c;
-      const sh = (tileH - gap * (r - 1)) / r;
-      if (sw <= 0 || sh <= 0) continue;
+  const overflowing = thatFit.length === 0;
 
-      const sar = sw / sh;
-      const inBounds = sar >= minAspectRatio && sar <= maxAspectRatio;
-      const arDiff = inBounds ? 0 : Math.min(Math.abs(sar - minAspectRatio), Math.abs(sar - maxAspectRatio));
-      const arCloseness = Math.abs(sar - tileAR);
+  const scored = pool.map(c => {
+    const subW = (tileW - gap * (c.subCols - 1)) / c.subCols;
+    const subH = (tileH - gap * (c.subRows - 1)) / c.subRows;
+    const ar = subW / subH;
+    const inBounds = ar >= minAspectRatio && ar <= maxAspectRatio ? 1 : 0;
+    const arDiff = Math.abs(ar - tileAR);
+    const cap = c.subRows * c.subCols;
+    return {c, cap, inBounds, arDiff};
+  });
 
-      if (inBounds) {
-        if (
-          !bestInBounds ||
-          cap < bestCap ||
-          (cap === bestCap && arCloseness < bestARDiff)
-        ) {
-          bestR = r;
-          bestC = c;
-          bestCap = cap;
-          bestARDiff = arCloseness;
-          bestInBounds = true;
-        }
-      } else if (!bestInBounds) {
-        if (arDiff < bestARDiff || (arDiff === bestARDiff && cap < bestCap)) {
-          bestR = r;
-          bestC = c;
-          bestCap = cap;
-          bestARDiff = arDiff;
-        }
-      }
-    }
-  }
+  // Non-overflow: smallest cap (minimise empty slots).
+  // Overflow: largest cap (maximise visible subtiles before the overflow badge).
+  scored.sort((a, b) => {
+    if (a.cap !== b.cap) return overflowing ? b.cap - a.cap : a.cap - b.cap;
+    if (a.inBounds !== b.inBounds) return b.inBounds - a.inBounds;
+    return a.arDiff - b.arDiff;
+  });
 
-  return {subRows: bestR, subCols: bestC};
+  return {subRows: scored[0].c.subRows, subCols: scored[0].c.subCols};
 }
 
 // ── Layout computation ────────────────────────────────────────────────────────
@@ -148,96 +156,94 @@ function computeLayout(
     rows: [],
   };
 
-  // Container has padding = gap on all sides; subtract before computing tile space.
+  // Container has padding = gap on all sides
   const usableW = width - 2 * gap;
   const usableH = height - 2 * gap;
 
   if (usableW <= 0 || usableH <= 0) return empty;
 
-  // ── Step 1: Grid capacity ──────────────────────────────────────────────────
-  // N tiles in a row use: N × minTileWidth + (N-1) × gap ≤ usableW
-  // → N ≤ (usableW + gap) / (minTileWidth + gap)
+  // ── Step 1: Grid capacity bounds ──────────────────────────────────────────
+  // Maximum columns/rows before tile dimensions drop below minimum.
+  // maxCols * minTileWidth + (maxCols-1) * gap ≤ usableW
+  // maxRows * minTileHeight + (maxRows-1) * gap ≤ usableH
   const minTileWidth = minTileHeight * minAspectRatio;
   const maxCols = Math.max(1, Math.floor((usableW + gap) / (minTileWidth + gap)));
   const maxRows = Math.max(1, Math.floor((usableH + gap) / (minTileHeight + gap)));
   const capacity = maxCols * maxRows;
 
-  // Sort participants by slot index for stable rendering order
+  if (participants.length === 0) return {...empty, maxRows, maxCols};
+
+  // ── Step 2: All participants sorted by priority (slot order) ──────────────
   const sorted = [...participants].sort((a, b) => (slotMap[a.id] ?? 0) - (slotMap[b.id] ?? 0));
+  const nParticipants = sorted.length;
 
-  const activeParts = sorted.filter(p => isActiveTier(p.tier));
-  const passiveParts = sorted.filter(p => !isActiveTier(p.tier));
-
-  const nActive = activeParts.length;
-  const nPassive = passiveParts.length;
-
-  if (nActive === 0 && nPassive === 0) return {...empty, maxRows, maxCols};
-
-  // ── Step 2: Premium / non-premium split ───────────────────────────────────
-  // A fractional tile is needed when there are passive participants or when
-  // active participants overflow the grid capacity.
-  const needFractional = nPassive > 0 || nActive > capacity;
-  const nFullTiles = Math.min(nActive, needFractional ? Math.max(0, capacity - 1) : capacity);
-  const overflowActive = Math.max(0, nActive - nFullTiles);
-  const passivesToPlace = nPassive + overflowActive;
-  const hasFractional = needFractional && passivesToPlace > 0;
-
-  // ── Step 3: Tile dimensions ────────────────────────────────────────────────
+  // ── Step 3: Tile counts ───────────────────────────────────────────────────
+  // All participants compete for the same pool of grid slots.
+  // When nParticipants > capacity, the last slot becomes a fractional tile.
+  const hasFractional = nParticipants > capacity;
+  const nFullTiles = hasFractional ? capacity - 1 : nParticipants;
   const nTiles = nFullTiles + (hasFractional ? 1 : 0);
-  const nRows = Math.max(1, Math.ceil(nTiles / maxCols));
-  const rawH = (usableH - gap * (nRows - 1)) / nRows;
-  const tileH = Math.min(Math.max(rawH, minTileHeight), maxTileHeight);
-  const targetAR = (minAspectRatio + maxAspectRatio) / 2;
-  const tileW = tileH * targetAR;
 
-  // ── Step 4: Sub-grid selection ─────────────────────────────────────────────
+  // ── Step 4: Optimal (nRows, nCols) for nTiles ────────────────────────────
+  // Enumerate candidate column counts and pick the layout with the largest
+  // tile area. This ensures maxCols * tileWidth ≤ usableW and
+  // maxRows * tileHeight ≤ usableH are always satisfied.
+  let bestNRows = 1;
+  let bestNCols = Math.min(nTiles, maxCols);
+  let bestScore = -Infinity;
+
+  for (let nc = 1; nc <= maxCols; nc++) {
+    const nr = Math.ceil(nTiles / nc);
+    if (nr > maxRows) continue;
+
+    const rawW = (usableW - gap * (nc - 1)) / nc;
+    const rawH = (usableH - gap * (nr - 1)) / nr;
+    const tH = Math.min(Math.max(rawH, minTileHeight), maxTileHeight);
+    const tW = Math.min(Math.max(rawW, tH * minAspectRatio), tH * maxAspectRatio);
+
+    // Prefer layouts where rawW is naturally ≥ minAR × tileH (tile is not too narrow).
+    // When rawW < minAR × tileH we must artificially widen the tile, wasting container
+    // space. Among otherwise-equal layouts, maximise the clamped tile area.
+    const hasNaturalWidth = rawW >= tH * minAspectRatio;
+    const score = (hasNaturalWidth ? 1e9 : 0) + tW * tH;
+
+    if (score > bestScore) {
+      bestScore = score;
+      bestNRows = nr;
+      bestNCols = nc;
+    }
+  }
+
+  const tileH = Math.min(
+    Math.max((usableH - gap * (bestNRows - 1)) / bestNRows, minTileHeight),
+    maxTileHeight,
+  );
+  const tileW_raw = (usableW - gap * (bestNCols - 1)) / bestNCols;
+  const tileW = Math.min(Math.max(tileW_raw, tileH * minAspectRatio), tileH * maxAspectRatio);
+  const tileAspectRatio = tileW / tileH;
+
+  // ── Step 5: Fractional tile ───────────────────────────────────────────────
   let subtileWidth: number | null = null;
   let subtileHeight: number | null = null;
   let subtileAspectRatio: number | null = null;
   let fractionalTile: TileDescriptor | null = null;
 
   if (hasFractional) {
-    const {subRows, subCols} = selectSubGrid(passivesToPlace, tileW, tileH, config);
+    const subtileParticipants = sorted.slice(nFullTiles);
+    const {subRows, subCols} = selectFractionalLayout(subtileParticipants.length, tileW, tileH, config);
     const fractCap = subRows * subCols;
 
     subtileWidth = (tileW - gap * (subCols - 1)) / subCols;
     subtileHeight = (tileH - gap * (subRows - 1)) / subRows;
     subtileAspectRatio = subtileWidth / subtileHeight;
 
-    // ── Step 5: Subtile assignment ───────────────────────────────────────────
-    // Overflow active participants go before passive participants in subtiles.
-    // All of these are already in slot order (passiveParts comes from `sorted`).
-    const overflowActiveParts = activeParts.slice(nFullTiles);
-    const passiveCameraOn = passiveParts.filter(p => p.tier === 'passive-camera');
-    const passiveCameraOff = passiveParts.filter(p => p.tier === 'passive-no-camera');
-
-    // All participants that need a subtile slot, in slot order (for counting / overflow).
-    const subtileParticipants: GridParticipant[] = [
-      ...overflowActiveParts,
-      ...passiveParts,
-    ];
-
-    const needsOverflow = passivesToPlace > fractCap;
-
-    let visibleParticipants: GridParticipant[];
-    let hiddenParticipants: GridParticipant[];
-
-    if (needsOverflow) {
-      // When the fractional tile is full, sub-prioritise passive participants:
-      // passive-camera gets a slot before passive-no-camera.
-      // Within each group slot order is preserved (stable).
-      // Priority order: overflow-active > passive-camera > passive-no-camera
-      const prioritised = [...overflowActiveParts, ...passiveCameraOn, ...passiveCameraOff];
-      const candidates = prioritised.slice(0, fractCap - 1);
-      // Re-sort by slot index so positions within the visible set are stable
-      // (turning camera on while already visible must not change your position).
-      visibleParticipants = candidates.slice().sort((a, b) => (slotMap[a.id] ?? 0) - (slotMap[b.id] ?? 0));
-      const visibleSet = new Set(visibleParticipants.map(p => p.id));
-      hiddenParticipants = subtileParticipants.filter(p => !visibleSet.has(p.id));
-    } else {
-      visibleParticipants = subtileParticipants;
-      hiddenParticipants = [];
-    }
+    const needsOverflow = subtileParticipants.length > fractCap;
+    const visibleParticipants = needsOverflow
+      ? subtileParticipants.slice(0, fractCap - 1)
+      : subtileParticipants;
+    const hiddenParticipants = needsOverflow
+      ? subtileParticipants.slice(fractCap - 1)
+      : [];
 
     const subtiles: SubtileDescriptor[] = visibleParticipants.map(p => ({
       type: 'participant',
@@ -255,15 +261,15 @@ function computeLayout(
     fractionalTile = {type: 'fractional', subRows, subCols, subtiles};
   }
 
-  // ── Step 6: Build rows ─────────────────────────────────────────────────────
+  // ── Step 6: Build rows ────────────────────────────────────────────────────
   const allTiles: TileDescriptor[] = [
-    ...activeParts.slice(0, nFullTiles).map(p => ({type: 'full' as const, participant: p})),
+    ...sorted.slice(0, nFullTiles).map(p => ({type: 'full' as const, participant: p})),
     ...(fractionalTile ? [fractionalTile] : []),
   ];
 
   const rows: RowLayout[] = [];
-  for (let i = 0; i < allTiles.length; i += maxCols) {
-    rows.push({tiles: allTiles.slice(i, i + maxCols)});
+  for (let i = 0; i < allTiles.length; i += bestNCols) {
+    rows.push({tiles: allTiles.slice(i, i + bestNCols)});
   }
 
   return {
@@ -271,7 +277,7 @@ function computeLayout(
     maxCols,
     tileWidth: tileW,
     tileHeight: tileH,
-    tileAspectRatio: targetAR,
+    tileAspectRatio,
     subtileWidth,
     subtileHeight,
     subtileAspectRatio,
@@ -311,7 +317,12 @@ export function createGridReducer(config: GridConfig) {
         if (state.participants.some(p => p.id === action.participant.id)) {
           return state;
         }
-        const participants = [...state.participants, action.participant];
+        let participant = action.participant;
+        // Auto-set activatedAt for active-tier participants that don't have one
+        if (isActiveTier(participant.tier) && participant.activatedAt === undefined) {
+          participant = {...participant, activatedAt: action.now ?? Date.now()};
+        }
+        const participants = [...state.participants, participant];
         const slotMap = updateSlotMap(participants, state.slotMap);
         const layout = computeLayout(participants, slotMap, state.containerSize, config);
         return {...state, participants, slotMap, layout};
@@ -327,7 +338,12 @@ export function createGridReducer(config: GridConfig) {
       case 'UPDATE_PARTICIPANT': {
         const idx = state.participants.findIndex(p => p.id === action.id);
         if (idx === -1) return state;
-        const updated = {...state.participants[idx], ...action.changes};
+        const prev = state.participants[idx];
+        let updated = {...prev, ...action.changes};
+        // Refresh activatedAt when tier changes so recency ordering is correct
+        if (action.changes.tier !== undefined && action.changes.tier !== prev.tier) {
+          updated = {...updated, activatedAt: action.now ?? Date.now()};
+        }
         const participants = [...state.participants];
         participants[idx] = updated;
         const slotMap = updateSlotMap(participants, state.slotMap);
@@ -347,4 +363,4 @@ export function createGridReducer(config: GridConfig) {
   };
 }
 
-export {updateSlotMap as _updateSlotMap, computeLayout as _computeLayout};
+export {updateSlotMap as _updateSlotMap, computeLayout as _computeLayout, selectFractionalLayout as _selectFractionalLayout};

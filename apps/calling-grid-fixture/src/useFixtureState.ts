@@ -1,8 +1,10 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {deriveParticipantTier, GridParticipant} from './components/FluidVideoGrid';
+import {GridParticipant, deriveParticipantTier} from './components/FluidVideoGrid';
 import {MOCK_PEOPLE} from './mockData';
 import {PRIME_HOLD_MS, SPEAKING_DEBOUNCE_MS} from './constants';
+
+export const YOU_ID = '__you__';
 
 interface ParticipantState {
   id: string;
@@ -42,6 +44,10 @@ export interface FixtureState {
   toggleSimulation: () => void;
   promotedIds: Set<string>;
   getPromotedUntil: (id: string) => number | null;
+  youHasCamera: boolean;
+  youIsMuted: boolean;
+  toggleYouCamera: () => void;
+  toggleYouMuted: () => void;
 }
 
 function makeVideoEl(src: string): () => React.ReactNode {
@@ -66,6 +72,7 @@ function toGridParticipant(p: ParticipantState, promotedIds: Set<string>): GridP
     hue: p.hue,
     renderVideo: videoSrc ? makeVideoEl(videoSrc) : undefined,
     tier: deriveParticipantTier({
+      isYou: false,
       isSharingScreen: p.isSharingScreen,
       isSpeaking: promotedIds.has(p.id),
       hasCamera: p.hasCamera,
@@ -95,6 +102,9 @@ export function useFixtureState(initialCount = 2): FixtureState {
   const [raw, setRaw] = useState<ParticipantState[]>(() =>
     MOCK_PEOPLE.slice(0, initialCount).map((p, i) => makeInitial(p, i)),
   );
+
+  const [youHasCamera, setYouHasCamera] = useState(true);
+  const [youIsMuted, setYouIsMuted] = useState(false);
 
   const [debounceMs, setDebounceMs] = useState(SPEAKING_DEBOUNCE_MS);
   const [holdMs, setHoldMs] = useState(PRIME_HOLD_MS);
@@ -276,7 +286,25 @@ export function useFixtureState(initialCount = 2): FixtureState {
     });
   }, []);
 
-  const participants = useMemo(() => raw.map(p => toGridParticipant(p, promotedIds)), [raw, promotedIds]);
+  const toggleYouCamera = useCallback(() => setYouHasCamera(v => !v), []);
+  const toggleYouMuted = useCallback(() => setYouIsMuted(v => !v), []);
+
+  const youParticipant = useMemo<GridParticipant>(
+    () => ({
+      id: YOU_ID,
+      name: 'You',
+      hue: 220,
+      tier: 'you',
+      isMuted: youIsMuted,
+      speakingDuration: 0,
+    }),
+    [youIsMuted],
+  );
+
+  const participants = useMemo(
+    () => [youParticipant, ...raw.map(p => toGridParticipant(p, promotedIds))],
+    [youParticipant, raw, promotedIds],
+  );
 
   return {
     participants,
@@ -297,5 +325,9 @@ export function useFixtureState(initialCount = 2): FixtureState {
     toggleSimulation,
     promotedIds,
     getPromotedUntil,
+    youHasCamera,
+    youIsMuted,
+    toggleYouCamera,
+    toggleYouMuted,
   };
 }

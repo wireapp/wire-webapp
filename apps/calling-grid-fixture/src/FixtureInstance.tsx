@@ -151,6 +151,10 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
     toggleSimulation,
     promotedIds,
     getPromotedUntil,
+    youHasCamera,
+    youIsMuted,
+    toggleYouCamera,
+    toggleYouMuted,
   } = useFixtureState(initialCount);
 
   // Local ticker to animate reservation bars while anyone is promoted
@@ -333,19 +337,19 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
               <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8}}>
                 <GroupHeader style={{margin: 0}}>Participants</GroupHeader>
                 <span style={{fontSize: 12, color: INK_DIM, fontVariantNumeric: 'tabular-nums'}}>
-                  {rawParticipants.length} / {MOCK_PEOPLE.length}
+                  {rawParticipants.length + 1} / {MOCK_PEOPLE.length + 1}
                 </span>
               </div>
               <div style={{display: 'flex', alignItems: 'center', gap: 6}}>
                 <button
                   onClick={() => setParticipantCount(rawParticipants.length - 1)}
-                  disabled={rawParticipants.length <= 1}
+                  disabled={rawParticipants.length <= 0}
                   style={{
                     width: 26, height: 26, borderRadius: 7,
                     border: `1px solid ${PANEL_LINE}`,
-                    background: rawParticipants.length > 1 ? '#fff' : '#f5f5f5',
-                    color: rawParticipants.length > 1 ? INK : INK_DIM,
-                    cursor: rawParticipants.length > 1 ? 'pointer' : 'default',
+                    background: rawParticipants.length > 0 ? '#fff' : '#f5f5f5',
+                    color: rawParticipants.length > 0 ? INK : INK_DIM,
+                    cursor: rawParticipants.length > 0 ? 'pointer' : 'default',
                     fontSize: 16, fontWeight: 600, lineHeight: 1,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0, fontFamily: 'inherit', padding: 0,
@@ -356,7 +360,7 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
                 </button>
                 <input
                   type="range"
-                  min={1}
+                  min={0}
                   max={MOCK_PEOPLE.length}
                   value={rawParticipants.length}
                   onChange={e => setParticipantCount(Number(e.target.value))}
@@ -383,6 +387,55 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
             </div>
 
             <div style={{display: 'flex', flexDirection: 'column', gap: 6}}>
+              {/* You row — always present, no delete/speak/share */}
+              <div
+                style={{
+                  border: `1px solid ${BLUE_BORDER}`,
+                  borderRadius: 10,
+                  padding: '8px 10px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 7,
+                  background: BLUE_50,
+                }}
+              >
+                <div style={{display: 'flex', alignItems: 'center', gap: 9}}>
+                  <div
+                    style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      flexShrink: 0,
+                      background: avatarGrad(220),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                      fontSize: 11,
+                      fontWeight: 700,
+                    }}
+                  >
+                    YO
+                  </div>
+                  <div style={{fontSize: 13, fontWeight: 600, flex: '1 1 auto', minWidth: 0, color: INK}}>
+                    You
+                  </div>
+                  <span style={{fontSize: 10.5, fontWeight: 700, letterSpacing: .2, padding: '2px 6px', borderRadius: 6, background: BLUE_50, color: BLUE, border: `1px solid ${BLUE_BORDER}`, whiteSpace: 'nowrap', flexShrink: 0}}>
+                    You
+                  </span>
+                </div>
+                <div style={{display: 'flex', gap: 6, flexWrap: 'wrap'}}>
+                  <button style={chip(youHasCamera)} onClick={toggleYouCamera}>
+                    {youHasCamera ? <IcVideo /> : <IcVideoOff />}
+                    {youHasCamera ? 'Camera' : 'Cam off'}
+                  </button>
+                  <button style={chip(!youIsMuted)} onClick={toggleYouMuted}>
+                    {youIsMuted ? <IcMicOff /> : <IcMic />}
+                    {youIsMuted ? 'Muted' : 'Mic on'}
+                  </button>
+                </div>
+              </div>
+
               {rawParticipants.map(p => {
                 const isPromoted = promotedIds.has(p.id);
                 const promotedUntil = getPromotedUntil(p.id);

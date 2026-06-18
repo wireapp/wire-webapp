@@ -2,12 +2,10 @@ import type { GridConfig } from './components/FluidVideoGrid';
 
 // ── Tile geometry constraints ─────────────────────────────────────────────────
 
-export const MIN_TILE_HEIGHT = 120; // px
+export const MIN_TILE_HEIGHT = 240; // px
 export const MAX_TILE_HEIGHT = 600; // px
 export const MIN_ASPECT_RATIO = 0.67; // 4:3
 export const MAX_ASPECT_RATIO = 1.78; // 16:9
-export const MAX_SUB_ROWS = 2; // max sub-rows inside the fractional tile
-export const MAX_SUB_COLS = 3; // max sub-cols inside the fractional tile
 export const TILE_GAP = 4; // px
 export const TRANSITION_DURATION_MS = 250;
 
@@ -20,8 +18,6 @@ export const GRID_CONFIG: GridConfig = {
   maxTileHeight: MAX_TILE_HEIGHT,
   minAspectRatio: MIN_ASPECT_RATIO,
   maxAspectRatio: MAX_ASPECT_RATIO,
-  maxSubRows: MAX_SUB_ROWS,
-  maxSubCols: MAX_SUB_COLS,
   tileGap: TILE_GAP,
 };
 
