@@ -19,7 +19,7 @@
 
 import {ReactNode, CSSProperties, useEffect, useState} from 'react';
 
-import {css} from '@emotion/react';
+import {css, CSSObject} from '@emotion/react';
 import {QualifiedId} from '@wireapp/api-client/lib/user';
 
 import {QUERY} from '@wireapp/react-ui-kit';
@@ -34,6 +34,7 @@ import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
 import {GroupVideoGridTile} from './GroupVideoGridTile';
+import {useDummyParticipants} from './useDummyParticipants';
 import {Video} from './Video';
 
 const PARTICIPANTS_LIMITS = {
@@ -125,6 +126,38 @@ const HEIGHT_QUERIES = {
   TALL: 'min-height: 830px',
 };
 
+const presenterWrapper: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  height: '100%',
+  gap: '4px',
+  backgroundColor: 'var(--group-video-bg)',
+};
+
+const presenterMainArea: CSSObject = {
+  flex: '2 0 0',
+  position: 'relative',
+  minHeight: 0,
+};
+
+const presenterBottomStrip: CSSObject = {
+  flex: '1 0 0',
+  display: 'flex',
+  flexDirection: 'row',
+  gap: '4px',
+  overflowX: 'auto',
+  overflowY: 'hidden',
+  minHeight: 0,
+};
+
+const presenterStripTile: CSSObject = {
+  height: '100%',
+  aspectRatio: '16/9',
+  flexShrink: 0,
+  position: 'relative',
+};
+
 const GroupVideoGrid = ({
   minimized = false,
   grid,
@@ -156,23 +189,39 @@ const GroupVideoGrid = ({
     }),
   );
 
+  const dummyParticipants = useDummyParticipants();
+  const allGridParticipants = [...grid.grid, ...dummyParticipants];
+
   const doubleClickedOnVideo = (userId: QualifiedId, clientId: string) => {
     if (typeof setMaximizedParticipant !== 'function') {
       return;
     }
     if (maximizedParticipant !== null) {
-      setMaximizedParticipant(null);
+      if (maximizedParticipant.doesMatchIds(userId, clientId)) {
+        setMaximizedParticipant(null);
+      } else {
+        const next = allGridParticipants.find(p => p?.doesMatchIds(userId, clientId)) ?? null;
+        if (next) {
+          setMaximizedParticipant(next);
+        }
+      }
       return;
     }
-    if (grid.grid.length < 2) {
+    if (allGridParticipants.length < 2) {
       return;
     }
 
-    const participant = grid.grid.find(participant => participant?.doesMatchIds(userId, clientId)) || null;
+    const participant = allGridParticipants.find(p => p?.doesMatchIds(userId, clientId)) || null;
     setMaximizedParticipant(participant);
   };
 
-  const participants = (maximizedParticipant ? [maximizedParticipant] : grid.grid).filter(Boolean);
+  const participants = (maximizedParticipant ? [maximizedParticipant] : allGridParticipants).filter(Boolean);
+
+  const otherParticipants = maximizedParticipant
+    ? allGridParticipants.filter(
+        p => p && !p.doesMatchIds(maximizedParticipant.user.qualifiedId, maximizedParticipant.clientId),
+      )
+    : [];
 
   useEffect(() => {
     setRowsAndColumns(
@@ -227,51 +276,90 @@ const GroupVideoGrid = ({
 
   return (
     <div className="group-video">
-      <div
-        className="group-video-grid"
-        css={{backgroundColor: 'var(--group-video-bg)'}}
-        style={rowsAndColumns}
-        data-uie-name="grids-wrapper"
-      >
-        {grid.grid.length === 0 && (
+      {maximizedParticipant ? (
+        <div css={presenterWrapper} data-uie-name="grids-wrapper">
           <div
-            css={{
-              alignItems: 'center',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-            }}
+            className="group-video-grid"
+            css={presenterMainArea}
+            style={{'--columns': 1, '--rows': 1} as CSSProperties}
           >
-            <Icon.LoadingIcon
-              css={{
-                '> path': {
-                  fill: 'var(--main-color)',
-                },
-                height: 32,
-                marginBottom: 32,
-                width: 32,
-              }}
+            <GroupVideoGridTile
+              minimized={false}
+              participant={maximizedParticipant}
+              selfParticipant={selfParticipant}
+              participantCount={grid.grid.length}
+              isMaximized={true}
+              onTileDoubleClick={doubleClickedOnVideo}
             />
-            <div
-              data-uie-name="no-active-speakers"
-              css={{color: 'var(--main-color)', fontSize: 'var(--font-size-xsmall)', fontWeight: 500}}
-            >
-              {t('noActiveSpeakers')}
-            </div>
           </div>
-        )}
-        {participants.map(participant => (
-          <GroupVideoGridTile
-            minimized={minimized}
-            participant={participant}
-            key={participant.clientId}
-            selfParticipant={selfParticipant}
-            participantCount={participants.length}
-            isMaximized={!!maximizedParticipant}
-            onTileDoubleClick={doubleClickedOnVideo}
-          />
-        ))}
-      </div>
+          {otherParticipants.length > 0 && (
+            <div css={presenterBottomStrip}>
+              {otherParticipants.map(participant => (
+                <div
+                  key={participant.clientId}
+                  css={presenterStripTile}
+                  style={{'--columns': 1, '--rows': 1} as CSSProperties}
+                >
+                  <GroupVideoGridTile
+                    minimized={false}
+                    participant={participant}
+                    selfParticipant={selfParticipant}
+                    participantCount={grid.grid.length}
+                    isMaximized={false}
+                    onTileDoubleClick={doubleClickedOnVideo}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div
+          className="group-video-grid"
+          css={{backgroundColor: 'var(--group-video-bg)'}}
+          style={rowsAndColumns}
+          data-uie-name="grids-wrapper"
+        >
+          {grid.grid.length === 0 && (
+            <div
+              css={{
+                alignItems: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              <Icon.LoadingIcon
+                css={{
+                  '> path': {
+                    fill: 'var(--main-color)',
+                  },
+                  height: 32,
+                  marginBottom: 32,
+                  width: 32,
+                }}
+              />
+              <div
+                data-uie-name="no-active-speakers"
+                css={{color: 'var(--main-color)', fontSize: 'var(--font-size-xsmall)', fontWeight: 500}}
+              >
+                {t('noActiveSpeakers')}
+              </div>
+            </div>
+          )}
+          {participants.map(participant => (
+            <GroupVideoGridTile
+              minimized={minimized}
+              participant={participant}
+              key={participant.clientId}
+              selfParticipant={selfParticipant}
+              participantCount={participants.length}
+              isMaximized={false}
+              onTileDoubleClick={doubleClickedOnVideo}
+            />
+          ))}
+        </div>
+      )}
       {thumbnail.videoStream != null && maximizedParticipant === null && (
         <GroupVideoThumbnailWrapper minimized={minimized}>
           <Video

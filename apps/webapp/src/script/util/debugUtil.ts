@@ -39,6 +39,7 @@ import {container} from 'tsyringe';
 
 import {AvsDebugger} from '@wireapp/avs-debugger';
 
+import {setDummyParticipantCount} from 'Components/calling/useDummyParticipants';
 import {CallingRepository} from 'Repositories/calling/CallingRepository';
 import {CallState} from 'Repositories/calling/CallState';
 import {Participant} from 'Repositories/calling/Participant';
@@ -179,6 +180,15 @@ export class DebugUtil {
     } catch (error: unknown) {
       this.logger.error(`Failed to import events: ${error}`);
     }
+  }
+
+  /**
+   * Injects animated dummy participants into the video grid for layout testing.
+   * Persists across reloads via localStorage. Pass 0 to remove all dummies.
+   * Usage: window.wire.app.debug.setDummyParticipants(8)
+   */
+  setDummyParticipants(count: number): void {
+    setDummyParticipantCount(count);
   }
 
   addCallParticipants(number: number) {

@@ -17,42 +17,42 @@
  *
  */
 
-import {QualifiedId} from '@wireapp/api-client/lib/user';
-import {amplify} from 'amplify';
+import { QualifiedId } from '@wireapp/api-client/lib/user';
+import { amplify } from 'amplify';
 import ko from 'knockout';
-import {container} from 'tsyringe';
+import { container } from 'tsyringe';
 
-import {REASON as CALL_REASON, STATE as CALL_STATE} from '@wireapp/avs';
-import {Availability} from '@wireapp/protocol-messaging';
-import {WebAppEvents} from '@wireapp/webapp-events';
+import { REASON as CALL_REASON, STATE as CALL_STATE } from '@wireapp/avs';
+import { Availability } from '@wireapp/protocol-messaging';
+import { WebAppEvents } from '@wireapp/webapp-events';
 
 import 'Components/calling/ChooseScreen';
-import {PrimaryModal} from 'Components/Modals/PrimaryModal';
-import type {AudioRepository} from 'Repositories/audio/audioRepository';
-import {AudioType} from 'Repositories/audio/audioType';
-import type {Call} from 'Repositories/calling/Call';
-import {CallingRepository} from 'Repositories/calling/CallingRepository';
-import {CallState, DesktopScreenShareMenu} from 'Repositories/calling/CallState';
-import {LEAVE_CALL_REASON} from 'Repositories/calling/enum/LeaveCallReason';
-import {ConversationState} from 'Repositories/conversation/ConversationState';
-import {ConversationVerificationState} from 'Repositories/conversation/ConversationVerificationState';
-import type {Conversation} from 'Repositories/entity/Conversation';
-import type {User} from 'Repositories/entity/User';
-import type {ElectronDesktopCapturerSource, MediaDevicesHandler} from 'Repositories/media/MediaDevicesHandler';
-import type {MediaStreamHandler} from 'Repositories/media/MediaStreamHandler';
-import {mediaDevicesStore} from 'Repositories/media/useMediaDevicesStore';
-import {isPermissionGranted} from 'Repositories/permission/permissionHandlers';
-import {PermissionType} from 'Repositories/permission/PermissionType';
-import {PropertiesRepository} from 'Repositories/properties/propertiesRepository';
-import {PROPERTIES_TYPE} from 'Repositories/properties/propertiesType';
-import type {TeamRepository} from 'Repositories/team/TeamRepository';
-import {TeamState} from 'Repositories/team/TeamState';
-import {ROLE} from 'Repositories/user/userPermission';
-import {replaceLink, t} from 'Util/localizerUtil';
-import {matchQualifiedIds} from 'Util/qualifiedId';
-import {safeWindowOpen} from 'Util/sanitizationUtil';
+import { PrimaryModal } from 'Components/Modals/PrimaryModal';
+import type { AudioRepository } from 'Repositories/audio/audioRepository';
+import { AudioType } from 'Repositories/audio/audioType';
+import type { Call } from 'Repositories/calling/Call';
+import { CallingRepository } from 'Repositories/calling/CallingRepository';
+import { CallState, DesktopScreenShareMenu } from 'Repositories/calling/CallState';
+import { LEAVE_CALL_REASON } from 'Repositories/calling/enum/LeaveCallReason';
+import { ConversationState } from 'Repositories/conversation/ConversationState';
+import { ConversationVerificationState } from 'Repositories/conversation/ConversationVerificationState';
+import type { Conversation } from 'Repositories/entity/Conversation';
+import type { User } from 'Repositories/entity/User';
+import type { ElectronDesktopCapturerSource, MediaDevicesHandler } from 'Repositories/media/MediaDevicesHandler';
+import type { MediaStreamHandler } from 'Repositories/media/MediaStreamHandler';
+import { mediaDevicesStore } from 'Repositories/media/useMediaDevicesStore';
+import { isPermissionGranted } from 'Repositories/permission/permissionHandlers';
+import { PermissionType } from 'Repositories/permission/PermissionType';
+import { PropertiesRepository } from 'Repositories/properties/propertiesRepository';
+import { PROPERTIES_TYPE } from 'Repositories/properties/propertiesType';
+import type { TeamRepository } from 'Repositories/team/TeamRepository';
+import { TeamState } from 'Repositories/team/TeamState';
+import { ROLE } from 'Repositories/user/userPermission';
+import { replaceLink, t } from 'Util/localizerUtil';
+import { matchQualifiedIds } from 'Util/qualifiedId';
+import { safeWindowOpen } from 'Util/sanitizationUtil';
 
-import {Config} from '../Config';
+import { Config } from '../Config';
 
 export interface CallActions {
   answer: (call: Call) => Promise<void>;
@@ -96,11 +96,11 @@ export class CallingViewModel {
     readonly callState = container.resolve(CallState),
     private readonly teamState = container.resolve(TeamState),
   ) {
-    const {setVideoInputDeviceId, setScreenInputDeviceId} = mediaDevicesStore.getState();
+    const { setVideoInputDeviceId, setScreenInputDeviceId } = mediaDevicesStore.getState();
     this.isSelfVerified = ko.pureComputed(() => selfUser().is_verified());
     this.activeCalls = ko.pureComputed(() =>
       this.callState.calls().filter(call => {
-        const {conversation} = call;
+        const { conversation } = call;
         if (conversation.isSelfUserRemoved()) {
           return false;
         }
@@ -212,7 +212,7 @@ export class CallingViewModel {
           text: t('conversation.E2EICallAnyway'),
         },
         secondaryAction: {
-          action: () => {},
+          action: () => { },
           text: t('conversation.E2EICancel'),
         },
         text: {
@@ -236,7 +236,7 @@ export class CallingViewModel {
         },
         text: {
           htmlMessage: `<div class="modal-description">
-            ${t('groupCallConfirmationModalTitle', {memberCount})}
+            ${t('groupCallConfirmationModalTitle', { memberCount })}
           </div>`,
           closeBtnLabel: t('groupCallModalCloseBtnLabel'),
         },
@@ -279,11 +279,11 @@ export class CallingViewModel {
       changePage: (newPage, call) => {
         this.callingRepository.changeCallPage(call, newPage);
       },
-      leave: ({conversation}: Call) => {
+      leave: ({ conversation }: Call) => {
         this.callingRepository.leaveCall(conversation.qualifiedId, LEAVE_CALL_REASON.MANUAL_LEAVE_BY_UI_CLICK);
         callState.activeCallViewTab(CallViewTab.ALL);
       },
-      reject: ({conversation}: Call) => {
+      reject: ({ conversation }: Call) => {
         this.callingRepository.rejectCall(conversation.qualifiedId);
       },
       startAudio: async (conversationEntity: Conversation) => {
@@ -292,7 +292,7 @@ export class CallingViewModel {
           typeof conferenceCallingEnabledState === 'function'
             ? conferenceCallingEnabledState()
             : conferenceCallingEnabledState;
-        if (conversationEntity.isGroupOrChannel() && isConferenceCallingEnabled === false) {
+        if (conversationEntity.isGroupOrChannel() && isConferenceCallingEnabled === false && false) {
           this.showRestrictedConferenceCallingModal();
         } else {
           await handleCallAction(conversationEntity);
@@ -348,7 +348,7 @@ export class CallingViewModel {
    * @param activeCall - the call to gracefully tear down
    */
   private async gracefullyTeardownCall(activeCall: Call): Promise<void> {
-    const {conversation} = activeCall;
+    const { conversation } = activeCall;
     if (activeCall.state() === CALL_STATE.INCOMING) {
       this.callingRepository.rejectCall(conversation.qualifiedId);
     } else {
@@ -368,7 +368,7 @@ export class CallingViewModel {
    */
   private canInitiateCall(
     conversationId: QualifiedId,
-    warningStrings: {action: string; message: string; title: string},
+    warningStrings: { action: string; message: string; title: string },
   ): Promise<boolean> {
     const idleCallStates = [CALL_STATE.INCOMING, CALL_STATE.NONE, CALL_STATE.UNKNOWN];
     const otherActiveCall = this.callState
@@ -419,7 +419,7 @@ export class CallingViewModel {
           text: {
             htmlMessage: t(
               'callingRestrictedConferenceCallOwnerModalDescription',
-              {brandName: Config.getConfig().BRAND_NAME},
+              { brandName: Config.getConfig().BRAND_NAME },
               replaceEnterprise,
             ),
             title: t('callingRestrictedConferenceCallOwnerModalTitle'),
