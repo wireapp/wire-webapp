@@ -396,8 +396,7 @@ const FullscreenVideoCall = ({
 
         <div id="video-element-remote" className="video-element-remote">
           <WireFluidVideoGrid
-            participants={participants}
-            selfParticipant={selfParticipant}
+            call={call}
             onViewAllParticipantsSelected={toggleParticipantsList}
           />
           {classifiedDomains && (

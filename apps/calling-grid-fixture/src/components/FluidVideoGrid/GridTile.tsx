@@ -13,13 +13,9 @@ interface GridTileProps {
 }
 
 export function GridTile({participant, isActiveSpeaker}: GridTileProps) {
-  const {name, avatarUrl, hue = 200, renderVideo, isMuted} = participant;
-  const initials = name
-    .split(' ')
-    .map(w => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const {name, displayName, initials: initialsOverride, avatarUrl, hue = 200, renderVideo, isMuted} = participant;
+  const initials = initialsOverride ?? name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const label = displayName ?? name;
 
   return (
     <div
@@ -133,7 +129,7 @@ export function GridTile({participant, isActiveSpeaker}: GridTileProps) {
           transition: 'background 0.2s',
         }}
       >
-        {name}
+        {label}
       </div>
     </div>
   );

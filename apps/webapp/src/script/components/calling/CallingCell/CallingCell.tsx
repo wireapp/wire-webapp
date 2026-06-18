@@ -92,7 +92,7 @@ export const CallingCell = ({
 }: CallingCellProps) => {
   const {fireAndForgetInvoker} = useApplicationContext();
   const {conversation} = call;
-  const {reason, state, isCbrEnabled, startedAt, muteState, participants} = useKoSubscribableChildren(call, [
+  const {reason, state, isCbrEnabled, startedAt, muteState} = useKoSubscribableChildren(call, [
     'reason',
     'state',
     'isCbrEnabled',
@@ -100,7 +100,6 @@ export const CallingCell = ({
     'pages',
     'currentPage',
     'muteState',
-    'participants',
   ]);
 
   const {
@@ -397,8 +396,7 @@ export const CallingCell = ({
                   aria-label={t('callMaximizeLabel')}
                 >
                   <WireFluidVideoGrid
-                    participants={participants}
-                    selfParticipant={selfParticipant}
+                    call={call}
                   />
 
                   {isOngoing && (

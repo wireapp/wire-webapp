@@ -10,7 +10,12 @@ export type ParticipantTier =
 
 export interface GridParticipant {
   id: string;
+  /** Raw name used for identity and fallback initials computation. */
   name: string;
+  /** Label shown in the name pill. Falls back to name when absent. */
+  displayName?: string;
+  /** Avatar placeholder text. Falls back to initials derived from name when absent. */
+  initials?: string;
   avatarUrl?: string;
   hue?: number;
   renderVideo?: () => ReactNode;

@@ -12,15 +12,11 @@ interface SubTileProps {
 }
 
 export function SubTile({participant}: SubTileProps) {
-  const {name, avatarUrl, hue = 200, renderVideo, isMuted} = participant;
+  const {name, displayName, initials: initialsOverride, avatarUrl, hue = 200, renderVideo, isMuted} = participant;
   const isActiveSpeaker =
     participant.tier === 'active-camera' || participant.tier === 'active-no-camera';
-  const initials = name
-    .split(' ')
-    .map(w => w[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+  const initials = initialsOverride ?? name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const label = displayName ?? name;
 
   return (
     <div
@@ -131,7 +127,7 @@ export function SubTile({participant}: SubTileProps) {
           transition: 'background 0.2s',
         }}
       >
-        {name}
+        {label}
       </div>
     </div>
   );

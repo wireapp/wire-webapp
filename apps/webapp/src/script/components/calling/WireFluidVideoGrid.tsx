@@ -17,14 +17,17 @@
  *
  */
 
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 
-import { FluidVideoGrid, deriveParticipantTier } from '@fluid-video-grid/components';
-import type { GridConfig, GridParticipant } from '@fluid-video-grid/components';
+import ko from 'knockout';
 
-import type { Participant } from 'Repositories/calling/Participant';
+import {FluidVideoGrid, deriveParticipantTier} from '@fluid-video-grid/components';
+import type {GridConfig, GridParticipant} from '@fluid-video-grid/components';
 
-import { Video } from './Video';
+import type {Call} from 'Repositories/calling/Call';
+import type {Participant} from 'Repositories/calling/Participant';
+
+import {Video} from './Video';
 
 const GRID_CONFIG: GridConfig = {
   minTileHeight: 240,
@@ -43,12 +46,15 @@ function hueFromId(id: string): number {
 }
 
 function participantToGrid(p: Participant, isYou: boolean): GridParticipant {
+  // Read all KO observables here — when called inside a ko.computed, every access is tracked
   const videoStream = p.hasActiveVideo() ? (p.processedVideoStream()?.stream ?? p.videoStream()) : undefined;
   const id = isYou ? 'self' : `${p.user.qualifiedId.id}/${p.clientId}`;
 
   return {
     id,
     name: p.user.name(),
+    displayName: isYou ? `You (${p.user.name()})` : undefined,
+    initials: isYou ? p.user.name().split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() : undefined,
     hue: hueFromId(id),
     renderVideo: videoStream
       ? () => (
@@ -71,49 +77,45 @@ function participantToGrid(p: Participant, isYou: boolean): GridParticipant {
   };
 }
 
-function useGridParticipants(participants: Participant[], selfParticipant: Participant): GridParticipant[] {
-  const [gridParticipants, setGridParticipants] = useState<GridParticipant[]>(() => [
-    participantToGrid(selfParticipant, true),
-    ...participants.map(p => participantToGrid(p, false)),
-  ]);
+function useGridParticipants(call: Call): GridParticipant[] {
+  const [gridParticipants, setGridParticipants] = useState<GridParticipant[]>([]);
 
   useEffect(() => {
-    const rebuild = () => {
-      setGridParticipants([
+    // ko.computed tracks every KO observable accessed inside it — call.participants(),
+    // plus all per-participant observables read by participantToGrid. Any change to any
+    // of them (join/leave, video on/off, mute, speaking) re-runs the computation and
+    // produces a fresh GridParticipant[], eliminating the need for manual subscriptions.
+    const computed = ko.computed<GridParticipant[]>(() => {
+      const selfParticipant = call.getSelfParticipant();
+      const all = call.participants();
+      return [
         participantToGrid(selfParticipant, true),
-        ...participants.map(p => participantToGrid(p, false)),
-      ]);
+        ...all.filter(p => p !== selfParticipant).map(p => participantToGrid(p, false)),
+      ];
+    });
+
+    setGridParticipants(computed());
+    const sub = computed.subscribe(setGridParticipants);
+
+    return () => {
+      sub.dispose();
+      computed.dispose();
     };
-
-    rebuild();
-
-    const subs: { dispose: () => void }[] = [];
-    for (const p of [selfParticipant, ...participants]) {
-      subs.push(p.videoStream.subscribe(rebuild));
-      subs.push(p.processedVideoStream.subscribe(rebuild));
-      subs.push(p.videoState.subscribe(rebuild));
-      subs.push(p.isMuted.subscribe(rebuild));
-      subs.push(p.isActivelySpeaking.subscribe(rebuild));
-    }
-
-    return () => subs.forEach(s => s.dispose());
-  }, [participants, selfParticipant]);
+  }, [call]);
 
   return gridParticipants;
 }
 
 interface WireFluidVideoGridProps {
-  participants: Participant[];
-  selfParticipant: Participant;
+  call: Call;
   onViewAllParticipantsSelected?: () => void;
 }
 
 export function WireFluidVideoGrid({
-  participants,
-  selfParticipant,
+  call,
   onViewAllParticipantsSelected,
 }: WireFluidVideoGridProps) {
-  const gridParticipants = useGridParticipants(participants, selfParticipant);
+  const gridParticipants = useGridParticipants(call);
   return (
     <FluidVideoGrid
       participants={gridParticipants}
