@@ -33,10 +33,10 @@ import {ThreadsOutlineIcon} from 'Components/ThreadIcons';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {User} from 'Repositories/entity/User';
+import {useAppMainState} from 'src/script/page/state';
 import {generateConversationThreadUrl} from 'src/script/router/routeGenerator';
 import {setHistoryParam} from 'src/script/router/Router';
-import {useAppMainState} from 'src/script/page/state';
-import {formatTimeShort} from 'src/script/util/TimeUtil';
+import {formatTimeShort} from 'src/script/util/timeUtil';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
