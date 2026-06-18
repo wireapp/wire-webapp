@@ -25,6 +25,7 @@ import {User} from 'Repositories/entity/User';
 import {SystemMessageType} from 'src/script/message/SystemMessageType';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
+import {renderMessage} from 'Util/messageRenderer';
 
 import {E2eEncryptionMessage} from './E2eEncryptionMessage/E2eEncryptionMessage';
 import {ConnectedMessage} from './MemberMessage/ConnectedMessage';
@@ -76,6 +77,7 @@ export const MemberMessage = ({
   const timedMessagesDisabledLabel = t('conversationDetailsActionTimedMessagesDisabled');
   const hasConversationDescription = conversationDescription !== undefined && conversationDescription.length > 0;
   const shouldShowDescription = isGroupCreation && hasConversationDescription;
+  const renderedConversationDescription = renderMessage(conversationDescription ?? '');
 
   const isConnectedMessage = [SystemMessageType.CONNECTION_ACCEPTED, SystemMessageType.CONNECTION_REQUEST].includes(
     message.memberMessageType,
@@ -116,9 +118,13 @@ export const MemberMessage = ({
           <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
             <Icon.MessageIcon />
           </div>
-          <p className="message-header-label message-header-label--description">
-            <strong>{t('conversationDescriptionLabel')}</strong> {conversationDescription}
-          </p>
+          <div className="message-header-label message-header-label--description">
+            <strong>{t('conversationDescriptionLabel')}</strong>{' '}
+            <span
+              data-uie-name="group-creation-description-text"
+              dangerouslySetInnerHTML={{__html: renderedConversationDescription}}
+            />
+          </div>
         </div>
       )}
 

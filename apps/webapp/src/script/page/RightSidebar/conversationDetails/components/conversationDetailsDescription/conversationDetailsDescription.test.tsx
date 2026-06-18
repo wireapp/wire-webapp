@@ -104,6 +104,31 @@ describe('ConversationDetailsDescription', () => {
     });
   });
 
+  describe('rendered description', () => {
+    it('renders line breaks and links like chat messages', () => {
+      const description = 'First line\nhttps://wire.com';
+
+      render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
+
+      const link = screen.getByRole('link', {name: 'https://wire.com'});
+      expect(link).toHaveAttribute('href', 'https://wire.com');
+      expect(link).toHaveAttribute('target', '_blank');
+      expect(screen.getByTestId('description-text').innerHTML).toContain('First line<br>');
+    });
+
+    it('escapes html when rendering the description', () => {
+      render(
+        <ConversationDetailsDescription
+          description={'<img src=x onerror=alert(1)>\nhttps://wire.com'}
+          onDescriptionChange={onDescriptionChange}
+        />,
+      );
+
+      expect(screen.getByTestId('description-text').querySelector('img')).toBeNull();
+      expect(screen.getByText('<img src=x onerror=alert(1)>')).not.toBeNull();
+    });
+  });
+
   describe('editing state', () => {
     it('enters edit mode when clicking the description text and editing is allowed', async () => {
       const description = 'Existing description';
@@ -156,7 +181,7 @@ describe('ConversationDetailsDescription', () => {
       expect(onDescriptionChange).toHaveBeenCalledWith('New description');
     });
 
-    it('saves on Enter key and calls onDescriptionChange', async () => {
+    it('allows multiple lines and saves them on blur', async () => {
       const description = 'Old description';
       render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
 
@@ -164,9 +189,13 @@ describe('ConversationDetailsDescription', () => {
 
       const textarea = screen.getByTestId('description-textarea');
       await userEvent.clear(textarea);
-      await userEvent.type(textarea, 'Updated text{Enter}');
+      fireEvent.change(textarea, {target: {value: 'First line\nSecond line'}});
 
-      expect(onDescriptionChange).toHaveBeenCalledWith('Updated text');
+      expect(onDescriptionChange).not.toHaveBeenCalled();
+
+      fireEvent.blur(textarea);
+
+      expect(onDescriptionChange).toHaveBeenCalledWith('First line\nSecond line');
     });
 
     it('cancels editing on Escape key without saving', async () => {

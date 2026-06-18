@@ -104,6 +104,36 @@ describe('MemberMessage', () => {
     expect(getByText('A useful group description')).toBeInTheDocument();
   });
 
+  it('renders conversation description line breaks and links like chat messages', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      conversationDescription: 'First line\nhttps://wire.com',
+    };
+
+    const {getByRole, getByTestId} = render(withTheme(<MemberMessage {...props} />));
+
+    const link = getByRole('link', {name: 'https://wire.com'});
+    expect(link).toHaveAttribute('href', 'https://wire.com');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(getByTestId('group-creation-description-text').innerHTML).toContain('First line<br>');
+  });
+
+  it('escapes html in the conversation description shown in chat', () => {
+    const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
+    const props = {
+      ...baseProps,
+      message,
+      conversationDescription: '<img src=x onerror=alert(1)>\nhttps://wire.com',
+    };
+
+    const {getByTestId, getByText} = render(withTheme(<MemberMessage {...props} />));
+
+    expect(getByTestId('group-creation-description-text').querySelector('img')).toBeNull();
+    expect(getByText('<img src=x onerror=alert(1)>')).toBeInTheDocument();
+  });
+
   it('does not show conversation description when group is created without description', () => {
     const message = createMemberMessage({systemType: SystemMessageType.CONVERSATION_CREATE}, [generateUser()]);
     const props = {

@@ -17,11 +17,12 @@
  *
  */
 
-import {FC, KeyboardEvent, useEffect, useRef, useState} from 'react';
+import {FC, KeyboardEvent, MouseEvent, useEffect, useRef, useState} from 'react';
 
 import * as Icon from 'Components/icon';
 import {isEnterKey, isEscapeKey} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
+import {renderMessage} from 'Util/messageRenderer';
 
 const MAX_DESCRIPTION_LENGTH = 200;
 
@@ -75,18 +76,31 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (isEnterKey(event)) {
-      event.preventDefault();
-      saveDescription();
-    }
-
     if (isEscapeKey(event)) {
       event.preventDefault();
       cancelEditing();
     }
   };
 
+  const handleContentClick = (event: MouseEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLElement;
+
+    if (target.closest('a')) {
+      return;
+    }
+
+    startEditing();
+  };
+
+  const handleContentKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (isEnterKey(event)) {
+      event.preventDefault();
+      startEditing();
+    }
+  };
+
   const hasDescription = description.length > 0;
+  const renderedDescription = renderMessage(description);
 
   return (
     <div
@@ -121,21 +135,26 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
           onKeyDown={handleKeyDown}
         />
       ) : (
-        <button
-          type="button"
+        <div
           className="conversation-details__description-content"
-          onClick={startEditing}
+          onClick={canEdit ? handleContentClick : undefined}
+          onKeyDown={canEdit ? handleContentKeyDown : undefined}
           data-uie-name="description-content"
-          disabled={!canEdit}
+          role={canEdit ? 'button' : undefined}
+          tabIndex={canEdit ? 0 : undefined}
         >
           {hasDescription ? (
-            <p className="conversation-details__description-text">{description}</p>
+            <div
+              className="conversation-details__description-text"
+              data-uie-name="description-text"
+              dangerouslySetInnerHTML={{__html: renderedDescription}}
+            />
           ) : (
             <p className="conversation-details__description-placeholder">
               {t('conversationDetailsDescriptionPlaceholder')}
             </p>
           )}
-        </button>
+        </div>
       )}
     </div>
   );
