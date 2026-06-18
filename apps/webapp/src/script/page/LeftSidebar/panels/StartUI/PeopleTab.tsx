@@ -49,7 +49,7 @@ export type SearchResultsData = {contacts: User[]; others: User[]};
 const TOP_PEOPLE_LIMIT = 6;
 const SEARCH_DEBOUNCE_MILLISECONDS = 300;
 
-interface PeopleTabProps {
+export interface PeopleTabProps {
   canInviteTeamMembers: boolean;
   canSearchUnconnectedUsers: boolean;
   conversationRepository: ConversationRepository;
@@ -214,7 +214,7 @@ export const PeopleTab = ({
 
   useEffect(() => {
     void debouncedSearch();
-  }, [debouncedSearch]);
+  }, [debouncedSearch, searchQuery]);
 
   useEffect(() => {
     // keep track of the most up to date value of the search query (in order to cancel outdated queries)
