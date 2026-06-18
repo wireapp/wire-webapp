@@ -127,9 +127,9 @@ export const conversationDescriptionInputCss: CSSObject = {
   lineHeight: 'var(--line-height-lg)',
   marginLeft: 0,
   marginRight: 0,
-  minHeight: 48,
+  minHeight: 96,
   outline: 'none',
   padding: '12px 16px',
-  resize: 'none',
+  resize: 'vertical',
   width: '100%',
 };
