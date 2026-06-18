@@ -48,7 +48,7 @@ export const tabButton = (isActive: boolean): CSSObject => ({
   lineHeight: 1.2,
   whiteSpace: 'nowrap',
   backgroundColor: isActive ? 'var(--list-item-selected-bg)' : 'var(--app-bg-secondary)',
-  color: isActive ? 'var(--app-bg-secondary)' : 'var(--foreground)',
+  color: isActive ? 'var(--app-bg-secondary)' : 'var(--main-color)',
   transition: 'background-color 0.15s ease, color 0.15s ease',
   '&:hover': {
     backgroundColor: isActive ? 'var(--list-item-selected-bg)' : 'var(--foreground-fade-8)',
@@ -63,6 +63,6 @@ export const tabBadge = (isActive: boolean): CSSObject => ({
   fontWeight: 600,
   lineHeight: '18px',
   textAlign: 'center',
-  backgroundColor: isActive ? 'rgba(0, 0, 0, 0.25)' : 'var(--foreground)',
-  color: 'var(--app-bg-secondary)',
+  backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'var(--sidebar-bg)',
+  color: isActive ? 'var(--app-bg-secondary)' : 'var(--main-color)',
 });
