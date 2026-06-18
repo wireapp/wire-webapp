@@ -17,7 +17,9 @@
  *
  */
 
-import {ReactNode, useCallback, useEffect, useMemo, useRef} from 'react';
+import {ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+
+import {css} from '@emotion/react';
 
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation/';
 import {amplify} from 'amplify';
@@ -62,6 +64,41 @@ import {RightSidebarParams} from '../../page/AppMain';
 import {PanelState} from '../../page/RightSidebar';
 import {CallActions} from '../../view_model/CallingViewModel';
 import {ViewModelRepositories} from '../../view_model/MainViewModel';
+
+const threadBreadcrumbNavStyles = css`
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+
+  ol {
+    min-width: 0;
+  }
+
+  button {
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-semibold);
+    color: var(--main-color);
+  }
+
+  button:hover {
+    color: var(--main-color);
+  }
+
+  li:first-child button > * {
+    transform: scale(1.0625);
+  }
+
+  li:last-child span {
+    font-size: var(--font-size-medium);
+    font-weight: var(--font-weight-semibold);
+    color: var(--accent-color);
+  }
+
+  li:last-child span svg {
+    width: 16px;
+    height: 15px;
+  }
+`;
 
 interface TitleBarProps {
   callActions: CallActions;
@@ -277,6 +314,7 @@ export const TitleBar = ({
   const isConversationThreadsListOpen = activeRightSidebarPanel === PanelState.CONVERSATION_THREADS_LIST;
   const isInfoPanelActive = isRightSidebarOpen && !isConversationThreadsListOpen;
   const isMainThreadOpen = !!activeThreadRootMessage;
+  const [isFollowingThread, setIsFollowingThread] = useState(false);
 
   const openConversationThreadsList = useCallback(() => {
     openRightSidebar(PanelState.CONVERSATION_THREADS_LIST, {entity: conversation}, true);
@@ -334,24 +372,68 @@ export const TitleBar = ({
     </button>
   );
 
+  const threadFollowButton = isFollowingThread ? (
+    <button
+      type="button"
+      className="conversation-title-bar-follow-button conversation-title-bar-follow-button--following"
+      aria-pressed={true}
+      aria-label="Unfollow thread"
+      onClick={() => setIsFollowingThread(false)}
+      data-uie-name="do-unfollow-thread"
+    >
+      <span className="conversation-title-bar-follow-button__content">
+        <span className="conversation-title-bar-follow-button__label conversation-title-bar-follow-button__label--following">
+          <Icon.CheckIcon width={12} height={9} />
+          Following
+        </span>
+        <span className="conversation-title-bar-follow-button__label conversation-title-bar-follow-button__label--unfollow">
+          <Icon.CloseIcon width={10} height={10} />
+          Unfollow
+        </span>
+      </span>
+    </button>
+  ) : (
+    <button
+      type="button"
+      className="conversation-title-bar-follow-button conversation-title-bar-follow-button--follow"
+      aria-pressed={false}
+      aria-label="Follow thread"
+      onClick={() => setIsFollowingThread(true)}
+      data-uie-name="do-follow-thread"
+    >
+      <Icon.PlusIcon width={12} height={12} />
+      Follow
+    </button>
+  );
+
   return (
     <ul
       id="conversation-title-bar"
       className={cx('conversation-title-bar', {
         'is-right-panel-open': isRightSidebarOpen,
         'conversation-title-bar--with-bottom-divider': withBottomDivider,
+        'conversation-title-bar--thread-open': isMainThreadOpen,
       })}
     >
-      <li className="conversation-title-bar-library">
+      <li
+        className={cx('conversation-title-bar-library', {
+          'conversation-title-bar-library--thread': isMainThreadOpen,
+        })}
+      >
         {isMainThreadOpen && (
-          <IconButton
-            variant={IconButtonVariant.SECONDARY}
-            className="conversation-title-bar-icon icon-back"
-            css={{marginBottom: 0}}
-            onClick={closeConversationThread}
-            aria-label="Back to conversation"
-            data-uie-name="do-close-message-thread"
-          />
+          <>
+            <IconButton
+              variant={IconButtonVariant.SECONDARY}
+              className="conversation-title-bar-icon icon-back"
+              css={{marginBottom: 0}}
+              onClick={closeConversationThread}
+              aria-label="Back to conversation"
+              data-uie-name="do-close-message-thread"
+            />
+            <nav aria-label="Thread navigation" css={threadBreadcrumbNavStyles} data-uie-name="thread-breadcrumb">
+              <Breadcrumbs items={threadBreadcrumbItems} onItemClick={onThreadBreadcrumbClick} />
+            </nav>
+          </>
         )}
 
         {!isMainThreadOpen && smBreakpoint && (
@@ -392,11 +474,7 @@ export const TitleBar = ({
       </li>
 
       <li className="conversation-title-bar-name">
-        {isMainThreadOpen ? (
-          <nav aria-label="Thread navigation" data-uie-name="thread-breadcrumb">
-            <Breadcrumbs items={threadBreadcrumbItems} onItemClick={onThreadBreadcrumbClick} />
-          </nav>
-        ) : (
+        {!isMainThreadOpen && (
           <div
             id="show-participants"
             onClick={onClickDetails}
@@ -440,27 +518,29 @@ export const TitleBar = ({
       </li>
 
       <li className="conversation-title-bar-icons">
-        {!isSharedDriveSearchViewOpen && (
-          <>
-            {showCallControls && !mdBreakpoint && (
-              <button
-                type="button"
-                className="conversation-title-bar-icon"
-                title={t('tooltipConversationCall')}
-                aria-label={t('tooltipConversationCall')}
-                onClick={event => {
-                  currentFocusedElementRef.current = event.currentTarget;
-                  startCallAndShowAlert();
-                }}
-                data-uie-name="do-call"
-                disabled={isCallButtonDisabled}
-              >
-                <CallIcon />
-              </button>
-            )}
-            {mdBreakpoint ? (
-              <>
-                {!isMainThreadOpen && (
+        {!isSharedDriveSearchViewOpen &&
+          (isMainThreadOpen ? (
+            threadFollowButton
+          ) : (
+            <>
+              {showCallControls && !mdBreakpoint && (
+                <button
+                  type="button"
+                  className="conversation-title-bar-icon"
+                  title={t('tooltipConversationCall')}
+                  aria-label={t('tooltipConversationCall')}
+                  onClick={event => {
+                    currentFocusedElementRef.current = event.currentTarget;
+                    startCallAndShowAlert();
+                  }}
+                  data-uie-name="do-call"
+                  disabled={isCallButtonDisabled}
+                >
+                  <CallIcon />
+                </button>
+              )}
+              {mdBreakpoint ? (
+                <>
                   <IconButton
                     className="icon-search"
                     css={{marginBottom: 0}}
@@ -471,38 +551,37 @@ export const TitleBar = ({
                   >
                     <span className="visually-hidden">{t('tooltipConversationSearch')}</span>
                   </IconButton>
-                )}
-                {showCallControls && (
-                  <IconButton
-                    title={t('tooltipConversationCall')}
-                    aria-label={t('tooltipConversationCall')}
-                    css={{marginBottom: 0}}
-                    onClick={onClickStartAudio}
-                    data-uie-name="do-call"
-                    disabled={isCallButtonDisabled}
+                  {showCallControls && (
+                    <IconButton
+                      title={t('tooltipConversationCall')}
+                      aria-label={t('tooltipConversationCall')}
+                      css={{marginBottom: 0}}
+                      onClick={onClickStartAudio}
+                      data-uie-name="do-call"
+                      disabled={isCallButtonDisabled}
+                    >
+                      <CallIcon />
+                    </IconButton>
+                  )}
+                  {threadButton}
+                </>
+              ) : (
+                <>
+                  {threadButton}
+                  <button
+                    type="button"
+                    title={t('tooltipConversationInfo')}
+                    aria-label={t('tooltipConversationInfo')}
+                    onClick={onClickDetails}
+                    className={cx('conversation-title-bar-icon', {active: isInfoPanelActive})}
+                    data-uie-name="do-open-info"
                   >
-                    <CallIcon />
-                  </IconButton>
-                )}
-                {threadButton}
-              </>
-            ) : (
-              <>
-                {threadButton}
-                <button
-                  type="button"
-                  title={t('tooltipConversationInfo')}
-                  aria-label={t('tooltipConversationInfo')}
-                  onClick={onClickDetails}
-                  className={cx('conversation-title-bar-icon', {active: isInfoPanelActive})}
-                  data-uie-name="do-open-info"
-                >
-                  <Icon.InfoIcon />
-                </button>
-              </>
-            )}
-          </>
-        )}
+                    <Icon.InfoIcon />
+                  </button>
+                </>
+              )}
+            </>
+          ))}
       </li>
 
       {badgeLabelCopy && (

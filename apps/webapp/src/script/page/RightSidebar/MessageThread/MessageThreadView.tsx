@@ -52,6 +52,7 @@ import {SearchRepository} from 'Repositories/search/SearchRepository';
 import {StorageRepository} from 'Repositories/storage';
 import {TeamState} from 'Repositories/team/TeamState';
 import {isContentMessage} from 'src/script/guards/Message';
+import {StatusType} from 'src/script/message/StatusType';
 import {useRoveFocus} from 'src/script/hooks/useRoveFocus';
 import {ActionsViewModel} from 'src/script/view_model/ActionsViewModel';
 import {getLogger} from 'Util/logger';
@@ -88,18 +89,42 @@ const getBackendEventThreadId = (event?: ThreadBackendEvent): string | null =>
 const getReactionTargetMessageId = (event?: ThreadBackendEvent): string | null =>
   event?.type === ClientEvent.CONVERSATION.REACTION && event.data?.message_id ? event.data.message_id : null;
 
-const mergeThreadReplies = (persistedReplies: ContentMessage[], localReplies: ContentMessage[]) => {
+const shouldReplaceThreadReply = (current: ContentMessage, candidate: ContentMessage) => {
+  const currentStatus = current.status();
+  const candidateStatus = candidate.status();
+
+  if (candidateStatus > currentStatus) {
+    return true;
+  }
+
+  if (candidateStatus < currentStatus) {
+    return false;
+  }
+
+  return true;
+};
+
+const mergeThreadReplies = (...replyGroups: ContentMessage[][]) => {
   const mergedById = new Map<string, ContentMessage>();
 
-  persistedReplies.forEach(reply => {
-    mergedById.set(reply.id, reply);
-  });
-
-  localReplies.forEach(reply => {
-    mergedById.set(reply.id, reply);
+  replyGroups.forEach(replyGroup => {
+    replyGroup.forEach(reply => {
+      const existing = mergedById.get(reply.id);
+      if (!existing || shouldReplaceThreadReply(existing, reply)) {
+        mergedById.set(reply.id, reply);
+      }
+    });
   });
 
   return Array.from(mergedById.values());
+};
+
+const markThreadReplyAsSent = (message: ContentMessage) => {
+  if (message.status() === StatusType.SENDING) {
+    message.status(StatusType.SENT);
+  }
+
+  return message;
 };
 
 export type MessageThreadViewProps = {
@@ -149,6 +174,7 @@ export const MessageThreadView: FC<MessageThreadViewProps> = ({
   const threadListRef = useRef<HTMLDivElement | null>(null);
   const eventMapperRef = useRef(new EventMapper());
   const latestLoadRequestIdRef = useRef(0);
+  const activeConversationRef = useRef(activeConversation);
   const isMountedRef = useRef(true);
   const pendingWindowFocusHandlersRef = useRef(new Set<() => void>());
   const [isMsgElementsFocusable, setMsgElementsFocusable] = useState(false);
@@ -159,39 +185,42 @@ export const MessageThreadView: FC<MessageThreadViewProps> = ({
     }
 
     return isContentMessage(rootMessage) ? rootMessage : null;
-  }, [activeConversation, rootMessage, threadId, threadReplies.length]);
+  }, [activeConversation, rootMessage, threadId]);
+
+  activeConversationRef.current = activeConversation;
 
   const loadThreadReplies = useCallback(async () => {
     const requestId = ++latestLoadRequestIdRef.current;
+    const conversation = activeConversationRef.current;
 
-    if (!threadId || !activeConversation?.id) {
+    if (!threadId || !conversation?.id) {
       setThreadReplies([]);
       return;
     }
 
     try {
-      const events = await eventRepository.eventService.loadThreadEvents(activeConversation.id, threadId);
-      const mappedMessages = eventMapperRef.current.mapJsonEvents(events, activeConversation);
+      const events = await eventRepository.eventService.loadThreadEvents(conversation.id, threadId);
+      const mappedMessages = eventMapperRef.current.mapJsonEvents(events, conversation);
 
       const contentMessages = mappedMessages.filter(isContentMessage);
       const messagesWithUsers = await Promise.all(
         contentMessages.map(message => messageRepository.ensureMessageSender(message)),
       );
-      const localThreadReplies = activeConversation
+      const localThreadReplies = conversation
         .messages()
         .filter((message): message is ContentMessage => isContentMessage(message) && message.threadId === threadId);
-      const mergedReplies = mergeThreadReplies(messagesWithUsers, localThreadReplies);
+      const loadedReplies = mergeThreadReplies(localThreadReplies, messagesWithUsers);
 
       if (isMountedRef.current && requestId === latestLoadRequestIdRef.current) {
-        setThreadReplies(mergedReplies);
+        setThreadReplies(previousReplies => mergeThreadReplies(previousReplies, loadedReplies));
       }
     } catch (error) {
       logger.warn(
-        `Failed to load thread replies for conversation '${activeConversation.id}' and thread '${threadId}'`,
+        `Failed to load thread replies for conversation '${conversation.id}' and thread '${threadId}'`,
         error,
       );
     }
-  }, [activeConversation, eventRepository.eventService, messageRepository, threadId]);
+  }, [activeConversation.id, eventRepository.eventService, messageRepository, threadId]);
 
   const threadMessages = useMemo(() => {
     if (!rootContentMessage) {
@@ -215,6 +244,10 @@ export const MessageThreadView: FC<MessageThreadViewProps> = ({
     [threadMessages],
   );
   const threadMessageIds = useMemo(() => new Set(threadMessages.map(message => message.id)), [threadMessages]);
+
+  useEffect(() => {
+    setThreadReplies([]);
+  }, [threadId]);
 
   useEffect(() => {
     void loadThreadReplies();
@@ -250,10 +283,40 @@ export const MessageThreadView: FC<MessageThreadViewProps> = ({
   }, []);
 
   useEffect(() => {
-    const handleReply = (payload: ThreadReplySentPayload) => {
-      if (payload.conversationId === activeConversation.id && payload.threadId === threadId) {
-        void loadThreadReplies();
+    const hydrateSentThreadReply = async (messageId: string) => {
+      const conversation = activeConversationRef.current;
+
+      try {
+        const sentMessage = await messageRepository.getMessageInConversationById(conversation, messageId);
+        if (!isContentMessage(sentMessage)) {
+          return;
+        }
+
+        const withSender = markThreadReplyAsSent(
+          (await messageRepository.ensureMessageSender(sentMessage)) as ContentMessage,
+        );
+
+        setThreadReplies(previousReplies => mergeThreadReplies(previousReplies, [withSender]));
+      } catch {
+        // Fall back to a full reload below.
       }
+    };
+
+    const handleReply = (payload: ThreadReplySentPayload) => {
+      if (payload.conversationId !== activeConversation.id || payload.threadId !== threadId) {
+        return;
+      }
+
+      if (payload.messageId) {
+        setThreadReplies(previousReplies =>
+          previousReplies.map(reply =>
+            reply.id === payload.messageId ? markThreadReplyAsSent(reply) : reply,
+          ),
+        );
+        void hydrateSentThreadReply(payload.messageId);
+      }
+
+      void loadThreadReplies();
     };
 
     const handleEventFromBackend = (event: ThreadBackendEvent) => {
@@ -279,7 +342,7 @@ export const MessageThreadView: FC<MessageThreadViewProps> = ({
       amplify.unsubscribe(THREAD_REPLY_SENT, handleReply);
       amplify.unsubscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, handleEventFromBackend);
     };
-  }, [activeConversation.id, loadThreadReplies, threadId, threadMessageIds]);
+  }, [activeConversation.id, loadThreadReplies, messageRepository, threadId, threadMessageIds]);
 
   useEffect(() => {
     threadListRef.current?.scrollTo({top: threadListRef.current.scrollHeight});

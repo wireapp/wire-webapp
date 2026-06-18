@@ -56,6 +56,12 @@ const defaultParams: Omit<React.ComponentProps<typeof Conversations>, 'conversat
     contentViewModel: {
       loadPreviousContent: jest.fn(),
       switchContent: jest.fn(),
+      repositories: {
+        message: {
+          getMessageInConversationById: jest.fn(),
+          ensureMessageSender: jest.fn(),
+        },
+      },
     },
   } as any,
   preferenceNotificationRepository: {notifications: observable([])} as any,
@@ -92,24 +98,5 @@ describe('Conversations', () => {
     });
 
     expect(defaultParams.listViewModel.switchList).toHaveBeenCalledWith(ListState.PREFERENCES);
-  });
-
-  it('shows threads placeholder when all threads tab is selected', () => {
-    const {getByTitle, getByText} = render(
-      withTheme(
-        <Conversations
-          {...defaultParams}
-          searchRepository={searchRepository}
-          conversationRepository={conversationRepository}
-        />,
-      ),
-    );
-
-    const allThreadsButton = getByTitle('All threads');
-    act(() => {
-      allThreadsButton.click();
-    });
-
-    expect(getByText('Thread list is coming in the next iteration.')).toBeTruthy();
   });
 });

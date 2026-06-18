@@ -19,12 +19,12 @@
 
 import {
   buildConversationThreadRowViewModel,
+  ensureThreadRootMetadata,
   getAllThreadsSorted,
-  getFilteredThreadRows,
-  getFilteredThreadsSorted,
   getThreadsForConversation,
-  isThreadInactive,
   useThreadIndexStore,
+  countScopedThreads,
+  getScopedThreadRows,
 } from './threadIndexStore';
 
 describe('threadIndexStore', () => {
@@ -240,90 +240,6 @@ describe('threadIndexStore', () => {
     expect(thread.isRootMessageBySelf).toBe(true);
   });
 
-  it('detects inactive threads with a 30 day window', () => {
-    const now = new Date('2026-02-24T00:00:00.000Z').getTime();
-
-    expect(
-      isThreadInactive(
-        {
-          conversationId: 'conversation-a',
-          threadId: 'thread-a',
-          lastReplyAt: '2026-01-20T00:00:00.000Z',
-          replyCount: 1,
-          unreadCount: 0,
-          hasUnreadMentionForSelf: false,
-          hasReplyBySelf: false,
-          isRootMessageBySelf: false,
-          seenMessageIds: [],
-        },
-        now,
-      ),
-    ).toBe(true);
-  });
-
-  it('filters to active threads by default when inactive filter is off', () => {
-    const store = useThreadIndexStore.getState();
-
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-active',
-      lastReplyAt: '2026-02-20T00:00:00.000Z',
-    });
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-inactive',
-      lastReplyAt: '2026-01-10T00:00:00.000Z',
-    });
-
-    const threads = getFilteredThreadsSorted(
-      useThreadIndexStore.getState(),
-      {
-        allThreads: true,
-        myThreads: false,
-        contributed: false,
-        inactive: false,
-      },
-      new Date('2026-02-24T00:00:00.000Z').getTime(),
-    );
-
-    expect(threads.map(thread => thread.threadId)).toEqual(['thread-active']);
-  });
-
-  it('applies ownership filters when all threads filter is disabled', () => {
-    const store = useThreadIndexStore.getState();
-
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-mine',
-      lastReplyAt: '2026-02-20T00:00:00.000Z',
-      isRootMessageBySelf: true,
-    });
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-contributed',
-      lastReplyAt: '2026-02-20T00:00:00.000Z',
-      hasReplyBySelf: true,
-    });
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-other',
-      lastReplyAt: '2026-02-20T00:00:00.000Z',
-    });
-
-    const threads = getFilteredThreadsSorted(
-      useThreadIndexStore.getState(),
-      {
-        allThreads: false,
-        myThreads: true,
-        contributed: true,
-        inactive: true,
-      },
-      new Date('2026-02-24T00:00:00.000Z').getTime(),
-    );
-
-    expect(threads.map(thread => thread.threadId)).toEqual(['thread-contributed', 'thread-mine']);
-  });
-
   it('reconciles hydrated threads without lowering existing reply count', () => {
     const store = useThreadIndexStore.getState();
 
@@ -468,157 +384,6 @@ describe('threadIndexStore', () => {
     expect(threads.map(thread => `${thread.conversationId}:${thread.threadId}`)).toEqual(['conversation-a:thread-a']);
   });
 
-  it('builds thread row view model with deterministic fallbacks', () => {
-    const store = useThreadIndexStore.getState();
-
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-a',
-      lastReplyAt: '2026-02-03T00:00:00.000Z',
-      unreadCount: 2,
-      hasUnreadMentionForSelf: true,
-      isRootMessageBySelf: true,
-      hasReplyBySelf: true,
-    });
-
-    const [row] = getFilteredThreadRows(
-      useThreadIndexStore.getState(),
-      {
-        allThreads: true,
-        myThreads: false,
-        contributed: false,
-        inactive: true,
-      },
-      {
-        conversationLabelsById: {'conversation-a': 'Project Alpha'},
-        now: new Date('2026-02-24T00:00:00.000Z').getTime(),
-      },
-    );
-
-    expect(row).toEqual(
-      expect.objectContaining({
-        conversationId: 'conversation-a',
-        threadId: 'thread-a',
-        title: 'Thread in Project Alpha',
-        conversationLabel: 'Project Alpha',
-        authorLabel: 'Unknown author',
-        preview: 'No preview available.',
-        lastActivityAt: '2026-02-03T00:00:00.000Z',
-        badges: expect.objectContaining({
-          unreadCount: 2,
-          hasUnreadMentionForSelf: true,
-          isMyThread: true,
-          isContributed: true,
-          isInactive: false,
-        }),
-      }),
-    );
-  });
-
-  it('builds thread row view model with label fallbacks and trimmed preview', () => {
-    const store = useThreadIndexStore.getState();
-
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-a',
-      lastReplyAt: '2026-01-01T00:00:00.000Z',
-      lastReplyAuthorId: 'user-a',
-      lastReplyPreview: '  hello world  ',
-    });
-
-    const [row] = getFilteredThreadRows(
-      useThreadIndexStore.getState(),
-      {
-        allThreads: true,
-        myThreads: false,
-        contributed: false,
-        inactive: true,
-      },
-      {
-        authorLabelsById: {'user-a': 'Ada Lovelace'},
-        now: new Date('2026-02-24T00:00:00.000Z').getTime(),
-      },
-    );
-
-    expect(row.title).toBe('Thread in conversation-a');
-    expect(row.conversationLabel).toBe('conversation-a');
-    expect(row.authorLabel).toBe('Ada Lovelace');
-    expect(row.preview).toBe('hello world');
-    expect(row.badges.isInactive).toBe(true);
-  });
-
-  it('uses root message preview as thread row title when available', () => {
-    const store = useThreadIndexStore.getState();
-
-    store.reconcileHydratedThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-a',
-      rootMessagePreview: '  Root message text  ',
-      lastReplyAt: '2026-01-03T00:00:00.000Z',
-      replyCount: 1,
-      hasReplyBySelf: false,
-      isRootMessageBySelf: false,
-    });
-
-    const [row] = getFilteredThreadRows(
-      useThreadIndexStore.getState(),
-      {
-        allThreads: true,
-        myThreads: false,
-        contributed: false,
-        inactive: true,
-      },
-      {
-        conversationLabelsById: {'conversation-a': 'Project Alpha'},
-      },
-    );
-
-    expect(row.title).toBe('Root message text');
-    expect(row.preview).toBe('No preview available.');
-  });
-
-  it('resolves author label with displayName -> handle -> id fallback chain', () => {
-    const store = useThreadIndexStore.getState();
-
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-display-name',
-      lastReplyAt: '2026-01-03T00:00:00.000Z',
-      lastReplyAuthorId: 'user-display',
-    });
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-handle',
-      lastReplyAt: '2026-01-02T00:00:00.000Z',
-      lastReplyAuthorId: 'user-handle',
-    });
-    store.upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-id',
-      lastReplyAt: '2026-01-01T00:00:00.000Z',
-      lastReplyAuthorId: 'user-id',
-    });
-
-    const rows = getFilteredThreadRows(
-      useThreadIndexStore.getState(),
-      {
-        allThreads: true,
-        myThreads: false,
-        contributed: false,
-        inactive: true,
-      },
-      {
-        authorLabelsById: {
-          'user-display': {displayName: 'Ada Lovelace', handle: '@ada'},
-          'user-handle': {displayName: '   ', handle: '@hopper'},
-          'user-id': {displayName: ' ', handle: ' '},
-        },
-      },
-    );
-
-    expect(rows.map(row => row.authorLabel)).toEqual(['Ada Lovelace', '@hopper', 'user-id']);
-  });
-
   it('tracks participant user ids with dedupe and max of three', () => {
     const store = useThreadIndexStore.getState();
 
@@ -720,4 +485,69 @@ describe('threadIndexStore', () => {
       }),
     );
   });
+
+  it('fills missing root metadata without overwriting existing values', () => {
+    const store = useThreadIndexStore.getState();
+
+    store.recordThreadReplyEvent({
+      conversationId: 'conversation-a',
+      threadId: 'thread-a',
+      eventTime: '2026-01-02T00:00:00.000Z',
+      messageId: 'reply-a',
+      authorId: 'user-b',
+      preview: 'First reply',
+      isSelfReply: false,
+      hasSelfMention: false,
+    });
+
+    ensureThreadRootMetadata('conversation-a', 'thread-a', {
+      rootMessagePreview: 'Root message',
+      rootMessageAuthorId: 'user-a',
+      rootMessageTimestamp: '2026-01-01T00:00:00.000Z',
+    });
+
+    const thread = useThreadIndexStore.getState().threadsByKey['conversation-a:thread-a'];
+    expect(thread.rootMessagePreview).toBe('Root message');
+    expect(thread.rootMessageAuthorId).toBe('user-a');
+    expect(thread.rootMessageTimestamp).toBe('2026-01-01T00:00:00.000Z');
+    expect(thread.replyCount).toBe(1);
+  });
+  it('returns scoped thread rows for selected conversation ids', () => {
+    const store = useThreadIndexStore.getState();
+
+    store.upsertThread({
+      conversationId: 'conversation-a',
+      threadId: 'thread-a',
+      rootMessagePreview: 'Favorite thread',
+      lastReplyAt: '2026-01-03T00:00:00.000Z',
+      replyCount: 2,
+      unreadCount: 1,
+    });
+    store.upsertThread({
+      conversationId: 'conversation-b',
+      threadId: 'thread-b',
+      rootMessagePreview: 'Other thread',
+      lastReplyAt: '2026-01-04T00:00:00.000Z',
+      replyCount: 1,
+      unreadCount: 0,
+    });
+
+    const rows = getScopedThreadRows(useThreadIndexStore.getState(), ['conversation-a'], {
+      conversationLabelsById: {'conversation-a': 'Favorites'},
+      authorLabelsById: {'user-a': 'Ada'},
+    });
+
+    expect(rows).toHaveLength(1);
+    expect(rows[0]).toEqual(
+      expect.objectContaining({
+        conversationId: 'conversation-a',
+        threadId: 'thread-a',
+        title: 'Favorite thread',
+        conversationLabel: 'Favorites',
+      }),
+    );
+    expect(countScopedThreads(useThreadIndexStore.getState(), ['conversation-a', 'conversation-b'])).toBe(2);
+    expect(countScopedThreads(useThreadIndexStore.getState(), ['conversation-a'])).toBe(1);
+  });
+
 });

@@ -28,4 +28,5 @@ export type OpenMessageThreadPayload = {
 export type ThreadReplySentPayload = {
   conversationId: string;
   threadId: string;
+  messageId?: string;
 };

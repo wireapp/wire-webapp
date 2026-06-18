@@ -68,5 +68,11 @@ export const searchInputStyles: CSSObject = {
 export const searchInputWrapperStyles: CSSObject = {
   zIndex: 1,
   position: 'relative',
-  marginBlock: '4px 16px',
+  marginBlock: '4px 8px',
+};
+
+export const headerContent: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  paddingBottom: '4px',
 };

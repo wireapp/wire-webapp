@@ -29,6 +29,11 @@ import {useCreateConversationModal} from 'Components/Modals/CreateConversation/h
 import {ConversationLabel} from 'Repositories/conversation/ConversationLabelRepository';
 import {User} from 'Repositories/entity/User';
 import {generatePermissionHelpers} from 'Repositories/user/userPermission';
+import {ConversationListFilterTabs} from 'src/script/page/LeftSidebar/panels/Conversations/ConversationListFilterTabs';
+import {
+  ConversationListContentFilter,
+  supportsConversationListContentFilter,
+} from 'src/script/page/LeftSidebar/panels/Conversations/useConversationListContentFilterStore';
 import {SidebarTabs} from 'src/script/page/LeftSidebar/panels/Conversations/useSidebarStore';
 import {handleEnterDown, handleEscDown} from 'Util/keyboardUtil';
 import {t} from 'Util/localizerUtil';
@@ -37,6 +42,7 @@ import {useChannelsFeatureFlag} from 'Util/useChannelsFeatureFlag';
 import {
   button,
   header,
+  headerContent,
   label,
   closeIconStyles,
   searchIconStyles,
@@ -55,6 +61,11 @@ interface ConversationHeaderProps {
   onSearchEnterClick: (event: KeyboardEvent<HTMLInputElement>) => void;
   jumpToRecentSearch: () => void;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
+  contentFilter?: ConversationListContentFilter;
+  onContentFilterChange?: (filter: ConversationListContentFilter) => void;
+  allCount?: number;
+  conversationCount?: number;
+  threadCount?: number;
 }
 
 export const ConversationHeaderComponent = ({
@@ -68,12 +79,18 @@ export const ConversationHeaderComponent = ({
   onSearchEnterClick,
   jumpToRecentSearch,
   searchInputRef,
+  contentFilter = ConversationListContentFilter.ALL,
+  onContentFilterChange,
+  allCount = 0,
+  conversationCount = 0,
+  threadCount = 0,
 }: ConversationHeaderProps) => {
   const {canCreateGroupConversation} = generatePermissionHelpers(selfUser.teamRole());
   const {canCreateChannels, isChannelsEnabled} = useChannelsFeatureFlag();
   const canExternalUserCreateChannel = canCreateChannels && isChannelsEnabled && selfUser.isExternal();
   const {showModal} = useCreateConversationModal();
   const isFolderView = currentTab === SidebarTabs.FOLDER;
+  const showContentFilters = supportsConversationListContentFilter(currentTab);
 
   const conversationsHeaderTitle: Partial<Record<SidebarTabs, string>> = {
     [SidebarTabs.RECENT]: t('conversationViewAllConversations'),
@@ -114,7 +131,7 @@ export const ConversationHeaderComponent = ({
   };
 
   return (
-    <>
+    <div css={headerContent}>
       <div css={header}>
         <h2 css={label} data-uie-name="conversation-list-header-title">
           {isFolderView && currentFolder ? currentFolder.name : conversationsHeaderTitle[currentTab]}
@@ -151,7 +168,17 @@ export const ConversationHeaderComponent = ({
           data-uie-name="search-conversations"
         />
       )}
-    </>
+
+      {showContentFilters && onContentFilterChange && (
+        <ConversationListFilterTabs
+          activeFilter={contentFilter}
+          allCount={allCount}
+          conversationCount={conversationCount}
+          threadCount={threadCount}
+          onChange={onContentFilterChange}
+        />
+      )}
+    </div>
   );
 };
 

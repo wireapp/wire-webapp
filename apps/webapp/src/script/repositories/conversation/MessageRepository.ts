@@ -448,7 +448,7 @@ export class MessageRepository {
     }
 
     if (threadId && state !== MessageSendingState.CANCELED) {
-      this.publishThreadReplySent(conversation.id, threadId);
+      this.publishThreadReplySent(conversation.id, threadId, textPayload.messageId);
     }
 
     if (state !== MessageSendingState.CANCELED) {
@@ -570,9 +570,9 @@ export class MessageRepository {
     const blob = await loadUrlBlob(url);
     const textMessage = t('extensionsGiphyMessage', {tag: tag as string | number}, {}, true);
     void this.sendText({conversation: conversationEntity, message: textMessage, quote: quoteEntity, threadId})
-      .then(({state}) => {
+      .then(({state, id}) => {
         if (threadId && state !== MessageSendingState.CANCELED) {
-          this.publishThreadReplySent(conversationEntity.id, threadId);
+          this.publishThreadReplySent(conversationEntity.id, threadId, id);
         }
       })
       .catch(() => undefined);
@@ -647,7 +647,7 @@ export class MessageRepository {
 
       if (state === SendAndInjectSendingState.FAILED) {
         if (threadId) {
-          this.publishThreadReplySent(conversation.id, threadId);
+          this.publishThreadReplySent(conversation.id, threadId, messageId);
         }
         await this.storeFileInDb(conversation, messageId, file);
         return;
@@ -659,7 +659,7 @@ export class MessageRepository {
       }
 
       if (threadId) {
-        this.publishThreadReplySent(conversation.id, threadId);
+        this.publishThreadReplySent(conversation.id, threadId, messageId);
       }
 
       const uploadDuration = (Date.now() - uploadStarted) / TIME_IN_MILLIS.SECOND;
@@ -680,7 +680,7 @@ export class MessageRepository {
         messageEntity.threadId,
       );
       if (threadId) {
-        this.publishThreadReplySent(conversation.id, threadId);
+        this.publishThreadReplySent(conversation.id, threadId, messageId);
       }
       return this.updateMessageAsUploadFailed(messageEntity);
     } finally {
@@ -1555,8 +1555,8 @@ export class MessageRepository {
     }, {} as QualifiedUserClients);
   }
 
-  private publishThreadReplySent(conversationId: string, threadId: string) {
-    amplify.publish(THREAD_REPLY_SENT, {conversationId, threadId});
+  private publishThreadReplySent(conversationId: string, threadId: string, messageId?: string) {
+    amplify.publish(THREAD_REPLY_SENT, {conversationId, threadId, messageId});
   }
 
   private async generateRecipients(

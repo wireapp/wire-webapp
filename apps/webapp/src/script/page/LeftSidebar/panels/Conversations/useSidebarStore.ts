@@ -20,9 +20,23 @@
 import {create} from 'zustand';
 import {createJSONStorage, persist} from 'zustand/middleware';
 
+/** @deprecated Former `SidebarTabs.THREADS` value before the all-threads sidebar view was removed. */
+const LEGACY_SIDEBAR_TAB_THREADS = 1;
+
+const migrateSidebarTab = (tab: number): SidebarTabs => {
+  if (tab === LEGACY_SIDEBAR_TAB_THREADS) {
+    return SidebarTabs.RECENT;
+  }
+
+  if (tab > LEGACY_SIDEBAR_TAB_THREADS) {
+    return tab - 1;
+  }
+
+  return tab;
+};
+
 export enum SidebarTabs {
   RECENT,
-  THREADS,
   FOLDER,
   FAVORITES,
   GROUPS,
@@ -143,8 +157,22 @@ const useSidebarStore = create<SidebarStore>()(
         )
           ? SidebarTabs.RECENT
           : state.currentTab,
-        visibleTabs: state.visibleTabs,
+        visibleTabs: state.visibleTabs.map(tab => migrateSidebarTab(tab)),
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<SidebarStore> | undefined;
+
+        if (!persisted) {
+          return currentState;
+        }
+
+        return {
+          ...currentState,
+          ...persisted,
+          currentTab: migrateSidebarTab(persisted.currentTab ?? currentState.currentTab),
+          visibleTabs: (persisted.visibleTabs ?? currentState.visibleTabs).map(tab => migrateSidebarTab(tab)),
+        };
+      },
     },
   ),
 );

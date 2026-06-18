@@ -141,6 +141,12 @@
     min-height: 0;
     flex: 1 1 auto;
     overflow-y: auto;
+
+    ul li:not(:last-child)::after {
+      display: none;
+      border-bottom: none;
+      content: none;
+    }
   }
 }
 

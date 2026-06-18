@@ -17,6 +17,4 @@
  *
  */
 
-export * from './ThreadsPanel';
-export {ThreadListItem} from '../ThreadListItem';
-export type {ThreadListItemProps} from '../ThreadListItem';
+export {ThreadListItem} from './ThreadListItem';

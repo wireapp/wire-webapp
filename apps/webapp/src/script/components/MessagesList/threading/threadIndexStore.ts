@@ -20,6 +20,8 @@
 import {create} from 'zustand';
 import {createJSONStorage, persist} from 'zustand/middleware';
 
+import type {ThreadRootMetadata} from './threadMetadataUtils';
+
 export type ThreadIndexEntry = {
   conversationId: string;
   threadId: string;
@@ -331,6 +333,31 @@ const useThreadIndexStore = create<ThreadIndexStore>()(
   ),
 );
 
+export const ensureThreadRootMetadata = (
+  conversationId: string,
+  threadId: string,
+  metadata: ThreadRootMetadata,
+) => {
+  const state = useThreadIndexStore.getState();
+  const key = getThreadIndexKey(conversationId, threadId);
+  const current = state.threadsByKey[key];
+  const needsPreview = !normalizePreview(current?.rootMessagePreview);
+  const needsAuthor = !current?.rootMessageAuthorId;
+  const needsTimestamp = !current?.rootMessageTimestamp;
+
+  if (!needsPreview && !needsAuthor && !needsTimestamp) {
+    return;
+  }
+
+  state.upsertThread({
+    conversationId,
+    threadId,
+    ...(needsPreview && metadata.rootMessagePreview ? {rootMessagePreview: metadata.rootMessagePreview} : {}),
+    ...(needsAuthor && metadata.rootMessageAuthorId ? {rootMessageAuthorId: metadata.rootMessageAuthorId} : {}),
+    ...(needsTimestamp && metadata.rootMessageTimestamp ? {rootMessageTimestamp: metadata.rootMessageTimestamp} : {}),
+  });
+};
+
 export const getAllThreadsSorted = (state: ThreadIndexStore): ThreadIndexEntry[] => {
   return Object.values(state.threadsByKey).sort((a, b) => {
     const timeDelta = new Date(b.lastReplyAt).getTime() - new Date(a.lastReplyAt).getTime();
@@ -340,37 +367,6 @@ export const getAllThreadsSorted = (state: ThreadIndexStore): ThreadIndexEntry[]
 
     return getThreadIndexKey(a.conversationId, a.threadId).localeCompare(getThreadIndexKey(b.conversationId, b.threadId));
   });
-};
-
-const DAYS_30_IN_MS = 30 * 24 * 60 * 60 * 1000;
-
-export const isThreadInactive = (thread: ThreadIndexEntry, now = Date.now()) =>
-  now - new Date(thread.lastReplyAt).getTime() > DAYS_30_IN_MS;
-
-export type ThreadListFilters = {
-  allThreads: boolean;
-  myThreads: boolean;
-  contributed: boolean;
-  inactive: boolean;
-};
-
-export type ThreadRowViewModel = {
-  conversationId: string;
-  threadId: string;
-  title: string;
-  conversationLabel: string;
-  authorLabel: string;
-  authorAccentColor?: string;
-  preview: string;
-  lastActivityAt: string;
-  badges: {
-    unreadCount: number;
-    hasUnreadMentionForSelf: boolean;
-    isMyThread: boolean;
-    isContributed: boolean;
-    isInactive: boolean;
-  };
-  thread: ThreadIndexEntry;
 };
 
 export type ConversationThreadRowViewModel = {
@@ -392,24 +388,12 @@ export type ThreadAuthorLabelData = {
   accentColor?: string;
 };
 
-const FALLBACK_TITLE_PREFIX = 'Thread in';
 const FALLBACK_AUTHOR_LABEL = 'Unknown author';
 const FALLBACK_PREVIEW = 'No preview available.';
-const FALLBACK_TITLE_SUFFIX = 'this conversation';
 
 const getThreadPreview = (preview?: string) => {
   const normalizedPreview = preview?.trim();
   return normalizedPreview ? normalizedPreview : FALLBACK_PREVIEW;
-};
-
-const getThreadTitle = (thread: ThreadIndexEntry, conversationLabel: string) => {
-  const rootPreview = normalizePreview(thread.rootMessagePreview);
-  if (rootPreview) {
-    return rootPreview;
-  }
-
-  const safeConversationLabel = getNormalizedLabel(conversationLabel) ?? FALLBACK_TITLE_SUFFIX;
-  return `${FALLBACK_TITLE_PREFIX} ${safeConversationLabel}`;
 };
 
 const getNormalizedLabel = (value?: string) => {
@@ -419,46 +403,6 @@ const getNormalizedLabel = (value?: string) => {
 
   const normalized = value.trim();
   return normalized.length > 0 ? normalized : undefined;
-};
-
-const getThreadAuthorLabel = (
-  thread: ThreadIndexEntry,
-  authorLabelsById: Record<string, ThreadAuthorLabelData | string>,
-) => {
-  if (!thread.lastReplyAuthorId) {
-    return FALLBACK_AUTHOR_LABEL;
-  }
-
-  const authorLabelData = authorLabelsById[thread.lastReplyAuthorId];
-  if (!authorLabelData) {
-    return thread.lastReplyAuthorId;
-  }
-
-  if (typeof authorLabelData === 'string') {
-    return getNormalizedLabel(authorLabelData) ?? thread.lastReplyAuthorId;
-  }
-
-  return (
-    getNormalizedLabel(authorLabelData.displayName) ??
-    getNormalizedLabel(authorLabelData.handle) ??
-    thread.lastReplyAuthorId
-  );
-};
-
-const getThreadAuthorAccentColor = (
-  thread: ThreadIndexEntry,
-  authorLabelsById: Record<string, ThreadAuthorLabelData | string>,
-) => {
-  if (!thread.lastReplyAuthorId) {
-    return undefined;
-  }
-
-  const authorLabelData = authorLabelsById[thread.lastReplyAuthorId];
-  if (!authorLabelData || typeof authorLabelData === 'string') {
-    return undefined;
-  }
-
-  return getNormalizedLabel(authorLabelData.accentColor);
 };
 
 const getRootAuthorLabel = (
@@ -534,59 +478,135 @@ export const buildConversationThreadRowViewModel = (
   isActive: activeThreadId != null && activeThreadId === thread.threadId,
 });
 
-export const getFilteredThreadsSorted = (
-  state: ThreadIndexStore,
-  filters: ThreadListFilters,
-  now = Date.now(),
-): ThreadIndexEntry[] => {
-  return getAllThreadsSorted(state).filter(thread => {
-    if (!filters.inactive && isThreadInactive(thread, now)) {
-      return false;
-    }
 
-    if (filters.allThreads) {
-      return true;
-    }
-
-    return (filters.myThreads && thread.isRootMessageBySelf) || (filters.contributed && thread.hasReplyBySelf);
-  });
+export type ThreadRowViewModel = {
+  conversationId: string;
+  threadId: string;
+  title: string;
+  conversationLabel: string;
+  authorLabel: string;
+  authorAccentColor?: string;
+  preview: string;
+  lastActivityAt: string;
+  badges: {
+    unreadCount: number;
+    hasUnreadMentionForSelf: boolean;
+  };
+  thread: ThreadIndexEntry;
 };
 
-export const getFilteredThreadRows = (
-  state: ThreadIndexStore,
-  filters: ThreadListFilters,
+const FALLBACK_TITLE_PREFIX = 'Thread in';
+const FALLBACK_TITLE_SUFFIX = 'this conversation';
+
+const getThreadTitle = (thread: ThreadIndexEntry, conversationLabel: string) => {
+  const rootPreview = normalizePreview(thread.rootMessagePreview);
+  if (rootPreview) {
+    return rootPreview;
+  }
+
+  const safeConversationLabel = getNormalizedLabel(conversationLabel) ?? FALLBACK_TITLE_SUFFIX;
+  return `${FALLBACK_TITLE_PREFIX} ${safeConversationLabel}`;
+};
+
+const getThreadAuthorLabel = (
+  thread: ThreadIndexEntry,
+  authorLabelsById: Record<string, ThreadAuthorLabelData | string>,
+) => {
+  if (!thread.lastReplyAuthorId) {
+    return FALLBACK_AUTHOR_LABEL;
+  }
+
+  const authorLabelData = authorLabelsById[thread.lastReplyAuthorId];
+  if (!authorLabelData) {
+    return thread.lastReplyAuthorId;
+  }
+
+  if (typeof authorLabelData === 'string') {
+    return getNormalizedLabel(authorLabelData) ?? thread.lastReplyAuthorId;
+  }
+
+  return (
+    getNormalizedLabel(authorLabelData.displayName) ??
+    getNormalizedLabel(authorLabelData.handle) ??
+    thread.lastReplyAuthorId
+  );
+};
+
+const getThreadAuthorAccentColor = (
+  thread: ThreadIndexEntry,
+  authorLabelsById: Record<string, ThreadAuthorLabelData | string>,
+) => {
+  if (!thread.lastReplyAuthorId) {
+    return undefined;
+  }
+
+  const authorLabelData = authorLabelsById[thread.lastReplyAuthorId];
+  if (!authorLabelData || typeof authorLabelData === 'string') {
+    return undefined;
+  }
+
+  return getNormalizedLabel(authorLabelData.accentColor);
+};
+
+const buildThreadRowViewModel = (
+  thread: ThreadIndexEntry,
   {
     conversationLabelsById = {},
     authorLabelsById = {},
-    now = Date.now(),
   }: {
     conversationLabelsById?: Record<string, string>;
     authorLabelsById?: Record<string, ThreadAuthorLabelData | string>;
-    now?: number;
+  } = {},
+): ThreadRowViewModel => {
+  const conversationLabel = conversationLabelsById[thread.conversationId] ?? thread.conversationId;
+
+  return {
+    conversationId: thread.conversationId,
+    threadId: thread.threadId,
+    title: getThreadTitle(thread, conversationLabel),
+    conversationLabel,
+    authorLabel: getThreadAuthorLabel(thread, authorLabelsById),
+    authorAccentColor: getThreadAuthorAccentColor(thread, authorLabelsById),
+    preview: getThreadPreview(thread.lastReplyPreview),
+    lastActivityAt: thread.lastReplyAt,
+    badges: {
+      unreadCount: thread.unreadCount,
+      hasUnreadMentionForSelf: thread.hasUnreadMentionForSelf,
+    },
+    thread,
+  };
+};
+
+export const getScopedThreadsSorted = (
+  state: ThreadIndexStore,
+  conversationIds: string[],
+): ThreadIndexEntry[] => {
+  if (!conversationIds.length) {
+    return [];
+  }
+
+  const conversationIdSet = new Set(conversationIds);
+
+  return getAllThreadsSorted(state).filter(thread => conversationIdSet.has(thread.conversationId));
+};
+
+export const countScopedThreads = (state: ThreadIndexStore, conversationIds: string[]): number =>
+  getScopedThreadsSorted(state, conversationIds).length;
+
+export const getScopedThreadRows = (
+  state: ThreadIndexStore,
+  conversationIds: string[],
+  {
+    conversationLabelsById = {},
+    authorLabelsById = {},
+  }: {
+    conversationLabelsById?: Record<string, string>;
+    authorLabelsById?: Record<string, ThreadAuthorLabelData | string>;
   } = {},
 ): ThreadRowViewModel[] => {
-  return getFilteredThreadsSorted(state, filters, now).map(thread => {
-    const conversationLabel = conversationLabelsById[thread.conversationId] ?? thread.conversationId;
-
-    return {
-      conversationId: thread.conversationId,
-      threadId: thread.threadId,
-      title: getThreadTitle(thread, conversationLabel),
-      conversationLabel,
-      authorLabel: getThreadAuthorLabel(thread, authorLabelsById),
-      authorAccentColor: getThreadAuthorAccentColor(thread, authorLabelsById),
-      preview: getThreadPreview(thread.lastReplyPreview),
-      lastActivityAt: thread.lastReplyAt,
-      badges: {
-        unreadCount: thread.unreadCount,
-        hasUnreadMentionForSelf: thread.hasUnreadMentionForSelf,
-        isMyThread: thread.isRootMessageBySelf,
-        isContributed: thread.hasReplyBySelf,
-        isInactive: isThreadInactive(thread, now),
-      },
-      thread,
-    };
-  });
+  return getScopedThreadsSorted(state, conversationIds).map(thread =>
+    buildThreadRowViewModel(thread, {conversationLabelsById, authorLabelsById}),
+  );
 };
 
 export {useThreadIndexStore};

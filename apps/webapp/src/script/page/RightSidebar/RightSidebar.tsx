@@ -46,7 +46,6 @@ import {GroupParticipantService} from './groupParticipantService';
 import {GroupParticipantUser} from './groupParticipantUser';
 import {GuestServicesOptions} from './guestServicesOptions';
 import {MessageDetails} from './messageDetails';
-import {MessageThread} from './MessageThread/MessageThread';
 import {Notifications} from './notifications';
 import {ParticipantDevices} from './participantDevices';
 import {TimedMessages} from './timedMessages';
@@ -83,7 +82,6 @@ export enum PanelState {
   GROUP_PARTICIPANT_USER = 'GROUP_PARTICIPANT_USER',
   GUEST_OPTIONS = 'GUEST_OPTIONS',
   MESSAGE_DETAILS = 'MESSAGE_DETAILS',
-  MESSAGE_THREAD = 'MESSAGE_THREAD',
   CONVERSATION_THREADS_LIST = 'CONVERSATION_THREADS_LIST',
   NOTIFICATIONS = 'NOTIFICATIONS',
   PARTICIPANT_DEVICES = 'DEVICES',
@@ -205,7 +203,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
       id="right-column"
       component="aside"
       className={cx('right-column', {
-        'right-column--message-thread': currentState === PanelState.MESSAGE_THREAD,
         'right-column--conversation-threads-list': currentState === PanelState.CONVERSATION_THREADS_LIST,
       })}
       childFactory={child =>
@@ -347,26 +344,6 @@ const RightSidebar: FC<RightSidebarProps> = ({
               usersById={Object.fromEntries(
                 activeConversation.allUserEntities().map(userEntity => [userEntity.id, userEntity]),
               )}
-            />
-          )}
-
-          {currentState === PanelState.MESSAGE_THREAD && messageEntity && (
-            <MessageThread
-              activeConversation={activeConversation}
-              rootMessage={messageEntity}
-              onClose={closePanel}
-              conversationRepository={repositories.conversation}
-              cellsRepository={repositories.cells}
-              messageRepository={repositories.message}
-              eventRepository={repositories.event}
-              giphyRepository={repositories.giphy}
-              propertiesRepository={repositories.properties}
-              searchRepository={repositories.search}
-              storageRepository={repositories.storage}
-              teamState={teamState}
-              isCellsEnabled={isCellsEnabled}
-              selfUser={selfUser}
-              actionsViewModel={actionsViewModel}
             />
           )}
 

@@ -72,7 +72,19 @@ import {
   isThreadTrackedForSelf,
   useThreadUnreadRepliesStore,
 } from '../components/MessagesList/threading/threadUnreadRepliesStore';
-import {useThreadIndexStore} from '../components/MessagesList/threading/threadIndexStore';
+import {
+  ensureThreadRootMetadata,
+  useThreadIndexStore,
+} from '../components/MessagesList/threading/threadIndexStore';
+import {
+  extractThreadPreviewFromEvent,
+  extractThreadRootMetadataFromEvent,
+  extractThreadRootMetadataFromMessage,
+} from '../components/MessagesList/threading/threadMetadataUtils';
+import {
+  THREAD_REPLY_SENT,
+  ThreadReplySentPayload,
+} from '../components/MessagesList/threading/threadingEvents';
 import {runClientVersionCheck} from '../application-periodic-checks/runClientVersionCheck';
 import {startApplicationPeriodicChecks} from '../application-periodic-checks/startApplicationPeriodicChecks';
 import {WallClock} from '../clock/wallClock';
@@ -307,20 +319,41 @@ export const AppMain = (properties: AppMainProps) => {
   const normalizeThreadId = (threadId?: string | null) =>
     typeof threadId === 'string' && threadId.length ? threadId : null;
 
-  const extractThreadPreview = (event?: {
-    data?: {
-      content?: string;
-      text?: {content?: string};
-    };
-  }) => {
-    const preview = event?.data?.text?.content ?? event?.data?.content;
-    if (typeof preview !== 'string') {
-      return undefined;
-    }
+  const hydrateThreadRootMetadata = useCallback(
+    async (conversationId: string, threadId: string) => {
+      const conversation = visibleConversations.find(visibleConversation => visibleConversation.id === conversationId);
+      if (conversation) {
+        ensureThreadRootMetadata(
+          conversationId,
+          threadId,
+          extractThreadRootMetadataFromMessage(conversation.getMessage(threadId)),
+        );
+      }
 
-    const normalizedPreview = preview.trim();
-    return normalizedPreview.length > 0 ? normalizedPreview : undefined;
-  };
+      const threadIndexStore = useThreadIndexStore.getState();
+      const currentThread = threadIndexStore.threadsByKey[`${conversationId}:${threadId}`];
+      const hasRootMetadata =
+        !!currentThread?.rootMessagePreview?.trim() &&
+        !!currentThread?.rootMessageAuthorId &&
+        !!currentThread?.rootMessageTimestamp;
+
+      if (hasRootMetadata) {
+        return;
+      }
+
+      try {
+        const rootEvent = await repositories.event.eventService.loadEvent(conversationId, threadId);
+        ensureThreadRootMetadata(conversationId, threadId, extractThreadRootMetadataFromEvent(rootEvent));
+
+        if (rootEvent?.from === selfUser.id) {
+          threadIndexStore.markThreadRootMessageBySelf(conversationId, threadId);
+        }
+      } catch {
+        // Keep best-effort metadata when root event cannot be resolved yet.
+      }
+    },
+    [repositories.event.eventService, selfUser.id, visibleConversations],
+  );
 
   const isThreadReplyMessageEvent = (eventType?: string) => {
     if (!eventType) {
@@ -448,7 +481,7 @@ export const AppMain = (properties: AppMainProps) => {
                 current.lastReplyAt = eventTime;
                 current.lastReplyMessageId = event.id;
                 current.lastReplyAuthorId = event.from;
-                current.lastReplyPreview = extractThreadPreview(event);
+                current.lastReplyPreview = extractThreadPreviewFromEvent(event);
               }
 
               aggregatedThreads.set(key, current);
@@ -469,7 +502,7 @@ export const AppMain = (properties: AppMainProps) => {
           try {
             const rootEvent = await repositories.event.eventService.loadEvent(thread.conversationId, thread.threadId);
             isRootMessageBySelf = rootEvent?.from === selfUser.id;
-            rootMessagePreview = extractThreadPreview(rootEvent);
+            rootMessagePreview = extractThreadPreviewFromEvent(rootEvent);
             rootMessageAuthorId = rootEvent?.from;
             rootMessageTimestamp = rootEvent?.time;
             if (rootEvent?.from) {
@@ -569,10 +602,12 @@ export const AppMain = (properties: AppMainProps) => {
         eventTime: event.time,
         messageId: event.id,
         authorId: event.from,
-        preview: extractThreadPreview(event),
+        preview: extractThreadPreviewFromEvent(event),
         isSelfReply: event.from === selfUser.id,
         hasSelfMention: isSelfMentionedInThreadReply,
       });
+
+      void hydrateThreadRootMetadata(conversationId, threadId);
 
       if (event.from === selfUser.id) {
         threadStore.markThreadRepliedBySelf(conversationId, threadId);
@@ -601,14 +636,7 @@ export const AppMain = (properties: AppMainProps) => {
 
       try {
         const rootEvent = await repositories.event.eventService.loadEvent(conversationId, threadId);
-        const rootMessagePreview = extractThreadPreview(rootEvent);
-        if (rootMessagePreview) {
-          useThreadIndexStore.getState().upsertThread({
-            conversationId,
-            threadId,
-            rootMessagePreview,
-          });
-        }
+        ensureThreadRootMetadata(conversationId, threadId, extractThreadRootMetadataFromEvent(rootEvent));
 
         if (rootEvent?.from === selfUser.id) {
           const freshStore = useThreadUnreadRepliesStore.getState();
@@ -638,7 +666,27 @@ export const AppMain = (properties: AppMainProps) => {
     return () => {
       amplify.unsubscribe(WebAppEvents.CONVERSATION.EVENT_FROM_BACKEND, handleBackendEvent);
     };
-  }, [repositories.event.eventService, selfUser.id, selfUser.qualifiedId?.domain]);
+  }, [hydrateThreadRootMetadata, repositories.event.eventService, selfUser.id, selfUser.qualifiedId?.domain]);
+
+  useEffect(() => {
+    const handleThreadReplySent = ({conversationId, threadId}: ThreadReplySentPayload) => {
+      const conversation = visibleConversations.find(visibleConversation => visibleConversation.id === conversationId);
+      if (conversation) {
+        ensureThreadRootMetadata(
+          conversationId,
+          threadId,
+          extractThreadRootMetadataFromMessage(conversation.getMessage(threadId)),
+        );
+      }
+
+      void hydrateThreadRootMetadata(conversationId, threadId);
+    };
+
+    amplify.subscribe(THREAD_REPLY_SENT, handleThreadReplySent);
+    return () => {
+      amplify.unsubscribe(THREAD_REPLY_SENT, handleThreadReplySent);
+    };
+  }, [hydrateThreadRootMetadata, visibleConversations]);
 
   const showLeftSidebar = (isMobileView && isMobileLeftSidebarView) || (!isMobileView && !isLeftSidebarHidden);
   const showMainContent =
@@ -687,7 +735,6 @@ export const AppMain = (properties: AppMainProps) => {
               className={cx('app', {
                 'app--hide-main-content-on-mobile':
                   currentTab !== SidebarTabs.CELLS && currentTab !== SidebarTabs.MEETINGS,
-                'app--message-thread-panel': currentState === PanelState.MESSAGE_THREAD,
                 'app--conversation-threads-list-panel': currentState === PanelState.CONVERSATION_THREADS_LIST,
               })}
             >

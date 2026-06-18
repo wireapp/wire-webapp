@@ -17,6 +17,32 @@
  *
  */
 
-export * from './ThreadsPanel';
-export {ThreadListItem} from '../ThreadListItem';
-export type {ThreadListItemProps} from '../ThreadListItem';
+import {CSSObject} from '@emotion/react';
+
+export const panelContainer: CSSObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+  minHeight: 0,
+};
+
+export const list: CSSObject = {
+  margin: 0,
+  padding: 0,
+  listStyle: 'none',
+  minHeight: 0,
+};
+
+export const emptyState: CSSObject = {
+  marginTop: '12px',
+  border: '1px dashed var(--border-color)',
+  borderRadius: '10px',
+  padding: '16px 12px',
+  textAlign: 'center',
+};
+
+export const noResultsMessage: CSSObject = {
+  margin: '12px 16px 0',
+  color: 'var(--text-input-placeholder)',
+  fontSize: 'var(--font-size-small)',
+};

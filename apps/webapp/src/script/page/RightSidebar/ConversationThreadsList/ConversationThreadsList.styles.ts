@@ -44,8 +44,11 @@ export const list: CSSObject = {
 
 export const listItem = (isActive: boolean): CSSObject => ({
   position: 'relative',
-  borderBottom: '1px solid var(--border-color)',
   backgroundColor: isActive ? 'var(--background-fade-8)' : 'var(--app-bg-secondary)',
+
+  ':not(:last-child)': {
+    borderBottom: '1px solid var(--border-color)',
+  },
 
   ':hover': {
     backgroundColor: 'var(--background-fade-8)',
@@ -147,7 +150,7 @@ export const rowContent: CSSObject = {
   minWidth: 0,
   flex: '1 1 auto',
   flexDirection: 'row',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   gap: AVATAR_COLUMN_GAP,
 };
 
@@ -174,9 +177,9 @@ export const authorLabel: CSSObject = {
   flex: '0 1 auto',
   fontSize: 'var(--font-size-small)',
   fontWeight: 'var(--font-weight-bold)',
-  lineHeight: 'var(--line-height-xs)',
+  lineHeight: 'var(--line-height-sm)',
   color: 'var(--main-color)',
-  overflowX: 'hidden',
+  overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
   minWidth: 0,
@@ -195,9 +198,9 @@ export const preview: CSSObject = {
   width: '100%',
   minWidth: 0,
   overflow: 'hidden',
-  color: 'var(--foreground)',
-  fontSize: 'var(--font-size-small)',
-  lineHeight: 'var(--line-height-sm)',
+  color: 'var(--main-color)',
+  fontSize: 'var(--font-size-base)',
+  lineHeight: 'var(--line-height-md)',
   textAlign: 'left',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',

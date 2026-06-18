@@ -89,6 +89,17 @@ body.theme-dark {
   }
 }
 
+.conversation-title-bar-library--thread {
+  min-width: 0;
+  flex-grow: 1;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.conversation-title-bar--thread-open .conversation-title-bar-name {
+  display: none;
+}
+
 .conversation-title-bar-icons {
   justify-content: flex-end;
   gap: 8px;
@@ -117,6 +128,97 @@ body.theme-dark {
       &:hover {
         border-color: transparent;
         background-color: transparent;
+      }
+    }
+  }
+}
+
+.conversation-title-bar-follow-button {
+  display: inline-flex;
+  min-width: auto;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+  gap: 6px;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out;
+
+  svg {
+    flex-shrink: 0;
+
+    path {
+      fill: currentColor;
+    }
+  }
+
+  &__content {
+    display: grid;
+    align-items: center;
+  }
+
+  &__label {
+    display: inline-flex;
+    align-items: center;
+    grid-area: 1 / 1;
+    gap: 6px;
+  }
+
+  &--follow {
+    border: 1px solid transparent;
+    background-color: var(--accent-color-500);
+    color: var(--white);
+
+    &:hover {
+      background-color: var(--accent-color-600);
+    }
+
+    body.theme-dark & {
+      color: var(--black);
+
+      &:hover {
+        background-color: var(--accent-color-400);
+      }
+    }
+  }
+
+  &--following {
+    border: 1px solid var(--gray-40);
+    background-color: var(--white);
+    color: #33373a;
+
+    .conversation-title-bar-follow-button__label--unfollow {
+      visibility: hidden;
+    }
+
+    &:hover {
+      border-color: var(--gray-50);
+      background-color: var(--gray-20);
+
+      .conversation-title-bar-follow-button__label--following {
+        visibility: hidden;
+      }
+
+      .conversation-title-bar-follow-button__label--unfollow {
+        visibility: visible;
+      }
+    }
+
+    body.theme-dark & {
+      border: 1px solid var(--gray-100);
+      background-color: var(--gray-90);
+      color: var(--white);
+
+      &:hover {
+        border-color: var(--gray-70);
+        background-color: var(--gray-80);
       }
     }
   }

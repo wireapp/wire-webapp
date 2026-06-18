@@ -31,68 +31,29 @@ describe('ThreadsPanel', () => {
   });
 
   it('renders empty state when there are no indexed threads', () => {
-    const {getByText} = render(withTheme(<ThreadsPanel />));
+    const {getByText} = render(withTheme(<ThreadsPanel conversationIds={['conversation-a']} />));
 
-    expect(getByText('0 threads shown')).toBeTruthy();
     expect(getByText('No threads found')).toBeTruthy();
-    expect(getByText('No threads for the current filters.')).toBeTruthy();
+    expect(getByText('No threads in this section yet.')).toBeTruthy();
   });
 
-  it('renders indexed threads from store', () => {
+  it('renders indexed threads using the thread list row design', () => {
     useThreadIndexStore.getState().upsertThread({
       conversationId: 'conversation-a',
       threadId: 'thread-a',
+      rootMessagePreview: 'Hi team, any news on the launch?',
       lastReplyAt: '2026-01-02T00:00:00.000Z',
       unreadCount: 2,
       replyCount: 3,
     });
 
-    const {getByText} = render(withTheme(<ThreadsPanel />));
+    const {getByText, queryByText} = render(withTheme(<ThreadsPanel conversationIds={['conversation-a']} />));
 
-    expect(getByText('Thread in conversation-a')).toBeTruthy();
+    expect(getByText('Hi team, any news on the launch?')).toBeTruthy();
     expect(getByText('conversation-a')).toBeTruthy();
-    expect(getByText('Last reply by Unknown author')).toBeTruthy();
-    expect(getByText('No preview available.')).toBeTruthy();
     expect(getByText('3 replies')).toBeTruthy();
-    expect(getByText('2 unread')).toBeTruthy();
-  });
-
-  it('hides inactive threads by default and shows them when inactive filter is selected', () => {
-    useThreadIndexStore.getState().upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-inactive',
-      lastReplyAt: '2020-01-01T00:00:00.000Z',
-      unreadCount: 0,
-      replyCount: 1,
-    });
-
-    const {queryByText, getByRole} = render(withTheme(<ThreadsPanel />));
-
-    expect(queryByText('conversation-a')).toBeNull();
-
-    fireEvent.click(getByRole('button', {name: 'Inactive'}));
-
-    expect(queryByText('1 thread shown')).toBeTruthy();
-    expect(queryByText('conversation-a')).toBeTruthy();
-  });
-
-  it('allows resetting filters back to default', () => {
-    useThreadIndexStore.getState().upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-inactive',
-      lastReplyAt: '2020-01-01T00:00:00.000Z',
-      unreadCount: 0,
-      replyCount: 1,
-    });
-
-    const {getByRole, queryByText} = render(withTheme(<ThreadsPanel />));
-
-    fireEvent.click(getByRole('button', {name: 'Inactive'}));
-    expect(queryByText('Reset filters')).toBeTruthy();
-    expect(queryByText('conversation-a')).toBeTruthy();
-
-    fireEvent.click(getByRole('button', {name: 'Reset filters'}));
-    expect(queryByText('conversation-a')).toBeNull();
+    expect(getByText('2')).toBeTruthy();
+    expect(queryByText('Last reply by Unknown author')).toBeNull();
   });
 
   it('calls onOpenThread when clicking a thread row', () => {
@@ -100,14 +61,17 @@ describe('ThreadsPanel', () => {
     useThreadIndexStore.getState().upsertThread({
       conversationId: 'conversation-a',
       threadId: 'thread-a',
+      rootMessagePreview: 'Planning notes',
       lastReplyAt: '2026-01-02T00:00:00.000Z',
       unreadCount: 0,
       replyCount: 1,
     });
 
-    const {getByRole} = render(withTheme(<ThreadsPanel onOpenThread={onOpenThread} />));
+    const {getByRole} = render(
+      withTheme(<ThreadsPanel conversationIds={['conversation-a']} onOpenThread={onOpenThread} />),
+    );
 
-    fireEvent.click(getByRole('button', {name: /conversation-a/}));
+    fireEvent.click(getByRole('button', {name: /Planning notes/}));
 
     expect(onOpenThread).toHaveBeenCalledTimes(1);
     expect(onOpenThread).toHaveBeenCalledWith(
@@ -122,86 +86,26 @@ describe('ThreadsPanel', () => {
     useThreadIndexStore.getState().upsertThread({
       conversationId: 'conversation-a',
       threadId: 'thread-a',
+      rootMessagePreview: 'Status update',
       lastReplyAt: '2026-01-02T00:00:00.000Z',
       unreadCount: 0,
       replyCount: 1,
     });
 
     const {getByText} = render(
-      withTheme(<ThreadsPanel conversationLabelsById={{'conversation-a': 'Project Alpha'}} />),
-    );
-
-    expect(getByText('Thread in Project Alpha')).toBeTruthy();
-    expect(getByText('Project Alpha')).toBeTruthy();
-  });
-
-  it('renders provided author labels', () => {
-    useThreadIndexStore.getState().upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-a',
-      lastReplyAt: '2026-01-02T00:00:00.000Z',
-      unreadCount: 0,
-      replyCount: 1,
-      lastReplyAuthorId: 'user-a',
-    });
-
-    const {getByText} = render(
-      withTheme(<ThreadsPanel authorLabelsById={{'user-a': {displayName: 'Ada Lovelace', handle: '@ada'}}} />),
-    );
-
-    expect(getByText('Last reply by Ada Lovelace')).toBeTruthy();
-  });
-
-  it('renders thread preview when available', () => {
-    useThreadIndexStore.getState().upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-a',
-      lastReplyAt: '2026-01-02T00:00:00.000Z',
-      unreadCount: 0,
-      replyCount: 1,
-      lastReplyPreview: 'Latest update',
-    });
-
-    const {getByText} = render(withTheme(<ThreadsPanel />));
-
-    expect(getByText('Latest update')).toBeTruthy();
-  });
-
-  it('renders mention badge when thread has unread mention', () => {
-    useThreadIndexStore.getState().upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-a',
-      lastReplyAt: '2026-01-02T00:00:00.000Z',
-      unreadCount: 1,
-      hasUnreadMentionForSelf: true,
-      replyCount: 1,
-    });
-
-    const {getByText} = render(withTheme(<ThreadsPanel />));
-
-    expect(getByText('Mentioned')).toBeTruthy();
-  });
-
-  it('renders a conversation avatar slot for thread rows', () => {
-    useThreadIndexStore.getState().upsertThread({
-      conversationId: 'conversation-a',
-      threadId: 'thread-a',
-      lastReplyAt: '2026-01-02T00:00:00.000Z',
-      replyCount: 1,
-    });
-
-    const {getByTestId} = render(
       withTheme(
-        <div data-testid="threads-wrapper">
-          <ThreadsPanel />
-        </div>,
+        <ThreadsPanel
+          conversationIds={['conversation-a']}
+          conversationLabelsById={{'conversation-a': 'Project Alpha'}}
+        />,
       ),
     );
 
-    expect(getByTestId('threads-wrapper').querySelector('[data-uie-name="threads-list-item-avatar"]')).toBeTruthy();
+    expect(getByText('Status update')).toBeTruthy();
+    expect(getByText('Project Alpha')).toBeTruthy();
   });
 
-  it('filters threads by root message content search', () => {
+  it('filters threads by search value', () => {
     useThreadIndexStore.getState().upsertThread({
       conversationId: 'conversation-a',
       threadId: 'thread-a',
@@ -217,10 +121,13 @@ describe('ThreadsPanel', () => {
       replyCount: 1,
     });
 
-    const {queryByText} = render(withTheme(<ThreadsPanel rootMessageSearchValue="launch" />));
+    const {queryByText} = render(
+      withTheme(
+        <ThreadsPanel conversationIds={['conversation-a', 'conversation-b']} searchValue="launch" />,
+      ),
+    );
 
     expect(queryByText('Launch planning notes')).toBeTruthy();
     expect(queryByText('Sprint retrospective')).toBeNull();
-    expect(queryByText('1 thread shown')).toBeTruthy();
   });
 });

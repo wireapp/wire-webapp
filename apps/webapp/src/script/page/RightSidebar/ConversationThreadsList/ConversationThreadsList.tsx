@@ -20,6 +20,8 @@
 import {FC, useCallback, useMemo} from 'react';
 
 import {Avatar} from 'Components/Avatar';
+import {FadingScrollbar} from 'Components/FadingScrollbar';
+import * as Icon from 'Components/icon';
 import {
   buildConversationThreadRowViewModel,
   getThreadsForConversation,
@@ -27,15 +29,13 @@ import {
   useThreadIndexStore,
 } from 'Components/MessagesList/threading/threadIndexStore';
 import {useThreadUnreadRepliesStore} from 'Components/MessagesList/threading/threadUnreadRepliesStore';
-import {ThreadsIcon} from 'Components/ThreadIcons';
+import {ThreadsOutlineIcon} from 'Components/ThreadIcons';
 import {MessageRepository} from 'Repositories/conversation/MessageRepository';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Message} from 'Repositories/entity/message/Message';
 import {User} from 'Repositories/entity/User';
-import {FadingScrollbar} from 'Components/FadingScrollbar';
-import * as Icon from 'Components/icon';
-import {formatTimeShort} from 'src/script/util/TimeUtil';
 import {useAppMainState} from 'src/script/page/state';
+import {formatTimeShort} from 'src/script/util/TimeUtil';
 import {useKoSubscribableChildren} from 'Util/componentUtil';
 import {t} from 'Util/localizerUtil';
 
@@ -157,7 +157,7 @@ export const ConversationThreadsList: FC<ConversationThreadsListProps> = ({
     >
       <header css={panelHeader} className="conversation-threads-list-header">
         <div css={headerTextBlock}>
-          <ThreadsIcon css={titleIcon} />
+          <ThreadsOutlineIcon css={titleIcon} />
           <h2 css={headerTitle} data-uie-name="conversation-threads-title">
             Threads
             <p css={headerSubtitle} data-uie-name="conversation-threads-subtitle">
@@ -212,9 +212,9 @@ export const ConversationThreadsList: FC<ConversationThreadsListProps> = ({
                           {formatTimeShort(row.rootMessageTimestamp)}
                         </time>
                       </div>
-                      <span css={preview}>{row.preview}</span>
                     </div>
                   </div>
+                  <span css={preview}>{row.preview}</span>
                   <div css={meta}>
                     {row.thread.lastReplyAuthorId && usersById[row.thread.lastReplyAuthorId] && (
                       <span css={lastReplyAvatar}>
