@@ -17,8 +17,9 @@
  *
  */
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 
+import is from '@sindresorhus/is';
 import {QualifiedId, UserType} from '@wireapp/api-client/lib/user';
 import {container} from 'tsyringe';
 import {useDebouncedCallback} from 'use-debounce';
@@ -76,6 +77,13 @@ export const UserSearchableList = ({
 
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [remoteTeamMembers, setRemoteTeamMembers] = useState<User[]>([]);
+  const currentFilter = useRef(filter);
+  const remoteTeamMembersFilter = useRef(filter);
+  currentFilter.current = filter;
+
+  useEffect(() => {
+    setRemoteTeamMembers([]);
+  }, [filter]);
 
   const filteredSelectedUsers = selectedUsers ? searchRepository.searchUserInSet(filter, selectedUsers) : undefined;
 
@@ -94,9 +102,14 @@ export const UserSearchableList = ({
 
     // We shouldn't show any members that have the 'external' role and are not already locally known.
     const nonExternalMembers = await teamRepository.filterExternals(uniqueMembers);
-    setRemoteTeamMembers(
-      filterRemoteTeamUsers ? await teamRepository.filterRemoteDomainUsers(nonExternalMembers) : nonExternalMembers,
-    );
+    const nextRemoteTeamMembers = filterRemoteTeamUsers
+      ? await teamRepository.filterRemoteDomainUsers(nonExternalMembers)
+      : nonExternalMembers;
+
+    if (currentFilter.current === query) {
+      remoteTeamMembersFilter.current = query;
+      setRemoteTeamMembers(nextRemoteTeamMembers);
+    }
   }, SEARCH_MEMBERS_DEBOUNCE_MILLISECONDS);
 
   // Filter all list items if a filter is provided
@@ -117,7 +130,7 @@ export const UserSearchableList = ({
           user.username() === normalizedQuery,
       );
 
-    if (normalizedQuery !== '' && selfInTeam && allowRemoteSearch === true) {
+    if (is.nonEmptyString(normalizedQuery) && selfInTeam && allowRemoteSearch === true) {
       fireAndForgetInvoker.fireAndForget(async (): Promise<void> => {
         await fetchMembersFromBackend(filter, results);
       });
@@ -152,7 +165,7 @@ export const UserSearchableList = ({
   ]);
 
   const foundUserEntities = () => {
-    if (!remoteTeamMembers.length) {
+    if (remoteTeamMembersFilter.current !== filter || is.emptyArray(remoteTeamMembers)) {
       return filteredUsers;
     }
     const {query: normalizedQuery} = searchRepository.normalizeQuery(filter);
@@ -177,7 +190,7 @@ export const UserSearchableList = ({
       user.type === UserType.REGULAR,
   );
   const isEmptyUserList = userList.length === 0;
-  const isSearching = filter.length > 0;
+  const isSearching = is.nonEmptyString(filter);
   const noResultsDataUieName = !isSearching ? 'status-all-added' : 'status-no-matches';
   const noResultsTranslationText = !isSearching ? 'searchListEveryoneParticipates' : 'searchListNoMatches';
 
