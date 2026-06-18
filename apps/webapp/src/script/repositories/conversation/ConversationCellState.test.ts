@@ -35,16 +35,10 @@ import {ConversationStatusIcon} from './ConversationStatusIcon';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {CALL_MESSAGE_TYPE} from '../../message/CallMessageType';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 
 describe('ConversationCellState', () => {
   describe('Notification state icon', () => {
-    const conversationEntity = createConversationForTest(
-      createUuid(),
-      '',
-      CONVERSATION_PROTOCOL.PROTEUS,
-      translateForTest,
-    );
+    const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const selfUserEntity = new User(createUuid(), '', translateForTest);
     selfUserEntity.isMe = true;
@@ -71,12 +65,7 @@ describe('ConversationCellState', () => {
   });
 
   describe('Second line description for conversations', () => {
-    const conversationEntity = createConversationForTest(
-      createUuid(),
-      '',
-      CONVERSATION_PROTOCOL.PROTEUS,
-      translateForTest,
-    );
+    const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const selfUserEntity = new User(createUuid(), '', translateForTest);
     selfUserEntity.isMe = true;

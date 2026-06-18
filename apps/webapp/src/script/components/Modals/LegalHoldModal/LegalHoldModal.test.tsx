@@ -40,7 +40,6 @@ import {
 import {LegalHoldModal, LegalHoldModalType} from './LegalHoldModal';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const userRepository = {} as UserRepository;
@@ -84,12 +83,7 @@ describe('LegalHoldModal', () => {
   it('is showUser', async () => {
     const props = defaultProps();
     await render(<LegalHoldModal {...props} />, {wrapper: rootProviderWrapper});
-    const selfConversation = createConversationForTest(
-      props.selfUser.id,
-      '',
-      CONVERSATION_PROTOCOL.PROTEUS,
-      translateForTest,
-    );
+    const selfConversation = new Conversation(props.selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     await act(() => {
       useLegalHoldModalState.getState().showUsers(false, selfConversation);

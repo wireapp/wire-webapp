@@ -35,7 +35,6 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {CollectionDetails} from './CollectionDetails';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 jest.mock('Components/Image', () => ({
@@ -95,7 +94,7 @@ describe('CollectionDetails', () => {
   const rootProviderWrapper = createRootProviderWrapperForTest(
     createRootContextValueForTest({translate: translateForTest}),
   );
-  const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   it('displays all image assets', async () => {
     const messages = [createImageMessage(), createImageMessage()];
     const {getAllByText} = render(<CollectionDetails conversation={conversation} messages={messages} />, {

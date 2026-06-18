@@ -38,7 +38,6 @@ import {createUuid} from 'Util/uuid';
 import {MessageDetails} from './messageDetails';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const testFactory = new TestFactory();
@@ -68,7 +67,7 @@ const getDefaultParams = (showReactions: boolean = false) => {
 
 describe('MessageDetails', () => {
   it('renders no reactions view', async () => {
-    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.teamId = 'mock-team-id';
 
     const timestamp = new Date('2022-01-21T15:08:14.225Z').getTime();

@@ -35,7 +35,6 @@ import {
 } from 'Util/util';
 
 import {createUuid} from './uuid';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -177,11 +176,11 @@ describe('getContentTypeFromDataUrl', () => {
 
 describe('sortGroupsByLastEvent', () => {
   it('finds out that Group A is more recent than Group B', () => {
-    const groupA = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const groupA = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     groupA.name('Latest');
     groupA.last_event_timestamp(1414505857975);
 
-    const groupB = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const groupB = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     groupB.name('Older');
     groupB.last_event_timestamp(1414505766449);
 
@@ -193,11 +192,11 @@ describe('sortGroupsByLastEvent', () => {
   });
 
   it('finds out that Group B is more recent than Group A', () => {
-    const groupA = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const groupA = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     groupA.name('Older');
     groupA.last_event_timestamp(1414505766449);
 
-    const groupB = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const groupB = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     groupB.name('Latest');
     groupB.last_event_timestamp(1414505857975);
 
@@ -209,12 +208,12 @@ describe('sortGroupsByLastEvent', () => {
   });
 
   it('finds out if two groups are equally recent', () => {
-    const groupA = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const groupA = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const timestamp = 1414505857975;
     groupA.name('Group A');
     groupA.last_event_timestamp(timestamp);
 
-    const groupB = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const groupB = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     groupB.name('Group B');
     groupB.last_event_timestamp(timestamp);
 

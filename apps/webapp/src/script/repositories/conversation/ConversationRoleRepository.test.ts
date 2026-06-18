@@ -28,7 +28,6 @@ import {createUuid} from 'Util/uuid';
 import {ConversationRoleRepository, Permissions} from './ConversationRoleRepository';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ConversationRoleRepository', () => {
@@ -76,12 +75,7 @@ describe('ConversationRoleRepository', () => {
 
   describe('canAddParticipants', () => {
     it('checks if a user can add participants to a group', async () => {
-      const conversationEntity = createConversationForTest(
-        createUuid(),
-        '',
-        CONVERSATION_PROTOCOL.PROTEUS,
-        translateForTest,
-      );
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       const userEntity = new User(createUuid(), null, translateForTest);
       conversationEntity.participating_user_ets.push(userEntity);
 

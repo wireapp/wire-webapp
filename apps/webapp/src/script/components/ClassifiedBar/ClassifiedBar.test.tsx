@@ -29,7 +29,6 @@ import {
 import {createUuid} from 'Util/uuid';
 
 import {ConversationClassifiedBar} from './ClassifiedBar';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -37,7 +36,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 );
 
 describe('ClassifiedBar', () => {
-  const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const classifiedDomains = ['same.domain', 'classified.domain', 'other-classified.domain'];
   const sameDomainUser = new User(createUuid(), 'same.domain', translateForTest);
   const classifiedDomainUser = new User(createUuid(), 'classified.domain', translateForTest);

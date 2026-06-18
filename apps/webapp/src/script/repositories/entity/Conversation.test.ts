@@ -30,7 +30,6 @@ import {NOTIFICATION_STATE} from 'Repositories/conversation/NotificationSetting'
 import 'src/script/localization/Localizer';
 import {StatusType} from 'src/script/message/StatusType';
 import {translate} from 'Util/localizerUtil';
-import {createConversationForTest as createBaseConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
@@ -60,11 +59,11 @@ describe('Conversation', () => {
   }
 
   function createLocalizedConversationForTest(
-    conversationId: Parameters<typeof createBaseConversationForTest>[0] = '',
-    domain: Parameters<typeof createBaseConversationForTest>[1] = '',
-    protocol: Parameters<typeof createBaseConversationForTest>[2] = CONVERSATION_PROTOCOL.PROTEUS,
+    conversationId: string = '',
+    domain: string = '',
+    protocol: CONVERSATION_PROTOCOL = CONVERSATION_PROTOCOL.PROTEUS,
   ) {
-    return createBaseConversationForTest(conversationId, domain, protocol, translate);
+    return new Conversation(conversationId, domain, protocol, translate);
   }
 
   beforeEach(() => {
@@ -157,7 +156,7 @@ describe('Conversation', () => {
   describe('translation injection', () => {
     it('uses the injected translate function for unavailable 1:1 display names', () => {
       const translate = jest.fn((translationKey: string) => `translated:${translationKey}`);
-      const conversation = createBaseConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translate);
+      const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translate);
 
       conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
       conversation.participating_user_ets([new User('', '', translateForTest)]);

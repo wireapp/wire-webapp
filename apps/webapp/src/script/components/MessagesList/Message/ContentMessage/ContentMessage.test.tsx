@@ -35,7 +35,6 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {ContentMessageComponent, ContentMessageProps} from './ContentMessage';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const rootProviderWrapper = createRootProviderWrapperForTest(
@@ -55,7 +54,7 @@ describe('message', () => {
 
     defaultParams = {
       contextMenu: {entries: ko.observable([])},
-      conversation: createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+      conversation: new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
       findMessage: jest.fn(),
       isFocused: true,
       isLastDeliveredMessage: false,

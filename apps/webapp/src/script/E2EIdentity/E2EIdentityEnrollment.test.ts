@@ -35,7 +35,6 @@ import {E2EIHandler} from './E2EIdentityEnrollment';
 import * as e2EIdentityVerification from './E2EIdentityVerification';
 import {getEnrollmentStore} from './Enrollment.store';
 import {OIDCServiceStore} from './OIDCService/OIDCServiceStorage';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -333,7 +332,7 @@ describe('E2EIHandler', () => {
     const conversationState = container.resolve(ConversationState);
     jest
       .spyOn(conversationState, 'getSelfMLSConversation')
-      .mockReturnValue(createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest) as any);
+      .mockReturnValue(new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest) as any);
 
     const enrollmentStore = getEnrollmentStore({id: 'userId', domain: 'domain'}, 'clientId');
     enrollmentStore.store.e2eiActivatedAt(Date.now());

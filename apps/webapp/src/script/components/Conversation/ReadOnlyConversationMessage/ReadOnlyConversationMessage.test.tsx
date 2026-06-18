@@ -29,7 +29,6 @@ import {User} from 'Repositories/entity/User';
 import {withTheme} from 'src/script/auth/util/test/TestUtil';
 
 import {ReadOnlyConversationMessage} from './ReadOnlyConversationMessage';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 
 const generateConversation = (
@@ -37,7 +36,7 @@ const generateConversation = (
   is1To1WithBlockedUser = false,
   userName = 'John Doe',
 ) => {
-  const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);
   conversation.readOnlyState(readOnlyState);
 

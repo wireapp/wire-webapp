@@ -37,7 +37,6 @@ import {EventStorageMiddleware} from './EventStorageMiddleware';
 import {ClientEvent} from '../../Client';
 import {EventService} from '../../EventService';
 import {EventSource} from '../../EventSource';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -95,12 +94,7 @@ describe('EventStorageMiddleware', () => {
       const [eventStorageMiddleware, {conversationState}] = buildEventStorageMiddleware();
       const conversationId = createUuid();
       const userIds = [createUuid(), createUuid(), createUuid(), createUuid()];
-      const conversation = createConversationForTest(
-        conversationId,
-        '',
-        CONVERSATION_PROTOCOL.PROTEUS,
-        translateForTest,
-      );
+      const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       conversationState.findConversation.mockImplementation(() => conversation);
 
@@ -124,12 +118,7 @@ describe('EventStorageMiddleware', () => {
       user1.isDeleted = true;
       user2.isDeleted = true;
       user3.isDeleted = true;
-      const conversation = createConversationForTest(
-        conversationId,
-        '',
-        CONVERSATION_PROTOCOL.PROTEUS,
-        translateForTest,
-      );
+      const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.participating_user_ets([user1, user2, user3]);
 
       conversationState.findConversation.mockImplementation(() => conversation);
@@ -151,12 +140,7 @@ describe('EventStorageMiddleware', () => {
       const user1 = new User(userIds[0], '', translateForTest);
       const user2 = new User(userIds[1], '', translateForTest);
       const user3 = new User(userIds[2], '', translateForTest);
-      const conversation = createConversationForTest(
-        conversationId,
-        '',
-        CONVERSATION_PROTOCOL.PROTEUS,
-        translateForTest,
-      );
+      const conversation = new Conversation(conversationId, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversation.participating_user_ets([user1, user2, user3]);
 
       conversationState.findConversation.mockImplementation(() => conversation);

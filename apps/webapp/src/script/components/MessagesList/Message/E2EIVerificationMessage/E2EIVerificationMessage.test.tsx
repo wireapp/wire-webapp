@@ -27,7 +27,6 @@ import {E2EIVerificationMessageType} from 'src/script/message/E2EIVerificationMe
 import {E2EIVerificationMessage} from './E2EIVerificationMessage';
 
 import {withTheme} from '../../../../auth/util/test/TestUtil';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -39,7 +38,7 @@ const createVerificationMessage = (partialVerificationMessage: Partial<Verificat
 };
 
 describe('E2EIVerificationMessage', () => {
-  const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
   describe('with verified message', () => {
     it('shows verified icon when message is verified', async () => {

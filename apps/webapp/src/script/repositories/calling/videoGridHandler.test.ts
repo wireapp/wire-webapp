@@ -24,7 +24,6 @@ import {User} from 'Repositories/entity/User';
 import {createUuid} from 'Util/uuid';
 import {Conversation} from 'Repositories/entity/Conversation';
 import {Participant} from 'Repositories/calling/Participant';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -34,7 +33,7 @@ describe('videoGridHandler', () => {
 
     return new Call(
       {domain: '', id: ''},
-      createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+      new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
       CONV_TYPE.CONFERENCE,
       new Participant(selfUser, ''),
       CALL_TYPE.NORMAL,

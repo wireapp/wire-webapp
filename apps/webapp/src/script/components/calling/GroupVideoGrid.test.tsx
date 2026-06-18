@@ -34,7 +34,6 @@ import {translate} from 'Util/localizerUtil';
 import {GroupVideoGrid, GroupVideoGripProps} from './GroupVideoGrid';
 
 import {buildMediaDevicesHandler} from '../../auth/util/test/TestUtil';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -64,7 +63,7 @@ const createMockParticipant = (
 const createMockCall = () => {
   return new Call(
     {domain: '', id: ''},
-    createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+    new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     0,
     new Participant(new User('', '', translateForTest), ''),
     CALL_TYPE.NORMAL,

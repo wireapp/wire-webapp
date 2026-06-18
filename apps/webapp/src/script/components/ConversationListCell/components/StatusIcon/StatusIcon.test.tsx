@@ -20,13 +20,13 @@
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 import {act, render, screen} from '@testing-library/react';
 
+import {Conversation} from 'Repositories/entity/Conversation';
 import {ContentMessage} from 'Repositories/entity/message/ContentMessage';
 import {User} from 'Repositories/entity/User';
 import {
   createRootContextValueForTest,
   createRootProviderWrapperForTest,
 } from 'src/script/page/testSupport/rootContextTestSupport';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
@@ -38,7 +38,7 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 
 describe('StatusIcon', () => {
   it('renders an unread mention icon after the conversation unread state changes', () => {
-    const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const selfUser = new User(createUuid(), '', translateForTest);
     selfUser.isMe = true;
     conversation.selfUser(selfUser);

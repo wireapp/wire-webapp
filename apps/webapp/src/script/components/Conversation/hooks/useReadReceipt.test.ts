@@ -25,7 +25,6 @@ import {translateForTest} from 'Util/test/translateForTest';
 import {createUuid} from 'Util/uuid';
 
 import {useReadReceiptSender} from './useReadReceipt';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 describe('useReadReceipt', () => {
@@ -36,8 +35,8 @@ describe('useReadReceipt', () => {
   it('batches the read receipt sending per conversation', async () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
-    const conversation1 = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
-    const conversation2 = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation1 = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation2 = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const sender = createUuid();
 
@@ -66,7 +65,7 @@ describe('useReadReceipt', () => {
   it('batches the read receipt sending per sender', async () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
-    const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const sender1 = createUuid();
     const sender2 = createUuid();
@@ -92,7 +91,7 @@ describe('useReadReceipt', () => {
   it('does not add the same message multiple times', async () => {
     const sendReadReceipt = jest.fn();
     const {result} = renderHook(() => useReadReceiptSender({sendReadReceipt}));
-    const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
     const message = new Message(createUuid(), undefined, translateForTest);
     message.from = createUuid();

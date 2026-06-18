@@ -44,7 +44,6 @@ import {
 import {createUuid} from 'Util/uuid';
 
 import {TestFactory} from '../../../../test/helper/TestFactory';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -88,7 +87,7 @@ describe('InputBar', () => {
 
   const getDefaultProps = () => ({
     assetRepository: new AssetRepository(),
-    conversation: createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+    conversation: new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     cellsRepository: new CellsRepository(),
     files: [] as FileWithPreview[],
     conversationRepository: {

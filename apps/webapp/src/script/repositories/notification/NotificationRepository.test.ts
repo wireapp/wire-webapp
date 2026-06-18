@@ -68,7 +68,6 @@ import {truncate} from 'Util/stringUtil';
 import {createUuid} from 'Util/uuid';
 
 import {NotificationRepository} from './NotificationRepository';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 
 function buildNotificationRepository(translate: Translate) {
   const userState = container.resolve(UserState);
@@ -796,7 +795,7 @@ describe('NotificationRepository', () => {
       selfUserEntity.isMe = true;
       selfUserEntity.teamId = createUuid();
 
-      conversationEntity = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.selfUser(selfUserEntity);
 
       messageEntity = new ContentMessage(createUuid(), translateForTest);

@@ -45,7 +45,6 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 import {NOTIFICATION_STATE} from './NotificationSetting';
 
 import {entities, payload} from '../../../../test/api/payloads';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 
 describe('ConversationMapper', () => {
@@ -207,12 +206,7 @@ describe('ConversationMapper', () => {
 
     it('only updates existing properties', () => {
       const updatedName = 'Christmas 2017';
-      const conversationEntity = createConversationForTest(
-        createUuid(),
-        '',
-        CONVERSATION_PROTOCOL.PROTEUS,
-        translateForTest,
-      );
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.name('Christmas 2016');
 
       expect(conversationEntity.name()).toBeDefined();
@@ -750,7 +744,7 @@ describe('ConversationMapper', () => {
         CONVERSATION_ACCESS_ROLE.TEAM_MEMBER,
       ];
 
-      const conversationEntity = createConversationForTest(
+      const conversationEntity = new Conversation(
         'conversation-id',
         'domain',
         CONVERSATION_PROTOCOL.PROTEUS,
@@ -774,7 +768,7 @@ describe('ConversationMapper', () => {
 
       const accessRoleV2: undefined = undefined;
 
-      const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.teamId = 'team_id';
 
       ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole, accessRoleV2);
@@ -838,7 +832,7 @@ describe('ConversationMapper', () => {
       ];
 
       it.each(mockRightsLegacy)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
-        const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+        const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
         conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
@@ -878,7 +872,7 @@ describe('ConversationMapper', () => {
       const mockAccessRights = Object.entries(mockRightsV3);
 
       it.each(mockAccessRights)('sets correct accessState for %s', (state, {accessModes, accessRole}) => {
-        const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+        const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
         conversationEntity.teamId = 'team_id';
 
         ConversationMapper.mapAccessState(conversationEntity, accessModes, accessRole);
@@ -887,7 +881,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for self conversation', () => {
-      const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       conversationEntity.type(CONVERSATION_TYPE.SELF);
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);
@@ -895,7 +889,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for personal group conversation', () => {
-      const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => true));
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);
@@ -903,7 +897,7 @@ describe('ConversationMapper', () => {
     });
 
     it('maps roles properly for personal one2one conversation', () => {
-      const conversationEntity = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+      const conversationEntity = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
       jest.spyOn(conversationEntity, 'isGroup').mockImplementationOnce(ko.pureComputed(() => false));
 
       ConversationMapper.mapAccessState(conversationEntity, [], []);

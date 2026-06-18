@@ -46,10 +46,9 @@ import {
 import {ListViewModel} from 'src/script/view_model/ListViewModel';
 
 import {ConversationsList} from './ConversationsList';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 
 const create1to1Conversation = (userName: string) => {
-  const conversation = createConversationForTest('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   const user = new User('id', 'domain', translateForTest);
   user.name(userName);
   conversation.type(CONVERSATION_TYPE.ONE_TO_ONE);

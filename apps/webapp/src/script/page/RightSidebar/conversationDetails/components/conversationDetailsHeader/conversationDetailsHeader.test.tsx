@@ -31,12 +31,11 @@ import {
 } from 'src/script/page/testSupport/rootContextTestSupport';
 
 import {ConversationDetailsHeader} from './conversationDetailsHeader';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 
 const participant = new User('id', '', translateForTest);
 const service = new ServiceEntity({id: 'id'});
-const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 conversation.name('Group Chat');
 conversation.type(CONVERSATION_TYPE.REGULAR);
 

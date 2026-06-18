@@ -27,7 +27,6 @@ import {TeamState} from 'Repositories/team/TeamState';
 import {UserState} from 'Repositories/user/userState';
 
 import {ConversationState} from './ConversationState';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 
 function createConversationState() {
@@ -35,7 +34,7 @@ function createConversationState() {
 }
 
 function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATION_TYPE) {
-  const conversation = createConversationForTest(randomUUID(), '', protocol, translateForTest);
+  const conversation = new Conversation(randomUUID(), '', protocol, translateForTest);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;
     conversation.epoch = 0;

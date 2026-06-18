@@ -39,7 +39,6 @@ import {ConnectionEntity} from './connectionEntity';
 import {ConnectionRepository} from './connectionRepository';
 import {ConnectionService} from './connectionService';
 import {ConnectionState} from './connectionState';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 function buildConnectionRepository(translate: Translate) {
@@ -90,7 +89,7 @@ describe('ConnectionRepository', () => {
       amplify.subscribe(WebAppEvents.CONVERSATION.SHOW, amplifySpy);
 
       return connectionRepository
-        .cancelRequest(user, true, createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest))
+        .cancelRequest(user, true, new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest))
         .then(() => {
           expect(connectionService.putConnections).toHaveBeenCalled();
           expect(amplifySpy).toHaveBeenCalled();

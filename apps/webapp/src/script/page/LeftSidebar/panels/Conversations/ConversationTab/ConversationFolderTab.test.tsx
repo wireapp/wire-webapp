@@ -32,7 +32,6 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {ConversationFolderTab} from './ConversationFolderTab';
 
 import {SidebarTabs} from '../useSidebarStore';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const getProps = async (conversations: Conversation[] = []) => {
@@ -69,15 +68,10 @@ describe('ConversationFolderTab', () => {
   });
 
   it('should list custom folders only', async () => {
-    const favoriteConversation = createConversationForTest(
-      'id',
-      'domain',
-      CONVERSATION_PROTOCOL.PROTEUS,
-      translateForTest,
-    );
+    const favoriteConversation = new Conversation('id', 'domain', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     favoriteConversation.name('favoriteConversation');
 
-    const customFolderConversation = createConversationForTest(
+    const customFolderConversation = new Conversation(
       'id2',
       'domain2',
       CONVERSATION_PROTOCOL.PROTEUS,

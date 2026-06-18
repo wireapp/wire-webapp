@@ -30,7 +30,6 @@ import {MLSConversationVerificationStateHandler} from './MLSStateHandler';
 
 import {ConversationState} from '../../ConversationState';
 import {ConversationVerificationState} from '../../ConversationVerificationState';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 
 jest.mock('src/script/E2EIdentity', () => ({
@@ -69,7 +68,7 @@ describe('MLSConversationVerificationStateHandler', () => {
   let core: Core;
   const e2eiHandler = e2eIdentity.E2EIHandler.getInstance();
   const groupId = 'AAEAAKA0LuGtiU7NjqqlZIE2dQUAZWxuYS53aXJlLmxpbms=';
-  const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
   conversationState.conversations.push(conversation);
   conversation.groupId = groupId;
 
@@ -306,7 +305,7 @@ describe('MLSConversationVerificationStateHandler', () => {
 
       jest.spyOn(core.service!.mls!, 'conversationExists').mockResolvedValueOnce(true);
 
-      const newConversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
+      const newConversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MLS, translateForTest);
       newConversation.groupId = 'AAEAAAOygT3TL0wljoaNabgK4yIAZWxuYS53aXJlLmxpbms=';
 
       jest.spyOn(e2eIdentity, 'getConversationVerificationState').mockResolvedValue(E2eiConversationState.Verified);

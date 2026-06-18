@@ -29,11 +29,10 @@ import {TestFactory} from 'test/helper/TestFactory';
 import {createUuid} from 'Util/uuid';
 
 import {joinUnestablishedMixedConversations} from '.';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 
 const createMixedConversation = (mockGroupId: string, epoch = 5): MixedConversation => {
-  const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.MIXED, translateForTest);
+  const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.MIXED, translateForTest);
   conversation.groupId = mockGroupId;
   conversation.type(CONVERSATION_TYPE.REGULAR);
   conversation.epoch = epoch;

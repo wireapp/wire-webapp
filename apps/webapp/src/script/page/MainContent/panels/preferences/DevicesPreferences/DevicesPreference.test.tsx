@@ -39,7 +39,6 @@ import {Core} from 'src/script/service/coreSingleton';
 import {createUuid} from 'Util/uuid';
 
 import {DevicesPreferences} from './DevicesPreference';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 
 function createDevice(): ClientEntity {
@@ -50,7 +49,7 @@ function createDevice(): ClientEntity {
 }
 
 function createConversation(protocol?: CONVERSATION_PROTOCOL, type?: CONVERSATION_TYPE) {
-  const conversation = createConversationForTest(randomUUID(), '', protocol, translateForTest);
+  const conversation = new Conversation(randomUUID(), '', protocol, translateForTest);
   if (protocol === CONVERSATION_PROTOCOL.MLS) {
     conversation.groupId = `groupid-${randomUUID()}`;
     conversation.epoch = 0;

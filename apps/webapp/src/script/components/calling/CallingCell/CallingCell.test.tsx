@@ -40,7 +40,6 @@ import {createUuid} from 'Util/uuid';
 import {CallingCell, CallingCellProps} from './CallingCell';
 
 import {buildMediaDevicesHandler} from '../../../auth/util/test/TestUtil';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -72,7 +71,7 @@ const createCall = (
   const selfParticipant = new Participant(selfUser, selfClientId);
   const call = new Call(
     {domain: '', id: ''},
-    createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+    new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
     0,
     selfParticipant,
     CALL_TYPE.NORMAL,
@@ -91,7 +90,7 @@ const createProps = async () => {
   const mockTeamState = new TeamState();
   jest.spyOn(mockTeamState, 'isExternal').mockReturnValue(false);
 
-  const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   conversation.participating_user_ets([new User('id', '', translateForTest)]);
   return {
     call: createCall(CALL_STATE.MEDIA_ESTAB),

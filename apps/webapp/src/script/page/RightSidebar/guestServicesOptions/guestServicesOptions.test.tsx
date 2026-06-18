@@ -33,7 +33,6 @@ import {
 import {GuestServicesOptions} from './guestServicesOptions';
 
 import {TestFactory} from '../../../../../test/helper/TestFactory';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -64,7 +63,7 @@ const getDefaultParams = (isGuest: boolean = true) => {
 
 describe('GuestServicesOptions', () => {
   it('renders guest options', async () => {
-    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.accessState(ACCESS_STATE.TEAM.GUEST_ROOM);
     conversation.accessCode('accessCode');
 
@@ -87,7 +86,7 @@ describe('GuestServicesOptions', () => {
   });
 
   it('renders services options', () => {
-    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     const defaultProps = getDefaultParams(false);
     const {getByText} = render(<GuestServicesOptions {...defaultProps} activeConversation={conversation} />, {
       wrapper: rootProviderWrapper,

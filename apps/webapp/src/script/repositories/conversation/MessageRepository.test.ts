@@ -59,7 +59,6 @@ import {ConversationVerificationState} from './ConversationVerificationState';
 
 import {StatusType} from '../../message/StatusType';
 import {ServerTimeHandler, serverTimeHandler} from '../../time/serverTimeHandler';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 
 const selfUser = new User('selfid', '', translateForTest);
 selfUser.isMe = true;
@@ -96,7 +95,7 @@ async function buildMessageRepository(
   const teamState = new TeamState();
 
   const conversationState = new ConversationState(userState);
-  const selfConversation = createConversationForTest(selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+  const selfConversation = new Conversation(selfUser.id, '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   selfConversation.selfUser(selfUser);
   conversationState.conversations([selfConversation]);
   const dependencies = {
@@ -130,7 +129,7 @@ describe('MessageRepository', () => {
     conversation_type = CONVERSATION_TYPE.REGULAR,
     connection_status = ConnectionStatus.ACCEPTED,
   ) => {
-    const conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     conversation.type(conversation_type);
 
     const connectionEntity = new ConnectionEntity();

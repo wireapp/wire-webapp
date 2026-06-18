@@ -40,7 +40,6 @@ import {translate} from 'Util/localizerUtil';
 import {FullscreenVideoCall, FullscreenVideoCallProps} from './FullscreenVideoCall';
 import {CallingViewMode, CallState} from 'Repositories/calling/CallState';
 import {KEY} from 'Util/keyboardUtil';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
 const useMatchMediaMock = useMatchMedia as jest.Mock;
@@ -56,13 +55,13 @@ const rootProviderWrapper = createRootProviderWrapperForTest(
 
 describe('fullscreenVideoCall', () => {
   const createProps = (): FullscreenVideoCallProps => {
-    const conversation = createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    const conversation = new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
     spyOn(conversation, 'supportsVideoCall').and.returnValue(true);
     const selfUser = new User('', '', translateForTest);
     selfUser.isMe = true;
     const call = new Call(
       {domain: '', id: ''},
-      createConversationForTest('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
+      new Conversation('', '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest),
       0,
       new Participant(selfUser, ''),
       0,

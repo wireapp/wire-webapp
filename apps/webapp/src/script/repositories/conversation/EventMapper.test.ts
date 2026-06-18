@@ -31,7 +31,6 @@ import {arrayToBase64} from 'Util/util';
 import {createUuid} from 'Util/uuid';
 
 import {EventMapper} from './EventMapper';
-import {createConversationForTest} from 'Util/test/createConversationForTest';
 import {translateForTest} from 'Util/test/translateForTest';
 import {CONVERSATION_PROTOCOL} from '@wireapp/api-client/lib/team';
 
@@ -40,7 +39,7 @@ describe('Event Mapper', () => {
   const eventMapper = new EventMapper(undefined, translate);
 
   beforeEach(() => {
-    conversation = createConversationForTest(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
+    conversation = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
   });
 
   describe('mapJsonEvent', () => {
@@ -169,12 +168,7 @@ describe('Event Mapper', () => {
       const validMention = new MentionEntity(text.indexOf('@'), mandy.length, createUuid());
       const outOfRangeMention = new MentionEntity(text.length, randy.length, createUuid());
 
-      const conversationEntity = createConversationForTest(
-        createUuid(),
-        '',
-        CONVERSATION_PROTOCOL.PROTEUS,
-        translateForTest,
-      );
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       const mentionArrays = [
         arrayToBase64(Mention.encode(validMention.toProto()).finish()),
@@ -209,12 +203,7 @@ describe('Event Mapper', () => {
       const overlappingStart = mandyStart + mandy.length - 1;
       const overlappingMention = new MentionEntity(overlappingStart, randy.length, createUuid());
 
-      const conversationEntity = createConversationForTest(
-        createUuid(),
-        '',
-        CONVERSATION_PROTOCOL.PROTEUS,
-        translateForTest,
-      );
+      const conversationEntity = new Conversation(createUuid(), '', CONVERSATION_PROTOCOL.PROTEUS, translateForTest);
 
       const mentionArrays = [
         arrayToBase64(Mention.encode(validMention1.toProto()).finish()),
