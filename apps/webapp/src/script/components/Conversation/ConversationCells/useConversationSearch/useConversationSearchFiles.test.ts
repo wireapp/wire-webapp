@@ -310,10 +310,14 @@ describe('useConversationSearchFiles', () => {
 
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
+    const searchCallCountBeforeClearingFilters = cellsRepository.searchNodes.mock.calls.length;
+
     act(() => rerender({filters: emptyFilters}));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(cellsRepository.searchNodes).toHaveBeenLastCalledWith(
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeClearingFilters + 1);
+    expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
+      searchCallCountBeforeClearingFilters + 1,
       expect.objectContaining({query: '', recursive: false}),
     );
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('all-files.pdf');
@@ -331,10 +335,14 @@ describe('useConversationSearchFiles', () => {
     act(() => result.current.handleSearch('test'));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
+    const searchCallCountBeforeClearingInput = cellsRepository.searchNodes.mock.calls.length;
+
     act(() => result.current.handleSearch(''));
     await act(() => fireAndForgetInvoker.waitUntilAllSettled());
 
-    expect(cellsRepository.searchNodes).toHaveBeenLastCalledWith(
+    expect(cellsRepository.searchNodes).toHaveBeenCalledTimes(searchCallCountBeforeClearingInput + 1);
+    expect(cellsRepository.searchNodes).toHaveBeenNthCalledWith(
+      searchCallCountBeforeClearingInput + 1,
       expect.objectContaining({query: '', recursive: false}),
     );
     expect(useCellsStore.getState().getNodes({conversationId: CONV_ID})[0]?.name).toBe('all-files.pdf');
