@@ -670,6 +670,8 @@ declare module 'I18n/en-US.json' {
     'conversationContextMenuUnlike': `Unlike`;
     'conversationCreateReceiptsEnabled': `Read receipts are on`;
     'conversationDescriptionLabel': `Description:`;
+    'conversationDescriptionOptionalLabel': `Description (optional)`;
+    'conversationDescriptionPlaceholder': `Enter a description`;
     'conversationCreateTeam': `with [showmore]all team members[/showmore]`;
     'conversationCreateTeamGuest': `with [showmore]all team members and one guest[/showmore]`;
     'conversationCreateTeamGuests': `with [showmore]all team members and {count} guests[/showmore]`;

@@ -23,7 +23,12 @@ import {UserState} from 'Repositories/user/userState';
 import {t} from 'Util/localizerUtil';
 
 import {ChannelSettings} from './ChannelSettings';
-import {groupsNotAllowedSectionCss} from './ConversationDetails.styles';
+import {
+  conversationDescriptionInputCss,
+  conversationDescriptionInputWrapperCss,
+  conversationDescriptionLabelCss,
+  groupsNotAllowedSectionCss,
+} from './ConversationDetails.styles';
 import {ConversationNameInput} from './ConversationNameInput';
 
 import {useCreateConversationModal} from '../../hooks/useCreateConversationModal';
@@ -31,7 +36,7 @@ import {ConversationType} from '../../types';
 import {Preference} from '../Preference';
 
 export const ConversationDetails = () => {
-  const {conversationType} = useCreateConversationModal();
+  const {conversationType, conversationDescription, setConversationDescription} = useCreateConversationModal();
   const userState = container.resolve(UserState);
   const selfUser = userState.self();
 
@@ -44,6 +49,23 @@ export const ConversationDetails = () => {
   ) : (
     <>
       <ConversationNameInput />
+      {conversationType === ConversationType.Group && (
+        <div css={conversationDescriptionInputWrapperCss}>
+          <label css={conversationDescriptionLabelCss} htmlFor="enter-group-description">
+            {t('conversationDescriptionOptionalLabel')}
+          </label>
+          <textarea
+            css={conversationDescriptionInputCss}
+            id="enter-group-description"
+            data-uie-name="enter-group-description"
+            name="enter-group-description"
+            maxLength={200}
+            value={conversationDescription}
+            onChange={event => setConversationDescription(event.target.value)}
+            onBlur={event => setConversationDescription(event.target.value.trim())}
+          />
+        </div>
+      )}
       {conversationType === ConversationType.Group ? <Preference /> : <ChannelSettings />}
     </>
   );

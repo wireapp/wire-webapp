@@ -53,6 +53,7 @@ export const useCreateConversation = () => {
   const [isLoading, setIsLoading] = useState(false);
   const {
     conversationName,
+    conversationDescription,
     hideModal,
     showModal,
     selectedContacts,
@@ -164,6 +165,11 @@ export const useCreateConversation = () => {
               : GROUP_CONVERSATION_TYPE.GROUP_CONVERSATION,
         },
       );
+
+      const trimmedDescription = conversationDescription.trim();
+      if (conversationType === ConversationType.Group && trimmedDescription.length > 0) {
+        await conversationRepository.updateConversationDescription(conversation, trimmedDescription);
+      }
 
       setCurrentSidebarTab(SidebarTabs.RECENT);
 

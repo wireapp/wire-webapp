@@ -23,6 +23,50 @@
       min-height: 4rem;
     }
 
+    .modal-input-wrapper:focus-within .group-creation__description-label {
+      color: var(--accent-color-500);
+    }
+
+    .group-creation__description-label {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--text-input-color);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .group-creation__description-input {
+      width: 100%;
+      min-height: 48px;
+      margin-right: 0;
+      margin-left: 0;
+      padding: 12px 16px;
+      box-sizing: border-box;
+      border: 1px solid var(--text-input-border);
+      border-radius: 12px;
+      background: var(--text-input-background);
+      color: var(--text-input-color);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-regular);
+      line-height: var(--line-height-lg);
+      outline: none;
+      resize: none;
+
+      &::placeholder {
+        color: var(--text-input-placeholder);
+        opacity: 1;
+      }
+
+      &:hover {
+        border-color: var(--text-input-border-hover);
+      }
+
+      &:focus,
+      &:focus-visible,
+      &:active {
+        border-color: var(--accent-color-500);
+      }
+    }
+
     .modal__content {
       height: 490px;
     }
@@ -32,7 +76,10 @@
     }
 
     .modal__info {
-      margin: 8px 4px 22px;
+      margin: 0 2px 16px;
+      color: var(--gray-90);
+      font-size: var(--font-size-small);
+      line-height: var(--line-height-xs);
     }
 
     .modal__select-description {

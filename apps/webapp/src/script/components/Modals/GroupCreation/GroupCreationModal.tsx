@@ -137,6 +137,7 @@ const GroupCreationModal = ({
   );
   const [nameError, setNameError] = useState<string>('');
   const [groupName, setGroupName] = useState<string>('');
+  const [groupDescription, setGroupDescription] = useState<string>('');
   const [participantsInput, setParticipantsInput] = useState<string>('');
   const [groupCreationState, setGroupCreationState] = useState<GroupCreationModalState>(
     GroupCreationModalState.DEFAULT,
@@ -233,6 +234,7 @@ const GroupCreationModal = ({
     setIsCreatingConversation(false);
     setNameError('');
     setGroupName('');
+    setGroupDescription('');
     setParticipantsInput('');
     setSelectedContacts([]);
     setGroupCreationState(GroupCreationModalState.DEFAULT);
@@ -257,6 +259,11 @@ const GroupCreationModal = ({
           },
         );
 
+        const trimmedDescription = groupDescription.trim();
+        if (trimmedDescription.length > 0) {
+          await conversationRepository.updateConversationDescription(conversation, trimmedDescription);
+        }
+
         setCurrentSidebarTab(SidebarTabs.RECENT);
 
         if (isKeyboardEvent(event)) {
@@ -267,6 +274,7 @@ const GroupCreationModal = ({
       } catch (error: unknown) {
         if (isNonFederatingBackendsError(error)) {
           const tempName = groupName;
+          const tempDescription = groupDescription;
           setIsShown(false);
 
           const backendString = error.backends.join(', and ');
@@ -281,6 +289,7 @@ const GroupCreationModal = ({
               text: t('groupCreationPreferencesNonFederatingEditList'),
               action: () => {
                 setGroupName(tempName);
+                setGroupDescription(tempDescription);
                 setIsShown(true);
                 setIsCreatingConversation(false);
                 setGroupCreationState(GroupCreationModalState.PARTICIPANTS);
@@ -501,6 +510,22 @@ const GroupCreationModal = ({
                 value={groupName}
                 isError={hasNameError}
                 errorMessage={nameError}
+              />
+            </div>
+
+            <div className="modal-input-wrapper">
+              <label className="label-medium group-creation__description-label" htmlFor="enter-group-description">
+                {t('conversationDescriptionOptionalLabel')}
+              </label>
+              <textarea
+                className="modal__input reset-textarea group-creation__description-input"
+                id="enter-group-description"
+                data-uie-name="enter-group-description"
+                name="enter-group-description"
+                maxLength={200}
+                value={groupDescription}
+                onChange={event => setGroupDescription(event.target.value)}
+                onBlur={event => setGroupDescription(event.target.value.trim())}
               />
             </div>
 

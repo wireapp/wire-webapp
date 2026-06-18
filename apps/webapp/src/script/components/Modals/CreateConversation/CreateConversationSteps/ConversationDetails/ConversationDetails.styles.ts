@@ -89,3 +89,47 @@ export const groupsNotAllowedSectionCss: CSSObject = {
   marginTop: '35%',
   textAlign: 'center',
 };
+
+export const conversationDescriptionInputWrapperCss: CSSObject = {
+  '&:focus-within label': {
+    color: 'var(--accent-color-500)',
+  },
+  marginTop: '4px',
+  paddingBottom: '1rem',
+  width: '100%',
+};
+
+export const conversationDescriptionLabelCss: CSSObject = {
+  color: 'var(--text-input-color)',
+  display: 'block',
+  fontWeight: 'var(--font-weight-semibold)',
+  marginBottom: 2,
+};
+
+export const conversationDescriptionInputCss: CSSObject = {
+  '&::placeholder': {
+    color: 'var(--text-input-placeholder)',
+    opacity: 1,
+  },
+  '&:hover': {
+    borderColor: 'var(--text-input-border-hover)',
+  },
+  '&:focus, &:focus-visible, &:active': {
+    borderColor: 'var(--accent-color-500)',
+  },
+  background: 'var(--text-input-background)',
+  boxSizing: 'border-box',
+  border: '1px solid var(--text-input-border)',
+  borderRadius: 12,
+  color: 'var(--text-input-color)',
+  fontSize: 'var(--font-size-base)',
+  fontWeight: 'var(--font-weight-regular)',
+  lineHeight: 'var(--line-height-lg)',
+  marginLeft: 0,
+  marginRight: 0,
+  minHeight: 48,
+  outline: 'none',
+  padding: '12px 16px',
+  resize: 'none',
+  width: '100%',
+};

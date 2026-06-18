@@ -36,6 +36,7 @@ import {
 type CreateConversationModalState = {
   isOpen: boolean;
   conversationName: string;
+  conversationDescription: string;
   access: ConversationAccess;
   moderator: ADD_PERMISSION;
   chatHistory: ChatHistory;
@@ -58,6 +59,7 @@ type CreateConversationModalState = {
   showModal: () => void;
   hideModal: () => void;
   setConversationName: (name: string) => void;
+  setConversationDescription: (description: string) => void;
   setAccess: (access: ConversationAccess) => void;
   setModerator: (access: ADD_PERMISSION) => void;
   setChatHistory: (history: ChatHistory) => void;
@@ -88,6 +90,7 @@ type CreateConversationModalState = {
 const initialState = {
   isOpen: false,
   conversationName: '',
+  conversationDescription: '',
   access: ConversationAccess.Private,
   moderator: ADD_PERMISSION.EVERYONE,
   chatHistory: ChatHistory.Off,
@@ -115,6 +118,7 @@ export const useCreateConversationModal = create<CreateConversationModalState>(s
   showModal: () => set(state => ({...state, isOpen: true})),
   hideModal: () => set({...initialState}),
   setConversationName: (name: string) => set({conversationName: name}),
+  setConversationDescription: (description: string) => set({conversationDescription: description}),
   setAccess: (access: ConversationAccess) =>
     set(state => ({
       access,
