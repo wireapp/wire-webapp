@@ -1,0 +1,40 @@
+{
+  "name": "calling-grid-fixture",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "{projectRoot}/src",
+  "projectType": "application",
+  "tags": ["type:app", "scope:fixture"],
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "continuous": true,
+      "options": {
+        "command": "webpack serve --config webpack.config.js",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "command": "webpack --config webpack.config.js --mode production",
+        "cwd": "{projectRoot}"
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/calling-grid-fixture"],
+      "options": {
+        "jestConfig": "{projectRoot}/jest.config.ts",
+        "passWithNoTests": true
+      },
+      "configurations": {
+        "ci": {
+          "ci": true,
+          "coverage": true,
+          "coverageReporters": ["html", "lcov", "text"]
+        }
+      }
+    }
+  }
+}

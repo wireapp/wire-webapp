@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "jsxImportSource": "@emotion/react",
+    "module": "esnext",
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "noEmitOnError": false,
+    "outDir": "../../dist/apps/calling-grid-fixture",
+    "rootDirs": ["src"],
+    "target": "ESNext",
+    "strict": true,
+    "esModuleInterop": true
+  },
+  "include": ["src/**/*", "webpack.config.js"],
+  "exclude": ["node_modules"]
+}
