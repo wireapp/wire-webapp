@@ -17,7 +17,7 @@
  *
  */
 
-import {ChangeEvent, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, useCallback, useEffect, useRef, useState} from 'react';
 
 import {DefaultConversationRoleName} from '@wireapp/api-client/lib/conversation/';
 import cx from 'classnames';
@@ -144,6 +144,9 @@ const FullscreenVideoCall = ({
   callState = container.resolve(CallState),
 }: FullscreenVideoCallProps) => {
   const [isConfirmCloseModalOpen, setIsConfirmCloseModalOpen] = useState<boolean>(false);
+  const [isPresenterMode, setIsPresenterMode] = useState(false);
+  const handlePresenterModeRequested = useCallback(() => setIsPresenterMode(true), []);
+  const togglePresenterMode = useCallback(() => setIsPresenterMode(prev => !prev), []);
   const selfParticipant = call.getSelfParticipant();
   const {sharesCamera: selfSharesCamera} = useKoSubscribableChildren(selfParticipant, ['sharesCamera']);
 
@@ -397,6 +400,8 @@ const FullscreenVideoCall = ({
         <div id="video-element-remote" className="video-element-remote">
           <WireFluidVideoGrid
             call={call}
+            presenterMode={isPresenterMode}
+            onPresenterModeRequested={handlePresenterModeRequested}
             onViewAllParticipantsSelected={toggleParticipantsList}
           />
           {classifiedDomains && (
@@ -489,6 +494,8 @@ const FullscreenVideoCall = ({
               sendEmoji={sendEmoji}
               onOpenBackgroundSettings={() => backgroundSidebarHandler(true)}
               isWebGLAvailable={isWebGLAvailable}
+              presenterModeActive={isPresenterMode}
+              onPresenterModeToggle={togglePresenterMode}
             />
           </>
         )}

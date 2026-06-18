@@ -131,6 +131,7 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
   const [vpIndex, setVpIndex] = useState(1); // default 1280×720
   const viewport = VIEWPORT_CONFIGS[vpIndex];
   const [panelOpen, setPanelOpen] = useState(true);
+  const [presenterMode, setPresenterMode] = useState(false);
 
   const {
     participants,
@@ -204,6 +205,8 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
           <FluidVideoGrid
             participants={participants}
             config={GRID_CONFIG}
+            presenterMode={presenterMode}
+            onPresenterModeRequested={() => setPresenterMode(true)}
             onViewAllParticipantsSelected={() => console.log('[fixture] view all participants')}
           />
         </div>
@@ -296,6 +299,7 @@ export function FixtureInstance({initialCount = 2}: FixtureInstanceProps) {
               </select>
             </Field>
             <ToggleRow label="Simulate conversation" on={simulationEnabled} onToggle={toggleSimulation} />
+            <ToggleRow label="Presenter mode" on={presenterMode} onToggle={() => setPresenterMode(p => !p)} />
           </div>
 
           {/* ── Timing logic group ── */}

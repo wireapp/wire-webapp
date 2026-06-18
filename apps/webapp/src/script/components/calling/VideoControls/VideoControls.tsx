@@ -172,6 +172,8 @@ interface VideoControlsProps {
   sendEmoji: (emoji: string, call: Call) => void;
   onOpenBackgroundSettings?: () => void;
   isWebGLAvailable: boolean;
+  presenterModeActive?: boolean;
+  onPresenterModeToggle?: () => void;
 }
 
 export const VideoControls = ({
@@ -198,6 +200,8 @@ export const VideoControls = ({
   sendEmoji,
   onOpenBackgroundSettings,
   isWebGLAvailable = true,
+  presenterModeActive,
+  onPresenterModeToggle,
   teamState = container.resolve(TeamState),
   callState = container.resolve(CallState),
 }: VideoControlsProps) => {
@@ -961,6 +965,33 @@ export const VideoControls = ({
                     />
                   )}
                   <GridIcon width={16} height={16} />
+                </button>
+              </li>
+            )}
+
+            {participants.length > 2 && onPresenterModeToggle && (
+              <li className="video-controls__item">
+                <button
+                  className={classNames('video-controls__button_primary', {active: presenterModeActive})}
+                  onClick={onPresenterModeToggle}
+                  onKeyDown={event =>
+                    handleKeyDown({
+                      event,
+                      callback: onPresenterModeToggle,
+                      keys: [KEY.ENTER, KEY.SPACE],
+                    })
+                  }
+                  type="button"
+                  data-uie-name="do-toggle-presenter-mode"
+                  role="switch"
+                  aria-checked={presenterModeActive}
+                  title={presenterModeActive ? 'Exit presenter view' : 'Presenter view'}
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <rect x="0" y="1" width="9" height="14" rx="2" />
+                    <rect x="11" y="1" width="5" height="6" rx="1" />
+                    <rect x="11" y="9" width="5" height="6" rx="1" />
+                  </svg>
                 </button>
               </li>
             )}

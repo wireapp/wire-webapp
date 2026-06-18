@@ -108,11 +108,15 @@ function useGridParticipants(call: Call): GridParticipant[] {
 
 interface WireFluidVideoGridProps {
   call: Call;
+  presenterMode?: boolean;
+  onPresenterModeRequested?: () => void;
   onViewAllParticipantsSelected?: () => void;
 }
 
 export function WireFluidVideoGrid({
   call,
+  presenterMode,
+  onPresenterModeRequested,
   onViewAllParticipantsSelected,
 }: WireFluidVideoGridProps) {
   const gridParticipants = useGridParticipants(call);
@@ -120,6 +124,8 @@ export function WireFluidVideoGrid({
     <FluidVideoGrid
       participants={gridParticipants}
       config={GRID_CONFIG}
+      presenterMode={presenterMode}
+      onPresenterModeRequested={onPresenterModeRequested}
       onViewAllParticipantsSelected={onViewAllParticipantsSelected}
     />
   );

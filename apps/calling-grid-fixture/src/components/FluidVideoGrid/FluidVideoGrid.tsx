@@ -5,11 +5,14 @@ import { GridConfig, GridParticipant, TileDescriptor } from './FluidVideoGrid.ty
 import { createGridReducer, createInitialState } from './gridReducer';
 import { FractionalTile } from './FractionalTile';
 import { GridTile } from './GridTile';
+import { OverflowTile } from './OverflowTile';
 
 export interface FluidVideoGridProps {
   participants: GridParticipant[];
   config: GridConfig;
   onViewAllParticipantsSelected?: () => void;
+  presenterMode?: boolean;
+  onPresenterModeRequested?: () => void;
 }
 
 const TILE_MOTION = {
@@ -20,8 +23,9 @@ const TILE_MOTION = {
   transition: { duration: 0.25, ease: 'easeOut' },
 } as const;
 
-export function FluidVideoGrid({ participants, config, onViewAllParticipantsSelected }: FluidVideoGridProps) {
+export function FluidVideoGrid({ participants, config, onViewAllParticipantsSelected, presenterMode, onPresenterModeRequested }: FluidVideoGridProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const prevHadScreenShare = useRef(false);
 
   const reducer = useMemo(() => createGridReducer(config), [config]);
   const [state, dispatch] = useReducer(reducer, createInitialState({ width: 0, height: 0 }));
@@ -56,9 +60,85 @@ export function FluidVideoGrid({ participants, config, onViewAllParticipantsSele
     }
   }, [participants]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { layout } = state;
+  // Auto-activate presenter mode when screen sharing first appears
+  useEffect(() => {
+    const hasScreenShare = state.participants.some(p => p.tier === 'screen-sharing');
+    if (hasScreenShare && !prevHadScreenShare.current) {
+      onPresenterModeRequested?.();
+    }
+    prevHadScreenShare.current = hasScreenShare;
+  }, [state.participants, onPresenterModeRequested]);
+
+  const { layout, slotMap, containerSize } = state;
   const { rows, tileWidth, tileHeight } = layout;
   const gap = config.tileGap;
+
+  // Presenter mode: spotlight + narrow strip
+  if (presenterMode) {
+    const sorted = [...state.participants].sort((a, b) => (slotMap[a.id] ?? 999) - (slotMap[b.id] ?? 999));
+    const spotlight = sorted.find(p => p.tier !== 'you');
+
+    if (spotlight) {
+      const narrowInnerWidth = Math.ceil(config.minTileHeight * config.minAspectRatio);
+      const gridParticipants = sorted.filter(p => p !== spotlight);
+      const availH = containerSize.height - 2 * gap;
+      const maxTiles = Math.max(1, Math.floor((availH + gap) / (config.minTileHeight + gap)));
+      const hasOverflow = gridParticipants.length > maxTiles;
+      const nVisible = hasOverflow ? maxTiles : gridParticipants.length;
+      const stripTileHeight = nVisible > 0
+        ? Math.min(config.maxTileHeight, (availH - gap * (nVisible - 1)) / nVisible)
+        : config.minTileHeight;
+      const visibleStripParticipants = gridParticipants.slice(0, hasOverflow ? maxTiles - 1 : nVisible);
+      const overflowCount = hasOverflow ? gridParticipants.length - (maxTiles - 1) : 0;
+      const overflowAvatars = hasOverflow ? gridParticipants.slice(maxTiles - 1) : [];
+
+      return (
+        <div
+          ref={containerRef}
+          style={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            background: '#111',
+            display: 'flex',
+            flexDirection: 'row',
+            gap,
+            padding: gap,
+            boxSizing: 'border-box',
+          }}
+        >
+          {/* Spotlight tile — grows to fill all available width */}
+          <div style={{flex: '1 1 0%', minWidth: 0, overflow: 'hidden'}}>
+            <GridTile
+              participant={spotlight}
+              isActiveSpeaker={spotlight.tier === 'active-camera' || spotlight.tier === 'active-no-camera'}
+            />
+          </div>
+
+          {/* Narrow strip — fixed single-column sidebar */}
+          <div style={{width: narrowInnerWidth, flexShrink: 0, display: 'flex', flexDirection: 'column', gap}}>
+            {visibleStripParticipants.map(p => (
+              <div key={p.id} style={{height: stripTileHeight, flexShrink: 0, overflow: 'hidden'}}>
+                <GridTile
+                  participant={p}
+                  isActiveSpeaker={p.tier === 'active-camera' || p.tier === 'active-no-camera'}
+                />
+              </div>
+            ))}
+            {overflowCount > 0 && (
+              <div style={{height: stripTileHeight, flexShrink: 0}}>
+                <OverflowTile
+                  count={overflowCount}
+                  avatars={overflowAvatars}
+                  onViewAll={onViewAllParticipantsSelected}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+  }
 
   const renderTile = (tile: TileDescriptor, key: string) => {
     if (tile.type === 'full') {
