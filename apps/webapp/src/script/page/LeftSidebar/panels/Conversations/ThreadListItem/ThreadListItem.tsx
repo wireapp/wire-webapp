@@ -18,6 +18,7 @@
  */
 
 import {CONVERSATION_ACCESS} from '@wireapp/api-client/lib/conversation';
+import cx from 'classnames';
 
 import {Avatar, AVATAR_SIZE, ChannelAvatar, GroupAvatar} from 'Components/Avatar';
 import type {ThreadIndexEntry, ThreadRowViewModel} from 'Components/MessagesList/threading/threadIndexStore';
@@ -25,18 +26,13 @@ import {ThreadsIcon} from 'Components/ThreadIcons';
 import type {Conversation} from 'Repositories/entity/Conversation';
 
 import {
-  content,
   contextIconPlaceholder,
   contextIconWrapper,
   conversationName,
-  listItem,
-  openButton,
-  primaryText,
   replyCount,
   secondaryRow,
   threadIcon,
   threadIconWrapper,
-  unreadBadge,
 } from './ThreadListItem.styles';
 
 export type ThreadListItemProps = {
@@ -91,38 +87,61 @@ export const ThreadListItem = ({thread, conversation, isActive = false, onClick}
   const replyCountLabel = getReplyCountLabel(thread.thread.replyCount);
 
   return (
-    <li css={listItem(isActive)} data-uie-name="threads-list-item" data-uie-status={isActive ? 'active' : undefined}>
-      {isUnread && (
-        <span css={unreadBadge(isActive)} data-uie-name="threads-list-item-unread-badge">
-          {unreadCount}
-        </span>
-      )}
-      <button
-        css={openButton}
-        type="button"
+    <li
+      className={cx('conversation-list-cell', {'conversation-list-cell--active': isActive})}
+      data-uie-name="threads-list-item"
+      data-uie-status={isActive ? 'active' : undefined}
+    >
+      <div
+        role="button"
+        className="conversation-list-cell-main-button"
         data-uie-name="threads-list-open-button"
         aria-current={isActive ? 'true' : undefined}
         aria-label={`${thread.title}, ${thread.conversationLabel}, ${replyCountLabel}${isUnread ? `, ${unreadCount} unread` : ''}`}
         onClick={() => onClick?.(thread.thread)}
       >
-        <span css={threadIconWrapper(isActive)} data-uie-name="threads-list-item-thread-icon" aria-hidden="true">
-          <ThreadsIcon css={threadIcon} />
-        </span>
-        <span css={content}>
-          <span css={primaryText(isUnread, isActive)} data-uie-name="threads-list-item-title">
+        <div className="conversation-list-cell-left">
+          <span css={threadIconWrapper(isActive)} data-uie-name="threads-list-item-thread-icon" aria-hidden="true">
+            <ThreadsIcon css={threadIcon} />
+          </span>
+        </div>
+
+        <div className="conversation-list-cell-center">
+          <span
+            className={cx('conversation-list-cell-name', {'conversation-list-cell-name--active': isActive})}
+            data-uie-name="threads-list-item-title"
+          >
             {thread.title}
           </span>
-          <span css={secondaryRow(isActive)} data-uie-name="threads-list-item-meta">
+
+          <span
+            css={secondaryRow}
+            className={cx('conversation-list-cell-description', {
+              'conversation-list-cell-description--active': isActive,
+            })}
+            data-uie-name="threads-list-item-meta"
+          >
             <ThreadContextIcon conversation={conversation} />
-            <span css={conversationName(isActive)} data-uie-name="threads-list-item-conversation-label">
+            <span css={conversationName} data-uie-name="threads-list-item-conversation-label">
               {thread.conversationLabel}
             </span>
-            <span css={replyCount(isActive)} data-uie-name="threads-list-item-replies">
+            <span css={replyCount} data-uie-name="threads-list-item-replies">
               {replyCountLabel}
             </span>
           </span>
-        </span>
-      </button>
+        </div>
+      </div>
+
+      <div className="conversation-list-cell-right">
+        {isUnread && (
+          <span
+            className="conversation-list-cell-badge cell-badge-dark"
+            data-uie-name="threads-list-item-unread-badge"
+          >
+            {unreadCount}
+          </span>
+        )}
+      </div>
     </li>
   );
 };

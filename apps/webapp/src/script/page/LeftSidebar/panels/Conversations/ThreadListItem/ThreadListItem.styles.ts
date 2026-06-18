@@ -21,40 +21,8 @@ import {CSSObject} from '@emotion/react';
 
 import {DIAMETER, AVATAR_SIZE} from 'Components/Avatar';
 
-const THREAD_ICON_SIZE = 40;
+const THREAD_ICON_SIZE = DIAMETER[AVATAR_SIZE.SMALL];
 const CONTEXT_ICON_SIZE = DIAMETER[AVATAR_SIZE.XX_SMALL];
-
-export const listItem = (isActive: boolean): CSSObject => ({
-  position: 'relative',
-  listStyle: 'none',
-  backgroundColor: isActive ? 'var(--list-item-selected-bg)' : 'var(--app-bg)',
-
-  ':not(:last-child)': {
-    borderBottom: '1px solid var(--border-color)',
-  },
-
-  ':hover': {
-    backgroundColor: isActive ? 'var(--list-item-selected-bg)' : 'var(--background-fade-8)',
-  },
-});
-
-export const openButton: CSSObject = {
-  display: 'flex',
-  width: '100%',
-  alignItems: 'flex-start',
-  gap: '12px',
-  padding: '12px 16px',
-  border: 'none',
-  background: 'transparent',
-  color: 'inherit',
-  cursor: 'pointer',
-  textAlign: 'left',
-
-  ':focus-visible': {
-    outline: '2px solid var(--accent-color)',
-    outlineOffset: '-2px',
-  },
-};
 
 export const threadIconWrapper = (isActive: boolean): CSSObject => ({
   display: 'flex',
@@ -63,7 +31,7 @@ export const threadIconWrapper = (isActive: boolean): CSSObject => ({
   justifyContent: 'center',
   width: `${THREAD_ICON_SIZE}px`,
   height: `${THREAD_ICON_SIZE}px`,
-  borderRadius: '8px',
+  borderRadius: '6px',
   backgroundColor: isActive ? 'rgba(255, 255, 255, 0.18)' : '#e7f0fa',
   color: isActive ? 'var(--app-bg-secondary)' : '#0667c8',
 
@@ -74,38 +42,16 @@ export const threadIconWrapper = (isActive: boolean): CSSObject => ({
 });
 
 export const threadIcon: CSSObject = {
-  width: '18px',
-  height: '18px',
+  width: '14px',
+  height: '14px',
 };
 
-export const content: CSSObject = {
-  display: 'flex',
-  minWidth: 0,
-  flex: '1 1 auto',
-  flexDirection: 'column',
-  gap: '4px',
-  paddingRight: '28px',
-};
-
-export const primaryText = (isUnread: boolean, isActive: boolean): CSSObject => ({
-  overflow: 'hidden',
-  color: isActive ? 'var(--app-bg-secondary)' : 'var(--foreground)',
-  fontSize: 'var(--font-size-medium)',
-  fontWeight: isUnread ? 'var(--font-weight-bold)' : 'var(--font-weight-semibold)',
-  lineHeight: 'var(--line-height-md)',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-});
-
-export const secondaryRow = (isActive: boolean): CSSObject => ({
+export const secondaryRow: CSSObject = {
   display: 'flex',
   minWidth: 0,
   alignItems: 'center',
   gap: '6px',
-  fontSize: 'var(--font-size-xsmall)',
-  lineHeight: 'var(--line-height-xs)',
-  color: isActive ? 'var(--app-bg-secondary)' : undefined,
-});
+};
 
 export const contextIconWrapper: CSSObject = {
   display: 'flex',
@@ -124,35 +70,14 @@ export const contextIconPlaceholder: CSSObject = {
   backgroundColor: 'var(--background-fade-16)',
 };
 
-export const conversationName = (isActive: boolean): CSSObject => ({
+export const conversationName: CSSObject = {
   overflow: 'hidden',
-  color: isActive ? 'var(--app-bg-secondary)' : 'var(--main-color)',
-  fontWeight: 'var(--font-weight-regular)',
+  minWidth: 0,
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  minWidth: 0,
-});
+};
 
-export const replyCount = (isActive: boolean): CSSObject => ({
+export const replyCount: CSSObject = {
   flexShrink: 0,
-  color: isActive ? 'rgba(255, 255, 255, 0.75)' : 'var(--text-input-placeholder)',
-  fontWeight: 'var(--font-weight-regular)',
   whiteSpace: 'nowrap',
-});
-
-export const unreadBadge = (isActive: boolean): CSSObject => ({
-  position: 'absolute',
-  top: '12px',
-  right: '16px',
-  minWidth: '18px',
-  height: '18px',
-  padding: '0 4px',
-  borderRadius: '4px',
-  backgroundColor: isActive ? 'var(--app-bg-secondary)' : 'var(--foreground)',
-  color: isActive ? 'var(--list-item-selected-bg)' : 'var(--app-bg-secondary)',
-  fontSize: 'var(--font-size-xsmall)',
-  fontWeight: 'var(--font-weight-semibold)',
-  lineHeight: '18px',
-  textAlign: 'center',
-  pointerEvents: 'none',
-});
+};
