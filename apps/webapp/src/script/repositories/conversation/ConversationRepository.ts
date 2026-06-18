@@ -2979,6 +2979,40 @@ export class ConversationRepository {
     );
   }
 
+  private async onDescriptionUpdate(conversationEntity: Conversation, eventJson: IncomingEvent) {
+    const eventData = eventJson.data as {ciphertext?: string; description?: string; version?: number};
+
+    if (eventData.description !== undefined) {
+      return this.addEventToConversation(conversationEntity, eventJson);
+    }
+
+    if (!conversationEntity.groupId || !eventData.ciphertext) {
+      this.logger.warn('Cannot decrypt conversation description update event', {
+        conversationId: conversationEntity.id,
+        hasCiphertext: Boolean(eventData.ciphertext),
+        hasGroupId: Boolean(conversationEntity.groupId),
+      });
+      return {conversationEntity};
+    }
+
+    const previousDescription = conversationEntity.description();
+    const action = previousDescription.length > 0 ? 'edit' : 'add';
+    const description = await this.conversationService.decryptConversationDescriptionCiphertext(
+      eventData.ciphertext,
+      conversationEntity.groupId,
+    );
+
+    if (eventData.version !== undefined) {
+      this.descriptionVersions.set(conversationEntity.id, eventData.version);
+    }
+    conversationEntity.description(description);
+
+    return this.addEventToConversation(conversationEntity, {
+      ...eventJson,
+      data: {action, description},
+    });
+  }
+
   private readonly inject1to1MigratedToMLS = async (conversation: Conversation) => {
     const currentTimestamp = this.serverTimeHandler.toServerTimestamp();
     const protocolUpdateEvent = EventBuilder.build1to1MigratedToMLS(conversation, currentTimestamp);
@@ -3774,6 +3808,8 @@ export class ConversationRepository {
       case CONVERSATION_EVENT.MESSAGE_TIMER_UPDATE:
       case ClientEvent.CONVERSATION.DELETE_EVERYWHERE:
       case ClientEvent.CONVERSATION.DESCRIPTION_UPDATE:
+        return this.onDescriptionUpdate(conversationEntity, eventJson);
+
       case ClientEvent.CONVERSATION.FILE_TYPE_RESTRICTED:
       case ClientEvent.CONVERSATION.INCOMING_MESSAGE_TOO_BIG:
       case ClientEvent.CONVERSATION.KNOCK:

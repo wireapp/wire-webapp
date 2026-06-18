@@ -227,6 +227,11 @@ export class ConversationService {
     return {version, description};
   }
 
+  async decryptConversationDescriptionCiphertext(ciphertext: string, groupId: string): Promise<string> {
+    const secret = await this.getDescriptionSecret(groupId);
+    return decryptDescription(ciphertext, secret);
+  }
+
   /**
    * Encrypt and update the conversation description.
    *
