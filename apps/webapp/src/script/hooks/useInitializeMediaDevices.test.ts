@@ -35,10 +35,6 @@ const createStreamHandler = (requestMediaStreamAccess = jest.fn().mockResolvedVa
   }) as unknown as MediaStreamHandler;
 
 describe('useInitializeMediaDevices', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
   it('requests media access, stops received tracks and initializes media devices', async () => {
     const stop = jest.fn();
     const stream = {
