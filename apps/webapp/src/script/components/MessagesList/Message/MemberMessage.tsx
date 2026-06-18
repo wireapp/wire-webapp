@@ -32,6 +32,12 @@ import {ConnectedMessage} from './MemberMessage/ConnectedMessage';
 import {MessageContent} from './MemberMessage/MessageContent';
 import {MessageTime} from './MessageTime';
 
+const PinIcon = () => (
+  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16">
+    <path d="M10.7 1.3 14.7 5.3 13.3 6.7 12.6 6 9.5 9.1 9.8 12.2 8.4 13.6 5.8 11 2.1 14.7 1.3 13.9 5 10.2 2.4 7.6 3.8 6.2 6.9 6.5 10 3.4 9.3 2.7 10.7 1.3Z" />
+  </svg>
+);
+
 interface MemberMessageProps {
   classifiedDomains?: string[];
   hasReadReceiptsTurnedOn: boolean;
@@ -115,8 +121,11 @@ export const MemberMessage = ({
           role="status"
           aria-live="polite"
         >
-          <div className="message-header-icon message-header-icon--svg text-foreground" aria-hidden="true">
-            <Icon.MessageIcon />
+          <div
+            className="message-header-icon message-header-icon--svg message-header-icon--top text-foreground"
+            aria-hidden="true"
+          >
+            <PinIcon />
           </div>
           <div className="message-header-label message-header-label--description">
             <strong data-uie-name="group-creation-description-label">{t('conversationDescriptionLabel')}</strong>
