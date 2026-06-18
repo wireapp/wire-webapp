@@ -1067,8 +1067,13 @@ export class UserRepository extends TypedEventEmitter<Events> {
     self.links = links;
   }
 
-  async getUserLinks(handle: string): Promise<AccountLink[]> {
+  async getUserPublicData(handle: string): Promise<{bio?: string; links: AccountLink[]}> {
     const profile = await this.userService.getUserPublicProfile(handle.replace(/^@/, ''));
-    return profile.links ?? [];
+    return {bio: profile.bio, links: profile.links ?? []};
+  }
+
+  async getUserLinks(handle: string): Promise<AccountLink[]> {
+    const {links} = await this.getUserPublicData(handle);
+    return links;
   }
 }

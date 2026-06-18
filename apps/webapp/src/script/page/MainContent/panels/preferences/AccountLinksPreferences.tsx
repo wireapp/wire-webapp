@@ -21,7 +21,7 @@ import {useEffect, useState} from 'react';
 
 import {type AccountLink} from '@wireapp/api-client/lib/user';
 
-import {Button, ButtonVariant} from '@wireapp/react-ui-kit';
+import {Button, ButtonVariant, Loading} from '@wireapp/react-ui-kit';
 
 import {Avatar, AVATAR_SIZE} from 'Components/Avatar';
 import * as Icon from 'Components/icon';
@@ -43,12 +43,18 @@ const AccountLinksPreferences = ({selfUser, userRepository}: AccountLinksPrefere
   const {username} = useKoSubscribableChildren(selfUser, ['username']);
   const [links, setLinks] = useState<AccountLink[]>([]);
   const [bio, setBio] = useState<string>(selfUser.bio ?? '');
+  const [isLoading, setIsLoading] = useState(true);
   const [newName, setNewName] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const handle = selfUser.isFederated ? `@${username}@${selfUser.domain}` : `@${username}`;
 
   useEffect(() => {
-    void userRepository.getUserLinks(username).then(setLinks);
+    void userRepository.getUserPublicData(username).then(({bio: fetchedBio, links: fetchedLinks}) => {
+      setLinks(fetchedLinks);
+      if (fetchedBio !== undefined) {
+        setBio(fetchedBio);
+      }
+    });
   }, [username, userRepository]);
 
   const saveLinks = async (updatedLinks: AccountLink[]) => {
