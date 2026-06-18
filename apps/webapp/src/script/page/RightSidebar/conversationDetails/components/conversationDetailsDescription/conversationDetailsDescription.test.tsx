@@ -58,7 +58,7 @@ describe('ConversationDetailsDescription', () => {
   });
 
   describe('hover state', () => {
-    it('shows the edit icon on hover when description exists', async () => {
+    it('shows the edit icon on hover when description exists and editing is allowed', async () => {
       const description = 'Some description';
       render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
 
@@ -71,6 +71,21 @@ describe('ConversationDetailsDescription', () => {
       expect(screen.getByTestId('description-edit-icon')).not.toBeNull();
 
       fireEvent.mouseLeave(section);
+
+      expect(screen.queryByTestId('description-edit-icon')).toBeNull();
+    });
+
+    it('does not show the edit icon when editing is not allowed', () => {
+      const description = 'Some description';
+      render(
+        <ConversationDetailsDescription
+          canEdit={false}
+          description={description}
+          onDescriptionChange={onDescriptionChange}
+        />,
+      );
+
+      fireEvent.mouseEnter(screen.getByTestId('conversation-details-description'));
 
       expect(screen.queryByTestId('description-edit-icon')).toBeNull();
     });
@@ -90,7 +105,7 @@ describe('ConversationDetailsDescription', () => {
   });
 
   describe('editing state', () => {
-    it('enters edit mode when clicking the description text', async () => {
+    it('enters edit mode when clicking the description text and editing is allowed', async () => {
       const description = 'Existing description';
       render(<ConversationDetailsDescription description={description} onDescriptionChange={onDescriptionChange} />);
 
@@ -100,6 +115,21 @@ describe('ConversationDetailsDescription', () => {
       const textarea = screen.getByTestId('description-textarea');
       expect(textarea).not.toBeNull();
       expect(textarea).toHaveValue(description);
+    });
+
+    it('does not enter edit mode when clicking description text and editing is not allowed', async () => {
+      const description = 'Existing description';
+      render(
+        <ConversationDetailsDescription
+          canEdit={false}
+          description={description}
+          onDescriptionChange={onDescriptionChange}
+        />,
+      );
+
+      await userEvent.click(screen.getByText(description));
+
+      expect(screen.queryByTestId('description-textarea')).toBeNull();
     });
 
     it('enters edit mode when clicking the placeholder', async () => {

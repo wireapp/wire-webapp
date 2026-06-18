@@ -26,11 +26,13 @@ import {t} from 'Util/localizerUtil';
 const MAX_DESCRIPTION_LENGTH = 200;
 
 interface ConversationDetailsDescriptionProps {
+  canEdit?: boolean;
   description?: string;
   onDescriptionChange: (description: string) => void;
 }
 
 const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = ({
+  canEdit = true,
   description = '',
   onDescriptionChange,
 }) => {
@@ -50,6 +52,10 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
   }, [isEditing]);
 
   const startEditing = () => {
+    if (!canEdit) {
+      return;
+    }
+
     setDraftValue(description);
     setIsEditing(true);
   };
@@ -91,7 +97,7 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
     >
       <div className="conversation-details__description-label">
         <h3 className="conversation-details__description-heading">{t('conversationDetailsDescription')}</h3>
-        {isHovered && !isEditing && hasDescription && (
+        {canEdit && isHovered && !isEditing && hasDescription && (
           <button
             type="button"
             className="conversation-details__description-edit-button"
@@ -120,6 +126,7 @@ const ConversationDetailsDescription: FC<ConversationDetailsDescriptionProps> = 
           className="conversation-details__description-content"
           onClick={startEditing}
           data-uie-name="description-content"
+          disabled={!canEdit}
         >
           {hasDescription ? (
             <p className="conversation-details__description-text">{description}</p>

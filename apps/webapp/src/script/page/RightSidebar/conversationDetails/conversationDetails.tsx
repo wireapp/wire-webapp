@@ -136,6 +136,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
     ]);
 
     const {isTemporaryGuest} = useKoSubscribableChildren(firstParticipant!, ['isTemporaryGuest']);
+    const canEditDescription = roleRepository.isUserGroupAdmin(activeConversation, selfUser);
 
     const {isTeam, classifiedDomains, team, isSelfDeletingMessagesEnforced, getEnforcedSelfDeletingMessagesTimeout} =
       useKoSubscribableChildren(teamState, [
@@ -331,6 +332,7 @@ const ConversationDetails = forwardRef<HTMLDivElement, ConversationDetailsProps>
               />
 
               <ConversationDetailsDescription
+                canEdit={canEditDescription}
                 description={description}
                 onDescriptionChange={updateConversationDescription}
               />
