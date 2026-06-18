@@ -33,7 +33,7 @@ type JoinRedirectQuery = {
   readonly code?: unknown;
 };
 
-export function createJoinRedirectLocation(query: JoinRedirectQuery): Maybe<string> {
+export function createJoinConversationRedirectUrl(query: JoinRedirectQuery): Maybe<string> {
   const {key, code} = query;
 
   if (!is.nonEmptyString(key) || !is.nonEmptyString(code)) {
@@ -49,18 +49,18 @@ export function createJoinRedirectLocation(query: JoinRedirectQuery): Maybe<stri
 }
 
 export function redirectToJoinConversation(request: Request, response: Response): void {
-  const redirectLocation = createJoinRedirectLocation(request.query);
+  const redirectUrl = createJoinConversationRedirectUrl(request.query);
 
   maybe.match(
     {
-      Just: location => {
-        response.redirect(HTTP_STATUS.MOVED_TEMPORARILY, location);
+      Just: url => {
+        response.redirect(HTTP_STATUS.MOVED_TEMPORARILY, url);
       },
       Nothing: () => {
         response.sendStatus(HTTP_STATUS.BAD_REQUEST);
       },
     },
-    redirectLocation,
+    redirectUrl,
   );
 }
 

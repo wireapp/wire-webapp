@@ -2,7 +2,7 @@ import {type Request, type Response} from 'express';
 import {StatusCodes as HTTP_STATUS} from 'http-status-codes';
 import {Maybe} from 'true-myth';
 
-import {createJoinRedirectLocation, redirectToJoinConversation, setNonCacheHeaders} from './redirectRoutes';
+import {createJoinConversationRedirectUrl, redirectToJoinConversation, setNonCacheHeaders} from './redirectRoutes';
 
 type HeaderValueMap = Record<string, string>;
 
@@ -56,42 +56,42 @@ function createJoinRedirectRequest(query: Request['query']): Request {
 
 describe('RedirectRoutes join redirect', () => {
   it('creates a redirect URL with join key, join code and join conversation hash', () => {
-    const redirectLocation = createJoinRedirectLocation({
+    const redirectUrl = createJoinConversationRedirectUrl({
       key: 'conversation-key',
       code: 'conversation-code',
     });
 
-    expect(redirectLocation).toStrictEqual(
+    expect(redirectUrl).toStrictEqual(
       Maybe.just('/auth/?join_key=conversation-key&join_code=conversation-code#/join-conversation'),
     );
   });
 
   it('keeps an encoded ampersand inside the join key value', () => {
     const originalJoinKey = 'safe&destination_url=https://example.invalid#/custom-env-redirect';
-    const redirectLocation = createJoinRedirectLocation({
+    const redirectUrl = createJoinConversationRedirectUrl({
       key: originalJoinKey,
       code: 'code',
     });
 
-    const redirectUrl = new URL(redirectLocation.unwrapOr(''), 'https://app.wire.com');
+    const parsedRedirectUrl = new URL(redirectUrl.unwrapOr(''), 'https://app.wire.com');
 
-    expect(redirectUrl.searchParams.get('destination_url')).toBeNull();
-    expect(redirectUrl.searchParams.get('join_key')).toBe(originalJoinKey);
-    expect(redirectUrl.searchParams.get('join_code')).toBe('code');
-    expect(redirectUrl.hash).toBe('#/join-conversation');
+    expect(parsedRedirectUrl.searchParams.get('destination_url')).toBeNull();
+    expect(parsedRedirectUrl.searchParams.get('join_key')).toBe(originalJoinKey);
+    expect(parsedRedirectUrl.searchParams.get('join_code')).toBe('code');
+    expect(parsedRedirectUrl.hash).toBe('#/join-conversation');
   });
 
   it.each([
     {key: 'safe#/custom-env-redirect', code: 'code'},
     {key: 'key', code: 'safe#/custom-env-redirect'},
   ])('keeps an encoded hash inside the join query value', query => {
-    const redirectLocation = createJoinRedirectLocation(query);
+    const redirectUrl = createJoinConversationRedirectUrl(query);
 
-    const redirectUrl = new URL(redirectLocation.unwrapOr(''), 'https://app.wire.com');
+    const parsedRedirectUrl = new URL(redirectUrl.unwrapOr(''), 'https://app.wire.com');
 
-    expect(redirectUrl.searchParams.get('join_key')).toBe(query.key);
-    expect(redirectUrl.searchParams.get('join_code')).toBe(query.code);
-    expect(redirectUrl.hash).toBe('#/join-conversation');
+    expect(parsedRedirectUrl.searchParams.get('join_key')).toBe(query.key);
+    expect(parsedRedirectUrl.searchParams.get('join_code')).toBe(query.code);
+    expect(parsedRedirectUrl.hash).toBe('#/join-conversation');
   });
 
   it.each([
