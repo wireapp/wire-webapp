@@ -103,6 +103,7 @@ export function FluidVideoGrid({participants, config, onViewAllParticipantsSelec
     <div
       ref={containerRef}
       style={{
+        position: 'relative',
         width: '100%',
         height: '100%',
         background: '#111',
@@ -115,10 +116,11 @@ export function FluidVideoGrid({participants, config, onViewAllParticipantsSelec
         justifyContent: 'center',
       }}
     >
-      <AnimatePresence>
+      <AnimatePresence mode="popLayout">
         {rows.map((row, rowIdx) => (
-          <div
+          <motion.div
             key={rowIdx}
+            layout
             style={{display: 'flex', flexDirection: 'row', gap, flexShrink: 0}}
           >
             {row.tiles.map((tile, tileIdx) => {
@@ -128,7 +130,7 @@ export function FluidVideoGrid({participants, config, onViewAllParticipantsSelec
                   : `fractional-${rowIdx}-${tileIdx}`;
               return renderTile(tile, key);
             })}
-          </div>
+          </motion.div>
         ))}
       </AnimatePresence>
     </div>

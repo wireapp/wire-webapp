@@ -41,7 +41,7 @@ export function OverflowTile({count, avatars, onViewAll}: OverflowTileProps) {
       }}
     >
       {/* Stacked overlapping avatars */}
-      <div style={{display: 'flex', position: 'relative', height: 30}}>
+      <div style={{position: 'relative', height: 30, width: (shown.length - 1) * 18 + 30}}>
         {shown.map((p, i) => (
           <div
             key={p.id}
